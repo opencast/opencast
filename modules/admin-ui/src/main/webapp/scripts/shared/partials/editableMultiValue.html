@@ -14,7 +14,8 @@
                        name="{{ params.name }}"
                        tabindex="{{ params.tabindex }}"
                        ng-blur="onBlur()"
-                       ng-keyup="keyUp($event)">
+                       ng-keyup="keyUp($event)"
+                       placeholder="{{ 'EDITABLE.MULTI.PLACEHOLDER' | translate}}">
   </div>
   <span ng-show="editMode" class="ng-multi-value"
                            ng-repeat="value in params.value">

@@ -10,7 +10,8 @@
    "SAVE": "Speichern",
    "LOGOUT": "Ausloggen",
    "RESET": "Zurücksetzen",
-   "SELECT_NO_OPTIONS": "Bitte auswählen…",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabisch",
@@ -545,7 +546,8 @@
                "EDITOR": "Video Editor öffnen",
                "EDITOR_NEEDS_CUTTING": "Video Editor öffnen (ein Kommentar zeigt, dass ein Videoschnitt angefordert wurde)",
                "COMMENTS": "Kommentare ansehen",
-               "PAUSED_WORKFLOW": "Angehaltenen Workflow anzeigen"
+               "PAUSED_WORKFLOW": "Angehaltenen Workflow anzeigen",
+               "PRESENTER": "Nach diesem Vortragenden filtern"
             }
          },
          "SCHEDULING_STATUS": {
@@ -875,25 +877,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Aktionen",
                "DETAILS": "Details",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Mehr Information",
+               "DESCRIPTION": "Beschreibung",
+               "MORE_INFO": "Mehr Informationen",
                "ID": "ID",
                "TYPE": "Typ",
                "TITLE": "Titel",
-               "STATE": "Status",
+               "STATUS": "Status",
                "STARTED": "Gestartet",
                "SERIES": "Serie",
                "SUBMITTED": "Übermittelt",
+               "SUBMITTER": "Absender",
+               "EXECUTION_TIME": "Ausführungszeit",
+               "WDID": "Workflow-Definition",
                "MIMETYPE": "MIME-Type",
                "URL": "URL",
                "CONFIGURATION": "Konfiguration",
                "NO_CONFIGURATION": "Keine Konfigurationsparameter für die ausgewählten Workflow-Definition.",
                "WORKFLOW": "Workflow",
                "TOOLTIP": {
-                  "STOP": "Workflowinstanz stoppen",
+                  "STOP": "Workflow stoppen",
                   "ABORT": "Ausführung der Workflowinstanz unterbrechen (fehlgeschlagene Operationen nicht wiederholen)",
-                  "RETRY": "Ausführung der Workflowinstanz wieder aufnehmen",
-                  "DELETE": "Workflowinstanz löschen"
+                  "RETRY": "Ausführung der Workflowinstanz erneut versuchen",
+                  "DELETE": "Workflow löschen",
+                  "DETAILS": "Workflow-Details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instanziiert",
@@ -901,7 +907,9 @@
                   "PAUSED": "Pausiert",
                   "SUCCEEDED": "Verarbeitet",
                   "FAILED": "Fehlgeschlagen",
+                  "FAILING": "Schlägt fehl",
                   "SKIPPED": "Übersprungen",
+                  "STOPPED": "Angehalten",
                   "RETRY": "Wiederholt"
                }
             },
@@ -2183,6 +2191,11 @@
          "SHUTTING_DOWN": "Fährt herunter",
          "UNKNOWN": "Unbekannt",
          "UPLOADING": "Lädt hoch"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "Einen Wert mit Enter bestätigen um weitere Werte einzufügen"
       }
    }
 }

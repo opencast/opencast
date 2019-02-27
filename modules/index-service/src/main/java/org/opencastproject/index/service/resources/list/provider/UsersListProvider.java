@@ -23,7 +23,6 @@ package org.opencastproject.index.service.resources.list.provider;
 
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -75,7 +74,7 @@ public class UsersListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+  public Map<String, String> getList(String listName, ResourceListQuery query) {
     Map<String, String> usersList = new HashMap<String, String>();
     int offset = 0;
     int limit = 0;

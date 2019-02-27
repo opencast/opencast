@@ -35,7 +35,7 @@ import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.endpoint.AbstractEventEndpointTest.TestEnv;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
-import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
@@ -100,7 +100,6 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
@@ -449,7 +448,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
     EasyMock.expect(listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQuery.class),
-            EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(licences).anyTimes();
+      EasyMock.anyBoolean())).andReturn(licences).anyTimes();
     EasyMock.replay(listProvidersService);
 
     final IncidentTree r = new IncidentTreeImpl(
@@ -492,8 +491,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
             EasyMock.anyObject(Date.class))).andReturn(events).anyTimes();
     schedulerService.updateEvent(EasyMock.anyString(), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
             EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
-            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
-            EasyMock.anyString());
+            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class));
     EasyMock.expectLastCall().anyTimes();
     EasyMock.expect(schedulerService.getWorkflowConfig("asdasd")).andThrow(new NotFoundException()).anyTimes();
     Map<String, String> workFlowConfig = new HashMap<>();

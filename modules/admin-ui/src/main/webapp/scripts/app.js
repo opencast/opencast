@@ -34,7 +34,6 @@ angular.module('adminNg', [
   'ngResource',
   'ngAnimate',
   'ngMessages',
-  'angular-md5',
   'adminNg.controllers',
   'adminNg.services',
   'adminNg.filters',

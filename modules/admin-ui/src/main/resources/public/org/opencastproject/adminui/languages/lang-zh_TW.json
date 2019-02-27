@@ -10,7 +10,8 @@
    "SAVE": "儲存",
    "LOGOUT": "登出",
    "RESET": "重設",
-   "SELECT_NO_OPTIONS": "沒有選項",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "是",
    "LANGUAGES": {
       "ARABIC": "阿拉伯文",
@@ -545,7 +546,8 @@
                "EDITOR": "打開視頻編輯器",
                "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "檢視註解",
-               "PAUSED_WORKFLOW": "查看暫停的工作流"
+               "PAUSED_WORKFLOW": "查看暫停的工作流",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {
@@ -875,25 +877,29 @@
             "WORKFLOWS": {
                "ACTIONS": "操作",
                "DETAILS": "詳細信息",
-               "DESCRIPTION": "",
-               "MORE_INFO": "More Information & Actions",
+               "DESCRIPTION": "說明",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "類型",
                "TITLE": "標題",
-               "STATE": "狀態",
+               "STATUS": "狀態",
                "STARTED": "已啟動",
                "SERIES": "系列",
                "SUBMITTED": "已提出",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "工作流程定義",
                "MIMETYPE": "Mime 型態",
                "URL": "網址",
                "CONFIGURATION": "配置",
                "NO_CONFIGURATION": "選定的工作流程，不存在設定參數。",
                "WORKFLOW": "工作流程",
                "TOOLTIP": {
-                  "STOP": "停止執行工作流實例",
-                  "ABORT": "中止執行工作流實例 (不再重試失敗的操作)",
-                  "RETRY": "重試工作流實例的執行",
-                  "DELETE": "刪除工作流實例"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instantiated",
@@ -901,12 +907,14 @@
                   "PAUSED": "暫停",
                   "SUCCEEDED": "Succeeded",
                   "FAILED": "失敗",
+                  "FAILING": "Failing",
                   "SKIPPED": "Skipped",
+                  "STOPPED": "Stopped",
                   "RETRY": "Retry"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Workflow instances"
+               "TITLE": "工作流程"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "工作流程細節",
@@ -2183,6 +2191,11 @@
          "SHUTTING_DOWN": "Shutting down",
          "UNKNOWN": "Unknown",
          "UPLOADING": "正在上傳"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

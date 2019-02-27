@@ -36,7 +36,6 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.workspace.api.Workspace;
@@ -94,7 +93,7 @@ public class EventCatalogUIAdapterTest {
     listProvidersService = EasyMock.createMock(ListProvidersService.class);
     EasyMock.expect(
             listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQueryImpl.class),
-                    EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(collection).anyTimes();
+                    EasyMock.anyBoolean())).andReturn(collection).anyTimes();
     EasyMock.expect(
             listProvidersService.isTranslatable(EasyMock.anyString()))
             .andThrow(new ListProviderException("not implemented")).anyTimes();

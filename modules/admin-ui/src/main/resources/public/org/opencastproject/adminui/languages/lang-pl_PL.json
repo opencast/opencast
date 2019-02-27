@@ -10,7 +10,8 @@
    "SAVE": "Zapisz",
    "LOGOUT": "Wyloguj",
    "RESET": "Wyzeruj",
-   "SELECT_NO_OPTIONS": "Brak opcji",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Tak",
    "LANGUAGES": {
       "ARABIC": "Arabski",
@@ -545,7 +546,8 @@
                "EDITOR": "Otwórz Edytor wideo",
                "EDITOR_NEEDS_CUTTING": "Otwórz w Edytorze (komenarz wskazuje, że ktoś domaga się wycięcia fragmentu filmu)",
                "COMMENTS": "Pokaż komentarze",
-               "PAUSED_WORKFLOW": "Zobacz zatrzymane procesy zadań"
+               "PAUSED_WORKFLOW": "Zobacz zatrzymane procesy zadań",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {
@@ -875,25 +877,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Działania",
                "DETAILS": "Szczegóły",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Więcej informacji i Operacje",
+               "DESCRIPTION": "Opis",
+               "MORE_INFO": "More Information",
                "ID": "Identyfikator",
                "TYPE": "Typ",
                "TITLE": "Tytuł",
-               "STATE": "Stan",
+               "STATUS": "Status",
                "STARTED": "Rozpoczęte",
                "SERIES": "Seria",
                "SUBMITTED": "Wysłano",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Definicja przepływu pracy",
                "MIMETYPE": "Właściwość MIMEType",
                "URL": "URL",
                "CONFIGURATION": "Konfiguracja",
                "NO_CONFIGURATION": "Nie ma parametrów dla wybranej definicji przepływu pracy.",
                "WORKFLOW": "Przepływ pracy",
                "TOOLTIP": {
-                  "STOP": "Zatrzymaj wykonywanie instancji ciągu zadaniowego",
-                  "ABORT": "Przewij wykonywanie ciągu zadaniowego (nie ponawiaj nieudanych operacji)",
-                  "RETRY": "Ponów wykonanie intancji ciągu zadaniowego",
-                  "DELETE": "Skasuj instancje ciągu zadaniowego"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Uruchomione",
@@ -901,12 +907,14 @@
                   "PAUSED": "Zatrzymane",
                   "SUCCEEDED": "Udało się",
                   "FAILED": "Zakończone niepowodzeniem",
+                  "FAILING": "Failing",
                   "SKIPPED": "Pominięte",
+                  "STOPPED": "Stopped",
                   "RETRY": "Ponów próbę"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Instancje przepływu zadań"
+               "TITLE": "Przepływy pracy"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Szczegóły przepływu pracy",
@@ -2183,6 +2191,11 @@
          "SHUTTING_DOWN": "Wyłączanie",
          "UNKNOWN": "Nieznany",
          "UPLOADING": "Przesyłanie"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

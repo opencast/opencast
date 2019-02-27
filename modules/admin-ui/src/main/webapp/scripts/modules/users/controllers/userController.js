@@ -124,7 +124,7 @@ angular.module('adminNg.controllers')
       $scope.user.roles = [];
 
       angular.forEach($scope.role.selected, function (value) {
-        $scope.user.roles.push({'id': value.value, 'type': value.type});
+        $scope.user.roles.push({'name': value.value, 'type': value.type});
       });
 
       if ($scope.action === 'edit') {

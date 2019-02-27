@@ -35,10 +35,11 @@ describe('Metadata Step in New Event Wizard', function () {
         expect(NewEventMetadata.metadata['dublincore/episode'].fields.length).toEqual(9);
     });
 
-    setParams = function (ctrl, id, value) {
+    setParams = function (ctrl, id, value, tabindex) {
         $scope.$parent.params = {
             id: id,
-            value: value
+            value: value,
+            tabindex: tabindex
         };
         ctrl.save($scope);
     };
@@ -46,14 +47,14 @@ describe('Metadata Step in New Event Wizard', function () {
     describe('#save', function () {
 
         it('saves new values', function () {
-            setParams(NewEventMetadata, 'testid', 'testvalue');
+            setParams(NewEventMetadata, 'testid', 'testvalue', 1);
             NewEventMetadata.save($scope);
-            expect(NewEventMetadata.ud['dublincore/episode'].fields.testid.value).toEqual('testvalue');
+            expect(NewEventMetadata.ud['dublincore/episode'].fields[0].value).toEqual('testvalue');
         });
 
         describe('with collection', function () {
             beforeEach(function () {
-                $scope.$parent.params = { collection: [], id: 'testid' };
+                $scope.$parent.params = { collection: [], id: 'testid', tabindex: 2 };
             });
 
             describe('with an array of values', function () {
@@ -63,7 +64,7 @@ describe('Metadata Step in New Event Wizard', function () {
 
                 it('assign the entire values array', function () {
                     NewEventMetadata.save($scope);
-                    expect(NewEventMetadata.ud['dublincore/episode'].fields.testid.value).toEqual(['a', 'b']);
+                    expect(NewEventMetadata.ud['dublincore/episode'].fields[1].value).toEqual(['a', 'b']);
                 });
             });
 
@@ -74,7 +75,7 @@ describe('Metadata Step in New Event Wizard', function () {
 
                 it('assign the entire values array', function () {
                     NewEventMetadata.save($scope);
-                    expect(NewEventMetadata.ud['dublincore/episode'].fields.testid.value).toEqual('a');
+                    expect(NewEventMetadata.ud['dublincore/episode'].fields[1].value).toEqual('a');
                 });
             });
         });
@@ -87,18 +88,18 @@ describe('Metadata Step in New Event Wizard', function () {
         });
 
         it('invalidates if a required field is deleted', function () {
-            setParams(NewEventMetadata, 'title', 'testTitle');
-            setParams(NewEventMetadata, 'presenters', '[Mark Twain]');
-            setParams(NewEventMetadata, 'subject', 'test subject');
+            setParams(NewEventMetadata, 'title', 'testTitle', 1);
+            setParams(NewEventMetadata, 'presenters', '[Mark Twain]', 2);
+            setParams(NewEventMetadata, 'subject', 'test subject', 3);
             expect(NewEventMetadata.isValid()).toBeTruthy();
-            setParams(NewEventMetadata, 'title', '');
+            setParams(NewEventMetadata, 'title', '', 1);
             expect(NewEventMetadata.isValid()).toBeFalsy();
         });
 
         it('becomes valid when all required fields are set', function () {
-            setParams(NewEventMetadata, 'title', 'testTitle');
-            setParams(NewEventMetadata, 'presenters', '[Mark Twain]');
-            setParams(NewEventMetadata, 'subject', 'test subject');
+            setParams(NewEventMetadata, 'title', 'testTitle', 1);
+            setParams(NewEventMetadata, 'presenters', '[Mark Twain]', 1);
+            setParams(NewEventMetadata, 'subject', 'test subject', 1);
             expect(NewEventMetadata.isValid()).toBeTruthy();
         });
     });

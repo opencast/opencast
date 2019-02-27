@@ -10,7 +10,8 @@
    "SAVE": "שמור",
    "LOGOUT": "התנתקות",
    "RESET": "איפוס",
-   "SELECT_NO_OPTIONS": "אין אפשרות",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "כן",
    "LANGUAGES": {
       "ARABIC": "ערבית",
@@ -545,7 +546,8 @@
                "EDITOR": "פתח עורך וידאו",
                "EDITOR_NEEDS_CUTTING": "פתח עורך וידאו (הערה מציינת כי חיתוך הווידאו התבקש)",
                "COMMENTS": "הצגת הערות",
-               "PAUSED_WORKFLOW": "הצגת תהליכי עבודה מושהים"
+               "PAUSED_WORKFLOW": "הצגת תהליכי עבודה מושהים",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {
@@ -875,25 +877,29 @@
             "WORKFLOWS": {
                "ACTIONS": "פעולות",
                "DETAILS": "פרטים",
-               "DESCRIPTION": "",
-               "MORE_INFO": "מידע נוסף ופעולות",
+               "DESCRIPTION": "תאור",
+               "MORE_INFO": "More Information",
                "ID": "מזהה",
                "TYPE": "סוג",
                "TITLE": "כותרת",
-               "STATE": "מצב",
+               "STATUS": "מצב",
                "STARTED": "החל",
                "SERIES": "סדרות",
                "SUBMITTED": "נשלח",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "הגדרה של תהליך עבודה",
                "MIMETYPE": "Mimetype",
                "URL": "כתובת אינטרנט",
                "CONFIGURATION": "הגדרות",
                "NO_CONFIGURATION": "אין הגדרת פרמטרים למהלך העבודה שנבחר.",
                "WORKFLOW": "מהלך עבודה",
                "TOOLTIP": {
-                  "STOP": "הפסקת ביצוע מופע של תהליך עבודה",
-                  "ABORT": "ביטול ביצוע של מופע תהליך עבודה (אל תנסה לבצע שוב פעולות שנכשלו)",
-                  "RETRY": "נסה שנית לבצע מופע של תהליך עבודה",
-                  "DELETE": "מחק מופע של תהליך עבודה"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "מופעל",
@@ -901,12 +907,14 @@
                   "PAUSED": "מושהה",
                   "SUCCEEDED": "הצליח",
                   "FAILED": "נכשל",
+                  "FAILING": "Failing",
                   "SKIPPED": "דולג",
+                  "STOPPED": "Stopped",
                   "RETRY": "ניסיון נוסף"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "מופע תהליך עבודה"
+               "TITLE": "תהליכים"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "פרטי מהלך-עבודה",
@@ -2183,6 +2191,11 @@
          "SHUTTING_DOWN": "כיבוי",
          "UNKNOWN": "לא ידוע",
          "UPLOADING": "מעלה"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

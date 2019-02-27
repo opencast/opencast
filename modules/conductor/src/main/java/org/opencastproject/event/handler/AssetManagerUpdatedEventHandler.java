@@ -172,6 +172,9 @@ public class AssetManagerUpdatedEventHandler {
         if (SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())) {
           // Build a new XACML file for this mediapackage
           try {
+            if (seriesItem.getOverrideEpisodeAcl()) {
+              authorizationService.removeAcl(mp, AclScope.Episode);
+            }
             authorizationService.setAcl(mp, AclScope.Series, seriesItem.getAcl());
           } catch (MediaPackageException e) {
             logger.error("Error setting ACL for media package {}", mp.getIdentifier(), e);

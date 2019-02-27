@@ -10,7 +10,8 @@
    "SAVE": "Enregistrer",
    "LOGOUT": "Déconnexion",
    "RESET": "Remise à zéro",
-   "SELECT_NO_OPTIONS": "Pas d'options",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Oui",
    "LANGUAGES": {
       "ARABIC": "Arabe",
@@ -545,7 +546,8 @@
                "EDITOR": "Ouvrir l’éditeur vidéo",
                "EDITOR_NEEDS_CUTTING": "Ouvrir l'éditeur vidéo (un commentaire indique que la découpe de la vidéo a été demandée)",
                "COMMENTS": "Voir commentaires",
-               "PAUSED_WORKFLOW": "Voir événement en pause"
+               "PAUSED_WORKFLOW": "Voir événement en pause",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {
@@ -875,25 +877,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Actions",
                "DETAILS": "Détails",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Informations supplémentaires et actions",
+               "DESCRIPTION": "Description",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "Type",
                "TITLE": "Titre",
-               "STATE": "Statut",
+               "STATUS": "Statut",
                "STARTED": "Démarré",
                "SERIES": "Séries",
                "SUBMITTED": "Soumis le",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Définition de workflow",
                "MIMETYPE": "Type MIME",
                "URL": "URL",
                "CONFIGURATION": "Configuration",
                "NO_CONFIGURATION": "Aucun paramètre de configuration existant pour la définition du flux de travail sélectionné.",
                "WORKFLOW": "Flux de travail",
                "TOOLTIP": {
-                  "STOP": "Arrêtez l'exécution de l'instance du flux de travail",
-                  "ABORT": "Interrompre l'exécution de l'instance du flux de travail (ne réessayez pas l'opération ayant échoué)",
-                  "RETRY": "Réessayer l'exécution de l'instance du flux de travail",
-                  "DELETE": "Supprimer l’instance du flux de travail"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instancié",
@@ -901,12 +907,14 @@
                   "PAUSED": "Suspendu",
                   "SUCCEEDED": "Réussi",
                   "FAILED": "Echoué",
+                  "FAILING": "Failing",
                   "SKIPPED": "Ignoré",
+                  "STOPPED": "Stopped",
                   "RETRY": "Réessayer"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Instance des flux de travail"
+               "TITLE": "Flux de travail"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Détails du workflow",
@@ -2183,6 +2191,11 @@
          "SHUTTING_DOWN": "Éteindre",
          "UNKNOWN": "Inconnu",
          "UPLOADING": "Transfert"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

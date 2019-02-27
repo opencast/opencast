@@ -21,7 +21,6 @@
 package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
-import static com.entwinemedia.fn.data.Opt.nul;
 import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
@@ -39,6 +38,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.security.api.User;
 import org.opencastproject.serviceregistry.api.IncidentL10n;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.IncidentServiceException;
@@ -402,8 +402,6 @@ public class JobEndpoint {
 
     for (WorkflowInstance instance : items) {
       long instanceId = instance.getId();
-      String series = instance.getMediaPackage().getSeriesTitle();
-
       // Retrieve submission date with the workflow instance main job
       Date created;
       try {
@@ -413,10 +411,16 @@ public class JobEndpoint {
                 instanceId, e), e.getCause());
       }
 
-      jsonList.add(obj(f("id", v(instanceId)), f("title", v(nul(instance.getMediaPackage().getTitle()).getOr(""))),
-              f("series", v(series, Jsons.BLANK)), f("workflow", v(instance.getTitle(), Jsons.BLANK)),
+      String creatorName = null;
+      User creator = instance.getCreator();
+      if (creator != null) {
+        creatorName = creator.getName();
+      }
+
+      jsonList.add(obj(f("id", v(instanceId)), f("title", v(instance.getTitle(), Jsons.BLANK)),
               f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState().toString())),
-              f("submitted", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : ""))));
+              f("submitted", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : "", Jsons.BLANK)),
+              f("submitter", v(creatorName, Jsons.BLANK))));
     }
 
     JObject json = obj(f("results", arr(jsonList)), f("count", v(workflowInstances.getTotalCount())),
@@ -434,10 +438,17 @@ public class JobEndpoint {
    */
   public JObject getTasksAsJSON(long id) throws JobEndpointException, NotFoundException {
     WorkflowInstance instance = getWorkflowById(id);
-
+    // Gather user information
+    User user = instance.getCreator();
+    List<Field> userInformation = new ArrayList<>();
+    if (user != null) {
+      userInformation.add(f("username", v(user.getUsername())));
+      userInformation.add(f("name", v(user.getName(), Jsons.BLANK)));
+      userInformation.add(f("email", v(user.getEmail(), Jsons.BLANK)));
+    }
     // Retrieve submission date with the workflow instance main job
     Date created;
-    long duration = 0;
+    long executionTime = 0;
     try {
       Job job = serviceRegistry.getJob(id);
       created = job.getDateCreated();
@@ -445,7 +456,7 @@ public class JobEndpoint {
       if (completed == null)
         completed = new Date();
 
-      duration = (completed.getTime() - created.getTime());
+      executionTime = (completed.getTime() - created.getTime());
     } catch (ServiceRegistryException e) {
       throw new JobEndpointException(
               String.format("Error when retrieving job %s from the service registry: %s", id, e), e.getCause());
@@ -458,13 +469,12 @@ public class JobEndpoint {
       fields.add(f(key, v(instance.getConfiguration(key), Jsons.BLANK)));
     }
 
-    return obj(f("start", v(created != null ? toUTC(created.getTime()) : "", Jsons.BLANK)),
-               f("state", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState(), Jsons.BLANK)),
-               f("description", v(instance.getDescription(), Jsons.BLANK)), f("duration", v(duration, Jsons.BLANK)),
-               f("id", v(instance.getId(), Jsons.BLANK)), f("workflow", v(instance.getTitle(), Jsons.BLANK)),
-               f("workflowId", v(instance.getTemplate(), Jsons.BLANK)), f("title", v(mp.getTitle(), Jsons.BLANK)),
-               f("series", v(mp.getSeries(), Jsons.BLANK)), f("series_title", v(mp.getSeriesTitle(), Jsons.BLANK)),
-               f("license", v(mp.getLicense(), Jsons.BLANK)), f("configuration", obj(fields)));
+    return obj(f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState(), Jsons.BLANK)),
+               f("description", v(instance.getDescription(), Jsons.BLANK)), f("executionTime", v(executionTime, Jsons.BLANK)),
+               f("wiid", v(instance.getId(), Jsons.BLANK)), f("title", v(instance.getTitle(), Jsons.BLANK)),
+               f("wdid", v(instance.getTemplate(), Jsons.BLANK)), f("configuration", obj(fields)),
+               f("submittedAt", v(created != null ? toUTC(created.getTime()) : "", Jsons.BLANK)),
+               f("creator", obj(userInformation)));
   }
 
   /**

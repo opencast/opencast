@@ -10,7 +10,8 @@
    "SAVE": "Gem",
    "LOGOUT": "Log ud",
    "RESET": "Nulstil",
-   "SELECT_NO_OPTIONS": "Intet valg",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabisk",
@@ -545,7 +546,8 @@
                "EDITOR": "Åbn videoredigeringsværktøj",
                "EDITOR_NEEDS_CUTTING": "Åbn videoredigeringsværktøjet (en kommentar indikerer, at der er blevet anmodet om videobeskæring)",
                "COMMENTS": "Vis kommentarer",
-               "PAUSED_WORKFLOW": "Vis arbejdsgange på pause"
+               "PAUSED_WORKFLOW": "Vis arbejdsgange på pause",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {
@@ -875,25 +877,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Handlinger",
                "DETAILS": "Oplysninger",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Flere oplysninger og handlinger",
+               "DESCRIPTION": "Beskriveslse",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "Type",
                "TITLE": "Titel",
-               "STATE": "Tilstand",
+               "STATUS": "Status",
                "STARTED": "Startet",
                "SERIES": "Serier",
                "SUBMITTED": "Indsendt",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Arbejdsgngsdefinition",
                "MIMETYPE": "Mime-type",
                "URL": "URL",
                "CONFIGURATION": "Opsætning",
                "NO_CONFIGURATION": "Ingen eksisterende opsætningsparametre til den valgte arbejdsgangsdefinition.",
                "WORKFLOW": "Arbejdsgang",
                "TOOLTIP": {
-                  "STOP": "Stop arbejdsgangseksekveringsproces",
-                  "ABORT": "Afbryd arbejdsgangseksekveringsproces (forsøg igen ikke fejlede operationer igen)",
-                  "RETRY": "Førsøg arbejdsgangseksekveringsproces igen",
-                  "DELETE": "Slet arbejdsgangsproces"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Forberedes",
@@ -901,12 +907,14 @@
                   "PAUSED": "På pause",
                   "SUCCEEDED": "Gennemført",
                   "FAILED": "Mislykkedes",
+                  "FAILING": "Failing",
                   "SKIPPED": "Oversprunget",
+                  "STOPPED": "Stopped",
                   "RETRY": "Prøv igen"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Arbejdsprocesinstanser"
+               "TITLE": "Arbejdsgange"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Arbejdsgangsoplysninger",
@@ -2183,6 +2191,11 @@
          "SHUTTING_DOWN": "Lukker ned",
          "UNKNOWN": "Ukendt",
          "UPLOADING": "Uploader"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

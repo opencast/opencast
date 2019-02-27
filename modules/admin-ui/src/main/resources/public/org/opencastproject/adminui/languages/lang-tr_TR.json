@@ -10,7 +10,8 @@
    "SAVE": "Kaydet",
    "LOGOUT": "Çıkış yap",
    "RESET": "Sıfırla",
-   "SELECT_NO_OPTIONS": "Seçenek yok",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Evet",
    "LANGUAGES": {
       "ARABIC": "Arapça",
@@ -545,7 +546,8 @@
                "EDITOR": "Video editörünü aç",
                "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "Yorumları görüntüle",
-               "PAUSED_WORKFLOW": "Duraklatılmış iş akışını görüntüle"
+               "PAUSED_WORKFLOW": "Duraklatılmış iş akışını görüntüle",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {
@@ -875,25 +877,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Hareketler",
                "DETAILS": "Ayrıntılar",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Daha Fazla Bilgi ve Eylemler",
+               "DESCRIPTION": "Açıklama",
+               "MORE_INFO": "More Information",
                "ID": "KİMLİK",
                "TYPE": "Tür",
                "TITLE": "Başlık",
-               "STATE": "Ülke",
+               "STATUS": "Durum",
                "STARTED": "Başlatıldı",
                "SERIES": "Diziler",
                "SUBMITTED": "Gönderildi",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "İş akışı tanımı",
                "MIMETYPE": "Mime Türü",
                "URL": "Bağlantı Adresi",
                "CONFIGURATION": "Yapılandır",
                "NO_CONFIGURATION": "Seçilen iş akışı tanımı için mevcut yapılandırma parametreleri yok.",
                "WORKFLOW": "İş akışı",
                "TOOLTIP": {
-                  "STOP": "Bu yürütme iş akışını durdur",
-                  "ABORT": "Bu iş akışı yürütümünü iptal et (başarısız işlemi yeniden deneme)",
-                  "RETRY": "Bu iş akışı yürütümünü yeniden dene",
-                  "DELETE": "Bu iş akışını sil"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "İlklendirildi",
@@ -901,12 +907,14 @@
                   "PAUSED": "Duraklatıldı",
                   "SUCCEEDED": "Başarılı oldu",
                   "FAILED": "Başarısız",
+                  "FAILING": "Failing",
                   "SKIPPED": "Atlandı",
+                  "STOPPED": "Stopped",
                   "RETRY": "Yeniden Dene"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Workflow instances"
+               "TITLE": "İş Akışları"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "İş akışı detayları",
@@ -2183,6 +2191,11 @@
          "SHUTTING_DOWN": "Shutting down",
          "UNKNOWN": "Unknown",
          "UPLOADING": "Yükleniyor"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

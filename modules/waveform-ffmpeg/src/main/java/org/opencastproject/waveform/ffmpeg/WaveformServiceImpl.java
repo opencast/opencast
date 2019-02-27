@@ -226,15 +226,15 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
    * {@inheritDoc}
    *
    * @see org.opencastproject.waveform.api.WaveformService#createWaveformImage(org.opencastproject.mediapackage.Track,
-   *         int, int, int, int)
+   *         int, int, int, int, String)
    */
   @Override
-  public Job createWaveformImage(Track sourceTrack, int pixelsPerMinute, int minWidth, int maxWidth, int height)
+  public Job createWaveformImage(Track sourceTrack, int pixelsPerMinute, int minWidth, int maxWidth, int height, String color)
       throws MediaPackageException, WaveformServiceException {
     try {
       return serviceRegistry.createJob(jobType, Operation.Waveform.toString(),
               Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), Integer.toString(pixelsPerMinute),
-                Integer.toString(minWidth), Integer.toString(maxWidth), Integer.toString(height)), waveformJobLoad);
+                Integer.toString(minWidth), Integer.toString(maxWidth), Integer.toString(height), color), waveformJobLoad);
     } catch (ServiceRegistryException ex) {
       throw new WaveformServiceException("Unable to create waveform job", ex);
     }
@@ -259,7 +259,8 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
           int minWidth = Integer.parseInt(arguments.get(2));
           int maxWidth = Integer.parseInt(arguments.get(3));
           int height = Integer.parseInt(arguments.get(4));
-          Attachment waveformMpe = extractWaveform(track, pixelsPerMinute, minWidth, maxWidth, height);
+          String color = arguments.get(5);
+          Attachment waveformMpe = extractWaveform(track, pixelsPerMinute, minWidth, maxWidth, height, color);
           return MediaPackageElementParser.getAsXml(waveformMpe);
         default:
           throw new ServiceRegistryException("This service can't handle operations of type '" + op + "'");
@@ -279,10 +280,11 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
    * @param minWidth minimum width of waveform image
    * @param maxWidth maximum width of waveform image
    * @param height height of waveform image
+   * @param color color of waveform image
    * @return waveform image attachment
    * @throws WaveformServiceException if processing fails
    */
-  private Attachment extractWaveform(Track track, int pixelsPerMinute, int minWidth, int maxWidth, int height)
+  private Attachment extractWaveform(Track track, int pixelsPerMinute, int minWidth, int maxWidth, int height, String color)
     throws WaveformServiceException {
     if (!track.hasAudio()) {
       throw new WaveformServiceException("Track has no audio");
@@ -308,11 +310,11 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     // create ffmpeg command
     String[] command = new String[] {
       binary,
-      "-nostats",
+      "-nostats", "-nostdin", "-hide_banner",
       "-i", mediaFile.getAbsolutePath(),
-      "-lavfi", createWaveformFilter(track, width, height),
+      "-lavfi", createWaveformFilter(track, width, height, color),
       "-frames:v", "1",
-      "-an", "-vn", "-sn", "-y",
+      "-an", "-vn", "-sn",
       waveformFilePath
     };
     logger.debug("Start waveform ffmpeg process: {}", StringUtils.join(command, " "));
@@ -338,7 +340,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     } catch (IOException ex) {
       throw new WaveformServiceException("Start ffmpeg process failed", ex);
     } catch (InterruptedException ex) {
-      throw new WaveformServiceException("Waiting for encoder process exited was interrupted unexpectly", ex);
+      throw new WaveformServiceException("Waiting for encoder process exited was interrupted unexpectedly", ex);
     } finally {
       IoSupport.closeQuietly(ffmpegProcess);
       IoSupport.closeQuietly(errStream);
@@ -352,7 +354,8 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     }
 
     if (exitCode != 0)
-      throw new WaveformServiceException("The encoder process exited abnormally with exit code " + exitCode);
+      throw new WaveformServiceException(String.format("The encoder process exited abnormally with exit code %s "
+              + "using command\n%s", exitCode, String.join(" ", command)));
 
     // put waveform image into workspace
     FileInputStream waveformFileInputStream = null;
@@ -390,13 +393,17 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
    * @param track source audio/video track with at least one audio channel
    * @param width width of waveform image
    * @param height height of waveform image
+   * @param color color of waveform image
    * @return ffmpeg filter parameter
    */
-  private String createWaveformFilter(Track track, int width, int height) {
+  private String createWaveformFilter(Track track, int width, int height, String color) {
     StringBuilder filterBuilder = new StringBuilder("");
     if (waveformFilterPre != null) {
       filterBuilder.append(waveformFilterPre);
       filterBuilder.append(",");
+    }
+    if (color != null) {
+      waveformColor =  StringUtils.split(color, "|");
     }
     filterBuilder.append("showwavespic=");
     filterBuilder.append("split_channels=");

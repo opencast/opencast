@@ -568,21 +568,6 @@ public interface IndexService {
           throws IndexServiceException, NotFoundException;
 
   /**
-   * Checks if the given event as an active transaction
-   *
-   * @param eventId
-   *          the event to check
-   * @return Whether the event has an active transaction or not
-   * @throws NotFoundException
-   *           Thrown if the {@link Event} could not be found.
-   * @throws UnauthorizedException
-   *           Thrown if the current user is unable to access the given event.
-   * @throws IndexServiceException
-   *           Thrown if there was an error reading the given event.
-   */
-  boolean hasActiveTransaction(String eventId) throws NotFoundException, UnauthorizedException, IndexServiceException;
-
-  /**
    * Checks if the given event has snapshots
    * @param eventId the event to check
    * @return <code>true</code> if the event has snapshots, <code>false</code> otherwise

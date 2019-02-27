@@ -38,7 +38,7 @@ import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;

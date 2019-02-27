@@ -31,7 +31,6 @@ import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 
 import org.osgi.framework.BundleContext;
@@ -75,7 +74,7 @@ public class ThemesListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query)
           throws ListProviderException {
     Map<String, String> list = new HashMap<String, String>();
 

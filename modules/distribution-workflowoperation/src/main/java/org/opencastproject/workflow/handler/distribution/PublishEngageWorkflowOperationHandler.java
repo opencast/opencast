@@ -184,7 +184,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     CONFIG_OPTIONS.put(STREAMING_SOURCE_TAGS,
             "Distribute any mediapackage elements with one of these (comma separated) tags to streaming.");
     CONFIG_OPTIONS.put(STREAMING_TARGET_TAGS,
-            "Add all of these comma separated tags to elements that have been distributed for download.");
+            "Add all of these comma separated tags to elements that have been distributed for streaming.");
     CONFIG_OPTIONS.put(CHECK_AVAILABILITY,
             "( true | false ) defaults to true. Check if the distributed download artifact is available at its URL");
     CONFIG_OPTIONS.put(STRATEGY,

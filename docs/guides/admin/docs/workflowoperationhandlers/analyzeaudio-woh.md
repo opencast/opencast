@@ -48,9 +48,7 @@ Example result track:
 |source-flavors    |"presentation/work,presenter/work"|The "flavors" of the track to use as a source input|EMPTY|
 |source-flavor     |"presentation/work"               |The "flavor" of the track to use as a source input|EMPTY|
 |source-tags       |"engage,atom,rss"                 |The "tag" of the track to use as a source input|EMPTY|
-|force-transcode   |"true" or "false"                 |Whether to force transcoding the audio stream
-(This is needed when trying to strip an audio stream from an audio only video container, because SoX can not handle video formats, so it must be encoded to an audio format)|FALSE|
-
+|force-transcode   |"true" or "false"                 |Whether to force transcoding the audio stream (This is needed when trying to strip an audio stream from an audio only video container, because SoX can not handle video formats, so it must be encoded to an audio format)|FALSE|
 
 ## Operation Example
 

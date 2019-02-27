@@ -4,7 +4,16 @@ Changelog
 Opencast 6
 ----------
 
+### Opencast 6.2
+
+*Released on January 24, 2019*
+
+- [[MH-13309](https://opencast.jira.com/browse/MH-13309)][[#649](https://github.com/opencast/opencast/pull/649)] -
+  return empty list when finding findUsersByUserName when the name param is empty.
+
 ### Opencast 6.1
+
+*Released on January 12, 2019*
 
 - [[MH-13305](https://opencast.jira.com/browse/MH-13305)][[#646](https://github.com/opencast/opencast/pull/646)] -
   MacOS installation update
@@ -408,9 +417,21 @@ Opencast 6
 Opencast 5
 ----------
 
+### Opencast 5.4
+
+*Released on January 24, 2019*
+
+- [[MH-13311](https://opencast.jira.com/browse/MH-13311)][[#652](https://github.com/opencast/opencast/pull/652)] -
+  WOH cover-image is broken
+- [SUREFIRE-1588: Resolving compilation issue on Debian and related distros
+  ](https://github.com/opencast/opencast/pull/651)
+- [[MH-13244](https://opencast.jira.com/browse/MH-13244)][[#581](https://github.com/opencast/opencast/pull/581)] -
+  Improve concurrency of OAIPMH republication
+
+
 ### Opencast 5.3
 
-*Released on January 11, 2018*
+*Released on January 11, 2019*
 
 - [[MH-13297](https://opencast.jira.com/browse/MH-13297)][[#638](https://github.com/opencast/opencast/pull/638)] -
   FasterXML Jackson Bugfix Update

@@ -20,6 +20,7 @@
  */
 package org.opencastproject.assetmanager.api;
 
+import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
 
 import com.entwinemedia.fn.data.Opt;
@@ -53,4 +54,7 @@ public interface Asset {
 
   /** Get the store ID of the asset store where this snapshot currently lives */
   String getStorageId();
+
+  /** Get the checksum */
+  Checksum getChecksum();
 }

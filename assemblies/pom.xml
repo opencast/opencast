@@ -111,7 +111,6 @@
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.stax-api-1.2/2.8.0;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan/2.7.2_3;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan-serializer/2.7.2_1;type:=endorsed;export:=true</library>
-              <library>mvn:javax.annotation/javax.annotation-api/1.2;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activator/2.8.0;type:=default;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.locator/2.8.0;type:=default;export:=true</library>
             </libraries>
@@ -141,10 +140,6 @@
                   <!-- Additional config lines to system.properties -->
                   <concat destfile="target/assembly/etc/system.properties" append="true">
                     <filelist dir="../resources" files="system.properties.append"/>
-                  </concat>
-                  <!-- Additional config lines to startup.properties -->
-                  <concat destfile="target/assembly/etc/startup.properties" append="true">
-                    <filelist dir="../resources" files="startup.properties.append"/>
                   </concat>
                   <!-- Adding extra OSGi system packages to configuration -->
                   <replace file="target/assembly/etc/config.properties" token="org.osgi.framework.system.packages= \" value="org.osgi.framework.system.packages= com.sun.image.codec.jpeg, com.sun.jndi.ldap, \"/>

@@ -20,9 +20,8 @@
  */
 package org.opencastproject.scheduler.impl.persistence;
 
-import org.opencastproject.util.EqualsUtil;
-
 import java.io.Serializable;
+import java.util.Objects;
 
 public class EventIdPK implements Serializable {
 
@@ -52,7 +51,7 @@ public class EventIdPK implements Serializable {
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(mediaPackageId, organization);
+    return Objects.hash(mediaPackageId, organization);
   }
 
   @Override
@@ -62,7 +61,7 @@ public class EventIdPK implements Serializable {
     if (!(obj instanceof EventIdPK))
       return false;
     EventIdPK pk = (EventIdPK) obj;
-    return EqualsUtil.eq(pk.getMediaPackageId(), mediaPackageId) && EqualsUtil.eq(pk.getOrganization(), organization);
+    return Objects.equals(pk.getMediaPackageId(), mediaPackageId) && Objects.equals(pk.getOrganization(), organization);
   }
 
 }

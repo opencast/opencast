@@ -23,7 +23,6 @@ package org.opencastproject.index.service.resources.list.provider;
 
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleDirectoryService;
 
@@ -61,7 +60,7 @@ public class RolesListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+  public Map<String, String> getList(String listName, ResourceListQuery query) {
 
     // Preserve the ordering of roles from the providers
     Map<String, String> rolesList = new LinkedHashMap<String, String>();

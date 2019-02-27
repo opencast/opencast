@@ -22,7 +22,7 @@
 package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
-import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;

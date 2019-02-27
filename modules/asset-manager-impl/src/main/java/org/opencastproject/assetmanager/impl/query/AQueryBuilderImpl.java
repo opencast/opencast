@@ -47,6 +47,7 @@ import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 import com.mysema.query.jpa.impl.JPAQueryFactory;
+import com.mysema.query.support.Expressions;
 import com.mysema.query.types.expr.BooleanExpression;
 
 import java.util.Date;
@@ -322,14 +323,12 @@ public final class AQueryBuilderImpl implements AQueryBuilder, EntityPaths {
     return new AbstractPredicate() {
       /* SELECT */
       @Override public SelectQueryContribution contributeSelect(JPAQueryFactory f) {
-        // could not find a boolean expression being constantly true, so use this as a workaround
-        return SelectQueryContribution.mk().where(Q_SNAPSHOT.eq(Q_SNAPSHOT));
+        return SelectQueryContribution.mk().where(Expressions.booleanTemplate("true = true"));
       }
 
       /* DELETE */
       @Override public DeleteQueryContribution contributeDelete(String owner) {
-        // could not find a boolean expression being constantly true, so use this as a workaround
-        return DeleteQueryContribution.mk().where(Q_SNAPSHOT.eq(Q_SNAPSHOT));
+        return DeleteQueryContribution.mk().where(Expressions.booleanTemplate("true = true"));
       }
     };
   }

@@ -43,8 +43,8 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 
 /**
- * This dictionary implementation is a dummy implementation which which will
- * just let the whole text pass through without any kind of filtering.
+ * This dictionary service implementation passes the input text
+ * to the hunspell spell checker and returns its results.
  */
 public class DictionaryServiceImpl implements DictionaryService {
 

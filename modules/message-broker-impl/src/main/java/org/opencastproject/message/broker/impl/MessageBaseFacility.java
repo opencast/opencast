@@ -54,7 +54,7 @@ public class MessageBaseFacility {
 
   /** Default Broker URL */
   private static final String ACTIVEMQ_DEFAULT_URL
-    = "failover://(tcp://localhost:61616)?initialReconnectDelay=2000&maxReconnectDelay=60000";
+    = "failover://(tcp://127.0.0.1:61616)?initialReconnectDelay=2000&maxReconnectDelay=60000";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(MessageBaseFacility.class);

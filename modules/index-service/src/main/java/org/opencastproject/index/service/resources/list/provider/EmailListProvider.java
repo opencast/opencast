@@ -28,7 +28,6 @@ import org.opencastproject.index.service.util.ListProviderUtil;
 import org.opencastproject.messages.MailService;
 import org.opencastproject.messages.MailServiceException;
 import org.opencastproject.messages.MessageTemplate;
-import org.opencastproject.security.api.Organization;
 
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -83,7 +82,7 @@ public class EmailListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query)
           throws ListProviderException {
     Map<String, String> result = new HashMap<String, String>();
     if (getListNameFromFilter(EmailFilterList.TEMPLATE_NAMES).equals(listName)) {

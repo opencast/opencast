@@ -22,11 +22,9 @@
 package org.opencastproject.index.service.resources.list.provider;
 
 import org.opencastproject.index.service.api.EventIndex;
-import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
 import org.osgi.framework.BundleContext;
@@ -77,8 +75,7 @@ public class EventsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
-          throws ListProviderException {
+  public Map<String, String> getList(String listName, ResourceListQuery query) {
     Map<String, String> list = new HashMap<String, String>();
 
     if (CONTRIBUTORS.equals(listName)) {

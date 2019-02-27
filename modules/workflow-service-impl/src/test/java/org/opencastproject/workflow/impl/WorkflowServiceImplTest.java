@@ -201,7 +201,7 @@ public class WorkflowServiceImplTest {
       // This is the asset manager the workflow service itself uses. Further below is the asset manager for the solr
       // index.
       final AssetManager assetManager = createNiceMock(AssetManager.class);
-      final AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
+      final AQueryBuilder query = EasyMock.createMock(AQueryBuilder.class);
       final Target t = EasyMock.createNiceMock(Target.class);
       final Predicate p = EasyMock.createNiceMock(Predicate.class);
       EasyMock.expect(p.and(EasyMock.anyObject(Predicate.class))).andReturn(p).anyTimes();
@@ -211,13 +211,14 @@ public class WorkflowServiceImplTest {
       EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
       EasyMock.expect(query.version()).andReturn(v).anyTimes();
       EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(p).anyTimes();
-      final ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
+      final ASelectQuery selectQuery = EasyMock.createMock(ASelectQuery.class);
       EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
       final AResult r = EasyMock.createNiceMock(AResult.class);
       EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
       final Stream<ARecord> recStream = Stream.mk();
       EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
       EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
+      EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
       EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
       EasyMock.replay(query, t, r, selectQuery, assetManager, p, v);
       service.setAssetManager(assetManager);

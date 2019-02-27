@@ -295,7 +295,13 @@ public class IngestServiceImplTest {
             }).anyTimes();
     EasyMock.replay(mediaInspectionService);
 
-    service = new IngestServiceImpl();
+    class MockedIngestServicve extends IngestServiceImpl {
+      protected TrustedHttpClient createStandaloneHttpClient(String user, String password) {
+        return httpClient;
+      }
+    }
+
+    service = new MockedIngestServicve();
     service.setHttpClient(httpClient);
     service.setAuthorizationService(authorizationService);
     service.setWorkingFileRepository(wfr);
@@ -524,12 +530,21 @@ public class IngestServiceImplTest {
     // NOTE: This test only works if the serivce.update() was not triggered by any previous tests
     testSeriesUpdateNewAndExisting(null);
 
+    String downloadPassword = "CHANGE_ME";
+    String downloadSource = "http://localhost";
+    String downloadUser = "opencast_system_account";
+
+    properties.put(IngestServiceImpl.DOWNLOAD_PASSWORD, downloadPassword);
+    properties.put(IngestServiceImpl.DOWNLOAD_SOURCE, downloadSource);
+    properties.put(IngestServiceImpl.DOWNLOAD_USER, downloadUser);
+
     // Test with properties and no key
     testSeriesUpdateNewAndExisting(properties);
 
     // Test with properties and key is true
     isOverwriteSeries = true;
     properties.put(IngestServiceImpl.PROPKEY_OVERWRITE_SERIES, String.valueOf(isOverwriteSeries));
+
     testSeriesUpdateNewAndExisting(properties);
 
     // Test series overwrite key is false

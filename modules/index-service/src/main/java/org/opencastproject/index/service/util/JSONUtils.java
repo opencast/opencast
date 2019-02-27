@@ -176,10 +176,11 @@ public final class JSONUtils {
         Map<String, String> values = null;
         boolean translatable = false;
 
-        if (!listProvidersService.hasProvider(listProviderName.get())) {
+        if (org != null && !listProvidersService.hasProvider(listProviderName.get(), org.getId())
+                && !listProvidersService.hasProvider(listProviderName.get())) {
           values = new HashMap<String, String>();
         } else {
-          values = listProvidersService.getList(listProviderName.get(), query, org, false);
+          values = listProvidersService.getList(listProviderName.get(), query, false);
           translatable = listProvidersService.isTranslatable(listProviderName.get());
         }
 
@@ -238,7 +239,7 @@ public final class JSONUtils {
               valuesJSON.add(f(entry.getValue(), v(entry.getKey(), Jsons.BLANK)));
             }
           } else {
-            Map<String, String> values = listProvidersService.getList(listProviderName.get(), query, org, false);
+            Map<String, String> values = listProvidersService.getList(listProviderName.get(), query, false);
             for (Entry<String, String> entry : values.entrySet()) {
               valuesJSON.add(f(entry.getKey(), v(entry.getValue(), Jsons.BLANK)));
             }

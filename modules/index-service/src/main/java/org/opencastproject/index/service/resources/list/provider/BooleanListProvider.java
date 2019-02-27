@@ -21,10 +21,8 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,7 +48,7 @@ public class BooleanListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) throws ListProviderException {
+  public Map<String, String> getList(String listName, ResourceListQuery query) {
     Map<String, String> result = new HashMap<String, String>();
 
     String listNameTrimmed = StringUtils.trimToEmpty(listName);

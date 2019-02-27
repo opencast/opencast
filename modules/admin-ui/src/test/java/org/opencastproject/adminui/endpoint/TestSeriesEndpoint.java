@@ -25,7 +25,7 @@ import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatal
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
 
-import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
@@ -64,7 +64,6 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -126,7 +125,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
       }
 
       @Override
-      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+      public Map<String, String> getList(String listName, ResourceListQuery query) {
         return new HashMap<>();
       }
 

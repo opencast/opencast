@@ -850,7 +850,7 @@ public class IndexServiceImpl implements IndexService {
       currentStartDate = sdf.parse((String) startDate.getValue().get());
     } else if (currentStartDate != null) {
       eventMetadata.removeField(startDate);
-      MetadataField<String> newStartDate = MetadataUtils.copyMetadataField(startDate);
+      MetadataField<String> newStartDate = new MetadataField(startDate);
       newStartDate.setValue(EncodingSchemeUtils.encodeDate(currentStartDate, Precision.Fraction).getValue());
       eventMetadata.addField(newStartDate);
     }
@@ -858,7 +858,7 @@ public class IndexServiceImpl implements IndexService {
     MetadataField<?> created = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
     if (created == null || !created.isUpdated() || created.getValue().isNone()) {
       eventMetadata.removeField(created);
-      MetadataField<String> newCreated = MetadataUtils.copyMetadataField(created);
+      MetadataField<String> newCreated = new MetadataField(created);
       if (currentStartDate != null) {
         newCreated.setValue(EncodingSchemeUtils.encodeDate(currentStartDate, Precision.Second).getValue());
       } else {
@@ -957,8 +957,7 @@ public class IndexServiceImpl implements IndexService {
         eventHttpServletRequest.setMediaPackage(mediaPackage);
         try {
           schedulerService.addEvent(start.toDate(), start.plus(duration).toDate(), captureAgentId, presenterUsernames,
-                  mediaPackage, configuration, (Map) caProperties, Opt.<Boolean> none(), Opt.<String> none(),
-                  SchedulerService.ORIGIN);
+                  mediaPackage, configuration, (Map) caProperties, Opt.<Boolean> none(), Opt.<String> none());
         } finally {
           for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
             try {
@@ -973,7 +972,7 @@ public class IndexServiceImpl implements IndexService {
         List<Period> periods = schedulerService.calculatePeriods(rRule, start.toDate(), end.toDate(), duration, tz);
         Map<String, Period> scheduled = new LinkedHashMap<>();
          scheduled = schedulerService.addMultipleEvents(rRule, start.toDate(), end.toDate(), duration, tz, captureAgentId,
-                presenterUsernames, eventHttpServletRequest.getMediaPackage().get(), configuration, (Map) caProperties, Opt.none(), Opt.none(), SchedulerService.ORIGIN);
+                presenterUsernames, eventHttpServletRequest.getMediaPackage().get(), configuration, (Map) caProperties, Opt.none(), Opt.none());
         return StringUtils.join(scheduled.keySet(), ",");
       default:
         logger.warn("Unknown source type {}", type);
@@ -1020,8 +1019,7 @@ public class IndexServiceImpl implements IndexService {
       Tuple<List<String>, Set<String>> updatedPresenters = getTechnicalPresenters(eventMetadata);
       presenterUsernames = updatedPresenters.getB();
       eventMetadata.removeField(presentersMetadataField);
-      MetadataField<Iterable<String>> newPresentersMetadataField = MetadataUtils
-              .copyMetadataField(presentersMetadataField);
+      MetadataField<Iterable<String>> newPresentersMetadataField = new MetadataField(presentersMetadataField);
       newPresentersMetadataField.setValue(updatedPresenters.getA());
       eventMetadata.addField(newPresentersMetadataField);
       return Opt.some(presenterUsernames);
@@ -1221,7 +1219,7 @@ public class IndexServiceImpl implements IndexService {
         try {
           schedulerService.updateEvent(event.getIdentifier(), Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
                   Opt.<Set<String>> none(), Opt.some(mediaPackage), Opt.<Map<String, String>> none(),
-                  Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+                  Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none());
         } catch (SchedulerException e) {
           logger.error("Unable to remove catalog with flavor {} by updating scheduled event {} because {}",
                   flavor, event.getIdentifier(), getStackTrace(e));
@@ -1296,7 +1294,7 @@ public class IndexServiceImpl implements IndexService {
         try {
           schedulerService.updateEvent(id, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(), presenters,
                   Opt.some(mediaPackage), Opt.<Map<String, String>> none(), Opt.<Map<String, String>> none(),
-                  Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+                  Opt.<Opt<Boolean>> none());
         } catch (SchedulerException e) {
           logger.error("Unable to update scheduled event {} with metadata {} because {}",
                   id, RestUtils.getJsonStringSilent(metadataList.toJSON()), getStackTrace(e));
@@ -1362,7 +1360,7 @@ public class IndexServiceImpl implements IndexService {
         try {
           mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
           schedulerService.updateEvent(id, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.some(mediaPackage),
-                  Opt.none(), Opt.none(), Opt.none(), SchedulerService.ORIGIN);
+                  Opt.none(), Opt.none(), Opt.none());
         } catch (SchedulerException | MediaPackageException e) {
           throw new IndexServiceException("Unable to update the acl for the scheduled event", e);
         }
@@ -1993,7 +1991,7 @@ public class IndexServiceImpl implements IndexService {
           case SCHEDULE:
             logger.info("Update scheduled mediapacakge {} with updated comments catalog.", event.getIdentifier());
             schedulerService.updateEvent(event.getIdentifier(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
-                    Opt.some(mediaPackage), Opt.none(), Opt.none(), Opt.none(), SchedulerService.ORIGIN);
+                    Opt.some(mediaPackage), Opt.none(), Opt.none(), Opt.none());
             break;
           default:
             logger.error("Unkown event source {}!", event.getSource());
@@ -2055,7 +2053,7 @@ public class IndexServiceImpl implements IndexService {
 
     schedulerService.updateEvent(eventId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
             Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
-            Opt.<Map<String, String>> none(), Opt.some(Opt.some(optout)), SchedulerService.ORIGIN);
+            Opt.<Map<String, String>> none(), Opt.some(Opt.some(optout)));
     logger.debug("Setting event {} to opt out status of {}", eventId, optout);
   }
 
@@ -2158,20 +2156,6 @@ public class IndexServiceImpl implements IndexService {
     return WorkflowState.INSTANTIATED.toString().equals(workflowState)
             || WorkflowState.RUNNING.toString().equals(workflowState)
             || WorkflowState.PAUSED.toString().equals(workflowState);
-  }
-
-  @Override
-  public boolean hasActiveTransaction(String eventId)
-          throws NotFoundException, UnauthorizedException, IndexServiceException {
-    try {
-      return schedulerService.hasActiveTransaction(eventId);
-    } catch (SchedulerException e) {
-      logger.error("Unable to get active transaction for scheduled event {} because {}", eventId, getStackTrace(e));
-      throw new IndexServiceException("Unable to get active transaction for scheduled event " + eventId);
-    } catch (NotFoundException e) {
-      logger.trace("The event was not found by the scheduler so it can't be in an active transaction.");
-      return false;
-    }
   }
 
 }

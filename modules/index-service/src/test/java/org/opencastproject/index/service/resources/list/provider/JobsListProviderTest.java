@@ -79,8 +79,8 @@ public class JobsListProviderTest {
   public void testStatusListName() throws ListProviderException, WorkflowDatabaseException {
     ResourceListQuery query = new JobsListQuery();
 
-    assertEquals(4, jobsListProvider.getList(JobsListProvider.LIST_STATUS, query, null).size());
-    for (Entry<String, String> entry : jobsListProvider.getList(JobsListProvider.LIST_STATUS, query, null).entrySet()) {
+    assertEquals(4, jobsListProvider.getList(JobsListProvider.LIST_STATUS, query).size());
+    for (Entry<String, String> entry : jobsListProvider.getList(JobsListProvider.LIST_STATUS, query).entrySet()) {
       try {
         Job.Status.valueOf(entry.getKey());
       } catch (IllegalArgumentException ex) {
@@ -96,10 +96,10 @@ public class JobsListProviderTest {
     ResourceListQuery query = new JobsListQuery();
 
     assertEquals(workflowDefinitions.size(),
-            jobsListProvider.getList(JobsListProvider.LIST_WORKFLOW, query, null).size());
+            jobsListProvider.getList(JobsListProvider.LIST_WORKFLOW, query).size());
 
     for (Entry<String, String> entry : jobsListProvider.getList(
-            JobsListProvider.LIST_WORKFLOW, query, null).entrySet()) {
+            JobsListProvider.LIST_WORKFLOW, query).entrySet()) {
 
       boolean match = false;
       for (WorkflowDefinition wfD : workflowDefinitions) {

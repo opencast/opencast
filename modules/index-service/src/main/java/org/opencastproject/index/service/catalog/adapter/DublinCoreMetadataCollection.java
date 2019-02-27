@@ -75,7 +75,7 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
     try {
       if (listProvidersService != null && metadataField.getListprovider().isSome()) {
         Map<String, String> collection = listProvidersService.getList(metadataField.getListprovider().get(),
-                new ResourceListQueryImpl(), null, true);
+                new ResourceListQueryImpl(), true);
         if (collection != null) {
           return Opt.some(collection);
         }

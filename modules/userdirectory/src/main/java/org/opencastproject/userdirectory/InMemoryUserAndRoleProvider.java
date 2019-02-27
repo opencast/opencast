@@ -35,16 +35,22 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
@@ -53,7 +59,7 @@ import java.util.stream.Collectors;
 /**
  * An in-memory user directory containing the users and roles used by the system.
  */
-public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
+public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider, ManagedService {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(InMemoryUserAndRoleProvider.class);
@@ -66,11 +72,10 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /** Configuration key for the digest users */
   public static final String DIGEST_USER_KEY = "org.opencastproject.security.digest.user";
-  public static final String CAPTURE_AGENT_USER_KEY = "org.opencastproject.security.capture_agent.user";
+  public static final String CAPTURE_AGENT_USER_PREFIX = "capture_agent.user.";
 
   /** Configuration key for the digest password */
   public static final String DIGEST_PASSWORD_KEY = "org.opencastproject.security.digest.pass";
-  public static final String CAPTURE_AGENT_PASSWORD_KEY = "org.opencastproject.security.capture_agent.pass";
 
   /**
    * System password set by default in the configuration file.
@@ -79,10 +84,20 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
   private static final String DIGEST_PASSWORD_DEFAULT_CONFIGURATION = "CHANGE_ME";
 
   /** Configuration key for optional additional roles for the capture agent user */
-  public static final String CAPTURE_AGENT_EXTRA_ROLES_KEY = "org.opencastproject.security.capture_agent.roles";
+  public static final String CAPTURE_AGENT_ROLES_PREFIX = "capture_agent.roles.";
 
   /** The list of in-memory users */
   private final Map<String, List<User>> inMemoryUsers = new ConcurrentHashMap<>();
+
+  /**
+   * List of capture agent users.
+   * <ul>
+   *   <li>the organization id is used as key.</li>
+   *   <li>the value is a list of capture agent user for that organization with each user being represented by a list
+   *       of the username and password, followed by additional roles</li>
+   * </ul>
+   **/
+  private Map<String, List<List<String>>> captureAgentUsers = new ConcurrentHashMap<>();
 
   /** The security service */
   protected SecurityService securityService;
@@ -121,6 +136,55 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
   }
 
   @Override
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    if (properties == null) {
+      captureAgentUsers.clear();
+      // enforce reload of users if the configuration has changed
+      inMemoryUsers.clear();
+      return;
+    }
+
+    Map<String, List<List<String>>> newCAUsers = new ConcurrentHashMap<>();
+
+    Enumeration<String> keys = properties.keys();
+    while (keys.hasMoreElements()) {
+      final String key = keys.nextElement();
+      // skip non user definition keys
+      if (!key.startsWith(CAPTURE_AGENT_USER_PREFIX)) {
+        continue;
+      }
+      final String[] orgUser = key.substring(CAPTURE_AGENT_USER_PREFIX.length()).split("\\.");
+      if (orgUser.length != 2) {
+        logger.warn("Ignoring invalid capture agent user definition. Should be {}.<organization>.<username>, was {}",
+                CAPTURE_AGENT_USER_PREFIX, key);
+      }
+      final String orgId = orgUser[0];
+      final String username = orgUser[1];
+      final String password = Objects.toString(properties.get(key), null);
+      if (password == null) {
+        continue;
+      }
+
+      // check for extra roles
+      final String rolesStr = Objects.toString(properties.get(CAPTURE_AGENT_ROLES_PREFIX + orgId + '.' + username), "");
+      final String[] roles = StringUtils.split(rolesStr, ", ");
+      final List<String> userData = new ArrayList<>();
+      userData.add(username);
+      userData.add(password);
+      userData.addAll(Arrays.asList(roles));
+      if (!newCAUsers.containsKey(orgId)) {
+        newCAUsers.put(orgId, new ArrayList<>());
+      }
+      newCAUsers.get(orgId).add(userData);
+    }
+
+    // update list of CA users
+    captureAgentUsers = newCAUsers;
+    // enforce reload of users if the configuration has changed
+    inMemoryUsers.clear();
+  }
+
+  @Override
   public String getName() {
     return PROVIDER_NAME;
   }
@@ -153,7 +217,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
       logger.trace("Organization users have already been initialized. Aborting.");
       return users;
     }
-    users = new ArrayList<>(1);
+    users = new ArrayList<>();
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
 
     // Create the system user
@@ -170,36 +234,28 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
       logger.info("Added system digest user '{}' for organization '{}'", digestUsername, organization.getId());
     }
 
-    /* Deactivated due to security issue (CVE-2018-16154)
-    String caUsername = organization.getProperties().get(CAPTURE_AGENT_USER_KEY);
-    String caUserPass = organization.getProperties().get(CAPTURE_AGENT_PASSWORD_KEY);
-    if (caUsername != null && caUserPass != null) {
+    for (List<String> userData: captureAgentUsers.getOrDefault(organization.getId(), new ArrayList<>())) {
+
+      final String username = userData.get(0);
+      final String password = userData.get(1);
+
       // Role set for the capture agent user
       Set<JaxbRole> caRoleList = new HashSet<>();
-      for (String roleName : SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLES) {
-        caRoleList.add(new JaxbRole(roleName, jaxbOrganization));
-      }
-
       // Add the organization anonymous role to the capture agent user
       caRoleList.add(new JaxbRole(organization.getAnonymousRole(), jaxbOrganization));
-
-      String caExtraRoles = organization.getProperties().get(CAPTURE_AGENT_EXTRA_ROLES_KEY);
-      // Add any extra custom roles to the CA user
-      if (caExtraRoles != null) {
-        List<String> items = Arrays.asList(caExtraRoles.split("\\s*,\\s*"));
-        for (String item : items) {
-          logger.debug("Adding custom role '{}' to capture agent user {}", item, caUsername);
-          caRoleList.add(new JaxbRole(item, jaxbOrganization));
-        }
-      }
+      // Add global CA user roles
+      Arrays.stream(SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLES)
+              .forEach((role) -> caRoleList.add(new JaxbRole(role, jaxbOrganization)));
+      // Add additional custom rules
+      userData.stream().skip(2).forEach((role) -> caRoleList.add(new JaxbRole(role, jaxbOrganization)));
 
       // Create the capture agent user
-      logger.info("Creating the capture agent digest user '{}'", caUsername);
-      User caUser = new JaxbUser(caUsername, caUserPass, CAPTURE_AGENT_USER_NAME, null, getName(), true,
+      logger.info("Creating the capture agent digest user '{}'", username);
+      User caUser = new JaxbUser(username, password, CAPTURE_AGENT_USER_NAME, null, getName(), true,
               jaxbOrganization, caRoleList);
-      inMemoryUsers.add(caUser);
+      users.add(caUser);
     }
-    */
+
     inMemoryUsers.put(organization.getId(), users);
     return users;
   }

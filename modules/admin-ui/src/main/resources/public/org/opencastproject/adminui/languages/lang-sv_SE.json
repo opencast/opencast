@@ -10,7 +10,8 @@
    "SAVE": "Spara",
    "LOGOUT": "Logga ut",
    "RESET": "Nollställ",
-   "SELECT_NO_OPTIONS": "Ingen option",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabiska",
@@ -545,7 +546,8 @@
                "EDITOR": "Öppna videoredigeraren",
                "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "Visa kommentarer",
-               "PAUSED_WORKFLOW": "Visa pausat arbetsflöde"
+               "PAUSED_WORKFLOW": "Visa pausat arbetsflöde",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {
@@ -875,25 +877,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Åtgärder",
                "DETAILS": "Detaljer",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Mer information och åtgärder",
+               "DESCRIPTION": "Beskrivning",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "Typ",
                "TITLE": "Titel",
-               "STATE": "Status",
+               "STATUS": "Status",
                "STARTED": "Startad",
                "SERIES": "Serie",
                "SUBMITTED": "Skickad",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Workflowdefinition",
                "MIMETYPE": "MimeType",
                "URL": "URI",
                "CONFIGURATION": "Konfiguration",
                "NO_CONFIGURATION": "Det finns inga konfigurationsparameter för den valda workflowdefinitionen.",
                "WORKFLOW": "Workflow",
                "TOOLTIP": {
-                  "STOP": "Stop execution workflow instance",
-                  "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow instance",
-                  "DELETE": "Delete workflow instance"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instantiated",
@@ -901,12 +907,14 @@
                   "PAUSED": "Pausad",
                   "SUCCEEDED": "Lyckade",
                   "FAILED": "Misslyckad",
+                  "FAILING": "Failing",
                   "SKIPPED": "Hoppades över",
+                  "STOPPED": "Stopped",
                   "RETRY": "Försök igen"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Instanser för arbetsflöde"
+               "TITLE": "Workflows"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Workflowdetaljer",
@@ -2183,6 +2191,11 @@
          "SHUTTING_DOWN": "Stänger ner",
          "UNKNOWN": "Okänd",
          "UPLOADING": "Laddar upp"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

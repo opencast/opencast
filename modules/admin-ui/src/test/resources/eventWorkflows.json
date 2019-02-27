@@ -5,27 +5,24 @@
     "results": [
         {
             "id": 1,
-            "series": "Serie 1",
-            "title": "Mediapackage 1",
+            "title": "Full",
             "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
             "submitted": "2014-06-05T15:00:00Z",
-            "workflow": "Full"
+            "submitter": ""
         },
         {
             "id": 2,
-            "series": "Serie 1",
-            "title": "",
+            "title": "Full",
             "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
             "submitted": "2014-06-05T15:00:00Z",
-            "workflow": "Full"
+            "submitter": ""
         },
         {
             "id": 3,
-            "series": "Serie 1",
-            "title": "Mediapackage 3",
+            "title": "Full",
             "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
             "submitted": "2014-06-05T15:00:00Z",
-            "workflow": "Full"
+            "submitter": ""
         }
     ],
     "offset": 0

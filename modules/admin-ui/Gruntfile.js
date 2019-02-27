@@ -46,14 +46,14 @@ module.exports = function (grunt) {
       },
       js: {
         files: ['<%= yeoman.app %>/scripts/{,*/}*.js'],
-        tasks: ['newer:jshint:all', 'newer:jscs:all'],
+        tasks: ['newer:jshint:all'],
         options: {
           livereload: '<%= connect.options.livereload %>'
         }
       },
       jsTest: {
         files: ['test/spec/{,*/}*.js'],
-        tasks: ['newer:jshint:test', 'newer:jscs:test', 'karma']
+        tasks: ['newer:jshint:test', 'karma']
       },
       sass: {
         files: ['<%= yeoman.app %>/styles/**/*.{scss,sass}'],
@@ -154,24 +154,6 @@ module.exports = function (grunt) {
         options: {
           jshintrc: 'test/.jshintrc'
         },
-        src: ['test/spec/{,*/}*.js']
-      }
-    },
-
-    // Make sure code styles are up to par
-    jscs: {
-      options: {
-        config: '.jscsrc',
-        fix: true, // Autofix code style violations when possible.
-        excludeFiles: ['src/main/webapp/scripts/lib/**']
-      },
-      all: {
-        src: [
-          'Gruntfile.js',
-          ['<%= yeoman.app %>/scripts/{,*/}*.js', '!<%= yeoman.app %>/scripts/lib/{,*/}*.js']
-        ]
-      },
-      test: {
         src: ['test/spec/{,*/}*.js']
       }
     },
@@ -377,9 +359,7 @@ module.exports = function (grunt) {
     // Note that ngAnnotate **can** actually output external source maps, too,
     // but in that mode, it does not in turn take into account any preexisting sourcemap.
 
-    // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
     extract_sourcemap: {
-    // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
       ngAnnotate: {
         files: [{
             src: '<%= yeoman.staging %>/concat/scripts/*.js',
@@ -509,8 +489,7 @@ module.exports = function (grunt) {
     'postcss',
     'connect:test',
     'karma',
-    'newer:jshint',
-    'newer:jscs'
+    'newer:jshint'
   ]);
 
   grunt.registerTask('build', function() {

@@ -28,7 +28,9 @@ import org.opencastproject.index.service.resources.list.query.ResourceListQueryI
 import org.opencastproject.index.service.resources.list.query.StringListFilter;
 import org.opencastproject.index.service.util.ListProviderUtil;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +45,8 @@ public class ListProvidersServiceTest {
   private static final String TEST_SORTBY = "value";
 
   private ListProvidersServiceImpl listProviderService;
+  private Organization organization;
+  private SecurityService securityService;
 
   /**
    * Returns a map for the example with default filtering
@@ -56,7 +60,7 @@ public class ListProvidersServiceTest {
       }
 
       @Override
-      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+      public Map<String, String> getList(String listName, ResourceListQuery query) {
 
         Map<String, String> filteredList = new HashMap<String, String>();
 
@@ -96,6 +100,13 @@ public class ListProvidersServiceTest {
   @Before
   public void setUp() {
     listProviderService = new ListProvidersServiceImpl();
+    securityService = EasyMock.createNiceMock(SecurityService.class);
+    organization = EasyMock.createNiceMock(Organization.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
+    EasyMock.expect(organization.getId()).andReturn("mh_default_org").anyTimes();
+    EasyMock.replay(organization);
+    EasyMock.replay(securityService);
+    listProviderService.setSecurityService(securityService);
   }
 
   @Test
@@ -122,8 +133,8 @@ public class ListProvidersServiceTest {
     Assert.assertEquals(baseNumber + 2, listProviderService.getAvailableProviders().size());
     Assert.assertTrue(listProviderService.hasProvider(providerName1));
     Assert.assertTrue(listProviderService.hasProvider(providerName2));
-    Assert.assertEquals(list1, listProviderService.getList(providerName1, query, null, false));
-    Assert.assertEquals(list2, listProviderService.getList(providerName2, query, null, false));
+    Assert.assertEquals(list1, listProviderService.getList(providerName1, query, false));
+    Assert.assertEquals(list2, listProviderService.getList(providerName2, query, false));
 
     listProviderService.removeProvider(providerName2);
     Assert.assertEquals(baseNumber + 1, listProviderService.getAvailableProviders().size());
@@ -144,20 +155,20 @@ public class ListProvidersServiceTest {
 
     query.setLimit(2);
     query.setOffset(1);
-    Assert.assertEquals(2, listProviderService.getList(providerName1, query, null, false).size());
+    Assert.assertEquals(2, listProviderService.getList(providerName1, query, false).size());
 
     query.setLimit(1);
     query.setOffset(5);
-    Assert.assertEquals(0, listProviderService.getList(providerName1, query, null, false).size());
+    Assert.assertEquals(0, listProviderService.getList(providerName1, query, false).size());
 
     query.setLimit(2);
     query.setOffset(1);
-    Assert.assertEquals(2, listProviderService.getList(providerName1, query, null, false).size());
+    Assert.assertEquals(2, listProviderService.getList(providerName1, query, false).size());
 
     query.setLimit(12);
     query.setOffset(0);
     query.addFilter(new StringListFilter(TEST_FILTER_NAME, "test"));
-    Assert.assertEquals(3, listProviderService.getList(providerName1, query, null, false).size());
+    Assert.assertEquals(3, listProviderService.getList(providerName1, query, false).size());
 
     // query.setSortedBy(TEST_SORTBY);
     // Map<String, String> list = listProviderService.getList(providerName1, query, null);

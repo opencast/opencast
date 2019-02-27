@@ -37,7 +37,7 @@ import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.ThumbnailImpl;
-import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
@@ -661,7 +661,8 @@ public class ToolsEndpoint implements ManagedService {
         } catch (UrlSigningException | URISyntaxException e) {
           logger.error("Error while trying to serialize the thumbnail url because: {}", getStackTrace(e));
           return R.serverError();
-        } catch (IOException | EncoderException | PublicationException | UnknownFileTypeException | MediaPackageException e) {
+        } catch (IOException | DistributionException | EncoderException | PublicationException
+            | UnknownFileTypeException | MediaPackageException e) {
           logger.error("Error while updating default thumbnail because: {}", getStackTrace(e));
           return R.serverError();
         }
