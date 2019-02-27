@@ -246,7 +246,8 @@ public class TestEventsEndpoint extends EventsEndpoint {
         eq(Opt.none()),
         eq(Opt.none()),
         eq(Opt.none()),
-        capture(capturedAgentConfig)
+        capture(capturedAgentConfig),
+        eq(false)
     );
     EasyMock.expectLastCall();
 

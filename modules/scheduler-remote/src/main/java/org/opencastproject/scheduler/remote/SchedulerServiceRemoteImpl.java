@@ -211,6 +211,17 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
           Opt<Map<String, String>> caMetadata)
                   throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException {
+
+    updateEvent(eventId, startDateTime, endDateTime, captureAgentId, userIds,
+                mediaPackage, wfProperties, caMetadata, false);
+  }
+
+  @Override
+  public void updateEvent(String eventId, Opt<Date> startDateTime, Opt<Date> endDateTime, Opt<String> captureAgentId,
+          Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
+          Opt<Map<String, String>> caMetadata, boolean allowConflict)
+                  throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException {
+
     logger.debug("Start updating event {}.", eventId);
     HttpPut put = new HttpPut("/" + eventId);
 
@@ -229,6 +240,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       params.add(new BasicNameValuePair("wfproperties", toPropertyString(wfProperties.get())));
     if (caMetadata.isSome())
       params.add(new BasicNameValuePair("agentparameters", toPropertyString(caMetadata.get())));
+    params.add(new BasicNameValuePair("allowConflict", BooleanUtils.toString(allowConflict, "true", "false", "false")));
     put.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
     HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED, SC_FORBIDDEN, SC_CONFLICT);
