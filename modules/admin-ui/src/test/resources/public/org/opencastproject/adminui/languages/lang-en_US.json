@@ -307,9 +307,6 @@
     }
   },
   "NAV": {
-    "DASHBOARD": {
-      "TITLE": "Dashboard"
-    },
     "EVENTS": {
       "TITLE": "Recordings"
     },
