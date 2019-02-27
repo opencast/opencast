@@ -76,15 +76,6 @@
             }
         }
 
-        .dashboard {
-            @include build-icon(auto, auto, dashboard, 30px, 20px);
-        }
-
-        &:hover  > .dashboard,
-        &:active > .dashboard {
-             @include build-icon(auto, auto, dashboard-on, 30px, 20px);
-        }
-
         .events {
             @include build-icon(auto, auto, events, 27px, 27px);
         }
