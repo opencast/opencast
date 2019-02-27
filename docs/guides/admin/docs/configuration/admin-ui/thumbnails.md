@@ -24,7 +24,7 @@ These options can be adjusted in the configuration file `etc/org.opencastproject
 Thumbnail Preview
 -----------------
 
-The video editor displays a preview of the actual thumbnail at any time. This is a downscaled version of the actual
+The video editor can display a preview of the actual thumbnail at any time. This is a downscaled version of the actual
 thumbnail image.
 
 The video editor expects this thumbnail preview image to be published in the publication channel `internal` as
@@ -39,6 +39,16 @@ The thumbnail preview is automatically downscaled if necessary using the followi
 
     # Default: editor.thumbnail.preview.downscale
     #thumbnail.preview.profile.downscale=editor.thumbnail.preview.downscale
+
+Since the extraction of a thumbnail can be expensive in case of large files, the update of the thumbnail preview
+image can be configured:
+
+    # Default: partial
+    #thumbnail.preview.mode=partial
+
+If set to `always`, the thumbnail preview image is updated whenever required. If set to `partial`, the thumbnail
+preview image is only updated for uploaded thumbnails to avoid long waiting times that could cause timeouts in
+case of very large files.
 
 Note that this image is supposed to be used by the Admin UI only.
 

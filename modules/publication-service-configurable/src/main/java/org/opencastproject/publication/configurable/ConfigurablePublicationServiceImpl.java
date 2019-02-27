@@ -246,15 +246,8 @@ public class ConfigurablePublicationServiceImpl extends AbstractJobProducer impl
   private Publication doReplace(final MediaPackage mp, final String channelId,
           final Collection<? extends MediaPackageElement> addElementIds, final Set<String> retractElementIds)
           throws DistributionException, MediaPackageException {
-    // Retract old elements
-    final Job retractJob = distributionService.retract(channelId, mp, retractElementIds);
-
-    if (!JobUtil.waitForJobs(serviceRegistry, retractJob).isSuccess()) {
-      throw new DistributionException("At least one of the retraction jobs did not complete successfully");
-    }
 
     final Optional<Publication> priorPublication = getPublication(mp, channelId);
-
     final Publication publication;
 
     if (priorPublication.isPresent()) {
@@ -265,9 +258,18 @@ public class ConfigurablePublicationServiceImpl extends AbstractJobProducer impl
       mp.add(publication);
     }
 
-    retractElementIds.forEach(publication::removeAttachmentById);
+    if (!retractElementIds.isEmpty()) {
+      final Job retractJob = distributionService.retract(channelId, mp, retractElementIds);
 
-    distributeMany(mp, channelId, addElementIds);
+      if (!JobUtil.waitForJobs(serviceRegistry, retractJob).isSuccess()) {
+        throw new DistributionException("At least one of the retraction jobs did not complete successfully");
+      }
+      retractElementIds.forEach(publication::removeAttachmentById);
+    }
+
+    if (!addElementIds.isEmpty()) {
+      distributeMany(mp, channelId, addElementIds);
+    }
 
     return publication;
   }
@@ -275,9 +277,6 @@ public class ConfigurablePublicationServiceImpl extends AbstractJobProducer impl
   private Publication doReplaceSync(final MediaPackage mp, final String channelId,
           final Collection<? extends MediaPackageElement> addElementIds, final Set<String> retractElementIds)
           throws DistributionException {
-    // Retract old elements
-    distributionService.retractSync(channelId, mp, retractElementIds);
-
     final Optional<Publication> priorPublication = getPublication(mp, channelId);
 
     final Publication publication;
@@ -290,9 +289,14 @@ public class ConfigurablePublicationServiceImpl extends AbstractJobProducer impl
       mp.add(publication);
     }
 
-    retractElementIds.forEach(publication::removeAttachmentById);
+    if (!retractElementIds.isEmpty()) {
+      distributionService.retractSync(channelId, mp, retractElementIds);
+      retractElementIds.forEach(publication::removeAttachmentById);
+    }
 
-    distributeManySync(mp, channelId, addElementIds);
+    if (!addElementIds.isEmpty()) {
+      distributeManySync(mp, channelId, addElementIds);
+    }
 
     return publication;
   }

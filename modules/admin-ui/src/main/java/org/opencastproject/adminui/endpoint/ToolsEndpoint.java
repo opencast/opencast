@@ -567,11 +567,17 @@ public class ToolsEndpoint implements ManagedService {
         distributedElement = thumbnail.chooseDefaultThumbnail(mp, position.getAsDouble());
         thumbnailSource = ThumbnailImpl.ThumbnailSource.DEFAULT;
       }
+      String signedUrl;
+      if (distributedElement != null) {
+        signedUrl = signUrl(distributedElement.getURI());
+      } else {
+        signedUrl = "";
+      }
       return RestUtils.okJson(obj(f("thumbnail", obj(
         f("type", thumbnailSource.name()),
         f("position", position.getAsDouble()),
         f("defaultPosition", thumbnail.getDefaultPosition()),
-        f("url", signUrl(distributedElement.getURI()))
+        f("url", signedUrl)
       ))));
     } catch (IOException | FileUploadException e) {
       logger.error("Error reading request body: {}", getStackTrace(e));

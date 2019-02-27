@@ -133,6 +133,7 @@ public final class ThumbnailImpl {
     }
   }
 
+  private final AdminUIConfiguration.ThumbnailPreviewMode previewMode;
   private final MediaPackageElementFlavor previewFlavor;
   private final String previewProfileDownscale;
   private final MediaPackageElementFlavor uploadedFlavor;
@@ -161,6 +162,7 @@ public final class ThumbnailImpl {
     final OaiPmhPublicationService oaiPmhPublicationService,
     final ConfigurablePublicationService configurablePublicationService, final AssetManager assetManager,
     final ComposerService composerService) {
+    this.previewMode = config.getThumbnailPreviewMode();
     this.previewFlavor = parseFlavor(config.getThumbnailPreviewFlavor());
     this.previewProfileDownscale = config.getThumbnailPreviewProfileDownscale();
     this.uploadedFlavor = parseFlavor(config.getThumbnailUploadedFlavor());
@@ -253,7 +255,9 @@ public final class ThumbnailImpl {
       final MediaPackageElementFlavor trackFlavor = getPrimaryOrSecondaryTrack(mp).getFlavor();
 
       final Tuple<URI, MediaPackageElement> internalPublicationResult = updateInternalPublication(mp, true);
-      deletionUris.add(internalPublicationResult.getA());
+      if (internalPublicationResult != null) {
+        deletionUris.add(internalPublicationResult.getA());
+      }
       if (thumbnailAutoDistribution) {
         deletionUris.add(updateExternalPublication(mp, trackFlavor));
         deletionUris.add(updateOaiPmh(mp, trackFlavor));
@@ -329,21 +333,27 @@ public final class ThumbnailImpl {
     final Set<Publication> publicationsToUpdate = new HashSet<>();
     externalPublicationOpt.ifPresent(publicationsToUpdate::add);
 
-    final String publishThumbnailId = UUID.randomUUID().toString();
-    final InputStream inputStream = tempInputStream();
-    final URI publishThumbnailUri = workspace
-      .put(mp.getIdentifier().compact(), publishThumbnailId, this.tempThumbnailFileName, inputStream);
-    inputStream.close();
+    HashSet<Attachment> addElements = new HashSet<>();
+    URI publishThumbnailUri = null;
 
-    final Attachment publishAttachment = AttachmentImpl.fromURI(publishThumbnailUri);
-    publishAttachment.setIdentifier(UUID.randomUUID().toString());
-    publishAttachment.setFlavor(publishFlavor.applyTo(trackFlavor));
-    publishTags.forEach(publishAttachment::addTag);
-    publishAttachment.setMimeType(this.tempThumbnailMimeType);
+    if (tempThumbnailFileName != null) {
+      final String publishThumbnailId = UUID.randomUUID().toString();
+      final InputStream inputStream = tempInputStream();
+      publishThumbnailUri = workspace
+        .put(mp.getIdentifier().compact(), publishThumbnailId, this.tempThumbnailFileName, inputStream);
+      inputStream.close();
+
+      final Attachment publishAttachment = AttachmentImpl.fromURI(publishThumbnailUri);
+      publishAttachment.setIdentifier(UUID.randomUUID().toString());
+      publishAttachment.setFlavor(publishFlavor.applyTo(trackFlavor));
+      publishTags.forEach(publishAttachment::addTag);
+      publishAttachment.setMimeType(this.tempThumbnailMimeType);
+      addElements.add(publishAttachment);
+    }
 
     final Publication oaiPmhPub = oaiPmhPublicationService.replaceSync(
       mp, oaiPmhChannel,
-      Collections.singleton(publishAttachment), Collections.emptySet(),
+      addElements, Collections.emptySet(),
       Collections.singleton(publishFlavor), Collections.emptySet(),
       publicationsToUpdate, false);
     mp.remove(oldOaiPmhPub.get());
@@ -362,29 +372,40 @@ public final class ThumbnailImpl {
     }
     final Publication pub = pubOpt.get();
 
-    final String aid = UUID.randomUUID().toString();
-    final InputStream inputStream = tempInputStream();
-    final URI aUri = workspace.put(mp.getIdentifier().compact(), aid, tempThumbnailFileName, inputStream);
-    inputStream.close();
-    final Attachment attachment = AttachmentImpl.fromURI(aUri);
-    attachment.setIdentifier(aid);
-    attachment.setFlavor(flavor);
-    tags.forEach(attachment::addTag);
-    attachment.setMimeType(tempThumbnailMimeType);
-    if (conversionProfile != null) {
-      downscaleAttachment(conversionProfile, attachment);
+    HashSet<Attachment> addElements = new HashSet<>();
+    String aid = null;
+    URI aUri = null;
+
+    if (tempThumbnailFileName != null) {
+      aid = UUID.randomUUID().toString();
+      final InputStream inputStream = tempInputStream();
+      aUri = workspace.put(mp.getIdentifier().compact(), aid, tempThumbnailFileName, inputStream);
+      inputStream.close();
+      final Attachment attachment = AttachmentImpl.fromURI(aUri);
+      attachment.setIdentifier(aid);
+      attachment.setFlavor(flavor);
+      tags.forEach(attachment::addTag);
+      attachment.setMimeType(tempThumbnailMimeType);
+      if (conversionProfile != null) {
+        downscaleAttachment(conversionProfile, attachment);
+      }
+      addElements.add(attachment);
     }
 
-    final Collection<MediaPackageElement> addElements = Collections.singleton(attachment);
     final Set<String> removeElementsIds = Arrays.stream(pub.getAttachments()).filter(priorFilter)
       .map(MediaPackageElement::getIdentifier).collect(Collectors.toSet());
     final Publication newPublication = this.configurablePublicationService.replaceSync(mp, channelId, addElements, removeElementsIds);
     mp.remove(pub);
     mp.add(newPublication);
-    //noinspection ConstantConditions
-    final Attachment newElement = Arrays.stream(newPublication.getAttachments())
-      .filter(att -> att.getIdentifier().equals(aid)).findAny().get();
-    return Tuple.tuple(aUri, newElement);
+    if (aUri != null) {
+      //noinspection ConstantConditions
+      final String aidFinal = aid;
+      final Attachment newElement = Arrays.stream(newPublication.getAttachments())
+        .filter(att -> att.getIdentifier().equals(aidFinal)).findAny().get();
+      return Tuple.tuple(aUri, newElement);
+    } else {
+      return null;
+    }
   }
 
   private void downscaleAttachment(final String conversionProfile, final Attachment attachment)
@@ -430,9 +451,13 @@ public final class ThumbnailImpl {
   private MediaPackageElement chooseThumbnail(final MediaPackage mp, final Track track, final double position)
     throws PublicationException, MediaPackageException, EncoderException, IOException, NotFoundException,
     UnknownFileTypeException {
-    tempThumbnail = composerService.imageSync(track, encodingProfile, position).get(0).getURI();
-    tempThumbnailMimeType = MimeTypes.fromURI(tempThumbnail);
-    tempThumbnailFileName = tempThumbnail.getPath().substring(tempThumbnail.getPath().lastIndexOf('/') + 1);
+    if (previewMode == AdminUIConfiguration.ThumbnailPreviewMode.ALWAYS) {
+      /* Extracting the image would requires downloading the track into the workspace which is a very
+         expensive operation */
+      tempThumbnail = composerService.imageSync(track, encodingProfile, position).get(0).getURI();
+      tempThumbnailMimeType = MimeTypes.fromURI(tempThumbnail);
+      tempThumbnailFileName = tempThumbnail.getPath().substring(tempThumbnail.getPath().lastIndexOf('/') + 1);
+    }
 
     final Collection<URI> deletionUris = new ArrayList<>(0);
     try {
@@ -441,15 +466,20 @@ public final class ThumbnailImpl {
       Arrays.stream(mp.getElementsByFlavor(uploadedFlavor)).forEach(mp::remove);
 
       final Tuple<URI, MediaPackageElement> internalPublicationResult = updateInternalPublication(mp, false);
-      deletionUris.add(internalPublicationResult.getA());
+      if (internalPublicationResult != null) {
+        deletionUris.add(internalPublicationResult.getA());
+      }
       if (thumbnailAutoDistribution) {
         deletionUris.add(updateExternalPublication(mp, track.getFlavor()));
         deletionUris.add(updateOaiPmh(mp, track.getFlavor()));
       }
 
       assetManager.takeSnapshot(mp);
-
-      return internalPublicationResult.getB();
+      if (internalPublicationResult != null) {
+        return internalPublicationResult.getB();
+      } else {
+        return null;
+      }
     } finally {
       workspace.cleanup(mp.getIdentifier());
       for (final URI uri : deletionUris) {

@@ -39,11 +39,16 @@ public class AdminUIConfiguration implements ManagedService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(AdminUIConfiguration.class);
 
+  public enum ThumbnailPreviewMode {
+    ALWAYS, PARTIAL;
+  }
+
   public static final String OPT_PREVIEW_SUBTYPE = "preview.subtype";
   public static final String OPT_WAVEFORM_SUBTYPE = "waveform.subtype";
   public static final String OPT_SMIL_CATALOG_FLAVOR = "smil.catalog.flavor";
   public static final String OPT_SMIL_CATALOG_TAGS = "smil.catalog.tags";
   public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
+  public static final String OPT_THUMBNAIL_PREVIEW_MODE = "thumbnail.preview.mode";
   public static final String OPT_THUMBNAIL_PUBLISH_FLAVOR = "thumbnail.publish.flavor";
   public static final String OPT_THUMBNAIL_PUBLISH_TAGS = "thumbnail.publish.tags";
   public static final String OPT_THUMBNAIL_UPLOADED_FLAVOR = "thumbnail.uploaded.flavor";
@@ -67,6 +72,7 @@ public class AdminUIConfiguration implements ManagedService {
   private static final String DEFAULT_SMIL_CATALOG_FLAVOR = "smil/cutting";
   private static final String DEFAULT_SMIL_CATALOG_TAGS = "archive";
   private static final String DEFAULT_SMIL_SILENCE_FLAVOR = "*/silence";
+  private static final ThumbnailPreviewMode DEFAULT_THUMBNAIL_PREVIEW_MODE = ThumbnailPreviewMode.PARTIAL;
   private static final String DEFAULT_THUMBNAIL_PUBLISH_FLAVOR = "*/search+preview";
   private static final String DEFAULT_THUMBNAIL_PUBLISH_TAGS = "engage-download";
   private static final String DEFAULT_THUMBNAIL_UPLOADED_FLAVOR = "thumbnail/source";
@@ -90,6 +96,7 @@ public class AdminUIConfiguration implements ManagedService {
   private Set<String> smilCatalogTagSet = new HashSet<>();
   private MediaPackageElementFlavor smilCatalogFlavor = MediaPackageElementFlavor.parseFlavor(DEFAULT_SMIL_CATALOG_FLAVOR);
   private MediaPackageElementFlavor smilSilenceFlavor = MediaPackageElementFlavor.parseFlavor(DEFAULT_SMIL_SILENCE_FLAVOR);
+  private ThumbnailPreviewMode thumbnailPreviewMode = DEFAULT_THUMBNAIL_PREVIEW_MODE;
   private String thumbnailPublishFlavor = DEFAULT_THUMBNAIL_PUBLISH_FLAVOR;
   private String thumbnailPublishTags = DEFAULT_THUMBNAIL_PUBLISH_TAGS;
   private String thumbnailUploadedFlavor = DEFAULT_THUMBNAIL_UPLOADED_FLAVOR;
@@ -128,6 +135,10 @@ public class AdminUIConfiguration implements ManagedService {
 
   public MediaPackageElementFlavor getSmilSilenceFlavor() {
     return smilSilenceFlavor;
+  }
+
+  public ThumbnailPreviewMode getThumbnailPreviewMode() {
+    return thumbnailPreviewMode;
   }
 
   public String getThumbnailUploadedFlavor() {
@@ -229,6 +240,17 @@ public class AdminUIConfiguration implements ManagedService {
     smilSilenceFlavor = MediaPackageElementFlavor.parseFlavor(
       StringUtils.defaultString((String) properties.get(OPT_SMIL_SILENCE_FLAVOR), DEFAULT_SMIL_SILENCE_FLAVOR));
     logger.debug("Smil silence flavor configuration set to '{}'", smilSilenceFlavor);
+
+    // Mode of thumbnail preview updates
+    try {
+      thumbnailPreviewMode = ThumbnailPreviewMode.valueOf(
+        StringUtils.defaultString((String) properties.get(OPT_THUMBNAIL_PREVIEW_MODE),
+          DEFAULT_THUMBNAIL_PREVIEW_MODE.toString()).toUpperCase());
+    } catch (IllegalArgumentException e) {
+      logger.warn("Invalid thumbnail preview mode value, falling back to default");
+      thumbnailPreviewMode = DEFAULT_THUMBNAIL_PREVIEW_MODE;
+    }
+    logger.debug("Thumbnail preview mode: '{}'", thumbnailPreviewMode);
 
     // Flavor of the uploaded thumbnail
     thumbnailUploadedFlavor = StringUtils.defaultString(
