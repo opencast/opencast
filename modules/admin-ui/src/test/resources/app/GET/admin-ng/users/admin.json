@@ -1,8 +1,4 @@
 {
-  "blacklist": {
-    "end": "2029-12-24T12:12:12Z",
-    "start": "2028-12-12T12:12:12Z"
-  },
   "email": "admin@example.com",
   "manageable": true,
   "name": "•mock• SystemAdmin",

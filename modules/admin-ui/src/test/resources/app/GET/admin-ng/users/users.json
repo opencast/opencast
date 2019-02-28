@@ -4,7 +4,6 @@
   "offset": 0,
   "results": [
     {
-      "blacklist": "",
       "email": "mh_admin@example.com",
       "manageable": false,
       "name": "•mock• MH System Account",
@@ -19,10 +18,6 @@
       "username": "matterhorn_system_account"
     },
     {
-      "blacklist": {
-        "end": "2029-12-24T12:12:12Z",
-        "start": "2028-12-12T12:12:12Z"
-      },
       "email": "admin@example.com",
       "manageable": true,
       "name": "•mock• SystemAdmin",
@@ -37,10 +32,6 @@
       "username": "admin"
     },
     {
-      "blacklist": {
-        "end": "2025-12-24T12:12:12Z",
-        "start": "2012-12-12T12:12:12Z"
-      },
       "email": "pm.user.1@example.com",
       "manageable": true,
       "name": "•mock• PM User 1",
@@ -53,10 +44,6 @@
       "username": "pm.user.1"
     },
     {
-      "blacklist": {
-        "end": "2025-12-24T12:12:12Z",
-        "start": "2012-12-12T12:12:12Z"
-      },
       "email": "pm.user.2@example.com",
       "manageable": true,
       "name": "•mock• PM User 2",
@@ -69,10 +56,6 @@
       "username": "pm.user.2"
     },
     {
-      "blacklist": {
-        "end": "2025-12-24T12:12:12Z",
-        "start": "2012-12-12T12:12:12Z"
-      },
       "email": "pm.user.3@example.com",
       "manageable": true,
       "name": "•mock• PM User 3",
