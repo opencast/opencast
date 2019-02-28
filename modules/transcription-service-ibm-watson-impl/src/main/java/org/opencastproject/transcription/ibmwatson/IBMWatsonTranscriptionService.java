@@ -195,7 +195,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
   /** Service configuration values */
   private boolean enabled = false; // Disabled by default
-  private String watsonServiceUrl = UrlSupport.concat(IBM_WATSON_SERVICE_URL, "/", API_VERSION, "/");
+  private String watsonServiceUrl = UrlSupport.concat(IBM_WATSON_SERVICE_URL, API_VERSION);
   private String user; // user name or 'apikey'
   private String psw; // password or api key
   private String model;
@@ -228,7 +228,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
         // Service url (optional)
         Option<String> urlOpt = OsgiUtil.getOptCfg(cc.getProperties(), IBM_WATSON_SERVICE_URL_CONFIG);
         if (urlOpt.isSome()) {
-          watsonServiceUrl = UrlSupport.concat(urlOpt.get(), "/", API_VERSION, "/");
+          watsonServiceUrl = UrlSupport.concat(urlOpt.get(), API_VERSION);
         }
 
         // Api key is checked first. If not entered, user and password are mandatory (to
@@ -485,7 +485,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
     CloseableHttpClient httpClient = makeHttpClient();
     HttpPost httpPost = new HttpPost(
-            watsonServiceUrl + REGISTER_CALLBACK + String.format("?callback_url=%s", callbackUrl));
+            UrlSupport.concat(watsonServiceUrl, REGISTER_CALLBACK) + String.format("?callback_url=%s", callbackUrl));
     CloseableHttpResponse response = null;
 
     try {
@@ -557,7 +557,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     }
     CloseableHttpResponse response = null;
     try {
-      HttpPost httpPost = new HttpPost(watsonServiceUrl + RECOGNITIONS
+      HttpPost httpPost = new HttpPost(UrlSupport.concat(watsonServiceUrl, RECOGNITIONS)
               + String.format(
                       "?user_token=%s&inactivity_timeout=-1&timestamps=true&smart_formatting=true%s",
                       mpId, additionalParms));
@@ -634,7 +634,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     CloseableHttpResponse response = null;
     String mpId = "unknown";
     try {
-      HttpGet httpGet = new HttpGet(watsonServiceUrl + RECOGNITIONS + "/" + jobId);
+      HttpGet httpGet = new HttpGet(UrlSupport.concat(watsonServiceUrl, RECOGNITIONS, jobId));
       response = httpClient.execute(httpGet);
       int code = response.getStatusLine().getStatusCode();
 
