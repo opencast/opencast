@@ -167,9 +167,6 @@ public interface EventIndexSchema extends IndexSchema {
   /** The recording status (opted-out) */
   String OPTED_OUT = "opted_out";
 
-  /** The recording status (blacklisted) */
-  String BLACKLISTED = "blacklisted";
-
   /** The scheduling status */
   String SCHEDULING_STATUS = "scheduling_status";
 

@@ -14,6 +14,7 @@ How to Upgrade
 5. [Upgrade the ActiveMQ configuration](#activemq-migration)
 6. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
 7. Migrate the scheduled events
+8. Rebuild the Elastic Search indexes
 
 Database Migration
 ------------------
@@ -80,3 +81,12 @@ change `maintenance` back to `false` to put the scheduler back into its normal m
 
 You should avoid running Opencast 7 without migrating the scheduled events first. Otherwise, your capture agents may
 fetch an empty calendar.
+
+Rebuild the Elastic Search Indexes
+----------------------------------
+
+Due to [MH-13396](https://opencast.jira.com/browse/MH-13396), the configuration of the Elastic Search indexes of both
+the Admin UI and the External API have changed.
+
+Therefore, those indexes both need to be rebuilt.
+

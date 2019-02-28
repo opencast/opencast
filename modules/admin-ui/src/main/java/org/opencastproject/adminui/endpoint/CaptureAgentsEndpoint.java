@@ -201,7 +201,7 @@ public class CaptureAgentsEndpoint {
     // Run through and build a map of updates (rather than states)
     List<JValue> agentsJSON = new ArrayList<>();
     for (Agent agent : filteredAgents) {
-      agentsJSON.add(generateJsonAgent(agent, /* Option.option(room), blacklist, */ inputs, false));
+      agentsJSON.add(generateJsonAgent(agent, inputs, false));
     }
 
     return okJsonList(agentsJSON, offset, limit, total);
@@ -252,7 +252,7 @@ public class CaptureAgentsEndpoint {
   }
 
   /**
-   * Generate a JSON Object for the given capture agent with its related blacklist periods
+   * Generate a JSON Object for the given capture agent
    *
    * @param agent
    *          The target capture agent

@@ -267,8 +267,8 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
   }
 
   @SuppressWarnings("unchecked")
-  private SearchResultItem<Event>[] createEvents(int readyCount, int blacklistedCount, int optedOutCount) {
-    SearchResultItem<Event>[] eventitems = new SearchResultItem[readyCount + blacklistedCount + optedOutCount];
+  private SearchResultItem<Event>[] createEvents(int readyCount, int optedOutCount) {
+    SearchResultItem<Event>[] eventitems = new SearchResultItem[readyCount + optedOutCount];
     int total = 1;
     String orgId = new DefaultOrganization().getId();
     for (int i = 0; i < readyCount; i++) {
@@ -276,16 +276,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
       readyEvent.setOptedOut(false);
       SearchResultItem<Event> eventItem = EasyMock.createMock(SearchResultItem.class);
       EasyMock.expect(eventItem.getSource()).andReturn(readyEvent);
-      EasyMock.replay(eventItem);
-      eventitems[total - 1] = eventItem;
-      total++;
-    }
-
-    for (int i = 0; i < blacklistedCount; i++) {
-      Event blacklistedEvent = new Event(Integer.toString(i + total), orgId);
-      blacklistedEvent.setBlacklisted(true);
-      SearchResultItem<Event> eventItem = EasyMock.createMock(SearchResultItem.class);
-      EasyMock.expect(eventItem.getSource()).andReturn(blacklistedEvent);
       EasyMock.replay(eventItem);
       eventitems[total - 1] = eventItem;
       total++;
@@ -340,13 +330,13 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     descSeriesItems[2] = item1;
 
     // final SearchResultItem<Event>[] eventItems1 = new SearchResultItem[0];
-    final SearchResultItem<Event>[] eventItems1 = createEvents(1, 1, 1);
+    final SearchResultItem<Event>[] eventItems1 = createEvents(1, 1);
 
     // Setup the events for series 2
     final SearchResultItem<Event>[] eventItems2 = new SearchResultItem[0];
 
     // Setup the events for series 3
-    final SearchResultItem<Event>[] eventItems3 = createEvents(0, 1, 2);
+    final SearchResultItem<Event>[] eventItems3 = createEvents(0, 2);
 
     final SearchResultItem<org.opencastproject.index.service.impl.index.theme.Theme> themeItem1 = EasyMock
             .createMock(SearchResultItem.class);

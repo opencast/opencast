@@ -80,7 +80,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private String schedulingStatus = null;
   private Boolean optedOut = null;
   private String reviewDate = null;
-  private Boolean blacklisted = null;
   private Boolean hasComments = null;
   private Boolean hasOpenComments = null;
   private Boolean needsCutting = null;
@@ -1020,28 +1019,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public Boolean getOptedOut() {
     return optedOut;
-  }
-
-  /**
-   * Selects recordings with the given recording status (blacklisted).
-   *
-   * @param blacklisted
-   *          the recording status (blacklisted)
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withBlacklisted(boolean blacklisted) {
-    clearExpectations();
-    this.blacklisted = blacklisted;
-    return this;
-  }
-
-  /**
-   * Returns the recording status (blacklisted) of the recording.
-   *
-   * @return the recording backlisted status
-   */
-  public Boolean getBlacklisted() {
-    return blacklisted;
   }
 
   /**

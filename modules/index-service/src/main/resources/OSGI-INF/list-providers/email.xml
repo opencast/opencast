@@ -3,7 +3,7 @@
                name="org.opencastproject.index.service.resources.list.provider.EmailListProvider" immediate="true"
                activate="activate">
   <implementation class="org.opencastproject.index.service.resources.list.provider.EmailListProvider"/>
-  <property name="service.description" value="Blacklists list provider"/>
+  <property name="service.description" value="Email list provider"/>
   <property name="opencast.service.type"
             value="org.opencastproject.index.service.resources.list.provider.EmailListProvider"/>
 

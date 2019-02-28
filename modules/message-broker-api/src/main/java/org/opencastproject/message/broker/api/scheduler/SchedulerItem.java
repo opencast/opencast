@@ -59,7 +59,6 @@ public class SchedulerItem implements Serializable {
   private final long end;
   private final String optOut;
   private final String presenters;
-  private final String blacklisted;
   private final String reviewStatus;
   private final long reviewDate;
   private final String recordingState;
@@ -68,7 +67,7 @@ public class SchedulerItem implements Serializable {
   private final Type type;
 
   public enum Type {
-    UpdateCatalog, UpdateProperties, UpdateAcl, UpdateAgentId, UpdateOptOut, UpdateBlacklist, UpdateEnd, UpdatePresenters, UpdateReviewStatus, UpdateRecordingStatus, UpdateStart, DeleteRecordingStatus, Delete
+    UpdateCatalog, UpdateProperties, UpdateAcl, UpdateAgentId, UpdateOptOut, UpdateEnd, UpdatePresenters, UpdateReviewStatus, UpdateRecordingStatus, UpdateStart, DeleteRecordingStatus, Delete
   };
 
   /**
@@ -115,14 +114,6 @@ public class SchedulerItem implements Serializable {
   }
 
   /**
-   * @param blacklisted
-   *          the blacklist status
-   * @return Builds {@link SchedulerItem} for updating the blacklist status of an event.
-   */
-  public static SchedulerItem updateBlacklist(boolean blacklisted) {
-    return new SchedulerItem(blacklisted, Type.UpdateBlacklist);
-  }
-
   /**
    * @param reviewStatus
    *          the review status
@@ -203,7 +194,6 @@ public class SchedulerItem implements Serializable {
     this.properties = null;
     this.acl = null;
     this.agentId = null;
-    this.blacklisted = null;
     this.end = -1;
     this.optOut = null;
     this.presenters = null;
@@ -226,7 +216,6 @@ public class SchedulerItem implements Serializable {
     this.properties = serializeProperties(properties);
     this.acl = null;
     this.agentId = null;
-    this.blacklisted = null;
     this.end = -1;
     this.optOut = null;
     this.presenters = null;
@@ -247,7 +236,6 @@ public class SchedulerItem implements Serializable {
     this.properties = null;
     this.acl = null;
     this.agentId = null;
-    this.blacklisted = null;
     this.end = -1;
     this.optOut = null;
     this.presenters = null;
@@ -274,7 +262,6 @@ public class SchedulerItem implements Serializable {
       throw new IllegalStateException();
     }
     this.agentId = null;
-    this.blacklisted = null;
     this.end = -1;
     this.optOut = null;
     this.presenters = null;
@@ -287,10 +274,10 @@ public class SchedulerItem implements Serializable {
   }
 
   /**
-   * Constructor to build an update blacklist status event {@link SchedulerItem} or an opt out status event.
+   * Constructor to build an opt out status event.
    *
    * @param x
-   *          The blacklist status or the opt out status
+   *          The opt out status
    * @param type
    *          The type of boolean to set
    */
@@ -299,11 +286,6 @@ public class SchedulerItem implements Serializable {
     this.properties = null;
     this.acl = null;
     this.agentId = null;
-    if (type == Type.UpdateBlacklist) {
-      this.blacklisted = gson.toJson(x);
-    } else {
-      this.blacklisted = null;
-    }
     this.end = -1;
     if (type == Type.UpdateOptOut) {
       this.optOut = gson.toJson(x);
@@ -332,7 +314,6 @@ public class SchedulerItem implements Serializable {
     this.properties = null;
     this.acl = null;
     this.agentId = null;
-    this.blacklisted = null;
     this.end = -1;
     this.optOut = null;
     this.presenters = null;
@@ -357,7 +338,6 @@ public class SchedulerItem implements Serializable {
     this.properties = null;
     this.acl = null;
     this.agentId = null;
-    this.blacklisted = null;
     this.end = -1;
     this.optOut = null;
     this.presenters = null;
@@ -373,7 +353,6 @@ public class SchedulerItem implements Serializable {
     this.event = null;
     this.acl = null;
     this.agentId = null;
-    this.blacklisted = null;
     this.end = end == null ? -1 : end.getTime();
     this.lastHeardFrom = null;
     this.optOut = null;
@@ -390,7 +369,6 @@ public class SchedulerItem implements Serializable {
     this.event = null;
     this.acl = null;
     this.agentId = agentId;
-    this.blacklisted = null;
     this.end = -1;
     this.lastHeardFrom = null;
     this.optOut = null;
@@ -407,7 +385,6 @@ public class SchedulerItem implements Serializable {
     this.event = null;
     this.acl = null;
     this.agentId = null;
-    this.blacklisted = null;
     this.end = -1;
     this.lastHeardFrom = null;
     this.optOut = null;
@@ -444,10 +421,6 @@ public class SchedulerItem implements Serializable {
 
   public String getAgentId() {
     return agentId;
-  }
-
-  public Boolean getBlacklisted() {
-    return gson.fromJson(blacklisted, Boolean.class);
   }
 
   public Date getEnd() {

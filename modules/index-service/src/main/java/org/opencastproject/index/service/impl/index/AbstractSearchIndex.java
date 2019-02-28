@@ -437,7 +437,6 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
       throw new NotFoundException("No event with id " + uid + " found.");
 
     event.setOptedOut(null);
-    event.setBlacklisted(null);
     event.setReviewDate(null);
     event.setReviewStatus(null);
     event.setSchedulingStatus(null);

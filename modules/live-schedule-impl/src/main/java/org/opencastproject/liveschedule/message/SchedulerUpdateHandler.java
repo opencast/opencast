@@ -104,7 +104,6 @@ public class SchedulerUpdateHandler extends UpdateHandler {
               liveScheduleService.deleteLiveEvent(mpId);
           break;
         case UpdateOptOut:
-        case UpdateBlacklist:
         case UpdatePresenters:
         case UpdateReviewStatus:
           break;
