@@ -64,17 +64,8 @@ public class AdminUIEventSearchQueryTest {
   // protected static AdminUISearchIndexStub idx = null;
   private static AdminUISearchIndex idx;
 
-  /** The index root directory */
-  protected static File idxRoot = null;
-
   /** The name of the index */
-  protected static final String indexName = "adminui";
-
-  /** The index version */
-  protected static final int indexVersion = 101;
-
-  /** Flag to indicate read only index */
-  protected static boolean isReadOnly = false;
+  private static final String indexName = "adminui";
 
   @ClassRule
   public static TemporaryFolder testFolder = new TemporaryFolder();
@@ -82,8 +73,7 @@ public class AdminUIEventSearchQueryTest {
   @BeforeClass
   public static void setupClass() throws Exception {
     TestUtils.startTesting();
-    // Index
-    idxRoot = testFolder.newFolder();
+    final File idxRoot = testFolder.newFolder();
     AdminUIElasticsearchUtils.createIndexConfigurationAt(idxRoot, indexName);
     idx = new AdminUISearchIndex();
     idx.activate(null);
@@ -119,19 +109,11 @@ public class AdminUIEventSearchQueryTest {
 
   /**
    * Adds sample pages to the search index and returns the number of documents added.
-   *
-   * @return the number of pages added
    */
-  protected int populateIndex() throws Exception {
-    int count = 0;
-
-    // Add content to the index
+  private void populateIndex() throws Exception {
     for (int i = 0; i < 10; i++) {
       Event event = new Event(Integer.toString(i), rightOrg.getId());
       idx.addOrUpdate(event);
-      count++;
     }
-
-    return count;
   }
 }

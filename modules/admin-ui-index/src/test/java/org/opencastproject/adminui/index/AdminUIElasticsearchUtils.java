@@ -51,7 +51,7 @@ public final class AdminUIElasticsearchUtils {
    * @throws IOException
    *           if creating the configuration fails
    */
-  public static String createIndexConfigurationAt(File homeDirectory, String index) throws IOException {
+  public static void createIndexConfigurationAt(File homeDirectory, String index) throws IOException {
 
     // Load the index configuration and move it into place
     File configurationRoot = new File(PathSupport.concat(new String[] { homeDirectory.getAbsolutePath(), "etc",
@@ -60,16 +60,16 @@ public final class AdminUIElasticsearchUtils {
     if (!configurationRoot.mkdirs())
       throw new IOException("Error creating " + configurationRoot);
 
-    String[] files = new String[] { "default-mapping.json", "event-mapping.json", "group-mapping.json", "names.txt",
+    String[] files = new String[] { "default-mapping.json", "event-mapping.json", "group-mapping.json",
             "series-mapping.json", "settings.yml", "theme-mapping.json", "version-mapping.json" };
 
     for (String file : files) {
       String bundleLocation = PathSupport.concat(new String[] { "/index", index, file });
       File fileLocation = new File(configurationRoot, file);
-      FileUtils
-              .copyInputStreamToFile(AdminUIElasticsearchUtils.class.getResourceAsStream(bundleLocation), fileLocation);
+      FileUtils.copyInputStreamToFile(
+              AdminUIElasticsearchUtils.class.getResourceAsStream(bundleLocation),
+              fileLocation);
     }
-    return configurationRoot.getParentFile().getAbsolutePath();
   }
 
 }
