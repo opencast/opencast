@@ -31,7 +31,7 @@ paella.addPlugin(function() {
 
     getAlignment() { return 'right'; }
     getButtonType() { return paella.ButtonPlugin.type.popUpButton; }
-
+    getIconClass() { return 'icon-list'; }
 
     checkEnabled(onSuccess) {
       var self = this;
