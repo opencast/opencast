@@ -1,0 +1,6 @@
+cluster.name: opencast
+path.home: ${opencast.home}/
+path.conf: ${opencast.home}/etc/index
+path.data: ${opencast.home}/index/data
+path.work: ${opencast.home}/work/index
+path.logs: ${opencast.home}/logs

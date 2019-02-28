@@ -28,7 +28,6 @@ import static org.opencastproject.matterhorn.search.impl.SearchIndexImplStub.CON
 
 import org.opencastproject.matterhorn.search.SearchMetadata;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -67,7 +66,7 @@ public class SearchIndexTest {
   /**
    * Sets up the solr search index. Since solr sometimes has a hard time shutting down cleanly, it's done only once for
    * all the tests.
-   * 
+   *
    * @throws Exception
    */
   @BeforeClass
@@ -87,7 +86,6 @@ public class SearchIndexTest {
     try {
       if (idx != null)
         idx.close();
-      FileUtils.deleteQuietly(idxRoot);
     } catch (IOException e) {
       fail("Error closing search index: " + e.getMessage());
     }
@@ -112,7 +110,7 @@ public class SearchIndexTest {
 
   /**
    * Adds sample pages to the search index and returns the number of documents added.
-   * 
+   *
    * @return the number of pages added
    */
   protected int populateIndex() throws Exception {

@@ -42,28 +42,23 @@ public final class ElasticsearchUtils {
 
   /**
    * Creates an elastic search index configuration inside the given directory by loading the relevant configuration
-   * files from the bundle. The final location will be <code>homeDirectory/etc/index</code>.
+   * files from the bundle. The final location will be <code>configDirectory/etc/index</code>.
    * 
-   * @param homeDirectory
+   * @param configDirectory
    *          the configuration directory
    * @param index
    *          the index name
    * @throws IOException
    *           if creating the configuration fails
    */
-  public static void createIndexConfigurationAt(File homeDirectory, String index) throws IOException {
+  public static void createIndexConfigurationAt(File configDirectory, String index) throws IOException {
 
     // Load the index configuration and move it into place
-    File configurationRoot = new File(PathSupport.concat(new String[] { homeDirectory.getAbsolutePath(), index }));
-    FileUtils.deleteQuietly(configurationRoot);
-    if (!configurationRoot.mkdirs())
-      throw new IOException("Error creating " + configurationRoot);
-
-    String[] files = new String[] { "content-mapping.json", "names.txt", "settings.yml", "version-mapping.json" };
+    String[] files = new String[] { "content-mapping.json", "elasticsearch.yml", "version-mapping.json" };
 
     for (String file : files) {
       String bundleLocation = PathSupport.concat(new String[] { "/elasticsearch", index, file });
-      File fileLocation = new File(configurationRoot, file);
+      File fileLocation = new File(configDirectory, file);
       FileUtils.copyInputStreamToFile(ElasticsearchUtils.class.getResourceAsStream(bundleLocation), fileLocation);
     }
 
