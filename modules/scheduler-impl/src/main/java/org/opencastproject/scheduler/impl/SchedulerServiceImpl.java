@@ -1759,8 +1759,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
 
             final List<SchedulerItem> indexItems = Arrays
-                    .asList(SchedulerItem.updateBlacklist(false),
-                            SchedulerItem.updateReviewStatus(reviewStatus, reviewDate));
+                    .asList(SchedulerItem.updateReviewStatus(reviewStatus, reviewDate));
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                     new SchedulerItemList(record.getMediaPackageId(), indexItems.toArray(new SchedulerItem[0])));
             final List<SchedulerItem> schedulerItems = new ArrayList<>(

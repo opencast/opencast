@@ -70,7 +70,7 @@ import javax.xml.transform.stream.StreamSource;
         "language", "source", "created", "creator", "publisher", "license", "rights", "accessPolicy", "managedAcl", "workflowState",
         "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration", "trackMimetypes",
         "trackStreamResolutions", "trackFlavors", "metadataFlavors", "metadataMimetypes", "attachmentFlavors",
-        "reviewStatus", "reviewDate", "optedOut", "blacklisted", "hasComments", "hasOpenComments", "hasPreview", "needsCutting",
+        "reviewStatus", "reviewDate", "optedOut", "hasComments", "hasOpenComments", "hasPreview", "needsCutting",
         "publications", "workflowScheduledDate", "archiveVersion", "schedulingStatus", "recordingStatus", "eventStatus",
         "agentId", "agentConfigurations", "technicalStartTime", "technicalEndTime", "technicalPresenters" })
 @XmlRootElement(name = "event", namespace = IndexObject.INDEX_XML_NAMESPACE)
@@ -81,7 +81,7 @@ public class Event implements IndexObject {
    * The scheduling status of the event
    */
   public enum SchedulingStatus {
-    BLACKLISTED, OPTED_OUT, READY_FOR_RECORDING
+    OPTED_OUT, READY_FOR_RECORDING
   };
 
   /** The document type */
@@ -256,10 +256,6 @@ public class Event implements IndexObject {
   /** The event opted out status, whether the event is opted out or not opted out */
   @XmlElement(name = "opted_out")
   private Boolean optedOut = null;
-
-  /** The event blacklist status, whether the event is blacklisted or not */
-  @XmlElement(name = "blacklisted")
-  private Boolean blacklisted = null;
 
   /** The event review date */
   @XmlElement(name = "review_date")
@@ -939,28 +935,6 @@ public class Event implements IndexObject {
   }
 
   /**
-   * Sets the blacklist status for this event
-   *
-   * @param blacklisted
-   *          the blacklist status, whether the event is blacklisted or not
-   */
-  public void setBlacklisted(Boolean blacklisted) {
-    this.blacklisted = blacklisted;
-
-    updateSchedulingStatus();
-    updateEventStatus();
-  }
-
-  /**
-   * Returns the blacklist status from this event
-   *
-   * @return the blacklist status from this event, whether the event is blacklist or not
-   */
-  public Boolean getBlacklisted() {
-    return blacklisted;
-  }
-
-  /**
    * Sets the list of presenters.
    *
    * @param presenters
@@ -1152,13 +1126,11 @@ public class Event implements IndexObject {
   }
 
   /**
-   * Update the scheduling status based on the optedOut and blacklisted properties
+   * Update the scheduling status based on the optedOut property
    */
   public void updateSchedulingStatus() {
-    if (blacklisted == null && optedOut == null) {
+    if (optedOut == null) {
       schedulingStatus = null;
-    } else if (blacklisted != null && blacklisted) {
-      schedulingStatus = SchedulingStatus.BLACKLISTED.toString();
     } else if (optedOut != null && optedOut) {
       schedulingStatus = SchedulingStatus.OPTED_OUT.toString();
     } else {
@@ -1174,11 +1146,6 @@ public class Event implements IndexObject {
 
     if (getRecordingStatus() != null) {
       eventStatus = recordingStatusMapping.get(getRecordingStatus());
-      return;
-    }
-
-    if (BooleanUtils.isTrue(getBlacklisted())) {
-      eventStatus = "EVENTS.EVENTS.STATUS.BLACKLISTED";
       return;
     }
 

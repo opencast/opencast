@@ -164,8 +164,6 @@ public final class EventIndexUtils {
       metadata.addField(EventIndexSchema.ARCHIVE_VERSION, event.getArchiveVersion(), true);
     if (event.getOptedOut() != null)
       metadata.addField(EventIndexSchema.OPTED_OUT, event.getOptedOut(), true);
-    if (event.getBlacklisted() != null)
-      metadata.addField(EventIndexSchema.BLACKLISTED, event.getBlacklisted(), true);
     if (event.getSchedulingStatus() != null)
       metadata.addField(EventIndexSchema.SCHEDULING_STATUS, event.getSchedulingStatus(), true);
     if (event.getRecordingStatus() != null)

@@ -257,11 +257,6 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       and(EventIndexSchema.REVIEW_DATE, query.getReviewDate());
     }
 
-    // Blacklisted
-    if (query.getBlacklisted() != null) {
-      and(EventIndexSchema.BLACKLISTED, query.getBlacklisted());
-    }
-
     // Has comments
     if (query.getHasComments() != null) {
       and(EventIndexSchema.HAS_COMMENTS, query.getHasComments());

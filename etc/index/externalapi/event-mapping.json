@@ -89,8 +89,6 @@
 
             "opted_out": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
 
-            "blacklisted": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
-
             "has_comments": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
 
             "has_open_comments": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },

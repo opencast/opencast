@@ -7,10 +7,6 @@
       "Name": "agent1",
       "Status": "AGENTS.STATUS.IDLE",
       "Update": "2014-05-26T15:37:02Z",
-      "blacklist": {
-        "start": "2014-08-10T22:00:00Z",
-        "end": "2014-08-15T21:59:00Z"
-      },
       "inputs": [
         {
           "id": "video",
@@ -27,10 +23,6 @@
       "Name": "agent2",
       "Status": "AGENTS.STATUS.ERROR",
       "Update": "2016-03-11T15:15:38Z",
-      "blacklist": {
-        "start": "2014-08-10T22:00:00Z",
-        "end": "2014-08-15T21:59:00Z"
-      },
       "inputs": [],
       "roomId": 622
     },
@@ -38,10 +30,6 @@
       "Name": "agent3",
       "Status": "AGENTS.STATUS.UPLOADING",
       "Update": "2014-05-26T15:37:02Z",
-      "blacklist": {
-        "start": "2014-08-10T22:00:00Z",
-        "end": "2014-08-15T21:59:00Z"
-      },
       "inputs": [
         {
           "id": "video",

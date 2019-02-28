@@ -75,8 +75,6 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
           event = getOrCreateEvent(mediaPackageId, organization, user, getSearchIndex());
           if (isBlank(event.getCreator()))
             event.setCreator(getSecurityService().getUser().getName());
-          if (event.getBlacklisted() == null)
-            event.setBlacklisted(false);
           if (event.getOptedOut() == null)
             event.setOptedOut(false);
 
@@ -153,22 +151,6 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
           event.setOptedOut(schedulerItem.getOptOut());
         } catch (SearchIndexException e) {
           logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
-          return;
-        }
-
-        // Persist the scheduling event
-        updateEvent(event);
-        return;
-      case UpdateBlacklist:
-        logger.debug("Received Update blacklist status");
-
-        // Load the corresponding recording event
-        try {
-          event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user,
-                  getSearchIndex());
-          event.setBlacklisted(schedulerItem.getBlacklisted());
-        } catch (SearchIndexException e) {
-          logger.error("Error retrieving the recording event from the search index: {}", e.getMessage());
           return;
         }
 

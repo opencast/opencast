@@ -63,7 +63,6 @@ describe('Source Step in New Event Wizard', function () {
                         'name': '•mock• agent4',
                         'Status': 'ok',
                         'Update': '2014-05-26T15:37:02Z',
-                        'blacklist': '',
                         'inputs': []
                 };
                 ud.SCHEDULE_SINGLE.device.inputMethods = {};
