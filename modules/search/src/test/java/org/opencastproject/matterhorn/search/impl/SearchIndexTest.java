@@ -74,7 +74,7 @@ public class SearchIndexTest {
     // Index
     idxRoot = testFolder.newFolder();
     System.setProperty("opencast.home", idxRoot.getPath());
-    ElasticsearchUtils.createIndexConfigurationAt(idxRoot, indexName);
+    ElasticsearchUtils.createIndexConfigurationAt(idxRoot);
     idx = new SearchIndexImplStub(indexName, indexVersion, idxRoot.getPath());
   }
 

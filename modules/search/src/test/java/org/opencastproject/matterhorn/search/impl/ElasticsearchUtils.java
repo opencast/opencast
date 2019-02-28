@@ -22,12 +22,11 @@
 
 package org.opencastproject.matterhorn.search.impl;
 
-import org.opencastproject.util.PathSupport;
-
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Utilities to ease dealing with Elasticsearch.
@@ -46,20 +45,19 @@ public final class ElasticsearchUtils {
    * 
    * @param configDirectory
    *          the configuration directory
-   * @param index
-   *          the index name
    * @throws IOException
    *           if creating the configuration fails
    */
-  public static void createIndexConfigurationAt(File configDirectory, String index) throws IOException {
+  public static void createIndexConfigurationAt(File configDirectory) throws IOException {
 
     // Load the index configuration and move it into place
     String[] files = new String[] { "content-mapping.json", "elasticsearch.yml", "version-mapping.json" };
 
     for (String file : files) {
-      String bundleLocation = PathSupport.concat(new String[] { "/elasticsearch", index, file });
-      File fileLocation = new File(configDirectory, file);
-      FileUtils.copyInputStreamToFile(ElasticsearchUtils.class.getResourceAsStream(bundleLocation), fileLocation);
+      final File fileLocation = new File(configDirectory, file);
+      try (InputStream in = ElasticsearchUtils.class.getResourceAsStream("/elasticsearch/" + file)) {
+        FileUtils.copyInputStreamToFile(in, fileLocation);
+      }
     }
 
   }
