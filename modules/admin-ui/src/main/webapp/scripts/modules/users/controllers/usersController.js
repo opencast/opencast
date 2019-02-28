@@ -48,12 +48,6 @@ angular.module('adminNg.controllers')
         label: 'USERS.USERS.TABLE.PROVIDER',
         sortable: true
       }, {
-        //     name:  'blacklist_from',
-        //     label: 'USERS.USERS.TABLE.BLACKLIST_FROM'
-        // }, {
-        //     name:  'blacklist_to',
-        //     label: 'USERS.USERS.TABLE.BLACKLIST_TO'
-        // }, {
         template: 'modules/users/partials/userActionsCell.html',
         label:    'USERS.USERS.TABLE.ACTION'
       }],
