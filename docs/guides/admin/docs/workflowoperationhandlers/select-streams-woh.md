@@ -12,8 +12,8 @@ video stream of the presenter track and the audio stream of the presentation tra
 The workflow operation will use workflow properties set by the Opencast video editor to determine which streams should be
 selected for further processing and add them to the media package based on `target-flavor` and `target-tags`.
 
-**IMPORTANT:** The input tracks need to be inspected using the workflow operation [inspect](inspect-woh.md) before running this
-operation.
+**IMPORTANT:** The input tracks need to be inspected using the workflow operation [inspect](inspect-woh.md) before
+running this operation.
 
 
 Parameter Table
