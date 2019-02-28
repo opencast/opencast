@@ -75,7 +75,7 @@ public class WaveformServiceRemote extends RemoteBase implements WaveformService
       params.add(new BasicNameValuePair("maxWidth", Integer.toString(maxWidth)));
       params.add(new BasicNameValuePair("height", Integer.toString(height)));
       params.add(new BasicNameValuePair("color", color));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new WaveformServiceException(e);
     }

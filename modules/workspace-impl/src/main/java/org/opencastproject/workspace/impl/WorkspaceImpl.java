@@ -401,10 +401,10 @@ public final class WorkspaceImpl implements Workspace {
         logger.debug("{} is not ready, try again later.", url);
         return left(response.getHeaders("token")[0].getValue());
       case HttpServletResponse.SC_OK:
-        logger.info("Downloading {} to {}", url, dst.getAbsolutePath());
+        logger.debug("Downloading {} to {}", url, dst.getAbsolutePath());
         return right(some(downloadTo(response, dst)));
       default:
-        logger.warn(format("Received unexpected response status %s while trying to download from %s", status, url));
+        logger.warn("Received unexpected response status {} while trying to download from {}", status, url);
         FileUtils.deleteQuietly(dst);
         return right(none(File.class));
     }

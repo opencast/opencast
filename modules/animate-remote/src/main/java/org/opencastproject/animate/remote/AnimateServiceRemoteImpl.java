@@ -73,7 +73,7 @@ public class AnimateServiceRemoteImpl extends RemoteBase implements AnimateServi
     HttpResponse response = null;
     try {
       HttpPost post = new HttpPost("/animate");
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
       response = getResponse(post);
       if (response == null) {
         throw new AnimateServiceException("No response from service");

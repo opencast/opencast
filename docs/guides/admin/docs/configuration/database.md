@@ -68,7 +68,7 @@ create a database called `opencast` by executing:
 
 Then create a user `opencast` with a password and grant it all necessary rights:
 
-    GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,TRIGGER,CREATE TEMPORARY TABLES ON opencast.*
+    GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,TRIGGER,CREATE TEMPORARY TABLES,REFERENCES ON opencast.*
       TO 'opencast'@'localhost' IDENTIFIED BY 'opencast_password';
 
 You can choose another name for the user and database and should use a different password.

@@ -328,24 +328,6 @@ public interface SchedulerService {
           throws NotFoundException, UnauthorizedException, SchedulerException;
 
   /**
-   * Returns a list of {@link Period}s which would be scheduled between a start and end date with a given recurrence
-   * rule. Note that this method does not actually schedule anything, merely calculates where things *would* be scheduled.
-   *
-   * @param rrule
-   *          The {@link RRule} defining the recurrence rules
-   * @param start
-   *          The start date and time
-   * @param end
-   *          The end date and time
-   * @param duration
-   *          The duration for each event
-   * @param tz
-   *          The timezone to schedule in
-   * @return The list of Periods which would be scheduled
-   */
-  List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz);
-
-  /**
    * Query
    */
 

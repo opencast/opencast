@@ -42,7 +42,6 @@ import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
-import org.opencastproject.scheduler.api.Util;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -145,9 +144,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       } else {
         throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service");
       }
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (SchedulerConflictException e) {
+    } catch (UnauthorizedException | SchedulerConflictException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service", e);
@@ -205,9 +202,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       } else {
         throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service");
       }
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (SchedulerConflictException e) {
+    } catch (UnauthorizedException | SchedulerConflictException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service", e);
@@ -278,11 +273,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           throw new SchedulerException("Unexpected status code " + response.getStatusLine());
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (SchedulerConflictException e) {
+    } catch (NotFoundException | SchedulerConflictException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to update event " + eventId + " to the scheduler service", e);
@@ -309,9 +300,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         logger.info("Unauthorized to remove the event {}.", eventId);
         throw new UnauthorizedException("Unauthorized to remove the event " + eventId);
       }
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (NotFoundException e) {
+    } catch (UnauthorizedException | NotFoundException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to remove event " + eventId + " from the scheduler service", e);
@@ -369,9 +358,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           return dublinCoreCatalog;
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to parse event dublincore from remote scheduler service", e);
@@ -435,9 +422,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
                   agentConfig, recordingOpt);
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to parse the technical metadata from remote scheduler service", e);
@@ -469,9 +454,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
             return accessControlList;
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to get event access control list from remote scheduler service", e);
@@ -501,9 +484,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           return new HashMap<String, String>((Map) properties);
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to parse event workflow configuration from remote scheduler service", e);
@@ -534,9 +515,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           return new HashMap<String, String>((Map) properties);
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException(
@@ -572,9 +551,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           return booleanObject.booleanValue();
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to get event opt out status from remote scheduler service", e);
@@ -610,9 +587,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           throw new SchedulerException("Unexpected status code " + response.getStatusLine());
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException(
@@ -652,9 +627,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           return reviewStatus;
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to get event review status from remote scheduler service", e);
@@ -662,11 +635,6 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       closeConnection(response);
     }
     throw new SchedulerException("Unable to get event review status from remote scheduler service");
-  }
-
-  @Override
-  public List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz) {
-    return Util.calculatePeriods(start, end, duration, rrule, tz);
   }
 
   @Override

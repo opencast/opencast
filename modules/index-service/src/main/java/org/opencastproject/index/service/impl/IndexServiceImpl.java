@@ -154,7 +154,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -855,8 +854,13 @@ public class IndexServiceImpl implements IndexService {
       eventMetadata.addField(newStartDate);
     }
 
+    // This field is null when it is not used in the Admin UI event details metadata tab.
+    // If used, set it to the the start Date or a new date.
+    // Note, even though this field borrows the DublinCore.PROPERTY_CREATED key,
+    // the startDate is used to update the DublinCore catalog PROPERTY_CREATED field,
+    // event, and mediapackage start fields.
     MetadataField<?> created = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
-    if (created == null || !created.isUpdated() || created.getValue().isNone()) {
+    if (created != null && (!created.isUpdated() || created.getValue().isNone())) {
       eventMetadata.removeField(created);
       MetadataField<String> newCreated = new MetadataField(created);
       if (currentStartDate != null) {
@@ -969,9 +973,7 @@ public class IndexServiceImpl implements IndexService {
         }
         return mediaPackage.getIdentifier().compact();
       case SCHEDULE_MULTIPLE:
-        List<Period> periods = schedulerService.calculatePeriods(rRule, start.toDate(), end.toDate(), duration, tz);
-        Map<String, Period> scheduled = new LinkedHashMap<>();
-         scheduled = schedulerService.addMultipleEvents(rRule, start.toDate(), end.toDate(), duration, tz, captureAgentId,
+        final Map<String, Period> scheduled = schedulerService.addMultipleEvents(rRule, start.toDate(), end.toDate(), duration, tz, captureAgentId,
                 presenterUsernames, eventHttpServletRequest.getMediaPackage().get(), configuration, (Map) caProperties, Opt.none(), Opt.none());
         return StringUtils.join(scheduled.keySet(), ",");
       default:
