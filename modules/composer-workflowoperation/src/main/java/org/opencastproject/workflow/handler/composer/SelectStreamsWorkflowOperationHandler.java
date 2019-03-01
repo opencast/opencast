@@ -63,6 +63,9 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
   /** Name of the 'encode to video only work copy' encoding profile */
   private static final String PREPARE_VIDEO_ONLY_PROFILE = "video-only.work";
 
+  /** Name of the 'encode to video only work copy' encoding profile */
+  private static final String PREPARE_AUDIO_ONLY_PROFILE = "audio-only.work";
+
   /** Name of the muxing encoding profile */
   private static final String MUX_AV_PROFILE = "mux-av.work";
 
@@ -318,8 +321,20 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
         final MuxResult muxResult = muxMultipleVideoTracks(mediaPackage, augmentedTracks);
         result.add(muxResult);
       }
+    } else if (allHidden(augmentedTracks, SubTrack.VIDEO)) {
+       // Second case: We only have audio. In this case, just pass through all input tracks.
+       for (final AugmentedTrack t : augmentedTracks) {
+         if (t.hasAudio()) {
+           if (t.hide(SubTrack.VIDEO)) {
+             final TrackJobResult hideVideoResult = hideVideo(t.track, mediaPackage);
+             result.add(hideVideoResult);
+           } else {
+             result.add(copyTrack(t.track));
+           }
+         }
+       }
     } else {
-      // Second case: we have exactly one video track that is not hidden (hopefully, because for all other cases there
+      // Third case: we have exactly one video track that is not hidden (hopefully, because for all other cases there
       // were no requirements given).
       final MuxResult muxResult = muxSingleVideoTrack(mediaPackage, augmentedTracks);
       result.add(muxResult);
@@ -449,10 +464,20 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     }
   }
 
+  private TrackJobResult hideVideo(final Track track, final MediaPackage mediaPackage)
+          throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException, IOException {
+    return hide(PREPARE_AUDIO_ONLY_PROFILE, track, mediaPackage);
+  }
+
   private TrackJobResult hideAudio(final Track track, final MediaPackage mediaPackage)
           throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException, IOException {
+    return hide(PREPARE_VIDEO_ONLY_PROFILE, track, mediaPackage);
+  }
+
+  private TrackJobResult hide(String encodingProfile, final Track track, final MediaPackage mediaPackage)
+          throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException, IOException {
     // Find the encoding profile
-    final EncodingProfile profile = getProfile(PREPARE_VIDEO_ONLY_PROFILE);
+    final EncodingProfile profile = getProfile(encodingProfile);
     logger.info("Encoding video only track {} to work version", track);
     final Job job = composerService.encode(track, profile.getIdentifier());
     if (!waitForStatus(job).isSuccess()) {
@@ -485,6 +510,11 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
   private boolean allNonHidden(final Collection<AugmentedTrack> augmentedTracks,
           @SuppressWarnings("SameParameterValue") final SubTrack st) {
     return augmentedTracks.stream().noneMatch(t -> !t.has(st) || t.hide(st));
+  }
+
+  private boolean allHidden(final Collection<AugmentedTrack> augmentedTracks,
+          @SuppressWarnings("SameParameterValue") final SubTrack st) {
+    return augmentedTracks.stream().noneMatch(t -> t.has(st) && !t.hide(st));
   }
 
   private static String constructHideProperty(final String s, final SubTrack st) {
