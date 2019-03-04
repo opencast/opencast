@@ -1,0 +1,15 @@
+[
+  {
+    "providerId": "event-views",
+    "providerType": "timeSeries",
+    "title": "Event Views",
+    "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+    "dataResolutions": [ "weekly", "monthly", "yearly" ]
+  },
+  {
+    "providerId": "unknown-provider",
+    "providerType": "unknown",
+    "title": "Unknown Provider",
+    "description": "We are only testing the ability to filter out or display errors for unknown providers here"
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "id": "organization.views.sum.influx",
+  "title": "STATISTICS.TITLE.VIEWS_SUM",
+  "description": "STATISTICS.DESCRIPTION.VIEWS_SUM",
+  "resourceType": "ORGANIZATION",
+  "resolutions": [
+    "DAILY",
+    "WEEKLY",
+    "MONTHLY",
+    "YEARLY"
+  ],
+  "source": "influx:infinite.impressions_daily:SUM:value:organizationId",
+  "type": "timeseries"
+}

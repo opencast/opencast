@@ -31,6 +31,9 @@
          with-role="ROLE_UI_NAV_CONFIGURATION_VIEW">
         <i class="configuration" title="{{ 'NAV.CONFIGURATION.TITLE' | translate }}"></i>
       </a>
+      <a admin-ng-href-role="{'ROLE_UI_STATISTICS_ORGANIZATION_VIEW': '#/statistics/organization'}" ng-class="{ active: category == 'statistics' }" with-role="ROLE_UI_NAV_STATISTICS_VIEW" ng-if="hasStatisticsProviders">
+        <i class="statistics" data-title="{{ 'NAV.STATISTICS.TITLE' | translate }}"></i>
+      </a>
     </div>
   </nav>
 </div>

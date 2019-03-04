@@ -66,6 +66,7 @@ nav:
       - Event Filters: 'configuration/admin-ui/event-filters.md'
       - Manual Asset Upload: 'configuration/admin-ui/asset-upload.md'
       - Languages: 'configuration/admin-ui/languages.md'
+      - Statistics: 'configuration/admin-ui/statistics.md'
       - Thumbnails: 'configuration/admin-ui/thumbnails.md'
 - Version Support: 'version-support.md'
 - Modules:
