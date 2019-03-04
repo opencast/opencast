@@ -139,6 +139,17 @@ public class AddCatalogWorkflowOperationHandlerTest {
   }
 
   @Test
+  public void testNoFlavorFail() throws WorkflowOperationException {
+    // setup
+    operation.setConfiguration("catalog-flavor", "");
+    operation.setConfiguration("catalog-type-collision-behavior", "keep");
+
+    // execution
+    expectedException.expect(WorkflowOperationException.class);
+    operationHandler.start(instance, null);
+  }
+
+  @Test
   public void testKeep() throws WorkflowOperationException {
     // setup
     operation.setConfiguration("catalog-flavor", "flavor/test");

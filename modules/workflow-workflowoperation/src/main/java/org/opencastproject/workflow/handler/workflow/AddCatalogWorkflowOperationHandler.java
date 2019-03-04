@@ -43,7 +43,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -72,11 +71,11 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
   private static final String CFG_KEY_CATALOG_NAME   = "catalog-name";
   /** config key for the catalog flavor */
   private static final String CFG_KEY_CATALOG_FLAVOR = "catalog-flavor";
-  /** config key, which locates the catalog on the filesystem */
+  /** config key which locates the catalog on the filesystem */
   private static final String CFG_KEY_CATALOG_PATH   = "catalog-path";
   /** config key for the catalog tags */
   private static final String CFG_KEY_CATALOG_TAGS   = "catalog-tags";
-  /** config key, which defines the behavior if a catalog of the same flavor already exists */
+  /** config key which defines the behavior if a catalog of the same flavor already exists */
   private static final String CFG_KEY_CATALOG_TYPE_COLLISION_BEHAVIOR = "catalog-type-collision-behavior";
 
   /** The mimetype of the added catalogs */
@@ -99,13 +98,19 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
   public WorkflowOperationResult start(WorkflowInstance wInst, JobContext context)
       throws WorkflowOperationException {
     // get Workflow configuration
-    String catalogName = getCfgValueFromOp(wInst, CFG_KEY_CATALOG_NAME, false);
-    String catalogPath = getCfgValueFromOp(wInst, CFG_KEY_CATALOG_PATH, false);
-    String catalogTags = getCfgValueFromOp(wInst, CFG_KEY_CATALOG_TAGS, true);
-    MediaPackageElementFlavor    catalogFlavor = parseFlavor(
-                           getCfgValueFromOp(wInst, CFG_KEY_CATALOG_FLAVOR, false));
+    String catalogName = getConfig(wInst, CFG_KEY_CATALOG_NAME);
+    String catalogPath = getConfig(wInst, CFG_KEY_CATALOG_PATH);
+    String catalogTags = getConfig(wInst, CFG_KEY_CATALOG_TAGS, "");
     CatalogTypeCollisionBehavior collBehavior  = parseCollisionBehavior(
-                           getCfgValueFromOp(wInst, CFG_KEY_CATALOG_TYPE_COLLISION_BEHAVIOR, false));
+                           getConfig(wInst, CFG_KEY_CATALOG_TYPE_COLLISION_BEHAVIOR));
+    MediaPackageElementFlavor    catalogFlavor = null;
+    try {
+      catalogFlavor = MediaPackageElementFlavor.parseFlavor(
+                           getConfig(wInst, CFG_KEY_CATALOG_FLAVOR));
+    }
+    catch (IllegalArgumentException e) {
+      throw new WorkflowOperationException("Unknown flavor");
+    }
 
     MediaPackage mp = wInst.getMediaPackage();
 
@@ -136,10 +141,8 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
     MediaPackageElement mpe = mp.add(catalogURI, MediaPackageElement.Type.Catalog, catalogFlavor);
     mpe.setIdentifier(catalogId);
     mpe.setMimeType(CATALOG_MIME_TYPE);
-    if (catalogTags != null) {
-      for (String tag : catalogTags.split(",")) {
-        mpe.addTag(tag);
-      }
+    for (String tag : asList(catalogTags)) {
+      mpe.addTag(tag);
     }
 
     return createResult(mp, Action.CONTINUE);
@@ -153,56 +156,8 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
    * @return true, if the catalogFlavor exists in the array of catalogs, else false
    */
   private boolean doesCatalogFlavorExist(MediaPackageElementFlavor catalogFlavor, Catalog[] catalogs) {
-    List<Catalog> ctls = Arrays.asList(catalogs);
-
-    boolean doesFlavorExist = ctls.stream()
+    return Arrays.asList(catalogs).stream()
       .anyMatch(cat -> catalogFlavor.matches(cat.getFlavor()));
-
-    return doesFlavorExist;
-  }
-
-  /**
-   * Gets a configuration value for a specific key from the current operation.
-   * isOptional can be used to specify whether null values are allowed to be returned
-   * or whether an WorkflowOperationException should be thrown.
-   *
-   * @param inst
-   *          used to get the value of the configuration
-   * @param cfgKey
-   *          specifies the value to get
-   * @param isOptional
-   *          is the configuration value allowed to be not set
-   * @return the value of the configuration key or null if isOptional is set and the configuration value is not set
-   * @throws WorkflowOperationException
-   *           if isOptional is false and the configuration value is not set
-   */
-  private String getCfgValueFromOp(WorkflowInstance inst, String cfgKey, boolean isOptional)
-      throws WorkflowOperationException {
-    String value = inst.getCurrentOperation().getConfiguration(cfgKey);
-
-    if (!isOptional && (value == null || value.isEmpty())) {
-      throw new WorkflowOperationException("'" + cfgKey + "' not set");
-    }
-
-    return value;
-  }
-
-  /**
-   * Parses the rawFlavor String to an MediaPackageElementFlavor
-   * or throws an WorkflowOperationException if the parsing failed
-   *
-   * @param rawFlavor
-   * @return
-   * @throws WorkflowOperationException
-   */
-  private MediaPackageElementFlavor parseFlavor(String rawFlavor)
-      throws WorkflowOperationException {
-    try {
-      return MediaPackageElementFlavor.parseFlavor(rawFlavor);
-    }
-    catch (IllegalArgumentException e) {
-      throw new WorkflowOperationException("Flavor needs to be an correct Flavor MimeType");
-    }
   }
 
   /**
