@@ -1,4 +1,4 @@
 {
-  "RESULTS": "Results {{{range.begin}}}-{{{range.end}}} of {{{total}}}",
-  "CREATOR": "by {{{creator}}}"
+  "RESULTS": "Resultados {{{range.begin}}}-{{{range.end}}} de {{{total}}}",
+  "CREATOR": "por {{{creator}}}"
 }

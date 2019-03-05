@@ -56,11 +56,9 @@
             "ACL": "The following ACL will be deleted",
             "GROUP": "The following group will be deleted",
             "USER": "The following user will be deleted",
-            "USER_BLACKLIST": "The following user blacklist will be deleted",
             "THEME": "The following theme will be deleted",
             "EMAIL": "The following email template will be deleted",
-            "LOCATION": "The following location will be deleted",
-            "LOCATION_BLACKLIST": "The following location blacklist will be deleted"
+            "LOCATION": "The following location will be deleted"
          },
          "NAME": "Name"
       },
@@ -131,21 +129,9 @@
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "The series has been deleted",
       "SERIES_NOT_DELETED": "The series could not be deleted",
-      "USER_BLACKLIST_CREATED": "The blacklist has been created",
-      "USER_BLACKLIST_NOT_CREATED": "The blacklist could not be created",
-      "USER_BLACKLIST_SAVED": "The blacklist has been saved",
-      "USER_BLACKLIST_NOT_SAVED": "The blacklist could not be saved",
-      "USER_BLACKLIST_DELETED": "The blacklist has been deleted",
-      "USER_BLACKLIST_NOT_DELETED": "The blacklist could not be deleted",
       "LOCATION_DELETED": "The location has been deleted",
       "LOCATION_NOT_DELETED": "The location could not be deleted",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
-      "LOCATION_BLACKLIST_CREATED": "The blacklist has been created",
-      "LOCATION_BLACKLIST_NOT_CREATED": "The blacklist could not be created",
-      "LOCATION_BLACKLIST_SAVED": "The blacklist has been saved",
-      "LOCATION_BLACKLIST_NOT_SAVED": "The blacklist could not be saved",
-      "LOCATION_BLACKLIST_DELETED": "The blacklist has been deleted",
-      "LOCATION_BLACKLIST_NOT_DELETED": "The blacklist could not be deleted",
       "EMAIL_TEMPLATE_CREATED": "The template has been created",
       "EMAIL_TEMPLATE_NOT_CREATED": "The template could not be created",
       "EMAIL_TEMPLATE_SAVED": "The template has been saved",
@@ -552,13 +538,11 @@
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Ready for recording",
-            "BLACKLISTED": "Blacklisted",
             "OPTED_OUT": "Opted-out"
          },
          "STATUS": {
             "SCHEDULED": "Scheduled",
             "OPTEDOUT": "Opted out",
-            "BLACKLISTED": "Blacklisted",
             "RECORDING": "Recording",
             "UPLOADING": "Uploading",
             "INGESTING": "Ingesting",
@@ -1138,12 +1122,10 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Location",
-         "BLACKLISTS": "Blacklists"
+         "LOCATIONS": "Location"
       },
       "ACTIONS": {
          "EXPORT": "Export",
-         "ADD_BLACKLIST": "Add blacklist",
          "REMOVE": "Remove"
       },
       "RECORDINGS": {
@@ -1157,8 +1139,6 @@
             "NEXT_NAME": "Next event title",
             "STATUS": "Status",
             "VERSION": "Version",
-            "BLACKLIST_FROM": "Blacklisted from",
-            "BLACKLIST_TO": "Blacklisted until",
             "ACTION": "Actions",
             "TOOLTIP": {
                "NAME": "Filter events for this location",
@@ -1189,60 +1169,18 @@
                "NO_CAPABILITIES": "No capabilities provided"
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Location blacklist",
-            "NAME": "Name",
-            "ACTIONS": "Actions"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Create blacklist",
-            "EDITCAPTION": "Edit blacklist",
-            "TABS": {
-               "LOCATIONS": "Locations",
-               "DATES": "Dates",
-               "REASON": "Reason",
-               "SUMMARY": "Summary"
-            },
-            "LOCATIONS": {
-               "REMOVE": "Remove",
-               "ADD_LOCATION": "Choose location",
-               "ALL_LOCATIONS": "All locations",
-               "SELECT_LOCATION": "Select"
-            },
-            "DATES": {
-               "START_DATE": "Start date",
-               "END_DATE": "End date"
-            },
-            "REASON": {
-               "SELECT_REASON": "Select",
-               "REASON": "Reason",
-               "COMMENTS": "Comments"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Summary",
-               "LOCATION": "Location",
-               "DATE_FROM": "From",
-               "DATE_TO": "Until",
-               "REASON": "Reason",
-               "COMMENTS": "Comments"
-            }
-         }
       }
    },
    "USERS": {
       "ACTIONS": {
          "ADD_USER": "Add user",
          "ADD_GROUP": "Add group",
-         "ADD_ACL": "Add access policy",
-         "ADD_BLACKLIST": "Add blacklist"
+         "ADD_ACL": "Add access policy"
       },
       "NAVIGATION": {
          "USERS": "Users",
          "GROUPS": "Groups",
-         "PERMISSIONS": "Access policies",
-         "BLACKLISTS": "Blacklist"
+         "PERMISSIONS": "Access policies"
       },
       "USERS": {
          "TABLE": {
@@ -1253,8 +1191,6 @@
             "ROLES": "Roles",
             "TYPE": "Type",
             "PROVIDER": "Provider",
-            "BLACKLIST_FROM": "Blacklisted from",
-            "BLACKLIST_TO": "Blacklisted until",
             "ACTION": "Actions",
             "TOOLTIP": {
                "DELETE": "Delete user",
@@ -1423,49 +1359,6 @@
                   "LABEL": "Select a role",
                   "EMPTY": "No role found"
                }
-            }
-         }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Users blacklist",
-            "NAME": "Name",
-            "DATE_FROM": "From",
-            "DATE_TO": "Until",
-            "REASON": "Reason",
-            "ACTION": "Actions"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Create blacklist",
-            "EDITCAPTION": "Edit blacklist",
-            "TABS": {
-               "USERS": "Users",
-               "DATES": "Dates",
-               "REASON": "Reason",
-               "SUMMARY": "Summary"
-            },
-            "USERS": {
-               "REMOVE": "Remove",
-               "ADD_USER": "Choose user",
-               "ALL_USERS": "All users",
-               "SELECT_USER": "Select"
-            },
-            "DATES": {
-               "START_DATE": "Start date",
-               "END_DATE": "End date"
-            },
-            "REASON": {
-               "SELECT_REASON": "Select",
-               "REASON": "Reason",
-               "COMMENTS": "Comments"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Summary",
-               "USER": "User",
-               "DATE_FROM": "From",
-               "DATE_TO": "Until",
-               "REASON": "Reason",
-               "COMMENTS": "Comments"
             }
          }
       }
@@ -2093,16 +1986,6 @@
    "TABLE_NO_RESULT": "No results found",
    "TABLE_LOADING": "Loading…",
    "TABLE_EDIT": "Edit",
-   "PM": {
-      "BLACKLIST": {
-         "REASONS": {
-            "SICK_LEAVE": "Sick leave",
-            "LEAVE": "Leave",
-            "FAMILY_EMERGENCY": "Family emergency",
-            "CONSTRUCTION": "Construction"
-         }
-      }
-   },
    "DASHBOARD": {
       "RUNNING": "Running",
       "FINISHED": "Finished",

@@ -56,11 +56,9 @@
             "ACL": "Folgende Zugriffsrichtlinie wird gelöscht",
             "GROUP": "Die folgende Gruppe wird gelöscht",
             "USER": "Der folgende Benutzer wird gelöscht",
-            "USER_BLACKLIST": "Die folgende Benutzer-Blacklist wird gelöscht",
             "THEME": "Das folgende Branding wird gelöscht",
             "EMAIL": "Die folgende E-Mail-Vorlage wird gelöscht",
-            "LOCATION": "Folgender Raum wird entfernt",
-            "LOCATION_BLACKLIST": "Die folgende Raum-Blacklist wird entfernt"
+            "LOCATION": "Folgender Raum wird entfernt"
          },
          "NAME": "Name"
       },
@@ -131,21 +129,9 @@
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Die Aufzeichnung konnte nicht gelöscht werden, weil Sie nicht dazu berechtigt sind.",
       "SERIES_DELETED": "Die Serie wurde gelöscht",
       "SERIES_NOT_DELETED": "Die Serie konnte nicht gelöscht werden",
-      "USER_BLACKLIST_CREATED": "Die Sperrliste wurde erstellt",
-      "USER_BLACKLIST_NOT_CREATED": "Die Sperrliste konnte nicht erstellt werden",
-      "USER_BLACKLIST_SAVED": "Die Sperrliste wurde gespeichert",
-      "USER_BLACKLIST_NOT_SAVED": "Die Sperrliste konnte nicht gespeichert werden",
-      "USER_BLACKLIST_DELETED": "Die Sperrliste wurde gelöscht",
-      "USER_BLACKLIST_NOT_DELETED": "Die Sperrliste konnte nicht gelöscht werden",
       "LOCATION_DELETED": "Das Aufzeichnungsgerät wurde entfernt",
       "LOCATION_NOT_DELETED": "Das Aufzeichnungsgerät konnte nicht entfernt werden",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Der Raum konnte nicht entfernt werden, weil Sie nicht dazu berechtigt sind.",
-      "LOCATION_BLACKLIST_CREATED": "Die Sperrliste wurde erstellt",
-      "LOCATION_BLACKLIST_NOT_CREATED": "Die Sperrliste konnte nicht erstellt werden",
-      "LOCATION_BLACKLIST_SAVED": "Die Sperrliste wurde gespeichert",
-      "LOCATION_BLACKLIST_NOT_SAVED": "Die Sperrliste konnte nicht gespeichert werden",
-      "LOCATION_BLACKLIST_DELETED": "Die Sperrliste wurde gelöscht",
-      "LOCATION_BLACKLIST_NOT_DELETED": "Die Sperrliste konnte nicht gelöscht werden",
       "EMAIL_TEMPLATE_CREATED": "Die Vorlage wurde erstellt",
       "EMAIL_TEMPLATE_NOT_CREATED": "Die Vorlage konnte nicht erstellt werden",
       "EMAIL_TEMPLATE_SAVED": "Die Vorlage wurde gespeichert",
@@ -552,13 +538,11 @@
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Bereit für die Aufnahme",
-            "BLACKLISTED": "Gesperrt",
             "OPTED_OUT": "Wird nicht aufgezeichnet"
          },
          "STATUS": {
             "SCHEDULED": "Geplant",
             "OPTEDOUT": "Wird nicht aufgezeichnet",
-            "BLACKLISTED": "Gesperrt",
             "RECORDING": "Zeichnet auf",
             "UPLOADING": "Lädt hoch",
             "INGESTING": "Importiert",
@@ -1138,12 +1122,10 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Räume",
-         "BLACKLISTS": "Sperrlisten"
+         "LOCATIONS": "Räume"
       },
       "ACTIONS": {
          "EXPORT": "Exportieren",
-         "ADD_BLACKLIST": "Sperrliste hinzufügen",
          "REMOVE": "Entfernen"
       },
       "RECORDINGS": {
@@ -1157,8 +1139,6 @@
             "NEXT_NAME": "Titel der nächsten Aufzeichnung",
             "STATUS": "Status",
             "VERSION": "Version",
-            "BLACKLIST_FROM": "Gesperrt von",
-            "BLACKLIST_TO": "Gesperrt bis",
             "ACTION": "Aktionen",
             "TOOLTIP": {
                "NAME": "Aufzeichnungen nach diesem Raum filtern",
@@ -1189,60 +1169,18 @@
                "NO_CAPABILITIES": "Keine Funktionen verfügbar"
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Raum-Sperrliste",
-            "NAME": "Name",
-            "ACTIONS": "Aktionen"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Sperrliste erstellen",
-            "EDITCAPTION": "Sperrliste bearbeiten",
-            "TABS": {
-               "LOCATIONS": "Räume",
-               "DATES": "Termine",
-               "REASON": "Grund",
-               "SUMMARY": "Zusammenfassung"
-            },
-            "LOCATIONS": {
-               "REMOVE": "Entfernen",
-               "ADD_LOCATION": "Raum auswählen",
-               "ALL_LOCATIONS": "Alle Räume",
-               "SELECT_LOCATION": "Wählen Sie"
-            },
-            "DATES": {
-               "START_DATE": "Startdatum",
-               "END_DATE": "Enddatum"
-            },
-            "REASON": {
-               "SELECT_REASON": "Wählen Sie",
-               "REASON": "Grund",
-               "COMMENTS": "Kommentare"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Zusammenfassung",
-               "LOCATION": "Raum",
-               "DATE_FROM": "Von",
-               "DATE_TO": "Bis",
-               "REASON": "Grund",
-               "COMMENTS": "Kommentare"
-            }
-         }
       }
    },
    "USERS": {
       "ACTIONS": {
          "ADD_USER": "Anwender hinzufügen",
          "ADD_GROUP": "Gruppe hinzufügen",
-         "ADD_ACL": "Zugriffsrichtlinie hinzufügen",
-         "ADD_BLACKLIST": "Sperrliste hinzufügen"
+         "ADD_ACL": "Zugriffsrichtlinie hinzufügen"
       },
       "NAVIGATION": {
          "USERS": "Benutzer",
          "GROUPS": "Gruppen",
-         "PERMISSIONS": "Zugriffsrichtlinien",
-         "BLACKLISTS": "Sperrliste"
+         "PERMISSIONS": "Zugriffsrichtlinien"
       },
       "USERS": {
          "TABLE": {
@@ -1253,8 +1191,6 @@
             "ROLES": "Rollen",
             "TYPE": "Typ",
             "PROVIDER": "Anbieter",
-            "BLACKLIST_FROM": "Gesperrt von",
-            "BLACKLIST_TO": "Gesperrt bis",
             "ACTION": "Aktionen",
             "TOOLTIP": {
                "DELETE": "Benutzer löschen",
@@ -1423,49 +1359,6 @@
                   "LABEL": "Rolle auswählen",
                   "EMPTY": "Keine Rolle gefunden"
                }
-            }
-         }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Anwender-Sperrliste",
-            "NAME": "Name",
-            "DATE_FROM": "Von",
-            "DATE_TO": "Bis",
-            "REASON": "Grund",
-            "ACTION": "Aktionen"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Sperrliste erstellen",
-            "EDITCAPTION": "Sperrliste bearbeiten",
-            "TABS": {
-               "USERS": "Benutzer",
-               "DATES": "Termine",
-               "REASON": "Grund",
-               "SUMMARY": "Zusammenfassung"
-            },
-            "USERS": {
-               "REMOVE": "Entfernen",
-               "ADD_USER": "Benutzer auswählen",
-               "ALL_USERS": "Alle Anwender",
-               "SELECT_USER": "Auswählen"
-            },
-            "DATES": {
-               "START_DATE": "Startdatum",
-               "END_DATE": "Enddatum"
-            },
-            "REASON": {
-               "SELECT_REASON": "Auswählen",
-               "REASON": "Grund",
-               "COMMENTS": "Kommentare"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Zusammenfassung",
-               "USER": "Anwender",
-               "DATE_FROM": "Von",
-               "DATE_TO": "Bis",
-               "REASON": "Grund",
-               "COMMENTS": "Kommentare"
             }
          }
       }
@@ -2093,16 +1986,6 @@
    "TABLE_NO_RESULT": "Keine Treffer gefunden.",
    "TABLE_LOADING": "Lädt…",
    "TABLE_EDIT": "Bearbeiten",
-   "PM": {
-      "BLACKLIST": {
-         "REASONS": {
-            "SICK_LEAVE": "Krankheit",
-            "LEAVE": "Abwesenheit",
-            "FAMILY_EMERGENCY": "Familiärer Notfall",
-            "CONSTRUCTION": "Umbau"
-         }
-      }
-   },
    "DASHBOARD": {
       "RUNNING": "In Verarbeitung",
       "FINISHED": "Verarbeitet",

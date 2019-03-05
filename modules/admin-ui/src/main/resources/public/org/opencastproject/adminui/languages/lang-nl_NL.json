@@ -56,11 +56,9 @@
             "ACL": "De volgende permissie wordt verwijderd",
             "GROUP": "De volgende groep wordt verwijderd",
             "USER": "De volgende gebruiker wordt verwijderd",
-            "USER_BLACKLIST": "De volgende zwarte lijst voor gebruikers wordt verwijderd",
             "THEME": "Het volgende thema wordt verwijderd",
             "EMAIL": "Het volgende e-mail sjabloon wordt verwijderd",
-            "LOCATION": "De volgende locatie wordt verwijderd",
-            "LOCATION_BLACKLIST": "De volgende zwarte lijst voor locaties wordt verwijderd"
+            "LOCATION": "De volgende locatie wordt verwijderd"
          },
          "NAME": "Naam"
       },
@@ -131,21 +129,9 @@
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "De gebeurtenis kan niet verwijderd worden, omdat u niet gemachtigd bent om dit te doen.",
       "SERIES_DELETED": "De series werden verwijderd",
       "SERIES_NOT_DELETED": "De series konden niet verwijderd worden",
-      "USER_BLACKLIST_CREATED": "De zwarte lijst werd aangemaakt",
-      "USER_BLACKLIST_NOT_CREATED": "De zwarte lijst kon niet aangemaakt worden",
-      "USER_BLACKLIST_SAVED": "De zwarte lijst werd opgeslagen",
-      "USER_BLACKLIST_NOT_SAVED": "De zwarte lijst kon niet opgeslagen worden",
-      "USER_BLACKLIST_DELETED": "De zwarte lijst werd verwijderd",
-      "USER_BLACKLIST_NOT_DELETED": "De zwarte lijst kon niet verwijderd worden",
       "LOCATION_DELETED": "De locatie werd verwijderd",
       "LOCATION_NOT_DELETED": "De locatie kon niet verwijderd worden",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "De locatie kan niet verwijderd worden, omdat u niet gemachtigd bent om dit te doen.",
-      "LOCATION_BLACKLIST_CREATED": "De zwarte lijst werd aangemaakt",
-      "LOCATION_BLACKLIST_NOT_CREATED": "De zwarte lijst kon niet aangemaakt worden",
-      "LOCATION_BLACKLIST_SAVED": "De zwarte lijst werd opgeslagen",
-      "LOCATION_BLACKLIST_NOT_SAVED": "De zwarte lijst kon niet opgeslagen worden",
-      "LOCATION_BLACKLIST_DELETED": "De zwarte lijst werd verwijderd",
-      "LOCATION_BLACKLIST_NOT_DELETED": "De zwarte lijst kon niet verwijderd worden",
       "EMAIL_TEMPLATE_CREATED": "Het sjabloon werd aangemaakt",
       "EMAIL_TEMPLATE_NOT_CREATED": "Het sjabloon kon niet aangemaakt worden",
       "EMAIL_TEMPLATE_SAVED": "Het sjabloon werd bewaard",
@@ -552,13 +538,11 @@
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Klaar voor opname",
-            "BLACKLISTED": "Geblokkeerd",
             "OPTED_OUT": "Uitgeschreven"
          },
          "STATUS": {
             "SCHEDULED": "Gepland",
             "OPTEDOUT": "Uitgeschreven",
-            "BLACKLISTED": "Geblokkeerd",
             "RECORDING": "Opname bezig",
             "UPLOADING": "Uploaden",
             "INGESTING": "Ingesting",
@@ -1138,12 +1122,10 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Locaties",
-         "BLACKLISTS": "Zwarte lijsten"
+         "LOCATIONS": "Locaties"
       },
       "ACTIONS": {
          "EXPORT": "Exporteren",
-         "ADD_BLACKLIST": "Zwarte lijst toevoegen",
          "REMOVE": "Verwijderen"
       },
       "RECORDINGS": {
@@ -1157,8 +1139,6 @@
             "NEXT_NAME": "Titel volgend evenement",
             "STATUS": "Status",
             "VERSION": "Versie",
-            "BLACKLIST_FROM": "Geblokkeerd van",
-            "BLACKLIST_TO": "Geblokkeerd tot",
             "ACTION": "Acties",
             "TOOLTIP": {
                "NAME": "Gebeurtenissen filteren voor deze locatie",
@@ -1189,60 +1169,18 @@
                "NO_CAPABILITIES": "Geen mogelijkheden"
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Zwarte lijst van locaties",
-            "NAME": "Naam",
-            "ACTIONS": "Acties"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Zwarte lijst maken",
-            "EDITCAPTION": "Zwarte lijst bewerken",
-            "TABS": {
-               "LOCATIONS": "Locaties",
-               "DATES": "Data",
-               "REASON": "Reden",
-               "SUMMARY": "Samenvatting"
-            },
-            "LOCATIONS": {
-               "REMOVE": "Verwijderen",
-               "ADD_LOCATION": "Kies locatie",
-               "ALL_LOCATIONS": "Alle locaties",
-               "SELECT_LOCATION": "Selecteer"
-            },
-            "DATES": {
-               "START_DATE": "Startdatum",
-               "END_DATE": "Einddatum"
-            },
-            "REASON": {
-               "SELECT_REASON": "Selecteer",
-               "REASON": "Reden",
-               "COMMENTS": "Reacties"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Samenvatting",
-               "LOCATION": "Locatie",
-               "DATE_FROM": "Van",
-               "DATE_TO": "Tot",
-               "REASON": "Reden",
-               "COMMENTS": "Reacties"
-            }
-         }
       }
    },
    "USERS": {
       "ACTIONS": {
          "ADD_USER": "Gebruiker toevoegen",
          "ADD_GROUP": "Groep toevoegen",
-         "ADD_ACL": "Toegangspolicy toevoegen",
-         "ADD_BLACKLIST": "Zwarte lijst toevoegen"
+         "ADD_ACL": "Toegangspolicy toevoegen"
       },
       "NAVIGATION": {
          "USERS": "Gebruikers",
          "GROUPS": "Groepen",
-         "PERMISSIONS": "Toegangspolicies",
-         "BLACKLISTS": "Zwarte lijst"
+         "PERMISSIONS": "Toegangspolicies"
       },
       "USERS": {
          "TABLE": {
@@ -1253,8 +1191,6 @@
             "ROLES": "Rollen",
             "TYPE": "Type",
             "PROVIDER": "Provider",
-            "BLACKLIST_FROM": "Geblokkeerd van",
-            "BLACKLIST_TO": "Geblokkeerd tot",
             "ACTION": "Acties",
             "TOOLTIP": {
                "DELETE": "Gebruiker verwijderen",
@@ -1423,49 +1359,6 @@
                   "LABEL": "Selecteer een rol",
                   "EMPTY": "Geen rol gevonden"
                }
-            }
-         }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Geblokkeerde gebruikers",
-            "NAME": "Naam",
-            "DATE_FROM": "Van",
-            "DATE_TO": "Tot",
-            "REASON": "Reden",
-            "ACTION": "Acties"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Zwarte lijst maken",
-            "EDITCAPTION": "Zwarte lijst bewerken",
-            "TABS": {
-               "USERS": "Gebruikers",
-               "DATES": "Data",
-               "REASON": "Reden",
-               "SUMMARY": "Samenvatting"
-            },
-            "USERS": {
-               "REMOVE": "Verwijderen",
-               "ADD_USER": "Kies gebruiker",
-               "ALL_USERS": "Alle gebruikers",
-               "SELECT_USER": "Selecteer"
-            },
-            "DATES": {
-               "START_DATE": "Startdatum",
-               "END_DATE": "Einddatum"
-            },
-            "REASON": {
-               "SELECT_REASON": "Selecteer",
-               "REASON": "Reden",
-               "COMMENTS": "Reacties"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Samenvatting",
-               "USER": "Gebruiker",
-               "DATE_FROM": "Van",
-               "DATE_TO": "Tot",
-               "REASON": "Reden",
-               "COMMENTS": "Reacties"
             }
          }
       }
@@ -2093,16 +1986,6 @@
    "TABLE_NO_RESULT": "Geen resultaten gevonden",
    "TABLE_LOADING": "Bezig met laden…",
    "TABLE_EDIT": "Bewerken",
-   "PM": {
-      "BLACKLIST": {
-         "REASONS": {
-            "SICK_LEAVE": "Ziekteverlof",
-            "LEAVE": "Verlof",
-            "FAMILY_EMERGENCY": "Familiaal noodgeval",
-            "CONSTRUCTION": "Werken"
-         }
-      }
-   },
    "DASHBOARD": {
       "RUNNING": "Bezig met uitvoeren",
       "FINISHED": "Voltooid",

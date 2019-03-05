@@ -56,11 +56,9 @@
             "ACL": "H παρακάτω πολιτική πρόσβασης θα διαγραφεί",
             "GROUP": "Η παρακάτω ομάδα θα διαγραφεί",
             "USER": "Ο παρακάτω χρήστης θα διαγραφεί",
-            "USER_BLACKLIST": "Η παρακάτω μαύρη λίστα χρηστών θα διαγραφεί",
             "THEME": "Το ακόλουθο θέμα θα διαγραφεί",
             "EMAIL": "Το ακόλουθο πρότυπο ηλεκτρονικού ταχυδρομείου θα διαγραφεί",
-            "LOCATION": "Η ακόλουθη τοποθεσία θα διαγραφεί",
-            "LOCATION_BLACKLIST": "Η ακόλουθη μαύρη λίστα τοποθεσίας θα διαγραφεί"
+            "LOCATION": "Η ακόλουθη τοποθεσία θα διαγραφεί"
          },
          "NAME": "Όνομα"
       },
@@ -131,21 +129,9 @@
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Η εκδήλωση δεν μπορεί να διαγραφεί, επειδή δεν έχετε τα δικαιώματα για να το πράξετε.",
       "SERIES_DELETED": "Η σειρά έχει διαγραφεί",
       "SERIES_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της σειράς",
-      "USER_BLACKLIST_CREATED": "Δημιουργήθηκε η μαύρη λίστα",
-      "USER_BLACKLIST_NOT_CREATED": "Δεν μπορεί να δημιουργηθεί η μαύρη λίστα",
-      "USER_BLACKLIST_SAVED": "Έχει αποθηκευτεί στη μαύρη λίστα",
-      "USER_BLACKLIST_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση της μαύρης λίστας",
-      "USER_BLACKLIST_DELETED": "Η μαύρη λίστα έχει διαγραφεί",
-      "USER_BLACKLIST_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της μαύρης λίστας",
       "LOCATION_DELETED": "Η τοποθεσία έχει διαγραφεί",
       "LOCATION_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της τοποθεσίας",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Η τοποθεσία δεν μπορεί να διαγραφεί, επειδή δεν έχετε τα δικαιώματα να το πράξετε.",
-      "LOCATION_BLACKLIST_CREATED": "Δημιουργήθηκε η μαύρη λίστα",
-      "LOCATION_BLACKLIST_NOT_CREATED": "Δεν μπορεί να δημιουργηθεί η μαύρη λίστα",
-      "LOCATION_BLACKLIST_SAVED": "Η μαύρη λίστα έχει αποθηκευτεί",
-      "LOCATION_BLACKLIST_NOT_SAVED": "Η μαύρη λίστα δεν μπορεί να αποθηκευτεί",
-      "LOCATION_BLACKLIST_DELETED": "Η μαύρη λίστα έχει διαγραφεί",
-      "LOCATION_BLACKLIST_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της μαύρης λίστας",
       "EMAIL_TEMPLATE_CREATED": "Το πρότυπο έχει δημιουργηθεί",
       "EMAIL_TEMPLATE_NOT_CREATED": "Δεν ήταν δυνατή η δημιουργία του προτύπου",
       "EMAIL_TEMPLATE_SAVED": "Το πρότυπο έχει αποθηκευτεί",
@@ -552,13 +538,11 @@
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Έτοιμη για εγγραφή",
-            "BLACKLISTED": "Στη μαύρη λίστα",
             "OPTED_OUT": "Επιλογή εξόδου"
          },
          "STATUS": {
             "SCHEDULED": "Προγραμματισμένη",
             "OPTEDOUT": "Επιλογή εξόδου",
-            "BLACKLISTED": "Στη μαύρη λίστα",
             "RECORDING": "Εγγραφή",
             "UPLOADING": "Μεταφόρτωση",
             "INGESTING": "Εισάγεται",
@@ -1138,12 +1122,10 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Τοποθεσίες",
-         "BLACKLISTS": "Μαύρες λίστες"
+         "LOCATIONS": "Τοποθεσίες"
       },
       "ACTIONS": {
          "EXPORT": "Εξαγωγή",
-         "ADD_BLACKLIST": "Προσθέστε στην μαύρη λίστα",
          "REMOVE": "Κατάργηση"
       },
       "RECORDINGS": {
@@ -1157,8 +1139,6 @@
             "NEXT_NAME": "Επόμενος τίτλος εκδήλωσης",
             "STATUS": "Κατάσταση",
             "VERSION": "Έκδοση",
-            "BLACKLIST_FROM": "Στη μαύρη λίστα από",
-            "BLACKLIST_TO": "Στη μαύρη λίστα μέχρι",
             "ACTION": "Ενέργειες",
             "TOOLTIP": {
                "NAME": "Φίλτρο για τις εκδηλώσεις αυτής της τοποθεσίας",
@@ -1189,60 +1169,18 @@
                "NO_CAPABILITIES": "Δεν παρέχονται δυνατότητες"
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Θέση μαύρη λίστα",
-            "NAME": "Όνομα",
-            "ACTIONS": "Ενέργειες"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Δημιουργήστε μια μαύρη λίστα",
-            "EDITCAPTION": "Επεξεργαστείτε τη μαύρη λίστα",
-            "TABS": {
-               "LOCATIONS": "Τοποθεσίες",
-               "DATES": "Ημερομηνίες",
-               "REASON": "Αιτία",
-               "SUMMARY": "Περίληψη"
-            },
-            "LOCATIONS": {
-               "REMOVE": "Κατάργηση",
-               "ADD_LOCATION": "Επιλέξτε τοποθεσία",
-               "ALL_LOCATIONS": "Όλες οι τοποθεσίες",
-               "SELECT_LOCATION": "Επιλέξτε"
-            },
-            "DATES": {
-               "START_DATE": "Ημερομηνία έναρξης",
-               "END_DATE": "Ημερομηνία λήξης"
-            },
-            "REASON": {
-               "SELECT_REASON": "Επιλέξτε",
-               "REASON": "Αιτία",
-               "COMMENTS": "Σχόλια"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Περίληψη",
-               "LOCATION": "Τοποθεσία",
-               "DATE_FROM": "Απο",
-               "DATE_TO": "Μέχρι",
-               "REASON": "Αιτία",
-               "COMMENTS": "Σχόλια"
-            }
-         }
       }
    },
    "USERS": {
       "ACTIONS": {
          "ADD_USER": "Προσθήκη χρήστη",
          "ADD_GROUP": "Προσθήκη ομάδας",
-         "ADD_ACL": "Προσθήκη πολιτικής πρόσβασης",
-         "ADD_BLACKLIST": "Προσθήκη μαύρης λίστας"
+         "ADD_ACL": "Προσθήκη πολιτικής πρόσβασης"
       },
       "NAVIGATION": {
          "USERS": "Χρήστες",
          "GROUPS": "Ομάδες",
-         "PERMISSIONS": "Πολιτικές πρόσβασης",
-         "BLACKLISTS": "Μαύρη λίστα"
+         "PERMISSIONS": "Πολιτικές πρόσβασης"
       },
       "USERS": {
          "TABLE": {
@@ -1253,8 +1191,6 @@
             "ROLES": "Ρόλοι",
             "TYPE": "Τύπος",
             "PROVIDER": "Πάροχος",
-            "BLACKLIST_FROM": "Στη μαύρη λίστα από",
-            "BLACKLIST_TO": "Στη μαύρη λίστα μέχρι",
             "ACTION": "Ενέργειες",
             "TOOLTIP": {
                "DELETE": "Διαγραφή χρήστη",
@@ -1423,49 +1359,6 @@
                   "LABEL": "Επιλέξτε ένα ρόλο",
                   "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
                }
-            }
-         }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Μαύρη λίστα χρηστών",
-            "NAME": "Όνομα",
-            "DATE_FROM": "Απο",
-            "DATE_TO": "Μέχρι",
-            "REASON": "Αιτία",
-            "ACTION": "Ενέργειες"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Δημιουργήστε μια μαύρη λίστα",
-            "EDITCAPTION": "Επεξεργαστείτε τη μαύρη λίστα",
-            "TABS": {
-               "USERS": "Χρήστες",
-               "DATES": "Ημερομηνίες",
-               "REASON": "Αιτία",
-               "SUMMARY": "Περίληψη"
-            },
-            "USERS": {
-               "REMOVE": "Κατάργηση",
-               "ADD_USER": "Επιλέξτε χρήστη",
-               "ALL_USERS": "Όλοι οι χρήστες",
-               "SELECT_USER": "Επιλογή"
-            },
-            "DATES": {
-               "START_DATE": "Ημερομηνία έναρξης",
-               "END_DATE": "Ημερομηνία λήξης"
-            },
-            "REASON": {
-               "SELECT_REASON": "Επιλογή",
-               "REASON": "Αιτία",
-               "COMMENTS": "Σχόλια"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Περίληψη",
-               "USER": "Χρήστης",
-               "DATE_FROM": "Απο",
-               "DATE_TO": "Μέχρι",
-               "REASON": "Αιτία",
-               "COMMENTS": "Σχόλια"
             }
          }
       }
@@ -2093,16 +1986,6 @@
    "TABLE_NO_RESULT": "Δεν βρέθηκαν αποτελέσματα",
    "TABLE_LOADING": "Φόρτωση…",
    "TABLE_EDIT": "Επεξεργασία",
-   "PM": {
-      "BLACKLIST": {
-         "REASONS": {
-            "SICK_LEAVE": "Αναρρωτική άδεια",
-            "LEAVE": "Αποχώρηση",
-            "FAMILY_EMERGENCY": "Οικογενειακή έκτακτη κατάσταση",
-            "CONSTRUCTION": "Κατασκευή"
-         }
-      }
-   },
    "DASHBOARD": {
       "RUNNING": "Εκτελείται",
       "FINISHED": "Ολοκληρώθηκε",

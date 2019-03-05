@@ -56,11 +56,9 @@
             "ACL": "ה-ACL הבאים יימחקו",
             "GROUP": "הקבוצה הבאה תימחק",
             "USER": "המשתמש הבא יימחקו",
-            "USER_BLACKLIST": "רשימת משתמשים חסומים הבאה תמחק",
             "THEME": "רשימת המשתמשים בחסומים הבאה תמחק",
             "EMAIL": "רשימת המשתמשים בחסומים הבאה תמחק",
-            "LOCATION": "המיקום הבא יימחק",
-            "LOCATION_BLACKLIST": "רשימת מיקומים חסומים הבאה תמחק"
+            "LOCATION": "המיקום הבא יימחק"
          },
          "NAME": "שם"
       },
@@ -131,21 +129,9 @@
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "האירוע לא ניתן למחיקה, מכיוון שאין לך את ההרשאות לבצע פעולה זו.",
       "SERIES_DELETED": "הסדרה נמחקה",
       "SERIES_NOT_DELETED": "לא ניתן היה למחוק את הסידרה",
-      "USER_BLACKLIST_CREATED": "הרשימה השחורה נוצרה",
-      "USER_BLACKLIST_NOT_CREATED": "הרשימה השחורה לא יכולה להיווצר",
-      "USER_BLACKLIST_SAVED": "הרשימה השחורה נשמרה",
-      "USER_BLACKLIST_NOT_SAVED": "הרשימה השחורה אינה יכולה להשמר",
-      "USER_BLACKLIST_DELETED": "הרשימה השחורה נמחקה",
-      "USER_BLACKLIST_NOT_DELETED": "לא ניתן למחוק את הרשימה השחורה",
       "LOCATION_DELETED": "המיקום נמחק",
       "LOCATION_NOT_DELETED": "לא ניתן למחוק את המיקום",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "המיקום לא ניתן למחיקה, מכיוון שאין לך את ההרשאות לבצע פעולה זו.",
-      "LOCATION_BLACKLIST_CREATED": "הרשימה השחורה נוצרה",
-      "LOCATION_BLACKLIST_NOT_CREATED": "הרשימה השחורה לא יכולה להיווצר",
-      "LOCATION_BLACKLIST_SAVED": "הרשימה השחורה נשמרה",
-      "LOCATION_BLACKLIST_NOT_SAVED": "הרשימה השחורה אינה יכולה להשמר",
-      "LOCATION_BLACKLIST_DELETED": "הרשימה השחורה נמחקה",
-      "LOCATION_BLACKLIST_NOT_DELETED": "לא ניתן למחוק את הרשימה השחורה",
       "EMAIL_TEMPLATE_CREATED": "התבנית נוצרה",
       "EMAIL_TEMPLATE_NOT_CREATED": "לא ניתן ליצור את התבנית",
       "EMAIL_TEMPLATE_SAVED": "התבנית נשמרה",
@@ -552,13 +538,11 @@
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "מוכן להקלטה",
-            "BLACKLISTED": "ברשימה השחורה",
             "OPTED_OUT": "בוטל/ו"
          },
          "STATUS": {
             "SCHEDULED": "מתוזמן",
             "OPTEDOUT": "בוטל/ו",
-            "BLACKLISTED": "ברשימה השחורה",
             "RECORDING": "מקליט",
             "UPLOADING": "מעלה",
             "INGESTING": "לעבד",
@@ -1138,12 +1122,10 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "מיקומים",
-         "BLACKLISTS": "רשימה שחורה"
+         "LOCATIONS": "מיקומים"
       },
       "ACTIONS": {
          "EXPORT": "יצא",
-         "ADD_BLACKLIST": "הוסף לרשימה שחורה",
          "REMOVE": "הסר"
       },
       "RECORDINGS": {
@@ -1157,8 +1139,6 @@
             "NEXT_NAME": "כותרת האירוע הבא",
             "STATUS": "מצב",
             "VERSION": "גירסה",
-            "BLACKLIST_FROM": "ברשימה השחורה מ",
-            "BLACKLIST_TO": "ברשימה השחורה עד",
             "ACTION": "פעולות",
             "TOOLTIP": {
                "NAME": "סנן אירועים עבור מיקום זה",
@@ -1189,60 +1169,18 @@
                "NO_CAPABILITIES": "לא סופקו יכולות"
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "רשימה שחורה של מיקום",
-            "NAME": "שם",
-            "ACTIONS": "פעולות"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "צור רשימה שחורה",
-            "EDITCAPTION": "עריכת רשימה שחורה",
-            "TABS": {
-               "LOCATIONS": "מיקומים",
-               "DATES": "תאריכים",
-               "REASON": "סיבה",
-               "SUMMARY": "סיכום"
-            },
-            "LOCATIONS": {
-               "REMOVE": "הסר",
-               "ADD_LOCATION": "בחר מיקום",
-               "ALL_LOCATIONS": "כל המיקומים",
-               "SELECT_LOCATION": "בחר"
-            },
-            "DATES": {
-               "START_DATE": "תאריך התחלה",
-               "END_DATE": "תאריך סיום"
-            },
-            "REASON": {
-               "SELECT_REASON": "בחר",
-               "REASON": "סיבה",
-               "COMMENTS": "הערות"
-            },
-            "SUMMARY": {
-               "SUMMARY": "סיכום",
-               "LOCATION": "מיקום",
-               "DATE_FROM": "מאת",
-               "DATE_TO": "עד",
-               "REASON": "סיבה",
-               "COMMENTS": "הערות"
-            }
-         }
       }
    },
    "USERS": {
       "ACTIONS": {
          "ADD_USER": "הוסף משתמש",
          "ADD_GROUP": "הוסף קבוצה",
-         "ADD_ACL": "הוסף מדיניות גישה",
-         "ADD_BLACKLIST": "הוסף רשימה שחורה"
+         "ADD_ACL": "הוסף מדיניות גישה"
       },
       "NAVIGATION": {
          "USERS": "משתמשים",
          "GROUPS": "קבוצות",
-         "PERMISSIONS": "מדיניות גישה",
-         "BLACKLISTS": "רשימה שחורה"
+         "PERMISSIONS": "מדיניות גישה"
       },
       "USERS": {
          "TABLE": {
@@ -1253,8 +1191,6 @@
             "ROLES": "תפקידים",
             "TYPE": "סוג",
             "PROVIDER": "ספק",
-            "BLACKLIST_FROM": "ברשימה השחורה מ",
-            "BLACKLIST_TO": "ברשימה השחורה עד",
             "ACTION": "פעולות",
             "TOOLTIP": {
                "DELETE": "מחק משתמש",
@@ -1423,49 +1359,6 @@
                   "LABEL": "בחר תפקיד",
                   "EMPTY": "לא נמצאו תפקידים"
                }
-            }
-         }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "משתמשים חסומים",
-            "NAME": "שם",
-            "DATE_FROM": "מאת",
-            "DATE_TO": "עד",
-            "REASON": "סיבה",
-            "ACTION": "פעולות"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "צור רשימה שחורה",
-            "EDITCAPTION": "עריכת רשימה שחורה",
-            "TABS": {
-               "USERS": "משתמשים",
-               "DATES": "תאריכים",
-               "REASON": "סיבה",
-               "SUMMARY": "סיכום"
-            },
-            "USERS": {
-               "REMOVE": "הסר",
-               "ADD_USER": "בחר משתמש",
-               "ALL_USERS": "כל המשתמשים",
-               "SELECT_USER": "בחר"
-            },
-            "DATES": {
-               "START_DATE": "תאריך התחלה",
-               "END_DATE": "תאריך סיום"
-            },
-            "REASON": {
-               "SELECT_REASON": "בחר",
-               "REASON": "סיבה",
-               "COMMENTS": "הערות"
-            },
-            "SUMMARY": {
-               "SUMMARY": "סיכום",
-               "USER": "משתמש",
-               "DATE_FROM": "מאת",
-               "DATE_TO": "עד",
-               "REASON": "סיבה",
-               "COMMENTS": "הערות"
             }
          }
       }
@@ -2093,16 +1986,6 @@
    "TABLE_NO_RESULT": "לא נמצאו תוצאות",
    "TABLE_LOADING": "טוען…",
    "TABLE_EDIT": "ערוך",
-   "PM": {
-      "BLACKLIST": {
-         "REASONS": {
-            "SICK_LEAVE": "מחלה",
-            "LEAVE": "עזוב",
-            "FAMILY_EMERGENCY": "מצב חירום משפחתי",
-            "CONSTRUCTION": "בנייה"
-         }
-      }
-   },
    "DASHBOARD": {
       "RUNNING": "רץ",
       "FINISHED": "הסתיים",

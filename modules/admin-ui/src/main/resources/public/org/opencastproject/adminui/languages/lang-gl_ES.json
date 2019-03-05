@@ -10,8 +10,8 @@
    "SAVE": "Gardar",
    "LOGOUT": "Pechar sesión",
    "RESET": "Restablecer",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "Sen opcións seleccionadas",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Sen opcións dispoñibles",
    "YES": "Si",
    "LANGUAGES": {
       "ARABIC": "Árabe",
@@ -56,11 +56,9 @@
             "ACL": "Vaise borrar o seguinte ACL",
             "GROUP": "Vaise borrar o seguinte grupo",
             "USER": "Vaise borrar o seguinte usuario",
-            "USER_BLACKLIST": "Vaise borrar a seguinte lista negra de usuarios",
             "THEME": "Vaise borrar o seguinte estilo",
             "EMAIL": "Vaise borrar o seguinte modelo de correo electrónico",
-            "LOCATION": "Vaise borrar a seguinte localización",
-            "LOCATION_BLACKLIST": "Vaise borrar a seguinte lista negra de localizacións"
+            "LOCATION": "Vaise borrar a seguinte localización"
          },
          "NAME": "Nome"
       },
@@ -131,21 +129,9 @@
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Non se puido borrar o evento porque non se dispón do permiso para facelo.",
       "SERIES_DELETED": "Serie borrada",
       "SERIES_NOT_DELETED": "Non se puido borrar a serie",
-      "USER_BLACKLIST_CREATED": "Lista negra creada",
-      "USER_BLACKLIST_NOT_CREATED": "Non se puido crear a lista negra",
-      "USER_BLACKLIST_SAVED": "Lista negra gardada",
-      "USER_BLACKLIST_NOT_SAVED": "Non se puido gardar a lista negra",
-      "USER_BLACKLIST_DELETED": "Lista negra borrada",
-      "USER_BLACKLIST_NOT_DELETED": "Non se puido borrar a lista negra",
       "LOCATION_DELETED": "Ubicación borrada",
       "LOCATION_NOT_DELETED": "Non se puido borrar a ubicación",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Non se puido borrar a ubicación porque non se dispón do permiso para facelo.",
-      "LOCATION_BLACKLIST_CREATED": "Lista negra creada",
-      "LOCATION_BLACKLIST_NOT_CREATED": "Non se puido crear a lista negra",
-      "LOCATION_BLACKLIST_SAVED": "Lista negra gardada",
-      "LOCATION_BLACKLIST_NOT_SAVED": "Non se puido gardar a lista negra",
-      "LOCATION_BLACKLIST_DELETED": "Lista negra borrada",
-      "LOCATION_BLACKLIST_NOT_DELETED": "Non se puido borrar a lista negra",
       "EMAIL_TEMPLATE_CREATED": "Modelo creado",
       "EMAIL_TEMPLATE_NOT_CREATED": "Non se puido crear o modelo",
       "EMAIL_TEMPLATE_SAVED": "Modelo gardado",
@@ -280,8 +266,8 @@
          },
          "EDIT": {
             "CAPTION": "Modificar",
-            "EVENT": "event",
-            "EVENTS": "events",
+            "EVENT": "evento",
+            "EVENTS": "eventos",
             "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Metadatos",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
@@ -450,7 +436,7 @@
                   "REPEATS": "Repetir",
                   "REPEAT_ON": "Repetir",
                   "WEEKDAYS": "Días da semana",
-                  "WEEKDAY": "Weekday"
+                  "WEEKDAY": "Día da semana"
                },
                "NO_SOURCE_AVAILABLE": "Non hai axentes de captura dispoñibles"
             },
@@ -552,13 +538,11 @@
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Preparado para gravar",
-            "BLACKLISTED": "Na lista negra",
             "OPTED_OUT": "Non se gravará"
          },
          "STATUS": {
             "SCHEDULED": "Programado",
             "OPTEDOUT": "Non se gravará",
-            "BLACKLISTED": "Na lista negra",
             "RECORDING": "Gravando",
             "UPLOADING": "Subindo",
             "INGESTING": "Importando",
@@ -878,7 +862,7 @@
                "ACTIONS": "Accións",
                "DETAILS": "Detalles",
                "DESCRIPTION": "Descrición",
-               "MORE_INFO": "More Information",
+               "MORE_INFO": "Máis información",
                "ID": "Id.",
                "TYPE": "Tipo",
                "TITLE": "Título",
@@ -886,8 +870,8 @@
                "STARTED": "Iniciado",
                "SERIES": "Series",
                "SUBMITTED": "Enviado",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
+               "SUBMITTER": "Remitente",
+               "EXECUTION_TIME": "Tempo de execución",
                "WDID": "Definición do fluxo de traballo",
                "MIMETYPE": "Tipo Mime",
                "URL": "URL",
@@ -895,11 +879,11 @@
                "NO_CONFIGURATION": "Non existen parámetros de configuración para o fluxo de traballo seleccionado.",
                "WORKFLOW": "Fluxo de traballo",
                "TOOLTIP": {
-                  "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
-                  "DETAILS": "Open workflow details"
+                  "STOP": "Deter o fluxo de traballo",
+                  "ABORT": "Anular a execución da instancia de fluxo de traballo (non volver tentar a operación errada)",
+                  "RETRY": "Volver tentar a execución do fluxo de traballo",
+                  "DELETE": "Eliminar fluxo de traballo",
+                  "DETAILS": "Abrir o fluxo de traballo"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instanciado",
@@ -907,9 +891,9 @@
                   "PAUSED": "Pausado",
                   "SUCCEEDED": "Finalizado",
                   "FAILED": "Errado",
-                  "FAILING": "Failing",
+                  "FAILING": "Con fallos",
                   "SKIPPED": "Omitido",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "Detido",
                   "RETRY": "Reintentar"
                }
             },
@@ -1138,12 +1122,10 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Ubicacións",
-         "BLACKLISTS": "Listas negras"
+         "LOCATIONS": "Ubicacións"
       },
       "ACTIONS": {
          "EXPORT": "Exportar",
-         "ADD_BLACKLIST": "Engadir lista negra",
          "REMOVE": "Eliminar"
       },
       "RECORDINGS": {
@@ -1157,8 +1139,6 @@
             "NEXT_NAME": "Título do próximo evento",
             "STATUS": "Estado",
             "VERSION": "Versión",
-            "BLACKLIST_FROM": "Na lista negra dende",
-            "BLACKLIST_TO": "Na lista negra ata",
             "ACTION": "Accións",
             "TOOLTIP": {
                "NAME": "Filtrar eventos para esta ubicación",
@@ -1189,60 +1169,18 @@
                "NO_CAPABILITIES": "Non se introduciron capacidades"
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Lista negra de ubicacións",
-            "NAME": "Nome",
-            "ACTIONS": "Accións"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Crear lista negra",
-            "EDITCAPTION": "Modificar lista negra",
-            "TABS": {
-               "LOCATIONS": "Ubicacións",
-               "DATES": "Datas",
-               "REASON": "Motivo",
-               "SUMMARY": "Resumo"
-            },
-            "LOCATIONS": {
-               "REMOVE": "Eliminar",
-               "ADD_LOCATION": "Elixir ubicación",
-               "ALL_LOCATIONS": "Todas as ubicacións",
-               "SELECT_LOCATION": "Seleccionar"
-            },
-            "DATES": {
-               "START_DATE": "Data de inicio",
-               "END_DATE": "Data de fin"
-            },
-            "REASON": {
-               "SELECT_REASON": "Seleccionar",
-               "REASON": "Motivo",
-               "COMMENTS": "Comentarios"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Resumo",
-               "LOCATION": "Ubicación",
-               "DATE_FROM": "Dende",
-               "DATE_TO": "Ata",
-               "REASON": "Motivo",
-               "COMMENTS": "Comentarios"
-            }
-         }
       }
    },
    "USERS": {
       "ACTIONS": {
          "ADD_USER": "Engadir usuario",
          "ADD_GROUP": "Engadir grupo",
-         "ADD_ACL": "Engadir política de acceso",
-         "ADD_BLACKLIST": "Engadir lista negra"
+         "ADD_ACL": "Engadir política de acceso"
       },
       "NAVIGATION": {
          "USERS": "Usuarios",
          "GROUPS": "Grupos",
-         "PERMISSIONS": "Políticas de acceso",
-         "BLACKLISTS": "Lista negra"
+         "PERMISSIONS": "Políticas de acceso"
       },
       "USERS": {
          "TABLE": {
@@ -1253,8 +1191,6 @@
             "ROLES": "Roles",
             "TYPE": "Tipo",
             "PROVIDER": "Fornecedor",
-            "BLACKLIST_FROM": "Na lista negra dende",
-            "BLACKLIST_TO": "Na lista negra ata",
             "ACTION": "Accións",
             "TOOLTIP": {
                "DELETE": "Eliminar usuario",
@@ -1423,49 +1359,6 @@
                   "LABEL": "Seleccione un rol",
                   "EMPTY": "Non hai roles dispoñibles"
                }
-            }
-         }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Lista negra de usuarios",
-            "NAME": "Nome",
-            "DATE_FROM": "Dende",
-            "DATE_TO": "Ata",
-            "REASON": "Motivo",
-            "ACTION": "Accións"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Crear lista negra",
-            "EDITCAPTION": "Modificar lista negra",
-            "TABS": {
-               "USERS": "Usuarios",
-               "DATES": "Datas",
-               "REASON": "Motivo",
-               "SUMMARY": "Resumo"
-            },
-            "USERS": {
-               "REMOVE": "Eliminar",
-               "ADD_USER": "Seleccione usuario",
-               "ALL_USERS": "Todos os usuarios",
-               "SELECT_USER": "Seleccionar"
-            },
-            "DATES": {
-               "START_DATE": "Data de inicio",
-               "END_DATE": "Data de fin"
-            },
-            "REASON": {
-               "SELECT_REASON": "Seleccionar",
-               "REASON": "Motivo",
-               "COMMENTS": "Comentarios"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Resumo",
-               "USER": "Usuario",
-               "DATE_FROM": "Dende",
-               "DATE_TO": "Ata",
-               "REASON": "Motivo",
-               "COMMENTS": "Comentarios"
             }
          }
       }
@@ -2093,16 +1986,6 @@
    "TABLE_NO_RESULT": "Non se atoparon resultados",
    "TABLE_LOADING": "Cargando…",
    "TABLE_EDIT": "Modificar",
-   "PM": {
-      "BLACKLIST": {
-         "REASONS": {
-            "SICK_LEAVE": "Baixa por enfermidade",
-            "LEAVE": "Vacacións",
-            "FAMILY_EMERGENCY": "Emerxencia familiar",
-            "CONSTRUCTION": "En obras"
-         }
-      }
-   },
    "DASHBOARD": {
       "RUNNING": "Procesando",
       "FINISHED": "Finalizado",
@@ -2195,7 +2078,7 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "Para inserir varios valores preme o Intro entre estes"
       }
    }
 }
