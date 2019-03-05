@@ -23,6 +23,7 @@ The following table contains the workflow operations that are available in an ou
 
 |Operation Handler   |Description                                                    |Details|
 |--------------------|---------------------------------------------------------------|------------------------------------|
+|add-catalog         |Add a catalog to the media package                             |[Documentation](add-catalog-woh.md)|
 |analyze-audio       |Analyze first audio stream                                     |[Documentation](analyzeaudio-woh.md)|
 |analyze-tracks      |Analyze tracks in media package                                |[Documentation](analyze-tracks-woh.md)|
 |animate             |Create animated video sequence                                 |[Documentation](animate-woh.md)|
