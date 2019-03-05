@@ -897,9 +897,9 @@
                   "PAUSED": "Pausado",
                   "SUCCEEDED": "Finalizado",
                   "FAILED": "Errado",
-                  "FAILING": "Failing",
+                  "FAILING": "Con fallos",
                   "SKIPPED": "Omitido",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "Detido",
                   "RETRY": "Reintentar"
                }
             },
