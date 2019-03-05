@@ -68,7 +68,7 @@ public class UIConfigRest {
   private static final Logger logger = LoggerFactory.getLogger(UIConfigRest.class);
 
   /** Configuration key for the ui config folder */
-  private static final String UI_CONFIG_FOLDER_PROPERTY = "org.opencastproject.uiconfig.folder";
+  static final String UI_CONFIG_FOLDER_PROPERTY = "org.opencastproject.uiconfig.folder";
 
   /** Default Path for the ui configuration folder (relative to ${karaf.etc}) */
   private static final String UI_CONFIG_FOLDER_DEFAULT = "ui-config";
