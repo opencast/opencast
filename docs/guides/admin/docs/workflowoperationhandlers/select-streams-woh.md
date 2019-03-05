@@ -12,6 +12,9 @@ video stream of the presenter track and the audio stream of the presentation tra
 The workflow operation will use workflow properties set by the Opencast video editor to determine which streams should be
 selected for further processing and add them to the media package based on `target-flavor` and `target-tags`.
 
+**IMPORTANT:** The input tracks need to be inspected using the workflow operation [inspect](inspect-woh.md) before
+running this operation.
+
 
 Parameter Table
 ---------------
@@ -25,6 +28,23 @@ audio-muxing      | force     | Move single-audio media packages to a specific t
 force-target      | presenter     | Target track for the `force` setting for `audio-muxing`
 
 \* mandatory configuration key
+
+
+Workflow Properties
+-------------------
+
+The names of the workflow properties that control which streams are included in the output tracks are
+
+    "hide_" + source-flavor.type + "_audio"
+    "hide_" + source-flavor.type + "_video"
+
+Example:
+
+For the source flavor `presenter/work`, use the boolean workflow properties `hide_presenter_audio` and
+`hide_presenter_video` to control which streams should be included in the output tracks.
+
+Those properties are set by the Opencast video editor and can also be set using a custom workflow configuration panel.
+
 
 Audio Muxing
 -----------------
@@ -62,6 +82,19 @@ The parameter value `duplicate` only applies to media packages that have exactly
 hidden video streams. For these media packages, the WOH will mux the audio stream it found to all video streams in
 the media package. For media packages without an audio stream or with more than one audio stream, the behavior is
 the same as if the parameter were omitted.
+
+Encoding Profiles
+-----------------
+
+This workflow operation handler depends on the presence of the following encoding profiles:
+
+Name            | Description
+----------------|------------
+video-only.work | Removes all audio streams from a media track
+audio-only.work | Removes all video streams from a media track
+mux-av.work     | Mux a video stream and an audio stream into a media track
+
+Note that those encoding profiles are included in the default configuration of Opencast.
 
 Operation Example
 -----------------
