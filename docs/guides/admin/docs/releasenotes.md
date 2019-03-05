@@ -98,10 +98,10 @@ Additional Notes about 6.2
 Opencast 6.2 contains a number of bug fixes for the Opencast 6.x line of releases.
 
 
-Additional Notes about 6.2
+Additional Notes about 6.3
 --------------------------
 
-Opencast 6.1 contains a number of performance improvements and additional minor bug fixes for the Opencast 6.x line of
+Opencast 6.3 contains a number of performance improvements and additional minor bug fixes for the Opencast 6.x line of
 releases.
 
 
