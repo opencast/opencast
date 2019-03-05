@@ -36,6 +36,8 @@ import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -77,12 +79,13 @@ import javax.xml.transform.stream.StreamSource;
 @XmlAccessorType(XmlAccessType.NONE)
 public class Event implements IndexObject {
 
-  /**
-   * The scheduling status of the event
-   */
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(Event.class);
+
+  /** The scheduling status of the event */
   public enum SchedulingStatus {
     BLACKLISTED, OPTED_OUT, READY_FOR_RECORDING
-  };
+  }
 
   /** The document type */
   public static final String DOCUMENT_TYPE = "event";
@@ -1167,12 +1170,18 @@ public class Event implements IndexObject {
   }
 
   private void updateEventStatus() {
-    if (getWorkflowId() != null) {
+    if (getWorkflowId() != null && StringUtils.isBlank(getWorkflowState())
+            || getWorkflowId() == null && StringUtils.isNotBlank(getWorkflowState())) {
+      logger.warn("The workflow id {} and workflow state {} are not in sync on event {} organization {}",
+              getWorkflowId(), getWorkflowState(), getIdentifier(), getOrganization());
+    }
+
+    if (getWorkflowId() != null && StringUtils.isNotBlank(getWorkflowState())) {
       eventStatus = workflowStatusMapping.get(getWorkflowState());
       return;
     }
 
-    if (getRecordingStatus() != null) {
+    if (StringUtils.isNotBlank(getRecordingStatus())) {
       eventStatus = recordingStatusMapping.get(getRecordingStatus());
       return;
     }

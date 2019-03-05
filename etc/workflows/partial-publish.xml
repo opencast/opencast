@@ -432,7 +432,7 @@
       description="Create YouTube compatible output"
       if="${publishToYouTube}"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error">
+      exception-handler-workflow="partial-error">
       <configurations>
         <configuration key="source-flavor-lower">presentation/themed</configuration>
         <configuration key="source-flavor-upper">presenter/themed</configuration>
