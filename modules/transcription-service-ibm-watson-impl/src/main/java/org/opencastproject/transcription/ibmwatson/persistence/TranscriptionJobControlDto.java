@@ -45,6 +45,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 @Table(name = "oc_ibm_watson_transcript_job")
 @NamedQueries({
         @NamedQuery(name = "TranscriptionJobControl.findByMediaPackage", query = "SELECT jc FROM TranscriptionJobControl jc WHERE jc.mediaPackageId = :mediaPackageId ORDER BY jc.dateCreated DESC"),
+        @NamedQuery(name = "TranscriptionJobControl.findByMediaPackageTrackAndStatus", query = "SELECT jc FROM TranscriptionJobControl jc WHERE jc.mediaPackageId = :mediaPackageId AND jc.trackId = :trackId AND jc.status IN :status"),
         @NamedQuery(name = "TranscriptionJobControl.findByJob", query = "SELECT jc FROM TranscriptionJobControl jc WHERE jc.transcriptionJobId = :transcriptionJobId"),
         @NamedQuery(name = "TranscriptionJobControl.findByStatus", query = "SELECT jc FROM TranscriptionJobControl jc WHERE jc.status IN :status") })
 public final class TranscriptionJobControlDto {
@@ -161,6 +162,25 @@ public final class TranscriptionJobControlDto {
     Query query = null;
     try {
       query = em.createNamedQuery("TranscriptionJobControl.findByStatus");
+      query.setParameter("status", statusCol);
+      return query.getResultList();
+    } catch (Exception e) {
+      throw new TranscriptionDatabaseException(e);
+    }
+  }
+
+  /** Find all job controls by media package and status. */
+  @SuppressWarnings("unchecked")
+  public static List<TranscriptionJobControlDto> findByMediaPackageTrackAndStatus(EntityManager em,
+          final String mediaPackageId, String trackId, final String... status) throws TranscriptionDatabaseException {
+    Collection<String> statusCol = new HashSet<String>();
+    for (String st : status)
+      statusCol.add(st);
+    Query query = null;
+    try {
+      query = em.createNamedQuery("TranscriptionJobControl.findByMediaPackageTrackAndStatus");
+      query.setParameter("mediaPackageId", mediaPackageId);
+      query.setParameter("trackId", trackId);
       query.setParameter("status", statusCol);
       return query.getResultList();
     } catch (Exception e) {
