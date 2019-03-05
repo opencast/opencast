@@ -40,6 +40,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -74,11 +75,31 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
   /** Target tags configuration property name. */
   private static final String TARGET_TAGS_PROPERTY = "target-tags";
 
+  /** Process first match only */
+  private static final String PROCCESS_FIRST_MATCH = "process-first-match-only";
+
   /** Image size configuration property name. */
   private static final String IMAGE_SIZE_PROPERTY = "image-count";
 
   /** Default value for image size. */
   private static final int DEFAULT_IMAGE_SIZE = 10;
+
+  /** The configuration options for this handler */
+  private static final SortedMap<String, String> CONFIG_OPTIONS;
+
+  static {
+    CONFIG_OPTIONS = new TreeMap<String, String>();
+    CONFIG_OPTIONS.put(SOURCE_FLAVOR_PROPERTY, "The source media file flavor.");
+    CONFIG_OPTIONS.put(SOURCE_TAGS_PROPERTY, "Comma-separated tags of the source media files. "
+            + "Any media that match " + SOURCE_FLAVOR_PROPERTY + " or " + SOURCE_TAGS_PROPERTY
+            + " will be processed.");
+    CONFIG_OPTIONS.put(TARGET_FLAVOR_PROPERTY, "The target timeline previews image flavor.");
+    CONFIG_OPTIONS.put(TARGET_TAGS_PROPERTY, "The timeline previews image (comma separated) target tags.");
+    CONFIG_OPTIONS.put(IMAGE_SIZE_PROPERTY, "The number of timeline previews in the image.");
+    // Only process the first file that matches tags/flavors
+    CONFIG_OPTIONS.put("process-first-match-only",
+            "Set to 'true' indicates only one track will be processed if more are selected");
+  }
 
   /** The timeline previews service. */
   private TimelinePreviewsService timelinePreviewsService = null;
@@ -138,6 +159,9 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
       logger.info("Property {} not set, using default value: {}", IMAGE_SIZE_PROPERTY, DEFAULT_IMAGE_SIZE);
     }
 
+    boolean processOnlyOne = BooleanUtils.toBoolean(StringUtils.trimToNull(
+            workflowInstance.getCurrentOperation().getConfiguration(PROCCESS_FIRST_MATCH)));
+
     TrackSelector trackSelector = new TrackSelector();
     for (String flavor : asList(sourceFlavorProperty)) {
       trackSelector.addFlavor(flavor);
@@ -166,6 +190,9 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
         logger.error("Creating timeline previews job for track '{}' in media package '{}' failed with error {}",
                 sourceTrack.getIdentifier(), mediaPackage.getIdentifier().compact(), ex.getMessage());
       }
+
+      if (processOnlyOne)
+        break;
     }
 
     logger.info("Wait for timeline previews jobs for media package {}", mediaPackage.getIdentifier().compact());
