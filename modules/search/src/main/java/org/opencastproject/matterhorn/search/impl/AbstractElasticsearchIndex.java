@@ -441,8 +441,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    * @throws IOException
    *           if reading the resources fails
    */
-  private String loadResources(final String fileName) throws IOException {
-    final String resourcePath =  "/elasticsearch/" + fileName;
+  private String loadResources(final String filename) throws IOException {
+    final String resourcePath =  "/elasticsearch/" + filename;
     // Try loading from the index implementation first.
     // This allows index implementations to override the defaults
     for (Class cls: Arrays.asList(this.getClass(), AbstractElasticsearchIndex.class)) {
@@ -458,8 +458,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   }
 
   /**
-   * Loads the settings for the elastic search configuration. An initial attempt is made to get the configuration from
-   * <code>${opencast.home}/etc/index/&lt; index &gt;/settings.yml</code>.
+   * Loads the settings for the elastic search configuration at <code>etc/elasticsearch.yml</code>.
    *
    * @return the elastic search settings
    * @throws IOException

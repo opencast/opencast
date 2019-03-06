@@ -31,7 +31,7 @@ import java.io.InputStream;
 /**
  * Utilities to ease dealing with Elasticsearch.
  */
-public final class ElasticsearchUtils {
+final class ElasticsearchUtils {
 
   /**
    * Private constructor to make sure this class is used as a utility class.
@@ -41,14 +41,14 @@ public final class ElasticsearchUtils {
 
   /**
    * Creates an elastic search index configuration inside the given directory by loading the relevant configuration
-   * files from the bundle. The final location will be <code>configDirectory/etc/index</code>.
+   * files from the bundle.
    * 
    * @param configDirectory
    *          the configuration directory
    * @throws IOException
    *           if creating the configuration fails
    */
-  public static void createIndexConfigurationAt(File configDirectory) throws IOException {
+  static void createIndexConfigurationAt(File configDirectory) throws IOException {
 
     // Load the index configuration and move it into place
     String[] files = new String[] { "content-mapping.json", "elasticsearch.yml", "version-mapping.json" };

@@ -28,11 +28,12 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
  * Utilities to ease dealing with Elasticsearch.
  */
-public final class AdminUIElasticsearchUtils {
+final class AdminUIElasticsearchUtils {
 
   /**
    * Private constructor to make sure this class is used as a utility class.
@@ -42,7 +43,7 @@ public final class AdminUIElasticsearchUtils {
 
   /**
    * Creates an elastic search index configuration inside the given directory by loading the relevant configuration
-   * files from the bundle. The final location will be <code>homeDirectory/etc/index</code>.
+   * files from the bundle.
    *
    * @param homeDirectory
    *          the configuration directory
@@ -51,7 +52,7 @@ public final class AdminUIElasticsearchUtils {
    * @throws IOException
    *           if creating the configuration fails
    */
-  public static void createIndexConfigurationAt(File homeDirectory, String index) throws IOException {
+  static void createIndexConfigurationAt(File homeDirectory, String index) throws IOException {
 
     // Load the index configuration and move it into place
     File configurationRoot = new File(PathSupport.concat(new String[] { homeDirectory.getAbsolutePath(), "etc",
@@ -64,7 +65,7 @@ public final class AdminUIElasticsearchUtils {
             "series-mapping.json", "settings.yml", "theme-mapping.json", "version-mapping.json" };
 
     for (String file : files) {
-      String bundleLocation = PathSupport.concat(new String[] { "/index", index, file });
+      String bundleLocation = Paths.get("/index", index, file).toString();
       File fileLocation = new File(configurationRoot, file);
       FileUtils.copyInputStreamToFile(
               AdminUIElasticsearchUtils.class.getResourceAsStream(bundleLocation),

@@ -4,31 +4,14 @@
 # multiple clusters on the same network, make sure you're using unique names.
 cluster.name: opencast
 
-#################################### Paths ####################################
-
+# Home directory of the Elasticsearch installation:
 path.home: ${karaf.home}/
 
-# Path to directory where to store index data allocated for this node.
-#
-#path.data: /path/to/data
-#
-# Can optionally include more than one location, causing data to be striped across
-# the locations (a la RAID 0) on a file level, favouring locations with most free
-# space on creation. For example:
-#
+# The location of the data files of each index / shard allocated on the node. Can hold multiple locations:
 path.data: ${karaf.data}/index/data
 
 # Path to log files:
-#
 path.logs: ${karaf.data}/log/
-
-
-############################## Network And HTTP ###############################
-
-# Elasticsearch, by default, binds itself to the 0.0.0.0 address, and listens
-# on port [9200-9300] for HTTP traffic and on port [9300-9400] for node-to-node
-# communication. (the range means that if the port is busy, it will automatically
-# try the next port).
 
 # Set the bind address specifically (IPv4 or IPv6):
 #network.bind_host: 192.168.0.1
@@ -52,8 +35,5 @@ network.host: 127.0.0.1
 # Disable HTTP completely:
 #http.enabled: false
 
-
-################################## Shutdown ###################################
-
-# Disable the Elasticsearch Shutdown API (recomended).
+# Disable the Elasticsearch Shutdown API:
 action.disable_shutdown: true
