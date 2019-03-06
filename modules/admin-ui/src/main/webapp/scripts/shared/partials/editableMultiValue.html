@@ -1,6 +1,6 @@
 <div ng-click="enterEditMode()" ng-form="innerForm">
   &nbsp;<ul ng-show="!editMode">
-    <li ng-repeat="value in params.value">
+    <li ng-repeat="value in params.value track by $index">
       <span ng-if="value">{{ value | translate }}</span>
     </li>
   </ul>
@@ -18,7 +18,7 @@
                        placeholder="{{ 'EDITABLE.MULTI.PLACEHOLDER' | translate}}">
   </div>
   <span ng-show="editMode" class="ng-multi-value"
-                           ng-repeat="value in params.value">
+                           ng-repeat="value in params.value track by $index">
     {{ value | translate | limitTo : 70}}
     <a ng-mousedown="removeValue($index)">
       <i class="fa fa-times"></i>
