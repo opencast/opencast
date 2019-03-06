@@ -54,8 +54,8 @@ org.opencastproject.elasticsearch.server.address=127.0.0.1
 Once this is set, Opencast will not launch its own internal Elasticsearch anymore. If necessary, you can also specify a
 custom port in this configuration file.
 
-Next, configure the correct cluster name for all indexes in `etc/index/*/settings.yml`. Make sure that the correct
-cluster name is set in the configuration file of each index:
+Next, configure the correct cluster name in `etc/elasticsearch.yml`. Make sure that the correct cluster name is set in
+the configuration file of each index:
 
 ```yml
 cluster.name: opencast
