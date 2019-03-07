@@ -458,7 +458,6 @@
        "ADD_EVENT": "Add event",
        "TABLE": {
          "CAPTION":  "Events",
-         "CREATORS": "Creators",
          "TITLE":    "Title",
          "PRESENTERS": "Presenter(s)",
          "SERIES":   "Series",
@@ -960,8 +959,8 @@
        "TABLE": {
          "CAPTION":      "Series",
          "TITLE":        "Series",
-         "HAS_EVENTS":    "Contains events",
-         "CREATORS":     "Organizer(s)",
+         "HAS_EVENTS":   "Contains events",
+         "ORGANIZERS":   "Organizer(s)",
          "CONTRIBUTORS": "Contributor(s)",
          "CREATED":      "Created",
          "MANAGED_ACL":  "Access policy",
