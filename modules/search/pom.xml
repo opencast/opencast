@@ -13,7 +13,7 @@
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <lucene.version>5.5.4</lucene.version>
+    <lucene.version>6.6.1</lucene.version>
   </properties>
   <dependencies>
     <dependency>
@@ -39,9 +39,44 @@
     <dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
-      <version>2.4.6</version>
+      <version>5.6.15</version>
     </dependency>
-    <!-- elasticsearch dependencies -->
+    <dependency>
+      <groupId>org.elasticsearch.client</groupId>
+      <artifactId>transport</artifactId>
+      <version>5.6.15</version>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.plugin</groupId>
+      <artifactId>transport-netty3-client</artifactId>
+      <version>5.6.15</version>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.plugin</groupId>
+      <artifactId>transport-netty4-client</artifactId>
+      <version>5.6.15</version>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.plugin</groupId>
+      <artifactId>reindex-client</artifactId>
+      <version>5.6.15</version>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.plugin</groupId>
+      <artifactId>percolator-client</artifactId>
+      <version>5.6.15</version>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.plugin</groupId>
+      <artifactId>lang-mustache-client</artifactId>
+      <version>5.6.15</version>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.plugin</groupId>
+      <artifactId>parent-join-client</artifactId>
+      <version>5.6.15</version>
+    </dependency>
+    <!-- Elasticsearch dependencies -->
     <dependency>
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna</artifactId>
@@ -50,6 +85,12 @@
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-analyzers-common</artifactId>
+      <version>${lucene.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-backward-codecs</artifactId>
       <version>${lucene.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -125,6 +166,18 @@
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-spatial-extras</artifactId>
+      <version>${lucene.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-spatial3d</artifactId>
+      <version>${lucene.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-suggest</artifactId>
       <version>${lucene.version}</version>
       <scope>runtime</scope>
@@ -182,12 +235,12 @@
     <dependency>
       <groupId>com.tdunning</groupId>
       <artifactId>t-digest</artifactId>
-      <version>3.0</version>
+      <version>3.2</version>
     </dependency>
     <dependency>
       <groupId>org.hdrhistogram</groupId>
       <artifactId>HdrHistogram</artifactId>
-      <version>2.1.6</version>
+      <version>2.1.9</version>
     </dependency>
     <dependency>
       <groupId>commons-cli</groupId>
@@ -196,8 +249,8 @@
     </dependency>
     <dependency>
       <groupId>io.netty</groupId>
-      <artifactId>netty</artifactId>
-      <version>3.10.6.Final</version>
+      <artifactId>netty-all</artifactId>
+      <version>4.1.33.Final</version>
     </dependency>
     <dependency>
       <groupId>org.yaml</groupId>
@@ -232,6 +285,19 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.jcraft</groupId>
+      <artifactId>jzlib</artifactId>
+      <version>1.1.3</version>
+    </dependency>
+
+    <!-- logging -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.11.1</version>
+    </dependency>
+
     <!-- testing -->
     <dependency>
       <groupId>junit</groupId>
@@ -260,34 +326,61 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
+              !com.barchart.udt*,
+              !org.jctools*,
+              !org.zeromq*,
+              !com.conversantmedia*,
+              !com.fasterxml.jackson.dataformat.xml*,
+              !com.lmax.disruptor*,
+              !org.apache.kafka*,
+              !com.fasterxml.aalto*,
               !com.github.mustachejava*,
-              !com.google.protobuf,
+              !com.google.common.geometry,
+              !com.google.protobuf*,
+              !com.jcraft.jzlib,
+              !gnu.io*,
               !groovy.lang,
+              !io.netty.internal.tcnative,
+              !org.eclipse.jetty.alpn,
               !org.antlr.*,
               !org.apache.log4j.*,
-              !org.apache.lucene.*,
+              !org.conscrypt*,
               !org.tartarus.snowball*,
+              !org.apache.http.impl.nio.client,
               !org.apache.tomcat.*,
               !org.bouncycastle.*,
               !org.codehaus.groovy.*,
               !org.eclipse.jetty.npn.*,
+              !org.elasticsearch.join,
+              !org.elasticsearch.percolator,
+              !org.elasticsearch.script*,
               !org.hyperic.sigar,
               !org.jboss.logging,
               !org.jboss.marshalling,
+              !org.locationtech*,
+              !lzma.sdk*,
+              !net.jpountz.*,
+              !joptsimple*,
               !sun.security.*,
               *
             </Import-Package>
+            <Private-Package>
+              org.jboss.netty.*
+            </Private-Package>
             <Export-Package>
+              org.apache.logging.log4j*,
               org.opencastproject.matterhorn.search.impl;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
               HdrHistogram,
+              log4j-core,
               asm,
               asm-commons,
               asm-tree,
               commons-cli,
               compress-lzf,
               elasticsearch,
+              transport,
               hppc,
               jackson-dataformat-smile,
               jackson-dataformat-yaml,
@@ -296,7 +389,10 @@
               joda-convert,
               jsr166e,
               jts,
+              jzlib,
+              lang-mustache-client,
               lucene-analyzers-common,
+              lucene-backward-codecs,
               lucene-codecs,
               lucene-core,
               lucene-expressions,
@@ -309,10 +405,18 @@
               lucene-queryparser,
               lucene-sandbox,
               lucene-spatial,
+              lucene-spatial-extras,
+              lucene-spatial3d,
               lucene-suggest,
-              netty,
+              netty-all,
+              parent-join-client,
+              percolator-client,
+              reindex-client,
               snakeyaml,
               spatial4j,
+              transport,
+              transport-netty3-client,
+              transport-netty4-client,
               t-digest
             </Embed-Dependency>
             <_exportcontents>

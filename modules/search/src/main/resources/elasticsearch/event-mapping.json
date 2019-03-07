@@ -1,7 +1,6 @@
 {
     "event" : {
         "_source" : { "enabled" : true },
-        "_timestamp" : { "enabled" : true },
         "dynamic": "true",
         "properties" : {
 
