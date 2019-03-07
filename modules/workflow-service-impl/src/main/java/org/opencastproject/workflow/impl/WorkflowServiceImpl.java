@@ -2364,7 +2364,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   @Override
-  public void repopulate(final String indexName) throws Exception {
+  public void repopulate(final String indexName) throws ServiceRegistryException {
     List<String> workflows =  serviceRegistry.getJobPayloads(Operation.START_WORKFLOW.toString());
 
     final String destinationId = WorkflowItem.WORKFLOW_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
@@ -2387,7 +2387,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           logger.warn("Skipping restoring of workflow. Error parsing: {}", workflow, e);
           continue;
         }
-        Organization organization = instance.getOrganization();
+        Organization organization = null;
+        try {
+          organization = organizationDirectoryService.getOrganization(instance.getOrganization());
+        } catch (NotFoundException e) {
+          logger.error("Found workflow with non-existing organization {}", instance.getOrganization());
+          continue;
+        }
 
         // get metadata for index update
         final String dcXml = getEpisodeDublinCoreXml(instance.getMediaPackage());

@@ -160,7 +160,7 @@ public class WorkflowPermissionsUpdatedEventHandler {
           if (!instance.isActive())
             continue;
 
-          Organization org = instance.getOrganization();
+          Organization org = organizationDirectoryService.getOrganization(instance.getOrganization());
           securityService.setOrganization(org);
 
           MediaPackage mp = instance.getMediaPackage();
@@ -227,11 +227,7 @@ public class WorkflowPermissionsUpdatedEventHandler {
         q = q.withStartPage(offset);
         result = workflowService.getWorkflowInstancesForAdministrativeRead(q);
       }
-    } catch (WorkflowException e) {
-      logger.warn(e.getMessage());
-    } catch (UnauthorizedException e) {
-      logger.warn(e.getMessage());
-    } catch (IOException e) {
+    } catch (WorkflowException | NotFoundException | IOException | UnauthorizedException e) {
       logger.warn(e.getMessage());
     } finally {
       securityService.setOrganization(prevOrg);

@@ -49,6 +49,7 @@ import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -130,6 +131,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /** To get the tenant path to the player URL **/
   private SecurityService securityService;
 
+  private OrganizationDirectoryService organizationDirectoryService = null;
+
   /** Whether to distribute to streaming server */
   private boolean distributeStreaming = false;
 
@@ -162,6 +165,10 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    */
   protected void setSearchService(SearchService searchService) {
     this.searchService = searchService;
+  }
+
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    this.organizationDirectoryService = organizationDirectoryService;
   }
 
   /** The configuration options for this handler */
@@ -379,9 +386,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
         logger.info("Publishing media package {} to search index", mediaPackageForSearch);
 
-        URL engageBaseUrl = null;
-        engageUrlString = StringUtils.trimToNull(workflowInstance.getOrganization().getProperties()
-                .get(ENGAGE_URL_PROPERTY));
+        URL engageBaseUrl;
+        Organization organization = organizationDirectoryService.getOrganization(workflowInstance.getOrganization());
+        engageUrlString = StringUtils.trimToNull(organization.getProperties().get(ENGAGE_URL_PROPERTY));
         if (engageUrlString != null) {
           engageBaseUrl = new URL(engageUrlString);
         } else {
