@@ -454,6 +454,16 @@ input.disabled, select.disabled {
   }
 }
 
+
+/*
+ * ---------------------------------------------
+ * MH-12139 notification upload ratio override
+ * ---------------------------------------------
+ */
+.alert p {
+  display: inline-flex;
+}
+
 // pagination of tables
 .main-view {
   #tbl-view-controls-container {
@@ -558,3 +568,4 @@ tr.info {
 .playback-controls-wrapper {
   width: 280px;
 }
+
