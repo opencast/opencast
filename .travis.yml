@@ -90,7 +90,7 @@ jobs:
             ! grep 'WARNING.*Documentation file' mkdocs.log &&
             ! grep 'pages exist in the docs directory' mkdocs.log &&
             cat mkdocs.log )
-        - (cd docs/guides && grunt)
+        - (cd docs/guides && npm test)
 
     # Test database scripts with MariaDB 10.x
     - stage: quick tests
