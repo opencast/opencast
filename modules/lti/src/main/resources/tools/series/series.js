@@ -27,9 +27,9 @@ var player,
     currentpage;
 
 function getSeries() {
-  var prefix = '?series=';
-  if (location.search.startsWith(prefix)) {
-    return location.search.substring(prefix.length).split('&')[0];
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('series')) {
+    return urlParams.get('series');
   }
   return '';
 }
