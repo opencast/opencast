@@ -24,18 +24,16 @@ Elasticsearch configuration file called `elasticsearch.yml`:
 
 ```yml
 cluster.name: opencast
-node.name: opencast-elasticsearch-single-node
-index.max_result_window: 2147483647
 network.host: 0.0.0.0
+discovery.type: single-node
 ```
 
 …and run
 
 ```sh
 % docker run -p 9200:9200 -p 9300:9300 \
-    -e "discovery.type=single-node" \
     -v "$(pwd)/elasticsearch.yml":/usr/share/elasticsearch/config/elasticsearch.yml \
-    elasticsearch:2.4.6
+    elasticsearch:5.6.15
 ```
 
 This will already give you a running cluster with the cluster name `opencast`. Note that the cluster name is important

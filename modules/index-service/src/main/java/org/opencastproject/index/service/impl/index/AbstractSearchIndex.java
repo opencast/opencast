@@ -64,16 +64,18 @@ import org.opencastproject.util.data.Option;
 import com.entwinemedia.fn.Fn;
 
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms.Bucket;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -366,9 +368,9 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     logger.debug("Removing element with id '{}' from searching index '{}'", uid, getIndexName());
 
     DeleteRequestBuilder deleteRequest = getSearchClient().prepareDelete(getIndexName(), documentType, uid);
-    deleteRequest.setRefresh(true);
+    deleteRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
     DeleteResponse delete = deleteRequest.execute().actionGet();
-    if (!delete.isFound()) {
+    if (delete.getResult() == DocWriteResponse.Result.NOT_FOUND) {
       logger.trace("Document {} to delete was not found on index '{}'", uid, getIndexName());
       return false;
     }
@@ -613,7 +615,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    */
   public List<String> getTermsForField(String field, Option<String[]> types) {
     final String facetName = "terms";
-    TermsBuilder aggBuilder = AggregationBuilders.terms(facetName).field(field);
+    AggregationBuilder aggBuilder = AggregationBuilders.terms(facetName).field(field);
     SearchRequestBuilder search = getSearchClient().prepareSearch(getIndexName()).addAggregation(aggBuilder);
 
     if (types.isSome())
