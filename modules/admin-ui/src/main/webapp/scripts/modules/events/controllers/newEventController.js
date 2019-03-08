@@ -142,13 +142,14 @@ angular.module('adminNg.controllers')
         $timeout(function () {
           Table.fetch();
         }, 500);
-
-        Notifications.add('success', 'EVENTS_CREATED');
+        // Requires manual removal to ensure that user acknowledges the successful create
+        Notifications.add('success', 'EVENTS_CREATED', 'global', -1);
         Notifications.remove(messageId);
         resetStates();
         window.onbeforeunload = null;
       }, function () {
-        Notifications.add('error', 'EVENTS_NOT_CREATED');
+        // Require manual removal to ensure that user acknowledges the failed create
+        Notifications.add('error', 'EVENTS_NOT_CREATED', 'global', -1);
         Notifications.remove(messageId);
         resetStates();
         window.onbeforeunload = null;

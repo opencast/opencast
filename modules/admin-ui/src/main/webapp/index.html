@@ -9,6 +9,7 @@
     <!-- build:css(src/main) styles/vendor.css -->
     <!-- bower:css -->
     <link rel="stylesheet" href="../../bower_components/angular-hotkeys/build/hotkeys.css" />
+    <link rel="stylesheet" href="../../bower_components/angular-loading-bar/build/loading-bar.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css(target/grunt/.tmp) styles/main.css -->
@@ -104,7 +105,7 @@
         </div>
       </nav>
     </header>
-
+    <div id="upload-progress-bar-container" ></div>
     <section ng-view class="main-content">
     </section>
 
@@ -134,6 +135,7 @@
     <script src="../../bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
     <script src="../../bower_components/angular-wizard/dist/angular-wizard.js"></script>
     <script src="../../bower_components/angular-hotkeys/build/hotkeys.js"></script>
+    <script src="../../bower_components/angular-loading-bar/build/loading-bar.js"></script>
     <script src="../../bower_components/ng-file-upload/angular-file-upload.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
@@ -167,6 +169,7 @@
     <script src="scripts/shared/services/schedulingHelperService.js"></script>
     <script src="scripts/shared/services/eventHelperService.js"></script>
     <script src="scripts/shared/services/hotkeysService.js"></script>
+    <script src="scripts/shared/services/progressBarService.js"></script>
     <script src="scripts/shared/services/restServiceMonitor.js"></script>
     <script src="scripts/shared/resources/resources.js"></script>
     <script src="scripts/shared/resources/identityResource.js"></script>

@@ -97,7 +97,7 @@ describe('New Event Controller', function () {
                 expect(Notifications.add).toHaveBeenCalledWith('success', 'EVENTS_UPLOAD_STARTED', 'global', -1);
                 $httpBackend.flush();
 
-                expect(Notifications.add).toHaveBeenCalledWith('success', 'EVENTS_CREATED');
+                expect(Notifications.add).toHaveBeenCalledWith('success', 'EVENTS_CREATED', 'global', -1);
             });
 
             it('closes the modal', function () {
@@ -120,7 +120,7 @@ describe('New Event Controller', function () {
                 expect(Notifications.add).toHaveBeenCalledWith('success', 'EVENTS_UPLOAD_STARTED', 'global', -1);
                 $httpBackend.flush();
 
-                expect(Notifications.add).toHaveBeenCalledWith('error', 'EVENTS_NOT_CREATED');
+                expect(Notifications.add).toHaveBeenCalledWith('error', 'EVENTS_NOT_CREATED', 'global', -1);
             });
         });
     });

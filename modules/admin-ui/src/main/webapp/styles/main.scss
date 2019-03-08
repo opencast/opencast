@@ -549,6 +549,36 @@ tr.info {
 }
 
 /*
+ * ---------------------------------------------
+ * MH-12139 load progress bar style override
+ * ---------------------------------------------
+ */
+
+#upload-progress-bar-container {
+  position: relative;
+  background: $yellow; /* OC default yellow */
+}
+
+#loading-bar .bar {
+  background: $state-warning-bg; /* light yellow variation from base variables scss */
+  position: relative;
+  height: 35px;
+}
+
+#loading-bar-text {
+  color: #46647e;
+  position: absolute;
+  text-align: center;
+  font-size: 1.2em;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  margin-top: 10px;
+  z-index: 10003; /* one higher than angular-loading-bar's z-index to show the text */
+  height: 35px;
+}
+
+/*
 * ----------------------------------------------------------------
 * THE FOLLOWING SECTION NEEDS TO BE DELEGATED TO THE DESIGNERS!!!
 * ----------------------------------------------------------------
@@ -565,3 +595,4 @@ tr.info {
 .playback-controls-wrapper {
   width: 280px;
 }
+

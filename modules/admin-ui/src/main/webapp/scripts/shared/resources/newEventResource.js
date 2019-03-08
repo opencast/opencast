@@ -21,7 +21,11 @@
 'use strict';
 
 angular.module('adminNg.resources')
-.factory('NewEventResource', ['$resource', 'JsHelper', function ($resource, JsHelper) {
+.factory('NewEventResource', ['$resource', 'JsHelper', 'ProgressBar', function ($resource, JsHelper, ProgressBar) {
+
+  // Track if current POST is a schedule or an upload in order to invoke upload progress bar
+  var isUpload = false;
+
   return $resource('/admin-ng/event/new', {}, {
     save: {
       method: 'POST',
@@ -33,9 +37,25 @@ angular.module('adminNg.resources')
       // of the request.
       headers: { 'Content-Type': undefined },
 
+      //Track file upload progress
+      uploadEventHandlers: {
+        progress: function(event) {
+          if (isUpload) {
+            ProgressBar.onUploadFileProgress(event);
+          }
+        }
+      },
+
       responseType: 'text',
 
-      transformResponse: [],
+      transformResponse: function () {
+
+        // reset params from uploaded new event
+        if (isUpload) {
+          isUpload = false;
+          ProgressBar.complete();
+        }
+      },
 
       transformRequest: function (data) {
 
@@ -121,6 +141,10 @@ angular.module('adminNg.resources')
           if (data.source.UPLOAD.metadata.start) {
             data.metadata[0].fields.push(data.source.UPLOAD.metadata.start);
           }
+
+          // Start the UPLOAD progress bar
+          isUpload = true;
+          ProgressBar.start();
         }
 
         if (assetConfig) {

@@ -17,6 +17,7 @@ module.exports = function (config) {
             '../../../bower_components/angular-local-storage/dist/angular-local-storage.js',
             '../../../bower_components/angular-wizard/dist/angular-wizard.js',
             '../../../bower_components/angular-hotkeys/build/hotkeys.js',
+            '../../../bower_components/angular-loading-bar/build/loading-bar.js',
             '../../../bower_components/ng-file-upload/angular-file-upload.js',
             '../../../bower_components/angular-mocks/angular-mocks.js',
             // endbower

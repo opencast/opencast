@@ -31,6 +31,7 @@ angular.module('adminNg', [
   'LocalStorageModule',
   'ngRoute',
   'cfp.hotkeys',
+  'cfp.loadingBar',
   'ngResource',
   'ngAnimate',
   'ngMessages',
@@ -45,7 +46,8 @@ angular.module('adminNg', [
   'adminNg.directives',
   'mgo-angular-wizard',
   'opencast.directives'
-]).config(['$routeProvider', function ($routeProvider) {
+])
+.config(['$routeProvider', function ($routeProvider) {
   var firstCharToUpper = function (string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
@@ -116,9 +118,16 @@ angular.module('adminNg', [
 }])
 .config(['chosenProvider', function (chosenProvider) {
   chosenProvider.setOption({
-    'search_contains': true,
+    'search_contains': true
   });
 }])
+.config(function(cfpLoadingBarProvider) {
+  cfpLoadingBarProvider.includeSpinner = false; // incrementing percentage text is sustitute for spinner
+  cfpLoadingBarProvider.autoIncrement = false; // manually set the actual file upload percentage
+  cfpLoadingBarProvider.parentSelector = '#upload-progress-bar-container';  // Target div is found in base index.html
+  cfpLoadingBarProvider.loadingBarTemplate = '<div id="loading-bar"><div class="bar"><div class="peg">' +
+      '</div></div><div id="loading-bar-text"></div></div>';
+})
 .run(['$rootScope', function ($rootScope) {
   // Define wrappers around non-mockable native functions.
   $rootScope.location = {};

@@ -13,6 +13,7 @@
     "angular-local-storage": "0.7.1",
     "angular-wizard": "0.6.0",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0",
+    "angular-loading-bar": "chieffancypants/angular-loading-bar#^0.9.0",
     "ng-file-upload": "2.0.5"
   },
   "devDependencies": {
