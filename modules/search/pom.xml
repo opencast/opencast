@@ -14,6 +14,7 @@
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
     <lucene.version>6.6.1</lucene.version>
+    <elasticsearch.version>5.6.15</elasticsearch.version>
   </properties>
   <dependencies>
     <dependency>
@@ -39,42 +40,42 @@
     <dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
-      <version>5.6.15</version>
+      <version>${elasticsearch.version}</version>
     </dependency>
     <dependency>
       <groupId>org.elasticsearch.client</groupId>
       <artifactId>transport</artifactId>
-      <version>5.6.15</version>
+      <version>${elasticsearch.version}</version>
     </dependency>
     <dependency>
       <groupId>org.elasticsearch.plugin</groupId>
       <artifactId>transport-netty3-client</artifactId>
-      <version>5.6.15</version>
+      <version>${elasticsearch.version}</version>
     </dependency>
     <dependency>
       <groupId>org.elasticsearch.plugin</groupId>
       <artifactId>transport-netty4-client</artifactId>
-      <version>5.6.15</version>
+      <version>${elasticsearch.version}</version>
     </dependency>
     <dependency>
       <groupId>org.elasticsearch.plugin</groupId>
       <artifactId>reindex-client</artifactId>
-      <version>5.6.15</version>
+      <version>${elasticsearch.version}</version>
     </dependency>
     <dependency>
       <groupId>org.elasticsearch.plugin</groupId>
       <artifactId>percolator-client</artifactId>
-      <version>5.6.15</version>
+      <version>${elasticsearch.version}</version>
     </dependency>
     <dependency>
       <groupId>org.elasticsearch.plugin</groupId>
       <artifactId>lang-mustache-client</artifactId>
-      <version>5.6.15</version>
+      <version>${elasticsearch.version}</version>
     </dependency>
     <dependency>
       <groupId>org.elasticsearch.plugin</groupId>
       <artifactId>parent-join-client</artifactId>
-      <version>5.6.15</version>
+      <version>${elasticsearch.version}</version>
     </dependency>
     <!-- Elasticsearch dependencies -->
     <dependency>
