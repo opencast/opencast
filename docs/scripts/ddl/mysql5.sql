@@ -545,59 +545,6 @@ CREATE TABLE oc_user_settings (
 
 CREATE INDEX IX_oc_user_setting_organization ON oc_user_settings (organization);
 
-CREATE TABLE oc_email_configuration (
-  id BIGINT(20) NOT NULL,
-  organization VARCHAR(128) NOT NULL,
-  port INT(5) DEFAULT NULL,
-  transport VARCHAR(255) DEFAULT NULL,
-  username VARCHAR(255) DEFAULT NULL,
-  server VARCHAR(255) NOT NULL,
-  ssl_enabled TINYINT(1) NOT NULL DEFAULT '0',
-  password VARCHAR(255) DEFAULT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT UNQ_oc_email_configuration UNIQUE (organization),
-  CONSTRAINT FK_oc_email_configuration_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_oc_email_configuration_organization ON oc_email_configuration (organization);
-
-CREATE TABLE oc_message_signature (
-  id BIGINT(20) NOT NULL,
-  organization VARCHAR(128) NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  creation_date DATETIME NOT NULL,
-  sender VARCHAR(255) NOT NULL,
-  sender_name VARCHAR(255) NOT NULL,
-  reply_to VARCHAR(255) DEFAULT NULL,
-  reply_to_name VARCHAR(255) DEFAULT NULL,
-  signature VARCHAR(255) NOT NULL,
-  creator_username VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT UNQ_oc_message_signature UNIQUE (organization, name),
-  CONSTRAINT FK_oc_message_signature_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_oc_message_signature_organization ON oc_message_signature (organization);
-CREATE INDEX IX_oc_message_signature_name ON oc_message_signature (name);
-
-CREATE TABLE oc_message_template (
-  id BIGINT(20) NOT NULL,
-  organization VARCHAR(128) NOT NULL,
-  body TEXT(65535) NOT NULL,
-  creation_date DATETIME NOT NULL,
-  subject VARCHAR(255) NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  template_type VARCHAR(255) DEFAULT NULL,
-  creator_username VARCHAR(255) NOT NULL,
-  hidden TINYINT(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (id),
-  CONSTRAINT UNQ_oc_message_template UNIQUE (organization, name),
-  CONSTRAINT FK_oc_message_template_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_oc_message_template_organization ON oc_message_template (organization);
-CREATE INDEX IX_oc_message_template_name ON oc_message_template (name);
-
 CREATE TABLE oc_event_comment (
   id BIGINT(20) NOT NULL,
   organization VARCHAR(128) NOT NULL,

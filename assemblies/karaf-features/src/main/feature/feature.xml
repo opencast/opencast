@@ -221,7 +221,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-mattermost-notification-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
     <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-notification-workflowoperation/${project.version}</bundle>
@@ -334,7 +333,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-mattermost-notification-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
     <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-notification-workflowoperation/${project.version}</bundle>
@@ -459,7 +457,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-mattermost-notification-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
     <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-notification-workflowoperation/${project.version}</bundle>
@@ -629,7 +626,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-mattermost-notification-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
     <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-notification-workflowoperation/${project.version}</bundle>
