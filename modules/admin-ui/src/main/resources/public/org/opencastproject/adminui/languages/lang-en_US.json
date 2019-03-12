@@ -1542,7 +1542,6 @@
      "JOBS": {
        "TABLE": {
          "ID":        "Job Identifier",
-         "ACTION":    "Actions",
          "CAPTION":   "Jobs",
          "CREATED":   "Created",
          "CREATOR":   "Creator",
@@ -1552,14 +1551,6 @@
          "STATUS":    "Status",
          "SUBMITTED": "Submitted",
          "TYPE":      "Type"
-       },
-       "DETAILS": {
-         "HEADER": "Job details {{resourceId}}",
-         "TABS": {
-           "GENERAL":    "General",
-           "OPERATIONS": "Operations",
-           "INCIDENTS":  "Incidents"
-         }
        },
        "STATUS": {
          "QUEUED": "Queued",
@@ -1587,7 +1578,6 @@
          "MEAN_RUN_TIME":   "Mean run time",
          "MEAN_QUEUE_TIME": "Mean queue time",
          "MAINTENANCE":     "Maintenance",
-         "ACTION":          "Actions",
          "MAINTENANCE_OFF": "Enter maintenance mode",
          "MAINTENANCE_ON":  "Leave maintenance mode"
        }
