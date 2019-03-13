@@ -27,7 +27,6 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbGroup;
 import org.opencastproject.security.api.JaxbRole;
 
-import org.apache.commons.io.IOUtils;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndTextQualifier;
 import org.custommonkey.xmlunit.XMLAssert;
@@ -62,18 +61,17 @@ public class GroupParsingTest {
     StringWriter writer  = new StringWriter();
     StringWriter writer2 = new StringWriter();
 
-    Set<JaxbRole> roles = new HashSet<JaxbRole>();
+    Set<JaxbRole> roles = new HashSet<>();
     roles.add(new JaxbRole("ROLE_COURSE_ADMIN", ORGANIZATION));
     roles.add(new JaxbRole("ROLE_USER", ORGANIZATION));
 
-    Set<String> members = new HashSet<String>();
+    Set<String> members = new HashSet<>();
     members.add("admin1");
     members.add("admin2");
 
     JaxbGroup group = new JaxbGroup("admin", ORGANIZATION, "Admin", "Admin group", roles, members);
     jaxbContext.createMarshaller().marshal(group, writer);
 
-    String expectedOutput = IOUtils.toString(getClass().getResourceAsStream(GROUP_XML_FILE), "UTF-8");
     StreamSource streamSource = new StreamSource(getClass().getResourceAsStream(GROUP_XML_FILE));
     JaxbGroup groupFromFile = jaxbContext.createUnmarshaller().unmarshal(streamSource, JaxbGroup.class).getValue();
     jaxbContext.createMarshaller().marshal(groupFromFile, writer2);

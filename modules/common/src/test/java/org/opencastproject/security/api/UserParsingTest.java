@@ -52,7 +52,7 @@ public class UserParsingTest {
 
   @Test
   public void testUnmarshalUser() throws Exception {
-    Set<JaxbRole> roles = new HashSet<JaxbRole>();
+    Set<JaxbRole> roles = new HashSet<>();
     roles.add(new JaxbRole("ROLE_USER", ORGANIZATION));
     roles.add(new JaxbRole("SERIES_1_ADMIN", ORGANIZATION));
     roles.add(new JaxbRole("ROLE_COURSE_ADMIN", ORGANIZATION));

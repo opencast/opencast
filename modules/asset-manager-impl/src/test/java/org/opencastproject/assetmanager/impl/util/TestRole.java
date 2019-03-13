@@ -32,12 +32,12 @@ import org.opencastproject.security.api.Role;
 public final class TestRole implements Role {
   private final String name;
   private final String description;
-  private final Organization organization;
+  private final String organizationId;
 
   public TestRole(String name, String description, Organization organization) {
     this.name = name;
     this.description = description;
-    this.organization = organization;
+    this.organizationId = organization.getId();
   }
 
   public static Role mk(String name, String description, Organization organization) {
@@ -56,12 +56,12 @@ public final class TestRole implements Role {
     return description;
   }
 
-  @Override public Organization getOrganization() {
-    return organization;
+  @Override public String getOrganizationId() {
+    return organizationId;
   }
 
   @Override public int hashCode() {
-    return hash(name, description, organization);
+    return hash(name, description, organizationId);
   }
 
   @Override public boolean equals(Object that) {
@@ -69,7 +69,7 @@ public final class TestRole implements Role {
   }
 
   private boolean eqFields(TestRole that) {
-    return eq(name, that.name) && eq(description, that.description) && eq(organization, that.organization);
+    return eq(name, that.name) && eq(description, that.description) && eq(organizationId, that.organizationId);
   }
 
   @Override public String toString() {

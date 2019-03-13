@@ -2162,7 +2162,7 @@ public class SchedulerServiceImplTest {
     Set<Role> rolesList = roles.stream().map(roleName -> {
       Role r = EasyMock.createNiceMock(Role.class);
       EasyMock.expect(r.getName()).andReturn(roleName).anyTimes();
-      EasyMock.expect(r.getOrganization()).andReturn(org).anyTimes();
+      EasyMock.expect(r.getOrganizationId()).andReturn(org.getId()).anyTimes();
       EasyMock.replay(r);
       return r;
     }).collect(Collectors.toSet());

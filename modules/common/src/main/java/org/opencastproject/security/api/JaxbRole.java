@@ -23,6 +23,8 @@ package org.opencastproject.security.api;
 
 import org.opencastproject.util.EqualsUtil;
 
+import java.util.Objects;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -45,9 +47,11 @@ public final class JaxbRole implements Role {
   @XmlElement(name = "description")
   protected String description;
 
-  /** The description */
   @XmlElement(name = "organization")
   protected JaxbOrganization organization;
+
+  @XmlElement(name = "organizationid")
+  protected String organizationId;
 
   @XmlElement(name = "type")
   protected Type type = Type.INTERNAL;
@@ -69,7 +73,7 @@ public final class JaxbRole implements Role {
   public JaxbRole(String name, JaxbOrganization organization) throws IllegalArgumentException {
     super();
     this.name = name;
-    this.organization = organization;
+    this.organizationId = organization.getId();
   }
 
   /**
@@ -86,7 +90,6 @@ public final class JaxbRole implements Role {
     this(name, organization);
     this.description = description;
   }
-
 
   /**
    * Constructs a role with the specified name, organization, description, and persistence settings.
@@ -105,11 +108,31 @@ public final class JaxbRole implements Role {
     this.type = type;
   }
 
+
+  /**
+   * Constructs a role with the specified name, organization identifier, description, and persistence settings.
+   *
+   * @param name
+   *          the name
+   * @param organizationId
+   *          the organization identifier
+   * @param description
+   *          the description
+   * @param type
+   *          the role {@link type}
+   */
+  public JaxbRole(String name, String organizationId, String description, Type type) throws IllegalArgumentException {
+    super();
+    this.name = name;
+    this.organizationId = organizationId;
+    this.description = description;
+    this.type = type;
+  }
+
   public static JaxbRole fromRole(Role role) {
     if (role instanceof JaxbRole)
       return (JaxbRole) role;
-    JaxbOrganization org = JaxbOrganization.fromOrganization(role.getOrganization());
-    return new JaxbRole(role.getName(), org, role.getDescription(), role.getType());
+    return new JaxbRole(role.getName(), role.getOrganizationId(), role.getDescription(), role.getType());
   }
 
   /**
@@ -134,11 +157,15 @@ public final class JaxbRole implements Role {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.security.api.Role#getOrganization()
    */
-  public Organization getOrganization() {
-    return organization;
+  public String getOrganizationId() {
+    if (organizationId != null) {
+      return organizationId;
+    }
+    if (organization != null) {
+      return organization.getId();
+    }
+    return null;
   }
 
   /**
@@ -157,7 +184,7 @@ public final class JaxbRole implements Role {
    */
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(name, organization);
+    return EqualsUtil.hash(name, getOrganizationId());
   }
 
   /**
@@ -170,7 +197,8 @@ public final class JaxbRole implements Role {
     if (!(obj instanceof Role))
       return false;
     Role other = (Role) obj;
-    return name.equals(other.getName()) && organization.equals(other.getOrganization());
+    return name.equals(other.getName())
+            && Objects.equals(getOrganizationId(), other.getOrganizationId());
   }
 
   /**
@@ -180,6 +208,6 @@ public final class JaxbRole implements Role {
    */
   @Override
   public String toString() {
-    return new StringBuilder(name).append(":").append(organization).toString();
+    return name + ":" + getOrganizationId();
   }
 }
