@@ -62,9 +62,6 @@ angular.module('adminNg.controllers')
         template: 'modules/systems/partials/serverMaintenanceCell.html',
         label:    'SYSTEMS.SERVERS.TABLE.MAINTENANCE',
         sortable: true
-        //}, {
-        //    template: 'modules/systems/partials/serverActionsCell.html',
-        //    label:    'SYSTEMS.SERVERS.TABLE.ACTION'
       }],
       caption:    'SYSTEMS.SERVERS.TABLE.CAPTION',
       resource:   'servers',
