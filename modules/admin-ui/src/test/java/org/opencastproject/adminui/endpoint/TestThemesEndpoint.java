@@ -31,7 +31,6 @@ import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.matterhorn.search.impl.SearchResultImpl;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.messages.MailServiceException;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
@@ -77,7 +76,7 @@ public class TestThemesEndpoint extends ThemesEndpoint {
     addData();
   }
 
-  private void addData() throws MailServiceException, ThemesServiceDatabaseException {
+  private void addData() throws ThemesServiceDatabaseException {
     Theme theme = new Theme(Option.some(theme1Id), creationDate, true, user, "The Theme name", "The Theme description",
             true, "bumper-file", true, "trailer-file", true, "title,room,date", "title-background-file", true,
             "license-background-file", "The license description", true, "watermark-file", "top-left");

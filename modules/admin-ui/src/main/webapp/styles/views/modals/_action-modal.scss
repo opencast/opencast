@@ -82,9 +82,7 @@
 
 
 // Set sizes for action modals on event view
-#send-message-modal,
 #change-status-modal,
-#delete-events,
-#add-email-template-modal {
+#delete-events {
     @extend .small-modal;
 }
