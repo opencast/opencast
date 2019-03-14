@@ -12,7 +12,7 @@ The ComposeWorkflowHandler is used to encode media files to different formats us
 |source-tags       | sometag                  | Tags of media to encode                                                       |
 |target-tags       | sometag                  | Specifies the tags of the new media                                           |
 |encoding-profile  | mp4-hd.http              | Specifies the encoding profile to use                                         |
-|encoding-profiles | mp4-low.http,mp4-hd.http | Specifies a coma separated encoding profiles to use                           |
+|encoding-profiles | mp4-low.http,mp4-hd.http | Specifies a comma-separated encoding profiles to use                           |
 |tags-and-flavors  | true                     | When false (default), the operation selects input elements that have EITHER any of the source tags OR the source flavor. When true, the operation selects input elements that have BOTH the source-flavor AND any of the source tags |
 
 
@@ -33,7 +33,7 @@ Encoding presenter (camera) video to MP4 medium quality:
         </configurations>
     </operation>
 
-Encoding 480p, 720p and 1080p video to MP4 adaptative streaming:
+Encoding 480p, 720p and 1080p video to MP4 adaptive streaming:
 
     <operation
         id="compose"
