@@ -112,21 +112,6 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
         // Persist the updated series
         update(seriesItem.getSeriesId(), series);
         break;
-      case UpdateOptOut:
-        logger.debug("Received update opt out status of series {} for index {}", seriesItem.getSeriesId(), getSearchIndex().getIndexName());
-
-        // Load or create the corresponding series
-        try {
-          series = SeriesIndexUtils.getOrCreate(seriesItem.getSeriesId(), organization, user, getSearchIndex());
-          series.setOptOut(seriesItem.getOptOut());
-        } catch (SearchIndexException e) {
-          logger.error("Error retrieving series {} from the search index", seriesItem.getSeriesId(), e);
-          return;
-        }
-
-        // Persist the updated series
-        update(seriesItem.getSeriesId(), series);
-        break;
       case UpdateProperty:
         logger.debug("Received update property of series {} for index {}", seriesItem.getSeriesId(), getSearchIndex().getIndexName());
 

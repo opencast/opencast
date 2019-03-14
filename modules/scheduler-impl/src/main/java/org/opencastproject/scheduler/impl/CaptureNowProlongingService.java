@@ -417,7 +417,7 @@ public class CaptureNowProlongingService implements ManagedService {
 
     schedulerService.updateEvent(eventId, Opt.<Date> none(), Opt.some(prolongedEndDate), Opt.<String> none(),
             Opt.<Set<String>> none(), Opt.some(event), Opt.<Map<String, String>> none(),
-            Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none());
+            Opt.<Map<String, String>> none());
   }
 
 }

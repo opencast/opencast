@@ -292,17 +292,6 @@ public class SeriesServiceSolrTest {
     Assert.assertTrue("No anomymous series", result.size() == 0);
   }
 
-  @Test
-  public void testOptOut() throws Exception {
-    String seriesID = testCatalog.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-
-    index.updateIndex(testCatalog);
-    Assert.assertFalse(index.isOptOut(seriesID));
-
-    index.updateOptOutStatus(seriesID, true);
-    Assert.assertTrue(index.isOptOut(seriesID));
-  }
-
   /**
    * @throws java.lang.Exception
    */

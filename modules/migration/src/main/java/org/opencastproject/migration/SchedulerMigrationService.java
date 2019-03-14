@@ -22,7 +22,6 @@ package org.opencastproject.migration;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Property;
-import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.fn.Properties;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
@@ -71,8 +70,6 @@ public class SchedulerMigrationService {
   static final String CA_NAMESPACE = SCHEDULER_NAMESPACE + ".ca.configuration";
   static final String RECORDING_LAST_HEARD_CONFIG = "recording_last_heard";
   static final String RECORDING_STATE_CONFIG = "recording_state";
-  static final String REVIEW_DATE_CONFIG = "review_date";
-  static final String REVIEW_STATUS_CONFIG = "review_status";
   static final String SOURCE_CONFIG = "source";
   static final String PRESENTERS_CONFIG = "presenters";
   static final String AGENT_CONFIG = "agent";
@@ -217,10 +214,6 @@ public class SchedulerMigrationService {
       if (lastModifiedDate.isSome()) {
         entity.setLastModifiedDate(lastModifiedDate.get());
       }
-      final Opt<Boolean> optout = event.getProperties().apply(Properties.getValueOpt(Value.BOOLEAN, OPTOUT_CONFIG));
-      if (optout.isSome()) {
-        entity.setOptOut(optout.get());
-      }
       final Opt<String> presenters = event.getProperties().apply(Properties.getStringOpt(PRESENTERS_CONFIG));
       if (presenters.isSome()) {
         entity.setPresenters(presenters.get());
@@ -232,14 +225,6 @@ public class SchedulerMigrationService {
       final Opt<String> recState = event.getProperties().apply(Properties.getStringOpt(RECORDING_STATE_CONFIG));
       if (recState.isSome()) {
         entity.setRecordingState(recState.get());
-      }
-      final Opt<Date> reviewDate = event.getProperties().apply(Properties.getDateOpt(REVIEW_DATE_CONFIG));
-      if (reviewDate.isSome()) {
-        entity.setReviewDate(reviewDate.get());
-      }
-      final Opt<String> reviewStatus = event.getProperties().apply(Properties.getStringOpt(REVIEW_STATUS_CONFIG));
-      if (reviewStatus.isSome()) {
-        entity.setReviewStatus(reviewStatus.get());
       }
       final Opt<String> source = event.getProperties().apply(Properties.getStringOpt(SOURCE_CONFIG));
       if (source.isSome()) {

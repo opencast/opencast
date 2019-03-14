@@ -240,10 +240,7 @@ CREATE TABLE oc_scheduled_extended_event (
   source VARCHAR(255),
   recording_state VARCHAR(255),
   recording_last_heard BIGINT,
-  review_status VARCHAR(128),
-  review_date DATETIME,
   presenters TEXT(65535),
-  optout TINYINT(1),
   last_modified_date DATETIME,
   checksum VARCHAR(64),
   capture_agent_properties MEDIUMTEXT,
@@ -275,7 +272,6 @@ CREATE TABLE oc_series (
   organization VARCHAR(128) NOT NULL,
   access_control TEXT(65535),
   dublin_core TEXT(65535),
-  opt_out   tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (id, organization),
   CONSTRAINT FK_oc_series_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

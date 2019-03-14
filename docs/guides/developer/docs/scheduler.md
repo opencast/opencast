@@ -60,7 +60,6 @@ Here is a sample to create a single event with the scheduler Java API.
                               event.getMediaPackage(),
                               event.getWfProperties(),
                               event.getCaMetadata(),
-                              event.getOptOut(),
                               event.getSource(),
                               "organization-xyz-script";
   }

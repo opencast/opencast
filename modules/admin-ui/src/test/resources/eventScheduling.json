@@ -1,6 +1,5 @@
 {
   "eventId":"asdasd",
-  "optOut":false,
   "agentId":"demo",
   "agentConfiguration":{
     "test":"true",

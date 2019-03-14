@@ -161,8 +161,6 @@ import net.fortuna.ical4j.model.property.RRule;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONException;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -230,7 +228,6 @@ public abstract class AbstractEventEndpoint {
   public static final String SCHEDULING_START_KEY = "start";
   public static final String SCHEDULING_END_KEY = "end";
   private static final String SCHEDULING_AGENT_CONFIGURATION_KEY = "agentConfiguration";
-  private static final String SCHEDULING_OPT_OUT_KEY = "optOut";
 
   private static final String WORKFLOW_ACTION_STOP = "STOP";
 
@@ -489,8 +486,7 @@ public abstract class AbstractEventEndpoint {
     Event event = optEvent.get();
     List<JValue> pubJSON = eventPublicationsToJson(event);
 
-    return okJson(obj(f("publications", arr(pubJSON)), f("optout", v(event.getOptedOut(), Jsons.BLANK)),
-            f("review-status", v(event.getReviewStatus(), Jsons.BLANK)),
+    return okJson(obj(f("publications", arr(pubJSON)),
             f("start-date", v(event.getRecordingStartDate(), Jsons.BLANK)),
             f("end-date", v(event.getRecordingEndDate(), Jsons.BLANK))));
   }
@@ -626,21 +622,14 @@ public abstract class AbstractEventEndpoint {
         event.getIdentifier(), technicalMetadata.getCaptureAgentConfiguration(), agentConfiguration);
     }
 
-    Opt<Opt<Boolean>> optOut = Opt.none();
-    if (schedulingJson.has(SCHEDULING_OPT_OUT_KEY)) {
-      optOut = Opt.some(Opt.some(schedulingJson.getBoolean(SCHEDULING_OPT_OUT_KEY)));
-      logger.trace("Updating optout status of event '{}' id from '{}' to '{}'",
-        event.getIdentifier(), event.getOptedOut(), optOut);
-    }
-
     if ((start.isSome() || end.isSome())
             && end.getOr(technicalMetadata.getEndDate()).before(start.getOr(technicalMetadata.getStartDate()))) {
       throw new IllegalStateException("The end date is before the start date");
     }
 
-    if (!start.isNone() || !end.isNone() || !agentId.isNone() || !agentConfiguration.isNone() || !optOut.isNone()) {
+    if (!start.isNone() || !end.isNone() || !agentId.isNone() || !agentConfiguration.isNone()) {
       getSchedulerService()
-        .updateEvent(event.getIdentifier(), start, end, agentId, Opt.none(), Opt.none(), Opt.none(), agentConfiguration, optOut);
+        .updateEvent(event.getIdentifier(), start, end, agentId, Opt.none(), Opt.none(), Opt.none(), agentConfiguration);
       // We want to keep the bibliographic meta data in sync
       updateBibliographicMetadata(event, agentId, start, end);
     }
@@ -859,7 +848,7 @@ public abstract class AbstractEventEndpoint {
         // We could check agent access here if we want to forbid updating ACLs for users without access.
         getSchedulerService().updateEvent(eventId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
                 Opt.<Set<String>> none(), some(mediaPackage), Opt.<Map<String, String>> none(),
-                Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none());
+                Opt.<Map<String, String>> none());
         return ok();
       }
     } catch (AclServiceException | MediaPackageException e) {
@@ -1104,31 +1093,6 @@ public abstract class AbstractEventEndpoint {
       logger.warn("Could not create event comment reply on comment {}", comment, e);
       throw new WebApplicationException(e);
     }
-  }
-
-  @GET
-  @Path("{eventId}/participation.json")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventparticipationinformation", description = "Get the particition information of a event", returnDescription = "The participation information", pathParameters = {
-          @RestParameter(name = "eventId", isRequired = true, description = "The event identifier", type = RestParameter.Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event has not been found."),
-                  @RestResponse(responseCode = SC_OK, description = "The access information ") })
-  public Response getEventParticipation(@PathParam("eventId") String eventId) throws Exception {
-    final Event event = getEventOrThrowNotFoundException(eventId);
-
-    Date startDate = new DateTime(event.getTechnicalStartTime()).toDateTime(DateTimeZone.UTC).toDate();
-    Date currentDate = new DateTime().toDateTime(DateTimeZone.UTC).toDate();
-    boolean readOnly = false;
-
-    if (currentDate.after(startDate)) {
-      readOnly = true;
-    }
-
-    Boolean optedOut = event.getOptedOut();
-
-    return okJson(obj(f("opt_out", v(optedOut != null ? optedOut : false)),
-            f("review_status", v(event.getReviewStatus(), BLANK)), f("read_only", v(readOnly))));
   }
 
   @GET
@@ -1528,7 +1492,7 @@ public abstract class AbstractEventEndpoint {
       return notFound("Cannot find an event with id '%s'.", id);
 
     try {
-      if (!optEvent.get().hasRecordingStarted()) {
+      if (optEvent.get().isScheduledEvent() && !optEvent.get().hasRecordingStarted()) {
         List<Field> fields = new ArrayList<Field>();
         Map<String, String> workflowConfig = getSchedulerService().getWorkflowConfig(id);
         for (Entry<String, String> entry : workflowConfig.entrySet()) {
@@ -1562,7 +1526,7 @@ public abstract class AbstractEventEndpoint {
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", id);
 
-    if (!optEvent.get().hasRecordingStarted()) {
+    if (optEvent.get().isScheduledEvent() && !optEvent.get().hasRecordingStarted()) {
       try {
 
         JSONObject configJSON;
@@ -1594,8 +1558,7 @@ public abstract class AbstractEventEndpoint {
         checkAgentAccessForAgent(optEvent.get().getAgentId());
 
         getSchedulerService().updateEvent(id, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-                Opt.<Set<String>> none(), Opt.<MediaPackage> none(), workflowConfigOpt, caMetadataOpt,
-                Opt.<Opt<Boolean>> none());
+                Opt.<Set<String>> none(), Opt.<MediaPackage> none(), workflowConfigOpt, caMetadataOpt);
         return Response.noContent().build();
       } catch (NotFoundException e) {
         return notFound("Cannot find event %s in scheduler service", id);
@@ -1950,71 +1913,6 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
-  @PUT
-  @Path("{eventId}/optout/{optout}")
-  @RestQuery(name = "updateEventOptoutStatus", description = "Updates an event's opt out status.", returnDescription = "The method doesn't return any content", pathParameters = {
-          @RestParameter(name = "eventId", isRequired = true, description = "The event identifier", type = RestParameter.Type.STRING),
-          @RestParameter(name = "optout", isRequired = true, description = "True or false, true to opt out of this recording.", type = RestParameter.Type.BOOLEAN) }, restParameters = {}, reponses = {
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "The event has not been found"),
-                  @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action"),
-                  @RestResponse(responseCode = SC_NO_CONTENT, description = "The method doesn't return any content") })
-  public Response updateEventOptOut(@PathParam("eventId") String eventId, @PathParam("optout") boolean optout)
-          throws NotFoundException, UnauthorizedException {
-    try {
-      checkAgentAccessForEvent(eventId);
-      getIndexService().changeOptOutStatus(eventId, optout, getIndex());
-      return Response.noContent().build();
-    } catch (SchedulerException e) {
-      logger.error("Unable to updated opt out status for event with id {}", eventId);
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-    } catch (SearchIndexException e) {
-      logger.error("Unable to get event with id {}", eventId);
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @POST
-  @Path("optouts")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "changeOptOuts", description = "Change the opt out status of many events", returnDescription = "A JSON array listing which events were or were not opted out.", restParameters = {
-          @RestParameter(name = "eventIds", description = "A JSON array of ids of the events to opt out or in", defaultValue = "[]", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "optout", description = "Whether to opt out or not either true or false.", defaultValue = "false", isRequired = true, type = RestParameter.Type.BOOLEAN), }, reponses = {
-                  @RestResponse(description = "Returns a JSON object with the results for the different opted out or in elements such as ok, notFound or error.", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "Unable to parse boolean value to opt out, or parse JSON array of opt out events", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
-  public Response changeOptOuts(@FormParam("optout") boolean optout, @FormParam("eventIds") String eventIds) {
-    JSONParser parser = new JSONParser();
-    JSONArray eventIdsArray;
-    try {
-      eventIdsArray = (JSONArray) parser.parse(eventIds);
-    } catch (org.json.simple.parser.ParseException e) {
-      logger.warn("Unable to parse event ids {} ", eventIds, e);
-      return Response.status(Status.BAD_REQUEST).build();
-    } catch (NullPointerException e) {
-      logger.warn("Unable to parse event ids because it was null {}", eventIds);
-      return Response.status(Status.BAD_REQUEST).build();
-    } catch (ClassCastException e) {
-      logger.warn("Unable to parse event ids because it was the wrong class {}", eventIds, e);
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-
-    BulkOperationResult result = new BulkOperationResult();
-
-    for (Object idObject : eventIdsArray) {
-      String eventId = idObject.toString();
-
-      try {
-        getIndexService().changeOptOutStatus(eventId, optout, getIndex());
-        result.addOk(eventId);
-      } catch (NotFoundException e) {
-        result.addNotFound(eventId);
-      } catch (Exception e) {
-        logger.error("Could not update opt out status of event {}", eventId, e);
-        result.addServerError(eventId);
-      }
-    }
-    return Response.ok(result.toJson()).build();
-  }
-
   @DELETE
   @Path("{eventId}/transitions/{transitionId}")
   @RestQuery(name = "deleteEventTransition", description = "Deletes an ACL transition from an event", returnDescription = "The method doesn't return any content", pathParameters = {
@@ -2310,10 +2208,6 @@ public abstract class AbstractEventEndpoint {
         query.withSeriesId(filters.get(name));
       if (EventListQuery.FILTER_STATUS_NAME.equals(name))
         query.withEventStatus(filters.get(name));
-      if (EventListQuery.FILTER_OPTEDOUT_NAME.equals(name))
-        query.withOptedOut(Boolean.parseBoolean(filters.get(name)));
-      if (EventListQuery.FILTER_REVIEW_STATUS_NAME.equals(name))
-        query.withReviewStatus(filters.get(name));
       if (EventListQuery.FILTER_PUBLISHER_NAME.equals(name))
         query.withPublisher(filters.get(name));
       if (EventListQuery.FILTER_COMMENTS_NAME.equals(name)) {
@@ -2456,13 +2350,8 @@ public abstract class AbstractEventEndpoint {
     fields.add(f("location", v(event.getLocation(), BLANK)));
     fields.add(f("start_date", v(event.getRecordingStartDate(), BLANK)));
     fields.add(f("end_date", v(event.getRecordingEndDate(), BLANK)));
-
-    String schedulingStatus = event.getSchedulingStatus() == null ? null
-            : "EVENTS.EVENTS.SCHEDULING_STATUS." + event.getSchedulingStatus();
     fields.add(f("managedAcl", v(event.getManagedAcl(), BLANK)));
-    fields.add(f("scheduling_status", v(schedulingStatus, BLANK)));
     fields.add(f("workflow_state", v(event.getWorkflowState(), BLANK)));
-    fields.add(f("review_status", v(event.getReviewStatus(), BLANK)));
     fields.add(f("event_status", v(event.getEventStatus())));
     fields.add(f("source", v(getIndexService().getEventSource(event).toString())));
     fields.add(f("has_comments", v(event.hasComments())));
@@ -2650,7 +2539,6 @@ public abstract class AbstractEventEndpoint {
       return obj(f("agentId", v(technicalMetadata.getAgentId(), BLANK)), f("agentConfiguration", agentConfig),
               f("start", start), f("end", end), f("eventId", v(technicalMetadata.getEventId(), BLANK)),
               f("presenters", JSONUtils.setToJSON(technicalMetadata.getPresenters())),
-              f("optOut", v(technicalMetadata.isOptOut())),
               f("recording", recordingToJson.apply(technicalMetadata.getRecording())));
     }
   };

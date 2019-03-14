@@ -75,9 +75,6 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
           event = getOrCreateEvent(mediaPackageId, organization, user, getSearchIndex());
           if (isBlank(event.getCreator()))
             event.setCreator(getSecurityService().getUser().getName());
-          if (event.getOptedOut() == null)
-            event.setOptedOut(false);
-
           if (dc != null)
             EventIndexUtils.updateEvent(event, dc);
         } catch (SearchIndexException e) {
@@ -138,40 +135,6 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
           logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
           return;
         }
-        // Persist the scheduling event
-        updateEvent(event);
-        return;
-      case UpdateOptOut:
-        logger.debug("Received Update opt out status");
-
-        // Load the corresponding recording event
-        try {
-          event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user,
-                  getSearchIndex());
-          event.setOptedOut(schedulerItem.getOptOut());
-        } catch (SearchIndexException e) {
-          logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
-          return;
-        }
-
-        // Persist the scheduling event
-        updateEvent(event);
-        return;
-      case UpdateReviewStatus:
-        logger.debug("Received Update review status");
-
-        // Load the corresponding recording event
-        try {
-          event = EventIndexUtils.getOrCreateEvent(mediaPackageId, organization, user,
-                  getSearchIndex());
-          event.setReviewStatus(schedulerItem.getReviewStatus());
-          if (schedulerItem.getReviewDate() != null)
-            event.setReviewDate(DateTimeSupport.toUTC(schedulerItem.getReviewDate().getTime()));
-        } catch (SearchIndexException e) {
-          logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
-          return;
-        }
-
         // Persist the scheduling event
         updateEvent(event);
         return;

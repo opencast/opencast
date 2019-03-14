@@ -384,7 +384,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @return If an event has a record of being a schedule, workflow or archive event.
    */
   protected boolean toDelete(Event event) {
-    boolean hasScheduling = event.getSchedulingStatus() != null;
+    boolean hasScheduling = event.isScheduledEvent();
     boolean hasWorkflow = event.getWorkflowId() != null;
     boolean hasArchive = event.getArchiveVersion() != null;
     return !hasScheduling && !hasWorkflow && !hasArchive;
@@ -438,10 +438,6 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     if (event == null)
       throw new NotFoundException("No event with id " + uid + " found.");
 
-    event.setOptedOut(null);
-    event.setReviewDate(null);
-    event.setReviewStatus(null);
-    event.setSchedulingStatus(null);
     event.setRecordingStatus(null);
 
     if (toDelete(event)) {

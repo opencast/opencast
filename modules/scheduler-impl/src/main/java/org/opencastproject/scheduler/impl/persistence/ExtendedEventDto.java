@@ -86,22 +86,9 @@ public class ExtendedEventDto {
   @Column(name = "recording_last_heard")
   private Long recordingLastHeard;
 
-  /** review status */
-  @Column(name = "review_status", length = 128)
-  private String reviewStatus;
-
-  /** review date */
-  @Column(name = "review_date")
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date reviewDate;
-
   /** presenters */
   @Column(name = "presenters")
   private String presenters;
-
-  /** opt out */
-  @Column(name = "optout")
-  private Boolean optOut;
 
   /** last modified date */
   @Column(name = "last_modified_date")
@@ -189,36 +176,12 @@ public class ExtendedEventDto {
     this.recordingLastHeard = recordingLastHeard;
   }
 
-  public String getReviewStatus() {
-    return reviewStatus;
-  }
-
-  public void setReviewStatus(String reviewStatus) {
-    this.reviewStatus = reviewStatus;
-  }
-
-  public Date getReviewDate() {
-    return reviewDate;
-  }
-
-  public void setReviewDate(Date reviewDate) {
-    this.reviewDate = reviewDate;
-  }
-
   public String getPresenters() {
     return presenters;
   }
 
   public void setPresenters(String presenters) {
     this.presenters = presenters;
-  }
-
-  public Boolean getOptOut() {
-    return optOut;
-  }
-
-  public void setOptOut(Boolean optOut) {
-    this.optOut = optOut;
   }
 
   public Date getLastModifiedDate() {

@@ -301,87 +301,6 @@ public class SeriesEndpoint implements ManagedService {
   }
 
   @GET
-  @Path("{seriesId}/participation.json")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getseriesparticipationinformation", description = "Get the particition information of a series", returnDescription = "The participation information", pathParameters = {
-          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
-                  @RestResponse(responseCode = SC_OK, description = "The access information ") })
-  public Response getSeriesParticipationInformation(@PathParam("seriesId") String seriesId) throws Exception {
-    if (StringUtils.isBlank(seriesId))
-      return RestUtil.R.badRequest("Path parameter series ID is missing");
-
-    Opt<Series> optSeries = indexService.getSeries(seriesId, searchIndex);
-
-    if (optSeries.isNone()) {
-      logger.warn("Unable to find the series '{}'", seriesId);
-      return notFound();
-    }
-
-    Series series = optSeries.get();
-
-    return okJson(obj(f("opt_out", v(series.isOptedOut()))));
-  }
-
-  @PUT
-  @Path("{seriesId}/optout/{optout}")
-  @RestQuery(name = "updateSeriesOptoutStatus", description = "Updates a series opt out status.", returnDescription = "The method doesn't return any content", pathParameters = {
-          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = RestParameter.Type.STRING),
-          @RestParameter(name = "optout", isRequired = true, description = "True or false, true to opt out of this series.", type = RestParameter.Type.BOOLEAN) }, restParameters = {}, reponses = {
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
-                  @RestResponse(responseCode = SC_NO_CONTENT, description = "The method doesn't return any content") })
-  public Response updateSeriesOptOut(@PathParam("seriesId") String seriesId, @PathParam("optout") boolean optout)
-          throws NotFoundException {
-    try {
-      seriesService.updateOptOutStatus(seriesId, optout);
-      return Response.noContent().build();
-    } catch (SeriesException e) {
-      logger.error("Unable to updated opt out status for series with id {}", seriesId);
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @POST
-  @Path("optouts")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "changeOptOuts", description = "Change the opt out status of many series", returnDescription = "A JSON array listing which series were or were not opted out.", restParameters = {
-          @RestParameter(name = "seriesIds", description = "A JSON array of ids of the series to opt out or in", defaultValue = "[]", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "optout", description = "Whether to opt out or not either true or false.", defaultValue = "false", isRequired = true, type = RestParameter.Type.BOOLEAN), }, reponses = {
-                  @RestResponse(description = "Returns a JSON object with the results for the different opted out or in elements such as ok, notFound or error.", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "Unable to parse boolean value to opt out, or parse JSON array of opt out series", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
-  public Response changeOptOuts(@FormParam("optout") boolean optout, @FormParam("seriesIds") String seriesIds) {
-    JSONParser parser = new JSONParser();
-    JSONArray seriesIdsArray;
-    try {
-      seriesIdsArray = (JSONArray) parser.parse(seriesIds);
-    } catch (org.json.simple.parser.ParseException e) {
-      logger.warn("Unable to parse series ids {} ", seriesIds, e);
-      return Response.status(Status.BAD_REQUEST).build();
-    } catch (NullPointerException e) {
-      logger.warn("Unable to parse series ids because it was null {}", seriesIds);
-      return Response.status(Status.BAD_REQUEST).build();
-    } catch (ClassCastException e) {
-      logger.warn("Unable to parse series ids because it was the wrong class {}", seriesIds, e);
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-
-    BulkOperationResult result = new BulkOperationResult();
-    for (Object seriesId : seriesIdsArray) {
-      try {
-        seriesService.updateOptOutStatus(seriesId.toString(), optout);
-        result.addOk(seriesId.toString());
-      } catch (NotFoundException e) {
-        result.addNotFound(seriesId.toString());
-      } catch (Exception e) {
-        logger.error("Could not update opt out status of series {}", seriesId.toString(), e);
-        result.addServerError(seriesId.toString());
-      }
-    }
-    return Response.ok(result.toJson()).build();
-  }
-
-  @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{seriesId}/metadata.json")
   @RestQuery(name = "getseriesmetadata", description = "Returns the series metadata as JSON", returnDescription = "Returns the series metadata as JSON", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
@@ -641,12 +560,11 @@ public class SeriesEndpoint implements ManagedService {
           @RestParameter(name = "sort", description = "The order instructions used to sort the query result. Must be in the form '<field name>:(ASC|DESC)'", isRequired = false, type = STRING),
           @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2,value2'", type = STRING),
           @RestParameter(name = "offset", isRequired = false, description = "The page offset", type = INTEGER, defaultValue = "0"),
-          @RestParameter(name = "optedOut", isRequired = false, description = "Whether this series is opted out", type = BOOLEAN),
           @RestParameter(name = "limit", isRequired = false, description = "The limit to define the number of returned results (-1 for all)", type = INTEGER, defaultValue = "100") }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "The access control list."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response getSeries(@QueryParam("filter") String filter, @QueryParam("sort") String sort,
-          @QueryParam("offset") int offset, @QueryParam("limit") int limit, @QueryParam("optedOut") Boolean optedOut)
+          @QueryParam("offset") int offset, @QueryParam("limit") int limit)
           throws UnauthorizedException {
     try {
       logger.debug("Requested series list");
@@ -660,9 +578,6 @@ public class SeriesEndpoint implements ManagedService {
 
       // If limit is 0, we set the default limit
       query.withLimit(limit == 0 ? DEFAULT_LIMIT : limit);
-
-      if (optedOut != null)
-        query.withOptedOut(optedOut);
 
       Map<String, String> filters = RestUtils.parseFilter(filter);
       for (String name : filters.keySet()) {
@@ -742,7 +657,6 @@ public class SeriesEndpoint implements ManagedService {
         Series s = item.getSource();
         String sId = s.getIdentifier();
         fields.add(f("id", v(sId)));
-        fields.add(f("optedOut", v(s.isOptedOut())));
         fields.add(f("title", v(s.getTitle(), Jsons.BLANK)));
         fields.add(f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))));
         fields.add(f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))));

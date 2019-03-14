@@ -124,16 +124,16 @@ public class SchedulerUtilTest {
     wfProperties.put("test", "true");
     wfProperties.put("clear", "all");
 
-    String expectedChecksum = "91f54dbcb65d2759e79f1da9edce7915";
+    String expectedChecksum = "2d5398c961f0784a13eaad323ebc43f3";
     String checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID,
-            userIds, mp, Opt.some(event), wfProperties, caProperties, false, acl);
+            userIds, mp, Opt.some(event), wfProperties, caProperties, acl);
     Assert.assertEquals(expectedChecksum, checksum);
 
     // change start date
     start = new Date();
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, false, acl);
+            mp, Opt.some(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change end date
@@ -141,7 +141,7 @@ public class SchedulerUtilTest {
     end = new Date();
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, false, acl);
+            mp, Opt.some(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change device
@@ -149,7 +149,7 @@ public class SchedulerUtilTest {
     captureDeviceID = "demo1";
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, false, acl);
+            mp, Opt.some(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change users
@@ -157,7 +157,7 @@ public class SchedulerUtilTest {
     userIds.add("test");
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, false, acl);
+            mp, Opt.some(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change episode dublincore
@@ -166,7 +166,7 @@ public class SchedulerUtilTest {
     event.set(PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(end, Precision.Minute));
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, false, acl);
+            mp, Opt.some(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change extended dublincore
@@ -177,7 +177,7 @@ public class SchedulerUtilTest {
     FileUtils.writeStringToFile(workspaceFile, dc.toXmlString(), "UTF-8");
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, false, acl);
+            mp, Opt.some(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change wf properties
@@ -187,7 +187,7 @@ public class SchedulerUtilTest {
     wfProperties.put("change", "change");
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, false, acl);
+            mp, Opt.some(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change ca properties
@@ -195,23 +195,12 @@ public class SchedulerUtilTest {
     caProperties.put("change", "change");
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, false, acl);
+            mp, Opt.some(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
-
-    // change opt out status
-    caProperties.remove("change");
-
-    checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, true, acl);
-    Assert.assertNotEquals(expectedChecksum, checksum);
-
-    checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, false, acl);
-    Assert.assertEquals(expectedChecksum, checksum);
 
     // change access control list
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, false,
+            mp, Opt.some(event), wfProperties, caProperties,
             new AccessControlList(new AccessControlEntry("ROLE_ADMIN", "write", false)));
     Assert.assertNotEquals(expectedChecksum, checksum);
   }

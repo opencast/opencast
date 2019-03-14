@@ -712,20 +712,18 @@ public class EventsEndpoint implements ManagedService {
           case EventIndexSchema.END_DATE:
             query.sortByEndDate(criterion.getOrder());
             break;
-          case EventIndexSchema.REVIEW_STATUS:
-            query.sortByReviewStatus(criterion.getOrder());
-            break;
           case EventIndexSchema.WORKFLOW_STATE:
             query.sortByWorkflowState(criterion.getOrder());
-            break;
-          case EventIndexSchema.SCHEDULING_STATUS:
-            query.sortBySchedulingStatus(criterion.getOrder());
             break;
           case EventIndexSchema.SERIES_NAME:
             query.sortBySeriesName(criterion.getOrder());
             break;
           case EventIndexSchema.LOCATION:
             query.sortByLocation(criterion.getOrder());
+            break;
+          // For compatibilty, we mimic to support the old review_status and scheduling_status sort criteria (MH-13407)
+          case "review_status":
+          case "scheduling_status":
             break;
           default:
             return RestUtil.R
@@ -1762,8 +1760,7 @@ public class EventsEndpoint implements ManagedService {
           Opt.none(),
           Opt.none(),
           Opt.none(),
-          caConfig,
-          Opt.none());
+          caConfig);
     } catch (SchedulerConflictException e) {
       final List<MediaPackage> conflictingEvents = getConflictingEvents(
           schedulingInfo.merge(technicalMetadata), agentStateService, schedulerService);

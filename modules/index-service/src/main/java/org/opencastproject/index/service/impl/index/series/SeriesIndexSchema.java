@@ -76,9 +76,6 @@ public interface SeriesIndexSchema extends IndexSchema {
   /** The publisher of the series */
   String PUBLISHERS = "publisher";
 
-  /** The series opted out status from the participation management, whether the series is opted out or not opted out */
-  String OPT_OUT = "opt_out";
-
   /** The abstract description for a series */
   String ABSTRACT = "abstract";
 

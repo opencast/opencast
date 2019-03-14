@@ -222,16 +222,6 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       and(EventIndexSchema.EVENT_STATUS, query.getEventStatus());
     }
 
-    // Review status
-    if (query.getReviewStatus() != null) {
-      and(EventIndexSchema.REVIEW_STATUS, query.getReviewStatus());
-    }
-
-    // Scheduling status
-    if (query.getSchedulingStatus() != null) {
-      and(EventIndexSchema.SCHEDULING_STATUS, query.getSchedulingStatus());
-    }
-
     // Recording start date period
     if (query.getStartFrom() != null && query.getStartTo() != null) {
       and(EventIndexSchema.START_DATE, query.getStartFrom(), query.getStartTo());
@@ -245,16 +235,6 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     // Recording duration
     if (query.getDuration() != null) {
       and(EventIndexSchema.DURATION, query.getDuration());
-    }
-
-    // Opt out
-    if (query.getOptedOut() != null) {
-      and(EventIndexSchema.OPTED_OUT, query.getOptedOut());
-    }
-
-    // Review date
-    if (query.getReviewDate() != null) {
-      and(EventIndexSchema.REVIEW_DATE, query.getReviewDate());
     }
 
     // Has comments

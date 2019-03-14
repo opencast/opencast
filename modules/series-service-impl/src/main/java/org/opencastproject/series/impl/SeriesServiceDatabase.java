@@ -180,33 +180,6 @@ public interface SeriesServiceDatabase {
           SeriesServiceDatabaseException;
 
   /**
-   * Returns the opt out status of series with the given series id
-   *
-   * @param seriesId
-   *          the series id
-   * @return the opt out status
-   * @throws NotFoundException
-   *           if there is no series with specified series ID
-   * @throws SeriesServiceDatabaseException
-   *           if exception occurred
-   */
-  boolean isOptOut(String seriesId) throws NotFoundException, SeriesServiceDatabaseException;
-
-  /**
-   * Updates a series' opt out status.
-   *
-   * @param seriesId
-   *          The id of the series to update the opt out status of.
-   * @param optOut
-   *          Whether to opt out this series or not.
-   * @throws NotFoundException
-   *           if there is no series with specified series ID
-   * @throws SeriesServiceDatabaseException
-   *           if exception occurred
-   */
-  void updateOptOutStatus(String seriesId, boolean optOut) throws NotFoundException, SeriesServiceDatabaseException;
-
-  /**
    * Returns true if the series with the given identifier contains an element with the given type.
    * 
    * @param seriesId

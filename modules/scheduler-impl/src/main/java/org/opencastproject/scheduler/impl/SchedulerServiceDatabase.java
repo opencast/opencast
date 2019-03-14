@@ -87,14 +87,8 @@ public interface SchedulerServiceDatabase {
    *          the recording state
    * @param  recordingLastHeard
    *          the recording last heard
-   * @param reviewStatus
-   *          the review status
-   * @param reviewDate
-   *          the review date
    * @param presenters
    *          the presenters
-   * @param optOut
-   *          the opt out
    * @param lastModifiedDate
    *          the last modified date
    * @param checksum
@@ -114,10 +108,7 @@ public interface SchedulerServiceDatabase {
       Opt<String> source,
       Opt<String> recordingState,
       Opt<Long> recordingLastHeard,
-      Opt<String> reviewStatus,
-      Opt<Date> reviewDate,
       Opt<String> presenters,
-      Opt<Boolean> optOut,
       Opt<Date> lastModifiedDate,
       Opt<String> checksum,
       Opt<Map<String,String>> workflowProperties,

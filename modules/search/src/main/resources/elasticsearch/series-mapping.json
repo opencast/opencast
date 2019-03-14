@@ -40,8 +40,6 @@
 
             "rights_holder": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "opt_out": { "type" : "boolean", "store" : "no" },
-
             "theme": { "type" : "long", "store" : "no" },
 
             "text": { "type" : "string", "index" : "analyzed", "analyzer": "lowercasespaceanalyzer", "store" : "no" },

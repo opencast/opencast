@@ -50,11 +50,6 @@ public interface SchedulerService {
    */
   String JOB_TYPE = "org.opencastproject.scheduler";
 
-  enum ReviewStatus {
-    UNSENT, UNCONFIRMED, CONFIRMED
-  }
-
-
   /**
    * Creates new event using specified mediapackage, workflow configuration and capture agent configuration. The
    * mediapackage id is used as the event's identifier.
@@ -80,8 +75,6 @@ public interface SchedulerService {
    *          the workflow configuration
    * @param caMetadata
    *          the capture agent configuration
-   * @param optOut
-   *          the optional opt out status
    * @param schedulingSource
    *          the optional scheduling source from which the event comes from
    * @throws UnauthorizedException
@@ -93,7 +86,7 @@ public interface SchedulerService {
    */
   void addEvent(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
           MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
-          Opt<Boolean> optOut, Opt<String> schedulingSource) throws UnauthorizedException,
+          Opt<String> schedulingSource) throws UnauthorizedException,
                   SchedulerConflictException, SchedulerException;
 
   /**
@@ -127,8 +120,6 @@ public interface SchedulerService {
    *          the workflow configuration
    * @param caMetadata
    *          the capture agent configuration
-   * @param optOut
-   *          the optional opt out status
    * @param schedulingSource
    *          the optional scheduling source from which the event comes from
    * @return A {@link Map} of mediapackage ID and {@link Period} where the event occurs
@@ -141,7 +132,7 @@ public interface SchedulerService {
    */
   Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
           String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String,
-          String> wfProperties, Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource)
+          String> wfProperties, Map<String, String> caMetadata, Opt<String> schedulingSource)
           throws UnauthorizedException, SchedulerConflictException, SchedulerException;
 
   /**
@@ -170,8 +161,6 @@ public interface SchedulerService {
    *          the optional workflow configuration to update
    * @param caMetadata
    *          the optional capture configuration to update
-   * @param optOut
-   *          the optional opt out status to update
    * @throws NotFoundException
    *           if event with specified ID cannot be found
    * @throws UnauthorizedException
@@ -183,7 +172,7 @@ public interface SchedulerService {
    */
   void updateEvent(String mediaPackageId, Opt<Date> startDateTime, Opt<Date> endDateTime, Opt<String> captureAgentId,
           Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
-          Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOut)
+          Opt<Map<String, String>> caMetadata)
                   throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException;
 
   /**
@@ -283,48 +272,6 @@ public interface SchedulerService {
    *           if exception occurred
    */
   Map<String, String> getCaptureAgentConfiguration(String mediaPackageId)
-          throws NotFoundException, UnauthorizedException, SchedulerException;
-
-  /**
-   * Returns the opt out status of an event with the given mediapackage id
-   *
-   * @param mediaPackageId
-   *          ID of event for which opt out status will be retrieved
-   * @return the opt out status
-   * @throws NotFoundException
-   *           if event with specified ID cannot be found
-   * @throws SchedulerException
-   *           if exception occurred
-   */
-  boolean isOptOut(String mediaPackageId) throws NotFoundException, UnauthorizedException, SchedulerException;
-
-  /**
-   * Updates the review status of the event with the given mediapackage ID
-   *
-   * @param mediaPackageId
-   *          ID of event's mediapackage for which review status will be changed
-   * @param reviewStatus
-   *          the review status
-   * @throws NotFoundException
-   *           if event with specified ID cannot be found
-   * @throws SchedulerException
-   *           if exception occurred
-   */
-  void updateReviewStatus(String mediaPackageId, ReviewStatus reviewStatus)
-          throws NotFoundException, UnauthorizedException, SchedulerException;
-
-  /**
-   * Returns the review status of an event with the given mediapackage id
-   *
-   * @param mediaPackageId
-   *          ID of event for which review status will be retrieved
-   * @return the review status
-   * @throws NotFoundException
-   *           if event with specified ID cannot be found
-   * @throws SchedulerException
-   *           if exception occurred
-   */
-  ReviewStatus getReviewStatus(String mediaPackageId)
           throws NotFoundException, UnauthorizedException, SchedulerException;
 
   /**

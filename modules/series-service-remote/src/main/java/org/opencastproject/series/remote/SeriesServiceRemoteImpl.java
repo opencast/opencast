@@ -38,7 +38,6 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -57,7 +56,6 @@ import org.opencastproject.util.doc.rest.RestService;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
@@ -70,7 +68,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jettison.json.JSONArray;
@@ -438,65 +435,6 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       closeConnection(response);
     }
     throw new SeriesException("Unable to count series from remote series index");
-  }
-
-  @Override
-  public boolean isOptOut(String seriesId) throws NotFoundException, SeriesException {
-    HttpGet get = new HttpGet(seriesId + "/optOut");
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
-    try {
-      if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          throw new NotFoundException("Series with id '" + seriesId + "' not found on remote series service!");
-        } else {
-          String optOutString = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-          Boolean booleanObject = BooleanUtils.toBooleanObject(optOutString);
-          if (booleanObject == null)
-            throw new SeriesException("Could not parse opt out status from the remote series service: " + optOutString);
-
-          logger.info("Successfully get opt out status of series with id {} from the remote series service", seriesId);
-          return booleanObject.booleanValue();
-        }
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SeriesException("Unable to get the series opt out status from remote series service: " + e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new SeriesException("Unable to get series opt out status from remote series service");
-  }
-
-  @Override
-  public void updateOptOutStatus(String seriesId, boolean optOut) throws NotFoundException, SeriesException {
-    HttpPost post = new HttpPost("/optOutSeries/" + optOut);
-    HttpResponse response = null;
-    try {
-      JSONArray seriesIds = new JSONArray();
-      seriesIds.put(seriesId);
-      post.setEntity(new StringEntity(seriesIds.toString()));
-
-      response = getResponse(post, SC_OK);
-
-      BulkOperationResult bulkOperationResult = new BulkOperationResult();
-      bulkOperationResult.fromJson(response.getEntity().getContent());
-      if (bulkOperationResult.getNotFound().size() > 0) {
-        throw new NotFoundException("Unable to find series with id " + seriesId);
-      } else if (bulkOperationResult.getServerError().size() > 0) {
-        throw new SeriesException(
-                "Unable to update series " + seriesId + " opt out status using the remote series services.");
-      }
-
-    } catch (Exception e) {
-      throw new SeriesException("Unable to assemble a remote series request for updating series " + seriesId
-              + " with optOut status of " + optOut + " because:" + ExceptionUtils.getStackTrace(e));
-    } finally {
-      if (response != null) {
-        closeConnection(response);
-      }
-    }
-    throw new SeriesException("Unable to update series " + seriesId + " using the remote series services");
   }
 
   /**

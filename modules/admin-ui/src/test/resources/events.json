@@ -20,7 +20,6 @@
       "id": "asdasd",
       "title": "title",
       "end_date": "2013-03-20T05:00:00Z",
-      "scheduling_status": "",
       "publications": [
         {
           "id": "rest",
@@ -34,7 +33,6 @@
       "technical_start": "2013-03-20T04:00:00Z",
       "has_preview": false,
       "start_date": "2013-03-20T04:00:00Z",
-      "review_status": "UNSENT"
     },
     {
       "technical_end": "2013-03-20T05:00:00Z",
@@ -53,7 +51,6 @@
       "id": "archivedid",
       "title": "title 2",
       "end_date": "2013-03-20T05:00:00Z",
-      "scheduling_status": "",
       "publications": [
         {
           "id": "rest",
@@ -67,7 +64,6 @@
       "technical_start": "2013-03-20T04:00:00Z",
       "has_preview": false,
       "start_date": "2013-03-20T04:00:00Z",
-      "review_status": "UNSENT"
     },
     {
       "technical_end": "2013-03-20T05:00:00Z",
@@ -86,7 +82,6 @@
       "id": "workflowid",
       "title": "title 3",
       "end_date": "2013-03-20T05:00:00Z",
-      "scheduling_status": "",
       "publications": [
         {
           "id": "rest",
@@ -100,7 +95,6 @@
       "technical_start": "2013-03-20T04:00:00Z",
       "has_preview": false,
       "start_date": "2013-03-20T04:00:00Z",
-      "review_status": "UNSENT"
     }
   ],
   "offset": 0
