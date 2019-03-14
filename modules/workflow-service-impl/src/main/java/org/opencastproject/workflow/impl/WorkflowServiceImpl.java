@@ -2389,9 +2389,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         }
         Organization organization = null;
         try {
-          organization = organizationDirectoryService.getOrganization(instance.getOrganization());
+          organization = organizationDirectoryService.getOrganization(instance.getOrganizationId());
         } catch (NotFoundException e) {
-          logger.error("Found workflow with non-existing organization {}", instance.getOrganization());
+          logger.error("Found workflow with non-existing organization {}", instance.getOrganizationId());
           continue;
         }
 

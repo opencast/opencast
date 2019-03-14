@@ -279,7 +279,7 @@ public class DefaultsWorkflowOperationHandlerTest {
     WorkflowInstance workflowInstance = EasyMock.createMock(WorkflowInstance.class);
     EasyMock.expect(workflowInstance.getId()).andReturn(1L).anyTimes();
     EasyMock.expect(workflowInstance.getCurrentOperation()).andReturn(operation).anyTimes();
-    EasyMock.expect(workflowInstance.getOrganization()).andReturn("org1").anyTimes();
+    EasyMock.expect(workflowInstance.getOrganizationId()).andReturn("org1").anyTimes();
     EasyMock.expect(workflowInstance.getMediaPackage()).andReturn(mediaPackage).anyTimes();
     if (provideEventValue) {
       EasyMock.expect(workflowInstance.getConfiguration(OPT_KEY)).andReturn(EVENT_PRESET_VALUE);

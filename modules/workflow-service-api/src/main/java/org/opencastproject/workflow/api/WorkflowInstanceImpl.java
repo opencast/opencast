@@ -93,7 +93,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   @XmlElement(name = "organization", namespace = "http://org.opencastproject.security")
   private JaxbOrganization organization;
 
-  @XmlElement(name = "organizationid", namespace = "http://org.opencastproject.security")
+  @XmlElement(name = "organization-id", namespace = "http://org.opencastproject.security")
   private String organizationId;
 
   @XmlElement(name = "mediapackage", namespace = "http://mediapackage.opencastproject.org")
@@ -207,10 +207,10 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowInstance#getOrganization()
+   * @see org.opencastproject.workflow.api.WorkflowInstance#getOrganizationId()
    */
   @Override
-  public String getOrganization() {
+  public String getOrganizationId() {
     if (organizationId != null) {
       return organizationId;
     }
@@ -235,7 +235,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
    * @param organizationId
    *          the organization identifier
    */
-  public void setOrganization(final String organizationId) {
+  public void setOrganizationId(final String organizationId) {
     this.organizationId = organizationId;
   }
 

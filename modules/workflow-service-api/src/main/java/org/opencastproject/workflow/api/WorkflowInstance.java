@@ -94,7 +94,7 @@ public interface WorkflowInstance extends Configurable {
    *
    * @return the organization
    */
-  String getOrganization();
+  String getOrganizationId();
 
   /**
    * Returns a copy of the {@link WorkflowOperationInstance}s that make up this workflow. In order to modify the

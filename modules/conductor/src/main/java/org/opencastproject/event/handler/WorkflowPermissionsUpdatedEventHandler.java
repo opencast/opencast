@@ -160,7 +160,7 @@ public class WorkflowPermissionsUpdatedEventHandler {
           if (!instance.isActive())
             continue;
 
-          Organization org = organizationDirectoryService.getOrganization(instance.getOrganization());
+          Organization org = organizationDirectoryService.getOrganization(instance.getOrganizationId());
           securityService.setOrganization(org);
 
           MediaPackage mp = instance.getMediaPackage();

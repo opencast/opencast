@@ -303,7 +303,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
         WorkflowInstance instance = null;
         try {
           instance = WorkflowParser.parseWorkflowInstance(payload);
-          Organization organization = orgDirectory.getOrganization(instance.getOrganization());
+          Organization organization = orgDirectory.getOrganization(instance.getOrganizationId());
           securityService.setOrganization(organization);
           securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
           index(instance);
@@ -494,7 +494,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
     User workflowCreator = instance.getCreator();
     doc.addField(WORKFLOW_CREATOR_KEY, workflowCreator.getUsername());
-    doc.addField(ORG_KEY, instance.getOrganization());
+    doc.addField(ORG_KEY, instance.getOrganizationId());
 
     // Media package used to get the active acl
     MediaPackage aclMp = mp;

@@ -387,7 +387,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         logger.info("Publishing media package {} to search index", mediaPackageForSearch);
 
         URL engageBaseUrl;
-        Organization organization = organizationDirectoryService.getOrganization(workflowInstance.getOrganization());
+        Organization organization = organizationDirectoryService.getOrganization(workflowInstance.getOrganizationId());
         engageUrlString = StringUtils.trimToNull(organization.getProperties().get(ENGAGE_URL_PROPERTY));
         if (engageUrlString != null) {
           engageBaseUrl = new URL(engageUrlString);

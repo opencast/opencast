@@ -87,7 +87,7 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
     logger.debug("Applying default values to {}", workflowInstance.getId());
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     Long id = workflowInstance.getId();
-    String organizationId = workflowInstance.getOrganization();
+    String organizationId = workflowInstance.getOrganizationId();
     String seriesID = workflowInstance.getMediaPackage().getSeries();
     // Iterate over all configuration keys
     Map<String, String> properties = new HashMap<>();
