@@ -23,33 +23,11 @@
   <roles>
     <role>
       <name>ROLE_USER</name>
-      <organization id="mh_default_org">
-        <name>Opencast Project</name>
-        <servers>
-          <server name="http://localhost" port="80"/>
-        </servers>
-        <adminRole>ROLE_ADMIN</adminRole>
-        <anonymousRole>ROLE_ANONYMOUS</anonymousRole>
-        <properties>
-          <property key="logo_large">/admin/img/logo/opencast.svg</property>
-          <property key="logo_small">/admin/img/logo/opencast-icon.svg</property>
-        </properties>
-      </organization>
+      <organization-id>mh_default_org</organization-id>
     </role>
     <role>
       <name>ROLE_COURSE_ADMIN</name>
-      <organization id="mh_default_org">
-        <name>Opencast Project</name>
-        <servers>
-          <server name="http://localhost" port="80"/>
-        </servers>
-        <adminRole>ROLE_ADMIN</adminRole>
-        <anonymousRole>ROLE_ANONYMOUS</anonymousRole>
-        <properties>
-          <property key="logo_small">/admin/img/logo/opencast-icon.svg</property>
-          <property key="logo_large">/admin/img/logo/opencast.svg</property>
-        </properties>
-      </organization>
+      <organization-id>mh_default_org</organization-id>
     </role>
   </roles>
 </group>

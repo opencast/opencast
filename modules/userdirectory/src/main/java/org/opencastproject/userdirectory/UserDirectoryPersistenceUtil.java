@@ -68,8 +68,8 @@ public final class UserDirectoryPersistenceUtil {
       // Save or update roles
       for (Role role : roles) {
         JpaRole jpaRole = (JpaRole) role;
-        saveOrganization((JpaOrganization) jpaRole.getOrganization(), emf);
-        JpaRole findRole = findRole(jpaRole.getName(), jpaRole.getOrganization().getId(), emf);
+        saveOrganization(jpaRole.getJpaOrganization(), emf);
+        JpaRole findRole = findRole(jpaRole.getName(), jpaRole.getOrganizationId(), emf);
         if (findRole == null) {
           em.persist(jpaRole);
           updatedRoles.add(jpaRole);

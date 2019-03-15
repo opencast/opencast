@@ -20,9 +20,10 @@
  */
 package org.opencastproject.security.impl.jpa;
 
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.util.EqualsUtil;
+
+import java.util.Objects;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -149,7 +150,11 @@ public final class JpaRole implements Role {
   }
 
   @Override
-  public Organization getOrganization() {
+  public String getOrganizationId() {
+    return organization.getId();
+  }
+
+  public JpaOrganization getJpaOrganization() {
     return organization;
   }
 
@@ -160,7 +165,7 @@ public final class JpaRole implements Role {
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(name, organization);
+    return EqualsUtil.hash(name, getOrganizationId());
   }
 
   @Override
@@ -168,12 +173,13 @@ public final class JpaRole implements Role {
     if (!(obj instanceof Role))
       return false;
     Role other = (Role) obj;
-    return name.equals(other.getName()) && organization.equals(other.getOrganization());
+    return name.equals(other.getName())
+            && Objects.equals(getOrganizationId(), other.getOrganizationId());
   }
 
   @Override
   public String toString() {
-    return new StringBuilder(name).append(":").append(organization).toString();
+    return name + ":" + getOrganizationId();
   }
 
 }
