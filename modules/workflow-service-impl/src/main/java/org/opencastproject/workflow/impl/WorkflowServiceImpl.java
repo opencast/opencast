@@ -104,6 +104,7 @@ import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.entwinemedia.fn.data.Opt;
 import com.google.common.util.concurrent.Striped;
 
 import org.apache.commons.io.IOUtils;
@@ -1056,6 +1057,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
   }
 
+
   /**
    * {@inheritDoc}
    *
@@ -1293,6 +1295,15 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     String currentOrgId = currentOrg.getId();
 
     MediaPackage mediapackage = workflow.getMediaPackage();
+
+    WorkflowState state = workflow.getState();
+    if (state != INSTANTIATED && state != RUNNING && workflow.getState() != FAILING) {
+      Opt<MediaPackage> assetMediapackage = assetManager.getMediaPackage(mediapackage.getIdentifier().toString());
+      if (assetMediapackage.isSome()) {
+        mediapackage = assetMediapackage.get();
+      }
+    }
+
     User workflowCreator = workflow.getCreator();
     String workflowOrgId = workflowCreator.getOrganization().getId();
 
