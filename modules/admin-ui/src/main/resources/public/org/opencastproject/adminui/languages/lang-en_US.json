@@ -1050,7 +1050,9 @@
            "SUBJECT":        "Subject",
            "LANGUAGE":       "Language",
            "LICENSE":        "License",
-           "DESCRIPTION":    "Description"
+           "DESCRIPTION":    "Description",
+           "ATOM":           "Atom Feedlink",
+           "RSS":            "RSS Feedlink"
          },
          "PARTICIPATION": {
             "CAPTION": "Participation status template",
