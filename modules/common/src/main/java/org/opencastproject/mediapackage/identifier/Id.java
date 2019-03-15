@@ -47,8 +47,6 @@ public interface Id {
     public IdImpl marshal(Id id) throws Exception {
       if (id instanceof IdImpl) {
         return (IdImpl) id;
-      } else if (id instanceof HandleImpl) {
-        return (HandleImpl) id;
       } else {
         throw new IllegalStateException("an unknown ID is un use: " + id);
       }

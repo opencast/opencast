@@ -23,12 +23,10 @@
 package org.opencastproject.util;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.EqualsUtil.eqMap;
-import static org.opencastproject.util.EqualsUtil.hash;
 import static org.opencastproject.util.data.Arrays.array;
 import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Tuple.tuple;
@@ -38,14 +36,6 @@ import org.junit.Test;
 import java.util.List;
 
 public class EqualUtilTest {
-  @Test
-  public void testHash() {
-    assertEquals(hash("a", "b", "c"), 41 * (41 * (41 + "a".hashCode()) + "b".hashCode()) + "c".hashCode());
-    assertEquals(hash("a", null, "c"), 41 * (41 * (41 + "a".hashCode()) + 0L) + "c".hashCode());
-    assertEquals(0L, hash());
-    assertEquals(0L, hash(null));
-  }
-
   @Test
   public void testEqualMap() {
     assertTrue(eqMap(map(tuple("a", "b")), map(tuple("a", "b"))));
