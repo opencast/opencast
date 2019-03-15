@@ -127,15 +127,12 @@ public class DefaultsWorkflowOperationHandlerTest {
 
   @Test
   public void usesEventLevelPreset() throws WorkflowOperationException {
-    Organization organization = EasyMock.createMock(Organization.class);
-    EasyMock.replay(organization);
-
     String seriesID = "series-ID";
 
     Map<String, String> workflowConfiguration = new HashMap<String, String>();
     workflowConfiguration.put(OPT_KEY, WORKFLOW_PRESET_VALUE);
 
-    WorkflowInstance workflowInstance = setupInstance(organization, seriesID, workflowConfiguration, true);
+    WorkflowInstance workflowInstance = setupInstance(seriesID, workflowConfiguration, true);
 
     DefaultsWorkflowOperationHandler handler = new DefaultsWorkflowOperationHandler();
     handler.setPresetProvider(presetProvider);
@@ -158,7 +155,7 @@ public class DefaultsWorkflowOperationHandlerTest {
     Map<String, String> workflowConfiguration = new HashMap<String, String>();
     workflowConfiguration.put(OPT_KEY, WORKFLOW_PRESET_VALUE);
 
-    WorkflowInstance workflowInstance = setupInstance(organization, seriesID, workflowConfiguration, false);
+    WorkflowInstance workflowInstance = setupInstance(seriesID, workflowConfiguration, false);
 
     DefaultsWorkflowOperationHandler handler = new DefaultsWorkflowOperationHandler();
     handler.setPresetProvider(presetProvider);
@@ -181,7 +178,7 @@ public class DefaultsWorkflowOperationHandlerTest {
     Map<String, String> workflowConfiguration = new HashMap<String, String>();
     workflowConfiguration.put(OPT_KEY, WORKFLOW_PRESET_VALUE);
 
-    WorkflowInstance workflowInstance = setupInstance(organization, seriesID, workflowConfiguration, false);
+    WorkflowInstance workflowInstance = setupInstance(seriesID, workflowConfiguration, false);
 
     DefaultsWorkflowOperationHandler handler = new DefaultsWorkflowOperationHandler();
     handler.setPresetProvider(presetProvider);
@@ -204,7 +201,7 @@ public class DefaultsWorkflowOperationHandlerTest {
     Map<String, String> workflowConfiguration = new HashMap<String, String>();
     workflowConfiguration.put(OPT_KEY, WORKFLOW_PRESET_VALUE);
 
-    WorkflowInstance workflowInstance = setupInstance(organization, seriesID, workflowConfiguration, false);
+    WorkflowInstance workflowInstance = setupInstance(seriesID, workflowConfiguration, false);
 
     DefaultsWorkflowOperationHandler handler = new DefaultsWorkflowOperationHandler();
     handler.setPresetProvider(presetProvider);
@@ -227,7 +224,7 @@ public class DefaultsWorkflowOperationHandlerTest {
     Map<String, String> workflowConfiguration = new HashMap<String, String>();
     workflowConfiguration.put(OPT_KEY, WORKFLOW_PRESET_VALUE);
 
-    WorkflowInstance workflowInstance = setupInstance(organization, seriesID, workflowConfiguration, false);
+    WorkflowInstance workflowInstance = setupInstance(seriesID, workflowConfiguration, false);
 
     DefaultsWorkflowOperationHandler handler = new DefaultsWorkflowOperationHandler();
     handler.setPresetProvider(presetProvider);
@@ -250,7 +247,7 @@ public class DefaultsWorkflowOperationHandlerTest {
     Map<String, String> workflowConfiguration = new HashMap<String, String>();
     workflowConfiguration.put(OPT_KEY, WORKFLOW_PRESET_VALUE);
 
-    WorkflowInstance workflowInstance = setupInstance(organization, seriesID, workflowConfiguration, false);
+    WorkflowInstance workflowInstance = setupInstance(seriesID, workflowConfiguration, false);
 
     DefaultsWorkflowOperationHandler handler = new DefaultsWorkflowOperationHandler();
     handler.setPresetProvider(presetProvider);
@@ -261,8 +258,6 @@ public class DefaultsWorkflowOperationHandlerTest {
   /**
    * Setup a workflow instance to test the preset values.
    * 
-   * @param organization
-   *          The {@link Organization} to use to get presets.
    * @param seriesID
    *          The series id to get the presets.
    * @param workflowConfiguration
@@ -271,8 +266,7 @@ public class DefaultsWorkflowOperationHandlerTest {
    *          Whether to provide an event level value for the key
    * @return A {@link WorkflowInstance} ready to run a test of {@link DefaultsWorkflowOperationHandler}
    */
-  private WorkflowInstance setupInstance(Organization organization, String seriesID,
-          Map<String, String> workflowConfiguration, boolean provideEventValue) {
+  private WorkflowInstance setupInstance(String seriesID, Map<String, String> workflowConfiguration, boolean provideEventValue) {
     WorkflowOperationInstance operation = EasyMock.createMock(WorkflowOperationInstance.class);
     EasyMock.expect(operation.getConfigurationKeys()).andReturn(workflowConfiguration.keySet());
     EasyMock.expect(operation.getConfiguration(OPT_KEY)).andReturn(WORKFLOW_PRESET_VALUE);
@@ -285,7 +279,7 @@ public class DefaultsWorkflowOperationHandlerTest {
     WorkflowInstance workflowInstance = EasyMock.createMock(WorkflowInstance.class);
     EasyMock.expect(workflowInstance.getId()).andReturn(1L).anyTimes();
     EasyMock.expect(workflowInstance.getCurrentOperation()).andReturn(operation).anyTimes();
-    EasyMock.expect(workflowInstance.getOrganization()).andReturn(organization).anyTimes();
+    EasyMock.expect(workflowInstance.getOrganizationId()).andReturn("org1").anyTimes();
     EasyMock.expect(workflowInstance.getMediaPackage()).andReturn(mediaPackage).anyTimes();
     if (provideEventValue) {
       EasyMock.expect(workflowInstance.getConfiguration(OPT_KEY)).andReturn(EVENT_PRESET_VALUE);

@@ -37,6 +37,9 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 
 import com.entwinemedia.fn.Fn;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -61,6 +64,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "workflow", namespace = "http://workflow.opencastproject.org")
 @XmlAccessorType(XmlAccessType.NONE)
 public class WorkflowInstanceImpl implements WorkflowInstance {
+
+  private final Logger logger = LoggerFactory.getLogger(WorkflowInstance.class);
 
   @XmlAttribute()
   private long id;
@@ -87,6 +92,9 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   @XmlJavaTypeAdapter(OrganizationAdapter.class)
   @XmlElement(name = "organization", namespace = "http://org.opencastproject.security")
   private JaxbOrganization organization;
+
+  @XmlElement(name = "organization-id", namespace = "http://org.opencastproject.security")
+  private String organizationId;
 
   @XmlElement(name = "mediapackage", namespace = "http://mediapackage.opencastproject.org")
   private MediaPackage mediaPackage;
@@ -134,7 +142,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
     this.parentId = parentWorkflowId;
     this.creator = creator;
     if (organization != null)
-      this.organization = JaxbOrganization.fromOrganization(organization);
+      this.organizationId = organization.getId();
     this.state = WorkflowState.INSTANTIATED;
     this.mediaPackage = mediaPackage;
     this.operations = new ArrayList<WorkflowOperationInstance>();
@@ -199,11 +207,18 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowInstance#getOrganization()
+   * @see org.opencastproject.workflow.api.WorkflowInstance#getOrganizationId()
    */
   @Override
-  public Organization getOrganization() {
-    return organization;
+  public String getOrganizationId() {
+    if (organizationId != null) {
+      return organizationId;
+    }
+    // get id from old jobs which stored the whole organization
+    if (organization != null) {
+      return organization.getId();
+    }
+    return null;
   }
 
   /**
@@ -217,14 +232,11 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   /**
    * Sets the workflow's organization.
    *
-   * @param organization
-   *          the organization
+   * @param organizationId
+   *          the organization identifier
    */
-  public void setOrganization(Organization organization) {
-    if (organization == null)
-      this.organization = null;
-    else
-      this.organization = JaxbOrganization.fromOrganization(organization);
+  public void setOrganizationId(final String organizationId) {
+    this.organizationId = organizationId;
   }
 
   /**
@@ -597,8 +609,9 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
    * Allows JAXB handling of {@link Organization} interfaces.
    */
   static class OrganizationAdapter extends XmlAdapter<JaxbOrganization, Organization> {
+
     @Override
-    public JaxbOrganization marshal(Organization org) throws Exception {
+    public JaxbOrganization marshal(Organization org) {
       if (org == null)
         return null;
       if (org instanceof JaxbOrganization)
@@ -607,9 +620,10 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
     }
 
     @Override
-    public Organization unmarshal(JaxbOrganization org) throws Exception {
+    public Organization unmarshal(JaxbOrganization org) {
       return org;
     }
+
   }
 
   /**

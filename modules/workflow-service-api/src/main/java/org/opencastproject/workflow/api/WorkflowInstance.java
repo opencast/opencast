@@ -22,7 +22,6 @@
 package org.opencastproject.workflow.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 
 import java.util.List;
@@ -95,7 +94,7 @@ public interface WorkflowInstance extends Configurable {
    *
    * @return the organization
    */
-  Organization getOrganization();
+  String getOrganizationId();
 
   /**
    * Returns a copy of the {@link WorkflowOperationInstance}s that make up this workflow. In order to modify the

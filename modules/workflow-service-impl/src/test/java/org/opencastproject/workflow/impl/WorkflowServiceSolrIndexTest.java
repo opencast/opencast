@@ -79,7 +79,7 @@ public class WorkflowServiceSolrIndexTest {
     WorkflowInstanceImpl workflow = new WorkflowInstanceImpl();
     workflow.setId(123);
     workflow.setCreator(securityService.getUser());
-    workflow.setOrganization(securityService.getOrganization());
+    workflow.setOrganizationId(securityService.getOrganization().getId());
     workflow.setState(WorkflowState.INSTANTIATED);
     workflow.setMediaPackage(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
     String jobPayload = WorkflowParser.toXml(workflow);
