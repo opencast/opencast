@@ -185,8 +185,8 @@ angular.module('adminNg.controllers')
 
         $scope.seriesCatalog.url =  $location.protocol() + "://" + $location.host() + ":" + $location.port();
         $scope.seriesCatalog.feeds = [];
-        $scope.seriesCatalog.feeds.push({label: "EVENTS.SERIES.DETAILS.METADATA.ATOM", value: $scope.seriesCatalog.url+"/feeds/atom/1.0/series/"+$scope.seriesCatalog.uid});
-        $scope.seriesCatalog.feeds.push({label: "EVENTS.SERIES.DETAILS.METADATA.RSS", value: $scope.seriesCatalog.url+"/feeds/rss/2.0/series/"+$scope.seriesCatalog.uid});
+        $scope.seriesCatalog.feeds.push( {label: "EVENTS.SERIES.DETAILS.METADATA.ATOM", value: $scope.seriesCatalog.url + "/feeds/atom/1.0/series/" + $scope.seriesCatalog.uid} );
+        $scope.seriesCatalog.feeds.push( {label: "EVENTS.SERIES.DETAILS.METADATA.RSS", value: $scope.seriesCatalog.url + "/feeds/rss/2.0/series/" + $scope.seriesCatalog.uid} );
 
         if (angular.isDefined(seriesCatalogIndex)) {
           metadata.entries.splice(seriesCatalogIndex, 1);
