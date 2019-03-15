@@ -27,18 +27,6 @@ package org.opencastproject.capture;
  */
 public interface CaptureParameters {
 
-  /** The number of milliseconds in a second */
-  long MILLISECONDS = 1000;
-  /** The base unit of measurement, 1 second */
-  long SECONDS = 1;
-  /** The number of seconds in a minute */
-  long MINUTES = 60 * SECONDS;
-  /** The number of seconds in an hour */
-  long HOURS = 60 * MINUTES;
-
-  /** The name of the agent */
-  String AGENT_NAME = "capture.agent.name";
-
   /** Agent configuration property indicating how the agent was registered */
   String AGENT_REGISTRATION_TYPE = "org.opencastproject.registration.type";
 

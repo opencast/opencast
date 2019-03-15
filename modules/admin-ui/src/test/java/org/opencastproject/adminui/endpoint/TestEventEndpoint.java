@@ -683,7 +683,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       public Properties getConfiguration() {
         Properties properties = new Properties();
         properties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, "input1,input2");
-        properties.put(CaptureParameters.AGENT_NAME, "testagent");
         properties.put("capture.device.timezone.offset", "-360");
         properties.put("capture.device.timezone", "America/Los_Angeles");
         return properties;
