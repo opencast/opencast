@@ -607,14 +607,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           Long parentWorkflowId, Map<String, String> originalProperties) throws WorkflowDatabaseException,
           WorkflowParsingException, NotFoundException {
     final String mediaPackageId = sourceMediaPackage.getIdentifier().compact();
+    Map<String, String> properties = null;
 
-    final Map<String, String> properties;
-    // Currently, the only place where the asset manager isn't involved is in the tests. But it might change.
-    if (assetManager != null) {
+    if (originalProperties != null) {
       WorkflowPropertiesUtil.storeProperties(assetManager, sourceMediaPackage, originalProperties);
       properties = WorkflowPropertiesUtil.getLatestWorkflowProperties(assetManager, mediaPackageId);
-    } else {
-      properties = originalProperties;
     }
 
     // We have to synchronize per media package to avoid starting multiple simultaneous workflows for one media package.

@@ -21,12 +21,16 @@
 
 package org.opencastproject.workflow.impl;
 
+import static org.easymock.EasyMock.createNiceMock;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Property;
+import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
@@ -52,6 +56,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -102,6 +107,7 @@ public class WorkflowOperationSkippingTest {
   private WorkflowServiceSolrIndex dao = null;
   protected Set<HandlerRegistration> handlerRegistrations = null;
   private Workspace workspace = null;
+  private Property property = null;
 
   private File sRoot = null;
 
@@ -182,6 +188,39 @@ public class WorkflowOperationSkippingTest {
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
+    {
+      final AssetManager assetManager = createNiceMock(AssetManager.class);
+      final AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
+      final Target t = EasyMock.createNiceMock(Target.class);
+      final Predicate p = EasyMock.createNiceMock(Predicate.class);
+      EasyMock.expect(p.and(EasyMock.anyObject(Predicate.class))).andReturn(p).anyTimes();
+      EasyMock.expect(query.snapshot()).andReturn(t).anyTimes();
+      EasyMock.expect(query.propertiesOf(EasyMock.anyString())).andReturn(t).anyTimes();
+      final VersionField v = EasyMock.createNiceMock(VersionField.class);
+      EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
+      EasyMock.expect(query.version()).andReturn(v).anyTimes();
+      EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
+      EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(p).anyTimes();
+      final ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
+      EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
+      final AResult r = EasyMock.createNiceMock(AResult.class);
+      EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
+      ARecord aRec = EasyMock.createNiceMock(ARecord.class);
+      final Stream<ARecord> recStream = Stream.mk(aRec);
+      EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
+      EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class))).
+              andReturn(selectQuery).anyTimes();
+      EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
+      EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
+
+      property = EasyMock.createNiceMock(Property.class);
+      Stream<Property> properties = Stream.mk(property);
+      EasyMock.expect(aRec.getProperties()).andReturn(properties).anyTimes();
+
+      EasyMock.replay(query, t, r, selectQuery, assetManager, p, v, aRec);
+      service.setAssetManager(assetManager);
+    }
+
     AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
     Version version = EasyMock.createNiceMock(Version.class);
     Snapshot snapshot = EasyMock.createNiceMock(Snapshot.class);
@@ -208,7 +247,7 @@ public class WorkflowOperationSkippingTest {
     EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
     EasyMock.expect(query.version()).andReturn(v).anyTimes();
     EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
-    EasyMock.replay(assetManager, version, snapshot, aRec, p, r, t, selectQuery, query, v);
+    EasyMock.replay(assetManager, version, snapshot, p, r, t, selectQuery, query, v, aRec);
 
     dao.setServiceRegistry(serviceRegistry);
     dao.setSecurityService(securityService);
@@ -222,9 +261,9 @@ public class WorkflowOperationSkippingTest {
     service.setUserDirectoryService(userDirectoryService);
     service.activate(null);
 
-    InputStream is = null;
+    InputStream is;
     try {
-      is = WorkflowOperationSkippingTest.class.getResourceAsStream("/workflow-definition-skipping.xml");
+      is = getClass().getResourceAsStream("/workflow-definition-skipping.xml");
       workingDefinition = WorkflowParser.parseWorkflowDefinition(is);
       service.registerWorkflowDefinition(workingDefinition);
       IOUtils.closeQuietly(is);
@@ -236,6 +275,7 @@ public class WorkflowOperationSkippingTest {
       IOUtils.closeQuietly(is);
       Assert.assertNotNull(mediapackage1.getIdentifier());
     } catch (Exception e) {
+      e.printStackTrace();
       Assert.fail(e.getMessage());
     }
   }
@@ -248,6 +288,14 @@ public class WorkflowOperationSkippingTest {
 
   @Test
   public void testIf() throws Exception {
+
+    EasyMock.expect(property.getId()).andReturn(new PropertyId(mediapackage1.getIdentifier().toString(),
+            OpencastConstants.WORKFLOW_PROPERTIES_NAMESPACE, "executecondition")).anyTimes();
+    EasyMock.expect(property.getValue()).andReturn(new Value.StringValue("true")).once();
+    EasyMock.expect(property.getValue()).andReturn(new Value.StringValue("false")).once();
+
+    EasyMock.replay(property);
+
     Map<String, String> properties1 = new HashMap<String, String>();
     properties1.put("executecondition", "true");
 

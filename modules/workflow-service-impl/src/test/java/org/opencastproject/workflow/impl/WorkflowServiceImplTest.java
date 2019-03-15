@@ -210,6 +210,7 @@ public class WorkflowServiceImplTest {
       final VersionField v = EasyMock.createNiceMock(VersionField.class);
       EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
       EasyMock.expect(query.version()).andReturn(v).anyTimes();
+      EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
       EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(p).anyTimes();
       final ASelectQuery selectQuery = EasyMock.createMock(ASelectQuery.class);
       EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
@@ -217,7 +218,8 @@ public class WorkflowServiceImplTest {
       EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
       final Stream<ARecord> recStream = Stream.mk();
       EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
-      EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
+      EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class))).
+              andReturn(selectQuery).anyTimes();
       EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
       EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
       EasyMock.replay(query, t, r, selectQuery, assetManager, p, v);
@@ -252,7 +254,8 @@ public class WorkflowServiceImplTest {
 
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
             organizationDirectoryService, incidentService);
-    serviceRegistry.registerHost(REMOTE_HOST, REMOTE_HOST, Runtime.getRuntime().totalMemory(), Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors());
+    serviceRegistry.registerHost(REMOTE_HOST, REMOTE_HOST, Runtime.getRuntime().totalMemory(), Runtime.getRuntime().
+            availableProcessors(), Runtime.getRuntime().availableProcessors());
     serviceRegistry.registerService(REMOTE_SERVICE, REMOTE_HOST, "/path", true);
     service.setWorkspace(workspace);
 

@@ -21,10 +21,14 @@
 
 package org.opencastproject.workflow.impl;
 
+import static org.easymock.EasyMock.createNiceMock;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Property;
+import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
@@ -50,6 +54,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -99,6 +104,7 @@ public class HoldStateTest {
   private WorkflowServiceSolrIndex dao = null;
   private SecurityService securityService = null;
   private ResumableTestWorkflowOperationHandler holdingOperationHandler;
+  private Property property = null;
 
   private File sRoot = null;
 
@@ -179,6 +185,37 @@ public class HoldStateTest {
     MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
     EasyMock.replay(messageSender);
 
+    {
+      final AssetManager assetManager = createNiceMock(AssetManager.class);
+      final AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
+      final Target t = EasyMock.createNiceMock(Target.class);
+      final Predicate p = EasyMock.createNiceMock(Predicate.class);
+      EasyMock.expect(p.and(EasyMock.anyObject(Predicate.class))).andReturn(p).anyTimes();
+      EasyMock.expect(query.snapshot()).andReturn(t).anyTimes();
+      EasyMock.expect(query.propertiesOf(EasyMock.anyString())).andReturn(t).anyTimes();
+      final VersionField v = EasyMock.createNiceMock(VersionField.class);
+      EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
+      EasyMock.expect(query.version()).andReturn(v).anyTimes();
+      EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
+      EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(p).anyTimes();
+      final ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
+      EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
+      final AResult r = EasyMock.createNiceMock(AResult.class);
+      EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
+      EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class))).
+              andReturn(selectQuery).anyTimes();
+      EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
+      EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
+      ARecord aRec = EasyMock.createNiceMock(ARecord.class);
+      final Stream<ARecord> recStream = Stream.mk(aRec);
+      EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
+      property = EasyMock.createNiceMock(Property.class);
+      Stream<Property> properties = Stream.mk(property);
+      EasyMock.expect(aRec.getProperties()).andReturn(properties).anyTimes();
+      EasyMock.replay(query, t, r, selectQuery, assetManager, p, v, aRec);
+      service.setAssetManager(assetManager);
+    }
+
     ServiceRegistryInMemoryImpl serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService,
             userDirectoryService, organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
 
@@ -239,6 +276,13 @@ public class HoldStateTest {
 
   @Test
   public void testHoldAndResume() throws Exception {
+
+    EasyMock.expect(property.getId()).andReturn(new PropertyId(mp.getIdentifier().toString(),
+            OpencastConstants.WORKFLOW_PROPERTIES_NAMESPACE, "testproperty")).anyTimes();
+    EasyMock.expect(property.getValue()).andReturn(new Value.StringValue("foo")).once();
+
+    EasyMock.replay(property);
+
     // Add a listener for paused workflow instances
     WorkflowStateListener pauseListener = new WorkflowStateListener(WorkflowState.PAUSED);
     service.addWorkflowListener(pauseListener);
@@ -278,6 +322,13 @@ public class HoldStateTest {
 
   @Test
   public void testMultipleHolds() throws Exception {
+
+    EasyMock.expect(property.getId()).andReturn(new PropertyId(mp.getIdentifier().toString(),
+            OpencastConstants.WORKFLOW_PROPERTIES_NAMESPACE, "testproperty")).anyTimes();
+    EasyMock.expect(property.getValue()).andReturn(new Value.StringValue("foo")).anyTimes();
+
+    EasyMock.replay(property);
+
     WorkflowStateListener pauseListener = new WorkflowStateListener(WorkflowState.PAUSED);
     service.addWorkflowListener(pauseListener);
     synchronized (pauseListener) {
