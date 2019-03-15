@@ -74,6 +74,14 @@
                     params="row" save="getSaveFunction(seriesCatalog.flavor)">
                 </td>
               </tr>
+              <tr ng-repeat="row in seriesCatalog.feeds">
+                <td>
+                  <span translate="{{ row.label }}"></span>
+                </td>
+                <td>
+                  <a target="_blank" rel="noopener noreferrer" href="{{ row.value }}"> {{ row.value }} </a>
+                </td>
+              </tr>
             </table>
           </div>
         </div>
