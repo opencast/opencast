@@ -21,7 +21,6 @@
 
 package org.opencastproject.security.api;
 
-import org.opencastproject.util.EqualsUtil;
 
 import java.util.Objects;
 
@@ -50,7 +49,7 @@ public final class JaxbRole implements Role {
   @XmlElement(name = "organization")
   protected JaxbOrganization organization;
 
-  @XmlElement(name = "organizationid")
+  @XmlElement(name = "organization-id")
   protected String organizationId;
 
   @XmlElement(name = "type")
@@ -184,7 +183,7 @@ public final class JaxbRole implements Role {
    */
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(name, getOrganizationId());
+    return Objects.hash(name, getOrganizationId());
   }
 
   /**
