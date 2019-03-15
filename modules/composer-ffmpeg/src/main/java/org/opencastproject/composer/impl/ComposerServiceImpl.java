@@ -98,6 +98,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1085,14 +1086,22 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         throw new EncoderException("Unable to extract an image from a track with unknown duration");
       }
       if (time < 0 || time * 1000 > sourceTrack.getDuration()) {
+        Duration duration = Duration.ofMillis(sourceTrack.getDuration());
+        long durationSeconds = duration.getSeconds();
+        long durationMillis = duration.minusSeconds(durationSeconds).toMillis();
+        String formattedDuration = String.valueOf(durationSeconds) + '.'
+                + StringUtils.leftPad(String.valueOf(durationMillis), 3, '0');
+
         Map<String, String> params = new HashMap<>();
         params.put("track-id", sourceTrack.getIdentifier());
         params.put("track-url", sourceTrack.getURI().toString());
-        params.put("track-duration", sourceTrack.getDuration().toString());
+        params.put("track-duration", formattedDuration);
         params.put("time", Double.toString(time));
         incident().recordFailure(job, IMAGE_EXTRACTION_TIME_OUTSIDE_DURATION, params);
-        throw new EncoderException("Can not extract an image at time " + time + " from a track with duration "
-                + sourceTrack.getDuration());
+
+        throw new EncoderException("An image could not be extracted from the track " + sourceTrack.getURI()
+                + " with id " + sourceTrack.getIdentifier() + " because the extraction time (" + time + " second(s)) is "
+                + "outside of the track's duration (" + formattedDuration + " second(s))");
       }
     }
 
