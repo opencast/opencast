@@ -175,13 +175,16 @@ angular.module('adminNg.controllers')
                 metadata.locked = entry.locked;
                 keepGoing = false;
               }
+              if (entry.id === 'identifier') {
+                $scope.seriesCatalog.uid = entry.value;
+              }
               entry.tabindex = tabindex++;
             });
           }
         });
 
         $scope.seriesCatalog.fields.push({id: "feed", label: "EVENTS.SERIES.DETAILS.METADATA.ATOM", readOnly: true, required: false, tabindex: 13, type: "text", value: "http://localhost:8080/feeds/atom/1.0/series/"+$scope.seriesCatalog.uid});
-        $scope.seriesCatalog.fields.push({id: "rss", label: "EVENTS.SERIES.DETAILS.METADATA.RSS", readOnly: true, required: false, tabindex: 13, type: "text", value: "http://localhost:8080/feeds/rss/2.0/series/"+$scope.seriesCatalog.uid});
+        $scope.seriesCatalog.fields.push({id: "rss", label: "EVENTS.SERIES.DETAILS.METADATA.RSS", readOnly: true, required: false, tabindex: 14, type: "text", value: "http://localhost:8080/feeds/rss/2.0/series/"+$scope.seriesCatalog.uid});
         console.log("$scope", $scope);
 
         if (angular.isDefined(seriesCatalogIndex)) {
