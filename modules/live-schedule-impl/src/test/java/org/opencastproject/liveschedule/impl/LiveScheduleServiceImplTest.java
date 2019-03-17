@@ -107,7 +107,6 @@ public class LiveScheduleServiceImplTest {
   private static final long DURATION = 60000L;
   private static final String ORG_ID = "org";
   private static final String ENGAGE_URL = "htttp://engage.server";
-  private static final String PATH_TO_PLAYER = "/path-to-playengageer/view.html";
 
   /** The service to test */
   private LiveScheduleServiceImpl service;
@@ -151,8 +150,7 @@ public class LiveScheduleServiceImplTest {
     organizationService = EasyMock.createNiceMock(OrganizationDirectoryService.class);
 
     Organization defOrg = new DefaultOrganization();
-    Map<String, String> orgProps = new HashMap<String, String>();
-    orgProps.put(LiveScheduleServiceImpl.PLAYER_PROPERTY, PATH_TO_PLAYER);
+    Map<String, String> orgProps = new HashMap<>();
     orgProps.put(LiveScheduleServiceImpl.ENGAGE_URL_PROPERTY, ENGAGE_URL);
     org = new JaxbOrganization(ORG_ID, "Test Organization", defOrg.getServers(), defOrg.getAdminRole(),
             defOrg.getAnonymousRole(), orgProps);
@@ -596,7 +594,7 @@ public class LiveScheduleServiceImplTest {
     Assert.assertEquals(1, publications.length);
     Assert.assertEquals(LiveScheduleService.CHANNEL_ID, publications[0].getChannel());
     Assert.assertEquals("text/html", publications[0].getMimeType().toString());
-    Assert.assertEquals(ENGAGE_URL + PATH_TO_PLAYER + "?id=" + MP_ID, publications[0].getURI().toString());
+    Assert.assertEquals(ENGAGE_URL + "/watch/" + MP_ID, publications[0].getURI().toString());
   }
 
   @Test

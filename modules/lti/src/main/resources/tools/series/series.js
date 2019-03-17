@@ -23,7 +23,7 @@
 
 'use strict';
 
-var player,
+var player = '/watch/',
     currentpage,
     defaultLang = i18ndata['en-US'],
     lang = defaultLang;
@@ -67,18 +67,6 @@ function getSeries() {
   return '';
 }
 
-function loadDefaultPlayer() {
-  var infoUrl = '/info/me.json';
-
-  // load spinner
-  $('main').html($('#template-loading').html());
-
-  // get organization configuration
-  return $.getJSON(infoUrl, function( data ) {
-    player = data.org.properties.player;
-  });
-}
-
 function loadPage(page) {
 
   var limit = 15,
@@ -111,7 +99,7 @@ function loadPage(page) {
           i18ncreator = Mustache.render(i18n('CREATOR'), {creator: episode.dcCreator}),
           template = $('#template-episode').html(),
           tpldata = {
-            player: player + '?id=' + episode.id,
+            player: player + episode.id,
             title: episode.dcTitle,
             i18ncreator: i18ncreator,
             created: tryLocalDate(episode.dcCreated)};
@@ -162,6 +150,5 @@ function loadPage(page) {
 
 $(document).ready(function() {
   lang = matchLanguage(navigator.language);
-  loadDefaultPlayer()
-    .then(loadPage(1));
+  loadPage(1);
 });

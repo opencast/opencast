@@ -14,7 +14,8 @@ How to Upgrade
 5. [Upgrade the ActiveMQ configuration](#activemq-migration)
 6. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
 7. Migrate the scheduled events
-8. Rebuild the Elastic Search indexes
+8. [Optionally update the player links](#update-player-links)
+9. Rebuild the Elastic Search indexes
 
 Database Migration
 ------------------
@@ -82,6 +83,57 @@ change `maintenance` back to `false` to put the scheduler back into its normal m
 You should avoid running Opencast 7 without migrating the scheduled events first. Otherwise, your capture agents may
 fetch an empty calendar.
 
+
+Update Player Links
+-------------------
+
+> This step is optional
+
+Opencast 7 comes with the capability of dynamically switching the configured player without requiring the republication
+of all published material by providing the dynamic target `https://example.opencast.org/watch/<id>`. This new target
+will be used for all new engage publications.
+
+But old publications still reference the players directly in the admin interface and the external API. This does not
+pose any immediate problem unless you actually want to switch players in which case you would need to republish the
+material once to update the publication links.
+
+Alternatively, you can rewrite the old links all at once without re-publication using the following method:
+
+1. Find the archive directory and run the following command (replacing `<playerlink>`):
+
+        sed -i 's_<playerlink>_/watch/_g' .../archive/*/*/*/manifest.xml
+
+    For Theodul, Paella and the Engage player the specific commands would be:
+
+        sed -i 's_/engage/theodul/ui/core.html?id=_/watch/_g' .../archive/*/*/*/manifest.xml
+        sed -i 's_/paella/ui/watch.html?id=_/watch/_g' .../archive/*/*/*/manifest.xml
+        sed -i 's_/engage/ui/watch.html?id=_/watch/_g' .../archive/*/*/*/manifest.xml
+
+2. Run the following SQL commands on your opencast database (replacing `<playerlink>`):
+
+        UPDATE oc_assets_snapshot
+          SET mediapackage_xml =
+          REPLACE(mediapackage_xml, '<playerlink>', '/watch/')
+          WHERE INSTR(mediapackage_xml, '<playerlink>') > 0;
+
+    For Theodul, Paella and the Engage player the specific commands would be:
+
+        UPDATE oc_assets_snapshot
+          SET mediapackage_xml =
+          REPLACE(mediapackage_xml, '/engage/theodul/ui/core.html?id=', '/watch/')
+          WHERE INSTR(mediapackage_xml, '/engage/theodul/ui/core.html?id=') > 0;
+        UPDATE oc_assets_snapshot
+          SET mediapackage_xml =
+          REPLACE(mediapackage_xml, '/paella/ui/watch.html?id=', '/watch/')
+          WHERE INSTR(mediapackage_xml, '/paella/ui/watch.html?id=') > 0;
+        UPDATE oc_assets_snapshot
+          SET mediapackage_xml =
+          REPLACE(mediapackage_xml, '/engage/ui/watch.html?id=', '/watch/')
+          WHERE INSTR(mediapackage_xml, '/engage/ui/watch.html?id=') > 0;
+
+Please ensure to execute these steps before rebuilding the index.
+
+
 Rebuild the Elastic Search Indexes
 ----------------------------------
 
@@ -89,4 +141,3 @@ Due to [MH-13396](https://opencast.jira.com/browse/MH-13396), the configuration 
 the Admin UI and the External API have changed.
 
 Therefore, those indexes both need to be rebuilt.
-

@@ -103,9 +103,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   /** The engage base url property **/
   static final String ENGAGE_URL_PROPERTY = "org.opencastproject.engage.ui.url";
   /** The default path to the player **/
-  static final String DEFAULT_PLAYER_PATH = "/engage/ui/watch.html";
-  /** The configuration property value for the player location. */
-  static final String PLAYER_PROPERTY = "player";
+  static final String PLAYER_PATH = "/watch/";
 
   /** Default values for configuration options */
   private static final String DEFAULT_STREAM_MIME_TYPE = "video/mp4";
@@ -679,10 +677,8 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   void addLivePublicationChannel(Organization currentOrg, MediaPackage mp) throws LiveScheduleException {
     logger.debug("Adding live channel publication element to media package {}", mp);
     String engageUrlString = null;
-    String playerPath = null;
     if (currentOrg != null) {
       engageUrlString = StringUtils.trimToNull(currentOrg.getProperties().get(ENGAGE_URL_PROPERTY));
-      playerPath = StringUtils.trimToNull(currentOrg.getProperties().get(PLAYER_PROPERTY));
     }
     if (engageUrlString == null) {
       engageUrlString = serverUrl;
@@ -690,12 +686,10 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
               "Using 'server.url' as a fallback for the non-existing organization level key '{}' for the publication url",
               ENGAGE_URL_PROPERTY);
     }
-    if (playerPath == null)
-      playerPath = DEFAULT_PLAYER_PATH;
 
     try {
       // Create new distribution element
-      URI engageUri = URIUtils.resolve(new URI(engageUrlString), playerPath + "?id=" + mp.getIdentifier().compact());
+      URI engageUri = URIUtils.resolve(new URI(engageUrlString), PLAYER_PATH + mp.getIdentifier().compact());
       Publication publicationElement = PublicationImpl.publication(UUID.randomUUID().toString(), CHANNEL_ID, engageUri,
               MimeTypes.parseMimeType("text/html"));
       mp.add(publicationElement);
