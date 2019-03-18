@@ -37,7 +37,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.scheduler.api.SchedulerEvent;
-import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
@@ -95,7 +94,6 @@ public final class SchedulerUtil {
       Opt<DublinCoreCatalog> episodeDublincore,
       Map<String, String> wfProperties,
       Map<String, String> finalCaProperties,
-      boolean optOut,
       AccessControlList acl) {
     List<String> userIdsList = new ArrayList<>(userIds);
     Collections.sort(userIdsList);
@@ -137,7 +135,6 @@ public final class SchedulerUtil {
       messageDigest.update(mkChecksumInput(entry.getKey()));
       messageDigest.update(mkChecksumInput(entry.getValue()));
     }
-    messageDigest.update(mkChecksumInput(optOut));
     return Checksum.convertToHex(messageDigest.digest());
   }
 
@@ -197,7 +194,6 @@ public final class SchedulerUtil {
     sb.append(CharUtils.LF);
 
     sb.append("Scheduling configuration").append(CharUtils.LF);
-    sb.append("- optout: ").append(technicalMetadata.isOptOut()).append(CharUtils.LF);
     for (Entry<String, String> entry : technicalMetadata.getCaptureAgentConfiguration().entrySet()) {
       sb.append("- ").append(entry.getKey()).append(": ").append(entry.getValue()).append(CharUtils.LF);
     }
@@ -290,14 +286,6 @@ public final class SchedulerUtil {
     @Override
     public Opt<MediaPackage> apply(ARecord record) {
       return record.getSnapshot().map(episodeToMp);
-    }
-  };
-
-
-  public static final Fn<String, ReviewStatus> toReviewStatus = new Fn<String, ReviewStatus>() {
-    @Override
-    public ReviewStatus apply(String reviewStatus) {
-      return ReviewStatus.valueOf(reviewStatus);
     }
   };
 

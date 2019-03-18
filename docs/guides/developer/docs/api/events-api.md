@@ -51,9 +51,9 @@ Sort Criteria       | Description
 `presenter`         | By the presenter of the event
 `start_date`        | By the start date of the event
 `end_date`          | By the end date of the event
-`review_status`     | By whether the event has been reviewed and approved or not
+`review_status`     | By whether the event has been reviewed and approved or not [DEPRECATED]
 `workflow_state`    | By the current processing state of the event. Is it scheduled to be recorded (INSTANTIATED), currently processing (RUNNING), paused waiting for a resource or user paused (PAUSED), cancelled (STOPPED), currently failing (FAILING), already failed (FAILED), or finally SUCCEEDED
-`scheduling_status` | By the current scheduling status of the event
+`scheduling_status` | By the current scheduling status of the event [DEPRECATED]
 `series_name`       | By the series name of the event
 `location`          | By the location (capture agent) that the event will be or has been recorded on
 

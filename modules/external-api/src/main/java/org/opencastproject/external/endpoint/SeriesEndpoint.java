@@ -366,8 +366,9 @@ public class SeriesEndpoint {
                 f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
                 f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
                 f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
-                f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))),
-                f("opt_out", v(s.isOptedOut())));
+                // For compatibility (MH-13405)
+                f("opt_out", false),
+                f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))));
       }
       else {
         responseContent = obj(
@@ -380,11 +381,12 @@ public class SeriesEndpoint {
                 f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
                 f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
                 f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
+                // For compatibility (MH-13405)
+                f("opt_out", false),
                 f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))),
                 f("language", v(s.getLanguage(), BLANK)),
                 f("license", v(s.getLicense(), BLANK)),
-                f("rightsholder", v(s.getRightsHolder(), BLANK)),
-                f("opt_out", v(s.isOptedOut())));
+                f("rightsholder", v(s.getRightsHolder(), BLANK)));
       }
       return ApiResponses.Json.ok(requestedVersion, responseContent);
     }

@@ -234,33 +234,6 @@ public interface SeriesService {
   int getSeriesCount() throws SeriesException;
 
   /**
-   * Returns the opt out status of series with the given series id
-   *
-   * @param seriesId
-   *          the series id
-   * @return the opt out status
-   * @throws NotFoundException
-   *           if there is no series with specified series ID
-   * @throws SeriesException
-   *           if exception occurred
-   */
-  boolean isOptOut(String seriesId) throws NotFoundException, SeriesException;
-
-  /**
-   * Updates a series' opt out status.
-   *
-   * @param seriesId
-   *          The id of the series to update the opt out status of.
-   * @param optOut
-   *          Whether to opt out this series or not.
-   * @throws NotFoundException
-   *           if there is no series with specified series ID
-   * @throws SeriesException
-   *           if exception occurred
-   */
-  void updateOptOutStatus(String seriesId, boolean optOut) throws NotFoundException, SeriesException;
-
-  /**
    * Returns the properties for a series.
    *
    * @param seriesID

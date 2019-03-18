@@ -468,27 +468,6 @@ public interface IndexService {
   List<SeriesCatalogUIAdapter> getSeriesCatalogUIAdapters();
 
   /**
-   * Changes the opt out status of a single event (by its mediapackage id)
-   *
-   * @param eventId
-   *          The event's unique id formally the mediapackage id
-   * @param optout
-   *          Whether the event should be moved into opted out.
-   * @param index
-   *          The index to update the event in.
-   * @throws NotFoundException
-   *           Thrown if the event could not be found.
-   * @throws SchedulerException
-   *           Thrown if there was an error in the scheduler service
-   * @throws SearchIndexException
-   *           Thrown if there was and error in search index
-   * @throws UnauthorizedException
-   *           Thrown if the current user is unable to update the event.
-   */
-  void changeOptOutStatus(String eventId, boolean optout, AbstractSearchIndex index)
-          throws NotFoundException, SchedulerException, SearchIndexException, UnauthorizedException;
-
-  /**
    * Update only the common default series metadata.
    *
    * @param id

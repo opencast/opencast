@@ -135,10 +135,6 @@ public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<Series
       and(SeriesIndexSchema.RIGHTS_HOLDER, query.getRightsHolder());
     }
 
-    if (query.getOptedOut() != null) {
-      and(SeriesIndexSchema.OPT_OUT, query.getOptedOut());
-    }
-
     if (query.getTheme() != null) {
       and(SeriesIndexSchema.THEME, query.getTheme());
     }

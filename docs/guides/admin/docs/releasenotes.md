@@ -38,13 +38,19 @@ Configuration changes
 
 - …
 
+API changes
+-----------
 
-Additional Notes about 6.1
---------------------------
+Due to [MH-13397](https://opencast.jira.com/browse/MH-13397):
 
-Opencast 6.1 contains a number of bug fixes, some of which are security relevant. The following known vulnerabilities
-within Opencast's `com.fasterxml.jackson.core:jackson-databind` dependency have been fixed by this release:
-`CVE-2018-19361`, `CVE-2018-19362`, `CVE-2018-19360`.
+- Modified GET /recordings/{id}/technical.json: Removed field `optOut`
+- Removed GET /recordings/{id}/optOut
+- Removed GET /recordings/{id}/reviewStatus
+- Removed PUT /recordings/{id}/reviewStatus
+- Modified POST /recordings: Removed form parameter `optOut`
+- Modified POST /recordings/multiple: Removed form parameter `optOut`
+- Modified PUT /recordings/{id}: Removed form parameters `optOut` and `updateOptOut`
+- Removed GET /series/{id}/optOut
 
 
 Additional Notes about 6.2

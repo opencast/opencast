@@ -183,7 +183,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
         securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
 
         index.updateIndex(DublinCoreXmlFormat.read(series.getDublinCoreXML()));
-        index.updateOptOutStatus(series.getSeriesId(), series.isOptOut());
         String aclStr = series.getAccessControl();
         if (StringUtils.isNotBlank(aclStr)) {
           AccessControlList acl = AccessControlParser.parseAcl(aclStr);
@@ -229,11 +228,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
           if (acl != null) {
             index.updateSecurityPolicy(id, acl);
           }
-        } catch (NotFoundException ignore) {
-          // Ignore not found since this is the first indexing
-        }
-        try {
-          index.updateOptOutStatus(id, persistence.isOptOut(id));
         } catch (NotFoundException ignore) {
           // Ignore not found since this is the first indexing
         }
@@ -390,29 +384,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       return (int) index.count();
     } catch (SeriesServiceDatabaseException e) {
       logger.error("Exception occured while counting series.", e);
-      throw new SeriesException(e);
-    }
-  }
-
-  @Override
-  public boolean isOptOut(String seriesId) throws NotFoundException, SeriesException {
-    try {
-      return index.isOptOut(seriesId);
-    } catch (SeriesServiceDatabaseException e) {
-      logger.error("Exception occurred while getting opt out status of series '{}'", seriesId, e);
-      throw new SeriesException(e);
-    }
-  }
-
-  @Override
-  public void updateOptOutStatus(String seriesId, boolean optOut) throws NotFoundException, SeriesException {
-    try {
-      persistence.updateOptOutStatus(seriesId, optOut);
-      index.updateOptOutStatus(seriesId, optOut);
-      messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-              SeriesItem.updateOptOut(seriesId, optOut));
-    } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to update opt out status of series with id '{}'", seriesId, e);
       throw new SeriesException(e);
     }
   }
@@ -596,8 +567,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                       logger.error("Unable to parse series {} access control list", id, ex);
                     }
                   }
-                  messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                          SeriesItem.updateOptOut(id, series.isOptOut()));
                   try {
                     for (Entry<String, String> property : persistence.getSeriesProperties(id).entrySet()) {
                       messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,

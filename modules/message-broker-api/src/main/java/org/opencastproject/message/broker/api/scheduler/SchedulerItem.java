@@ -23,7 +23,6 @@ package org.opencastproject.message.broker.api.scheduler;
 
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
-import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 
@@ -57,17 +56,15 @@ public class SchedulerItem implements Serializable {
   private final String acl;
   private final String agentId;
   private final long end;
-  private final String optOut;
   private final String presenters;
-  private final String reviewStatus;
-  private final long reviewDate;
   private final String recordingState;
   private final long start;
   private final String lastHeardFrom;
   private final Type type;
 
   public enum Type {
-    UpdateCatalog, UpdateProperties, UpdateAcl, UpdateAgentId, UpdateOptOut, UpdateEnd, UpdatePresenters, UpdateReviewStatus, UpdateRecordingStatus, UpdateStart, DeleteRecordingStatus, Delete
+    UpdateCatalog, UpdateProperties, UpdateAcl, UpdateAgentId, UpdateEnd, UpdatePresenters, UpdateRecordingStatus,
+    UpdateStart, DeleteRecordingStatus, Delete
   };
 
   /**
@@ -102,27 +99,6 @@ public class SchedulerItem implements Serializable {
    */
   public static SchedulerItem updateAcl(AccessControlList accessControlList) {
     return new SchedulerItem(accessControlList);
-  }
-
-  /**
-   * @param optOut
-   *          the opt out status
-   * @return Builds {@link SchedulerItem} for updating the opt out status of an event.
-   */
-  public static SchedulerItem updateOptOut(boolean optOut) {
-    return new SchedulerItem(optOut, Type.UpdateOptOut);
-  }
-
-  /**
-  /**
-   * @param reviewStatus
-   *          the review status
-   * @param reviewDate
-   *          the review date
-   * @return Builds {@link SchedulerItem} for updating the review status of an event.
-   */
-  public static SchedulerItem updateReviewStatus(ReviewStatus reviewStatus, Date reviewDate) {
-    return new SchedulerItem(reviewStatus, reviewDate);
   }
 
   /**
@@ -195,10 +171,7 @@ public class SchedulerItem implements Serializable {
     this.acl = null;
     this.agentId = null;
     this.end = -1;
-    this.optOut = null;
     this.presenters = null;
-    this.reviewStatus = null;
-    this.reviewDate = -1;
     this.recordingState = null;
     this.start = -1;
     this.lastHeardFrom = null;
@@ -217,10 +190,7 @@ public class SchedulerItem implements Serializable {
     this.acl = null;
     this.agentId = null;
     this.end = -1;
-    this.optOut = null;
     this.presenters = null;
-    this.reviewStatus = null;
-    this.reviewDate = -1;
     this.recordingState = null;
     this.start = -1;
     this.lastHeardFrom = null;
@@ -237,10 +207,7 @@ public class SchedulerItem implements Serializable {
     this.acl = null;
     this.agentId = null;
     this.end = -1;
-    this.optOut = null;
     this.presenters = null;
-    this.reviewStatus = null;
-    this.reviewDate = -1;
     this.recordingState = null;
     this.start = -1;
     this.lastHeardFrom = null;
@@ -263,66 +230,11 @@ public class SchedulerItem implements Serializable {
     }
     this.agentId = null;
     this.end = -1;
-    this.optOut = null;
     this.presenters = null;
-    this.reviewStatus = null;
-    this.reviewDate = -1;
     this.recordingState = null;
     this.start = -1;
     this.lastHeardFrom = null;
     this.type = Type.UpdateAcl;
-  }
-
-  /**
-   * Constructor to build an opt out status event.
-   *
-   * @param x
-   *          The opt out status
-   * @param type
-   *          The type of boolean to set
-   */
-  public SchedulerItem(boolean x, Type type) {
-    this.event = null;
-    this.properties = null;
-    this.acl = null;
-    this.agentId = null;
-    this.end = -1;
-    if (type == Type.UpdateOptOut) {
-      this.optOut = gson.toJson(x);
-    } else {
-      this.optOut = null;
-    }
-    this.presenters = null;
-    this.reviewStatus = null;
-    this.reviewDate = -1;
-    this.recordingState = null;
-    this.start = -1;
-    this.lastHeardFrom = null;
-    this.type = type;
-  }
-
-  /**
-   * Constructor to build an update review status event {@link SchedulerItem}.
-   *
-   * @param reviewStatus
-   *          The review status
-   * @param reviewDate
-   *          The review date
-   */
-  public SchedulerItem(ReviewStatus reviewStatus, Date reviewDate) {
-    this.event = null;
-    this.properties = null;
-    this.acl = null;
-    this.agentId = null;
-    this.end = -1;
-    this.optOut = null;
-    this.presenters = null;
-    this.reviewStatus = reviewStatus.toString();
-    this.reviewDate = reviewDate == null ? -1 : reviewDate.getTime();
-    this.recordingState = null;
-    this.start = -1;
-    this.lastHeardFrom = null;
-    this.type = Type.UpdateReviewStatus;
   }
 
   /**
@@ -339,10 +251,7 @@ public class SchedulerItem implements Serializable {
     this.acl = null;
     this.agentId = null;
     this.end = -1;
-    this.optOut = null;
     this.presenters = null;
-    this.reviewStatus = null;
-    this.reviewDate = -1;
     this.recordingState = state;
     this.start = -1;
     this.lastHeardFrom = gson.toJson(lastHeardFrom);
@@ -355,12 +264,9 @@ public class SchedulerItem implements Serializable {
     this.agentId = null;
     this.end = end == null ? -1 : end.getTime();
     this.lastHeardFrom = null;
-    this.optOut = null;
     this.presenters = null;
     this.properties = null;
     this.recordingState = null;
-    this.reviewDate = -1;
-    this.reviewStatus = null;
     this.start = start == null ? -1 : start.getTime();
     this.type = type;
   }
@@ -371,12 +277,9 @@ public class SchedulerItem implements Serializable {
     this.agentId = agentId;
     this.end = -1;
     this.lastHeardFrom = null;
-    this.optOut = null;
     this.presenters = null;
     this.properties = null;
     this.recordingState = null;
-    this.reviewDate = -1;
-    this.reviewStatus = null;
     this.start = -1;
     this.type = Type.UpdateAgentId;
   }
@@ -387,12 +290,9 @@ public class SchedulerItem implements Serializable {
     this.agentId = null;
     this.end = -1;
     this.lastHeardFrom = null;
-    this.optOut = null;
     this.presenters = gson.toJson(presenters);
     this.properties = null;
     this.recordingState = null;
-    this.reviewDate = -1;
-    this.reviewStatus = null;
     this.start = -1;
     this.type = Type.UpdatePresenters;
   }
@@ -431,21 +331,9 @@ public class SchedulerItem implements Serializable {
     return gson.fromJson(lastHeardFrom, Long.class);
   }
 
-  public Boolean getOptOut() {
-    return gson.fromJson(optOut, Boolean.class);
-  }
-
   @SuppressWarnings("unchecked")
   public Set<String> getPresenters() {
     return gson.fromJson(presenters, Set.class);
-  }
-
-  public ReviewStatus getReviewStatus() {
-    return ReviewStatus.valueOf(reviewStatus);
-  }
-
-  public Date getReviewDate() {
-    return reviewDate < 0 ? null : new Date(reviewDate);
   }
 
   public String getRecordingState() {

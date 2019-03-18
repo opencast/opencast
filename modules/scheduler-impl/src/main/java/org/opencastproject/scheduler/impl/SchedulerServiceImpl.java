@@ -23,13 +23,11 @@ package org.opencastproject.scheduler.impl;
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.some;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.opencastproject.scheduler.api.SchedulerService.ReviewStatus.UNSENT;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.calculateChecksum;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.episodeToMp;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.eventOrganizationFilter;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.isNotEpisodeDublinCore;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.recordToMp;
-import static org.opencastproject.scheduler.impl.SchedulerUtil.toReviewStatus;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.uiAdapterToFlavor;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.Log.getHumanReadableTimeString;
@@ -96,7 +94,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
@@ -410,15 +407,15 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Override
   public void addEvent(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
           MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
-          Opt<Boolean> optOutStatus, Opt<String> schedulingSource)
+          Opt<String> schedulingSource)
                   throws UnauthorizedException, SchedulerException {
     addEventInternal(startDateTime, endDateTime, captureAgentId, userIds, mediaPackage, wfProperties, caMetadata,
-            optOutStatus, schedulingSource);
+            schedulingSource);
   }
 
   private void addEventInternal(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
           MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
-          Opt<Boolean> optOutStatus, Opt<String> schedulingSource)
+          Opt<String> schedulingSource)
                   throws SchedulerException {
     notNull(startDateTime, "startDateTime");
     notNull(endDateTime, "endDateTime");
@@ -427,7 +424,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(mediaPackage, "mediaPackage");
     notNull(wfProperties, "wfProperties");
     notNull(caMetadata, "caMetadata");
-    notNull(optOutStatus, "optOutStatus");
     notNull(schedulingSource, "schedulingSource");
     if (endDateTime.before(startDateTime))
       throw new IllegalArgumentException("The end date is before the start date");
@@ -447,17 +443,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       Opt<String> seriesId = Opt.nul(StringUtils.trimToNull(mediaPackage.getSeries()));
 
-      // Get opt out status
-      boolean optOut = getOptOutStatus(seriesId, optOutStatus);
-
-      // Check for conflicting events if not opted out
-      if (!optOut) {
-        List<MediaPackage> conflictingEvents = findConflictingEvents(captureAgentId, startDateTime, endDateTime);
-        if (conflictingEvents.size() > 0) {
-          logger.info("Unable to add event {}, conflicting events found: {}", mediaPackageId, conflictingEvents);
-          throw new SchedulerConflictException(
-                  "Unable to add event, conflicting events found for event " + mediaPackageId);
-        }
+      List<MediaPackage> conflictingEvents = findConflictingEvents(captureAgentId, startDateTime, endDateTime);
+      if (conflictingEvents.size() > 0) {
+        logger.info("Unable to add event {}, conflicting events found: {}", mediaPackageId, conflictingEvents);
+        throw new SchedulerConflictException(
+                "Unable to add event, conflicting events found for event " + mediaPackageId);
       }
 
       // Load dublincore and acl for update
@@ -470,16 +460,15 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       // Persist asset
       String checksum = calculateChecksum(workspace, getEventCatalogUIAdapterFlavors(), startDateTime, endDateTime,
-                                          captureAgentId, userIds, mediaPackage, dublinCore, wfProperties, finalCaProperties, optOut,
-                                          acl);
+                                          captureAgentId, userIds, mediaPackage, dublinCore, wfProperties,
+                                          finalCaProperties, acl);
       persistEvent(mediaPackageId, checksum, Opt.some(startDateTime), Opt.some(endDateTime),
               Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
-              Opt.some(finalCaProperties), Opt.some(optOut), schedulingSource);
+              Opt.some(finalCaProperties), schedulingSource);
 
       // Send updates
-      sendUpdateAddEvent(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime),
-              Opt.some(endDateTime), Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties),
-              Opt.some(optOut));
+      sendUpdateAddEvent(mediaPackageId, Opt.some(acl), dublinCore, Opt.some(startDateTime),
+              Opt.some(endDateTime), Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties));
 
       // Update last modified
       touchLastEntry(captureAgentId);
@@ -494,21 +483,20 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Override
   public Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
           String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
-          Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource)
+          Map<String, String> caMetadata, Opt<String> schedulingSource)
           throws UnauthorizedException, SchedulerConflictException, SchedulerException {
     // input Rrule is UTC. Needs to be adjusted to tz
     Util.adjustRrule(rRule, start, tz);
     List<Period> periods = Util.calculatePeriods(start, end, duration, rRule, tz);
     return addMultipleEventInternal(periods, captureAgentId, userIds, templateMp, wfProperties, caMetadata,
-            optOut, schedulingSource);
+            schedulingSource);
   }
 
 
 
   private Map<String, Period> addMultipleEventInternal(List<Period> periods, String captureAgentId,
           Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
-          Map<String, String> caMetadata, Opt<Boolean> optOutStatus,
-          Opt<String> schedulingSource) throws SchedulerException {
+          Map<String, String> caMetadata, Opt<String> schedulingSource) throws SchedulerException {
     notNull(periods, "periods");
     requireTrue(periods.size() > 0, "periods");
     notEmpty(captureAgentId, "captureAgentId");
@@ -516,7 +504,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(templateMp, "mediaPackages");
     notNull(wfProperties, "wfProperties");
     notNull(caMetadata, "caMetadata");
-    notNull(optOutStatus, "optOutStatus");
     notNull(schedulingSource, "schedulingSource");
 
     Map<String, Period> scheduledEvents = new ConcurrentHashMap<>();
@@ -549,16 +536,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
 
       Opt<String> seriesId = Opt.nul(StringUtils.trimToNull(templateMp.getSeries()));
-      // Get opt out status
-      boolean optOut = getOptOutStatus(seriesId, optOutStatus);
 
-      // Check for conflicting events if not opted out
-      if (!optOut) {
-        List<MediaPackage> conflictingEvents = findConflictingEvents(periods, captureAgentId, TimeZone.getDefault());
-        if (conflictingEvents.size() > 0) {
-          logger.info("Unable to add events, conflicting events found: {}", conflictingEvents);
-          throw new SchedulerConflictException("Unable to add event, conflicting events found");
-        }
+      List<MediaPackage> conflictingEvents = findConflictingEvents(periods, captureAgentId, TimeZone.getDefault());
+      if (conflictingEvents.size() > 0) {
+        logger.info("Unable to add events, conflicting events found: {}", conflictingEvents);
+        throw new SchedulerConflictException("Unable to add event, conflicting events found");
       }
 
       final Organization org = securityService.getOrganization();
@@ -617,17 +599,18 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
         // Persist asset
         String checksum = calculateChecksum(workspace, getEventCatalogUIAdapterFlavors(), startDateTime, endDateTime,
-                captureAgentId, userIds, mediaPackage, dublinCore, wfProperties, finalCaProperties, optOut, acl);
+                captureAgentId, userIds, mediaPackage, dublinCore, wfProperties, finalCaProperties, acl);
         try {
-          persistEvent(mediaPackageId, checksum, Opt.some(startDateTime), Opt.some(endDateTime), Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
-                Opt.some(finalCaProperties), Opt.some(optOut), schedulingSource);
+          persistEvent(mediaPackageId, checksum, Opt.some(startDateTime), Opt.some(endDateTime),
+                Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
+                Opt.some(finalCaProperties), schedulingSource);
         } catch (Exception e) {
           Misc.chuck(e);
         }
 
         // Send updates
         sendUpdateAddEvent(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
-                Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.some(optOut));
+                Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties));
 
         scheduledEvents.put(mediaPackageId, event);
         for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
@@ -654,15 +637,15 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Override
   public void updateEvent(final String mpId, Opt<Date> startDateTime, Opt<Date> endDateTime, Opt<String> captureAgentId,
           Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
-          Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOutOption)
+          Opt<Map<String, String>> caMetadata)
                   throws NotFoundException, UnauthorizedException, SchedulerException {
     updateEventInternal(mpId, startDateTime, endDateTime, captureAgentId, userIds, mediaPackage,
-            wfProperties, caMetadata, optOutOption);
+            wfProperties, caMetadata);
   }
 
   private void updateEventInternal(final String mpId, Opt<Date> startDateTime,
           Opt<Date> endDateTime, Opt<String> captureAgentId, Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage,
-          Opt<Map<String, String>> wfProperties, Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOutOption
+          Opt<Map<String, String>> wfProperties, Opt<Map<String, String>> caMetadata
   ) throws NotFoundException, SchedulerException {
     notEmpty(mpId, "mpId");
     notNull(startDateTime, "startDateTime");
@@ -672,7 +655,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(mediaPackage, "mediaPackage");
     notNull(wfProperties, "wfProperties");
     notNull(caMetadata, "caMetadata");
-    notNull(optOutOption, "optOutStatus");
 
     try {
       AQueryBuilder query = assetManager.createQuery();
@@ -705,25 +687,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       String agentId = extendedEventDto.getCaptureAgentId();
       Opt<String> seriesId = Opt.nul(record.getSnapshot().get().getMediaPackage().getSeries());
-      boolean oldOptOut = extendedEventDto.getOptOut();
 
-      // Get opt out status
-      Opt<Boolean> optOut = Opt.none();
-      for (Opt<Boolean> optOutToUpdate : optOutOption) {
-        optOut = Opt.some(getOptOutStatus(seriesId, optOutToUpdate));
-      }
-
-      // Set to opted out
-      boolean isNewOptOut = optOut.isSome() && optOut.get();
-
-      // Changed to ready for recording
-      boolean readyForRecording = optOut.isSome() && !optOut.get();
-
-      // Has a conflict related property be changed?
-      boolean propertyChanged = captureAgentId.isSome() || startDateTime.isSome() || endDateTime.isSome();
-
-      // Check for conflicting events
-      if (!isNewOptOut && readyForRecording || !isNewOptOut && propertyChanged && !oldOptOut) {
+      // Check scheduling conficts in case a property relevant for conflicts has changed
+      if (captureAgentId.isSome() || startDateTime.isSome() || endDateTime.isSome()) {
         List<MediaPackage> conflictingEvents = $(findConflictingEvents(captureAgentId.getOr(agentId),
                 startDateTime.getOr(start), endDateTime.getOr(end))).filter(new Fn<MediaPackage, Boolean>() {
                     @Override
@@ -794,7 +760,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               endDateTime.getOr(end), captureAgentId.getOr(agentId), userIds.getOr(presenters),
               mediaPackage.getOr(record.getSnapshot().get().getMediaPackage()),
               some(dublinCore.getOr(dublinCoreOpt.get())), wfProperties.getOr(wfProps),
-              finalCaProperties.getOr(caProperties), optOut.getOr(oldOptOut), acl.getOr(new AccessControlList()));
+              finalCaProperties.getOr(caProperties), acl.getOr(new AccessControlList()));
 
       String oldChecksum = extendedEventDto.getChecksum();
       if (checksum.equals(oldChecksum)) {
@@ -804,14 +770,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       // Update asset
       persistEvent(mpId, checksum, startDateTime, endDateTime, captureAgentId, userIds,
-              mediaPackage, wfProperties, finalCaProperties, optOut, Opt.<String> none());
+              mediaPackage, wfProperties, finalCaProperties, Opt.<String> none());
 
       // Send updates
       sendUpdateAddEvent(mpId, acl, dublinCore, startDateTime, endDateTime, userIds, Opt.some(agentId),
-              finalCaProperties, optOut);
+              finalCaProperties);
       // Update last modified
-      if (propertiesChanged || dublinCoreChanged || optOutOption.isSome() || startDateTime.isSome()
-              || endDateTime.isSome()) {
+      if (propertiesChanged || dublinCoreChanged || startDateTime.isSome() || endDateTime.isSome()) {
         touchLastEntry(agentId);
         for (String agent : captureAgentId) {
           touchLastEntry(agent);
@@ -1046,23 +1011,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public boolean isOptOut(String mediaPackageId) throws NotFoundException, SchedulerException {
-    notEmpty(mediaPackageId, "mediaPackageId");
-
-    try {
-      Opt<ExtendedEventDto> optExtEvt = persistence.getEvent(mediaPackageId);
-      if (optExtEvt.isNone())
-        throw new NotFoundException();
-
-      return optExtEvt.get().getOptOut();
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException(e);
-    }
-  }
-
-  @Override
   public int getEventCount() throws SchedulerException {
     try {
       return persistence.countEvents();
@@ -1205,11 +1153,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           continue;
         }
 
-        if (searchResult.get(record.getMediaPackageId()).getOptOut()) {
-          logger.debug("event '{}' is opted out. Skipping.", record.getMediaPackageId());
-          continue;
-        }
-
         if (seriesId.isSome() && !seriesId.get().equals(optMp.get().getSeries())) {
           continue;
         }
@@ -1248,62 +1191,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       return cal.getCalendar().toString();
 
-    } catch (Exception e) {
-      throw new SchedulerException(e);
-    }
-  }
-
-  @Override
-  public void updateReviewStatus(String mediaPackageId, ReviewStatus reviewStatus)
-          throws NotFoundException, SchedulerException {
-    notEmpty(mediaPackageId, "mediaPackageId");
-    notNull(reviewStatus, "reviewStatus");
-
-    try {
-      Date now = new Date();
-      if (persistence.getEvent(mediaPackageId).isNone()) {
-        throw new NotFoundException("Cannot update review status of non-existing event " + mediaPackageId);
-      }
-      persistence.storeEvent(
-          mediaPackageId,
-          securityService.getOrganization().getId(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.some(reviewStatus.toString()),
-          Opt.some(now),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none()
-      );
-
-      sendSchedulerMessage(SchedulerItemList
-              .singleton(mediaPackageId, SchedulerItem.updateReviewStatus(reviewStatus, now)));
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException(e);
-    }
-  }
-
-  @Override
-  public ReviewStatus getReviewStatus(String mediaPackageId) throws NotFoundException, SchedulerException {
-    notEmpty(mediaPackageId, "mediaPackageId");
-
-    try {
-      Opt<ExtendedEventDto> extEvt = persistence.getEvent(mediaPackageId);
-      if (extEvt.isNone()) {
-        throw new NotFoundException();
-      }
-      return Opt.nul(extEvt.get().getReviewStatus()).map(toReviewStatus).getOr(UNSENT);
-    } catch (NotFoundException e) {
-      throw e;
     } catch (Exception e) {
       throw new SchedulerException(e);
     }
@@ -1404,9 +1291,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           Opt.none(),
           Opt.none(),
           Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
           Opt.none()
       );
       return true;
@@ -1419,6 +1303,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   @Override
   public Recording getRecordingState(String id) throws NotFoundException, SchedulerException {
+
     notEmpty(id, "id");
 
     try {
@@ -1468,7 +1353,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           final Opt<Date> startDateTime, final Opt<Date> endDateTime, final Opt<String> captureAgentId,
           final Opt<Set<String>> userIds, final Opt<MediaPackage> mediaPackage,
           final Opt<Map<String, String>> wfProperties, final Opt<Map<String, String>> caProperties,
-          final Opt<Boolean> optOut, final Opt<String> schedulingSource) throws SchedulerServiceDatabaseException {
+          final Opt<String> schedulingSource) throws SchedulerServiceDatabaseException {
     // Store scheduled mediapackage
     for (MediaPackage mpToUpdate : mediaPackage) {
       assetManager.takeSnapshot(SNAPSHOT_OWNER, mpToUpdate);
@@ -1484,10 +1369,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         schedulingSource,
         Opt.none(),
         Opt.none(),
-        Opt.none(),
-        Opt.none(),
         userIds.isSome() ? Opt.some(String.join(",", userIds.get())) : Opt.none(),
-        optOut,
         Opt.some(new Date()),
         Opt.some(checksum),
         wfProperties,
@@ -1496,7 +1378,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   private List<SchedulerItem> updateAddEventItems(Opt<AccessControlList> acl, Opt<DublinCoreCatalog> dublinCore, Opt<Date> startTime, Opt<Date> endTime, Opt<Set<String>> presenters,
-          Opt<String> agentId, Opt<Map<String, String>> properties, Opt<Boolean> optOut) {
+          Opt<String> agentId, Opt<Map<String, String>> properties) {
     List<SchedulerItem> items = new ArrayList<>();
     if (acl.isSome()) {
       items.add(SchedulerItem.updateAcl(acl.get()));
@@ -1519,30 +1401,16 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     if (properties.isSome()) {
       items.add(SchedulerItem.updateProperties(properties.get()));
     }
-    if (optOut.isSome()) {
-      items.add(SchedulerItem.updateOptOut(optOut.get()));
-    }
     return items;
   }
 
   private void sendUpdateAddEvent(String mpId, Opt<AccessControlList> acl, Opt<DublinCoreCatalog> dublinCore,
           Opt<Date> startTime, Opt<Date> endTime, Opt<Set<String>> presenters, Opt<String> agentId,
-          Opt<Map<String, String>> properties, Opt<Boolean> optOut) {
+          Opt<Map<String, String>> properties) {
     List<SchedulerItem> items = updateAddEventItems(acl, dublinCore, startTime, endTime, presenters, agentId,
-            properties, optOut);
+            properties);
     if (!items.isEmpty()) {
       sendSchedulerMessage(new SchedulerItemList(mpId, items.toArray(new SchedulerItem[0])));
-    }
-  }
-
-  private boolean getOptOutStatus(Opt<String> seriesId, Opt<Boolean> optOutStatus)
-          throws NotFoundException, SeriesException {
-    if (optOutStatus.isSome()) {
-      return optOutStatus.get();
-    } else if (seriesId.isSome()) {
-      return seriesService.isOptOut(seriesId.get());
-    } else {
-      return false;
     }
   }
 
@@ -1646,7 +1514,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   private TechnicalMetadata getTechnicalMetadata(ExtendedEventDto extEvt) {
     final String agentId = extEvt.getCaptureAgentId();
-    final boolean optOut = extEvt.getOptOut();
     final Date start = extEvt.getStartDate();
     final Date end = extEvt.getEndDate();
     final Set<String> presenters = getPresenters(Opt.nul(extEvt.getPresenters()).getOr(""));
@@ -1659,7 +1526,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     if (recordingStatus.isSome() && lastHeard.isSome())
       recording = new RecordingImpl(extEvt.getMediaPackageId(), recordingStatus.get(), lastHeard.get());
 
-    return new TechnicalMetadataImpl(extEvt.getMediaPackageId(), agentId, start, end, optOut, presenters, wfProperties,
+    return new TechnicalMetadataImpl(extEvt.getMediaPackageId(), agentId, start, end, presenters, wfProperties,
             caMetadata, Opt.nul(recording));
   }
 
@@ -1743,26 +1610,19 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
             final ExtendedEventDto extEvt = optExtEvt.get();
             String agentId = extEvt.getCaptureAgentId();
-            boolean optOut = extEvt.getOptOut();
             Date start = extEvt.getStartDate();
             Date end = extEvt.getEndDate();
             Set<String> presenters = getPresenters(Opt.nul(extEvt.getPresenters()).getOr(""));
             Map<String, String> caMetadata = deserializeExtendedEventProperties(extEvt.getCaptureAgentProperties());
-            ReviewStatus reviewStatus = Opt.nul(extEvt.getReviewStatus()).map(toReviewStatus).getOr(UNSENT);
-            Date reviewDate = extEvt.getReviewDate();
             Opt<String> recordingStatus = Opt.nul(extEvt.getRecordingState());
             Opt<Long> lastHeard = Opt.nul(extEvt.getRecordingLastHeard());
 
             Opt<AccessControlList> acl = loadEpisodeAclFromAsset(snapshot);
             Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
 
-            final List<SchedulerItem> indexItems = Arrays
-                    .asList(SchedulerItem.updateReviewStatus(reviewStatus, reviewDate));
-            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                    new SchedulerItemList(record.getMediaPackageId(), indexItems.toArray(new SchedulerItem[0])));
             final List<SchedulerItem> schedulerItems = new ArrayList<>(
                     updateAddEventItems(acl, dublinCore, Opt.some(start), Opt.some(end),
-                            Opt.some(presenters), Opt.some(agentId), Opt.some(caMetadata), Opt.some(optOut)));
+                            Opt.some(presenters), Opt.some(agentId), Opt.some(caMetadata)));
             if (recordingStatus.isSome() && lastHeard.isSome()) {
               schedulerItems.addAll(recordingUpdateMessages(new RecordingImpl(record.getMediaPackageId(), recordingStatus.get(), lastHeard.get())));
             }

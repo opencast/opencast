@@ -1,7 +1,6 @@
 [
   {
     "eventId": "first",
-    "optOut": false,
     "agentId": "agent1",
     "agentConfiguration": {
       "test": "true",
@@ -16,7 +15,6 @@
   },
   {
     "eventId": "second",
-    "optOut": false,
     "agentId": "agent1",
     "agentConfiguration": {
       "test": "true",

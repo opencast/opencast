@@ -84,7 +84,7 @@ public class AbstractEventEndpointTest {
             // TODO: add all serialised props to mock and check here
             .body("id", equalTo("asdasd")).body("title", equalTo("title"))
             .body("event_status", equalTo("EVENTS.EVENTS.STATUS.ARCHIVE")).body("has_preview", equalTo(false))
-            .body("review_status", equalTo("UNSENT")).body("has_open_comments", equalTo(false))
+            .body("has_open_comments", equalTo(false))
             .body("series.id", equalTo("seriesId")).body("technical_start", equalTo("2013-03-20T04:00:00Z"))
             .body("start_date", equalTo("2013-03-20T04:00:00Z")).when().get(rt.host("/{eventId}"));
 
@@ -127,16 +127,6 @@ public class AbstractEventEndpointTest {
 
     String result = given().pathParam("eventId", "asdasd").pathParam("commentId", 33).expect()
             .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/comment/{commentId}")).asString();
-
-    assertThat(eventString, SameJSONAs.sameJSONAs(result));
-  }
-
-  @Test
-  public void testGetEventParticipation() throws Exception {
-    String eventString = IOUtils.toString(getClass().getResource("/eventParticipation.json"));
-
-    String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/participation.json")).asString();
 
     assertThat(eventString, SameJSONAs.sameJSONAs(result));
   }

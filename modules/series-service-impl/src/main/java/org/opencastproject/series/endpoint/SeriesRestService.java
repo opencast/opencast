@@ -84,7 +84,6 @@ import java.text.ParseException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -99,7 +98,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 /**
  * REST endpoint for Series Service.
@@ -415,24 +413,6 @@ public class SeriesRestService {
       logger.warn("Could not update ACL for {}: {}", seriesID, e.getMessage());
     }
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-  }
-
-  @GET
-  @Path("{id}/optOut")
-  @RestQuery(name = "IsOptOut", description = "Returns true if the series is opted out", returnDescription = "True if opted out, false if not", pathParameters = { @RestParameter(name = "id", description = "ID of series", isRequired = true, type = Type.STRING) }, reponses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The Series opt out status"),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Series with specified ID does not exist") })
-  public Response getOptOut(@PathParam("id") String seriesId) {
-    try {
-      boolean optedOut = seriesService.isOptOut(seriesId);
-      return Response.ok(Boolean.toString(optedOut)).build();
-    } catch (NotFoundException e) {
-      logger.warn("Series with id '{}' does not exist.", seriesId);
-      return Response.status(Status.NOT_FOUND).build();
-    } catch (Exception e) {
-      logger.warn("Unable to get series opt out status with id '{}'", seriesId, e);
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
   }
 
   @DELETE

@@ -35,7 +35,7 @@
       "email": "pm.user.1@example.com",
       "manageable": true,
       "name": "•mock• PM User 1",
-      "provider": "participation",
+      "provider": "system",
       "personId": 1,
       "roles": [
         {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
@@ -47,7 +47,7 @@
       "email": "pm.user.2@example.com",
       "manageable": true,
       "name": "•mock• PM User 2",
-      "provider": "participation",
+      "provider": "system",
       "personId": 2,
       "roles": [
         {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
@@ -59,7 +59,7 @@
       "email": "pm.user.3@example.com",
       "manageable": true,
       "name": "•mock• PM User 3",
-      "provider": "participation",
+      "provider": "system",
       "personId": 3,
       "roles": [
         {"name": "•mock• ROLE_USER", "type": "INTERNAL"},

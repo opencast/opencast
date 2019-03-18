@@ -10,10 +10,7 @@ CREATE TABLE oc_scheduled_extended_event (
   source VARCHAR(255),
   recording_state VARCHAR(255),
   recording_last_heard BIGINT,
-  review_status VARCHAR(128),
-  review_date DATETIME,
   presenters TEXT(65535),
-  optout TINYINT(1),
   last_modified_date DATETIME,
   checksum VARCHAR(64),
   capture_agent_properties MEDIUMTEXT,
@@ -28,6 +25,9 @@ DELETE FROM oc_assets_properties WHERE namespace = 'org.opencastproject.schedule
 
 ALTER TABLE oc_job DROP COLUMN blocking_job;
 DROP TABLE oc_blocking_job;
+
+-- Due to MH-13397 Remove unfinished feature "Participation Management"
+ALTER TABLE oc_series DROP COLUMN opt_out;
 
 -- Due to MH-13431 Remove unfinished feature "Bulk Messaging"
 DROP TABLE oc_email_configuration;

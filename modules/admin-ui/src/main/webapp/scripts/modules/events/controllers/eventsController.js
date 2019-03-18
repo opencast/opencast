@@ -85,7 +85,7 @@ angular.module('adminNg.controllers')
       }, {
         template: 'modules/events/partials/eventsStatusCell.html',
         name:  'event_status',
-        label: 'EVENTS.EVENTS.TABLE.SCHEDULING_STATUS',
+        label: 'EVENTS.EVENTS.TABLE.STATUS',
         sortable: true
       }, {
         template: 'modules/events/partials/eventActionsCell.html',

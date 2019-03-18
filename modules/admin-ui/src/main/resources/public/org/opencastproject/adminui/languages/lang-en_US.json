@@ -143,11 +143,6 @@
      "SERIES_ACL_LOCKED": "Editing Access Policies is not allowed when operations are running on an event that is part of the series",
      "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
      "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
-     "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "The event opt-out status has been successfully updated.",
-     "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Error while updating the event opt-out status.",
-     "EVENT_PARTICIPATION_STATUS_READONLY": "The participation status can not be updated as the scheduling start date is in the past.",
-     "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "The series opt-out status has been successfully updated.",
-     "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Error while updating the series opt-out status.",
      "THEME_NAME_ALREADY_TAKEN": "This name is already in use",
      "THEME_NAME_EMPTY": "The name cannot be empty",
      "BUMPER_UPLOAD_ERROR": "Error while uploading media",
@@ -177,11 +172,6 @@
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
       "WARNING":"Warning",
-      "EDIT_STATUS": {
-          "CAPTION": "Edit Status",
-          "READY_FOR_RECORDING": "Ready for recording",
-          "OPTED_OUT": "Opted-out"
-      },
       "DELETE": {
           "SERIES": {
             "CAPTION": "Delete",
@@ -483,9 +473,7 @@
          "LAST":     "Last",
          "NEXT":     "Next",
          "MANAGED_ACL": "Access policy",
-         "SCHEDULING_STATUS": "Status",
          "WORKFLOW_STATE": "Progress",
-         "REVIEW_STATUS": "Review status",
          "PREVIOUS": "Previous",
          "NOCONTENT": "No data available",
          "PUBLISHED": "Published",
@@ -504,13 +492,8 @@
            "PRESENTER": "Filter for this presenter"
          }
        },
-       "SCHEDULING_STATUS": {
-         "READY_FOR_RECORDING": "Ready for recording",
-         "OPTED_OUT": "Opted-out"
-       },
        "STATUS": {
          "SCHEDULED": "Scheduled",
-         "OPTEDOUT": "Opted out",
          "RECORDING": "Recording",
          "UPLOADING": "Uploading",
          "INGESTING": "Ingesting",
@@ -539,9 +522,6 @@
            "NO_PUBLICATIONS_AVAILABLE":  "This event has not been published",
            "PUBLICATION_DESCRIPTION":    "This event has been published to the following publication channels:",
            "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
-           "SCHEDULING_STATUS":          "Status",
-           "READY_FOR_RECORDING":        "Ready for recording",
-           "OPTED_OUT":                  "Opted-out",
            "CUSTOM":                     "Custom",
            "ENGAGE":                     "Engage",
            "ENGAGE_LIVE":                "Engage Live",
@@ -808,14 +788,6 @@
          },
           "SCHEDULING": {
             "CAPTION": "Scheduling configuration",
-            "REVIEW_STATUS": {
-              "CAPTION": "Review status"
-            },
-            "OPTEDOUT": {
-              "CAPTION": "Opted-out Status",
-              "READY": "Ready for recording",
-              "OPTEDOUT": "Opted out"
-            },
             "PLACEHOLDER": {
               "PRESENTERS": "Presenter(s)"
            }
@@ -1006,7 +978,6 @@
           "TABS": {
            "METADATA":    "Metadata",
            "EXTENDED_METADATA":    "Metadata II",
-           "PARTICIPATION": "Participation",
            "EVENTS":      "Events",
            "PERMISSIONS": "Access policy",
            "THEME": "Theme"
@@ -1052,24 +1023,6 @@
            "LICENSE":        "License",
            "DESCRIPTION":    "Description"
          },
-         "PARTICIPATION": {
-            "CAPTION": "Participation status template",
-            "WARNING_TEMPLATE": "Series participation status will be used as default value for new events that are part of the series.",
-            "REVIEW_STATUS": {
-              "CAPTION": "Review status"
-            },
-            "OPTEDOUT": {
-              "CAPTION": "Opted-out Status",
-              "READY": "Ready for recording",
-              "OPTEDOUT": "Opted out"
-            },
-            "MESSAGES": {
-              "CAPTION": "Messages",
-              "CREATION_DATE": "Creation date",
-              "SENDER": "Sender",
-              "SUBJECT": "Subject"
-            }
-          },
          "EVENTS": {
            "TITLE":     "Title",
            "PRESENTER": "Presenter(s)",
@@ -1741,9 +1694,6 @@
        "LOCATION": {
          "LABEL": "Location"
        },
-       "OPTEDOUT": {
-         "LABEL": "Opted Out"
-       },
        "PERIOD": {
          "LABEL": "Period"
        },
@@ -1755,12 +1705,6 @@
        },
        "PROGRESS": {
          "LABEL": "Progress"
-       },
-       "REVIEW_STATUS": {
-         "LABEL": "Review Status",
-         "CONFIRMED": "Confirmed",
-         "UNCONFIRMED": "Unconfirmed",
-         "UNSENT": "Unsent"
        },
        "SERIES": {
          "LABEL": "Series"

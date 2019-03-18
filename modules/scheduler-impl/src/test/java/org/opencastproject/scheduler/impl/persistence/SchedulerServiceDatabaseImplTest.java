@@ -100,10 +100,7 @@ public class SchedulerServiceDatabaseImplTest {
     final String source = "source";
     final String recordingState = "recordingState";
     final Long lastHeard = new Date().getTime();
-    final String reviewStatus = "reviewStatus";
-    final Date reviewDate = new Date();
     final String presenters = "Werner";
-    final Boolean optOut = true;
     final String lastModifiedOrigin = "lastModifiedOrigin";
     final Date lastModifiedDate = new Date();
     final String checksum = "checksum";
@@ -122,10 +119,7 @@ public class SchedulerServiceDatabaseImplTest {
         Opt.some(source),
         Opt.some(recordingState),
         Opt.some(lastHeard),
-        Opt.some(reviewStatus),
-        Opt.some(reviewDate),
         Opt.some(presenters),
-        Opt.some(optOut),
         Opt.some(lastModifiedDate),
         Opt.some(checksum),
         Opt.some(wfProperties),
@@ -141,10 +135,7 @@ public class SchedulerServiceDatabaseImplTest {
     Assert.assertEquals(source, newEvent.get().getSource());
     Assert.assertEquals(recordingState, newEvent.get().getRecordingState());
     Assert.assertEquals(lastHeard, newEvent.get().getRecordingLastHeard());
-    Assert.assertEquals(reviewStatus, newEvent.get().getReviewStatus());
-    Assert.assertEquals(reviewDate, newEvent.get().getReviewDate());
     Assert.assertEquals(presenters, newEvent.get().getPresenters());
-    Assert.assertEquals(optOut, newEvent.get().getOptOut());
     Assert.assertEquals(lastModifiedDate, newEvent.get().getLastModifiedDate());
     Assert.assertEquals(checksum, newEvent.get().getChecksum());
     Assert.assertEquals(new Gson().toJson(wfProperties), newEvent.get().getWorkflowProperties());
@@ -161,10 +152,7 @@ public class SchedulerServiceDatabaseImplTest {
     final String source = "source";
     final String recordingState = "recordingState";
     final Long lastHeard = new Date().getTime();
-    final String reviewStatus = "reviewStatus";
-    final Date reviewDate = new Date();
     final String presenters = "Werner";
-    final Boolean optOut = true;
     final String lastModifiedOrigin = "lastModifiedOrigin";
     final Date lastModifiedDate = new Date();
     final String checksum = "checksum";
@@ -183,10 +171,7 @@ public class SchedulerServiceDatabaseImplTest {
         Opt.some(source),
         Opt.some(recordingState),
         Opt.some(lastHeard),
-        Opt.some(reviewStatus),
-        Opt.some(reviewDate),
         Opt.some(presenters),
-        Opt.some(optOut),
         Opt.some(lastModifiedDate),
         Opt.some(checksum),
         Opt.some(wfProperties),
@@ -212,9 +197,6 @@ public class SchedulerServiceDatabaseImplTest {
         Opt.none(),
         Opt.none(),
         Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
         Opt.some(updatedCaProperties)
     );
     final Opt<ExtendedEventDto> updatedEvent = schedulerDatabase.getEvent(mpId);
@@ -227,10 +209,7 @@ public class SchedulerServiceDatabaseImplTest {
     Assert.assertEquals(source, updatedEvent.get().getSource());
     Assert.assertEquals(updatedRecordingState, updatedEvent.get().getRecordingState());
     Assert.assertEquals(lastHeard, updatedEvent.get().getRecordingLastHeard());
-    Assert.assertEquals(reviewStatus, updatedEvent.get().getReviewStatus());
-    Assert.assertEquals(reviewDate, updatedEvent.get().getReviewDate());
     Assert.assertEquals(presenters, updatedEvent.get().getPresenters());
-    Assert.assertEquals(optOut, updatedEvent.get().getOptOut());
     Assert.assertEquals(lastModifiedDate, updatedEvent.get().getLastModifiedDate());
     Assert.assertEquals(checksum, updatedEvent.get().getChecksum());
     Assert.assertEquals(new Gson().toJson(wfProperties), updatedEvent.get().getWorkflowProperties());
@@ -267,9 +246,6 @@ public class SchedulerServiceDatabaseImplTest {
           Opt.some(agentId),
           Opt.some(start),
           Opt.some(end),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
           Opt.none(),
           Opt.none(),
           Opt.none(),
@@ -320,9 +296,6 @@ public class SchedulerServiceDatabaseImplTest {
           Opt.some(agentId),
           Opt.some(start),
           Opt.some(end),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
           Opt.none(),
           Opt.none(),
           Opt.none(),
@@ -558,9 +531,6 @@ public class SchedulerServiceDatabaseImplTest {
           Opt.none(),
           Opt.none(),
           Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
           Opt.none()
       );
     }
@@ -608,9 +578,6 @@ public class SchedulerServiceDatabaseImplTest {
           Opt.some(agentIds[i % 2]),
           Opt.some(start),
           Opt.some(end),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
           Opt.none(),
           Opt.none(),
           Opt.none(),
@@ -693,9 +660,6 @@ public class SchedulerServiceDatabaseImplTest {
         Opt.none(),
         Opt.none(),
         Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
         Opt.none()
     );
     final Opt<ExtendedEventDto> initialEvent = schedulerDatabase.getEvent(mpId);
@@ -740,9 +704,6 @@ public class SchedulerServiceDatabaseImplTest {
           Opt.none(),
           Opt.none(),
           Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
           Opt.none()
       );
     }
@@ -764,10 +725,7 @@ public class SchedulerServiceDatabaseImplTest {
     final String source = "source";
     final String recordingState = "recordingState";
     final Long lastHeard = new Date().getTime();
-    final String reviewStatus = "reviewStatus";
-    final Date reviewDate = new Date();
     final String presenters = "Werner";
-    final Boolean optOut = true;
     final String lastModifiedOrigin = "lastModifiedOrigin";
     final Date lastModifiedDate = new Date();
     final String checksum = "checksum";
@@ -783,10 +741,7 @@ public class SchedulerServiceDatabaseImplTest {
         Opt.some(source),
         Opt.some(recordingState),
         Opt.some(lastHeard),
-        Opt.some(reviewStatus),
-        Opt.some(reviewDate),
         Opt.some(presenters),
-        Opt.some(optOut),
         Opt.some(lastModifiedDate),
         Opt.some(checksum),
         Opt.some(wfProperties),
@@ -805,10 +760,7 @@ public class SchedulerServiceDatabaseImplTest {
     Assert.assertEquals(source, updatedEvent.get().getSource());
     Assert.assertNull(updatedEvent.get().getRecordingState());
     Assert.assertNull(updatedEvent.get().getRecordingLastHeard());
-    Assert.assertEquals(reviewStatus, updatedEvent.get().getReviewStatus());
-    Assert.assertEquals(reviewDate, updatedEvent.get().getReviewDate());
     Assert.assertEquals(presenters, updatedEvent.get().getPresenters());
-    Assert.assertEquals(optOut, updatedEvent.get().getOptOut());
     Assert.assertEquals(lastModifiedDate, updatedEvent.get().getLastModifiedDate());
     Assert.assertEquals(checksum, updatedEvent.get().getChecksum());
     Assert.assertEquals(new Gson().toJson(wfProperties), updatedEvent.get().getWorkflowProperties());
@@ -837,9 +789,6 @@ public class SchedulerServiceDatabaseImplTest {
           Opt.some(agentId),
           Opt.some(start),
           Opt.some(end),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
           Opt.none(),
           Opt.none(),
           Opt.none(),

@@ -41,7 +41,6 @@ describe('Event controller', function () {
         $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/workflows.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/access.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/access.json')));
-        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/participation.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/components.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/eventUploadAssetOptions.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/resources/eventUploadAssetOptions.json')));

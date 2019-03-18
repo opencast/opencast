@@ -89,7 +89,6 @@ import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -491,7 +490,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
             EasyMock.anyObject(Date.class))).andReturn(events).anyTimes();
     schedulerService.updateEvent(EasyMock.anyString(), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
             EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
-            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class));
+            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class));
     EasyMock.expectLastCall().anyTimes();
     EasyMock.expect(schedulerService.getWorkflowConfig("asdasd")).andThrow(new NotFoundException()).anyTimes();
     Map<String, String> workFlowConfig = new HashMap<>();
@@ -511,7 +510,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     wfProperties.put("test", "false");
     wfProperties.put("skip", "true");
     TechnicalMetadata technicalMetadata = new TechnicalMetadataImpl("asdasd", "demo",
-            new Date(fromUTC("2017-01-27T10:00:37Z")), new Date(fromUTC("2017-01-27T10:10:37Z")), false, userIds,
+            new Date(fromUTC("2017-01-27T10:00:37Z")), new Date(fromUTC("2017-01-27T10:10:37Z")), userIds,
             wfProperties, caProperties, Opt.<Recording> none());
     expect(schedulerService.getTechnicalMetadata("notExists")).andThrow(new NotFoundException()).anyTimes();
     expect(schedulerService.getTechnicalMetadata(anyString())).andReturn(technicalMetadata).anyTimes();
@@ -534,7 +533,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     episodeDublinCoreCatalogUIAdapter.updated(toDictionary(episodeCatalogProperties));
 
     Series series = new Series();
-    series.setOptOut(true);
 
     Event event = createEvent("asdasd", "title", Source.SCHEDULE);
     Event event2 = createEvent("archivedid", "title 2", Source.ARCHIVE);
@@ -586,9 +584,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(event.getIdentifier()).andReturn(id).anyTimes();
     EasyMock.expect(event.getTitle()).andReturn(title).anyTimes();
     EasyMock.expect(event.getSeriesId()).andReturn("seriesId").anyTimes();
-    EasyMock.expect(event.getReviewStatus()).andReturn(ReviewStatus.UNSENT.toString()).anyTimes();
     EasyMock.expect(event.getEventStatus()).andReturn("EVENTS.EVENTS.STATUS.ARCHIVE").anyTimes();
-    EasyMock.expect(event.getOptedOut()).andReturn(true).anyTimes();
     EasyMock.expect(event.getRecordingStartDate()).andReturn("2013-03-20T04:00:00Z").anyTimes();
     EasyMock.expect(event.getRecordingEndDate()).andReturn("2013-03-20T05:00:00Z").anyTimes();
     EasyMock.expect(event.getTechnicalStartTime()).andReturn("2013-03-20T04:00:00Z").anyTimes();

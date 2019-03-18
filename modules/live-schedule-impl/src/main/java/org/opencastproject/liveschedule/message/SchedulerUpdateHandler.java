@@ -103,9 +103,7 @@ public class SchedulerUpdateHandler extends UpdateHandler {
             if (isLive(mpId))
               liveScheduleService.deleteLiveEvent(mpId);
           break;
-        case UpdateOptOut:
         case UpdatePresenters:
-        case UpdateReviewStatus:
           break;
         default:
           throw new IllegalArgumentException("Unhandled type of SchedulerItem");
