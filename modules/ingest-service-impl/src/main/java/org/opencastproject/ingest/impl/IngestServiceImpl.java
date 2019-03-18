@@ -56,8 +56,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.security.api.AccessControlEntry;
-import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -249,7 +247,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           .build();
 
   /** The default is to overwrite series catalog on ingest */
-  protected boolean defaultIsOverWriteSeries = true;
+  protected boolean defaultIsOverWriteSeries = false;
 
   /** Option to overwrite series on ingest */
   protected boolean isOverwriteSeries = defaultIsOverWriteSeries;
@@ -880,9 +878,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             logger.info("Creating new series {} with default ACL", id);
             seriesService.updateSeries(dc);
             isUpdated = true;
-            String anonymousRole = securityService.getOrganization().getAnonymousRole();
-            AccessControlList acl = new AccessControlList(new AccessControlEntry(anonymousRole, "read", true));
-            seriesService.updateAccessControl(id, acl);
           }
 
         } catch (Exception e) {

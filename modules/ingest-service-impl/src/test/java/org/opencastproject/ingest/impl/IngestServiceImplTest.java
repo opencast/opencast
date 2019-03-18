@@ -561,7 +561,7 @@ public class IngestServiceImplTest {
   private void testSeriesUpdateNewAndExisting(Dictionary<String, String> properties) throws Exception {
 
     // default expectation for series overwrite is True
-    boolean isExpectSeriesOverwrite = true;
+    boolean isExpectSeriesOverwrite = false;
 
     if (properties != null) {
       service.updated(properties);
@@ -596,7 +596,7 @@ public class IngestServiceImplTest {
     service.setSeriesService(seriesService);
 
     // This is true or false depending on the isOverwrite value
-    Assert.assertEquals("Desire to update series is " + String.valueOf(isExpectSeriesOverwrite) + ".",
+    Assert.assertEquals("Desire to update series is " + isExpectSeriesOverwrite + ".",
             isExpectSeriesOverwrite, service.updateSeries(urlCatalog2));
 
     // Test with mock not found exception
