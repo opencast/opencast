@@ -191,6 +191,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The key to look for in the service configuration file to override the {@link DEFAULT_INGEST_ZIP_JOB_LOAD} */
   public static final String ZIP_JOB_LOAD_KEY = "job.load.ingest.zip";
 
+  /** The default is to leave series catalogs untouched on ingest */
+  static final boolean DEFAULT_IS_OVERWRITE_SERIES = false;
+
   /** The approximate load placed on the system by ingesting a file */
   private float ingestFileJobLoad = DEFAULT_INGEST_FILE_JOB_LOAD;
 
@@ -246,11 +249,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   private Cache<String, Long> partialTrackStartTimes = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.DAYS)
           .build();
 
-  /** The default is to overwrite series catalog on ingest */
-  protected boolean defaultIsOverWriteSeries = false;
-
   /** Option to overwrite series on ingest */
-  protected boolean isOverwriteSeries = defaultIsOverWriteSeries;
+  protected boolean isOverwriteSeries = DEFAULT_IS_OVERWRITE_SERIES;
 
   /**
    * Creates a new ingest service instance.
@@ -304,7 +304,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       isOverwriteSeries = Boolean.parseBoolean(((String) properties.get(PROPKEY_OVERWRITE_SERIES)).trim());
     } catch (Exception e) {
-      isOverwriteSeries = defaultIsOverWriteSeries;
+      isOverwriteSeries = DEFAULT_IS_OVERWRITE_SERIES;
       logger.warn("Unable to update configuration. {}", e.getMessage());
     }
     logger.info("Configuration updated. It is {} that existing series will be overwritten during ingest.",

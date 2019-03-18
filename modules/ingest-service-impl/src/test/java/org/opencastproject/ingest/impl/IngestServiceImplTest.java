@@ -560,8 +560,8 @@ public class IngestServiceImplTest {
    */
   private void testSeriesUpdateNewAndExisting(Dictionary<String, String> properties) throws Exception {
 
-    // default expectation for series overwrite is True
-    boolean isExpectSeriesOverwrite = false;
+    // default expectation for series overwrite
+    boolean isExpectSeriesOverwrite = IngestServiceImpl.DEFAULT_IS_OVERWRITE_SERIES;
 
     if (properties != null) {
       service.updated(properties);
