@@ -171,6 +171,15 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  /** Supported streaming formats */
+  private static final Set<TrackImpl.StreamingProtocol> STREAMING_FORMATS = new HashSet<>(Arrays.asList(
+          TrackImpl.StreamingProtocol.RTMP,
+          TrackImpl.StreamingProtocol.RTMPE,
+          TrackImpl.StreamingProtocol.HLS,
+          TrackImpl.StreamingProtocol.DASH,
+          TrackImpl.StreamingProtocol.HDS,
+          TrackImpl.StreamingProtocol.SMOOTH));
+
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
@@ -605,20 +614,12 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Checks if the MediaPackage track transport protocol is a streaming format protocol
-   * @param element The MediapackageElement to analyze
+   * @param element The MediaPackageElement to analyze
    * @return true if it is a TrackImpl and has a streaming protocol as transport
    */
   private boolean isStreamingFormat(MediaPackageElement element) {
-    if (element instanceof TrackImpl) {
-      if (TrackImpl.StreamingProtocol.RTMP.equals(((TrackImpl) element).getTransport())
-          || TrackImpl.StreamingProtocol.RTMPE.equals(((TrackImpl) element).getTransport())
-          || TrackImpl.StreamingProtocol.HLS.equals(((TrackImpl) element).getTransport())
-          || TrackImpl.StreamingProtocol.DASH.equals(((TrackImpl) element).getTransport())
-          || TrackImpl.StreamingProtocol.HDS.equals(((TrackImpl) element).getTransport())
-          || TrackImpl.StreamingProtocol.SMOOTH.equals(((TrackImpl) element).getTransport()))
-        return true;
-    }
-    return false;
+    return element instanceof TrackImpl
+            && STREAMING_FORMATS.contains(((TrackImpl) element).getTransport());
   }
 
   /**
