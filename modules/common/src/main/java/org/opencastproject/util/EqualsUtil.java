@@ -25,6 +25,7 @@ package org.opencastproject.util;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /** Utility function helping to implement equality. */
@@ -33,13 +34,15 @@ public final class EqualsUtil {
   }
 
   /** Check if <code>a</code> and <code>b</code> are equal. Each of them may be null. */
+  @Deprecated
   public static boolean eqObj(Object a, Object b) {
-    return (a == b) || (a != null && a.equals(b));
+    return Objects.equals(a, b);
   }
 
   /** Check if <code>a</code> and <code>b</code> are equal. Each of them may be null. */
+  @Deprecated
   public static boolean eq(Object a, Object b) {
-    return (a == b) || (a != null && a.equals(b));
+    return Objects.equals(a, b);
   }
 
   /** Check if <code>a</code> and <code>b</code> are not equal. Each of them may be null. */
@@ -132,20 +135,9 @@ public final class EqualsUtil {
    * Create a hash code for a list of objects. Each of them may be null.
    * Algorithm adapted from "Programming in Scala, Second Edition", p670.
    */
+  @Deprecated
   public static int hash(Object... as) {
-    if (as == null)
-      return 0;
-    int hash = 0;
-    for (Object a : as) {
-      if (hash != 0)
-        hash = 41 * hash + hash1(a);
-      else
-        hash = 41 + hash1(a);
-    }
-    return hash;
+    return Objects.hash(as);
   }
 
-  private static int hash1(Object a) {
-    return a != null ? a.hashCode() : 0;
-  }
 }
