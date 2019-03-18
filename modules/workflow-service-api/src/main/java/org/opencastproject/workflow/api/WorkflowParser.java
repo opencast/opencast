@@ -161,43 +161,6 @@ public final class WorkflowParser {
   }
 
   /**
-   * Loads workflow statistics from the given input stream.
-   *
-   * @param in
-   *          the input stream
-   * @return the workflow statistics
-   * @throws WorkflowParsingException
-   *           if creating the workflow statistics fails
-   */
-  public static WorkflowStatistics parseWorkflowStatistics(InputStream in) throws WorkflowParsingException {
-    try {
-      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), WorkflowStatistics.class).getValue();
-    } catch (Exception e) {
-      throw new WorkflowParsingException(e);
-    } finally {
-      IoSupport.closeQuietly(in);
-    }
-  }
-
-  /**
-   * Loads workflow statistics from the given xml string.
-   *
-   * @param xml
-   *          the xml serialized representation of the workflow statistics
-   * @return the workflow statistics
-   * @throws WorkflowParsingException
-   *           if creating the workflow statistics fails
-   */
-  public static WorkflowStatistics parseWorkflowStatistics(String xml) throws WorkflowParsingException {
-    try {
-      return parseWorkflowStatistics(IOUtils.toInputStream(xml, "UTF8"));
-    } catch (IOException e) {
-      throw new WorkflowParsingException(e);
-    }
-  }
-
-  /**
    * Loads a set of workflow instances from the given input stream.
    *
    * @param in
@@ -278,16 +241,4 @@ public final class WorkflowParser {
       throw new WorkflowParsingException(e);
     }
   }
-
-  public static String toXml(WorkflowStatistics stats) throws WorkflowParsingException {
-    try {
-      Marshaller marshaller = jaxbContext.createMarshaller();
-      Writer writer = new StringWriter();
-      marshaller.marshal(stats, writer);
-      return writer.toString();
-    } catch (Exception e) {
-      throw new WorkflowParsingException(e);
-    }
-  }
-
 }

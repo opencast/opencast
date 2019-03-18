@@ -39,25 +39,13 @@ Configuration changes
 - …
 
 
-Additional Notes about 6.1
---------------------------
+API changes
+-----------
 
-Opencast 6.1 contains a number of bug fixes, some of which are security relevant. The following known vulnerabilities
-within Opencast's `com.fasterxml.jackson.core:jackson-databind` dependency have been fixed by this release:
-`CVE-2018-19361`, `CVE-2018-19362`, `CVE-2018-19360`.
+Due to [MH-13240](https://opencast.jira.com/browse/MH-13240):
 
-
-Additional Notes about 6.2
---------------------------
-
-Opencast 6.2 contains a number of bug fixes for the Opencast 6.x line of releases.
-
-
-Additional Notes about 6.3
---------------------------
-
-Opencast 6.3 contains a number of performance improvements and additional minor bug fixes for the Opencast 6.x line of
-releases.
+- Removed GET /workflow/statistics.json
+- Removed GET /workflow/statistics.xml
 
 
 Release Schedule
