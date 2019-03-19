@@ -52,6 +52,19 @@ Due to [MH-13397](https://opencast.jira.com/browse/MH-13397):
 - Modified PUT /recordings/{id}: Removed form parameters `optOut` and `updateOptOut`
 - Removed GET /series/{id}/optOut
 
+Due to [MH-13446](https://opencast.jira.com/browse/MH-13446):
+
+- Removed GET /acl-manager/transitions.json
+- Removed GET /acl-manager/transitionsfor.json
+- Removed POST /acl-manager/episode/{id}
+- Removed POST /acl-manager/series/{id}
+- Modified POST /acl-manager/apply/episode/{id}: Removed form parameters workflowDefinitionId and workflowParams
+- Modified POST /acl-manager/apply/series/{id}: Removed form parameters workflowDefinitionId and workflowParams
+- Removed DELETE /acl-manager/episode/{transitionId}
+- Removed DELETE /acl-manager/series/{transitionId}
+- Removed PUT /acl-manager/episode/{transitionId}
+- Removed PUT /acl-manager/series/{transitionId}
+
 
 Additional Notes about 6.2
 --------------------------

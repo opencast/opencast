@@ -56,8 +56,6 @@ import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
-import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.exception.IndexServiceException;
@@ -83,7 +81,6 @@ import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
-import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -264,21 +261,6 @@ public class SeriesEndpoint implements ManagedService {
       systemAclsJson.add(AccessInformationUtil.serializeManagedAcl(acl));
     }
 
-    final TransitionQuery q = TransitionQuery.query().withId(seriesId).withScope(AclScope.Series);
-    List<SeriesACLTransition> seriesTransistions;
-    JSONArray transitionsJson = new JSONArray();
-    try {
-      seriesTransistions = getAclService().getTransitions(q).getSeriesTransistions();
-      for (SeriesACLTransition trans : seriesTransistions) {
-        transitionsJson.add(AccessInformationUtil.serializeSeriesACLTransition(trans));
-      }
-    } catch (AclServiceException e) {
-      logger.error(
-              "There was an error while trying to get the ACL transitions for serie '{}' from the ACL service: {}",
-              seriesId, e);
-      return RestUtil.R.serverError();
-    }
-
     JSONObject seriesAccessJson = new JSONObject();
     try {
       AccessControlList seriesAccessControl = seriesService.getSeriesAccessControl(seriesId);
@@ -286,7 +268,6 @@ public class SeriesEndpoint implements ManagedService {
       seriesAccessJson.put("current_acl", currentAcl.isSome() ? currentAcl.get().getId() : 0);
       seriesAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(seriesAccessControl));
       seriesAccessJson.put("acl", AccessControlParser.toJsonSilent(seriesAccessControl));
-      seriesAccessJson.put("transitions", transitionsJson);
       seriesAccessJson.put("locked", hasProcessingEvents);
     } catch (SeriesException e) {
       logger.error("Unable to get ACL from series {}", seriesId, e);
@@ -967,7 +948,7 @@ public class SeriesEndpoint implements ManagedService {
     }
 
     try {
-      if (getAclService().applyAclToSeries(seriesId, accessControlList, override, Option.none()))
+      if (getAclService().applyAclToSeries(seriesId, accessControlList, override))
         return ok();
       else {
         logger.warn("Unable to find series '{}' to apply the ACL.", seriesId);

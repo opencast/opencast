@@ -63,9 +63,7 @@ import org.opencastproject.adminui.util.BulkUpdateUtil;
 import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
-import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
@@ -137,7 +135,6 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -829,7 +826,7 @@ public abstract class AbstractEventEndpoint {
 
       Source eventSource = getIndexService().getEventSource(optEvent.get());
       if (eventSource == Source.ARCHIVE) {
-        if (getAclService().applyAclToEpisode(eventId, accessControlList, Option.<ConfiguredWorkflowRef> none())) {
+        if (getAclService().applyAclToEpisode(eventId, accessControlList)) {
           return ok();
         } else {
           logger.warn("Unable to find the event '{}'", eventId);
@@ -1750,21 +1747,6 @@ public abstract class AbstractEventEndpoint {
       systemAclsJson.add(AccessInformationUtil.serializeManagedAcl(acl));
     }
 
-    // Get the episode ACL
-    final TransitionQuery q = TransitionQuery.query().withId(eventId).withScope(AclScope.Episode);
-    List<EpisodeACLTransition> episodeTransistions;
-    JSONArray transitionsJson = new JSONArray();
-    try {
-      episodeTransistions = getAclService().getTransitions(q).getEpisodeTransistions();
-      for (EpisodeACLTransition trans : episodeTransistions) {
-        transitionsJson.add(AccessInformationUtil.serializeEpisodeACLTransition(trans));
-      }
-    } catch (AclServiceException e) {
-      logger.error("There was an error while trying to get the ACL transitions for series '{}' from the ACL service",
-        eventId, e);
-      return RestUtil.R.serverError();
-    }
-
     AccessControlList activeAcl = new AccessControlList();
     try {
       if (optEvent.get().getAccessPolicy() != null)
@@ -1778,7 +1760,6 @@ public abstract class AbstractEventEndpoint {
     episodeAccessJson.put("current_acl", currentAcl.isSome() ? currentAcl.get().getId() : 0L);
     episodeAccessJson.put("acl", AccessControlParser.toJsonSilent(activeAcl));
     episodeAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(activeAcl));
-    episodeAccessJson.put("transitions", transitionsJson);
     if (StringUtils.isNotBlank(optEvent.get().getWorkflowState())
             && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(optEvent.get().getWorkflowState())))
       episodeAccessJson.put("locked", true);
@@ -1788,100 +1769,6 @@ public abstract class AbstractEventEndpoint {
     jsonReturnObj.put("system_acls", systemAclsJson);
 
     return Response.ok(jsonReturnObj.toString()).build();
-  }
-
-  @POST
-  @Path("{eventId}/transitions")
-  @RestQuery(name = "addEventTransition", description = "Adds an ACL transition to an event", returnDescription = "The method doesn't return any content", pathParameters = {
-          @RestParameter(name = "eventId", isRequired = true, description = "The event identifier", type = RestParameter.Type.STRING) }, restParameters = {
-                  @RestParameter(name = "transition", isRequired = true, description = "The transition (JSON object) to add", type = RestParameter.Type.TEXT) }, reponses = {
-                          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required params were missing in the request."),
-                          @RestResponse(responseCode = SC_NO_CONTENT, description = "The method doesn't return any content"),
-                          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event has not been found.") })
-  public Response addEventTransition(@PathParam("eventId") String eventId,
-          @FormParam("transition") String transitionStr) throws SearchIndexException {
-    if (StringUtils.isBlank(eventId) || StringUtils.isBlank(transitionStr))
-      return RestUtil.R.badRequest("Missing parameters");
-
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
-      return notFound("Cannot find an event with id '%s'.", eventId);
-
-    try {
-      final org.codehaus.jettison.json.JSONObject t = new org.codehaus.jettison.json.JSONObject(transitionStr);
-      Option<ConfiguredWorkflowRef> workflowRef;
-      if (t.has("workflow_id"))
-        workflowRef = Option.some(ConfiguredWorkflowRef.workflow(t.getString("workflow_id")));
-      else
-        workflowRef = Option.none();
-
-      Option<Long> managedAclId;
-      if (t.has("acl_id"))
-        managedAclId = Option.some(t.getLong("acl_id"));
-      else
-        managedAclId = Option.none();
-
-      getAclService().addEpisodeTransition(eventId, managedAclId,
-              new Date(DateTimeSupport.fromUTC(t.getString("application_date"))), workflowRef);
-      return Response.noContent().build();
-    } catch (AclServiceException e) {
-      logger.error("Error while trying to get ACL transitions for event '{}' from ACL service: {}", eventId, e);
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-    } catch (JSONException e) {
-      return RestUtil.R.badRequest("The transition object is not valid");
-    } catch (IllegalStateException e) {
-      // That should never happen
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-    } catch (ParseException e) {
-      return RestUtil.R.badRequest("The date could not be parsed");
-    }
-  }
-
-  @PUT
-  @Path("{eventId}/transitions/{transitionId}")
-  @RestQuery(name = "updateEventTransition", description = "Updates an ACL transition of an event", returnDescription = "The method doesn't return any content", pathParameters = {
-          @RestParameter(name = "eventId", isRequired = true, description = "The event identifier", type = RestParameter.Type.STRING),
-          @RestParameter(name = "transitionId", isRequired = true, description = "The transition identifier", type = RestParameter.Type.INTEGER) }, restParameters = {
-                  @RestParameter(name = "transition", isRequired = true, description = "The updated transition (JSON object)", type = RestParameter.Type.TEXT) }, reponses = {
-                          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required params were missing in the request."),
-                          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event or transtion has not been found."),
-                          @RestResponse(responseCode = SC_NO_CONTENT, description = "The method doesn't return any content") })
-  public Response updateEventTransition(@PathParam("eventId") String eventId,
-          @PathParam("transitionId") long transitionId, @FormParam("transition") String transitionStr)
-                  throws NotFoundException, SearchIndexException {
-    if (StringUtils.isBlank(transitionStr))
-      return RestUtil.R.badRequest("Missing parameters");
-
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
-      return notFound("Cannot find an event with id '%s'.", eventId);
-
-    try {
-      final org.codehaus.jettison.json.JSONObject t = new org.codehaus.jettison.json.JSONObject(transitionStr);
-      Option<ConfiguredWorkflowRef> workflowRef;
-      if (t.has("workflow_id"))
-        workflowRef = Option.some(ConfiguredWorkflowRef.workflow(t.getString("workflow_id")));
-      else
-        workflowRef = Option.none();
-
-      Option<Long> managedAclId;
-      if (t.has("acl_id"))
-        managedAclId = Option.some(t.getLong("acl_id"));
-      else
-        managedAclId = Option.none();
-
-      getAclService().updateEpisodeTransition(transitionId, managedAclId,
-              new Date(DateTimeSupport.fromUTC(t.getString("application_date"))), workflowRef);
-      return Response.noContent().build();
-    } catch (JSONException e) {
-      return RestUtil.R.badRequest("The transition object is not valid");
-    } catch (IllegalStateException | ParseException e) {
-      // That should never happen
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-    } catch (AclServiceException e) {
-      logger.error("Unable to update transition {} of event {}", transitionId, eventId, e);
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-    }
   }
 
   // MH-12085 Add manually uploaded assets, multipart file upload has to be a POST
@@ -1910,28 +1797,6 @@ public abstract class AbstractEventEndpoint {
       return RestUtil.R.badRequest(e.getMessage());
     } catch (Exception e) {
       return RestUtil.R.serverError();
-    }
-  }
-
-  @DELETE
-  @Path("{eventId}/transitions/{transitionId}")
-  @RestQuery(name = "deleteEventTransition", description = "Deletes an ACL transition from an event", returnDescription = "The method doesn't return any content", pathParameters = {
-          @RestParameter(name = "eventId", isRequired = true, description = "The series identifier", type = RestParameter.Type.STRING),
-          @RestParameter(name = "transitionId", isRequired = true, description = "The transition identifier", type = RestParameter.Type.INTEGER) }, reponses = {
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event or the transition has not been found."),
-                  @RestResponse(responseCode = SC_NO_CONTENT, description = "The method does not return any content") })
-  public Response deleteEventTransition(@PathParam("eventId") String eventId,
-          @PathParam("transitionId") long transitionId) throws NotFoundException, SearchIndexException {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
-      return notFound("Cannot find an event with id '%s'.", eventId);
-
-    try {
-      getAclService().deleteEpisodeTransition(transitionId);
-      return Response.noContent().build();
-    } catch (AclServiceException e) {
-      logger.error("Error while trying to delete transition '{}' from event '{}'", transitionId, eventId, e);
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     }
   }
 
