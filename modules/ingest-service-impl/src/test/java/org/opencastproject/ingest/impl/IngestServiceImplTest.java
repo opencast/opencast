@@ -561,13 +561,13 @@ public class IngestServiceImplTest {
   private void testSeriesUpdateNewAndExisting(Dictionary<String, String> properties) throws Exception {
 
     // default expectation for series overwrite
-    boolean isExpectSeriesOverwrite = IngestServiceImpl.DEFAULT_IS_OVERWRITE_SERIES;
+    boolean allowSeriesModifications = IngestServiceImpl.DEFAULT_ALLOW_SERIES_MODIFICATIONS;
 
     if (properties != null) {
       service.updated(properties);
       try {
         boolean testForValue = Boolean.parseBoolean(properties.get(IngestServiceImpl.PROPKEY_OVERWRITE_SERIES).trim());
-        isExpectSeriesOverwrite = testForValue;
+        allowSeriesModifications = testForValue;
       } catch (Exception e) {
         // If key or value not found or not boolean, use the default overwrite expectation
       }
@@ -596,8 +596,8 @@ public class IngestServiceImplTest {
     service.setSeriesService(seriesService);
 
     // This is true or false depending on the isOverwrite value
-    Assert.assertEquals("Desire to update series is " + isExpectSeriesOverwrite + ".",
-            isExpectSeriesOverwrite, service.updateSeries(urlCatalog2));
+    Assert.assertEquals("Desire to update series is " + allowSeriesModifications + ".",
+            allowSeriesModifications, service.updateSeries(urlCatalog2));
 
     // Test with mock not found exception
     EasyMock.reset(seriesService);

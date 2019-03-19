@@ -191,8 +191,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The key to look for in the service configuration file to override the {@link DEFAULT_INGEST_ZIP_JOB_LOAD} */
   public static final String ZIP_JOB_LOAD_KEY = "job.load.ingest.zip";
 
-  /** The default is to leave series catalogs untouched on ingest */
-  static final boolean DEFAULT_IS_OVERWRITE_SERIES = false;
+  /** By default, do not allow event ingest to modify existing series metadata */
+  static final boolean DEFAULT_ALLOW_SERIES_MODIFICATIONS = false;
 
   /** The approximate load placed on the system by ingesting a file */
   private float ingestFileJobLoad = DEFAULT_INGEST_FILE_JOB_LOAD;
@@ -249,8 +249,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   private Cache<String, Long> partialTrackStartTimes = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.DAYS)
           .build();
 
-  /** Option to overwrite series on ingest */
-  protected boolean isOverwriteSeries = DEFAULT_IS_OVERWRITE_SERIES;
+  /** Option, if an event ingest may modify metadata from existing series */
+  private boolean allowSeriesModifications = DEFAULT_ALLOW_SERIES_MODIFICATIONS;
 
   /**
    * Creates a new ingest service instance.
@@ -302,13 +302,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             serviceRegistry);
     // try to get overwrite series option from config, use default if not configured
     try {
-      isOverwriteSeries = Boolean.parseBoolean(((String) properties.get(PROPKEY_OVERWRITE_SERIES)).trim());
+      allowSeriesModifications = Boolean.parseBoolean(((String) properties.get(PROPKEY_OVERWRITE_SERIES)).trim());
     } catch (Exception e) {
-      isOverwriteSeries = DEFAULT_IS_OVERWRITE_SERIES;
+      allowSeriesModifications = DEFAULT_ALLOW_SERIES_MODIFICATIONS;
       logger.warn("Unable to update configuration. {}", e.getMessage());
     }
     logger.info("Configuration updated. It is {} that existing series will be overwritten during ingest.",
-            isOverwriteSeries);
+            allowSeriesModifications);
   }
 
   /**
@@ -866,7 +866,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         try {
           try {
             seriesService.getSeries(id);
-            if (isOverwriteSeries) {
+            if (allowSeriesModifications) {
               // Update existing series
               seriesService.updateSeries(dc);
               isUpdated = true;
