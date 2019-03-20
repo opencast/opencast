@@ -237,12 +237,7 @@
               spring-security-oauth;inline=true,
               jboss-xacml;inline=true
             </Embed-Dependency>
-            <Private-Package>
-              org.jboss.security.xacml.core,
-              org.jboss.security.xacml.core.model.policy,
-            </Private-Package>
             <Import-Package>
-              !org.jboss.security.xacml.sunxacml.*,
               !org.springframework.jdbc.core.*,
               !org.springframework.security.core.codec.*,
               !org.w3c.dom.*,

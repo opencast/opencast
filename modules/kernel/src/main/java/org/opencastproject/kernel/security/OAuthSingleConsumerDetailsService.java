@@ -23,14 +23,13 @@ package org.opencastproject.kernel.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth.common.OAuthException;
-import org.springframework.security.oauth.common.signature.SharedConsumerSecret;
+import org.springframework.security.oauth.common.signature.SharedConsumerSecretImpl;
 import org.springframework.security.oauth.provider.BaseConsumerDetails;
 import org.springframework.security.oauth.provider.ConsumerDetails;
 import org.springframework.security.oauth.provider.ConsumerDetailsService;
@@ -91,13 +90,14 @@ public class OAuthSingleConsumerDetailsService implements ConsumerDetailsService
    * @return the consumer details
    */
   private ExtraTrustConsumerDetails createConsumerDetails(String consumerKey, String consumerName, String consumerSecret) {
-    SharedConsumerSecret secret = new SharedConsumerSecret(consumerSecret);
+    SharedConsumerSecretImpl secret = new SharedConsumerSecretImpl(consumerSecret);
+
     BaseConsumerDetails bcd = new BaseConsumerDetails();
     bcd.setConsumerKey(consumerKey);
     bcd.setConsumerName(consumerName);
     bcd.setSignatureSecret(secret);
     List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-    authorities.add(new GrantedAuthorityImpl("ROLE_OAUTH_USER"));
+    authorities.add(new SimpleGrantedAuthority("ROLE_OAUTH_USER"));
     bcd.setAuthorities(authorities);
     bcd.setRequiredToObtainAuthenticatedToken(false); // false for 2 legged OAuth
     return bcd;
@@ -115,7 +115,7 @@ public class OAuthSingleConsumerDetailsService implements ConsumerDetailsService
   }
 
   @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
+  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     return delegate.loadUserByUsername(username);
   }
 
