@@ -272,6 +272,7 @@
       "BACK": "Previous",
       "CREATE": "Create",
       "RETRACT": "Retract",
+      "DELETE": "Delete",
       "UPDATE": "Update",
       "DURATION": {
           "HOURS": "Hours",

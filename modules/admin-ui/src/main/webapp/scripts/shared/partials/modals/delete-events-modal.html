@@ -211,7 +211,7 @@
     <a ng-click="submit()"
        data-modal-tab="next" class="submit"
                              ng-class="{active: bulkDeleteForm.summaryForm.$valid, inactive: bulkDeleteForm.summaryForm.$invalid, disabled: submitButton}">
-      {{ 'WIZARD.RETRACT' | translate }}
+      {{ (events.published.has ? 'WIZARD.RETRACT' : 'WIZARD.DELETE') | translate }}
     </a>
     <a ng-click="navigateTo('retractForm', currentForm, [])"
        data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
