@@ -45,7 +45,9 @@
                     <input type="checkbox" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox">
                   </td>
                   <td>{{ row.title }}</td>
-                  <td>{{ row.creator }}</td>
+                  <td>
+                    <span class="metadata-entry" ng-repeat="creator in row.creators">{{ creator }}</span>
+                  </td>
                   <td ng-class="row.hasEvents == true ? 'fa fa-check' : ''"></td>
                 </tr>
               </tbody>

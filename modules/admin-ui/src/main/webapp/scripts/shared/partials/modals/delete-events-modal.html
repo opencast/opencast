@@ -51,7 +51,9 @@
                   <tr ng-repeat="row in unpublished.rows" ng-form="rowsForm" ng-class="{error: rowsForm.selection.$error.schedulingAuthorized}">
                     <td><input name="selection" type="checkbox" ng-model="row.selected" scheduling-authorized="{{row}}" ng-change="unpublished.rowSelectionChanged($index)" class="child-cbox"/></td>
                     <td>{{ row.title }}</td>
-                    <td>{{ row.presenters }}</td>
+                    <td>
+                      <span class="metadata-entry" ng-repeat="presenter in row.presenters">{{ presenter }}</span>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -111,7 +113,9 @@
                 <tr ng-repeat="row in published.rows">
                   <td><input type="checkbox" ng-model="row.selected" ng-change="published.rowSelectionChanged($index)" class="child-cbox"/></td>
                   <td>{{ row.title }}</td>
-                  <td>{{ row.presenters }}</td>
+                  <td>
+                    <span class="metadata-entry" ng-repeat="presenter in row.presenters">{{ presenter }}</span>
+                  </td>
                 </tr>
               </tbody>
             </table>
