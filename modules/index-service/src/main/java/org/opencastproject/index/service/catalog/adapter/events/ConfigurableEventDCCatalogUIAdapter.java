@@ -56,12 +56,15 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Dictionary;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Managed service implementation of a AbstractEventsCatalogUIAdapter
@@ -108,7 +111,7 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
     // Add all of the rest of the fields that didn't have values as empty.
     for (String field : emptyFields) {
       try {
-        dublinCoreMetadata.addField(dublinCoreProperties.get(field), "", getListProvidersService());
+        dublinCoreMetadata.addField(dublinCoreProperties.get(field), Collections.emptyList(), getListProvidersService());
       } catch (Exception e) {
         logger.error("Skipping metadata field '{}' because of error", field, e);
       }
@@ -145,10 +148,13 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
         }
         if (namespace.equalsIgnoreCase(propertyKey.getNamespaceURI())
                 && metadataField.getInputID().equalsIgnoreCase(propertyKey.getLocalName())) {
-          for (DublinCoreValue dublinCoreValue : dc.get(propertyKey)) {
+          List<DublinCoreValue> values = dc.get(propertyKey);
+          if (!values.isEmpty()) {
             emptyFields.remove(metdataFieldKey);
             try {
-              dublinCoreMetadata.addField(metadataField, dublinCoreValue.getValue(), getListProvidersService());
+              dublinCoreMetadata.addField(metadataField, values.stream()
+                      .map(DublinCoreValue::getValue)
+                      .collect(Collectors.toList()), getListProvidersService());
             } catch (IllegalArgumentException e) {
               logger.error("Skipping metadata field '{}' because of error: {}", metadataField.getInputID(),
                       ExceptionUtils.getStackTrace(e));
