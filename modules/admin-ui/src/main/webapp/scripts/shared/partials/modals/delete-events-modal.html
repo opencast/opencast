@@ -209,8 +209,9 @@
   </div><!-- modal-content [summary] -->
   <footer ng-if="currentForm === 'summaryForm'">
     <a ng-click="submit()"
-       data-modal-tab="next" class="submit"
-                             ng-class="{active: bulkDeleteForm.summaryForm.$valid, inactive: bulkDeleteForm.summaryForm.$invalid, disabled: submitButton}">
+       data-modal-tab="next" ng-class="{active: bulkDeleteForm.summaryForm.$valid,
+         inactive: bulkDeleteForm.summaryForm.$invalid, disabled: submitButton, submit: events.published.has,
+         danger: !events.published.has}">
       {{ (events.published.has ? 'WIZARD.RETRACT' : 'WIZARD.DELETE') | translate }}
     </a>
     <a ng-click="navigateTo('retractForm', currentForm, [])"
