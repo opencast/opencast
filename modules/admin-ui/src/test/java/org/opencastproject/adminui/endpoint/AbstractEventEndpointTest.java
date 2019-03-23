@@ -523,42 +523,6 @@ public class AbstractEventEndpointTest {
   }
 
   @Test
-  public void testAddEventTransition() throws Exception {
-    given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
-            .post(rt.host("{eventId}/transitions"));
-
-    given().pathParam("eventId", "asdasd").formParam("transition", "adsf").expect()
-            .statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("{eventId}/transitions"));
-
-    String transition = "{\"id\": 1,\"application_date\": \"2014-06-05T15:00:00Z\", \"done\": false, \"acl_id\": 43, \"is_deleted\": false }";
-
-    given().pathParam("eventId", "asdasd").formParam("transition", transition).expect()
-            .statusCode(HttpStatus.SC_NO_CONTENT).when().post(rt.host("{eventId}/transitions"));
-  }
-
-  @Test
-  public void testUpdateEventTransition() throws Exception {
-    given().pathParam("eventId", "asdasd").pathParam("transitionId", "adf").expect().statusCode(HttpStatus.SC_NOT_FOUND)
-            .when().put(rt.host("{eventId}/transitions/{transitionId}"));
-    given().pathParam("eventId", "asdasd").pathParam("transitionId", 5).expect().statusCode(HttpStatus.SC_BAD_REQUEST)
-            .when().put(rt.host("{eventId}/transitions/{transitionId}"));
-    given().pathParam("eventId", "asdasd").pathParam("transitionId", 5).formParam("transition", "adsf").expect()
-            .statusCode(HttpStatus.SC_BAD_REQUEST).when().put(rt.host("{eventId}/transitions/{transitionId}"));
-
-    String transition = "{\"id\": 1,\"application_date\": \"2014-06-05T15:00:00Z\", \"done\": false, \"acl_id\": 43, \"is_deleted\": false }";
-    given().pathParam("eventId", "asdasd").pathParam("transitionId", 5).formParam("transition", transition).expect()
-            .statusCode(HttpStatus.SC_NO_CONTENT).when().put(rt.host("{eventId}/transitions/{transitionId}"));
-  }
-
-  @Test
-  public void testDeleteEventTransition() throws Exception {
-    given().pathParam("eventId", "asdasd").pathParam("transitionId", "adf").expect().statusCode(HttpStatus.SC_NOT_FOUND)
-            .when().delete(rt.host("{eventId}/transitions/{transitionId}"));
-    given().pathParam("eventId", "asdasd").pathParam("transitionId", 5).expect().statusCode(HttpStatus.SC_NO_CONTENT)
-            .when().delete(rt.host("{eventId}/transitions/{transitionId}"));
-  }
-
-  @Test
   @Ignore
   public void testGetNewMetadata() throws Exception {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/newEventMetadata.json"));

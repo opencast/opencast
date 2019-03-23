@@ -39,9 +39,7 @@ import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.impl.AclDb;
 import org.opencastproject.authorization.xacml.manager.impl.AclServiceImpl;
-import org.opencastproject.authorization.xacml.manager.impl.AclTransitionDb;
 import org.opencastproject.authorization.xacml.manager.impl.persistence.JpaAclDb;
-import org.opencastproject.authorization.xacml.manager.impl.persistence.OsgiJpaAclTransitionDb;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
@@ -61,7 +59,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
@@ -92,7 +89,7 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   public static final MessageSender messageSender;
   public static final Workspace workspace;
   public static final EntityManagerFactory authorizationEMF = newTestEntityManagerFactory(
-          OsgiJpaAclTransitionDb.PERSISTENCE_UNIT);
+          "org.opencastproject.authorization.xacml.manager");
 
   static {
     SecurityService testSecurityService = EasyMock.createNiceMock(SecurityService.class);
@@ -110,8 +107,8 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
-        return new AclServiceImpl(new DefaultOrganization(), newAclPersistence(), newTransitionPersistence(),
-                seriesService, assetManager, newWorkflowService(), authorizationService, messageSender, workspace);
+        return new AclServiceImpl(new DefaultOrganization(), newAclPersistence(),
+                seriesService, assetManager, authorizationService, messageSender, workspace);
       }
     };
   }
@@ -143,10 +140,6 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
 
   private static MessageSender newMessageSender() {
     return EasyMock.createNiceMock(MessageSender.class);
-  }
-
-  private static WorkflowService newWorkflowService() {
-    return EasyMock.createNiceMock(WorkflowService.class);
   }
 
   private static Workspace newWorkspace() {
@@ -211,13 +204,6 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
     EasyMock.replay(assetManager, version, query, predicate, select, result, record, snapshot);
     return assetManager;
-  }
-
-  private static AclTransitionDb newTransitionPersistence() {
-    OsgiJpaAclTransitionDb aclManagerDatabase = new OsgiJpaAclTransitionDb();
-    aclManagerDatabase.setEntityManagerFactory(authorizationEMF);
-    aclManagerDatabase.activate(null);
-    return aclManagerDatabase;
   }
 
   private static AclDb newAclPersistence() {

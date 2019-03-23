@@ -7,7 +7,6 @@
       }
     },
     "acl": "{\"acl\":{\"ace\":[{\"allow\":true,\"role\":\"ROLE_USER_ADMIN\",\"action\":\"read\"},{\"allow\":true,\"role\":\"ROLE_USER_ADMIN\",\"action\":\"write\"}]}}",
-    "transitions": [],
     "locked": false,
     "current_acl": 0
   },

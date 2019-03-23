@@ -34,6 +34,10 @@ DROP TABLE oc_email_configuration;
 DROP TABLE oc_message_signature;
 DROP TABLE oc_message_template;
 
+-- Due to MH-13446 Remove unfinished feature "ACL transitions"
+DROP TABLE oc_acl_episode_transition;
+DROP TABLE oc_acl_series_transition;
+
 -- Clean up orphaned asset manager properties
 delete p from oc_assets_properties p where not exists (
   select * from oc_assets_snapshot s

@@ -22,19 +22,12 @@
 package org.opencastproject.adminui.endpoint;
 
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
-import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
-import org.opencastproject.authorization.xacml.manager.api.TransitionResult;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
-import org.opencastproject.authorization.xacml.manager.impl.TransitionResultImpl;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.impl.IndexServiceImpl;
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -75,7 +68,6 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -212,17 +204,11 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     managedAcls.add(managedAcl1);
     managedAcls.add(new ManagedAclImpl(44L, "Private", defaultOrganization.getId(), acl));
 
-    Date transitionDate = new Date(DateTimeSupport.fromUTC("2014-06-05T15:00:00Z"));
-    TransitionResult transitionResult = getTransitionResult(managedAcl1, transitionDate);
-
     AclService aclService = EasyMock.createNiceMock(AclService.class);
     EasyMock.expect(aclService.getAcls()).andReturn(managedAcls).anyTimes();
     EasyMock.expect(aclService.getAcl(EasyMock.anyLong())).andReturn(Option.some(managedAcl1)).anyTimes();
-    Option<ConfiguredWorkflowRef> anyWorkflowOption = EasyMock.anyObject();
     EasyMock.expect(aclService.applyAclToSeries(EasyMock.anyString(), EasyMock.anyObject(AccessControlList.class),
-            EasyMock.anyBoolean(), anyWorkflowOption)).andReturn(true).anyTimes();
-    EasyMock.expect(aclService.getTransitions(EasyMock.anyObject(TransitionQuery.class))).andReturn(transitionResult)
-            .anyTimes();
+            EasyMock.anyBoolean())).andReturn(true).anyTimes();
     EasyMock.replay(aclService);
 
     AclServiceFactory aclServiceFactory = EasyMock.createNiceMock(AclServiceFactory.class);
@@ -484,91 +470,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     EasyMock.replay(adminuiSearchIndex, item1, item2, item3, themeItem1, ascSeriesSearchResult, descSeriesSearchResult,
             emptySearchResult, oneSearchResult, twoSearchResult);
-  }
-
-  private TransitionResult getTransitionResult(final ManagedAcl macl, final Date now) {
-    return new TransitionResultImpl(
-            org.opencastproject.util.data.Collections.<EpisodeACLTransition> list(new EpisodeACLTransition() {
-              @Override
-              public String getEpisodeId() {
-                return "episode";
-              }
-
-              @Override
-              public Option<ManagedAcl> getAccessControlList() {
-                return some(macl);
-              }
-
-              @Override
-              public boolean isDelete() {
-                return getAccessControlList().isNone();
-              }
-
-              @Override
-              public long getTransitionId() {
-                return 1L;
-              }
-
-              @Override
-              public String getOrganizationId() {
-                return "org";
-              }
-
-              @Override
-              public Date getApplicationDate() {
-                return now;
-              }
-
-              @Override
-              public Option<ConfiguredWorkflowRef> getWorkflow() {
-                return none();
-              }
-
-              @Override
-              public boolean isDone() {
-                return false;
-              }
-            }), org.opencastproject.util.data.Collections.<SeriesACLTransition> list(new SeriesACLTransition() {
-              @Override
-              public String getSeriesId() {
-                return "series";
-              }
-
-              @Override
-              public ManagedAcl getAccessControlList() {
-                return macl;
-              }
-
-              @Override
-              public boolean isOverride() {
-                return true;
-              }
-
-              @Override
-              public long getTransitionId() {
-                return 2L;
-              }
-
-              @Override
-              public String getOrganizationId() {
-                return "org";
-              }
-
-              @Override
-              public Date getApplicationDate() {
-                return now;
-              }
-
-              @Override
-              public Option<ConfiguredWorkflowRef> getWorkflow() {
-                return none();
-              }
-
-              @Override
-              public boolean isDone() {
-                return false;
-              }
-            }));
   }
 
 }

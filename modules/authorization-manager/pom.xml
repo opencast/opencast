@@ -206,11 +206,9 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/acl-jpa-db.xml,
-              OSGI-INF/acl-jpa-transition-db.xml,
               OSGI-INF/acl-service-factory.xml,
               OSGI-INF/acl-scanner.xml,
-              OSGI-INF/acl-service-rest.xml,
-              OSGI-INF/acl-scheduler.xml
+              OSGI-INF/acl-service-rest.xml
             </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml

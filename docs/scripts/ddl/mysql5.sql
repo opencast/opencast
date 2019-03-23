@@ -419,35 +419,6 @@ CREATE TABLE oc_acl_managed_acl (
   CONSTRAINT UNQ_oc_acl_managed_acl UNIQUE (name, organization_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE oc_acl_episode_transition (
-  pk BIGINT(20) NOT NULL,
-  workflow_params VARCHAR(255) DEFAULT NULL,
-  application_date DATETIME DEFAULT NULL,
-  workflow_id VARCHAR(128) DEFAULT NULL,
-  done TINYINT(1) DEFAULT 0,
-  episode_id VARCHAR(128) DEFAULT NULL,
-  organization_id VARCHAR(128) DEFAULT NULL,
-  managed_acl_fk BIGINT(20) DEFAULT NULL,
-  PRIMARY KEY (pk),
-  CONSTRAINT UNQ_oc_acl_episode_transition UNIQUE (episode_id, organization_id, application_date),
-  CONSTRAINT FK_oc_acl_episode_transition_managed_acl_fk FOREIGN KEY (managed_acl_fk) REFERENCES oc_acl_managed_acl (pk)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE oc_acl_series_transition (
-  pk BIGINT(20) NOT NULL,
-  workflow_params VARCHAR(255) DEFAULT NULL,
-  application_date DATETIME DEFAULT NULL,
-  workflow_id VARCHAR(128) DEFAULT NULL,
-  override TINYINT(1) DEFAULT 0,
-  done TINYINT(1) DEFAULT 0,
-  organization_id VARCHAR(128) DEFAULT NULL,
-  series_id VARCHAR(128) DEFAULT NULL,
-  managed_acl_fk BIGINT(20) DEFAULT NULL,
-  PRIMARY KEY (pk),
-  CONSTRAINT UNQ_oc_acl_series_transition UNIQUE (series_id, organization_id, application_date),
-  CONSTRAINT FK_oc_acl_series_transition_managed_acl_fk FOREIGN KEY (managed_acl_fk) REFERENCES oc_acl_managed_acl (pk)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE oc_role (
   id bigint(20) NOT NULL,
   description varchar(255) DEFAULT NULL,

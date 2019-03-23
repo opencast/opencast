@@ -56,7 +56,6 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
 
   private final String clazzName = OsgiAclServiceFactory.class.getName();
 
-  private AclTransitionDb transitionDb;
   private AclDb aclDb;
   private SeriesService seriesService;
   private AssetManager assetManager;
@@ -72,13 +71,8 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
 
   @Override
   public AclService serviceFor(Organization org) {
-    return new AclServiceImpl(org, aclDb, transitionDb, seriesService, assetManager, workflowService,
+    return new AclServiceImpl(org, aclDb, seriesService, assetManager,
             authorizationService, messageSender, workspace);
-  }
-
-  /** OSGi DI callback. */
-  public void setTransitionDb(AclTransitionDb transitionDb) {
-    this.transitionDb = transitionDb;
   }
 
   /** OSGi DI callback. */
@@ -104,11 +98,6 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
   /** OSGi DI callback. */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
-  }
-
-  /** OSGi DI callback. */
-  public void setWorkflowService(WorkflowService workflowService) {
-    this.workflowService = workflowService;
   }
 
   /** OSGi DI callback. */
