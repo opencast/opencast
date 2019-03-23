@@ -22,9 +22,7 @@
 package org.opencastproject.workflow.handler.composer;
 
 import static org.opencastproject.util.data.Collections.nil;
-import static org.opencastproject.util.data.Collections.smap;
 import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
@@ -58,7 +56,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.SortedMap;
 
 /**
  * The workflow definition creating a video from a still image.
@@ -73,12 +70,6 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ImageToVideoWorkflowOperationHandler.class);
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS = smap(
-          tuple(OPT_SOURCE_TAGS, "The image attachment must be tagged with one of the given tags"),
-          tuple(OPT_SOURCE_FLAVOR, "The image attachment must be of the given flavor"),
-          tuple(OPT_DURATION, "The duration of the resulting video in seconds"));
 
   /** The composer service */
   private ComposerService composerService = null;
@@ -105,16 +96,6 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   @Override

@@ -91,7 +91,6 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
@@ -704,11 +703,6 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       JSONObject jsonHandler = new JSONObject();
       jsonHandler.put("id", handler.getId());
       jsonHandler.put("description", handler.getDescription());
-      JSONObject jsonConfigOptions = new JSONObject();
-      for (Entry<String, String> configEntry : handler.getConfigurationOptions().entrySet()) {
-        jsonConfigOptions.put(configEntry.getKey(), configEntry.getValue());
-      }
-      jsonHandler.put("options", jsonConfigOptions);
       jsonArray.add(jsonHandler);
     }
     return Response.ok(jsonArray.toJSONString()).header("Content-Type", MediaType.APPLICATION_JSON).build();

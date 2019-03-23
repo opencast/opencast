@@ -58,8 +58,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * The workflow definition for handling "sox" operations
@@ -74,20 +72,6 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
 
   /** Name of the muxing encoding profile */
   public static final String SOX_AREPLACE_PROFILE = "sox-audio-replace.work";
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put("source-flavors", "The \"flavors\" of the track to use as a source input");
-    CONFIG_OPTIONS.put("source-flavor", "The \"flavor\" of the track to use as a source input");
-    CONFIG_OPTIONS.put("source-tags", "The \"tag\" of the track to use as a source input");
-    CONFIG_OPTIONS.put("target-flavor", "The flavor to apply to the normalized file");
-    CONFIG_OPTIONS.put("target-tags", "The tags to apply to the normalized file");
-    CONFIG_OPTIONS.put("target-decibel", "The target RMS Level Decibel");
-    CONFIG_OPTIONS.put("force-transcode", "Whether to force transcoding the audio stream");
-  }
 
   /** The SoX service */
   private SoxService soxService = null;
@@ -127,16 +111,6 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

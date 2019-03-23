@@ -62,8 +62,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Produces a zipped archive of a mediapackage, places it in the archive collection, and removes the rest of the
@@ -107,29 +105,10 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   /** The temporary storage location */
   protected File tempStorageDir = null;
 
-  /** The configuration properties */
-  protected SortedMap<String, String> configurationOptions = null;
-
   /**
    * The workspace to use in retrieving and storing files.
    */
   protected Workspace workspace;
-
-  /** The default no-arg constructor builds the configuration options set */
-  public ZipWorkflowOperationHandler() {
-    configurationOptions = new TreeMap<String, String>();
-    configurationOptions.put(ZIP_COLLECTION_PROPERTY,
-            "The configuration key that specifies the zip archive collection.  Defaults to " + DEFAULT_ZIP_COLLECTION);
-    configurationOptions.put(COMPRESS_PROPERTY,
-            "The configuration key that specifies whether to compress the zip archive.  Defaults to false.");
-    configurationOptions.put(INCLUDE_FLAVORS_PROPERTY,
-            "The configuration key that specifies the element flavors to include in the zipped mediapackage archive");
-    configurationOptions.put(TARGET_FLAVOR_PROPERTY, "The target flavor for the zip archive element, defaulting to '"
-            + DEFAULT_ARCHIVE_FLAVOR + "'");
-    configurationOptions.put(TARGET_FLAVOR_PROPERTY, "The target flavor for the zip archive element, defaulting to '"
-            + DEFAULT_ARCHIVE_FLAVOR + "'");
-    configurationOptions.put(TARGET_TAGS_PROPERTY, "The target tags for the zip archive element");
-  }
 
   /**
    * Sets the workspace to use.
@@ -353,16 +332,6 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
     // Return the zip
     return zip;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return configurationOptions;
   }
 
 }

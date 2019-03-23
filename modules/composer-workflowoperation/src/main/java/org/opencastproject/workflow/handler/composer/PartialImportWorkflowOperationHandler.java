@@ -87,8 +87,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
 
 /**
@@ -133,29 +131,6 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String SILENT_AUDIO_PROFILE = "import.silent";
   private static final String IMAGE_MOVIE_PROFILE = "image-movie.work";
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_PRESENTER_FLAVOR, "The source flavor of the partial presenter tracks");
-    CONFIG_OPTIONS.put(SOURCE_PRESENTATION_FLAVOR, "The source flavor of the partial presentation tracks");
-    CONFIG_OPTIONS.put(SOURCE_SMIL_FLAVOR, "The source flavor of the partial smil catalog");
-
-    CONFIG_OPTIONS.put(TARGET_PRESENTER_FLAVOR,
-            "The target flavor to apply to the standard media presenter video track");
-    CONFIG_OPTIONS.put(TARGET_PRESENTATION_FLAVOR,
-            "The target flavor to apply to the standard media presentation video track");
-    CONFIG_OPTIONS.put(CONCAT_ENCODING_PROFILE, "The concat encoding profile to use");
-    CONFIG_OPTIONS.put(CONCAT_OUTPUT_FRAMERATE, "Output framerate for concat operation");
-    CONFIG_OPTIONS.put(FORCE_ENCODING_PROFILE, "The force encoding profile to use");
-    CONFIG_OPTIONS.put(TRIM_ENCODING_PROFILE, "The trim encoding profile to use");
-    CONFIG_OPTIONS.put(FORCE_ENCODING, "Whether to force the tracks to be encoded");
-    CONFIG_OPTIONS.put(REQUIRED_EXTENSIONS,
-            "Automatically re-encode a track if its extension doesn't match one in this comma separated list");
-    CONFIG_OPTIONS.put(ENFORCE_DIVISIBLE_BY_TWO, "Whether to enforce the track's dimension to be divisible by two");
-  }
-
   /** The composer service */
   private ComposerService composerService = null;
 
@@ -181,16 +156,6 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

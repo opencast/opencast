@@ -51,8 +51,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Workflow Operation for POSTing a MediaPackage via HTTP
@@ -68,16 +66,6 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
   public void setSearchService(SearchService searchService) {
     this.searchService = searchService;
   }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-    public SortedMap<String, String> getConfigurationOptions() {
-      return Configuration.OPTIONS;
-    }
 
   /**
    * {@inheritDoc}
@@ -182,7 +170,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
 
     public enum Format {
       XML, JSON
-    };
+    }
 
     // Key for the WorkflowOperation Configuration
     public static final String PROPERTY_URL = "url";
@@ -193,27 +181,6 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
     public static final String PROPERTY_AUTHPASSWD = "auth.password";
     public static final String PROPERTY_DEBUG = "debug";
     public static final String PROPERTY_MEDIAPACKAGE_TYPE = "mediapackage.type";
-    public static final TreeMap<String, String> OPTIONS;
-
-    static {
-      OPTIONS = new TreeMap<String, String>();
-      OPTIONS.put(Configuration.PROPERTY_URL,
-          "The URL to which the MediaPackage will be submitted");
-      OPTIONS.put(Configuration.PROPERTY_FORMAT,
-          "The output format for the MediaPackage (default: XML)");
-      OPTIONS.put(Configuration.PROPERTY_ENCODING,
-          "Message Encoding (default: UTF-8)");
-      OPTIONS.put(Configuration.PROPERTY_AUTH,
-          "The authentication method to use (no/http-digest)");
-      OPTIONS.put(Configuration.PROPERTY_AUTHUSER,
-          "The username to use for authentication");
-      OPTIONS.put(Configuration.PROPERTY_AUTHPASSWD,
-          "The password to use for authentication");
-      OPTIONS.put(Configuration.PROPERTY_DEBUG,
-          "If this options is set the message body returned by target host is dumped to log (default: no)");
-      OPTIONS.put(Configuration.PROPERTY_MEDIAPACKAGE_TYPE,
-          "Type of Mediapackage to send (workflow, search; default: search)");
-    }
 
     // Configuration values
     private URI url;

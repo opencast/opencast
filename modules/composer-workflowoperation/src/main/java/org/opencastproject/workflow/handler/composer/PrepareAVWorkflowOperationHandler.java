@@ -46,8 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * The <tt>prepare media</tt> operation will make sure that media where audio and video track come in separate files
@@ -77,19 +75,6 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   /** Name of audio muxing configuration key */
   public static final String OPT_AUDIO_MUXING_SOURCE_FLAVORS = "audio-muxing-source-flavors";
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put("source-flavor", "The \"flavor\" of the track to use as a video source input");
-    CONFIG_OPTIONS.put("encoding-profile", "The encoding profile to use (default is 'mux-av.http')");
-    CONFIG_OPTIONS.put("target-flavor", "The flavor to apply to the encoded file");
-    CONFIG_OPTIONS.put(OPT_REWRITE, "Indicating whether the container for audio and video tracks should be rewritten");
-    CONFIG_OPTIONS.put(OPT_AUDIO_MUXING_SOURCE_FLAVORS, "If the video track has no audio, try to find an audio track in this sequence of flavors");
-    CONFIG_OPTIONS.put("target-tags", "The tags to apply to the encoded file");
-  }
-
   /** The composer service */
   private ComposerService composerService = null;
 
@@ -115,16 +100,6 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

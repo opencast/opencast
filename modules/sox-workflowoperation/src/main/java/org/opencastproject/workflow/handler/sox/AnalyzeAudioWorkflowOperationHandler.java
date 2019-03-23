@@ -56,8 +56,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * The workflow definition for handling "sox" operations
@@ -69,17 +67,6 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /** Name of the 'encode to SoX audio only work copy' encoding profile */
   public static final String SOX_AONLY_PROFILE = "sox-audio-only.work";
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put("source-flavors", "The \"flavors\" of the track to use as a source input");
-    CONFIG_OPTIONS.put("source-flavor", "The \"flavor\" of the track to use as a source input");
-    CONFIG_OPTIONS.put("source-tags", "The \"tag\" of the track to use as a source input");
-    CONFIG_OPTIONS.put("force-transcode", "Whether to force transcoding the audio stream");
-  }
 
   /** The SoX service */
   private SoxService soxService = null;
@@ -118,16 +105,6 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
    */
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

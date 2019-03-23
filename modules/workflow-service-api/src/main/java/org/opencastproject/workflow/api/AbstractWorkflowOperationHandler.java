@@ -47,8 +47,6 @@ import org.osgi.service.component.ComponentContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Abstract base implementation for an operation handler, which implements a simple start operation that returns a
@@ -61,9 +59,6 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /** The description of what this handler actually does */
   protected String description = null;
-
-  /** The configuration options for this operation handler */
-  protected SortedMap<String, String> options = new TreeMap<String, String>();
 
   /** Optional service registry */
   protected ServiceRegistry serviceRegistry = null;
@@ -112,38 +107,6 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    */
   @Override
   public void destroy(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return options;
-  }
-
-  /**
-   * Adds a configuration option to the list of possible configuration options.
-   *
-   * @param name
-   *          the option name
-   * @param description
-   *          the option description
-   */
-  public void addConfigurationOption(String name, String description) {
-    options.put(name, description);
-  }
-
-  /**
-   * Removes the configuration option from the list of possible configuration options.
-   *
-   * @param name
-   *          the option name
-   */
-  public void removeConfigurationOption(String name) {
-    options.remove(name);
   }
 
   /**

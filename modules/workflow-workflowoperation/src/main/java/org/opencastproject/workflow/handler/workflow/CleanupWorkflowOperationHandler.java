@@ -54,8 +54,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Removes all files in the working file repository for mediapackage elements that don't match one of the
@@ -75,9 +73,6 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /** Time to wait in seconds before removing files */
   public static final String DELAY = "delay";
 
-  /** The configuration properties */
-  protected SortedMap<String, String> configurationOptions = null;
-
   /**
    * The workspace to use in retrieving and storing files.
    */
@@ -85,18 +80,6 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
-
-  /** The default no-arg constructor builds the configuration options set */
-  public CleanupWorkflowOperationHandler() {
-    configurationOptions = new TreeMap<String, String>();
-    configurationOptions.put(PRESERVE_FLAVOR_PROPERTY,
-            "The configuration key that specifies the flavors to preserve.  If not specified, this operation will not"
-                    + "remove any files.");
-    configurationOptions.put(DELETE_EXTERNAL,
-            "Whether to try to delete external working file repository URIs. Default is false.");
-    configurationOptions.put(DELAY,
-            "Time to wait in seconds before removing files. Default is 1s.");
-  }
 
   /**
    * Sets the workspace to use.
@@ -310,15 +293,5 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
     } finally {
       client.close(response);
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return configurationOptions;
   }
 }

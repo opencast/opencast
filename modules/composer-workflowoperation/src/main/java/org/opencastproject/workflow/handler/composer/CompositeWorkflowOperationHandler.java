@@ -75,8 +75,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -114,41 +112,9 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CompositeWorkflowOperationHandler.class);
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
   /** The legal options for SOURCE_AUDIO_NAME */
   private static final Pattern sourceAudioOption = Pattern.compile(
           ComposerService.LOWER + "|" + ComposerService.UPPER + "|" + ComposerService.BOTH, Pattern.CASE_INSENSITIVE);
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_AUDIO_NAME, "Only \"upper\", \"lower\" or \"both\" track to be used as source audio");
-    CONFIG_OPTIONS.put(SOURCE_TAGS_UPPER, "The \"tag\" of the upper track to use as a source input");
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR_UPPER, "The \"flavor\" of the upper track to use as a source input");
-    CONFIG_OPTIONS.put(SOURCE_TAGS_LOWER, "The \"tag\" of the lower track to use as a source input");
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR_LOWER, "The \"flavor\" of the lower track to use as a source input");
-    CONFIG_OPTIONS.put(SOURCE_TAGS_WATERMARK, "The \"tag\" of the attachement image to use as a source input");
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR_WATERMARK, "The \"flavor\" of the attachement image to use as a source input");
-    CONFIG_OPTIONS.put(SOURCE_URL_WATERMARK, "The \"URL\" of the fallback image to use as a source input");
-
-    CONFIG_OPTIONS.put(ENCODING_PROFILE, "The encoding profile to use");
-
-    CONFIG_OPTIONS.put(TARGET_TAGS, "The tags to apply to the compound video track");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR, "The flavor to apply to the compound video track");
-
-    CONFIG_OPTIONS
-            .put(LAYOUT_MULTIPLE,
-                    "The layout name to use or a semi-colon separated JSON layout definition (lower, upper, optional watermark) if there are multiple videos");
-    CONFIG_OPTIONS
-            .put(LAYOUT_SINGLE,
-                    "The layout name to use or a semi-colon separated JSON layout definition (video, optional watermark) if there is a single video source");
-    CONFIG_OPTIONS.put(LAYOUT_PREFIX,
-            "Define semi-colon separated JSON layouts (lower, upper, optional watermark) to provide by name");
-
-    CONFIG_OPTIONS.put(OUTPUT_RESOLUTION, "The resulting resolution of the compound video e.g. 1900x1080");
-    CONFIG_OPTIONS.put(OUTPUT_BACKGROUND, "The resulting background color of the compound video e.g. black");
-  }
 
   /** The composer service */
   private ComposerService composerService = null;
@@ -175,16 +141,6 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

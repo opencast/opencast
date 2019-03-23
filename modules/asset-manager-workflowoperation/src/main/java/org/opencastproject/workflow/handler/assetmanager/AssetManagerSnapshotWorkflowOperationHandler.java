@@ -21,8 +21,6 @@
 package org.opencastproject.workflow.handler.assetmanager;
 
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
-import static org.opencastproject.util.data.Collections.smap;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.job.api.JobContext;
@@ -48,7 +46,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 
 /**
  * Workflow operation for taking a snapshot of a media package.
@@ -60,16 +57,6 @@ public class AssetManagerSnapshotWorkflowOperationHandler extends AbstractWorkfl
 
   /** The asset manager. */
   private AssetManager assetManager;
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS = smap(
-          tuple("source-tags", "Add any media package elements with one of these (comma separated) tags"),
-          tuple("source-flavors", "Add any media package elements with one of these (comma separated) flavors"));
-
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
 
   /** OSGi DI */
   public void setAssetManager(AssetManager assetManager) {

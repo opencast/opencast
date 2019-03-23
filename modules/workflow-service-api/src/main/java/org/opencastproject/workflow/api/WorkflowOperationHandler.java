@@ -23,8 +23,6 @@ package org.opencastproject.workflow.api;
 
 import org.opencastproject.job.api.JobContext;
 
-import java.util.SortedMap;
-
 /**
  * Handler for workflow operations.
  */
@@ -43,13 +41,6 @@ public interface WorkflowOperationHandler {
    * @return The handler's description
    */
   String getDescription();
-
-  /**
-   * Returns the configuration keys that this handler accepts, along with a description of their purpose.
-   *
-   * @return The configuration keys and their meaning
-   */
-  SortedMap<String, String> getConfigurationOptions();
 
   /**
    * Runs the workflow operation on this {@link WorkflowInstance}. If the execution fails for some reason, this must

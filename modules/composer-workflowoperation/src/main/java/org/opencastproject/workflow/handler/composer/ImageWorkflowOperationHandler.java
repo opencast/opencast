@@ -34,7 +34,6 @@ import static com.entwinemedia.fn.parser.Parsers.token;
 import static com.entwinemedia.fn.parser.Parsers.yield;
 import static java.lang.String.format;
 import static org.opencastproject.util.EqualsUtil.eq;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -85,7 +84,6 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.IllegalFormatException;
 import java.util.List;
-import java.util.SortedMap;
 import java.util.UUID;
 
 /**
@@ -108,22 +106,6 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   public static final String OPT_END_MARGIN = "end-margin";
 
   private static final long END_MARGIN_DEFAULT = 100;
-
-  /** The configuration options for this handler */
-  @SuppressWarnings("unchecked")
-  private static final SortedMap<String, String> CONFIG_OPTIONS = Collections.smap(
-          tuple(OPT_SOURCE_FLAVOR, "The \"flavor\" of the track to use as a video source input"),
-          tuple(OPT_SOURCE_FLAVORS, "The \"flavors\" of the track to use as a video source input"),
-          tuple(OPT_SOURCE_TAGS,
-                "The required tags that must exist on the track for the track to be used as a video source"),
-          tuple(OPT_PROFILES, "The encoding profile to use"),
-          tuple(OPT_POSITIONS, "The number of seconds into the video file to extract the image"),
-          tuple(OPT_TARGET_FLAVOR, "The flavor to apply to the extracted image"),
-          tuple(OPT_TARGET_TAGS, "The tags to apply to the extracted image"),
-          tuple(OPT_TARGET_BASE_NAME_FORMAT_SECOND, "TODO"), // todo description
-          tuple(OPT_TARGET_BASE_NAME_FORMAT_PERCENT, "The target base name pattern for seconds 'thumbnail' or 'extracted'."), //todo description
-          tuple(OPT_END_MARGIN, "A margin in milliseconds at the end of the video. Each position is "
-                  + "limited to not exceed this bound. Defaults to " + END_MARGIN_DEFAULT + "ms."));
 
   /** The composer service */
   private ComposerService composerService = null;
@@ -150,11 +132,6 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   @Override

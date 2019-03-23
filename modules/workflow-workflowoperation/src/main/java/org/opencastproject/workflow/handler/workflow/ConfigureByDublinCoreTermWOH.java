@@ -44,8 +44,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Take look in specified catalog for specified term, if the value matches the specified value add the target-tags
@@ -53,9 +51,6 @@ import java.util.TreeMap;
 public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBase {
 
   private static final Logger logger = LoggerFactory.getLogger(ConfigureByDublinCoreTermWOH.class);
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
 
   /** Name of the configuration option that provides the catalog to examine */
   public static final String DCCATALOG_PROPERTY = "dccatalog";
@@ -74,27 +69,6 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
 
   /** The local workspace */
   private Workspace workspace = null;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<>();
-
-    CONFIG_OPTIONS.put(DCCATALOG_PROPERTY, "The flavor of the catalog to examine, will throw error if not present");
-    CONFIG_OPTIONS.put(DCTERM_PROPERTY, "The Dublin Core term/element to examine");
-    CONFIG_OPTIONS.put(DEFAULT_VALUE_PROPERTY,
-            "The Dublin Core term/element's value if not found, if this is not given then match will fail");
-    CONFIG_OPTIONS.put(MATCH_VALUE_PROPERTY,
-            "The match the Dublin Core term/element against this value, if true then apply target-tags");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
 
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.

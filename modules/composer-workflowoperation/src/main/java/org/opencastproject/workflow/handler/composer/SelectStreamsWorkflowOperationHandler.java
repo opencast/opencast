@@ -51,8 +51,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -75,9 +73,6 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
   /** The local workspace */
   private Workspace workspace = null;
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
   private enum AudioMuxing {
     NONE, FORCE, DUPLICATE;
 
@@ -96,24 +91,6 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String CONFIG_FORCE_TARGET = "force-target";
 
   private static final String FORCE_TARGET_DEFAULT = "presenter";
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<>();
-    CONFIG_OPTIONS.put("source-flavor", "The \"flavor\" of the track to use as a video source input");
-    CONFIG_OPTIONS.put("target-flavor", "The flavor to apply to the encoded file");
-    CONFIG_OPTIONS.put("target-tags", "The tags to apply to the encoded file");
-    CONFIG_OPTIONS.put(CONFIG_FORCE_TARGET,
-            String.format("Target flavor type for the \"%s\" option \"%s\" (default %s)", CONFIG_AUDIO_MUXING,
-                    AudioMuxing.FORCE, FORCE_TARGET_DEFAULT));
-    CONFIG_OPTIONS.put(CONFIG_AUDIO_MUXING,
-            String.format("Either \"%s\", \"%s\" or \"%s\" to specially mux audio streams", AudioMuxing.NONE,
-                    AudioMuxing.DUPLICATE, AudioMuxing.FORCE));
-  }
-
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
 
   /**
    * Callback for the OSGi declarative services configuration.
