@@ -6,4 +6,4 @@ and can easily be used for frontend configuration. Please expect all these confi
 Therefore, so not use them for any kind of secrets (passwords, …).
 
 Note that the configuration is organization aware. That means that if you use the service, the HTTP path
-`/web/config/<component>/<filename>` will map to the local file `<organization-id>/<component>/<filename>`.
+`/ui/config/<component>/<filename>` will map to the local file `<organization-id>/<component>/<filename>`.

@@ -38,6 +38,7 @@ Configuration changes
 
 - `KARAF_NOROOT` is now set to `true` by default, preventing Opencast to be started as root user unless the
   configuration is changed.
+- The default configuration for the Paella player has been moved to `etc/ui-config/mh_default_org/paella/config.json`
 
 API changes
 -----------
