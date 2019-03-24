@@ -37,3 +37,4 @@
 export EXTRA_JAVA_OPTS="-Dorg.eclipse.jetty.server.Request.maxFormContentSize=1500000 -Dfile.encoding=UTF-8"
 export JAVA_MAX_MEM=1G
 export JAVA_PERM_MEM=256M
+export KARAF_NOROOT=true
