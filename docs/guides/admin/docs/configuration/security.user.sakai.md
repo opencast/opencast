@@ -21,6 +21,11 @@ Series ACL to grant access to the Series to members of the `mysiteid` site in Sa
 The Sakai User Provider requires Sakai 11.0 or later, and an admin-equivalent
 account on the Sakai instance.
 
+### Step 0
+
+Edit `etc/org.apache.karaf.features.cfg` and make sure the `opencast-sakai` feature is listed in the `featuresBoot`
+option.
+
 ### Step 1
 
 To enable the Sakai User Provider, copy and rename the bundled configuration template from

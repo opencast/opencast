@@ -36,6 +36,11 @@ After the installation, a new user with the capabilities
 Then generate a new web service token and add that user to the "Opencast web
 service" service.
 
+### Step 0
+
+Edit `etc/org.apache.karaf.features.cfg` and make sure the `opencast-moodle` feature is listed in the `featuresBoot`
+option.
+
 ### Step 1
 
 To enable the Moodle User Provider, copy and rename the bundled configuration
