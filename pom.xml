@@ -20,28 +20,31 @@
     <!-- library version specifications -->
     <aws.version>1.11.49_1</aws.version>
     <commons-beanutils.version>1.9.3</commons-beanutils.version>
-    <commons-collections.version>4.2</commons-collections.version>
+    <commons-codec.version>1.12</commons-codec.version>
+    <commons-collections.version>4.3</commons-collections.version>
     <commons-compress.version>1.18</commons-compress.version>
     <commons-csv.version>1.6</commons-csv.version>
+    <commons-fileupload.version>1.4</commons-fileupload.version>
     <commons-lang3.version>3.8.1</commons-lang3.version>
     <commons-text.version>1.6</commons-text.version>
     <cxf.version>3.2.6</cxf.version>
     <eclipselink.version>2.7.3</eclipselink.version>
     <functional.version>1.4.2</functional.version>
     <guava.version>23.0</guava.version>
-    <httpcomponents-httpclient.version>4.5.6</httpcomponents-httpclient.version>
-    <httpcomponents-httpcore.version>4.4.10</httpcomponents-httpcore.version>
+    <httpcomponents-httpclient.version>4.5.7</httpcomponents-httpclient.version>
+    <httpcomponents-httpcore.version>4.4.11</httpcomponents-httpcore.version>
     <jackson.version>2.9.8</jackson.version>
     <jdk.version>1.8</jdk.version>
     <joda-time.version>2.10.1</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
     <karaf.version>4.2.2</karaf.version>
-    <mina.version>2.0.19</mina.version>
+    <mina.version>2.1.0</mina.version>
     <node.version>v10.15.1</node.version>
     <npm.version>6.4.1</npm.version>
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
+    <querydsl.version>3.7.4</querydsl.version>
   </properties>
   <modules>
     <module>modules/admin-ui</module>
@@ -686,7 +689,7 @@
       <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-client</artifactId>
-        <version>5.15.7</version>
+        <version>5.15.9</version>
       </dependency>
       <dependency>
         <groupId>org.apache.activemq</groupId>
@@ -994,11 +997,6 @@
         <version>2.9.1_3</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.servicemix.bundles</groupId>
-        <artifactId>org.apache.servicemix.bundles.jsr305</artifactId>
-        <version>2.0.1_1</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore-osgi</artifactId>
         <version>${httpcomponents-httpcore.version}</version>
@@ -1012,7 +1010,7 @@
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <scope>test</scope>
-        <version>4.0.1</version>
+        <version>4.0.2</version>
       </dependency>
       <dependency>
         <groupId>org.easymock</groupId>
@@ -1067,7 +1065,7 @@
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.11</version>
+        <version>${commons-codec.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -1077,7 +1075,7 @@
       <dependency>
         <groupId>commons-fileupload</groupId>
         <artifactId>commons-fileupload</artifactId>
-        <version>1.3.3</version>
+        <version>${commons-fileupload.version}</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
@@ -1103,13 +1101,13 @@
       <dependency>
         <groupId>com.mysema.querydsl</groupId>
         <artifactId>querydsl-apt</artifactId>
-        <version>3.6.5</version>
+        <version>${querydsl.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>com.mysema.querydsl</groupId>
         <artifactId>querydsl-jpa</artifactId>
-        <version>3.6.5</version>
+        <version>${querydsl.version}</version>
       </dependency>
       <dependency>
         <groupId>joda-time</groupId>
@@ -1119,25 +1117,25 @@
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>json-path</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>xml-path</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>rest-assured</artifactId>
-        <version>3.2.0</version>
+        <version>3.3.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>com.google.code.findbugs</groupId>
         <artifactId>jsr305</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.2</version>
       </dependency>
       <dependency>
         <groupId>com.googlecode.json-simple</groupId>
@@ -1174,7 +1172,7 @@
       <dependency>
         <groupId>com.mchange</groupId>
         <artifactId>c3p0</artifactId>
-        <version>0.9.5.3</version>
+        <version>0.9.5.4</version>
       </dependency>
       <dependency>
         <groupId>com.entwinemedia.common</groupId>
@@ -1235,7 +1233,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.0</version>
       </dependency>
       <dependency>
         <groupId>org.opencastproject</groupId>

@@ -5,9 +5,9 @@
     <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
     <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
     <bundle>mvn:com.mysema.commons/mysema-commons-lang/0.2.4</bundle>
-    <bundle>mvn:com.mysema.querydsl/querydsl-core/3.6.5</bundle>
-    <bundle>mvn:com.mysema.querydsl/querydsl-sql/3.6.5</bundle>
-    <bundle>mvn:com.mysema.querydsl/querydsl-jpa/3.6.5</bundle>
+    <bundle>mvn:com.mysema.querydsl/querydsl-core/${querydsl.version}</bundle>
+    <bundle>mvn:com.mysema.querydsl/querydsl-sql/${querydsl.version}</bundle>
+    <bundle>mvn:com.mysema.querydsl/querydsl-jpa/${querydsl.version}</bundle>
   </feature>
 
   <feature name="ext-core" version="${project.version}">
@@ -22,7 +22,7 @@
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpclient-osgi/${httpcomponents-httpclient.version}</bundle>
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpcore-osgi/${httpcomponents-httpcore.version}</bundle>
     <bundle start-level="55">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/3.1_7</bundle>
-    <bundle start-level="55">mvn:commons-codec/commons-codec/1.11</bundle>
+    <bundle start-level="55">mvn:commons-codec/commons-codec/${commons-codec.version}</bundle>
 
     <!-- General specifications -->
     <bundle>mvn:javax.el/javax.el-api/3.0.0</bundle>
@@ -44,9 +44,9 @@
     <!-- 3rd party libraries -->
     <bundle>mvn:com.entwinemedia.common/functional/${functional.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
-    <bundle>mvn:com.google.guava/guava/18.0</bundle>
+    <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
     <bundle>mvn:com.google.code.gson/gson/2.8.2</bundle>
-    <bundle>mvn:commons-fileupload/commons-fileupload/1.3.3</bundle>
+    <bundle>mvn:commons-fileupload/commons-fileupload/${commons-fileupload.version}</bundle>
     <bundle>mvn:commons-io/commons-io/2.6</bundle>
     <!-- FIXME: commons-lang 2.6 only needed for the ical library in the commons bundle -->
     <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
