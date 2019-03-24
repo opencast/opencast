@@ -114,7 +114,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String MERGE_FORCE_FLAVORS_DEFAULT = "dublincore/*,security/*";
 
   /** Path the REST endpoint which will re-direct users to the currently configured video player **/
-  static final String PLAYER_PATH = "/watch/";
+  static final String PLAYER_PATH = "/play/";
 
   /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;

@@ -103,7 +103,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   /** The engage base url property **/
   static final String ENGAGE_URL_PROPERTY = "org.opencastproject.engage.ui.url";
   /** The default path to the player **/
-  static final String PLAYER_PATH = "/watch/";
+  static final String PLAYER_PATH = "/play/";
 
   /** Default values for configuration options */
   private static final String DEFAULT_STREAM_MIME_TYPE = "video/mp4";

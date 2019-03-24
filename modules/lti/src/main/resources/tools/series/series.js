@@ -23,8 +23,9 @@
 
 'use strict';
 
-var player = '/watch/',
-    currentpage,
+const player = '/play/';
+
+var currentpage,
     defaultLang = i18ndata['en-US'],
     lang = defaultLang;
 

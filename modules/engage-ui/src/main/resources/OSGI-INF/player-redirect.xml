@@ -5,7 +5,7 @@
   <property name="service.description" value="Configurable Player Endpoint"/>
 
   <property name="opencast.service.type" value="org.opencastproject.engage.ui.player.redirect"/>
-  <property name="opencast.service.path" value="/watch"/>
+  <property name="opencast.service.path" value="/play"/>
 
   <service>
     <provide interface="org.opencastproject.engage.ui.PlayerRedirect"/>

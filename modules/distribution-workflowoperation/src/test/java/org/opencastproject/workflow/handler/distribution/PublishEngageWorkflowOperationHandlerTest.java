@@ -59,7 +59,7 @@ public class PublishEngageWorkflowOperationHandlerTest {
     PublishEngageWorkflowOperationHandler publishEngagePublish = new PublishEngageWorkflowOperationHandler();
     publishEngagePublish.setSecurityService(securityService);
     URI result = publishEngagePublish.createEngageUri(engageURI, mp);
-    assertEquals(engageURI.toString() + "/watch/" + mpId, result.toString());
+    assertEquals(engageURI.toString() + "/play/" + mpId, result.toString());
   }
 
   @Test

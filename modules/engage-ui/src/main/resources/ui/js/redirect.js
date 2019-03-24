@@ -19,7 +19,7 @@
  *
  */
 
-const player = '/watch/';
+const player = '/play/';
 
 function error() {
   $('#error').show();

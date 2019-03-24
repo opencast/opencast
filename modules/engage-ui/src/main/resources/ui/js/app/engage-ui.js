@@ -12,7 +12,7 @@ function($, bootbox, _, alertify) {
 
         // URL's and Endpoints
         var restEndpoint = "/search/";
-        var playerEndpoint = "/watch/";
+        var playerEndpoint = "/play/";
         var infoMeURL = "/info/me.json";
         var springSecurityLoginURL = "/j_spring_security_check";
         var springSecurityLogoutURL = "/j_spring_security_logout";

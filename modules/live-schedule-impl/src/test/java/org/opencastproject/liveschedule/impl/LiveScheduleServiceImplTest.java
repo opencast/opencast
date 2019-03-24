@@ -594,7 +594,7 @@ public class LiveScheduleServiceImplTest {
     Assert.assertEquals(1, publications.length);
     Assert.assertEquals(LiveScheduleService.CHANNEL_ID, publications[0].getChannel());
     Assert.assertEquals("text/html", publications[0].getMimeType().toString());
-    Assert.assertEquals(ENGAGE_URL + "/watch/" + MP_ID, publications[0].getURI().toString());
+    Assert.assertEquals(ENGAGE_URL + "/play/" + MP_ID, publications[0].getURI().toString());
   }
 
   @Test

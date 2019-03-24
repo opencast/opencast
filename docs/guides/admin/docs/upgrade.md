@@ -90,7 +90,7 @@ Update Player Links
 > This step is optional
 
 Opencast 7 comes with the capability of dynamically switching the configured player without requiring the republication
-of all published material by providing the dynamic target `https://example.opencast.org/watch/<id>`. This new target
+of all published material by providing the dynamic target `https://example.opencast.org/play/<id>`. This new target
 will be used for all new engage publications.
 
 But old publications still reference the players directly in the admin interface and the external API. This does not
@@ -101,34 +101,34 @@ Alternatively, you can rewrite the old links all at once without re-publication 
 
 1. Find the archive directory and run the following command (replacing `<playerlink>`):
 
-        sed -i 's_<playerlink>_/watch/_g' .../archive/*/*/*/manifest.xml
+        sed -i 's_<playerlink>_/play/_g' .../archive/*/*/*/manifest.xml
 
     For Theodul, Paella and the Engage player the specific commands would be:
 
-        sed -i 's_/engage/theodul/ui/core.html?id=_/watch/_g' .../archive/*/*/*/manifest.xml
-        sed -i 's_/paella/ui/watch.html?id=_/watch/_g' .../archive/*/*/*/manifest.xml
-        sed -i 's_/engage/ui/watch.html?id=_/watch/_g' .../archive/*/*/*/manifest.xml
+        sed -i 's_/engage/theodul/ui/core.html?id=_/play/_g' .../archive/*/*/*/manifest.xml
+        sed -i 's_/paella/ui/watch.html?id=_/play/_g' .../archive/*/*/*/manifest.xml
+        sed -i 's_/engage/ui/watch.html?id=_/play/_g' .../archive/*/*/*/manifest.xml
 
 2. Run the following SQL commands on your opencast database (replacing `<playerlink>`):
 
         UPDATE oc_assets_snapshot
           SET mediapackage_xml =
-          REPLACE(mediapackage_xml, '<playerlink>', '/watch/')
+          REPLACE(mediapackage_xml, '<playerlink>', '/play/')
           WHERE INSTR(mediapackage_xml, '<playerlink>') > 0;
 
     For Theodul, Paella and the Engage player the specific commands would be:
 
         UPDATE oc_assets_snapshot
           SET mediapackage_xml =
-          REPLACE(mediapackage_xml, '/engage/theodul/ui/core.html?id=', '/watch/')
+          REPLACE(mediapackage_xml, '/engage/theodul/ui/core.html?id=', '/play/')
           WHERE INSTR(mediapackage_xml, '/engage/theodul/ui/core.html?id=') > 0;
         UPDATE oc_assets_snapshot
           SET mediapackage_xml =
-          REPLACE(mediapackage_xml, '/paella/ui/watch.html?id=', '/watch/')
+          REPLACE(mediapackage_xml, '/paella/ui/watch.html?id=', '/play/')
           WHERE INSTR(mediapackage_xml, '/paella/ui/watch.html?id=') > 0;
         UPDATE oc_assets_snapshot
           SET mediapackage_xml =
-          REPLACE(mediapackage_xml, '/engage/ui/watch.html?id=', '/watch/')
+          REPLACE(mediapackage_xml, '/engage/ui/watch.html?id=', '/play/')
           WHERE INSTR(mediapackage_xml, '/engage/ui/watch.html?id=') > 0;
 
 Please ensure to execute these steps before rebuilding the index.
