@@ -36,7 +36,8 @@ A non-comprehensive list of improvements:
 Configuration changes
 ---------------------
 
-- …
+- `KARAF_NOROOT` is now set to `true` by default, preventing Opencast to be started as root user unless the
+  configuration is changed.
 
 API changes
 -----------
