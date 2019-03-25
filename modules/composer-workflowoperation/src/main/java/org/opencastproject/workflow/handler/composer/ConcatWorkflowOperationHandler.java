@@ -60,8 +60,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * The workflow definition for handling "concat" operations
@@ -95,31 +93,6 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ConcatWorkflowOperationHandler.class);
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_TAGS_PREFIX,
-            "The prefix of the iterative \"tags\" used to specify the order of the source input tracks");
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR_PREFIX,
-            "The prefix of the iterative \"flavors\" used to specify the order of the source input tracks");
-
-    CONFIG_OPTIONS.put(TARGET_TAGS, "The tags to apply to the compound video track");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR, "The flavor to apply to the compound video track");
-    CONFIG_OPTIONS
-            .put(OUTPUT_RESOLUTION,
-                    "The resulting resolution of the concat video e.g. 1900x1080 or the part name to take as the output resolution");
-    CONFIG_OPTIONS.put(ENCODING_PROFILE, "The encoding profile to use");
-    CONFIG_OPTIONS.put(OUTPUT_FRAMERATE,
-            "The frame rate of the resulting video in frames per second, e.g. 25, 23.976 "
-            + "or part name to take the value from, e.g. part-1.");
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR_NUMBERED_FILES,
-          "The tagged input files are an LEXIGRAPHICALLY ordered set of iterative videos, whose names are a prefix followed immediately by a number to specify the order of the source input tracks. This cannot be used with other source flavors/tags");
-    CONFIG_OPTIONS.put(SAME_CODEC,
-      "true if source files all have the identical codec/framerate/dimension, etc - do not scale and transcode before concatenation");
-  }
-
   /** The composer service */
   private ComposerService composerService = null;
 
@@ -145,16 +118,6 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

@@ -54,8 +54,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Workflow operation handler that will send HTTP POST or PUT requests to a specified address.
@@ -94,19 +92,6 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
 
   /** Name of the workflow instance id HTTP parameter */
   public static final String HTTP_PARAM_WORKFLOW = "workflowInstanceId";
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<>();
-    CONFIG_OPTIONS.put(OPT_URL_PATH, "Notification request target");
-    CONFIG_OPTIONS.put(OPT_NOTIFICATION_SUBJECT, "Notification title");
-    CONFIG_OPTIONS.put(OPT_NOTIFICATION_MESSAGE, "Notification");
-    CONFIG_OPTIONS.put(OPT_METHOD, "HTTP Method");
-    CONFIG_OPTIONS.put(OPT_MAX_RETRY, "Maximum attempts for the notification request");
-    CONFIG_OPTIONS.put(OPT_TIMEOUT, "Request timeout");
-  }
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(HttpNotificationWorkflowOperationHandler.class);

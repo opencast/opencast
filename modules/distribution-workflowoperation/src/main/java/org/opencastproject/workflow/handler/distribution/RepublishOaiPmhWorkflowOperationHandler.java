@@ -24,8 +24,6 @@ import static com.entwinemedia.fn.fns.Strings.trimToNone;
 import static java.lang.String.format;
 import static org.opencastproject.util.JobUtil.waitForJobs;
 import static org.opencastproject.util.data.Collections.set;
-import static org.opencastproject.util.data.Collections.smap;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
@@ -46,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedMap;
 
 /** Workflow operation for handling "republish" operations to OAI-PMH repositories. */
 public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
@@ -59,17 +56,6 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
   private static final String OPT_SOURCE_FLAVORS = "source-flavors";
   private static final String OPT_SOURCE_TAGS = "source-tags";
   private static final String OPT_REPOSITORY = "repository";
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS = smap(
-          tuple(OPT_SOURCE_FLAVORS, "Republish any media package elements with one of these flavors"),
-          tuple(OPT_SOURCE_TAGS, "Republish only media package elements that are tagged with one of these tags"),
-          tuple(OPT_REPOSITORY, "The OAI-PMH repository to update"));
-
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
 
   @Override
   public WorkflowOperationResult start(WorkflowInstance wi, JobContext context) throws WorkflowOperationException {

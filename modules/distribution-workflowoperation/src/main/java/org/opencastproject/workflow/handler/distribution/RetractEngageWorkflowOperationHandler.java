@@ -49,8 +49,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Workflow operation for retracting a media package from the engage player.
@@ -62,9 +60,6 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /** Configuration property id */
   private static final String STREAMING_URL_PROPERTY = "org.opencastproject.streaming.url";
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS = new TreeMap<String, String>();
 
   /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
@@ -107,16 +102,6 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    */
   protected void setSearchService(SearchService searchService) {
     this.searchService = searchService;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

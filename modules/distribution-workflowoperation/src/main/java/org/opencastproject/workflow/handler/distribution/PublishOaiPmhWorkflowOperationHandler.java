@@ -58,8 +58,6 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
 
 /**
@@ -96,38 +94,6 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
    */
   public void setPublicationService(OaiPmhPublicationService publicationService) {
     this.publicationService = publicationService;
-  }
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<>();
-    CONFIG_OPTIONS.put(DOWNLOAD_FLAVORS,
-            "Distribute any mediapackage elements with one of these (comma separated) flavors to download");
-    CONFIG_OPTIONS.put(DOWNLOAD_TAGS,
-            "Distribute any mediapackage elements with one of these (comma separated) tags to download.");
-    CONFIG_OPTIONS.put(STREAMING_FLAVORS,
-            "Distribute any mediapackage elements with one of these (comma separated) flavors to streaming");
-    CONFIG_OPTIONS.put(STREAMING_TAGS,
-            "Distribute any mediapackage elements with one of these (comma separated) tags to streaming.");
-    CONFIG_OPTIONS.put(CHECK_AVAILABILITY,
-            "( true | false ) defaults to true. Check if the distributed download artifact is available at its URL");
-    CONFIG_OPTIONS.put(REPOSITORY, "The OAI-PMH repository");
-    CONFIG_OPTIONS.put(EXTERNAL_CHANNEL_NAME, "The external element's channel name");
-    CONFIG_OPTIONS.put(EXTERNAL_TEMPLATE,
-            "The external element's URL template (https://www.externalURL.com/watch.html?series={series}&id={event})");
-    CONFIG_OPTIONS.put(EXTERNAL_MIME_TYPE, "The external element's mime type");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /** OSGi component activation. */

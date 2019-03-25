@@ -87,8 +87,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import junit.framework.Assert;
 
@@ -325,11 +323,6 @@ public class WorkflowOperationSkippingTest {
 
     SucceedingWorkflowOperationHandler(MediaPackage mp) {
       this.mp = mp;
-    }
-
-    @Override
-    public SortedMap<String, String> getConfigurationOptions() {
-      return new TreeMap<String, String>();
     }
 
     @Override

@@ -53,8 +53,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Downloads all external URI's to the working file repository and optionally deletes external working file repository
@@ -68,9 +66,6 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
   /** Deleting external working file repository URI's after download config key */
   public static final String DELETE_EXTERNAL = "delete-external";
 
-  /** The configuration properties */
-  protected SortedMap<String, String> configurationOptions = null;
-
   /**
    * The workspace to use in retrieving and storing files.
    */
@@ -81,9 +76,6 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
   /** The default no-arg constructor builds the configuration options set */
   public IngestDownloadWorkflowOperationHandler() {
-    configurationOptions = new TreeMap<String, String>();
-    configurationOptions.put(DELETE_EXTERNAL,
-            "Whether to try to delete external working file repository URIs. Default is false.");
   }
 
   /**
@@ -243,15 +235,5 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
     }
 
     return createResult(mediaPackage, Action.CONTINUE);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return configurationOptions;
   }
 }

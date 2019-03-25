@@ -41,8 +41,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Simple implementation that holds for user-entered trim points.
@@ -52,9 +50,6 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   private static final Logger logger = LoggerFactory.getLogger(TagWorkflowOperationHandler.class);
   private static final String PLUS = "+";
   private static final String MINUS = "-";
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
 
   /** Name of the configuration option that provides the source flavors we are looking for */
   public static final String SOURCE_FLAVORS_PROPERTY = "source-flavors";
@@ -70,31 +65,6 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /** Name of the configuration option that provides the copy boolean we are looking for */
   public static final String COPY_PROPERTY = "copy";
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_FLAVORS_PROPERTY,
-            "Tagging any mediapackage elements with one of these (comma sparated) flavors.");
-    CONFIG_OPTIONS.put(SOURCE_TAGS_PROPERTY,
-            "Tagging any mediapackage elements with one of these (comma separated) tags.");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR_PROPERTY, "Apply these flavor to any mediapackage elements");
-    CONFIG_OPTIONS
-            .put(TARGET_TAGS_PROPERTY,
-                    "Apply these (comma separated) tags to any mediapackage elements. If a target-tag starts with a '-', "
-                            + "tag will removed from preexisting tags, if starts with a '+', tag will added to preexisting tags.");
-    CONFIG_OPTIONS.put(COPY_PROPERTY,
-            "Indicates if any mediapackage elements should be copied 'true' or overridden 'false'");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
 
   /**
    * {@inheritDoc}

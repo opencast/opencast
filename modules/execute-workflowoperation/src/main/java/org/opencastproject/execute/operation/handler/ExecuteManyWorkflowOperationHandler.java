@@ -53,8 +53,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Runs an operation multiple times with each MediaPackageElement matching the characteristics
@@ -102,25 +100,6 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
 
   /** The workspace service */
   protected Workspace workspace;
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<>();
-    CONFIG_OPTIONS.put(EXEC_PROPERTY, "The full path the executable to run");
-    CONFIG_OPTIONS.put(PARAMS_PROPERTY, "Space separated list of command line parameters to pass to the executable");
-    CONFIG_OPTIONS.put(LOAD_PROPERTY, "A floating point estimate of the load imposed on the node by this job");
-    CONFIG_OPTIONS.put(OUTPUT_FILENAME_PROPERTY, "The name of the elements created by this operation");
-    CONFIG_OPTIONS.put(EXPECTED_TYPE_PROPERTY,
-            "The type of the element returned by this operation. Accepted values are: manifest, timeline, track, catalog, attachment, other");
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR_PROPERTY,
-            "The \"flavor\" that the mediapackage elements must have in order to be used as an input argument");
-    CONFIG_OPTIONS.put(SOURCE_TAGS_PROPERTY,
-            "The required tags that must exist on the mediapackage element for the element to be used as an input argument");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR_PROPERTY, "The flavor that the resulting mediapackage elements will be assigned");
-    CONFIG_OPTIONS.put(TARGET_TAGS_PROPERTY, "The tags that the resulting mediapackage elements will be assigned");
-  }
 
   /**
    * {@inheritDoc}
@@ -308,16 +287,6 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
   @Override
   public void destroy(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
     // Do nothing (nothing to clean up, the command line program should do this itself)
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

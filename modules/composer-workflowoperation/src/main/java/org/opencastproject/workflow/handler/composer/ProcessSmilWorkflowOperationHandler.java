@@ -69,8 +69,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * The workflow definition for handling "compose" operations
@@ -79,22 +77,6 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
   static final String SEPARATOR = ";";
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ProcessSmilWorkflowOperationHandler.class);
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put("smil-flavor", "The flavor of the smil file");
-    CONFIG_OPTIONS.put("source-flavors", "The \"flavor\" of the track to use as a source input, use \"" + SEPARATOR
-            + "\" to separate sections when using multiple target flavors");
-    CONFIG_OPTIONS.put("encoding-profiles", "The encoding profile(s) to use, use \"" + SEPARATOR
-            + "\" to separate sections mapped to each source-flavor section in the same order");
-    CONFIG_OPTIONS.put("target-flavors", "The flavors to apply to the encoded file, use \"" + SEPARATOR
-            + "\" to separate sections mapped to each source-flavor section in the same order");
-    CONFIG_OPTIONS.put("target-tags", "The tags to apply to the encoded file");
-    CONFIG_OPTIONS.put("tag-with-profile",
-            "Set to 'true' to tag target tracks with corresponding encoding profile Id, false by default");
-  }
 
   /** The composer service */
   private ComposerService composerService = null;
@@ -212,16 +194,6 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

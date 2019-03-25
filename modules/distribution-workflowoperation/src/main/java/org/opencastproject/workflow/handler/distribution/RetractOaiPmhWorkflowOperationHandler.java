@@ -37,9 +37,6 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 /**
  * Workflow operation for retracting a media package from OAI-PMH publication repository.
  */
@@ -51,25 +48,8 @@ public class RetractOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
   /** Workflow configuration option keys */
   private static final String REPOSITORY = "repository";
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS = new TreeMap<String, String>();
-
-  static {
-    CONFIG_OPTIONS.put(REPOSITORY, "The OAI-PMH repository");
-  }
-
   /** The OAI-PMH publication service */
   private OaiPmhPublicationService publicationService = null;
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
 
   /**
    * OSGi declarative service configuration callback.

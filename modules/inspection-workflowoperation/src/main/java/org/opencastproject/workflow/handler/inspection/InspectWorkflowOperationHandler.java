@@ -63,8 +63,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Workflow operation used to inspect all tracks of a media package.
@@ -73,9 +71,6 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(InspectWorkflowOperationHandler.class);
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
 
   /** Option for rewriting existing metadata */
   private static final String OPT_OVERWRITE = "overwrite";
@@ -88,14 +83,6 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
       Default: false */
   private static final String OPT_ACCURATE_FRAME_COUNT = "accurate-frame-count";
 
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(OPT_OVERWRITE, "Whether to rewrite existing metadata");
-    CONFIG_OPTIONS.put(OPT_ACCEPT_NO_MEDIA, "Whether mediapackages with no media tracks should be accepted");
-    CONFIG_OPTIONS.put(OPT_ACCURATE_FRAME_COUNT,
-            "Whether the media inspection service should determine the exact frame count");
-  }
-
   /** The inspection service */
   private MediaInspectionService inspectionService = null;
 
@@ -107,16 +94,6 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   public void setDublincoreService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

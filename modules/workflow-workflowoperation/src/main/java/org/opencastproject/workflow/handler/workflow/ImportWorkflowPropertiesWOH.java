@@ -52,8 +52,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Workflow operation handler for importing workflow properties.
@@ -61,7 +59,6 @@ import java.util.TreeMap;
 public class ImportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandler {
 
   /* Configuration options */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
   public static final String SOURCE_FLAVOR_PROPERTY = "source-flavor";
   public static final String KEYS_PROPERTY = "keys";
 
@@ -70,22 +67,9 @@ public class ImportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
   /* Service references */
   private Workspace workspace;
 
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR_PROPERTY,
-            "Flavor of the attachment that contains the serialized workflow instance properties");
-    CONFIG_OPTIONS.put(KEYS_PROPERTY,
-            "The workflow property keys to retrieve (comma separated list). If the option has not been specified, all keys will be retrieved");
-  }
-
   /** OSGi DI */
   void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   @Override

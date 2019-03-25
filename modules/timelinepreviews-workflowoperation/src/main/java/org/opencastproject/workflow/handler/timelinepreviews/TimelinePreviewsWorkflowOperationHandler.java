@@ -53,8 +53,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Workflow operation for the timeline previews service.
@@ -82,21 +80,6 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
   /** Default value for image size. */
   private static final int DEFAULT_IMAGE_SIZE = 10;
 
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR_PROPERTY, "The source media file flavor.");
-    CONFIG_OPTIONS.put(SOURCE_TAGS_PROPERTY, "Comma-separated tags of the source media files. "
-            + "Any media that match " + SOURCE_FLAVOR_PROPERTY + " or " + SOURCE_TAGS_PROPERTY
-            + " will be processed.");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR_PROPERTY, "The target timeline previews image flavor.");
-    CONFIG_OPTIONS.put(TARGET_TAGS_PROPERTY, "The timeline previews image (comma separated) target tags.");
-    CONFIG_OPTIONS.put(IMAGE_SIZE_PROPERTY, "The number of timeline previews in the image.");
-  }
-
   /** The timeline previews service. */
   private TimelinePreviewsService timelinePreviewsService = null;
 
@@ -107,17 +90,6 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
   public void activate(ComponentContext cc) {
     super.activate(cc);
     logger.info("Registering timeline previews workflow operation handler");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see
-   * org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

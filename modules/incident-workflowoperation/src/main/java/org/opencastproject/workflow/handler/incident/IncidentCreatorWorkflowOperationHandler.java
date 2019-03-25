@@ -43,8 +43,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class IncidentCreatorWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
@@ -55,22 +53,7 @@ public class IncidentCreatorWorkflowOperationHandler extends AbstractWorkflowOpe
   private static final String OPT_DETAILS = "details";
   private static final String OPT_PARAMS = "params";
 
-  private static final SortedMap<String, String> CONFIG_OPTS;
-
-  static {
-    CONFIG_OPTS = new TreeMap<>();
-    CONFIG_OPTS.put(OPT_CODE, "The code number of the incident to produce.");
-    CONFIG_OPTS.put(OPT_SEVERITY, "The severity");
-    CONFIG_OPTS.put(OPT_DETAILS, "Some details: title=content;title=content;...");
-    CONFIG_OPTS.put(OPT_PARAMS, "Some params: key=value;key=value;...");
-  }
-
   private NopService nopService;
-
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTS;
-  }
 
   @Override
   public WorkflowOperationResult start(WorkflowInstance wi, JobContext ctx) throws WorkflowOperationException {

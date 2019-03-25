@@ -81,8 +81,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -180,33 +178,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           TrackImpl.StreamingProtocol.HDS,
           TrackImpl.StreamingProtocol.SMOOTH));
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(DOWNLOAD_SOURCE_FLAVORS,
-            "Distribute any mediapackage elements with one of these (comma separated) flavors to download");
-    CONFIG_OPTIONS.put(STREAMING_TARGET_SUBFLAVOR,
-            "Target subflavor for elements that have been distributed for downloads");
-    CONFIG_OPTIONS.put(DOWNLOAD_SOURCE_TAGS,
-            "Distribute any mediapackage elements with one of these (comma separated) tags to download.");
-    CONFIG_OPTIONS.put(DOWNLOAD_TARGET_TAGS,
-            "Add all of these comma separated tags to elements that have been distributed for download.");
-    CONFIG_OPTIONS.put(STREAMING_SOURCE_FLAVORS,
-            "Distribute any mediapackage elements with one of these (comma separated) flavors to streaming");
-    CONFIG_OPTIONS.put(STREAMING_TARGET_SUBFLAVOR,
-            "Target subflavor for elements that have been distributed for streaming");
-    CONFIG_OPTIONS.put(STREAMING_SOURCE_TAGS,
-            "Distribute any mediapackage elements with one of these (comma separated) tags to streaming.");
-    CONFIG_OPTIONS.put(STREAMING_TARGET_TAGS,
-            "Add all of these comma separated tags to elements that have been distributed for streaming.");
-    CONFIG_OPTIONS.put(CHECK_AVAILABILITY,
-            "( true | false ) defaults to true. Check if the distributed download artifact is available at its URL");
-    CONFIG_OPTIONS.put(STRATEGY,
-            "Strategy if there is an existing Publication");
-  }
-
   @Override
   protected void activate(ComponentContext cc) {
     super.activate(cc);
@@ -215,16 +186,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     // Get configuration
     serverUrl = UrlSupport.url(bundleContext.getProperty(SERVER_URL_PROPERTY));
     distributeStreaming = StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY));
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

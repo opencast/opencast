@@ -72,8 +72,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import javax.xml.bind.JAXBException;
 
@@ -118,28 +116,6 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
   private static final String SKIP_NOT_TRIMMED_PROPERTY = "skip-if-not-trimmed";
 
   /**
-   * The configuration options for this handler
-   */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<>();
-    CONFIG_OPTIONS.put(SOURCE_FLAVORS_PROPERTY, "The flavor for working files (tracks to edit).");
-    CONFIG_OPTIONS.put(PREVIEW_FLAVORS_PROPERTY, "The flavor for preview files (tracks to show in edit UI).");
-    CONFIG_OPTIONS.put(SKIPPED_FLAVORS_PROPERTY, "The flavor for working files if videoeditor operation is disabled."
-            + " This is an optional option." + " Default value is given by \"" + SOURCE_FLAVORS_PROPERTY + "\".");
-    CONFIG_OPTIONS.put(SMIL_FLAVORS_PROPERTY, "The flavor for input SMIL files.");
-    CONFIG_OPTIONS.put(TARGET_SMIL_FLAVOR_PROPERTY, "The flavor for target SMIL file.");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR_SUBTYPE_PROPERTY, "The flavor subtype for target media files.");
-    CONFIG_OPTIONS.put(INTERACTIVE_PROPERTY, "Whether the operation is interactive or not.");
-    CONFIG_OPTIONS.put(SKIP_PROCESSING_PROPERTY,
-            "Do not processing the files, keep the raw smil produced by the videoeditor operation if it is enabled."
-                    + " This is an optional option." + " Default value is \"FALSE\".");
-    CONFIG_OPTIONS.put(SKIP_NOT_TRIMMED_PROPERTY,
-            "If 'true', do not process the input track(s) if no trimming points are defined.");
-  }
-
-  /**
    * The SMIL service to modify SMIL files.
    */
   private SmilService smilService;
@@ -158,16 +134,6 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     setHoldActionTitle("Review / VideoEdit");
     registerHoldStateUserInterface(HOLD_UI_PATH);
     logger.info("Registering videoEditor hold state ui from classpath {}", HOLD_UI_PATH);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

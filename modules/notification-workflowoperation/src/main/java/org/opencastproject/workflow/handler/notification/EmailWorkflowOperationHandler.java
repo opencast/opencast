@@ -78,13 +78,6 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   @Override
   protected void activate(ComponentContext cc) {
     super.activate(cc);
-    addConfigurationOption(TO_PROPERTY, "The mail address(es) to send to");
-    addConfigurationOption(CC_PROPERTY, "The mail address(es) to send to as \"carbon copy\"");
-    addConfigurationOption(BCC_PROPERTY, "The mail address(es) to send to as \"blind carbon copy\"");
-    addConfigurationOption(SUBJECT_PROPERTY, "The subject line");
-    addConfigurationOption(BODY_PROPERTY, "The email body text (or email template)");
-    addConfigurationOption(BODY_TEMPLATE_FILE_PROPERTY, "The file name of the Freemarker template for the email body");
-    addConfigurationOption(IS_HTML, "Is the body text (or email template) in HTML");
   }
 
   /**
