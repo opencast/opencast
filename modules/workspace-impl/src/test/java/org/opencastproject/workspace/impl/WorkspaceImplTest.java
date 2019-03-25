@@ -21,6 +21,8 @@
 
 package org.opencastproject.workspace.impl;
 
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClient.RequestRunner;
 import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
@@ -89,6 +91,13 @@ public class WorkspaceImplTest {
     File source = new File(
             "target/test-classes/../test-classes/../test-classes/../test-classes/../test-classes/../test-classes/../test-classes/../test-classes/../test-classes/../test-classes/../test-classes/../test-classes/../test-classes/../test-classes/../test-classes/../test-classes/opencast_header.gif");
     URL urlToSource = source.toURI().toURL();
+
+    Organization organization = EasyMock.createMock(Organization.class);
+    EasyMock.expect(organization.getId()).andReturn("org1").anyTimes();
+    SecurityService securityService = EasyMock.createMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
+    EasyMock.replay(securityService, organization);
+    workspace.setSecurityService(securityService);
 
     final TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
     HttpEntity entity = EasyMock.createNiceMock(HttpEntity.class);
@@ -239,6 +248,13 @@ public class WorkspaceImplTest {
     EasyMock.expect(repo.getBaseUri()).andReturn(new URI("http://localhost:8080/files")).anyTimes();
     EasyMock.replay(repo);
     workspace.setRepository(repo);
+
+    Organization organization = EasyMock.createMock(Organization.class);
+    EasyMock.expect(organization.getId()).andReturn("org1").anyTimes();
+    SecurityService securityService = EasyMock.createMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
+    EasyMock.replay(securityService, organization);
+    workspace.setSecurityService(securityService);
 
     RequestRunner<Either<String, Option<File>>> requestRunner = f -> {
       Either<String, Option<File>> right = Either.right(Option.some(expectedFile));
