@@ -64,6 +64,9 @@
               org.opencastproject.assetmanager.api.fn;version=${project.version},
               org.opencastproject.assetmanager.api.query;version=${project.version}
             </Export-Package>
+            <Private-Package>
+              javax.annotation*
+            </Private-Package>
           </instructions>
         </configuration>
       </plugin>
