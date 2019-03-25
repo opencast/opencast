@@ -118,7 +118,6 @@
     <bundle start-level="81">mvn:org.opencastproject/opencast-db/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dublincore/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-kernel/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-message-broker-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-message-broker-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata-api/${project.version}</bundle>
@@ -219,6 +218,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-mattermost-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
@@ -331,6 +331,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-mattermost-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
@@ -455,6 +456,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-mattermost-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
@@ -624,6 +626,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-mattermost-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
