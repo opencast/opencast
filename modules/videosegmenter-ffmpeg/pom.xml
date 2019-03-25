@@ -26,6 +26,11 @@
       <artifactId>opencast-workspace-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-mpeg7</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!--  Thirdparty dependencies -->
     <dependency>
       <groupId>javax.servlet</groupId>
