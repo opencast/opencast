@@ -201,8 +201,6 @@ public interface SchedulerService {
    *          the optional workflow configuration to update
    * @param caMetadata
    *          the optional capture configuration to update
-   * @param optOut
-   *          the optional opt out status to update
    * @param allowConflict
    *          the flag to ignore conflict checks
    * @throws NotFoundException
@@ -216,7 +214,7 @@ public interface SchedulerService {
    */
   void updateEvent(String mediaPackageId, Opt<Date> startDateTime, Opt<Date> endDateTime, Opt<String> captureAgentId,
           Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
-          Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOut, boolean allowConflict)
+          Opt<Map<String, String>> caMetadata, boolean allowConflict)
                   throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException;
 
   /**

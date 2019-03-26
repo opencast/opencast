@@ -699,7 +699,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       Opt<String> seriesId = Opt.nul(record.getSnapshot().get().getMediaPackage().getSeries());
 
       // Check for conflicting events
-      if ((!isNewOptOut && readyForRecording || !isNewOptOut && propertyChanged && !oldOptOut)
+      // Check scheduling conficts in case a property relevant for conflicts has changed
+      if ((captureAgentId.isSome() || startDateTime.isSome() || endDateTime.isSome())
             && (!isAdmin() || (isAdmin() && !allowConflict))) {
         List<MediaPackage> conflictingEvents = $(findConflictingEvents(captureAgentId.getOr(agentId),
                 startDateTime.getOr(start), endDateTime.getOr(end))).filter(new Fn<MediaPackage, Boolean>() {

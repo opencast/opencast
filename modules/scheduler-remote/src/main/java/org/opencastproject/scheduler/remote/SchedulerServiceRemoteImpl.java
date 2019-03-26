@@ -55,6 +55,7 @@ import com.entwinemedia.fn.data.Opt;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;

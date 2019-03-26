@@ -32,7 +32,6 @@ import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_2_0;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
-import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.external.common.ApiMediaType;
