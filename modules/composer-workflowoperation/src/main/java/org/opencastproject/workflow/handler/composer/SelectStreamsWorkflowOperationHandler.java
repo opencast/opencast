@@ -198,6 +198,14 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     String getFlavorType() {
       return track.getFlavor().getType();
     }
+
+    public String toString() {
+      return String.format("ID: %s, Flavor: %s [hasAudio %s, hideAudio %s, hasVideo %s, hideVideo: %s]",
+          track.getIdentifier(),track.getFlavor(),
+          hasAudio(), hide(SubTrack.AUDIO),
+          hasVideo(), hide(SubTrack.VIDEO)
+      );
+    }
   }
 
   @Override
@@ -232,22 +240,20 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     final List<AugmentedTrack> augmentedTracks = createAugmentedTracks(tracks, workflowInstance);
 
     final MuxResult result = MuxResult.empty();
-    // This function is formulated in a way so that it's hopefully compatible with an event with an arbitrary number of
-    // tracks. However, many of the requirements were written with one or two tracks in mind. For example, below, we
-    // test if "all tracks are non-hidden" or "exactly one track is non-hidden". This works for arbitrary tracks, of
-    // course, but with more than two, we might want something better. Hopefully, this will be easy to improve later
-    // on.
+    // Note that the logic below currently supports at most two input tracks
 
-    // First case: We have only tracks with non-hidden video streams. So we keep them all and possibly cut away audio.
     if (allNonHidden(augmentedTracks, SubTrack.VIDEO)) {
+      // Case 1: We have only tracks with non-hidden video streams. So we keep them all and possibly cut away audio.
+
       final AudioMuxing audioMuxing = getConfiguration(workflowInstance, CONFIG_AUDIO_MUXING)
               .map(AudioMuxing::fromConfigurationString).orElse(AudioMuxing.NONE);
-      // For both special options, we need to find out if we have exactly one audio track present
       final Optional<AugmentedTrack> singleAudioTrackOpt = findSingleAudioTrack(augmentedTracks);
       final boolean multipleVideo = augmentedTracks.size() > 1;
+
       if (multipleVideo && audioMuxing == AudioMuxing.DUPLICATE && singleAudioTrackOpt.isPresent()) {
-        // Special option: If we have multiple video tracks, but only one audio track: copy this audio track to
-        // all video tracks.
+        /* Case 1.1: We have more than one track, all tracks have non-hidden video streams and exactly one track has
+           an audio stream. Audio muxing is set to DUPLICATE, so duplicate the single audio stream into all tracks */
+        logger.debug("Duplicate the audio stream of track {} into all tracks", singleAudioTrackOpt.get());
         final AugmentedTrack singleAudioTrack = singleAudioTrackOpt.get();
         for (final AugmentedTrack t : augmentedTracks) {
           if (t.track != singleAudioTrack.track) {
@@ -258,8 +264,10 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
           }
         }
       } else if (multipleVideo && audioMuxing == AudioMuxing.FORCE && singleAudioTrackOpt.isPresent()) {
-        // Special option: if the only audio track we have selected is not in the video track of "force-target", we
-        // copy it there (and remove the original audio track).
+        /* Case 1.2: We have more than one track, all tracks have non-hidden video streams and exactly one track has
+           an audio stream. Audio muxing is set to FORCE, so we enforce that the audio stream is moved to the track
+           specified by CONFIG_FORCE_TARGET if not already there */
+        logger.debug("Enforce audio stream to be present in track {} only", singleAudioTrackOpt.get());
         final AugmentedTrack singleAudioTrack = singleAudioTrackOpt.get();
         final String forceTargetOpt = getConfiguration(workflowInstance, CONFIG_FORCE_TARGET)
                 .orElse(FORCE_TARGET_DEFAULT);
@@ -294,12 +302,15 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
           }
         }
       } else {
-        // No special options selected, or conditions for special options don't match.
+        /* Case 1.3: We have one or more tracks and all tracks have non-hidden video streams. Audio muxing is either
+           set to NONE or we don't have a single audio streams as required by DUPLICATE and FORCE.
+           In this case, simply remove audio streams where requested or copy the track otherwise */
         final MuxResult muxResult = muxMultipleVideoTracks(mediaPackage, augmentedTracks);
         result.add(muxResult);
       }
     } else if (allHidden(augmentedTracks, SubTrack.VIDEO)) {
-       // Second case: We only have audio. In this case, just pass through all input tracks.
+       /* Case 2: No tracks have non-hidden video streams. In this case, simply remove video streams where
+          requested or copy the track otherwise */
        for (final AugmentedTrack t : augmentedTracks) {
          if (t.hasAudio()) {
            if (t.hide(SubTrack.VIDEO)) {
@@ -311,8 +322,10 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
          }
        }
     } else {
-      // Third case: we have exactly one video track that is not hidden (hopefully, because for all other cases there
-      // were no requirements given).
+      /* Case 3: We have one or more tracks where exactly one track has a non-hidden video stream (implied as this
+         logic assumes at most two input tracks).
+         Considering the audio stream, the track with the non-hidden video stream might also contain an audio stream
+         or we have to mux the audio stream from another track into that track */
       final MuxResult muxResult = muxSingleVideoTrack(mediaPackage, augmentedTracks);
       result.add(muxResult);
     }
@@ -344,8 +357,7 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
 
     final Collection<Track> resultingTracks = new ArrayList<>(0);
 
-    // Otherwise, we have just one video track that's not hidden (because hopefully, the UI prevented all other
-    // cases). We keep that, and mux in the audio from the other track.
+    // This method expects exactly one track with a non-hidden video stream. Let's find it.
     final AugmentedTrack nonHiddenVideo = findNonHidden(augmentedTracks, SubTrack.VIDEO)
             .orElseThrow(() -> new IllegalStateException("couldn't find a stream with non-hidden video"));
     // Implicit here is the assumption that there's just _one_ other audio stream. It's written so that
@@ -388,6 +400,8 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
       } else {
         // Even if we don't modify the track, we clone and re-add it to the MP (since it will be a new track with a
         // different flavor)
+        logger.debug("Add clone of track {} to mediapackage {}", t.track.getIdentifier(),
+            mediaPackage.getIdentifier());
         final Track clonedTrack = (Track) t.track.clone();
         clonedTrack.setIdentifier(null);
         resultingTracks.add(clonedTrack);
@@ -417,6 +431,7 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
 
   private TrackJobResult mux(final Track videoTrack, final Track audioTrack, final MediaPackage mediaPackage)
           throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException, IOException {
+    logger.info("Mux video track {} and audio track {}", videoTrack, audioTrack);
     // Find the encoding profile
     final EncodingProfile profile = getProfile(MUX_AV_PROFILE);
 
@@ -443,11 +458,13 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
 
   private TrackJobResult hideVideo(final Track track, final MediaPackage mediaPackage)
           throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException, IOException {
+    logger.info("Remove video streams from track {}", track.getIdentifier());
     return hide(PREPARE_AUDIO_ONLY_PROFILE, track, mediaPackage);
   }
 
   private TrackJobResult hideAudio(final Track track, final MediaPackage mediaPackage)
           throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException, IOException {
+    logger.info("Remove audio streams from track {}", track.getIdentifier());
     return hide(PREPARE_VIDEO_ONLY_PROFILE, track, mediaPackage);
   }
 
@@ -455,7 +472,6 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
           throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException, IOException {
     // Find the encoding profile
     final EncodingProfile profile = getProfile(encodingProfile);
-    logger.info("Encoding video only track {} to work version", track);
     final Job job = composerService.encode(track, profile.getIdentifier());
     if (!waitForStatus(job).isSuccess()) {
       throw new WorkflowOperationException(String.format("Rewriting container for video track %s failed", track));
@@ -507,11 +523,14 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     return Arrays.stream(tracks).map(t -> {
       final boolean hideAudio = trackHidden(instance, t.getFlavor().getType(), SubTrack.AUDIO);
       final boolean hideVideo = trackHidden(instance, t.getFlavor().getType(), SubTrack.VIDEO);
-      return new AugmentedTrack(t, hideAudio, hideVideo);
+      AugmentedTrack result = new AugmentedTrack(t, hideAudio, hideVideo);
+      logger.debug("AugmentedTrack {}", result);
+      return result;
     }).collect(Collectors.toList());
   }
 
   private TrackJobResult copyTrack(final Track track) throws WorkflowOperationException {
+    logger.debug("Create copy of track {}", track);
     final Track copiedTrack = (Track) track.clone();
     copiedTrack.setIdentifier(UUID.randomUUID().toString());
     try {
@@ -523,7 +542,6 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
       }
 
       // Copy the files on dis and put them into the working file repository
-      logger.debug("Start copying element {}.", track.getURI());
       final URI newUri = workspace.put(track.getMediaPackage().getIdentifier().toString(), copiedTrack.getIdentifier(),
               targetFilename, workspace.read(track.getURI()));
       copiedTrack.setURI(newUri);
