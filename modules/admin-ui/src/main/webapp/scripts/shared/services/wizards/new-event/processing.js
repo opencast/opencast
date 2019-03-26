@@ -26,11 +26,19 @@ angular.module('adminNg.services')
   var Processing = function (use) {
     // Update the content of the configuration panel with the given HTML
     var me = this, queryParams,
-        updateConfigurationPanel = function (html) {
-          if (angular.isUndefined(html)) {
-            html = '';
+        updateConfigurationPanel = function (workflow) {
+          var html = '';
+          var description = '';
+          if (angular.isDefined(workflow)){
+            if(angular.isDefined(workflow.configuration_panel)) {
+              html = workflow.configuration_panel;
+            }
+            if(angular.isDefined(workflow.description)) {
+              description = workflow.description;
+            }
           }
           me.workflowConfiguration = $sce.trustAsHtml(html);
+          me.workflowDescription = description;
         },
         isWorkflowSet = function () {
           return angular.isDefined(me.ud.workflow) && angular.isDefined(me.ud.workflow.id);
@@ -275,7 +283,7 @@ angular.module('adminNg.services')
 
           if (workflow.id === me.default_workflow_id){
             me.ud.workflow = workflow;
-            updateConfigurationPanel(me.ud.workflow.configuration_panel);
+            updateConfigurationPanel(me.ud.workflow);
             this.applyWorkflowProperties(workflowProperties, selectedIds);
             me.save();
             break;
@@ -292,7 +300,7 @@ angular.module('adminNg.services')
       originalValues = {};
       me.changingWorkflow = true;
       if (angular.isDefined(me.ud.workflow)) {
-        updateConfigurationPanel(me.ud.workflow.configuration_panel);
+        updateConfigurationPanel(me.ud.workflow);
       } else {
         updateConfigurationPanel();
       }

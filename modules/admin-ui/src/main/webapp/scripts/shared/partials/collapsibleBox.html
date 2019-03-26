@@ -1,0 +1,19 @@
+<div ng-show="hasInput"
+  ng-class="
+  {
+    'cb-box':true,
+    'cb-overflown':isOverflown,
+    'cb-collapsed':isCollapsed
+  }"
+  ng-style="collapsibleStyle"
+  ng-click="toggle()">
+  <div class="cb-text">{{inputFormatted}}</div>
+  <div class="cb-transparent-overlay" ng-show="isOverflown && isCollapsed" ng-style="collapsibleOverlayStyle">
+  </div>
+</div>
+<div ng-show="isOverflown" class="cb-arrow-box" ng-click="toggle()">
+  <div class="cb-angle">
+    <i ng-show="angleDown" class="fa fa-angle-down"></i>
+    <i ng-show="angleUp" class="fa fa-angle-up"></i>
+  </div>
+</div>

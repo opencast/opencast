@@ -8,7 +8,10 @@
     <tag>schedule</tag>
   </tags>
   <displayOrder>1000</displayOrder>
-  <description/>
+  <description>
+    A complex workflow, showcasing most of Opencast's features.
+  </description>
+
   <configuration_panel>
     <![CDATA[
       <div id="workflow-configuration">
