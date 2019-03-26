@@ -153,8 +153,10 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
             workspace,
             systemUserName);
     // compose with security
+    boolean includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
+    boolean includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
     boolean includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
-    delegate = new AssetManagerWithSecurity(withMessaging, authSvc, secSvc, includeUIRoles);
+    delegate = new AssetManagerWithSecurity(withMessaging, authSvc, secSvc, includeAPIRoles, includeCARoles, includeUIRoles);
     for (RemoteAssetStore ras : remotes) {
       delegate.addRemoteAssetStore(ras);
     }

@@ -42,6 +42,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -67,16 +68,23 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   private final AuthorizationService authSvc;
   private final SecurityService secSvc;
 
-  private final boolean includeUIRoles;
+  // Settings for role filter
+  private boolean includeAPIRoles;
+  private boolean includeCARoles;
+  private boolean includeUIRoles;
 
   public AssetManagerWithSecurity(
       TieredStorageAssetManager delegate,
       AuthorizationService authSvc,
       SecurityService secSvc,
-      boolean includeUIRoles) {
+      final boolean includeAPIRoles,
+      final boolean includeCARoles,
+      final boolean includeUIRoles) {
     super(delegate);
     this.authSvc = authSvc;
     this.secSvc = secSvc;
+    this.includeAPIRoles = includeAPIRoles;
+    this.includeCARoles = includeCARoles;
     this.includeUIRoles = includeUIRoles;
   }
 
@@ -167,7 +175,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   private Predicate mkAuthPredicate(final String action) {
     final AQueryBuilder q = q();
     return secSvc.getUser().getRoles().stream()
-            .filter((role) -> includeUIRoles || !role.getName().startsWith("ROLE_UI_"))
+            .filter(roleFilter)
             .map((role) -> mkSecurityProperty(q, role.getName(), action).eq(true))
             .reduce(Predicate::or)
             .orElseGet(() -> q.always().not())
@@ -200,7 +208,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
         // check acl rules
         logger.debug("Non admin user. Checking ACL rules.");
         final List<String> roles = secSvc.getUser().getRoles().parallelStream()
-                .filter((role) -> includeUIRoles || !role.getName().startsWith("ROLE_UI_"))
+                .filter(roleFilter)
                 .map((role) -> mkPropertyName(role.getName(), action))
                 .collect(Collectors.toList());
         return selectProperties(mediaPackageId, SECURITY_NAMESPACE).parallelStream()
@@ -261,4 +269,14 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   private String mkPropertyName(String role, String action) {
     return role + " | " + action;
   }
+
+  /**
+   * Configurable filter for roles
+   */
+  private java.util.function.Predicate<Role> roleFilter = (role) -> {
+    final String name = role.getName();
+    return (includeAPIRoles || !name.startsWith("ROLE_API_"))
+        && (includeCARoles  || !name.startsWith("ROLE_CAPTURE_AGENT_"))
+        && (includeUIRoles  || !name.startsWith("ROLE_UI_"));
+  };
 }
