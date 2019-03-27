@@ -93,6 +93,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.http.Header;
@@ -126,6 +127,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -202,6 +204,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** By default, do not allow event ingest to modify existing series metadata */
   static final boolean DEFAULT_ALLOW_SERIES_MODIFICATIONS = false;
 
+  /** Control if catalogs sent by capture agents for scheduled events are skipped. */
+  private static final String SKIP_CATALOGS_KEY = "skip.catalogs.for.existing.events";
+
+  /** Control if attachments sent by capture agents for scheduled events are skipped. */
+  private static final String SKIP_ATTACHMENTS_KEY = "skip.attachments.for.existing.events";
+
   /** The approximate load placed on the system by ingesting a file */
   private float ingestFileJobLoad = DEFAULT_INGEST_FILE_JOB_LOAD;
 
@@ -269,6 +277,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** Option, if an event ingest may modify metadata from existing series */
   private boolean allowSeriesModifications = DEFAULT_ALLOW_SERIES_MODIFICATIONS;
 
+  private boolean skipCatalogs = true;
+  private boolean skipAttachments = true;
+
   /**
    * Creates a new ingest service instance.
    */
@@ -316,6 +327,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     downloadPassword = StringUtils.trimToEmpty((String)properties.get(DOWNLOAD_PASSWORD));
     downloadUser = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_USER)));
     downloadSource = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_SOURCE)));
+
+    skipAttachments = BooleanUtils.toBoolean(Objects.toString(properties.get(SKIP_ATTACHMENTS_KEY), "true"));
+    skipCatalogs = BooleanUtils.toBoolean(Objects.toString(properties.get(SKIP_CATALOGS_KEY), "true"));
+    logger.debug("Skip attachments sent by agents for scheduled events: {}", skipAttachments);
+    logger.debug("Skip metadata catalogs sent by agents for scheduled events: {}", skipCatalogs);
 
     ingestFileJobLoad = LoadUtil.getConfiguredLoadValue(properties, FILE_JOB_LOAD_KEY, DEFAULT_INGEST_FILE_JOB_LOAD,
             serviceRegistry);
@@ -1343,7 +1359,22 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
   }
 
-  private void mergeMediaPackageElements(MediaPackage mp, MediaPackage scheduledMp) {
+  private void mergeMediaPackageElements(final MediaPackage mp, final MediaPackage scheduledMp) {
+    // drop catalogs sent by the capture agent in favor of Opencast's own metadata
+    if (skipCatalogs) {
+      for (MediaPackageElement element : mp.getCatalogs()) {
+        mp.remove(element);
+      }
+    }
+
+    // drop attachments the capture agent sent us in favor of Opencast's attachments
+    // e.g. prevent capture agents from modifying security rules of schedules events
+    if (skipAttachments) {
+      for (MediaPackageElement element : mp.getAttachments()) {
+        mp.remove(element);
+      }
+    }
+
     for (MediaPackageElement element : scheduledMp.getElements()) {
       // Asset manager media package may have a publication element (for live) if retract live has not run yet
       if (element.getFlavor() != null
