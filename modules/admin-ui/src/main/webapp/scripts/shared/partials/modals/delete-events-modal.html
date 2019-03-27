@@ -210,9 +210,9 @@
   <footer ng-if="currentForm === 'summaryForm'">
     <a ng-click="submit()"
        data-modal-tab="next" ng-class="{active: bulkDeleteForm.summaryForm.$valid,
-         inactive: bulkDeleteForm.summaryForm.$invalid, disabled: submitButton, submit: events.published.has,
-         danger: !events.published.has}">
-      {{ (events.published.has ? 'WIZARD.RETRACT' : 'WIZARD.DELETE') | translate }}
+         inactive: bulkDeleteForm.summaryForm.$invalid, disabled: submitButton, submit: !events.unpublished.has,
+         danger: events.unpublished.has}">
+      {{ (events.published.has ? (events.unpublished.has ? 'WIZARD.RETRACT_DELETE' : 'WIZARD.RETRACT') : 'WIZARD.DELETE') | translate }}
     </a>
     <a ng-click="navigateTo('retractForm', currentForm, [])"
        data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
