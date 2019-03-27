@@ -24,6 +24,8 @@ package org.opencastproject.workflow.handler.ingest;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
+import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
@@ -65,6 +67,15 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
   /** Deleting external working file repository URI's after download config key */
   public static final String DELETE_EXTERNAL = "delete-external";
+
+  /** config key used to specify a list of flavors (seperated by comma), elements matching a flavor will be downloaded */
+  public static final String SOURCE_FLAVORS = "source-flavors";
+
+  /** config key used to specify a list of tags (seperated by comma), elements matching a tag will be downloaded */
+  public static final String SOURCE_TAGS = "source-tags";
+
+  /** config key used to specify, whether both, a tag and a flavor, must match or if one is sufficient */
+  public static final String TAGS_AND_FLAVORS = "tags-and-flavors";
 
   /**
    * The workspace to use in retrieving and storing files.
@@ -111,11 +122,23 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
 
     boolean deleteExternal = BooleanUtils.toBoolean(currentOperation.getConfiguration(DELETE_EXTERNAL));
+    boolean tagsAndFlavor  = BooleanUtils.toBoolean(currentOperation.getConfiguration(TAGS_AND_FLAVORS));
+    String  sourceFlavors  = getConfig(workflowInstance, SOURCE_FLAVORS, "*/*");
+    String  sourceTags     = getConfig(workflowInstance, SOURCE_TAGS, "");
+
+    // building elementSelector with tags and flavors
+    AbstractMediaPackageElementSelector<MediaPackageElement> elementSelector = new SimpleElementSelector();
+    for (String tag : asList(sourceTags)) {
+      elementSelector.addTag(tag);
+    }
+    for (String flavor: asList(sourceFlavors)) {
+      elementSelector.addFlavor(flavor);
+    }
 
     String baseUrl = workspace.getBaseUri().toString();
 
     List<URI> externalUris = new ArrayList<URI>();
-    for (MediaPackageElement element : mediaPackage.getElements()) {
+    for (MediaPackageElement element : elementSelector.select(mediaPackage, tagsAndFlavor)) {
       if (element.getURI() == null)
         continue;
 
