@@ -26,7 +26,9 @@ Improvements
 
 A non-comprehensive list of improvements:
 
-- Improvement of performance when scheduling new events or checking for conflicts, reducing the time for adding multiple schedules by up to 90% compared to the previous implementation. Please read the [upgrade guide] to make sure you migrate your data properly.
+- Improvement of performance when scheduling new events or checking for conflicts, reducing the time for adding
+multiple schedules by up to 90% compared to the previous implementation. Please read the [upgrade guide](upgrade.md)
+to make sure you migrate your data properly.
 
 Configuration changes
 ---------------------
