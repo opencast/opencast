@@ -59,7 +59,7 @@ public class SchedulerItem implements Serializable {
   private final String presenters;
   private final String recordingState;
   private final long start;
-  private final String lastHeardFrom;
+
   private final Type type;
 
   public enum Type {
@@ -174,7 +174,6 @@ public class SchedulerItem implements Serializable {
     this.presenters = null;
     this.recordingState = null;
     this.start = -1;
-    this.lastHeardFrom = null;
     this.type = Type.UpdateCatalog;
   }
 
@@ -193,7 +192,6 @@ public class SchedulerItem implements Serializable {
     this.presenters = null;
     this.recordingState = null;
     this.start = -1;
-    this.lastHeardFrom = null;
     this.type = Type.UpdateProperties;
   }
 
@@ -210,7 +208,6 @@ public class SchedulerItem implements Serializable {
     this.presenters = null;
     this.recordingState = null;
     this.start = -1;
-    this.lastHeardFrom = null;
     this.type = type;
   }
 
@@ -233,7 +230,6 @@ public class SchedulerItem implements Serializable {
     this.presenters = null;
     this.recordingState = null;
     this.start = -1;
-    this.lastHeardFrom = null;
     this.type = Type.UpdateAcl;
   }
 
@@ -254,7 +250,6 @@ public class SchedulerItem implements Serializable {
     this.presenters = null;
     this.recordingState = state;
     this.start = -1;
-    this.lastHeardFrom = gson.toJson(lastHeardFrom);
     this.type = Type.UpdateRecordingStatus;
   }
 
@@ -263,7 +258,6 @@ public class SchedulerItem implements Serializable {
     this.acl = null;
     this.agentId = null;
     this.end = end == null ? -1 : end.getTime();
-    this.lastHeardFrom = null;
     this.presenters = null;
     this.properties = null;
     this.recordingState = null;
@@ -276,7 +270,6 @@ public class SchedulerItem implements Serializable {
     this.acl = null;
     this.agentId = agentId;
     this.end = -1;
-    this.lastHeardFrom = null;
     this.presenters = null;
     this.properties = null;
     this.recordingState = null;
@@ -289,7 +282,6 @@ public class SchedulerItem implements Serializable {
     this.acl = null;
     this.agentId = null;
     this.end = -1;
-    this.lastHeardFrom = null;
     this.presenters = gson.toJson(presenters);
     this.properties = null;
     this.recordingState = null;
@@ -325,10 +317,6 @@ public class SchedulerItem implements Serializable {
 
   public Date getEnd() {
     return end < 0 ? null : new Date(end);
-  }
-
-  public Long getLastHeardFrom() {
-    return gson.fromJson(lastHeardFrom, Long.class);
   }
 
   @SuppressWarnings("unchecked")
