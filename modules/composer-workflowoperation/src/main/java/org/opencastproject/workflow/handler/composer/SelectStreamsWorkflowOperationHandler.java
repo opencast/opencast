@@ -310,10 +310,15 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
           result.add(copyTrack(singleAudioTrack.track));
         }
 
-        // Just copy the rest of the tracks to ensure they got the correct output flavor
+        // Just copy the rest of the tracks and remove audio where necessary
         for (final AugmentedTrack augmentedTrack : augmentedTracks) {
           if (augmentedTrack.track != singleAudioTrack.track && augmentedTrack.track != forceTargetTrack.track) {
-            result.add(copyTrack(augmentedTrack.track));
+            if (augmentedTrack.hasAudio() && augmentedTrack.hide(SubTrack.AUDIO)) {
+              final TrackJobResult hideAudioResult = hideAudio(augmentedTrack.track, mediaPackage);
+              result.add(hideAudioResult);
+            } else {
+              result.add(copyTrack(augmentedTrack.track));
+            }
           }
         }
       } else {
