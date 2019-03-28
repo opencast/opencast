@@ -44,6 +44,7 @@ import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -61,6 +62,7 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * The inbox scanner monitors a directory for incoming media packages.
@@ -136,9 +138,9 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     final String orgId = getCfg(properties, USER_ORG);
     final String userId = getCfg(properties, USER_NAME);
     final String mediaFlavor = getCfg(properties, MEDIA_FLAVOR);
-    final String workflowDefinition = getCfgOrDefault(properties, WORKFLOW_DEFINITION, null);
+    final String workflowDefinition = Objects.toString(properties.get(WORKFLOW_DEFINITION), null);
     final Map<String, String> workflowConfig = getCfgAsMap(properties, WORKFLOW_CONFIG);
-    final int interval = getCfgAsIntOrDefault(properties, INBOX_POLL, 5000);
+    final int interval = NumberUtils.toInt(Objects.toString(properties.get(INBOX_POLL), "5000"));
     final File inbox = new File(getCfg(properties, INBOX_PATH));
     if (!inbox.isDirectory()) {
       try {
@@ -156,9 +158,9 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     if (!inbox.canWrite()) {
       throw new ConfigurationException(INBOX_PATH, String.format("Cannot write to %s", inbox.getAbsolutePath()));
     }
-    final int maxthreads = getCfgAsIntOrDefault(properties, INBOX_THREADS, 1);
-    final int maxTries = getCfgAsIntOrDefault(properties, INBOX_TRIES, 3);
-    final int secondesBetweenTries = getCfgAsIntOrDefault(properties, INBOX_TRIES_BETWEEN_SEC, 300);
+    final int maxThreads = NumberUtils.toInt(Objects.toString(properties.get(INBOX_THREADS), "1"));
+    final int maxTries = NumberUtils.toInt(Objects.toString(properties.get(INBOX_TRIES), "3"));
+    final int secondsBetweenTries = NumberUtils.toInt(Objects.toString(properties.get(INBOX_TRIES_BETWEEN_SEC), "300"));
     final Option<SecurityContext> secCtx = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
             .bind(new Function<Tuple<User, Organization>, Option<SecurityContext>>() {
               @Override
@@ -174,7 +176,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
       fileInstallCfg = some(configureFileInstall(cc.getBundleContext(), inbox, interval));
       // create new scanner
       Ingestor ingestor = new Ingestor(ingestService, workingFileRepository, secCtx.get(), workflowDefinition,
-              workflowConfig, mediaFlavor, inbox, maxthreads, seriesService, maxTries, secondesBetweenTries);
+              workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries);
       this.ingestor = some(ingestor);
       new Thread(ingestor).start();
       logger.info("Now watching inbox {}", inbox.getAbsolutePath());
@@ -184,7 +186,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     }
   }
 
-  public static final Effect<Configuration> removeFileInstallCfg = new Effect.X<Configuration>() {
+  private static final Effect<Configuration> removeFileInstallCfg = new Effect.X<Configuration>() {
     @Override
     protected void xrun(Configuration cfg) throws Exception {
       cfg.delete();
@@ -197,7 +199,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
    * see section 104.4.1 Location Binding, paragraph 4, of the OSGi Spec 4.2 The correct permissions are needed in order
    * to set configuration data for a bundle other than the calling bundle itself.
    */
-  public static Configuration configureFileInstall(BundleContext bc, File inbox, int interval) {
+  private static Configuration configureFileInstall(BundleContext bc, File inbox, int interval) {
     final ServiceReference caRef = bc.getServiceReference(ConfigurationAdmin.class.getName());
     if (caRef == null) {
       throw new Error("Cannot obtain a reference to the ConfigurationAdmin service");
@@ -246,12 +248,12 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   }
 
   @Override
-  public void update(File artifact) throws Exception {
+  public void update(File artifact) {
     logger.trace("update(): {}", artifact.getName());
   }
 
   @Override
-  public void uninstall(File artifact) throws Exception {
+  public void uninstall(File artifact) {
     logger.trace("uninstall(): {}", artifact.getName());
     ingestor.foreach(new Effect<Ingestor>() {
       @Override
@@ -294,7 +296,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
    * @throws ConfigurationException
    *           key does not exist or its value is blank
    */
-  public static String getCfg(Dictionary d, String key) throws ConfigurationException {
+  private static String getCfg(Dictionary d, String key) throws ConfigurationException {
     Object p = d.get(key);
     if (p == null)
       throw new ConfigurationException(key, "does not exist");
@@ -304,32 +306,17 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     return ps;
   }
 
-  public static String getCfgOrDefault(Dictionary d, String key, String defaultValue) throws ConfigurationException {
-    Object p = d.get(key);
-    if (p == null)
-      return defaultValue;
-    if (p instanceof String)
-      return (String) p;
-    return p.toString();
-  }
+  private static Map<String, String> getCfgAsMap(final Dictionary d, final String key) {
 
-  public static Map<String, String> getCfgAsMap(Dictionary<String, String> d, String key) throws ConfigurationException {
-    HashMap<String, String> config = new HashMap<String, String>();
+    HashMap<String, String> config = new HashMap<>();
     if (d == null) return config;
-    for (Enumeration<String> e = d.keys(); e.hasMoreElements();) {
-      String dKey = (String) e.nextElement();
-      if (dKey.startsWith(key))
-        config.put(dKey.substring(key.length() + 1), (String) d.get(dKey));
+    for (Enumeration e = d.keys(); e.hasMoreElements();) {
+      final String dKey = Objects.toString(e.nextElement());
+      if (dKey.startsWith(key)) {
+        config.put(dKey.substring(key.length() + 1), Objects.toString(d.get(dKey), null));
+      }
     }
     return config;
-  }
-
-  public static int getCfgAsIntOrDefault(Dictionary d, String key, int defaultValue) throws ConfigurationException {
-    String valStr = getCfgOrDefault(d, key, null);
-    if (StringUtils.isEmpty(valStr))
-      return defaultValue;
-    else
-      return Integer.parseInt(valStr);
   }
 
   public void setSeriesService(SeriesService seriesService) {
