@@ -56,8 +56,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.security.api.AccessControlEntry;
-import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -193,6 +191,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The key to look for in the service configuration file to override the {@link DEFAULT_INGEST_ZIP_JOB_LOAD} */
   public static final String ZIP_JOB_LOAD_KEY = "job.load.ingest.zip";
 
+  /** By default, do not allow event ingest to modify existing series metadata */
+  static final boolean DEFAULT_ALLOW_SERIES_MODIFICATIONS = false;
+
   /** The approximate load placed on the system by ingesting a file */
   private float ingestFileJobLoad = DEFAULT_INGEST_FILE_JOB_LOAD;
 
@@ -248,11 +249,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   private Cache<String, Long> partialTrackStartTimes = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.DAYS)
           .build();
 
-  /** The default is to overwrite series catalog on ingest */
-  protected boolean defaultIsOverWriteSeries = true;
-
-  /** Option to overwrite series on ingest */
-  protected boolean isOverwriteSeries = defaultIsOverWriteSeries;
+  /** Option, if an event ingest may modify metadata from existing series */
+  private boolean allowSeriesModifications = DEFAULT_ALLOW_SERIES_MODIFICATIONS;
 
   /**
    * Creates a new ingest service instance.
@@ -304,13 +302,13 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             serviceRegistry);
     // try to get overwrite series option from config, use default if not configured
     try {
-      isOverwriteSeries = Boolean.parseBoolean(((String) properties.get(PROPKEY_OVERWRITE_SERIES)).trim());
+      allowSeriesModifications = Boolean.parseBoolean(((String) properties.get(PROPKEY_OVERWRITE_SERIES)).trim());
     } catch (Exception e) {
-      isOverwriteSeries = defaultIsOverWriteSeries;
+      allowSeriesModifications = DEFAULT_ALLOW_SERIES_MODIFICATIONS;
       logger.warn("Unable to update configuration. {}", e.getMessage());
     }
     logger.info("Configuration updated. It is {} that existing series will be overwritten during ingest.",
-            isOverwriteSeries);
+            allowSeriesModifications);
   }
 
   /**
@@ -868,7 +866,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         try {
           try {
             seriesService.getSeries(id);
-            if (isOverwriteSeries) {
+            if (allowSeriesModifications) {
               // Update existing series
               seriesService.updateSeries(dc);
               isUpdated = true;
@@ -880,9 +878,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             logger.info("Creating new series {} with default ACL", id);
             seriesService.updateSeries(dc);
             isUpdated = true;
-            String anonymousRole = securityService.getOrganization().getAnonymousRole();
-            AccessControlList acl = new AccessControlList(new AccessControlEntry(anonymousRole, "read", true));
-            seriesService.updateAccessControl(id, acl);
           }
 
         } catch (Exception e) {
