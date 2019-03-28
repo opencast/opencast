@@ -190,6 +190,11 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   }
 
   @Override
+  public Opt<MediaPackage> getMediaPackage(String mediaPackageId) {
+    return delegate.getMediaPackage(mediaPackageId);
+  }
+
+  @Override
   public void setAvailability(Version version, String mpId, Availability availability) {
     delegate.setAvailability(version, mpId, availability);
   }

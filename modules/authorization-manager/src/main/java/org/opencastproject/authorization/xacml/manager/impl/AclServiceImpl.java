@@ -21,12 +21,9 @@
 
 package org.opencastproject.authorization.xacml.manager.impl;
 
-import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.authorization.xacml.manager.impl.Util.toAcl;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.fn.Snapshots;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
@@ -41,7 +38,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -63,31 +59,29 @@ public final class AclServiceImpl implements AclService {
   private final SeriesService seriesService;
   private final AssetManager assetManager;
   private final AuthorizationService authorizationService;
-  private final Workspace workspace;
   private final MessageSender messageSender;
 
-  public AclServiceImpl(Organization organization, AclDb aclDb,
-          SeriesService seriesService, AssetManager assetManager, AuthorizationService authorizationService,
-          MessageSender messageSender, Workspace workspace) {
+  public AclServiceImpl(Organization organization, AclDb aclDb, SeriesService seriesService, AssetManager assetManager,
+          AuthorizationService authorizationService, MessageSender messageSender) {
     this.organization = organization;
     this.aclDb = aclDb;
     this.seriesService = seriesService;
     this.assetManager = assetManager;
     this.authorizationService = authorizationService;
     this.messageSender = messageSender;
-    this.workspace = workspace;
   }
 
   @Override
   public boolean applyAclToEpisode(String episodeId, AccessControlList acl) throws AclServiceException {
     try {
-      Option<MediaPackage> mediaPackage = Option.none();
+      Opt<MediaPackage> mediaPackage = Opt.none();
       if (assetManager != null)
-        mediaPackage = getFromAssetManagerByMpId(episodeId);
+        mediaPackage = assetManager.getMediaPackage(episodeId);
 
       Option<AccessControlList> aclOpt = Option.option(acl);
       // the episode service is the source of authority for the retrieval of media packages
-      for (final MediaPackage episodeSvcMp : mediaPackage) {
+      if (mediaPackage.isSome()) {
+        MediaPackage episodeSvcMp = mediaPackage.get();
         aclOpt.fold(new Option.EMatch<AccessControlList>() {
           // set the new episode ACL
           @Override
@@ -149,26 +143,6 @@ public final class AclServiceImpl implements AclService {
   public boolean applyAclToSeries(String seriesId, ManagedAcl managedAcl, boolean override)
       throws AclServiceException {
     return applyAclToSeries(seriesId, managedAcl.getAcl(), override);
-  }
-
-  /**
-   * Return media package with id <code>mpId</code> from asset manager.
-   *
-   * @return single element list or empty list
-   */
-  private Option<MediaPackage> getFromAssetManagerByMpId(String mpId) {
-    final AQueryBuilder q = assetManager.createQuery();
-    final Opt<MediaPackage> mp = enrich(
-            q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run()).getSnapshots()
-                    .head().map(Snapshots.getMediaPackage);
-    return Option.fromOpt(mp);
-  }
-
-  /** Return all media packages of a series from the asset manager. */
-  private List<MediaPackage> getFromAssetManagerBySeriesId(String seriesId) {
-    final AQueryBuilder q = assetManager.createQuery();
-    return enrich(q.select(q.snapshot()).where(q.seriesId().eq(seriesId).and(q.version().isLatest())).run())
-            .getSnapshots().map(Snapshots.getMediaPackage).toList();
   }
 
   @Override

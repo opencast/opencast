@@ -1588,12 +1588,10 @@ public class IndexServiceImpl implements IndexService {
         }
         return currentWorkflowInstance.get().getMediaPackage();
       case ARCHIVE:
-        final AQueryBuilder q = assetManager.createQuery();
-        final AResult r = q.select(q.snapshot())
-                .where(q.mediaPackageId(event.getIdentifier()).and(q.version().isLatest())).run();
-        if (r.getSize() > 0) {
+        Opt<MediaPackage> mpOpt = assetManager.getMediaPackage(event.getIdentifier());
+        if (mpOpt.isSome()) {
           logger.debug("Found event in archive with id {}", event.getIdentifier());
-          return enrich(r).getSnapshots().head2().getMediaPackage();
+          return mpOpt.get();
         }
         logger.error("No event with id {} found from archive!", event.getIdentifier());
         throw new IndexServiceException("No archived event found with id " + event.getIdentifier());
