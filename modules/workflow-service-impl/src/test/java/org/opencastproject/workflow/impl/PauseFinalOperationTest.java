@@ -21,6 +21,7 @@
 
 package org.opencastproject.workflow.impl;
 
+import static org.easymock.EasyMock.createNiceMock;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -175,6 +176,32 @@ public class PauseFinalOperationTest {
     workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.getCollectionContents((String) EasyMock.anyObject())).andReturn(new URI[0]);
     EasyMock.replay(workspace);
+
+    {
+      final AssetManager assetManager = createNiceMock(AssetManager.class);
+      final AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
+      final Target t = EasyMock.createNiceMock(Target.class);
+      final Predicate p = EasyMock.createNiceMock(Predicate.class);
+      EasyMock.expect(p.and(EasyMock.anyObject(Predicate.class))).andReturn(p).anyTimes();
+      EasyMock.expect(query.snapshot()).andReturn(t).anyTimes();
+      EasyMock.expect(query.propertiesOf(EasyMock.anyString())).andReturn(t).anyTimes();
+      final VersionField v = EasyMock.createNiceMock(VersionField.class);
+      EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
+      EasyMock.expect(query.version()).andReturn(v).anyTimes();
+      EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
+      EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(p).anyTimes();
+      final ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
+      EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
+      final AResult r = EasyMock.createNiceMock(AResult.class);
+      EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
+      final Stream<ARecord> recStream = Stream.mk();
+      EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
+      EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class))).
+              andReturn(selectQuery).anyTimes();
+      EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
+      EasyMock.replay(query, t, r, selectQuery, assetManager, p, v);
+      service.setAssetManager(assetManager);
+    }
 
     AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
     Version version = EasyMock.createNiceMock(Version.class);

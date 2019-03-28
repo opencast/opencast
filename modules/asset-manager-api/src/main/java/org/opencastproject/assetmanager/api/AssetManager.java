@@ -50,6 +50,14 @@ public interface AssetManager {
   String DEFAULT_OWNER = "default";
 
   /**
+   * Get the media package from the lates snapshot.
+   *
+   * @param mediaPackageId
+   * @return mediapackage
+   */
+  Opt<MediaPackage> getMediaPackage(String mediaPackageId);
+
+  /**
    * Take a versioned snapshot of a media package.
    * <p>
    * Snapshot are tagged with string identifying the owner. Only the owner
