@@ -62,64 +62,24 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-    <!--
-      - test
-      -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <scope>test</scope>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
-      <version>1.3</version>
-      <scope>test</scope>
-    </dependency>
-    <!--
-      - Parameterized tests for JUnit
-      - https://github.com/Pragmatists/JUnitParams
-      -->
-    <dependency>
-      <groupId>pl.pragmatists</groupId>
-      <artifactId>JUnitParams</artifactId>
-      <version>1.0.4</version>
-    </dependency>
-    <!-- logging -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <scope>test</scope>
+      <groupId>com.entwinemedia.common</groupId>
+      <artifactId>functional</artifactId>
     </dependency>
   </dependencies>
   <build>
     <plugins>
-      <!--
-        - http://pitest.org/quickstart/maven/
-        - run with mvn org.pitest:pitest-maven:mutationCoverage
-        -->
       <plugin>
-        <groupId>org.pitest</groupId>
-        <artifactId>pitest-maven</artifactId>
-        <version>1.1.5</version>
-        <configuration>
-          <targetClasses>
-            <param>org.opencastproject.assetmanager.util*</param>
-          </targetClasses>
-          <targetTests>
-            <param>org.opencastproject.assetmanager.util*Test</param>
-          </targetTests>
-        </configuration>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
       </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>

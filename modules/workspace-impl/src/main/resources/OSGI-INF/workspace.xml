@@ -8,7 +8,9 @@
     <provide interface="org.opencastproject.workspace.api.Workspace"/>
   </service>
   <reference name="REPO" interface="org.opencastproject.workingfilerepository.api.WorkingFileRepository"
-             cardinality="1..1" policy="static" bind="setRepository"/>
+             bind="setRepository" />
   <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
-             cardinality="1..1" policy="static" bind="setTrustedHttpClient"/>
+             bind="setTrustedHttpClient" />
+  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
+             bind="setSecurityService" />
 </scr:component>
