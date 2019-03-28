@@ -1393,25 +1393,29 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     // Merge media package fields
     if (mp.getDate() == null)
       mp.setDate(scheduledMp.getDate());
-    if (isBlank(mp.getLicense()))
+
+    if (skipCatalogs || isBlank(mp.getLicense()))
       mp.setLicense(scheduledMp.getLicense());
-    if (isBlank(mp.getSeries()))
+    if (skipCatalogs || isBlank(mp.getSeries()))
       mp.setSeries(scheduledMp.getSeries());
-    if (isBlank(mp.getSeriesTitle()))
+    if (skipCatalogs || isBlank(mp.getSeriesTitle()))
       mp.setSeriesTitle(scheduledMp.getSeriesTitle());
-    if (isBlank(mp.getTitle()))
+    if (skipCatalogs || isBlank(mp.getTitle()))
       mp.setTitle(scheduledMp.getTitle());
-    if (mp.getSubjects().length == 0) {
+    if (skipCatalogs || mp.getSubjects().length == 0) {
+      Arrays.stream(mp.getSubjects()).forEach(mp::removeSubject);
       for (String subject : scheduledMp.getSubjects()) {
         mp.addSubject(subject);
       }
     }
-    if (mp.getContributors().length == 0) {
+    if (skipCatalogs || mp.getContributors().length == 0) {
+      Arrays.stream(mp.getContributors()).forEach(mp::removeContributor);
       for (String contributor : scheduledMp.getContributors()) {
         mp.addContributor(contributor);
       }
     }
-    if (mp.getCreators().length == 0) {
+    if (skipCatalogs || mp.getCreators().length == 0) {
+      Arrays.stream(mp.getCreators()).forEach(mp::removeCreator);
       for (String creator : scheduledMp.getCreators()) {
         mp.addCreator(creator);
       }
