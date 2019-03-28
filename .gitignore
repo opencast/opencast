@@ -40,7 +40,6 @@ docs/guides/*/site
 # Ignore Makefiles
 # Sometimes they help, but they should never be tracked
 Makefile
-/modules/admin-ui/bower_components/
 
 # Ignore OS artifacts
 .DS_Store
