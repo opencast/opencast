@@ -921,9 +921,8 @@ In case of a conflict:
 ]
 ```
 
-`allowConflict` was introduced in version 1.2.0, it allows the schedule to be
-updated without checking for conflicts. To allow conflicts (`true`) the call
-**MUST** be made with a user that has an _Administrative Role_.
+`allowConflict` allows the schedule to be updated without checking for conflicts.
+To allow conflicts (`true`) the call **MUST** be made with a user that has an _Administrative Role_.
 
 If not handled properly this will likely cause two or more events to be
 scheduled on a particular capture agent at the same time, which will then

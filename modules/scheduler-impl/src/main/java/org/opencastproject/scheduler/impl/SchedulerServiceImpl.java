@@ -701,7 +701,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Check for conflicting events
       // Check scheduling conficts in case a property relevant for conflicts has changed
       if ((captureAgentId.isSome() || startDateTime.isSome() || endDateTime.isSome())
-            && (!isAdmin() || (isAdmin() && !allowConflict))) {
+            && (!allowConflict || !isAdmin())) {
         List<MediaPackage> conflictingEvents = $(findConflictingEvents(captureAgentId.getOr(agentId),
                 startDateTime.getOr(start), endDateTime.getOr(end))).filter(new Fn<MediaPackage, Boolean>() {
                     @Override

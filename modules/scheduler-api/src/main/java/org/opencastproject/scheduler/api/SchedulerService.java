@@ -176,7 +176,7 @@ public interface SchedulerService {
                   throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException;
 
   /**
-   * Updates event with specified ID and possiblyDictionary checking for conflicts.
+   * Updates event with specified ID and possibly checking for conflicts.
    *
    * Default capture agent properties are created from DublinCore. Following values are generated:
    * <ul>

@@ -42,9 +42,6 @@ Configuration changes
 API changes
 -----------
 
-Due to [MH-13392](https://opencast.jira.com/browse/MH-13392):
-- Modified PUT /api/events/{id}/scheduling: Added optional field 'allowConflict'
-
 Due to [MH-13397](https://opencast.jira.com/browse/MH-13397):
 
 - Modified GET /recordings/{id}/technical.json: Removed field `optOut`

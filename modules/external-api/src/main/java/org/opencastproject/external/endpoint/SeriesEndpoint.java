@@ -943,7 +943,7 @@ public class SeriesEndpoint {
   @RestQuery(name = "updateseriesacl", description = "Updates a series' access policy.", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
                   @RestParameter(name = "acl", isRequired = true, description = "Access policy", type = STRING),
-                  @RestParameter(name = "override", isRequired = false, defaultValue = "false", description = "If true the series ACL will take precedence over any existing episode ACL", type = STRING)}, reponses = {
+                  @RestParameter(name = "override", isRequired = false, description = "If true the series ACL will take precedence over any existing episode ACL", type = STRING)}, reponses = {
                           @RestResponse(description = "The access control list for the specified series is updated.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String seriesID,
