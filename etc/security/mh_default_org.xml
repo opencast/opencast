@@ -19,6 +19,7 @@
   <sec:http pattern="/admin-ng/fonts/**" security="none" />
   <sec:http pattern="/admin-ng/scripts/**" security="none" />
   <sec:http pattern="/admin-ng/styles/**" security="none" />
+  <sec:http pattern="/play/*" security="none" />
 
   <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast"
     entry-point-ref="opencastEntryPoint">
