@@ -43,6 +43,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.EntityManagerFactory;
@@ -151,7 +153,10 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
             workspace,
             systemUserName);
     // compose with security
-    delegate = new AssetManagerWithSecurity(withMessaging, authSvc, secSvc);
+    boolean includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
+    boolean includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
+    boolean includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
+    delegate = new AssetManagerWithSecurity(withMessaging, authSvc, secSvc, includeAPIRoles, includeCARoles, includeUIRoles);
     for (RemoteAssetStore ras : remotes) {
       delegate.addRemoteAssetStore(ras);
     }
@@ -217,6 +222,16 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   @Override
   public boolean snapshotExists(final String mediaPackageId) {
     return delegate.snapshotExists(mediaPackageId);
+  }
+
+  @Override
+  public boolean snapshotExists(final String mediaPackageId, final String organization) {
+    return delegate.snapshotExists(mediaPackageId, organization);
+  }
+
+  @Override
+  public List<Property> selectProperties(final String mediaPackageId, final String namespace) {
+    return delegate.selectProperties(mediaPackageId, namespace);
   }
 
   @Override
