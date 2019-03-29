@@ -468,8 +468,8 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
 	if (headerAffiliation != null) {
       String affiliation = request.getHeader(headerAffiliation);
 	  List<String> affiliations = Arrays.asList(affiliation.split(";"));
-	  for (String affiliation : affiliations) {
-		roles.add(new JpaRole(roleAffiliationPrefix + affiliation, organization));
+	  for (String eachAffiliation : affiliations) {
+		roles.add(new JpaRole(roleAffiliationPrefix + eachAffiliation, organization));
       }
     }
 	
