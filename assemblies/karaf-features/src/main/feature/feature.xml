@@ -146,6 +146,8 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-working-file-repository-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workspace-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workspace-impl/${project.version}</bundle>
+
+    <feature start-level="80">opencast-security-cas</feature>
   </feature>
 
   <feature name="opencast-allinone" version="${project.version}">
@@ -742,7 +744,7 @@
     <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-security-cas" version="${project.version}">  
+  <feature name="opencast-security-cas" version="${project.version}">
     <bundle start-level="82">mvn:commons-collections/commons-collections/3.2.1</bundle>
     <bundle start-level="82">mvn:org.apache.velocity/velocity/1.7</bundle>
     <bundle start-level="82">mvn:org.apache.santuario/xmlsec/2.1.2</bundle>

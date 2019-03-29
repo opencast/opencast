@@ -116,9 +116,6 @@
             </libraries>
             <archiveZip>false</archiveZip>
             <archiveTarGz>false</archiveTarGz>
-            <installedFeatures>
-              <feature>opencast-security-cas</feature>
-            </installedFeatures>
           </configuration>
         </plugin>
         <plugin>
