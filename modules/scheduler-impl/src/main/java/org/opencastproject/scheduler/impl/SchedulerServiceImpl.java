@@ -804,14 +804,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   private boolean isAdmin() {
-    if (securityService.getUser().hasRole(GLOBAL_ADMIN_ROLE)) {
-      return true;
-    }
-    else if (securityService.getUser().hasRole(securityService.getOrganization().getAdminRole())) {
-      return true;
-    }
-
-    return false;
+    return (securityService.getUser().hasRole(GLOBAL_ADMIN_ROLE)
+            || securityService.getUser().hasRole(securityService.getOrganization().getAdminRole()));
   }
 
   private Opt<AccessControlList> loadEpisodeAclFromAsset(Snapshot snapshot) {
