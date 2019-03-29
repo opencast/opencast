@@ -66,7 +66,7 @@ angular.module('adminNg.directives')
             if (angular.isDefined(user.org.properties[ADMIN_EDITOR_PREVIEWMODE_DEFAULT])) {
               scope.previewMode = user.org.properties[ADMIN_EDITOR_PREVIEWMODE_DEFAULT].toUpperCase() !== 'FALSE';
             }
-          });
+          }).catch(angular.noop);
         }
 
         scope.wrapperClass = ''; // list of border classes for the segment wrapper.

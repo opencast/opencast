@@ -184,6 +184,6 @@ angular.module('adminNg.controllers')
 
     $translate('VIDEO_TOOL.WARNING_UNSAVED').then(function (translation) {
       window.unloadConfirmMsg = translation;
-    });
+    }).catch(angular.noop);
   }
 ]);

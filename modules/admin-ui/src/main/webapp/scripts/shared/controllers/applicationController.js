@@ -62,7 +62,7 @@ angular.module('adminNg.controllers')
       if (angular.isDefined(user.org.properties[MEDIA_MODULE_URL_PROPERTY])) {
         $scope.mediaModuleUrl = user.org.properties[MEDIA_MODULE_URL_PROPERTY];
       }
-    });
+    }).catch(angular.noop);
 
     //Running RestService on loop - updating $scope.service
     $interval(function(){

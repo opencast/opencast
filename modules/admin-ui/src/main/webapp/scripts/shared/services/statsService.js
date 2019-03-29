@@ -83,7 +83,7 @@ angular.module('adminNg.services')
 
             me.runningQueries--;
             me.refreshScheduler.restartSchedule();
-          }, function () {
+          }).catch(function () {
             me.runningQueries--;
             me.refreshScheduler.restartSchedule();
           });
@@ -91,8 +91,8 @@ angular.module('adminNg.services')
       };
 
       /**
-        * Scheduler for the refresh of the fetch
-        */
+       * Scheduler for the refresh of the fetch
+       */
       this.refreshScheduler = {
         on: true,
         restartSchedule: function () {
