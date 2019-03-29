@@ -73,6 +73,7 @@ import org.opencastproject.workingfilerepository.impl.WorkingFileRepositoryImpl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -195,12 +196,7 @@ public class IngestServiceImplTest {
     workflowService = EasyMock.createNiceMock(WorkflowService.class);
     EasyMock.expect(workflowService.start((WorkflowDefinition) EasyMock.anyObject(), EasyMock.capture(mp),
             (Map) EasyMock.anyObject())).andReturn(workflowInstance);
-    EasyMock.expect(workflowInstance.getMediaPackage()).andAnswer(new IAnswer<MediaPackage>() {
-      @Override
-      public MediaPackage answer() throws Throwable {
-        return mp.getValue();
-      }
-    });
+    EasyMock.expect(workflowInstance.getMediaPackage()).andAnswer(mp::getValue).anyTimes();
     EasyMock.expect(workflowService.start((WorkflowDefinition) EasyMock.anyObject(),
             (MediaPackage) EasyMock.anyObject(), (Map) EasyMock.anyObject())).andReturn(workflowInstance);
     EasyMock.expect(
@@ -332,7 +328,7 @@ public class IngestServiceImplTest {
     mediaPackage = service.addAttachment(urlAttachment, MediaPackageElements.MEDIAPACKAGE_COVER_FLAVOR, mediaPackage);
     WorkflowInstance instance = service.ingest(mediaPackage);
     Assert.assertEquals(1, mediaPackage.getTracks().length);
-    Assert.assertEquals(1, mediaPackage.getCatalogs().length);
+    Assert.assertEquals(0, mediaPackage.getCatalogs().length);
     Assert.assertEquals(1, mediaPackage.getAttachments().length);
     Assert.assertEquals(workflowInstanceID, instance.getId());
   }
@@ -436,6 +432,8 @@ public class IngestServiceImplTest {
     catalogs = mediaPackage.getCatalogs(MediaPackageElements.SMIL);
     Assert.assertEquals(0, catalogs.length);
 
+    FieldUtils.writeField(FieldUtils.getField(IngestServiceImpl.class, "skipCatalogs", true),
+            service, false, true);
     service.ingest(mediaPackage);
     catalogs = mediaPackage.getCatalogs(MediaPackageElements.SMIL);
     Assert.assertEquals(1, catalogs.length);
@@ -454,8 +452,11 @@ public class IngestServiceImplTest {
   public void testMergeScheduledMediaPackage() throws Exception {
     MediaPackage ingestMediaPackage = MediaPackageParser
             .getFromXml(IOUtils.toString(getClass().getResourceAsStream("/source-manifest-partial.xml"), "UTF-8"));
-    WorkflowInstance instance = service.ingest(ingestMediaPackage);
-    MediaPackage mergedMediaPackage = instance.getMediaPackage();
+    FieldUtils.writeField(FieldUtils.getField(IngestServiceImpl.class, "skipAttachments", true),
+            service, false, true);
+    FieldUtils.writeField(FieldUtils.getField(IngestServiceImpl.class, "skipCatalogs", true),
+            service, false, true);
+    MediaPackage mergedMediaPackage = service.ingest(ingestMediaPackage).getMediaPackage();
     Assert.assertEquals(4, mergedMediaPackage.getTracks().length);
     Track track = mergedMediaPackage.getTrack("track-1");
     Assert.assertEquals("/vonlya1.mov", track.getURI().toString());
@@ -477,6 +478,15 @@ public class IngestServiceImplTest {
     Assert.assertEquals("sd2", mergedMediaPackage.getContributors()[0]);
     Assert.assertEquals(1, mergedMediaPackage.getCreators().length);
     Assert.assertEquals("p2", mergedMediaPackage.getCreators()[0]);
+
+    // check element skipping
+    FieldUtils.writeField(FieldUtils.getField(IngestServiceImpl.class, "skipAttachments", true),
+            service, true, true);
+    FieldUtils.writeField(FieldUtils.getField(IngestServiceImpl.class, "skipCatalogs", true),
+            service, true, true);
+    mergedMediaPackage = service.ingest(ingestMediaPackage).getMediaPackage();
+    Assert.assertEquals(0, mergedMediaPackage.getCatalogs().length);
+    Assert.assertEquals(1, mergedMediaPackage.getAttachments().length);
   }
 
   @Test

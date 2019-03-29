@@ -36,6 +36,10 @@ Configuration changes
 - `KARAF_NOROOT` is now set to `true` by default, preventing Opencast to be started as root user unless the
   configuration is changed.
 - The default configuration for the Paella player has been moved to `etc/ui-config/mh_default_org/paella/config.json`
+- By default, metadata catalogs and attachments sent by capture agents are discarded since this data is usually
+  controlled by Opencast and the routing through capture agents which existed for historical reasons was just an
+  additional source for errors. If you rely on the old behavior, it can be configured in
+  `etc/org.opencastproject.ingest.impl.IngestServiceImpl.cfg`.
 
 API changes
 -----------
