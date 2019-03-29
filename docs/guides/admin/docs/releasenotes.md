@@ -20,6 +20,10 @@ New Features
 - Add Internationalization support for series LTI tools
 - Display responsible person for workflows
 - Allow the Ingest Service to make authenticated requests to other servers
+- Some modules are now plugins. These are not started by default to reduce the amount of code running unnecessarily.
+  They can easily be enabled in `etc/org.apache.karaf.features.cfg`. Modified modules are:
+    - Moodle user directory
+    - Sakai user directory
 
 Improvements
 ------------

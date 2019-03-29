@@ -133,8 +133,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-static-file-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-ldap/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-moodle/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-sakai/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-user-interface-configuration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-urlsigning-common/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-urlsigning-service-api/${project.version}</bundle>
@@ -754,5 +752,14 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-cas/${project.version}</bundle>
   </feature>
 
+  <feature name="opencast-moodle" version="${project.version}">
+    <feature start-level="80">opencast-core</feature>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-moodle/${project.version}</bundle>
+  </feature>
+
+  <feature name="opencast-sakai" version="${project.version}">
+    <feature start-level="80">opencast-core</feature>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-sakai/${project.version}</bundle>
+  </feature>
 
 </features>

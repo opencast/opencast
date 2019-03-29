@@ -38,6 +38,11 @@ service" service.
 
 ### Step 1
 
+Edit `etc/org.apache.karaf.features.cfg` and make sure the `opencast-moodle` feature is listed in the `featuresBoot`
+option.
+
+### Step 2
+
 To enable the Moodle User Provider, copy and rename the bundled configuration
 template from
 `OPENCAST/etc/org.opencastproject.userdirectory.moodle-default.cfg.template` to
@@ -52,7 +57,7 @@ org.opencastproject.userdirectory.moodle.url=http://localhost/webservice/rest/se
 org.opencastproject.userdirectory.moodle.token=mytoken1234abcdef
 ```
 
-### Step 2
+### Step 3
 
 Verify that the Moodle User Provider starts up with the correct Moodle URL by looking
 for a log entry like this:
@@ -73,7 +78,7 @@ by adding an entry to `OPENCAST/etc/org.ops4j.pax.logging.cfg`:
 log4j.logger.org.opencastproject.userdirectory.moodle=DEBUG
 ```
 
-### Step 3
+### Step 4
 
 You can grant additional roles to all Moodle users in Opencast by creating a
 group with the name 'Moodle'. You can then add additional roles to this group,
