@@ -273,7 +273,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
       logger.warn("Optional header '{}' is not configured ", CFG_HEADER_HOME_ORGANIZATION_KEY);
     }
 	
-	String cfgAffiliation = StringUtils.trimToNull((String) properties.get(CFG_HEADER_AFFILIATION_KEY));
+    String cfgAffiliation = StringUtils.trimToNull((String) properties.get(CFG_HEADER_AFFILIATION_KEY));
     if (cfgAffiliation != null) {
       headerAffiliation = cfgAffiliation;
       logger.info("Header '{}' set to '{}'", CFG_HEADER_AFFILIATION_KEY, headerAffiliation);
@@ -328,7 +328,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
               CFG_ROLE_ORGANIZATION_SUFFIX_KEY, roleOrganizationSuffix);
     }
 	
-	String cfgRoleAffiliationPrefix = StringUtils.trimToNull((String) properties.get(
+    String cfgRoleAffiliationPrefix = StringUtils.trimToNull((String) properties.get(
             CFG_ROLE_AFFILIATION_PREFIX_KEY));
     if (cfgRoleAffiliationPrefix != null) {
       roleAffiliationPrefix = cfgRoleAffiliationPrefix;
@@ -465,11 +465,11 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
     if (StringUtils.equals(id, bootstrapUserId)) {
       roles.add(new JpaRole(GLOBAL_ADMIN_ROLE, organization));
     }
-	if (headerAffiliation != null) {
+    if (headerAffiliation != null) {
       String affiliation = request.getHeader(headerAffiliation);
-	  List<String> affiliations = Arrays.asList(affiliation.split(";"));
-	  for (String eachAffiliation : affiliations) {
-		roles.add(new JpaRole(roleAffiliationPrefix + eachAffiliation, organization));
+      List<String> affiliations = Arrays.asList(affiliation.split(";"));
+      for (String eachAffiliation : affiliations) {
+        roles.add(new JpaRole(roleAffiliationPrefix + eachAffiliation, organization));
       }
     }
 	
