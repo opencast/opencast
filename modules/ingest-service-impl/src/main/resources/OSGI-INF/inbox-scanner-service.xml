@@ -28,4 +28,6 @@
              cardinality="1..1" policy="static" bind="setUserDirectoryService"/>
   <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
              cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
+  <reference name="service-impl" interface="org.opencastproject.series.api.SeriesService"
+             cardinality="1..1" policy="static" bind="setSeriesService" />
 </scr:component>
