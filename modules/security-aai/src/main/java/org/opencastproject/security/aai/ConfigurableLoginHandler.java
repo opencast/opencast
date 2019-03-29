@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
@@ -52,7 +53,6 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -93,7 +93,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
 
   /** Name of the optional configuration property specifying a list of home organizations */
   private static final String CFG_HEADER_HOME_ORGANIZATION_KEY = "header.home_organization";
-  
+
   /** Name of the optional configuration property specifying the name of the HTTP request header where affiliations
       can be extracted */
   private static final String CFG_HEADER_AFFILIATION_KEY = "header.affiliation";
@@ -130,7 +130,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
 
   /** Default value of the configuration property CFG_ROLE_FEDERATION_KEY */
   private static final String CFG_ROLE_FEDERATION_DEFAULT = "ROLE_AAI_USER";
-  
+
   /**
    * Name of the configuration property that specifies the prefix of the affiliation role for Shibboleth
    * authenticated users. The role will be of the form ROLE_AFFILIATION_PREFIX + SHIBBOLETH_EDUPERSONAFFILIATION
@@ -166,7 +166,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
 
   /** Header to extract the home organization */
   private String headerHomeOrganization = null;
-  
+
   /** Header to extract the affiliation */
   private String headerAffiliation = null;
 
@@ -181,7 +181,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
 
   /** Suffix of the home organization membership role */
   private String roleOrganizationSuffix = CFG_ROLE_ORGANIZATION_SUFFIX_DEFAULT;
-  
+
   /** Prefix of the affiliation role */
   private String roleAffiliationPrefix = CFG_ROLE_AFFILIATION_PREFIX_DEFAULT;
 
@@ -272,7 +272,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
     } else {
       logger.warn("Optional header '{}' is not configured ", CFG_HEADER_HOME_ORGANIZATION_KEY);
     }
-	
+
     String cfgAffiliation = StringUtils.trimToNull((String) properties.get(CFG_HEADER_AFFILIATION_KEY));
     if (cfgAffiliation != null) {
       headerAffiliation = cfgAffiliation;
@@ -327,7 +327,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
       logger.info("AAI organization membership role suffix '{}' is not configured, using default '{}'",
               CFG_ROLE_ORGANIZATION_SUFFIX_KEY, roleOrganizationSuffix);
     }
-	
+
     String cfgRoleAffiliationPrefix = StringUtils.trimToNull((String) properties.get(
             CFG_ROLE_AFFILIATION_PREFIX_KEY));
     if (cfgRoleAffiliationPrefix != null) {
@@ -474,7 +474,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
         }
       }
     }
-	
+
     return roles;
   }
 
