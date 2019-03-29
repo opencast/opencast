@@ -886,9 +886,10 @@ Available since API version 1.1.0.
 
 Update the scheduling information of the event with id `{event_id}`.
 
-Form Parameters             |Type            | Description
-:---------------------------|:---------------|:----------------------------
-`scheduling`                | `string`       | The scheduling information.
+Form Parameters             |Type            | Description                              | Default | Version
+:---------------------------|:---------------|:-----------------------------------------|:--------|:-------
+`scheduling`                | `string`       | The scheduling information.              | <span class="required">Required</span>| 1.1.0
+`allowConflict`             | `boolean`      | Allow conflicts when updating scheduling.| false   | 1.2.0
 
 __Sample__
 
@@ -919,3 +920,13 @@ In case of a conflict:
   }
 ]
 ```
+
+`allowConflict` allows the schedule to be updated without checking for conflicts.
+To allow conflicts (`true`) the call **MUST** be made with a user that has an _Administrative Role_.
+
+If not handled properly this will likely cause two or more events to be
+scheduled on a particular capture agent at the same time, which will then
+cause a capture failure for all but one of the events.
+
+The person making this call and allowing conflicts to exist, will bear the
+responsibility of resolving the conflicts that might result.

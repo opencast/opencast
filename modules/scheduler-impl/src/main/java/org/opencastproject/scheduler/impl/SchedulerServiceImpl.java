@@ -29,6 +29,7 @@ import static org.opencastproject.scheduler.impl.SchedulerUtil.eventOrganization
 import static org.opencastproject.scheduler.impl.SchedulerUtil.isNotEpisodeDublinCore;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.recordToMp;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.uiAdapterToFlavor;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.Log.getHumanReadableTimeString;
 import static org.opencastproject.util.RequireUtil.notEmpty;
@@ -640,13 +641,22 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           Opt<Map<String, String>> caMetadata)
                   throws NotFoundException, UnauthorizedException, SchedulerException {
     updateEventInternal(mpId, startDateTime, endDateTime, captureAgentId, userIds, mediaPackage,
-            wfProperties, caMetadata);
+            wfProperties, caMetadata, false);
+  }
+
+  @Override
+  public void updateEvent(final String mpId, Opt<Date> startDateTime, Opt<Date> endDateTime, Opt<String> captureAgentId,
+          Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
+          Opt<Map<String, String>> caMetadata, boolean allowConflict)
+                throws NotFoundException, UnauthorizedException, SchedulerException {
+    updateEventInternal(mpId, startDateTime, endDateTime, captureAgentId, userIds, mediaPackage,
+            wfProperties, caMetadata, allowConflict);
   }
 
   private void updateEventInternal(final String mpId, Opt<Date> startDateTime,
           Opt<Date> endDateTime, Opt<String> captureAgentId, Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage,
-          Opt<Map<String, String>> wfProperties, Opt<Map<String, String>> caMetadata
-  ) throws NotFoundException, SchedulerException {
+          Opt<Map<String, String>> wfProperties, Opt<Map<String, String>> caMetadata, boolean allowConflict)
+                throws NotFoundException, SchedulerException {
     notEmpty(mpId, "mpId");
     notNull(startDateTime, "startDateTime");
     notNull(endDateTime, "endDateTime");
@@ -688,8 +698,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       String agentId = extendedEventDto.getCaptureAgentId();
       Opt<String> seriesId = Opt.nul(record.getSnapshot().get().getMediaPackage().getSeries());
 
+      // Check for conflicting events
       // Check scheduling conficts in case a property relevant for conflicts has changed
-      if (captureAgentId.isSome() || startDateTime.isSome() || endDateTime.isSome()) {
+      if ((captureAgentId.isSome() || startDateTime.isSome() || endDateTime.isSome())
+            && (!allowConflict || !isAdmin())) {
         List<MediaPackage> conflictingEvents = $(findConflictingEvents(captureAgentId.getOr(agentId),
                 startDateTime.getOr(start), endDateTime.getOr(end))).filter(new Fn<MediaPackage, Boolean>() {
                     @Override
@@ -789,6 +801,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     } catch (Exception e) {
       throw new SchedulerException(e);
     }
+  }
+
+  private boolean isAdmin() {
+    return (securityService.getUser().hasRole(GLOBAL_ADMIN_ROLE)
+            || securityService.getUser().hasRole(securityService.getOrganization().getAdminRole()));
   }
 
   private Opt<AccessControlList> loadEpisodeAclFromAsset(Snapshot snapshot) {
