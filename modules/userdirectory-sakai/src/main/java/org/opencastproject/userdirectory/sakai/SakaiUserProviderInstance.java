@@ -295,18 +295,18 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
       boolean isInstructor = false;
 
       for (String r : sakaiRoles) {
-        roles.add(new JaxbRole(r, jaxbOrganization, "Sakai external role", Role.Type.EXTERNAL));
+        roles.add(new JaxbRole(r, jaxbOrganization, "Sakai external role", Role.Type.EXTERNAL, Role.Target.ACL));
 
         if (r.endsWith(LTI_INSTRUCTOR_ROLE))
           isInstructor = true;
       }
 
       // Group role for all Sakai users
-      roles.add(new JaxbRole(Group.ROLE_PREFIX + "SAKAI", jaxbOrganization, "Sakai Users", Role.Type.EXTERNAL_GROUP));
+      roles.add(new JaxbRole(Group.ROLE_PREFIX + "SAKAI", jaxbOrganization, "Sakai Users", Role.Type.EXTERNAL_GROUP, Role.Target.ALL));
 
       // Group role for Sakai users who are an instructor in one more sites
       if (isInstructor)
-        roles.add(new JaxbRole(Group.ROLE_PREFIX + "SAKAI_INSTRUCTOR", jaxbOrganization, "Sakai Instructors", Role.Type.EXTERNAL_GROUP));
+        roles.add(new JaxbRole(Group.ROLE_PREFIX + "SAKAI_INSTRUCTOR", jaxbOrganization, "Sakai Instructors", Role.Type.EXTERNAL_GROUP, Role.Target.ALL));
 
       logger.debug("Returning JaxbRoles: " + roles);
 
@@ -677,11 +677,11 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
 
      if (ltirole) {
        // Query is for a Site ID and an LTI role (Instructor/Learner)
-       roles.add(new JaxbRole(query, jaxbOrganization, "Sakai Site Role", Role.Type.EXTERNAL));
+       roles.add(new JaxbRole(query, jaxbOrganization, "Sakai Site Role", Role.Type.EXTERNAL, Role.Target.ACL));
      } else {
        // Site ID - return both roles
-       roles.add(new JaxbRole(sakaiSite + "_" + LTI_INSTRUCTOR_ROLE, jaxbOrganization, "Sakai Site Instructor Role", Role.Type.EXTERNAL));
-       roles.add(new JaxbRole(sakaiSite + "_" + LTI_LEARNER_ROLE, jaxbOrganization, "Sakai Site Learner Role", Role.Type.EXTERNAL));
+       roles.add(new JaxbRole(sakaiSite + "_" + LTI_INSTRUCTOR_ROLE, jaxbOrganization, "Sakai Site Instructor Role", Role.Type.EXTERNAL, Role.Target.ACL));
+       roles.add(new JaxbRole(sakaiSite + "_" + LTI_LEARNER_ROLE, jaxbOrganization, "Sakai Site Learner Role", Role.Type.EXTERNAL, Role.Target.ACL));
      }
 
      return roles.iterator();

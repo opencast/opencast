@@ -29,6 +29,8 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -68,7 +70,8 @@ public final class JpaRole implements Role {
   @Transient
   private Type type = Type.INTERNAL;
 
-  @Transient
+  @Enumerated(EnumType.STRING)
+  @Column(name = "target", length = 4)
   private Target target = Target.ALL;
 
   /**

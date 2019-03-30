@@ -442,17 +442,17 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
     if (ltirole) {
       // Query is for a Moodle ID and an LTI role (Instructor/Learner/Group)
-      roles.add(new JaxbRole(query, jaxbOrganization, "Moodle Site Role", Role.Type.EXTERNAL));
+      roles.add(new JaxbRole(query, jaxbOrganization, "Moodle Site Role", Role.Type.EXTERNAL, Role.Target.ACL));
     } else if (findGroupRole) {
       // Group ID
       roles.add(new JaxbRole(GROUP_ROLE_PREFIX + moodleId + "_" + GROUP_ROLE_SUFFIX, jaxbOrganization,
-              "Moodle Group Learner Role", Role.Type.EXTERNAL));
+              "Moodle Group Learner Role", Role.Type.EXTERNAL, Role.Target.ACL));
     } else {
       // Course ID - return both roles
       roles.add(new JaxbRole(moodleId + "_" + INSTRUCTOR_ROLE_SUFFIX, jaxbOrganization,
-              "Moodle Course Instructor Role", Role.Type.EXTERNAL));
+              "Moodle Course Instructor Role", Role.Type.EXTERNAL, Role.Target.ACL));
       roles.add(new JaxbRole(moodleId + "_" + LEARNER_ROLE_SUFFIX, jaxbOrganization, "Moodle Course Learner Role",
-              Role.Type.EXTERNAL));
+              Role.Type.EXTERNAL, Role.Target.ACL));
     }
 
     return roles.iterator();
@@ -505,18 +505,18 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
 
       // Create Opencast Objects
       Set<JaxbRole> roles = new HashSet<>();
-      roles.add(new JaxbRole(Group.ROLE_PREFIX + "MOODLE", jaxbOrganization, "Moodle Users", Role.Type.EXTERNAL_GROUP));
+      roles.add(new JaxbRole(Group.ROLE_PREFIX + "MOODLE", jaxbOrganization, "Moodle Users", Role.Type.EXTERNAL_GROUP, Role.Target.ACL));
       for (String courseId : courseIdsInstructor) {
         roles.add(new JaxbRole(courseId + "_" + INSTRUCTOR_ROLE_SUFFIX, jaxbOrganization, "Moodle Course Instructor Role",
-                Role.Type.EXTERNAL));
+                Role.Type.EXTERNAL, Role.Target.ACL));
       }
       for (String courseId : courseIdsLearner) {
         roles.add(new JaxbRole(courseId + "_" + LEARNER_ROLE_SUFFIX, jaxbOrganization, "Moodle Course Learner Role",
-                Role.Type.EXTERNAL));
+                Role.Type.EXTERNAL, Role.Target.ACL));
       }
       for (String groupId : groupIdsLearner) {
         roles.add(new JaxbRole(GROUP_ROLE_PREFIX + groupId + "_" + GROUP_ROLE_SUFFIX, jaxbOrganization,
-                "Moodle Group Learner Role", Role.Type.EXTERNAL));
+                "Moodle Group Learner Role", Role.Type.EXTERNAL, Role.Target.ACL));
       }
 
       return new JaxbUser(moodleUser.getUsername(), null, moodleUser.getFullname(), moodleUser.getEmail(),
