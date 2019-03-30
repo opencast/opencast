@@ -76,4 +76,11 @@ public interface Role {
    * @return the type
    */
   Type getType();
+
+  /**
+   * Return the role's {@link Target}
+   *
+   * @return the target
+   */
+  Target getTarget();
 }

@@ -68,6 +68,9 @@ public final class JpaRole implements Role {
   @Transient
   private Type type = Type.INTERNAL;
 
+  @Transient
+  private Target target = Target.ALL;
+
   /**
    * No-arg constructor needed by JPA
    */
@@ -115,9 +118,10 @@ public final class JpaRole implements Role {
    * @param type
    *          the role {@link Type}
    */
-  public JpaRole(String name, JpaOrganization organization, String description, Type type) {
+  public JpaRole(String name, JpaOrganization organization, String description, Type type, Target target) {
     this(name, organization, description);
     this.type = type;
+    this.target = target;
   }
 
   /**
@@ -161,6 +165,11 @@ public final class JpaRole implements Role {
   @Override
   public Type getType() {
     return type;
+  }
+
+  @Override
+  public Target getTarget() {
+    return target;
   }
 
   @Override

@@ -55,6 +55,10 @@ public final class JaxbRole implements Role {
   @XmlElement(name = "type")
   protected Type type = Type.INTERNAL;
 
+  @XmlElement(name = "target")
+  protected Target target = Target.ALL;
+
+
   /**
    * No-arg constructor needed by JAXB
    */
@@ -101,10 +105,13 @@ public final class JaxbRole implements Role {
    *          the description
    * @param type
    *          the role {@link type}
+   * @param target
+   *          the role {@link target}
    */
-  public JaxbRole(String name, JaxbOrganization organization, String description, Type type) throws IllegalArgumentException {
+  public JaxbRole(String name, JaxbOrganization organization, String description, Type type, Target target) throws IllegalArgumentException {
     this(name, organization, description);
     this.type = type;
+    this.target = target;
   }
 
 
@@ -119,19 +126,22 @@ public final class JaxbRole implements Role {
    *          the description
    * @param type
    *          the role {@link type}
+   * @param target
+   *          the role {@link target}
    */
-  public JaxbRole(String name, String organizationId, String description, Type type) throws IllegalArgumentException {
+  public JaxbRole(String name, String organizationId, String description, Type type, Target target) throws IllegalArgumentException {
     super();
     this.name = name;
     this.organizationId = organizationId;
     this.description = description;
     this.type = type;
+    this.target = target;
   }
 
   public static JaxbRole fromRole(Role role) {
     if (role instanceof JaxbRole)
       return (JaxbRole) role;
-    return new JaxbRole(role.getName(), role.getOrganizationId(), role.getDescription(), role.getType());
+    return new JaxbRole(role.getName(), role.getOrganizationId(), role.getDescription(), role.getType(), role.getTarget());
   }
 
   /**
@@ -175,6 +185,16 @@ public final class JaxbRole implements Role {
   public Type getType() {
     return type;
   }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.security.api.Role#getTarget()
+   */
+  public Target getTarget() {
+    return target;
+  }
+
 
   /**
    * {@inheritDoc}

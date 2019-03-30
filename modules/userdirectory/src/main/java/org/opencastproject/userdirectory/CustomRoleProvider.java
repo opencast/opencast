@@ -27,7 +27,6 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.Role.Type;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 
@@ -162,7 +161,7 @@ public class CustomRoleProvider implements RoleProvider {
       if (m.matches()) {
           List<Role> roles = new LinkedList<Role>();
           JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
-          roles.add(new JaxbRole(exactQuery, jaxbOrganization, "Custom Role", Role.Type.EXTERNAL));
+          roles.add(new JaxbRole(exactQuery, jaxbOrganization, "Custom Role", Role.Type.EXTERNAL, Role.Target.ALL));
           return roles.iterator();
       }
     }
@@ -182,7 +181,7 @@ public class CustomRoleProvider implements RoleProvider {
   private static final Fn2<String, Organization, Role> toRole = new Fn2<String, Organization, Role>() {
     @Override
     public Role apply(String role, Organization organization) {
-      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization), "Custom Role", Type.INTERNAL);
+      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization), "Custom Role", Role.Type.INTERNAL, Role.Target.ALL);
     }
   };
 

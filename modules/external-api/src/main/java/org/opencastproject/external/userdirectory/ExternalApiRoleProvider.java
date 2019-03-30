@@ -27,7 +27,6 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.Role.Type;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
@@ -135,7 +134,7 @@ public class ExternalApiRoleProvider implements RoleProvider {
   private static final Fn2<String, Organization, Role> toRole = new Fn2<String, Organization, Role>() {
     @Override
     public Role apply(String role, Organization organization) {
-      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization), "External API Role", Type.INTERNAL);
+      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization), "External API Role", Role.Type.INTERNAL, Role.Target.USER);
     }
   };
 

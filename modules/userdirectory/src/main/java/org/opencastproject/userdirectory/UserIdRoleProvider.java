@@ -122,8 +122,8 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
   public List<Role> getRolesForUser(String userName) {
     Organization organization = securityService.getOrganization();
     List<Role> roles = new ArrayList<Role>();
-    roles.add(new JaxbRole(getUserIdRole(userName), JaxbOrganization.fromOrganization(organization), "The user id role", Role.Type.SYSTEM));
-    roles.add(new JaxbRole(ROLE_USER, JaxbOrganization.fromOrganization(organization), "The authenticated user role", Role.Type.SYSTEM));
+    roles.add(new JaxbRole(getUserIdRole(userName), JaxbOrganization.fromOrganization(organization), "The user id role", Role.Type.SYSTEM, Role.Target.ALL));
+    roles.add(new JaxbRole(ROLE_USER, JaxbOrganization.fromOrganization(organization), "The authenticated user role", Role.Type.SYSTEM, Role.Target.ALL));
     return Collections.unmodifiableList(roles);
   }
 
@@ -155,7 +155,8 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
 
     // Return authenticated user role if it matches the query pattern
     if (like(ROLE_USER, query)) {
-      foundRoles.add(new JaxbRole(ROLE_USER, JaxbOrganization.fromOrganization(organization), "The authenticated user role", Role.Type.SYSTEM));
+      foundRoles.add(new JaxbRole(ROLE_USER, JaxbOrganization.fromOrganization(organization),
+        "The authenticated user role", Role.Type.SYSTEM, Role.Target.ALL));
     }
 
     // Include user id roles only if wildcard search or query matches user id role prefix
@@ -174,7 +175,8 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
       User u = users.next();
       // We exclude the digest user, but then add the global ROLE_USER above
       if (!"system".equals(u.getProvider())) {
-        foundRoles.add(new JaxbRole(getUserIdRole(u.getUsername()), JaxbOrganization.fromOrganization(u.getOrganization()), "User id role", Role.Type.SYSTEM));
+        foundRoles.add(new JaxbRole(getUserIdRole(u.getUsername()), JaxbOrganization.fromOrganization(u.getOrganization()),
+          "User id role", Role.Type.SYSTEM, Role.Target.ALL));
       }
     }
 

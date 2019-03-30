@@ -27,7 +27,6 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.Role.Type;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
@@ -70,9 +69,11 @@ public class OrganizationRoleProvider implements RoleProvider {
     List<Role> roles = new ArrayList<Role>();
     // The GLOBAL_ADMIN_ROLE is provided by the InMemoryUserAndRoleProvider
     if (!GLOBAL_ADMIN_ROLE.equals(organization.getAdminRole())) {
-      roles.add(new JaxbRole(organization.getAdminRole(), JaxbOrganization.fromOrganization(organization), "", Type.INTERNAL));
+      roles.add(new JaxbRole(organization.getAdminRole(), JaxbOrganization.fromOrganization(organization), "",
+        Role.Type.INTERNAL, Role.Target.ALL));
     }
-    roles.add(new JaxbRole(organization.getAnonymousRole(), JaxbOrganization.fromOrganization(organization), "", Type.SYSTEM));
+    roles.add(new JaxbRole(organization.getAnonymousRole(), JaxbOrganization.fromOrganization(organization), "",
+      Role.Type.SYSTEM, Role.Target.ALL));
     return roles.iterator();
   }
 

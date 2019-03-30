@@ -364,7 +364,7 @@ public class UsersEndpoint {
       //  use the previous roles if no new ones are provided
       rolesSet = new HashSet<>();
       for (Role role : user.getRoles()) {
-        rolesSet.add(new JpaRole(role.getName(), organization, role.getDescription(), role.getType()));
+        rolesSet.add(new JpaRole(role.getName(), organization, role.getDescription(), role.getType(), role.getTarget()));
       }
     }
 
@@ -430,7 +430,7 @@ public class UsersEndpoint {
     Set<JpaRole> rolesSet = new HashSet<>();
     for (JsonRole role: rolesList) {
       try {
-        rolesSet.add(new JpaRole(role.getName(), organization, null, role.getType()));
+        rolesSet.add(new JpaRole(role.getName(), organization, null, role.getType(), role.getTarget()));
       } catch (NullPointerException e) {
         throw new IllegalArgumentException(e);
       }
@@ -448,7 +448,7 @@ public class UsersEndpoint {
     userData.put("provider", user.getProvider());
     userData.put("roles", user.getRoles().stream()
       .sorted(Comparator.comparing(Role::getName))
-      .map((r) -> new JsonRole(r.getName(), r.getType()))
+      .map((r) -> new JsonRole(r.getName(), r.getType(), r.getTarget()))
       .collect(Collectors.toList()));
     return userData;
   }
@@ -456,10 +456,12 @@ public class UsersEndpoint {
   class JsonRole {
     private String name;
     private String type;
+    private String target;
 
-    JsonRole(String name, Role.Type type) {
+    JsonRole(String name, Role.Type type, Role.Target target) {
       this.name = name;
       this.type = type.toString();
+      this.target = target.toString();
     }
 
     public String getName() {
@@ -468,6 +470,10 @@ public class UsersEndpoint {
 
     public Role.Type getType() {
       return Role.Type.valueOf(type);
+    }
+
+    public Role.Target getTarget() {
+      return Role.Target.valueOf(target);
     }
   }
 

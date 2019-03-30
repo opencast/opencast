@@ -24,7 +24,6 @@ package org.opencastproject.adminui.userdirectory;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.Role.Type;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
@@ -127,7 +126,7 @@ public class UIRolesRoleProvider implements RoleProvider {
   }
 
   private Role toRole(final String role, final JaxbOrganization organization) {
-    return new JaxbRole(role, organization, "AdminNG UI Role", Type.INTERNAL);
+    return new JaxbRole(role, organization, "AdminNG UI Role", Role.Type.INTERNAL, Role.Target.USER);
   }
 
 }

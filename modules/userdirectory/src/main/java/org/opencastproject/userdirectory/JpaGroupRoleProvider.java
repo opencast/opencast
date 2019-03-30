@@ -195,7 +195,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
     Group group = UserDirectoryPersistenceUtil.findGroupByRole(groupName, orgId, emf);
     if (group != null) {
       for (Role role : group.getRoles()) {
-        roles.add(new JaxbRole(role.getName(), role.getOrganizationId(), role.getDescription(), Role.Type.DERIVED));
+        roles.add(new JaxbRole(role.getName(), role.getOrganizationId(), role.getDescription(), Role.Type.DERIVED, role.getTarget()));
       }
     } else {
       logger.warn("Group {} not found", groupName);
@@ -231,7 +231,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
     List<Role> roles = new ArrayList<Role>();
     for (JpaGroup group : groups) {
       if (like(group.getRole(), query))
-        roles.add(new JaxbRole(group.getRole(), JaxbOrganization.fromOrganization(group.getOrganization()), "", Role.Type.GROUP));
+        roles.add(new JaxbRole(group.getRole(), JaxbOrganization.fromOrganization(group.getOrganization()), "", Role.Type.GROUP, Role.Target.ALL));
     }
 
     Set<Role> result = new HashSet<Role>();
@@ -387,9 +387,9 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   private List<Role> getGroupsRoles(List<JpaGroup> groups) {
     List<Role> roles = new ArrayList<Role>();
     for (Group group : groups) {
-      roles.add(new JaxbRole(group.getRole(), JaxbOrganization.fromOrganization(group.getOrganization()), "", Role.Type.GROUP));
+      roles.add(new JaxbRole(group.getRole(), JaxbOrganization.fromOrganization(group.getOrganization()), "", Role.Type.GROUP, Role.Target.ALL));
       for (Role role : group.getRoles()) {
-        roles.add(new JaxbRole(role.getName(), role.getOrganizationId(), role.getDescription(), Role.Type.DERIVED));
+        roles.add(new JaxbRole(role.getName(), role.getOrganizationId(), role.getDescription(), Role.Type.DERIVED, role.getTarget()));
       }
 
     }

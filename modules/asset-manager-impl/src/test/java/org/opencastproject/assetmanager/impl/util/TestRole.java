@@ -83,4 +83,9 @@ public final class TestRole implements Role {
     return Type.INTERNAL;
   }
 
+  @Override
+  public Target getTarget() {
+    return Target.ALL;
+  }
+
 }

@@ -62,8 +62,7 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
     final String roleName = SecurityUtil.getCaptureAgentRole(name);
     final JaxbOrganization organization = JaxbOrganization.fromOrganization(securityService.getOrganization());
     final String description = "Role for capture agent \"" + name + "\"";
-    final Role.Type system = Role.Type.INTERNAL;
-    return new JaxbRole(roleName, organization, description, system);
+    return new JaxbRole(roleName, organization, description, Role.Type.INTERNAL, Role.Target.USER);
   }
 
   /**
