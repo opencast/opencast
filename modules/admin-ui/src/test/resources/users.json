@@ -9,8 +9,8 @@
             "name": "User1",
             "provider": "provider1",
             "roles": [
-                {"name": "ADMIN", "type": "INTERNAL"},
-                {"name": "USER", "type": "INTERNAL"}
+                {"name": "ADMIN", "type": "INTERNAL", "target": "ALL"},
+                {"name": "USER", "type": "INTERNAL", "target": "ALL"}
             ],
             "username": "user1"
         },

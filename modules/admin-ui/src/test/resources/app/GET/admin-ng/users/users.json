@@ -9,11 +9,11 @@
       "name": "•mock• MH System Account",
       "provider": "system",
       "roles": [
-        {"name": "•mock• ROLE_ADMIN", "type": "INTERNAL"},
-        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
-        {"name": "•mock• ROLE_OAUTH_USER", "type": "INTERNAL"},
-        {"name": "•mock• MATTERHORN_ADMINISTRATOR", "type": "INTERNAL"},
-        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
+        {"name": "•mock• ROLE_ADMIN", "type": "INTERNAL", "target": "ALL"},
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL", "target": "ALL"},
+        {"name": "•mock• ROLE_OAUTH_USER", "type": "INTERNAL", "target": "ALL"},
+        {"name": "•mock• MATTERHORN_ADMINISTRATOR", "type": "INTERNAL", "target": "ALL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL", "target": "ALL"}
       ],
       "username": "matterhorn_system_account"
     },
@@ -23,11 +23,11 @@
       "name": "•mock• SystemAdmin",
       "provider": "local",
       "roles": [
-        {"name": "•mock• ROLE_ADMIN", "type": "INTERNAL"},
-        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
-        {"name": "•mock• ROLE_OAUTH_USER", "type": "INTERNAL"},
-        {"name": "•mock• MATTERHORN_ADMINISTRATOR", "type": "INTERNAL"},
-        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
+        {"name": "•mock• ROLE_ADMIN", "type": "INTERNAL", "target": "ALL"},
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL", "target": "ALL"},
+        {"name": "•mock• ROLE_OAUTH_USER", "type": "INTERNAL", "target": "ALL"},
+        {"name": "•mock• MATTERHORN_ADMINISTRATOR", "type": "INTERNAL", "target": "ALL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL", "target": "ALL"}
       ],
       "username": "admin"
     },
@@ -38,8 +38,8 @@
       "provider": "system",
       "personId": 1,
       "roles": [
-        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
-        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL", "target": "ALL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL", "target": "ALL"}
       ],
       "username": "pm.user.1"
     },
@@ -50,8 +50,8 @@
       "provider": "system",
       "personId": 2,
       "roles": [
-        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
-        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL", "target": "ALL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL", "target": "ALL"}
       ],
       "username": "pm.user.2"
     },
@@ -62,8 +62,8 @@
       "provider": "system",
       "personId": 3,
       "roles": [
-        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
-        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL", "target": "ALL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL", "target": "ALL"}
       ],
       "username": "pm.user.3"
     }
