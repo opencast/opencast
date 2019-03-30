@@ -932,28 +932,27 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   private synchronized void processCachedLoadChange(JpaJob job) {
     if (JOB_STATUSES_INFLUENCING_LOAD_BALANCING.contains(job.getStatus()) && jobCache.get(job.getId()) == null) {
-      logger.debug("{} Adding to load cache: Job {}, type {}, load {}, status {}", Thread.currentThread().getId(), job.getId(),
-              job.getJobType(), job.getJobLoad(), job.getStatus());
+      logger.debug("Adding to load cache: Job {}, type {}, load {}, status {}",
+              job.getId(), job.getJobType(), job.getJobLoad(), job.getStatus());
       localSystemLoad += job.getJobLoad();
       jobCache.put(job.getId(), job.getJobLoad());
     } else if (jobCache.get(job.getId()) != null && Status.FINISHED.equals(job.getStatus())
             || Status.FAILED.equals(job.getStatus()) || Status.WAITING.equals(job.getStatus())) {
-      logger.debug("{} Removing from load cache: Job {}, type {}, load {}, status {}", Thread.currentThread().getId(),
+      logger.debug("Removing from load cache: Job {}, type {}, load {}, status {}",
               job.getId(), job.getJobType(), job.getJobLoad(), job.getStatus());
       localSystemLoad -= job.getJobLoad();
       jobCache.remove(job.getId());
     } else {
-      logger.debug("{} Ignoring for load cache: Job {}, type {}, status {}", Thread.currentThread().getId(),
+      logger.debug("Ignoring for load cache: Job {}, type {}, status {}",
               job.getId(), job.getJobType(), job.getStatus());
     }
-    logger.debug("{} Current host load: {}, job load cache size: {}",
-            Thread.currentThread().getId(), format("%.1f", localSystemLoad), jobCache.size());
+    logger.debug("Current host load: {}, job load cache size: {}", format("%.1f", localSystemLoad), jobCache.size());
   }
 
   private synchronized void removeFromLoadCache(Long jobId) {
     if (jobCache.get(jobId) != null) {
       float jobLoad = jobCache.get(jobId);
-      logger.debug("{} Removing deleted job from load cache: Job {}, load {}", Thread.currentThread().getId(), jobId, jobLoad);
+      logger.debug("Removing deleted job from load cache: Job {}, load {}", jobId, jobLoad);
       localSystemLoad -= jobLoad;
       jobCache.remove(jobId);
     }
