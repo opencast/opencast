@@ -68,24 +68,13 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   private final AuthorizationService authSvc;
   private final SecurityService secSvc;
 
-  // Settings for role filter
-  private boolean includeAPIRoles;
-  private boolean includeCARoles;
-  private boolean includeUIRoles;
-
   public AssetManagerWithSecurity(
       TieredStorageAssetManager delegate,
       AuthorizationService authSvc,
-      SecurityService secSvc,
-      final boolean includeAPIRoles,
-      final boolean includeCARoles,
-      final boolean includeUIRoles) {
+      SecurityService secSvc) {
     super(delegate);
     this.authSvc = authSvc;
     this.secSvc = secSvc;
-    this.includeAPIRoles = includeAPIRoles;
-    this.includeCARoles = includeCARoles;
-    this.includeUIRoles = includeUIRoles;
   }
 
   @Override public Snapshot takeSnapshot(String owner, MediaPackage mp) {
@@ -275,8 +264,6 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
    */
   private java.util.function.Predicate<Role> roleFilter = (role) -> {
     final String name = role.getName();
-    return (includeAPIRoles || !name.startsWith("ROLE_API_"))
-        && (includeCARoles  || !name.startsWith("ROLE_CAPTURE_AGENT_"))
-        && (includeUIRoles  || !name.startsWith("ROLE_UI_"));
+    return (role.getTarget() == Role.Target.ALL || role.getTarget() == Role.Target.ACL);
   };
 }
