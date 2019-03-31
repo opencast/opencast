@@ -71,7 +71,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -120,6 +119,11 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /** Executor used for asynchronous indexing */
   protected ExecutorService indexingExecutor;
+
+  /** ACL role target filter */
+  private java.util.function.Predicate<Role> targetFilterACL = (role) -> {
+    return (role.getTarget() == Role.Target.ALL || role.getTarget() == Role.Target.ACL);
+  };
 
   /**
    * No-argument constructor for OSGi declarative services.
@@ -741,11 +745,8 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     User currentUser = securityService.getUser();
     Organization currentOrg = securityService.getOrganization();
     if (!currentUser.hasRole(currentOrg.getAdminRole()) && !currentUser.hasRole(GLOBAL_ADMIN_ROLE)) {
-      List<String> roleList = new ArrayList<String>();
-      for (Role role : currentUser.getRoles()) {
-        roleList.add(role.getName());
-      }
-      String[] roles = roleList.toArray(new String[roleList.size()]);
+
+      String[] roles = currentUser.getRoles().parallelStream().filter(targetFilterACL).map(Role::getName).toArray(String[]::new);
       if (forEdit) {
         appendAnd(sb, SolrFields.ACCESS_CONTROL_EDIT, roles);
       } else if (roles.length > 0) {

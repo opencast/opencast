@@ -66,7 +66,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -95,6 +94,11 @@ public class SolrRequester {
    * The optional serializer
    */
   private MediaPackageSerializer serializer = null;
+
+   /** ACL role target filter */
+   private java.util.function.Predicate<Role> targetFilterACL = (role) -> {
+     return (role.getTarget() == Role.Target.ALL || role.getTarget() == Role.Target.ACL);
+   };
 
   /**
    * Creates a new requester for solr that will be using the given connection object to query the search index.
@@ -702,8 +706,7 @@ public class SolrRequester {
       User user = securityService.getUser();
 
       // Get filtered role list
-      Set<Role> userAllRoles = user.getRoles();
-      List<Role> roles = userAllRoles.stream().filter(aclFilter).collect(Collectors.<Role> toList());
+      List<Role> roles = user.getRoles().stream().filter(targetFilterACL).collect(Collectors.<Role> toList());
 
       boolean userHasAnonymousRole = false;
       if (roles.size() > 0) {
@@ -770,10 +773,6 @@ public class SolrRequester {
     query.setFields("* score");
     return query;
   }
-
-  private java.util.function.Predicate<Role> aclFilter = (role) -> {
-    return (role.getTarget() == Role.Target.ALL || role.getTarget() == Role.Target.ACL);
-  };
 
   /**
    * Returns the search results, regardless of permissions. This should be used for maintenance purposes only.
