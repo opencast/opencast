@@ -80,8 +80,10 @@ public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<Series
       User user = query.getUser();
       if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole())) {
         for (Role role : user.getRoles()) {
-          for (String action : query.getActions()) {
-            and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName());
+          if (role.getTarget() == Role.Target.ALL || role.getTarget() == Role.Target.ACL) {
+            for (String action : query.getActions()) {
+              and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName());
+            }
           }
         }
       }
