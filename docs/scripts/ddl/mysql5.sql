@@ -598,3 +598,25 @@ CREATE TABLE oc_transcription_service_job (
   PRIMARY KEY (id),
   CONSTRAINT FK_oc_transcription_service_job_provider_id FOREIGN KEY (provider_id) REFERENCES oc_transcription_service_provider (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE oc_statistic_registration (
+  adopter_key VARCHAR(36) NOT NULL,
+  username VARCHAR(128) NOT NULL,
+  organisation VARCHAR(128) NOT NULL,
+  department VARCHAR(128),
+  first_name VARCHAR(128),
+  last_name VARCHAR(128),
+  email VARCHAR(128),
+  country VARCHAR(3) NOT NULL,
+  postal_code VARCHAR(16) NOT NULL,
+  city VARCHAR(128) NOT NULL,
+  street VARCHAR(128),
+  street_no VARCHAR(16),
+  contact_me TINYINT(1) DEFAULT 0,
+  allows_statistics TINYINT(1) DEFAULT 0,
+  allows_error_reports TINYINT(1) DEFAULT 0,
+  allows_tech_data TINYINT(1) DEFAULT 0,
+  created DATETIME,
+  last_modified DATETIME,
+  PRIMARY KEY (adopter_key)
+)

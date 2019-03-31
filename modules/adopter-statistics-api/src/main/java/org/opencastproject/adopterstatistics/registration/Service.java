@@ -19,11 +19,15 @@
  *
  */
 
+package org.opencastproject.adopterstatistics.registration;
 
-// Components
-@import "components/tables";
-@import "components/drag-and-drop";
+/**
+ * API for the Adopter Statistics Registrations
+ */
+public interface Service {
 
-// Views
-@import "views/modals/edit-table-view";
-@import "views/modals/registration";
+  void saveFormData(IForm form) throws Exception;
+
+  IForm retrieveFormData() throws Exception;
+
+}

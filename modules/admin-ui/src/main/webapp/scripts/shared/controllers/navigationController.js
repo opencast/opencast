@@ -23,7 +23,8 @@
 // A controller for global page navigation
 angular.module('adminNg.controllers')
 .controller('NavCtrl', ['$scope', '$rootScope', '$location', '$window', '$resource', '$routeParams', 'Language',
-  'hotkeys', function ($scope, $rootScope, $location, $window, $resource, $routeParams, Language, hotkeys) {
+  'hotkeys', 'ResourceModal', function ($scope, $rootScope, $location, $window, $resource, $routeParams, Language,
+    hotkeys, ResourceModal) {
     // FIXME Move this information to the Language service so it can be
     // fetched via Language.getAvailableLanguages().
 
@@ -37,6 +38,10 @@ angular.module('adminNg.controllers')
 
     $scope.showHotkeyCheatSheet = function () {
       hotkeys.toggleCheatSheet();
+    };
+
+    $scope.showAdopterRegistrationModal = function () {
+      ResourceModal.show('registration-modal', 'slim');
     };
 
     $rootScope.$on('language-changed', function () {

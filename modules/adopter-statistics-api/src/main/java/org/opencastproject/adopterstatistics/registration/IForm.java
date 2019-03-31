@@ -19,11 +19,13 @@
  *
  */
 
+package org.opencastproject.adopterstatistics.registration;
 
-// Components
-@import "components/tables";
-@import "components/drag-and-drop";
+/**
+ * Interface for the statistic registration form.
+ */
+public interface IForm {
 
-// Views
-@import "views/modals/edit-table-view";
-@import "views/modals/registration";
+  void merge(IForm form);
+
+}

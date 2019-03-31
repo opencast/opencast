@@ -103,6 +103,7 @@
     <sec:intercept-url pattern="/admin-ng/statistics/*.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/statistics/export.csv" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/assets/assets/**" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
 
     <sec:intercept-url pattern="/admin-ng/acl/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_ACLS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_EDIT" />
@@ -120,6 +121,7 @@
     <sec:intercept-url pattern="/admin-ng/themes/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_THEMES_EDIT" />
     <sec:intercept-url pattern="/admin-ng/users/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_USERS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/user-settings/signature/*" method="PUT" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="PUT" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
 
     <sec:intercept-url pattern="/services/maintenance" method="POST" access="ROLE_ADMIN, ROLE_UI_SERVERS_MAINTENANCE_EDIT" />
     <sec:intercept-url pattern="/services/sanitize" method="POST" access="ROLE_ADMIN, ROLE_UI_SERVICES_STATUS_EDIT" />
@@ -147,6 +149,7 @@
     <sec:intercept-url pattern="/admin-ng/tools/*/thumbnail.json" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_EDIT" />
     <sec:intercept-url pattern="/admin-ng/users" method="POST" access="ROLE_ADMIN, ROLE_UI_USERS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/user-settings/signature" method="POST" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="POST" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
 
     <sec:intercept-url pattern="/admin-ng/acl/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_ACLS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/capture-agents/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_DELETE" />
@@ -159,6 +162,7 @@
     <sec:intercept-url pattern="/admin-ng/series/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_SERIES_DELETE" />
     <sec:intercept-url pattern="/admin-ng/themes/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_THEMES_DELETE" />
     <sec:intercept-url pattern="/admin-ng/users/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_USERS_DELETE" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="DELETE" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
 
     <!-- Securing the URLs for the external API interface -->
     <!-- External API GET Endpoints -->

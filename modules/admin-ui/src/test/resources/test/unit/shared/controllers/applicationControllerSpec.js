@@ -1,5 +1,6 @@
 describe('Application controller', function () {
-    var $scope, $controller, $httpBackend, $location, AuthService, Notifications, ResourceModal;
+    var $scope, $controller, $httpBackend, $location, AuthService, Notifications,
+      ResourceModal, AdopterRegistrationResource;
 
     beforeEach(module('adminNg'));
     beforeEach(module(function ($provide) {
@@ -9,18 +10,26 @@ describe('Application controller', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function ($rootScope, _$controller_, _$location_, _$httpBackend_, _AuthService_, _Notifications_, _ResourceModal_) {
+    beforeEach(inject(function ($rootScope, _$controller_, _$location_, _$httpBackend_, _AuthService_, _Notifications_,
+                                _ResourceModal_, _AdopterRegistrationResource_) {
+
         $httpBackend = _$httpBackend_;
         $controller = _$controller_;
         $location = _$location_;
         AuthService = _AuthService_;
         Notifications = _Notifications_;
         ResourceModal = _ResourceModal_;
+        AdopterRegistrationResource = _AdopterRegistrationResource_;
 
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $httpBackend.whenGET('/info/me.json').respond(
             JSON.stringify(getJSONFixture('info/me.json'))
         );
+
+        $httpBackend.whenGET('/admin-ng/adopter/statistics/registration').respond(
+            {'lastModified' : '2020.01.16'}
+        );
+
         $httpBackend.whenGET('/sysinfo/bundles/version?prefix=opencast').respond(
             {'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}
         );
