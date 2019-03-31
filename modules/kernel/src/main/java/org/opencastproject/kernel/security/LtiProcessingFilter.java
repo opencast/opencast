@@ -24,7 +24,7 @@ package org.opencastproject.kernel.security;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth.provider.ProtectedResourceProcessingFilter;
+import org.springframework.security.oauth.provider.filter.ProtectedResourceProcessingFilter;
 
 /**
  * Overrides the default behavior of the OAuth ProtectedResourceProcessingFilter to keep the authentication returned by
