@@ -381,8 +381,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    * @see org.springframework.security.core.userdetails.UserDetailsService#loadUserByUsername(java.lang.String)
    */
   @Override
-  public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException,
-          org.springframework.dao.DataAccessException {
+  public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
     User user = loadUser(userName);
     if (user == null)
       throw new UsernameNotFoundException(userName);
