@@ -424,6 +424,7 @@ CREATE TABLE oc_role (
   description varchar(255) DEFAULT NULL,
   name varchar(128) DEFAULT NULL,
   organization varchar(128) DEFAULT NULL,
+  target varchar(4) DEFAULT 'ALL' NOT NULL,
   PRIMARY KEY (id),
   CONSTRAINT UNQ_oc_role UNIQUE (name, organization),
   CONSTRAINT FK_oc_role_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE

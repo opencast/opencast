@@ -69,6 +69,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Class implementing <code>LookupRequester</code> to provide connection to solr indexing facility.
@@ -699,7 +700,11 @@ public class SolrRequester {
       sb.append(" AND ").append(Schema.OC_ORGANIZATION).append(":")
               .append(SolrUtils.clean(securityService.getOrganization().getId()));
       User user = securityService.getUser();
-      Set<Role> roles = user.getRoles();
+
+      // Get filtered role list
+      Set<Role> userAllRoles = user.getRoles();
+      List<Role> roles = userAllRoles.stream().filter(aclFilter).collect(Collectors.<Role> toList());
+
       boolean userHasAnonymousRole = false;
       if (roles.size() > 0) {
         sb.append(" AND (");
@@ -765,6 +770,10 @@ public class SolrRequester {
     query.setFields("* score");
     return query;
   }
+
+  private java.util.function.Predicate<Role> aclFilter = (role) -> {
+    return (role.getTarget() == Role.Target.ALL || role.getTarget() == Role.Target.ACL);
+  };
 
   /**
    * Returns the search results, regardless of permissions. This should be used for maintenance purposes only.

@@ -263,7 +263,6 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
    * Configurable filter for roles
    */
   private java.util.function.Predicate<Role> roleFilter = (role) -> {
-    final String name = role.getName();
     return (role.getTarget() == Role.Target.ALL || role.getTarget() == Role.Target.ACL);
   };
 }
