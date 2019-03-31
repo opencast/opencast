@@ -42,7 +42,7 @@ public class LtiProcessingFilter extends ProtectedResourceProcessingFilter {
   /**
    * {@inheritDoc}
    *
-   * @see org.springframework.security.oauth.provider.OAuthProviderProcessingFilter#resetPreviousAuthentication(org.springframework.security.core.Authentication)
+   * @see org.springframework.security.oauth.provider.filter.OAuthProviderProcessingFilter#resetPreviousAuthentication(org.springframework.security.core.Authentication)
    */
   @Override
   protected void resetPreviousAuthentication(Authentication previousAuthentication) {
