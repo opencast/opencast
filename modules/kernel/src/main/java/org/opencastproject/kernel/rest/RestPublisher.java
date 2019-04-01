@@ -100,7 +100,7 @@ public class RestPublisher implements RestConstants {
   protected static final Logger logger = LoggerFactory.getLogger(RestPublisher.class);
 
   /** The rest publisher looks for any non-servlet with the 'opencast.service.path' property */
-  public static final String JAX_RS_SERVICE_FILTER = "(&(!(objectClass=javax.servlet.Servlet))(" + SERVICE_PATH_PROPERTY
+  public static final String JAX_RS_SERVICE_FILTER = "(&(!(objectClass=javax.servlet.Servlet))(" + Companion.getSERVICE_PATH_PROPERTY()
           + "=*))";
 
   /** A map that sets default xml namespaces in {@link XMLStreamWriter}s */
@@ -147,7 +147,7 @@ public class RestPublisher implements RestConstants {
         logger.warn("No service reference found for class {}", clazz.getName());
         return nullToken;
       }
-      String servicePath = (String) ref.getProperty(SERVICE_PATH_PROPERTY);
+      String servicePath = (String) ref.getProperty(Companion.getSERVICE_PATH_PROPERTY());
       return StringUtils.isBlank(servicePath) ? nullToken : servicePath;
     }
   };
@@ -159,7 +159,7 @@ public class RestPublisher implements RestConstants {
   @SuppressWarnings("unchecked")
   protected void activate(ComponentContext componentContext) {
     logger.debug("activate()");
-    baseServerUri = componentContext.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
+    baseServerUri = componentContext.getBundleContext().getProperty(OpencastConstants.Companion.getSERVER_URL_PROPERTY());
     this.componentContext = componentContext;
     servletRegistrationMap = new ConcurrentHashMap<>();
     providers = new ArrayList<>();
@@ -256,11 +256,11 @@ public class RestPublisher implements RestConstants {
    *          The service itself
    */
   protected void createEndpoint(ServiceReference<?> ref, Object service) {
-    String serviceType = (String) ref.getProperty(SERVICE_TYPE_PROPERTY);
-    String servicePath = (String) ref.getProperty(SERVICE_PATH_PROPERTY);
-    boolean servicePublishFlag = ref.getProperty(SERVICE_PUBLISH_PROPERTY) == null
-            || Boolean.parseBoolean((String) ref.getProperty(SERVICE_PUBLISH_PROPERTY));
-    boolean jobProducer = Boolean.parseBoolean((String) ref.getProperty(SERVICE_JOBPRODUCER_PROPERTY));
+    String serviceType = (String) ref.getProperty(Companion.getSERVICE_TYPE_PROPERTY());
+    String servicePath = (String) ref.getProperty(Companion.getSERVICE_PATH_PROPERTY());
+    boolean servicePublishFlag = ref.getProperty(Companion.getSERVICE_PUBLISH_PROPERTY()) == null
+            || Boolean.parseBoolean((String) ref.getProperty(Companion.getSERVICE_PUBLISH_PROPERTY()));
+    boolean jobProducer = Boolean.parseBoolean((String) ref.getProperty(Companion.getSERVICE_JOBPRODUCER_PROPERTY()));
 
     ServiceRegistration<?> reg = servletRegistrationMap.get(servicePath);
     if (reg != null) {
@@ -271,14 +271,14 @@ public class RestPublisher implements RestConstants {
     RestServlet cxf = new RestServlet();
     try {
       Dictionary<String, Object> props = new Hashtable<>();
-      props.put(SharedHttpContext.ALIAS, servicePath);
-      props.put(SharedHttpContext.SERVLET_NAME, service.toString());
-      props.put(SharedHttpContext.CONTEXT_ID, RestConstants.HTTP_CONTEXT_ID);
-      props.put(SharedHttpContext.SHARED, "true");
-      props.put(SERVICE_TYPE_PROPERTY, serviceType);
-      props.put(SERVICE_PATH_PROPERTY, servicePath);
-      props.put(SERVICE_PUBLISH_PROPERTY, servicePublishFlag);
-      props.put(SERVICE_JOBPRODUCER_PROPERTY, jobProducer);
+      props.put(SharedHttpContext.Companion.getALIAS(), servicePath);
+      props.put(SharedHttpContext.Companion.getSERVLET_NAME(), service.toString());
+      props.put(SharedHttpContext.Companion.getCONTEXT_ID(), RestConstants.Companion.getHTTP_CONTEXT_ID());
+      props.put(SharedHttpContext.Companion.getSHARED(), "true");
+      props.put(Companion.getSERVICE_TYPE_PROPERTY(), serviceType);
+      props.put(Companion.getSERVICE_PATH_PROPERTY(), servicePath);
+      props.put(Companion.getSERVICE_PUBLISH_PROPERTY(), servicePublishFlag);
+      props.put(Companion.getSERVICE_JOBPRODUCER_PROPERTY(), jobProducer);
       reg = componentContext.getBundleContext().registerService(Servlet.class.getName(), cxf, props);
     } catch (Exception e) {
       logger.info("Problem registering REST endpoint {} : {}", servicePath, e.getMessage());
@@ -406,7 +406,7 @@ public class RestPublisher implements RestConstants {
 
     @Override
     public void removedService(ServiceReference<Object> reference, Object service) {
-      String servicePath = (String) reference.getProperty(SERVICE_PATH_PROPERTY);
+      String servicePath = (String) reference.getProperty(Companion.getSERVICE_PATH_PROPERTY());
       destroyEndpoint(servicePath, reference);
       super.removedService(reference, service);
     }
@@ -423,7 +423,8 @@ public class RestPublisher implements RestConstants {
           logger.warn(
                   "{} was registered with '{}={}', but the service is not annotated with the JAX-RS "
                           + "@Path annotation",
-                  service, SERVICE_PATH_PROPERTY, reference.getProperty(SERVICE_PATH_PROPERTY));
+                  service,
+                  Companion.getSERVICE_PATH_PROPERTY(), reference.getProperty(Companion.getSERVICE_PATH_PROPERTY()));
         } else {
           createEndpoint(reference, service);
         }
@@ -475,15 +476,15 @@ public class RestPublisher implements RestConstants {
      */
     @Override
     public Object addingBundle(Bundle bundle, BundleEvent event) {
-      String classpath = bundle.getHeaders().get(RestConstants.HTTP_CLASSPATH);
-      String alias = bundle.getHeaders().get(RestConstants.HTTP_ALIAS);
-      String welcomeFile = bundle.getHeaders().get(RestConstants.HTTP_WELCOME);
+      String classpath = bundle.getHeaders().get(RestConstants.Companion.getHTTP_CLASSPATH());
+      String alias = bundle.getHeaders().get(RestConstants.Companion.getHTTP_ALIAS());
+      String welcomeFile = bundle.getHeaders().get(RestConstants.Companion.getHTTP_WELCOME());
 
       if (classpath != null && alias != null) {
         Dictionary<String, String> props = new Hashtable<>();
-        props.put(SharedHttpContext.ALIAS, alias);
-        props.put(SharedHttpContext.CONTEXT_ID, RestConstants.HTTP_CONTEXT_ID);
-        props.put(SharedHttpContext.SHARED, "true");
+        props.put(SharedHttpContext.Companion.getALIAS(), alias);
+        props.put(SharedHttpContext.Companion.getCONTEXT_ID(), RestConstants.Companion.getHTTP_CONTEXT_ID());
+        props.put(SharedHttpContext.Companion.getSHARED(), "true");
 
         StaticResource servlet = new StaticResource(new StaticResourceClassLoader(bundle), classpath, alias,
                 welcomeFile);
@@ -502,8 +503,8 @@ public class RestPublisher implements RestConstants {
 
     @Override
     public void removedBundle(Bundle bundle, BundleEvent event, Object object) {
-      String classpath = bundle.getHeaders().get(RestConstants.HTTP_CLASSPATH);
-      String alias = bundle.getHeaders().get(RestConstants.HTTP_ALIAS);
+      String classpath = bundle.getHeaders().get(RestConstants.Companion.getHTTP_CLASSPATH());
+      String alias = bundle.getHeaders().get(RestConstants.Companion.getHTTP_ALIAS());
       if (classpath != null && alias != null) {
         ServiceRegistration serviceRegistration = servlets.get(bundle);
         if (serviceRegistration != null) {

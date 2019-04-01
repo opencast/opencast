@@ -46,7 +46,7 @@ public class LanguageServiceTest {
     TestClassPathInspector classPathInspector = new TestClassPathInspector();
     languageService = new LanguageServiceImpl();
     languageService.setClassPathInspector(classPathInspector);
-    languageService.setLanguageFileFolder(LanguageService.TRANSLATION_FILES_PATH);
+    languageService.setLanguageFileFolder(LanguageService.Companion.getTRANSLATION_FILES_PATH());
   }
 
   @Test
@@ -95,7 +95,7 @@ public class LanguageServiceTest {
   }
 
   protected void testPattern(String filename, String expected) {
-    Pattern p = Pattern.compile(LanguageService.LANGUAGE_PATTERN);
+    Pattern p = Pattern.compile(LanguageService.Companion.getLANGUAGE_PATTERN());
     Matcher matcher = p.matcher(filename);
     assertTrue(matcher.matches());
     assertEquals(1, matcher.groupCount());
@@ -138,7 +138,7 @@ public class LanguageServiceTest {
   }
 
   private String localeFromFilename(String translationFileName) {
-    Pattern p = Pattern.compile(LanguageService.LANGUAGE_PATTERN);
+    Pattern p = Pattern.compile(LanguageService.Companion.getLANGUAGE_PATTERN());
     Matcher matcher = p.matcher(translationFileName);
     if (matcher.matches()) {
       return matcher.group(1);

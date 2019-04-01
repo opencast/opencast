@@ -95,7 +95,7 @@ public class ServiceRegistryEndpoint {
   protected ServiceRegistry serviceRegistry = null;
 
   /** This server's URL */
-  protected String serverUrl = UrlSupport.DEFAULT_BASE_URL;
+  protected String serverUrl = UrlSupport.INSTANCE.getDEFAULT_BASE_URL();
 
   /** The service path for this endpoint */
   protected String servicePath = "/";
@@ -112,8 +112,8 @@ public class ServiceRegistryEndpoint {
    *          OSGi component context
    */
   public void activate(ComponentContext cc) {
-    serverUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
-    servicePath = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+    serverUrl = cc.getBundleContext().getProperty(OpencastConstants.Companion.getSERVER_URL_PROPERTY());
+    servicePath = (String) cc.getProperties().get(RestConstants.Companion.getSERVICE_PATH_PROPERTY());
   }
 
   @GET
@@ -500,7 +500,7 @@ public class ServiceRegistryEndpoint {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Job not found.") })
   public Response updateJob(@PathParam("id") String id, @FormParam("job") String jobXml) throws NotFoundException {
     try {
-      Job job = JobParser.parseJob(jobXml);
+      Job job = JobParser.INSTANCE.parseJob(jobXml);
       serviceRegistry.updateJob(job);
       return Response.status(Status.NO_CONTENT).build();
     } catch (Exception e) {

@@ -218,7 +218,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     // Preview subtype
     AdminUIConfiguration adminUIConfiguration = new AdminUIConfiguration();
     Hashtable<String, String> dictionary = new Hashtable<>();
-    dictionary.put(AdminUIConfiguration.OPT_PREVIEW_SUBTYPE, PREVIEW_SUBTYPE);
+    dictionary.put(AdminUIConfiguration.Companion.getOPT_PREVIEW_SUBTYPE(), PREVIEW_SUBTYPE);
     adminUIConfiguration.updated(dictionary);
     env.setAdminUIConfiguration(adminUIConfiguration);
 
@@ -757,7 +757,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
   @Override
   public long getUrlSigningExpireDuration() {
-    return DEFAULT_URL_SIGNING_EXPIRE_DURATION;
+    return Companion.getDEFAULT_URL_SIGNING_EXPIRE_DURATION();
   }
 
   @Override

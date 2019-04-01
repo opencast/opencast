@@ -64,7 +64,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   protected ServiceRegistry serviceRegistry = null;
 
   /** The JobBarrier polling interval */
-  private long jobBarrierPollingInterval = JobBarrier.DEFAULT_POLLING_INTERVAL;
+  private long jobBarrierPollingInterval = JobBarrier.Companion.getDEFAULT_POLLING_INTERVAL();
 
   /**
    * Activates this component with its properties once all of the collaborating services have been set
@@ -315,7 +315,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * @deprecated use {@link #getConfig(WorkflowInstance, String)} or {@link #getOptConfig(org.opencastproject.workflow.api.WorkflowInstance, String)}
    */
   protected Option<String> getCfg(WorkflowInstance wi, String key) {
-    return option(wi.getCurrentOperation().getConfiguration(key));
+    return Companion.option(wi.getCurrentOperation().getConfiguration(key));
   }
 
   /**

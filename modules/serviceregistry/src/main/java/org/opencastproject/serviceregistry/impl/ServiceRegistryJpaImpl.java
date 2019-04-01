@@ -277,17 +277,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     logger.info("Activate service registry");
 
     // Find this host's url
-    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY))) {
-      hostName = UrlSupport.DEFAULT_BASE_URL;
+    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OpencastConstants.Companion.getSERVER_URL_PROPERTY()))) {
+      hostName = UrlSupport.INSTANCE.getDEFAULT_BASE_URL();
     } else {
-      hostName = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
+      hostName = cc.getBundleContext().getProperty(OpencastConstants.Companion.getSERVER_URL_PROPERTY());
     }
 
     // Check hostname for sanity. It should be the hosts URL with protocol but without any part of the service paths.
     if (hostName.endsWith("/")) {
       logger.warn("The configured value of {} ends with '/'. This is very likely a configuration error which could "
               + "lead to services not working properly. Note that this configuration should not contain any part of "
-              + "the service paths.", OpencastConstants.SERVER_URL_PROPERTY);
+              + "the service paths.", OpencastConstants.Companion.getSERVER_URL_PROPERTY());
     }
 
     // Clean all undispatchable jobs that were orphaned when this host was last deactivated
@@ -299,9 +299,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       hostsStatistics = new HostsStatistics(serviceStatistics);
       servicesStatistics = new ServicesStatistics(hostName, serviceStatistics);
       jobsStatistics = new JobsStatistics(hostName);
-      jmxBeans.add(JmxUtil.registerMXBean(hostsStatistics, JMX_HOSTS_STATISTICS_TYPE));
-      jmxBeans.add(JmxUtil.registerMXBean(servicesStatistics, JMX_SERVICES_STATISTICS_TYPE));
-      jmxBeans.add(JmxUtil.registerMXBean(jobsStatistics, JMX_JOBS_STATISTICS_TYPE));
+      jmxBeans.add(JmxUtil.INSTANCE.registerMXBean(hostsStatistics, JMX_HOSTS_STATISTICS_TYPE));
+      jmxBeans.add(JmxUtil.INSTANCE.registerMXBean(servicesStatistics, JMX_SERVICES_STATISTICS_TYPE));
+      jmxBeans.add(JmxUtil.INSTANCE.registerMXBean(jobsStatistics, JMX_JOBS_STATISTICS_TYPE));
     } catch (ServiceRegistryException e) {
       logger.error("Error registering JMX statistic beans", e);
     }
@@ -350,8 +350,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     // Whether a service accepts a job whose load exceeds the host’s max load
     if (cc != null) {
-      acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
-              .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
+      acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, Companion.getACCEPT_JOB_LOADS_EXCEEDING_PROPERTY()).map(
+              Strings.INSTANCE.getToBool())
+                                                                                                                   .getOrElse(
+                                                                                                                           Companion
+                                                                                                                                   .getDEFAULT_ACCEPT_JOB_LOADS_EXCEEDING());
     }
 
     systemLoad = getHostLoads(emf.createEntityManager()).get(hostName).getLoadFactor();
@@ -372,7 +375,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     logger.debug("deactivate");
 
     for (ObjectInstance mbean : jmxBeans) {
-      JmxUtil.unregisterMXBean(mbean);
+      JmxUtil.INSTANCE.unregisterMXBean(mbean);
     }
 
     if (tracker != null) {
@@ -2317,7 +2320,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   class RestServiceTracker extends ServiceTracker {
     protected static final String FILTER = "(&(objectClass=javax.servlet.Servlet)("
-            + RestConstants.SERVICE_PATH_PROPERTY + "=*))";
+            + RestConstants.Companion.getSERVICE_PATH_PROPERTY() + "=*))";
 
     protected BundleContext bundleContext = null;
 
@@ -2348,10 +2351,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     @Override
     public Object addingService(ServiceReference reference) {
-      String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
-      String servicePath = (String) reference.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
-      boolean publishFlag = (Boolean) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
-      boolean jobProducer = (Boolean) reference.getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY);
+      String serviceType = (String) reference.getProperty(RestConstants.Companion.getSERVICE_TYPE_PROPERTY());
+      String servicePath = (String) reference.getProperty(RestConstants.Companion.getSERVICE_PATH_PROPERTY());
+      boolean publishFlag = (Boolean) reference.getProperty(RestConstants.Companion.getSERVICE_PUBLISH_PROPERTY());
+      boolean jobProducer = (Boolean) reference.getProperty(RestConstants.Companion.getSERVICE_JOBPRODUCER_PROPERTY());
 
       // Only register services that have the "publish" flag set to "true"
       if (publishFlag) {
@@ -2369,8 +2372,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     @Override
     public void removedService(ServiceReference reference, Object service) {
-      String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
-      boolean publishFlag = (Boolean) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
+      String serviceType = (String) reference.getProperty(RestConstants.Companion.getSERVICE_TYPE_PROPERTY());
+      boolean publishFlag = (Boolean) reference.getProperty(RestConstants.Companion.getSERVICE_PUBLISH_PROPERTY());
 
       // Services that have the "publish" flag set to "true" have been registered before.
       if (publishFlag) {
@@ -3151,12 +3154,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
         triedDispatching = true;
 
-        String serviceUrl = UrlSupport.concat(registration.getHost(), registration.getPath(), "dispatch");
+        String serviceUrl = UrlSupport.INSTANCE.concat(registration.getHost(), registration.getPath(), "dispatch");
         HttpPost post = new HttpPost(serviceUrl);
 
         // Add current organization and user so they can be used during execution at the remote end
-        post.addHeader(ORGANIZATION_HEADER, securityService.getOrganization().getId());
-        post.addHeader(USER_HEADER, securityService.getUser().getUsername());
+        post.addHeader(Companion.getORGANIZATION_HEADER(), securityService.getOrganization().getId());
+        post.addHeader(Companion.getUSER_HEADER(), securityService.getUser().getUsername());
 
         List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
         params.add(new BasicNameValuePair("id", Long.toString(job.getId())));
@@ -3290,7 +3293,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             continue;
 
           // We think this service is online and available. Prove it.
-          String serviceUrl = UrlSupport.concat(service.getHost(), service.getPath(), "dispatch");
+          String serviceUrl = UrlSupport.INSTANCE.concat(service.getHost(), service.getPath(), "dispatch");
 
           HttpHead options = new HttpHead(serviceUrl);
           HttpResponse response = null;

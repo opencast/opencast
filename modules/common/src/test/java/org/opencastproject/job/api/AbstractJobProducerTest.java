@@ -180,7 +180,7 @@ public class AbstractJobProducerTest extends EasyMockSupport {
     }
 
     protected void setAcceptOversizeJobs(boolean acceptOversizeJobs) {
-      this.acceptJobLoadsExeedingMaxLoad = acceptOversizeJobs;
+      this.setAcceptJobLoadsExeedingMaxLoad(acceptOversizeJobs);
     }
 
     @Override

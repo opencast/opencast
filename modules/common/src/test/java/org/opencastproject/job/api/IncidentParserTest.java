@@ -46,13 +46,13 @@ public class IncidentParserTest {
   @Test
   public void testSerializationOfJaxbIncident() throws Exception {
     final Incident incident = new IncidentImpl(1, 2, "service", "localhost", new Date(0), Severity.FAILURE, "code",
-            Arrays.asList(tuple("title", "content"), tuple("Another title", "...and even more content")),
+            Arrays.asList(Companion.tuple("title", "content"), Companion.tuple("Another title", "...and even more content")),
             Collections.singletonMap("key", "value"));
-    final String marshaled = IncidentParser.I.toXml(new JaxbIncident(incident));
+    final String marshaled = IncidentParser.Companion.getI().toXml(new JaxbIncident(incident));
     logger.info(marshaled);
     assertThat(the(marshaled),
             similarTo(the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-1.xml").get())));
-    final Incident unmarshaled = IncidentParser.I.parseIncidentFromXml(IOUtils.toInputStream(marshaled)).toIncident();
+    final Incident unmarshaled = IncidentParser.Companion.getI().parseIncidentFromXml(IOUtils.toInputStream(marshaled)).toIncident();
     assertEquals(incident, unmarshaled);
   }
 
@@ -65,18 +65,20 @@ public class IncidentParserTest {
                     Collections.singletonList(new IncidentTreeImpl(
                             Arrays.asList(incident(4), incident(5)),
                             Collections.emptyList())))));
-    final String marshaled = IncidentParser.I.toXml(new JaxbIncidentTree(tree));
+    final String marshaled = IncidentParser.Companion.getI().toXml(new JaxbIncidentTree(tree));
     logger.info(marshaled);
     assertThat(the(marshaled),
             similarTo(the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-tree-1.xml")
                     .get())));
-    final IncidentTree unmarshaled = IncidentParser.I.parseIncidentTreeFromXml(IOUtils.toInputStream(marshaled))
+    final IncidentTree unmarshaled = IncidentParser.Companion
+            .getI()
+            .parseIncidentTreeFromXml(IOUtils.toInputStream(marshaled))
             .toIncidentTree();
     assertEquals(tree, unmarshaled);
   }
 
   public Incident incident(long id) {
     return new IncidentImpl(id, 2, "service", "localhost", new Date(id), Severity.FAILURE, "code",
-            Collections.singletonList(tuple("title", "content")), Collections.singletonMap("key", "value"));
+                            Collections.singletonList(Companion.tuple("title", "content")), Collections.singletonMap("key", "value"));
   }
 }

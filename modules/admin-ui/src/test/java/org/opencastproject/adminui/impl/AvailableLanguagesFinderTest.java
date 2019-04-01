@@ -39,7 +39,7 @@ public class AvailableLanguagesFinderTest {
     PathInspector testClassPathInspector = new TestClassPathInspector();
     LanguageServiceImpl languageService = new LanguageServiceImpl();
     languageService.setClassPathInspector(testClassPathInspector);
-    languageService.setLanguageFileFolder(LanguageService.TRANSLATION_FILES_PATH);
+    languageService.setLanguageFileFolder(LanguageService.Companion.getTRANSLATION_FILES_PATH());
     List<Language> availableLanguages = languageService.getAvailableLanguages();
     assertEquals(2, availableLanguages.size());
   }

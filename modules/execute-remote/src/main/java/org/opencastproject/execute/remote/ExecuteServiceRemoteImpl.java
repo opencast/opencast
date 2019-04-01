@@ -93,7 +93,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
     HttpResponse response = null;
 
     try {
-      String inElementStr = MediaPackageElementParser.getAsXml(inElement);
+      String inElementStr = MediaPackageElementParser.INSTANCE.getAsXml(inElement);
       List<NameValuePair> formStringParams = new ArrayList<NameValuePair>();
       formStringParams.add(new BasicNameValuePair(EXEC_FORM_PARAM, exec));
       formStringParams.add(new BasicNameValuePair(PARAMS_FORM_PARAM, params));
@@ -111,7 +111,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
       response = getResponse(post);
 
       if (response != null) {
-        Job job = JobParser.parseJob(response.getEntity().getContent());
+        Job job = JobParser.INSTANCE.parseJob(response.getEntity().getContent());
         logger.info("Completing execution of command {} using a remote execute service", exec);
         return job;
       } else
@@ -147,7 +147,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
     HttpResponse response = null;
 
     try {
-      String mpStr = MediaPackageParser.getAsXml(mp);
+      String mpStr = MediaPackageParser.INSTANCE.getAsXml(mp);
       List<NameValuePair> formStringParams = new ArrayList<NameValuePair>();
       formStringParams.add(new BasicNameValuePair(EXEC_FORM_PARAM, exec));
       formStringParams.add(new BasicNameValuePair(PARAMS_FORM_PARAM, params));
@@ -165,7 +165,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
       response = getResponse(post);
 
       if (response != null) {
-        Job job = JobParser.parseJob(response.getEntity().getContent());
+        Job job = JobParser.INSTANCE.parseJob(response.getEntity().getContent());
         logger.info("Completing execution of command {} using a remote execute service", exec);
         return job;
       } else {

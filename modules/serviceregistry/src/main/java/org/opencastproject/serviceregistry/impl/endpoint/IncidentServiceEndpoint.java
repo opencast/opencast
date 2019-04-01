@@ -116,7 +116,7 @@ public class IncidentServiceEndpoint {
   protected ServiceRegistry serviceRegistry = null;
 
   /** This server's base URL */
-  protected String serverUrl = UrlSupport.DEFAULT_BASE_URL;
+  protected String serverUrl = UrlSupport.INSTANCE.getDEFAULT_BASE_URL();
 
   /** The REST endpoint's base URL */
   protected String serviceUrl = "/incidents";
@@ -135,10 +135,10 @@ public class IncidentServiceEndpoint {
   public void activate(ComponentContext cc) {
     // Get the configured server URL
     if (cc != null) {
-      String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.Companion.getSERVER_URL_PROPERTY());
       if (StringUtils.isNotBlank(ccServerUrl))
         serverUrl = ccServerUrl;
-      serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+      serviceUrl = (String) cc.getProperties().get(RestConstants.Companion.getSERVICE_PATH_PROPERTY());
     }
   }
 
@@ -168,7 +168,7 @@ public class IncidentServiceEndpoint {
           @PathParam("type") final String type) {
     try {
       final List<Incident> incidents = svc.getIncidentsOfJob(jobIds);
-      final MediaType mt = getResponseType(type);
+      final MediaType mt = INSTANCE.getResponseType(type);
       if (eq(FMT_SYS, format)) {
         return ok(mt, new JaxbIncidentList(incidents));
       } else if (eq(FMT_DIGEST, format)) {
@@ -219,7 +219,7 @@ public class IncidentServiceEndpoint {
           throws NotFoundException {
     try {
       final IncidentTree tree = svc.getIncidentsOfJob(jobId, cascade);
-      final MediaType mt = getResponseType(type);
+      final MediaType mt = INSTANCE.getResponseType(type);
       if (eq(FMT_SYS, format)) {
         return ok(mt, new JaxbIncidentTree(tree));
       } else if (eq(FMT_DIGEST, format)) {
@@ -254,7 +254,7 @@ public class IncidentServiceEndpoint {
           throws NotFoundException {
     try {
       Incident incident = svc.getIncident(incidentId);
-      return ok(getResponseType(type), new JaxbIncident(incident));
+      return ok(INSTANCE.getResponseType(type), new JaxbIncident(incident));
     } catch (IncidentServiceException e) {
       logger.warn("Unable to get job incident for incident id {}: {}", incidentId, e);
       throw new WebApplicationException(INTERNAL_SERVER_ERROR);
@@ -311,8 +311,8 @@ public class IncidentServiceEndpoint {
     Map<String, String> map = new HashMap<String, String>();
     List<Tuple<String, String>> list = new ArrayList<Tuple<String, String>>();
     try {
-      job = JobParser.parseJob(jobXml);
-      timestamp = new Date(DateTimeSupport.fromUTC(date));
+      job = JobParser.INSTANCE.parseJob(jobXml);
+      timestamp = new Date(DateTimeSupport.INSTANCE.fromUTC(date));
       severity = Severity.valueOf(severityString);
       if (params != null)
         map = params.getMap();
@@ -321,7 +321,7 @@ public class IncidentServiceEndpoint {
         final JSONArray array = (JSONArray) JSONValue.parse(details);
         for (int i = 0; i < array.size(); i++) {
           JSONObject tuple = (JSONObject) array.get(i);
-          list.add(Tuple.tuple((String) tuple.get("title"), (String) tuple.get("content")));
+          list.add(Tuple.Companion.tuple((String) tuple.get("title"), (String) tuple.get("content")));
         }
       }
     } catch (Exception e) {
@@ -330,7 +330,7 @@ public class IncidentServiceEndpoint {
 
     try {
       Incident incident = svc.storeIncident(job, timestamp, code, severity, map, list);
-      String uri = UrlSupport.concat(serverUrl, serviceUrl, Long.toString(incident.getId()), ".xml");
+      String uri = UrlSupport.INSTANCE.concat(serverUrl, serviceUrl, Long.toString(incident.getId()), ".xml");
       return Response.created(new URI(uri)).entity(new JaxbIncident(incident)).build();
     } catch (IllegalStateException e) {
       return Response.status(Status.CONFLICT).build();

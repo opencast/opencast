@@ -95,22 +95,22 @@ public class JobUtilTest {
     Job job3 = new JobImpl(1);
     job3.setStatus(Status.FINISHED);
 
-    Result result = waitForJob(serviceRegistry, job1);
+    Result result = INSTANCE.waitForJob(serviceRegistry, job1);
     assertTrue(result.isSuccess());
 
-    result = waitForJob(job2, serviceRegistry, job3);
+    result = INSTANCE.waitForJob(job2, serviceRegistry, job3);
     assertTrue(result.isSuccess());
 
-    result = waitForJob(serviceRegistry, Option.some(2000L), job1);
+    result = INSTANCE.waitForJob(serviceRegistry, Option.Companion.some(2000L), job1);
     assertTrue(result.isSuccess());
 
-    result = waitForJob(serviceRegistry, Option.<Long> none(), job1);
+    result = INSTANCE.waitForJob(serviceRegistry, Option.Companion.<Long> none(), job1);
     assertTrue(result.isSuccess());
 
-    result = waitForJob(job2, serviceRegistry, Option.some(2000L), job3);
+    result = INSTANCE.waitForJob(job2, serviceRegistry, Option.Companion.some(2000L), job3);
     assertTrue(result.isSuccess());
 
-    result = waitForJob(job2, serviceRegistry, Option.some(2000L), job3);
+    result = INSTANCE.waitForJob(job2, serviceRegistry, Option.Companion.some(2000L), job3);
     assertTrue(result.isSuccess());
   }
 
@@ -123,25 +123,25 @@ public class JobUtilTest {
     Job job3 = new JobImpl(3);
     job3.setStatus(Status.FINISHED);
 
-    Result result = JobUtil.waitForJobs(job2, serviceRegistry, 0L, 0L, new Job[] { job1, job3 });
+    Result result = JobUtil.INSTANCE.waitForJobs(job2, serviceRegistry, 0L, 0L, new Job[] { job1, job3 });
     assertTrue(result.isSuccess());
   }
 
   @Test
   public void testGetPayload() throws NotFoundException, ServiceRegistryException {
-    Opt<String> payload = getPayload(serviceRegistry, new JobImpl(23));
+    Opt<String> payload = INSTANCE.getPayload(serviceRegistry, new JobImpl(23));
     assertTrue(payload.isNone());
 
-    payload = getPayload(serviceRegistry, new JobImpl(20));
+    payload = INSTANCE.getPayload(serviceRegistry, new JobImpl(20));
     assertTrue(payload.isSome());
   }
 
   @Test
   public void testUpdate() throws NotFoundException, ServiceRegistryException {
-    Opt<Job> update = update(serviceRegistry, new JobImpl(23));
+    Opt<Job> update = INSTANCE.update(serviceRegistry, new JobImpl(23));
     assertTrue(update.isNone());
 
-    update = update(serviceRegistry, new JobImpl(20));
+    update = INSTANCE.update(serviceRegistry, new JobImpl(20));
     assertTrue(update.isSome());
   }
 
@@ -149,11 +149,11 @@ public class JobUtilTest {
   public void testIsReadyToDispatch() {
     JobImpl job = new JobImpl(20);
     job.setStatus(Status.RUNNING);
-    boolean readyToDispatch = isReadyToDispatch(job);
+    boolean readyToDispatch = INSTANCE.isReadyToDispatch(job);
     assertTrue(readyToDispatch);
 
     job.setStatus(Status.FAILED);
-    readyToDispatch = isReadyToDispatch(job);
+    readyToDispatch = INSTANCE.isReadyToDispatch(job);
     assertFalse(readyToDispatch);
   }
 
@@ -162,7 +162,7 @@ public class JobUtilTest {
     JobImpl job = new JobImpl(20);
     job.setStatus(Status.FAILED);
 
-    Function<Job, Boolean> waitForJobSuccess = waitForJobSuccess(job, serviceRegistry, Option.<Long> none());
+    Function<Job, Boolean> waitForJobSuccess = INSTANCE.waitForJobSuccess(job, serviceRegistry, Option.Companion.<Long> none());
     Boolean isSuccess = waitForJobSuccess.apply(job);
     assertFalse(isSuccess);
 
@@ -174,14 +174,14 @@ public class JobUtilTest {
   @Test
   public void testPayloadAsMediaPackageElement() throws Exception {
     MediaPackageElement element = new MediaPackageElementBuilderImpl().newElement(Type.Track,
-            MediaPackageElements.PRESENTATION_SOURCE);
+                                                                                  MediaPackageElements.Companion.getPRESENTATION_SOURCE());
 
     JobImpl job = new JobImpl(20);
     job.setStatus(Status.FINISHED);
-    job.setPayload(MediaPackageElementParser.getAsXml(element));
+    job.setPayload(MediaPackageElementParser.INSTANCE.getAsXml(element));
 
-    Function<Job, MediaPackageElement> payloadAsMediaPackageElement = payloadAsMediaPackageElement(job,
-            serviceRegistry);
+    Function<Job, MediaPackageElement> payloadAsMediaPackageElement = INSTANCE.payloadAsMediaPackageElement(job,
+                                                                                                            serviceRegistry);
     assertEquals(element, payloadAsMediaPackageElement.apply(job));
   }
 
@@ -189,13 +189,13 @@ public class JobUtilTest {
   public void testJobFromHttpResponse() throws Exception {
     BasicHttpResponse response = new BasicHttpResponse(
             new BasicStatusLine(new HttpVersion(1, 1), HttpStatus.SC_NO_CONTENT, "No message"));
-    Option<Job> job = JobUtil.jobFromHttpResponse.apply(response);
+    Option<Job> job = JobUtil.INSTANCE.getJobFromHttpResponse().apply(response);
     assertFalse(job.isSome());
 
     JaxbJob jaxbJob = new JaxbJob(new JobImpl(32));
-    response.setEntity(new StringEntity(JobParser.toXml(jaxbJob), StandardCharsets.UTF_8));
+    response.setEntity(new StringEntity(JobParser.INSTANCE.toXml(jaxbJob), StandardCharsets.UTF_8));
 
-    job = JobUtil.jobFromHttpResponse.apply(response);
+    job = JobUtil.INSTANCE.getJobFromHttpResponse().apply(response);
     assertTrue(job.isSome());
     assertEquals(jaxbJob.toJob(), job.get());
   }
@@ -213,7 +213,7 @@ public class JobUtilTest {
     Job job3 = new JobImpl(1);
     job3.setQueueTime(queueTime3);
 
-    long sumQueueTime = sumQueueTime(list(job1, job2, job3));
+    long sumQueueTime = INSTANCE.sumQueueTime(list(job1, job2, job3));
     assertEquals(queueTime1 + queueTime2 + queueTime3, sumQueueTime);
   }
 
@@ -226,7 +226,7 @@ public class JobUtilTest {
     Job job3 = new JobImpl(1);
     job3.setStatus(Status.WAITING);
 
-    List<Job> nonFinished = getNonFinished(list(job1, job2, job3));
+    List<Job> nonFinished = INSTANCE.getNonFinished(list(job1, job2, job3));
     assertEquals(2, nonFinished.size());
     assertFalse(nonFinished.contains(job1));
   }

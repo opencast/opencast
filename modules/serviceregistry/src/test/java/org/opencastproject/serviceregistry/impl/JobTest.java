@@ -78,7 +78,7 @@ public class JobTest {
   private static final String JOB_TYPE_1 = "testing1";
   private static final String JOB_TYPE_2 = "testing2";
   private static final String OPERATION_NAME = "op";
-  private static final String LOCALHOST = UrlSupport.DEFAULT_BASE_URL;
+  private static final String LOCALHOST = UrlSupport.INSTANCE.getDEFAULT_BASE_URL();
   private static final String REMOTEHOST = "http://remotehost:8080";
   private static final String PATH = "/path";
 
@@ -93,7 +93,7 @@ public class JobTest {
 
   @Before
   public void setUp() throws Exception {
-    final EntityManagerFactory emf = newTestEntityManagerFactory(ServiceRegistryJpaImpl.PERSISTENCE_UNIT);
+    final EntityManagerFactory emf = INSTANCE.newTestEntityManagerFactory(ServiceRegistryJpaImpl.PERSISTENCE_UNIT);
 
     serviceRegistry = new ServiceRegistryJpaImpl();
     serviceRegistry.setEntityManagerFactory(emf);
@@ -106,7 +106,7 @@ public class JobTest {
     EasyMock.replay(organizationDirectoryService);
     serviceRegistry.setOrganizationDirectoryService(organizationDirectoryService);
 
-    JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
+    JaxbOrganization jaxbOrganization = JaxbOrganization.Companion.fromOrganization(organization);
     User anonymous = new JaxbUser("anonymous", "test", jaxbOrganization, new JaxbRole(
             jaxbOrganization.getAnonymousRole(), jaxbOrganization));
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
@@ -125,7 +125,7 @@ public class JobTest {
     regType2Localhost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_2, LOCALHOST, PATH);
     regType2Remotehost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_2, REMOTEHOST, PATH);
 
-    penv = persistenceEnvironment(emf);
+    penv = INSTANCE.persistenceEnvironment(emf);
   }
 
   @After
@@ -154,10 +154,12 @@ public class JobTest {
 
     // Finish the job
     job = serviceRegistry.getJob(job.getId());
-    Track t = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-            .elementFromURI(new URI("file://test.mov"), Track.TYPE, MediaPackageElements.PRESENTATION_SOURCE);
+    Track t = (Track) MediaPackageElementBuilderFactory.Companion.newInstance().newElementBuilder()
+                                                                 .elementFromURI(new URI("file://test.mov"),
+                                                                                 Track.Companion.getTYPE(),
+                                                                                 MediaPackageElements.Companion.getPRESENTATION_SOURCE());
     t.setIdentifier("track-1");
-    job.setPayload(MediaPackageElementParser.getAsXml(t));
+    job.setPayload(MediaPackageElementParser.INSTANCE.getAsXml(t));
     job.setStatus(Status.FINISHED);
     job = serviceRegistry.updateJob(job);
 
@@ -406,13 +408,13 @@ public class JobTest {
         return serviceRegistry.getCountPerHostService(em);
       }
     });
-    assertTrue(jpql.exists(eq("http://remotehost:8080,testing1,2,1")));
-    assertTrue(jpql.exists(eq("http://localhost:8080,testing2,2,2"))); // <-- 2 jobs, one of them is the
+    assertTrue(jpql.exists(INSTANCE.eq("http://remotehost:8080,testing1,2,1")));
+    assertTrue(jpql.exists(INSTANCE.eq("http://localhost:8080,testing2,2,2"))); // <-- 2 jobs, one of them is the
     // dispatchable job
-    assertTrue(jpql.exists(eq("http://remotehost:8080,testing1,3,1")));
-    assertTrue(jpql.exists(eq("http://localhost:8080,testing2,3,1")));
-    assertTrue(jpql.exists(eq("http://localhost:8080,testing1,3,1")));
-    assertTrue(jpql.exists(eq("http://localhost:8080,testing1,2,2")));
+    assertTrue(jpql.exists(INSTANCE.eq("http://remotehost:8080,testing1,3,1")));
+    assertTrue(jpql.exists(INSTANCE.eq("http://localhost:8080,testing2,3,1")));
+    assertTrue(jpql.exists(INSTANCE.eq("http://localhost:8080,testing1,3,1")));
+    assertTrue(jpql.exists(INSTANCE.eq("http://localhost:8080,testing1,2,2")));
     assertEquals(6, jpql.value().size());
   }
 
@@ -421,7 +423,7 @@ public class JobTest {
       @Override
       protected Monadics.ListMonadic<String> xapply(EntityManager em) throws Exception {
         // (host, service_type, status, count)
-        return mlist(q.apply(em)).map(new Function<Object[], String>() {
+        return INSTANCE.mlist(q.apply(em)).map(new Function<Object[], String>() {
           @Override
           public String apply(Object[] a) {
             return mkString(a, ",");
@@ -504,8 +506,8 @@ public class JobTest {
     Job job = new JobImpl();
     job.setPayload(payload);
 
-    String marshalledJob = JobParser.toXml(new JaxbJob(job));
-    Job unmarshalledJob = JobParser.parseJob(marshalledJob);
+    String marshalledJob = JobParser.INSTANCE.toXml(new JaxbJob(job));
+    Job unmarshalledJob = JobParser.INSTANCE.parseJob(marshalledJob);
 
     assertEquals("json from unmarshalled job should remain unchanged", StringUtils.trim(payload),
             StringUtils.trim(unmarshalledJob.getPayload()));
@@ -517,8 +519,8 @@ public class JobTest {
     Job job = new JobImpl();
     job.setPayload(payload);
 
-    String marshalledJob = JobParser.toXml(new JaxbJob(job));
-    Job unmarshalledJob = JobParser.parseJob(marshalledJob);
+    String marshalledJob = JobParser.INSTANCE.toXml(new JaxbJob(job));
+    Job unmarshalledJob = JobParser.INSTANCE.parseJob(marshalledJob);
 
     assertEquals("xml from unmarshalled job should remain unchanged", StringUtils.trim(payload),
             StringUtils.trim(unmarshalledJob.getPayload()));
