@@ -474,6 +474,23 @@ Opencast 6
 Opencast 5
 ----------
 
+### Opencast 5.5
+
+*Released on April 1, 2019*
+
+- [[MH-12603](https://opencast.jira.com/browse/MH-12603)][[#746](https://github.com/opencast/opencast/pull/746)] -
+  Take 'ng' out of the youtube composite operation
+- [[MH-13386](https://opencast.jira.com/browse/MH-13386)][[#733](https://github.com/opencast/opencast/pull/733)] -
+  Event status calculation wrong assumption fixed
+- [[MH-13383](https://opencast.jira.com/browse/MH-13383)][[#728](https://github.com/opencast/opencast/pull/728)] -
+  don't smooth the waveform in the editor
+- [[MH-13366](https://opencast.jira.com/browse/MH-13366)][[#708](https://github.com/opencast/opencast/pull/708)] -
+  Add `REFERENCES` permission to standard Opencast `GRANT` statement
+- [[MH-13363](https://opencast.jira.com/browse/MH-13363)][[#706](https://github.com/opencast/opencast/pull/706)] -
+  Publish to OAI-PMH an allready published mediapackage …
+- [[MH-13333](https://opencast.jira.com/browse/MH-13333)][[#669](https://github.com/opencast/opencast/pull/669)] -
+  Do not import properties in publish WF
+
 ### Opencast 5.4
 
 *Released on January 24, 2019*
