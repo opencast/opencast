@@ -274,7 +274,6 @@
               OSGI-INF/list-providers/boolean.xml,
               OSGI-INF/list-providers/comments.xml,
               OSGI-INF/list-providers/contributors.xml,
-              OSGI-INF/list-providers/email.xml,
               OSGI-INF/list-providers/events.xml,
               OSGI-INF/list-providers/groups.xml,
               OSGI-INF/list-providers/jobs.xml,
