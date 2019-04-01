@@ -506,6 +506,7 @@
               OSGI-INF/adminui_configuration.xml,
               OSGI-INF/captureagents_endpoint.xml,
               OSGI-INF/event_endpoint.xml,
+              OSGI-INF/feed_endpoint.xml,
               OSGI-INF/groups_endpoint.xml,
               OSGI-INF/index_endpoint.xml,
               OSGI-INF/job_endpoint.xml,
