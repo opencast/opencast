@@ -57,7 +57,6 @@
             "GROUP": "Följande grupp raderas",
             "USER": "Följande användare kommer att raderas",
             "THEME": "Följande tema raderas",
-            "EMAIL": "Följande e-postmallen raderas",
             "LOCATION": "Följande plats tas bort"
          },
          "NAME": "Namn"
@@ -132,15 +131,6 @@
       "LOCATION_DELETED": "Platsen har raderats",
       "LOCATION_NOT_DELETED": "Platsen kunde inte raderas",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Platsen kunde inte tas bort eftersom att du inte har rättigheterna för att göra det.",
-      "EMAIL_TEMPLATE_CREATED": "Mallen har skapats",
-      "EMAIL_TEMPLATE_NOT_CREATED": "Mallen kunde inte skapas",
-      "EMAIL_TEMPLATE_SAVED": "Mallen har sparats",
-      "EMAIL_TEMPLATE_NOT_SAVED": "Mallen kunde inte sparas",
-      "EMAIL_TEMPLATE_DELETED": "Mallen har tagits bort",
-      "EMAIL_TEMPLATE_NOT_DELETED": "Mallen kunde inte tas bort",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "Detta namn används redan",
-      "EMAIL_SENT": "Meddelandet har skickats",
-      "EMAIL_NOT_SENT": "Meddelandet kunde inte skickas",
       "CONFLICT_DETECTED": "Konflikt vid schemaläggning: Denna nya händelse överlappar med en annan. Ändra rum, datum eller tider.",
       "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Fel vid schemaläggning: Händelsen har redan avslutats.",
@@ -153,11 +143,6 @@
       "SERIES_ACL_LOCKED": "Åtkomstpolicys får inte redigeras medan en operation utförs på en händelse som är del av serien",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Åtkomstpolicy kräver minst en roll med behörigheterna att läsa och skriva.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "Åtkomstpolicy kräver minst en roll med behörigheterna att läsa och skriva.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Händelsens avhopp-status har uppdaterats.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Fel vid uppdatering händelsens avhopp-status.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "Deltagandestatus kan inte uppdateras eftersom startdatum är förflyten.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Seriens avhopp-status har uppdaterats.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Fel vid uppdatering seriens avhopp-status.",
       "THEME_NAME_ALREADY_TAKEN": "Detta namn används redan",
       "THEME_NAME_EMPTY": "Namn får inte vara tom",
       "BUMPER_UPLOAD_ERROR": "Fel vid uppladdning av media",
@@ -186,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Åtgärder",
-      "SEND_MESSAGE": "Skicka meddelande",
       "WARNING": "Varning",
-      "EDIT_STATUS": {
-         "CAPTION": "Redigera status",
-         "READY_FOR_RECORDING": "Redo för inspelning",
-         "OPTED_OUT": "Avhoppad"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Ta bort",
@@ -292,6 +271,8 @@
       "BACK": "Föregående",
       "CREATE": "Skapa",
       "RETRACT": "Dra tillbaka",
+      "RETRACT_DELETE": "Retract/Delete",
+      "DELETE": "Ta bort",
       "UPDATE": "Uppdatera",
       "DURATION": {
          "HOURS": "Timmar",
@@ -348,28 +329,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "Skicka meddelande",
-         "TABS": {
-            "RECIPIENTS": "Mottagare",
-            "MESSAGE": "Meddelande",
-            "SUMMARY": "Summering"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "Lägg till på redovisningsspårningen",
-            "AUDIT_TRAIL_DESCRIPTION": "Markera om du vill lägga till meddelandet i redovisningsspårningen",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "Välj e-postmall",
-            "SUBJECT": "Ämne",
-            "MESSAGE": "Meddelande",
-            "INCLUDE_SIGNATURE": "Lägg till min signatur i e-post"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "Summering"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -500,7 +459,6 @@
          "ADD_EVENT": "Lägg till händelse",
          "TABLE": {
             "CAPTION": "Händelser",
-            "CREATORS": "Skapare",
             "TITLE": "Titel",
             "PRESENTERS": "Presentatör(er)",
             "SERIES": "Serie",
@@ -515,9 +473,7 @@
             "LAST": "Sista",
             "NEXT": "Nästa",
             "MANAGED_ACL": "Åtkomstpolicy",
-            "SCHEDULING_STATUS": "Status",
             "WORKFLOW_STATE": "Förlopp",
-            "REVIEW_STATUS": "Granskningsstatus",
             "PREVIOUS": "Föregående",
             "NOCONTENT": "Inga data tillgängliga",
             "PUBLISHED": "Publicerad",
@@ -536,13 +492,8 @@
                "PRESENTER": "Filter for this presenter"
             }
          },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "Redo för inspelning",
-            "OPTED_OUT": "Avhoppad"
-         },
          "STATUS": {
             "SCHEDULED": "Schemalagd",
-            "OPTEDOUT": "Avhoppad",
             "RECORDING": "Spelar in",
             "UPLOADING": "Laddar upp",
             "INGESTING": "Intag",
@@ -571,9 +522,6 @@
                "NO_PUBLICATIONS_AVAILABLE": "Denna händelse har inga publikationer",
                "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
-               "SCHEDULING_STATUS": "Status",
-               "READY_FOR_RECORDING": "Redo för inspelning",
-               "OPTED_OUT": "Avhoppad",
                "CUSTOM": "Anpassad",
                "ENGAGE": "Engage",
                "ENGAGE_LIVE": "Engage Live",
@@ -840,20 +788,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "Deltagandestatus",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Granskningsstatus"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Opt out-status",
-                  "READY": "Redo för inspelning",
-                  "OPTEDOUT": "Avhoppad"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Meddelanden",
-                  "CREATION_DATE": "Skapandedatum",
-                  "SENDER": "Avsändare",
-                  "SUBJECT": "Ämne"
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Presentatör(er)"
                }
@@ -1027,7 +961,7 @@
             "CAPTION": "Serie",
             "TITLE": "Serie",
             "HAS_EVENTS": "Innehåller händelser",
-            "CREATORS": "Organisatör(er)",
+            "ORGANIZERS": "Organisatör(er)",
             "CONTRIBUTORS": "Medförfattare",
             "CREATED": "Skapad",
             "MANAGED_ACL": "Åtkomstpolicy",
@@ -1044,7 +978,6 @@
             "TABS": {
                "METADATA": "Metadata",
                "EXTENDED_METADATA": "Metadata II",
-               "PARTICIPATION": "Deltagande",
                "EVENTS": "Händelser",
                "PERMISSIONS": "Åtkomstpolicy",
                "THEME": "Tema"
@@ -1089,24 +1022,6 @@
                "LANGUAGE": "Språk",
                "LICENSE": "Licens",
                "DESCRIPTION": "Beskrivning"
-            },
-            "PARTICIPATION": {
-               "CAPTION": "Deltagandestatus schablon",
-               "WARNING_TEMPLATE": "Deltagandestatus för serien används som standardvärde för nya händelser som ingår i serien.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Granskningsstatus"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Opt out-status",
-                  "READY": "Redo för inspelning",
-                  "OPTEDOUT": "Avhoppad"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Meddelanden",
-                  "CREATION_DATE": "Skapandedatum",
-                  "SENDER": "Avsändare",
-                  "SUBJECT": "Ämne"
-               }
             },
             "EVENTS": {
                "TITLE": "Titel",
@@ -1418,34 +1333,7 @@
          "ADD_THEME": "Lägg till tema"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "E-postmallar",
-         "MAIL_SERVERS": "E-postinställningar",
          "THEMES": "Teman"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "E-postmallar",
-            "NAME": "Namn",
-            "CREATOR": "Skapare",
-            "CREATED": "Skapad",
-            "ACTION": "Åtgärder"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Skapa mall",
-            "EDITCAPTION": "Redigera mall",
-            "TABS": {
-               "MESSAGE": "Meddelande",
-               "SUMMARY": "Summering"
-            },
-            "MESSAGE": {
-               "NAME": "Namn",
-               "SUBJECT": "Ämne",
-               "MESSAGE": "Meddelande"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "Sammanfattning av meddelandet"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1541,7 +1429,6 @@
       "JOBS": {
          "TABLE": {
             "ID": "Jobb-ID",
-            "ACTION": "Åtgärder",
             "CAPTION": "Jobb",
             "CREATED": "Skapad",
             "CREATOR": "Skapare",
@@ -1551,14 +1438,6 @@
             "STATUS": "Status",
             "SUBMITTED": "Skickad",
             "TYPE": "Typ"
-         },
-         "DETAILS": {
-            "HEADER": "Jobbdetaljer {{resourceId}}",
-            "TABS": {
-               "GENERAL": "Allmänt",
-               "OPERATIONS": "Aktiviteter",
-               "INCIDENTS": "Incidenter"
-            }
          },
          "STATUS": {
             "QUEUED": "Kölagd",
@@ -1586,7 +1465,6 @@
             "MEAN_RUN_TIME": "Genomsnittlig körtid",
             "MEAN_QUEUE_TIME": "Genomsnittlig kötid",
             "MAINTENANCE": "Underhåll",
-            "ACTION": "Åtgärder",
             "MAINTENANCE_OFF": "Starta underhållsläge",
             "MAINTENANCE_ON": "Lämna underhållsläget"
          }
@@ -1816,9 +1694,6 @@
          "LOCATION": {
             "LABEL": "Plats"
          },
-         "OPTEDOUT": {
-            "LABEL": "Avhoppad"
-         },
          "PERIOD": {
             "LABEL": "Tidsperiod"
          },
@@ -1830,12 +1705,6 @@
          },
          "PROGRESS": {
             "LABEL": "Förlopp"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "Granskningsstatus",
-            "CONFIRMED": "Bekräftad",
-            "UNCONFIRMED": "Obekräftad",
-            "UNSENT": "Ej skickad"
          },
          "SERIES": {
             "LABEL": "Serie"

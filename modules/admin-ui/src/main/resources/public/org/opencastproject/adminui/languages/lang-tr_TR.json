@@ -57,7 +57,6 @@
             "GROUP": "Aşağıdaki grup silinecek",
             "USER": "Aşağıdaki kullanıcı silinecek",
             "THEME": "Aşağıdaki tema silinecek",
-            "EMAIL": "Aşağıdaki email teması silinecek",
             "LOCATION": "Aşağıdaki konum silinecek"
          },
          "NAME": "İsim"
@@ -132,15 +131,6 @@
       "LOCATION_DELETED": "Konum silindi",
       "LOCATION_NOT_DELETED": "Konum silinemedi",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Lokasyon silinemedi çünkü bunu yapma izniniz yok.",
-      "EMAIL_TEMPLATE_CREATED": "Şablon oluşturuldu",
-      "EMAIL_TEMPLATE_NOT_CREATED": "Şablon oluşturulamadı",
-      "EMAIL_TEMPLATE_SAVED": "Şablon kaydedildi",
-      "EMAIL_TEMPLATE_NOT_SAVED": "Şablon kaydedilemedi",
-      "EMAIL_TEMPLATE_DELETED": "Şablon silindi",
-      "EMAIL_TEMPLATE_NOT_DELETED": "Şablon silinemedi",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "Bu isim zaten kullanılıyor",
-      "EMAIL_SENT": "Mesaj gönderildi",
-      "EMAIL_NOT_SENT": "Mesaj gönderilemedi",
       "CONFLICT_DETECTED": "Zamanlama sorunu: yeni etkinlik eski etkinlikle çakışmakta. Lütfen konumu, tarihi ve zamanı değiştirin.",
       "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Zamanlama hatası: Etkinlik zaten bitmiş durumda.",
@@ -153,11 +143,6 @@
       "SERIES_ACL_LOCKED": "Dizideki etkinlikler üzerinde işlem yapılırken Erişim İlkelerinin düzenlenmesine izin verilmez",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Erişim İlkesi en az 1 Okuma ve Yazma yetkisi gerektirir.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "Erişim İlkesi en az bir Okuma ve Yazma yetkisi gerektirir.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Etkinlik devre dışı durumu başarıyla güncellendi.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Etkinliğin devre dışı durumunu güncellerken hata oluştu.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "Katılım durumu planlama başlangıç tarihi geçmişte olduğu için güncellenemez.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Serinin devre dışı durumu başarıyla güncellendi.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Serinin devre dışı durumunu güncellerken hata oluştu.",
       "THEME_NAME_ALREADY_TAKEN": "Bu isim zaten kullanılıyor",
       "THEME_NAME_EMPTY": "İsim boş bırakılamaz",
       "BUMPER_UPLOAD_ERROR": "Medyayı yüklerken bir hata oluştu",
@@ -186,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Hareketler",
-      "SEND_MESSAGE": "İleti gönder",
       "WARNING": "Uyarı",
-      "EDIT_STATUS": {
-         "CAPTION": "Durumu Düzenle",
-         "READY_FOR_RECORDING": "Kayıt için hazır",
-         "OPTED_OUT": "Vazgeçildi"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Sil",
@@ -292,6 +271,8 @@
       "BACK": "Önceki",
       "CREATE": "Oluştur",
       "RETRACT": "Geri al",
+      "RETRACT_DELETE": "Retract/Delete",
+      "DELETE": "Sil",
       "UPDATE": "Güncelle",
       "DURATION": {
          "HOURS": "Saat",
@@ -348,28 +329,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "Mesaj Gönder",
-         "TABS": {
-            "RECIPIENTS": "Alıcılar",
-            "MESSAGE": "Mesaj",
-            "SUMMARY": "Özet"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "Denetim izi ekle",
-            "AUDIT_TRAIL_DESCRIPTION": "Denetim izine mesaj eklemek için kontrol et",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "E-posta şablonunu seç",
-            "SUBJECT": "Konu",
-            "MESSAGE": "Mesaj",
-            "INCLUDE_SIGNATURE": "İmzamı e-postaya ekle"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "Özet"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -500,7 +459,6 @@
          "ADD_EVENT": "Etkinlik ekle",
          "TABLE": {
             "CAPTION": "Etkinlikler",
-            "CREATORS": "Yapımcılar",
             "TITLE": "Başlık",
             "PRESENTERS": "Sununlar",
             "SERIES": "Seriler",
@@ -515,9 +473,7 @@
             "LAST": "Son",
             "NEXT": "İleri",
             "MANAGED_ACL": "Erişim İlkesi",
-            "SCHEDULING_STATUS": "Durum",
             "WORKFLOW_STATE": "İlerleme Durumu",
-            "REVIEW_STATUS": "İnceleme durumu",
             "PREVIOUS": "Önceki",
             "NOCONTENT": "Veri yok",
             "PUBLISHED": "Yayınlandı",
@@ -536,13 +492,8 @@
                "PRESENTER": "Filter for this presenter"
             }
          },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "Kayıt için hazır",
-            "OPTED_OUT": "Vazgeçildi"
-         },
          "STATUS": {
             "SCHEDULED": "Zamanlandı",
-            "OPTEDOUT": "Vazgeçildi",
             "RECORDING": "Kaydediliyor",
             "UPLOADING": "Yükleniyor",
             "INGESTING": "Toplanıyor",
@@ -571,9 +522,6 @@
                "NO_PUBLICATIONS_AVAILABLE": "Etkinliğin hiçbir yayını yok",
                "PUBLICATION_DESCRIPTION": "Bu etkinlik aşağıdaki yayın kanallarına yayınlanmıştır:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Bu etkinlik su anda devam etmiyor",
-               "SCHEDULING_STATUS": "Durum",
-               "READY_FOR_RECORDING": "Kayıt için hazır",
-               "OPTED_OUT": "Vazgeçildi",
                "CUSTOM": "Özel",
                "ENGAGE": "Katıl",
                "ENGAGE_LIVE": "Engage Live",
@@ -840,20 +788,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "Participation status",
-               "REVIEW_STATUS": {
-                  "CAPTION": "İnceleme durumu"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Kapatılan Durum",
-                  "READY": "Kayıt için hazır",
-                  "OPTEDOUT": "Vazgeçildi"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Mesajlar",
-                  "CREATION_DATE": "Oluşturma tarihi",
-                  "SENDER": "Gönderici",
-                  "SUBJECT": "Konu"
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Sunun(lar)"
                }
@@ -1027,7 +961,7 @@
             "CAPTION": "Diziler",
             "TITLE": "Diziler",
             "HAS_EVENTS": "Etkinlikler içerir",
-            "CREATORS": "Organizatör(ler)",
+            "ORGANIZERS": "Organizatör(ler)",
             "CONTRIBUTORS": "Katkı Sağlayan(lar)",
             "CREATED": "Oluşturuldu",
             "MANAGED_ACL": "Erişim İlkesi",
@@ -1044,7 +978,6 @@
             "TABS": {
                "METADATA": "Meta verisi",
                "EXTENDED_METADATA": "Meta Verisi II",
-               "PARTICIPATION": "Katılım",
                "EVENTS": "Etkinlikler",
                "PERMISSIONS": "Erişim ilkesi",
                "THEME": "Tema"
@@ -1089,24 +1022,6 @@
                "LANGUAGE": "Dil",
                "LICENSE": "Sürüm",
                "DESCRIPTION": "Açıklama"
-            },
-            "PARTICIPATION": {
-               "CAPTION": "Katılımm durum şablonu",
-               "WARNING_TEMPLATE": "Serinin katılım durumu serinin parçası olan yeni etkinlikler için varsayılan değer olarak kullanılacaktır.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "İnceleme durumu"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Vazgeçilen Durum",
-                  "READY": "Kayıt için hazır",
-                  "OPTEDOUT": "Vazgeçildi"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Mesajlar",
-                  "CREATION_DATE": "Oluşturma tarihi",
-                  "SENDER": "Gönderici",
-                  "SUBJECT": "Konu"
-               }
             },
             "EVENTS": {
                "TITLE": "Başlık",
@@ -1418,34 +1333,7 @@
          "ADD_THEME": "Tema ekle"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "Email şablonları",
-         "MAIL_SERVERS": "Email ayarları",
          "THEMES": "Temalar"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "Email teması",
-            "NAME": "İsim",
-            "CREATOR": "Oluşturan",
-            "CREATED": "Oluşturdu",
-            "ACTION": "Eylemler"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Şablon oluştur",
-            "EDITCAPTION": "Şablon düzenle",
-            "TABS": {
-               "MESSAGE": "Mesaj",
-               "SUMMARY": "Özet"
-            },
-            "MESSAGE": {
-               "NAME": "İsim",
-               "SUBJECT": "Konu",
-               "MESSAGE": "Mesaj"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "Mesaj özeti"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1541,7 +1429,6 @@
       "JOBS": {
          "TABLE": {
             "ID": "Meslek Tanımlayıcı",
-            "ACTION": "Eylemler",
             "CAPTION": "İşler",
             "CREATED": "Oluşturuldu",
             "CREATOR": "Yapımcı",
@@ -1551,14 +1438,6 @@
             "STATUS": "Durum",
             "SUBMITTED": "Gönderildi",
             "TYPE": "Tür"
-         },
-         "DETAILS": {
-            "HEADER": "Meslek detayları {{resourceId}}",
-            "TABS": {
-               "GENERAL": "Genel",
-               "OPERATIONS": "İşlemler",
-               "INCIDENTS": "Olaylar"
-            }
          },
          "STATUS": {
             "QUEUED": "Sıraya alındı",
@@ -1586,7 +1465,6 @@
             "MEAN_RUN_TIME": "Ortalama çalışma süresi",
             "MEAN_QUEUE_TIME": "Ortalama kuyruk süresi",
             "MAINTENANCE": "Bakım",
-            "ACTION": "Eylemler",
             "MAINTENANCE_OFF": "Bakım moduna gir",
             "MAINTENANCE_ON": "Bakım modundan çık"
          }
@@ -1816,9 +1694,6 @@
          "LOCATION": {
             "LABEL": "Konum"
          },
-         "OPTEDOUT": {
-            "LABEL": "Vazgeçildi"
-         },
          "PERIOD": {
             "LABEL": "Dönem"
          },
@@ -1830,12 +1705,6 @@
          },
          "PROGRESS": {
             "LABEL": "İlerleme Durumu"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "İnceleme Durumu",
-            "CONFIRMED": "Onaylandı",
-            "UNCONFIRMED": "Onaylanmadı",
-            "UNSENT": "Gönderilmemiş"
          },
          "SERIES": {
             "LABEL": "Seriler"

@@ -57,7 +57,6 @@
             "GROUP": "הקבוצה הבאה תימחק",
             "USER": "המשתמש הבא יימחקו",
             "THEME": "רשימת המשתמשים בחסומים הבאה תמחק",
-            "EMAIL": "רשימת המשתמשים בחסומים הבאה תמחק",
             "LOCATION": "המיקום הבא יימחק"
          },
          "NAME": "שם"
@@ -132,15 +131,6 @@
       "LOCATION_DELETED": "המיקום נמחק",
       "LOCATION_NOT_DELETED": "לא ניתן למחוק את המיקום",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "המיקום לא ניתן למחיקה, מכיוון שאין לך את ההרשאות לבצע פעולה זו.",
-      "EMAIL_TEMPLATE_CREATED": "התבנית נוצרה",
-      "EMAIL_TEMPLATE_NOT_CREATED": "לא ניתן ליצור את התבנית",
-      "EMAIL_TEMPLATE_SAVED": "התבנית נשמרה",
-      "EMAIL_TEMPLATE_NOT_SAVED": "לא ניתן לשמור את התבנית",
-      "EMAIL_TEMPLATE_DELETED": "התבנית נחקה",
-      "EMAIL_TEMPLATE_NOT_DELETED": "לא ניתן למחוק את התבנית",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "שם זה נמצא כבר בשימוש",
-      "EMAIL_SENT": "ההודעה נשלחה",
-      "EMAIL_NOT_SENT": "לא ניתן היה לשלוח את ההודעה",
       "CONFLICT_DETECTED": "סתירה בתזמון: האירוע החדש מתנגש עם אירוע קיים. בבקשה שנו את המיקום, התאריך או השעה.",
       "CONFLICT_BULK_DETECTED": "התנגשות בתזמון: שינוי האירועים יוצר התנגשויות. אנא שנה את המיקום, תאריכים או שעות.",
       "CONFLICT_ALREADY_ENDED": "שגיאה בתזמון: האירוע כבר נגמר.",
@@ -153,11 +143,6 @@
       "SERIES_ACL_LOCKED": "עריכת מדיניות גישה אסורה בזמן שפעולות רצות באירועים שהם חלק מהסדרה",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "המדיניות גישה דורשת תפקיד אחד לפחות עם הרשאות קריאה וכתיבה.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "המדיניות גישה דורשת תפקיד אחד לפחות עם הרשאות קריאה וכתיבה.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "מצב הצטרפות לאירוע עודכן בהצלחה.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "שגיאה בעת עדכון מצב הצטרפות לאירוע.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "לא ניתן לעדכון את מצב ההצטרפות מכיוון שתזמון ההתחלה נמצא בעבר.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "מצב הצטרפות לאירוע עודכן בהצלחה.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "שגיאה בעת עדכון מצב הצטרפות לאירוע.",
       "THEME_NAME_ALREADY_TAKEN": "שם זה נמצא כבר בשימוש",
       "THEME_NAME_EMPTY": "השם אינו יכול להשאר ריק",
       "BUMPER_UPLOAD_ERROR": "שגיאה בזמן האלעת מדיה",
@@ -186,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "פעולות",
-      "SEND_MESSAGE": "שלח הודעה",
       "WARNING": "אזהרה",
-      "EDIT_STATUS": {
-         "CAPTION": "ערוך מצב",
-         "READY_FOR_RECORDING": "מוכן להקלטה",
-         "OPTED_OUT": "נבחר להוצאה"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "מחק",
@@ -292,6 +271,8 @@
       "BACK": "הקודם",
       "CREATE": "צור",
       "RETRACT": "ביטול",
+      "RETRACT_DELETE": "Retract/Delete",
+      "DELETE": "מחק",
       "UPDATE": "עדכן",
       "DURATION": {
          "HOURS": "שעות",
@@ -348,28 +329,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "שלח הודעה",
-         "TABS": {
-            "RECIPIENTS": "נמענים",
-            "MESSAGE": "הודעה",
-            "SUMMARY": "סיכום"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "הוסף שובל מעקב",
-            "AUDIT_TRAIL_DESCRIPTION": "סמן כדי להוסיף את ההודעה לבדיקה/ביקורת",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "בחר תבנית דוא\"ל",
-            "SUBJECT": "נושא",
-            "MESSAGE": "הודעה",
-            "INCLUDE_SIGNATURE": "כולל את החתימה שלי בדוא\"ל"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "סיכום"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -500,7 +459,6 @@
          "ADD_EVENT": "הוסף ארוע",
          "TABLE": {
             "CAPTION": "אירועים",
-            "CREATORS": "יוצרים",
             "TITLE": "כותרת",
             "PRESENTERS": "מציג(ים)",
             "SERIES": "סדרה",
@@ -515,9 +473,7 @@
             "LAST": "אחרון",
             "NEXT": "הבא",
             "MANAGED_ACL": "מדיניות גישה",
-            "SCHEDULING_STATUS": "מצב",
             "WORKFLOW_STATE": "התקדמות",
-            "REVIEW_STATUS": "מצב הסקירה",
             "PREVIOUS": "הקודם",
             "NOCONTENT": "אין נתונים זמינים",
             "PUBLISHED": "פורסם",
@@ -536,13 +492,8 @@
                "PRESENTER": "Filter for this presenter"
             }
          },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "מוכן להקלטה",
-            "OPTED_OUT": "בוטל/ו"
-         },
          "STATUS": {
             "SCHEDULED": "מתוזמן",
-            "OPTEDOUT": "בוטל/ו",
             "RECORDING": "מקליט",
             "UPLOADING": "מעלה",
             "INGESTING": "לעבד",
@@ -571,9 +522,6 @@
                "NO_PUBLICATIONS_AVAILABLE": "לאירוע זה אין פרסומים",
                "PUBLICATION_DESCRIPTION": "האירוע הזה פורסם לערוצים הציבוריים הבאים:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "אירוע זה אינו נמצא כעת בתהליך",
-               "SCHEDULING_STATUS": "מצב",
-               "READY_FOR_RECORDING": "מוכן להקלטה",
-               "OPTED_OUT": "נבחר להוצאה",
                "CUSTOM": "מותאם אישית",
                "ENGAGE": "צפייה",
                "ENGAGE_LIVE": "צפייה חיה",
@@ -840,20 +788,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "תצורת תיזמון",
-               "REVIEW_STATUS": {
-                  "CAPTION": "סקור מצב"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "סטטוס נבחרו להוצאה",
-                  "READY": "מוכן להקלטה",
-                  "OPTEDOUT": "נבחר להוצאה"
-               },
-               "MESSAGES": {
-                  "CAPTION": "הודעות",
-                  "CREATION_DATE": "תאריך יצירה",
-                  "SENDER": "שולח",
-                  "SUBJECT": "נושא"
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "מציג(ים)"
                }
@@ -1027,7 +961,7 @@
             "CAPTION": "סדרות",
             "TITLE": "סדרות",
             "HAS_EVENTS": "מכיל אירועים",
-            "CREATORS": "אירגונ(ים)",
+            "ORGANIZERS": "אירגונ(ים)",
             "CONTRIBUTORS": "תורמ(ים)",
             "CREATED": "נוצר",
             "MANAGED_ACL": "מדיניות גישה",
@@ -1044,7 +978,6 @@
             "TABS": {
                "METADATA": "מטא-נתונים",
                "EXTENDED_METADATA": "מטא-נתונים II",
-               "PARTICIPATION": "השתתפות",
                "EVENTS": "אירועים",
                "PERMISSIONS": "מדיניות גישה",
                "THEME": "ערכת נושא"
@@ -1089,24 +1022,6 @@
                "LANGUAGE": "שפה",
                "LICENSE": "רישיון",
                "DESCRIPTION": "תאור"
-            },
-            "PARTICIPATION": {
-               "CAPTION": "תבנית מצב השתתפות",
-               "WARNING_TEMPLATE": "מצב השתתפות בסידרה ישמש בתור ערך ברירת המחדל עבור אירועים חדשים בסדרה.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "מצב הסקירה"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "סטטוס נבחרו להוצאה",
-                  "READY": "מוכן להקלטה",
-                  "OPTEDOUT": "בוטל/ו"
-               },
-               "MESSAGES": {
-                  "CAPTION": "הודעות",
-                  "CREATION_DATE": "תאריך יצירה",
-                  "SENDER": "שולח",
-                  "SUBJECT": "נושא"
-               }
             },
             "EVENTS": {
                "TITLE": "כותרת",
@@ -1418,34 +1333,7 @@
          "ADD_THEME": "הוסף ערכת נושא"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "תבנית דוא\"ל",
-         "MAIL_SERVERS": "הגדרות דוא\"ל",
          "THEMES": "ערכות נושא"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "תבנית דוא\"ל",
-            "NAME": "שם",
-            "CREATOR": "יוצר",
-            "CREATED": "נוצר",
-            "ACTION": "פעולות"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "צור תבנית חדשה",
-            "EDITCAPTION": "ערוך תבנית",
-            "TABS": {
-               "MESSAGE": "הודעה",
-               "SUMMARY": "סיכום"
-            },
-            "MESSAGE": {
-               "NAME": "שם",
-               "SUBJECT": "נושא",
-               "MESSAGE": "הודעה"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "סיכום הודעה"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1541,7 +1429,6 @@
       "JOBS": {
          "TABLE": {
             "ID": "מזהה עבודה",
-            "ACTION": "פעולות",
             "CAPTION": "עבודות",
             "CREATED": "נוצר",
             "CREATOR": "יוצר",
@@ -1551,14 +1438,6 @@
             "STATUS": "מצב",
             "SUBMITTED": "נשלח",
             "TYPE": "סוג"
-         },
-         "DETAILS": {
-            "HEADER": "פרטי עבודה - {{resourceId}}",
-            "TABS": {
-               "GENERAL": "כללי",
-               "OPERATIONS": "תהליכים",
-               "INCIDENTS": "תקריות"
-            }
          },
          "STATUS": {
             "QUEUED": "בהמתנה",
@@ -1586,7 +1465,6 @@
             "MEAN_RUN_TIME": "זמן ריצה ממוצע",
             "MEAN_QUEUE_TIME": "זמן ממוצע בתור",
             "MAINTENANCE": "תחזוקה",
-            "ACTION": "פעולות",
             "MAINTENANCE_OFF": "הפעל מצב תחזוקה",
             "MAINTENANCE_ON": "צא ממצב תחזוקה"
          }
@@ -1816,9 +1694,6 @@
          "LOCATION": {
             "LABEL": "מיקום"
          },
-         "OPTEDOUT": {
-            "LABEL": "בוטל/ו"
-         },
          "PERIOD": {
             "LABEL": "תקופה"
          },
@@ -1830,12 +1705,6 @@
          },
          "PROGRESS": {
             "LABEL": "התקדמות"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "מצב סקירה",
-            "CONFIRMED": "מאושר",
-            "UNCONFIRMED": "לא מאושר",
-            "UNSENT": "לא נשלח"
          },
          "SERIES": {
             "LABEL": "סדרה"
