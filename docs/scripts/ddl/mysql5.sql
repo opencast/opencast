@@ -605,3 +605,22 @@ CREATE TABLE oc_aws_asset_mapping (
   CONSTRAINT UNQ_aws_archive_mapping_0 UNIQUE (organization, media_package, media_package_element, version)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE oc_transcription_service_provider (
+  id BIGINT(20) NOT NULL,
+  provider VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE oc_transcription_service_job (
+  id BIGINT(20) NOT NULL,
+  media_package_id VARCHAR(128) NOT NULL,
+  track_id VARCHAR(128) NOT NULL,
+  job_id  VARCHAR(128) NOT NULL,
+  date_created DATETIME NOT NULL,
+  date_completed DATETIME DEFAULT NULL,
+  status VARCHAR(128) DEFAULT NULL,
+  track_duration BIGINT NOT NULL,
+  provider_id BIGINT(20) NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT FK_oc_transcription_service_job_provider_id FOREIGN KEY (provider_id) REFERENCES oc_transcription_service_provider (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

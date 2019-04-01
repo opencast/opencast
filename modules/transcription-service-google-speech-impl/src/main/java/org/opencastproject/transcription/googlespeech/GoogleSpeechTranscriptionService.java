@@ -18,7 +18,7 @@
  * the License.
  *
  */
-package org.opencastproject.transcription.ibmwatson;
+package org.opencastproject.transcription.googlespeech;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.fn.Enrichments;
@@ -44,17 +44,14 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.transcription.api.TranscriptionServiceException;
-import org.opencastproject.transcription.ibmwatson.persistence.TranscriptionDatabase;
-import org.opencastproject.transcription.ibmwatson.persistence.TranscriptionDatabaseException;
-import org.opencastproject.transcription.ibmwatson.persistence.TranscriptionJobControl;
-import org.opencastproject.util.LoadUtil;
+import org.opencastproject.transcription.persistence.TranscriptionDatabase;
+import org.opencastproject.transcription.persistence.TranscriptionDatabaseException;
+import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.PathSupport;
-import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -64,19 +61,15 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -101,26 +94,34 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class IBMWatsonTranscriptionService extends AbstractJobProducer implements TranscriptionService {
+public class GoogleSpeechTranscriptionService extends AbstractJobProducer implements TranscriptionService {
 
-  /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(IBMWatsonTranscriptionService.class);
+  /**
+   * The logger
+   */
+  private static final Logger logger = LoggerFactory.getLogger(GoogleSpeechTranscriptionService.class);
 
-  private static final String JOB_TYPE = "org.opencastproject.transcription.ibmwatson";
+  private static final String JOB_TYPE = "org.opencastproject.transcription.googlespeech";
 
   static final String TRANSCRIPT_COLLECTION = "transcripts";
-  static final String APIKEY = "apikey";
   private static final int CONNECTION_TIMEOUT = 60000; // ms, 1 minute
   private static final int SOCKET_TIMEOUT = 60000; // ms, 1 minute
-  // Default wf to attach transcription results to mp
-  public static final String DEFAULT_WF_DEF = "attach-watson-transcripts";
-  private static final long DEFAULT_COMPLETION_BUFFER = 600; // in seconds, default is 10 minutes
+  private static final int ACCESS_TOKEN_MINIMUN_TIME = 60000; // ms , 1 minute
+  // Default workflow to attach transcription results to mediapackage
+  public static final String DEFAULT_WF_DEF = "google-speech-attach-transcripts";
+  private static final long DEFAULT_COMPLETION_BUFFER = 300; // in seconds, default is 5 minutes
   private static final long DEFAULT_DISPATCH_INTERVAL = 60; // in seconds, default is 1 minute
-  private static final long DEFAULT_MAX_PROCESSING_TIME = 2 * 60 * 60; // in seconds, default is 2 hours
-  private static final String DEFAULT_LANGUAGE = "en";
-  // Cleans up results files that are older than 7 days (which is how long the IBM watson
-  // speech-to-text-service keeps the jobs by default)
+  private static final long DEFAULT_MAX_PROCESSING_TIME = 5 * 60 * 60; // in seconds, default is 5 hours
+  // Cleans up results files that are older than 7 days
   private static final int DEFAULT_CLEANUP_RESULTS_DAYS = 7;
+  private static final boolean DEFAULT_PROFANITY_FILTER = false;
+  private static final String DEFAULT_LANGUAGE = "en-US";
+  private static final String GOOGLE_SPEECH_URL = "https://speech.googleapis.com/v1";
+  private static final String GOOGLE_AUTH2_URL = "https://www.googleapis.com/oauth2/v4/token";
+  private static final String REQUEST_PATH = "/speech:longrunningrecognize";
+  private static final String RESULT_PATH = "/operations/";
+  private static final String INVALID_TOKEN = "-1";
+  private static final String PROVIDER = "Google Speech";
 
   // Global configuration (custom.properties)
   public static final String ADMIN_URL_PROPERTY = "org.opencastproject.admin.ui.url";
@@ -131,28 +132,16 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   private static final String CLUSTER_NAME_PROPERTY = "org.opencastproject.environment.name";
   private String clusterName = "";
 
-  /** The load introduced on the system by creating a transcription job */
-  public static final float DEFAULT_START_TRANSCRIPTION_JOB_LOAD = 0.1f;
-
-  /** The key to look for in the service configuration file to override the default h=job load */
-  public static final String START_TRANSCRIPTION_JOB_LOAD_KEY = "job.load.start.transcription";
-
-  /** The load introduced on the system by creating a caption job */
-  private float jobLoad = DEFAULT_START_TRANSCRIPTION_JOB_LOAD;
-
   // The events we are interested in receiving notifications
   public interface JobEvent {
+
     String COMPLETED_WITH_RESULTS = "recognitions.completed_with_results";
     String FAILED = "recognitions.failed";
   }
 
-  public interface RecognitionJobStatus {
-    String COMPLETED = "completed";
-    String FAILED = "failed";
-    String PROCESSING = "processing";
-  }
-
-  /** Service dependencies */
+  /**
+   * Service dependencies
+   */
   private ServiceRegistry serviceRegistry;
   private SecurityService securityService;
   private UserDirectoryService userDirectoryService;
@@ -171,51 +160,47 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     StartTranscription
   }
 
-  private static final String IBM_WATSON_SERVICE_URL = "https://stream.watsonplatform.net/speech-to-text/api";
-  private static final String API_VERSION = "v1";
-  private static final String REGISTER_CALLBACK = "register_callback";
-  private static final String RECOGNITIONS = "recognitions";
-  private static final String CALLBACK_PATH = "/transcripts/watson/results";
-
-  /** Service configuration options */
+  /**
+   * Service configuration options
+   */
   public static final String ENABLED_CONFIG = "enabled";
-  public static final String IBM_WATSON_SERVICE_URL_CONFIG = "ibm.watson.service.url";
-  public static final String IBM_WATSON_USER_CONFIG = "ibm.watson.user";
-  public static final String IBM_WATSON_PSW_CONFIG = "ibm.watson.password";
-  public static final String IBM_WATSON_API_KEY_CONFIG = "ibm.watson.api.key";
-  public static final String IBM_WATSON_MODEL_CONFIG = "ibm.watson.model";
+  public static final String GOOGLE_SPEECH_LANGUAGE = "google.speech.language";
+  public static final String PROFANITY_FILTER = "google.speech.profanity.filter";
   public static final String WORKFLOW_CONFIG = "workflow";
   public static final String DISPATCH_WORKFLOW_INTERVAL_CONFIG = "workflow.dispatch.interval";
   public static final String COMPLETION_CHECK_BUFFER_CONFIG = "completion.check.buffer";
   public static final String MAX_PROCESSING_TIME_CONFIG = "max.processing.time";
   public static final String NOTIFICATION_EMAIL_CONFIG = "notification.email";
   public static final String CLEANUP_RESULTS_DAYS_CONFIG = "cleanup.results.days";
-  public static final String MAX_ATTEMPTS_CONFIG = "max.attempts";
-  public static final String RETRY_WORKLFOW_CONFIG = "retry.workflow";
+  public static final String GOOGLE_CLOUD_CLIENT_ID = "google.cloud.client.id";
+  public static final String GOOGLE_CLOUD_CLIENT_SECRET = "google.cloud.client.secret";
+  public static final String GOOGLE_CLOUD_REFRESH_TOKEN = "google.cloud.refresh.token";
+  public static final String GOOGLE_CLOUD_BUCKET = "google.cloud.storage.bucket";
+  public static final String GOOGLE_CLOUD_TOKEN_ENDPOINT_URL = "google.cloud.token.endpoint.url";
 
-  /** Service configuration values */
+  /**
+   * Service configuration values
+   */
   private boolean enabled = false; // Disabled by default
-  private String watsonServiceUrl = UrlSupport.concat(IBM_WATSON_SERVICE_URL, API_VERSION);
-  private String user; // user name or 'apikey'
-  private String psw; // password or api key
-  private String model;
+  private boolean profanityFilter = DEFAULT_PROFANITY_FILTER;
+  private String language = DEFAULT_LANGUAGE;
   private String workflowDefinitionId = DEFAULT_WF_DEF;
   private long workflowDispatchInterval = DEFAULT_DISPATCH_INTERVAL;
   private long completionCheckBuffer = DEFAULT_COMPLETION_BUFFER;
   private long maxProcessingSeconds = DEFAULT_MAX_PROCESSING_TIME;
   private String toEmailAddress;
   private int cleanupResultDays = DEFAULT_CLEANUP_RESULTS_DAYS;
-  private String language = DEFAULT_LANGUAGE;
-  private int maxAttempts = 1;
-  private String retryWfDefId = null;
-
+  private String clientId;
+  private String clientSecret;
+  private String clientToken;
+  private String accessToken = INVALID_TOKEN;
+  private String tokenEndpoint = GOOGLE_AUTH2_URL;
+  private String storageBucket;
+  private long tokenExpiryTime = 0;
   private String systemAccount;
-  private String serverUrl;
-  private String callbackUrl;
-  private boolean callbackAlreadyRegistered = false;
   private ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
 
-  public IBMWatsonTranscriptionService() {
+  public GoogleSpeechTranscriptionService() {
     super(JOB_TYPE);
   }
 
@@ -225,41 +210,42 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       enabled = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), ENABLED_CONFIG).get();
 
       if (enabled) {
-        // Service url (optional)
-        Option<String> urlOpt = OsgiUtil.getOptCfg(cc.getProperties(), IBM_WATSON_SERVICE_URL_CONFIG);
-        if (urlOpt.isSome()) {
-          watsonServiceUrl = UrlSupport.concat(urlOpt.get(), API_VERSION);
-        }
+        // Mandatory API access properties
+        clientId = OsgiUtil.getComponentContextProperty(cc, GOOGLE_CLOUD_CLIENT_ID);
+        clientSecret = OsgiUtil.getComponentContextProperty(cc, GOOGLE_CLOUD_CLIENT_SECRET);
+        clientToken = OsgiUtil.getComponentContextProperty(cc, GOOGLE_CLOUD_REFRESH_TOKEN);
+        storageBucket = OsgiUtil.getComponentContextProperty(cc, GOOGLE_CLOUD_BUCKET);
 
-        // Api key is checked first. If not entered, user and password are mandatory (to
-        // support older instances of the STT service)
-        Option<String> keyOpt = OsgiUtil.getOptCfg(cc.getProperties(), IBM_WATSON_API_KEY_CONFIG);
-        if (keyOpt.isSome()) {
-          user = APIKEY;
-          psw = keyOpt.get();
-          logger.info("Using transcription service at {} with api key", watsonServiceUrl);
+        // access token endpoint
+        Option<String> tokenOpt = OsgiUtil.getOptCfg(cc.getProperties(), GOOGLE_CLOUD_TOKEN_ENDPOINT_URL);
+        if (tokenOpt.isSome()) {
+          tokenEndpoint = tokenOpt.get();
+          logger.info("Access token endpoint is set to {}", tokenEndpoint);
         } else {
-          // User name (mandatory if api key is empty)
-          user = OsgiUtil.getComponentContextProperty(cc, IBM_WATSON_USER_CONFIG);
-          // Password (mandatory if api key is empty)
-          psw = OsgiUtil.getComponentContextProperty(cc, IBM_WATSON_PSW_CONFIG);
-          logger.info("Using transcription service at {} with username {}", watsonServiceUrl, user);
+          logger.info("Default access token endpoint will be used");
         }
 
-        // Language model to be used (optional)
-        Option<String> modelOpt = OsgiUtil.getOptCfg(cc.getProperties(), IBM_WATSON_MODEL_CONFIG);
-        if (modelOpt.isSome()) {
-          model = modelOpt.get();
-          language = StringUtils.substringBefore(model, "-");
-          logger.info("Model is {}", model);
+        // profanity filter to use
+        Option<String> profanityOpt = OsgiUtil.getOptCfg(cc.getProperties(), PROFANITY_FILTER);
+        if (profanityOpt.isSome()) {
+          profanityFilter = Boolean.parseBoolean(profanityOpt.get());
+          logger.info("Profanity filter is set to {}", profanityFilter);
         } else {
-          logger.info("Default model will be used");
+          logger.info("Default profanity filter will be used");
         }
-
+        // Language model to be used
+        Option<String> languageOpt = OsgiUtil.getOptCfg(cc.getProperties(), GOOGLE_SPEECH_LANGUAGE);
+        if (languageOpt.isSome()) {
+          language = languageOpt.get();
+          logger.info("Language used is {}", language);
+        } else {
+          logger.info("Default language will be used");
+        }
         // Workflow to execute when getting callback (optional, with default)
         Option<String> wfOpt = OsgiUtil.getOptCfg(cc.getProperties(), WORKFLOW_CONFIG);
-        if (wfOpt.isSome())
+        if (wfOpt.isSome()) {
           workflowDefinitionId = wfOpt.get();
+        }
         logger.info("Workflow definition is {}", workflowDefinitionId);
         // Interval to check for completed transcription jobs and start workflows to attach transcripts
         Option<String> intervalOpt = OsgiUtil.getOptCfg(cc.getProperties(), DISPATCH_WORKFLOW_INTERVAL_CONFIG);
@@ -279,7 +265,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
           } catch (NumberFormatException e) {
             // Use default
             logger.warn("Invalid configuration for {} : {}. Default used instead: {}",
-                    COMPLETION_CHECK_BUFFER_CONFIG, bufferOpt.get(), completionCheckBuffer);
+                    new Object[]{COMPLETION_CHECK_BUFFER_CONFIG, bufferOpt.get(), completionCheckBuffer});
           }
         }
         logger.info("Completion check buffer is {} seconds", completionCheckBuffer);
@@ -304,26 +290,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
         }
         logger.info("Cleanup result files after {} days", cleanupResultDays);
 
-        // Maximum number of retries if error (optional)
-        Option<String> maxAttemptsOpt = OsgiUtil.getOptCfg(cc.getProperties(), MAX_ATTEMPTS_CONFIG);
-        if (maxAttemptsOpt.isSome()) {
-          try {
-            maxAttempts = Integer.parseInt(maxAttemptsOpt.get());
-            retryWfDefId = OsgiUtil.getComponentContextProperty(cc, RETRY_WORKLFOW_CONFIG);
-          } catch (NumberFormatException e) {
-            // Use default
-            logger.warn("Invalid configuration for {} : {}. Default used instead: no retries", MAX_ATTEMPTS_CONFIG,
-                    maxAttemptsOpt.get());
-          }
-        } else {
-          logger.info("No retries in case of errors");
-        }
-
-        serverUrl = OsgiUtil.getContextProperty(cc, OpencastConstants.SERVER_URL_PROPERTY);
         systemAccount = OsgiUtil.getContextProperty(cc, DIGEST_USER_PROPERTY);
-
-        jobLoad = LoadUtil.getConfiguredLoadValue(cc.getProperties(), START_TRANSCRIPTION_JOB_LOAD_KEY,
-                DEFAULT_START_TRANSCRIPTION_JOB_LOAD, serviceRegistry);
 
         // Schedule the workflow dispatching, starting in 2 minutes
         scheduledExecutor.scheduleWithFixedDelay(new WorkflowDispatcher(), 120, workflowDispatchInterval,
@@ -334,42 +301,46 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
         // Notification email passed in this service configuration?
         Option<String> optTo = OsgiUtil.getOptCfg(cc.getProperties(), NOTIFICATION_EMAIL_CONFIG);
-        if (optTo.isSome())
+        if (optTo.isSome()) {
           toEmailAddress = optTo.get();
-        else {
+        } else {
           // Use admin email informed in custom.properties
           optTo = OsgiUtil.getOptContextProperty(cc, ADMIN_EMAIL_PROPERTY);
-          if (optTo.isSome())
+          if (optTo.isSome()) {
             toEmailAddress = optTo.get();
+          }
         }
-        if (toEmailAddress != null)
+        if (toEmailAddress != null) {
           logger.info("Notification email set to {}", toEmailAddress);
-        else
+        } else {
           logger.warn("Email notification disabled");
+        }
 
         Option<String> optCluster = OsgiUtil.getOptContextProperty(cc, CLUSTER_NAME_PROPERTY);
-        if (optCluster.isSome())
+        if (optCluster.isSome()) {
           clusterName = optCluster.get();
+        }
         logger.info("Environment name is {}", clusterName);
 
         logger.info("Activated!");
-        // Cannot call registerCallback here because of the REST service dependency on this service
       } else {
         logger.info("Service disabled. If you want to enable it, please update the service configuration.");
       }
-    } else
+    } else {
       throw new IllegalArgumentException("Missing component context");
+    }
   }
 
   @Override
-  public Job startTranscription(String mpId, Track track) throws TranscriptionServiceException {
-    if (!enabled)
+  public Job startTranscription(String mpId, Track track, String language) throws TranscriptionServiceException {
+    if (!enabled) {
       throw new TranscriptionServiceException(
               "This service is disabled. If you want to enable it, please update the service configuration.");
+    }
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.StartTranscription.name(),
-              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track)), jobLoad);
+              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track), language));
     } catch (ServiceRegistryException e) {
       throw new TranscriptionServiceException("Unable to create a job", e);
     } catch (MediaPackageException e) {
@@ -378,7 +349,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   }
 
   @Override
-  public Job startTranscription(String mpId, Track track, String language) {
+  public Job startTranscription(String mpId, Track track) throws TranscriptionServiceException {
     throw new UnsupportedOperationException("Not supported.");
   }
 
@@ -386,58 +357,41 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   public void transcriptionDone(String mpId, Object obj) throws TranscriptionServiceException {
     JSONObject jsonObj = null;
     String jobId = null;
+    String token = INVALID_TOKEN;
+    try {
+      token = getRefreshAccessToken();
+    } catch (IOException ex) {
+      logger.error("Unable to create access token, error: {}", ex.toString());
+    }
+    if (token.equals(INVALID_TOKEN)) {
+      throw new TranscriptionServiceException("Invalid access token");
+    }
     try {
       jsonObj = (JSONObject) obj;
-      jobId = (String) jsonObj.get("id");
-
-      // Check for errors inside the results object. Sometimes we get a status completed, but
-      // the transcription failed e.g.
-      // curl --header "Content-Type: application/json" --request POST --data
-      // '{"id":"ebeeb546-2e1a-11e9-941d-f349af2d6273",
-      // "results":[{"error":"failed when posting audio to the STT service"}],
-      // "event":"recognitions.completed_with_results",
-      // "user_token":"66c6c9b0-b6a2-4c9a-92c8-55f953ab3d38",
-      // "created":"2019-02-11T05:04:29.283Z"}' http://ADMIN/transcripts/watson/results
-      if (jsonObj.get("results") instanceof JSONArray) {
-        JSONArray resultsArray = (JSONArray) jsonObj.get("results");
-        if (resultsArray != null && resultsArray.size() > 0) {
-          String error = (String) ((JSONObject) resultsArray.get(0)).get("error");
-          if (!StringUtils.isEmpty(error)) {
-            retryOrError(jobId, mpId,
-                String.format("Transcription completed with error for mpId %s, jobId %s: %s", mpId, jobId, error));
-            return;
-          }
-        }
-      }
-
+      jobId = (String) jsonObj.get("name");
       logger.info("Transcription done for mpId {}, jobId {}", mpId, jobId);
+      JSONArray resultsArray = getTranscriptionResult(jsonObj);
 
       // Update state in database
       // If there's an optimistic lock exception here, it's ok because the workflow dispatcher
       // may be doing the same thing
       database.updateJobControl(jobId, TranscriptionJobControl.Status.TranscriptionComplete.name());
 
-      // Save results in file system if there
-      if (jsonObj.get("results") != null)
+      // Delete audio file from Google storage
+      deleteStorageFile(mpId, token);
+
+      // Save results in file system if there exist
+      if (resultsArray != null) {
         saveResults(jobId, jsonObj);
+      }
     } catch (IOException e) {
       logger.warn("Could not save transcription results file for mpId {}, jobId {}: {}",
-              mpId, jobId, jsonObj == null ? "null" : jsonObj.toJSONString());
+              new Object[]{mpId, jobId, jsonObj == null ? "null" : jsonObj.toJSONString()});
       throw new TranscriptionServiceException("Could not save transcription results file", e);
     } catch (TranscriptionDatabaseException e) {
-      logger.warn("Error when updating state in database for mpId {}, jobId {}", mpId, jobId);
+      logger.warn("Transcription results file were saved but state in db not updated for mpId {}, jobId {}", mpId,
+              jobId);
       throw new TranscriptionServiceException("Could not update transcription job control db", e);
-    }
-  }
-
-  @Override
-  public void transcriptionError(String mpId, Object obj) throws TranscriptionServiceException {
-    JSONObject jsonObj = (JSONObject) obj;
-    String jobId = (String) jsonObj.get("id");
-    try {
-      retryOrError(jobId, mpId, String.format("Transcription error for media package %s, job id %s", mpId, jobId));
-    } catch (TranscriptionDatabaseException e) {
-      throw new TranscriptionServiceException("Error when updating job state.", e);
     }
   }
 
@@ -447,167 +401,113 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   }
 
   @Override
+  public void transcriptionError(String mpId, Object obj) throws TranscriptionServiceException {
+    JSONObject jsonObj = null;
+    String jobId = null;
+    try {
+      jsonObj = (JSONObject) obj;
+      jobId = (String) jsonObj.get("name");
+      // Update state in database
+      database.updateJobControl(jobId, TranscriptionJobControl.Status.Error.name());
+      TranscriptionJobControl jobControl = database.findByJob(jobId);
+      logger.warn(String.format("Error received for media package %s, job id %s",
+              jobControl.getMediaPackageId(), jobId));
+      // Send notification email
+      sendEmail("Transcription ERROR",
+              String.format("There was a transcription error for for media package %s, job id %s.",
+                      jobControl.getMediaPackageId(), jobId));
+    } catch (TranscriptionDatabaseException e) {
+      logger.warn("Transcription error. State in db could not be updated to error for mpId {}, jobId {}", mpId, jobId);
+      throw new TranscriptionServiceException("Could not update transcription job control db", e);
+    }
+  }
+
+  @Override
   protected String process(Job job) throws Exception {
     Operation op = null;
     String operation = job.getOperation();
     List<String> arguments = job.getArguments();
     String result = "";
-
     op = Operation.valueOf(operation);
-
     switch (op) {
       case StartTranscription:
         String mpId = arguments.get(0);
         Track track = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
-        createRecognitionsJob(mpId, track);
+        String languageCode = arguments.get(2);
+        createRecognitionsJob(mpId, track, languageCode);
         break;
       default:
         throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
     }
-
     return result;
   }
 
   /**
-   * Register the callback url with the Speech-to-text service. From:
-   * https://cloud.ibm.com/apidocs/speech-to-text#register-a-callback
-   *
-   * curl -X POST -u "apikey:{apikey}"
-   * "https://stream.watsonplatform.net/speech-to-text/api/v1/register_callback?callback_url=http://{user_callback_path}/job_results&user_secret=ThisIsMySecret"
-   * Response looks like: { "status": "created", "url": "http://{user_callback_path}/results" }
+   * Asynchronous Requests and Responses call to Google Speech API
+   * https://cloud.google.com/speech-to-text/docs/basics
    */
-  void registerCallback() throws TranscriptionServiceException {
-    if (callbackAlreadyRegistered)
-      return;
-
-    Organization org = securityService.getOrganization();
-    String adminUrl = StringUtils.trimToNull(org.getProperties().get(ADMIN_URL_PROPERTY));
-    if (adminUrl != null)
-      callbackUrl = adminUrl + CALLBACK_PATH;
-    else
-      callbackUrl = serverUrl + CALLBACK_PATH;
-    logger.info("Callback url is {}", callbackUrl);
-
+  void createRecognitionsJob(String mpId, Track track, String languageCode) throws TranscriptionServiceException, IOException {
+    // Use default language if not set by workflow
+    if (languageCode == null || languageCode.isEmpty()) {
+      languageCode = language;
+    }
+    String audioUrl;
+    audioUrl = uploadAudioFileToGoogleStorage(mpId, track);
     CloseableHttpClient httpClient = makeHttpClient();
-    HttpPost httpPost = new HttpPost(
-            UrlSupport.concat(watsonServiceUrl, REGISTER_CALLBACK) + String.format("?callback_url=%s", callbackUrl));
     CloseableHttpResponse response = null;
+    String token = getRefreshAccessToken();
+    if (token.equals(INVALID_TOKEN) || audioUrl == null) {
+      throw new TranscriptionServiceException("Could not create recognition job. Audio file or access token invalid");
+    }
+
+    // Create json for configuration and audio file 
+    JSONObject configValues = new JSONObject();
+    JSONObject audioValues = new JSONObject();
+    JSONObject container = new JSONObject();
+    configValues.put("languageCode", languageCode);
+    configValues.put("enableWordTimeOffsets", true);
+    configValues.put("profanityFilter", profanityFilter);
+    audioValues.put("uri", audioUrl);
+    container.put("config", configValues);
+    container.put("audio", audioValues);
 
     try {
+      HttpPost httpPost = new HttpPost(GOOGLE_SPEECH_URL + REQUEST_PATH);
+      logger.debug("Url to invoke Google speech service: {}", httpPost.getURI().toString());
+      StringEntity params = new StringEntity(container.toJSONString());
+      httpPost.addHeader("Authorization", "Bearer " + token); // add the authorization header to the request;
+      httpPost.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8");
+      httpPost.setEntity(params);
       response = httpClient.execute(httpPost);
       int code = response.getStatusLine().getStatusCode();
+      HttpEntity entity = response.getEntity();
+      String jsonString = EntityUtils.toString(response.getEntity());
+      JSONParser jsonParser = new JSONParser();
+      JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
-          logger.info("Callback url: {} had already already been registered", callbackUrl);
-          callbackAlreadyRegistered = true;
-          EntityUtils.consume(response.getEntity());
-          break;
-        case HttpStatus.SC_CREATED: // 201
-          logger.info("Callback url: {} has been successfully registered", callbackUrl);
-          callbackAlreadyRegistered = true;
-          EntityUtils.consume(response.getEntity());
-          break;
-        case HttpStatus.SC_BAD_REQUEST: // 400
-          logger.warn("Callback url {} could not be verified, status: {}", callbackUrl, code);
-          break;
-        case HttpStatus.SC_SERVICE_UNAVAILABLE: // 503
-          logger.warn("Service unavailable when registering callback url {} status: {}", callbackUrl, code);
-          break;
-        default:
-          logger.warn("Unknown status when registering callback url {}, status: {}", callbackUrl, code);
-          break;
-      }
-    } catch (Exception e) {
-      logger.warn("Exception when calling the the register callback endpoint", e);
-    } finally {
-      try {
-        httpClient.close();
-        if (response != null)
-          response.close();
-      } catch (IOException e) {
-      }
-    }
-  }
-
-  /**
-   * From: https://cloud.ibm.com/apidocs/speech-to-text#create-a-job:
-   *
-   * curl -X POST -u "apikey:{apikey}" --header "Content-Type: audio/flac" --data-binary @audio-file.flac
-   * "https://stream.watsonplatform.net/speech-to-text/api/v1/recognitions?callback_url=http://{user_callback_path}/job_results&user_token=job25&timestamps=true"
-   *
-   * Response: { "id": "4bd734c0-e575-21f3-de03-f932aa0468a0", "status": "waiting", "url":
-   * "http://stream.watsonplatform.net/speech-to-text/api/v1/recognitions/4bd734c0-e575-21f3-de03-f932aa0468a0" }
-   */
-  void createRecognitionsJob(String mpId, Track track) throws TranscriptionServiceException {
-    if (!callbackAlreadyRegistered)
-      registerCallback();
-
-    // Get audio track file
-    File audioFile = null;
-    try {
-      audioFile = workspace.get(track.getURI());
-    } catch (Exception e) {
-      throw new TranscriptionServiceException("Error reading audio track", e);
-    }
-
-    CloseableHttpClient httpClient = makeHttpClient();
-    String additionalParms = "";
-    if (callbackAlreadyRegistered) {
-      additionalParms = String.format("&callback_url=%s&events=%s,%s", callbackUrl, JobEvent.COMPLETED_WITH_RESULTS,
-              JobEvent.FAILED);
-    }
-    if (!StringUtils.isEmpty(model)) {
-      additionalParms += String.format("&model=%s", model);
-    }
-    CloseableHttpResponse response = null;
-    try {
-      HttpPost httpPost = new HttpPost(UrlSupport.concat(watsonServiceUrl, RECOGNITIONS)
-              + String.format(
-                      "?user_token=%s&inactivity_timeout=-1&timestamps=true&smart_formatting=true%s",
-                      mpId, additionalParms));
-      logger.debug("Url to invoke ibm watson service: {}", httpPost.getURI().toString());
-      httpPost.setHeader(HttpHeaders.CONTENT_TYPE, track.getMimeType().toString());
-      FileEntity fileEntity = new FileEntity(audioFile);
-      fileEntity.setChunked(true);
-      httpPost.setEntity(fileEntity);
-      response = httpClient.execute(httpPost);
-      int code = response.getStatusLine().getStatusCode();
-
-      switch (code) {
-        case HttpStatus.SC_CREATED: // 201
           logger.info("Recognitions job has been successfully created");
 
-          HttpEntity entity = response.getEntity();
-          // Response returned is a json object:
-          // {
-          // "id": "4bd734c0-e575-21f3-de03-f932aa0468a0",
-          // "status": "waiting",
-          // "url":
-          // "http://stream.watsonplatform.net/speech-to-text/api/v1/recognitions/4bd734c0-e575-21f3-de03-f932aa0468a0"
-          // }
-          String jsonString = EntityUtils.toString(response.getEntity());
-          JSONParser jsonParser = new JSONParser();
-          JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
-          String jobId = (String) jsonObject.get("id");
-          String jobStatus = (String) jsonObject.get("status");
-          String jobUrl = (String) jsonObject.get("url");
+          /**
+           * Response returned is a json object: { "name":
+           * "7612202767953098924", "metadata": { "@type":
+           * "type.googleapis.com/google.cloud.speech.v1.LongRunningRecognizeMetadata",
+           * "progressPercent": 90, "startTime": "2017-07-20T16:36:55.033650Z",
+           * "lastUpdateTime": "2017-07-20T16:37:17.158630Z" } }
+           */
+          String jobId = (String) jsonObject.get("name");
           logger.info(String.format(
-                  "Transcription for mp %s has been submitted. Job id: %s, job status: %s, job url: %s", mpId,
-                  jobId, jobStatus, jobUrl));
+                  "Transcription for mp %s has been submitted. Job id: %s", mpId,
+                  jobId));
 
           database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.Progress.name(),
-                  track.getDuration() == null ? 0 : track.getDuration().longValue());
+                  track.getDuration() == null ? 0 : track.getDuration().longValue(), PROVIDER);
           EntityUtils.consume(entity);
           return;
-        case HttpStatus.SC_BAD_REQUEST: // 400
-          logger.info("Invalid argument returned, status: {}", code);
-          break;
-        case HttpStatus.SC_SERVICE_UNAVAILABLE: // 503
-          logger.info("Service unavailable returned, status: {}", code);
-          break;
         default:
-          logger.info("Unknown return status: {}.", code);
+          JSONObject errorObj = (JSONObject) jsonObject.get("error");
+          logger.warn("Invalid argument returned, status: {} with message: {}", code, (String) errorObj.get("message"));
           break;
       }
       throw new TranscriptionServiceException("Could not create recognition job. Status returned: " + code);
@@ -617,69 +517,79 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     } finally {
       try {
         httpClient.close();
-        if (response != null)
+        if (response != null) {
           response.close();
+        }
       } catch (IOException e) {
       }
     }
   }
 
   /**
-   * From: https://cloud.ibm.com/apidocs/speech-to-text#check-a-job:
+   * Get transcription job result: GET /v1/operations/{name}
    *
-   * curl -X GET -u "apikey:{apikey}" "https://stream.watsonplatform.net/speech-to-text/api/v1/recognitions/{id}"
-   *
-   * Response: { "results": [ { "result_index": 0, "results": [ { "final": true, "alternatives": [ { "transcript":
-   * "several tornadoes touch down as a line of severe thunderstorms swept through Colorado on Sunday ", "timestamps": [
-   * [ "several", 1, 1.52 ], [ "tornadoes", 1.52, 2.15 ], . . . [ "Sunday", 5.74, 6.33 ] ], "confidence": 0.885 } ] } ]
-   * } ], "created": "2016-08-17T19:11:04.298Z", "updated": "2016-08-17T19:11:16.003Z", "status": "completed" }
+   * "response": { "@type":
+   * "type.googleapis.com/google.cloud.speech.v1.LongRunningRecognizeResponse",
+   * "results": [ { "alternatives": [ { "transcript": "Four score and
+   * twenty...", "confidence": 0.97186122, "words": [ { "startTime": "1.300s",
+   * "endTime": "1.400s", "word": "Four" }, { "startTime": "1.400s", "endTime":
+   * "1.600s", "word": "score" }, { "startTime": "1.600s", "endTime": "1.600s",
+   * "word": "and" }, { "startTime": "1.600s", "endTime": "1.900s", "word":
+   * "twenty" }, ] } ] }
    */
-  String getAndSaveJobResults(String jobId) throws TranscriptionServiceException {
+  boolean getAndSaveJobResults(String jobId) throws TranscriptionServiceException, IOException {
     CloseableHttpClient httpClient = makeHttpClient();
     CloseableHttpResponse response = null;
     String mpId = "unknown";
+    JSONArray resultsArray = null;
+    String token = getRefreshAccessToken();
+    if (token.equals(INVALID_TOKEN)) {
+      return false;
+    }
     try {
-      HttpGet httpGet = new HttpGet(UrlSupport.concat(watsonServiceUrl, RECOGNITIONS, jobId));
+      HttpGet httpGet = new HttpGet(GOOGLE_SPEECH_URL + RESULT_PATH + jobId);
+      logger.debug("Url to invoke Google speech service: {}", httpGet.getURI().toString());
+      // add the authorization header to the request;
+      httpGet.addHeader("Authorization", "Bearer " + token);
       response = httpClient.execute(httpGet);
       int code = response.getStatusLine().getStatusCode();
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
           HttpEntity entity = response.getEntity();
-
           // Response returned is a json object described above
           String jsonString = EntityUtils.toString(entity);
           JSONParser jsonParser = new JSONParser();
           JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
-          String jobStatus = (String) jsonObject.get("status");
-          mpId = (String) jsonObject.get("user_token");
-          // user_token doesn't come back if this is not in the context of a callback so get the mpId from the db
-          if (mpId == null) {
-            TranscriptionJobControl jc = database.findByJob(jobId);
-            if (jc != null)
-              mpId = jc.getMediaPackageId();
+          Boolean jobDone = (Boolean) jsonObject.get("done");
+          if (jobDone) {
+            resultsArray = getTranscriptionResult(jsonObject);
           }
-          logger.info("Recognitions job {} has been found, status {}", jobId, jobStatus);
+          TranscriptionJobControl jc = database.findByJob(jobId);
+          if (jc != null) {
+            mpId = jc.getMediaPackageId();
+          }
+          logger.info("Recognitions job {} has been found, completed status {}", jobId, jobDone.toString());
           EntityUtils.consume(entity);
 
-          if (jobStatus.indexOf(RecognitionJobStatus.COMPLETED) > -1 && jsonObject.get("results") != null) {
+          if (jobDone && resultsArray != null) {
             transcriptionDone(mpId, jsonObject);
+            return true;
           }
-          return jobStatus;
+          return false;
         case HttpStatus.SC_NOT_FOUND: // 404
-          logger.info("Job not found: {}", jobId);
+          logger.warn("Job not found: {}", jobId);
           break;
         case HttpStatus.SC_SERVICE_UNAVAILABLE: // 503
-          logger.info("Service unavailable returned, status: {}", code);
+          logger.warn("Service unavailable returned, status: {}", code);
           break;
         default:
-          logger.info("Unknown return status: {}.", code);
+          logger.warn("Error return status: {}.", code);
           break;
       }
       throw new TranscriptionServiceException(
               String.format("Could not check recognition job for media package %s, job id %s. Status returned: %d",
-                      mpId, jobId, code),
-              code);
+                      mpId, jobId, code), code);
     } catch (TranscriptionServiceException e) {
       throw e;
     } catch (Exception e) {
@@ -691,15 +601,69 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     } finally {
       try {
         httpClient.close();
-        if (response != null)
+        if (response != null) {
           response.close();
+        }
       } catch (IOException e) {
       }
     }
   }
 
+  /**
+   * Get transcription result: GET /v1/operations/{name} Method mainly used by
+   * the REST endpoint
+   *
+   * @param jobId
+   * @return job details
+   * @throws org.opencastproject.transcription.api.TranscriptionServiceException
+   * @throws java.io.IOException
+   */
+  public String getTranscriptionResults(String jobId)
+          throws TranscriptionServiceException, IOException {
+    CloseableHttpClient httpClient = makeHttpClient();
+    CloseableHttpResponse response = null;
+    String token = getRefreshAccessToken();
+    if (token.equals(INVALID_TOKEN)) {
+      logger.warn("Invalid access token");
+      return "No results found";
+    }
+    try {
+      HttpGet httpGet = new HttpGet(GOOGLE_SPEECH_URL + RESULT_PATH + jobId);
+      logger.debug("Url to invoke Google speech service: {}", httpGet.getURI().toString());
+      // add the authorization header to the request;
+      httpGet.addHeader("Authorization", "Bearer " + token);
+      response = httpClient.execute(httpGet);
+      int code = response.getStatusLine().getStatusCode();
+
+      switch (code) {
+        case HttpStatus.SC_OK: // 200
+          HttpEntity entity = response.getEntity();
+          logger.info("Retrieved details for transcription with job id: '{}'", jobId);
+          return EntityUtils.toString(entity);
+        default:
+          logger.warn("Error retrieving details for transcription with job id: '{}', return status: {}.", jobId, code);
+          break;
+      }
+    } catch (Exception e) {
+      String msg = String.format("Exception when calling the transcription service for job id: %s", jobId);
+      logger.warn(String.format(msg, jobId), e);
+      throw new TranscriptionServiceException(String.format(
+              "Exception when calling the transcription service for job id: %s", jobId), e);
+    } finally {
+      try {
+        httpClient.close();
+        if (response != null) {
+          response.close();
+        }
+      } catch (IOException e) {
+      }
+    }
+    return "No results found";
+  }
+
   private void saveResults(String jobId, JSONObject jsonObj) throws IOException {
-    if (jsonObj.get("results") != null) {
+    JSONArray resultsArray = getTranscriptionResult(jsonObj);
+    if (resultsArray != null) {
       // Save the results into a collection
       workspace.putInCollection(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId),
               new ByteArrayInputStream(jsonObj.toJSONString().getBytes()));
@@ -707,69 +671,168 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   }
 
   @Override
-  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId) throws TranscriptionServiceException {
+  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId)
+          throws TranscriptionServiceException {
     try {
       // If jobId is unknown, look for all jobs associated to that mpId
       if (jobId == null || "null".equals(jobId)) {
         jobId = null;
         for (TranscriptionJobControl jc : database.findByMediaPackage(mpId)) {
           if (TranscriptionJobControl.Status.Closed.name().equals(jc.getStatus())
-                  || TranscriptionJobControl.Status.TranscriptionComplete.name().equals(jc.getStatus()))
+                  || TranscriptionJobControl.Status.TranscriptionComplete.name().equals(jc.getStatus())) {
             jobId = jc.getTranscriptionJobId();
+          }
         }
       }
 
-      if (jobId == null)
+      if (jobId == null) {
         throw new TranscriptionServiceException(
                 "No completed or closed transcription job found in database for media package " + mpId);
+      }
 
       // Results already saved?
       URI uri = workspace.getCollectionURI(TRANSCRIPT_COLLECTION, buildResultsFileName(jobId));
       try {
         workspace.get(uri);
       } catch (Exception e) {
-        // Not saved yet so call the ibm watson service to get the results
-        getAndSaveJobResults(jobId);
+        try {
+          // Not saved yet so call the google speech service to get the results
+          getAndSaveJobResults(jobId);
+        } catch (IOException ex) {
+          logger.error("Unable to retrieve transcription job, error: {}", ex.toString());
+        }
       }
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-      return builder.elementFromURI(uri, Attachment.TYPE, new MediaPackageElementFlavor("captions", "ibm-watson-json"));
+      return builder.elementFromURI(uri, Attachment.TYPE, new MediaPackageElementFlavor("captions", "google-speech-json"));
     } catch (TranscriptionDatabaseException e) {
       throw new TranscriptionServiceException("Job id not informed and could not find transcription", e);
     }
   }
 
-  protected CloseableHttpClient makeHttpClient() {
-    CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-    credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(user, psw));
+  /**
+   * Get mediapackage transcription status
+   *
+   * @param mpId, mediapackage id
+   * @return transcription status
+   * @throws TranscriptionServiceException
+   */
+  public String getTranscriptionStatus(String mpId) throws TranscriptionServiceException {
+    try {
+      for (TranscriptionJobControl jc : database.findByMediaPackage(mpId)) {
+        return jc.getStatus();
+      }
+    } catch (TranscriptionDatabaseException e) {
+      throw new TranscriptionServiceException("Mediapackage id transcription status unknown", e);
+    }
+    return "Unknown";
+  }
+
+  protected CloseableHttpClient makeHttpClient() throws IOException {
     RequestConfig reqConfig = RequestConfig.custom().setConnectTimeout(CONNECTION_TIMEOUT)
             .setSocketTimeout(SOCKET_TIMEOUT).setConnectionRequestTimeout(CONNECTION_TIMEOUT).build();
-    return HttpClients.custom().setDefaultCredentialsProvider(credentialsProvider).setDefaultRequestConfig(reqConfig)
+    return HttpClients.custom().setDefaultRequestConfig(reqConfig)
             .build();
   }
 
-  protected void retryOrError(String jobId, String mpId, String errorMsg) throws TranscriptionDatabaseException {
-    logger.warn(errorMsg);
+  protected String refreshAccessToken(String clientId, String clientSecret, String refreshToken)
+          throws TranscriptionServiceException, IOException {
+    CloseableHttpClient httpClient = makeHttpClient();
+    CloseableHttpResponse response = null;
 
-    // TranscriptionJobControl.Status status
-    TranscriptionJobControl jc = database.findByJob(jobId);
-    String trackId = jc.getTrackId();
-    // Current job is still in progress state
-    int attempts = database
-            .findByMediaPackageTrackAndStatus(mpId, trackId, TranscriptionJobControl.Status.Error.name(),
-                    TranscriptionJobControl.Status.Progress.name(), TranscriptionJobControl.Status.Canceled.name())
-            .size();
-    if (attempts < maxAttempts) {
-      // Update state in database to retry
-      database.updateJobControl(jobId, TranscriptionJobControl.Status.Retry.name());
-      logger.info("Will retry transcription for media package {}, track {}", mpId, trackId);
-    } else {
-      // Update state in database to error
-      database.updateJobControl(jobId, TranscriptionJobControl.Status.Error.name());
-      // Send error notification email
-      logger.error("{} transcription attempts exceeded maximum of {} for media package {}, track {}.", attempts,
-              maxAttempts, mpId, trackId);
-      sendEmail("Transcription ERROR", String.format(errorMsg, mpId, jobId));
+    try {
+      HttpPost httpPost = new HttpPost(tokenEndpoint + String.format(
+              "?client_id=%s&client_secret=%s&refresh_token=%s&grant_type=refresh_token",
+              clientId, clientSecret, refreshToken));
+      httpPost.addHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded");
+      response = httpClient.execute(httpPost);
+      int code = response.getStatusLine().getStatusCode();
+      String jsonString = EntityUtils.toString(response.getEntity());
+      JSONParser jsonParser = new JSONParser();
+      JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
+      switch (code) {
+        case HttpStatus.SC_OK: // 200
+          accessToken = (String) jsonObject.get("access_token");
+          long duration = (long) jsonObject.get("expires_in"); // Duration in second
+          tokenExpiryTime = (System.currentTimeMillis() + (duration * 1000)); // time in millisecond
+          if (!INVALID_TOKEN.equals(accessToken)) {
+            logger.info("Google Cloud Service access token created");
+            return accessToken;
+          }
+          return INVALID_TOKEN;
+        case HttpStatus.SC_BAD_REQUEST: // 400
+        case HttpStatus.SC_UNAUTHORIZED: // 401
+          String error = (String) jsonObject.get("error");
+          String errorDetails = (String) jsonObject.get("error_description");
+          logger.warn("Invalid argument returned, status: {}", code);
+          logger.warn("Unable to refresh Google Cloud Serice token, error: {}, error details: {}", error, errorDetails);
+          break;
+        default:
+          logger.warn("Invalid argument returned, status: {}", code);
+      }
+      throw new TranscriptionServiceException(
+              String.format("Could not create Google access token. Status returned: %d", code), code);
+    } catch (TranscriptionServiceException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.warn("Unable to generate access token for Google Cloud Services");
+      return INVALID_TOKEN;
+    } finally {
+      try {
+        httpClient.close();
+        if (response != null) {
+          response.close();
+        }
+      } catch (IOException e) {
+      }
     }
+  }
+
+  protected String getRefreshAccessToken() throws TranscriptionServiceException, IOException {
+    // Check that token hasn't expired
+    if ((!INVALID_TOKEN.equals(accessToken)) && (System.currentTimeMillis() < (tokenExpiryTime - ACCESS_TOKEN_MINIMUN_TIME))) {
+      return accessToken;
+    }
+    return refreshAccessToken(clientId, clientSecret, clientToken);
+  }
+
+  protected String uploadAudioFileToGoogleStorage(String mpId, Track track)
+          throws TranscriptionServiceException, IOException {
+    File audioFile;
+    String audioUrl = null;
+    String fileExtension;
+    int audioRespone;
+    CloseableHttpClient httpClientStorage = makeHttpClient();
+    GoogleSpeechTranscriptionServiceStorage storage = new GoogleSpeechTranscriptionServiceStorage();
+    try {
+      audioFile = workspace.get(track.getURI());
+      fileExtension = FilenameUtils.getExtension(audioFile.getName());
+      long fileSize = audioFile.length();
+      String contentType = track.getMimeType().toString();
+      String token = getRefreshAccessToken();
+      // Upload file to google cloud storage
+      audioRespone = storage.startUpload(httpClientStorage, storageBucket, mpId, fileExtension,
+              audioFile, String.valueOf(fileSize), contentType, token);
+      if (audioRespone == HttpStatus.SC_OK) {
+        audioUrl = String.format("gs://%s/%s.%s", storageBucket, mpId, fileExtension);
+        return audioUrl;
+      }
+      logger.error("Errow when uploading audio to Google Storage, error code: {}", audioRespone);
+      return audioUrl;
+    } catch (Exception e) {
+      throw new TranscriptionServiceException("Error reading audio track", e);
+    }
+  }
+
+  private JSONArray getTranscriptionResult(JSONObject jsonObj) {
+    JSONObject responseObj = (JSONObject) jsonObj.get("response");
+    JSONArray resultsArray = (JSONArray) responseObj.get("results");
+    return resultsArray;
+  }
+
+  protected void deleteStorageFile(String mpId, String token) throws IOException {
+    CloseableHttpClient httpClientDel = makeHttpClient();
+    GoogleSpeechTranscriptionServiceStorage storage = new GoogleSpeechTranscriptionServiceStorage();
+    storage.deleteGoogleStorageFile(httpClientDel, storageBucket, mpId + ".flac", token);
   }
 
   private void sendEmail(String subject, String body) {
@@ -788,10 +851,6 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
   private String buildResultsFileName(String jobId) {
     return PathSupport.toSafeName(jobId + ".json");
-  }
-
-  public boolean isCallbackAlreadyRegistered() {
-    return callbackAlreadyRegistered;
   }
 
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
@@ -871,37 +930,35 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       logger.debug("WorkflowDispatcher waking up...");
 
       try {
-        // Find jobs that are in progress and jobs that had transcription complete i.e. got the callback
+        // Find jobs that are in progress and jobs that had transcription complete
         List<TranscriptionJobControl> jobs = database.findByStatus(TranscriptionJobControl.Status.Progress.name(),
                 TranscriptionJobControl.Status.TranscriptionComplete.name());
-
         for (TranscriptionJobControl j : jobs) {
           String mpId = j.getMediaPackageId();
           String jobId = j.getTranscriptionJobId();
 
-          // If the job in progress, check if it should already have finished and we didn't get the callback for some
-          // reason. This can happen if the admin server was offline when the callback came.
+          // If the job in progress, check if it should already have finished.
           if (TranscriptionJobControl.Status.Progress.name().equals(j.getStatus())) {
             // If job should already have been completed, try to get the results. Consider a buffer factor so that we
             // don't try it too early.
             if (j.getDateCreated().getTime() + j.getTrackDuration() + completionCheckBuffer * 1000 < System
                     .currentTimeMillis()) {
               try {
-                String jobStatus = getAndSaveJobResults(jobId);
-                if (RecognitionJobStatus.FAILED.equals(jobStatus)) {
-                  retryOrError(jobId, mpId,
-                          String.format("Transcription job failed for mpId %s, jobId %s", mpId, jobId));
-                  continue;
-                } else if (RecognitionJobStatus.PROCESSING.equals(jobStatus)) {
-                  // Job still running so check if it should have finished more than N seconds ago
+                if (!getAndSaveJobResults(jobId)) {
+                  // Job still running, not finished, so check if it should have finished more than N seconds ago
                   if (j.getDateCreated().getTime() + j.getTrackDuration()
                           + (completionCheckBuffer + maxProcessingSeconds) * 1000 < System.currentTimeMillis()) {
-                    // Processing for too long, mark job as error or retry and don't check anymore
-                    retryOrError(jobId, mpId, String.format(
-                            "Transcription job was in processing state for too long (media package %s, job id %s)",
+                    // Processing for too long, mark job as cancelled and don't check anymore
+                    database.updateJobControl(jobId, TranscriptionJobControl.Status.Canceled.name());
+                    // Delete file stored on Google storage
+                    String token = getRefreshAccessToken();
+                    deleteStorageFile(mpId, token);
+                    // Send notification email
+                    sendEmail("Transcription ERROR", String.format(
+                            "Transcription job was in processing state for too long and was marked as cancelled (media package %s, job id %s).",
                             mpId, jobId));
                   }
-                  // else job still running, not finished
+                  // else Job still running, not finished
                   continue;
                 }
               } catch (TranscriptionServiceException e) {
@@ -913,53 +970,36 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
                           String.format("Transcription job was not found (media package %s, job id %s).", mpId, jobId));
                 }
                 continue; // Skip this one, exception was already logged
+              } catch (IOException ex) {
+                logger.error("Transcription job not found, error: {}", ex.toString());
               }
-            } else
+            } else {
               continue; // Not time to check yet
+            }
           }
 
-          // Jobs that get here have state TranscriptionCompleted.
+          // Jobs that get here have state TranscriptionCompleted
           try {
+
             // Apply workflow to attach transcripts
             Map<String, String> params = new HashMap<String, String>();
             params.put("transcriptionJobId", jobId);
             String wfId = startWorkflow(mpId, workflowDefinitionId, params);
             if (wfId == null) {
-              logger.warn("Attach transcription workflow could NOT be scheduled for mp {}, watson job {}", mpId, jobId);
+              logger.warn("Attach transcription workflow could NOT be scheduled for mp {}, google speech job {}", mpId, jobId);
               continue;
             }
             // Update state in the database
             database.updateJobControl(jobId, TranscriptionJobControl.Status.Closed.name());
-            logger.info("Attach transcription workflow {} scheduled for mp {}, watson job {}",
+            logger.info("Attach transcription workflow {} scheduled for mp {}, google speech job {}",
                     wfId, mpId, jobId);
           } catch (Exception e) {
-            logger.warn("Attach transcription workflow could NOT be scheduled for mp {}, watson job {}, {}: {}",
+            logger.warn("Attach transcription workflow could NOT be scheduled for mp {}, google speech job {}, {}: {}",
                     mpId, jobId, e.getClass().getName(), e.getMessage());
           }
         }
-
-        if (maxAttempts > 1) {
-          // Find jobs that need to be re-submitted
-          jobs = database.findByStatus(TranscriptionJobControl.Status.Retry.name());
-          HashMap<String, String> params = new HashMap<String, String>();
-          for (TranscriptionJobControl j : jobs) {
-            String mpId = j.getMediaPackageId();
-            String wfId = startWorkflow(mpId, retryWfDefId, params);
-            String jobId = j.getTranscriptionJobId();
-            if (wfId == null) {
-              logger.warn(
-                      "Retry transcription workflow could NOT be scheduled for mp {}, watson job {}. Will try again next time.",
-                      mpId, jobId);
-              // Will try again next time
-              continue;
-            }
-            logger.info("Retry transcription workflow {} scheduled for mp {}.", wfId, mpId);
-            // Retry was submitted, update previously failed job state to error
-            database.updateJobControl(jobId, TranscriptionJobControl.Status.Error.name());
-          }
-        }
       } catch (TranscriptionDatabaseException e) {
-        logger.warn("Could not read/update transcription job control database.", e);
+        logger.warn("Could not read transcription job control database: {}", e.getMessage());
       }
     }
   }
@@ -1007,16 +1047,8 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     return null;
   }
 
-  /**
-   * Allow transcription service to be disabled via config Utility to verify service is active
-   *
-   * @return true if service is enabled, false if service should be skipped
-   */
-  public boolean isEnabled() {
-    return enabled;
-  }
-
   class ResultsFileCleanup implements Runnable {
+
     @Override
     public void run() {
       logger.info("ResultsFileCleanup waking up...");
