@@ -8,7 +8,8 @@ Opencast 6
 
 *Released on April 01, 2019*
 
-- [[MH-13449](https://opencast.jira.com/browse/MH-13449)][[cc11441](https://github.com/opencast/opencast/commit/cc1144125ecda32cbb29afba51ab0ac7efb7ca7e)] -
+- [[MH-13449](https://opencast.jira.com/browse/MH-13449)][[cc11441
+  ](https://github.com/opencast/opencast/commit/cc1144125ecda32cbb29afba51ab0ac7efb7ca7e)] -
   MH-13449, upgrade spring-security-oauth libs
 - [[MH-13464](https://opencast.jira.com/browse/MH-13464)][[#805](https://github.com/opencast/opencast/pull/805)] -
   Update paella player to 6.1.0
