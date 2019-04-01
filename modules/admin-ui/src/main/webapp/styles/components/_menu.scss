@@ -62,25 +62,6 @@
             line-height: 50px;
             @include transition(all .2s);
             color: #c9c9c9;
-
-            &[data-title]:hover:after {
-                display: block;
-                position: absolute;
-                content: attr(data-title);
-                z-index: $max-z;
-                border: $thin-border-stroke #c3cbd0;
-                opacity: 0.9;
-                @include transition(all .2s);
-                @include linear-gradient(top, #fff, #f3f4f4);
-                padding: 0 10px;
-                line-height: 25px;
-                left: 40px;
-                border-radius: 4px;
-                color: $dark-prim-color;
-                font-size: 10px;
-                font-weight: 600;
-                text-transform: uppercase;
-            }
         }
 
         @keyframes fadeIn {
@@ -93,15 +74,6 @@
             100% {
                 opacity: 0.9;
             }
-        }
-
-        .dashboard {
-            @include build-icon(auto, auto, dashboard, 30px, 20px);
-        }
-
-        &:hover  > .dashboard,
-        &:active > .dashboard {
-             @include build-icon(auto, auto, dashboard-on, 30px, 20px);
         }
 
         .events {

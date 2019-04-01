@@ -43,8 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 public class StartTranscriptionOperationHandler extends AbstractWorkflowOperationHandler {
 
@@ -59,30 +57,9 @@ public class StartTranscriptionOperationHandler extends AbstractWorkflowOperatio
   /** The transcription service */
   private TranscriptionService service = null;
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR, "The \"flavor\" of the track to use as audio input");
-    CONFIG_OPTIONS.put(SOURCE_TAG, "The \"tag\" of the track to use as audio input");
-    CONFIG_OPTIONS
-            .put(SKIP_IF_FLAVOR_EXISTS, "If this \"flavor\" is already in the media package, skip this operation");
-  }
-
   @Override
   protected void activate(ComponentContext cc) {
     super.activate(cc);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

@@ -49,8 +49,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Workflow operation handler for copying video data through NFS
@@ -68,17 +66,6 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
 
   /** Configuration key for the name of the target file */
   public static final String OPT_TARGET_FILENAME = "target-filename";
-
-  /** The configuration options for this handler */
-  public static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(OPT_SOURCE_TAGS, "The \"tag\" of the track to use as a source input");
-    CONFIG_OPTIONS.put(OPT_SOURCE_FLAVORS, "The \"flavor\" of the track to use as a source input");
-    CONFIG_OPTIONS.put(OPT_TARGET_DIRECTORY, "The directory where the file must be delivered");
-    CONFIG_OPTIONS.put(OPT_TARGET_FILENAME, "The optional name of the target file");
-  }
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CopyWorkflowOperationHandler.class);

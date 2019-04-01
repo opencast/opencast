@@ -44,11 +44,10 @@ public final class ExternalMetadataUtils {
     // Change subject to subjects.
     MetadataField<?> subject = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     collection.removeField(subject);
-    MetadataField<Iterable<String>> newSubjects; // = //MetadataUtils.copyMetadataField(subject);
-    newSubjects = MetadataField.createIterableStringMetadataField(subject.getInputID(), Opt.some("subjects"),
-            subject.getLabel(), subject.isReadOnly(), subject.isRequired(), subject.isTranslatable(),
-            subject.getCollection(), subject.getCollectionID(), subject.getDelimiter(), subject.getOrder(),
-            subject.getNamespace());
+    MetadataField<Iterable<String>> newSubjects = MetadataField.createIterableStringMetadataField(subject.getInputID(),
+            Opt.some("subjects"), subject.getLabel(), subject.isReadOnly(), subject.isRequired(),
+            subject.isTranslatable(), subject.getCollection(), subject.getCollectionID(), subject.getDelimiter(),
+            subject.getOrder(), subject.getNamespace());
     List<String> subjectNames = new ArrayList<String>();
     if (subject.getValue().isSome()) {
       subjectNames = com.entwinemedia.fn.Stream.$(subject.getValue().get().toString().split(",")).toList();

@@ -75,7 +75,7 @@ public class RoleParsingTest {
 
     assertEquals(expectedRole.getName(), role.getName());
     assertEquals(expectedRole.getDescription(), role.getDescription());
-    assertEquals(expectedRole.getOrganization(), role.getOrganization());
+    assertEquals(expectedRole.getOrganizationId(), role.getOrganizationId());
   }
 
 }

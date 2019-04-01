@@ -158,21 +158,6 @@ public interface EventIndexSchema extends IndexSchema {
    * Scheduler specific fields
    */
 
-  /** The review status */
-  String REVIEW_STATUS = "review_status";
-
-  /** The review date */
-  String REVIEW_DATE = "review_date";
-
-  /** The recording status (opted-out) */
-  String OPTED_OUT = "opted_out";
-
-  /** The recording status (blacklisted) */
-  String BLACKLISTED = "blacklisted";
-
-  /** The scheduling status */
-  String SCHEDULING_STATUS = "scheduling_status";
-
   /** The recording status */
   String RECORDING_STATUS = "recording_status";
 

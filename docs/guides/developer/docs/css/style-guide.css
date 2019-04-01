@@ -505,3 +505,9 @@ dl.images img {
     float: left;
     margin-right: 15px;
 }
+
+.required {
+    color: #E45253;
+    font-size: 90%;
+    font-weight: bold;
+}

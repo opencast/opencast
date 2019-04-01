@@ -25,6 +25,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
+import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -49,7 +50,7 @@ public class SchedulerMessageReceiverImplTest {
   @Test
   public void testUpdateCreator() throws Exception {
     DublinCoreCatalog catalog = DublinCores.read(getClass().getResourceAsStream("/dublincore.xml"));
-    SchedulerItem schedulerItem = SchedulerItem.updateCatalog("uuid", catalog);
+    SchedulerItemList schedulerItem = SchedulerItemList.singleton("uuid", SchedulerItem.updateCatalog(catalog));
 
     // Test initial set of creator
     scheduler.execute(schedulerItem);

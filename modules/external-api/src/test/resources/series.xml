@@ -2,10 +2,8 @@
 <series-list xmlns:ns2="http://index.matterhorn.opencastproject.org">
     <ns2:series>
         <ns2:title>Series 1</ns2:title>
-        <ns2:opt_out>false</ns2:opt_out>
     </ns2:series>
     <ns2:series>
         <ns2:title>Series 2</ns2:title>
-        <ns2:opt_out>false</ns2:opt_out>
     </ns2:series>
 </series-list>

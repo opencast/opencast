@@ -24,6 +24,8 @@ package org.opencastproject.workflow.handler.ingest;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
+import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
@@ -53,8 +55,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Downloads all external URI's to the working file repository and optionally deletes external working file repository
@@ -68,8 +68,14 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
   /** Deleting external working file repository URI's after download config key */
   public static final String DELETE_EXTERNAL = "delete-external";
 
-  /** The configuration properties */
-  protected SortedMap<String, String> configurationOptions = null;
+  /** config key used to specify a list of flavors (seperated by comma), elements matching a flavor will be downloaded */
+  public static final String SOURCE_FLAVORS = "source-flavors";
+
+  /** config key used to specify a list of tags (seperated by comma), elements matching a tag will be downloaded */
+  public static final String SOURCE_TAGS = "source-tags";
+
+  /** config key used to specify, whether both, a tag and a flavor, must match or if one is sufficient */
+  public static final String TAGS_AND_FLAVORS = "tags-and-flavors";
 
   /**
    * The workspace to use in retrieving and storing files.
@@ -81,9 +87,6 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
 
   /** The default no-arg constructor builds the configuration options set */
   public IngestDownloadWorkflowOperationHandler() {
-    configurationOptions = new TreeMap<String, String>();
-    configurationOptions.put(DELETE_EXTERNAL,
-            "Whether to try to delete external working file repository URIs. Default is false.");
   }
 
   /**
@@ -119,11 +122,23 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
 
     boolean deleteExternal = BooleanUtils.toBoolean(currentOperation.getConfiguration(DELETE_EXTERNAL));
+    boolean tagsAndFlavor  = BooleanUtils.toBoolean(currentOperation.getConfiguration(TAGS_AND_FLAVORS));
+    String  sourceFlavors  = getConfig(workflowInstance, SOURCE_FLAVORS, "*/*");
+    String  sourceTags     = getConfig(workflowInstance, SOURCE_TAGS, "");
+
+    // building elementSelector with tags and flavors
+    AbstractMediaPackageElementSelector<MediaPackageElement> elementSelector = new SimpleElementSelector();
+    for (String tag : asList(sourceTags)) {
+      elementSelector.addTag(tag);
+    }
+    for (String flavor: asList(sourceFlavors)) {
+      elementSelector.addFlavor(flavor);
+    }
 
     String baseUrl = workspace.getBaseUri().toString();
 
     List<URI> externalUris = new ArrayList<URI>();
-    for (MediaPackageElement element : mediaPackage.getElements()) {
+    for (MediaPackageElement element : elementSelector.select(mediaPackage, tagsAndFlavor)) {
       if (element.getURI() == null)
         continue;
 
@@ -243,15 +258,5 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
     }
 
     return createResult(mediaPackage, Action.CONTINUE);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return configurationOptions;
   }
 }

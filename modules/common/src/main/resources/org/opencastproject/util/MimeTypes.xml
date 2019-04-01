@@ -100,6 +100,11 @@
     <Extensions>flac</Extensions>
   </MimeType>
   <MimeType>
+    <Type>audio/m4a</Type>
+    <Description>AAC audio</Description>
+    <Extensions>m4a</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>audio/mid</Type>
     <Description>MIDI</Description>
     <Extensions>mid,midi,smf,kar</Extensions>

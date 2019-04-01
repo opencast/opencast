@@ -47,8 +47,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * The workflow definition will run suitable recordings by the video segmentation.
@@ -64,31 +62,11 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
   /** Name of the configuration key that specifies the flavor of the track to analyze */
   private static final String PROP_TARGET_TAGS = "target-tags";
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(PROP_ANALYSIS_TRACK_FLAVOR,
-            "The flavor of the track to analyze. If multiple tracks match this flavor, the first will be used.");
-    CONFIG_OPTIONS.put(PROP_TARGET_TAGS, "The tags to apply to the resulting mpeg-7 segments catalog");
-  }
-
   /** The composer service */
   private VideoSegmenterService videosegmenter = null;
 
   /** The local workspace */
   private Workspace workspace = null;
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
 
   /**
    * {@inheritDoc}

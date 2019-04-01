@@ -41,8 +41,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This dictionary implementation is a dummy implementation which which will
- * just let the whole text pass through without any kind of filtering.
+ * This dictionary service implementation applies a pattern
+ * to an input string - as many times as it matches - and
+ * returns the matches, separated by a space character.
  */
 public class DictionaryServiceImpl implements DictionaryService, ManagedService {
 

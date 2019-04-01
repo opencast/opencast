@@ -42,12 +42,6 @@ angular.module('adminNg.controllers')
         name:  'updated',
         label: 'RECORDINGS.RECORDINGS.TABLE.UPDATED',
         sortable: true
-        //}, {
-        //    name:  'blacklist_from',
-        //    label: 'USERS.USERS.TABLE.BLACKLIST_FROM'
-        //}, {
-        //    name:  'blacklist_to',
-        //    label: 'USERS.USERS.TABLE.BLACKLIST_TO'
       }, {
         template: 'modules/recordings/partials/recordingActionsCell.html',
         label:    'RECORDINGS.RECORDINGS.TABLE.ACTION'

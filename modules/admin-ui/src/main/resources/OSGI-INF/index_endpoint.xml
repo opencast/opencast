@@ -11,7 +11,7 @@
     <provide interface="org.opencastproject.adminui.endpoint.IndexEndpoint"/>
   </service>
   <reference name="AdminUISearchIndex"
-             interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"
+             interface="org.opencastproject.adminui.index.AdminUISearchIndex"
              cardinality="1..1"
              policy="static"
              bind="setAdminUISearchIndex"/>

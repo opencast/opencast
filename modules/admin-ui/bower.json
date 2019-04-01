@@ -2,17 +2,19 @@
   "name": "adminui",
   "version": "0.0.0",
   "dependencies": {
+    "jquery": "components/jquery#1.12",
+    "jquery-ui": "1.12",
     "angular": "1.5.11",
     "angular-route": "1.5.11",
     "angular-resource": "1.5.11",
     "angular-animate": "1.5.11",
     "angular-messages": "1.5.11",
-    "angular-md5": "0.1.8",
     "angular-translate": "2.18.1",
     "angular-translate-loader-static-files": "2.18.1",
     "angular-local-storage": "0.7.1",
     "angular-wizard": "0.6.0",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0",
+    "angular-ui-sortable": "0.14.4",
     "ng-file-upload": "2.0.5"
   },
   "devDependencies": {

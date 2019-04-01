@@ -23,11 +23,9 @@
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
 .controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource',
-  'SeriesThemeResource', 'ResourcesListResource', 'UserRolesResource', 'Notifications', 'OptoutSingleResource',
-  'SeriesParticipationResource', 'AuthService',
+  'SeriesThemeResource', 'ResourcesListResource', 'UserRolesResource', 'Notifications', 'AuthService',
   function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource,
-    ResourcesListResource, UserRolesResource, Notifications, OptoutSingleResource, SeriesParticipationResource,
-    AuthService) {
+    ResourcesListResource, UserRolesResource, Notifications, AuthService) {
 
     var roleSlice = 100;
     var roleOffset = 0;
@@ -118,19 +116,6 @@ angular.module('adminNg.controllers')
       $scope.accessSave();
     };
 
-    $scope.updateOptout = function (newBoolean) {
-
-      OptoutSingleResource.save({
-        resource: 'series',
-        id: $scope.resourceId,
-        optout: newBoolean
-      }, function () {
-        Notifications.add('success', 'SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS', 'series-participation');
-      }, function () {
-        Notifications.add('error', 'SERIES_PARTICIPATION_STATUS_UPDATE_ERROR', 'series-participation');
-      });
-    };
-
     $scope.getMoreRoles = function (value) {
 
       if (loading)
@@ -207,7 +192,6 @@ angular.module('adminNg.controllers')
         }
       });
 
-      $scope.participation = SeriesParticipationResource.get({ id: id });
       $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
       $scope.actions = {};
       $scope.hasActions = false;

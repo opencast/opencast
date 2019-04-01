@@ -39,7 +39,7 @@ The GenericUrlSigningProvider that comes with Opencast has its own configuration
 All signing providers follow the same configuration structure and support multiple configuration blocks, providing the
 settings for separate distributions (i.e. download or streaming servers, services or paths).
 
-Each configuration block consists of the following items:
+Each signing key configuration consists of the following attributes:
 
 * **Key ID:** Key identifier, e.g. `demoKeyOne`
 * **Key secret:** Key value, e.g. `25DA2BA549CB62EF297977845259A`. The key-length is not predefined, but a key length of
@@ -49,19 +49,11 @@ Each configuration block consists of the following items:
 
 A typical configuration looks like this:
 
-    id.1=demoKeyOne
-    key.1=6EDB5EDDCF994B7432C371D7C274F
-    url.1=http://download.opencast.org/engage
+    key.demoKeyOne.secret=6EDB5EDDCF994B7432C371D7C274F
+    key.demoKeyOne.url=http://download.opencast.org/engage
 
-    id.2=demoKeyTwo
-    key.2=6EDB5EDDCF994B7432C371D7C274F
-    url.2=http://download.opencast.org/custom
-
-The properties defined in the configuration file take a numeric suffix that must start at `1` and increase in single
-increments. In the example above these can be seen as: `.1` and `.2`. As soon as there is a missing number it will stop
-looking for further entries.
-
-Note that id and key form a fixed pair, while the same key can be used in more than one configuration block.
+    key.demoKeyTwo.secret=6EDB5EDDCF994B7432C371D7C274F
+    key.demoKeyTwo.url=http://download.opencast.org/custom
 
 Configuration of URL Signing Timeout Values
 -------------------------------------------
@@ -148,17 +140,11 @@ The configuration is located at:
 
     etc/org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl.cfg
 
-First of all, the key pairs used to sign must be configured in order to allow the filter to verify the signatures. More
-than one key pair can be defined by increasing the counter (1, 2, 3, ...) in steps of 1. If you miss any numbers it will
-stop looking for further configurations.
-
 Example:
 
-    id.1=demoKeyOne
-    key.1=6EDB5EDDCF994B7432C371D7C274F
+    key.demoKeyOne=6EDB5EDDCF994B7432C371D7C274F
 
-    id.2=demoKeyTwo
-    key.2=C843C21ECF59F2B38872A1BCAA774
+    key.demoKeyTwo=C843C21ECF59F2B38872A1BCAA774
 
 The entries in this file need to have the same values for the signing providers configuration.
 
@@ -183,11 +169,11 @@ Example:
 
     strict=true
 
-    url.regex.1=.*files\/collection\/.*
-    url.regex.2=.*files\/mediapackage\/.*
-    url.regex.3=(?\=(.*staticfiles.*))(?=^(?!.*staticfiles.*url|.*docs.*).*$)(.*)
-    url.regex.4=.*archive\/archive\/mediapackage\/.*\/.*\/.*
-    url.regex.5=.*static.*
+    url.regex.collection=.*files\/collection\/.*
+    url.regex.mediapackage=.*files\/mediapackage\/.*
+    url.regex.staticfiles=(?\=(.*staticfiles.*))(?=^(?!.*staticfiles.*url|.*docs.*).*$)(.*)
+    url.regex.archive=.*archive\/archive\/mediapackage\/.*\/.*\/.*
+    url.regex.static=.*static.*
 
 Testing
 -------

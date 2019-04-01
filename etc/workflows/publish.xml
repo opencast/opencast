@@ -106,6 +106,27 @@
 
     <!-- Apply the default workflow configuration -->
 
+    <!--
+    The following operation allows you to import properties from
+    a Java properties file, which might have been created by the
+    upload-and-schedule workflow.
+    However, whatever you import here will override the choices
+    your users made in the configuration panel. That's why it is
+    commented.
+    -->
+    <!--
+    <operation
+      id="import-wf-properties"
+      fail-on-error="true"
+      exception-handler-workflow="ng-partial-error"
+      description="Import workflow settings from Java properties file">
+      <configurations>
+        <configuration key="source-flavor">processing/defaults</configuration>
+        <configuration key="keys">publishToSearch</configuration>
+      </configurations>
+    </operation>
+    -->
+
     <operation
       id="defaults"
       description="Applying default configuration values">

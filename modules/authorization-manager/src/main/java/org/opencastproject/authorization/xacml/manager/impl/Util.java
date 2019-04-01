@@ -21,52 +21,17 @@
 
 package org.opencastproject.authorization.xacml.manager.impl;
 
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.workflow.api.ConfiguredWorkflowRef.workflow;
-
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Tuple;
-import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
-
-import org.json.simple.JSONValue;
-
-import java.util.Map;
 
 /**
  * General helper functions.
  */
 public final class Util {
   private Util() {
-  }
-
-  /**
-   * @return none if workflowId is none
-   */
-  public static Option<ConfiguredWorkflowRef> createConfiguredWorkflowRef(Option<String> workflowId,
-          final Option<String> jsonParams) {
-    for (String wid : workflowId) {
-      for (String p : jsonParams) {
-        return some(workflow(wid, (Map<String, String>) JSONValue.parse(p)));
-      }
-      return some(workflow(wid));
-    }
-    return none();
-  }
-
-  /**
-   * @return (workflowId, workflowParamJson)
-   */
-  public static Tuple<Option<String>, Option<String>> splitConfiguredWorkflowRef(Option<ConfiguredWorkflowRef> workflow) {
-    for (ConfiguredWorkflowRef a : workflow) {
-      return tuple(some(a.getWorkflowId()), some(JSONValue.toJSONString(a.getParameters())));
-    }
-    return tuple(Option.<String> none(), Option.<String> none());
   }
 
   public static final Function<ManagedAcl, AccessControlList> toAcl = new Function<ManagedAcl, AccessControlList>() {

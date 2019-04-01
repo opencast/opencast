@@ -53,8 +53,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * The workflow definition for handling "compose" operations
@@ -63,23 +61,6 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ComposeWorkflowOperationHandler.class);
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put("source-flavors", "The \"flavor\" of the track to use as a source input");
-    CONFIG_OPTIONS.put("source-tags", "The \"tag\" of the track to use as a source input");
-    CONFIG_OPTIONS.put("encoding-profiles", "The encoding profile(s) to use");
-    CONFIG_OPTIONS.put("target-flavor", "The flavor to apply to the encoded file");
-    CONFIG_OPTIONS.put("target-tags", "The tags to apply to the encoded file");
-    CONFIG_OPTIONS.put("audio-only", "Set to 'true' to process tracks containing only audio streams");
-    CONFIG_OPTIONS.put("video-only", "Set to 'true' to process tracks containing only video streams");
-    // Only process the first file that matches tags/flavors
-    CONFIG_OPTIONS.put("process-first-match-only",
-            "Set to 'true' indicates only one track will be processed if more are selected");
-  }
 
   /** The composer service */
   private ComposerService composerService = null;
@@ -106,16 +87,6 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

@@ -26,16 +26,15 @@ angular.module('adminNg.controllers')
   '$scope', 'Notifications', 'EventTransactionResource', 'EventMetadataResource', 'EventAssetsResource',
   'EventAssetCatalogsResource', 'CommentResource', 'EventWorkflowsResource', 'EventWorkflowActionResource',
   'EventWorkflowDetailsResource', 'ResourcesListResource', 'UserRolesResource', 'EventAccessResource',
-  'EventPublicationsResource', 'OptoutsResource', 'EventParticipationResource', 'EventSchedulingResource',
-  'NewEventProcessingResource', 'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language',
-  'JsHelper', '$sce', '$timeout', 'EventHelperService', 'UploadAssetOptions', 'EventUploadAssetResource', 'Table',
-  'SchedulingHelperService',
+  'EventPublicationsResource', 'EventSchedulingResource','NewEventProcessingResource', 'CaptureAgentsResource',
+  'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService', 'UploadAssetOptions',
+  'EventUploadAssetResource', 'Table', 'SchedulingHelperService',
   function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource,
     EventAssetCatalogsResource, CommentResource, EventWorkflowsResource, EventWorkflowActionResource,
     EventWorkflowDetailsResource, ResourcesListResource, UserRolesResource, EventAccessResource,
-    EventPublicationsResource, OptoutsResource, EventParticipationResource, EventSchedulingResource,
-    NewEventProcessingResource, OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper,
-    $sce, $timeout, EventHelperService, UploadAssetOptions, EventUploadAssetResource, Table, SchedulingHelperService) {
+    EventPublicationsResource, EventSchedulingResource, NewEventProcessingResource, CaptureAgentsResource,
+    ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
+    EventUploadAssetResource, Table, SchedulingHelperService) {
 
     var roleSlice = 100;
     var roleOffset = 0;
@@ -375,13 +374,6 @@ angular.module('adminNg.controllers')
 
           $scope.assets = EventAssetsResource.get({ id: id });
 
-          $scope.participation = EventParticipationResource.get({ id: id }, function (data) {
-            if (data.read_only) {
-              $scope.lastNotificationId = Notifications.add('warning', 'EVENT_PARTICIPATION_STATUS_READONLY',
-                'event-scheduling', -1);
-            }
-          });
-
           $scope.setWorkflowDefinitions = function (workflowDefinitions) {
             $scope.workflowDefinitions = workflowDefinitions;
             $scope.workflowDefinitionIds = workflowDefinitions.map(function (w) {return w.id;});
@@ -641,20 +633,6 @@ angular.module('adminNg.controllers')
       return [{
         uri: url
       }];
-    };
-
-    $scope.updateOptout = function (newBoolean) {
-
-      OptoutSingleResource.save({
-        resource: 'event',
-        id: $scope.resourceId,
-        optout: newBoolean
-      }, function () {
-        Notifications.add('success', 'EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS', 'event-scheduling');
-      }, function () {
-        Notifications.add('error', 'EVENT_PARTICIPATION_STATUS_UPDATE_ERROR', 'event-scheduling');
-      });
-
     };
 
     me.loadingWorkflow = true;

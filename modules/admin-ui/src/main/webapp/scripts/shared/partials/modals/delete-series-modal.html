@@ -35,7 +35,7 @@
                     <input type="checkbox" ng-model="allSelected" ng-change="allSelectedChanged()" class="select-all-cbox">
                   </th>
                   <th translate="EVENTS.SERIES.TABLE.TITLE"><!-- Series --></th>
-                  <th translate="EVENTS.SERIES.TABLE.CREATORS"><!-- Organizer(s) --></th>
+                  <th translate="EVENTS.SERIES.TABLE.ORGANIZERS"><!-- Organizer(s) --></th>
                   <th translate="EVENTS.SERIES.TABLE.HAS_EVENTS"><!-- Has events --></th>
                 </tr>
               </thead>
@@ -45,7 +45,9 @@
                     <input type="checkbox" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox">
                   </td>
                   <td>{{ row.title }}</td>
-                  <td>{{ row.creator }}</td>
+                  <td>
+                    <span class="metadata-entry" ng-repeat="creator in row.creators">{{ creator }}</span>
+                  </td>
                   <td ng-class="row.hasEvents == true ? 'fa fa-check' : ''"></td>
                 </tr>
               </tbody>

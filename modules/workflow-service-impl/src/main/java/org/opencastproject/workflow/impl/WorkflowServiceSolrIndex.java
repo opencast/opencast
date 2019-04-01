@@ -303,11 +303,11 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
         WorkflowInstance instance = null;
         try {
           instance = WorkflowParser.parseWorkflowInstance(payload);
-          Organization organization = instance.getOrganization();
+          Organization organization = orgDirectory.getOrganization(instance.getOrganizationId());
           securityService.setOrganization(organization);
           securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
           index(instance);
-        } catch (WorkflowParsingException | WorkflowDatabaseException e) {
+        } catch (WorkflowParsingException | WorkflowDatabaseException | NotFoundException e) {
           logger.warn("Skipping restoring of workflow {}", payload, e);
         }
         if (current % 100 == 0) {
@@ -494,7 +494,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
     User workflowCreator = instance.getCreator();
     doc.addField(WORKFLOW_CREATOR_KEY, workflowCreator.getUsername());
-    doc.addField(ORG_KEY, instance.getOrganization().getId());
+    doc.addField(ORG_KEY, instance.getOrganizationId());
 
     // Media package used to get the active acl
     MediaPackage aclMp = mp;

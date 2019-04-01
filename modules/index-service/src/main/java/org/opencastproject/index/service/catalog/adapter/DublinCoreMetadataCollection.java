@@ -29,6 +29,7 @@ import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
 import com.entwinemedia.fn.data.Opt;
+import com.google.common.collect.Iterables;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -36,8 +37,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
   private static final Logger logger = LoggerFactory.getLogger(DublinCoreMetadataCollection.class);
@@ -88,10 +92,26 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
   }
 
   public void addField(MetadataField<?> metadataField, String value, ListProvidersService listProvidersService) {
+    addField(metadataField, Collections.singletonList(value), listProvidersService);
+  }
+
+  public void addField(MetadataField<?> metadataField, List<String> values, ListProvidersService listProvidersService) {
+
+    List<String> filteredValues = values.stream()
+            .filter(StringUtils::isNotBlank)
+            .collect(Collectors.toList());
 
     String defaultKey = getCollectionDefault(metadataField, listProvidersService);
-    if (StringUtils.isBlank(value) && StringUtils.isNotBlank(defaultKey)) {
-      value = defaultKey;
+
+    if (StringUtils.isNotBlank(defaultKey) && filteredValues.isEmpty()) {
+      filteredValues.add(defaultKey);
+    }
+
+    if (filteredValues.size() > 1
+            && metadataField.getType() != MetadataField.Type.MIXED_TEXT
+            && metadataField.getType() != MetadataField.Type.ITERABLE_TEXT) {
+      logger.warn("Cannot put multiple values into a single-value field, only the last value is used. {}",
+              Arrays.toString(filteredValues.toArray()));
     }
 
     switch (metadataField.getType()) {
@@ -99,8 +119,8 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
         MetadataField<Boolean> booleanField = MetadataField.createBooleanMetadata(metadataField.getInputID(),
                 Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
                 metadataField.isRequired(), metadataField.getOrder(), metadataField.getNamespace());
-        if (StringUtils.isNotBlank(value)) {
-          booleanField.setValue(Boolean.parseBoolean(value));
+        if (!filteredValues.isEmpty()) {
+          booleanField.setValue(Boolean.parseBoolean(Iterables.getLast(filteredValues)));
         }
         addField(booleanField);
         break;
@@ -112,8 +132,8 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
                 Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
                 metadataField.isRequired(), metadataField.getPattern().get(), metadataField.getOrder(),
                 metadataField.getNamespace());
-        if (StringUtils.isNotBlank(value)) {
-          dateField.setValue(EncodingSchemeUtils.decodeDate(value));
+        if (!filteredValues.isEmpty()) {
+          dateField.setValue(EncodingSchemeUtils.decodeDate(Iterables.getLast(filteredValues)));
         }
         addField(dateField);
         break;
@@ -124,28 +144,31 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
                 getCollection(metadataField, listProvidersService),
                 metadataField.getCollectionID(), metadataField.getOrder(), metadataField.getNamespace());
 
-        DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value);
-        Long longValue = -1L;
+        if (!filteredValues.isEmpty()) {
+          String value = Iterables.getLast(filteredValues);
+          DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value);
+          Long longValue = -1L;
 
-        // Check to see if it is from the front end
-        String[] durationParts = value.split(":");
-        if (durationParts.length == 3) {
-          Integer hours = Integer.parseInt(durationParts[0]);
-          Integer minutes = Integer.parseInt(durationParts[1]);
-          Integer seconds = Integer.parseInt(durationParts[2]);
-          longValue = ((hours.longValue() * 60 + minutes.longValue()) * 60 + seconds.longValue()) * 1000;
-        } else if (period != null && period.hasStart() && period.hasEnd()) {
-          longValue = period.getEnd().getTime() - period.getStart().getTime();
-        } else {
-          try {
-            longValue = Long.parseLong(value);
-          } catch (NumberFormatException e) {
-            logger.debug("Unable to parse duration '{}' value as either a period or millisecond duration.", value);
-            longValue = -1L;
+          // Check to see if it is from the front end
+          String[] durationParts = value.split(":");
+          if (durationParts.length == 3) {
+            Integer hours = Integer.parseInt(durationParts[0]);
+            Integer minutes = Integer.parseInt(durationParts[1]);
+            Integer seconds = Integer.parseInt(durationParts[2]);
+            longValue = ((hours.longValue() * 60 + minutes.longValue()) * 60 + seconds.longValue()) * 1000;
+          } else if (period != null && period.hasStart() && period.hasEnd()) {
+            longValue = period.getEnd().getTime() - period.getStart().getTime();
+          } else {
+            try {
+              longValue = Long.parseLong(value);
+            } catch (NumberFormatException e) {
+              logger.debug("Unable to parse duration '{}' value as either a period or millisecond duration.", value);
+              longValue = -1L;
+            }
           }
-        }
-        if (longValue > 0) {
-          durationField.setValue(longValue.toString());
+          if (longValue > 0) {
+            durationField.setValue(longValue.toString());
+          }
         }
         addField(durationField);
         break;
@@ -157,8 +180,8 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
                 getCollectionIsTranslatable(metadataField, listProvidersService),
                 getCollection(metadataField, listProvidersService), metadataField.getCollectionID(),
                 metadataField.getDelimiter(), metadataField.getOrder(), metadataField.getNamespace());
-        if (StringUtils.isNotBlank(value)) {
-          iterableTextField.setValue(Arrays.asList(value));
+        if (!filteredValues.isEmpty()) {
+          iterableTextField.setValue(filteredValues);
         }
         addField(iterableTextField);
         break;
@@ -170,8 +193,8 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
                 getCollectionIsTranslatable(metadataField, listProvidersService),
                 getCollection(metadataField, listProvidersService), metadataField.getCollectionID(),
                 metadataField.getDelimiter(), metadataField.getOrder(), metadataField.getNamespace());
-        if (StringUtils.isNotBlank(value)) {
-          mixedIterableTextField.setValue(Arrays.asList(value));
+        if (!filteredValues.isEmpty()) {
+          mixedIterableTextField.setValue(filteredValues);
         }
         addField(mixedIterableTextField);
         break;
@@ -181,8 +204,8 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
                 metadataField.isRequired(), getCollectionIsTranslatable(metadataField, listProvidersService),
                 getCollection(metadataField, listProvidersService),
                 metadataField.getCollectionID(), metadataField.getOrder(), metadataField.getNamespace());
-        if (StringUtils.isNotBlank(value)) {
-          longField.setValue(Long.parseLong(value));
+        if (!filteredValues.isEmpty()) {
+          longField.setValue(Long.parseLong(Iterables.getLast(filteredValues)));
         }
         addField(longField);
         break;
@@ -192,8 +215,8 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
                 metadataField.isRequired(), getCollectionIsTranslatable(metadataField, listProvidersService),
                 getCollection(metadataField, listProvidersService),
                 metadataField.getCollectionID(), metadataField.getOrder(), metadataField.getNamespace());
-        if (StringUtils.isNotBlank(value)) {
-          textField.setValue(value);
+        if (!filteredValues.isEmpty()) {
+          textField.setValue(Iterables.getLast(filteredValues));
         }
         addField(textField);
         break;
@@ -203,8 +226,8 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
                 metadataField.isRequired(), getCollectionIsTranslatable(metadataField, listProvidersService),
                 getCollection(metadataField, listProvidersService),
                 metadataField.getCollectionID(), metadataField.getOrder(), metadataField.getNamespace());
-        if (StringUtils.isNotBlank(value)) {
-          textLongField.setValue(value);
+        if (!filteredValues.isEmpty()) {
+          textLongField.setValue(Iterables.getLast(filteredValues));
         }
         addField(textLongField);
         break;
@@ -216,8 +239,8 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
                 Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
                 metadataField.isRequired(), metadataField.getPattern().get(), metadataField.getOrder(),
                 metadataField.getNamespace());
-        if (StringUtils.isNotBlank(value)) {
-          startDate.setValue(value);
+        if (!filteredValues.isEmpty()) {
+          startDate.setValue(Iterables.getLast(filteredValues));
         }
         addField(startDate);
         break;
@@ -227,8 +250,8 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
             metadataField.isRequired(), getCollectionIsTranslatable(metadataField, listProvidersService),
             getCollection(metadataField, listProvidersService),
             metadataField.getCollectionID(), metadataField.getOrder(), metadataField.getNamespace());
-        if (StringUtils.isNotBlank(value)) {
-          orderedTextField.setValue(value);
+        if (!filteredValues.isEmpty()) {
+          orderedTextField.setValue(Iterables.getLast(filteredValues));
         }
         addField(orderedTextField);
         break;

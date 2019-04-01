@@ -1193,7 +1193,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
       switch (op) {
         case Distribute:
           MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds);
-          if (logger.isDebugEnabled()) {
+          if (logger.isDebugEnabled() && distributedElements != null) {
             for (MediaPackageElement element : distributedElements)
               if (element != null)
                 logger.debug("Distributed element {} with URL {}", element.getIdentifier(), element.getURI());
@@ -1211,7 +1211,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
           if (distributionDirectory != null) {
             if (streamingUri != null || adaptiveStreamingUri != null) {
               retractedElements = retractElements(channelId, mediapackage, elementIds);
-              if (logger.isDebugEnabled()) {
+              if (logger.isDebugEnabled() && retractedElements != null) {
                 for (MediaPackageElement element : retractedElements)
                   if (element != null)
                     logger.debug("Retracted element {} with URL {}", element.getIdentifier(), element.getURI());

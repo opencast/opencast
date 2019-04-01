@@ -20,20 +20,6 @@
  */
 .modal {
 
-    // Server Details View
-    // ----------------------------------------
-
-    &#server-details-modal {
-
-        // Modal Size
-        @extend .large-modal;
-
-        .modal-ios {
-            margin: 0;
-        }
-    }
-
-
     // Confirm Modal View
     // ----------------------------------------
 

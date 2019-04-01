@@ -45,7 +45,6 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.identifier.HandleException;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -56,14 +55,13 @@ import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.security.api.AccessControlEntry;
-import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -95,6 +93,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.http.Header;
@@ -128,6 +127,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -192,11 +192,38 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The key to look for in the service configuration file to override the {@link DEFAULT_INGEST_ZIP_JOB_LOAD} */
   public static final String ZIP_JOB_LOAD_KEY = "job.load.ingest.zip";
 
+  /** The source to download from  */
+  public static final String DOWNLOAD_SOURCE = "org.opencastproject.download.source";
+
+  /** The user for download from external sources */
+  public static final String DOWNLOAD_USER = "org.opencastproject.download.user";
+
+  /** The password for download from external sources */
+  public static final String DOWNLOAD_PASSWORD = "org.opencastproject.download.password";
+
+  /** By default, do not allow event ingest to modify existing series metadata */
+  static final boolean DEFAULT_ALLOW_SERIES_MODIFICATIONS = false;
+
+  /** Control if catalogs sent by capture agents for scheduled events are skipped. */
+  private static final String SKIP_CATALOGS_KEY = "skip.catalogs.for.existing.events";
+
+  /** Control if attachments sent by capture agents for scheduled events are skipped. */
+  private static final String SKIP_ATTACHMENTS_KEY = "skip.attachments.for.existing.events";
+
   /** The approximate load placed on the system by ingesting a file */
   private float ingestFileJobLoad = DEFAULT_INGEST_FILE_JOB_LOAD;
 
   /** The approximate load placed on the system by ingesting a zip file */
   private float ingestZipJobLoad = DEFAULT_INGEST_ZIP_JOB_LOAD;
+
+  /** The user for download from external sources */
+  private static String downloadUser = DOWNLOAD_USER;
+
+  /** The password for download from external sources */
+  private static String downloadPassword = DOWNLOAD_PASSWORD;
+
+  /** The external source dns name */
+  private static String downloadSource = DOWNLOAD_SOURCE;
 
   /** The JMX business object for ingest statistics */
   private IngestStatistics ingestStatistics = new IngestStatistics();
@@ -247,11 +274,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   private Cache<String, Long> partialTrackStartTimes = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.DAYS)
           .build();
 
-  /** The default is to overwrite series catalog on ingest */
-  protected boolean defaultIsOverWriteSeries = true;
+  /** Option, if an event ingest may modify metadata from existing series */
+  private boolean allowSeriesModifications = DEFAULT_ALLOW_SERIES_MODIFICATIONS;
 
-  /** Option to overwrite series on ingest */
-  protected boolean isOverwriteSeries = defaultIsOverWriteSeries;
+  private boolean skipCatalogs = true;
+  private boolean skipAttachments = true;
 
   /**
    * Creates a new ingest service instance.
@@ -297,19 +324,28 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       return;
     }
 
+    downloadPassword = StringUtils.trimToEmpty((String)properties.get(DOWNLOAD_PASSWORD));
+    downloadUser = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_USER)));
+    downloadSource = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_SOURCE)));
+
+    skipAttachments = BooleanUtils.toBoolean(Objects.toString(properties.get(SKIP_ATTACHMENTS_KEY), "true"));
+    skipCatalogs = BooleanUtils.toBoolean(Objects.toString(properties.get(SKIP_CATALOGS_KEY), "true"));
+    logger.debug("Skip attachments sent by agents for scheduled events: {}", skipAttachments);
+    logger.debug("Skip metadata catalogs sent by agents for scheduled events: {}", skipCatalogs);
+
     ingestFileJobLoad = LoadUtil.getConfiguredLoadValue(properties, FILE_JOB_LOAD_KEY, DEFAULT_INGEST_FILE_JOB_LOAD,
             serviceRegistry);
     ingestZipJobLoad = LoadUtil.getConfiguredLoadValue(properties, ZIP_JOB_LOAD_KEY, DEFAULT_INGEST_ZIP_JOB_LOAD,
             serviceRegistry);
     // try to get overwrite series option from config, use default if not configured
     try {
-      isOverwriteSeries = Boolean.parseBoolean(((String) properties.get(PROPKEY_OVERWRITE_SERIES)).trim());
+      allowSeriesModifications = Boolean.parseBoolean(((String) properties.get(PROPKEY_OVERWRITE_SERIES)).trim());
     } catch (Exception e) {
-      isOverwriteSeries = defaultIsOverWriteSeries;
+      allowSeriesModifications = DEFAULT_ALLOW_SERIES_MODIFICATIONS;
       logger.warn("Unable to update configuration. {}", e.getMessage());
     }
     logger.info("Configuration updated. It is {} that existing series will be overwritten during ingest.",
-            isOverwriteSeries);
+            allowSeriesModifications);
   }
 
   /**
@@ -599,7 +635,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @see org.opencastproject.ingest.api.IngestService#createMediaPackage()
    */
   @Override
-  public MediaPackage createMediaPackage() throws MediaPackageException, ConfigurationException, HandleException {
+  public MediaPackage createMediaPackage() throws MediaPackageException, ConfigurationException {
     MediaPackage mediaPackage;
     try {
       mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
@@ -619,7 +655,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   @Override
   public MediaPackage createMediaPackage(String mediaPackageId)
-          throws MediaPackageException, ConfigurationException, HandleException {
+          throws MediaPackageException, ConfigurationException {
     MediaPackage mediaPackage;
     try {
       mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
@@ -867,7 +903,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         try {
           try {
             seriesService.getSeries(id);
-            if (isOverwriteSeries) {
+            if (allowSeriesModifications) {
               // Update existing series
               seriesService.updateSeries(dc);
               isUpdated = true;
@@ -879,9 +915,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             logger.info("Creating new series {} with default ACL", id);
             seriesService.updateSeries(dc);
             isUpdated = true;
-            String anonymousRole = securityService.getOrganization().getAnonymousRole();
-            AccessControlList acl = new AccessControlList(new AccessControlEntry(anonymousRole, "read", true));
-            seriesService.updateAccessControl(id, acl);
           }
 
         } catch (Exception e) {
@@ -1210,7 +1243,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
     try {
       schedulerService.addEvent(period.getStart(), period.getEnd(), captureAgent, new HashSet<>(), mediaPackage,
-              workflowProperties, agentProperties, Opt.none(), Opt.none(), "ingest-service");
+              workflowProperties, agentProperties, Opt.none());
     } finally {
       for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
         try {
@@ -1326,7 +1359,22 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
   }
 
-  private void mergeMediaPackageElements(MediaPackage mp, MediaPackage scheduledMp) {
+  private void mergeMediaPackageElements(final MediaPackage mp, final MediaPackage scheduledMp) {
+    // drop catalogs sent by the capture agent in favor of Opencast's own metadata
+    if (skipCatalogs) {
+      for (MediaPackageElement element : mp.getCatalogs()) {
+        mp.remove(element);
+      }
+    }
+
+    // drop attachments the capture agent sent us in favor of Opencast's attachments
+    // e.g. prevent capture agents from modifying security rules of schedules events
+    if (skipAttachments) {
+      for (MediaPackageElement element : mp.getAttachments()) {
+        mp.remove(element);
+      }
+    }
+
     for (MediaPackageElement element : scheduledMp.getElements()) {
       // Asset manager media package may have a publication element (for live) if retract live has not run yet
       if (element.getFlavor() != null
@@ -1345,25 +1393,29 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     // Merge media package fields
     if (mp.getDate() == null)
       mp.setDate(scheduledMp.getDate());
-    if (isBlank(mp.getLicense()))
+
+    if (skipCatalogs || isBlank(mp.getLicense()))
       mp.setLicense(scheduledMp.getLicense());
-    if (isBlank(mp.getSeries()))
+    if (skipCatalogs || isBlank(mp.getSeries()))
       mp.setSeries(scheduledMp.getSeries());
-    if (isBlank(mp.getSeriesTitle()))
+    if (skipCatalogs || isBlank(mp.getSeriesTitle()))
       mp.setSeriesTitle(scheduledMp.getSeriesTitle());
-    if (isBlank(mp.getTitle()))
+    if (skipCatalogs || isBlank(mp.getTitle()))
       mp.setTitle(scheduledMp.getTitle());
-    if (mp.getSubjects().length == 0) {
+    if (skipCatalogs || mp.getSubjects().length == 0) {
+      Arrays.stream(mp.getSubjects()).forEach(mp::removeSubject);
       for (String subject : scheduledMp.getSubjects()) {
         mp.addSubject(subject);
       }
     }
-    if (mp.getContributors().length == 0) {
+    if (skipCatalogs || mp.getContributors().length == 0) {
+      Arrays.stream(mp.getContributors()).forEach(mp::removeContributor);
       for (String contributor : scheduledMp.getContributors()) {
         mp.addContributor(contributor);
       }
     }
-    if (mp.getCreators().length == 0) {
+    if (skipCatalogs || mp.getCreators().length == 0) {
+      Arrays.stream(mp.getCreators()).forEach(mp::removeCreator);
       for (String creator : scheduledMp.getCreators()) {
         mp.addCreator(creator);
       }
@@ -1478,13 +1530,30 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     logger.info("Sucessful discarded mediapackage {}", mp);
   }
 
+  /**
+   * Creates a StandAloneTrustedHttpClientImpl
+   *
+   * @param user
+   * @param password
+   * @return
+   */
+  protected TrustedHttpClient createStandaloneHttpClient(String user, String password) {
+    return new StandAloneTrustedHttpClientImpl(this.downloadUser, this.downloadPassword, none(), none(), none());
+  }
+
   protected URI addContentToRepo(MediaPackage mp, String elementId, URI uri) throws IOException {
     InputStream in = null;
     HttpResponse response = null;
+    TrustedHttpClient httpClientStandAlone = httpClient;
     try {
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
-        response = httpClient.execute(get);
+
+        if (uri.getHost().matches(this.downloadSource)) {
+          httpClientStandAlone = this.createStandaloneHttpClient(downloadUser,downloadPassword);
+        }
+        response = httpClientStandAlone.execute(get);
+
         int httpStatusCode = response.getStatusLine().getStatusCode();
         if (httpStatusCode != 200) {
           throw new IOException(uri + " returns http " + httpStatusCode);
@@ -1502,7 +1571,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       return addContentToRepo(mp, elementId, fileName, in);
     } finally {
       IOUtils.closeQuietly(in);
-      httpClient.close(response);
+      httpClientStandAlone.close(response);
     }
   }
 

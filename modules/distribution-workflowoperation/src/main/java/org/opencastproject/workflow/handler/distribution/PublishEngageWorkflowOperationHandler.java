@@ -49,6 +49,7 @@ import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -80,8 +81,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -112,8 +111,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   private static final String MERGE_FORCE_FLAVORS_DEFAULT = "dublincore/*,security/*";
 
-  /** The default path to the player **/
-  protected static final String DEFAULT_PLAYER_PATH = "/engage/ui/watch.html";
+  /** Path the REST endpoint which will re-direct users to the currently configured video player **/
+  static final String PLAYER_PATH = "/play/";
 
   /** The streaming distribution service */
   private DistributionService streamingDistributionService = null;
@@ -129,6 +128,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /** To get the tenant path to the player URL **/
   private SecurityService securityService;
+
+  private OrganizationDirectoryService organizationDirectoryService = null;
 
   /** Whether to distribute to streaming server */
   private boolean distributeStreaming = false;
@@ -164,32 +165,18 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     this.searchService = searchService;
   }
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(DOWNLOAD_SOURCE_FLAVORS,
-            "Distribute any mediapackage elements with one of these (comma separated) flavors to download");
-    CONFIG_OPTIONS.put(STREAMING_TARGET_SUBFLAVOR,
-            "Target subflavor for elements that have been distributed for downloads");
-    CONFIG_OPTIONS.put(DOWNLOAD_SOURCE_TAGS,
-            "Distribute any mediapackage elements with one of these (comma separated) tags to download.");
-    CONFIG_OPTIONS.put(DOWNLOAD_TARGET_TAGS,
-            "Add all of these comma separated tags to elements that have been distributed for download.");
-    CONFIG_OPTIONS.put(STREAMING_SOURCE_FLAVORS,
-            "Distribute any mediapackage elements with one of these (comma separated) flavors to streaming");
-    CONFIG_OPTIONS.put(STREAMING_TARGET_SUBFLAVOR,
-            "Target subflavor for elements that have been distributed for streaming");
-    CONFIG_OPTIONS.put(STREAMING_SOURCE_TAGS,
-            "Distribute any mediapackage elements with one of these (comma separated) tags to streaming.");
-    CONFIG_OPTIONS.put(STREAMING_TARGET_TAGS,
-            "Add all of these comma separated tags to elements that have been distributed for download.");
-    CONFIG_OPTIONS.put(CHECK_AVAILABILITY,
-            "( true | false ) defaults to true. Check if the distributed download artifact is available at its URL");
-    CONFIG_OPTIONS.put(STRATEGY,
-            "Strategy if there is an existing Publication");
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    this.organizationDirectoryService = organizationDirectoryService;
   }
+
+  /** Supported streaming formats */
+  private static final Set<TrackImpl.StreamingProtocol> STREAMING_FORMATS = new HashSet<>(Arrays.asList(
+          TrackImpl.StreamingProtocol.RTMP,
+          TrackImpl.StreamingProtocol.RTMPE,
+          TrackImpl.StreamingProtocol.HLS,
+          TrackImpl.StreamingProtocol.DASH,
+          TrackImpl.StreamingProtocol.HDS,
+          TrackImpl.StreamingProtocol.SMOOTH));
 
   @Override
   protected void activate(ComponentContext cc) {
@@ -199,16 +186,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     // Get configuration
     serverUrl = UrlSupport.url(bundleContext.getProperty(SERVER_URL_PROPERTY));
     distributeStreaming = StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY));
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**
@@ -379,9 +356,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
         logger.info("Publishing media package {} to search index", mediaPackageForSearch);
 
-        URL engageBaseUrl = null;
-        engageUrlString = StringUtils.trimToNull(workflowInstance.getOrganization().getProperties()
-                .get(ENGAGE_URL_PROPERTY));
+        URL engageBaseUrl;
+        Organization organization = organizationDirectoryService.getOrganization(workflowInstance.getOrganizationId());
+        engageUrlString = StringUtils.trimToNull(organization.getProperties().get(ENGAGE_URL_PROPERTY));
         if (engageUrlString != null) {
           engageBaseUrl = new URL(engageUrlString);
         } else {
@@ -440,18 +417,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param mp
    * @return the assembled player URI for this mediapackage
    */
-  protected URI createEngageUri(URI engageUri, MediaPackage mp) {
-    String playerPath = null;
-    String configedPlayerPath = null;
-    // Use the current user's organizational information for the player path
-    Organization currentOrg = securityService.getOrganization();
-    if (currentOrg != null) {
-      configedPlayerPath = StringUtils
-              .trimToNull(currentOrg.getProperties().get(ConfigurablePublishWorkflowOperationHandler.PLAYER_PROPERTY));
-    }
-    // If not configuration, use a default path
-    playerPath = configedPlayerPath != null ? configedPlayerPath : DEFAULT_PLAYER_PATH;
-    return URIUtils.resolve(engageUri, playerPath + "?id=" + mp.getIdentifier().compact());
+  URI createEngageUri(URI engageUri, MediaPackage mp) {
+    return URIUtils.resolve(engageUri, PLAYER_PATH + mp.getIdentifier().compact());
   }
 
   /**
@@ -598,20 +565,12 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * Checks if the MediaPackage track transport protocol is a streaming format protocol
-   * @param element The MediapackageElement to analyze
+   * @param element The MediaPackageElement to analyze
    * @return true if it is a TrackImpl and has a streaming protocol as transport
    */
   private boolean isStreamingFormat(MediaPackageElement element) {
-    if (element instanceof TrackImpl) {
-      if (TrackImpl.StreamingProtocol.RTMP.equals(((TrackImpl) element).getTransport())
-          || TrackImpl.StreamingProtocol.RTMPE.equals(((TrackImpl) element).getTransport())
-          || TrackImpl.StreamingProtocol.HLS.equals(((TrackImpl) element).getTransport())
-          || TrackImpl.StreamingProtocol.DASH.equals(((TrackImpl) element).getTransport())
-          || TrackImpl.StreamingProtocol.HDS.equals(((TrackImpl) element).getTransport())
-          || TrackImpl.StreamingProtocol.SMOOTH.equals(((TrackImpl) element).getTransport()))
-        return true;
-    }
-    return false;
+    return element instanceof TrackImpl
+            && STREAMING_FORMATS.contains(((TrackImpl) element).getTransport());
   }
 
   /**

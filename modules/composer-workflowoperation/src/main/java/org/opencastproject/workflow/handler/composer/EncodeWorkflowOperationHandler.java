@@ -53,8 +53,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * The workflow definition for handling "compose" operations
@@ -63,18 +61,6 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(EncodeWorkflowOperationHandler.class);
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put("source-flavors", "The \"flavor\" of the track to use as a source input");
-    CONFIG_OPTIONS.put("source-tags", "The \"tag\" of the track to use as a source input");
-    CONFIG_OPTIONS.put("encoding-profiles", "The encoding profile(s) to use");
-    CONFIG_OPTIONS.put("target-flavor", "The flavor to apply to the encoded file");
-    CONFIG_OPTIONS.put("target-tags", "The tags to apply to the encoded file");
-  }
 
   /** The composer service */
   private ComposerService composerService = null;
@@ -101,16 +87,6 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

@@ -40,10 +40,8 @@ import org.opencastproject.scheduler.api.RecordingImpl;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.scheduler.api.SchedulerTransactionLockException;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
-import org.opencastproject.scheduler.api.Util;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -102,168 +100,10 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   }
 
   @Override
-  public SchedulerTransaction getTransaction(String id) throws NotFoundException, SchedulerException {
-    HttpGet get = new HttpGet("transaction/".concat(id));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
-    try {
-      if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          throw new NotFoundException("Scheduler transaction '" + id + "' not found on remote scheduler service!");
-        } else {
-          String transactionJson = EntityUtils.toString(response.getEntity(), UTF_8);
-          JSONObject json = (JSONObject) parser.parse(transactionJson);
-          String transactionId = (String) json.get("id");
-          String schedulingSource = (String) json.get("source");
-          logger.info("Successfully get scheduler transaction {} from the remote scheduler service", id);
-          return new SchedulerTransactionRemoteImpl(transactionId, schedulingSource);
-        }
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException("Unable to get scheduler transaction from remote scheduler service: " + e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new SchedulerException("Unable to get scheduler transaction from remote scheduler service");
-  }
-
-  @Override
-  public SchedulerTransaction getTransactionBySource(String source) throws NotFoundException, SchedulerException {
-    HttpGet get = new HttpGet("transaction/source/".concat(source));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
-    try {
-      if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          throw new NotFoundException(
-                  "Scheduler transaction with source '" + source + "' not found on remote scheduler service!");
-        } else {
-          String transactionJson = EntityUtils.toString(response.getEntity(), UTF_8);
-          JSONObject json = (JSONObject) parser.parse(transactionJson);
-          String transactionId = (String) json.get("id");
-          String schedulingSource = (String) json.get("source");
-          logger.info("Successfully get scheduler transaction with source {} from the remote scheduler service",
-                  source);
-          return new SchedulerTransactionRemoteImpl(transactionId, schedulingSource);
-        }
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException("Unable to get scheduler transaction from remote scheduler service: " + e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new SchedulerException("Unable to get scheduler transaction from remote scheduler service");
-  }
-
-  @Override
-  public boolean hasActiveTransaction(String mediaPackageId)
-          throws NotFoundException, UnauthorizedException, SchedulerException {
-    HttpGet get = new HttpGet("transaction/event/".concat(mediaPackageId));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
-    try {
-      if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          throw new NotFoundException(
-                  "Event with mediapackage id '" + mediaPackageId + "' not found on remote scheduler service!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
-          logger.info("Unauthorized to get active transaction status of event {}.", mediaPackageId);
-          throw new UnauthorizedException(
-                  "Unauthorized to get active transaction status of the event " + mediaPackageId);
-        } else {
-          String hasActiveTransactionString = EntityUtils.toString(response.getEntity(), UTF_8);
-          Boolean booleanObject = BooleanUtils.toBooleanObject(hasActiveTransactionString);
-          if (booleanObject == null)
-            throw new SchedulerException("Could not parse active transaction status from the remote scheduler service: "
-                    + hasActiveTransactionString);
-
-          logger.info(
-                  "Successfully get active transaction status of event with mediapackage id {} from the remote scheduler service",
-                  mediaPackageId);
-          return booleanObject.booleanValue();
-        }
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException(
-              "Unable to get active transaction status for event from remote scheduler service: " + e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new SchedulerException(
-            "Unable to get active transaction status for event from from remote scheduler service");
-  }
-
-  @Override
-  public SchedulerTransaction createTransaction(final String schedulingSource)
-          throws UnauthorizedException, SchedulerConflictException, SchedulerException {
-    HttpPost post = new HttpPost("/transaction");
-    List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    params.add(new BasicNameValuePair("source", schedulingSource));
-    post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
-
-    HttpResponse response = getResponse(post, SC_OK, SC_UNAUTHORIZED, SC_CONFLICT);
-    try {
-      if (response != null && SC_OK == response.getStatusLine().getStatusCode()) {
-        String transactionJson = EntityUtils.toString(response.getEntity(), UTF_8);
-        JSONObject json = (JSONObject) parser.parse(transactionJson);
-        String transactionId = (String) json.get("id");
-        String source = (String) json.get("source");
-        logger.info("Successfully created scheduler transaction '{}' with id '{}' to the scheduler service", source,
-                transactionId);
-        return new SchedulerTransactionRemoteImpl(transactionId, source);
-      } else if (response != null && SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
-        logger.info("Unauthorized to create scheduler transaction");
-        throw new UnauthorizedException("Unauthorized to create scheduler transaction");
-      } else if (response != null && SC_CONFLICT == response.getStatusLine().getStatusCode()) {
-        logger.info("Transaction with source {} already exists!", schedulingSource);
-        throw new SchedulerConflictException("Transaction already exists with source " + schedulingSource);
-      }
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (SchedulerConflictException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException(
-              "Unable to create scheduler transaction '" + schedulingSource + "' to the scheduler service: " + e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new SchedulerException(
-            "Unable to create scheduler transaction '" + schedulingSource + "' to the scheduler service");
-  }
-
-  @Override
-  public void cleanupTransactions() throws UnauthorizedException, SchedulerException {
-    HttpPost post = new HttpPost("/transaction/cleanup");
-    HttpResponse response = getResponse(post, SC_OK, SC_UNAUTHORIZED);
-    try {
-      if (response != null && SC_OK == response.getStatusLine().getStatusCode()) {
-        logger.info("Successfully cleaned up scheduler transactions to the scheduler service");
-        return;
-      } else if (response != null && SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
-        logger.info("Unauthorized to cleanup scheduler transactions");
-        throw new UnauthorizedException("Unauthorized to cleanup scheduler transactions");
-      }
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException("Unable to cleanup scheduler transactions to the scheduler service: " + e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new SchedulerException("Unable to cleanup scheduler transactions to the scheduler service");
-  }
-
-  @Override
   public void addEvent(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
           MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
-          Opt<Boolean> optOut, Opt<String> schedulingSource, String origin) throws UnauthorizedException,
-                  SchedulerTransactionLockException, SchedulerConflictException, SchedulerException {
+          Opt<String> schedulingSource) throws UnauthorizedException, SchedulerConflictException,
+          SchedulerException {
     HttpPost post = new HttpPost("/");
     String eventId = mediaPackage.getIdentifier().compact();
     logger.debug("Start adding a new event {} through remote Schedule Service", eventId);
@@ -276,11 +116,8 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     params.add(new BasicNameValuePair("mediaPackage", MediaPackageParser.getAsXml(mediaPackage)));
     params.add(new BasicNameValuePair("wfproperties", toPropertyString(wfProperties)));
     params.add(new BasicNameValuePair("agentparameters", toPropertyString(caMetadata)));
-    if (optOut.isSome())
-      params.add(new BasicNameValuePair("optOut", Boolean.toString(optOut.get())));
     if (schedulingSource.isSome())
       params.add(new BasicNameValuePair("source", schedulingSource.get()));
-    params.add(new BasicNameValuePair("origin", origin));
     post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
     HttpResponse response = getResponse(post, SC_CREATED, SC_UNAUTHORIZED, SC_CONFLICT);
@@ -293,11 +130,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         JSONObject json = (JSONObject) parser.parse(errorJson);
         JSONObject error = (JSONObject) json.get("error");
         String errorCode = (String) error.get("code");
-        if (SchedulerTransactionLockException.ERROR_CODE.equals(errorCode)) {
-          logger.info("Event is locked by a transaction, unable to add event {}", eventId);
-          throw new SchedulerTransactionLockException(
-                  "Event is locked by a transaction, unable to add event " + eventId);
-        } else if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
+        if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
           logger.info("Conflicting events found when adding event {}", eventId);
           throw new SchedulerConflictException("Conflicting events found when adding event " + eventId);
         } else {
@@ -309,14 +142,10 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       } else {
         throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service");
       }
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (SchedulerTransactionLockException e) {
-      throw e;
-    } catch (SchedulerConflictException e) {
+    } catch (UnauthorizedException | SchedulerConflictException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service: " + e);
+      throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -325,9 +154,8 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   @Override
   public Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
           String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
-          Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource, String modificationOrigin)
-          throws UnauthorizedException, SchedulerConflictException, SchedulerTransactionLockException,
-          SchedulerException {
+          Map<String, String> caMetadata, Opt<String> schedulingSource)
+          throws UnauthorizedException, SchedulerConflictException, SchedulerException {
     HttpPost post = new HttpPost("/");
     logger.debug("Start adding a new events through remote Schedule Service");
 
@@ -342,11 +170,8 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     params.add(new BasicNameValuePair("templateMp", MediaPackageParser.getAsXml(templateMp)));
     params.add(new BasicNameValuePair("wfproperties", toPropertyString(wfProperties)));
     params.add(new BasicNameValuePair("agentparameters", toPropertyString(caMetadata)));
-    if (optOut.isSome())
-      params.add(new BasicNameValuePair("optOut", Boolean.toString(optOut.get())));
     if (schedulingSource.isSome())
       params.add(new BasicNameValuePair("source", schedulingSource.get()));
-    params.add(new BasicNameValuePair("origin", modificationOrigin));
     post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
     String eventId = templateMp.getIdentifier().compact();
@@ -361,11 +186,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         JSONObject json = (JSONObject) parser.parse(errorJson);
         JSONObject error = (JSONObject) json.get("error");
         String errorCode = (String) error.get("code");
-        if (SchedulerTransactionLockException.ERROR_CODE.equals(errorCode)) {
-          logger.info("Event is locked by a transaction, unable to add event based on {}", eventId);
-          throw new SchedulerTransactionLockException(
-                  "Event is locked by a transaction, unable to add event " + eventId);
-        } else if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
+        if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
           logger.info("Conflicting events found when adding event based on {}", eventId);
           throw new SchedulerConflictException("Conflicting events found when adding event based on" + eventId);
         } else {
@@ -377,14 +198,10 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       } else {
         throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service");
       }
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (SchedulerTransactionLockException e) {
-      throw e;
-    } catch (SchedulerConflictException e) {
+    } catch (UnauthorizedException | SchedulerConflictException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service: " + e);
+      throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -393,9 +210,19 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   @Override
   public void updateEvent(String eventId, Opt<Date> startDateTime, Opt<Date> endDateTime, Opt<String> captureAgentId,
           Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
-          Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOut, String origin)
-                  throws NotFoundException, UnauthorizedException, SchedulerTransactionLockException,
-                  SchedulerConflictException, SchedulerException {
+          Opt<Map<String, String>> caMetadata)
+                  throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException {
+
+    updateEvent(eventId, startDateTime, endDateTime, captureAgentId, userIds,
+                mediaPackage, wfProperties, caMetadata, false);
+  }
+
+  @Override
+  public void updateEvent(String eventId, Opt<Date> startDateTime, Opt<Date> endDateTime, Opt<String> captureAgentId,
+          Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
+          Opt<Map<String, String>> caMetadata, boolean allowConflict)
+                  throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException {
+
     logger.debug("Start updating event {}.", eventId);
     HttpPut put = new HttpPut("/" + eventId);
 
@@ -414,14 +241,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       params.add(new BasicNameValuePair("wfproperties", toPropertyString(wfProperties.get())));
     if (caMetadata.isSome())
       params.add(new BasicNameValuePair("agentparameters", toPropertyString(caMetadata.get())));
-    if (optOut.isSome()) {
-      params.add(new BasicNameValuePair("updateOptOut", Boolean.toString(true)));
-      if (optOut.get().isSome())
-        params.add(new BasicNameValuePair("optOut", Boolean.toString(optOut.get().get())));
-    } else {
-      params.add(new BasicNameValuePair("updateOptOut", Boolean.toString(false)));
-    }
-    params.add(new BasicNameValuePair("origin", origin));
+    params.add(new BasicNameValuePair("allowConflict", BooleanUtils.toString(allowConflict, "true", "false", "false")));
     put.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
     HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED, SC_FORBIDDEN, SC_CONFLICT);
@@ -438,11 +258,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           JSONObject json = (JSONObject) parser.parse(errorJson);
           JSONObject error = (JSONObject) json.get("error");
           String errorCode = (String) error.get("code");
-          if (SchedulerTransactionLockException.ERROR_CODE.equals(errorCode)) {
-            logger.info("Event is locked by a transaction, unable to update event {}", eventId);
-            throw new SchedulerTransactionLockException(
-                    "Event is locked by a transaction, unable to update event " + eventId);
-          } else if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
+          if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
             logger.info("Conflicting events found when updating event {}", eventId);
             throw new SchedulerConflictException("Conflicting events found when updating event " + eventId);
           } else {
@@ -458,16 +274,10 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           throw new SchedulerException("Unexpected status code " + response.getStatusLine());
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (SchedulerTransactionLockException e) {
-      throw e;
-    } catch (SchedulerConflictException e) {
+    } catch (NotFoundException | SchedulerConflictException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to update event " + eventId + " to the scheduler service: " + e);
+      throw new SchedulerException("Unable to update event " + eventId + " to the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -475,8 +285,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   }
 
   @Override
-  public void removeEvent(String eventId)
-          throws NotFoundException, UnauthorizedException, SchedulerTransactionLockException, SchedulerException {
+  public void removeEvent(String eventId) throws NotFoundException, UnauthorizedException, SchedulerException {
     logger.debug("Start removing event {} from scheduling service.", eventId);
     HttpDelete delete = new HttpDelete("/" + eventId);
 
@@ -491,19 +300,11 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       } else if (response != null && SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
         logger.info("Unauthorized to remove the event {}.", eventId);
         throw new UnauthorizedException("Unauthorized to remove the event " + eventId);
-      } else if (response != null && SC_CONFLICT == response.getStatusLine().getStatusCode()) {
-        logger.info("Event is locked by a transaction, unable to delete event {}", eventId);
-        throw new SchedulerTransactionLockException(
-                "Event is locked by a transaction, unable to delete event " + eventId);
       }
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (SchedulerTransactionLockException e) {
+    } catch (UnauthorizedException | NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to remove event " + eventId + " from the scheduler service: " + e);
+      throw new SchedulerException("Unable to remove event " + eventId + " from the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -533,7 +334,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to parse event media package from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to parse event media package from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -558,12 +359,10 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           return dublinCoreCatalog;
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to parse event dublincore from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to parse event dublincore from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -588,7 +387,6 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           final String recordingId = (String) json.get("id");
           final Date start = new Date(DateTimeSupport.fromUTC((String) json.get("start")));
           final Date end = new Date(DateTimeSupport.fromUTC((String) json.get("end")));
-          final boolean optOut = (Boolean) json.get("optOut");
           final String location = (String) json.get("location");
 
           final Set<String> presenters = new HashSet<>();
@@ -620,16 +418,14 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           final Opt<Recording> recordingOpt = Opt.nul(recording);
           logger.info("Successfully get the technical metadata of event '{}' from the remote scheduler service",
                   eventId);
-          return new TechnicalMetadataImpl(recordingId, location, start, end, optOut, presenters, wfProperties,
+          return new TechnicalMetadataImpl(recordingId, location, start, end, presenters, wfProperties,
                   agentConfig, recordingOpt);
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to parse the technical metadata from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to parse the technical metadata from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -658,12 +454,10 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
             return accessControlList;
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get event access control list from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get event access control list from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -690,12 +484,10 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           return new HashMap<String, String>((Map) properties);
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to parse event workflow configuration from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to parse event workflow configuration from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -723,13 +515,11 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           return new HashMap<String, String>((Map) properties);
         }
       }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       throw new SchedulerException(
-              "Unable to parse event capture agent configuration from remote scheduler service: " + e);
+              "Unable to parse event capture agent configuration from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -737,164 +527,23 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   }
 
   @Override
-  public boolean isOptOut(String mediapackageId) throws NotFoundException, UnauthorizedException, SchedulerException {
-    HttpGet get = new HttpGet(UrlSupport.concat(mediapackageId, "optOut"));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
+  public int getEventCount() throws SchedulerException, UnauthorizedException {
+    final HttpGet get = new HttpGet(UrlSupport.concat("eventCount"));
+    final HttpResponse response = getResponse(get, SC_OK, SC_UNAUTHORIZED);
     try {
-      if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          throw new NotFoundException(
-                  "Event with mediapackage id '" + mediapackageId + "' not found on remote scheduler service!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
-          logger.info("Unauthorized to get opt out status of the event {}.", mediapackageId);
-          throw new UnauthorizedException("Unauthorized to get opt out status of the event " + mediapackageId);
-        } else {
-          String optOutString = EntityUtils.toString(response.getEntity(), UTF_8);
-          Boolean booleanObject = BooleanUtils.toBooleanObject(optOutString);
-          if (booleanObject == null)
-            throw new SchedulerException(
-                    "Could not parse opt out status from the remote scheduler service: " + optOutString);
-
-          logger.info(
-                  "Successfully get opt out status of event with mediapackage id {} from the remote scheduler service",
-                  mediapackageId);
-          return booleanObject.booleanValue();
-        }
+      if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        logger.info("Unauthorized to get event count");
+        throw new UnauthorizedException("Unauthorized to get event count");
       }
-    } catch (NotFoundException e) {
-      throw e;
+      final String countString = EntityUtils.toString(response.getEntity(), UTF_8);
+      return Integer.parseInt(countString);
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get event opt out status from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get event count from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
-    throw new SchedulerException("Unable to get event opt out status from remote scheduler service");
-  }
-
-  @Override
-  public void updateReviewStatus(String mediapackageId, ReviewStatus reviewStatus)
-          throws NotFoundException, UnauthorizedException, SchedulerException {
-    HttpPut put = new HttpPut(UrlSupport.concat(mediapackageId, "reviewStatus"));
-
-    List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    params.add(new BasicNameValuePair("reviewStatus", reviewStatus.toString()));
-    put.setEntity(new UrlEncodedFormEntity(params, UTF_8));
-
-    HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
-    try {
-      if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          logger.warn("Event with mediapackage id {} was not found by the scheduler service", mediapackageId);
-          throw new NotFoundException(
-                  "Event with mediapackage id '" + mediapackageId + "' not found on remote scheduler service!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
-          logger.info("Unauthorized to update review status of the event {}.", mediapackageId);
-          throw new UnauthorizedException("Unauthorized to update review status of the event " + mediapackageId);
-        } else if (SC_OK == response.getStatusLine().getStatusCode()) {
-          logger.info("Event with mediapackage id {} successfully updated with review status.", mediapackageId);
-          return;
-        } else {
-          throw new SchedulerException("Unexpected status code " + response.getStatusLine());
-        }
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException(
-              "Unable to update event with mediapackage id " + mediapackageId + " to the scheduler service: " + e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new SchedulerException("Unable to update  event with mediapackage id " + mediapackageId);
-  }
-
-  @Override
-  public ReviewStatus getReviewStatus(String mediapackageId)
-          throws NotFoundException, UnauthorizedException, SchedulerException {
-    HttpGet get = new HttpGet(UrlSupport.concat(mediapackageId, "reviewStatus"));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
-    try {
-      if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          throw new NotFoundException(
-                  "Event with mediapackage id '" + mediapackageId + "' not found on remote scheduler service!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
-          logger.info("Unauthorized to get review status of the event {}.", mediapackageId);
-          throw new UnauthorizedException("Unauthorized to get review status of the event " + mediapackageId);
-        } else {
-          String reviewStatusString = EntityUtils.toString(response.getEntity(), UTF_8);
-
-          ReviewStatus reviewStatus;
-          try {
-            reviewStatus = ReviewStatus.valueOf(reviewStatusString);
-          } catch (Exception e) {
-            throw new SchedulerException(
-                    "Could not parse review status from the remote scheduler service: " + reviewStatusString);
-          }
-          logger.info(
-                  "Successfully get review status of event with mediapackage id {} from the remote scheduler service",
-                  mediapackageId);
-          return reviewStatus;
-        }
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException("Unable to get event review status from remote scheduler service: " + e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new SchedulerException("Unable to get event review status from remote scheduler service");
-  }
-
-  @Override
-  public List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz) {
-    return Util.calculatePeriods(start, end, duration, rrule, tz);
-  }
-
-  @Override
-  public boolean isBlacklisted(String mediapackageId)
-          throws NotFoundException, UnauthorizedException, SchedulerException {
-    HttpGet get = new HttpGet(UrlSupport.concat(mediapackageId, "blacklisted"));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
-    try {
-      if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          throw new NotFoundException(
-                  "Event with mediapackage id '" + mediapackageId + "' not found on remote scheduler service!");
-        } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
-          logger.info("Unauthorized to get blacklist status of the event {}.", mediapackageId);
-          throw new UnauthorizedException("Unauthorized to get blacklist status of the event " + mediapackageId);
-        } else {
-          String blacklistString = EntityUtils.toString(response.getEntity(), UTF_8);
-
-          Boolean booleanObject = BooleanUtils.toBooleanObject(blacklistString);
-          if (booleanObject == null)
-            throw new SchedulerException(
-                    "Could not parse blacklist status from the remote scheduler service: " + blacklistString);
-
-          logger.info(
-                  "Successfully get blacklist status of event with mediapackage id {} from the remote scheduler service",
-                  mediapackageId);
-          return booleanObject.booleanValue();
-        }
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException("Unable to get event blacklist status from remote scheduler service: " + e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new SchedulerException("Unable to get event blacklist status from remote scheduler service");
   }
 
   @Override
@@ -911,7 +560,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         }
       }
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get agent last modified hash from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get agent last modified hash from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -954,11 +603,61 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get recordings from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get recordings from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
     throw new SchedulerException("Unable to get recordings from remote scheduler service");
+  }
+
+  @Override
+  public Opt<MediaPackage> getCurrentRecording(String captureAgentId) throws SchedulerException, UnauthorizedException {
+    HttpGet get = new HttpGet(UrlSupport.concat("currentRecording", captureAgentId));
+    HttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT, SC_UNAUTHORIZED);
+    try {
+      if (SC_OK == response.getStatusLine().getStatusCode()) {
+        String mediaPackageXml = EntityUtils.toString(response.getEntity(), UTF_8);
+        MediaPackage event = MediaPackageParser.getFromXml(mediaPackageXml);
+        logger.info("Successfully get current recording of agent {} from the remote scheduler service", captureAgentId);
+        return Opt.some(event);
+      } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        logger.info("Unauthorized to get current recording of agent {}", captureAgentId);
+        throw new UnauthorizedException("Unauthorized to get current recording of agent " + captureAgentId);
+      } else {
+        return Opt.none();
+      }
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to get current recording from remote scheduler service", e);
+    } finally {
+      closeConnection(response);
+    }
+  }
+
+  @Override
+  public Opt<MediaPackage> getUpcomingRecording(String captureAgentId) throws SchedulerException, UnauthorizedException {
+    HttpGet get = new HttpGet(UrlSupport.concat("upcomingRecording", captureAgentId));
+    HttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT, SC_UNAUTHORIZED);
+    try {
+      if (SC_OK == response.getStatusLine().getStatusCode()) {
+        String mediaPackageXml = EntityUtils.toString(response.getEntity(), UTF_8);
+        MediaPackage event = MediaPackageParser.getFromXml(mediaPackageXml);
+        logger.info("Successfully get upcoming recording of agent {} from the remote scheduler service", captureAgentId);
+        return Opt.some(event);
+      } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        logger.info("Unauthorized to get upcoming recording of agent {}", captureAgentId);
+        throw new UnauthorizedException("Unauthorized to get upcoming recording of agent " + captureAgentId);
+      } else {
+        return Opt.none();
+      }
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to get upcoming recording from remote scheduler service", e);
+    } finally {
+      closeConnection(response);
+    }
   }
 
   @Override
@@ -987,7 +686,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get conflicts from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get conflicts from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -1023,7 +722,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get conflicts from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get conflicts from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -1055,7 +754,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         }
       }
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get calendar from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get calendar from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -1083,7 +782,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to remove old schedules from the scheduler service: " + e);
+      throw new SchedulerException("Unable to remove old schedules from the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -1121,7 +820,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to update recording state of event with mediapackage id " + mediapackageId
-              + " to the scheduler service: " + e);
+              + " to the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -1150,7 +849,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get calendar from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get calendar from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -1174,7 +873,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       throw e;
     } catch (Exception e) {
       throw new SchedulerException(
-              "Unable to remove recording status of event " + eventId + " from the scheduler service: " + e);
+              "Unable to remove recording status of event " + eventId + " from the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -1203,165 +902,11 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         }
       }
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get recording states from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get recording states from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
     throw new SchedulerException("Unable to get recording states from remote scheduler service");
-  }
-
-  private void addTransactionEvent(String id, Date startDateTime, Date endDateTime, String captureAgentId,
-          Set<String> userIds, MediaPackage mediaPackage, Map<String, String> wfProperties,
-          Map<String, String> caMetadata, Opt<Boolean> optOut)
-                  throws NotFoundException, UnauthorizedException, SchedulerException {
-    HttpPut put = new HttpPut(UrlSupport.concat("transaction", id, "add"));
-
-    List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    params.add(new BasicNameValuePair("start", Long.toString(startDateTime.getTime())));
-    params.add(new BasicNameValuePair("end", Long.toString(endDateTime.getTime())));
-    params.add(new BasicNameValuePair("agent", captureAgentId));
-    params.add(new BasicNameValuePair("users", StringUtils.join(userIds, ",")));
-    params.add(new BasicNameValuePair("mediaPackage", MediaPackageParser.getAsXml(mediaPackage)));
-    params.add(new BasicNameValuePair("wfproperties", toPropertyString(wfProperties)));
-    params.add(new BasicNameValuePair("agentparameters", toPropertyString(caMetadata)));
-    if (optOut.isSome())
-      params.add(new BasicNameValuePair("optOut", Boolean.toString(optOut.get())));
-    put.setEntity(new UrlEncodedFormEntity(params, UTF_8));
-
-    final String eventId = mediaPackage.getIdentifier().compact();
-    HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND, SC_CONFLICT, SC_UNAUTHORIZED);
-    try {
-      if (response != null && SC_OK == response.getStatusLine().getStatusCode()) {
-        logger.info("Successfully added event '{}' to scheduler transaction '{}' on the scheduler service", eventId,
-                id);
-        return;
-      } else if (response != null && SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
-        logger.info("Unauthorized to add event '{}' to scheduler transaction '{}'", eventId, id);
-        throw new UnauthorizedException("Unauthorized to add event to scheduler transaction");
-      } else if (response != null && SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-        logger.info("Scheduler transaction '{}' not found", id);
-        throw new NotFoundException("Not found scheduler transaction " + id);
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException(
-              "Unable to add event to scheduler transaction '" + id + "' on the scheduler service: " + e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new SchedulerException("Unable to add event to scheduler transaction '" + id + "' on the scheduler service");
-  }
-
-  private void commitTransaction(String id) throws NotFoundException, UnauthorizedException, SchedulerException {
-    HttpPost post = new HttpPost(UrlSupport.concat("transaction", id, "commit"));
-
-    HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
-    try {
-      if (response != null && SC_OK == response.getStatusLine().getStatusCode()) {
-        logger.info("Successfully committed scheduler transaction '{}' to the scheduler service", id);
-        return;
-      } else if (response != null && SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
-        logger.info("Unauthorized to commit scheduler transaction '{}'", id);
-        throw new UnauthorizedException("Unauthorized to commit scheduler transaction");
-      } else if (response != null && SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-        logger.info("Scheduler transaction '{}' not found", id);
-        throw new NotFoundException("Not found scheduler transaction " + id);
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException(
-              "Unable to commit scheduler transaction '" + id + "' to the scheduler service: " + e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new SchedulerException("Unable to commit scheduler transaction '" + id + "' to the scheduler service");
-  }
-
-  private void rollbackTransaction(String id) throws NotFoundException, UnauthorizedException, SchedulerException {
-    HttpPost post = new HttpPost(UrlSupport.concat("transaction", id, "rollback"));
-
-    HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
-    try {
-      if (response != null && SC_OK == response.getStatusLine().getStatusCode()) {
-        logger.info("Successfully rolled back scheduler transaction '{}' to the scheduler service", id);
-        return;
-      } else if (response != null && SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
-        logger.info("Unauthorized to rollback scheduler transaction '{}'", id);
-        throw new UnauthorizedException("Unauthorized to rollback scheduler transaction");
-      } else if (response != null && SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-        logger.info("Scheduler transaction '{}' not found", id);
-        throw new NotFoundException("Not found scheduler transaction " + id);
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException(
-              "Unable to rollback scheduler transaction '" + id + "' to the scheduler service: " + e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new SchedulerException("Unable to rollback scheduler transaction '" + id + "' to the scheduler service");
-  }
-
-  private final class SchedulerTransactionRemoteImpl implements SchedulerTransaction {
-
-    private final String id;
-    private final String schedulingSource;
-
-    SchedulerTransactionRemoteImpl(String id, String schedulingSource) {
-      this.id = id;
-      this.schedulingSource = schedulingSource;
-    }
-
-    @Override
-    public String getId() {
-      return id;
-    }
-
-    @Override
-    public String getSource() {
-      return schedulingSource;
-    }
-
-    @Override
-    public void addEvent(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
-            MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
-            Opt<Boolean> optOut) throws NotFoundException, UnauthorizedException, SchedulerException {
-      addTransactionEvent(id, startDateTime, endDateTime, captureAgentId, userIds, mediaPackage, wfProperties,
-              caMetadata, optOut);
-    }
-
-    @Override
-    public void commit() throws NotFoundException, UnauthorizedException, SchedulerException {
-      commitTransaction(id);
-    }
-
-    @Override
-    public void rollback() throws NotFoundException, UnauthorizedException, SchedulerException {
-      rollbackTransaction(id);
-    }
-
-    @Override
-    public int hashCode() {
-      return getId().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (obj instanceof SchedulerTransaction) {
-        return getId().equals(((SchedulerTransaction) obj).getId());
-      }
-      return false;
-    }
-
   }
 
   private String toPropertyString(Map<String, String> properties) {

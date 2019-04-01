@@ -21,6 +21,7 @@
 
 package org.opencastproject.workflow.handler.workflow;
 
+import static org.easymock.EasyMock.anyString;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.eq;
@@ -34,14 +35,6 @@ import static org.opencastproject.workflow.handler.workflow.StartWorkflowWorkflo
 import static org.opencastproject.workflow.handler.workflow.StartWorkflowWorkflowOperationHandler.WORKFLOW_DEFINITION;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.api.query.ASelectQuery;
-import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.api.query.Target;
-import org.opencastproject.assetmanager.api.query.VersionField;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.identifier.IdImpl;
@@ -56,7 +49,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 import com.google.common.collect.Lists;
 
@@ -79,7 +71,11 @@ public class StartWorkflowWorkflowOperationHandlerTest {
   @Before
   public void setUp() throws Exception {
     assetManager = createNiceMock(AssetManager.class);
+    expect(assetManager.getMediaPackage(anyString())).andReturn(Opt.none()).anyTimes();
+
     workflowService = createNiceMock(WorkflowService.class);
+
+    replay(assetManager, workflowService);
 
     operationHandler = new StartWorkflowWorkflowOperationHandler();
     operationHandler.setAssetManager(assetManager);
@@ -101,92 +97,15 @@ public class StartWorkflowWorkflowOperationHandlerTest {
 
   @Test(expected = WorkflowOperationException.class)
   public void testNoMediaPackage() throws Exception {
-    // Query
-    Target t = createNiceMock(Target.class);
-
-    Predicate p = createNiceMock(Predicate.class);
-    expect(p.and(p)).andReturn(p);
-
-    VersionField v = createNiceMock(VersionField.class);
-    expect(v.isLatest()).andReturn(p);
-
-    ASelectQuery selectQuery = createNiceMock(ASelectQuery.class);
-    expect(selectQuery.where(p)).andReturn(selectQuery);
-
-    AQueryBuilder query = createNiceMock(AQueryBuilder.class);
-    expect(query.snapshot()).andReturn(t);
-    expect(query.select(t)).andReturn(selectQuery);
-    expect(query.mediaPackageId(MP_ID)).andReturn(p);
-    expect(query.version()).andReturn(v);
-
-    // Asset Manager
-    reset(assetManager);
-    expect(assetManager.createQuery()).andReturn(query);
-
-    // Result
-    AResult r = createNiceMock(AResult.class);
-    expect(r.getSize()).andReturn(0L);
-
-    expect(selectQuery.run()).andReturn(r);
-
-    // Workflow Service
-    reset(workflowService);
-
-    replay(assetManager, workflowService, query, t, selectQuery, p, v, r);
-
-    // Run Operation
     operationHandler.start(workflowInstance, null);
   }
 
   @Test(expected = WorkflowOperationException.class)
   public void testNoWorkflowDefinition() throws Exception {
-    // Media Package
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-    mp.setIdentifier(new IdImpl(MP_ID));
-
-    // Snapshot
-    Snapshot snapshot = createNiceMock(Snapshot.class);
-    expect(snapshot.getMediaPackage()).andReturn(mp);
-
-    // Query
-    Target t = createNiceMock(Target.class);
-
-    Predicate p = createNiceMock(Predicate.class);
-    expect(p.and(p)).andReturn(p);
-
-    VersionField v = createNiceMock(VersionField.class);
-    expect(v.isLatest()).andReturn(p);
-
-    ASelectQuery selectQuery = createNiceMock(ASelectQuery.class);
-    expect(selectQuery.where(p)).andReturn(selectQuery);
-
-    AQueryBuilder query = createNiceMock(AQueryBuilder.class);
-    expect(query.snapshot()).andReturn(t);
-    expect(query.select(t)).andReturn(selectQuery);
-    expect(query.mediaPackageId(MP_ID)).andReturn(p);
-    expect(query.version()).andReturn(v);
-
-    // Asset Manager
-    reset(assetManager);
-    expect(assetManager.createQuery()).andReturn(query);
-
-    // Result
-    ARecord aRec = createNiceMock(ARecord.class);
-    expect(aRec.getSnapshot()).andReturn(Opt.some(snapshot));
-
-    AResult r = createNiceMock(AResult.class);
-    expect(r.getSize()).andReturn(1L);
-    expect(r.getRecords()).andReturn(Stream.mk(aRec));
-
-    expect(selectQuery.run()).andReturn(r);
-
-    // Workflow Service
     reset(workflowService);
     expect(workflowService.getWorkflowDefinitionById(WD_ID)).andThrow(new NotFoundException());
+    replay(workflowService);
 
-    replay(assetManager, workflowService, query, t, selectQuery, p, v, snapshot, aRec, r);
-
-    // Run Operation
     operationHandler.start(workflowInstance, null);
   }
 
@@ -196,41 +115,9 @@ public class StartWorkflowWorkflowOperationHandlerTest {
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     mp.setIdentifier(new IdImpl(MP_ID));
 
-    // Snapshot
-    Snapshot snapshot = createNiceMock(Snapshot.class);
-    expect(snapshot.getMediaPackage()).andReturn(mp);
-
-    // Query
-    Target t = createNiceMock(Target.class);
-
-    Predicate p = createNiceMock(Predicate.class);
-    expect(p.and(p)).andReturn(p);
-
-    VersionField v = createNiceMock(VersionField.class);
-    expect(v.isLatest()).andReturn(p);
-
-    ASelectQuery selectQuery = createNiceMock(ASelectQuery.class);
-    expect(selectQuery.where(p)).andReturn(selectQuery);
-
-    AQueryBuilder query = createNiceMock(AQueryBuilder.class);
-    expect(query.snapshot()).andReturn(t);
-    expect(query.select(t)).andReturn(selectQuery);
-    expect(query.mediaPackageId(MP_ID)).andReturn(p);
-    expect(query.version()).andReturn(v);
-
     // Asset Manager
     reset(assetManager);
-    expect(assetManager.createQuery()).andReturn(query);
-
-    // Result
-    ARecord aRec = createNiceMock(ARecord.class);
-    expect(aRec.getSnapshot()).andReturn(Opt.some(snapshot));
-
-    AResult r = createNiceMock(AResult.class);
-    expect(r.getSize()).andReturn(1L);
-    expect(r.getRecords()).andReturn(Stream.mk(aRec));
-
-    expect(selectQuery.run()).andReturn(r);
+    expect(assetManager.getMediaPackage(anyString())).andReturn(Opt.some(mp));
 
     // Workflow Service
     WorkflowDefinition wd = new WorkflowDefinitionImpl();
@@ -242,12 +129,11 @@ public class StartWorkflowWorkflowOperationHandlerTest {
     expect(workflowService.getWorkflowDefinitionById(WD_ID)).andReturn(wd);
     expect(workflowService.start(eq(wd), eq(mp), capture(wProperties))).andReturn(null);
 
-    replay(assetManager, workflowService, query, t, selectQuery, p, v, snapshot, aRec, r);
+    replay(assetManager, workflowService);
 
-    // Run Operation
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
 
-    verify(assetManager, workflowService, query, t, selectQuery, p, v, snapshot, aRec, r);
+    verify(assetManager, workflowService);
 
     assertEquals(WorkflowOperationResult.Action.CONTINUE, result.getAction());
     assertEquals(2, wProperties.getValue().size());

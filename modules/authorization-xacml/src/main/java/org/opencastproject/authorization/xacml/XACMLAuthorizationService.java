@@ -45,8 +45,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +55,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
@@ -82,16 +83,26 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
   private static final String CONFIG_MERGE_MODE = "merge.mode";
 
   /** Definition of how merging of series and episode ACLs work */
-  private MergeMode mergeMode = MergeMode.OVERRIDE;
+  private static MergeMode mergeMode = MergeMode.OVERRIDE;
 
   enum MergeMode {
     OVERRIDE, ROLES, ACTIONS
   }
 
+  public void activate(ComponentContext cc) {
+    updated(cc.getProperties());
+  }
+
+  public void modified(Map<String, Object> config) {
+    // this prevents the service from restarting on configuration updated.
+    // updated() will handle the configuration update.
+  }
+
   @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  public synchronized void updated(Dictionary<String, ?> properties) {
     if (properties == null) {
       mergeMode = MergeMode.OVERRIDE;
+      logger.debug("Merge mode set to {}", mergeMode);
       return;
     }
     final String mode = StringUtils.defaultIfBlank((String) properties.get(CONFIG_MERGE_MODE),
@@ -102,6 +113,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
       logger.warn("Invalid value set for ACL merge mode, defaulting to {}", MergeMode.OVERRIDE);
       mergeMode = MergeMode.OVERRIDE;
     }
+    logger.debug("Merge mode set to {}", mergeMode);
   }
 
   @Override

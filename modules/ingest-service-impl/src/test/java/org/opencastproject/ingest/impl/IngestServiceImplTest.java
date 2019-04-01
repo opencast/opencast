@@ -73,6 +73,7 @@ import org.opencastproject.workingfilerepository.impl.WorkingFileRepositoryImpl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -195,12 +196,7 @@ public class IngestServiceImplTest {
     workflowService = EasyMock.createNiceMock(WorkflowService.class);
     EasyMock.expect(workflowService.start((WorkflowDefinition) EasyMock.anyObject(), EasyMock.capture(mp),
             (Map) EasyMock.anyObject())).andReturn(workflowInstance);
-    EasyMock.expect(workflowInstance.getMediaPackage()).andAnswer(new IAnswer<MediaPackage>() {
-      @Override
-      public MediaPackage answer() throws Throwable {
-        return mp.getValue();
-      }
-    });
+    EasyMock.expect(workflowInstance.getMediaPackage()).andAnswer(mp::getValue).anyTimes();
     EasyMock.expect(workflowService.start((WorkflowDefinition) EasyMock.anyObject(),
             (MediaPackage) EasyMock.anyObject(), (Map) EasyMock.anyObject())).andReturn(workflowInstance);
     EasyMock.expect(
@@ -295,7 +291,13 @@ public class IngestServiceImplTest {
             }).anyTimes();
     EasyMock.replay(mediaInspectionService);
 
-    service = new IngestServiceImpl();
+    class MockedIngestServicve extends IngestServiceImpl {
+      protected TrustedHttpClient createStandaloneHttpClient(String user, String password) {
+        return httpClient;
+      }
+    }
+
+    service = new MockedIngestServicve();
     service.setHttpClient(httpClient);
     service.setAuthorizationService(authorizationService);
     service.setWorkingFileRepository(wfr);
@@ -326,7 +328,7 @@ public class IngestServiceImplTest {
     mediaPackage = service.addAttachment(urlAttachment, MediaPackageElements.MEDIAPACKAGE_COVER_FLAVOR, mediaPackage);
     WorkflowInstance instance = service.ingest(mediaPackage);
     Assert.assertEquals(1, mediaPackage.getTracks().length);
-    Assert.assertEquals(1, mediaPackage.getCatalogs().length);
+    Assert.assertEquals(0, mediaPackage.getCatalogs().length);
     Assert.assertEquals(1, mediaPackage.getAttachments().length);
     Assert.assertEquals(workflowInstanceID, instance.getId());
   }
@@ -430,6 +432,8 @@ public class IngestServiceImplTest {
     catalogs = mediaPackage.getCatalogs(MediaPackageElements.SMIL);
     Assert.assertEquals(0, catalogs.length);
 
+    FieldUtils.writeField(FieldUtils.getField(IngestServiceImpl.class, "skipCatalogs", true),
+            service, false, true);
     service.ingest(mediaPackage);
     catalogs = mediaPackage.getCatalogs(MediaPackageElements.SMIL);
     Assert.assertEquals(1, catalogs.length);
@@ -448,8 +452,11 @@ public class IngestServiceImplTest {
   public void testMergeScheduledMediaPackage() throws Exception {
     MediaPackage ingestMediaPackage = MediaPackageParser
             .getFromXml(IOUtils.toString(getClass().getResourceAsStream("/source-manifest-partial.xml"), "UTF-8"));
-    WorkflowInstance instance = service.ingest(ingestMediaPackage);
-    MediaPackage mergedMediaPackage = instance.getMediaPackage();
+    FieldUtils.writeField(FieldUtils.getField(IngestServiceImpl.class, "skipAttachments", true),
+            service, false, true);
+    FieldUtils.writeField(FieldUtils.getField(IngestServiceImpl.class, "skipCatalogs", true),
+            service, false, true);
+    MediaPackage mergedMediaPackage = service.ingest(ingestMediaPackage).getMediaPackage();
     Assert.assertEquals(4, mergedMediaPackage.getTracks().length);
     Track track = mergedMediaPackage.getTrack("track-1");
     Assert.assertEquals("/vonlya1.mov", track.getURI().toString());
@@ -471,6 +478,15 @@ public class IngestServiceImplTest {
     Assert.assertEquals("sd2", mergedMediaPackage.getContributors()[0]);
     Assert.assertEquals(1, mergedMediaPackage.getCreators().length);
     Assert.assertEquals("p2", mergedMediaPackage.getCreators()[0]);
+
+    // check element skipping
+    FieldUtils.writeField(FieldUtils.getField(IngestServiceImpl.class, "skipAttachments", true),
+            service, true, true);
+    FieldUtils.writeField(FieldUtils.getField(IngestServiceImpl.class, "skipCatalogs", true),
+            service, true, true);
+    mergedMediaPackage = service.ingest(ingestMediaPackage).getMediaPackage();
+    Assert.assertEquals(0, mergedMediaPackage.getCatalogs().length);
+    Assert.assertEquals(1, mergedMediaPackage.getAttachments().length);
   }
 
   @Test
@@ -524,12 +540,21 @@ public class IngestServiceImplTest {
     // NOTE: This test only works if the serivce.update() was not triggered by any previous tests
     testSeriesUpdateNewAndExisting(null);
 
+    String downloadPassword = "CHANGE_ME";
+    String downloadSource = "http://localhost";
+    String downloadUser = "opencast_system_account";
+
+    properties.put(IngestServiceImpl.DOWNLOAD_PASSWORD, downloadPassword);
+    properties.put(IngestServiceImpl.DOWNLOAD_SOURCE, downloadSource);
+    properties.put(IngestServiceImpl.DOWNLOAD_USER, downloadUser);
+
     // Test with properties and no key
     testSeriesUpdateNewAndExisting(properties);
 
     // Test with properties and key is true
     isOverwriteSeries = true;
     properties.put(IngestServiceImpl.PROPKEY_OVERWRITE_SERIES, String.valueOf(isOverwriteSeries));
+
     testSeriesUpdateNewAndExisting(properties);
 
     // Test series overwrite key is false
@@ -560,14 +585,14 @@ public class IngestServiceImplTest {
    */
   private void testSeriesUpdateNewAndExisting(Dictionary<String, String> properties) throws Exception {
 
-    // default expectation for series overwrite is True
-    boolean isExpectSeriesOverwrite = true;
+    // default expectation for series overwrite
+    boolean allowSeriesModifications = IngestServiceImpl.DEFAULT_ALLOW_SERIES_MODIFICATIONS;
 
     if (properties != null) {
       service.updated(properties);
       try {
         boolean testForValue = Boolean.parseBoolean(properties.get(IngestServiceImpl.PROPKEY_OVERWRITE_SERIES).trim());
-        isExpectSeriesOverwrite = testForValue;
+        allowSeriesModifications = testForValue;
       } catch (Exception e) {
         // If key or value not found or not boolean, use the default overwrite expectation
       }
@@ -596,8 +621,8 @@ public class IngestServiceImplTest {
     service.setSeriesService(seriesService);
 
     // This is true or false depending on the isOverwrite value
-    Assert.assertEquals("Desire to update series is " + String.valueOf(isExpectSeriesOverwrite) + ".",
-            isExpectSeriesOverwrite, service.updateSeries(urlCatalog2));
+    Assert.assertEquals("Desire to update series is " + allowSeriesModifications + ".",
+            allowSeriesModifications, service.updateSeries(urlCatalog2));
 
     // Test with mock not found exception
     EasyMock.reset(seriesService);

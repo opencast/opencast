@@ -31,16 +31,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.Objects;
 import java.util.Properties;
 
 public class UrlSigningVerifierImpl implements UrlSigningVerifier, ManagedService {
+  /** Prefix for key entry configuration keys */
+  public static final String KEY_PREFIX = "key.";
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(UrlSigningVerifierImpl.class);
-
-  /** The prefix in the configuration file to define the id of the key. */
-  public static final String ID_PREFIX = "id";
-  /** The prefix in the configuration file to define the encryption key. */
-  public static final String KEY_PREFIX = "key";
 
   private Properties keys = new Properties();
 
@@ -59,7 +58,7 @@ public class UrlSigningVerifierImpl implements UrlSigningVerifier, ManagedServic
   }
 
   @Override
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     logger.info("Updating UrlSigningVerifierImpl");
 
     // Clear the current set of keys
@@ -70,29 +69,17 @@ public class UrlSigningVerifierImpl implements UrlSigningVerifier, ManagedServic
       return;
     }
 
-    String key = null;
-    String keyId = null;
-
-    int i = 1;
-    while (true) {
-      // Create the configuration prefixes
-      key = new StringBuilder(KEY_PREFIX).append(".").append(i).toString();
-      keyId = new StringBuilder(ID_PREFIX).append(".").append(i).toString();
-      logger.debug("Looking for configuration of {}, {}", key, keyId);
-      // Read the key and keyId
-      String keyValue = StringUtils.trimToNull((String) properties.get(key));
-      String keyIdValue = StringUtils.trimToNull((String) properties.get(keyId));
-
-      // Has the url signing provider been fully configured
-      if (keyValue == null || keyIdValue == null) {
-        logger.debug(
-                "Unable to configure key with id '{}' because the id or key is missing. Stopping to look for new keys.",
-                keyIdValue);
-        break;
+    Enumeration<String> ids = properties.keys();
+    while (ids.hasMoreElements()) {
+      String propertyKey = ids.nextElement();
+      String id = StringUtils.removeStart(propertyKey, KEY_PREFIX);
+      if (id != propertyKey) {
+        String key = StringUtils.trimToNull(Objects.toString(properties.get(propertyKey), null));
+        if (key == null) {
+          throw new ConfigurationException(propertyKey, "can't be empty");
+        }
+        keys.setProperty(id, key);
       }
-
-      keys.put(keyIdValue, keyValue);
-      i++;
     }
 
     if (keys.size() == 0) {

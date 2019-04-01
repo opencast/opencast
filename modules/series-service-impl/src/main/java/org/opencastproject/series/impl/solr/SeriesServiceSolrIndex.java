@@ -51,9 +51,7 @@ import org.opencastproject.util.SolrUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -318,45 +316,6 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
           } catch (Exception e) {
             logger.warn("Unable to index series {}: {}", doc.getFieldValue(SolrFields.COMPOSITE_ID_KEY),
                     e.getMessage());
-          }
-        }
-      });
-    }
-  }
-
-  @Override
-  public void updateOptOutStatus(String seriesId, boolean optedOut)
-          throws NotFoundException, SeriesServiceDatabaseException {
-    SolrDocument seriesDoc = getSolrDocumentByID(seriesId);
-    if (seriesDoc == null) {
-      logger.debug("No series with ID " + seriesId + " found.");
-      throw new NotFoundException("Series with ID " + seriesId + " was not found.");
-    }
-
-    final SolrInputDocument inputDoc = ClientUtils.toSolrInputDocument(seriesDoc);
-    inputDoc.setField(SolrFields.OPT_OUT, optedOut);
-
-    if (synchronousIndexing) {
-      try {
-        synchronized (solrServer) {
-          solrServer.add(inputDoc);
-          solrServer.commit();
-        }
-      } catch (Exception e) {
-        throw new SeriesServiceDatabaseException("Unable to index opt out status", e);
-      }
-    } else {
-      indexingExecutor.submit(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            synchronized (solrServer) {
-              solrServer.add(inputDoc);
-              solrServer.commit();
-            }
-          } catch (Exception e) {
-            logger.warn("Unable to index opt out status for series {}: {}",
-                    inputDoc.getFieldValue(SolrFields.COMPOSITE_ID_KEY), ExceptionUtils.getStackTrace(e));
           }
         }
       });
@@ -1005,16 +964,6 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
       }
     }
     return accessControl;
-  }
-
-  @Override
-  public boolean isOptOut(String seriesId) throws NotFoundException, SeriesServiceDatabaseException {
-    SolrDocument seriesDoc = getSolrDocumentByID(seriesId);
-    if (seriesDoc == null) {
-      logger.debug("No series exists with ID '{}'", seriesId);
-      throw new NotFoundException("No series with ID " + seriesId + " found.");
-    }
-    return BooleanUtils.toBoolean((Boolean) seriesDoc.get(SolrFields.OPT_OUT));
   }
 
   /**

@@ -4,6 +4,63 @@ Changelog
 Opencast 6
 ----------
 
+### Opencast 6.3
+
+*Released on March 05, 2019*
+
+- [[MH-13402](https://opencast.jira.com/browse/MH-13402)][[#749](https://github.com/opencast/opencast/pull/749)] -
+  WOH select-tracks does not work with audio-only input
+- [[MH-13404](https://opencast.jira.com/browse/MH-13404)][[#748](https://github.com/opencast/opencast/pull/748)] -
+  Improve Workspace Logging
+- [[MH-13401](https://opencast.jira.com/browse/MH-13401)][[#747](https://github.com/opencast/opencast/pull/747)] -
+  Fix icon in Paella Player
+- [[MH-13388](https://opencast.jira.com/browse/MH-13388)][[#734](https://github.com/opencast/opencast/pull/734)] -
+  Updating job load values for composer service on worker nodes …
+- [[MH-13378](https://opencast.jira.com/browse/MH-13378)][[#725](https://github.com/opencast/opencast/pull/725)] -
+  Add mimetype audio/m4a
+- [[MH-13377](https://opencast.jira.com/browse/MH-13377)][[#723](https://github.com/opencast/opencast/pull/723)] -
+  Fix scheduler rrule TimeZone issue
+- [[MH-12631](https://opencast.jira.com/browse/MH-12631)][[#721](https://github.com/opencast/opencast/pull/721)] -
+  Drop the ORGANIZER field from the ical feed
+- [[MH-13369](https://opencast.jira.com/browse/MH-13369)][[#715](https://github.com/opencast/opencast/pull/715)] -
+  Delete Capture Agents
+- [[MH-12177](https://opencast.jira.com/browse/MH-12177)][[#712](https://github.com/opencast/opencast/pull/712)] -
+  TimeZone threadsafe and bulk schedule across DST (NEW)
+- [[MH-13355](https://opencast.jira.com/browse/MH-13355)][[#700](https://github.com/opencast/opencast/pull/700)] -
+  Increase the default timeout for TrustedHttpClientImpl
+- [[MH-13359](https://opencast.jira.com/browse/MH-13359)][[#699](https://github.com/opencast/opencast/pull/699)] -
+  Adding UTF-8 encoding for all remote services
+- [[MH-13357](https://opencast.jira.com/browse/MH-13357)][[#697](https://github.com/opencast/opencast/pull/697)] -
+  Enable being able to disable 2 confusing Admin UI metadata: "duration" & "created"
+- [[MH-13356](https://opencast.jira.com/browse/MH-13356)][[#696](https://github.com/opencast/opencast/pull/696)] -
+  Unnecessary Snapshots
+- [[MH-13347](https://opencast.jira.com/browse/MH-13347)][[#695](https://github.com/opencast/opencast/pull/695)] -
+  Don't always look for orphaned properties
+- [[MH-13354](https://opencast.jira.com/browse/MH-13354)][[#694](https://github.com/opencast/opencast/pull/694)] -
+  Asset Manager Property Performance
+- [[MH-13352](https://opencast.jira.com/browse/MH-13352)][[#693](https://github.com/opencast/opencast/pull/693)] -
+  Unnecessary Format
+- [[MH-13310](https://opencast.jira.com/browse/MH-13310)][[#692](https://github.com/opencast/opencast/pull/692)] -
+  Simplify `AQueryBuilderImpl#always`
+- [[#686](https://github.com/opencast/opencast/pull/686)] -
+  Document workaround steps for authentication with IBM Watson STT
+- [[MH-13147](https://opencast.jira.com/browse/MH-13147)][[#683](https://github.com/opencast/opencast/pull/683)] -
+  6.x): OptimisticLockException in ServiceRegistry dispatchJob
+- [[MH-13343](https://opencast.jira.com/browse/MH-13343)][[#679](https://github.com/opencast/opencast/pull/679)] -
+  Load track into workspace with unique ID
+- [[MH-13338](https://opencast.jira.com/browse/MH-13338)][[#673](https://github.com/opencast/opencast/pull/673)] -
+  Elasticsearch Upgrade Documentation
+- [[MH-13337](https://opencast.jira.com/browse/MH-13337)][[#672](https://github.com/opencast/opencast/pull/672)] -
+  Admin UI workflow status translation keys added
+- [[MH-13329](https://opencast.jira.com/browse/MH-13329)][[#668](https://github.com/opencast/opencast/pull/668)] -
+  Removing a capture agent resets the password of all Opencast users
+- [[MH-13326](https://opencast.jira.com/browse/MH-13326)][[#663](https://github.com/opencast/opencast/pull/663)] -
+  No file/directory found when taking snapshot
+- [[MH-13315](https://opencast.jira.com/browse/MH-13315)][[#655](https://github.com/opencast/opencast/pull/655)] -
+  Don't destroy Notifications service on destruction of the Notifications directive
+- [[MH-13312](https://opencast.jira.com/browse/MH-13312)][[#654](https://github.com/opencast/opencast/pull/654)] -
+  Do not show outdated conflict information
+
 ### Opencast 6.2
 
 *Released on January 24, 2019*

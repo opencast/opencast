@@ -60,7 +60,7 @@ public class SoxServiceRemoteImpl extends RemoteBase implements SoxService {
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("sourceAudioTrack", MediaPackageElementParser.getAsXml(sourceAudioTrack)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new SoxException(e);
     }
@@ -96,7 +96,7 @@ public class SoxServiceRemoteImpl extends RemoteBase implements SoxService {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("sourceAudioTrack", MediaPackageElementParser.getAsXml(sourceAudioTrack)));
       params.add(new BasicNameValuePair("targetRmsLevDb", targetRmsLevDb.toString()));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new SoxException(e);
     }

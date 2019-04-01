@@ -45,7 +45,6 @@ import java.util.Date;
  * <li>location</li>
  * <li>agent</li>
  * <li>language</li>
- * <li>reviewStatus</li>
  * <li>startDate</li>
  * <li>status</li>
  * </ul>
@@ -82,12 +81,6 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static final String FILTER_COMMENTS_NAME = "comments";
   private static final String FILTER_COMMENTS_LABEL = "FILTERS.EVENTS.COMMENTS.LABEL";
 
-  public static final String FILTER_OPTEDOUT_NAME = "optedOut";
-  private static final String FILTER_OPTEDOUT_LABEL = "FILTERS.EVENTS.OPTEDOUT.LABEL";
-
-  public static final String FILTER_REVIEW_STATUS_NAME = "reviewStatus";
-  private static final String FILTER_REVIEW_STATUS_LABEL = "FILTERS.EVENTS.REVIEW_STATUS.LABEL";
-
   public static final String FILTER_PUBLISHER_NAME = "publisher";
   private static final String FILTER_PUBLISHER_LABEL = "FILTERS.EVENTS.PUBLISHER.LABEL";
 
@@ -105,8 +98,6 @@ public class EventListQuery extends ResourceListQueryImpl {
     this.availableFilters.add(createStatusFilter(Option.<String> none()));
     this.availableFilters.add(createCommentsFilter(Option.<String> none()));
     this.availableFilters.add(createPublisherFilter(Option.<String> none()));
-//    this.availableFilters.add(createOptedoutFilter(Option.<Boolean> none()));
-//    this.availableFilters.add(createReviewStatusFilter(Option.<String> none()));
   }
 
   /**
@@ -126,44 +117,6 @@ public class EventListQuery extends ResourceListQueryImpl {
    */
   public Option<String> getSeriesId() {
     return this.getFilterValue(FILTER_SERIES_NAME);
-  }
-
-  /**
-   * Add a {@link ResourceListFilter} filter to the query with the given opted-out status
-   *
-   * @param optedout
-   *          the opted-out status to filter with
-   */
-  public void withOptedOut(Boolean optedout) {
-    this.addFilter(createOptedoutFilter(Option.option(optedout)));
-  }
-
-  /**
-   * Returns an {@link Option} containing the opted-out status used to filter if set
-   *
-   * @return an {@link Option} containing the opted-out status or none.
-   */
-  public Option<Boolean> getOptedOut() {
-    return this.getFilterValue(FILTER_OPTEDOUT_NAME);
-  }
-
-  /**
-   * Add a {@link ResourceListFilter} filter to the query with the given review status
-   *
-   * @param reviewStatus
-   *          the review status to filter with
-   */
-  public void withReviewStatus(String reviewStatus) {
-    this.addFilter(createReviewStatusFilter(Option.option(reviewStatus)));
-  }
-
-  /**
-   * Returns an {@link Option} containing the review status used to filter if set
-   *
-   * @return an {@link Option} containing the review status or none.
-   */
-  public Option<Boolean> getReviewStatus() {
-    return this.getFilterValue(FILTER_REVIEW_STATUS_LABEL);
   }
 
   /**
@@ -486,28 +439,5 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static ResourceListFilter<String> createPublisherFilter(Option<String> publisher) {
     return FiltersUtils.generateFilter(publisher, FILTER_PUBLISHER_NAME, FILTER_PUBLISHER_LABEL, SourceType.SELECT,
             Option.some(EventsListProvider.PUBLISHER));
-  }
-
-  /**
-   * Create a new {@link ResourceListFilter} based on the opted-out status
-   *
-   * @param optedout
-   *          the opted-out to filter on wrapped in an {@link Option} or {@link Option#none()}
-   * @return a new {@link ResourceListFilter} for progress based query
-   */
-  public static ResourceListFilter<Boolean> createOptedoutFilter(Option<Boolean> optedout) {
-    return FiltersUtils.generateFilter(optedout, FILTER_OPTEDOUT_NAME, FILTER_OPTEDOUT_LABEL, SourceType.BOOLEAN,
-            Option.<String> none());
-  }
-
-  /**
-   * Create a new {@link ResourceListFilter} based on the opted-out status
-   *
-   * @param reviewStatus
-   * @return a new {@link ResourceListFilter} for progress based query
-   */
-  public static ResourceListFilter<String> createReviewStatusFilter(Option<String> reviewStatus) {
-    return FiltersUtils.generateFilter(reviewStatus, FILTER_REVIEW_STATUS_NAME, FILTER_REVIEW_STATUS_LABEL,
-            SourceType.SELECT, Option.some(EventsListProvider.REVIEW_STATUS));
   }
 }

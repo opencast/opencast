@@ -23,14 +23,10 @@ package org.opencastproject.index.service.util;
 
 import static org.opencastproject.util.data.Monadics.mlist;
 
-import org.opencastproject.authorization.xacml.manager.api.ACLTransition;
-import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
-import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
 
@@ -86,114 +82,6 @@ public final class AccessInformationUtil {
     }
 
     return systemAclJson;
-  }
-
-  /**
-   * Serialize a {@link ACLTransition} as {@link JSONObject}. The JSON structure will look like this
-   *
-   * <pre>
-   * {
-   *   "id": 37494,
-   *   "application_date": "2014-05-15T11:12:13Z",
-   *   "workflow_id": "custom_workflow",
-   *   "done": true,
-   * }
-   * </pre>
-   *
-   * @param trans
-   *          the transition to serialize
-   * @return the transition as JSON object
-   * @throws IllegalArgumentException
-   *           if the <code>trans</code> parameter is null
-   */
-  public static JSONObject serializeACLTransition(ACLTransition trans) {
-    if (trans == null)
-      throw new IllegalArgumentException("The parameter trans must not be null");
-
-    JSONObject transJson = new JSONObject();
-    try {
-      transJson.put("id", trans.getTransitionId());
-      transJson.put("application_date", DateTimeSupport.toUTC(trans.getApplicationDate().getTime()));
-      if (trans.getWorkflow().isSome())
-        transJson.put("workflow_id", trans.getWorkflow().get().getWorkflowId());
-      transJson.put("done", trans.isDone());
-    } catch (JSONException e) {
-      // This should never happen, because the key is never null
-      logger.error("An unexpected error occured:", e);
-      throw new IllegalStateException(e);
-    }
-
-    return transJson;
-  }
-
-  /**
-   * Serialize a {@link SeriesACLTransition} as {@link JSONObject}. The JSON structure will look like this
-   *
-   * <pre>
-   * {
-   *   "id": 37494,
-   *   "application_date": "2014-05-15T11:12:13Z",
-   *   "workflow_id": "custom_workflow",
-   *   "done": true,
-   *   "acl_id": 1894,
-   *   "override_episodes": true
-   * }
-   * </pre>
-   *
-   * @param trans
-   *          the transition to serialize
-   * @return the transition as JSON object
-   * @throws IllegalArgumentException
-   *           if the <code>trans</code> parameter is null
-   */
-  public static JSONObject serializeSeriesACLTransition(SeriesACLTransition trans) {
-    JSONObject transJson = serializeACLTransition((ACLTransition) trans);
-    try {
-      if (trans.getAccessControlList() != null)
-        transJson.put("acl_id", trans.getAccessControlList().getId());
-      transJson.put("override_episodes", trans.isOverride());
-    } catch (JSONException e) {
-      // This should never happen, because the key is never null
-      logger.error("An unexpected error occured:", e);
-      throw new IllegalStateException(e);
-    }
-
-    return transJson;
-  }
-
-  /**
-   * Serialize a {@link EpisodeACLTransition} as {@link JSONObject}. The JSON structure will look like this
-   *
-   * <pre>
-   * {
-   *   "id": 37494,
-   *   "application_date": "2014-05-15T11:12:13Z",
-   *   "workflow_id": "custom_workflow",
-   *   "done": true,
-   *   "acl_id": 1894,
-   *   "is_deleted": true
-   * }
-   * </pre>
-   *
-   * @param trans
-   *          the transition to serialize
-   * @return the transition as JSON object
-   * @throws IllegalArgumentException
-   *           if the <code>trans</code> parameter is null
-   */
-  public static JSONObject serializeEpisodeACLTransition(EpisodeACLTransition trans) {
-    JSONObject transJson = serializeACLTransition((ACLTransition) trans);
-    try {
-      if (trans.getAccessControlList().isSome())
-        transJson.put("acl_id", trans.getAccessControlList().get().getId());
-      transJson.put("is_deleted", trans.isDelete());
-    } catch (JSONException e) {
-      // This should never happen, because the key is never null
-      logger.error("An unexpected error occured:", e);
-      throw new IllegalStateException(e);
-    }
-
-    return transJson;
   }
 
   /**

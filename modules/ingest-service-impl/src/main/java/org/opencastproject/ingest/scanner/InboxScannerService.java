@@ -25,7 +25,6 @@ package org.opencastproject.ingest.scanner;
 import static org.opencastproject.security.util.SecurityUtil.getUserAndOrganization;
 import static org.opencastproject.util.data.Collections.dict;
 import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
@@ -36,15 +35,16 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityContext;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -62,6 +62,7 @@ import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * The inbox scanner monitors a directory for incoming media packages.
@@ -103,11 +104,16 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   /** The configuration key to use for determining the polling interval in ms. */
   public static final String INBOX_POLL = "inbox.poll";
 
+  public static final String INBOX_THREADS = "inbox.threads";
+  public static final String INBOX_TRIES = "inbox.tries";
+  public static final String INBOX_TRIES_BETWEEN_SEC = "inbox.tries.between.sec";
+
   private IngestService ingestService;
   private WorkingFileRepository workingFileRepository;
   private SecurityService securityService;
   private UserDirectoryService userDir;
   private OrganizationDirectoryService orgDir;
+  private SeriesService seriesService;
 
   private ComponentContext cc;
 
@@ -132,9 +138,9 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     final String orgId = getCfg(properties, USER_ORG);
     final String userId = getCfg(properties, USER_NAME);
     final String mediaFlavor = getCfg(properties, MEDIA_FLAVOR);
-    final String workflowDefinition = getCfg(properties, WORKFLOW_DEFINITION);
+    final String workflowDefinition = Objects.toString(properties.get(WORKFLOW_DEFINITION), null);
     final Map<String, String> workflowConfig = getCfgAsMap(properties, WORKFLOW_CONFIG);
-    final int interval = getCfgAsInt(properties, INBOX_POLL);
+    final int interval = NumberUtils.toInt(Objects.toString(properties.get(INBOX_POLL), "5000"));
     final File inbox = new File(getCfg(properties, INBOX_PATH));
     if (!inbox.isDirectory()) {
       try {
@@ -152,8 +158,9 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     if (!inbox.canWrite()) {
       throw new ConfigurationException(INBOX_PATH, String.format("Cannot write to %s", inbox.getAbsolutePath()));
     }
-    final int maxthreads = option(cc.getBundleContext().getProperty("org.opencastproject.inbox.threads")).bind(
-            Strings.toInt).getOrElse(1);
+    final int maxThreads = NumberUtils.toInt(Objects.toString(properties.get(INBOX_THREADS), "1"));
+    final int maxTries = NumberUtils.toInt(Objects.toString(properties.get(INBOX_TRIES), "3"));
+    final int secondsBetweenTries = NumberUtils.toInt(Objects.toString(properties.get(INBOX_TRIES_BETWEEN_SEC), "300"));
     final Option<SecurityContext> secCtx = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
             .bind(new Function<Tuple<User, Organization>, Option<SecurityContext>>() {
               @Override
@@ -168,8 +175,10 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
       // set up new file install config
       fileInstallCfg = some(configureFileInstall(cc.getBundleContext(), inbox, interval));
       // create new scanner
-      ingestor = some(new Ingestor(ingestService, workingFileRepository, secCtx.get(), workflowDefinition,
-            workflowConfig, mediaFlavor, inbox, maxthreads));
+      Ingestor ingestor = new Ingestor(ingestService, workingFileRepository, secCtx.get(), workflowDefinition,
+              workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries);
+      this.ingestor = some(ingestor);
+      new Thread(ingestor).start();
       logger.info("Now watching inbox {}", inbox.getAbsolutePath());
     } else {
       logger.warn("Cannot create security context for user {}, organization {}. "
@@ -177,7 +186,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     }
   }
 
-  public static final Effect<Configuration> removeFileInstallCfg = new Effect.X<Configuration>() {
+  private static final Effect<Configuration> removeFileInstallCfg = new Effect.X<Configuration>() {
     @Override
     protected void xrun(Configuration cfg) throws Exception {
       cfg.delete();
@@ -190,13 +199,14 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
    * see section 104.4.1 Location Binding, paragraph 4, of the OSGi Spec 4.2 The correct permissions are needed in order
    * to set configuration data for a bundle other than the calling bundle itself.
    */
-  public static Configuration configureFileInstall(BundleContext bc, File inbox, int interval) {
+  private static Configuration configureFileInstall(BundleContext bc, File inbox, int interval) {
     final ServiceReference caRef = bc.getServiceReference(ConfigurationAdmin.class.getName());
     if (caRef == null) {
       throw new Error("Cannot obtain a reference to the ConfigurationAdmin service");
     }
     final Dictionary<String, String> fileInstallConfig = dict(tuple("felix.fileinstall.dir", inbox.getAbsolutePath()),
-            tuple("felix.fileinstall.poll", Integer.toString(interval)));
+            tuple("felix.fileinstall.poll", Integer.toString(interval)),
+            tuple("felix.fileinstall.subdir.mode", "recurse"));
 
     // update file install config with the new directory
     try {
@@ -228,6 +238,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   @Override
   public void install(final File artifact) throws Exception {
+    logger.trace("install(): {}", artifact.getName());
     ingestor.foreach(new Effect<Ingestor>() {
       @Override
       protected void run(Ingestor ingestor) {
@@ -237,13 +248,19 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   }
 
   @Override
-  public void update(File artifact) throws Exception {
-    // To change body of implemented methods use File | Settings | File Templates.
+  public void update(File artifact) {
+    logger.trace("update(): {}", artifact.getName());
   }
 
   @Override
-  public void uninstall(File artifact) throws Exception {
-    // To change body of implemented methods use File | Settings | File Templates.
+  public void uninstall(File artifact) {
+    logger.trace("uninstall(): {}", artifact.getName());
+    ingestor.foreach(new Effect<Ingestor>() {
+      @Override
+      protected void run(Ingestor ingestor) {
+        ingestor.cleanup(artifact);
+      }
+    });
   }
 
   // --
@@ -279,7 +296,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
    * @throws ConfigurationException
    *           key does not exist or its value is blank
    */
-  public static String getCfg(Dictionary d, String key) throws ConfigurationException {
+  private static String getCfg(Dictionary d, String key) throws ConfigurationException {
     Object p = d.get(key);
     if (p == null)
       throw new ConfigurationException(key, "does not exist");
@@ -289,27 +306,20 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     return ps;
   }
 
-  public static Map<String, String> getCfgAsMap(Dictionary<String, String> d, String key) throws ConfigurationException {
-    HashMap<String, String> config = new HashMap<String, String>();
-    for (Enumeration<String> e = d.keys(); e.hasMoreElements();) {
-      String dKey = (String) e.nextElement();
-      if (dKey.startsWith(key))
-        config.put(dKey.substring(key.length() + 1), (String) d.get(dKey));
+  private static Map<String, String> getCfgAsMap(final Dictionary d, final String key) {
+
+    HashMap<String, String> config = new HashMap<>();
+    if (d == null) return config;
+    for (Enumeration e = d.keys(); e.hasMoreElements();) {
+      final String dKey = Objects.toString(e.nextElement());
+      if (dKey.startsWith(key)) {
+        config.put(dKey.substring(key.length() + 1), Objects.toString(d.get(dKey), null));
+      }
     }
     return config;
   }
 
-  /**
-   * Get a mandatory integer from a dictionary.
-   *
-   * @throws ConfigurationException
-   *           key does not exist or is not an integer
-   */
-  public static int getCfgAsInt(Dictionary d, String key) throws ConfigurationException {
-    try {
-      return Integer.parseInt(getCfg(d, key));
-    } catch (NumberFormatException e) {
-      throw new ConfigurationException(key, "not an integer");
-    }
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
   }
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.index.service.message.WorkflowMessageReceiverImpl-Adminui"
+               immediate="true">
+  <implementation
+    class="org.opencastproject.index.service.message.WorkflowMessageReceiverImpl"/>
+  <property name="service.description" value="Workflow Message Receiver"/>
+  <property name="destinationId" value="WORKFLOW.Adminui"/>
+  <service>
+    <provide interface="org.opencastproject.index.service.message.WorkflowMessageReceiverImpl"/>
+  </service>
+
+  <reference name="message-broker-sender"
+             interface="org.opencastproject.message.broker.api.MessageSender"
+             bind="setMessageSender"/>
+
+  <reference name="message-broker-receiver"
+             interface="org.opencastproject.message.broker.api.MessageReceiver"
+             bind="setMessageReceiver"/>
+
+  <reference name="message-receiver-lock-service"
+             interface="org.opencastproject.index.service.message.MessageReceiverLockService"
+             bind="setMessageReceiverLockService"/>
+
+  <reference name="search-index"
+             interface="org.opencastproject.adminui.index.AdminUISearchIndex"
+             bind="setSearchIndex"/>
+
+  <reference name="security-service"
+             interface="org.opencastproject.security.api.SecurityService"
+             bind="setSecurityService"/>
+
+</scr:component>

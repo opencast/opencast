@@ -24,8 +24,7 @@ describe('Series Access API Resource', function () {
                             read: true,
                             write: true
                         }
-                    },
-                    transitions: []
+                    }
                 },
                 system_acls: [{
                     id: 1601,

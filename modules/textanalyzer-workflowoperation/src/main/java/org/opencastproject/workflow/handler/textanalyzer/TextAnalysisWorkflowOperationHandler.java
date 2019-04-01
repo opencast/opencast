@@ -107,18 +107,8 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
   /** Name of the constant used to retreive the stability threshold */
   public static final String OPT_STABILITY_THRESHOLD = "stabilitythreshold";
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
   /** The stability threshold */
   private int stabilityThreshold = DEFAULT_STABILITY_THRESHOLD;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put("source-flavor", "The flavor of the input tracks");
-    CONFIG_OPTIONS.put("source-tags", "The required tags that must exist on the segments catalog");
-    CONFIG_OPTIONS.put("target-tags", "The tags to apply to the resulting mpeg-7 catalog");
-  }
 
   /** The local workspace */
   private Workspace workspace = null;
@@ -131,16 +121,6 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /** The composer service */
   protected ComposerService composer = null;
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
 
   /**
    * Callback for the OSGi declarative services configuration that will set the text analysis service.

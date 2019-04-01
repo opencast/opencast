@@ -367,7 +367,7 @@ public class JsonpFilter implements Filter {
      *
      * @return the buffer as a byte array
      */
-    public synchronized byte toByteArray()[] {
+    public synchronized byte[] toByteArray() {
       return Arrays.copyOf(buf, count);
     }
 

@@ -45,8 +45,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * The workflow definition for handling "publish" operations
@@ -67,25 +65,6 @@ public class PublishYouTubeWorkflowOperationHandler extends AbstractWorkflowOper
    */
   public void setPublicationService(YouTubePublicationService publicationService) {
     this.publicationService = publicationService;
-  }
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put("source-tags", "Publish the mediapackage element with these matching (comma separated) tags.");
-    CONFIG_OPTIONS.put("source-flavors", "Publish the mediapackage element with one of these matching flavors");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

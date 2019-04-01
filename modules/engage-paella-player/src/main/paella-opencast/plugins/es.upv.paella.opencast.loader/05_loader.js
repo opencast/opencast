@@ -42,7 +42,7 @@ function initPaellaOpencast() {
 function loadOpencastPaella(containerId) {
   initPaellaOpencast();
   paella.load(containerId, {
-    configUrl:'/paella/config/config.json',
+    configUrl:'/ui/config/paella/config.json',
     loadVideo:function() {
       return new Promise((resolve, reject) => {
         paella.opencast.getEpisode()

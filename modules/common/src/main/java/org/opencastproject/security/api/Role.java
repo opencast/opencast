@@ -66,9 +66,9 @@ public interface Role {
   /**
    * Returns the role's organization identifier.
    *
-   * @return the organization
+   * @return the organization identifier
    */
-  Organization getOrganization();
+  String getOrganizationId();
 
   /**
    * Returns the role's {@link Type}

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-               name="org.opencastproject.authorization.xacml.XACMLAuthorizationService">
+               name="org.opencastproject.authorization.xacml.XACMLAuthorizationService"
+               modified="modified">
   <implementation class="org.opencastproject.authorization.xacml.XACMLAuthorizationService"/>
   <property name="service.description"
             value="Provides translation between access control entries and xacml documents"/>

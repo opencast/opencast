@@ -149,6 +149,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -165,7 +166,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {}, abstractText = "Provides resources and operations related to the events")
 public class EventsEndpoint implements ManagedService {
   private static final String METADATA_JSON_KEY = "metadata";
@@ -457,7 +458,7 @@ public class EventsEndpoint implements ManagedService {
         if (eventHttpServletRequest.getScheduling().isSome() && !requestedVersion.isSmallerThan(VERSION_1_1_0)) {
           // Scheduling is only available for version 1.1.0 and above
           Optional<Response> clientError = updateSchedulingInformation(
-              eventHttpServletRequest.getScheduling().get(), eventId, requestedVersion);
+              eventHttpServletRequest.getScheduling().get(), eventId, requestedVersion, false);
           if (clientError.isPresent()) {
             return clientError.get();
           }
@@ -712,20 +713,18 @@ public class EventsEndpoint implements ManagedService {
           case EventIndexSchema.END_DATE:
             query.sortByEndDate(criterion.getOrder());
             break;
-          case EventIndexSchema.REVIEW_STATUS:
-            query.sortByReviewStatus(criterion.getOrder());
-            break;
           case EventIndexSchema.WORKFLOW_STATE:
             query.sortByWorkflowState(criterion.getOrder());
-            break;
-          case EventIndexSchema.SCHEDULING_STATUS:
-            query.sortBySchedulingStatus(criterion.getOrder());
             break;
           case EventIndexSchema.SERIES_NAME:
             query.sortBySeriesName(criterion.getOrder());
             break;
           case EventIndexSchema.LOCATION:
             query.sortByLocation(criterion.getOrder());
+            break;
+          // For compatibilty, we mimic to support the old review_status and scheduling_status sort criteria (MH-13407)
+          case "review_status":
+          case "scheduling_status":
             break;
           default:
             return RestUtil.R
@@ -1676,7 +1675,7 @@ public class EventsEndpoint implements ManagedService {
 
   @GET
   @Path("{eventId}/scheduling")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0 })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0 })
   @RestQuery(name = "geteventscheduling", description = "Returns an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
       @RestResponse(description = "The scheduling information for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
@@ -1704,19 +1703,24 @@ public class EventsEndpoint implements ManagedService {
 
   @PUT
   @Path("{eventId}/scheduling")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0 })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0 })
   @RestQuery(name = "updateeventscheduling", description = "Update an event's scheduling information.", returnDescription = "", pathParameters = {
-      @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, restParameters = {
-      @RestParameter(name = "scheduling", isRequired = true, description = "Scheduling Information", type = STRING) }, reponses = {
+      @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = Type.STRING) }, restParameters = {
+      @RestParameter(name = "scheduling", isRequired = true, description = "Scheduling Information", type = Type.STRING),
+      @RestParameter(name = "allowConflict", description = "Allow conflicts when updating scheduling", isRequired = false, type = Type.BOOLEAN) }, reponses = {
       @RestResponse(description = "The  scheduling information for the specified event is updated.", responseCode = HttpServletResponse.SC_NO_CONTENT),
       @RestResponse(description = "The specified event has no scheduling information to update.", responseCode = HttpServletResponse.SC_NOT_ACCEPTABLE),
       @RestResponse(description = "The scheduling information could not be updated due to a conflict.", responseCode = HttpServletResponse.SC_CONFLICT),
       @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventScheduling(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
-                                 @FormParam("scheduling") String scheduling) throws Exception {
+                                 @FormParam("scheduling") String scheduling,
+                                 @FormParam("allowConflict") @DefaultValue("false") boolean allowConflict) throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     final Opt<Event> event = indexService.getEvent(id, externalIndex);
 
+    if (requestedVersion.isSmallerThan(ApiVersion.VERSION_1_2_0)) {
+        allowConflict = false;
+    }
     if (event.isNone()) {
       return ApiResponses.notFound(String.format("Unable to find event with id '%s'", id));
     }
@@ -1728,14 +1732,16 @@ public class EventsEndpoint implements ManagedService {
       logger.debug("Client sent unparsable scheduling information for event {}: {}", id, scheduling);
       return RestUtil.R.badRequest("Unparsable scheduling information");
     }
-    Optional<Response> clientError = updateSchedulingInformation(parsedJson, id, requestedVersion);
+    Optional<Response> clientError = updateSchedulingInformation(parsedJson, id, requestedVersion, allowConflict);
     return clientError.orElse(Response.noContent().build());
   }
 
   private Optional<Response> updateSchedulingInformation(
       JSONObject parsedScheduling,
       String id,
-      ApiVersion requestedVersion) throws Exception {
+      ApiVersion requestedVersion,
+      boolean allowConflict) throws Exception {
+
     SchedulingInfo schedulingInfo;
     try {
       schedulingInfo = SchedulingInfo.of(parsedScheduling);
@@ -1763,8 +1769,7 @@ public class EventsEndpoint implements ManagedService {
           Opt.none(),
           Opt.none(),
           caConfig,
-          Opt.none(),
-          SchedulerService.ORIGIN);
+          allowConflict);
     } catch (SchedulerConflictException e) {
       final List<MediaPackage> conflictingEvents = getConflictingEvents(
           schedulingInfo.merge(technicalMetadata), agentStateService, schedulerService);

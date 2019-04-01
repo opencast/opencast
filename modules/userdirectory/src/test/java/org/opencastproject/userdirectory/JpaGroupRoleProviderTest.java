@@ -178,14 +178,10 @@ public class JpaGroupRoleProviderTest {
   public void testRemoveGroupNotAllowedAsNonAdminUser() throws NotFoundException, Exception {
     JpaGroup group = new JpaGroup("test", org1, "Test", "Test group", Collections.set(
             new JpaRole(SecurityConstants.GLOBAL_ADMIN_ROLE, org1)));
-    try {
-      provider.addGroup(group);
-      Group loadGroup = provider.loadGroup(group.getGroupId(), group.getOrganization().getId());
-      assertNotNull(loadGroup);
-      assertEquals(group.getGroupId(), loadGroup.getGroupId());
-    } catch (Exception e) {
-      fail("The group should be added");
-    }
+    provider.addGroup(group);
+    Group loadGroup = provider.loadGroup(group.getGroupId(), group.getOrganization().getId());
+    assertNotNull(loadGroup);
+    assertEquals(group.getGroupId(), loadGroup.getGroupId());
 
     JpaUser user = new JpaUser("user", "pass1", org1, "User", "user@localhost", "opencast", true,
             Collections.set(new JpaRole("ROLE_USER", org1)));

@@ -10,7 +10,6 @@
 	<organizers>organizer-one</organizers>
 	<license>Creative Commons 2.0</license>
 	<access_policy>ROLE_ADMIN</access_policy>
-	<opt_out>true</opt_out>
 	<createdDateTime>2011-07-16T20:39:05Z</createdDateTime>
 	<organizers>organizer-two</organizers>
 	<organizers>organizer-three</organizers>

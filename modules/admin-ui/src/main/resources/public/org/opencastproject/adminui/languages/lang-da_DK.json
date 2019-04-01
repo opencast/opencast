@@ -10,7 +10,8 @@
    "SAVE": "Gem",
    "LOGOUT": "Log ud",
    "RESET": "Nulstil",
-   "SELECT_NO_OPTIONS": "Intet valg",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabisk",
@@ -55,11 +56,9 @@
             "ACL": "Den følgende ACL slettes",
             "GROUP": "Den følgende gruppe slettes",
             "USER": "Den følgende bruger slettes",
-            "USER_BLACKLIST": "Den følgende brugersortliste slettes",
             "THEME": "Det følgende tema slettes",
             "EMAIL": "Den følgende e-mail slettes",
-            "LOCATION": "Den følgende placering slettes",
-            "LOCATION_BLACKLIST": "Den følgende placeringssortliste slettes"
+            "LOCATION": "Den følgende placering slettes"
          },
          "NAME": "Navn"
       },
@@ -130,21 +129,9 @@
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Begivenheden kunne ikke slettes, da du ikke har tilladelse til at gøre det.",
       "SERIES_DELETED": "Serien er blevet oprette",
       "SERIES_NOT_DELETED": "Serien kunne ikke slettes",
-      "USER_BLACKLIST_CREATED": "Sortlisten er blevet oprettet",
-      "USER_BLACKLIST_NOT_CREATED": "Sortlisten kunne ikke oprettes",
-      "USER_BLACKLIST_SAVED": "Sortlisten er blevet gemt",
-      "USER_BLACKLIST_NOT_SAVED": "Sortlisten kunne ikke gemmes",
-      "USER_BLACKLIST_DELETED": "Sortlisten er blevet slettet",
-      "USER_BLACKLIST_NOT_DELETED": "Sortlisten kunne ikke slettes",
       "LOCATION_DELETED": "Placeringen er blevet slettet",
       "LOCATION_NOT_DELETED": "Placeringen kunne ikke slettes",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Placeringen kunne ikke slettes, da du ikke har tilladelse til at gøre det.",
-      "LOCATION_BLACKLIST_CREATED": "Sortlisten er blevet oprettet",
-      "LOCATION_BLACKLIST_NOT_CREATED": "Sortlisten kunne ikke oprettes",
-      "LOCATION_BLACKLIST_SAVED": "Sortlisten er blevet gemt",
-      "LOCATION_BLACKLIST_NOT_SAVED": "Sortlisten kunne ikke gemmes",
-      "LOCATION_BLACKLIST_DELETED": "Sortlisten er blevet slettet",
-      "LOCATION_BLACKLIST_NOT_DELETED": "Sortlisten kunne ikke slettes",
       "EMAIL_TEMPLATE_CREATED": "Skabelonen er blevet oprettet",
       "EMAIL_TEMPLATE_NOT_CREATED": "Skabelonen kunne ikke oprettes",
       "EMAIL_TEMPLATE_SAVED": "Skabelonen er blevet gemt",
@@ -545,18 +532,17 @@
                "EDITOR": "Åbn videoredigeringsværktøj",
                "EDITOR_NEEDS_CUTTING": "Åbn videoredigeringsværktøjet (en kommentar indikerer, at der er blevet anmodet om videobeskæring)",
                "COMMENTS": "Vis kommentarer",
-               "PAUSED_WORKFLOW": "Vis arbejdsgange på pause"
+               "PAUSED_WORKFLOW": "Vis arbejdsgange på pause",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Klar til optagelse",
-            "BLACKLISTED": "Sortlistet",
             "OPTED_OUT": "Frameldt"
          },
          "STATUS": {
             "SCHEDULED": "Planlagt",
             "OPTEDOUT": "Frameldt",
-            "BLACKLISTED": "Sortlistet",
             "RECORDING": "Optager",
             "UPLOADING": "Uploader",
             "INGESTING": "Indtager",
@@ -875,25 +861,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Handlinger",
                "DETAILS": "Oplysninger",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Flere oplysninger og handlinger",
+               "DESCRIPTION": "Beskriveslse",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "Type",
                "TITLE": "Titel",
-               "STATE": "Tilstand",
+               "STATUS": "Status",
                "STARTED": "Startet",
                "SERIES": "Serier",
                "SUBMITTED": "Indsendt",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Arbejdsgngsdefinition",
                "MIMETYPE": "Mime-type",
                "URL": "URL",
                "CONFIGURATION": "Opsætning",
                "NO_CONFIGURATION": "Ingen eksisterende opsætningsparametre til den valgte arbejdsgangsdefinition.",
                "WORKFLOW": "Arbejdsgang",
                "TOOLTIP": {
-                  "STOP": "Stop arbejdsgangseksekveringsproces",
-                  "ABORT": "Afbryd arbejdsgangseksekveringsproces (forsøg igen ikke fejlede operationer igen)",
-                  "RETRY": "Førsøg arbejdsgangseksekveringsproces igen",
-                  "DELETE": "Slet arbejdsgangsproces"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Forberedes",
@@ -901,12 +891,14 @@
                   "PAUSED": "På pause",
                   "SUCCEEDED": "Gennemført",
                   "FAILED": "Mislykkedes",
+                  "FAILING": "Failing",
                   "SKIPPED": "Oversprunget",
+                  "STOPPED": "Stopped",
                   "RETRY": "Prøv igen"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Arbejdsprocesinstanser"
+               "TITLE": "Arbejdsgange"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Arbejdsgangsoplysninger",
@@ -1130,12 +1122,10 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Placeringer",
-         "BLACKLISTS": "Sortlister"
+         "LOCATIONS": "Placeringer"
       },
       "ACTIONS": {
          "EXPORT": "Exportér",
-         "ADD_BLACKLIST": "Tilføj sortliste",
          "REMOVE": "Fjern"
       },
       "RECORDINGS": {
@@ -1149,8 +1139,6 @@
             "NEXT_NAME": "Næste begivenhedstitel",
             "STATUS": "Status",
             "VERSION": "Version",
-            "BLACKLIST_FROM": "Sortlistet fra",
-            "BLACKLIST_TO": "Sortlistet indtil",
             "ACTION": "Handlinger",
             "TOOLTIP": {
                "NAME": "Filtrér begivenheder for denne placering",
@@ -1181,60 +1169,18 @@
                "NO_CAPABILITIES": "Ingen kapaciteter til rådighed"
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Placeringssortliste",
-            "NAME": "Navn",
-            "ACTIONS": "Handlinger"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Opret sortliste",
-            "EDITCAPTION": "Redigér sortliste",
-            "TABS": {
-               "LOCATIONS": "Placeringer",
-               "DATES": "Datoer",
-               "REASON": "Årsag",
-               "SUMMARY": "Oversigt"
-            },
-            "LOCATIONS": {
-               "REMOVE": "Fjern",
-               "ADD_LOCATION": "Vælg placering",
-               "ALL_LOCATIONS": "Alle placeringer",
-               "SELECT_LOCATION": "Vælg"
-            },
-            "DATES": {
-               "START_DATE": "Startdato",
-               "END_DATE": "Slutdato"
-            },
-            "REASON": {
-               "SELECT_REASON": "Vælg",
-               "REASON": "Årsag",
-               "COMMENTS": "Kommentarer"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Oversigt",
-               "LOCATION": "Placering",
-               "DATE_FROM": "Fra",
-               "DATE_TO": "Indtil",
-               "REASON": "Årsag",
-               "COMMENTS": "Kommentarer"
-            }
-         }
       }
    },
    "USERS": {
       "ACTIONS": {
          "ADD_USER": "Tilføj bruger",
          "ADD_GROUP": "Tilføj gruppe",
-         "ADD_ACL": "Tilføj adgangspolitik",
-         "ADD_BLACKLIST": "Tilføj sortliste"
+         "ADD_ACL": "Tilføj adgangspolitik"
       },
       "NAVIGATION": {
          "USERS": "Brugere",
          "GROUPS": "Grupper",
-         "PERMISSIONS": "Adgangspolitikker",
-         "BLACKLISTS": "Sortliste"
+         "PERMISSIONS": "Adgangspolitikker"
       },
       "USERS": {
          "TABLE": {
@@ -1245,8 +1191,6 @@
             "ROLES": "Roller",
             "TYPE": "Type",
             "PROVIDER": "Udbyder",
-            "BLACKLIST_FROM": "Sortlistet fra",
-            "BLACKLIST_TO": "Sortlistet indtil",
             "ACTION": "Handlinger",
             "TOOLTIP": {
                "DELETE": "Slet bruger",
@@ -1415,49 +1359,6 @@
                   "LABEL": "Vælg en rolle",
                   "EMPTY": "Ingen rolle fundet"
                }
-            }
-         }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Brugeres sortliste",
-            "NAME": "Navn",
-            "DATE_FROM": "Fra",
-            "DATE_TO": "Indtil",
-            "REASON": "Årsag",
-            "ACTION": "Handlinger"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Opret sortliste",
-            "EDITCAPTION": "Redigér sortliste",
-            "TABS": {
-               "USERS": "Brugere",
-               "DATES": "Datoer",
-               "REASON": "Årsag",
-               "SUMMARY": "Oversigt"
-            },
-            "USERS": {
-               "REMOVE": "Fjern",
-               "ADD_USER": "Vælg bruger",
-               "ALL_USERS": "Alle brugere",
-               "SELECT_USER": "Vælg"
-            },
-            "DATES": {
-               "START_DATE": "Startdato",
-               "END_DATE": "Slutdato"
-            },
-            "REASON": {
-               "SELECT_REASON": "Vælg",
-               "REASON": "Årsag",
-               "COMMENTS": "Kommentarer"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Oversigt",
-               "USER": "Bruger",
-               "DATE_FROM": "Fra",
-               "DATE_TO": "Indtil",
-               "REASON": "Årsag",
-               "COMMENTS": "Kommentarer"
             }
          }
       }
@@ -2085,16 +1986,6 @@
    "TABLE_NO_RESULT": "Intet resultat fundet",
    "TABLE_LOADING": "Indlæser…",
    "TABLE_EDIT": "Redigér",
-   "PM": {
-      "BLACKLIST": {
-         "REASONS": {
-            "SICK_LEAVE": "Sygeorlov",
-            "LEAVE": "Orlov",
-            "FAMILY_EMERGENCY": "Familienødsituation",
-            "CONSTRUCTION": "Under opførelse"
-         }
-      }
-   },
    "DASHBOARD": {
       "RUNNING": "Kører",
       "FINISHED": "Færdig",
@@ -2183,6 +2074,11 @@
          "SHUTTING_DOWN": "Lukker ned",
          "UNKNOWN": "Ukendt",
          "UPLOADING": "Uploader"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

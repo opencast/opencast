@@ -25,31 +25,24 @@ import static org.opencastproject.util.MimeType.mimeType;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.util.data.functions.Strings;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -122,58 +115,21 @@ public final class MimeTypes {
     JAR = MimeTypes.parseMimeType("application/java-archive");
     SMIL = MimeTypes.parseMimeType("application/smil");
     PNG = MimeTypes.parseMimeType("image/png");
+
     // initialize from file
-    InputStream is = null;
-    InputStreamReader isr = null;
     try {
-      String definitions = null;
-      is = MimeTypes.class.getResourceAsStream(DEFINITION_FILE);
-      StringBuilder buf = new StringBuilder();
-      if (is == null)
-        throw new FileNotFoundException(DEFINITION_FILE);
-
-      isr = new InputStreamReader(is);
-      char[] chars = new char[1024];
-      int count = 0;
-      while ((count = isr.read(chars)) > 0) {
-        for (int i = 0; i < count; i++) {
-          buf.append(chars[i]);
-        }
-      }
-
-      definitions = buf.toString();
       SAXParserFactory parserFactory = SAXParserFactory.newInstance();
       SAXParser parser = parserFactory.newSAXParser();
       DefaultHandler handler = new MimeTypeParser(mimeTypes);
-      parser.parse(new InputSource(new StringReader(definitions)), handler);
-    } catch (FileNotFoundException e) {
-      logger.error("Error initializing mime type registry: definition file not found!");
+
+      try (InputStream inputStream = MimeTypes.class.getResourceAsStream(DEFINITION_FILE)) {
+        parser.parse(inputStream, handler);
+      }
     } catch (IOException e) {
-      logger.error("Error initializing mime type registry: " + e.getMessage());
-    } catch (ParserConfigurationException e) {
-      logger.error("Configuration error while parsing mime type registry: " + e.getMessage());
-    } catch (SAXException e) {
-      logger.error("Error parsing mime type registry: " + e.getMessage());
-    } finally {
-      IOUtils.closeQuietly(isr);
-      IOUtils.closeQuietly(is);
+      logger.error("Error initializing mime type registry", e);
+    } catch (ParserConfigurationException | SAXException e) {
+      logger.error("Error parsing mime type registry", e);
     }
-  }
-
-  /** Get a mime type from the registry. */
-  public static Option<MimeType> get(String type, String subtype) {
-    for (MimeType t : mimeTypes) {
-      if (t.getType().equals(type) && t.getSubtype().equals(subtype))
-        return some(t);
-    }
-    return none();
-  }
-
-  /** Get a mime type from the registry or create a new one if not available. */
-  public static MimeType getOrCreate(String type, String subtype) {
-    for (MimeType t : get(type, subtype))
-      return t;
-    return mimeType(type, subtype);
   }
 
   public static final Fn<String, Opt<MimeType>> toMimeType = new Fn<String, Opt<MimeType>>() {
@@ -239,26 +195,6 @@ public final class MimeTypes {
    * If no mime type can be derived from either the file name or its contents, a <code>UnknownFileTypeException</code>
    * is thrown.
    *
-   * @param url
-   *          the file
-   * @return the corresponding mime type
-   * @throws UnknownFileTypeException
-   *           if the mime type cannot be derived from the file
-   */
-  public static MimeType fromURL(URL url) throws UnknownFileTypeException {
-    if (url == null)
-      throw new IllegalArgumentException("Argument 'url' is null");
-    return fromString(url.getPath());
-  }
-
-  /**
-   * Returns a mime type for the provided file.
-   * <p>
-   * This method tries various ways to extract mime type information from the files name or its contents.
-   * <p>
-   * If no mime type can be derived from either the file name or its contents, a <code>UnknownFileTypeException</code>
-   * is thrown.
-   *
    * @param uri
    *          the file
    * @return the corresponding mime type
@@ -289,28 +225,7 @@ public final class MimeTypes {
     if (name == null)
       throw new IllegalArgumentException("Argument 'name' is null");
 
-    MimeType mimeType = null;
-
-    // Extract suffix
-    String filename = name;
-    String suffix = null;
-    int separatorPos = filename.lastIndexOf('.');
-    if (separatorPos > 0 && separatorPos < filename.length() - 1) {
-      suffix = filename.substring(separatorPos + 1);
-    } else {
-      throw new UnknownFileTypeException("Unable to get mime type without suffix");
-    }
-
-    // Try to get mime type for file suffix
-    try {
-      mimeType = fromSuffix(suffix);
-      if (mimeType != null)
-        return mimeType;
-    } catch (UnknownFileTypeException e) {
-      throw e;
-    }
-
-    throw new UnknownFileTypeException("File '" + name + "' cannot be matched to any mime type");
+    return fromSuffix(FilenameUtils.getExtension(name));
   }
 
   /**
@@ -376,19 +291,15 @@ public final class MimeTypes {
     }
 
     @Override
-    public void endElement(String uri, String localName, String name) throws SAXException {
+    public void endElement(final String uri, final String localName, final String name) throws SAXException {
       super.endElement(uri, localName, name);
 
       if ("Type".equals(name)) {
         type = getContent();
-        return;
       } else if ("Description".equals(name)) {
         description = getContent();
-        return;
-      }
-      if ("Extensions".equals(name)) {
+      } else if ("Extensions".equals(name)) {
         extensions = getContent();
-        return;
       } else if ("MimeType".equals(name)) {
         String[] t = type.split("/");
         MimeType mimeType = mimeType(t[0].trim(), t[1].trim(),

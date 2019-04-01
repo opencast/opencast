@@ -63,7 +63,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0 })
 @RestService(name = "externalapisecurity", title = "External API Security Service", notes = {}, abstractText = "Provides security operations related to the external API")
 public class SecurityEndpoint implements ManagedService {
 

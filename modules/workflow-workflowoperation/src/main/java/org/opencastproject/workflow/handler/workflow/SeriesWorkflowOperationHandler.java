@@ -20,8 +20,6 @@
  */
 package org.opencastproject.workflow.handler.workflow;
 
-import static java.lang.String.format;
-
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -75,8 +73,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
 
 /**
@@ -86,9 +82,6 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SeriesWorkflowOperationHandler.class);
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
 
   /** Name of the configuration option that provides the optional series identifier */
   public static final String SERIES_PROPERTY = "series";
@@ -168,29 +161,6 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
   /** OSGi callback to remove {@link SeriesCatalogUIAdapter} instance. */
   public void removeCatalogUIAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
     seriesCatalogUIAdapters.remove(catalogUIAdapter);
-  }
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<>();
-    CONFIG_OPTIONS.put(SERIES_PROPERTY, "The optional series identifier");
-    CONFIG_OPTIONS.put(ATTACH_PROPERTY, "The flavors of the series catalogs to attach to the mediapackage.");
-    CONFIG_OPTIONS.put(APPLY_ACL_PROPERTY, "Whether the ACL should be applied or not");
-    CONFIG_OPTIONS.put(COPY_METADATA_PROPERTY,
-            "A blank- or comma-separated list of metadata fields to copy to the episode catalog, "
-                    + "when they are defined in the series' catalog but not in the episode's");
-    CONFIG_OPTIONS.put(DEFAULT_NS_PROPERTY,
-            format("The default Namespace assumed when the metadata fields are not fully qualified. Defaults to '%s'",
-                    DublinCore.TERMS_NS_URI));
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**

@@ -222,16 +222,6 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       and(EventIndexSchema.EVENT_STATUS, query.getEventStatus());
     }
 
-    // Review status
-    if (query.getReviewStatus() != null) {
-      and(EventIndexSchema.REVIEW_STATUS, query.getReviewStatus());
-    }
-
-    // Scheduling status
-    if (query.getSchedulingStatus() != null) {
-      and(EventIndexSchema.SCHEDULING_STATUS, query.getSchedulingStatus());
-    }
-
     // Recording start date period
     if (query.getStartFrom() != null && query.getStartTo() != null) {
       and(EventIndexSchema.START_DATE, query.getStartFrom(), query.getStartTo());
@@ -245,21 +235,6 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     // Recording duration
     if (query.getDuration() != null) {
       and(EventIndexSchema.DURATION, query.getDuration());
-    }
-
-    // Opt out
-    if (query.getOptedOut() != null) {
-      and(EventIndexSchema.OPTED_OUT, query.getOptedOut());
-    }
-
-    // Review date
-    if (query.getReviewDate() != null) {
-      and(EventIndexSchema.REVIEW_DATE, query.getReviewDate());
-    }
-
-    // Blacklisted
-    if (query.getBlacklisted() != null) {
-      and(EventIndexSchema.BLACKLISTED, query.getBlacklisted());
     }
 
     // Has comments
@@ -311,7 +286,7 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     // Text
     if (query.getTerms() != null) {
       for (SearchTerms<String> terms : query.getTerms()) {
-        StringBuffer queryText = new StringBuffer();
+        StringBuilder queryText = new StringBuilder();
         for (String term : terms.getTerms()) {
           if (queryText.length() > 0)
             queryText.append(" ");
@@ -323,7 +298,7 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
           this.text = queryText.toString();
         if (Quantifier.All.equals(terms.getQuantifier())) {
           if (groups == null)
-            groups = new ArrayList<ValueGroup>();
+            groups = new ArrayList<>();
           if (query.isFuzzySearch()) {
             logger.warn("All quantifier not supported in conjunction with wildcard text");
           }

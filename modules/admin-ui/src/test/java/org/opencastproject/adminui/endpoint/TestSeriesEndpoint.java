@@ -22,19 +22,12 @@
 package org.opencastproject.adminui.endpoint;
 
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
-import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
-import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
-import org.opencastproject.authorization.xacml.manager.api.TransitionResult;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
-import org.opencastproject.authorization.xacml.manager.impl.TransitionResultImpl;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.impl.IndexServiceImpl;
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -75,7 +68,6 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -212,17 +204,11 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     managedAcls.add(managedAcl1);
     managedAcls.add(new ManagedAclImpl(44L, "Private", defaultOrganization.getId(), acl));
 
-    Date transitionDate = new Date(DateTimeSupport.fromUTC("2014-06-05T15:00:00Z"));
-    TransitionResult transitionResult = getTransitionResult(managedAcl1, transitionDate);
-
     AclService aclService = EasyMock.createNiceMock(AclService.class);
     EasyMock.expect(aclService.getAcls()).andReturn(managedAcls).anyTimes();
     EasyMock.expect(aclService.getAcl(EasyMock.anyLong())).andReturn(Option.some(managedAcl1)).anyTimes();
-    Option<ConfiguredWorkflowRef> anyWorkflowOption = EasyMock.anyObject();
     EasyMock.expect(aclService.applyAclToSeries(EasyMock.anyString(), EasyMock.anyObject(AccessControlList.class),
-            EasyMock.anyBoolean(), anyWorkflowOption)).andReturn(true).anyTimes();
-    EasyMock.expect(aclService.getTransitions(EasyMock.anyObject(TransitionQuery.class))).andReturn(transitionResult)
-            .anyTimes();
+            EasyMock.anyBoolean())).andReturn(true).anyTimes();
     EasyMock.replay(aclService);
 
     AclServiceFactory aclServiceFactory = EasyMock.createNiceMock(AclServiceFactory.class);
@@ -267,35 +253,14 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
   }
 
   @SuppressWarnings("unchecked")
-  private SearchResultItem<Event>[] createEvents(int readyCount, int blacklistedCount, int optedOutCount) {
-    SearchResultItem<Event>[] eventitems = new SearchResultItem[readyCount + blacklistedCount + optedOutCount];
+  private SearchResultItem<Event>[] createEvents(int readyCount) {
+    SearchResultItem<Event>[] eventitems = new SearchResultItem[readyCount];
     int total = 1;
     String orgId = new DefaultOrganization().getId();
     for (int i = 0; i < readyCount; i++) {
       Event readyEvent = new Event(Integer.toString(i + total), orgId);
-      readyEvent.setOptedOut(false);
       SearchResultItem<Event> eventItem = EasyMock.createMock(SearchResultItem.class);
       EasyMock.expect(eventItem.getSource()).andReturn(readyEvent);
-      EasyMock.replay(eventItem);
-      eventitems[total - 1] = eventItem;
-      total++;
-    }
-
-    for (int i = 0; i < blacklistedCount; i++) {
-      Event blacklistedEvent = new Event(Integer.toString(i + total), orgId);
-      blacklistedEvent.setBlacklisted(true);
-      SearchResultItem<Event> eventItem = EasyMock.createMock(SearchResultItem.class);
-      EasyMock.expect(eventItem.getSource()).andReturn(blacklistedEvent);
-      EasyMock.replay(eventItem);
-      eventitems[total - 1] = eventItem;
-      total++;
-    }
-
-    for (int i = 0; i < optedOutCount; i++) {
-      Event optedOutEvent = new Event(Integer.toString(i + total), orgId);
-      optedOutEvent.setOptedOut(true);
-      SearchResultItem<Event> eventItem = EasyMock.createMock(SearchResultItem.class);
-      EasyMock.expect(eventItem.getSource()).andReturn(optedOutEvent);
       EasyMock.replay(eventItem);
       eventitems[total - 1] = eventItem;
       total++;
@@ -340,13 +305,13 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     descSeriesItems[2] = item1;
 
     // final SearchResultItem<Event>[] eventItems1 = new SearchResultItem[0];
-    final SearchResultItem<Event>[] eventItems1 = createEvents(1, 1, 1);
+    final SearchResultItem<Event>[] eventItems1 = createEvents(1);
 
     // Setup the events for series 2
     final SearchResultItem<Event>[] eventItems2 = new SearchResultItem[0];
 
     // Setup the events for series 3
-    final SearchResultItem<Event>[] eventItems3 = createEvents(0, 1, 2);
+    final SearchResultItem<Event>[] eventItems3 = createEvents(0);
 
     final SearchResultItem<org.opencastproject.index.service.impl.index.theme.Theme> themeItem1 = EasyMock
             .createMock(SearchResultItem.class);
@@ -505,91 +470,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     EasyMock.replay(adminuiSearchIndex, item1, item2, item3, themeItem1, ascSeriesSearchResult, descSeriesSearchResult,
             emptySearchResult, oneSearchResult, twoSearchResult);
-  }
-
-  private TransitionResult getTransitionResult(final ManagedAcl macl, final Date now) {
-    return new TransitionResultImpl(
-            org.opencastproject.util.data.Collections.<EpisodeACLTransition> list(new EpisodeACLTransition() {
-              @Override
-              public String getEpisodeId() {
-                return "episode";
-              }
-
-              @Override
-              public Option<ManagedAcl> getAccessControlList() {
-                return some(macl);
-              }
-
-              @Override
-              public boolean isDelete() {
-                return getAccessControlList().isNone();
-              }
-
-              @Override
-              public long getTransitionId() {
-                return 1L;
-              }
-
-              @Override
-              public String getOrganizationId() {
-                return "org";
-              }
-
-              @Override
-              public Date getApplicationDate() {
-                return now;
-              }
-
-              @Override
-              public Option<ConfiguredWorkflowRef> getWorkflow() {
-                return none();
-              }
-
-              @Override
-              public boolean isDone() {
-                return false;
-              }
-            }), org.opencastproject.util.data.Collections.<SeriesACLTransition> list(new SeriesACLTransition() {
-              @Override
-              public String getSeriesId() {
-                return "series";
-              }
-
-              @Override
-              public ManagedAcl getAccessControlList() {
-                return macl;
-              }
-
-              @Override
-              public boolean isOverride() {
-                return true;
-              }
-
-              @Override
-              public long getTransitionId() {
-                return 2L;
-              }
-
-              @Override
-              public String getOrganizationId() {
-                return "org";
-              }
-
-              @Override
-              public Date getApplicationDate() {
-                return now;
-              }
-
-              @Override
-              public Option<ConfiguredWorkflowRef> getWorkflow() {
-                return none();
-              }
-
-              @Override
-              public boolean isDone() {
-                return false;
-              }
-            }));
   }
 
 }

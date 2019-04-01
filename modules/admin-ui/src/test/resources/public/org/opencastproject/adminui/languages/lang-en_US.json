@@ -55,11 +55,8 @@
         "ACL"                : "The following ACL will be deleted",
         "GROUP"              : "The following group will be deleted",
         "USER"               : "The following user will be deleted",
-        "USER_BLACKLIST"     : "The following user blacklist will be deleted",
         "THEME"              : "The following theme will be deleted",
-        "EMAIL"              : "The following email template will be deleted",
-        "LOCATION"           : "The following location will be deleted",
-        "LOCATION_BLACKLIST" : "The following location blacklist will be deleted"
+        "LOCATION"           : "The following location will be deleted"
       },
       "NAME" : "Name"
     },
@@ -130,30 +127,9 @@
     "EVENTS_NOT_DELETED_NOT_AUTHORIZED":  "The event could not be deleted, because you don't have the permission to do so.",
     "SERIES_DELETED": "The series has been deleted",
     "SERIES_NOT_DELETED": "The series could not be deleted",
-    "USER_BLACKLIST_CREATED": "The blacklist has been created",
-    "USER_BLACKLIST_NOT_CREATED":  "The blacklist could not be created",
-    "USER_BLACKLIST_SAVED": "The blacklist has been saved",
-    "USER_BLACKLIST_NOT_SAVED":  "The blacklist could not be saved",
-    "USER_BLACKLIST_DELETED":  "The blacklist has been deleted",
-    "USER_BLACKLIST_NOT_DELETED":  "The blacklist could not be deleted",
     "LOCATION_DELETED": "The location has been deleted",
     "LOCATION_NOT_DELETED": "The location could not be deleted",
     "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
-    "LOCATION_BLACKLIST_CREATED": "The blacklist has been created",
-    "LOCATION_BLACKLIST_NOT_CREATED":  "The blacklist could not be created",
-    "LOCATION_BLACKLIST_SAVED": "The blacklist has been saved",
-    "LOCATION_BLACKLIST_NOT_SAVED":  "The blacklist could not be saved",
-    "LOCATION_BLACKLIST_DELETED":  "The blacklist has been deleted",
-    "LOCATION_BLACKLIST_NOT_DELETED":  "The blacklist could not be deleted",
-    "EMAIL_TEMPLATE_CREATED": "The template has been created",
-    "EMAIL_TEMPLATE_NOT_CREATED":  "The template could not be created",
-    "EMAIL_TEMPLATE_SAVED": "The template has been saved",
-    "EMAIL_TEMPLATE_NOT_SAVED":  "The template could not be saved",
-    "EMAIL_TEMPLATE_DELETED":  "The template has been deleted",
-    "EMAIL_TEMPLATE_NOT_DELETED":  "The template could not be deleted",
-    "EMAIL_TEMPLATE_NAME_TAKEN": "This name is already in use",
-    "EMAIL_SENT": "The message has been sent",
-    "EMAIL_NOT_SENT": "The message could not be sent",
     "CONFLICT_DETECTED":   "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
     "CONFLICT_BULK_DETECTED":   "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
     "CONFLICT_ALREADY_ENDED":   "Scheduling error: The event has already ended.",
@@ -165,11 +141,6 @@
     "SERIES_ACL_LOCKED": "Editing Access Policies is not allowed when operations are running on an event that is part of the series",
     "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
     "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "The event opt-out status has been successfully updated.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Error while updating the event opt-out status.",
-    "EVENT_PARTICIPATION_STATUS_READONLY": "The participation status can not be updated as the scheduling start date is in the past.",
-    "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "The series opt-out status has been successfully updated.",
-    "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Error while updating the series opt-out status.",
     "THEME_NAME_ALREADY_TAKEN": "This name is already in use",
     "THEME_NAME_EMPTY": "The name cannot be empty",
     "BUMPER_UPLOAD_ERROR": "Error while uploading media",
@@ -193,7 +164,6 @@
   },
   "BULK_ACTIONS": {
     "CAPTION": "Actions",
-    "SEND_MESSAGE": "Send message",
     "WARNING":"Warning",
     "EDIT_STATUS": {
       "CAPTION": "Edit Status",
@@ -307,9 +277,6 @@
     }
   },
   "NAV": {
-    "DASHBOARD": {
-      "TITLE": "Dashboard"
-    },
     "EVENTS": {
       "TITLE": "Recordings"
     },
@@ -349,28 +316,6 @@
       "BSD":"BSD",
       "CCND":"CCND",
       "GPL":"GPL"
-    },
-    "SEND_MESSAGE": {
-      "CAPTION": "Send message",
-      "TABS": {
-        "RECIPIENTS": "Recipients",
-        "MESSAGE":    "Message",
-        "SUMMARY":    "Summary"
-      },
-      "RECIPIENTS": {
-        "AUDIT_TRAIL_CAPTION": "Add to audit trail",
-        "AUDIT_TRAIL_DESCRIPTION": "Check to add the message to the audit trail",
-        "AUDIT_TRAIL_LABEL": ""
-      },
-      "MESSAGE": {
-        "EMAIL_TEMPLATE": "Select email template",
-        "SUBJECT": "Subject",
-        "MESSAGE": "Message",
-        "INCLUDE_SIGNATURE": "Include my signature in the email"
-      },
-      "SUMMARY": {
-        "MESSAGE_SUMMARY": "Summary"
-      }
     },
     "EVENTS": {
       "NEW": {
@@ -514,9 +459,7 @@
         "LAST":     "Last",
         "NEXT":     "Next",
         "MANAGED_ACL": "Access policy",
-        "SCHEDULING_STATUS": "Status",
         "WORKFLOW_STATE": "Progress",
-        "REVIEW_STATUS": "Review status",
         "PREVIOUS": "Previous",
         "NOCONTENT": "No data available",
         "PUBLISHED": "Published",
@@ -534,15 +477,8 @@
           "PAUSED_WORKFLOW": "View paused workflow"
         }
       },
-      "SCHEDULING_STATUS": {
-        "READY_FOR_RECORDING": "Ready for recording",
-        "BLACKLISTED": "Blacklisted",
-        "OPTED_OUT": "Opted-out"
-      },
       "STATUS": {
         "SCHEDULED": "Scheduled",
-        "OPTEDOUT": "Opted out",
-        "BLACKLISTED": "Blacklisted",
         "RECORDING": "Recording",
         "UPLOADING": "Uploading",
         "INGESTING": "Ingesting",
@@ -571,9 +507,6 @@
           "NO_PUBLICATIONS_AVAILABLE":  "This event has not been published",
           "PUBLICATION_DESCRIPTION":    "This event has been published to the following publication channels:",
           "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
-          "SCHEDULING_STATUS":          "Status",
-          "READY_FOR_RECORDING":        "Ready for recording",
-          "OPTED_OUT":                  "Opted-out",
           "CUSTOM":                     "Custom",
           "ENGAGE":                     "Engage",
           "ENGAGE_LIVE":                "Engage Live",
@@ -837,20 +770,6 @@
         },
         "SCHEDULING": {
           "CAPTION": "Scheduling configuration",
-          "REVIEW_STATUS": {
-            "CAPTION": "Review status"
-          },
-          "OPTEDOUT": {
-            "CAPTION": "Opted-out Status",
-            "READY": "Ready for recording",
-            "OPTEDOUT": "Opted out"
-          },
-          "MESSAGES": {
-            "CAPTION": "Messages",
-            "CREATION_DATE": "Creation date",
-            "SENDER": "Sender",
-            "SUBJECT": "Subject"
-          },
           "PLACEHOLDER": {
             "PRESENTERS": "Presenter(s)"
           }
@@ -1003,7 +922,6 @@
         "TABS": {
           "METADATA":    "Metadata",
           "EXTENDED_METADATA":    "Metadata II",
-          "PARTICIPATION": "Participation",
           "EVENTS":      "Events",
           "PERMISSIONS": "Access policy",
           "THEME": "Theme"
@@ -1049,24 +967,6 @@
           "LICENSE":        "License",
           "DESCRIPTION":    "Description"
         },
-        "PARTICIPATION": {
-          "CAPTION": "Participation status template",
-          "WARNING_TEMPLATE": "Series participation status will be used as default value for new events that are part of the series.",
-          "REVIEW_STATUS": {
-            "CAPTION": "Review status"
-          },
-          "OPTEDOUT": {
-            "CAPTION": "Opted-out Status",
-            "READY": "Ready for recording",
-            "OPTEDOUT": "Opted out"
-          },
-          "MESSAGES": {
-            "CAPTION": "Messages",
-            "CREATION_DATE": "Creation date",
-            "SENDER": "Sender",
-            "SUBJECT": "Subject"
-          }
-        },
         "EVENTS": {
           "TITLE":     "Title",
           "PRESENTER": "Presenter(s)",
@@ -1081,12 +981,10 @@
   },
   "RECORDINGS": {
     "NAVIGATION": {
-      "LOCATIONS":  "Locations",
-      "BLACKLISTS": "Blacklists"
+      "LOCATIONS":  "Locations"
     },
     "ACTIONS": {
       "EXPORT": "Export",
-      "ADD_BLACKLIST": "Add blacklist",
       "REMOVE": "Remove"
     },
     "RECORDINGS": {
@@ -1100,8 +998,6 @@
         "NEXT_NAME": "Next event title",
         "STATUS":    "Status",
         "VERSION":   "Version",
-        "BLACKLIST_FROM": "Blacklisted from",
-        "BLACKLIST_TO":   "Blacklisted until",
         "ACTION":    "Actions",
         "TOOLTIP": {
           "NAME": "Filter events for this location",
@@ -1132,60 +1028,18 @@
           "NO_CAPABILITIES": "No capabilities provided"
         }
       }
-    },
-    "BLACKLISTS": {
-      "TABLE": {
-        "CAPTION":   "Location blacklist",
-        "NAME":      "Name",
-        "ACTIONS":   "Actions"
-      },
-      "DETAILS": {
-        "NEWCAPTION":  "Create blacklist",
-        "EDITCAPTION": "Edit blacklist",
-        "TABS": {
-          "LOCATIONS": "Locations",
-          "DATES":     "Dates",
-          "REASON":    "Reason",
-          "SUMMARY":   "Summary"
-        },
-        "LOCATIONS": {
-          "REMOVE":          "Remove",
-          "ADD_LOCATION":    "Choose location",
-          "ALL_LOCATIONS":   "All locations",
-          "SELECT_LOCATION": "Select"
-        },
-        "DATES": {
-          "START_DATE": "Start date",
-          "END_DATE": "End date"
-        },
-        "REASON": {
-          "SELECT_REASON": "Select",
-          "REASON": "Reason",
-          "COMMENTS": "Comments"
-        },
-        "SUMMARY": {
-          "SUMMARY": "Summary",
-          "LOCATION": "Location",
-          "DATE_FROM": "From",
-          "DATE_TO": "Until",
-          "REASON": "Reason",
-          "COMMENTS": "Comments"
-        }
-      }
     }
   },
   "USERS": {
     "ACTIONS": {
       "ADD_USER":  "Add user",
       "ADD_GROUP": "Add group",
-      "ADD_ACL":   "Add access policy",
-      "ADD_BLACKLIST": "Add blacklist"
+      "ADD_ACL":   "Add access policy"
     },
     "NAVIGATION": {
       "USERS":       "Users",
       "GROUPS":      "Groups",
-      "PERMISSIONS": "Access policies",
-      "BLACKLISTS":  "Blacklist"
+      "PERMISSIONS": "Access policies"
     },
     "USERS": {
       "TABLE": {
@@ -1196,8 +1050,6 @@
         "ROLES":    "Roles",
         "TYPE":     "Type",
         "PROVIDER":  "Provider",
-        "BLACKLIST_FROM": "Blacklisted from",
-        "BLACKLIST_TO":   "Blacklisted until",
         "ACTION":   "Actions",
         "TOOLTIP": {
           "DELETE": "Delete user",
@@ -1368,49 +1220,6 @@
           }
         }
       }
-    },
-    "BLACKLISTS": {
-      "TABLE": {
-        "CAPTION":   "Users blacklist",
-        "NAME":      "Name",
-        "DATE_FROM": "From",
-        "DATE_TO":   "Until",
-        "REASON":    "Reason",
-        "ACTION":    "Actions"
-      },
-      "DETAILS": {
-        "NEWCAPTION":  "Create blacklist",
-        "EDITCAPTION": "Edit blacklist",
-        "TABS": {
-          "USERS":   "Users",
-          "DATES":   "Dates",
-          "REASON":  "Reason",
-          "SUMMARY": "Summary"
-        },
-        "USERS": {
-          "REMOVE":      "Remove",
-          "ADD_USER":    "Choose user",
-          "ALL_USERS":   "All users",
-          "SELECT_USER": "Select"
-        },
-        "DATES": {
-          "START_DATE": "Start date",
-          "END_DATE": "End date"
-        },
-        "REASON": {
-          "SELECT_REASON": "Select",
-          "REASON": "Reason",
-          "COMMENTS": "Comments"
-        },
-        "SUMMARY": {
-          "SUMMARY": "Summary",
-          "USER": "User",
-          "DATE_FROM": "From",
-          "DATE_TO": "Until",
-          "REASON": "Reason",
-          "COMMENTS": "Comments"
-        }
-      }
     }
   },
   "THEMES": {
@@ -1468,34 +1277,7 @@
       "ADD_THEME": "Add theme"
     },
     "NAVIGATION": {
-      "MAIL_TEMPLATES": "Email templates",
-      "MAIL_SERVERS":   "Email settings",
       "THEMES": "Themes"
-    },
-    "EMAIL_TEMPLATES": {
-      "TABLE": {
-        "CAPTION":  "Email templates",
-        "NAME":     "Name",
-        "CREATOR":  "Creator",
-        "CREATED":  "Created",
-        "ACTION":   "Actions"
-      },
-      "DETAILS": {
-        "NEWCAPTION":  "Create template",
-        "EDITCAPTION": "Edit template",
-        "TABS": {
-          "MESSAGE": "Message",
-          "SUMMARY": "Summary"
-        },
-        "MESSAGE": {
-          "NAME":    "Name",
-          "SUBJECT": "Subject",
-          "MESSAGE": "Message"
-        },
-        "SUMMARY": {
-          "MESSAGE_SUMMARY": "Message summary"
-        }
-      }
     },
     "THEMES": {
       "TABLE": {
@@ -1771,9 +1553,6 @@
       "LOCATION": {
         "LABEL": "Location"
       },
-      "OPTEDOUT": {
-        "LABEL": "Opted Out"
-      },
       "PERIOD": {
         "LABEL": "Period"
       },
@@ -1785,12 +1564,6 @@
       },
       "PROGRESS": {
         "LABEL": "Progress"
-      },
-      "REVIEW_STATUS": {
-        "LABEL": "Review Status",
-        "CONFIRMED": "Confirmed",
-        "UNCONFIRMED": "Unconfirmed",
-        "UNSENT": "Unsent"
       },
       "SERIES": {
         "LABEL": "Series"
@@ -1930,27 +1703,12 @@
       "USER_DIRECTORY": {
         "LABEL": "User directory"
       }
-    },
-    "REVIEW_STATUS": {
-      "UNSENT": "Unsent",
-      "UNCONFIRMED": "Unconfirmed",
-      "CONFIRMED": "Confirmed"
     }
   },
   "TABLE_SUMMARY": "{{numberOfRows}} rows",
   "TABLE_NO_RESULT": "No results found",
   "TABLE_LOADING": "Loading…",
   "TABLE_EDIT": "Edit",
-  "PM": {
-    "BLACKLIST": {
-      "REASONS": {
-        "SICK_LEAVE":       "Sick leave",
-        "LEAVE":            "Leave",
-        "FAMILY_EMERGENCY": "Family emergency",
-        "CONSTRUCTION":     "Construction"
-      }
-    }
-  },
   "DASHBOARD": {
     "RUNNING":   "Running",
     "FINISHED":  "Finished",

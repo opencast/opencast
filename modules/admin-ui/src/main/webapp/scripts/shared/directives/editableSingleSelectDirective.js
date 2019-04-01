@@ -61,7 +61,6 @@ angular.module('adminNg.directives')
         var array = [];
 
         angular.forEach(map, function (mapValue, mapKey) {
-
           array.push({
             label: translate ? $filter('translate')(mapKey) : mapKey,
             value: mapValue
@@ -94,51 +93,101 @@ angular.module('adminNg.directives')
         });
       };
 
-
       //transform map to array so that orderBy can be used
       scope.collection = scope.ordered ? mapToArrayOrdered(scope.collection, scope.params.translatable) :
         mapToArray(scope.collection, scope.params.translatable);
 
-      scope.submit = function () {
-        // Wait until the change of the value propagated to the parent's
-        // metadata object.
-        scope.submitTimer = $timeout(function () {
-          scope.save(scope.params.id);
-        });
-        scope.editMode = false;
+      scope.editMode = false;
+
+      scope.$on('$destroy', function () {
+        $timeout.cancel(scope.submitTimer);
+        $timeout.cancel(scope.focusTimer);
+      });
+
+      element.on('chosen:hiding_dropdown', 'select', function(evt, params) {
+        scope.submit();
+      });
+
+      // get tab event before chosen can swallow it so we don't have to hit tab twice
+      element[0].addEventListener('keydown', function (event) {
+        if (event.key === 'Tab') {
+
+          var shift = event.getModifierState('Shift');
+          var alt = event.getModifierState('Alt');
+          var control = event.getModifierState('Control');
+
+          var nextElement = null;
+          var nextTabIndex = null;
+
+          var currentTabIndex = document.activeElement.tabIndex;
+
+          $('i.edit[tabindex]').each(function(index, element) {
+
+            var tabIndex = element.tabIndex;
+
+            if ((shift && tabIndex < currentTabIndex && (tabIndex > nextTabIndex || !nextTabIndex)) ||
+            (!(shift || alt || control) &&  tabIndex > currentTabIndex && (tabIndex < nextTabIndex || !nextTabIndex))) {
+
+              nextElement = element;
+              nextTabIndex = tabIndex;
+            }
+          });
+
+          if (nextElement && nextTabIndex >= 0) {
+            nextElement.focus();
+          }
+        }
+      }, true);
+
+      scope.keyUp = function (event) {
+        if (event.key === 'Escape' || event.key === 'Esc') {
+          scope.leaveEditMode();
+          event.stopPropagation();
+        }
       };
 
-      scope.getLabel = function (searchedValue) {
-        var label;
+      scope.getLabel = function () {
+        var label = '';
 
-        angular.forEach(scope.collection, function (obj) {
-          if (obj.value === searchedValue) {
-            label = obj.label;
-          }
-        });
+        if (scope.collection.length === 0) {
+          label = 'SELECT_NO_OPTIONS_AVAILABLE';
+        }
+        else if (scope.params.value === '' || scope.params.value === null || angular.isUndefined(scope.params.value)) {
+          label = 'SELECT_NO_OPTION_SELECTED';
+        }
+        else {
+          angular.forEach(scope.collection, function (obj) {
+            if (obj.value === scope.params.value) {
+              label = obj.label;
+            }
+          });
+        }
 
         return label;
       };
 
-      scope.$on('$destroy', function () {
-        $timeout.cancel(scope.submitTimer);
-      });
-
-      scope.enterEditMode = function () {
-        // Store the original value for later comparision or undo
-        if (!angular.isDefined(scope.original)) {
-          scope.original = scope.params.value;
-        }
-        scope.editMode = true;
-        scope.focusTimer = $timeout(function () {
-          if ($('[chosen]')) {
-            element.find('select').trigger('chosen:activate');
-          }
+      scope.submit = function () {
+        // Wait until the change of the value propagated to the parent's metadata object.
+        scope.submitTimer = $timeout(function () {
+          scope.save(scope.params.id);
         });
+        scope.leaveEditMode();
+      };
+
+      scope.enterEditMode = function (event) {
+        if (event) {
+          event.stopPropagation();
+        }
+        if (scope.editMode == false && scope.collection.length != 0) {
+
+          scope.editMode = true;
+          scope.focusTimer = $timeout(function () {
+            element.find('select').trigger('chosen:open');
+          });
+        }
       };
 
       scope.leaveEditMode = function () {
-        // does not work currently, as angular chose does not support ng-blur yet. But it does not break anything
         scope.editMode = false;
       };
     }

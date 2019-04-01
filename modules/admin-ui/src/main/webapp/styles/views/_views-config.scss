@@ -22,20 +22,15 @@
 
 // Views
 @import "core";
-@import "dashboard";
 @import "login";
 
 // Modal Views
-@import "modals/send-message-modal";
 @import "modals/users";
-@import "modals/remove-blacklist-by-user-modal";
-//@import "modals/change-status-modal";
 @import "modals/action-modal";
 @import "modals/modal-dialog";
 @import "modals/group";
 @import "modals/lists";
 @import "modals/new-event-series";
-@import "modals/blacklist-modal";
 @import "modals/event-series";
 @import "modals/edit-events";
 @import "modals/hotkey-cheat-sheet";

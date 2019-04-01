@@ -31,7 +31,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * Properties can be defined and associated to a media package's version history.
  */
 @ParametersAreNonnullByDefault
-public final class Property {
+public class Property {
   private final PropertyId id;
   private final Value value;
 

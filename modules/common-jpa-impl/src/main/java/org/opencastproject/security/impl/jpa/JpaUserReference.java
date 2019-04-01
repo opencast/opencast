@@ -30,6 +30,7 @@ import org.opencastproject.util.EqualsUtil;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Access;
@@ -160,8 +161,9 @@ public class JpaUserReference {
           JpaOrganization organization, Set<JpaRole> roles) {
     this(username, name, email, loginMechanism, lastLogin, organization);
     for (Role role : roles) {
-      if (role.getOrganization() == null || !organization.getId().equals(role.getOrganization().getId()))
+      if (!Objects.equals(organization.getId(), role.getOrganizationId())) {
         throw new IllegalArgumentException("Role " + role + " is not from the same organization!");
+      }
     }
     this.roles = roles;
   }

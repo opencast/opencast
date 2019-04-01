@@ -25,22 +25,30 @@ Workflow 2 runs:
 * Media package is republished with captions/transcripts
 
 IBM Watson Speech-to-Text service documentation, including which languages are currently supported, can be found
- [here](https://www.ibm.com/watson/developercloud/doc/speech-to-text/index.html).
+ [here](https://cloud.ibm.com/docs/services/speech-to-text/index.html#about).
 
 Configuration
 -------------
 
 ### Step 1: Get IBM Watson credentials
 
-* [Create a 30-day trial acoount in IBM Bluemix](https://www.ibm.com/cloud-computing/bluemix)
-* [Get service credentials](https://www.ibm.com/watson/developercloud/doc/common/getting-started-credentials.html)
+* [Create a 30-day trial acoount in IBM Cloud](https://console.bluemix.net)
+* [Get service credentials](https://console.bluemix.net/docs/services/watson/getting-started-iam.html#iam)
+
+As of 10/30/2018, the service has migrated to token-based Identity and Access Management (IAM) authentication so user
+and password are not generated anymore. Previously created instances can still use user name and password.
+Details can be found [here](https://cloud.ibm.com/docs/services/speech-to-text/release-notes.html#October2018b).
 
 ### Step 2: Configure IBMWatsonTranscriptionService
 
 Edit  _etc/org.opencastproject.transcription.ibmwatson.IBMWatsonTranscriptionService.cfg_:
 
 * Set _enabled_=true
-* Use service credentials obtained above to set _ibm.watson.user_ and _ibm.watson.psw_
+* Use service credentials obtained above to set _ibm_watson_api_key_ (_ibm.watson.user_ and _ibm.watson.psw_
+are
+still supported to be used with instances created previously)
+* Enter the IBM Watson Speech-to-Text url in _ibm.watson.service.url_, if not using the default
+(https://stream.watsonplatform.net/speech-to-text/api)
 * Enter the appropriate language model in _ibm.watson.model_, if not using the default (_en-US_BroadbandModel_)
 * In _workflow_, enter the workflow definition id of the workflow to be used to attach the generated
 transcripts/captions
@@ -48,47 +56,75 @@ transcripts/captions
 etc/custom.properties (org.opencastproject.admin.email) will be used. Configure the SmtpService.
 If no email address specified in either _notification.email_ or _org.opencastproject.admin.email_,
 email notifications will be disabled.
+* If re-submitting requests is desired in case of failures, configure _max-attempts_ and _retry.workflow_.
+If _max.attempts_ > 1 and the service receives an error callback, it will start the workflow specified in
+_retry_workflow_ to create a new job. When _max.attempts_ is reached for a track, the service will stop retrying.
 
 ```
 # Change enabled to true to enable this service.
-enabled=true
+enabled=false
 
-# User obtained when registering with the IBM Watson Speech-to_text service
-ibm.watson.user=<SERVICE_USER>
+# IBM Watson Speech-to-Text service url
+# Default: https://stream.watsonplatform.net/speech-to-text/api
+# ibm.watson.service.url=https://stream.watsonplatform.net/speech-to-text/api
+
+# APi key obtained when registering with the IBM Watson Speech-to_text service.
+# If empty, user and password below will be used.
+ibm.watson.api.key=<API_KEY>
+
+# User obtained when registering with the IBM Watson Speech-to_text service.
+# Mandatory if ibm.watson.api.key not entered.
+#ibm.watson.user=<SERVICE_USER>
 
 # Password obtained when registering with the IBM Watson Speech-to_text service
-ibm.watson.password=<SERVICE_PSW>
+# Mandatory if ibm.watson.api.key not entered.
+#ibm.watson.password=<SERVICE_PSW>
 
 # Language model to be used. See the IBM Watson Speech-to-Text service documentation
-# for available models. If empty, the default will be used ("en-US_BroadbandModel").
-#ibm.watson.model=
+# for available models.
+# Default: en-US_BroadbandModel
+#ibm.watson.model=en-US_BroadbandModel
 
 # Workflow to be executed when results are ready to be attached to media package.
-#workflow=attach-watson-transcription
+# Default: attach-watson-transcripts
+#workflow=attach-watson-transcripts
 
 # Interval the workflow dispatcher runs to start workflows to attach transcripts to the media package
-# after the transcription job is completed.
-# (in seconds) Default is 1 minute.
+# after the transcription job is completed. In seconds.
+# Default: 60
 #workflow.dispatch.interval=60
 
 # How long it should wait to check jobs after their start date + track duration has passed.
-# The default is 10 minutes. This is only used if we didn't get a callback from the
-# ibm watson speech-to-text service.
-# (in seconds)
+# This is only used if we didn't get a callback from the ibm watson speech-to-text service.
+# In seconds.
+# Default: 600
 #completion.check.buffer=600
 
 # How long to wait after a transcription is supposed to finish before marking the job as
-# canceled in the database. Default is 2 hours.
-# (in seconds)
+# canceled in the database. In seconds. Default is 2 hours.
+# Default: 7200
 #max.processing.time=7200
 
 # How long to keep result files in the working file repository in days.
-# The default is 7 days.
+# Default: 7
 #cleanup.results.days=7
 
 # Email to send notifications of errors. If not entered, the value from
 # org.opencastproject.admin.email in custom.properties will be used.
 #notification.email=
+
+# Start transcription job load
+# Default: 0.1
+#job.load.start.transcription=0.1
+
+# Number of max attempts. If max attempts > 1 and the service returned an error after the recognitions job was
+# accepted or the job did not return any results, the transcription is re-submitted. Default is to not retry.
+# Default: 1
+#max.attempts=
+
+# If max.attempts > 1, name of workflow to use for retries.
+#retry.workflow=
+
 ```
 
 ### Step 3: Add encoding profile for extracting audio
@@ -141,6 +177,9 @@ the second workflow can retrieve it from the Asset Manager to attach the caption
 
 Create a workflow that will add the generated caption/transcript to the media package and republish it.
 A sample one can be found in etc/workflows/attach-watson-transcripts.xml
+
+If re-submitting requests is desired in case of failures, create a workflow that will start a transcription job.
+A sample one can be found in etc/workflows/retry-watson-transcripts.xml
 
 Workflow Operations
 -------------------

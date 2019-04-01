@@ -21,9 +21,10 @@
 
 package org.opencastproject.scheduler.impl;
 
-import org.opencastproject.scheduler.api.Blacklist;
+import org.opencastproject.scheduler.impl.persistence.ExtendedEventDto;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Tuple;
+
+import com.entwinemedia.fn.data.Opt;
 
 import java.util.Date;
 import java.util.List;
@@ -66,86 +67,103 @@ public interface SchedulerServiceDatabase {
    */
   Map<String, Date> getLastModifiedDates() throws SchedulerServiceDatabaseException;
 
-  /**
-   * Get a {@link List} of active transaction identifiers.
-   *
-   * @return a list of active transaction identifiers
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  List<String> getTransactions() throws SchedulerServiceDatabaseException;
 
   /**
-   * Get the transaction identifier by the source
+   * Create or update an event identified by mediapackageId and organizationId
    *
+   * @param mediapackageId
+   *          the mediapackage ID
+   * @param organizationId
+   *          the organization ID of the organization owning the event
+   * @param captureAgentId
+   *          the capture agent ID of the capture agent this event is scheduled on
+   * @param start
+   *          the recording start time
+   * @param end
+   *          the recording end time
    * @param source
    *          the source
-   * @return the transaction identifier
-   * @throws NotFoundException
-   *           if the transaction could not be found
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
+   * @param recordingState
+   *          the recording state
+   * @param  recordingLastHeard
+   *          the recording last heard
+   * @param presenters
+   *          the presenters
+   * @param lastModifiedDate
+   *          the last modified date
+   * @param checksum
+   *          the checksum
+   * @param workflowProperties
+   *          the workflow properties
+   * @param captureAgentProperties
+   *          the capture agent properties
+   * @throws SchedulerServiceDatabaseException in case the event cannot be stored.
    */
-  String getTransactionId(String source) throws NotFoundException, SchedulerServiceDatabaseException;
+  void storeEvent(
+      String mediapackageId,
+      String organizationId,
+      Opt<String> captureAgentId,
+      Opt<Date> start,
+      Opt<Date> end,
+      Opt<String> source,
+      Opt<String> recordingState,
+      Opt<Long> recordingLastHeard,
+      Opt<String> presenters,
+      Opt<Date> lastModifiedDate,
+      Opt<String> checksum,
+      Opt<Map<String,String>> workflowProperties,
+      Opt<Map<String,String>> captureAgentProperties
+  ) throws SchedulerServiceDatabaseException;
 
   /**
-   * Get the transaction source by the identifier
+   * Get the mediapackage IDs of all events scheduled on the given capture agent between the given start/end time.
+   * Events which are only partially contained within the given interval are also included in the result set. The
+   * results are ordered by start date ascending.
    *
-   * @param id
-   *          the transaction identifier
-   * @return the source
-   * @throws NotFoundException
-   *           if the transaction could not be found
+   * @param captureAgentId
+   *          the capture agent ID of the capture agent to check
+   * @param start
+   *          the start date of the interval to check
+   * @param end
+   *          the end date of the interval to check
+   * @param separationMillis
+   *          number of milliseconds to prepend and append to given interval
+   * @return The mediapackage IDs of the events between start (inclusive) and end (inclusive) scheduled on the given
+   * capture agent.
    * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
+   *           If the database cannot be queried.
    */
-  String getTransactionSource(String id) throws NotFoundException, SchedulerServiceDatabaseException;
+  List<String> getEvents(String captureAgentId, Date start, Date end, int separationMillis) throws SchedulerServiceDatabaseException;
 
   /**
-   * Get the transaction last modified date by the transaction identifier
+   * Retrieve all events matching given filter ordered by start time ascending.
    *
-   * @param id
-   *          the transaction identifier
-   * @return the transaction last modified date
-   * @throws NotFoundException
-   *           if the transaction could not be found
+   * @param captureAgentId
+   *          the capture agent id filter
+   * @param startsFrom
+   *          the start from date filter
+   * @param startsTo
+   *          the start to date filter
+   * @param endFrom
+   *          the end from date filter
+   * @param endTo
+   *          the end to date filter
+   * @param limit
+   *          the maximum number of results to retrieve
+   * @return The events matching the given filter
    * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
+   *           If the database cannot be queried.
    */
-  Date getTransactionLastModified(String id) throws NotFoundException, SchedulerServiceDatabaseException;
+  List<ExtendedEventDto> search(Opt<String> captureAgentId, Opt<Date> startsFrom, Opt<Date> startsTo, Opt<Date> endFrom, Opt<Date> endTo, Opt<Integer> limit) throws SchedulerServiceDatabaseException;
 
   /**
-   * Returns whether the source has an active transaction or not
+   * Retrieve all events which have a recording state and a recording last heard.
    *
-   * @param source
-   *          the source
-   * @return whether the source has an active transaction <code>true</code> or not <code>false</code>
-   */
-  boolean hasTransaction(String source) throws SchedulerServiceDatabaseException;
-
-  /**
-   * Stores the given transaction
-   *
-   * @param id
-   *          the transaction identifier
-   * @param source
-   *          the transaction source
+   * @return all events which have a recording state and a recording last heard
    * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
+   *           If the database cannot be queried.
    */
-  void storeTransaction(String id, String source) throws SchedulerServiceDatabaseException;
-
-  /**
-   * Delete the transaction by the given identifier
-   *
-   * @param id
-   *          the transaction identifier
-   * @throws NotFoundException
-   *           if the transaction could not be found
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  void deleteTransaction(String id) throws NotFoundException, SchedulerServiceDatabaseException;
+  List<ExtendedEventDto> getKnownRecordings() throws SchedulerServiceDatabaseException;
 
   /**
    * Removes the extended event from persistent storage.
@@ -159,37 +177,51 @@ public interface SchedulerServiceDatabase {
    */
   void deleteEvent(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException;
 
-  // TODO
-  List<Tuple<String, Boolean>> updateBlacklist(Blacklist blacklist) throws SchedulerServiceDatabaseException;
+  /**
+   * Get the event with the given mediapackage id for the current organization.
+   *
+   * @param mediapackageId
+   *          The mediapackage id to look for
+   *
+   * @return The event or nothing, if the event couldn't be found.
+   *
+   * @throws SchedulerServiceDatabaseException
+   *           If the database cannot be queried.
+   */
+  Opt<ExtendedEventDto> getEvent(String mediapackageId) throws SchedulerServiceDatabaseException;
 
   /**
-   * Returns the blacklist status of the agent with the given ID
+   * Get the event with the given mediapackage id and organization.
    *
-   * @param agentId
-   *          the agent identifier
-   * @param start
-   *          the start date
-   * @param end
-   *          the end date
-   * @return the blacklist status
+   * @param mediapackageId
+   *          The mediapackage id to look for
+   * @param orgId
+   *          The organization id to look for
+   *
+   * @return The event or nothing, if the event couldn't be found.
+   *
    * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
+   *           If the database cannot be queried.
    */
-  boolean isBlacklisted(String agentId, Date start, Date end) throws SchedulerServiceDatabaseException;
+  Opt<ExtendedEventDto> getEvent(String mediapackageId, String orgId) throws SchedulerServiceDatabaseException;
 
   /**
-   * Returns the blacklist status of the given presenters
-   *
-   * @param presenters
-   *          the list of presenters
-   * @param start
-   *          the start date
-   * @param end
-   *          the end date
-   * @return the blacklist status
+   * Nulls recording state and recording last heard of of the given media package.
+   * @param mediapackageId
+   *          The mediapackage id to look for
+   * @throws NotFoundException
+   *           if there is no element with specified ID
    * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
+   *           If the database cannot be queried.
    */
-  boolean isBlacklisted(List<String> presenters, Date start, Date end) throws SchedulerServiceDatabaseException;
+  void resetRecordingState(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException;
 
+  /**
+   * Retrieve the number of events.
+   *
+   * @return The number of events.
+   * @throws SchedulerServiceDatabaseException
+   *           If the database cannot be queried.
+   */
+  int countEvents() throws SchedulerServiceDatabaseException;
 }

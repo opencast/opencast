@@ -24,8 +24,6 @@ package org.opencastproject.scheduler.endpoint;
 import static com.entwinemedia.fn.Prelude.chuck;
 import static com.entwinemedia.fn.Stream.$;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
@@ -68,9 +66,6 @@ import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
-import org.opencastproject.scheduler.api.SchedulerService.SchedulerTransaction;
-import org.opencastproject.scheduler.api.SchedulerTransactionLockException;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.impl.CaptureNowProlongingService;
 import org.opencastproject.security.api.AccessControlList;
@@ -385,7 +380,7 @@ public class SchedulerRestService {
       }
       return RestUtil.R.ok(obj(p("id", metadata.getEventId()), p("location", metadata.getAgentId()),
               p("start", DateTimeSupport.toUTC(metadata.getStartDate().getTime())),
-              p("end", DateTimeSupport.toUTC(metadata.getEndDate().getTime())), p("optOut", metadata.isOptOut()),
+              p("end", DateTimeSupport.toUTC(metadata.getEndDate().getTime())),
               p("presenters", presenters), p("wfProperties", obj(wfProperties.toArray(new Prop[wfProperties.size()]))),
               p("agentConfig", obj(agentConfig.toArray(new Prop[agentConfig.size()]))), p("state", state),
               p("lastHeardFrom", lastHeard)));
@@ -484,27 +479,6 @@ public class SchedulerRestService {
     }
   }
 
-  @GET
-  @Produces(MediaType.TEXT_PLAIN)
-  @Path("{id}/optOut")
-  @RestQuery(name = "recordingoptoutstatus", description = "Retrieves the opt out status for specified event", returnDescription = "The opt out status", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the opt out status will be retrieved", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The opt out status of event is in the body of response"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to get the event opt out status. Maybe you need to authenticate.") })
-  public Response getOptOut(@PathParam("id") String mediaPackageId) throws UnauthorizedException {
-    try {
-      boolean optOut = service.isOptOut(mediaPackageId);
-      return Response.ok(Boolean.toString(optOut)).build();
-    } catch (NotFoundException e) {
-      logger.info("Event with mediapackage id '{}' does not exist.", mediaPackageId);
-      return Response.status(Status.NOT_FOUND).build();
-    } catch (SchedulerException e) {
-      logger.error("Unable to retrieve event with mediapackage id '{}': {}", mediaPackageId, getMessage(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
   /**
    *
    * Removes the specified event. Returns true if the event was found and could be removed.
@@ -531,8 +505,6 @@ public class SchedulerRestService {
       return Response.status(Status.NOT_FOUND).build();
     } catch (UnauthorizedException e) {
       throw e;
-    } catch (SchedulerTransactionLockException e) {
-      return Response.status(Status.CONFLICT).build();
     } catch (Exception e) {
       logger.error("Unable to delete event with id '{}': {}", eventId, getMessage(e));
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -594,78 +566,6 @@ public class SchedulerRestService {
     }
   }
 
-  @GET
-  @Produces(MediaType.TEXT_PLAIN)
-  @Path("{id}/reviewStatus")
-  @RestQuery(name = "recordingreviewstatus", description = "Retrieves the review status for specified event", returnDescription = "The review status", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the review status will be retrieved", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The review status of event is in the body of response"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to remove the event. Maybe you need to authenticate.") })
-  public Response getReviewStatus(@PathParam("id") String mediaPackageId) throws UnauthorizedException {
-    try {
-      ReviewStatus reviewStatus = service.getReviewStatus(mediaPackageId);
-      return Response.ok(reviewStatus.toString()).build();
-    } catch (NotFoundException e) {
-      logger.info("Event with mediapackage id '{}' does not exist.", mediaPackageId);
-      return Response.status(Status.NOT_FOUND).build();
-    } catch (SchedulerException e) {
-      logger.error("Unable to retrieve event with mediapackage id '{}': {}", mediaPackageId, getMessage(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @PUT
-  @Path("{id}/reviewStatus")
-  @RestQuery(name = "updatereviewstatus", description = "Updates the review status of the event with the given mediapackage id", returnDescription = "Status OK is returned if event was successfully updated", pathParameters = {
-          @RestParameter(name = "id", description = "ID of events mediapackage", isRequired = true, type = Type.STRING) }, restParameters = {
-                  @RestParameter(name = "reviewStatus", isRequired = false, description = "The review status to set: [UNSENT, UNCONFIRMED, CONFIRMED]", type = Type.STRING) }, reponses = {
-                          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
-                          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
-                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "review status could not be parsed"),
-                          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to remove the event. Maybe you need to authenticate.") })
-  public Response updateReviewStatus(@PathParam("id") String mpId, @FormParam("reviewStatus") String reviewStatusString)
-          throws UnauthorizedException {
-    ReviewStatus reviewStatus;
-    try {
-      reviewStatus = ReviewStatus.valueOf(reviewStatusString);
-    } catch (Exception e) {
-      logger.info("Unable to parse review status {}", reviewStatusString);
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-
-    try {
-      service.updateReviewStatus(mpId, reviewStatus);
-      return Response.ok().build();
-    } catch (NotFoundException e) {
-      logger.info("Event with mediapackage id '{}' does not exist.", mpId);
-      return Response.status(Status.NOT_FOUND).build();
-    } catch (SchedulerException e) {
-      logger.error("Unable to update event with mediapackage id '{}': {}", mpId, getStackTrace(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @GET
-  @Produces(MediaType.TEXT_PLAIN)
-  @Path("{id}/blacklisted")
-  @RestQuery(name = "recordingblackliststatus", description = "Retrieves the blacklist status for specified event", returnDescription = "The blacklist status", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the blacklist status will be retrieved", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The blacklist status of event is in the body of response"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified mediapackage ID does not exist"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to remove the event. Maybe you need to authenticate.") })
-  public Response getBlacklistStatus(@PathParam("id") String mediaPackageId) throws UnauthorizedException {
-    try {
-      boolean blacklisted = service.isBlacklisted(mediaPackageId);
-      return Response.ok(Boolean.toString(blacklisted)).build();
-    } catch (NotFoundException e) {
-      logger.info("Event with mediapackage id '{}' does not exist.", mediaPackageId);
-      return Response.status(Status.NOT_FOUND).build();
-    } catch (SchedulerException e) {
-      logger.error("Unable to retrieve event with mediapackage id '{}': {}", mediaPackageId, getMessage(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
 
   @GET
   @Produces(MediaType.TEXT_PLAIN)
@@ -722,9 +622,7 @@ public class SchedulerRestService {
                   + "configuration keys for the event. Each key will be prefixed by 'org.opencastproject.workflow"
                   + ".config.' and added to the capture agent parameters."),
           @RestParameter(name = "agentparameters", isRequired = false, type = Type.TEXT, description = "The capture agent properties for the event"),
-          @RestParameter(name = "optOut", isRequired = false, type = Type.BOOLEAN, description = "The opt out status of the event"),
           @RestParameter(name = "source", isRequired = false, type = Type.STRING, description = "The scheduling source of the event"),
-          @RestParameter(name = "origin", isRequired = false, type = Type.STRING, description = "The origin")
           }, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Event is successfully created"),
           @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "Unable to create event, conflicting events found (ConflicsFound)"),
@@ -734,12 +632,9 @@ public class SchedulerRestService {
   public Response addEvent(@FormParam("start") long startTime, @FormParam("end") long endTime,
           @FormParam("agent") String agentId, @FormParam("users") String users,
           @FormParam("mediaPackage") String mediaPackageXml, @FormParam("wfproperties") String workflowProperties,
-          @FormParam("agentparameters") String agentParameters, @FormParam("optOut") Boolean optOut,
-          @FormParam("source") String schedulingSource, @FormParam("origin") String origin)
+          @FormParam("agentparameters") String agentParameters,
+          @FormParam("source") String schedulingSource)
                   throws UnauthorizedException {
-    if (StringUtils.isBlank(origin))
-      origin = SchedulerService.ORIGIN;
-
     if (endTime <= startTime || startTime < 0) {
       logger.debug("Cannot add event without proper start and end time");
       return RestUtil.R.badRequest("Cannot add event without proper start and end time");
@@ -796,12 +691,12 @@ public class SchedulerRestService {
 
     try {
       service.addEvent(startDate.toDate(), endDate.toDate(), agentId, userIds, mediaPackage, wfProperties, caProperties,
-              Opt.nul(optOut), Opt.nul(schedulingSource), origin);
+              Opt.nul(schedulingSource));
       return Response.status(Status.CREATED)
               .header("Location", serverUrl + serviceUrl + '/' + eventId + "/mediapackage.xml").build();
     } catch (UnauthorizedException e) {
       throw e;
-    } catch (SchedulerTransactionLockException | SchedulerConflictException e) {
+    } catch (SchedulerConflictException e) {
       return Response.status(Status.CONFLICT).entity(generateErrorResponse(e)).type(MediaType.APPLICATION_JSON).build();
     } catch (Exception e) {
       logger.error("Unable to create new event with id '{}'", eventId, e);
@@ -829,9 +724,7 @@ public class SchedulerRestService {
                           + "configuration keys for the event. Each key will be prefixed by 'org.opencastproject.workflow"
                           + ".config.' and added to the capture agent parameters."),
                   @RestParameter(name = "agentparameters", isRequired = false, type = Type.TEXT, description = "The capture agent properties for the event"),
-                  @RestParameter(name = "optOut", isRequired = false, type = Type.BOOLEAN, description = "The opt out status of the event"),
                   @RestParameter(name = "source", isRequired = false, type = Type.STRING, description = "The scheduling source of the event"),
-                  @RestParameter(name = "origin", isRequired = false, type = Type.STRING, description = "The origin")
           }, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Event is successfully created"),
           @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "Unable to create event, conflicting events found (ConflicsFound)"),
@@ -842,12 +735,9 @@ public class SchedulerRestService {
           @FormParam("end") long endTime, @FormParam("duration") long duration, @FormParam("tz") String tzString,
           @FormParam("agent") String agentId, @FormParam("users") String users,
           @FormParam("templateMp") MediaPackage templateMp, @FormParam("wfproperties") String workflowProperties,
-          @FormParam("agentparameters") String agentParameters, @FormParam("optOut") Boolean optOut,
-          @FormParam("source") String schedulingSource, @FormParam("origin") String origin)
+          @FormParam("agentparameters") String agentParameters,
+          @FormParam("source") String schedulingSource)
           throws UnauthorizedException {
-    if (StringUtils.isBlank(origin))
-      origin = SchedulerService.ORIGIN;
-
     if (endTime <= startTime || startTime < 0) {
       logger.debug("Cannot add event without proper start and end time");
       return RestUtil.R.badRequest("Cannot add event without proper start and end time");
@@ -903,16 +793,17 @@ public class SchedulerRestService {
     if (ids != null)
       userIds.addAll(Arrays.asList(ids));
 
-    DateTime startDate = new DateTime(startTime).toDateTime(DateTimeZone.UTC);
-    DateTime endDate = new DateTime(endTime).toDateTime(DateTimeZone.UTC);
+    // ical4j expects start and end dates to be in TimeZone to be schedule to (not UTC)
+    DateTime startDate = new DateTime(startTime).toDateTime(DateTimeZone.forTimeZone(tz));
+    DateTime endDate = new DateTime(endTime).toDateTime(DateTimeZone.forTimeZone(tz));
 
     try {
       service.addMultipleEvents(rrule, startDate.toDate(), endDate.toDate(), duration, tz, agentId, userIds, templateMp, wfProperties, caProperties,
-              Opt.nul(optOut), Opt.nul(schedulingSource), origin);
+              Opt.nul(schedulingSource));
       return Response.status(Status.CREATED).build();
     } catch (UnauthorizedException e) {
       throw e;
-    } catch (SchedulerTransactionLockException | SchedulerConflictException e) {
+    } catch (SchedulerConflictException e) {
       return Response.status(Status.CONFLICT).entity(generateErrorResponse(e)).type(MediaType.APPLICATION_JSON).build();
     } catch (Exception e) {
       logger.error("Unable to create new events", e);
@@ -930,10 +821,8 @@ public class SchedulerRestService {
                   @RestParameter(name = "users", isRequired = false, type = Type.STRING, description = "Updated comma separated list of user ids (speakers/lecturers) for the event"),
                   @RestParameter(name = "mediaPackage", isRequired = false, description = "Updated media package for event", type = Type.TEXT),
                   @RestParameter(name = "wfproperties", isRequired = false, description = "Workflow configuration properties", type = Type.TEXT),
-                  @RestParameter(name = "agentparameters", isRequired = false, description = "Updated Capture Agent properties", type = Type.TEXT),
-                  @RestParameter(name = "updateOptOut", isRequired = true, defaultValue = "false", description = "Whether to update the opt out status", type = Type.BOOLEAN),
-                  @RestParameter(name = "optOut", isRequired = false, description = "Update opt out status", type = Type.BOOLEAN),
-                  @RestParameter(name = "origin", isRequired = false, description = "The origin", type = Type.STRING) }, reponses = {
+                  @RestParameter(name = "agentparameters", isRequired = false, description = "Updated Capture Agent properties", type = Type.TEXT)
+                  }, reponses = {
                           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
                           @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
                           @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "Unable to update event, conflicting events found (ConflicsFound)"),
@@ -944,11 +833,7 @@ public class SchedulerRestService {
   public Response updateEvent(@PathParam("id") String eventID, @FormParam("start") Long startTime,
           @FormParam("end") Long endTime, @FormParam("agent") String agentId, @FormParam("users") String users,
           @FormParam("mediaPackage") String mediaPackageXml, @FormParam("wfproperties") String workflowProperties,
-          @FormParam("agentparameters") String agentParameters, @FormParam("updateOptOut") boolean updateOptOut,
-          @FormParam("optOut") Boolean optOutBoolean, @FormParam("origin") String origin) throws UnauthorizedException {
-    if (StringUtils.isBlank(origin))
-      origin = SchedulerService.ORIGIN;
-
+          @FormParam("agentparameters") String agentParameters) throws UnauthorizedException {
     if (startTime != null) {
       if (startTime < 0) {
         logger.debug("Cannot add event with negative start time ({} < 0)", startTime);
@@ -1010,17 +895,11 @@ public class SchedulerRestService {
       endDate = new DateTime(endTime).toDateTime(DateTimeZone.UTC).toDate();
     }
 
-    final Opt<Opt<Boolean>> optOut;
-    if (updateOptOut) {
-      optOut = Opt.some(Opt.nul(optOutBoolean));
-    } else {
-      optOut = Opt.none();
-    }
     try {
       service.updateEvent(eventID, Opt.nul(startDate), Opt.nul(endDate), Opt.nul(StringUtils.trimToNull(agentId)),
-              Opt.nul(userIds), Opt.nul(mediaPackage), Opt.nul(wfProperties), Opt.nul(caProperties), optOut, origin);
+              Opt.nul(userIds), Opt.nul(mediaPackage), Opt.nul(wfProperties), Opt.nul(caProperties));
       return Response.ok().build();
-    } catch (SchedulerTransactionLockException | SchedulerConflictException e) {
+    } catch (SchedulerConflictException e) {
       return Response.status(Status.CONFLICT).entity(generateErrorResponse(e)).type(MediaType.APPLICATION_JSON).build();
     } catch (SchedulerException e) {
       logger.warn("Error updating event with id '{}'", eventID, e);
@@ -1033,6 +912,68 @@ public class SchedulerRestService {
     } catch (Exception e) {
       logger.error("Unable to update event with id '{}'", eventID, e);
       return Response.serverError().build();
+    }
+  }
+
+  @GET
+  @Path("currentRecording/{agent}")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "currentrecording", description = "Get the current capture event as XML", returnDescription = "The current capture event as XML", pathParameters = {
+      @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent identifier") }, reponses = {
+      @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "current event is in the body of response"),
+      @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "There is no current recording") })
+  public Response currentRecording(@PathParam("agent") String agentId) throws UnauthorizedException {
+    try {
+      Opt<MediaPackage> current = service.getCurrentRecording(agentId);
+      if (current.isNone()) {
+        return Response.noContent().build();
+      } else {
+        return Response.ok(MediaPackageParser.getAsXml(current.get())).build();
+      }
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Unable to get the current recording for agent '{}'", agentId, e);
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Path("upcomingRecording/{agent}")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "upcomingrecording", description = "Get the upcoming capture event as XML", returnDescription = "The upcoming capture event as XML", pathParameters = {
+      @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent identifier") }, reponses = {
+      @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "upcoming event is in the body of response"),
+      @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "There is no upcoming recording") })
+  public Response upcomingRecording(@PathParam("agent") String agentId) throws UnauthorizedException {
+    try {
+      Opt<MediaPackage> upcoming = service.getUpcomingRecording(agentId);
+      if (upcoming.isNone()) {
+        return Response.noContent().build();
+      } else {
+        return Response.ok(MediaPackageParser.getAsXml(upcoming.get())).build();
+      }
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Unable to get the upcoming recording for agent '{}'", agentId, e);
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Path("eventCount")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RestQuery(name = "eventcount", description = "Get the number of scheduled events", returnDescription = "The number of scheduled events", reponses = {
+      @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The event count") })
+  public Response eventCount() throws UnauthorizedException {
+    try {
+      return Response.ok("" + service.getEventCount()).build();
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Unable to get the event count", e);
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -1140,6 +1081,14 @@ public class SchedulerRestService {
   public Response getConflicts(@PathParam("type") final String type, @QueryParam("agent") String device, @QueryParam("rrule") String rrule,
           @QueryParam("start") Long startDate, @QueryParam("end") Long endDate, @QueryParam("duration") Long duration,
           @QueryParam("timezone") String timezone) throws UnauthorizedException {
+    // Pass dates in the TZ to be schedule to (not UTC)
+    // If no timezone passed, use the local timezone of the system
+    if (StringUtils.isBlank(timezone)) {
+      timezone = DateTimeZone.getDefault().toString();
+    }
+    Date start = new DateTime(startDate).toDateTime(DateTimeZone.forID(timezone)).toDate();
+    Date end = new DateTime(endDate).toDateTime(DateTimeZone.forID(timezone)).toDate();
+
     try {
       List<MediaPackage> events = getConflictingEvents(device, rrule, startDate, endDate, duration, timezone);
       if (!events.isEmpty()) {
@@ -1248,237 +1197,6 @@ public class SchedulerRestService {
    *
    *
    *
-   * Transaction API
-   *
-   *
-   *
-   *
-   */
-
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("transaction/{id}")
-  @RestQuery(name = "gettransaction", description = "Retrieves scheduler transaction for specified id", returnDescription = "The scheduler transaction as JSON", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "ID of scheduler transaction", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Scheduler transaction is in the body of response"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Scheduler transaction with specified ID does not exist") })
-  public Response getTransaction(@PathParam("id") String transactionId) {
-    try {
-      SchedulerTransaction transaction = service.getTransaction(transactionId);
-      return RestUtil.R.ok(obj(p("id", transaction.getId()), p("source", transaction.getSource())));
-    } catch (NotFoundException e) {
-      logger.info("Scheduler transaction with id '{}' does not exist.", transactionId);
-      return Response.status(Status.NOT_FOUND).build();
-    } catch (SchedulerException e) {
-      logger.error("Unable to retrieve scheduler transaction with id '{}': {}", transactionId, getStackTrace(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("transaction/source/{source}")
-  @RestQuery(name = "gettransactionbysource", description = "Retrieves scheduler transaction for specified source", returnDescription = "The scheduler transaction as JSON", pathParameters = {
-          @RestParameter(name = "source", isRequired = true, description = "Source of scheduler transaction", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Scheduler transaction is in the body of response"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Scheduler transaction with specified ID does not exist") })
-  public Response getTransactionBySource(@PathParam("source") String source) {
-    try {
-      SchedulerTransaction transaction = service.getTransactionBySource(source);
-      return RestUtil.R.ok(obj(p("id", transaction.getId()), p("source", transaction.getSource())));
-    } catch (NotFoundException e) {
-      logger.info("Scheduler transaction with source '{}' does not exist.", source);
-      return Response.status(Status.NOT_FOUND).build();
-    } catch (SchedulerException e) {
-      logger.error("Unable to retrieve scheduler transaction with source '{}': {}", source, getStackTrace(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @GET
-  @Produces(MediaType.TEXT_PLAIN)
-  @Path("transaction/event/{id}")
-  @RestQuery(name = "gettransactionstatusbyevent", description = "Retrieves the active transaction status for specified event", returnDescription = "The active transaction status", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "ID of events mediapackage id for which the active transaction status will be retrieved", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The active transaction status of event is in the body of response"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Scheduler transaction with specified ID does not exist"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to get the event transaction status. Maybe you need to authenticate.") })
-  public Response getTransactionStatusByEvent(@PathParam("id") String mediaPackageId) throws UnauthorizedException {
-    try {
-      return Response.ok(Boolean.toString(service.hasActiveTransaction(mediaPackageId))).build();
-    } catch (NotFoundException e) {
-      logger.info("Event with mediapackage id '{}' does not exist.", mediaPackageId);
-      return Response.status(Status.NOT_FOUND).build();
-    } catch (SchedulerException e) {
-      logger.error("Unable to retrieve event with mediapackage id '{}': {}", mediaPackageId, getMessage(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @POST
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("/transaction")
-  @RestQuery(name = "createtransaction", description = "Creates a new scheduler transaction with specified source", returnDescription = "The scheduler transaction as JSON", reponses = {
-          @RestResponse(responseCode = SC_OK, description = "New scheduler transaction created"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to create a scheduler transaction. Maybe you need to authenticate."),
-          @RestResponse(responseCode = SC_CONFLICT, description = "New scheduler transaction created"), }, restParameters = {
-                  @RestParameter(name = "source", type = RestParameter.Type.STRING, isRequired = true, description = "The scheduling source") })
-  public Response createTransaction(@FormParam("source") String schedulingSource) throws UnauthorizedException {
-    try {
-      SchedulerTransaction transaction = service.createTransaction(schedulingSource);
-      return RestUtil.R.ok(obj(p("id", transaction.getId()), p("source", transaction.getSource())));
-    } catch (SchedulerConflictException e) {
-      return Response.status(Status.CONFLICT).build();
-    } catch (SchedulerException e) {
-      logger.error("Unable to create transaction: {}", getStackTrace(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @POST
-  @Path("/transaction/cleanup")
-  @RestQuery(name = "cleanuptransaction", description = "Cleanup scheduler transactions", returnDescription = "The scheduler transactions has been cleaned up", reponses = {
-          @RestResponse(responseCode = SC_OK, description = "The scheduler transactions has been cleaned up"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to cleanup scheduler transactions. Maybe you need to authenticate.") })
-  public Response cleanupTransactions() throws UnauthorizedException {
-    try {
-      service.cleanupTransactions();
-      return RestUtil.R.ok();
-    } catch (SchedulerException e) {
-      logger.error("Unable to cleanup transactions: {}", getStackTrace(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @POST
-  @Path("/transaction/{id}/commit")
-  @RestQuery(name = "committransaction", description = "Commits the scheduler transaction with specified id", returnDescription = "Successfully committed scheduler transaction", reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Successfully committed scheduler transaction"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Scheduler transaction with specified ID does not exist"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to commit the scheduler transaction. Maybe you need to authenticate.") }, pathParameters = {
-                  @RestParameter(name = "id", type = RestParameter.Type.STRING, isRequired = true, description = "ID of scheduler transaction") })
-  public Response commitTransaction(@PathParam("id") String transactionId)
-          throws UnauthorizedException, NotFoundException {
-    try {
-      SchedulerTransaction transaction = service.getTransaction(transactionId);
-      transaction.commit();
-      return Response.ok().build();
-    } catch (SchedulerException e) {
-      logger.error("Unable to commit scheduler transaction '{}': {}", transactionId, getStackTrace(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @POST
-  @Path("/transaction/{id}/rollback")
-  @RestQuery(name = "rollbacktransaction", description = "Rolls back the scheduler transaction with specified id", returnDescription = "Successfully rolled back scheduler transaction", reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Successfully rolled back scheduler transaction"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Scheduler transaction with specified ID does not exist"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to rollback the scheduler transaction. Maybe you need to authenticate.") }, pathParameters = {
-                  @RestParameter(name = "id", type = RestParameter.Type.STRING, isRequired = true, description = "ID of scheduler transaction") })
-  public Response rollbackTransaction(@PathParam("id") String transactionId)
-          throws UnauthorizedException, NotFoundException {
-    try {
-      SchedulerTransaction transaction = service.getTransaction(transactionId);
-      transaction.rollback();
-      return Response.ok().build();
-    } catch (SchedulerException e) {
-      logger.error("Unable to rollback scheduler transaction '{}': {}", transactionId, getStackTrace(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @PUT
-  @Path("/transaction/{id}/add")
-  @RestQuery(name = "transactionaddevent", description = "Commits the scheduler transaction with specified id", returnDescription = "Successfully committed scheduler transaction", reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Successfully committed scheduler transaction"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Scheduler transaction with specified ID does not exist"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to commit the scheduler transaction. Maybe you need to authenticate.") }, pathParameters = {
-                  @RestParameter(name = "id", type = RestParameter.Type.STRING, isRequired = true, description = "ID of scheduler transaction") }, restParameters = {
-                          @RestParameter(name = "start", isRequired = true, type = Type.INTEGER, description = "The start date of the event"),
-                          @RestParameter(name = "end", isRequired = true, type = Type.INTEGER, description = "The end date of the event"),
-                          @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent of the event"),
-                          @RestParameter(name = "users", isRequired = false, type = Type.STRING, description = "Comma separated list of user ids (speakers/lecturers) for the event"),
-                          @RestParameter(name = "mediaPackage", isRequired = true, type = Type.TEXT, description = "The media package of the event"),
-                          @RestParameter(name = "wfproperties", isRequired = false, type = Type.TEXT, description = "The workflow properties for the event"),
-                          @RestParameter(name = "agentparameters", isRequired = false, type = Type.TEXT, description = "The capture agent properties for the event"),
-                          @RestParameter(name = "optOut", isRequired = false, type = Type.BOOLEAN, description = "The opt out status of the event") })
-  public Response addTransactionEvent(@PathParam("id") String transactionId, @FormParam("start") long startTime,
-          @FormParam("end") long endTime, @FormParam("agent") String agentId, @FormParam("users") String users,
-          @FormParam("mediaPackage") String mediaPackageXml, @FormParam("wfproperties") String workflowProperties,
-          @FormParam("agentparameters") String agentParameters, @FormParam("optOut") Boolean optOut)
-                  throws UnauthorizedException, NotFoundException {
-    if (startTime < 0 || endTime < 0) {
-      logger.info("Cannot add event without proper start and/or end time");
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-
-    if (StringUtils.isBlank(agentId)) {
-      logger.info("Cannot add event without agent identifier");
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-
-    if (StringUtils.isBlank(mediaPackageXml)) {
-      logger.info("Cannot add event without media package");
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-
-    MediaPackage mediaPackage;
-    try {
-      mediaPackage = MediaPackageParser.getFromXml(mediaPackageXml);
-    } catch (Exception e) {
-      logger.info("Could not parse media package:", e);
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-
-    Map<String, String> caProperties = new HashMap<>();
-    if (StringUtils.isNotBlank(agentParameters)) {
-      try {
-        Properties prop = parseProperties(agentParameters);
-        caProperties.putAll((Map) prop);
-      } catch (Exception e) {
-        logger.info("Could not parse capture agent properties: {}", agentParameters);
-        return Response.status(Status.BAD_REQUEST).build();
-      }
-    }
-
-    Map<String, String> wfProperties = new HashMap<>();
-    if (StringUtils.isNotBlank(workflowProperties)) {
-      try {
-        Properties prop = parseProperties(workflowProperties);
-        wfProperties.putAll((Map) prop);
-      } catch (IOException e) {
-        logger.info("Could not parse workflow configuration properties: {}", workflowProperties);
-        return Response.status(Status.BAD_REQUEST).build();
-      }
-    }
-    Set<String> userIds = new HashSet<>();
-    String[] ids = StringUtils.split(users, ",");
-    if (ids != null)
-      userIds.addAll(Arrays.asList(ids));
-
-    DateTime startDate = new DateTime(startTime).toDateTime(DateTimeZone.UTC);
-    DateTime endDate = new DateTime(endTime).toDateTime(DateTimeZone.UTC);
-
-    try {
-      SchedulerTransaction transaction = service.getTransaction(transactionId);
-      transaction.addEvent(startDate.toDate(), endDate.toDate(), agentId, userIds, mediaPackage, wfProperties,
-              caProperties, Opt.nul(optOut));
-      return Response.ok().build();
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      logger.error("Unable to commit scheduler transaction '{}': {}", transactionId, getStackTrace(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  /**
-   *
-   *
-   *
    * Prolonging service
    *
    *
@@ -1500,13 +1218,12 @@ public class SchedulerRestService {
               .entity("Scheduler service is unavailable, please wait...").build();
 
     try {
-      List<MediaPackage> search = service.search(Opt.some(agentId), Opt.<Date> none(), Opt.some(new Date()),
-              Opt.some(new Date()), Opt.<Date> none());
-      if (search.isEmpty()) {
+      Opt<MediaPackage> current = service.getCurrentRecording(agentId);
+      if (current.isNone()) {
         logger.info("No recording to stop found for agent '{}'!", agentId);
         throw new NotFoundException("No recording to stop found for agent: " + agentId);
       } else {
-        DublinCoreCatalog catalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, search.get(0)).get();
+        DublinCoreCatalog catalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, current.get()).get();
         return Response.ok(catalog.toJson()).build();
       }
     } catch (NotFoundException e) {
@@ -1531,13 +1248,12 @@ public class SchedulerRestService {
               .entity("Scheduler service is unavailable, please wait...").build();
 
     try {
-      List<MediaPackage> search = service.search(Opt.some(agentId), Opt.some(new Date()), Opt.<Date> none(),
-              Opt.<Date> none(), Opt.<Date> none());
-      if (search.isEmpty()) {
+      Opt<MediaPackage> upcoming = service.getUpcomingRecording(agentId);
+      if (upcoming.isNone()) {
         logger.info("No recording to stop found for agent '{}'!", agentId);
         throw new NotFoundException("No recording to stop found for agent: " + agentId);
       } else {
-        DublinCoreCatalog catalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, search.get(0)).get();
+        DublinCoreCatalog catalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, upcoming.get()).get();
         return Response.ok(catalog.toJson()).build();
       }
     } catch (NotFoundException e) {
@@ -1629,7 +1345,7 @@ public class SchedulerRestService {
 
         prolongingService.schedule(agentId);
         service.addEvent(now, temporaryEndDate, agentId, Collections.<String> emptySet(), mediaPackage, wfProperties,
-                caProperties, Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+                caProperties, Opt.<String> none());
         return Response.status(Status.CREATED)
                 .header("Location", serverUrl + serviceUrl + '/' + mediaPackage.getIdentifier().compact() + ".xml")
                 .build();
@@ -1693,15 +1409,14 @@ public class SchedulerRestService {
       MediaPackage mp;
       DublinCoreCatalog eventCatalog;
       try {
-        List<MediaPackage> search = service.search(Opt.some(agentId), Opt.<Date> none(), Opt.some(new Date()),
-                Opt.some(new Date()), Opt.<Date> none());
-        if (search.isEmpty()) {
+        Opt<MediaPackage> current = service.getCurrentRecording(agentId);
+        if (current.isNone()) {
           logger.info("No recording to stop found for agent '{}'!", agentId);
           return Response.notModified().build();
         } else {
-          mp = search.get(0);
-          eventCatalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, search.get(0)).get();
-          eventId = search.get(0).getIdentifier().compact();
+          mp = current.get();
+          eventCatalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp).get();
+          eventId = mp.getIdentifier().compact();
         }
       } catch (Exception e) {
         logger.error("Unable to get the immediate recording for agent '{}': {}", agentId, e);
@@ -1719,7 +1434,7 @@ public class SchedulerRestService {
 
         service.updateEvent(eventId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
                 Opt.<Set<String>> none(), Opt.some(mp), Opt.<Map<String, String>> none(),
-                Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+                Opt.<Map<String, String>> none());
         prolongingService.stop(agentId);
         return Response.ok().build();
       } catch (UnauthorizedException e) {

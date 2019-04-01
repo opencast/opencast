@@ -154,7 +154,6 @@ CREATE TABLE oc_job (
   parent BIGINT,
   root BIGINT,
   job_load FLOAT NOT NULL DEFAULT 1.0,
-  blocking_job BIGINT DEFAULT NULL,
   PRIMARY KEY (id),
   CONSTRAINT FK_oc_job_creator_service FOREIGN KEY (creator_service) REFERENCES oc_service_registration (id) ON DELETE CASCADE,
   CONSTRAINT FK_oc_job_processor_service FOREIGN KEY (processor_service) REFERENCES oc_service_registration (id) ON DELETE CASCADE,
@@ -182,13 +181,6 @@ CREATE TABLE oc_job_argument (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_oc_job_argument_id ON oc_job_argument (id);
-
-CREATE TABLE oc_blocking_job (
-  id BIGINT NOT NULL,
-  blocking_job_list BIGINT,
-  job_index INTEGER,
-  CONSTRAINT FK_oc_blocking_job_id FOREIGN KEY (id) REFERENCES oc_job (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE oc_job_context (
   id BIGINT NOT NULL,
@@ -242,21 +234,24 @@ CREATE INDEX IX_oc_scheduled_last_modified_last_modified ON oc_scheduled_last_mo
 CREATE TABLE oc_scheduled_extended_event (
   mediapackage_id VARCHAR(128) NOT NULL,
   organization VARCHAR(128) NOT NULL,
+  capture_agent_id VARCHAR(128) NOT NULL,
+  start_date DATETIME NOT NULL,
+  end_date DATETIME NOT NULL,
+  source VARCHAR(255),
+  recording_state VARCHAR(255),
+  recording_last_heard BIGINT,
+  presenters TEXT(65535),
+  last_modified_date DATETIME,
+  checksum VARCHAR(64),
+  capture_agent_properties MEDIUMTEXT,
+  workflow_properties MEDIUMTEXT,
   PRIMARY KEY (mediapackage_id, organization),
   CONSTRAINT FK_oc_scheduled_extended_event_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE oc_scheduled_transaction (
-  id VARCHAR(128) NOT NULL,
-  organization VARCHAR(128) NOT NULL,
-  source VARCHAR(255) NOT NULL,
-  last_modified DATETIME NOT NULL,
-  PRIMARY KEY (id, organization),
-  CONSTRAINT UNQ_oc_scheduled_transaction UNIQUE (id, organization, source),
-  CONSTRAINT FK_oc_scheduled_transaction_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_oc_scheduled_transaction_source ON oc_scheduled_transaction (source);
+CREATE INDEX IX_oc_scheduled_extended_event_organization ON oc_scheduled_extended_event (organization);
+CREATE INDEX IX_oc_scheduled_extended_event_capture_agent_id ON oc_scheduled_extended_event (capture_agent_id);
+CREATE INDEX IX_oc_scheduled_extended_event_dates ON oc_scheduled_extended_event (start_date, end_date);
 
 CREATE TABLE oc_search (
   id VARCHAR(128) NOT NULL,
@@ -277,7 +272,6 @@ CREATE TABLE oc_series (
   organization VARCHAR(128) NOT NULL,
   access_control TEXT(65535),
   dublin_core TEXT(65535),
-  opt_out   tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (id, organization),
   CONSTRAINT FK_oc_series_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -425,35 +419,6 @@ CREATE TABLE oc_acl_managed_acl (
   CONSTRAINT UNQ_oc_acl_managed_acl UNIQUE (name, organization_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE oc_acl_episode_transition (
-  pk BIGINT(20) NOT NULL,
-  workflow_params VARCHAR(255) DEFAULT NULL,
-  application_date DATETIME DEFAULT NULL,
-  workflow_id VARCHAR(128) DEFAULT NULL,
-  done TINYINT(1) DEFAULT 0,
-  episode_id VARCHAR(128) DEFAULT NULL,
-  organization_id VARCHAR(128) DEFAULT NULL,
-  managed_acl_fk BIGINT(20) DEFAULT NULL,
-  PRIMARY KEY (pk),
-  CONSTRAINT UNQ_oc_acl_episode_transition UNIQUE (episode_id, organization_id, application_date),
-  CONSTRAINT FK_oc_acl_episode_transition_managed_acl_fk FOREIGN KEY (managed_acl_fk) REFERENCES oc_acl_managed_acl (pk)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE oc_acl_series_transition (
-  pk BIGINT(20) NOT NULL,
-  workflow_params VARCHAR(255) DEFAULT NULL,
-  application_date DATETIME DEFAULT NULL,
-  workflow_id VARCHAR(128) DEFAULT NULL,
-  override TINYINT(1) DEFAULT 0,
-  done TINYINT(1) DEFAULT 0,
-  organization_id VARCHAR(128) DEFAULT NULL,
-  series_id VARCHAR(128) DEFAULT NULL,
-  managed_acl_fk BIGINT(20) DEFAULT NULL,
-  PRIMARY KEY (pk),
-  CONSTRAINT UNQ_oc_acl_series_transition UNIQUE (series_id, organization_id, application_date),
-  CONSTRAINT FK_oc_acl_series_transition_managed_acl_fk FOREIGN KEY (managed_acl_fk) REFERENCES oc_acl_managed_acl (pk)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE oc_role (
   id bigint(20) NOT NULL,
   description varchar(255) DEFAULT NULL,
@@ -546,59 +511,6 @@ CREATE TABLE oc_user_settings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_oc_user_setting_organization ON oc_user_settings (organization);
-
-CREATE TABLE oc_email_configuration (
-  id BIGINT(20) NOT NULL,
-  organization VARCHAR(128) NOT NULL,
-  port INT(5) DEFAULT NULL,
-  transport VARCHAR(255) DEFAULT NULL,
-  username VARCHAR(255) DEFAULT NULL,
-  server VARCHAR(255) NOT NULL,
-  ssl_enabled TINYINT(1) NOT NULL DEFAULT '0',
-  password VARCHAR(255) DEFAULT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT UNQ_oc_email_configuration UNIQUE (organization),
-  CONSTRAINT FK_oc_email_configuration_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_oc_email_configuration_organization ON oc_email_configuration (organization);
-
-CREATE TABLE oc_message_signature (
-  id BIGINT(20) NOT NULL,
-  organization VARCHAR(128) NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  creation_date DATETIME NOT NULL,
-  sender VARCHAR(255) NOT NULL,
-  sender_name VARCHAR(255) NOT NULL,
-  reply_to VARCHAR(255) DEFAULT NULL,
-  reply_to_name VARCHAR(255) DEFAULT NULL,
-  signature VARCHAR(255) NOT NULL,
-  creator_username VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT UNQ_oc_message_signature UNIQUE (organization, name),
-  CONSTRAINT FK_oc_message_signature_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_oc_message_signature_organization ON oc_message_signature (organization);
-CREATE INDEX IX_oc_message_signature_name ON oc_message_signature (name);
-
-CREATE TABLE oc_message_template (
-  id BIGINT(20) NOT NULL,
-  organization VARCHAR(128) NOT NULL,
-  body TEXT(65535) NOT NULL,
-  creation_date DATETIME NOT NULL,
-  subject VARCHAR(255) NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  template_type VARCHAR(255) DEFAULT NULL,
-  creator_username VARCHAR(255) NOT NULL,
-  hidden TINYINT(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (id),
-  CONSTRAINT UNQ_oc_message_template UNIQUE (organization, name),
-  CONSTRAINT FK_oc_message_template_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_oc_message_template_organization ON oc_message_template (organization);
-CREATE INDEX IX_oc_message_template_name ON oc_message_template (name);
 
 CREATE TABLE oc_event_comment (
   id BIGINT(20) NOT NULL,

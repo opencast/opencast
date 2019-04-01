@@ -51,6 +51,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class JpaUserProviderTest {
 
@@ -111,10 +112,10 @@ public class JpaUserProviderTest {
 
     Role role = roles.next();
     assertEquals(astroRole.getName(), role.getName());
-    assertEquals(astroRole.getOrganization(), role.getOrganization());
+    assertEquals(astroRole.getOrganizationId(), role.getOrganizationId());
     assertEquals(astroRole.getDescription(), role.getDescription());
 
-    assertFalse("There should onyl be one role", roles.hasNext());
+    assertFalse("There should only be one role", roles.hasNext());
   }
 
   @Test
@@ -356,10 +357,13 @@ public class JpaUserProviderTest {
 
     assertEquals("There should be three roles", 3, IteratorUtils.toList(provider.getRoles()).size());
 
-    List<Role> rolesForUser = provider.getRolesForUser("user1");
+    List<String> rolesForUser = provider.getRolesForUser("user1").stream()
+            .map(Role::getName)
+            .sorted()
+            .collect(Collectors.toList());
     assertEquals("There should be two roles", 2, rolesForUser.size());
-    assertEquals("ROLE_ONE", rolesForUser.get(0).getName());
-    assertEquals("ROLE_TWO", rolesForUser.get(1).getName());
+    assertEquals("ROLE_ONE", rolesForUser.get(0));
+    assertEquals("ROLE_TWO", rolesForUser.get(1));
   }
 
   @Test

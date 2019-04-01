@@ -75,9 +75,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
@@ -88,6 +87,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
 
   private static final String COLLECTION = "composite";
 
+  private static final String SOURCE_AUDIO_NAME = "source-audio-name";
   private static final String SOURCE_TAGS_UPPER = "source-tags-upper";
   private static final String SOURCE_FLAVOR_UPPER = "source-flavor-upper";
   private static final String SOURCE_TAGS_LOWER = "source-tags-lower";
@@ -112,36 +112,9 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CompositeWorkflowOperationHandler.class);
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_TAGS_UPPER, "The \"tag\" of the upper track to use as a source input");
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR_UPPER, "The \"flavor\" of the upper track to use as a source input");
-    CONFIG_OPTIONS.put(SOURCE_TAGS_LOWER, "The \"tag\" of the lower track to use as a source input");
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR_LOWER, "The \"flavor\" of the lower track to use as a source input");
-    CONFIG_OPTIONS.put(SOURCE_TAGS_WATERMARK, "The \"tag\" of the attachement image to use as a source input");
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR_WATERMARK, "The \"flavor\" of the attachement image to use as a source input");
-    CONFIG_OPTIONS.put(SOURCE_URL_WATERMARK, "The \"URL\" of the fallback image to use as a source input");
-
-    CONFIG_OPTIONS.put(ENCODING_PROFILE, "The encoding profile to use");
-
-    CONFIG_OPTIONS.put(TARGET_TAGS, "The tags to apply to the compound video track");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR, "The flavor to apply to the compound video track");
-
-    CONFIG_OPTIONS
-            .put(LAYOUT_MULTIPLE,
-                    "The layout name to use or a semi-colon separated JSON layout definition (lower, upper, optional watermark) if there are multiple videos");
-    CONFIG_OPTIONS
-            .put(LAYOUT_SINGLE,
-                    "The layout name to use or a semi-colon separated JSON layout definition (video, optional watermark) if there is a single video source");
-    CONFIG_OPTIONS.put(LAYOUT_PREFIX,
-            "Define semi-colon separated JSON layouts (lower, upper, optional watermark) to provide by name");
-
-    CONFIG_OPTIONS.put(OUTPUT_RESOLUTION, "The resulting resolution of the compound video e.g. 1900x1080");
-    CONFIG_OPTIONS.put(OUTPUT_BACKGROUND, "The resulting background color of the compound video e.g. black");
-  }
+  /** The legal options for SOURCE_AUDIO_NAME */
+  private static final Pattern sourceAudioOption = Pattern.compile(
+          ComposerService.LOWER + "|" + ComposerService.UPPER + "|" + ComposerService.BOTH, Pattern.CASE_INSENSITIVE);
 
   /** The composer service */
   private ComposerService composerService = null;
@@ -168,16 +141,6 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**
@@ -304,6 +267,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     /** Use resolution of upper part as output resolution */
     public static final String OUTPUT_RESOLUTION_UPPER = "upper";
 
+    private String sourceAudioName;
     private String sourceTagsUpper;
     private String sourceFlavorUpper;
     private String sourceTagsLower;
@@ -345,6 +309,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     CompositeSettings(MediaPackage mediaPackage, WorkflowOperationInstance operation)
             throws WorkflowOperationException {
       // Check which tags have been configured
+      sourceAudioName = StringUtils.trimToNull(operation.getConfiguration(SOURCE_AUDIO_NAME));
       sourceTagsUpper = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_UPPER));
       sourceFlavorUpper = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR_UPPER));
       sourceTagsLower = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_LOWER));
@@ -388,6 +353,10 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         singleSourceLayout = singleLayouts.getA();
         watermarkLayout = singleLayouts.getB();
       }
+
+      // Check that source audio is upper, lower or use a combination of both
+      if (sourceAudioName != null && !sourceAudioOption.matcher(sourceAudioName).matches())
+        throw new WorkflowOperationException("sourceAudioName if used, must be either upper, lower or both!");
 
       // Find the encoding profile
       if (encodingProfile == null)
@@ -542,6 +511,10 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       return targetTags;
     }
 
+    public String getSourceAudioName() {
+      return sourceAudioName;
+    }
+
     public String getOutputBackground() {
       return outputBackground;
     }
@@ -660,7 +633,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
 
       Job compositeJob = composerService.composite(outputDimension, Option
               .<LaidOutElement<Track>> none(), lowerLaidOutElement, watermarkOption, compositeSettings.getProfile()
-              .getIdentifier(), compositeSettings.getOutputBackground());
+              .getIdentifier(), compositeSettings.getOutputBackground(), compositeSettings.getSourceAudioName());
 
       // Wait for the jobs to return
       if (!waitForStatus(compositeJob).isSuccess())
@@ -792,7 +765,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
 
       Job compositeJob = composerService.composite(outputDimension, Option
               .option(upperLaidOutElement), lowerLaidOutElement, watermarkOption, compositeSettings.getProfile()
-              .getIdentifier(), compositeSettings.getOutputBackground());
+              .getIdentifier(), compositeSettings.getOutputBackground(), compositeSettings.getSourceAudioName());
 
       // Wait for the jobs to return
       if (!waitForStatus(compositeJob).isSuccess())

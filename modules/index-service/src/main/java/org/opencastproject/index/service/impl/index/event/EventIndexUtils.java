@@ -154,20 +154,10 @@ public final class EventIndexUtils {
       metadata.addField(EventIndexSchema.END_DATE, event.getRecordingEndDate(), true);
     if (event.getDuration() != null)
       metadata.addField(EventIndexSchema.DURATION, event.getDuration(), true);
-    if (StringUtils.isNotBlank(event.getReviewStatus()))
-      metadata.addField(EventIndexSchema.REVIEW_STATUS, event.getReviewStatus(), true);
-    if (StringUtils.isNotBlank(event.getReviewDate()))
-      metadata.addField(EventIndexSchema.REVIEW_DATE, event.getReviewDate(), true);
     if (StringUtils.isNotBlank(event.getWorkflowScheduledDate()))
       metadata.addField(EventIndexSchema.WORKFLOW_SCHEDULED_DATETIME, event.getWorkflowScheduledDate(), true);
     if (event.getArchiveVersion() != null)
       metadata.addField(EventIndexSchema.ARCHIVE_VERSION, event.getArchiveVersion(), true);
-    if (event.getOptedOut() != null)
-      metadata.addField(EventIndexSchema.OPTED_OUT, event.getOptedOut(), true);
-    if (event.getBlacklisted() != null)
-      metadata.addField(EventIndexSchema.BLACKLISTED, event.getBlacklisted(), true);
-    if (event.getSchedulingStatus() != null)
-      metadata.addField(EventIndexSchema.SCHEDULING_STATUS, event.getSchedulingStatus(), true);
     if (event.getRecordingStatus() != null)
       metadata.addField(EventIndexSchema.RECORDING_STATUS, event.getRecordingStatus(), true);
 
@@ -251,10 +241,6 @@ public final class EventIndexUtils {
     if (event.getTechnicalPresenters() != null) {
       metadata.addField(EventIndexSchema.TECHNICAL_PRESENTERS,
               event.getTechnicalPresenters().toArray(new String[event.getTechnicalPresenters().size()]), true);
-    }
-
-    if (event.getAgentConfiguration() != null) {
-      metadata.addField(EventIndexSchema.AGENT_CONFIGURATION, event.getAgentConfiguration(), false);
     }
 
     return metadata;
@@ -485,7 +471,7 @@ public final class EventIndexUtils {
   }
 
   public static Event updateTechnicalDate(Event event) {
-    if (event.hasRecordingStarted()) {
+    if (event.isScheduledEvent() && event.hasRecordingStarted()) {
       // Override technical dates from recording if already started
       event.setTechnicalStartTime(event.getRecordingStartDate());
       event.setTechnicalEndTime(event.getRecordingEndDate());

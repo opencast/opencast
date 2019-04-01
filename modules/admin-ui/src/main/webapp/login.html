@@ -5,9 +5,6 @@
     <title>Opencast</title>
     <link rel="stylesheet" href="styles/main.css">
     <link rel="shortcut icon" href="img/favicon.ico">
-    <script>
-      window.jQuery || document.write('<script src="lib/jquery-1.10.2.js"><\/script>')
-      </script>
   </head>
 
   <body class="login-body" ng-controller="LoginCtrl" ng-cloak>
@@ -67,17 +64,19 @@
 
     <!-- build:js(src/main) scripts/bower.js -->
     <!-- bower:js -->
+    <script src="../../bower_components/jquery/jquery.js"></script>
+    <script src="../../bower_components/jquery-ui/jquery-ui.js"></script>
     <script src="../../bower_components/angular/angular.js"></script>
     <script src="../../bower_components/angular-route/angular-route.js"></script>
     <script src="../../bower_components/angular-resource/angular-resource.js"></script>
     <script src="../../bower_components/angular-animate/angular-animate.js"></script>
     <script src="../../bower_components/angular-messages/angular-messages.js"></script>
-    <script src="../../bower_components/angular-md5/angular-md5.js"></script>
     <script src="../../bower_components/angular-translate/angular-translate.js"></script>
     <script src="../../bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
     <script src="../../bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
     <script src="../../bower_components/angular-wizard/dist/angular-wizard.js"></script>
     <script src="../../bower_components/angular-hotkeys/build/hotkeys.js"></script>
+    <script src="../../bower_components/angular-ui-sortable/sortable.js"></script>
     <script src="../../bower_components/ng-file-upload/angular-file-upload.js"></script>
     <!-- endbower -->
     <!-- endbuild -->

@@ -76,11 +76,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private Long duration = null;
   private String startDate = null;
   private String eventStatus = null;
-  private String reviewStatus = null;
-  private String schedulingStatus = null;
-  private Boolean optedOut = null;
-  private String reviewDate = null;
-  private Boolean blacklisted = null;
   private Boolean hasComments = null;
   private Boolean hasOpenComments = null;
   private Boolean needsCutting = null;
@@ -913,50 +908,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   }
 
   /**
-   * Selects recordings with the given review status.
-   *
-   * @param reviewStatus
-   *          the review status
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withReviewStatus(String reviewStatus) {
-    clearExpectations();
-    this.reviewStatus = reviewStatus;
-    return this;
-  }
-
-  /**
-   * Returns the review status of the recording.
-   *
-   * @return the review status
-   */
-  public String getReviewStatus() {
-    return reviewStatus;
-  }
-
-  /**
-   * Selects recordings with the given scheduling status.
-   *
-   * @param schedulingStatus
-   *          the scheduling status
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withSchedulingStatus(String schedulingStatus) {
-    clearExpectations();
-    this.schedulingStatus = schedulingStatus;
-    return this;
-  }
-
-  /**
-   * Returns the scheduling status of the recording.
-   *
-   * @return the scheduling status
-   */
-  public String getSchedulingStatus() {
-    return schedulingStatus;
-  }
-
-  /**
    * Selects recordings with the given event status.
    *
    * @param eventStatus
@@ -976,72 +927,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public String getEventStatus() {
     return eventStatus;
-  }
-
-  /**
-   * Selects recordings with the given review date.
-   *
-   * @param reviewDate
-   *          the review date
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withReviewDate(String reviewDate) {
-    clearExpectations();
-    this.reviewDate = reviewDate;
-    return this;
-  }
-
-  /**
-   * Returns the review date of the recording.
-   *
-   * @return the review date
-   */
-  public String getReviewDate() {
-    return reviewDate;
-  }
-
-  /**
-   * Selects recordings with the given recording status (opted out).
-   *
-   * @param optedOut
-   *          the recording status
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withOptedOut(boolean optedOut) {
-    clearExpectations();
-    this.optedOut = optedOut;
-    return this;
-  }
-
-  /**
-   * Returns the recording status (opted out) of the recording.
-   *
-   * @return the recording out
-   */
-  public Boolean getOptedOut() {
-    return optedOut;
-  }
-
-  /**
-   * Selects recordings with the given recording status (blacklisted).
-   *
-   * @param blacklisted
-   *          the recording status (blacklisted)
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withBlacklisted(boolean blacklisted) {
-    clearExpectations();
-    this.blacklisted = blacklisted;
-    return this;
-  }
-
-  /**
-   * Returns the recording status (blacklisted) of the recording.
-   *
-   * @return the recording backlisted status
-   */
-  public Boolean getBlacklisted() {
-    return blacklisted;
   }
 
   /**
@@ -1484,27 +1369,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   }
 
   /**
-   * Defines the sort order for the review status.
-   *
-   * @param order
-   *          the sort order
-   * @return the updated query
-   */
-  public EventSearchQuery sortByReviewStatus(Order order) {
-    withSortOrder(EventIndexSchema.REVIEW_STATUS, order);
-    return this;
-  }
-
-  /**
-   * Returns the sort order for the review status.
-   *
-   * @return the sort order
-   */
-  public Order getReviewStatusSortOrder() {
-    return getSortOrder(EventIndexSchema.REVIEW_STATUS);
-  }
-
-  /**
    * Defines the sort order for the workflow state.
    *
    * @param order
@@ -1523,27 +1387,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public Order getWorkflowStateSortOrder() {
     return getSortOrder(EventIndexSchema.WORKFLOW_STATE);
-  }
-
-  /**
-   * Defines the sort order for the scheduling status.
-   *
-   * @param order
-   *          the sort order
-   * @return the updated query
-   */
-  public EventSearchQuery sortBySchedulingStatus(Order order) {
-    withSortOrder(EventIndexSchema.SCHEDULING_STATUS, order);
-    return this;
-  }
-
-  /**
-   * Returns the sort order for the scheduling status.
-   *
-   * @return the sort order
-   */
-  public Order getSchedulingStatusSortOrder() {
-    return getSortOrder(EventIndexSchema.SCHEDULING_STATUS);
   }
 
   /**

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.uiconfig.UIConfigRest"
+               immediate="true">
+
+  <implementation class="org.opencastproject.uiconfig.UIConfigRest"/>
+
+  <property name="service.description" value="UI Config REST Endpoint"/>
+  <property name="opencast.service.type" value="org.opencastproject.uiconfig"/>
+  <property name="opencast.service.path" value="/ui/config"/>
+
+  <service>
+    <provide interface="org.opencastproject.uiconfig.UIConfigRest"/>
+  </service>
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+             bind="setSecurityService"/>
+</scr:component>

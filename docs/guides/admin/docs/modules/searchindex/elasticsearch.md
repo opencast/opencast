@@ -24,18 +24,16 @@ Elasticsearch configuration file called `elasticsearch.yml`:
 
 ```yml
 cluster.name: opencast
-node.name: opencast-elasticsearch-single-node
-index.max_result_window: 2147483647
 network.host: 0.0.0.0
+discovery.type: single-node
 ```
 
 …and run
 
 ```sh
 % docker run -p 9200:9200 -p 9300:9300 \
-    -e "discovery.type=single-node" \
     -v "$(pwd)/elasticsearch.yml":/usr/share/elasticsearch/config/elasticsearch.yml \
-    elasticsearch:2.4.6
+    elasticsearch:5.6.15
 ```
 
 This will already give you a running cluster with the cluster name `opencast`. Note that the cluster name is important
@@ -54,8 +52,8 @@ org.opencastproject.elasticsearch.server.address=127.0.0.1
 Once this is set, Opencast will not launch its own internal Elasticsearch anymore. If necessary, you can also specify a
 custom port in this configuration file.
 
-Next, configure the correct cluster name for all indexes in `etc/index/*/settings.yml`. Make sure that the correct
-cluster name is set in the configuration file of each index:
+Next, configure the correct cluster name in `etc/elasticsearch.yml`. Make sure that the correct cluster name is set in
+the configuration file of each index:
 
 ```yml
 cluster.name: opencast

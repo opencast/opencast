@@ -78,8 +78,10 @@ public final class DublinCoreMetadataUtil {
         if (field.getType() == MetadataField.Type.START_DATE) {
           setStartDate(dc, field, ename);
         } else if (field.getType() == MetadataField.Type.DURATION) {
+          // WARN: the duration change assumes the catalog's start date is already up to date.
           setDuration(dc, field, ename);
         } else if (field.getType() == Type.DATE) {
+          // Skip over metadata field tagged with key "created".
           // DC created should only be modified by changing the start date, see MH-12250
           if (! DublinCore.PROPERTY_CREATED.equals(ename))
             setDate(dc, field, ename);
@@ -268,7 +270,7 @@ public final class DublinCoreMetadataUtil {
     if (duration < 1L) {
       duration = getDuration(period);
     }
-    // Get the current start date
+    // Get the current start date (WARN: this assumes any start time updates have already been performed)
     DateTime startDateTime = getCurrentStartDateTime(period);
     // Get the current end date based on new date and duration.
     DateTime endDate = new DateTime(startDateTime.toDate().getTime() + duration);
@@ -278,25 +280,33 @@ public final class DublinCoreMetadataUtil {
 
   @SuppressWarnings("unchecked")
   public static Map<String, MetadataField<?>> getDublinCoreProperties(Dictionary configProperties) {
-    Map<String, MetadataField<?>> dublinCorePropertyMapByConfigurationName = new HashMap<String, MetadataField<?>>();
+
+    Map<String,Map<String, String>> allProperties = new HashMap();
+
     for (Object configObject : Collections.list(configProperties.keys())) {
       String property = configObject.toString();
-      if (getDublinCorePropertyName(property).isSome()) {
-        MetadataField<?> dublinCoreProperty = dublinCorePropertyMapByConfigurationName
-                .get(getDublinCorePropertyName(property).get());
-        if (dublinCoreProperty == null) {
-          dublinCoreProperty = new MetadataField();
-        }
-        dublinCoreProperty.setValue(getDublinCorePropertyKey(property).get(),
-                configProperties.get(property).toString());
-        dublinCorePropertyMapByConfigurationName.put(getDublinCorePropertyName(property).get(), dublinCoreProperty);
+
+      Opt<String> propertyNameOpt = getDublinCorePropertyName(property);
+      Opt<String> propertyKeyOpt = getDublinCorePropertyKey(property);
+
+      if (propertyNameOpt.isSome() && propertyKeyOpt.isSome()) {
+
+        String propertyName = propertyNameOpt.get();
+        String propertyKey = propertyKeyOpt.get();
+
+        Map<String,String> metadataFieldProperties = allProperties.computeIfAbsent(propertyName,
+                key -> new HashMap<>());
+        metadataFieldProperties.put(propertyKey, configProperties.get(property).toString());
       }
     }
-    Map<String, MetadataField<?>> dublinCorePropertyMap = new TreeMap<String, MetadataField<?>>();
-    for (MetadataField dublinCoreProperty : dublinCorePropertyMapByConfigurationName.values()) {
-      dublinCorePropertyMap.put(dublinCoreProperty.getOutputID(), dublinCoreProperty);
+
+    Map<String, MetadataField<?>> metadataFieldsMap = new TreeMap<String, MetadataField<?>>();
+    for (Map<String, String> metadataFieldPropertiesMap : allProperties.values()) {
+      MetadataField metadataField = MetadataField.createMetadataField(metadataFieldPropertiesMap);
+      metadataFieldsMap.put(metadataField.getOutputID(), metadataField);
     }
-    return dublinCorePropertyMap;
+
+    return metadataFieldsMap;
   }
 
   static boolean isDublinCoreProperty(String propertyKey) {

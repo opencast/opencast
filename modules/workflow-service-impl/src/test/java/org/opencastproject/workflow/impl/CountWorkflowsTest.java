@@ -21,6 +21,7 @@
 
 package org.opencastproject.workflow.impl;
 
+import static org.easymock.EasyMock.createNiceMock;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
@@ -58,7 +59,6 @@ import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowParser;
@@ -84,8 +84,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import junit.framework.Assert;
 
@@ -181,6 +179,33 @@ public class CountWorkflowsTest {
 
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
             organizationDirectoryService, EasyMock.createNiceMock(IncidentService.class));
+
+    {
+      final AssetManager assetManager = createNiceMock(AssetManager.class);
+      final AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
+      final Target t = EasyMock.createNiceMock(Target.class);
+      final Predicate p = EasyMock.createNiceMock(Predicate.class);
+      EasyMock.expect(p.and(EasyMock.anyObject(Predicate.class))).andReturn(p).anyTimes();
+      EasyMock.expect(query.snapshot()).andReturn(t).anyTimes();
+      EasyMock.expect(query.propertiesOf(EasyMock.anyString())).andReturn(t).anyTimes();
+      final VersionField v = EasyMock.createNiceMock(VersionField.class);
+      EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
+      EasyMock.expect(query.version()).andReturn(v).anyTimes();
+      EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
+      EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(p).anyTimes();
+      final ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
+      EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
+      final AResult r = EasyMock.createNiceMock(AResult.class);
+      EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
+      final Stream<ARecord> recStream = Stream.mk();
+      EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
+      EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class))).
+              andReturn(selectQuery).anyTimes();
+      EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
+      EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
+      EasyMock.replay(query, t, r, selectQuery, assetManager, p, v);
+      service.setAssetManager(assetManager);
+    }
 
     AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
     Version version = EasyMock.createNiceMock(Version.class);
@@ -287,14 +312,8 @@ public class CountWorkflowsTest {
    */
   class ContinuingWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
     @Override
-    public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
-            throws WorkflowOperationException {
+    public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) {
       return createResult(Action.CONTINUE);
-    }
-
-    @Override
-    public SortedMap<String, String> getConfigurationOptions() {
-      return new TreeMap<String, String>();
     }
 
     @Override

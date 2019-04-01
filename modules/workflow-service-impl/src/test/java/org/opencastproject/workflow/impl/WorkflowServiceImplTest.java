@@ -113,8 +113,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 public class WorkflowServiceImplTest {
 
@@ -201,7 +199,7 @@ public class WorkflowServiceImplTest {
       // This is the asset manager the workflow service itself uses. Further below is the asset manager for the solr
       // index.
       final AssetManager assetManager = createNiceMock(AssetManager.class);
-      final AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
+      final AQueryBuilder query = EasyMock.createMock(AQueryBuilder.class);
       final Target t = EasyMock.createNiceMock(Target.class);
       final Predicate p = EasyMock.createNiceMock(Predicate.class);
       EasyMock.expect(p.and(EasyMock.anyObject(Predicate.class))).andReturn(p).anyTimes();
@@ -210,14 +208,17 @@ public class WorkflowServiceImplTest {
       final VersionField v = EasyMock.createNiceMock(VersionField.class);
       EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
       EasyMock.expect(query.version()).andReturn(v).anyTimes();
+      EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
       EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(p).anyTimes();
-      final ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
+      final ASelectQuery selectQuery = EasyMock.createMock(ASelectQuery.class);
       EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
       final AResult r = EasyMock.createNiceMock(AResult.class);
       EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
       final Stream<ARecord> recStream = Stream.mk();
       EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
-      EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
+      EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class))).
+              andReturn(selectQuery).anyTimes();
+      EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
       EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
       EasyMock.replay(query, t, r, selectQuery, assetManager, p, v);
       service.setAssetManager(assetManager);
@@ -251,7 +252,8 @@ public class WorkflowServiceImplTest {
 
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
             organizationDirectoryService, incidentService);
-    serviceRegistry.registerHost(REMOTE_HOST, REMOTE_HOST, Runtime.getRuntime().totalMemory(), Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors());
+    serviceRegistry.registerHost(REMOTE_HOST, REMOTE_HOST, Runtime.getRuntime().totalMemory(), Runtime.getRuntime().
+            availableProcessors(), Runtime.getRuntime().availableProcessors());
     serviceRegistry.registerService(REMOTE_SERVICE, REMOTE_HOST, "/path", true);
     service.setWorkspace(workspace);
 
@@ -1036,10 +1038,6 @@ public class WorkflowServiceImplTest {
   }
 
   class SucceedingWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
-    @Override
-    public SortedMap<String, String> getConfigurationOptions() {
-      return new TreeMap<String, String>();
-    }
 
     @Override
     public String getId() {
@@ -1059,11 +1057,6 @@ public class WorkflowServiceImplTest {
   }
 
   class FailingWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
-    @Override
-    public SortedMap<String, String> getConfigurationOptions() {
-      return new TreeMap<String, String>();
-    }
-
     @Override
     public String getId() {
       return this.getClass().getName();

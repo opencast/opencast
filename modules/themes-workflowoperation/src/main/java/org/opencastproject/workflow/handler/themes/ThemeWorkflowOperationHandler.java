@@ -67,8 +67,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
 
 /**
@@ -107,37 +105,8 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ThemeWorkflowOperationHandler.class);
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
   private static final MediaPackageElementBuilderFactory elementBuilderFactory = MediaPackageElementBuilderFactory
           .newInstance();
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(BUMPER_FLAVOR, "The flavor to apply to the added bumper element");
-    CONFIG_OPTIONS.put(BUMPER_TAGS, "The tags to apply to the added bumper element");
-    CONFIG_OPTIONS.put(TRAILER_FLAVOR, "The flavor to apply to the added trailer element");
-    CONFIG_OPTIONS.put(TRAILER_TAGS, "The tags to apply to the added trailer element");
-    CONFIG_OPTIONS.put(TITLE_SLIDE_FLAVOR, "The flavor to apply to the added title slide element");
-    CONFIG_OPTIONS.put(TITLE_SLIDE_TAGS, "The tags to apply to the added title slide element");
-    CONFIG_OPTIONS.put(LICENSE_SLIDE_FLAVOR, "The flavor to apply to the added license slide element");
-    CONFIG_OPTIONS.put(LICENSE_SLIDE_TAGS, "The tags to apply to the added license slide element");
-    CONFIG_OPTIONS.put(WATERMARK_FLAVOR, "The flavor to apply to the added watermark element");
-    CONFIG_OPTIONS.put(WATERMARK_TAGS, "The tags to apply to the added watermark element");
-    CONFIG_OPTIONS.put(WATERMARK_LAYOUT, "The layout to adjust by the watermark position");
-    CONFIG_OPTIONS.put(WATERMARK_LAYOUT_VARIABLE, "The workflow variable where the adjusted layout is stored");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
 
   /** The series service */
   private SeriesService seriesService;

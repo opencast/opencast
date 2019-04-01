@@ -129,7 +129,7 @@ public class WaveformServiceImplTest {
 
     WaveformServiceImpl instance = new WaveformServiceImpl();
     instance.setServiceRegistry(serviceRegistry);
-    Job job = instance.createWaveformImage(dummyTrack, 200, 5000, 20000, 500);
+    Job job = instance.createWaveformImage(dummyTrack, 200, 5000, 20000, 500, "black");
     assertEquals(expectedJob, job);
   }
 
@@ -154,7 +154,7 @@ public class WaveformServiceImplTest {
     Job job = new JobImpl(1);
     job.setJobType(WaveformServiceImpl.JOB_TYPE);
     job.setOperation(WaveformServiceImpl.Operation.Waveform.toString());
-    job.setArguments(Arrays.asList(audioTrackXml, "200", "5000", "20000", "500"));
+    job.setArguments(Arrays.asList(audioTrackXml, "200", "5000", "20000", "500", "black"));
     String result = instance.process(job);
     assertNotNull(result);
 

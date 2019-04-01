@@ -22,6 +22,7 @@ package org.opencastproject.external.common;
 
 public final class ApiMediaType {
 
+  public static final String VERSION_1_2_0 = "application/v1.2.0+json";
   public static final String VERSION_1_1_0 = "application/v1.1.0+json";
   public static final String VERSION_1_0_0 = "application/v1.0.0+json";
   public static final String JSON = "application/json";
@@ -42,8 +43,10 @@ public final class ApiMediaType {
   public static ApiMediaType parse(String acceptHeader) throws ApiMediaTypeException {
     /* MH-12802: The External API does not support content negotiation */
     ApiMediaType mediaType;
-    if (acceptHeader == null || acceptHeader.contains(VERSION_1_1_0) || acceptHeader.contains(JSON)
+    if (acceptHeader == null || acceptHeader.contains(VERSION_1_2_0) || acceptHeader.contains(JSON)
     || acceptHeader.contains(APPLICATION_ANY) || acceptHeader.contains(ANY)) {
+      mediaType = new ApiMediaType(ApiVersion.VERSION_1_2_0, ApiFormat.JSON, VERSION_1_2_0);
+    } else if (acceptHeader.contains(VERSION_1_1_0)) {
       mediaType = new ApiMediaType(ApiVersion.VERSION_1_1_0, ApiFormat.JSON, VERSION_1_1_0);
     } else if (acceptHeader.contains(VERSION_1_0_0)) {
       mediaType = new ApiMediaType(ApiVersion.VERSION_1_0_0, ApiFormat.JSON, VERSION_1_0_0);

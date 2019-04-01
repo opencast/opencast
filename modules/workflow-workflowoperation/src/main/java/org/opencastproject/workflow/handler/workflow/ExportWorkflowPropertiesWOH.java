@@ -55,8 +55,6 @@ import java.io.StringWriter;
 import java.net.URI;
 import java.util.Properties;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
 
 /**
@@ -71,17 +69,6 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
 
   public static final String DEFAULT_TARGET_FLAVOR = MediaPackageElements.PROCESSING_PROPERTIES.toString();
   public static final String EXPORTED_PROPERTIES_FILENAME = "processing-properties.xml";
-
-  /** The configuration options for this handler */
-  public static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(KEYS_PROPERTY,
-            "The workflow property keys that need to be persisted. If the option is not specified, all defined properties should be persisted.");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR_PROPERTY, "The flavor to apply to the exported workflow properties");
-    CONFIG_OPTIONS.put(TARGET_TAGS_PROPERTY, "The tags to apply to the exported workflow properties");
-  }
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ExportWorkflowPropertiesWOH.class);

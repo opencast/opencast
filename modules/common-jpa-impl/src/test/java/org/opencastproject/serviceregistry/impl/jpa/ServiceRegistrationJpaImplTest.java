@@ -128,7 +128,7 @@ public class ServiceRegistrationJpaImplTest {
  @Test
  public void testToString() throws Exception {
    Job newJob = new JobImpl(3L, "test", "test_org", 0L, "simple", "do", null, DISPATCHING, "localhost",
-           "remotehost", null, null, null, 100L, 200L, "result", 3L, 1L, true, null, 1.5F, null, 4L);
+            "remotehost", null, null, null, 100L, 200L, "result", 3L, 1L, true, null, 1.5F);
    JpaJob jpaJob = JpaJob.from(newJob);
    String jobString = "Job {id:3, operation:do, status:DISPATCHING}";
    assertEquals(jpaJob.toString(), jobString);

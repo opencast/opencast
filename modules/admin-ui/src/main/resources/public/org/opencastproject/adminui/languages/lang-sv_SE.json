@@ -10,7 +10,8 @@
    "SAVE": "Spara",
    "LOGOUT": "Logga ut",
    "RESET": "Nollställ",
-   "SELECT_NO_OPTIONS": "Ingen option",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabiska",
@@ -55,11 +56,9 @@
             "ACL": "Följande ACL raderas",
             "GROUP": "Följande grupp raderas",
             "USER": "Följande användare kommer att raderas",
-            "USER_BLACKLIST": "Följande svarta användarelistan kommer att raderas",
             "THEME": "Följande tema raderas",
             "EMAIL": "Följande e-postmallen raderas",
-            "LOCATION": "Följande plats tas bort",
-            "LOCATION_BLACKLIST": "Den följande svarta platslistan kommer att raderas"
+            "LOCATION": "Följande plats tas bort"
          },
          "NAME": "Namn"
       },
@@ -130,21 +129,9 @@
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Du kan inte radera händelsen för att du inte ha rättigheterna.",
       "SERIES_DELETED": "Serien har tagits bort",
       "SERIES_NOT_DELETED": "Serien kunde inte raderas",
-      "USER_BLACKLIST_CREATED": "Svartlistan har skapats",
-      "USER_BLACKLIST_NOT_CREATED": "Svartlistan kunde inte skapas",
-      "USER_BLACKLIST_SAVED": "Svartlistan har sparats",
-      "USER_BLACKLIST_NOT_SAVED": "Svartlistan kunde inte sparas",
-      "USER_BLACKLIST_DELETED": "Svartlistan har tagits bort",
-      "USER_BLACKLIST_NOT_DELETED": "Svartlistan kunde inte tas bort",
       "LOCATION_DELETED": "Platsen har raderats",
       "LOCATION_NOT_DELETED": "Platsen kunde inte raderas",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Platsen kunde inte tas bort eftersom att du inte har rättigheterna för att göra det.",
-      "LOCATION_BLACKLIST_CREATED": "Svartlistan har skapats",
-      "LOCATION_BLACKLIST_NOT_CREATED": "Svartlistan kunde inte skapas",
-      "LOCATION_BLACKLIST_SAVED": "Svartlistan har sparats",
-      "LOCATION_BLACKLIST_NOT_SAVED": "Svartlistan kunde inte sparas",
-      "LOCATION_BLACKLIST_DELETED": "Svartlistan har tagits bort",
-      "LOCATION_BLACKLIST_NOT_DELETED": "Svartlistan kunde inte tas bort",
       "EMAIL_TEMPLATE_CREATED": "Mallen har skapats",
       "EMAIL_TEMPLATE_NOT_CREATED": "Mallen kunde inte skapas",
       "EMAIL_TEMPLATE_SAVED": "Mallen har sparats",
@@ -545,18 +532,17 @@
                "EDITOR": "Öppna videoredigeraren",
                "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "Visa kommentarer",
-               "PAUSED_WORKFLOW": "Visa pausat arbetsflöde"
+               "PAUSED_WORKFLOW": "Visa pausat arbetsflöde",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Redo för inspelning",
-            "BLACKLISTED": "Svartlistad",
             "OPTED_OUT": "Avhoppad"
          },
          "STATUS": {
             "SCHEDULED": "Schemalagd",
             "OPTEDOUT": "Avhoppad",
-            "BLACKLISTED": "Svartlistad",
             "RECORDING": "Spelar in",
             "UPLOADING": "Laddar upp",
             "INGESTING": "Intag",
@@ -875,25 +861,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Åtgärder",
                "DETAILS": "Detaljer",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Mer information och åtgärder",
+               "DESCRIPTION": "Beskrivning",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "Typ",
                "TITLE": "Titel",
-               "STATE": "Status",
+               "STATUS": "Status",
                "STARTED": "Startad",
                "SERIES": "Serie",
                "SUBMITTED": "Skickad",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Workflowdefinition",
                "MIMETYPE": "MimeType",
                "URL": "URI",
                "CONFIGURATION": "Konfiguration",
                "NO_CONFIGURATION": "Det finns inga konfigurationsparameter för den valda workflowdefinitionen.",
                "WORKFLOW": "Workflow",
                "TOOLTIP": {
-                  "STOP": "Stop execution workflow instance",
-                  "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow instance",
-                  "DELETE": "Delete workflow instance"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instantiated",
@@ -901,12 +891,14 @@
                   "PAUSED": "Pausad",
                   "SUCCEEDED": "Lyckade",
                   "FAILED": "Misslyckad",
+                  "FAILING": "Failing",
                   "SKIPPED": "Hoppades över",
+                  "STOPPED": "Stopped",
                   "RETRY": "Försök igen"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Instanser för arbetsflöde"
+               "TITLE": "Workflows"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Workflowdetaljer",
@@ -1130,12 +1122,10 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Platser",
-         "BLACKLISTS": "Svartlistor"
+         "LOCATIONS": "Platser"
       },
       "ACTIONS": {
          "EXPORT": "Exportera",
-         "ADD_BLACKLIST": "Lägg till svartlista",
          "REMOVE": "Ta bort"
       },
       "RECORDINGS": {
@@ -1149,8 +1139,6 @@
             "NEXT_NAME": "Nästa händelsetitel",
             "STATUS": "Status",
             "VERSION": "Version",
-            "BLACKLIST_FROM": "Svartlistad från",
-            "BLACKLIST_TO": "Svartlistad tills",
             "ACTION": "Åtgärder",
             "TOOLTIP": {
                "NAME": "Filtrera händelserna för den här platsen",
@@ -1181,60 +1169,18 @@
                "NO_CAPABILITIES": "Inga funktioner given"
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Platssvartlista",
-            "NAME": "Namn",
-            "ACTIONS": "Åtgärder"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Skapa svartlista",
-            "EDITCAPTION": "Redigera svartlista",
-            "TABS": {
-               "LOCATIONS": "Platser",
-               "DATES": "Datum",
-               "REASON": "Orsak",
-               "SUMMARY": "Summering"
-            },
-            "LOCATIONS": {
-               "REMOVE": "Ta bort",
-               "ADD_LOCATION": "Välj plats",
-               "ALL_LOCATIONS": "Alla platser",
-               "SELECT_LOCATION": "Välj"
-            },
-            "DATES": {
-               "START_DATE": "Startdatum",
-               "END_DATE": "Slutdatum"
-            },
-            "REASON": {
-               "SELECT_REASON": "Välj",
-               "REASON": "Orsak",
-               "COMMENTS": "Kommentarer"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Summering",
-               "LOCATION": "Plats",
-               "DATE_FROM": "Från",
-               "DATE_TO": "Tills",
-               "REASON": "Orsak",
-               "COMMENTS": "Kommentarer"
-            }
-         }
       }
    },
    "USERS": {
       "ACTIONS": {
          "ADD_USER": "Lägg till användare",
          "ADD_GROUP": "Lägg till grupp",
-         "ADD_ACL": "Lägg till åtkomstpolicy",
-         "ADD_BLACKLIST": "Lägg till svartlista"
+         "ADD_ACL": "Lägg till åtkomstpolicy"
       },
       "NAVIGATION": {
          "USERS": "Användare",
          "GROUPS": "Grupper",
-         "PERMISSIONS": "Åtkomstpolicyer",
-         "BLACKLISTS": "Svartlista"
+         "PERMISSIONS": "Åtkomstpolicyer"
       },
       "USERS": {
          "TABLE": {
@@ -1245,8 +1191,6 @@
             "ROLES": "Roller",
             "TYPE": "Typ",
             "PROVIDER": "Leverantör",
-            "BLACKLIST_FROM": "Svartlistad från",
-            "BLACKLIST_TO": "Svartlistad tills",
             "ACTION": "Åtgärder",
             "TOOLTIP": {
                "DELETE": "Ta bort användare",
@@ -1415,49 +1359,6 @@
                   "LABEL": "Välj en roll",
                   "EMPTY": "Ingen roll hittad"
                }
-            }
-         }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Användarsvartlista",
-            "NAME": "Namn",
-            "DATE_FROM": "Från",
-            "DATE_TO": "Tills",
-            "REASON": "Orsak",
-            "ACTION": "Åtgärder"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Skapa svartlista",
-            "EDITCAPTION": "Redigera svartlista",
-            "TABS": {
-               "USERS": "Användare",
-               "DATES": "Datum",
-               "REASON": "Orsak",
-               "SUMMARY": "Summering"
-            },
-            "USERS": {
-               "REMOVE": "Ta bort",
-               "ADD_USER": "Välj användare",
-               "ALL_USERS": "Alla användare",
-               "SELECT_USER": "Välj"
-            },
-            "DATES": {
-               "START_DATE": "Startdatum",
-               "END_DATE": "Slutdatum"
-            },
-            "REASON": {
-               "SELECT_REASON": "Välj",
-               "REASON": "Orsak",
-               "COMMENTS": "Kommentarer"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Summering",
-               "USER": "Användare",
-               "DATE_FROM": "Från",
-               "DATE_TO": "Tills",
-               "REASON": "Orsak",
-               "COMMENTS": "Kommentarer"
             }
          }
       }
@@ -2085,16 +1986,6 @@
    "TABLE_NO_RESULT": "Inga resultat hittade",
    "TABLE_LOADING": "Laddar…",
    "TABLE_EDIT": "Redigera",
-   "PM": {
-      "BLACKLIST": {
-         "REASONS": {
-            "SICK_LEAVE": "Sjukfrånvaro",
-            "LEAVE": "Lämna",
-            "FAMILY_EMERGENCY": "Nödsituation i familjen",
-            "CONSTRUCTION": "Konstruktion"
-         }
-      }
-   },
    "DASHBOARD": {
       "RUNNING": "På gång",
       "FINISHED": "Avslutade",
@@ -2183,6 +2074,11 @@
          "SHUTTING_DOWN": "Stänger ner",
          "UNKNOWN": "Okänd",
          "UPLOADING": "Laddar upp"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

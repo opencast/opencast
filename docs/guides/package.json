@@ -2,8 +2,9 @@
   "name": "docs",
   "private": true,
   "devDependencies": {
-    "grunt": "^1.0.3",
-    "grunt-markdownlint": "^2.1.0",
-    "load-grunt-tasks": "^4.0.0"
+    "markdownlint-cli": "^0.14.1"
+  },
+  "scripts": {
+    "test": "markdownlint ./admin/**/*.md ./developer/**/*.md ./user/**/*.md ../../*.md"
   }
 }

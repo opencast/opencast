@@ -1,0 +1,36 @@
+## Elasticsearch Configuration
+
+# Cluster name identifies your cluster for auto-discovery. If you're running
+# multiple clusters on the same network, make sure you're using unique names.
+cluster.name: opencast
+
+# Home directory of the Elasticsearch installation:
+path.home: ${karaf.home}/
+
+# The location of the data files of each index / shard allocated on the node. Can hold multiple locations:
+path.data: ${karaf.data}/index/data
+
+# Path to log files:
+path.logs: ${karaf.data}/log/
+
+# Set the bind address specifically (IPv4 or IPv6):
+#network.bind_host: 192.168.0.1
+
+# Set the address other nodes will use to communicate with this node. If not
+# set, it is automatically derived. It must point to an actual IP address.
+#network.publish_host: 192.168.0.1
+
+# Set both 'bind_host' and 'publish_host':
+network.host: 127.0.0.1
+
+# Set a custom port for the node to node communication (9300 by default):
+#transport.tcp.port: 9300
+
+# Set a custom port to listen for HTTP traffic:
+#http.port: 9200
+
+# Set a custom allowed content length:
+#http.max_content_length: 100mb
+
+# Disable HTTP completely:
+#http.enabled: false

@@ -10,7 +10,8 @@
    "SAVE": "Shrani",
    "LOGOUT": "Odjava",
    "RESET": "Ponastavitev",
-   "SELECT_NO_OPTIONS": "Ni možnosti",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Da",
    "LANGUAGES": {
       "ARABIC": "arabščina",
@@ -55,11 +56,9 @@
             "ACL": "Naslednji seznam za nadzor dostopa bo izbrisan",
             "GROUP": "Naslednja skupina bo izbrisana",
             "USER": "Naslednji uporabnik bo izbrisan",
-            "USER_BLACKLIST": "Naslednji seznam prepovedanih uporabnikov bo izbrisan",
             "THEME": "Naslednja tema bo izbrisana",
             "EMAIL": "Naslednja e-poštna predloga bo izbrisana",
-            "LOCATION": "Naslednja lokacija bo izbrisana",
-            "LOCATION_BLACKLIST": "Naslednji seznam prepovedanih lokacij bo izbrisan"
+            "LOCATION": "Naslednja lokacija bo izbrisana"
          },
          "NAME": "Ime"
       },
@@ -130,21 +129,9 @@
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Posnetka ni mogoče izbrisati, ker nimate ustreznih pravic.",
       "SERIES_DELETED": "Serija je izbrisana",
       "SERIES_NOT_DELETED": "Serije ni bilo mogoče izbrisati",
-      "USER_BLACKLIST_CREATED": "Seznam prepovedanih je ustvarjen",
-      "USER_BLACKLIST_NOT_CREATED": "Seznama prepovedanih ni bilo mogoče ustvariti",
-      "USER_BLACKLIST_SAVED": "Seznam prepovedanih je shranjen",
-      "USER_BLACKLIST_NOT_SAVED": "Seznama prepovedanih ni bilo mogoče shraniti",
-      "USER_BLACKLIST_DELETED": "Seznam prepovedanih je izbrisan",
-      "USER_BLACKLIST_NOT_DELETED": "Seznama prepovedanih ni bilo mogoče izbrisati",
       "LOCATION_DELETED": "Lokacija je izbrisana",
       "LOCATION_NOT_DELETED": "Lokacije ni bilo mogoče izbrisati",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Lokacije ne morete izbrisati, ker nimate ustreznih pravic.",
-      "LOCATION_BLACKLIST_CREATED": "Seznam prepovedanih je ustvarjen",
-      "LOCATION_BLACKLIST_NOT_CREATED": "Seznama prepovedanih ni bilo mogoče ustvariti",
-      "LOCATION_BLACKLIST_SAVED": "Seznam prepovedanih je shranjen",
-      "LOCATION_BLACKLIST_NOT_SAVED": "Seznama prepovedanih ni bilo mogoče shraniti",
-      "LOCATION_BLACKLIST_DELETED": "Seznam prepovedanih je izbrisan",
-      "LOCATION_BLACKLIST_NOT_DELETED": "Seznama prepovedanih ni bilo mogoče izbrisati",
       "EMAIL_TEMPLATE_CREATED": "Predloga je ustvarjena",
       "EMAIL_TEMPLATE_NOT_CREATED": "Predloge ni bilo mogoče ustvariti",
       "EMAIL_TEMPLATE_SAVED": "Predloga je shranjena",
@@ -545,18 +532,17 @@
                "EDITOR": "Odpri video urejevalnik",
                "EDITOR_NEEDS_CUTTING": "Odpri video urejevalnik (opomba označuje, da je bilo sproženo obrezovanje videa)",
                "COMMENTS": "Poglej komentarje",
-               "PAUSED_WORKFLOW": "Poglej začasno ustavljen potek dela"
+               "PAUSED_WORKFLOW": "Poglej začasno ustavljen potek dela",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Pripravljeno za snemanje",
-            "BLACKLISTED": "Na seznamu prepovedanih",
             "OPTED_OUT": "Onemogočeno"
          },
          "STATUS": {
             "SCHEDULED": "Načrtovano",
             "OPTEDOUT": "Onemogočeno",
-            "BLACKLISTED": "Na seznamu prepovedanih",
             "RECORDING": "Posnetek",
             "UPLOADING": "Nalaganje",
             "INGESTING": "Uvažanje",
@@ -875,25 +861,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Dejanja",
                "DETAILS": "Podrobnosti",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Več informacij in dejanj",
+               "DESCRIPTION": "Opis",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "Vrsta",
                "TITLE": "Naslov",
-               "STATE": "Stanje",
+               "STATUS": "Stanje",
                "STARTED": "Začeto",
                "SERIES": "Serije",
                "SUBMITTED": "Poslano",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Definicija poteka dela",
                "MIMETYPE": "Mimetype",
                "URL": "URL",
                "CONFIGURATION": "Konfiguracija",
                "NO_CONFIGURATION": "Ni obstoječih konfiguracijskih parametrov za izbrano definicijo poteka dela.",
                "WORKFLOW": "Potek dela",
                "TOOLTIP": {
-                  "STOP": "Ustavi potek dela",
-                  "ABORT": "Prekliči potek dela (ne ponovi neuspešnega postopka)",
-                  "RETRY": "Ponovi potek dela",
-                  "DELETE": "Izbriši potek dela"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "V izdelavi",
@@ -901,12 +891,14 @@
                   "PAUSED": "Začasno ustavljeno",
                   "SUCCEEDED": "Uspelo",
                   "FAILED": "Ni uspelo",
+                  "FAILING": "Failing",
                   "SKIPPED": "Izpuščen",
+                  "STOPPED": "Stopped",
                   "RETRY": "Ponovi"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Potek dela"
+               "TITLE": "Poteki dela"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Podrobnosti poteka dela",
@@ -1130,12 +1122,10 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Lokacije",
-         "BLACKLISTS": "Seznami prepovedanih"
+         "LOCATIONS": "Lokacije"
       },
       "ACTIONS": {
          "EXPORT": "Izvozi",
-         "ADD_BLACKLIST": "Dodaj seznam prepovedanih",
          "REMOVE": "Odstrani"
       },
       "RECORDINGS": {
@@ -1149,8 +1139,6 @@
             "NEXT_NAME": "Naslov naslednjega dogodka",
             "STATUS": "Stanje",
             "VERSION": "Različica",
-            "BLACKLIST_FROM": "Na seznamu prepovedanih od",
-            "BLACKLIST_TO": "Na seznamu prepovedanih do",
             "ACTION": "Dejanja",
             "TOOLTIP": {
                "NAME": "Filtriraj posnetke za to lokacijo",
@@ -1181,60 +1169,18 @@
                "NO_CAPABILITIES": "Zmožnosti niso navedene"
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Seznam prepovedanih lokacij",
-            "NAME": "Ime",
-            "ACTIONS": "Dejanja"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Ustvari seznam prepovedanih",
-            "EDITCAPTION": "Uredi seznam prepovedanih",
-            "TABS": {
-               "LOCATIONS": "Lokacije",
-               "DATES": "Datumi",
-               "REASON": "Razlog",
-               "SUMMARY": "Povzetek"
-            },
-            "LOCATIONS": {
-               "REMOVE": "Odstrani",
-               "ADD_LOCATION": "Izberite lokacijo",
-               "ALL_LOCATIONS": "Vse lokacije",
-               "SELECT_LOCATION": "Izberite"
-            },
-            "DATES": {
-               "START_DATE": "Datum začetka",
-               "END_DATE": "Končni datum"
-            },
-            "REASON": {
-               "SELECT_REASON": "Izberite",
-               "REASON": "Razlog",
-               "COMMENTS": "Komentarji"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Povzetek",
-               "LOCATION": "Lokacija",
-               "DATE_FROM": "Od",
-               "DATE_TO": "Do",
-               "REASON": "Razlog",
-               "COMMENTS": "Komentarji"
-            }
-         }
       }
    },
    "USERS": {
       "ACTIONS": {
          "ADD_USER": "Dodaj uporabnika",
          "ADD_GROUP": "Dodaj skupino",
-         "ADD_ACL": "Dodaj pravilnik o dostopu",
-         "ADD_BLACKLIST": "Dodaj seznam prepovedanih"
+         "ADD_ACL": "Dodaj pravilnik o dostopu"
       },
       "NAVIGATION": {
          "USERS": "Uporabniki",
          "GROUPS": "Skupine",
-         "PERMISSIONS": "Pravilniki o dostopu",
-         "BLACKLISTS": "Seznam prepovedanih"
+         "PERMISSIONS": "Pravilniki o dostopu"
       },
       "USERS": {
          "TABLE": {
@@ -1245,8 +1191,6 @@
             "ROLES": "Vloge",
             "TYPE": "Vrsta",
             "PROVIDER": "Ponudnik",
-            "BLACKLIST_FROM": "Na seznamu prepovedanih od",
-            "BLACKLIST_TO": "Na seznamu prepovedanih do",
             "ACTION": "Dejanja",
             "TOOLTIP": {
                "DELETE": "Brisanje uporabnika",
@@ -1415,49 +1359,6 @@
                   "LABEL": "Izberite vlogo",
                   "EMPTY": "Ni najdenih vlog"
                }
-            }
-         }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Seznam prepovedanih uporabnikov",
-            "NAME": "Ime",
-            "DATE_FROM": "Od",
-            "DATE_TO": "Do",
-            "REASON": "Razlog",
-            "ACTION": "Dejanja"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Ustvari seznam prepovedanih",
-            "EDITCAPTION": "Uredi seznam prepovedanih",
-            "TABS": {
-               "USERS": "Uporabniki",
-               "DATES": "Datumi",
-               "REASON": "Razlog",
-               "SUMMARY": "Povzetek"
-            },
-            "USERS": {
-               "REMOVE": "Odstrani",
-               "ADD_USER": "Izberite uporabnika",
-               "ALL_USERS": "Vsi uporabniki",
-               "SELECT_USER": "Izberite"
-            },
-            "DATES": {
-               "START_DATE": "Datum začetka",
-               "END_DATE": "Končni datum"
-            },
-            "REASON": {
-               "SELECT_REASON": "Izberite",
-               "REASON": "Razlog",
-               "COMMENTS": "Komentarji"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Povzetek",
-               "USER": "Uporabnik",
-               "DATE_FROM": "Od",
-               "DATE_TO": "Do",
-               "REASON": "Razlog",
-               "COMMENTS": "Komentarji"
             }
          }
       }
@@ -2085,16 +1986,6 @@
    "TABLE_NO_RESULT": "Ni najdenih rezultatov",
    "TABLE_LOADING": "Nalaganje ...",
    "TABLE_EDIT": "Uredi",
-   "PM": {
-      "BLACKLIST": {
-         "REASONS": {
-            "SICK_LEAVE": "Bolniški dopust",
-            "LEAVE": "Zapusti",
-            "FAMILY_EMERGENCY": "Družinski nujni primer",
-            "CONSTRUCTION": "Sestavljanje"
-         }
-      }
-   },
    "DASHBOARD": {
       "RUNNING": "Izvajanje",
       "FINISHED": "Dokončano",
@@ -2183,6 +2074,11 @@
          "SHUTTING_DOWN": "Ustavljanje",
          "UNKNOWN": "Neznan",
          "UPLOADING": "Nalaganje"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

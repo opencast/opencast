@@ -486,7 +486,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    *          The Agent you wish to modify or add in the database.
    */
   protected void updateAgentInDatabase(AgentImpl agent) {
-    updateAgentInDatabase(agent, true);
+    updateAgentInDatabase(agent, true, 10);
   }
 
   /**
@@ -498,7 +498,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    *          True to update the last heard from timestamp from the agentCache, false to avoid this.
    *          Note that you should nearly always update the cache, this was added to avoid deadlocks when removing agents from the cache. 
    */
-  private void updateAgentInDatabase(AgentImpl agent, boolean updateFromCache) {
+  private void updateAgentInDatabase(AgentImpl agent, boolean updateFromCache, int retries) {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -534,8 +534,12 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
         updateAgentInCache(agent.getName(), agent.getState(), agent.getOrganization(), agent.getConfiguration());
       }
     } catch (RollbackException e) {
-      logger.warn("Unable to commit to DB in updateAgent.");
-      throw e;
+      retries--;
+      if (retries < 0) {
+        throw new RollbackException("Maximum number of retries exceeded", e);
+      } else {
+        updateAgentInDatabase(agent, updateFromCache, retries);
+      }
     } finally {
       if (em != null)
         em.close();
@@ -595,7 +599,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
             AgentImpl agent = getAgent(agentName, org);
             if (!ignoredStates.contains(agent.getState())) {
               agent.setState(AgentState.OFFLINE);
-              updateAgentInDatabase(agent, false);
+              updateAgentInDatabase(agent, false, 0);
             }
           } catch (NotFoundException e) {
             //Ignore this

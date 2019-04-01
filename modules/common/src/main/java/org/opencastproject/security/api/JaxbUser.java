@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -252,13 +253,16 @@ public final class JaxbUser implements User {
     this.canLogin = canLogin;
     this.provider = provider;
     this.organization = organization;
-    if (roles == null)
-      this.roles = new HashSet<JaxbRole>();
-    for (Role role : roles) {
-      if (role.getOrganization() == null || !organization.getId().equals(role.getOrganization().getId()))
-        throw new IllegalArgumentException("Role " + role + " is not from the same organization!");
+    if (roles == null) {
+      this.roles = new HashSet<>();
+    } else {
+      for (Role role : roles) {
+        if (!Objects.equals(organization.getId(), role.getOrganizationId())) {
+          throw new IllegalArgumentException("Role " + role + " is not from the same organization!");
+        }
+      }
+      this.roles = roles;
     }
-    this.roles = roles;
   }
 
   /**
@@ -333,7 +337,7 @@ public final class JaxbUser implements User {
    */
   @Override
   public Set<Role> getRoles() {
-    return new HashSet<Role>(roles);
+    return new HashSet<>(roles);
   }
 
   /**

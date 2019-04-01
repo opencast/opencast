@@ -226,7 +226,6 @@ public class TestEventsEndpoint extends EventsEndpoint {
         "testAgent23",
         Date.from(Instant.parse("2017-08-28T00:05:00Z")),
         Date.from(Instant.parse("2017-08-28T00:07:00Z")),
-        false,
         null,
         null,
         Collections.singletonMap(CaptureParameters.CAPTURE_DEVICE_NAMES, "default1"),
@@ -248,8 +247,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
         eq(Opt.none()),
         eq(Opt.none()),
         capture(capturedAgentConfig),
-        eq(Opt.none()),
-        eq(SchedulerService.ORIGIN)
+        eq(false)
     );
     EasyMock.expectLastCall();
 
@@ -262,7 +260,6 @@ public class TestEventsEndpoint extends EventsEndpoint {
         "testAgent24",
         Date.from(Instant.parse("2017-08-29T00:05:00Z")),
         Date.from(Instant.parse("2017-08-29T00:07:00Z")),
-        false,
         null,
         null,
         Collections.singletonMap(CaptureParameters.CAPTURE_DEVICE_NAMES, "default1,default2"),

@@ -23,6 +23,11 @@ account on the Sakai instance.
 
 ### Step 1
 
+Edit `etc/org.apache.karaf.features.cfg` and make sure the `opencast-sakai` feature is listed in the `featuresBoot`
+option.
+
+### Step 2
+
 To enable the Sakai User Provider, copy and rename the bundled configuration template from
 `OPENCAST/etc/org.opencastproject.userdirectory.sakai-default.cfg.template` to
 `OPENCAST/etc/org.opencastproject.userdirectory.sakai-default.cfg`
@@ -36,7 +41,7 @@ sakai.user=opencast
 sakai.password=CHANGE_ME
 ```
 
-### Step 2
+### Step 3
 
 Verify that the Sakai User Provider starts up with the correct Sakai URL by looking
 for a log entry like this:
@@ -56,11 +61,10 @@ adding an entry to `OPENCAST/etc/org.ops4j.pax.logging.cfg`:
 log4j.logger.org.opencastproject.userdirectory.sakai=DEBUG
 ```
 
-### Step 3
+### Step 4
 
 You can grant additional roles to all Sakai users in Opencast by creating a group
 with the title 'Sakai'. You can then add additional roles to this group, which will
 be inherited by all Sakai users.
 
 You can also use the group role name ROLE_GROUP_SAKAI in Event or Series ACLs.
-

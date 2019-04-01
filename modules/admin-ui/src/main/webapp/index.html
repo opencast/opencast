@@ -17,16 +17,6 @@
     <link type="text/css" href="lib/datepicker/themes/smoothness/jquery-ui-1.10.3.min.css" rel="stylesheet">
     <link type="text/css" href="lib/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet">
     <link rel="shortcut icon" href="img/favicon.ico">
-    <script>
-      window.jQuery || document.write('<script src="lib/jquery-1.10.2.js"><\/script>');
-      </script>
-      <script type="text/javascript" src="lib/jquery-ui.js"></script>
-      <script type="text/javascript" src="lib/datepicker/i18n/jquery-ui-i18n.js"></script>
-      <script type="text/javascript" src="lib/timepicker/jquery-ui-timepicker-addon.js"></script>
-      <script type="text/javascript" src="lib/timepicker/i18n/jquery-ui-timepicker-addon-i18n.js"></script>
-      <script type="text/javascript" src="lib/underscore-1.5.2.js"></script>
-      <script type="text/javascript" src="lib/chosen.jquery.js"></script>
-      <script type="text/javascript" src="lib/moment-with-locales.js"></script>
   </head>
   <body ng-cloak ng-controller="ApplicationCtrl" ng-click="bodyClicked()">
     <header ng-controller="NavCtrl" class="primary-header">
@@ -123,23 +113,30 @@
 
     <!-- build:js(src/main) scripts/bower.js -->
     <!-- bower:js -->
+    <script src="../../bower_components/jquery/jquery.js"></script>
+    <script src="../../bower_components/jquery-ui/jquery-ui.js"></script>
     <script src="../../bower_components/angular/angular.js"></script>
     <script src="../../bower_components/angular-route/angular-route.js"></script>
     <script src="../../bower_components/angular-resource/angular-resource.js"></script>
     <script src="../../bower_components/angular-animate/angular-animate.js"></script>
     <script src="../../bower_components/angular-messages/angular-messages.js"></script>
-    <script src="../../bower_components/angular-md5/angular-md5.js"></script>
     <script src="../../bower_components/angular-translate/angular-translate.js"></script>
     <script src="../../bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
     <script src="../../bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
     <script src="../../bower_components/angular-wizard/dist/angular-wizard.js"></script>
     <script src="../../bower_components/angular-hotkeys/build/hotkeys.js"></script>
+    <script src="../../bower_components/angular-ui-sortable/sortable.js"></script>
     <script src="../../bower_components/ng-file-upload/angular-file-upload.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:js(src/main/webapp) scripts/vendor.js -->
+    <script type="text/javascript" src="scripts/lib/datepicker/i18n/jquery-ui-i18n.js"></script>
+    <script type="text/javascript" src="scripts/lib/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script type="text/javascript" src="scripts/lib/timepicker/i18n/jquery-ui-timepicker-addon-i18n.js"></script>
+    <script type="text/javascript" src="scripts/lib/underscore-1.5.2.js"></script>
+    <script type="text/javascript" src="scripts/lib/chosen.jquery.js"></script>
+    <script type="text/javascript" src="scripts/lib/moment-with-locales.js"></script>
     <script src="scripts/lib/angular-chosen.js"></script>
-    <script src="scripts/lib/angular-sortable.js"></script>
     <script src="scripts/lib/video-js/video.js"></script>
     <script src="scripts/lib/javascript-md5/js/md5.min.js"></script>
     <!-- endbuild -->
@@ -172,12 +169,9 @@
     <script src="scripts/shared/resources/identityResource.js"></script>
     <script src="scripts/shared/resources/versionResource.js"></script>
     <script src="scripts/shared/resources/eventsResource.js"></script>
-    <script src="scripts/shared/resources/optoutsResource.js"></script>
-    <script src="scripts/shared/resources/optoutSingleResource.js"></script>
     <script src="scripts/shared/resources/seriesResource.js"></script>
     <script src="scripts/shared/resources/seriesAccessResource.js"></script>
     <script src="scripts/shared/resources/seriesMetadataResource.js"></script>
-    <script src="scripts/shared/resources/seriesParticipationResource.js"></script>
     <script src="scripts/shared/resources/seriesEventsResource.js"></script>
     <script src="scripts/shared/resources/seriesHasEventsResource.js"></script>
     <script src="scripts/shared/resources/seriesConfigurationResource.js"></script>
@@ -195,7 +189,6 @@
     <script src="scripts/shared/resources/eventAttachmentDetailsResource.js"></script>
     <script src="scripts/shared/resources/eventMediaDetailsResource.js"></script>
     <script src="scripts/shared/resources/eventCatalogDetailsResource.js"></script>
-    <script src="scripts/shared/resources/eventParticipationResource.js"></script>
     <script src="scripts/shared/resources/eventPublicationDetailsResource.js"></script>
     <script src="scripts/shared/resources/eventAssetPublicationsResource.js"></script>
     <script src="scripts/shared/resources/eventSchedulingResource.js"></script>
@@ -234,8 +227,6 @@
     <script src="scripts/shared/resources/resourcesFilterResource.js"></script>
     <script src="scripts/shared/resources/resourcesListResource.js"></script>
     <script src="scripts/shared/resources/workflowsResource.js"></script>
-    <script src="scripts/shared/resources/blacklistsResource.js"></script>
-    <script src="scripts/shared/resources/blacklistCountResource.js"></script>
     <script src="scripts/shared/resources/themesResource.js"></script>
     <script src="scripts/shared/resources/newThemeResource.js"></script>
     <script src="scripts/shared/resources/signatureResource.js"></script>
@@ -253,20 +244,6 @@
     <script src="scripts/shared/services/wizards/new-group/roles.js"></script>
     <script src="scripts/shared/services/wizards/new-group/states.js"></script>
     <script src="scripts/shared/services/wizards/new-group/metadata.js"></script>
-    <script src="scripts/shared/services/wizards/userblacklist/states.js"></script>
-    <script src="scripts/shared/services/wizards/userblacklist/items.js"></script>
-    <script src="scripts/shared/services/wizards/userblacklist/dates.js"></script>
-    <script src="scripts/shared/services/wizards/userblacklist/reason.js"></script>
-    <script src="scripts/shared/services/wizards/userblacklist/summary.js"></script>
-    <script src="scripts/shared/services/wizards/locationblacklist/states.js"></script>
-    <script src="scripts/shared/services/wizards/locationblacklist/items.js"></script>
-    <script src="scripts/shared/services/wizards/locationblacklist/dates.js"></script>
-    <script src="scripts/shared/services/wizards/locationblacklist/reason.js"></script>
-    <script src="scripts/shared/services/wizards/locationblacklist/summary.js"></script>
-    <script src="scripts/shared/services/wizards/bulk-message/states.js"></script>
-    <script src="scripts/shared/services/wizards/bulk-message/recipients.js"></script>
-    <script src="scripts/shared/services/wizards/bulk-message/message.js"></script>
-    <script src="scripts/shared/services/wizards/bulk-message/summary.js"></script>
     <script src="scripts/shared/services/wizards/new-series/access.js"></script>
     <script src="scripts/shared/services/wizards/new-series/metadata.js"></script>
     <script src="scripts/shared/services/wizards/new-series/metadataExtended.js"></script>
@@ -303,6 +280,7 @@
     <script src="scripts/shared/directives/navDirective.js"></script>
     <script src="scripts/shared/directives/tableDirective.js"></script>
     <script src="scripts/shared/directives/statsDirective.js"></script>
+    <script src="scripts/shared/directives/collapsibleBoxDirective.js"></script>
     <script src="scripts/shared/directives/confirmationModalDirective.js"></script>
     <script src="scripts/shared/directives/deleteSingleSeriesModalDirective.js"></script>
     <script src="scripts/shared/directives/resourceModalDirective.js"></script>
@@ -342,7 +320,6 @@
     <script src="scripts/shared/controllers/hotkeyCheatSheetController.js"></script>
     <script src="scripts/modules/events/controllers/eventsController.js"></script>
     <script src="scripts/modules/events/controllers/eventController.js"></script>
-    <script src="scripts/modules/events/controllers/editStatusController.js"></script>
     <script src="scripts/modules/events/controllers/editEventsController.js"></script>
     <script src="scripts/modules/events/controllers/newEventController.js"></script>
     <script src="scripts/modules/events/controllers/newSeriesController.js"></script>
@@ -359,8 +336,6 @@
     <script src="scripts/modules/events/validators/schedulingAuthorizedValidator.js"></script>
     <script src="scripts/modules/recordings/controllers/recordingController.js"></script>
     <script src="scripts/modules/recordings/controllers/recordingsController.js"></script>
-    <script src="scripts/modules/recordings/controllers/locationblacklistsController.js"></script>
-    <script src="scripts/modules/recordings/controllers/locationblacklistController.js"></script>
     <script src="scripts/modules/users/controllers/usersController.js"></script>
     <script src="scripts/modules/users/controllers/userController.js"></script>
     <script src="scripts/modules/users/controllers/groupsController.js"></script>
@@ -369,13 +344,10 @@
     <script src="scripts/modules/users/controllers/newAclController.js"></script>
     <script src="scripts/modules/users/controllers/aclController.js"></script>
     <script src="scripts/modules/users/controllers/aclsController.js"></script>
-    <script src="scripts/modules/users/controllers/userblacklistsController.js"></script>
-    <script src="scripts/modules/users/controllers/userblacklistController.js"></script>
     <script src="scripts/modules/login/controllers/loginController.js"></script>
     <script src="scripts/modules/systems/controllers/serversController.js"></script>
     <script src="scripts/modules/systems/controllers/jobsController.js"></script>
     <script src="scripts/modules/systems/controllers/servicesController.js"></script>
-    <script src="scripts/modules/dashboard/controllers/dashboardController.js"></script>
     <script src="scripts/modules/configuration/controllers/themesController.js"></script>
     <script src="scripts/modules/configuration/controllers/themeFormController.js"></script>
     <script src="scripts/modules/configuration/validators/uniqueThemeName.js"></script>
@@ -391,12 +363,5 @@
           });
         }};
     </script>
-    <!-- <script src="modules/configuration/controllers/emailtemplatesController.js"></script> -->
-    <!-- <script src="modules/configuration/controllers/emailtemplateController.js"></script> -->
-    <!-- <script src="shared/resources/emailTemplateResource.js"></script> -->
-    <!-- <script src="shared/resources/emailResource.js"></script> -->
-    <!-- <script src="shared/services/wizards/emailtemplate/states.js"></script> -->
-    <!-- <script src="shared/services/wizards/emailtemplate/message.js"></script> -->
-    <!-- <script src="shared/services/wizards/emailtemplate/summary.js"></script> -->
   </body>
 </html>

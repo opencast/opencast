@@ -1,5 +1,8 @@
 # Sakai UserDirectoryProvider configuration
 
+# This is an an optional service which is not enabled by default. To enable it,
+# edit etc/org.apache.karaf.features.cfg and add opencast-sakai to the featuresBoot option.
+
 # The organization for this provider
 org.opencastproject.userdirectory.sakai.org=mh_default_org
 

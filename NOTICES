@@ -625,7 +625,7 @@ admin-ui
   com.jayway.restassured                 rest-assured                                     Apache 2.0
   javax.ws.rs                            jsr311-api                                       -
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  net.fortuna.ical4j                     ical4j                                           -
+  org.mnode.ical4j                       ical4j                                           BSD 3-Clause License
   org.codehaus.groovy                    groovy-all                                       The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
@@ -1013,19 +1013,6 @@ message-broker-impl
   org.slf4j                              slf4j-api                                        MIT License
 
 
-messages
-  GroupId                                ArtifactId                                       License
-  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
-  commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
-  commons-collections                    commons-collections                              The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.cxf                         cxf-bundle-jaxrs                                 The Apache Software License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.slf4j                              slf4j-api                                        MIT License
-
-
 metadata
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
@@ -1092,7 +1079,7 @@ scheduler-impl
   commons-logging                        commons-logging                                  The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  net.fortuna.ical4j                     ical4j                                           -
+  org.mnode.ical4j                       ical4j                                           BSD 3-Clause License
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 

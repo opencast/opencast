@@ -36,7 +36,9 @@ import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Prelude.sleep;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.assetmanager.util.AssetPathUtils;
 import org.opencastproject.mediapackage.identifier.Id;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.HttpUtil;
@@ -77,6 +79,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -129,6 +133,8 @@ public final class WorkspaceImpl implements Workspace {
 
   private TrustedHttpClient trustedHttpClient;
 
+  private SecurityService securityService = null;
+
   /** The working file repository */
   private WorkingFileRepository wfr = null;
 
@@ -138,6 +144,9 @@ public final class WorkspaceImpl implements Workspace {
   private CopyOnWriteArraySet<String> staticCollections = new CopyOnWriteArraySet<String>();
 
   private boolean waitForResourceFlag = false;
+
+  /** the asset manager directory if locally available */
+  private String assetManagerPath = null;
 
   /** The workspce cleaner */
   private WorkspaceCleaner workspaceCleaner = null;
@@ -214,7 +223,7 @@ public final class WorkspaceImpl implements Workspace {
       }
 
       // Create a unique target file
-      File targetFile = null;
+      File targetFile;
       try {
         targetFile = File.createTempFile(".linktest.", ".tmp", new File(wsRoot));
         targetFile.delete();
@@ -286,6 +295,8 @@ public final class WorkspaceImpl implements Workspace {
     staticCollections.add("videosegments");
     staticCollections.add("waveform");
 
+    // Check if we can read from the asset manager locally to avoid downloading files via HTTP
+    assetManagerPath = AssetPathUtils.getAssetManagerPath(cc);
   }
 
   /** Callback from OSGi on service deactivation. */
@@ -335,6 +346,15 @@ public final class WorkspaceImpl implements Workspace {
         }
       }
     }
+
+    // Check if we can get the files directly from the asset manager
+    final File asset = AssetPathUtils.getLocalFile(assetManagerPath, securityService.getOrganization().getId(), uri);
+    if (asset != null) {
+      logger.debug("Copy local file {} from asset manager to workspace", asset);
+      Files.copy(asset.toPath(), inWs.toPath(), StandardCopyOption.REPLACE_EXISTING);
+      return new File(inWs.getAbsolutePath());
+    }
+
     // do HTTP transfer
     return locked(inWs, downloadIfNecessary(uri));
   }
@@ -342,6 +362,7 @@ public final class WorkspaceImpl implements Workspace {
   @Override
   public InputStream read(final URI uri) throws NotFoundException, IOException {
 
+    // Check if we can get the file from the working file repository directly
     if (pathMappable != null) {
       if (uri.toString().startsWith(pathMappable.getUrlPrefix())) {
         final String localPath = uri.toString().substring(pathMappable.getUrlPrefix().length());
@@ -354,6 +375,12 @@ public final class WorkspaceImpl implements Workspace {
         }
         logger.warn("The working file repository URI and paths don't match. Looking up {} at {} failed", uri, wfrCopy);
       }
+    }
+
+    // Check if we can get the files directly from the asset manager
+    final File asset = AssetPathUtils.getLocalFile(assetManagerPath, securityService.getOrganization().getId(), uri);
+    if (asset != null) {
+      return new FileInputStream(asset);
     }
 
     // fall back to get() which should download the file into local workspace if necessary
@@ -401,10 +428,10 @@ public final class WorkspaceImpl implements Workspace {
         logger.debug("{} is not ready, try again later.", url);
         return left(response.getHeaders("token")[0].getValue());
       case HttpServletResponse.SC_OK:
-        logger.info("Downloading {} to {}", url, dst.getAbsolutePath());
+        logger.debug("Downloading {} to {}", url, dst.getAbsolutePath());
         return right(some(downloadTo(response, dst)));
       default:
-        logger.warn(format("Received unexpected response status %s while trying to download from %s", status, url));
+        logger.warn("Received unexpected response status {} while trying to download from {}", status, url);
         FileUtils.deleteQuietly(dst);
         return right(none(File.class));
     }
@@ -858,6 +885,10 @@ public final class WorkspaceImpl implements Workspace {
 
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     this.trustedHttpClient = trustedHttpClient;
+  }
+
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   private static final long TIMEOUT = 2L * 60L * 1000L;

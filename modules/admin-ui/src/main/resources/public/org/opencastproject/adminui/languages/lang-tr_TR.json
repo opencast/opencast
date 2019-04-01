@@ -10,7 +10,8 @@
    "SAVE": "Kaydet",
    "LOGOUT": "Çıkış yap",
    "RESET": "Sıfırla",
-   "SELECT_NO_OPTIONS": "Seçenek yok",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Evet",
    "LANGUAGES": {
       "ARABIC": "Arapça",
@@ -55,11 +56,9 @@
             "ACL": "Aşağıdaki ACL silinecek",
             "GROUP": "Aşağıdaki grup silinecek",
             "USER": "Aşağıdaki kullanıcı silinecek",
-            "USER_BLACKLIST": "Aşağıdaki kullanıcı kara listesi silinecek",
             "THEME": "Aşağıdaki tema silinecek",
             "EMAIL": "Aşağıdaki email teması silinecek",
-            "LOCATION": "Aşağıdaki konum silinecek",
-            "LOCATION_BLACKLIST": "Aşağıdaki konum kara listesi silinecek"
+            "LOCATION": "Aşağıdaki konum silinecek"
          },
          "NAME": "İsim"
       },
@@ -130,21 +129,9 @@
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Etkinlik silinemedi çünkü bunu yapma izniniz yok.",
       "SERIES_DELETED": "Seriler silindi",
       "SERIES_NOT_DELETED": "Seriler silinemedi",
-      "USER_BLACKLIST_CREATED": "Kara liste oluşturuldu",
-      "USER_BLACKLIST_NOT_CREATED": "Kara liste oluşturulamadı",
-      "USER_BLACKLIST_SAVED": "Kara liste kaydedildi",
-      "USER_BLACKLIST_NOT_SAVED": "Kara liste kaydedilemedi",
-      "USER_BLACKLIST_DELETED": "Kara liste silindi",
-      "USER_BLACKLIST_NOT_DELETED": "Kara liste silinemedi",
       "LOCATION_DELETED": "Konum silindi",
       "LOCATION_NOT_DELETED": "Konum silinemedi",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Lokasyon silinemedi çünkü bunu yapma izniniz yok.",
-      "LOCATION_BLACKLIST_CREATED": "Kara liste oluşturuldu",
-      "LOCATION_BLACKLIST_NOT_CREATED": "Kara liste oluşturulamadı",
-      "LOCATION_BLACKLIST_SAVED": "Kara liste kaydedildi",
-      "LOCATION_BLACKLIST_NOT_SAVED": "Kara liste kaydedilemedi",
-      "LOCATION_BLACKLIST_DELETED": "Kara liste silindi",
-      "LOCATION_BLACKLIST_NOT_DELETED": "Kara liste silinemedi",
       "EMAIL_TEMPLATE_CREATED": "Şablon oluşturuldu",
       "EMAIL_TEMPLATE_NOT_CREATED": "Şablon oluşturulamadı",
       "EMAIL_TEMPLATE_SAVED": "Şablon kaydedildi",
@@ -545,18 +532,17 @@
                "EDITOR": "Video editörünü aç",
                "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "Yorumları görüntüle",
-               "PAUSED_WORKFLOW": "Duraklatılmış iş akışını görüntüle"
+               "PAUSED_WORKFLOW": "Duraklatılmış iş akışını görüntüle",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Kayıt için hazır",
-            "BLACKLISTED": "Engellenenler",
             "OPTED_OUT": "Vazgeçildi"
          },
          "STATUS": {
             "SCHEDULED": "Zamanlandı",
             "OPTEDOUT": "Vazgeçildi",
-            "BLACKLISTED": "Kara Listeye Alındı",
             "RECORDING": "Kaydediliyor",
             "UPLOADING": "Yükleniyor",
             "INGESTING": "Toplanıyor",
@@ -875,25 +861,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Hareketler",
                "DETAILS": "Ayrıntılar",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Daha Fazla Bilgi ve Eylemler",
+               "DESCRIPTION": "Açıklama",
+               "MORE_INFO": "More Information",
                "ID": "KİMLİK",
                "TYPE": "Tür",
                "TITLE": "Başlık",
-               "STATE": "Ülke",
+               "STATUS": "Durum",
                "STARTED": "Başlatıldı",
                "SERIES": "Diziler",
                "SUBMITTED": "Gönderildi",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "İş akışı tanımı",
                "MIMETYPE": "Mime Türü",
                "URL": "Bağlantı Adresi",
                "CONFIGURATION": "Yapılandır",
                "NO_CONFIGURATION": "Seçilen iş akışı tanımı için mevcut yapılandırma parametreleri yok.",
                "WORKFLOW": "İş akışı",
                "TOOLTIP": {
-                  "STOP": "Bu yürütme iş akışını durdur",
-                  "ABORT": "Bu iş akışı yürütümünü iptal et (başarısız işlemi yeniden deneme)",
-                  "RETRY": "Bu iş akışı yürütümünü yeniden dene",
-                  "DELETE": "Bu iş akışını sil"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "İlklendirildi",
@@ -901,12 +891,14 @@
                   "PAUSED": "Duraklatıldı",
                   "SUCCEEDED": "Başarılı oldu",
                   "FAILED": "Başarısız",
+                  "FAILING": "Failing",
                   "SKIPPED": "Atlandı",
+                  "STOPPED": "Stopped",
                   "RETRY": "Yeniden Dene"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Workflow instances"
+               "TITLE": "İş Akışları"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "İş akışı detayları",
@@ -1130,12 +1122,10 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Konumlar",
-         "BLACKLISTS": "Kara Listeler"
+         "LOCATIONS": "Konumlar"
       },
       "ACTIONS": {
          "EXPORT": "Dışa Aktar",
-         "ADD_BLACKLIST": "Kara liste ekle",
          "REMOVE": "Kaldır"
       },
       "RECORDINGS": {
@@ -1149,8 +1139,6 @@
             "NEXT_NAME": "Sonraki olay başlığı",
             "STATUS": "Durum",
             "VERSION": "Sürüm",
-            "BLACKLIST_FROM": "Kara listeye alındı",
-            "BLACKLIST_TO": "Tarihine kadar Kara listeye alındı",
             "ACTION": "Eylemler",
             "TOOLTIP": {
                "NAME": "Etkinlikleri bu lokasyona göre filtrele",
@@ -1181,60 +1169,18 @@
                "NO_CAPABILITIES": "Yetenekler sağlanmadı"
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Kara Liste Konumu",
-            "NAME": "İsim",
-            "ACTIONS": "Eylemler"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Kara liste oluşturma",
-            "EDITCAPTION": "Kara liste düzenle",
-            "TABS": {
-               "LOCATIONS": "Konumlar",
-               "DATES": "Tarihler",
-               "REASON": "Sebep",
-               "SUMMARY": "Özet"
-            },
-            "LOCATIONS": {
-               "REMOVE": "Kaldır",
-               "ADD_LOCATION": "Konum seç",
-               "ALL_LOCATIONS": "Tüm konumlar",
-               "SELECT_LOCATION": "Seç"
-            },
-            "DATES": {
-               "START_DATE": "Başlangıç tarihi",
-               "END_DATE": "Bitiş tarihi"
-            },
-            "REASON": {
-               "SELECT_REASON": "Seç",
-               "REASON": "Sebep",
-               "COMMENTS": "Yorumlar"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Özet",
-               "LOCATION": "Konum",
-               "DATE_FROM": "den",
-               "DATE_TO": "'e kadar",
-               "REASON": "Sebep",
-               "COMMENTS": "Yorumlar"
-            }
-         }
       }
    },
    "USERS": {
       "ACTIONS": {
          "ADD_USER": "Kullanıcı Ekle",
          "ADD_GROUP": "Grup Ekle",
-         "ADD_ACL": "Erişim politikası ekle",
-         "ADD_BLACKLIST": "Kara liste ekle"
+         "ADD_ACL": "Erişim politikası ekle"
       },
       "NAVIGATION": {
          "USERS": "Kullanıcılar",
          "GROUPS": "Gruplar",
-         "PERMISSIONS": "Erişim Politikaları",
-         "BLACKLISTS": "Kara Liste"
+         "PERMISSIONS": "Erişim Politikaları"
       },
       "USERS": {
          "TABLE": {
@@ -1245,8 +1191,6 @@
             "ROLES": "Roller",
             "TYPE": "Tür",
             "PROVIDER": "Sunucu",
-            "BLACKLIST_FROM": "Roller",
-            "BLACKLIST_TO": "Tarihine kadar Kara listeye alındı",
             "ACTION": "Eylemler",
             "TOOLTIP": {
                "DELETE": "Kullanıcıyı Sil",
@@ -1415,49 +1359,6 @@
                   "LABEL": "Rol seçin",
                   "EMPTY": "Rol bulunamadı"
                }
-            }
-         }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Kullanıcı kara listeleri",
-            "NAME": "İsim",
-            "DATE_FROM": "Kimden",
-            "DATE_TO": "Kadar",
-            "REASON": "Sebep",
-            "ACTION": "Eylemler"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Karaliste oluştur",
-            "EDITCAPTION": "Karaliste'yi düzenle",
-            "TABS": {
-               "USERS": "Kullanıcılar",
-               "DATES": "Tarihler",
-               "REASON": "Sebep",
-               "SUMMARY": "Özet"
-            },
-            "USERS": {
-               "REMOVE": "Kaldır",
-               "ADD_USER": "Kullanıcı seç",
-               "ALL_USERS": "Tüm kullanıcılar",
-               "SELECT_USER": "Seç"
-            },
-            "DATES": {
-               "START_DATE": "Başlangıç tarihi",
-               "END_DATE": "Bitiş tarihi"
-            },
-            "REASON": {
-               "SELECT_REASON": "Seç",
-               "REASON": "Sebep",
-               "COMMENTS": "Yorumlar"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Özet",
-               "USER": "Kullanıcı",
-               "DATE_FROM": "Ne zamandan",
-               "DATE_TO": "'a kadar",
-               "REASON": "Sebep",
-               "COMMENTS": "Yorumlar"
             }
          }
       }
@@ -2085,16 +1986,6 @@
    "TABLE_NO_RESULT": "Sonuç bulunamadı",
    "TABLE_LOADING": "Yükleniyor…",
    "TABLE_EDIT": "Düzenle",
-   "PM": {
-      "BLACKLIST": {
-         "REASONS": {
-            "SICK_LEAVE": "Hasta izni",
-            "LEAVE": "Ayrıl",
-            "FAMILY_EMERGENCY": "Ailevi bir durum",
-            "CONSTRUCTION": "Yapım"
-         }
-      }
-   },
    "DASHBOARD": {
       "RUNNING": "Çalışıyor",
       "FINISHED": "Tamamlandı",
@@ -2183,6 +2074,11 @@
          "SHUTTING_DOWN": "Shutting down",
          "UNKNOWN": "Unknown",
          "UPLOADING": "Yükleniyor"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

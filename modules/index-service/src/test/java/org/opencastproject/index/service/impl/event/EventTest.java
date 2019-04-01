@@ -28,10 +28,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.opencastproject.index.service.impl.index.event.Event;
-import org.opencastproject.index.service.impl.index.event.Event.SchedulingStatus;
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.util.DateTimeSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jettison.json.JSONException;
@@ -47,7 +45,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -203,19 +200,20 @@ public class EventTest {
   @Test
   public void testHasRecordingStarted() {
     Event event = new Event(id, defaultOrganization);
-    assertTrue(event.hasRecordingStarted());
 
-    Date now = new Date();
-
-    event.setSchedulingStatus(SchedulingStatus.READY_FOR_RECORDING.toString());
-    event.setTechnicalStartTime(DateTimeSupport.toUTC(now.getTime() - (3 * 60 * 1000)));
-    event.setRecordingStatus(RecordingState.CAPTURING);
-    assertTrue(event.hasRecordingStarted());
-
-    event.setSchedulingStatus(SchedulingStatus.OPTED_OUT.toString());
-    event.setTechnicalStartTime(DateTimeSupport.toUTC(now.getTime() + (3 * 60 * 1000)));
-    event.setRecordingStatus(null);
+    // This is not a scheduled event so the recording cannot have started
     assertFalse(event.hasRecordingStarted());
+
+    event.setAgentId("test");
+
+    // With a valid capture agent ID, it is a scheduled event, but the recording cannot have started
+    // as we don't have a start time
+    assertFalse(event.hasRecordingStarted());
+
+    event.setRecordingStatus(RecordingState.CAPTURING);
+
+    // The event is a scheduled event and has a valid recording state, so the recording has started
+    assertTrue(event.hasRecordingStarted());
   }
 
 }

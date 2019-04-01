@@ -48,6 +48,10 @@
     </dependency>
     <!-- -->
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
     </dependency>
@@ -207,6 +211,7 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
+              !javax.annotation,
               org.eclipse.persistence.descriptors.changetracking,
               org.eclipse.persistence.internal.descriptors,
               org.eclipse.persistence.internal.identitymaps,

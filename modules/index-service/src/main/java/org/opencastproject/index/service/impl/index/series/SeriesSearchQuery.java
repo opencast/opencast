@@ -54,7 +54,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
   private List<String> organizers = new ArrayList<String>();
   private List<String> contributors = new ArrayList<String>();
   private List<String> publishers = new ArrayList<String>();
-  private Boolean optOut = null;
   private Date createdFrom = null;
   private Date createdTo = null;
   private boolean editOnly = false;
@@ -439,28 +438,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
   }
 
   /**
-   * Selects series with the given recording status (opted out).
-   *
-   * @param optOut
-   *          the recording status
-   * @return the enhanced search query
-   */
-  public SeriesSearchQuery withOptedOut(boolean optOut) {
-    clearExpectations();
-    this.optOut = optOut;
-    return this;
-  }
-
-  /**
-   * Returns the series status (opted out) of the series.
-   *
-   * @return the series recording status
-   */
-  public Boolean getOptedOut() {
-    return optOut;
-  }
-
-  /**
    * The created date to start looking for series.
    *
    * @param createdFrom
@@ -701,10 +678,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
 
     if (publishers.size() > 0) {
       sb.append("publishers:'" + publishers.toString() + "' ");
-    }
-
-    if (optOut != null) {
-      sb.append("Opt Out:'" + optOut + "' ");
     }
 
     if (theme != null) {

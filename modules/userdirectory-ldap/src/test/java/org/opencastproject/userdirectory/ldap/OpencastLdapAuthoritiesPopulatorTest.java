@@ -117,7 +117,7 @@ public class OpencastLdapAuthoritiesPopulatorTest {
     Set<Role> groupRoles = new HashSet<>();
     for (int i = 1; i <= N_GROUP_ROLES; i++) {
       Role r = EasyMock.createNiceMock(Role.class);
-      EasyMock.expect(r.getOrganization()).andReturn(org).anyTimes();
+      EasyMock.expect(r.getOrganizationId()).andReturn(ORG_NAME).anyTimes();
       EasyMock.expect(r.getName()).andReturn(format("group_role_%d", i)).anyTimes();
       EasyMock.replay(r);
       groupRoles.add(r);

@@ -35,6 +35,7 @@ import org.opencastproject.util.NotFoundException;
 import com.entwinemedia.fn.data.Opt;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 public class AssetManagerDecorator<A extends TieredStorageAssetManager> implements TieredStorageAssetManager {
@@ -56,12 +57,41 @@ public class AssetManagerDecorator<A extends TieredStorageAssetManager> implemen
     return delegate.getAsset(version, mpId, mpeId);
   }
 
+  @Override public Opt<MediaPackage> getMediaPackage(String mediaPackageId) {
+    return delegate.getMediaPackage(mediaPackageId);
+  }
+
   @Override public void setAvailability(Version version, String mpId, Availability availability) {
     delegate.setAvailability(version, mpId, availability);
   }
 
   @Override public boolean setProperty(Property property) {
     return delegate.setProperty(property);
+  }
+
+  @Override
+  public void deleteProperties(final String mediaPackageId) {
+    delegate.deleteProperties(mediaPackageId);
+  }
+
+  @Override
+  public void deleteProperties(final String mediaPackageId, final String namespace) {
+    delegate.deleteProperties(mediaPackageId, namespace);
+  }
+
+  @Override
+  public boolean snapshotExists(final String mediaPackageId) {
+    return delegate.snapshotExists(mediaPackageId);
+  }
+
+  @Override
+  public boolean snapshotExists(final String mediaPackageId, final String organization) {
+    return delegate.snapshotExists(mediaPackageId, organization);
+  }
+
+  @Override
+  public List<Property> selectProperties(final String mediaPackageId, final String namespace) {
+    return delegate.selectProperties(mediaPackageId, namespace);
   }
 
   @Override public AQueryBuilder createQuery() {

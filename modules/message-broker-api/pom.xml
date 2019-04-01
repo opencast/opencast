@@ -68,6 +68,10 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
+            <Import-Package>
+              !javax.annotation,
+              *
+            </Import-Package>
             <Private-Package>
             </Private-Package>
             <Export-Package>

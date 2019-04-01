@@ -543,6 +543,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "The watermark source attachment containing watermark image", isRequired = false, name = "watermarkTrack", type = Type.TEXT),
           @RestParameter(description = "The watermark layout containing the JSON definition of the layout", isRequired = false, name = "watermarkLayout", type = Type.TEXT),
           @RestParameter(description = "The background color", isRequired = false, name = "background", type = Type.TEXT, defaultValue = "black"),
+          @RestParameter(description = "The name of the audio source (lower or upper or both)", isRequired = false, name = "audioSourceName", type = Type.TEXT, defaultValue = ComposerService.BOTH),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING) }, reponses = {
           @RestResponse(description = "Results in an xml document containing the compound video track", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "If required parameters aren't set or if the source elements aren't from the right type", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
@@ -551,7 +552,8 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
           @FormParam("upperTrack") String upperTrackXml, @FormParam("upperLayout") String upperLayoutJson,
           @FormParam("watermarkAttachment") String watermarkAttachmentXml,
           @FormParam("watermarkLayout") String watermarkLayoutJson, @FormParam("profileId") String profileId,
-          @FormParam("background") @DefaultValue("black") String background) throws Exception {
+          @FormParam("background") @DefaultValue("black") String background,
+          @FormParam("sourceAudioName") @DefaultValue(ComposerService.BOTH) String sourceAudioName) throws Exception {
     // Ensure that the POST parameters are present
     if (StringUtils.isBlank(compositeSizeJson) || StringUtils.isBlank(lowerTrackXml)
             || StringUtils.isBlank(lowerLayoutJson) || StringUtils.isBlank(profileId))
@@ -590,7 +592,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
     try {
       // Asynchronously composite the specified source elements
       Job job = composerService.composite(compositeTrackSize, upperLaidOutElement, lowerLaidOutElement,
-              watermarkLaidOutElement, profileId, background);
+              watermarkLaidOutElement, profileId, background, sourceAudioName);
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
       logger.warn("Unable to composite video: " + e.getMessage());
@@ -825,8 +827,8 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.status(Response.Status.BAD_REQUEST).entity("smil and profileId must not be null").build();
 
     // Deserialize the data
-    Smil smil;
     String[] profiles = StringUtils.split(profileIds, ",");
+    Smil smil;
     try {
       smil = smilService.fromXml(smilAsXml).getSmil();
     } catch (Exception e) {
@@ -881,24 +883,24 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
    *
    * @param sourceImageXml
    *          The source image
-   * @param profileId
-   *          The profile to use in image conversion
+   * @param profileIds
+   *          The encoding profiles to use in image conversion
    * @return A {@link Response} with the resulting image in the response body
    * @throws Exception
    */
   @POST
   @Path("convertimagesync")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "convertimagesync", description = "Synchronously converts an image, based on the specified encoding profile ID and the source image", restParameters = {
+  @RestQuery(name = "convertimagesync", description = "Synchronously converts an image, based on the specified encoding profiles and the source image", restParameters = {
       @RestParameter(description = "The original image", isRequired = true, name = "sourceImage", type = Type.TEXT, defaultValue = IMAGE_ATTACHMENT_DEFAULT),
-      @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "image-conversion.http") }, reponses = {
-      @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK),
-      @RestResponse(description = "If required parameters aren't set or if sourceImage isn't from the type Attachment", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
-  public Response convertImageSync(@FormParam("sourceImage") String sourceImageXml, @FormParam("profileId") String profileId)
-      throws Exception {
+      @RestParameter(description = "The encoding profiles to use", isRequired = true, name = "profileIds", type = Type.STRING, defaultValue = "image-conversion.http") }, reponses = {
+      @RestResponse(description = "Results in an xml document containing the image attachments", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "If required parameters aren't set or if sourceImage isn't from the type attachment", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  public Response convertImageSync(@FormParam("sourceImage") String sourceImageXml, @FormParam("profileIds")
+      String profileIds) throws Exception {
     // Ensure that the POST parameters are present
-    if (StringUtils.isBlank(sourceImageXml) || StringUtils.isBlank(profileId))
-      return Response.status(Response.Status.BAD_REQUEST).entity("sourceImage and profileId must not be null").build();
+    if (StringUtils.isBlank(sourceImageXml) || StringUtils.isBlank(profileIds))
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceImage and profileIds must not be null").build();
 
     // Deserialize the source track
     MediaPackageElement sourceImage = MediaPackageElementParser.getFromXml(sourceImageXml);
@@ -906,8 +908,9 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceImage element must be of type track").build();
 
     try {
-      Attachment result = composerService.convertImageSync((Attachment) sourceImage, profileId);
-      return Response.ok().entity(MediaPackageElementParser.getAsXml(result)).build();
+      List<Attachment> results = composerService.convertImageSync((Attachment) sourceImage,
+          StringUtils.split(profileIds, ','));
+      return Response.ok().entity(MediaPackageElementParser.getArrayAsXml(results)).build();
     } catch (EncoderException e) {
       logger.warn("Unable to convert image: " + e.getMessage());
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

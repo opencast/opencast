@@ -24,11 +24,9 @@ package org.opencastproject.index.service.impl.index.event;
 import org.opencastproject.index.service.impl.index.IndexObject;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.scheduler.api.RecordingState;
-import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -36,6 +34,8 @@ import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -70,19 +70,15 @@ import javax.xml.transform.stream.StreamSource;
         "language", "source", "created", "creator", "publisher", "license", "rights", "accessPolicy", "managedAcl", "workflowState",
         "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration", "trackMimetypes",
         "trackStreamResolutions", "trackFlavors", "metadataFlavors", "metadataMimetypes", "attachmentFlavors",
-        "reviewStatus", "reviewDate", "optedOut", "blacklisted", "hasComments", "hasOpenComments", "hasPreview", "needsCutting",
-        "publications", "workflowScheduledDate", "archiveVersion", "schedulingStatus", "recordingStatus", "eventStatus",
-        "agentId", "agentConfigurations", "technicalStartTime", "technicalEndTime", "technicalPresenters" })
+        "hasComments", "hasOpenComments", "hasPreview", "needsCutting", "publications", "workflowScheduledDate",
+        "archiveVersion", "recordingStatus", "eventStatus", "agentId", "agentConfigurations",
+        "technicalStartTime", "technicalEndTime", "technicalPresenters" })
 @XmlRootElement(name = "event", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class Event implements IndexObject {
 
-  /**
-   * The scheduling status of the event
-   */
-  public enum SchedulingStatus {
-    BLACKLISTED, OPTED_OUT, READY_FOR_RECORDING
-  };
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(Event.class);
 
   /** The document type */
   public static final String DOCUMENT_TYPE = "event";
@@ -249,22 +245,6 @@ public class Event implements IndexObject {
   @XmlElement(name = "event_status")
   private String eventStatus = null;
 
-  /** The event review status */
-  @XmlElement(name = "review_status")
-  private String reviewStatus = ReviewStatus.UNSENT.toString();
-
-  /** The event opted out status, whether the event is opted out or not opted out */
-  @XmlElement(name = "opted_out")
-  private Boolean optedOut = null;
-
-  /** The event blacklist status, whether the event is blacklisted or not */
-  @XmlElement(name = "blacklisted")
-  private Boolean blacklisted = null;
-
-  /** The event review date */
-  @XmlElement(name = "review_date")
-  private String reviewDate = null;
-
   /** Whether the event has comments */
   @XmlElement(name = "has_comments")
   private Boolean hasComments = false;
@@ -289,10 +269,6 @@ public class Event implements IndexObject {
   /** The workflow scheduled date of the event */
   @XmlElement(name = "workflow_scheduled_date")
   private String workflowScheduledDate = null;
-
-  /** The scheduling status of the event */
-  @XmlElement(name = "scheduling_status")
-  private String schedulingStatus = null;
 
   /** The recording status of the event */
   @XmlElement(name = "recording_status")
@@ -879,88 +855,6 @@ public class Event implements IndexObject {
   }
 
   /**
-   * Sets the review status from this event
-   *
-   * @param reviewStatus
-   *          the review status
-   */
-  public void setReviewStatus(ReviewStatus reviewStatus) {
-    this.reviewStatus = reviewStatus == null ? null : reviewStatus.toString();
-  }
-
-  /**
-   * Returns the review status from this event
-   *
-   * @return the review status
-   */
-  public String getReviewStatus() {
-    return reviewStatus;
-  }
-
-  /**
-   * Sets the review date
-   *
-   * @param reviewDate
-   *          the review date
-   */
-  public void setReviewDate(String reviewDate) {
-    this.reviewDate = reviewDate;
-  }
-
-  /**
-   * Returns the review date
-   *
-   * @return the review date
-   */
-  public String getReviewDate() {
-    return reviewDate;
-  }
-
-  /**
-   * Sets the opt out status for this event
-   *
-   * @param optedOut
-   *          the opt out status, whether the event is opted-out or not opted-out
-   */
-  public void setOptedOut(Boolean optedOut) {
-    this.optedOut = optedOut;
-
-    updateSchedulingStatus();
-    updateEventStatus();
-  }
-
-  /**
-   * Returns the opt out status from this event
-   *
-   * @return the opt out status from this event, whether the event is opted-out or not opted-out
-   */
-  public Boolean getOptedOut() {
-    return optedOut;
-  }
-
-  /**
-   * Sets the blacklist status for this event
-   *
-   * @param blacklisted
-   *          the blacklist status, whether the event is blacklisted or not
-   */
-  public void setBlacklisted(Boolean blacklisted) {
-    this.blacklisted = blacklisted;
-
-    updateSchedulingStatus();
-    updateEventStatus();
-  }
-
-  /**
-   * Returns the blacklist status from this event
-   *
-   * @return the blacklist status from this event, whether the event is blacklist or not
-   */
-  public Boolean getBlacklisted() {
-    return blacklisted;
-  }
-
-  /**
    * Sets the list of presenters.
    *
    * @param presenters
@@ -1141,85 +1035,38 @@ public class Event implements IndexObject {
     return archiveVersion;
   }
 
-  /**
-   * Sets the scheduling status
-   *
-   * @param status
-   *          the scheduling status
-   */
-  public void setSchedulingStatus(String status) {
-    this.schedulingStatus = status;
-  }
-
-  /**
-   * Update the scheduling status based on the optedOut and blacklisted properties
-   */
-  public void updateSchedulingStatus() {
-    if (blacklisted == null && optedOut == null) {
-      schedulingStatus = null;
-    } else if (blacklisted != null && blacklisted) {
-      schedulingStatus = SchedulingStatus.BLACKLISTED.toString();
-    } else if (optedOut != null && optedOut) {
-      schedulingStatus = SchedulingStatus.OPTED_OUT.toString();
-    } else {
-      schedulingStatus = SchedulingStatus.READY_FOR_RECORDING.toString();
-    }
-  }
-
   private void updateEventStatus() {
-    if (getWorkflowId() != null) {
+    if (getWorkflowId() != null && StringUtils.isBlank(getWorkflowState())
+            || getWorkflowId() == null && StringUtils.isNotBlank(getWorkflowState())) {
+      logger.warn("The workflow id {} and workflow state {} are not in sync on event {} organization {}",
+              getWorkflowId(), getWorkflowState(), getIdentifier(), getOrganization());
+    }
+
+    if (getWorkflowId() != null && StringUtils.isNotBlank(getWorkflowState())) {
       eventStatus = workflowStatusMapping.get(getWorkflowState());
-      return;
-    }
-
-    if (getRecordingStatus() != null) {
+    } else if (StringUtils.isNotBlank(getRecordingStatus())) {
       eventStatus = recordingStatusMapping.get(getRecordingStatus());
-      return;
-    }
-
-    if (BooleanUtils.isTrue(getBlacklisted())) {
-      eventStatus = "EVENTS.EVENTS.STATUS.BLACKLISTED";
-      return;
-    }
-
-    if (BooleanUtils.isTrue(getOptedOut())) {
-      eventStatus = "EVENTS.EVENTS.STATUS.OPTEDOUT";
-      return;
-    }
-
-    if (StringUtils.isNotBlank(getSchedulingStatus())) {
+    } else if (isScheduledEvent()) {
       eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
-      return;
+    } else {
+      /* This can be the case if all workflows of an event have been deleted */
+      eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
     }
+  }
 
-    eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
+  public boolean isScheduledEvent() {
+    /* Only scheduled events have a capture ID assigned */
+    return StringUtils.isNotBlank(getAgentId());
   }
 
   /**
-   * Check whether or not the start time of the recording of this event has passed, yet.
+   * Check whether the recording of the event already has started.
+   * Always returns false for uploaded events.
    *
-   * This method treats non-scheduled (i.e.) uploaded events as always having
-   * a recording start time in the pase, because for the video to be able
-   * to be uploaded, it obviously must have been recorded, already.
-   *
-   * @return <code>true</code> if the start ime of the recording of this event
-   *         is in the past, and <code>false</code> otherwise
+   * @return <code>true</code> if recording of this event has started, and <code>false</code> otherwise
    */
   public boolean hasRecordingStarted() {
-    return
-            // handle uploaded events
-            getSchedulingStatus() == null
-            // handle scheduled events
-            || getRecordingStatus() != null;
-  }
-
-  /**
-   * Returns the scheduling status
-   *
-   * @return the scheduling status
-   */
-  public String getSchedulingStatus() {
-    return schedulingStatus;
+    return isScheduledEvent() && StringUtils.isNotBlank(getRecordingStatus());
   }
 
   /**

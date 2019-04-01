@@ -106,7 +106,7 @@ public class CommentSchedulerConflictNotifierTest {
 
     final String mpId = "1234";
     final TechnicalMetadata technicalMetadata = new TechnicalMetadataImpl(mpId, "demo", new Date(),
-            new Date(new Date().getTime() + 10 * 60 * 1000), false, userIds, wfProperties, caProperties, null);
+            new Date(new Date().getTime() + 10 * 60 * 1000), userIds, wfProperties, caProperties, null);
     final MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     mp.setIdentifier(new IdImpl(mpId));
     mp.add(DublinCores.mkOpencastEpisode().getCatalog());

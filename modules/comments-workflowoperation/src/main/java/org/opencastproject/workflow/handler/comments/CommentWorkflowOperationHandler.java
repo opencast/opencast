@@ -43,8 +43,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * A workflow operation handler for creating, resolving and deleting comments automatically during the workflow process.
@@ -61,26 +59,9 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
   private EventCommentService eventCommentService;
   private SecurityService securityService;
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
   public enum Operation {
     create, resolve, delete
   };
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(REASON,
-            "The optional comment reason's i18n id. You can find the id in etc/listproviders/event.comment.reasons.properties");
-    CONFIG_OPTIONS.put(DESCRIPTION, "The description text to add to the comment.");
-    CONFIG_OPTIONS.put(ACTION, "Options are " + StringUtils.join(Operation.values(), ",")
-            + ". Creates a new comment, marks a comment as resolved or deletes a comment that matches the same description and reason. By default creates.");
-  }
-
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
 
   /**
    * {@inheritDoc}
