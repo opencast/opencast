@@ -15,7 +15,7 @@
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
-<dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-asset-manager-api</artifactId>
       <version>${project.version}</version>

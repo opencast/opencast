@@ -51,7 +51,7 @@
         <configuration key="encoding-profile">audio-flac</configuration>
         <configuration key="process-first-match-only">true</configuration>
       </configurations>
-    </operation> 
+    </operation>
 
     <!-- Start Google Speech transcription job -->
     <operation

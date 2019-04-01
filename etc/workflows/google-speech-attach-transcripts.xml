@@ -13,7 +13,7 @@
 
     <operation id="google-speech-attach-transcription"
       fail-on-error="true"
-      exception-handler-workflow="partial-error" 
+      exception-handler-workflow="partial-error"
       description="Attach captions/transcription">
       <configurations>
         <!-- This is filled out by the transcription service when starting this workflow -->

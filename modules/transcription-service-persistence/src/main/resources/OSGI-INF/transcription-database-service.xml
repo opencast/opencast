@@ -9,6 +9,6 @@
     <provide interface="org.opencastproject.transcription.persistence.TranscriptionDatabase" />
   </service>
   <reference name="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
-               target="(osgi.unit.name=org.opencastproject.transcription.persistence)" cardinality="1..1" 
-               policy="static" bind="setEntityManagerFactory" />
+             target="(osgi.unit.name=org.opencastproject.transcription.persistence)" cardinality="1..1" 
+             policy="static" bind="setEntityManagerFactory" />
 </scr:component>

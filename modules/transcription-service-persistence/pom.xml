@@ -105,7 +105,7 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.transcription.persistence;version=${project.version}
-            </Export-Package> 
+            </Export-Package>
             <Service-Component>
               OSGI-INF/transcription-database-service.xml
             </Service-Component>
