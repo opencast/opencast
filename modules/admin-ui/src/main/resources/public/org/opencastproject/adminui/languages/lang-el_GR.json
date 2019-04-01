@@ -57,7 +57,6 @@
             "GROUP": "Η παρακάτω ομάδα θα διαγραφεί",
             "USER": "Ο παρακάτω χρήστης θα διαγραφεί",
             "THEME": "Το ακόλουθο θέμα θα διαγραφεί",
-            "EMAIL": "Το ακόλουθο πρότυπο ηλεκτρονικού ταχυδρομείου θα διαγραφεί",
             "LOCATION": "Η ακόλουθη τοποθεσία θα διαγραφεί"
          },
          "NAME": "Όνομα"
@@ -132,15 +131,6 @@
       "LOCATION_DELETED": "Η τοποθεσία έχει διαγραφεί",
       "LOCATION_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της τοποθεσίας",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Η τοποθεσία δεν μπορεί να διαγραφεί, επειδή δεν έχετε τα δικαιώματα να το πράξετε.",
-      "EMAIL_TEMPLATE_CREATED": "Το πρότυπο έχει δημιουργηθεί",
-      "EMAIL_TEMPLATE_NOT_CREATED": "Δεν ήταν δυνατή η δημιουργία του προτύπου",
-      "EMAIL_TEMPLATE_SAVED": "Το πρότυπο έχει αποθηκευτεί",
-      "EMAIL_TEMPLATE_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση του προτύπου",
-      "EMAIL_TEMPLATE_DELETED": "Το πρότυπο έχει διαγραφεί",
-      "EMAIL_TEMPLATE_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή του προτύπου",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "Αυτό το όνομα είναι ήδη σε χρήση",
-      "EMAIL_SENT": "Το μήνυμα έχει σταλεί",
-      "EMAIL_NOT_SENT": "Δεν μπόρεσε να σταλεί το μήνυμα",
       "CONFLICT_DETECTED": "Σύγκρουση στον προγραμματισμό: η νέα εκδήλωση συμπίμπτει με μία υπάρχουσα. Παρακαλώ αλλάξτε την αίθουσα, τις ημερηνίες ή τις ημέρες.",
       "CONFLICT_BULK_DETECTED": "Προγραμματισμός σε σύγκρουση: η αλλαγή στις εκδηλώσεις οδηγεί σε συγκρούση. Παρακαλώ να αλλάξετε την τοποθεσία, τις ημερομηνίες ή τις ώρες.",
       "CONFLICT_ALREADY_ENDED": "Σφάλμα στον προγραμματισμό. Η εκδήλωση έχει ήδη λήξει.",
@@ -153,11 +143,6 @@
       "SERIES_ACL_LOCKED": "Η επεξεργασία την πολιτικών πρόσβαησς δεν επιτρέπεται όταν εκτελούνται εργασίες σε μία εκδήλωση που αποτελεί μέρος της σειράς",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Η πολιτική πρόσβασης απαιτεί τουλάχιστον ένα ρόλο με δικαιώματα ανάγνωσης και εγγραφής.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "Η πολιτική πρόσβασης απαιτεί τουλάχιστον ένα ρόλο με δικαιώματα ανάγνωσης και εγγραφής.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Η κατάσταση εξαίρεσης εκδήλωσης έχει ενημερωθεί με επιτυχία.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Σφάλμα κατά την ενημέρωση κατάστασης της εκδήλωσης στο καθεστώς εξαίρεσης.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "Η κατάσταση συμμετοχής δεν μπορεί να ενημερωθεί καθώς η ημερομηνία έναρξης του προγραμματισμού είναι στο παρελθόν.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Η κατάσταση εξαίρεσης εκδήλωσης έχει ενημερωθεί με επιτυχία.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Σφάλμα κατά την ενημέρωση κατάστασης εξαίρεσης της σειράς.",
       "THEME_NAME_ALREADY_TAKEN": "Αυτό το όνομα είναι ήδη σε χρήση",
       "THEME_NAME_EMPTY": "Το όνομα δεν είναι δυνατό να είναι κενό",
       "BUMPER_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την μεταφόρτωση των αρχείων πολυμέσων",
@@ -186,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Ενέργειες",
-      "SEND_MESSAGE": "Αποστολή μηνύματος",
       "WARNING": "Προειδοποίηση",
-      "EDIT_STATUS": {
-         "CAPTION": "Επεξεργαστείτε την κατάσταση",
-         "READY_FOR_RECORDING": "Έτοιμη για εγγραφή",
-         "OPTED_OUT": "Επιλογή εξόδου"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Διαγραφή",
@@ -292,6 +271,8 @@
       "BACK": "Προηγούμενη",
       "CREATE": "Δημιουργία",
       "RETRACT": "Ανάκληση",
+      "RETRACT_DELETE": "Retract/Delete",
+      "DELETE": "Διαγραφή",
       "UPDATE": "Ενημέρωση",
       "DURATION": {
          "HOURS": "Ώρες",
@@ -348,28 +329,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "Στείλτε μήνυμα",
-         "TABS": {
-            "RECIPIENTS": "Παραλήπτες",
-            "MESSAGE": "Μήνυμα",
-            "SUMMARY": "Περίληψη"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "Προσθέστε στη διαδρομή ελέγχου",
-            "AUDIT_TRAIL_DESCRIPTION": "Επιλέξτε για να προσθέσετε το μήνυμα στην διαδρομή ελέγχου",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "Επιλέξτε το πρότυπο ηλεκτρονικού ταχυδρομείου",
-            "SUBJECT": "Θέμα",
-            "MESSAGE": "Μήνυμα",
-            "INCLUDE_SIGNATURE": "Συμπεριλάβετε την υπογραφή μου στο email"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "Περίληψη"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -500,7 +459,6 @@
          "ADD_EVENT": "Προσθήκη εκδήλωσης",
          "TABLE": {
             "CAPTION": "Εκδηλώσεις",
-            "CREATORS": "Δημιουργοί",
             "TITLE": "Τίτλος",
             "PRESENTERS": "Παρουσιαστής(ές)",
             "SERIES": "Σειρά",
@@ -515,9 +473,7 @@
             "LAST": "Τελευταία",
             "NEXT": "Επόμενη",
             "MANAGED_ACL": "Πολιτική πρόσβασης",
-            "SCHEDULING_STATUS": "Κατάσταση",
             "WORKFLOW_STATE": "Πρόοδος",
-            "REVIEW_STATUS": "Κατάσταση ανάλυσης",
             "PREVIOUS": "Προηγούμενη",
             "NOCONTENT": "Δεν υπάρχουν διαθέσιμα δεδομένα",
             "PUBLISHED": "Δημοσιευμένο",
@@ -536,13 +492,8 @@
                "PRESENTER": "Filter for this presenter"
             }
          },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "Έτοιμη για εγγραφή",
-            "OPTED_OUT": "Επιλογή εξόδου"
-         },
          "STATUS": {
             "SCHEDULED": "Προγραμματισμένη",
-            "OPTEDOUT": "Επιλογή εξόδου",
             "RECORDING": "Εγγραφή",
             "UPLOADING": "Μεταφόρτωση",
             "INGESTING": "Εισάγεται",
@@ -571,9 +522,6 @@
                "NO_PUBLICATIONS_AVAILABLE": "Αυτή η εκδήλωση δεν έχει δημοσιεύσεις",
                "PUBLICATION_DESCRIPTION": "Αυτό η εκδήλωση έχει δημοσιευθεί στα παρακάτω κανάλια δημοσίευσης:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Αυτή η εκδήλωση δεν είναι σε εξέλιξη",
-               "SCHEDULING_STATUS": "Κατάσταση",
-               "READY_FOR_RECORDING": "Έτοιμη για εγγραφή",
-               "OPTED_OUT": "Επιλογή εξόδου",
                "CUSTOM": "Προσαρμοσμένη",
                "ENGAGE": "Engage",
                "ENGAGE_LIVE": "Engage live",
@@ -840,20 +788,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "Κατάσταση συμμετοχής",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Κατάσταση ανάλυσης"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Κατάσταση opt-out",
-                  "READY": "Έτοιμη για καταγραφή",
-                  "OPTEDOUT": "Opted out"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Μηνύματα",
-                  "CREATION_DATE": "Ημερομηνία δημιουργίας",
-                  "SENDER": "Αποστολέας",
-                  "SUBJECT": "Θέμα"
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Παρουσιαστής(ές)"
                }
@@ -1027,7 +961,7 @@
             "CAPTION": "Σειρές",
             "TITLE": "Σειρές",
             "HAS_EVENTS": "Περιέχει εκδηλώσεις",
-            "CREATORS": "Οργανωτής(ες)",
+            "ORGANIZERS": "Οργανωτής(ες)",
             "CONTRIBUTORS": "Χορηγός(οι)",
             "CREATED": "Δημιουργήθηκε",
             "MANAGED_ACL": "Πολιτική πρόσβασης",
@@ -1044,7 +978,6 @@
             "TABS": {
                "METADATA": "Μεταδεδομένα",
                "EXTENDED_METADATA": "Μεταδεδομένα ΙΙ",
-               "PARTICIPATION": "Συμμετοχή",
                "EVENTS": "Εκδηλώσεις",
                "PERMISSIONS": "Πολιτική πρόσβασης",
                "THEME": "Θέμα"
@@ -1089,24 +1022,6 @@
                "LANGUAGE": "Γλώσσα",
                "LICENSE": "Άδεια χρήσης",
                "DESCRIPTION": "Περιγραφή"
-            },
-            "PARTICIPATION": {
-               "CAPTION": "Κατάσταση προτύπου συμμετοχής",
-               "WARNING_TEMPLATE": "Η κατάσταση συμμετοχής της σειράς θα χρησιμοποιηθεί σαν προεπιλεγμένη τιμη για τις νέες εκδηλώσεις που αποτελούν μέρος την σειράς.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Κατάσταση ανάλυσης"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Κατάσταση επιλογής εξόδου",
-                  "READY": "Έτοιμη για καταγραφή",
-                  "OPTEDOUT": "Επιλογή εξόδου"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Μηνύματα",
-                  "CREATION_DATE": "Ημερομηνία δημιουργίας",
-                  "SENDER": "Αποστολέας",
-                  "SUBJECT": "Θέμα"
-               }
             },
             "EVENTS": {
                "TITLE": "Τίτλος",
@@ -1418,34 +1333,7 @@
          "ADD_THEME": "Προσθέστε το θέμα"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "Πρότυπα email",
-         "MAIL_SERVERS": "Ρυθμίσεις ηλεκτρονικού ταχυδρομείου",
          "THEMES": "Θέματα"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "Πρότυπα ηλεκτρονικού ταχυδρομείου",
-            "NAME": "Όνομα",
-            "CREATOR": "Δημιουργός",
-            "CREATED": "Δημιουργήθηκε",
-            "ACTION": "Ενέργειες"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Δημιουργία προτύπου",
-            "EDITCAPTION": "Επεξεργασία πρότυπου",
-            "TABS": {
-               "MESSAGE": "Μήνυμα",
-               "SUMMARY": "Περίληψη"
-            },
-            "MESSAGE": {
-               "NAME": "Όνομα",
-               "SUBJECT": "Θέμα",
-               "MESSAGE": "Μήνυμα"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "Σύνοψη μηνύματος"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1541,7 +1429,6 @@
       "JOBS": {
          "TABLE": {
             "ID": "Αναγνωριστικό εργασίας",
-            "ACTION": "Ενέργειες",
             "CAPTION": "Εργασίες",
             "CREATED": "Δημιουργήθηκε",
             "CREATOR": "Δημιουργός",
@@ -1551,14 +1438,6 @@
             "STATUS": "Κατάσταση",
             "SUBMITTED": "Υποβλήθηκε",
             "TYPE": "Τύπος"
-         },
-         "DETAILS": {
-            "HEADER": "Λεπτομέρειες εργασίας {{resourceId}}",
-            "TABS": {
-               "GENERAL": "Γενικά",
-               "OPERATIONS": "Λειτουργίες",
-               "INCIDENTS": "Περιστατικά"
-            }
          },
          "STATUS": {
             "QUEUED": "Στην ουρά",
@@ -1586,7 +1465,6 @@
             "MEAN_RUN_TIME": "Μέσος χρόνος εκτέλεσης",
             "MEAN_QUEUE_TIME": "Μέσος χρόνος αναμονής",
             "MAINTENANCE": "Συντήρηση",
-            "ACTION": "Ενέργειες",
             "MAINTENANCE_OFF": "Είσοδος σε λειτουργία συντήρησης",
             "MAINTENANCE_ON": "Έξοδος από λειτουργία συντήρησης"
          }
@@ -1816,9 +1694,6 @@
          "LOCATION": {
             "LABEL": "Τοποθεσία"
          },
-         "OPTEDOUT": {
-            "LABEL": "Επιλογή εξόδου"
-         },
          "PERIOD": {
             "LABEL": "Περίοδος"
          },
@@ -1830,12 +1705,6 @@
          },
          "PROGRESS": {
             "LABEL": "Πρόοδος"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "Κατάσταση ανάλυσης",
-            "CONFIRMED": "Επιβεβαιωμένο",
-            "UNCONFIRMED": "Ανεπιβεβαίωτη",
-            "UNSENT": "Aόριστο"
          },
          "SERIES": {
             "LABEL": "Σειρά"

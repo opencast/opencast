@@ -57,7 +57,6 @@
             "GROUP": "Le groupe suivant sera supprimé",
             "USER": "L’utilisateur suivant sera supprimée",
             "THEME": "Le thème suivant sera supprimé",
-            "EMAIL": "Le modèle d'email suivant sera supprimé",
             "LOCATION": "L’emplacement suivant sera supprimé"
          },
          "NAME": "Nom"
@@ -132,15 +131,6 @@
       "LOCATION_DELETED": "L’emplacement a été supprimé",
       "LOCATION_NOT_DELETED": "L’emplacement n’a pas pu être supprimé",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Vous n’avez pas la permission de supprimer cet emplacement.",
-      "EMAIL_TEMPLATE_CREATED": "Le modèle a été créé",
-      "EMAIL_TEMPLATE_NOT_CREATED": "Le modèle n'a pas pu être créé",
-      "EMAIL_TEMPLATE_SAVED": "Le modèle a été enregistré",
-      "EMAIL_TEMPLATE_NOT_SAVED": "Le modèle n'a pas pu être enregistré",
-      "EMAIL_TEMPLATE_DELETED": "Le modèle a été supprimé",
-      "EMAIL_TEMPLATE_NOT_DELETED": "Le modèle n'a pas pu être supprimé",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "Ce nom est déjà utilisé",
-      "EMAIL_SENT": "Le messag a été envoyé",
-      "EMAIL_NOT_SENT": "Le message n'a pas pu être envoyé",
       "CONFLICT_DETECTED": "Conflit de programmation: le nouvel événement entre en conflit avec un événement existant. Veuillez changer l'emplacement ou les dates.",
       "CONFLICT_BULK_DETECTED": "Conflit dans la planification: la modification des événements entraîne des conflits. S'il vous plaît changer l'emplacement, les dates ou les heures.",
       "CONFLICT_ALREADY_ENDED": "Erreur de programmation : l’événement est déjà terminée.",
@@ -153,11 +143,6 @@
       "SERIES_ACL_LOCKED": "Modification des droits d'accès n'est pas autorisée lorsque des opérations sont en cours d'exécution sur un événement appartenant à cette série",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Sélectionner au moins un role avec permission de lecture et écriture.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "Sélectionner au moins un role avec permission de lecture et écriture.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Le statut de l'événement opt-out a été mis à jour avec succès.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Erreur lors de la mise à jour du statut de l’événement opt-out.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "Le statut de l’événement de participation ne peut pas être mis à jour car la date de début programmée est dans le passé.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Le statut opt-out de la série a été mis à jour avec succès.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Erreur lors de la mise à jour du statut opt-out de la série.",
       "THEME_NAME_ALREADY_TAKEN": "Ce nom est déjà utilisé",
       "THEME_NAME_EMPTY": "Le nom ne peux pas rester vide",
       "BUMPER_UPLOAD_ERROR": "Erreur lors de l'envoi du ficher",
@@ -186,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
-      "SEND_MESSAGE": "Envoyer un message",
       "WARNING": "Avertissement",
-      "EDIT_STATUS": {
-         "CAPTION": "Modifier statut",
-         "READY_FOR_RECORDING": "Prêt pour l'enregistrement",
-         "OPTED_OUT": "Abstention"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Supprimer",
@@ -292,6 +271,8 @@
       "BACK": "Précédent",
       "CREATE": "Créer",
       "RETRACT": "Retirer",
+      "RETRACT_DELETE": "Retract/Delete",
+      "DELETE": "Supprimer",
       "UPDATE": "Appliquer",
       "DURATION": {
          "HOURS": "Heures",
@@ -348,28 +329,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "Envoyer Message",
-         "TABS": {
-            "RECIPIENTS": "Destinataires",
-            "MESSAGE": "Message",
-            "SUMMARY": "Résumé"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "Ajouter à la liste d'audit",
-            "AUDIT_TRAIL_DESCRIPTION": "Cocher pour ajouter le message à la trace d'audit",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "Sélectionnez le modèle de courriel",
-            "SUBJECT": "Objet ",
-            "MESSAGE": "Message",
-            "INCLUDE_SIGNATURE": "Inclure ma signature dans le courriel"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "Résumé"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -500,7 +459,6 @@
          "ADD_EVENT": "Ajouter événement",
          "TABLE": {
             "CAPTION": "Événements",
-            "CREATORS": "Créateurs",
             "TITLE": "Titre",
             "PRESENTERS": "Présentateur(s)",
             "SERIES": "Séries",
@@ -515,9 +473,7 @@
             "LAST": "Dernière",
             "NEXT": "Suivante",
             "MANAGED_ACL": "Droits d'accès",
-            "SCHEDULING_STATUS": "Statut",
             "WORKFLOW_STATE": "Progression",
-            "REVIEW_STATUS": "État de la révision",
             "PREVIOUS": "Précédente",
             "NOCONTENT": "Aucune donnée disponible",
             "PUBLISHED": "Publié",
@@ -536,13 +492,8 @@
                "PRESENTER": "Filter for this presenter"
             }
          },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "Prêt pour l'enregistrement",
-            "OPTED_OUT": "Abstention"
-         },
          "STATUS": {
             "SCHEDULED": "Programmé",
-            "OPTEDOUT": "Abstention",
             "RECORDING": "Enregistrement en cours",
             "UPLOADING": "Transfert",
             "INGESTING": "Préparation",
@@ -571,9 +522,6 @@
                "NO_PUBLICATIONS_AVAILABLE": "Cet événement n’a pas de publications",
                "PUBLICATION_DESCRIPTION": "Cet événement a été publié sur les chaînes de publication suivantes :",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Cet événement n'est actuellement pas en cours",
-               "SCHEDULING_STATUS": "Statut",
-               "READY_FOR_RECORDING": "Prêt pour l'enregistrement",
-               "OPTED_OUT": "Abstention",
                "CUSTOM": "Personnalisé",
                "ENGAGE": "Engage",
                "ENGAGE_LIVE": "Engage Live",
@@ -840,20 +788,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "Statut de participation",
-               "REVIEW_STATUS": {
-                  "CAPTION": "État de la révision"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Statut désinscrit",
-                  "READY": "Prêt pour l'enregistrement",
-                  "OPTEDOUT": "Abstention"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Messages",
-                  "CREATION_DATE": "Date de création ",
-                  "SENDER": "Expéditeur",
-                  "SUBJECT": "Objet "
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Présentateur(s)"
                }
@@ -1027,7 +961,7 @@
             "CAPTION": "Séries",
             "TITLE": "Séries",
             "HAS_EVENTS": "Contient des événements",
-            "CREATORS": "Organisateur(s)",
+            "ORGANIZERS": "Organisateur(s)",
             "CONTRIBUTORS": "Contributeur(s)",
             "CREATED": "Création",
             "MANAGED_ACL": "Droits d'accès",
@@ -1044,7 +978,6 @@
             "TABS": {
                "METADATA": "Métadonnées",
                "EXTENDED_METADATA": "Métadonnées II",
-               "PARTICIPATION": "Participation",
                "EVENTS": "Événements",
                "PERMISSIONS": "Droits d'accès",
                "THEME": "Thème"
@@ -1089,24 +1022,6 @@
                "LANGUAGE": "Langue",
                "LICENSE": "Licence",
                "DESCRIPTION": "Description"
-            },
-            "PARTICIPATION": {
-               "CAPTION": "Modèle de statut de participation",
-               "WARNING_TEMPLATE": "L'état de participation de la série servira de valeur par défaut pour les nouveaux événements qui feront partie de la série.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "État de la révision"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Statut désinscrit",
-                  "READY": "Prêt pour l'enregistrement",
-                  "OPTEDOUT": "Abstention"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Messages",
-                  "CREATION_DATE": "Date de création ",
-                  "SENDER": "Expéditeur",
-                  "SUBJECT": "Sujet"
-               }
             },
             "EVENTS": {
                "TITLE": "Titre",
@@ -1418,34 +1333,7 @@
          "ADD_THEME": "Ajouter thème"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "Modèles de courriel",
-         "MAIL_SERVERS": "Paramètres du courriel",
          "THEMES": "Thèmes"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "Modèles de courriel",
-            "NAME": "Nom",
-            "CREATOR": "Auteur",
-            "CREATED": "Créé le",
-            "ACTION": "Actions"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Créer un modèle",
-            "EDITCAPTION": "Modifier le modèle",
-            "TABS": {
-               "MESSAGE": "Message",
-               "SUMMARY": "Résumé"
-            },
-            "MESSAGE": {
-               "NAME": "Nom",
-               "SUBJECT": "Sujet",
-               "MESSAGE": "Message"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "Résumé"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1541,7 +1429,6 @@
       "JOBS": {
          "TABLE": {
             "ID": "Identifiant de la tâche",
-            "ACTION": "Actions",
             "CAPTION": "Tâches",
             "CREATED": "Créé le",
             "CREATOR": "Auteur",
@@ -1551,14 +1438,6 @@
             "STATUS": "Statut",
             "SUBMITTED": "Envoyée",
             "TYPE": "Type"
-         },
-         "DETAILS": {
-            "HEADER": "Détails de l'opération {{resourceId}}",
-            "TABS": {
-               "GENERAL": "Général",
-               "OPERATIONS": "Opérations",
-               "INCIDENTS": "Incidents"
-            }
          },
          "STATUS": {
             "QUEUED": "En attente",
@@ -1586,7 +1465,6 @@
             "MEAN_RUN_TIME": "Temps moyen d'exécution",
             "MEAN_QUEUE_TIME": "Temps moyen d'attente",
             "MAINTENANCE": "Maintenance",
-            "ACTION": "Actions",
             "MAINTENANCE_OFF": "Activer mode de maintenance",
             "MAINTENANCE_ON": "Désactiver mode de maintenance"
          }
@@ -1816,9 +1694,6 @@
          "LOCATION": {
             "LABEL": "Emplacement"
          },
-         "OPTEDOUT": {
-            "LABEL": "Désinscrit"
-         },
          "PERIOD": {
             "LABEL": "Période"
          },
@@ -1830,12 +1705,6 @@
          },
          "PROGRESS": {
             "LABEL": "Progression"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "État de la révision",
-            "CONFIRMED": "Confirmé",
-            "UNCONFIRMED": "Non confirmé",
-            "UNSENT": "Non envoyé"
          },
          "SERIES": {
             "LABEL": "Séries"

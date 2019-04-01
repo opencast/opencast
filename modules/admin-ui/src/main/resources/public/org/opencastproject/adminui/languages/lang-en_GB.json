@@ -57,7 +57,6 @@
             "GROUP": "The following group will be deleted",
             "USER": "The following user will be deleted",
             "THEME": "The following theme will be deleted",
-            "EMAIL": "The following email template will be deleted",
             "LOCATION": "The following location will be deleted"
          },
          "NAME": "Name"
@@ -132,15 +131,6 @@
       "LOCATION_DELETED": "The location has been deleted",
       "LOCATION_NOT_DELETED": "The location could not be deleted",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
-      "EMAIL_TEMPLATE_CREATED": "The template has been created",
-      "EMAIL_TEMPLATE_NOT_CREATED": "The template could not be created",
-      "EMAIL_TEMPLATE_SAVED": "The template has been saved",
-      "EMAIL_TEMPLATE_NOT_SAVED": "The template could not be saved",
-      "EMAIL_TEMPLATE_DELETED": "The template has been deleted",
-      "EMAIL_TEMPLATE_NOT_DELETED": "The template could not be deleted",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "This name is already in use",
-      "EMAIL_SENT": "The message has been sent",
-      "EMAIL_NOT_SENT": "The message could not be sent",
       "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
       "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Scheduling error: The event has already ended.",
@@ -153,11 +143,6 @@
       "SERIES_ACL_LOCKED": "Editing Access Policies is not allowed when operations are running on an event that is part of the series",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "The event opt-out status has been successfully updated.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Error while updating the event opt-out status.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "The participation status can not be updated as the scheduling start date is in the past.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "The series opt-out status has been successfully updated.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Error while updating the series opt-out status.",
       "THEME_NAME_ALREADY_TAKEN": "This name is already in use",
       "THEME_NAME_EMPTY": "The name cannot be empty",
       "BUMPER_UPLOAD_ERROR": "Error while uploading media",
@@ -186,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
-      "SEND_MESSAGE": "Send message",
       "WARNING": "Warning",
-      "EDIT_STATUS": {
-         "CAPTION": "Edit Status",
-         "READY_FOR_RECORDING": "Ready for recording",
-         "OPTED_OUT": "Opted-out"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Delete",
@@ -292,6 +271,8 @@
       "BACK": "Previous",
       "CREATE": "Create",
       "RETRACT": "Retract",
+      "RETRACT_DELETE": "Retract/Delete",
+      "DELETE": "Delete",
       "UPDATE": "Update",
       "DURATION": {
          "HOURS": "Hours",
@@ -348,28 +329,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "Send message",
-         "TABS": {
-            "RECIPIENTS": "Recipients",
-            "MESSAGE": "Message",
-            "SUMMARY": "Summary"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "Add to audit trail",
-            "AUDIT_TRAIL_DESCRIPTION": "Check to add the message to the audit trail",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "Select email template",
-            "SUBJECT": "Subject",
-            "MESSAGE": "Message",
-            "INCLUDE_SIGNATURE": "Include my signature in the email"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "Summary"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -500,7 +459,6 @@
          "ADD_EVENT": "Add event",
          "TABLE": {
             "CAPTION": "Events",
-            "CREATORS": "Creators",
             "TITLE": "Title",
             "PRESENTERS": "Presenter(s)",
             "SERIES": "Series",
@@ -515,9 +473,7 @@
             "LAST": "Last",
             "NEXT": "Next",
             "MANAGED_ACL": "Access policy",
-            "SCHEDULING_STATUS": "Status",
             "WORKFLOW_STATE": "Progress",
-            "REVIEW_STATUS": "Review status",
             "PREVIOUS": "Previous",
             "NOCONTENT": "No data available",
             "PUBLISHED": "Published",
@@ -536,13 +492,8 @@
                "PRESENTER": "Filter for this presenter"
             }
          },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "Ready for recording",
-            "OPTED_OUT": "Opted-out"
-         },
          "STATUS": {
             "SCHEDULED": "Scheduled",
-            "OPTEDOUT": "Opted out",
             "RECORDING": "Recording",
             "UPLOADING": "Uploading",
             "INGESTING": "Ingesting",
@@ -571,9 +522,6 @@
                "NO_PUBLICATIONS_AVAILABLE": "This event has no publications",
                "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
-               "SCHEDULING_STATUS": "Status",
-               "READY_FOR_RECORDING": "Ready for recording",
-               "OPTED_OUT": "Opted-out",
                "CUSTOM": "Custom",
                "ENGAGE": "Engage",
                "ENGAGE_LIVE": "Engage Live",
@@ -840,20 +788,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "Participation status",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Review status"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Opted-out Status",
-                  "READY": "Ready for recording",
-                  "OPTEDOUT": "Opted out"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Messages",
-                  "CREATION_DATE": "Creation date",
-                  "SENDER": "Sender",
-                  "SUBJECT": "Subject"
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Presenter(s)"
                }
@@ -1027,7 +961,7 @@
             "CAPTION": "Series",
             "TITLE": "Series",
             "HAS_EVENTS": "Contains events",
-            "CREATORS": "Organizer(s)",
+            "ORGANIZERS": "Organizer(s)",
             "CONTRIBUTORS": "Contributor(s)",
             "CREATED": "Created",
             "MANAGED_ACL": "Access policy",
@@ -1044,7 +978,6 @@
             "TABS": {
                "METADATA": "Metadata",
                "EXTENDED_METADATA": "Metadata II",
-               "PARTICIPATION": "Participation",
                "EVENTS": "Events",
                "PERMISSIONS": "Access policy",
                "THEME": "Theme"
@@ -1089,24 +1022,6 @@
                "LANGUAGE": "Language",
                "LICENSE": "License",
                "DESCRIPTION": "Description"
-            },
-            "PARTICIPATION": {
-               "CAPTION": "Participation status template",
-               "WARNING_TEMPLATE": "Series participation status will be used as default value for new events that are part of the series.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Review status"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Opted-out Status",
-                  "READY": "Ready for recording",
-                  "OPTEDOUT": "Opted out"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Messages",
-                  "CREATION_DATE": "Creation date",
-                  "SENDER": "Sender",
-                  "SUBJECT": "Subject"
-               }
             },
             "EVENTS": {
                "TITLE": "Title",
@@ -1418,34 +1333,7 @@
          "ADD_THEME": "Add theme"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "Email templates",
-         "MAIL_SERVERS": "Email settings",
          "THEMES": "Themes"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "Email templates",
-            "NAME": "Name",
-            "CREATOR": "Creator",
-            "CREATED": "Created",
-            "ACTION": "Actions"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Create template",
-            "EDITCAPTION": "Edit template",
-            "TABS": {
-               "MESSAGE": "Message",
-               "SUMMARY": "Summary"
-            },
-            "MESSAGE": {
-               "NAME": "Name",
-               "SUBJECT": "Subject",
-               "MESSAGE": "Message"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "Message summary"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1541,7 +1429,6 @@
       "JOBS": {
          "TABLE": {
             "ID": "Job Identifier",
-            "ACTION": "Actions",
             "CAPTION": "Jobs",
             "CREATED": "Created",
             "CREATOR": "Creator",
@@ -1551,14 +1438,6 @@
             "STATUS": "Status",
             "SUBMITTED": "Submitted",
             "TYPE": "Type"
-         },
-         "DETAILS": {
-            "HEADER": "Job details {{resourceId}}",
-            "TABS": {
-               "GENERAL": "General",
-               "OPERATIONS": "Operations",
-               "INCIDENTS": "Incidents"
-            }
          },
          "STATUS": {
             "QUEUED": "Queued",
@@ -1586,7 +1465,6 @@
             "MEAN_RUN_TIME": "Mean run time",
             "MEAN_QUEUE_TIME": "Mean queue time",
             "MAINTENANCE": "Maintenance",
-            "ACTION": "Actions",
             "MAINTENANCE_OFF": "Enter maintenance mode",
             "MAINTENANCE_ON": "Leave maintenance mode"
          }
@@ -1816,9 +1694,6 @@
          "LOCATION": {
             "LABEL": "Location"
          },
-         "OPTEDOUT": {
-            "LABEL": "Opted Out"
-         },
          "PERIOD": {
             "LABEL": "Period"
          },
@@ -1830,12 +1705,6 @@
          },
          "PROGRESS": {
             "LABEL": "Progress"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "Review Status",
-            "CONFIRMED": "Confirmed",
-            "UNCONFIRMED": "Unconfirmed",
-            "UNSENT": "Unsent"
          },
          "SERIES": {
             "LABEL": "Series"
