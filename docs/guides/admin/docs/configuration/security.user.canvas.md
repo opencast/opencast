@@ -1,4 +1,4 @@
-### What it does
+# What it does
 
 The [Canvas](https://www.canvaslms.com/) User Provider enriches Opencast users
 with a set of roles made up of the user's membership in Canvas courses, of the form
