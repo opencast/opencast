@@ -43,6 +43,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
@@ -89,7 +91,8 @@ public class CanvasUserProviderFactory implements ManagedServiceFactory {
   private static final String CACHE_EXPIRATION = "org.opencastproject.userdirectory.canvas.cache.expiration";
 
   /** A map of pid to canvas user provider instance */
-  private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();;
+  private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<String, ServiceRegistration>();
+  ;
 
   /** The OSGI bundle context */
   protected BundleContext bundleContext = null;
@@ -143,58 +146,64 @@ public class CanvasUserProviderFactory implements ManagedServiceFactory {
     if (StringUtils.isBlank(token)) throw new ConfigurationException(CANVAS_TOKEN_KEY, "is not set");
 
     String courseIdentifierProperty = (String) properties.get(COURSE_IDENTIFIER_PROPERTY_KEY);
-    if (!"id".equals(courseIdentifierProperty) && !"sis_course_id".equals(courseIdentifierProperty)) {
-      // Default to using `id`
-      courseIdentifierProperty = "id";
-    }
+    if (!"id".equals(courseIdentifierProperty) && !"sis_course_id".equals(courseIdentifierProperty))
+      throw new ConfigurationException(COURSE_IDENTIFIER_PROPERTY_KEY,
+          "is invalid.  Must be either `id` or `sis_course_id`");
 
     String coursePattern = (String) properties.get(COURSE_PATTERN_KEY);
+    if (StringUtils.isNotBlank(coursePattern)) {
+      try {
+        Pattern.compile(coursePattern);
+      } catch (PatternSyntaxException e) {
+        throw new ConfigurationException(COURSE_PATTERN_KEY, "has an invalid regex syntax");
+      }
+    }
     String userPattern = (String) properties.get(USER_PATTERN_KEY);
-
+    if (StringUtils.isNotBlank(userPattern)) {
+      try {
+        Pattern.compile(userPattern);
+      } catch (PatternSyntaxException e) {
+        throw new ConfigurationException(USER_PATTERN_KEY, "has an invalid regex syntax");
+      }
+    }
     String userNameProperty = (String) properties.get(USER_NAME_PROPERTY_KEY);
-    if (!"name".equals(userNameProperty) && !"short_name".equals(userNameProperty)) {
-      // Default to using `short_name`
-      userNameProperty = "short_name";
-    }
+    if (!"name".equals(userNameProperty) && !"short_name".equals(userNameProperty))
+      throw new ConfigurationException(USER_NAME_PROPERTY_KEY,
+          "is invalid.  Must use either `name` or `short_name`");
 
-    int cacheSize = 1000;
-    try {
-      if (properties.get(CACHE_SIZE) != null) {
-        Integer configuredCacheSize = Integer.parseInt(properties.get(CACHE_SIZE).toString());
-        if (configuredCacheSize != null) {
-          cacheSize = configuredCacheSize.intValue();
-        }
+    int cacheSize;
+    if (properties.get(CACHE_SIZE) == null) {
+      throw new ConfigurationException(CACHE_SIZE, "is not set");
+    } else {
+      try {
+        cacheSize = Integer.parseInt(properties.get(CACHE_SIZE).toString());
+
+      } catch (NumberFormatException e) {
+        throw new ConfigurationException(CACHE_SIZE, "is invalid , use a positive integer");
       }
-    } catch (Exception e) {
-      logger.warn("{} could not be loaded, default value is used: {}", CACHE_SIZE, cacheSize);
     }
 
+    int cacheExpiration;
+    if (properties.get(CACHE_EXPIRATION) == null) {
+      throw new ConfigurationException(CACHE_EXPIRATION, "is not set");
+    } else {
+      try {
+        cacheExpiration = Integer.parseInt(properties.get(CACHE_EXPIRATION).toString());
 
-    int cacheExpiration = 60;
-    try {
-      if (properties.get(CACHE_EXPIRATION) != null) {
-        Integer configuredCacheExpiration = Integer.parseInt(properties.get(CACHE_EXPIRATION).toString());
-        if (configuredCacheExpiration != null) {
-          cacheExpiration = configuredCacheExpiration.intValue();
-        }
+      } catch (NumberFormatException e) {
+        throw new ConfigurationException(CACHE_EXPIRATION, "is invalid , use a positive integer");
       }
-    } catch (Exception e) {
-      logger.warn("{} could not be loaded, default value is used: {}", CACHE_EXPIRATION, cacheExpiration);
     }
 
-    // Instructor roles
     Set<String> instructorRoles;
     String instructorRoleList = (String) properties.get(CANVAS_INSTRUCTOR_ROLES_KEY);
 
-    if (!StringUtils.isEmpty(instructorRoleList)) {
-      String trimmedRoles = StringUtils.trim(instructorRoleList);
-      String[] roles = trimmedRoles.split(",");
-      instructorRoles = new HashSet<String>(Arrays.asList(roles));
+    if (StringUtils.isNotEmpty(instructorRoleList)) {
+      String[] roles = StringUtils.split(instructorRoleList, " ,");
+      instructorRoles = new HashSet<>(Arrays.asList(roles));
       logger.debug("Canvas instructor roles: {}", Arrays.toString(roles));
     } else {
-      // Default instructor roles
-      instructorRoles = new HashSet<String>();
-      instructorRoles.add("TeacherEnrollment");
+      throw new ConfigurationException(CANVAS_INSTRUCTOR_ROLES_KEY, "is not set");
     }
 
     // Now that we have everything we need, go ahead and activate a new provider, removing an old one if necessary
@@ -211,9 +220,9 @@ public class CanvasUserProviderFactory implements ManagedServiceFactory {
       throw new ConfigurationException(ORGANIZATION_KEY, "not found");
     }
 
-    logger.debug("Creating new CanvasUserProviderInstance for pid=" + pid);
+    logger.debug("Creating new CanvasUserProviderInstance for pid={}", pid);
     CanvasUserProviderInstance provider = new CanvasUserProviderInstance(pid, org, url, token, courseIdentifierProperty,
-      coursePattern, userPattern, userNameProperty, instructorRoles, cacheSize, cacheExpiration);
+        coursePattern, userPattern, userNameProperty, instructorRoles, cacheSize, cacheExpiration);
 
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
     providerRegistrations.put(pid, bundleContext.registerService(RoleProvider.class.getName(), provider, null));
@@ -226,7 +235,7 @@ public class CanvasUserProviderFactory implements ManagedServiceFactory {
    */
   @Override
   public void deleted(String pid) {
-    logger.debug("Delete CanvasUserProviderInstance for pid=" + pid);
+    logger.debug("Delete CanvasUserProviderInstance for pid={}", pid);
     ServiceRegistration registration = providerRegistrations.remove(pid);
     if (registration != null) {
       registration.unregister();
@@ -234,7 +243,10 @@ public class CanvasUserProviderFactory implements ManagedServiceFactory {
         ManagementFactory.getPlatformMBeanServer().unregisterMBean(CanvasUserProviderFactory.getObjectName(pid));
       } catch (Exception e) {
         logger.warn("Unable to unregister mbean for pid='{}': {}", pid, e.getMessage());
+        e.printStackTrace();
+
       }
+
     }
   }
 
