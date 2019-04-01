@@ -1245,7 +1245,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
     }
 
-    User workflowCreator = workflow.getCreator();
+    User workflowCreator = userDirectoryService.loadUser(workflow.getCreatorName());
     String workflowOrgId = workflowCreator.getOrganization().getId();
 
     boolean authorized = currentUser.hasRole(GLOBAL_ADMIN_ROLE)

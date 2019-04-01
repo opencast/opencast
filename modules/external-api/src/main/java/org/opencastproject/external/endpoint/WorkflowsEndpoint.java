@@ -539,7 +539,7 @@ public class WorkflowsEndpoint {
     fields.add(f("description", v(wi.getDescription(), BLANK)));
     fields.add(f("workflow_definition_identifier", v(wi.getTemplate(), BLANK)));
     fields.add(f("event_identifier", v(wi.getMediaPackage().getIdentifier().toString())));
-    fields.add(f("creator", v(wi.getCreator().getName())));
+    fields.add(f("creator", v(wi.getCreatorName())));
     fields.add(f("state", enumToJSON(wi.getState())));
     if (withOperations) {
       fields.add(f("operations", arr(wi.getOperations()
