@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.userdirectory.brightspace.BrightspaceUserProviderFactory"
+               immediate="true"
+               activate="activate">
+    <implementation class="org.opencastproject.userdirectory.brightspace.BrightspaceUserProviderFactory"/>
+    <property name="service.pid" value="org.opencastproject.userdirectory.brightspace"/>
+    <property name="service.description" value="Provides Brightspace user directory instances"/>
+    <service>
+        <provide interface="org.osgi.service.cm.ManagedServiceFactory"/>
+    </service>
+    <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+               cardinality="1..1" policy="static" bind="setOrgDirectory"/>
+</scr:component>
