@@ -355,8 +355,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     }
 
-    localSystemLoad = getHostLoads(emf.createEntityManager()).get(hostName).getLoadFactor();
-    logger.info("Current system load: {}", format("%.1f", localSystemLoad));
+    localSystemLoad = 0;
+    logger.info("Activated");
   }
 
   @Override
