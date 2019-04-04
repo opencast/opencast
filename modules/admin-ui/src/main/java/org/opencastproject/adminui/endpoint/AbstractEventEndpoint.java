@@ -36,6 +36,7 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.conflictJson;
@@ -116,6 +117,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -2047,8 +2049,12 @@ public abstract class AbstractEventEndpoint {
     Option<Integer> optOffset = Option.option(offset);
     Option<String> optSort = Option.option(trimToNull(sort));
     ArrayList<JValue> eventsList = new ArrayList<>();
-    EventSearchQuery query = new EventSearchQuery(getSecurityService().getOrganization().getId(),
-            getSecurityService().getUser());
+    final Organization organization = getSecurityService().getOrganization();
+    final User user = getSecurityService().getUser();
+    if (organization == null || user == null) {
+      return Response.status(SC_SERVICE_UNAVAILABLE).build();
+    }
+    EventSearchQuery query = new EventSearchQuery(organization.getId(), user);
 
     // If the limit is set to 0, this is not taken into account
     if (optLimit.isSome() && limit == 0) {
