@@ -10,8 +10,8 @@
    "SAVE": "Guardar",
    "LOGOUT": "Cerrar sesión",
    "RESET": "Reestablecer",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "Sin opción seleccionada",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No hay opciones disponibles",
    "YES": "Sí",
    "LANGUAGES": {
       "ARABIC": "Árabe",
@@ -245,9 +245,9 @@
          },
          "EDIT": {
             "CAPTION": "Modificar",
-            "EVENT": "event",
-            "EVENTS": "events",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "EVENT": "evento",
+            "EVENTS": "eventos",
+            "HEADER": "Esta página le permite editar eventos programados agrupados por días de semana. Los campos de entrada están ya preconfigurados en caso de que todos los eventos tengan el mismo valor para un campo en específico. De otra forma, los campos de entrada quedan en blanco. Dejar los campos de entrada en blanco significa que los valores respectivos para cada evento no debieran ser cambiados.",
             "METADATA": "Metadatos",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -271,7 +271,7 @@
       "BACK": "Anterior",
       "CREATE": "Crear",
       "RETRACT": "Retirar",
-      "RETRACT_DELETE": "Retract/Delete",
+      "RETRACT_DELETE": "Retirar/Eliminar",
       "DELETE": "Eliminar",
       "UPDATE": "Actualizar",
       "DURATION": {
@@ -395,7 +395,7 @@
                   "REPEATS": "Repetir",
                   "REPEAT_ON": "Repetir",
                   "WEEKDAYS": "Entre semana",
-                  "WEEKDAY": "Weekday"
+                  "WEEKDAY": "Día de semana"
                },
                "NO_SOURCE_AVAILABLE": "No hay agentes de captura disponibles"
             },
@@ -489,7 +489,7 @@
                "EDITOR_NEEDS_CUTTING": "Abrir editor de vídeo (un comentario indica que se ha solicitado edición)",
                "COMMENTS": "Ver comentarios",
                "PAUSED_WORKFLOW": "Ver Workflows pausados",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "Filtrar para este presentador"
             }
          },
          "STATUS": {
@@ -796,7 +796,7 @@
                "ACTIONS": "Acciones",
                "DETAILS": "Detalles",
                "DESCRIPTION": "Descripción",
-               "MORE_INFO": "More Information",
+               "MORE_INFO": "Más información",
                "ID": "ID",
                "TYPE": "Tipo",
                "TITLE": "Título",
@@ -804,8 +804,8 @@
                "STARTED": "Iniciado",
                "SERIES": "Series",
                "SUBMITTED": "Enviado",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
+               "SUBMITTER": "Enviado por",
+               "EXECUTION_TIME": "Tiempo de ejecución",
                "WDID": "Definición del flujo de trabajo",
                "MIMETYPE": "Tipo MIME",
                "URL": "URL",
@@ -813,11 +813,11 @@
                "NO_CONFIGURATION": "No existen parámetros de configuración para el flujo de trabajo seleccionado.",
                "WORKFLOW": "Flujo de trabajo",
                "TOOLTIP": {
-                  "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
-                  "DETAILS": "Open workflow details"
+                  "STOP": "Detener flujo de trabajo",
+                  "ABORT": "Abortar la ejecución del flujo de trabajo (No reintentar la operación fallida de nuevo)",
+                  "RETRY": "Reintentar la ejecución del flujo de trabajo",
+                  "DELETE": "Borrar flujo de trabajo",
+                  "DETAILS": "Abrir detalles del flujo de trabajo"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instanciado",
@@ -825,9 +825,9 @@
                   "PAUSED": "En pausa",
                   "SUCCEEDED": "Finalizado",
                   "FAILED": "Error",
-                  "FAILING": "Failing",
+                  "FAILING": "Fallando",
                   "SKIPPED": "Omitido",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "Detenido",
                   "RETRY": "Reintentar"
                }
             },
@@ -1000,8 +1000,8 @@
                   "ACTION": "Acciones",
                   "NEW": "Nueva política",
                   "DETAILS": "Detalles",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
+                  "REPLACE_EVENT_ACLS": "Actualizar permisos de evento",
+                  "REPLACE_EVENT_ACLS_HINT": "Asegúrese de que todos los eventos de esta serie tengan estos permisos en vigor"
                },
                "ROLES": {
                   "LABEL": "Seleccione un rol",
@@ -1947,7 +1947,7 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "Para insertar varios valores, pulse Enter"
       }
    }
 }
