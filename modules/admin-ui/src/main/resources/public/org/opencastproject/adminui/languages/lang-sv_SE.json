@@ -263,7 +263,7 @@
             "CAPTION": "Allmänt",
             "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
             "NOCHANGES": "No changes to the events detected!",
-            "CONFLICT_FIRST_EVENT": "Changed event",
+            "CONFLICT_FIRST_EVENT": "Förändrad event",
             "CONFLICT_SECOND_EVENT": "Händelse i konflikt",
             "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
@@ -534,12 +534,12 @@
             "TOOLTIP": {
                "START": "Filter för detta startdatum",
                "SERIES": "Filter för den här serien",
-               "STATUS": "Filter for this event status",
+               "STATUS": "Filter för denna händelsestatus",
                "LOCATION": "Filtrera för den här platsen",
                "DETAILS": "Öppna eventdetaljer",
                "DELETE": "Ta bort händelse",
                "EDITOR": "Öppna videoredigeraren",
-               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
+               "EDITOR_NEEDS_CUTTING": "Öppna video editor (en kommentar anger att det har begärts att skära videon)",
                "COMMENTS": "Visa kommentarer",
                "PAUSED_WORKFLOW": "Visa pausat arbetsflöde"
             }
@@ -579,8 +579,8 @@
             "PUBLICATIONS": {
                "CAPTION": "Publikationer",
                "NO_PUBLICATIONS_AVAILABLE": "Denna händelse har inga publikationer",
-               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
-               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
+               "PUBLICATION_DESCRIPTION": "Den här händelsen har publicerats till följande publikationskanaler:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "Den här händelsen pågår inte för närvarandet",
                "SCHEDULING_STATUS": "Status",
                "READY_FOR_RECORDING": "Redo för inspelning",
                "OPTED_OUT": "Avhoppad",
@@ -886,20 +886,20 @@
                "NO_CONFIGURATION": "Det finns inga konfigurationsparameter för den valda workflowdefinitionen.",
                "WORKFLOW": "Workflow",
                "TOOLTIP": {
-                  "STOP": "Stop execution workflow instance",
+                  "STOP": "Stoppa utförning av arbetsflödesinstans",
                   "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
                   "RETRY": "Retry execution of workflow instance",
-                  "DELETE": "Delete workflow instance"
+                  "DELETE": "Ta bort workflow-instans"
                },
                "OPERATION_STATUS": {
-                  "INSTANTIATED": "Instantiated",
+                  "INSTANTIATED": "Instansierad",
                   "RUNNING": "Kör",
                   "PAUSED": "Pausad",
                   "SUCCEEDED": "Lyckade",
                   "FAILED": "Misslyckad",
-                  "FAILING": "Failing",
+                  "FAILING": "Misslyckas",
                   "SKIPPED": "Hoppades över",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "Stoppad",
                   "RETRY": "Försök igen"
                }
             },
@@ -925,7 +925,7 @@
                   "TITLE": "Titel",
                   "STATE": "Status",
                   "DESCRIPTION": "Beskrivning",
-                  "EXECUTION_HOST": "Execution Host",
+                  "EXECUTION_HOST": "Utförande host",
                   "JOB": "Jobb",
                   "TIME_IN_QUEUE": "Tid i kön",
                   "STARTED": "Startad",
@@ -933,7 +933,7 @@
                   "RETRY_STRATEGY": "Retry Strategy",
                   "FAILED_ATTEMPTS": "Misslyckade försök",
                   "MAX_ATTEMPTS": "Max",
-                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Exception-hanterande Workflow",
                   "FAIL_ON_ERROR": "Misslyckas vid fel"
                }
             },
@@ -1041,7 +1041,7 @@
             "ACTION": "Åtgärder",
             "TOOLTIP": {
                "SERIES": "Filter events for this series",
-               "DETAILS": "Open series details",
+               "DETAILS": "Öppen seriedetaljer",
                "DELETE": "Ta bort serier"
             }
          },
@@ -1662,8 +1662,8 @@
             "FINISHED": "Färdig",
             "FAILED": "Misslyckad",
             "DELETED": "Togs bort",
-            "INSTANTIATED": "Instantiated",
-            "DISPATCHING": "Dispatching",
+            "INSTANTIATED": "Instansierad",
+            "DISPATCHING": "Påbörjad",
             "RESTART": "Starta om",
             "CANCELED": "Avbröts",
             "WAITING": "Väntar"
@@ -1711,7 +1711,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
+      "WARNING_UNSAVED": "Varning: Några av dina ändringar sparades inte. Om du lämnar videoeditoren kommer dessa förändringar att gå bort. Vill du verkligen fortsätta?",
       "TIMELINE": "Tidslinje",
       "ZOOMLEVEL": "Zoomnivå",
       "PREVIEW_MODE": "Förhandsgranskningsläge",
@@ -1779,7 +1779,7 @@
             }
          },
          "PREVIEW": {
-            "NOT_AVAILABLE": "No preview available",
+            "NOT_AVAILABLE": "Ingen förhandsgranskning tillgänglig",
             "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
          },
          "CURRENT": {
@@ -1800,21 +1800,21 @@
          "VIDEO": {
             "HEADER": "Videospår",
             "NOT_AVAILABLE": "Det finns inga videospår tillgängliga",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
-            "NO_TRACK_SELECTED": "No video track selected",
+            "NO_PREVIEW_AVAILABLE": "Det finns inget preview-bild tillgänglig",
+            "NO_TRACK_SELECTED": "Inget videospår utvald",
             "TOOLTIPS": {
-               "HIDE": "This video track is currently enabled. Click to disable",
-               "UNHIDE": "This video track is currently disabled. Click to enable."
+               "HIDE": "Det här videospåret är utvald. Klicka för att avvälja",
+               "UNHIDE": "Det här videospåret är inte utvald. Klicka för att välja."
             }
          },
          "AUDIO": {
             "HEADER": "Ljudspår",
-            "NOT_AVAILABLE": "No audio tracks available",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
-            "NO_TRACK_SELECTED": "No audio track selected",
+            "NOT_AVAILABLE": "Det finns inga audiospår tillgängliga",
+            "NO_PREVIEW_AVAILABLE": "Det finns inget preview-bild tillgängliga",
+            "NO_TRACK_SELECTED": "Inget audiospår utvald",
             "TOOLTIPS": {
-               "HIDE": "This audio track is currently enabled. Click to disable",
-               "UNHIDE": "This audio track is currently disabled. Click to enable"
+               "HIDE": "Det här audiospåret är utvald. Klicka för att avvälja",
+               "UNHIDE": "Det här audiospåret är inte utvald. Klicka för att välja"
             }
          }
       },
@@ -1852,7 +1852,7 @@
       "PLACEHOLDER": "Sök…",
       "PROFILES": {
          "FILTERS_HEADER": "Sparade filter-set",
-         "EDIT": "Edit filter set",
+         "EDIT": "Redigera filterset",
          "REMOVE": "Ta bort sparat filter",
          "EMPTY": "Inga sparade filter än",
          "SAVE_FILTERS": "Spara",

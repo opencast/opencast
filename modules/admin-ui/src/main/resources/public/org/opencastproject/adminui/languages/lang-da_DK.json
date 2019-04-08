@@ -897,14 +897,14 @@
                   "PAUSED": "På pause",
                   "SUCCEEDED": "Gennemført",
                   "FAILED": "Mislykkedes",
-                  "FAILING": "Failing",
+                  "FAILING": "Mislykkede",
                   "SKIPPED": "Oversprunget",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "Standsede",
                   "RETRY": "Prøv igen"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Arbejdsprocesinstanser"
+               "TITLE": "Arbejdsgangsinstanser"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Arbejdsgangsoplysninger",

@@ -897,9 +897,9 @@
                   "PAUSED": "Gepauzeerd",
                   "SUCCEEDED": "Geslaagd",
                   "FAILED": "Mislukt",
-                  "FAILING": "Failing",
+                  "FAILING": "Mislukt",
                   "SKIPPED": "Overgeslagen",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "Gestopt",
                   "RETRY": "Opnieuw"
                }
             },
