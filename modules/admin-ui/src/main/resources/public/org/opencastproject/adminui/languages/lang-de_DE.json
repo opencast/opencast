@@ -10,8 +10,8 @@
    "SAVE": "Speichern",
    "LOGOUT": "Ausloggen",
    "RESET": "Zurücksetzen",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "Keine Option ausgewählt",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Keine Optionen verfügbar",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabisch",
@@ -271,7 +271,7 @@
       "BACK": "Zurück",
       "CREATE": "Anlegen",
       "RETRACT": "Zurückziehen",
-      "RETRACT_DELETE": "Retract/Delete",
+      "RETRACT_DELETE": "Zurückziehen/Löschen",
       "DELETE": "Löschen",
       "UPDATE": "Aktualisieren",
       "DURATION": {
