@@ -57,7 +57,6 @@
             "GROUP": "以下群組將被刪除",
             "USER": "以下的使用者將被刪除",
             "THEME": "下列主題將被刪除",
-            "EMAIL": "將刪除以下電子郵件範本",
             "LOCATION": "以下位置將被刪除"
          },
          "NAME": "名稱"
@@ -132,15 +131,6 @@
       "LOCATION_DELETED": "位置已被刪除",
       "LOCATION_NOT_DELETED": "無法刪除位置",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
-      "EMAIL_TEMPLATE_CREATED": "樣板已創建",
-      "EMAIL_TEMPLATE_NOT_CREATED": "樣板無法創建",
-      "EMAIL_TEMPLATE_SAVED": "樣板已儲存",
-      "EMAIL_TEMPLATE_NOT_SAVED": "樣板無法儲存",
-      "EMAIL_TEMPLATE_DELETED": "樣板已刪除",
-      "EMAIL_TEMPLATE_NOT_DELETED": "樣板無法刪除",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "樣版名稱已被使用",
-      "EMAIL_SENT": "訊息已發送",
-      "EMAIL_NOT_SENT": "訊息無法發送",
       "CONFLICT_DETECTED": "預約程序有衝突 ︰ 新的事件與現有的事件重疊。請更改位置、 日期或時間。",
       "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "排程有誤，此一事件已經結束。",
@@ -153,11 +143,6 @@
       "SERIES_ACL_LOCKED": "如果正在執行屬於系列中的一個事件，將無法編輯存取權限",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "需要具備至少一項讀取和寫入的權限",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "需要具備至少一項讀取和寫入的權限",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "已成功更新事件退出狀態。",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "更新事件退出狀態時出現錯誤。",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "參與狀態無法更新，因為該排程已經過期。",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "已成功更新系列退出狀態。",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "更新系列退出狀態時出現錯誤。",
       "THEME_NAME_ALREADY_TAKEN": "這個名稱已被使用",
       "THEME_NAME_EMPTY": "這個名稱不能為空白",
       "BUMPER_UPLOAD_ERROR": "上傳時發生錯誤",
@@ -186,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "操作",
-      "SEND_MESSAGE": "發送消息",
       "WARNING": "警告",
-      "EDIT_STATUS": {
-         "CAPTION": "編輯狀態",
-         "READY_FOR_RECORDING": "準備錄製",
-         "OPTED_OUT": "選擇退出"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "刪除",
@@ -292,6 +271,8 @@
       "BACK": "上一個",
       "CREATE": "新增",
       "RETRACT": "撤銷",
+      "RETRACT_DELETE": "Retract/Delete",
+      "DELETE": "刪除",
       "UPDATE": "更新",
       "DURATION": {
          "HOURS": "小時",
@@ -348,28 +329,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "發送消息",
-         "TABS": {
-            "RECIPIENTS": "收件人",
-            "MESSAGE": "信息",
-            "SUMMARY": "摘要"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "加入稽核追蹤",
-            "AUDIT_TRAIL_DESCRIPTION": "檢查的消息加入到稽核追蹤",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "選擇電子郵件樣板",
-            "SUBJECT": "主題",
-            "MESSAGE": "訊息：",
-            "INCLUDE_SIGNATURE": "在電子郵件中包含我的簽名"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "摘要"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -500,7 +459,6 @@
          "ADD_EVENT": "增加事件",
          "TABLE": {
             "CAPTION": "事件",
-            "CREATORS": "建立者",
             "TITLE": "標題",
             "PRESENTERS": "演講者",
             "SERIES": "系列",
@@ -515,9 +473,7 @@
             "LAST": "最後一次",
             "NEXT": "下一次",
             "MANAGED_ACL": "存取權限",
-            "SCHEDULING_STATUS": "狀態",
             "WORKFLOW_STATE": "進程",
-            "REVIEW_STATUS": "檢視狀態",
             "PREVIOUS": "前一項",
             "NOCONTENT": "無可用數據",
             "PUBLISHED": "已發佈",
@@ -536,13 +492,8 @@
                "PRESENTER": "Filter for this presenter"
             }
          },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "準備錄製",
-            "OPTED_OUT": "選擇退出"
-         },
          "STATUS": {
             "SCHEDULED": "已排程",
-            "OPTEDOUT": "選擇退出",
             "RECORDING": "錄製中",
             "UPLOADING": "正在上傳",
             "INGESTING": "攝取中",
@@ -571,9 +522,6 @@
                "NO_PUBLICATIONS_AVAILABLE": "此事件沒有發佈",
                "PUBLICATION_DESCRIPTION": "此事件已發佈到以下發布管道:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "此事件當前未進行",
-               "SCHEDULING_STATUS": "狀態",
-               "READY_FOR_RECORDING": "準備錄製",
-               "OPTED_OUT": "選擇退出",
                "CUSTOM": "自定義",
                "ENGAGE": "播放",
                "ENGAGE_LIVE": "即時轉播",
@@ -840,20 +788,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "參與狀態",
-               "REVIEW_STATUS": {
-                  "CAPTION": "檢視狀態"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "退出狀態",
-                  "READY": "準備錄製",
-                  "OPTEDOUT": "選擇退出"
-               },
-               "MESSAGES": {
-                  "CAPTION": "訊息",
-                  "CREATION_DATE": "建立日期",
-                  "SENDER": "發送者",
-                  "SUBJECT": "主題"
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "演講者"
                }
@@ -1027,7 +961,7 @@
             "CAPTION": "系列",
             "TITLE": "系列",
             "HAS_EVENTS": "Contains events",
-            "CREATORS": "主辦單位",
+            "ORGANIZERS": "主辦單位",
             "CONTRIBUTORS": "貢獻者",
             "CREATED": "建立於",
             "MANAGED_ACL": "存取權限",
@@ -1044,7 +978,6 @@
             "TABS": {
                "METADATA": "後設資料",
                "EXTENDED_METADATA": "後設資料II",
-               "PARTICIPATION": "參與",
                "EVENTS": "事件",
                "PERMISSIONS": "存取權限",
                "THEME": "主題"
@@ -1089,24 +1022,6 @@
                "LANGUAGE": "語言",
                "LICENSE": "許可證",
                "DESCRIPTION": "說明"
-            },
-            "PARTICIPATION": {
-               "CAPTION": "參與狀態範本",
-               "WARNING_TEMPLATE": "系列參與狀態將作為預設值用於系列中的一部分的新事件。",
-               "REVIEW_STATUS": {
-                  "CAPTION": "檢視狀態"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "退出狀態",
-                  "READY": "準備錄製",
-                  "OPTEDOUT": "選擇退出"
-               },
-               "MESSAGES": {
-                  "CAPTION": "訊息",
-                  "CREATION_DATE": "建立日期",
-                  "SENDER": "發送者",
-                  "SUBJECT": "主題"
-               }
             },
             "EVENTS": {
                "TITLE": "標題",
@@ -1418,34 +1333,7 @@
          "ADD_THEME": "新增主題"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "電子郵件模板",
-         "MAIL_SERVERS": "電子郵件設定",
          "THEMES": "主題"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "電子郵件模板",
-            "NAME": "姓名",
-            "CREATOR": "建立者",
-            "CREATED": "建立於",
-            "ACTION": "操作"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "建立模板",
-            "EDITCAPTION": "編輯模板",
-            "TABS": {
-               "MESSAGE": "消息",
-               "SUMMARY": "摘要"
-            },
-            "MESSAGE": {
-               "NAME": "姓名",
-               "SUBJECT": "主題",
-               "MESSAGE": "信息"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "信息摘要"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1541,7 +1429,6 @@
       "JOBS": {
          "TABLE": {
             "ID": "作業的識別碼",
-            "ACTION": "操作",
             "CAPTION": "工作",
             "CREATED": "創建",
             "CREATOR": "建立者",
@@ -1551,14 +1438,6 @@
             "STATUS": "狀態",
             "SUBMITTED": "已提出",
             "TYPE": "類型"
-         },
-         "DETAILS": {
-            "HEADER": "工作信息 {{resourceId}}",
-            "TABS": {
-               "GENERAL": "常規",
-               "OPERATIONS": "操作",
-               "INCIDENTS": "事故"
-            }
          },
          "STATUS": {
             "QUEUED": "已排入佇列",
@@ -1586,7 +1465,6 @@
             "MEAN_RUN_TIME": "平均運行時間",
             "MEAN_QUEUE_TIME": "平均排序時間",
             "MAINTENANCE": "維護",
-            "ACTION": "操作",
             "MAINTENANCE_OFF": "進入維護模式",
             "MAINTENANCE_ON": "離開維護模式"
          }
@@ -1816,9 +1694,6 @@
          "LOCATION": {
             "LABEL": "位置"
          },
-         "OPTEDOUT": {
-            "LABEL": "選擇退出"
-         },
          "PERIOD": {
             "LABEL": "週期"
          },
@@ -1830,12 +1705,6 @@
          },
          "PROGRESS": {
             "LABEL": "進程"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "檢視狀態",
-            "CONFIRMED": "已確認",
-            "UNCONFIRMED": "未確認",
-            "UNSENT": "未發送"
          },
          "SERIES": {
             "LABEL": "系列"

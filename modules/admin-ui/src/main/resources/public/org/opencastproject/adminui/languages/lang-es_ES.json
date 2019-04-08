@@ -57,7 +57,6 @@
             "GROUP": "Se va a borrar el siguiente grupo",
             "USER": "Se va a borrar el siguiente usuario",
             "THEME": "Se va a borrar el siguiente estilo",
-            "EMAIL": "Se va a borrar la siguiente plantilla de correo electrónico",
             "LOCATION": "Se va a borrar la siguiente localización"
          },
          "NAME": "Nombre"
@@ -132,15 +131,6 @@
       "LOCATION_DELETED": "Se ha borrado la ubicación",
       "LOCATION_NOT_DELETED": "No se ha podido borrar la ubicación",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "No se ha podido borrar la ubicación porque no se dispone del permiso para ello.",
-      "EMAIL_TEMPLATE_CREATED": "Se ha creado la plantilla",
-      "EMAIL_TEMPLATE_NOT_CREATED": "No se ha podido crear la plantilla",
-      "EMAIL_TEMPLATE_SAVED": "Se ha guardado la plantilla",
-      "EMAIL_TEMPLATE_NOT_SAVED": "No se ha podido guardar la plantilla",
-      "EMAIL_TEMPLATE_DELETED": "La plantilla ha sido eliminada",
-      "EMAIL_TEMPLATE_NOT_DELETED": "No se ha podido eliminar la plantilla",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "Este nombre ya está en uso",
-      "EMAIL_SENT": "El mensaje ha sido enviado",
-      "EMAIL_NOT_SENT": "No se ha podido enviar el mensaje",
       "CONFLICT_DETECTED": "Conflicto de programación: el nuevo evento se solapa con otro existente. Por favor, cambie la sala, las fechas o las horas.",
       "CONFLICT_BULK_DETECTED": "Conflicto de programación: los cambios propuestos causan un conflicto. Por favor, cambia la ubicación, las fechas o horas.",
       "CONFLICT_ALREADY_ENDED": "Error de programación: El evento ya ha terminado.",
@@ -153,11 +143,6 @@
       "SERIES_ACL_LOCKED": "No es posible editar las Políticas de Acceso cuando existen operaciones activas en algún evento de la serie",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "La Política de Acceso requiere al menos un rol con permisos de Lectura y Escritura.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "La Política de Acceso requiere al menos un rol con permisos de Lectura y Escritura.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "El estado de aprobación de la serie se ha actualizado correctamente.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Error al actualizar el estado de aprobación del evento.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "No se puede actualizar el estado de aprobación del evento después de la fecha de inicio programada.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "El estado de aprobación de la serie se ha actualizado correctamente.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Error al actualizar el estado de aprobación de la serie.",
       "THEME_NAME_ALREADY_TAKEN": "Este nombre ya está en uso",
       "THEME_NAME_EMPTY": "El nombre no puede estar vacío",
       "BUMPER_UPLOAD_ERROR": "Error en la subida de archivos",
@@ -186,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Acciones",
-      "SEND_MESSAGE": "Enviar mensaje",
       "WARNING": "Advertencia",
-      "EDIT_STATUS": {
-         "CAPTION": "Modificar estado",
-         "READY_FOR_RECORDING": "Preparado para grabar",
-         "OPTED_OUT": "No se grabará"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Eliminar",
@@ -292,6 +271,8 @@
       "BACK": "Anterior",
       "CREATE": "Crear",
       "RETRACT": "Retirar",
+      "RETRACT_DELETE": "Retract/Delete",
+      "DELETE": "Eliminar",
       "UPDATE": "Actualizar",
       "DURATION": {
          "HOURS": "Horas",
@@ -348,28 +329,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "Enviar mensaje",
-         "TABS": {
-            "RECIPIENTS": "Destinatarios",
-            "MESSAGE": "Mensaje",
-            "SUMMARY": "Resumen"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "Añadir al informe de auditoría",
-            "AUDIT_TRAIL_DESCRIPTION": "Marque la casilla para añadir el mensaje al informe de auditoría",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "Seleccione la plantilla de correo electrónico",
-            "SUBJECT": "Asunto",
-            "MESSAGE": "Mensaje",
-            "INCLUDE_SIGNATURE": "Incluír mi firma en el correo"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "Resumen"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -500,7 +459,6 @@
          "ADD_EVENT": "Añadir evento",
          "TABLE": {
             "CAPTION": "Eventos",
-            "CREATORS": "Creadores",
             "TITLE": "Título",
             "PRESENTERS": "Ponente(s)",
             "SERIES": "Serie",
@@ -515,9 +473,7 @@
             "LAST": "Último",
             "NEXT": "Siguiente",
             "MANAGED_ACL": "Política de acceso",
-            "SCHEDULING_STATUS": "Estado",
             "WORKFLOW_STATE": "Progreso",
-            "REVIEW_STATUS": "Estado de revisión",
             "PREVIOUS": "Anterior",
             "NOCONTENT": "No hay información disponible",
             "PUBLISHED": "Publicado",
@@ -536,13 +492,8 @@
                "PRESENTER": "Filter for this presenter"
             }
          },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "Preparado para grabar",
-            "OPTED_OUT": "No se grabará"
-         },
          "STATUS": {
             "SCHEDULED": "Programado",
-            "OPTEDOUT": "No se grabará",
             "RECORDING": "Grabando",
             "UPLOADING": "Subiendo",
             "INGESTING": "Ingestando",
@@ -571,9 +522,6 @@
                "NO_PUBLICATIONS_AVAILABLE": "Este evento no ha sido publicado",
                "PUBLICATION_DESCRIPTION": "Este evento ha sido publicado en los siguientes canales de publicación:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Este evento no está actualmente en progreso",
-               "SCHEDULING_STATUS": "Estado",
-               "READY_FOR_RECORDING": "Preparado para grabar",
-               "OPTED_OUT": "No se grabará",
                "CUSTOM": "Personalizado",
                "ENGAGE": "Engage",
                "ENGAGE_LIVE": "Engage Live",
@@ -840,20 +788,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "Estado de aprobación",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Estado de revisión"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Estado de Aprobación",
-                  "READY": "Preparado para grabar",
-                  "OPTEDOUT": "No se grabará"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Mensajes",
-                  "CREATION_DATE": "Fecha de creación",
-                  "SENDER": "Remitente",
-                  "SUBJECT": "Asunto"
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Ponente(s)"
                }
@@ -1027,7 +961,7 @@
             "CAPTION": "Series",
             "TITLE": "Series",
             "HAS_EVENTS": "Contiene eventos",
-            "CREATORS": "Organizador(es)",
+            "ORGANIZERS": "Organizador(es)",
             "CONTRIBUTORS": "Colaborador(es)",
             "CREATED": "Fecha de creación",
             "MANAGED_ACL": "Política de acceso",
@@ -1044,7 +978,6 @@
             "TABS": {
                "METADATA": "Metadatos",
                "EXTENDED_METADATA": "Metadatos II",
-               "PARTICIPATION": "Aprobación",
                "EVENTS": "Eventos",
                "PERMISSIONS": "Política de acceso",
                "THEME": "Estilo"
@@ -1089,24 +1022,6 @@
                "LANGUAGE": "Idioma",
                "LICENSE": "Licencia",
                "DESCRIPTION": "Descripción"
-            },
-            "PARTICIPATION": {
-               "CAPTION": "Plantilla de estado de aprobación",
-               "WARNING_TEMPLATE": "El estado de aprobación de la serie se utilizará como valor por defecto para los nuevos eventos que formen parte de la serie.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Estado de revisión"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Estado de Aprobación",
-                  "READY": "Preparado para grabar",
-                  "OPTEDOUT": "No se grabará"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Mensajes",
-                  "CREATION_DATE": "Fecha de creación",
-                  "SENDER": "Remitente",
-                  "SUBJECT": "Tema"
-               }
             },
             "EVENTS": {
                "TITLE": "Título",
@@ -1418,34 +1333,7 @@
          "ADD_THEME": "Añadir estilo"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "Plantillas de correo electrónico",
-         "MAIL_SERVERS": "Configuración de correo electrónico",
          "THEMES": "Estilos"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "Plantillas de correo electrónico",
-            "NAME": "Nombre",
-            "CREATOR": "Creador",
-            "CREATED": "Fecha de creación",
-            "ACTION": "Acciones"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Crear plantilla",
-            "EDITCAPTION": "Modificar plantilla",
-            "TABS": {
-               "MESSAGE": "Mensaje",
-               "SUMMARY": "Resumen"
-            },
-            "MESSAGE": {
-               "NAME": "Nombre",
-               "SUBJECT": "Tema",
-               "MESSAGE": "Mensaje"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "Resumen del mensaje"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1541,7 +1429,6 @@
       "JOBS": {
          "TABLE": {
             "ID": "Identificador del Trabajo",
-            "ACTION": "Acciones",
             "CAPTION": "Trabajos",
             "CREATED": "Fecha de creación",
             "CREATOR": "Creador",
@@ -1551,14 +1438,6 @@
             "STATUS": "Estado",
             "SUBMITTED": "Enviado",
             "TYPE": "Tipo"
-         },
-         "DETAILS": {
-            "HEADER": "Detalles del trabajo {{resourceId}}",
-            "TABS": {
-               "GENERAL": "General",
-               "OPERATIONS": "Operaciones",
-               "INCIDENTS": "Incidencias"
-            }
          },
          "STATUS": {
             "QUEUED": "En cola",
@@ -1586,7 +1465,6 @@
             "MEAN_RUN_TIME": "Tiempo medio de ejecución",
             "MEAN_QUEUE_TIME": "Tiempo medio de espera en cola",
             "MAINTENANCE": "Mantenimiento",
-            "ACTION": "Acciones",
             "MAINTENANCE_OFF": "Activar el modo de mantenimiento",
             "MAINTENANCE_ON": "Desactivar el modo de mantenimiento"
          }
@@ -1816,9 +1694,6 @@
          "LOCATION": {
             "LABEL": "Ubicación"
          },
-         "OPTEDOUT": {
-            "LABEL": "No se Grabará"
-         },
          "PERIOD": {
             "LABEL": "Periodo"
          },
@@ -1830,12 +1705,6 @@
          },
          "PROGRESS": {
             "LABEL": "Progreso"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "Estado de Revisión",
-            "CONFIRMED": "Confirmado",
-            "UNCONFIRMED": "Sin confirmar",
-            "UNSENT": "No enviado"
          },
          "SERIES": {
             "LABEL": "Serie"

@@ -72,6 +72,14 @@ Due to [MH-13446](https://opencast.jira.com/browse/MH-13446):
 - Removed PUT /acl-manager/episode/{transitionId}
 - Removed PUT /acl-manager/series/{transitionId}
 
+Additional Notes about 6.4
+--------------------------
+
+Opencast 6.4 contains a number of bug fixes, some of which are security relevant. The following known vulnerability
+within Opencast's `org.springframework.security.oauth:spring-security-oauth` dependency have been fixed by this release:
+`CVE-2019-3778`.
+
+
 Release Schedule
 ----------------
 

@@ -43,6 +43,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Dictionary;
+import java.util.List;
 
 /**
  * Commandline wrapper around tesseract' <code>tesseract</code> command.
@@ -70,6 +71,12 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
 
   /** Additional options for the tesseract command */
   protected String addOptions = "";
+
+  /** Tesseract stderr lines not to log */
+  private static final List<String> stderrFilter = java.util.Arrays.asList(
+          "Page",
+          "Tesseract Open Source OCR Engine",
+          "Warning. Invalid resolution 0 dpi. Using 70 instead.");
 
   /**
    * Creates a new tesseract command wrapper that will be using the default binary.
@@ -143,7 +150,8 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     try {
       final int exitCode = ProcessRunner.run(ProcessRunner.mk(binary, opts), fnLogDebug, new Pred<String>() {
         @Override public Boolean apply(String line) {
-          if (!line.trim().startsWith("Page") && !line.trim().startsWith("Tesseract Open Source OCR Engine")) {
+          final String trimmedLine = line.trim();
+          if (stderrFilter.parallelStream().noneMatch(trimmedLine::startsWith)) {
             logger.warn(line);
           }
           return true;
