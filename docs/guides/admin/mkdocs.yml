@@ -58,6 +58,7 @@ nav:
       - LDAP Authentication and Authorization (without CAS): 'configuration/security.ldap.md'
       - Moodle User Provider: 'configuration/security.user.moodle.md'
       - Sakai User Provider: 'configuration/security.user.sakai.md'
+      - Brightspace User Provider: 'configuration/security.user.brightspace.md'
    - Stream Security: 'configuration/stream-security.md'
    - Workflow: 'configuration/workflow.md'
    - External API: 'configuration/external-api.md'
