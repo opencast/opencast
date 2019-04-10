@@ -524,7 +524,8 @@ CREATE TABLE oc_event_comment (
   reason VARCHAR(255) DEFAULT NULL,
   modification_date DATETIME NOT NULL,
   resolved_status TINYINT(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  KEY IX_oc_event_comment_event (event, organization)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE oc_event_comment_reply (

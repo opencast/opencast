@@ -49,3 +49,6 @@ CREATE INDEX IX_oc_search_series ON oc_search (series_id);
 
 -- MH-13380 Add snapshot_id index for efficiency
 CREATE INDEX IX_oc_assets_asset_snapshot_id ON oc_assets_asset (snapshot_id);
+
+-- MH-13490 Add event index for efficiency
+CREATE INDEX IX_oc_event_comment_event ON oc_event_comment (event, organization);
