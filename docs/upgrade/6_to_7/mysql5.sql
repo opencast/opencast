@@ -43,3 +43,6 @@ delete p from oc_assets_properties p where not exists (
   select * from oc_assets_snapshot s
     where p.mediapackage_id = s.mediapackage_id
 );
+
+-- MH-12047 Add series index for efficiency
+CREATE INDEX IX_oc_search_series ON oc_search (series_id);

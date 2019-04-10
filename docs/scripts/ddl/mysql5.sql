@@ -262,6 +262,7 @@ CREATE TABLE oc_search (
   mediapackage_xml MEDIUMTEXT,
   modification_date DATETIME,
   PRIMARY KEY (id),
+  KEY `IX_oc_search_series` (`series_id`),
   CONSTRAINT FK_oc_search_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
