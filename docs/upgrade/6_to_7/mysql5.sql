@@ -46,3 +46,6 @@ delete p from oc_assets_properties p where not exists (
 
 -- MH-12047 Add series index for efficiency
 CREATE INDEX IX_oc_search_series ON oc_search (series_id);
+
+-- MH-13380 Add snapshot_id index for efficiency
+CREATE INDEX IX_oc_assets_asset_snapshot_id ON oc_assets_asset (snapshot_id);
