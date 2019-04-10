@@ -367,7 +367,8 @@ CREATE TABLE oc_assets_snapshot (
   INDEX IX_oc_assets_snapshot_archival_date (archival_date),
   INDEX IX_oc_assets_snapshot_mediapackage_id (mediapackage_id),
   INDEX IX_oc_assets_snapshot_organization_id (organization_id),
-  INDEX IX_oc_assets_snapshot_owner (owner)
+  INDEX IX_oc_assets_snapshot_owner (owner),
+  INDEX IX_oc_assets_snapshot_series (series_id, version)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE oc_assets_asset (
