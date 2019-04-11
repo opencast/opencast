@@ -46,7 +46,7 @@ import javax.ws.rs.core.MediaType;
 public class FeedEndpoint extends RemoteBase {
 
   public FeedEndpoint() {
-    super("???");
+    super("org.opencastproject.feed.impl.FeedServiceImpl");
   }
 
   @GET
@@ -65,9 +65,14 @@ public class FeedEndpoint extends RemoteBase {
     details.put("type", "SomeClass");
     feedServices.add(details);
 
-    HttpGet get = new HttpGet("/feeds/listFeedServices");
-    HttpResponse response = getResponse(get);
-    // response.getEntity().getContent()
+    HttpGet get = new HttpGet("/listFeedServices");
+    try {
+      HttpResponse response = getResponse(get);
+      // response.getEntity().getContent()
+    } catch (Exception e) {
+
+    }
+
 
     return gson.toJson(feedServices);
   }
