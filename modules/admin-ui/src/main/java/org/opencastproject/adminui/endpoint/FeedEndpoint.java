@@ -21,9 +21,13 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.util.doc.rest.RestService;
 
 import com.google.gson.Gson;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,15 +39,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-
 @Path("/")
 @RestService(name = "FeedService", title = "Admin UI Feed Service",
   abstractText = "Provides Feed Information",
-  notes = { "This service offers Feed information for the admin UI."})
-public class FeedEndpoint {
+  notes = {"This service offers Feed information for the admin UI."})
+public class FeedEndpoint extends RemoteBase {
+
+  public FeedEndpoint() {
+    super("org.opencastproject.feed");
+  }
 
   @GET
-  @Path("/ttt/{name}")
+  @Path("/ttt")
   @Produces(MediaType.APPLICATION_JSON)
   public String listFeedServices() {
 
@@ -57,6 +64,10 @@ public class FeedEndpoint {
     details.put("copyright", "MIT");
     details.put("type", "SomeClass");
     feedServices.add(details);
+
+    HttpGet get = new HttpGet("/feeds/listFeedServices");
+    HttpResponse response = getResponse(get);
+    // response.getEntity().getContent()
 
     return gson.toJson(feedServices);
   }
