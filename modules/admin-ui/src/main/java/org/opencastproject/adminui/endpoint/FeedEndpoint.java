@@ -46,11 +46,11 @@ import javax.ws.rs.core.MediaType;
 public class FeedEndpoint extends RemoteBase {
 
   public FeedEndpoint() {
-    super("org.opencastproject.feed");
+    super("???");
   }
 
   @GET
-  @Path("/ttt")
+  @Path("/listFeedServices")
   @Produces(MediaType.APPLICATION_JSON)
   public String listFeedServices() {
 
