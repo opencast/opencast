@@ -1,0 +1,15 @@
+{
+    "value_locale": "it",
+    "error_AudioCodecNotSupported": "Errore: Il codec audio non è supportato da questo browser",
+    "error_AudioElementNotSupported": "Errore: Il tuo browser non supporta l'elemento audio.",
+    "video": "Video",
+    "video_short": "Vid.",
+    "openInPlayer": "Apri nel player",
+    "givenTime": "Il tempo indicato",
+    "hasToBeSmallerThanDuration": "deve essere più corto della durata",
+    "msg_waitToSetTime": "Si prega di attendere il settaggio di un tempo di riproduzione finché il video viene caricato.",
+    "msg_startPlayingToSetTime": "Si prega di far partire il video prima di impostare un tempo di riproduzione.",
+    "msg_waitToSeek": "Non è possibile cercare finché il video viene caricato.",
+    "msg_startPlayingToSeek": "Non è possibile cercare se non clicchi almeno una volta il pulsante Play.",
+    "chromeBuffer": "Il correttore del buffer è stato disattivato a causa di limitazioni di Chrome. È possibile che si verifichino problemi con la riproduzione video."
+}
