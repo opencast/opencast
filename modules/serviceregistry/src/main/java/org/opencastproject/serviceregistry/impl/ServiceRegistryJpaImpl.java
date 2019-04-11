@@ -355,8 +355,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     }
 
-    localSystemLoad = getHostLoads(emf.createEntityManager()).get(hostName).getLoadFactor();
-    logger.info("Current system load: {}", format("%.1f", localSystemLoad));
+    localSystemLoad = 0;
+    logger.info("Activated");
   }
 
   @Override
@@ -947,6 +947,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               job.getId(), job.getJobType(), job.getStatus());
     }
     logger.debug("Current host load: {}, job load cache size: {}", format("%.1f", localSystemLoad), jobCache.size());
+
+    if (jobCache.isEmpty() && Math.abs(localSystemLoad) > 0.01f) {
+      logger.warn("No jobs in the job load cache, but load is {}: setting job load to 0",
+              format("%.2f", localSystemLoad));
+      localSystemLoad = 0;
+    }
   }
 
   private synchronized void removeFromLoadCache(Long jobId) {
