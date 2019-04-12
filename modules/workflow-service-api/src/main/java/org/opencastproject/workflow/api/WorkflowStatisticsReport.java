@@ -18,57 +18,51 @@
  * the License.
  *
  */
-
-
 package org.opencastproject.workflow.api;
 
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.annotation.XmlType;
 
 /**
- * The search result represents a set of result items that has been compiled as a result for a search operation.
+ * This class encapsualtes statistics for the workflow service.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "workflows", namespace = "http://workflow.opencastproject.org")
-public class WorkflowSetImpl implements WorkflowSet {
-
-  /** A list of search items. */
-  @XmlElement(name = "workflow")
-  private List<WorkflowInstance> workflows = null;
+@XmlRootElement(name = "statistics_report", namespace = "http://workflow.opencastproject.org")
+@XmlType(name = "statistics_report", namespace = "http://workflow.opencastproject.org")
+public class WorkflowStatisticsReport extends WorkflowStatistics {
 
   /**
-   * A no-arg constructor needed by JAXB
+   * The workflow definition reports
    */
-  public WorkflowSetImpl() {
-  }
+  @XmlElementWrapper(name = "definitions")
+  @XmlElement(name = "definition")
+  protected Set<WorkflowDefinitionReport> definitionsReports = new TreeSet<>((report1, report2) -> {
+    if (report1.equals(report2)) {
+      return 0;
+    }
+    return report1.getId().compareTo(report2.getId());
+  });
 
-  public WorkflowSetImpl(List<WorkflowInstance> workflows) {
-    this.workflows = workflows;
+  /**
+   * @return the definitions
+   */
+  public Set<WorkflowDefinitionReport> getDefinitionsReports() {
+    return definitionsReports;
   }
 
   /**
-   * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowSet#getItems()
+   * @param definitionsReport
    */
-  @Override
-  public List<WorkflowInstance> getItems() {
-    return workflows;
-  }
-
-  public static class Adapter extends XmlAdapter<WorkflowSetImpl, WorkflowSet> {
-    public WorkflowSetImpl marshal(WorkflowSet set) throws Exception {
-      return (WorkflowSetImpl) set;
-    }
-
-    public WorkflowSet unmarshal(WorkflowSetImpl set) throws Exception {
-      return set;
-    }
+  public void addDefinitionsReport(WorkflowDefinitionReport definitionsReport) {
+    definitionsReports.add(definitionsReport);
   }
 
 }

@@ -302,7 +302,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
           jobs.put(videoSegment, analysisService.extract(image));
         }
 
-        // Wait for all jobs to be finished
+        // Wait for all jobs to be succeeded
         if (!waitForStatus(jobs.values().toArray(new Job[jobs.size()])).isSuccess()) {
           throw new WorkflowOperationException("Text extraction failed on images from " + sourceTrack);
         }

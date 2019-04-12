@@ -1025,7 +1025,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       IOUtils.closeQuietly(in);
       if (isIngestLimitEnabled()) {
         setIngestLimit(getIngestLimit() + 1);
-        logger.debug("An ingest has finished so increased ingest limit to " + getIngestLimit());
+        logger.debug("An ingest has succeeded so increased ingest limit to " + getIngestLimit());
       }
     }
   }

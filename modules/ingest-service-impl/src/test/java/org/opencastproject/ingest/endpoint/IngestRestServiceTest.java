@@ -276,7 +276,7 @@ public class IngestRestServiceTest {
     limitVerifier.start();
 
     Assert.assertEquals("There should be no errors when making requests.", 0, limitVerifier.getError());
-    Assert.assertEquals("There should have been the same number of successful ingests finished as expected.",
+    Assert.assertEquals("There should have been the same number of successful ingests succeeded as expected.",
             expectedOK, limitVerifier.getOk());
     Assert.assertEquals("The extra ingests beyond the limit should have received a server unavailable error. ",
             expectedBusy, limitVerifier.getUnavailable());

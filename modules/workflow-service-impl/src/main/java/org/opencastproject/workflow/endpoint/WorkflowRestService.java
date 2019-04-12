@@ -54,7 +54,6 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-import org.opencastproject.workflow.api.Configurable;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -70,10 +69,10 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.Sort;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSet;
-import org.opencastproject.workflow.api.WorkflowStatistics;
+import org.opencastproject.workflow.api.WorkflowSetImpl;
+import org.opencastproject.workflow.api.WorkflowStatisticsReport;
+import org.opencastproject.workflow.impl.HandlerRegistration;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl;
-import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.common.util.concurrent.Striped;
@@ -91,7 +90,6 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import javax.servlet.http.HttpServletResponse;
@@ -200,14 +198,35 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("/count")
-  @RestQuery(name = "count", description = "Returns the number of workflow instances in a specific state and operation", returnDescription = "Returns the number of workflow instances in a specific state and operation", restParameters = {
-          @RestParameter(name = "state", isRequired = false, description = "The workflow state", type = STRING),
-          @RestParameter(name = "operation", isRequired = false, description = "The current operation", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The number of workflow instances.") })
-  public Response getCount(@QueryParam("state") WorkflowInstance.WorkflowState state,
-          @QueryParam("operation") String operation) {
+  @RestQuery(name = "count", description = "Returns the number of workflow instances in a specific state and operation",
+          returnDescription = "Returns the number of workflow instances in a specific state and operation",
+          restParameters = {
+            @RestParameter(name = "state", isRequired = false, description = "The workflow state", type = STRING),
+            @RestParameter(name = "operation", isRequired = false, description = "The current operation", type = STRING) },
+          reponses = {
+            @RestResponse(responseCode = SC_OK, description = "The number of workflow instances."),
+            @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to count workflows, are you admin?"),
+            @RestResponse(description = "Invalid workflow state.", responseCode = HttpServletResponse.SC_BAD_REQUEST)
+  })
+  public Response getCount(@QueryParam("state") String state, @QueryParam("operation") String operation) {
+
+    if (StringUtils.isBlank(operation)) {
+      operation = null;
+    }
+    WorkflowInstance.WorkflowState workflowState = null;
+    if (!StringUtils.isBlank(state)) {
+      try {
+        workflowState = WorkflowState.valueOf(state);
+      } catch (IllegalArgumentException e) {
+        return Response.status(Status.BAD_REQUEST).build();
+      }
+    }
+
     try {
-      Long count = service.countWorkflowInstances(state, operation);
+      Long count = service.countWorkflowInstances(workflowState, operation);
       return Response.ok(count).build();
+    } catch (UnauthorizedException e) {
+      return Response.status(Status.UNAUTHORIZED).build();
     } catch (WorkflowDatabaseException e) {
       throw new WebApplicationException(e);
     }
@@ -217,7 +236,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @Path("/statistics.xml")
   @RestQuery(name = "statisticsasxml", description = "Returns the workflow statistics as XML", returnDescription = "An XML representation of the workflow statistics.", reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow statistics.") })
-  public WorkflowStatistics getStatisticsAsXml() throws WorkflowDatabaseException {
+  public WorkflowStatisticsReport getStatisticsAsXml() throws WorkflowDatabaseException, UnauthorizedException {
     return service.getStatistics();
   }
 
@@ -225,7 +244,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("/statistics.json")
   @RestQuery(name = "statisticsasjson", description = "Returns the workflow statistics as JSON", returnDescription = "A JSON representation of the workflow statistics.", reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow statistics.") })
-  public WorkflowStatistics getStatisticsAsJson() throws WorkflowDatabaseException {
+  public WorkflowStatisticsReport getStatisticsAsJson() throws WorkflowDatabaseException, UnauthorizedException {
     return getStatisticsAsXml();
   }
 
@@ -288,6 +307,42 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       def = service.getWorkflowDefinitionById(definitionId);
       String out = def.getConfigurationPanel();
       return Response.ok(out).build();
+    } catch (WorkflowDatabaseException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("mediaPackage/{id}/hasActiveWorkflows")
+  @RestQuery(name = "hasactiveworkflows", description = "Returns if a media package has active workflows",
+             returnDescription = "Returns wether the media package has active workflows as a boolean.",
+             pathParameters = {
+               @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
+             reponses = {
+               @RestResponse(responseCode = SC_OK, description = "Whether the media package has active workflows.")})
+  public Response mediaPackageHasActiveWorkflows(@PathParam("id") String mediaPackageId) {
+    try {
+      return Response.ok(Boolean.toString(service.mediaPackageHasActiveWorkflows(mediaPackageId))).build();
+
+    } catch (WorkflowDatabaseException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("mediaPackage/{id}/instances.xml")
+  @RestQuery(name = "workflowsofmediapackage", description = "Returns the workflows media package has active workflows",
+          returnDescription = "Returns wether the media package has active workflows as a boolean.",
+          pathParameters = {
+                  @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
+          reponses = {
+                  @RestResponse(responseCode = SC_OK, description = "Whether the media package has active workflows.")})
+  public Response getWorkflowsOfMediaPackage(@PathParam("id") String mediaPackageId) {
+    try {
+      return Response.ok(new WorkflowSetImpl(service.getWorkflowInstancesByMediaPackage(mediaPackageId))).build();
+
     } catch (WorkflowDatabaseException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
@@ -406,11 +461,11 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       }
     }
 
-    WorkflowSet set = service.getWorkflowInstances(q);
+    List<WorkflowInstance> workflowInstances = service.getWorkflowInstances(q);
 
     // Marshalling of a full workflow takes a long time. Therefore, we strip everything that's not needed.
     if (compact) {
-      for (WorkflowInstance instance : set.getItems()) {
+      for (WorkflowInstance instance : workflowInstances) {
 
         // Remove all operations but the current one
         WorkflowOperationInstance currentOperation = instance.getCurrentOperation();
@@ -434,7 +489,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
       }
     }
 
-    return Response.ok(set).build();
+    return Response.ok(new WorkflowSetImpl(workflowInstances)).build();
   }
 
   // CHECKSTYLE:OFF (The number of method parameters is large because we need to handle many potential query parameters)
@@ -781,34 +836,6 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     } catch (WorkflowDatabaseException e) {
       throw new WebApplicationException(e);
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  protected JSONArray getOperationsAsJson(List<WorkflowOperationInstance> operations) {
-    JSONArray jsonArray = new JSONArray();
-    for (WorkflowOperationInstance op : operations) {
-      JSONObject jsOp = new JSONObject();
-      jsOp.put("name", op.getTemplate());
-      jsOp.put("description", op.getDescription());
-      jsOp.put("state", op.getState().name().toLowerCase());
-      jsOp.put("configurations", getConfigsAsJson(op));
-      jsonArray.add(jsOp);
-    }
-    return jsonArray;
-  }
-
-  @SuppressWarnings("unchecked")
-  protected JSONArray getConfigsAsJson(Configurable entity) {
-    JSONArray json = new JSONArray();
-    Set<String> keys = entity.getConfigurationKeys();
-    if (keys != null) {
-      for (String key : keys) {
-        JSONObject jsConfig = new JSONObject();
-        jsConfig.put(key, entity.getConfiguration(key));
-        json.add(jsConfig);
-      }
-    }
-    return json;
   }
 
   /**

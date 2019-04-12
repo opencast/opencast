@@ -162,7 +162,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
 
       WorkflowOperationResult result = null;
 
-      // Wait for all jobs to be finished
+      // Wait for all jobs to be succeeded
       if (!waitForStatus(job).isSuccess())
         throw new WorkflowOperationException("Execute operation failed");
 

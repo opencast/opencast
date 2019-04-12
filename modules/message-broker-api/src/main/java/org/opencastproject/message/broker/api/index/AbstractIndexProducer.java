@@ -272,7 +272,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
           logger.info("Index '{}' has received a start repopulating command for service '{}'.",
                   indexObject.getIndexName(), getService());
           repopulate(indexObject.getIndexName());
-          logger.info("Index '{}' has finished repopulating service '{}'.", indexObject.getIndexName(), getService());
+          logger.info("Index '{}' has succeeded repopulating service '{}'.", indexObject.getIndexName(), getService());
         } catch (InterruptedException e) {
           logger.error("Problem while getting {} message events", getClassName(), e);
         } catch (ExecutionException e) {

@@ -213,7 +213,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
         IndexRecreateObject indexRecreateObject = (IndexRecreateObject) message.getObject();
         switch (indexRecreateObject.getStatus()) {
           case Update:
-            logger.info("Updating service: '{}' with {}/{} finished, {}% complete.", indexRecreateObject.getService(),
+            logger.info("Updating service: '{}' with {}/{} succeeded, {}% complete.", indexRecreateObject.getService(),
                     indexRecreateObject.getCurrent(), indexRecreateObject.getTotal(), (int) (indexRecreateObject.getCurrent() * 100 / indexRecreateObject.getTotal()));
             if (indexRecreateObject.getCurrent() == indexRecreateObject.getTotal()) {
               logger.info("Waiting for service '{}' indexing to complete", indexRecreateObject.getService());
@@ -224,11 +224,11 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
             logger.info("Finished re-creating data for service '{}'", indexRecreateObject.getService());
             break;
           case Error:
-            logger.error("Error updating service '{}' with {}/{} finished.",
+            logger.error("Error updating service '{}' with {}/{} succeeded.",
                     indexRecreateObject.getService(), indexRecreateObject.getCurrent(),
                             indexRecreateObject.getTotal());
             throw new IndexServiceException(
-                    format("Error updating service '%s' with %s/%s finished.", indexRecreateObject.getService(),
+                    format("Error updating service '%s' with %s/%s succeeded.", indexRecreateObject.getService(),
                             indexRecreateObject.getCurrent(), indexRecreateObject.getTotal()));
           default:
             logger.error("Unable to handle the status '{}' for service '{}'", indexRecreateObject.getStatus(),

@@ -207,7 +207,7 @@ public class ServiceRegistrationTest {
     Assert.assertEquals(ServiceState.WARNING, updatedService.getServiceState());
     Assert.assertEquals(0, updatedService.getErrorStateTrigger());
 
-    // 3rd try, finished on localhost
+    // 3rd try, succeeded on localhost
     jobTry3.setStatus(Status.FINISHED);
     jobTry3.setJobType(regType1Localhost.getServiceType());
     jobTry3.setProcessingHost(regType1Localhost.getHost());
@@ -381,7 +381,7 @@ public class ServiceRegistrationTest {
     Assert.assertEquals(ServiceState.WARNING, updatedService3.getServiceState());
     Assert.assertEquals(0, updatedService2.getErrorStateTrigger());
 
-    // 4th try, finished on localhost
+    // 4th try, succeeded on localhost
     jobTry4.setStatus(Status.FINISHED);
     jobTry4.setJobType(regType1Localhost.getServiceType());
     jobTry4.setProcessingHost(regType1Localhost.getHost());

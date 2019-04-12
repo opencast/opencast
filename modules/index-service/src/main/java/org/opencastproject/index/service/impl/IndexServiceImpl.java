@@ -117,9 +117,7 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn2;
@@ -150,7 +148,6 @@ import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -158,6 +155,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -651,7 +649,7 @@ public class IndexServiceImpl implements IndexService {
    * "captionHold": "false", "archiveOp": "true", "publishEngage": "true", "publishHarvesting": "true" } }, ....
    *
    * @param metadataJson
-   * @param mp
+   * @param mediaPackage
    * @return the created workflow instance id
    * @throws IndexServiceException
    */
@@ -672,14 +670,11 @@ public class IndexServiceImpl implements IndexService {
 
     try {
       // 1. Check if any active workflows are running for this mediapackage id
-      WorkflowSet workflowSet  = workflowService.getWorkflowInstances(new WorkflowQuery().withMediaPackage(mpId));
-      for (WorkflowInstance wf : Arrays.asList(workflowSet.getItems())) {
-        if (wf.isActive()) {
-          logger.warn("Unable to start new workflow '{}' on archived media package '{}', existing workfow {} is running",
-                  workflowDefId, mediaPackage, wf.getId());
+      if (workflowService.mediaPackageHasActiveWorkflows(mpId)) {
+          logger.warn("Unable to start new workflow '{}' on archived media package '{}', existing workflow is running",
+                  workflowDefId, mediaPackage);
           throw new IllegalArgumentException("A workflow is already active for mp " + mpId + ", cannot start this workflow.");
         }
-      }
       // 2. Save the snapshot
       assetManager.takeSnapshot(mediaPackage);
 
@@ -1185,6 +1180,16 @@ public class IndexServiceImpl implements IndexService {
     return updateEventMetadata(id, metadataList, index);
   }
 
+  Optional<WorkflowInstance> getCurrentWorkflowInstanceForMediaPackage(String mediaPackageId)
+          throws WorkflowDatabaseException {
+
+    List<WorkflowInstance> workflowInstances = workflowService.getWorkflowInstancesByMediaPackage(mediaPackageId);
+    if (workflowInstances.size() == 0) {
+      return Optional.empty();
+    }
+    return Optional.of(workflowInstances.get(0)); //first is current
+  }
+
   @Override
   public void removeCatalogByFlavor(Event event, MediaPackageElementFlavor flavor)
           throws IndexServiceException, NotFoundException, UnauthorizedException {
@@ -1199,12 +1204,13 @@ public class IndexServiceImpl implements IndexService {
     }
     switch (getEventSource(event)) {
       case WORKFLOW:
-        Opt<WorkflowInstance> workflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
-        if (workflowInstance.isNone()) {
-          logger.error("No workflow instance for event {} found!", event.getIdentifier());
-          throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
-        }
         try {
+          Optional<WorkflowInstance> workflowInstance =
+                  getCurrentWorkflowInstanceForMediaPackage(event.getIdentifier());
+          if (!workflowInstance.isPresent()) {
+            logger.error("No workflow instance for event {} found!", event.getIdentifier());
+            throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
+          }
           WorkflowInstance instance = workflowInstance.get();
           instance.setMediaPackage(mediaPackage);
           updateWorkflowInstance(instance);
@@ -1274,12 +1280,12 @@ public class IndexServiceImpl implements IndexService {
     updateMediaPackageMetadata(mediaPackage, metadataList);
     switch (getEventSource(event)) {
       case WORKFLOW:
-        Opt<WorkflowInstance> workflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
-        if (workflowInstance.isNone()) {
-          logger.error("No workflow instance for event {} found!", event.getIdentifier());
-          throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
-        }
         try {
+          Optional<WorkflowInstance> workflowInstance = getCurrentWorkflowInstanceForMediaPackage(event.getIdentifier());
+          if (!workflowInstance.isPresent()) {
+            logger.error("No workflow instance for event {} found!", event.getIdentifier());
+            throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
+          }
           WorkflowInstance instance = workflowInstance.get();
           instance.setMediaPackage(mediaPackage);
           updateWorkflowInstance(instance);
@@ -1507,11 +1513,10 @@ public class IndexServiceImpl implements IndexService {
     boolean notFoundWorkflow = false;
     boolean removedWorkflow = true;
     try {
-      WorkflowQuery workflowQuery = new WorkflowQuery().withMediaPackage(id);
-      WorkflowSet workflowSet = workflowService.getWorkflowInstances(workflowQuery);
-      if (workflowSet.size() == 0)
+      List<WorkflowInstance> workflowInstances = workflowService.getWorkflowInstancesByMediaPackage(id);
+      if (workflowInstances.size() == 0)
         notFoundWorkflow = true;
-      for (WorkflowInstance instance : workflowSet.getItems()) {
+      for (WorkflowInstance instance : workflowInstances) {
         workflowService.stop(instance.getId());
         workflowService.remove(instance.getId());
       }
@@ -1581,12 +1586,19 @@ public class IndexServiceImpl implements IndexService {
   public MediaPackage getEventMediapackage(Event event) throws IndexServiceException {
     switch (getEventSource(event)) {
       case WORKFLOW:
-        Opt<WorkflowInstance> currentWorkflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
-        if (currentWorkflowInstance.isNone()) {
-          logger.error("No workflow instance for event {} found!", event.getIdentifier());
-          throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
+        try {
+          Optional<WorkflowInstance> currentWorkflowInstance =
+                  getCurrentWorkflowInstanceForMediaPackage(event.getIdentifier());
+          if (!currentWorkflowInstance.isPresent()) {
+            logger.error("No workflow instance for event {} found!", event.getIdentifier());
+            throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
+          }
+          return currentWorkflowInstance.get().getMediaPackage();
+        } catch (WorkflowDatabaseException e) {
+          logger.error("Unable to get current workflow instance for event with id {} from workflow service",
+                  event.getIdentifier(), e);
+          throw new IndexServiceException(e.getMessage(), e);
         }
-        return currentWorkflowInstance.get().getMediaPackage();
       case ARCHIVE:
         Opt<MediaPackage> mpOpt = assetManager.getMediaPackage(event.getIdentifier());
         if (mpOpt.isSome()) {
@@ -1637,30 +1649,6 @@ public class IndexServiceImpl implements IndexService {
     } else {
       return Source.SCHEDULE;
     }
-  }
-
-  @Override
-  public Opt<WorkflowInstance> getCurrentWorkflowInstance(String mpId) throws IndexServiceException {
-    WorkflowQuery query = new WorkflowQuery().withMediaPackage(mpId);
-    WorkflowSet workflowInstances;
-    try {
-      workflowInstances = workflowService.getWorkflowInstances(query);
-      if (workflowInstances.size() == 0) {
-        logger.info("No workflow instance found for mediapackage {}.", mpId);
-        return Opt.none();
-      }
-    } catch (WorkflowDatabaseException e) {
-      logger.error("Unable to get workflows for event {} because {}", mpId, getStackTrace(e));
-      throw new IndexServiceException("Unable to get current workflow for event " + mpId);
-    }
-    // Get the newest workflow instance
-    // TODO This presuppose knowledge of the Database implementation and should be fixed sooner or later!
-    WorkflowInstance workflowInstance = workflowInstances.getItems()[0];
-    for (WorkflowInstance instance : workflowInstances.getItems()) {
-      if (instance.getId() > workflowInstance.getId())
-        workflowInstance = instance;
-    }
-    return Opt.some(workflowInstance);
   }
 
   private void updateMediaPackageMetadata(MediaPackage mp, MetadataList metadataList) {
@@ -1973,8 +1961,9 @@ public class IndexServiceImpl implements IndexService {
         switch (getEventSource(event)) {
           case WORKFLOW:
             logger.info("Update workflow mediapacakge {} with updated comments catalog.", event.getIdentifier());
-            Opt<WorkflowInstance> workflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
-            if (workflowInstance.isNone()) {
+            Optional<WorkflowInstance> workflowInstance =
+                    getCurrentWorkflowInstanceForMediaPackage(event.getIdentifier());
+            if (!workflowInstance.isPresent()) {
               logger.error("No workflow instance for event {} found!", event.getIdentifier());
               throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
             }

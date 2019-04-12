@@ -102,7 +102,7 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
   }
 
   /**
-   * Deletes JobArguments for every finished Job of the WorkfloInstance
+   * Deletes JobArguments for every succeeded Job of the WorkfloInstance
    *
    * @param workflowInstance
    */

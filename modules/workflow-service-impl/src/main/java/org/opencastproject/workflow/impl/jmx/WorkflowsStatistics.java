@@ -23,7 +23,7 @@ package org.opencastproject.workflow.impl.jmx;
 
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowStatistics;
+import org.opencastproject.workflow.api.WorkflowStatisticsReport;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,15 +40,15 @@ public class WorkflowsStatistics extends NotificationBroadcasterSupport implemen
   private static final String DELIMITER = ";";
   private long sequenceNumber = 1;
 
-  private Map<String, Long> workflowCounts = new HashMap<String, Long>();
-  private WorkflowStatistics workflowStatistics;
+  private Map<String, Long> workflowCounts = new HashMap<>();
+  private WorkflowStatisticsReport workflowStatisticsReport;
 
-  public WorkflowsStatistics(WorkflowStatistics workflowStatistics, List<WorkflowInstance> workflows) {
-    updateWorkflow(workflowStatistics, workflows);
+  public WorkflowsStatistics(WorkflowStatisticsReport workflowStatisticsReport, List<WorkflowInstance> workflows) {
+    updateWorkflow(workflowStatisticsReport, workflows);
   }
 
-  public void updateWorkflow(WorkflowStatistics workflowStatistics, List<WorkflowInstance> workflows) {
-    this.workflowStatistics = workflowStatistics;
+  public void updateWorkflow(WorkflowStatisticsReport workflowStatisticsReport, List<WorkflowInstance> workflows) {
+    this.workflowStatisticsReport = workflowStatisticsReport;
     for (WorkflowInstance wf : workflows) {
       Long count = workflowCounts.get(wf.getTemplate());
       if (count == null) {
@@ -75,7 +75,7 @@ public class WorkflowsStatistics extends NotificationBroadcasterSupport implemen
    */
   @Override
   public int getTotal() {
-    return (int) workflowStatistics.getTotal();
+    return (int) workflowStatisticsReport.getTotal();
   }
 
   /**
@@ -83,7 +83,7 @@ public class WorkflowsStatistics extends NotificationBroadcasterSupport implemen
    */
   @Override
   public int getInstantiated() {
-    return (int) workflowStatistics.getInstantiated();
+    return (int) workflowStatisticsReport.get(WorkflowInstance.WorkflowState.INSTANTIATED);
   }
 
   /**
@@ -91,7 +91,7 @@ public class WorkflowsStatistics extends NotificationBroadcasterSupport implemen
    */
   @Override
   public int getRunning() {
-    return (int) workflowStatistics.getRunning();
+    return (int) workflowStatisticsReport.get(WorkflowInstance.WorkflowState.RUNNING);
   }
 
   /**
@@ -99,7 +99,7 @@ public class WorkflowsStatistics extends NotificationBroadcasterSupport implemen
    */
   @Override
   public int getOnHold() {
-    return (int) workflowStatistics.getPaused();
+    return (int) workflowStatisticsReport.get(WorkflowInstance.WorkflowState.PAUSED);
   }
 
   /**
@@ -107,7 +107,7 @@ public class WorkflowsStatistics extends NotificationBroadcasterSupport implemen
    */
   @Override
   public int getStopped() {
-    return (int) workflowStatistics.getStopped();
+    return (int) workflowStatisticsReport.get(WorkflowInstance.WorkflowState.INSTANTIATED.STOPPED);
   }
 
   /**
@@ -115,7 +115,7 @@ public class WorkflowsStatistics extends NotificationBroadcasterSupport implemen
    */
   @Override
   public int getFinished() {
-    return (int) workflowStatistics.getFinished();
+    return (int) workflowStatisticsReport.get(WorkflowInstance.WorkflowState.SUCCEEDED);
   }
 
   /**
@@ -123,7 +123,7 @@ public class WorkflowsStatistics extends NotificationBroadcasterSupport implemen
    */
   @Override
   public int getFailing() {
-    return (int) workflowStatistics.getFailing();
+    return (int) workflowStatisticsReport.get(WorkflowInstance.WorkflowState.FAILING);
   }
 
   /**
@@ -131,7 +131,7 @@ public class WorkflowsStatistics extends NotificationBroadcasterSupport implemen
    */
   @Override
   public int getFailed() {
-    return (int) workflowStatistics.getFailed();
+    return (int) workflowStatisticsReport.get(WorkflowInstance.WorkflowState.FAILED);
   }
 
   /**

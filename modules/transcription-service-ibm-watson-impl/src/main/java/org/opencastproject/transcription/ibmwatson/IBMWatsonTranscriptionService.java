@@ -874,7 +874,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
           String mpId = j.getMediaPackageId();
           String jobId = j.getTranscriptionJobId();
 
-          // If the job in progress, check if it should already have finished and we didn't get the callback for some
+          // If the job in progress, check if it should already have succeeded and we didn't get the callback for some
           // reason. This can happen if the admin server was offline when the callback came.
           if (TranscriptionJobControl.Status.Progress.name().equals(j.getStatus())) {
             // If job should already have been completed, try to get the results. Consider a buffer factor so that we
@@ -888,7 +888,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
                           String.format("Transcription job failed for mpId %s, jobId %s", mpId, jobId));
                   continue;
                 } else if (RecognitionJobStatus.PROCESSING.equals(jobStatus)) {
-                  // Job still running so check if it should have finished more than N seconds ago
+                  // Job still running so check if it should have succeeded more than N seconds ago
                   if (j.getDateCreated().getTime() + j.getTrackDuration()
                           + (completionCheckBuffer + maxProcessingSeconds) * 1000 < System.currentTimeMillis()) {
                     // Processing for too long, mark job as error or retry and don't check anymore
@@ -896,7 +896,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
                             "Transcription job was in processing state for too long (media package %s, job id %s)",
                             mpId, jobId));
                   }
-                  // else job still running, not finished
+                  // else job still running, not succeeded
                   continue;
                 }
               } catch (TranscriptionServiceException e) {

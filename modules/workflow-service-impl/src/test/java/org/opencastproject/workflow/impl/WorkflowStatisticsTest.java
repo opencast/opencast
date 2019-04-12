@@ -53,17 +53,17 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
+import org.opencastproject.workflow.api.WorkflowDefinitionReport;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowListener;
 import org.opencastproject.workflow.api.WorkflowOperationDefinition;
 import org.opencastproject.workflow.api.WorkflowOperationDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
+import org.opencastproject.workflow.api.WorkflowOperationReport;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowStateListener;
-import org.opencastproject.workflow.api.WorkflowStatistics;
-import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport;
-import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionReport.OperationReport;
+import org.opencastproject.workflow.api.WorkflowStatisticsReport;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -89,7 +89,7 @@ import java.util.Set;
 import junit.framework.Assert;
 
 /**
- * Test cases for the implementation at {@link WorkflowStatistics}.
+ * Test cases for the implementation at {@link WorkflowStatisticsReport}.
  */
 public class WorkflowStatisticsTest {
 
@@ -274,7 +274,7 @@ public class WorkflowStatisticsTest {
    */
   @Test
   public void testEmptyStatistics() throws Exception {
-    WorkflowStatistics stats = service.getStatistics();
+    WorkflowStatisticsReport stats = service.getStatistics();
     assertEquals(0, stats.getDefinitions().size());
     assertEquals(0, stats.getFailed());
     assertEquals(0, stats.getFailing());
@@ -352,7 +352,7 @@ public class WorkflowStatisticsTest {
 
     service.removeWorkflowListener(listener);
 
-    // Resume all of them, so some will be finished, some won't
+    // Resume all of them, so some will be succeeded, some won't
     int j = 0;
     for (WorkflowInstance instance : instances) {
       WorkflowListener instanceListener = new IndividualWorkflowListener(instance.getId());
@@ -369,7 +369,7 @@ public class WorkflowStatisticsTest {
     // TODO: Add failed, failing, stopped etc. workflows as well
 
     // Get the statistics
-    WorkflowStatistics stats = service.getStatistics();
+    WorkflowStatisticsReport stats = service.getStatistics();
     assertEquals(failed, stats.getFailed());
     assertEquals(failing, stats.getFailing());
     assertEquals(instantiated, stats.getInstantiated());
@@ -393,16 +393,16 @@ public class WorkflowStatisticsTest {
    */
   @Test
   public void testStatisticsMarshalling() throws Exception {
-    WorkflowStatistics stats = new WorkflowStatistics();
+    WorkflowStatisticsReport stats = new WorkflowStatisticsReport();
     stats.setFailed(100);
     stats.setInstantiated(20);
 
-    OperationReport op1 = new OperationReport();
+    WorkflowOperationReport op1 = new WorkflowOperationReport();
     op1.setId("compose");
     op1.setInstantiated(10);
     op1.setFailing(1);
 
-    List<OperationReport> ops1 = new ArrayList<WorkflowStatistics.WorkflowDefinitionReport.OperationReport>();
+    List<WorkflowOperationReport> ops1 = new ArrayList<>();
     ops1.add(op1);
 
     WorkflowDefinitionReport def1 = new WorkflowDefinitionReport();

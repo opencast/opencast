@@ -120,9 +120,9 @@ public class OldScheduledScanner extends AbstractBufferScanner implements Manage
     try {
       service.removeScheduledRecordingsBeforeBuffer(getBuffer());
     } catch (UnauthorizedException e) {
-      logger.error("Unable to scan for finished recordings, not authorized: ", e);
+      logger.error("Unable to scan for succeeded recordings, not authorized: ", e);
     } catch (SchedulerException e) {
-      logger.error("Unable to scan for finished recordings: ", e);
+      logger.error("Unable to scan for succeeded recordings: ", e);
     }
   }
 

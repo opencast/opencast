@@ -391,7 +391,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * Set the @link org.opencastproject.job.api.JobBarrier polling interval.
    * <p>
-   * While waiting for other jobs to finish, the barrier will poll the status of these jobs until they are finished. To
+   * While waiting for other jobs to finish, the barrier will poll the status of these jobs until they are succeeded. To
    * reduce load on the system, the polling is done only every x milliseconds. This interval defines the sleep time
    * between these polls.
    * <p>

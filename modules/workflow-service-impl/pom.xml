@@ -197,11 +197,13 @@
               org.opencastproject.workflow.impl;version=${project.version},
               org.opencastproject.workflow.endpoint;version=${project.version}
             </Export-Package>
+            <Meta-Persistence>
+              META-INF/persistence.xml
+            </Meta-Persistence>
             <Service-Component>
               OSGI-INF/workflow-cleanup-scheduler-service.xml,
               OSGI-INF/workflow-definition-scanner.xml,
               OSGI-INF/workflow-service.xml,
-              OSGI-INF/workflow-service-index.xml,
               OSGI-INF/workflow-service-rest.xml
             </Service-Component>
             <Http-Alias>/workflow/samples</Http-Alias>

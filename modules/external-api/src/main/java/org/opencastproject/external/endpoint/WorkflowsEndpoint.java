@@ -61,7 +61,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStateException;
 
 import com.entwinemedia.fn.data.Opt;
@@ -79,7 +78,6 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -299,7 +297,7 @@ public class WorkflowsEndpoint {
     }
 
     // Get results
-    WorkflowSet workflowInstances;
+    List<WorkflowInstance> workflowInstances;
     try {
       workflowInstances = workflowService.getWorkflowInstances(query);
     } catch (Exception e) {
@@ -307,9 +305,9 @@ public class WorkflowsEndpoint {
       return ApiResponses.serverError("Could not retrieve workflow instances, reason: '%s'", e.getMessage());
     }
 
-    List<JValue> json = Arrays.stream(workflowInstances.getItems())
-                              .map(wi -> workflowInstanceToJSON(wi, withOperations, withConfiguration))
-                              .collect(Collectors.toList());
+    List<JValue> json = workflowInstances.stream()
+            .map(wi -> workflowInstanceToJSON(wi, withOperations, withConfiguration))
+            .collect(Collectors.toList());
 
     return ApiResponses.Json.ok(acceptHeader, arr(json));
   }

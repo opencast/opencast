@@ -300,7 +300,7 @@ public class CountWorkflowsTest {
     }
     service.removeWorkflowListener(listener);
 
-    // Make sure one workflow is still on hold, the other is finished.
+    // Make sure one workflow is still on hold, the other is succeeded.
     assertEquals(2, service.countWorkflowInstances());
     assertEquals(1, service.countWorkflowInstances(WorkflowState.PAUSED, null));
     assertEquals(1, service.countWorkflowInstances(WorkflowState.PAUSED, "op1"));

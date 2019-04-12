@@ -22,11 +22,12 @@
 
 package org.opencastproject.workflow.api;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -34,41 +35,55 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  * The search result represents a set of result items that has been compiled as a result for a search operation.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "workflows", namespace = "http://workflow.opencastproject.org")
-public class WorkflowSetImpl implements WorkflowSet {
+@XmlRootElement(name = "workflowconfig", namespace = "http://workflow.opencastproject.org")
+public class WorkflowConfigurationSetImpl implements WorkflowConfigurationSet {
 
-  /** A list of search items. */
-  @XmlElement(name = "workflow")
-  private List<WorkflowInstance> workflows = null;
+  @XmlElement(name = "configuration")
+  @XmlElementWrapper(name = "configurations")
+  private Set<WorkflowConfiguration> configurations;
 
   /**
    * A no-arg constructor needed by JAXB
    */
-  public WorkflowSetImpl() {
+  public WorkflowConfigurationSetImpl() {
   }
 
-  public WorkflowSetImpl(List<WorkflowInstance> workflows) {
-    this.workflows = workflows;
+  /**
+   * Constructor
+   *
+   * @param configurations
+   */
+  public WorkflowConfigurationSetImpl(Set<WorkflowConfiguration> configurations) {
+    this.configurations = configurations;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowSet#getItems()
+   * @see WorkflowConfigurationSet#get()
    */
   @Override
-  public List<WorkflowInstance> getItems() {
-    return workflows;
+  public Set<WorkflowConfiguration> get() {
+    return configurations;
   }
 
-  public static class Adapter extends XmlAdapter<WorkflowSetImpl, WorkflowSet> {
-    public WorkflowSetImpl marshal(WorkflowSet set) throws Exception {
-      return (WorkflowSetImpl) set;
+  /**
+   * {@inheritDoc}
+   *
+   * @see WorkflowConfigurationSet#set(Set<WorkflowConfiguration>)
+   */
+  @Override
+  public void set(Set<WorkflowConfiguration> configurations) {
+    this.configurations = configurations;
+  }
+
+  public static class Adapter extends XmlAdapter<WorkflowConfigurationSetImpl, WorkflowConfigurationSet> {
+    public WorkflowConfigurationSetImpl marshal(WorkflowConfigurationSet set) throws Exception {
+      return (WorkflowConfigurationSetImpl) set;
     }
 
-    public WorkflowSet unmarshal(WorkflowSetImpl set) throws Exception {
+    public WorkflowConfigurationSet unmarshal(WorkflowConfigurationSetImpl set) throws Exception {
       return set;
     }
   }
-
 }

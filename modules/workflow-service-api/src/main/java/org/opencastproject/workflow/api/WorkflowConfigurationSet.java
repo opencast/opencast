@@ -18,22 +18,34 @@
  * the License.
  *
  */
+
+
 package org.opencastproject.workflow.api;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * A single result of searching.
  */
-@XmlJavaTypeAdapter(WorkflowSetImpl.Adapter.class)
-public interface WorkflowSet {
+@XmlJavaTypeAdapter(WorkflowConfigurationSetImpl.Adapter.class)
+public interface WorkflowConfigurationSet {
 
   /**
-   * Get the list of workflow instances
+   * Get set of workflow configurations
    *
-   * @return list of workflow instances
+   * @return
+   *         Set of workflow configurations
    */
-  List<WorkflowInstance> getItems();
+  Set<WorkflowConfiguration> get();
+
+  /**
+   * Set set of workflow configurations
+   *
+   * @param configurations
+   *        Set of workflow configurations
+   */
+  void set(Set<WorkflowConfiguration> configurations);
+
 }

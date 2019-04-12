@@ -21,14 +21,9 @@
 
 package org.opencastproject.workflow.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -38,7 +33,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "statistics", namespace = "http://workflow.opencastproject.org")
 @XmlType(name = "statistics", namespace = "http://workflow.opencastproject.org")
-public class WorkflowStatistics {
+public abstract class WorkflowStatistics {
+
 
   /** The total number of workflow instances in the system */
   @XmlAttribute
@@ -60,9 +56,9 @@ public class WorkflowStatistics {
   @XmlAttribute
   protected long stopped = 0;
 
-  /** The total number of finished workflow instances in the system */
+  /** The total number of succeeded workflow instances in the system */
   @XmlAttribute
-  protected long finished = 0;
+  protected long succeeded = 0;
 
   /** The total number of failing workflow instances in the system */
   @XmlAttribute
@@ -72,11 +68,6 @@ public class WorkflowStatistics {
   @XmlAttribute
   protected long failed = 0;
 
-  /** The workflow definition reports */
-  @XmlElementWrapper(name = "definitions")
-  @XmlElement(name = "definition")
-  protected List<WorkflowDefinitionReport> definitions = new ArrayList<WorkflowStatistics.WorkflowDefinitionReport>();
-
   /**
    * @return the total
    */
@@ -85,512 +76,72 @@ public class WorkflowStatistics {
   }
 
   /**
-   * @param total
-   *          the total to set
+   * Get the amount of workflows for a specific state
+   *
+   * @param state
+   *         the workflow state
+   *
+   * @return the amount of workflows with that state
    */
-  public void setTotal(long total) {
-    this.total = total;
-  }
-
-  /**
-   * @return the instantiated
-   */
-  public long getInstantiated() {
-    return instantiated;
-  }
-
-  /**
-   * @param instantiated
-   *          the instantiated to set
-   */
-  public void setInstantiated(long instantiated) {
-    this.instantiated = instantiated;
-  }
-
-  /**
-   * @return the running
-   */
-  public long getRunning() {
-    return running;
-  }
-
-  /**
-   * @param running
-   *          the running to set
-   */
-  public void setRunning(long running) {
-    this.running = running;
-  }
-
-  /**
-   * @return the paused
-   */
-  public long getPaused() {
-    return paused;
-  }
-
-  /**
-   * @param paused
-   *          the paused to set
-   */
-  public void setPaused(long paused) {
-    this.paused = paused;
-  }
-
-  /**
-   * @return the stopped
-   */
-  public long getStopped() {
-    return stopped;
-  }
-
-  /**
-   * @param stopped
-   *          the stopped to set
-   */
-  public void setStopped(long stopped) {
-    this.stopped = stopped;
-  }
-
-  /**
-   * @return the finished
-   */
-  public long getFinished() {
-    return finished;
-  }
-
-  /**
-   * @param finished
-   *          the finished to set
-   */
-  public void setFinished(long finished) {
-    this.finished = finished;
-  }
-
-  /**
-   * @return the failing
-   */
-  public long getFailing() {
-    return failing;
-  }
-
-  /**
-   * @param failing
-   *          the failing to set
-   */
-  public void setFailing(long failing) {
-    this.failing = failing;
-  }
-
-  /**
-   * @return the failed
-   */
-  public long getFailed() {
-    return failed;
-  }
-
-  /**
-   * @param failed
-   *          the failed to set
-   */
-  public void setFailed(long failed) {
-    this.failed = failed;
-  }
-
-  /**
-   * @return the definitions
-   */
-  public List<WorkflowDefinitionReport> getDefinitions() {
-    return definitions;
-  }
-
-  /**
-   * @param definitions
-   *          the definitions to set
-   */
-  public void setDefinitions(List<WorkflowDefinitionReport> definitions) {
-    this.definitions = definitions;
-  }
-
-  /**
-   * Statistics for a specific workflow definition
-   */
-  @XmlAccessorType(XmlAccessType.FIELD)
-  @XmlRootElement(name = "definition_report", namespace = "http://workflow.opencastproject.org")
-  @XmlType(name = "definition_report", namespace = "http://workflow.opencastproject.org")
-  public static class WorkflowDefinitionReport {
-    /** The workflow definition id */
-    @XmlAttribute
-    private String id;
-
-    /** The total number of instances of this workflow definition */
-    @XmlAttribute
-    private long total = 0;
-
-    /** The total number of instantiated (not yet running) instances of this workflow definition */
-    @XmlAttribute
-    private long instantiated = 0;
-
-    /** The total number of running instances of this workflow definition */
-    @XmlAttribute
-    private long running = 0;
-
-    /** The total number of paused instances of this workflow definition */
-    @XmlAttribute
-    private long paused = 0;
-
-    /** The total number of stopped instances of this workflow definition */
-    @XmlAttribute
-    private long stopped = 0;
-
-    /** The total number of finished instances of this workflow definition */
-    @XmlAttribute
-    private long finished = 0;
-
-    /** The total number of failing instances of this workflow definition */
-    @XmlAttribute
-    private long failing = 0;
-
-    /** The total number of failed instances of this workflow definition */
-    @XmlAttribute
-    private long failed = 0;
-
-    /** The workflow operation reports */
-    @XmlElementWrapper(name = "operations")
-    @XmlElement(name = "operation")
-    private List<OperationReport> operations = new ArrayList<WorkflowStatistics.WorkflowDefinitionReport.OperationReport>();
-
-    /**
-     * @return the id
-     */
-    public String getId() {
-      return id;
-    }
-
-    /**
-     * @param id
-     *          the id to set
-     */
-    public void setId(String id) {
-      this.id = id;
-    }
-
-    /**
-     * @return the total
-     */
-    public long getTotal() {
-      return total;
-    }
-
-    /**
-     * @param total
-     *          the total to set
-     */
-    public void setTotal(long total) {
-      this.total = total;
-    }
-
-    /**
-     * @return the instantiated
-     */
-    public long getInstantiated() {
-      return instantiated;
-    }
-
-    /**
-     * @param instantiated
-     *          the instantiated to set
-     */
-    public void setInstantiated(long instantiated) {
-      this.instantiated = instantiated;
-    }
-
-    /**
-     * @return the running
-     */
-    public long getRunning() {
-      return running;
-    }
-
-    /**
-     * @param running
-     *          the running to set
-     */
-    public void setRunning(long running) {
-      this.running = running;
-    }
-
-    /**
-     * @return the paused
-     */
-    public long getPaused() {
-      return paused;
-    }
-
-    /**
-     * @param paused
-     *          the paused to set
-     */
-    public void setPaused(long paused) {
-      this.paused = paused;
-    }
-
-    /**
-     * @return the stopped
-     */
-    public long getStopped() {
-      return stopped;
-    }
-
-    /**
-     * @param stopped
-     *          the stopped to set
-     */
-    public void setStopped(long stopped) {
-      this.stopped = stopped;
-    }
-
-    /**
-     * @return the finished
-     */
-    public long getFinished() {
-      return finished;
-    }
-
-    /**
-     * @param finished
-     *          the finished to set
-     */
-    public void setFinished(long finished) {
-      this.finished = finished;
-    }
-
-    /**
-     * @return the failing
-     */
-    public long getFailing() {
-      return failing;
-    }
-
-    /**
-     * @param failing
-     *          the failing to set
-     */
-    public void setFailing(long failing) {
-      this.failing = failing;
-    }
-
-    /**
-     * @return the failed
-     */
-    public long getFailed() {
-      return failed;
-    }
-
-    /**
-     * @param failed
-     *          the failed to set
-     */
-    public void setFailed(long failed) {
-      this.failed = failed;
-    }
-
-    /**
-     * @return the operations
-     */
-    public List<OperationReport> getOperations() {
-      return operations;
-    }
-
-    /**
-     * @param operations
-     *          the operations to set
-     */
-    public void setOperations(List<OperationReport> operations) {
-      this.operations = operations;
-    }
-
-    /**
-     * Statistics for a specific workflow operation within a given worflow definition
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlRootElement(name = "operation_report", namespace = "http://workflow.opencastproject.org")
-    @XmlType(name = "operation_report", namespace = "http://workflow.opencastproject.org")
-    public static class OperationReport {
-      /** The workflow operation id */
-      @XmlAttribute
-      private String id;
-
-      /** The total number of instances of this workflow definition currently in this operation */
-      @XmlAttribute
-      private long total = 0;
-
-      /**
-       * The total number of instantiated (not yet running) instances of this workflow definition currently in this
-       * operation
-       */
-      @XmlAttribute
-      private long instantiated = 0;
-
-      /** The total number of running instances of this workflow definition currently in this operation */
-      @XmlAttribute
-      private long running = 0;
-
-      /** The total number of paused instances of this workflow definition currently in this operation */
-      @XmlAttribute
-      private long paused = 0;
-
-      /** The total number of stopped instances of this workflow definition currently in this operation */
-      @XmlAttribute
-      private long stopped = 0;
-
-      /** The total number of finished instances of this workflow definition currently in this operation */
-      @XmlAttribute
-      private long finished = 0;
-
-      /** The total number of failing instances of this workflow definition currently in this operation */
-      @XmlAttribute
-      private long failing = 0;
-
-      /** The total number of failed instances of this workflow definition currently in this operation */
-      @XmlAttribute
-      private long failed = 0;
-
-      /**
-       * @return the id
-       */
-      public String getId() {
-        return id;
-      }
-
-      /**
-       * @param id
-       *          the id to set
-       */
-      public void setId(String id) {
-        this.id = id;
-      }
-
-      /**
-       * @return the total
-       */
-      public long getTotal() {
-        return total;
-      }
-
-      /**
-       * @param total
-       *          the total to set
-       */
-      public void setTotal(long total) {
-        this.total = total;
-      }
-
-      /**
-       * @return the instantiated
-       */
-      public long getInstantiated() {
+  public long get(WorkflowInstance.WorkflowState state) {
+    switch (state) {
+      case INSTANTIATED:
         return instantiated;
-      }
-
-      /**
-       * @param instantiated
-       *          the instantiated to set
-       */
-      public void setInstantiated(long instantiated) {
-        this.instantiated = instantiated;
-      }
-
-      /**
-       * @return the running
-       */
-      public long getRunning() {
+      case RUNNING:
         return running;
-      }
-
-      /**
-       * @param running
-       *          the running to set
-       */
-      public void setRunning(long running) {
-        this.running = running;
-      }
-
-      /**
-       * @return the paused
-       */
-      public long getPaused() {
+      case PAUSED:
         return paused;
-      }
-
-      /**
-       * @param paused
-       *          the paused to set
-       */
-      public void setPaused(long paused) {
-        this.paused = paused;
-      }
-
-      /**
-       * @return the stopped
-       */
-      public long getStopped() {
+      case STOPPED:
         return stopped;
-      }
-
-      /**
-       * @param stopped
-       *          the stopped to set
-       */
-      public void setStopped(long stopped) {
-        this.stopped = stopped;
-      }
-
-      /**
-       * @return the finished
-       */
-      public long getFinished() {
-        return finished;
-      }
-
-      /**
-       * @param finished
-       *          the finished to set
-       */
-      public void setFinished(long finished) {
-        this.finished = finished;
-      }
-
-      /**
-       * @return the failing
-       */
-      public long getFailing() {
+      case SUCCEEDED:
+        return succeeded;
+      case FAILING:
         return failing;
-      }
-
-      /**
-       * @param failing
-       *          the failing to set
-       */
-      public void setFailing(long failing) {
-        this.failing = failing;
-      }
-
-      /**
-       * @return the failed
-       */
-      public long getFailed() {
+      case FAILED:
         return failed;
-      }
-
-      /**
-       * @param failed
-       *          the failed to set
-       */
-      public void setFailed(long failed) {
-        this.failed = failed;
-      }
+      default:
+        throw new IllegalArgumentException("Unknown workflow state!");
     }
   }
 
+  /**
+   * Set the amount of workflows for a specific state
+   *
+   * @param state
+   *         the workflow state
+   * @param amount
+   *         the amount of workflows with that state
+   */
+  public void set(WorkflowInstance.WorkflowState state, long amount) {
+    switch(state) {
+      case INSTANTIATED:
+        instantiated = amount;
+        break;
+      case RUNNING:
+        running = amount;
+        break;
+      case PAUSED:
+        paused = amount;
+        break;
+      case STOPPED:
+        stopped = amount;
+        break;
+      case SUCCEEDED:
+        succeeded = amount;
+        break;
+      case FAILING:
+        failing = amount;
+        break;
+      case FAILED:
+        failed = amount;
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown attribute!");
+    }
+    calculateTotal();
+  }
+
+  private void calculateTotal() {
+    total = instantiated + running + paused + stopped + succeeded + failing + failed;
+  }
 }

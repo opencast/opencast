@@ -188,7 +188,7 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
       throw new WorkflowOperationException(e);
     }
 
-    logger.info("Cover Image Workflow finished successfully for media package '{}' within {}ms",
+    logger.info("Cover Image Workflow succeeded successfully for media package '{}' within {}ms",
             mediaPackage.getIdentifier(), generate.getQueueTime());
     return createResult(mediaPackage, Action.CONTINUE, generate.getQueueTime());
   }

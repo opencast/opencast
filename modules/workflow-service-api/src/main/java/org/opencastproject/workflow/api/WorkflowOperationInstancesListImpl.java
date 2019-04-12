@@ -27,6 +27,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -34,41 +35,55 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  * The search result represents a set of result items that has been compiled as a result for a search operation.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "workflows", namespace = "http://workflow.opencastproject.org")
-public class WorkflowSetImpl implements WorkflowSet {
+@XmlRootElement(name = "workflowoperations", namespace = "http://workflow.opencastproject.org")
+public class WorkflowOperationInstancesListImpl implements WorkflowOperationInstancesList {
 
-  /** A list of search items. */
-  @XmlElement(name = "workflow")
-  private List<WorkflowInstance> workflows = null;
+  @XmlElement(name = "operation")
+  @XmlElementWrapper(name = "operations")
+  private List<WorkflowOperationInstance> operations;
 
   /**
    * A no-arg constructor needed by JAXB
    */
-  public WorkflowSetImpl() {
+  public WorkflowOperationInstancesListImpl() {
   }
 
-  public WorkflowSetImpl(List<WorkflowInstance> workflows) {
-    this.workflows = workflows;
+  /**
+   * Constructor
+   *
+   * @param operations
+   */
+  public WorkflowOperationInstancesListImpl(List<WorkflowOperationInstance> operations) {
+    this.operations = operations;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowSet#getItems()
+   * @see WorkflowOperationInstancesList#get()
    */
   @Override
-  public List<WorkflowInstance> getItems() {
-    return workflows;
+  public List<WorkflowOperationInstance> get() {
+    return operations;
   }
 
-  public static class Adapter extends XmlAdapter<WorkflowSetImpl, WorkflowSet> {
-    public WorkflowSetImpl marshal(WorkflowSet set) throws Exception {
-      return (WorkflowSetImpl) set;
-    }
-
-    public WorkflowSet unmarshal(WorkflowSetImpl set) throws Exception {
-      return set;
-    }
+  /**
+   * {@inheritDoc}
+   *
+   * @see WorkflowOperationInstancesList#set(List<WorkflowOperationInstance>)
+   */
+  @Override
+  public void set(List<WorkflowOperationInstance> operations) {
+    this.operations = operations;
   }
 
+  public static class Adapter extends XmlAdapter<WorkflowOperationInstancesListImpl, WorkflowOperationInstancesList> {
+    public WorkflowOperationInstancesListImpl marshal(WorkflowOperationInstancesList list) throws Exception {
+      return (WorkflowOperationInstancesListImpl) list;
+    }
+
+    public WorkflowOperationInstancesList unmarshal(WorkflowOperationInstancesListImpl list) throws Exception {
+      return list;
+    }
+  }
 }

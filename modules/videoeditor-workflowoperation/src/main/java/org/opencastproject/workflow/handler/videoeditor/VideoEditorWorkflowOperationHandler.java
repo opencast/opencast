@@ -453,7 +453,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     // If skipProcessing, The track is processed by a separate operation which takes the SMIL file and encode directly
     // to delivery format
     if (skipProcessing) {
-      logger.info("VideoEdit workflow {} finished - smil file is {}", workflowInstance.getId(), smil.getId());
+      logger.info("VideoEdit workflow {} succeeded - smil file is {}", workflowInstance.getId(), smil.getId());
       return createResult(mp, Action.CONTINUE);
     }
     // create video edit jobs and run them
@@ -571,7 +571,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
       }
     }
 
-    logger.info("VideoEdit workflow {} finished", workflowInstance.getId());
+    logger.info("VideoEdit workflow {} succeeded", workflowInstance.getId());
     return createResult(mp, Action.CONTINUE);
   }
 

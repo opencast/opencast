@@ -82,7 +82,7 @@ public class FileReadDeleteTest {
         // wait for reader
         start.wait();
       }
-      assertEquals("Reader already finished", 0, totalRead);
+      assertEquals("Reader already succeeded", 0, totalRead);
       assertTrue("File could not be deleted", work.delete());
       assertFalse("File still exists", work.exists());
       logger.debug("Work file deleted");

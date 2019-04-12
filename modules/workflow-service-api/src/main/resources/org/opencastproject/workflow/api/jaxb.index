@@ -5,5 +5,7 @@ WorkflowInstanceImpl
 WorkflowOperationDefinitionImpl
 WorkflowOperationInstanceImpl
 WorkflowOperationResultImpl
+WorkflowConfigurationSetImpl
+WorkflowOperationInstancesListImpl
 WorkflowSetImpl
-WorkflowStatistics
+WorkflowStatisticsReport

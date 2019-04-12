@@ -186,7 +186,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
       for (int i = 0; i < inputElements.length; i++)
         jobs[i] = executeService.execute(exec, params, inputElements[i], outputFilename, expectedType, load);
 
-      // Wait for all jobs to be finished
+      // Wait for all jobs to be succeeded
       if (!waitForStatus(jobs).isSuccess())
         throw new WorkflowOperationException("Execute operation failed");
 

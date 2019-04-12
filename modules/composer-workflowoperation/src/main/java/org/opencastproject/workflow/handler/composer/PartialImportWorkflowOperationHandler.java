@@ -493,7 +493,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
 
     Track[] targetAudioTracks = mediaPackage.getTracks(deriveAudioFlavor(targetFlavor));
     for (Track track : targetAudioTracks) {
-      logger.debug("Adding {} to finished audio tracks.", track.getURI());
+      logger.debug("Adding {} to succeeded audio tracks.", track.getURI());
       mediaPackage.remove(track);
       track.setFlavor(targetFlavor);
       mediaPackage.add(track);

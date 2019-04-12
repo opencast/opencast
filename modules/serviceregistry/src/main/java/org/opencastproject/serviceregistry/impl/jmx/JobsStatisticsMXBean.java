@@ -48,9 +48,9 @@ public interface JobsStatisticsMXBean {
   int getQueuedJobCount();
 
   /**
-   * Gets the number of finished jobs
+   * Gets the number of succeeded jobs
    *
-   * @return the number of finished jobs
+   * @return the number of succeeded jobs
    */
   int getFinishedJobCount();
 
@@ -83,9 +83,9 @@ public interface JobsStatisticsMXBean {
   int getQueuedJobCountByNode();
 
   /**
-   * Gets the number of finished jobs of this JMX node
+   * Gets the number of succeeded jobs of this JMX node
    *
-   * @return the number of finished jobs
+   * @return the number of succeeded jobs
    */
   int getFinishedJobCountByNode();
 
@@ -118,9 +118,9 @@ public interface JobsStatisticsMXBean {
   String[] getQueuedJobs();
 
   /**
-   * Gets a list of all finished jobs
+   * Gets a list of all succeeded jobs
    *
-   * @return an array including all finished jobs
+   * @return an array including all succeeded jobs
    */
   String[] getFinishedJobs();
 
@@ -153,9 +153,9 @@ public interface JobsStatisticsMXBean {
   String[] getQueuedJobsByNode();
 
   /**
-   * Gets a list of finished jobs of this JMX node
+   * Gets a list of succeeded jobs of this JMX node
    *
-   * @return an array including finished jobs
+   * @return an array including succeeded jobs
    */
   String[] getFinishedJobsByNode();
 

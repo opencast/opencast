@@ -466,7 +466,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         throw new WorkflowOperationException(e);
       }
 
-      // If the job finished successfully, but returned no new element, the channel simply doesn't support this
+      // If the job succeeded successfully, but returned no new element, the channel simply doesn't support this
       // kind of element. So we just keep on looping.
       if (distributedElements == null || distributedElements.size() < 1)
         continue;

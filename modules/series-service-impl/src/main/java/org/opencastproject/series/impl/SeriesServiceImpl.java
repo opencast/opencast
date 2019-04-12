@@ -169,7 +169,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     }
     final int total = allSeries.size();
     if (total == 0) {
-      logger.info("No series found. Repopulating index finished.");
+      logger.info("No series found. Repopulating index succeeded.");
       return;
     }
 

@@ -376,9 +376,6 @@ public interface IndexService {
   Source getEventSource(Event event);
 
   // TODO remove when it is no longer needed by AbstractEventEndpoint
-  Opt<WorkflowInstance> getCurrentWorkflowInstance(String mpId) throws IndexServiceException;
-
-  // TODO remove when it is no longer needed by AbstractEventEndpoint
   void updateWorkflowInstance(WorkflowInstance workflowInstance) throws WorkflowException, UnauthorizedException;
 
   void updateCommentCatalog(Event event, List<EventComment> comments) throws Exception;

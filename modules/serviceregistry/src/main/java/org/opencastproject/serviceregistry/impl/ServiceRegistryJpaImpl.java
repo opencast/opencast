@@ -2459,7 +2459,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     if (currentService == null)
       return;
 
-    // Job is finished with a failure
+    // Job is succeeded with a failure
     if (job.getStatus() == FAILED && !DATA.equals(job.getFailureReason())) {
 
       // Services in WARNING or ERROR state triggered by current job
@@ -2515,7 +2515,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     }
 
-    // Job is finished without failure
+    // Job is succeeded without failure
     else if (job.getStatus() == Status.FINISHED) {
 
       // If the service was in warning state reset to normal state
@@ -3119,7 +3119,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         throw new ServiceUnavailableException("No service of type " + job.getJobType() + " available");
       }
 
-      // Try the service registrations, after the first one finished, we quit;
+      // Try the service registrations, after the first one succeeded, we quit;
       job.setStatus(Status.DISPATCHING);
 
       boolean triedDispatching = false;

@@ -9,8 +9,6 @@
     <provide interface="org.opencastproject.workflow.api.WorkflowService"/>
     <provide interface="org.opencastproject.workflow.impl.WorkflowServiceImpl"/>
   </service>
-  <reference name="index" interface="org.opencastproject.workflow.impl.WorkflowServiceIndex" cardinality="1..1"
-             policy="static" bind="setDao"/>
   <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
              cardinality="1..1" policy="static" bind="setWorkspace"/>
   <reference name="metadata" interface="org.opencastproject.metadata.api.MediaPackageMetadataService"
@@ -39,4 +37,6 @@
              cardinality="1..1" policy="static" bind="setMessageReceiver"/>
   <reference name="message-broker-sender" interface="org.opencastproject.message.broker.api.MessageSender"
              cardinality="1..1" policy="static" bind="setMessageSender"/>
+  <reference name="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
+             target="(osgi.unit.name=org.opencastproject.workflow.impl)" bind="setEntityManagerFactory"/>
 </scr:component>

@@ -133,7 +133,7 @@ public class StartTranscriptionOperationHandler extends AbstractWorkflowOperatio
     if (!waitForStatus(job).isSuccess()) {
       throw new WorkflowOperationException("Transcription job did not complete successfully");
     }
-    // Return OK means that the ibm watson job was created, but not finished yet
+    // Return OK means that the ibm watson job was created, but not succeeded yet
 
     logger.debug("External transcription job for mediapackage {} was created", mediaPackage);
 

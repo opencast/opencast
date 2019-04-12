@@ -48,9 +48,9 @@ public interface WorkflowsStatisticsMXBean {
   int getOnHold();
 
   /**
-   * Gets the number of finished workflows
+   * Gets the number of succeeded workflows
    *
-   * @return the number of finished workflows
+   * @return the number of succeeded workflows
    */
   int getFinished();
 

@@ -1241,7 +1241,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   public void removeScheduledRecordingsBeforeBuffer(long buffer) throws SchedulerException {
     DateTime end = new DateTime(DateTimeZone.UTC).minus(buffer * 1000);
 
-    logger.info("Starting to look for scheduled recordings that have finished before {}.",
+    logger.info("Starting to look for scheduled recordings that have succeeded before {}.",
             DateTimeSupport.toUTC(end.getMillis()));
 
     List<ExtendedEventDto> finishedEvents;
