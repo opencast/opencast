@@ -49,6 +49,12 @@ execution of the workflow operation.
 |`${publication_id}`|The id of this publication.               |`54f6c12d-8e68-4ec8-badf-cd045b33d01e`|
 |`${series_id}`     |The id of the series if available         |`36f3c5d8-ad4d-4dab-beb1-1400ffab4a69`|
 
+You can also access all data from metadata catalogues here. The notation to access them is `MainFlavor.SubFlavor.fieldID`.
+For example `${dublincore.series.title}`.
+
+Opencast uses the Freemarker template engine here with several functions to manipulate the string.
+So you can create templates like this `https://my.portal/${myterms.series.courseId?ensure_ends_with("/")}${event_id}`.
+
 ## Publication Channel Labels and Icons
 
 Using this workflow operation, you can create arbitrary custom publication channels. Without further action, the

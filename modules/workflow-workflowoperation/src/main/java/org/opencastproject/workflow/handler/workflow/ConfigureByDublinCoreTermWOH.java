@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +58,9 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
 
   /** Name of the configuration option that provides Dublin Core term/element */
   public static final String DCTERM_PROPERTY = "dcterm";
+
+  /** Name of the configuration option that provides the catalog to examine */
+  public static final String EXTERNAL_CATALOG_PROPERTY = "externalcatalog";
 
   /** Name of the configuration option that provides term's default value if not present */
   public static final String DEFAULT_VALUE_PROPERTY = "default-value";
@@ -96,29 +100,55 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
 
     String configuredCatalog = StringUtils.trimToEmpty(currentOperation.getConfiguration(DCCATALOG_PROPERTY));
     String configuredDCTerm = StringUtils.trimToEmpty(currentOperation.getConfiguration(DCTERM_PROPERTY));
+    String configuredExternalCatalog = StringUtils.trimToEmpty(currentOperation.getConfiguration(EXTERNAL_CATALOG_PROPERTY));
     String configuredDefaultValue = StringUtils.trimToNull(currentOperation.getConfiguration(DEFAULT_VALUE_PROPERTY));
     String configuredMatchValue = StringUtils.trimToEmpty(currentOperation.getConfiguration(MATCH_VALUE_PROPERTY));
 
+    // Set Default
+    EName dcterm = null;
+    if (("").equals(configuredExternalCatalog)) {
+      configuredExternalCatalog = "dublincore";
+      dcterm = new EName(TERMS_NS_URI, configuredDCTerm);
+    }
+
+    logger.info("External catalog is " + configuredExternalCatalog);
+
     // Find Catalog
     Catalog[] catalogs = mediaPackage
-            .getCatalogs(new MediaPackageElementFlavor("dublincore", StringUtils.lowerCase(configuredCatalog)));
+            .getCatalogs(new MediaPackageElementFlavor(configuredExternalCatalog, StringUtils.lowerCase(configuredCatalog)));
+
+    logger.info("found " + catalogs.length + " Metdata catalogs.");
 
     if (catalogs != null && catalogs.length > 0) {
       Boolean foundValue = false;
-      EName dcterm = new EName(TERMS_NS_URI, configuredDCTerm);
 
       // Find DCTerm
+      List<DublinCoreValue> values = new LinkedList<>();
       for (Catalog catalog : catalogs) {
         DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(workspace, catalog);
-        // Match Value
-        List<DublinCoreValue> values = dc.get(dcterm);
-        if (values.isEmpty()) {
-          // Use default
-          if (configuredDefaultValue != null) {
-            foundValue = configuredDefaultValue.equals(configuredMatchValue);
+          for (Map.Entry<EName, List<DublinCoreValue>> entry : dc.getValues().entrySet()) {
+            if (dcterm != null && dcterm.equals(entry)) {
+              values.addAll(entry.getValue());
+            } else if (entry.getKey().getLocalName().equals(configuredDCTerm)) {
+              values.addAll(entry.getValue());
+            }
           }
-        } else {
-          foundValue = values.contains(DublinCoreValue.mk(configuredMatchValue));
+      }
+      // Match Value
+      if (values.isEmpty()) {
+        logger.info("no value found");
+        // Use default
+        if (configuredDefaultValue != null) {
+          // check for direct character match or regex match
+          foundValue = configuredDefaultValue.equals(configuredMatchValue)
+                  || configuredDefaultValue.matches(configuredMatchValue);
+        }
+      } else {
+        for (DublinCoreValue value : values) {
+          foundValue = value.getValue().equals(configuredMatchValue)
+                  || value.getValue().matches(configuredMatchValue);
+          logger.info("found value " + value.getValue() + ", regex matched " + value.getValue().matches(configuredMatchValue));
+          if (foundValue) break;
         }
       }
 
@@ -128,7 +158,7 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
         for (String key : currentOperation.getConfigurationKeys()) {
           // Ignore this operations configuration
           if (DCCATALOG_PROPERTY.equals(key) || DCTERM_PROPERTY.equals(key) || DEFAULT_VALUE_PROPERTY.equals(key)
-                  || MATCH_VALUE_PROPERTY.equals(key)) {
+                  || MATCH_VALUE_PROPERTY.equals(key) || EXTERNAL_CATALOG_PROPERTY.equals(key)) {
             continue;
           }
 

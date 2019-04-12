@@ -15,7 +15,8 @@ Tags and flavors can be used in combination.
 |------------------|-------|-----------|-------------|
 |dccatalog         |"episode" or "series"|the type of catalog in which to search for `dcterm`|EMPTY|
 |dcterm            |"creator"            |the name of the Dublin Core term which to check|EMPTY|
-|match-value       |"Joe Bloggs"         |the Dublin Core term value to check for|EMPTY|
+|externalcatalog   |i.e. "myterms"       |the type of external metadata catalog in which to search for `dcterm`|dublincore|
+|match-value       |"Joe Bloggs"         |the Dublin Core term value to check for. Direct pattern matching and regex matching|EMPTY|
 |default-value     |"Anon"               |the implied value if the dubincore term is not present in the catalog|EMPTY|
 |*configProperty*  |true / false         |a configuration property and the value it will be given if a match is found|EMPTY|
 
@@ -26,8 +27,13 @@ The type of Dublin Core catalog in which to look for the `dcterm`. This will usu
 The name of the Dublin Core term to look for in the `dccatalog`. This could be one of the terms set by Opencast or an
 additional term adding to the catalog.
 
+### external catalog
+By default the dublin core catalogs that are mandatory in Opencast will be used. Optionally also external metadata
+catalogs can be accessed here. 
+
 ### match-value
-The value of the `dcterm` which to match against. The comparison is case sensitive.
+The value of the `dcterm` which to match against. The comparison is case sensitive. You can also use and regular
+expression.
 
 ### default-value
 If `default-value` is used when the `dcterm` is not found in the catalog. If not specified the operation will treat the
