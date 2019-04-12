@@ -110,14 +110,9 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
       configuredExternalCatalog = "dublincore";
       dcterm = new EName(TERMS_NS_URI, configuredDCTerm);
     }
-
-    logger.info("External catalog is " + configuredExternalCatalog);
-
     // Find Catalog
     Catalog[] catalogs = mediaPackage
             .getCatalogs(new MediaPackageElementFlavor(configuredExternalCatalog, StringUtils.lowerCase(configuredCatalog)));
-
-    logger.info("found " + catalogs.length + " Metdata catalogs.");
 
     if (catalogs != null && catalogs.length > 0) {
       Boolean foundValue = false;
@@ -136,7 +131,6 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
       }
       // Match Value
       if (values.isEmpty()) {
-        logger.info("no value found");
         // Use default
         if (configuredDefaultValue != null) {
           // check for direct character match or regex match
@@ -147,7 +141,6 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
         for (DublinCoreValue value : values) {
           foundValue = value.getValue().equals(configuredMatchValue)
                   || value.getValue().matches(configuredMatchValue);
-          logger.info("found value " + value.getValue() + ", regex matched " + value.getValue().matches(configuredMatchValue));
           if (foundValue) break;
         }
       }
