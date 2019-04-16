@@ -24,6 +24,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
@@ -40,7 +41,7 @@ public class AdminUIConfiguration implements ManagedService {
   private static final Logger logger = LoggerFactory.getLogger(AdminUIConfiguration.class);
 
   public enum ThumbnailPreviewMode {
-    ALWAYS, PARTIAL;
+    ALWAYS, OPTIMIZED, PARTIAL;
   }
 
   public static final String OPT_PREVIEW_SUBTYPE = "preview.subtype";
@@ -116,6 +117,12 @@ public class AdminUIConfiguration implements ManagedService {
     DEFAULT_SOURCE_TRACK_LEFT_FLAVOR);
   private MediaPackageElementFlavor sourceTrackRightFlavor = MediaPackageElementFlavor.parseFlavor(
     DEFAULT_SOURCE_TRACK_RIGHT_FLAVOR);
+
+  private String archiveBasePath = null;
+
+  public String getArchiveBasePath() {
+    return archiveBasePath;
+  }
 
   public String getPreviewSubtype() {
     return previewSubtype;
@@ -209,10 +216,15 @@ public class AdminUIConfiguration implements ManagedService {
     return sourceTrackRightFlavor;
   }
 
+  protected void activate(BundleContext bundleContext) {
+    this.archiveBasePath = bundleContext.getProperty("org.opencastproject.episode.rootdir");
+  }
+
   @Override
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
-    if (properties == null)
+    if (properties == null) {
       return;
+    }
 
     // Preview subtype
     previewSubtype = StringUtils.defaultString((String) properties.get(OPT_PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);

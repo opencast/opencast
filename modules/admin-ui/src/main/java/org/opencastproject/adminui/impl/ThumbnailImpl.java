@@ -25,12 +25,18 @@ import static org.opencastproject.mediapackage.MediaPackageElementFlavor.flavor;
 import static org.opencastproject.mediapackage.MediaPackageElementFlavor.parseFlavor;
 
 import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.ARecord;
+import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementBuilder;
+import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Publication;
@@ -49,10 +55,20 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -68,12 +84,16 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public final class ThumbnailImpl {
+
   /** Name of the thumbnail type workflow property */
   private static final String THUMBNAIL_PROPERTY_TYPE = "thumbnailType";
   /** Name of the thumbnail position workflow property */
   private static final String THUMBNAIL_PROPERTY_POSITION = "thumbnailPosition";
   /** Name of the thumbnail track workflow property */
   private static final String THUMBNAIL_PROPERTY_TRACK = "thumbnailTrack";
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(ThumbnailImpl.class);
 
   public enum ThumbnailSource {
     DEFAULT(0),
@@ -133,6 +153,7 @@ public final class ThumbnailImpl {
     }
   }
 
+  private final String archiveBasePath;
   private final AdminUIConfiguration.ThumbnailPreviewMode previewMode;
   private final MediaPackageElementFlavor previewFlavor;
   private final String previewProfileDownscale;
@@ -162,7 +183,11 @@ public final class ThumbnailImpl {
     final OaiPmhPublicationService oaiPmhPublicationService,
     final ConfigurablePublicationService configurablePublicationService, final AssetManager assetManager,
     final ComposerService composerService) {
+    this.archiveBasePath = config.getArchiveBasePath();
     this.previewMode = config.getThumbnailPreviewMode();
+    if ((this.previewMode == AdminUIConfiguration.ThumbnailPreviewMode.OPTIMIZED) && (this.archiveBasePath == null)) {
+      logger.error("Cannot enable thumbnail preview mode OPTIMIZED (archive path unknown). Falling back to ALWAYS.");
+    }
     this.previewFlavor = parseFlavor(config.getThumbnailPreviewFlavor());
     this.previewProfileDownscale = config.getThumbnailPreviewProfileDownscale();
     this.uploadedFlavor = parseFlavor(config.getThumbnailUploadedFlavor());
@@ -451,10 +476,16 @@ public final class ThumbnailImpl {
   private MediaPackageElement chooseThumbnail(final MediaPackage mp, final Track track, final double position)
     throws PublicationException, MediaPackageException, EncoderException, IOException, NotFoundException,
     UnknownFileTypeException {
-    if (previewMode == AdminUIConfiguration.ThumbnailPreviewMode.ALWAYS) {
-      /* Extracting the image would requires downloading the track into the workspace which is a very
-         expensive operation */
-      tempThumbnail = composerService.imageSync(track, encodingProfile, position).get(0).getURI();
+    if ((previewMode == AdminUIConfiguration.ThumbnailPreviewMode.ALWAYS)
+        || (previewMode == AdminUIConfiguration.ThumbnailPreviewMode.OPTIMIZED)) {
+      if (previewMode == AdminUIConfiguration.ThumbnailPreviewMode.ALWAYS) {
+        /* Extracting the image would requires downloading the track into the workspace which is a very
+           expensive operation */
+        tempThumbnail = composerService.imageSync(track, encodingProfile, position).get(0).getURI();
+      } else {
+        /* In optimized mode, we call the ffmpeg command directly */
+        tempThumbnail = extractThumbnailImage(track, position, mp.getIdentifier().compact()).get(0).getURI();
+      }
       tempThumbnailMimeType = MimeTypes.fromURI(tempThumbnail);
       tempThumbnailFileName = tempThumbnail.getPath().substring(tempThumbnail.getPath().lastIndexOf('/') + 1);
     }
@@ -529,5 +560,57 @@ public final class ThumbnailImpl {
     WorkflowPropertiesUtil.storeProperty(assetManager, mp, THUMBNAIL_PROPERTY_TRACK, trackFlavor.getType());
 
     return result;
+  }
+
+  private String getFullname(final Track track, final String mpId) {
+    final AQueryBuilder q = assetManager.createQuery();
+    final AResult result = q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run();
+    final ARecord firstResult = result.getRecords().toList().get(0);
+    final Snapshot snapshot = firstResult.getSnapshot().get();
+    final String fileExtension = FilenameUtils.getExtension(track.getURI().getPath());
+    final File basePath = new File(String
+      .format("%s/%s/%s/%s/%s.%s", this.archiveBasePath, snapshot.getOrganizationId(), mpId,
+        snapshot.getVersion().toString(), track.getIdentifier(), fileExtension));
+    logger.debug("ArchiveBase: {}, basePath.abs: {}", this.archiveBasePath, basePath.getAbsolutePath());
+    return basePath.getAbsolutePath();
+  }
+
+  private List<Attachment> extractThumbnailImage(final Track sourceTrack, final double time, final String mpId)
+    throws IOException, EncoderException {
+
+    logger.info("Extract thumbnail from media package {} [optimized]", mpId);
+    final String inFullname = getFullname(sourceTrack, mpId);
+
+    final File tempFile = File.createTempFile("thumbnail", ".jpg");
+    final String outFilename = tempFile.getAbsolutePath();
+    final String timeStr = getTimeString(time);
+    final Process myProcess = Runtime.getRuntime().exec(
+      new String[] { "ffmpeg", "-y", "-ss", timeStr, "-i", inFullname, "-r", "1", "-frames:v", "1", "-filter:v",
+        "yadif,scale=320:-1", outFilename });
+    while (true) {
+      try {
+        if (myProcess.waitFor() != 0) {
+          throw new EncoderException(
+            "Process exited, error output: " + IOUtils.toString(myProcess.getErrorStream(), StandardCharsets.UTF_8));
+        }
+        break;
+      } catch (final InterruptedException ignored) {
+      }
+    }
+    final String aid = UUID.randomUUID().toString();
+    try (InputStream is = new FileInputStream(tempFile)) {
+      final URI thumbnailUri = workspace.put(mpId, aid, tempFile.getName(), is);
+      tempFile.delete();
+      final MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+      final Attachment attachment = (Attachment) builder.elementFromURI(thumbnailUri, Attachment.TYPE, null);
+      return Collections.singletonList(attachment);
+    }
+  }
+
+  private String getTimeString(final double time) {
+    final DecimalFormatSymbols ffmpegFormat = new DecimalFormatSymbols();
+    ffmpegFormat.setDecimalSeparator('.');
+    final DecimalFormat df = new DecimalFormat("0.00000", ffmpegFormat);
+    return df.format(time);
   }
 }

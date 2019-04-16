@@ -49,6 +49,9 @@ image can be configured:
 If set to `always`, the thumbnail preview image is updated whenever required. If set to `partial`, the thumbnail
 preview image is only updated for uploaded thumbnails to avoid long waiting times that could cause timeouts in
 case of very large files.
+If set to `optimized`, the thumbnail preview image is updated whenever required, but instead of downloading
+files into the workspace (slow for large files), `ffmpeg` is called directly on the Admin node and accesses the
+file directly from the shared volume.
 
 Note that this image is supposed to be used by the Admin UI only.
 
