@@ -121,6 +121,11 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider, CaptureA
       throw new IllegalArgumentException("Query must be set");
     }
 
+    // These roles are not meaningful for use in ACLs
+    if (target == Role.Target.ACL) {
+      return Collections.emptyIterator();
+    }
+
     Stream<Role> skip = getRolesStream()
             .filter(e -> like(e.getName(), query) || like(e.getDescription(), query))
             .skip(offset);
