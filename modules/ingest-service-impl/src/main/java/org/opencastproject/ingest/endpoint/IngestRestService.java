@@ -270,7 +270,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       ingestService.discardMediaPackage(mp);
       return Response.ok().build();
     } catch (Exception e) {
-      logger.warn("Unable to discard mediapackage", e);
+      logger.warn("Unable to discard mediapackage {}", mpx, e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }
