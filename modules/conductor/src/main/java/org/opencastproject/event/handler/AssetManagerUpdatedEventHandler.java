@@ -243,7 +243,8 @@ public class AssetManagerUpdatedEventHandler {
         }
       }
     } catch (IOException | NotFoundException e) {
-      logger.warn("Unable to handle update event for series {}: {}", seriesItem, e.getMessage());
+      logger.warn("Unable to handle update event for series {} for user {}: {}",
+                  seriesItem, prevUser.getUsername(), e.getMessage());
     } finally {
       securityService.setOrganization(prevOrg);
       securityService.setUser(prevUser);
