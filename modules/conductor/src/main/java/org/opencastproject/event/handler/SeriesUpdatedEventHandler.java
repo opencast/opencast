@@ -275,19 +275,10 @@ public class SeriesUpdatedEventHandler {
         barrier.waitForJobs();
       }
     } catch (SearchException e) {
-      logger.warn("Unable to find mediapackages in search: ", e.getMessage());
-    } catch (UnauthorizedException e) {
-      logger.warn(e.getMessage());
-    } catch (MediaPackageException e) {
-      logger.warn(e.getMessage());
-    } catch (ServiceRegistryException e) {
-      logger.warn(e.getMessage());
-    } catch (NotFoundException e) {
-      logger.warn(e.getMessage());
-    } catch (IOException e) {
-      logger.warn(e.getMessage());
-    } catch (DistributionException e) {
-      logger.warn(e.getMessage());
+      logger.warn("Unable to find mediapackages for series {} in search: {}", seriesItem, e.getMessage());
+    } catch (UnauthorizedException | MediaPackageException | ServiceRegistryException
+             | NotFoundException | IOException | DistributionException e) {
+      logger.warn("Unable to update mediapackages for series {}: {}", seriesItem, e.getMessage());
     } finally {
       securityService.setOrganization(prevOrg);
       securityService.setUser(prevUser);
