@@ -298,7 +298,7 @@ public class GroupsEndpoint {
     try {
       indexService.createGroup(name, description, roles, users);
     } catch (IllegalArgumentException e) {
-      logger.warn(e.getMessage());
+      logger.warn("Unable to create group with name {}: {}", name, e.getMessage());
       return Response.status(Status.BAD_REQUEST).build();
     } catch (UnauthorizedException e) {
       return Response.status(SC_FORBIDDEN).build();
@@ -332,7 +332,7 @@ public class GroupsEndpoint {
     try {
       indexService.updateGroup(groupId, name, description, roles, users);
     } catch (IllegalArgumentException e) {
-      logger.warn(e.getMessage());
+      logger.warn("Unable to update group with id {}: {}", groupId, e.getMessage());
       return Response.status(Status.BAD_REQUEST).build();
     } catch (UnauthorizedException ex) {
       return Response.status(SC_FORBIDDEN).build();

@@ -1876,7 +1876,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         throw new ServiceRegistryException("This argument list for operation '" + op + "' does not meet expectations",
                 e);
       } catch (NotFoundException e) {
-        logger.warn(e.getMessage());
+        logger.warn("Not found processing job {}: {}", job, e.getMessage());
         updateOperationJob(job.getId(), OperationState.FAILED);
       }
       return null;
