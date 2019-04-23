@@ -66,8 +66,9 @@ public class FeedEndpoint extends RemoteBase {
     feedServices.add(details);
 
     HttpGet get = new HttpGet("/listFeedServices");
+    HttpResponse response = null;
     try {
-      HttpResponse response = getResponse(get);
+      response = getResponse(get);
       // response.getEntity().getContent()
     } catch (Exception e) {
 
