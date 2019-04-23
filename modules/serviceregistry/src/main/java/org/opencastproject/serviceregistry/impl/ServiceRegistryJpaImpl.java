@@ -354,7 +354,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     }
 
-    systemLoad = getHostLoads(emf.createEntityManager()).get(hostName).getLoadFactor();
+    systemLoad = getHostLoads(emf.createEntityManager()).get(hostName).getCurrentLoad();
     logger.info("Current system load: {}", systemLoad);
   }
 
@@ -2227,29 +2227,23 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       String host = String.valueOf(resultArray[0]);
 
       Status status = Status.values()[(int) resultArray[1]];
-      float load = ((Number) resultArray[2]).floatValue();
+      float currentLoad = ((Number) resultArray[2]).floatValue();
+      float maxLoad = ((Number) resultArray[3]).floatValue();
 
       // Only queued, and running jobs are adding to the load, so every other status is discarded
       if (status == null || !JOB_STATUSES_INFLUENCING_LOAD_BALANCING.contains(status)) {
-        load = 0.0f;
+        currentLoad = 0.0f;
       }
 
       // Add the service registration
-      NodeLoad serviceLoad;
-      if (systemLoad.containsHost(host)) {
-        serviceLoad = systemLoad.get(host);
-        serviceLoad.setLoadFactor(serviceLoad.getLoadFactor() + load);
-      } else {
-        serviceLoad = new NodeLoad(host, load);
-      }
-
+      NodeLoad serviceLoad = new NodeLoad(host, currentLoad, maxLoad);
       systemLoad.addNodeLoad(serviceLoad);
     }
 
     // This is important, otherwise services which have no current load are not listed in the output!
     for (HostRegistration h : getHostRegistrations(em)) {
       if (!systemLoad.containsHost(h.getBaseUrl())) {
-        systemLoad.addNodeLoad(new NodeLoad(h.getBaseUrl(), 0.0f));
+        systemLoad.addNodeLoad(new NodeLoad(h.getBaseUrl(), 0.0f, h.getMaxLoad()));
       }
     }
 
@@ -2754,7 +2748,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         logger.warn("Unable to determine max load for host {}", service.getHost());
 
       // Determine the current load for this host
-      Float hostLoad = systemLoad.get(service.getHost()).getLoadFactor();
+      Float hostLoad = systemLoad.get(service.getHost()).getCurrentLoad();
       if (hostLoad == null)
         logger.warn("Unable to determine current load for host {}", service.getHost());
 
@@ -2847,7 +2841,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   public SystemLoad getMaxLoads() throws ServiceRegistryException {
     final SystemLoad loads = new SystemLoad();
     for (HostRegistration host : getHostRegistrations()) {
-      NodeLoad load = new NodeLoad(host.getBaseUrl(), host.getMaxLoad());
+      NodeLoad load = new NodeLoad(host.getBaseUrl(), 0.0f, host.getMaxLoad());
       loads.addNodeLoad(load);
     }
     return loads;
@@ -2866,7 +2860,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       em = emf.createEntityManager();
       query = em.createNamedQuery("HostRegistration.getMaxLoadByHostName");
       query.setParameter("host", host);
-      return new NodeLoad(host, ((Number) query.getSingleResult()).floatValue());
+      return new NodeLoad(host, 0.0f, ((Number) query.getSingleResult()).floatValue());
     } catch (NoResultException e) {
       throw new NotFoundException(e);
     } catch (Exception e) {

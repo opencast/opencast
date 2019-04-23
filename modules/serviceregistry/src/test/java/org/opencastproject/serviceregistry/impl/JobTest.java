@@ -611,10 +611,10 @@ public class JobTest {
 
   @Test
   public void testMaxLoad() throws Exception {
-    assertEquals(1.0f, serviceRegistry.getMaxLoads().get(serviceRegistry.getRegistryHostname()).getLoadFactor(), 0.01f);
-    assertEquals(1.0f, serviceRegistry.getMaxLoads().get(LOCALHOST).getLoadFactor(), 0.01f);
-    assertEquals(1.0f, serviceRegistry.getMaxLoads().get(REMOTEHOST).getLoadFactor(), 0.01f);
-    assertEquals(1.0f, serviceRegistry.getMaxLoadOnNode(serviceRegistry.getRegistryHostname()).getLoadFactor(), 0.01f);
+    assertEquals(1.0f, serviceRegistry.getMaxLoads().get(serviceRegistry.getRegistryHostname()).getMaxLoad(), 0.01f);
+    assertEquals(1.0f, serviceRegistry.getMaxLoads().get(LOCALHOST).getMaxLoad(), 0.01f);
+    assertEquals(1.0f, serviceRegistry.getMaxLoads().get(REMOTEHOST).getMaxLoad(), 0.01f);
+    assertEquals(1.0f, serviceRegistry.getMaxLoadOnNode(serviceRegistry.getRegistryHostname()).getMaxLoad(), 0.01f);
   }
 
   @Test
