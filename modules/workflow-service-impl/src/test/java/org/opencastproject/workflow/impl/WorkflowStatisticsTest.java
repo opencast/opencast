@@ -21,18 +21,10 @@
 
 package org.opencastproject.workflow.impl;
 
-import static org.easymock.EasyMock.createNiceMock;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.api.query.ASelectQuery;
-import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.api.query.Target;
-import org.opencastproject.assetmanager.api.query.VersionField;
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
@@ -67,7 +59,6 @@ import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionRep
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.FileUtils;
@@ -82,6 +73,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -155,29 +147,13 @@ public class WorkflowStatisticsTest {
     scanner = new WorkflowDefinitionScanner();
     service.addWorkflowDefinitionScanner(scanner);
 
-    final AssetManager assetManager = createNiceMock(AssetManager.class);
-    final AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
-    final Target t = EasyMock.createNiceMock(Target.class);
-    final Predicate p = EasyMock.createNiceMock(Predicate.class);
-    EasyMock.expect(p.and(EasyMock.anyObject(Predicate.class))).andReturn(p).anyTimes();
-    EasyMock.expect(query.snapshot()).andReturn(t).anyTimes();
-    EasyMock.expect(query.propertiesOf(EasyMock.anyString())).andReturn(t).anyTimes();
-    final VersionField v = EasyMock.createNiceMock(VersionField.class);
-    EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
-    EasyMock.expect(query.version()).andReturn(v).anyTimes();
+    final AssetManager assetManager = EasyMock.createMock(AssetManager.class);
+    EasyMock.expect(assetManager.selectProperties(EasyMock.anyString(), EasyMock.anyString()))
+            .andReturn(Collections.emptyList())
+            .anyTimes();
     EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
-    EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(p).anyTimes();
-    final ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
-    EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
-    final AResult r = EasyMock.createNiceMock(AResult.class);
-    EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
-    final Stream<ARecord> recStream = Stream.mk();
-    EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
-    EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class))).
-            andReturn(selectQuery).anyTimes();
-    EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
-    EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
-    EasyMock.replay(query, t, r, selectQuery, assetManager, p, v);
+    EasyMock.expect(assetManager.snapshotExists(EasyMock.anyString())).andReturn(true).anyTimes();
+    EasyMock.replay(assetManager);
     service.setAssetManager(assetManager);
 
     // security service

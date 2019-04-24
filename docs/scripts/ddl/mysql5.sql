@@ -262,6 +262,7 @@ CREATE TABLE oc_search (
   mediapackage_xml MEDIUMTEXT,
   modification_date DATETIME,
   PRIMARY KEY (id),
+  KEY `IX_oc_search_series` (`series_id`),
   CONSTRAINT FK_oc_search_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -366,7 +367,8 @@ CREATE TABLE oc_assets_snapshot (
   INDEX IX_oc_assets_snapshot_archival_date (archival_date),
   INDEX IX_oc_assets_snapshot_mediapackage_id (mediapackage_id),
   INDEX IX_oc_assets_snapshot_organization_id (organization_id),
-  INDEX IX_oc_assets_snapshot_owner (owner)
+  INDEX IX_oc_assets_snapshot_owner (owner),
+  INDEX IX_oc_assets_snapshot_series (series_id, version)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE oc_assets_asset (
@@ -380,7 +382,8 @@ CREATE TABLE oc_assets_asset (
   --
   CONSTRAINT FK_oc_assets_asset_snapshot_id FOREIGN KEY (snapshot_id) REFERENCES oc_assets_snapshot (id) ON DELETE CASCADE,
   INDEX IX_oc_assets_asset_checksum (checksum),
-  INDEX IX_oc_assets_asset_mediapackage_element_id (mediapackage_element_id)
+  INDEX IX_oc_assets_asset_mediapackage_element_id (mediapackage_element_id),
+  INDEX IX_oc_assets_asset_snapshot_id (snapshot_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE oc_assets_properties (
@@ -522,7 +525,8 @@ CREATE TABLE oc_event_comment (
   reason VARCHAR(255) DEFAULT NULL,
   modification_date DATETIME NOT NULL,
   resolved_status TINYINT(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  KEY IX_oc_event_comment_event (event, organization)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE oc_event_comment_reply (
