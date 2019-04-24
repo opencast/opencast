@@ -4,6 +4,26 @@ Changelog
 Opencast 6
 ----------
 
+### Opencast 6.4
+
+*Released on April 01, 2019*
+
+- [[MH-13449](https://opencast.jira.com/browse/MH-13449)][[cc11441
+  ](https://github.com/opencast/opencast/commit/cc1144125ecda32cbb29afba51ab0ac7efb7ca7e)] -
+  MH-13449, upgrade spring-security-oauth libs
+- [[MH-13464](https://opencast.jira.com/browse/MH-13464)][[#805](https://github.com/opencast/opencast/pull/805)] -
+  Update paella player to 6.1.0
+- [[MH-13463](https://opencast.jira.com/browse/MH-13463)][[#803](https://github.com/opencast/opencast/pull/803)] -
+  WOH select-streams does not hide audio track as expected
+- [[MH-13444](https://opencast.jira.com/browse/MH-13444)][[#786](https://github.com/opencast/opencast/pull/786)] -
+  Insecure Series Creation
+- [[MH-13387](https://opencast.jira.com/browse/MH-13387)][[#777](https://github.com/opencast/opencast/pull/777)] -
+  Get ACLs of finished workflows from AssetManager
+- [Document encoding-profiles parameter in ComposeWorkflowHandler
+  ](https://github.com/opencast/opencast/pull/772)
+- [[MH-13429](https://opencast.jira.com/browse/MH-13429)][[#767](https://github.com/opencast/opencast/pull/767)] -
+  Make sure series LTI tool respects provided series custom param
+
 ### Opencast 6.3
 
 *Released on March 05, 2019*
@@ -473,6 +493,23 @@ Opencast 6
 
 Opencast 5
 ----------
+
+### Opencast 5.5
+
+*Released on April 1, 2019*
+
+- [[MH-12603](https://opencast.jira.com/browse/MH-12603)][[#746](https://github.com/opencast/opencast/pull/746)] -
+  Take 'ng' out of the youtube composite operation
+- [[MH-13386](https://opencast.jira.com/browse/MH-13386)][[#733](https://github.com/opencast/opencast/pull/733)] -
+  Event status calculation wrong assumption fixed
+- [[MH-13383](https://opencast.jira.com/browse/MH-13383)][[#728](https://github.com/opencast/opencast/pull/728)] -
+  don't smooth the waveform in the editor
+- [[MH-13366](https://opencast.jira.com/browse/MH-13366)][[#708](https://github.com/opencast/opencast/pull/708)] -
+  Add `REFERENCES` permission to standard Opencast `GRANT` statement
+- [[MH-13363](https://opencast.jira.com/browse/MH-13363)][[#706](https://github.com/opencast/opencast/pull/706)] -
+  Publish to OAI-PMH an allready published mediapackage …
+- [[MH-13333](https://opencast.jira.com/browse/MH-13333)][[#669](https://github.com/opencast/opencast/pull/669)] -
+  Do not import properties in publish WF
 
 ### Opencast 5.4
 
