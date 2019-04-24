@@ -20,6 +20,7 @@ describe('adminNg.modules.configuration.validators.uniqueThemeName', function ()
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $httpBackend.whenGET('/admin-ng/themes/themes.json').respond(JSON.stringify(getJSONFixture('admin-ng/themes/themes.json')));
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         element = '<form name="form"><input type="text" name="themename" ng-model="model.name" unique-theme-name/></form>';
         $compile(element)($rootScope);
     });

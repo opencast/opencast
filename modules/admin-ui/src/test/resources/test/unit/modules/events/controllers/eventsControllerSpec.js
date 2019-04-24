@@ -16,6 +16,7 @@ describe('Events controller', function () {
         $controller('EventsCtrl', {$scope: $scope});
         $httpBackend = _$httpBackend_;
         EventsResource = _EventsResource_;
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
     }));
 
     it('instantiates', function () {

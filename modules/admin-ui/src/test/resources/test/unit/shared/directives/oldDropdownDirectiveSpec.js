@@ -1,5 +1,5 @@
 describe('adminNg.directives.oldAdminNgDropdown', function () {
-    var $compile, $rootScope, element;
+    var $compile, $rootScope, element, $httpBackend;
 
     beforeEach(module('adminNg'));
 
@@ -10,12 +10,14 @@ describe('adminNg.directives.oldAdminNgDropdown', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function (_$rootScope_, _$compile_) {
+    beforeEach(inject(function (_$httpBackend_, _$rootScope_, _$compile_) {
+        $httpBackend = _$httpBackend_;
         $compile = _$compile_;
         $rootScope = _$rootScope_;
     }));
 
     beforeEach(function () {
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         element = $compile('<div old-admin-ng-dropdown=""><ul><li><a></a></li></ul></div>')($rootScope);
         $rootScope.$digest();
     });

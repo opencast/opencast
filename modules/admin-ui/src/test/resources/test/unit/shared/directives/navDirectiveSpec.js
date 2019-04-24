@@ -36,6 +36,7 @@ describe('adminNg.directives.adminNgNav', function () {
             callback.apply(element.find('#roll-up-menu'));
         });
 
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
         $httpBackend.whenGET('/sysinfo/bundles/version?prefix=opencast').respond(201, {});
         // Until we're actually testing the statistics endpoint, just return an empty set here

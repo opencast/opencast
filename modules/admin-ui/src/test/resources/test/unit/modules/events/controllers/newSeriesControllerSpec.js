@@ -14,6 +14,7 @@ describe('New Series Controller', function () {
         Table = _Table_;
         $httpBackend = _$httpBackend_;
 
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.expectGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=100&offset=0').respond('{"ROLE_ANONYMOUS": "ROLE_ANONYMOUS"}');
 
         $parentScope = $rootScope.$new();
