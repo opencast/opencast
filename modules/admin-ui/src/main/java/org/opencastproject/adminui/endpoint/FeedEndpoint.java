@@ -26,13 +26,9 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import com.google.gson.Gson;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -54,28 +50,18 @@ public class FeedEndpoint extends RemoteBase {
   @Produces(MediaType.APPLICATION_JSON)
   public String listFeedServices() {
 
-    Gson gson = new Gson();
-    List<Map<String, String>> feedServices = new ArrayList<>();
-
-    Map<String, String> details = new HashMap<>();
-    details.put("identifier", "localhost test");
-    details.put("name", "some text");
-    details.put("description", "some desc test");
-    details.put("copyright", "MIT");
-    details.put("type", "SomeClass");
-    feedServices.add(details);
-
     HttpGet get = new HttpGet("/listFeedServices");
     HttpResponse response = null;
+    String result = null;
+
     try {
       response = getResponse(get);
-      // response.getEntity().getContent()
+      result = IOUtils.toString(response.getEntity().getContent(), "utf-8");
     } catch (Exception e) {
 
     }
 
-
-    return gson.toJson(feedServices);
+    return result;
   }
 
 }
