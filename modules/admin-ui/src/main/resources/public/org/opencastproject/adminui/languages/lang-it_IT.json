@@ -10,7 +10,8 @@
    "SAVE": "Salva",
    "LOGOUT": "Disconnettersi",
    "RESET": "Reset",
-   "SELECT_NO_OPTIONS": "Nessuna opzione",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Sì",
    "LANGUAGES": {
       "ARABIC": "Arabo",
@@ -55,11 +56,8 @@
             "ACL": "L'ACL seguente sarà eliminato",
             "GROUP": "Il gruppo seguente sarà eliminato",
             "USER": "L'utente seguente sarà eliminato",
-            "USER_BLACKLIST": "La seguente blacklist di utenti sarà cancellata",
             "THEME": "Il tema seguente sarà eliminato",
-            "EMAIL": "Il modello email seguente sarà cancellato",
-            "LOCATION": "La seguente posizione non sarà eliminata",
-            "LOCATION_BLACKLIST": "La seguente blacklist di posizioni sarà eliminata"
+            "LOCATION": "La seguente posizione non sarà eliminata"
          },
          "NAME": "Nome"
       },
@@ -130,30 +128,9 @@
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "L'evento non può essere eliminato, perché non possiedi i permessi per questa operazione.",
       "SERIES_DELETED": "La serie è stata cancellata",
       "SERIES_NOT_DELETED": "La serie non può essere cancellata",
-      "USER_BLACKLIST_CREATED": "La blacklist è stata creata",
-      "USER_BLACKLIST_NOT_CREATED": "La blacklist non può essere creata",
-      "USER_BLACKLIST_SAVED": "La blacklist è stata salvata",
-      "USER_BLACKLIST_NOT_SAVED": "La blacklist non può essere salvata",
-      "USER_BLACKLIST_DELETED": "La blacklist è stata cancellata",
-      "USER_BLACKLIST_NOT_DELETED": "La blacklist non può essere cancellata",
       "LOCATION_DELETED": "La posizione è stata eliminata",
       "LOCATION_NOT_DELETED": "La posizione non potrebbe essere eliminata",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "La posizione non può essere eliminata, perché non possiedi i permessi per questa operazione.",
-      "LOCATION_BLACKLIST_CREATED": "La blacklist è stata creata",
-      "LOCATION_BLACKLIST_NOT_CREATED": "La blacklist non può essere creata",
-      "LOCATION_BLACKLIST_SAVED": "La blacklist è stata salvata",
-      "LOCATION_BLACKLIST_NOT_SAVED": "La blacklist non può essere salvata",
-      "LOCATION_BLACKLIST_DELETED": "La blacklist è stata cancellata",
-      "LOCATION_BLACKLIST_NOT_DELETED": "La blacklist non può essere cancellata",
-      "EMAIL_TEMPLATE_CREATED": "Il modello è stato creato",
-      "EMAIL_TEMPLATE_NOT_CREATED": "Il modello non può essere creato",
-      "EMAIL_TEMPLATE_SAVED": "Il modello è stato creato",
-      "EMAIL_TEMPLATE_NOT_SAVED": "Il modello non può essere creato",
-      "EMAIL_TEMPLATE_DELETED": "Il modello è stato cancellato",
-      "EMAIL_TEMPLATE_NOT_DELETED": "Il modello non può essere cancellato",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "Questo nome è già in uso",
-      "EMAIL_SENT": "Il messaggio è stato inviato",
-      "EMAIL_NOT_SENT": "Il messaggio non può essere inviato",
       "CONFLICT_DETECTED": "Conflitto di programmazione: questo nuovo evento si sovrappone ad un evento esistente. Si prega di cambiare il luogo, le date o gli orari.",
       "CONFLICT_BULK_DETECTED": "Conflitto di programmazione: modificare gli eventi è causa di conflitti. Cambia la posizione, le date o i tempi.",
       "CONFLICT_ALREADY_ENDED": "Errore di programmazione: L'evento è già terminato.",
@@ -166,11 +143,6 @@
       "SERIES_ACL_LOCKED": "La modifica delle Policy di Accesso non è consentita quando le operazioni sono in esecuzione su un evento che fa parte della serie",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "La Policy di Accesso richiede almeno un ruolo con i permessi di Lettura e Scrittura.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "La Policy di Accesso richiede almeno un ruolo con i permessi di Lettura e Scrittura.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Lo stato di opt-out dell'evento è stato aggiornato con successo.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Errore durante l'aggiornamento dello stato di opt-out di evento.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "Lo stato di partecipazione non può essere aggiornato in quanto la data di inizio della pianificazione è passata.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Lo stato di opt-out della serie è stato aggiornato con successo.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Errore durante l'aggiornamento dello stato di opt-out della serie.",
       "THEME_NAME_ALREADY_TAKEN": "Questo nome è già in uso",
       "THEME_NAME_EMPTY": "Il nome non può essere vuoto",
       "BUMPER_UPLOAD_ERROR": "Errore durante il caricamento dei media",
@@ -199,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Azioni",
-      "SEND_MESSAGE": "Invia messaggio",
       "WARNING": "Attenzione",
-      "EDIT_STATUS": {
-         "CAPTION": "Modifica lo stato",
-         "READY_FOR_RECORDING": "Pronto per la registrazione",
-         "OPTED_OUT": "Non selezionato"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Elimina",
@@ -279,8 +245,11 @@
          },
          "EDIT": {
             "CAPTION": "Modifica",
+            "EVENT": "evento",
+            "EVENTS": "eventi",
+            "HEADER": "Questa pagina consente di modificare gli eventi programmati raggruppandoli per giorni feriali. I campi in entrata sono pre-compilati nel caso in cui tutti gli eventi pianificati abbiano lo stesso valore per un campo specifico. Altrimenti, i campi di input sono lasciati vuoti. Lasciando i campi di input vuoto significa che i rispettivi valori non devono essere modificati.",
             "METADATA": "Metadati",
-            "SCHEDULING": "Programmazione"
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       }
    },
@@ -302,6 +271,8 @@
       "BACK": "Precedente",
       "CREATE": "Crea",
       "RETRACT": "Ritira",
+      "RETRACT_DELETE": "Retract/Delete",
+      "DELETE": "Elimina",
       "UPDATE": "Aggiorna",
       "DURATION": {
          "HOURS": "Ore",
@@ -358,28 +329,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "Invia messaggio",
-         "TABS": {
-            "RECIPIENTS": "Destinatari",
-            "MESSAGE": "Messaggio",
-            "SUMMARY": "Riepilogo"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "Aggiungi alla lista audit",
-            "AUDIT_TRAIL_DESCRIPTION": "Seleziona per aggiungere il messaggio alla lista di audit",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "Seleziona un Template Email",
-            "SUBJECT": "Oggetto",
-            "MESSAGE": "Messaggio",
-            "INCLUDE_SIGNATURE": "Includi la mia firma nell'email"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "Riepilogo"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -445,7 +394,8 @@
                   "CAPTION": "Pianifica più eventi",
                   "REPEATS": "Cadenza",
                   "REPEAT_ON": "Ripeti",
-                  "WEEKDAYS": "Giorni feriali"
+                  "WEEKDAYS": "Giorni feriali",
+                  "WEEKDAY": "Giorno feriale"
                },
                "NO_SOURCE_AVAILABLE": "Nessun agente di cattura disponibile per la programmazione"
             },
@@ -509,7 +459,6 @@
          "ADD_EVENT": "Aggiungi evento",
          "TABLE": {
             "CAPTION": "Eventi",
-            "CREATORS": "Creatori",
             "TITLE": "Titolo",
             "PRESENTERS": "Presentatore(i)",
             "SERIES": "Serie",
@@ -524,9 +473,7 @@
             "LAST": "Ultimo",
             "NEXT": "Successivo",
             "MANAGED_ACL": "Politica di accesso",
-            "SCHEDULING_STATUS": "Stato",
             "WORKFLOW_STATE": "Progresso",
-            "REVIEW_STATUS": "Stato di revisione",
             "PREVIOUS": "Precedente",
             "NOCONTENT": "Nessun dato disponibile",
             "PUBLISHED": "Pubblicato",
@@ -541,18 +488,12 @@
                "EDITOR": "Apri video Editor",
                "EDITOR_NEEDS_CUTTING": "Apri video Editor (un commento indica che è stato richiesto tagliare il video)",
                "COMMENTS": "Visualizza commenti",
-               "PAUSED_WORKFLOW": "Mostra flusso di lavoro in pausa"
+               "PAUSED_WORKFLOW": "Mostra flusso di lavoro in pausa",
+               "PRESENTER": "Filtra per questo presentatore"
             }
-         },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "Pronto per la registrazione",
-            "BLACKLISTED": "In blacklist",
-            "OPTED_OUT": "Non selezionato"
          },
          "STATUS": {
             "SCHEDULED": "Programmato",
-            "OPTEDOUT": "Non selezionato",
-            "BLACKLISTED": "In blacklist",
             "RECORDING": "Registrazione",
             "UPLOADING": "Caricamento",
             "INGESTING": "Ingresso",
@@ -581,9 +522,6 @@
                "NO_PUBLICATIONS_AVAILABLE": "This event has no publications",
                "PUBLICATION_DESCRIPTION": "Questo evento è stato pubblicato per i seguenti canali di pubblicazione:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Questo evento non è attualmente in corso",
-               "SCHEDULING_STATUS": "Stato",
-               "READY_FOR_RECORDING": "Pronto per la registrazione",
-               "OPTED_OUT": "Non selezionato",
                "CUSTOM": "Personalizzato",
                "ENGAGE": "Partecipa",
                "ENGAGE_LIVE": "Engage Live",
@@ -850,20 +788,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "Participation status",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Stato di revisione"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Stato non selezionato",
-                  "READY": "Pronto per la registrazione",
-                  "OPTEDOUT": "Non selezionato"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Messaggi",
-                  "CREATION_DATE": "Data di creazione",
-                  "SENDER": "Mittente",
-                  "SUBJECT": "Oggetto"
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Presentatore(i)"
                }
@@ -871,25 +795,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Azioni",
                "DETAILS": "Dettagli",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Altre informazioni e azioni",
+               "DESCRIPTION": "Descrizione",
+               "MORE_INFO": "Maggiori informazioni",
                "ID": "ID",
                "TYPE": "Tipo",
                "TITLE": "Titolo",
-               "STATE": "Stato",
+               "STATUS": "Stato",
                "STARTED": "Avviato",
                "SERIES": "Serie",
                "SUBMITTED": "Inviato",
+               "SUBMITTER": "Mittente",
+               "EXECUTION_TIME": "Tempo di esecuzione",
+               "WDID": "Definizione del flusso di lavoro",
                "MIMETYPE": "Mimetype",
                "URL": "URL",
                "CONFIGURATION": "Configurazione",
                "NO_CONFIGURATION": "Nessun parametro di configurazione esistente per la definizione del flusso di lavoro selezionato.",
                "WORKFLOW": "Flusso di lavoro",
                "TOOLTIP": {
-                  "STOP": "Interrompi istanza di esecuzione flusso di lavoro",
+                  "STOP": "Interrompi il flusso di lavoro",
                   "ABORT": "Interrompere l'esecuzione dell'istanza del flusso di lavoro (non ritentare nuovamente operazione non riuscita)",
-                  "RETRY": "Ritenta l'esecuzione dell'istanza del flusso di lavoro",
-                  "DELETE": "Elimina istanza del flusso di lavoro"
+                  "RETRY": "Ritenta l'esecuzione del flusso di lavoro",
+                  "DELETE": "Elimina il flusso di lavoro",
+                  "DETAILS": "Apri dettagli flusso di lavoro"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Istanziato",
@@ -904,7 +832,7 @@
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Istanze Workflow"
+               "TITLE": "Flussi di lavoro"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Dettagli flusso di lavoro",
@@ -1033,7 +961,7 @@
             "CAPTION": "Serie",
             "TITLE": "Serie",
             "HAS_EVENTS": "Contiene eventi",
-            "CREATORS": "Organizzatore(i)",
+            "ORGANIZERS": "Organizzatore(i)",
             "CONTRIBUTORS": "Collaboratore(i)",
             "CREATED": "Creata",
             "MANAGED_ACL": "Politica di accesso",
@@ -1050,7 +978,6 @@
             "TABS": {
                "METADATA": "Metadati",
                "EXTENDED_METADATA": "Metadati",
-               "PARTICIPATION": "Partecipazione",
                "EVENTS": "Eventi",
                "PERMISSIONS": "Politica di accesso",
                "THEME": "Tema"
@@ -1072,7 +999,9 @@
                   "ADDITIONAL_ACTIONS": "Azioni aggiuntive",
                   "ACTION": "Azioni",
                   "NEW": "Nuova politica",
-                  "DETAILS": "Dettagli"
+                  "DETAILS": "Dettagli",
+                  "REPLACE_EVENT_ACLS": "Aggiorna permessi evento",
+                  "REPLACE_EVENT_ACLS_HINT": "Assicurarsi che tutti gli eventi di questa serie abbiano questi permessi in vigore"
                },
                "ROLES": {
                   "LABEL": "Seleziona un ruolo",
@@ -1094,24 +1023,6 @@
                "LICENSE": "Licenza",
                "DESCRIPTION": "Descrizione"
             },
-            "PARTICIPATION": {
-               "CAPTION": "Modello di stato della partecipazione",
-               "WARNING_TEMPLATE": "Lo stato di partecipazione delle serie verrà utilizzato come valore predefinito per i nuovi eventi che fanno parte della serie.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Stato di Revisione"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Stato non selezionato",
-                  "READY": "Pronto per la registrazione",
-                  "OPTEDOUT": "Non selezionato"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Messaggi",
-                  "CREATION_DATE": "Data di creazione",
-                  "SENDER": "Mittente",
-                  "SUBJECT": "Oggetto"
-               }
-            },
             "EVENTS": {
                "TITLE": "Titolo",
                "PRESENTER": "Presentatore(i)",
@@ -1126,12 +1037,10 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Posizioni",
-         "BLACKLISTS": "Blacklist"
+         "LOCATIONS": "Posizioni"
       },
       "ACTIONS": {
          "EXPORT": "Esporta",
-         "ADD_BLACKLIST": "Aggiungi blacklist",
          "REMOVE": "Rimuovi"
       },
       "RECORDINGS": {
@@ -1145,8 +1054,6 @@
             "NEXT_NAME": "Titolo evento seguente",
             "STATUS": "Stato",
             "VERSION": "Versione",
-            "BLACKLIST_FROM": "Messo in blacklist da",
-            "BLACKLIST_TO": "Messo in blacklist fino a",
             "ACTION": "Azioni",
             "TOOLTIP": {
                "NAME": "Filtra eventi per questa posizione",
@@ -1177,60 +1084,18 @@
                "NO_CAPABILITIES": "Nessuna capacità fornita"
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Blacklist posizioni",
-            "NAME": "Nome",
-            "ACTIONS": "Azioni"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Crea blacklist",
-            "EDITCAPTION": "Modifica blacklist",
-            "TABS": {
-               "LOCATIONS": "Posizioni",
-               "DATES": "Date",
-               "REASON": "Motivo",
-               "SUMMARY": "Riepilogo"
-            },
-            "LOCATIONS": {
-               "REMOVE": "Rimuovi",
-               "ADD_LOCATION": "Scegli posizione",
-               "ALL_LOCATIONS": "Tutte le posizioni",
-               "SELECT_LOCATION": "Seleziona"
-            },
-            "DATES": {
-               "START_DATE": "Data di inizio",
-               "END_DATE": "Data di fine"
-            },
-            "REASON": {
-               "SELECT_REASON": "Seleziona",
-               "REASON": "Motivo",
-               "COMMENTS": "Commenti"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Riepilogo",
-               "LOCATION": "Posizione",
-               "DATE_FROM": "Da",
-               "DATE_TO": "Fino a",
-               "REASON": "Motivo",
-               "COMMENTS": "Commenti"
-            }
-         }
       }
    },
    "USERS": {
       "ACTIONS": {
          "ADD_USER": "Aggiungi utente",
          "ADD_GROUP": "Aggiungi gruppo",
-         "ADD_ACL": "Aggiungi politica di accesso",
-         "ADD_BLACKLIST": "Aggiungi blacklist"
+         "ADD_ACL": "Aggiungi politica di accesso"
       },
       "NAVIGATION": {
          "USERS": "Utenti",
          "GROUPS": "Gruppi",
-         "PERMISSIONS": "Politiche di accesso",
-         "BLACKLISTS": "Blacklist"
+         "PERMISSIONS": "Politiche di accesso"
       },
       "USERS": {
          "TABLE": {
@@ -1241,8 +1106,6 @@
             "ROLES": "Ruoli",
             "TYPE": "Tipo",
             "PROVIDER": "Provider",
-            "BLACKLIST_FROM": "Messo in blacklist da",
-            "BLACKLIST_TO": "Messo in blacklist fino a",
             "ACTION": "Azioni",
             "TOOLTIP": {
                "DELETE": "Cancella utente",
@@ -1413,49 +1276,6 @@
                }
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Blacklist utenti",
-            "NAME": "Nome",
-            "DATE_FROM": "Da",
-            "DATE_TO": "Fino a",
-            "REASON": "Motivo",
-            "ACTION": "Azioni"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Crea blacklist",
-            "EDITCAPTION": "Modifica blacklist",
-            "TABS": {
-               "USERS": "Utenti",
-               "DATES": "Date",
-               "REASON": "Motivo",
-               "SUMMARY": "Riepilogo"
-            },
-            "USERS": {
-               "REMOVE": "Rimuovi",
-               "ADD_USER": "Scegli utente",
-               "ALL_USERS": "Tutti gli utenti",
-               "SELECT_USER": "Seleziona"
-            },
-            "DATES": {
-               "START_DATE": "Data di inizio",
-               "END_DATE": "Data di fine"
-            },
-            "REASON": {
-               "SELECT_REASON": "Seleziona",
-               "REASON": "Motivo",
-               "COMMENTS": "Commenti"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Riepilogo",
-               "USER": "Utente",
-               "DATE_FROM": "Da",
-               "DATE_TO": "Fino a",
-               "REASON": "Motivo",
-               "COMMENTS": "Commenti"
-            }
-         }
       }
    },
    "THEMES": {
@@ -1513,34 +1333,7 @@
          "ADD_THEME": "Aggiungi tema"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "Modelli email",
-         "MAIL_SERVERS": "Impostazioni Email",
          "THEMES": "Temi"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "Modelli email",
-            "NAME": "Nome",
-            "CREATOR": "Creatore",
-            "CREATED": "Creata",
-            "ACTION": "Azioni"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Crea un modello",
-            "EDITCAPTION": "Modifica modello",
-            "TABS": {
-               "MESSAGE": "Messaggio",
-               "SUMMARY": "Riepilogo"
-            },
-            "MESSAGE": {
-               "NAME": "Nome",
-               "SUBJECT": "Oggetto",
-               "MESSAGE": "Messaggio"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "Riepilogo messaggio"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1636,7 +1429,6 @@
       "JOBS": {
          "TABLE": {
             "ID": "Identificatore processo",
-            "ACTION": "Azioni",
             "CAPTION": "Attività",
             "CREATED": "Creata",
             "CREATOR": "Creatore",
@@ -1646,14 +1438,6 @@
             "STATUS": "Stato",
             "SUBMITTED": "Inviato",
             "TYPE": "Tipo"
-         },
-         "DETAILS": {
-            "HEADER": "Dettagli processo {{resourceId}}",
-            "TABS": {
-               "GENERAL": "Generale",
-               "OPERATIONS": "Operazioni",
-               "INCIDENTS": "Segnalazioni"
-            }
          },
          "STATUS": {
             "QUEUED": "In coda",
@@ -1681,7 +1465,6 @@
             "MEAN_RUN_TIME": "Durata effettiva",
             "MEAN_QUEUE_TIME": "Tempo di attesa medio",
             "MAINTENANCE": "Manutenzione",
-            "ACTION": "Azioni",
             "MAINTENANCE_OFF": "Inserisci modalità manutenzione",
             "MAINTENANCE_ON": "Lascia modalità manutenzione"
          }
@@ -1911,9 +1694,6 @@
          "LOCATION": {
             "LABEL": "Posizione"
          },
-         "OPTEDOUT": {
-            "LABEL": "Non selezionato"
-         },
          "PERIOD": {
             "LABEL": "Periodo"
          },
@@ -1925,12 +1705,6 @@
          },
          "PROGRESS": {
             "LABEL": "Progresso"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "Stato di revisione",
-            "CONFIRMED": "Confermato",
-            "UNCONFIRMED": "Non confermato",
-            "UNSENT": "Non inviato"
          },
          "SERIES": {
             "LABEL": "Serie"
@@ -2081,16 +1855,6 @@
    "TABLE_NO_RESULT": "Nessun risultato trovato",
    "TABLE_LOADING": "Caricamento…",
    "TABLE_EDIT": "Modifica",
-   "PM": {
-      "BLACKLIST": {
-         "REASONS": {
-            "SICK_LEAVE": "Congedo per malattia",
-            "LEAVE": "Abbandona",
-            "FAMILY_EMERGENCY": "Emergenza familiare",
-            "CONSTRUCTION": "Costruzione"
-         }
-      }
-   },
    "DASHBOARD": {
       "RUNNING": "In esecuzione",
       "FINISHED": "Completato",
@@ -2179,6 +1943,11 @@
          "SHUTTING_DOWN": "Arresto",
          "UNKNOWN": "Sconosciuto",
          "UPLOADING": "Caricamento"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "Per inserire più valori premere Enter tra l'uno e l'altro"
       }
    }
 }
