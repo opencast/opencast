@@ -24,8 +24,6 @@ package org.opencastproject.adminui.endpoint;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.util.doc.rest.RestService;
 
-import com.google.gson.Gson;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
