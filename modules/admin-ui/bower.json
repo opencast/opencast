@@ -15,7 +15,7 @@
     "angular-wizard": "1.1.1",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0",
     "angular-ui-sortable": "0.19.0",
-    "ng-file-upload": "2.0.5",
+    "ng-file-upload": "2.2.2",
     "angular-chart.js": "^1.1.1"
   },
   "devDependencies": {
