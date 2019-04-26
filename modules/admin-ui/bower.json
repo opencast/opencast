@@ -12,7 +12,7 @@
     "angular-translate": "2.18.1",
     "angular-translate-loader-static-files": "2.18.1",
     "angular-local-storage": "0.7.1",
-    "angular-wizard": "0.6.0",
+    "angular-wizard": "1.1.1",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0",
     "angular-ui-sortable": "0.19.0",
     "ng-file-upload": "2.0.5",
