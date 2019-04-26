@@ -14,7 +14,7 @@
     "angular-local-storage": "0.7.1",
     "angular-wizard": "0.6.0",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0",
-    "angular-ui-sortable": "0.14.4",
+    "angular-ui-sortable": "0.19.0",
     "ng-file-upload": "2.0.5",
     "angular-chart.js": "^1.1.1"
   },
