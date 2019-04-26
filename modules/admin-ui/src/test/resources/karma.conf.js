@@ -6,6 +6,7 @@ module.exports = function (config) {
             // bower:js
             '../../../bower_components/jquery/dist/jquery.js',
             '../../../bower_components/jquery-ui/jquery-ui.js',
+            '../../../bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.js',
             '../../../bower_components/angular/angular.js',
             '../../../bower_components/angular-route/angular-route.js',
             '../../../bower_components/angular-resource/angular-resource.js',
@@ -27,7 +28,6 @@ module.exports = function (config) {
             '../../main/webapp/scripts/lib/underscore-1.5.2.js',
             '../../main/webapp/scripts/lib/video-js/video.js',
             '../../main/webapp/scripts/lib/moment-with-locales.js',
-            '../../main/webapp/scripts/lib/timepicker/jquery-ui-timepicker-addon.js',
 
             '../../main/webapp/scripts/app.js',
             '../../main/webapp/scripts/shared/filters/filters.js',

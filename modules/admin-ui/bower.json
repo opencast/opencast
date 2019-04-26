@@ -4,6 +4,7 @@
   "dependencies": {
     "jquery": "3.4.1",
     "jquery-ui": "1.12.1",
+    "jqueryui-timepicker-addon": "1.6.3",
     "angular": "1.7.8",
     "angular-route": "1.7.8",
     "angular-resource": "1.7.8",
