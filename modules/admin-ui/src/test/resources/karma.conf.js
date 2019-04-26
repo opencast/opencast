@@ -4,7 +4,7 @@ module.exports = function (config) {
 
         files : [
             // bower:js
-            '../../../bower_components/jquery/jquery.js',
+            '../../../bower_components/jquery/dist/jquery.js',
             '../../../bower_components/jquery-ui/jquery-ui.js',
             '../../../bower_components/angular/angular.js',
             '../../../bower_components/angular-route/angular-route.js',

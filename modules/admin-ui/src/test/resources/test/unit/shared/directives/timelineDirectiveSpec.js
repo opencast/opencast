@@ -133,7 +133,7 @@ describe('adminNg.directives.timelineDirective', function () {
             expect(element.isolateScope().zoomLevel).toBe(50);
             expect(element.isolateScope().zoomSelected).toBe('');
             expect(element.find('.zoom-control .zoom-level').val()).toBe('50');
-            var fovWidth = element.find('.field-of-vision .field').width();
+            const fovWidth = parseFloat(element.find('.field-of-vision .field').css('width'));
             expect(fovWidth).toBeGreaterThan(59.5);
             expect(fovWidth).toBeLessThan(59.7);
         });
@@ -147,7 +147,8 @@ describe('adminNg.directives.timelineDirective', function () {
             expect(element.isolateScope().zoomValue).toBe(52125);
             expect(element.isolateScope().zoomOffset).toBe(0);
             expect(element.isolateScope().zoomFieldOffset).toBe(0);
-            expect(element.find('.field-of-vision .field').width()).toBe(100);
+            var fovWidth = parseFloat(element.find('.field-of-vision .field').css('width'));
+            expect(fovWidth).toBe(100);
 
             const zoomSelected = { name: '10 Sec', time: 10000 };
             element.isolateScope().zoomSelected = zoomSelected;
@@ -157,7 +158,7 @@ describe('adminNg.directives.timelineDirective', function () {
             expect(element.isolateScope().zoomValue).toBe(10000);
             expect(element.isolateScope().zoomOffset).toBe(0);
             expect(element.isolateScope().zoomFieldOffset).toBe(0);
-            var fovWidth = element.find('.field-of-vision .field').width();
+            fovWidth = parseFloat(element.find('.field-of-vision .field').css('width'));
             expect(fovWidth).toBeGreaterThan(19);
             expect(fovWidth).toBeLessThan(20);
         });
