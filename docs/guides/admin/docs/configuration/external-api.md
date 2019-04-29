@@ -89,10 +89,10 @@ directly in the Opencast administrative user interface.
 
 **Statistics API**
 
-|ROLE                            |METHOD | URL                                                  |
-|--------------------------------|-------|------------------------------------------------------|
-|ROLE_API_STATISTICS_VIEW        |GET    |/api/statistics                                        |
-|ROLE_API_STATISTICS_VIEW        |POST   |/api/statistics                                       |
+|ROLE                            |METHOD | URL                                                      |
+|--------------------------------|-------|----------------------------------------------------------|
+|ROLE_API_STATISTICS_VIEW        |GET    |/api/statistics/providers<br>/api/statistics/providers/\* |
+|ROLE_API_STATISTICS_VIEW        |POST   |/api/statistics/data/query                                |
 
 **Groups API**
 

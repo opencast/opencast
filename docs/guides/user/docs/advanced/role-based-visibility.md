@@ -99,7 +99,7 @@ There are quite a number of roles to provide selective access to the tabs offere
 |ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW   |Display tab *Scheduling*                 |
 |ROLE_UI_EVENTS_DETAILS_ACL_VIEW          |Display tab *Access Policy*              |
 |ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW     |Display tab *Comments*                   |
-|ROLE_UI_EVENTS_DETAULS_STATISTICS_VIEW   |Display tab *Statistics*                 |
+|ROLE_UI_EVENTS_DETAILS_STATISTICS_VIEW   |Display tab *Statistics*                 |
 
 For the individual tabs, it is possible to further provide access:
 

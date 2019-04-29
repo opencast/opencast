@@ -22,11 +22,11 @@
 package org.opencastproject.statistics.impl;
 
 import org.opencastproject.statistics.api.DataResolution;
-import org.opencastproject.statistics.api.DateUtil;
 import org.opencastproject.statistics.api.ResourceType;
 import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsProviderRegistry;
 import org.opencastproject.statistics.api.StatisticsService;
+import org.opencastproject.statistics.api.StatisticsUtil;
 import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
 
@@ -71,7 +71,11 @@ public class StatisticsServiceImpl implements StatisticsService, StatisticsProvi
 
   @Override
   public Set<StatisticsProvider> getProviders(ResourceType resourceType) {
-    return providers.values().stream().filter(p -> p.getResourceType().equals(resourceType)).collect(Collectors.toSet());
+    return providers
+            .values()
+            .stream()
+            .filter(p -> p.getResourceType().equals(resourceType))
+            .collect(Collectors.toSet());
   }
 
   @Override
@@ -80,13 +84,19 @@ public class StatisticsServiceImpl implements StatisticsService, StatisticsProvi
   }
 
   @Override
-  public TimeSeries getTimeSeriesData(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution resolution, ZoneId zoneId) {
+  public TimeSeries getTimeSeriesData(
+          StatisticsProvider provider,
+          String resourceId,
+          Instant from,
+          Instant to,
+          DataResolution resolution,
+          ZoneId zoneId) {
     if (!(provider instanceof TimeSeriesProvider)) {
       throw new IllegalArgumentException("The given provider '" + provider.getTitle()
           + "' (" + provider.getId() + ") does not provide time series data");
 
     }
-    final List<Instant> buckets = DateUtil.getBuckets(from, to, resolution, zoneId);
+    final List<Instant> buckets = StatisticsUtil.getBuckets(from, to, resolution, zoneId);
     return fill(((TimeSeriesProvider) provider).getValues(resourceId, from, to, resolution, zoneId), buckets);
   }
 

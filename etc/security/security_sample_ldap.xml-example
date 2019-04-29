@@ -96,7 +96,7 @@
     <sec:intercept-url pattern="/admin-ng/resources/providers.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/resources/THEMES.json" method="GET" access="ROLE_ADMIN, ROLE_UI_THEMES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/*.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/statistics/views/**" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/admin-ng/statistics/*.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/assets/assets/**" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
 
     <sec:intercept-url pattern="/admin-ng/acl/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_ACLS_EDIT" />
@@ -178,6 +178,8 @@
     <sec:intercept-url pattern="/api/series/*/metadata" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_VIEW"/>
     <sec:intercept-url pattern="/api/series/*/metadata/*" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_VIEW"/>
     <sec:intercept-url pattern="/api/series/*/properties" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_PROPERTIES_VIEW"/>
+    <sec:intercept-url pattern="/api/statistics/providers" method="GET" access="ROLE_ADMIN, ROLE_API_STATISTICS_VIEW"/>
+    <sec:intercept-url pattern="/api/statistics/providers/*" method="GET" access="ROLE_ADMIN, ROLE_API_STATISTICS_VIEW"/>
     <sec:intercept-url pattern="/api/version" method="GET" access="ROLE_ADMIN, ROLE_API"/>
     <sec:intercept-url pattern="/api/version/*" method="GET" access="ROLE_ADMIN, ROLE_API"/>
     <!-- External API PUT Endpoints -->
@@ -201,6 +203,7 @@
     <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="ROLE_ADMIN"/>
     <sec:intercept-url pattern="/api/series" method="POST" access="ROLE_ADMIN, ROLE_API_SERIES_CREATE"/>
     <sec:intercept-url pattern="/api/security/sign" method="POST" access="ROLE_ADMIN, ROLE_API_SECURITY_EDIT"/>
+    <sec:intercept-url pattern="/api/statistics/data/query" method="POST" access="ROLE_ADMIN, ROLE_API_STATISTICS_VIEW"/>
     <!-- External API DELETE Endpoints -->
     <sec:intercept-url pattern="/api/events/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_DELETE"/>
     <sec:intercept-url pattern="/api/events/*/acl/*/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_DELETE"/>

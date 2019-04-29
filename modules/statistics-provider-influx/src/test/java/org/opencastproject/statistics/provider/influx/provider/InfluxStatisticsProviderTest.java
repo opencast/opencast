@@ -24,8 +24,9 @@ package org.opencastproject.statistics.provider.influx.provider;
 import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.statistics.api.DataResolution;
-import org.opencastproject.statistics.api.DateUtil;
 import org.opencastproject.util.data.Tuple;
+
+import com.google.common.collect.Ordering;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -56,8 +57,8 @@ public class InfluxStatisticsProviderTest {
     for (int i = 0; i < repetitions; i++) {
       final Instant a = randomInstant();
       final Instant b = randomInstant();
-      final Instant from = DateUtil.min(a, b);
-      final Instant to = DateUtil.max(a, b);
+      final Instant from = Ordering.natural().min(a, b);
+      final Instant to = Ordering.natural().max(a, b);
       logger.info("from {} to {} {}", from, to, DataResolution.DAILY.name());
       final List<Tuple<Instant, Instant>> periods = InfluxStatisticsProvider.getPeriods(from, to, DataResolution.DAILY,
           ZoneId.of("Z"));
@@ -72,8 +73,8 @@ public class InfluxStatisticsProviderTest {
     for (int i = 0; i < repetitions; i++) {
       final Instant a = randomInstant();
       final Instant b = randomInstant();
-      final Instant from = DateUtil.min(a, b);
-      final Instant to = DateUtil.max(a, b);
+      final Instant from = Ordering.natural().min(a, b);
+      final Instant to = Ordering.natural().max(a, b);
       logger.info("from {} to {} {}", from, to, DataResolution.WEEKLY.name());
       final List<Tuple<Instant, Instant>> periods = InfluxStatisticsProvider.getPeriods(from, to, DataResolution.WEEKLY,
           ZoneId.of("Z"));
@@ -89,8 +90,8 @@ public class InfluxStatisticsProviderTest {
     for (int i = 0; i < repetitions; i++) {
       final Instant a = randomInstant();
       final Instant b = randomInstant();
-      final Instant from = DateUtil.min(a, b);
-      final Instant to = DateUtil.max(a, b);
+      final Instant from = Ordering.natural().min(a, b);
+      final Instant to = Ordering.natural().max(a, b);
       logger.info("from {} to {} {}", from, to, DataResolution.MONTHLY.name());
       final List<Tuple<Instant, Instant>> periods = InfluxStatisticsProvider.getPeriods(from, to, DataResolution.MONTHLY,
           ZoneId.of("Z"));
@@ -130,8 +131,8 @@ public class InfluxStatisticsProviderTest {
     for (int i = 0; i < repetitions; i++) {
       final Instant a = randomInstant();
       final Instant b = randomInstant();
-      final Instant from = DateUtil.min(a, b);
-      final Instant to = DateUtil.max(a, b);
+      final Instant from = Ordering.natural().min(a, b);
+      final Instant to = Ordering.natural().max(a, b);
       logger.info("from {} to {} {}", from, to, DataResolution.YEARLY.name());
       final List<Tuple<Instant, Instant>> periods = InfluxStatisticsProvider.getPeriods(from, to, DataResolution.YEARLY,
           ZoneId.of("Z"));

@@ -21,6 +21,8 @@
 
 package org.opencastproject.statistics.api;
 
+import com.google.common.collect.Ordering;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -29,17 +31,9 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class DateUtil {
+public final class StatisticsUtil {
 
-  private DateUtil() {
-  }
-
-  public static Instant min(final Instant i1, final Instant i2) {
-    return i1.isBefore(i2) ? i1 : i2;
-  }
-
-  public static Instant max(final Instant i1, final Instant i2) {
-    return !i1.isBefore(i2) ? i1 : i2;
+  private StatisticsUtil() {
   }
 
   public static List<Instant> getBuckets(final Instant from, final Instant to, final DataResolution resolution, final ZoneId zoneId) {
@@ -51,19 +45,19 @@ public final class DateUtil {
         case MONTHLY:
           final Instant currentMonthStart = YearMonth.of(localStart.getYear(), localStart.getMonth())
                   .atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC);
-          result.add(min(to, max(from, currentMonthStart)));
+          result.add(Ordering.natural().min(to, Ordering.natural().max(from, currentMonthStart)));
           localStart = localStart.plusMonths(1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
           break;
         case YEARLY:
           final Instant currentYearStart = YearMonth.of(localStart.getYear(), 1)
                   .atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC);
-          result.add(min(to, max(from, currentYearStart)));
+          result.add(Ordering.natural().min(to, Ordering.natural().max(from, currentYearStart)));
           localStart = localStart.plusYears(1).withMonth(1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
           break;
         case DAILY:
           final Instant currentDayStart = localStart.withHour(0).withMinute(0).withSecond(0).withNano(0)
                   .toInstant(ZoneOffset.UTC);
-          result.add(min(to, max(from, currentDayStart)));
+          result.add(Ordering.natural().min(to, Ordering.natural().max(from, currentDayStart)));
           localStart = localStart.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
           break;
         case WEEKLY:

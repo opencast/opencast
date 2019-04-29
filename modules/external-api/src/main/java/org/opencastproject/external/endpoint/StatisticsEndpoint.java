@@ -124,7 +124,7 @@ public class StatisticsEndpoint {
     },
     reponses = {
       @RestResponse(
-        description = "Returns the requested statistics providersas JSON",
+        description = "Returns the requested statistics providers as JSON",
         responseCode = HttpServletResponse.SC_OK),
       @RestResponse(
         description = "If the current user is not authorized to perform this action",

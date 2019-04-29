@@ -33,7 +33,6 @@ import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
 import org.opencastproject.util.doc.rest.RestService;
 
-
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpGet;
@@ -45,8 +44,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -72,7 +69,6 @@ import javax.ws.rs.Path;
         + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>"})
 public class StatisticsServiceRemoteImpl extends RemoteBase implements StatisticsService {
 
-  private static final Logger logger = LoggerFactory.getLogger(StatisticsServiceRemoteImpl.class);
   private static final JSONParser jsonParser = new JSONParser();
 
   public StatisticsServiceRemoteImpl() {

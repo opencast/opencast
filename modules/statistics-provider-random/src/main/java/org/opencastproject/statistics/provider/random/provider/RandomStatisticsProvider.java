@@ -22,7 +22,8 @@
 package org.opencastproject.statistics.provider.random.provider;
 
 import org.opencastproject.statistics.api.DataResolution;
-import org.opencastproject.statistics.api.DateUtil;
+import org.opencastproject.statistics.api.ResourceType;
+import org.opencastproject.statistics.api.StatisticsUtil;
 import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
 
@@ -30,15 +31,35 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-public abstract class RandomStatisticsProvider implements TimeSeriesProvider {
+public class RandomStatisticsProvider implements TimeSeriesProvider {
 
   private static final Random random = new Random();
+  private String id;
+  private ResourceType resourceType;
+  private Set<DataResolution> dataResolutions;
+  private String title;
+  private String description;
+
+  public RandomStatisticsProvider(
+      String id,
+      ResourceType resourceType,
+      Set<DataResolution> dataResolutions,
+      String title,
+      String description
+  ) {
+    this.id = id;
+    this.resourceType = resourceType;
+    this.dataResolutions = dataResolutions;
+    this.title = title;
+    this.description = description;
+  }
 
   @Override
   public TimeSeries getValues(String resourceId, Instant from, Instant to, DataResolution resolution, ZoneId zoneId) {
-    final List<String> labels = DateUtil.getBuckets(from, to, resolution, zoneId).stream()
+    final List<String> labels = StatisticsUtil.getBuckets(from, to, resolution, zoneId).stream()
         .map(Instant::toString)
         .collect(Collectors.toList());
     final List<Double> values = labels.stream()
@@ -46,5 +67,30 @@ public abstract class RandomStatisticsProvider implements TimeSeriesProvider {
         .map(Double::valueOf)
         .collect(Collectors.toList());
     return new TimeSeries(labels, values, values.stream().mapToDouble(v -> v).sum());
+  }
+
+  @Override
+  public String getId() {
+    return id;
+  }
+
+  @Override
+  public ResourceType getResourceType() {
+    return resourceType;
+  }
+
+  @Override
+  public Set<DataResolution> getDataResolutions() {
+    return dataResolutions;
+  }
+
+  @Override
+  public String getTitle() {
+    return title;
+  }
+
+  @Override
+  public String getDescription() {
+    return description;
   }
 }

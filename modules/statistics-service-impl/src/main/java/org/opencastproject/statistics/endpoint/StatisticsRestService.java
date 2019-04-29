@@ -24,13 +24,11 @@ package org.opencastproject.statistics.endpoint;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.statistics.api.DataResolution;
 import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsService;
 import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
-import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -39,7 +37,6 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,14 +74,6 @@ public class StatisticsRestService {
   /** Statistics Service */
   private StatisticsService statisticsService;
 
-  /** Default server URL */
-  protected String serverUrl = "http://localhost:8080";
-
-  /** Service url */
-  protected String serviceUrl = null;
-
-  private static final JSONParser jsonParser = new JSONParser();
-
   /**
    * OSGi callback for setting statistics service.
    *
@@ -95,30 +84,18 @@ public class StatisticsRestService {
   }
 
   /**
-   * Activates REST service.
+   * Activates REST service (needed by OSGi)
    *
    * @param cc
    *          ComponentContext
    */
   public void activate(ComponentContext cc) {
-    if (cc == null) {
-      this.serverUrl = "http://localhost:8080";
-    } else {
-      String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
-      logger.debug("Configured server url is {}", ccServerUrl);
-      if (ccServerUrl == null)
-        this.serverUrl = "http://localhost:8080";
-      else {
-        this.serverUrl = ccServerUrl;
-      }
-    }
-    serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
   }
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("providers.json")
-  @RestQuery(name = "getAsJson", description = "Returns active providers", returnDescription = "Returns the active providers JSON document",
+  @RestQuery(name = "getAllAsJson", description = "Returns active providers", returnDescription = "Returns the active providers JSON document",
       reponses = {
           @RestResponse(responseCode = SC_OK, description = "The active providers.")
       })
@@ -134,13 +111,13 @@ public class StatisticsRestService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("timeseries/{providerId:.+}.json")
-  @RestQuery(name = "getAsJson", description = "Returns the time series data for the given providerId", returnDescription = "Returns the time series data JSON document",
+  @RestQuery(name = "getTimeSeriesAsJson", description = "Returns the time series data for the given providerId", returnDescription = "Returns the time series data JSON document",
       pathParameters = {@RestParameter(name = "providerId", isRequired = true, description = "The provider identifier", type = STRING)},
       restParameters = {
           @RestParameter(name = "resourceId", description = "The id of the resource to get the data for. E.g. episode id.", isRequired = true, type = STRING),
           @RestParameter(name = "from", description = "Start of the time series as ISO 8601 UTC date string", isRequired = true, type = STRING),
           @RestParameter(name = "to", description = "End of the time series as ISO 8601 UTC date string", isRequired = true, type = STRING),
-          @RestParameter(name = "resolution", description = "Data aggregation level. Must be one of 'hourly', 'daily', 'weekly', 'monthly', 'yearly'", isRequired = true, type = STRING),
+          @RestParameter(name = "resolution", description = "Data aggregation level. Must be one of 'daily', 'weekly', 'monthly', 'yearly'", isRequired = true, type = STRING),
           @RestParameter(name = "zoneId", description = "The time zone id to use for calculations", isRequired = true, type = STRING),
       },
       reponses = {

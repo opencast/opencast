@@ -2,7 +2,7 @@ Overview
 ========
 
 In Opencast, the "Statistics" feature can be seen as a set of charts which can be displayed in the Admin UI. Currently,
-statistics for three so called "resource types" are available:
+statistics for three so-called "resource types" are available:
 
 - Statistics for the resource type **EPISODE** are displayed in a tab in the event details dialog.
 - Statistics for the resource type **SERIES** are displayed in a tab in the series details dialog.
@@ -54,8 +54,8 @@ To support the detailed configuration of the charts to be shown in the Admin UI,
 _Statistics Providers_. Each statistics provider can be configured separately and for each provider, there is one chart
 displayed in the Admin UI.
 
-The configuration files of the providers have to stored under `etc/statistics` and they have to follow a certain naming
-pattern. Configuration files of providers using InfluxDB have to be named starting with `influx.`. All provider
+The configuration files of the providers have to be stored at `etc/statistics` and they have to follow a certain naming
+convention. Configuration files of providers using InfluxDB have to be named starting with `influx.`. All provider
 configurations have to be in json format. So e.g. _influx.views.episode.sum.json_ would be a valid name.
 
 For each provider, the following properties have to be configured:
@@ -63,7 +63,7 @@ For each provider, the following properties have to be configured:
 - **`id`** has to be a unique identifier and can be chosen freely.
 - **`title`** is the title to be displayed with the chart. This can be a translation key.
 - **`description`** is the description to be displayed with the chart. This can be a translation key.
-- **`resourceType`** tells Opencast to which type if entity the chart refers to. Valid values are `EPISODE`, `SERIES`,
+- **`resourceType`** tells Opencast to which type of entity the chart refers to. Valid values are `EPISODE`, `SERIES`,
   and`ORGANIZATION`. This is used by Opencast to decide where to display the chart.
 - **`resolutions`** is a list of resolutions supported by this provider. Opencast allows the user to select a
   _resolution_ with which the data is displayed. Valid values are `DAILY`, `WEEKLY`, `MONTHLY` and `YEARLY`. E.g. when a
@@ -74,7 +74,7 @@ For each provider, the following properties have to be configured:
   colons (:). A valid `source` string would be `influx:infinite.impressions_daily:SUM:value:episodeId` which has the
   following meaning:
 
-    1. `influx` tells Opencast that InfluxDB is is the data source.
+    1. `influx` tells Opencast that InfluxDB is the data source.
     2. `infinite.impressions_daily` tells Opencast that your InfluxDB data retention policy is named `infinite` and your
         InfluxDB measurement name is `impressions_daily`.
     3. `SUM` tells Opencast that InfluxDB's `SUM()` function should be used to calculate the values to display in the
@@ -109,7 +109,7 @@ Verifying Your Setup<a name="verify"></a>
 ====================
 
 If you want to test your setup, you can put the following test data into InfluxDB and check if Opencast displays all
-charts correctly. First, create a series and an event as part of that series using the Opencast Admin UI. Seconds. copy
+charts correctly. First, create a series and an event as part of that series using the Opencast Admin UI. Second, copy
 the test data to a file called `testdata.txt` and edit it to match your InfluxDB database schema. Make sure you replace
 the `episodeId`, `seriesId`, and `organizazionId` tag value with the correct identifiers of the test event/series you
 just created. Also make sure, that the tag names (e.g.) `episodeId` and the field name (`value`) match the ones you have

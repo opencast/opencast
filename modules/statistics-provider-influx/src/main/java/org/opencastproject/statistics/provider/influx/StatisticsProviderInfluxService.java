@@ -22,8 +22,6 @@
 package org.opencastproject.statistics.provider.influx;
 
 import org.opencastproject.statistics.api.ConfiguredProvider;
-import org.opencastproject.statistics.api.DataResolution;
-import org.opencastproject.statistics.api.ResourceType;
 import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsProviderRegistry;
 import org.opencastproject.statistics.provider.influx.provider.InfluxTimeSeriesStatisticsProvider;
@@ -44,7 +42,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Dictionary;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -80,58 +77,9 @@ public class StatisticsProviderInfluxService implements ManagedService, Artifact
     logger.info("Activating Statistics Provider Influx Service");
   }
 
-  private StatisticsProvider createInfluxTimeSeriesStatisticsProvider(ConfiguredProvider providerCfg) {
-    return new InfluxTimeSeriesStatisticsProvider(this) {
-      @Override
-      protected String getMeasurement() {
-        return providerCfg.getSource().split(":")[1];
-      }
-
-      @Override
-      protected String getAggregation() {
-        return providerCfg.getSource().split(":")[2];
-      }
-
-      @Override
-      protected String getAggregationVariable() {
-        return providerCfg.getSource().split(":")[3];
-      }
-
-      @Override
-      protected String getResourceIdName() {
-        return providerCfg.getSource().split(":")[4];
-      }
-
-      @Override
-      public String getId() {
-        return providerCfg.getId();
-      }
-
-      @Override
-      public ResourceType getResourceType() {
-        return providerCfg.getResourceType();
-      }
-
-      @Override
-      public String getTitle() {
-        return providerCfg.getTitle();
-      }
-
-      @Override
-      public String getDescription() {
-        return providerCfg.getDescription();
-      }
-
-      @Override
-      public Set<DataResolution> getDataResolutions() {
-        return providerCfg.getResolutions();
-      }
-    };
-  }
-
   public void deactivate(ComponentContext cc) {
     logger.info("Deactivating Statistics Provider Influx Service");
-    disconnectInfux();
+    disconnectInflux();
   }
 
   @Override
@@ -142,7 +90,18 @@ public class StatisticsProviderInfluxService implements ManagedService, Artifact
       throw new ConfigurationException("Unexpected source string: " + providerCfg.getSource());
     }
     if ("timeseries".equalsIgnoreCase(providerCfg.getType())) {
-      final StatisticsProvider provider = createInfluxTimeSeriesStatisticsProvider(providerCfg);
+      final StatisticsProvider provider = new InfluxTimeSeriesStatisticsProvider(
+          this,
+          providerCfg.getId(),
+          providerCfg.getResourceType(),
+          providerCfg.getResolutions(),
+          providerCfg.getTitle(),
+          providerCfg.getDescription(),
+          providerCfg.getSource().split(":")[2],
+          providerCfg.getSource().split(":")[3],
+          providerCfg.getSource().split(":")[1],
+          providerCfg.getSource().split(":")[4]
+      );
       fileNameToProvider.put(file.getName(), provider);
       if (influxDB != null) {
         statisticsProviderRegistry.addProvider(provider);
@@ -176,8 +135,8 @@ public class StatisticsProviderInfluxService implements ManagedService, Artifact
   @Override
   public void updated(Dictionary<String, ?> dictionary) {
     if (dictionary == null) {
-      logger.info("No configuration available. Not connecting to influx.");
-      disconnectInfux();
+      logger.info("No configuration available. Not connecting to influx DB.");
+      disconnectInflux();
     } else {
       final Object influxUriValue = dictionary.get(KEY_INFLUX_URI);
       if (influxUriValue != null) {
@@ -204,13 +163,13 @@ public class StatisticsProviderInfluxService implements ManagedService, Artifact
   }
 
   private void connectInflux() {
-    disconnectInfux();
+    disconnectInflux();
     influxDB = InfluxDBFactory.connect(influxUri, influxUser, influxPw);
     influxDB.setDatabase(influxDbName);
     fileNameToProvider.values().forEach(provider -> statisticsProviderRegistry.addProvider(provider));
   }
 
-  private void disconnectInfux() {
+  private void disconnectInflux() {
     if (influxDB != null) {
       fileNameToProvider.values().forEach(provider -> statisticsProviderRegistry.removeProvider(provider));
       influxDB.close();

@@ -22,8 +22,6 @@
 package org.opencastproject.statistics.provider.random;
 
 import org.opencastproject.statistics.api.ConfiguredProvider;
-import org.opencastproject.statistics.api.DataResolution;
-import org.opencastproject.statistics.api.ResourceType;
 import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsProviderRegistry;
 import org.opencastproject.statistics.provider.random.provider.RandomStatisticsProvider;
@@ -38,7 +36,6 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -65,35 +62,6 @@ public class StatisticsProviderRandomService implements ArtifactInstaller {
     fileNameToProvider.values().forEach(provider -> statisticsProviderRegistry.removeProvider(provider));
   }
 
-  private StatisticsProvider createRandomStatisticsProvider(ConfiguredProvider providerCfg) {
-    return new RandomStatisticsProvider() {
-      @Override
-      public String getId() {
-        return providerCfg.getId();
-      }
-
-      @Override
-      public ResourceType getResourceType() {
-        return providerCfg.getResourceType();
-      }
-
-      @Override
-      public String getTitle() {
-        return providerCfg.getTitle();
-      }
-
-      @Override
-      public String getDescription() {
-        return providerCfg.getDescription();
-      }
-
-      @Override
-      public Set<DataResolution> getDataResolutions() {
-        return providerCfg.getResolutions();
-      }
-    };
-  }
-
   @Override
   public void install(File file) throws Exception {
     final String json = new String(Files.readAllBytes(file.toPath()), Charset.forName("utf-8"));
@@ -102,7 +70,13 @@ public class StatisticsProviderRandomService implements ArtifactInstaller {
       throw new ConfigurationException("Unexpected source string: " + providerCfg.getSource());
     }
     if ("timeseries".equalsIgnoreCase(providerCfg.getType())) {
-      final StatisticsProvider provider = createRandomStatisticsProvider(providerCfg);
+      final StatisticsProvider provider = new RandomStatisticsProvider(
+          providerCfg.getId(),
+          providerCfg.getResourceType(),
+          providerCfg.getResolutions(),
+          providerCfg.getTitle(),
+          providerCfg.getDescription()
+      );
       fileNameToProvider.put(file.getName(), provider);
       statisticsProviderRegistry.addProvider(provider);
     } else {

@@ -50,7 +50,7 @@ public final class ResourceTypeUtils {
         result = RESOURCE_TYPE_SERIES;
         break;
       case ORGANIZATION:
-        result = RESOURCE_TYPE_EPISODE;
+        result = RESOURCE_TYPE_ORGANIZATION;
         break;
       default:
         result = RESOURCE_TYPE_UNKNOWN;

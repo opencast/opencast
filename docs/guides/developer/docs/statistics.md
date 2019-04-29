@@ -24,9 +24,9 @@ An API module defining the core StatisticsService and StatisticsProvider functio
 The default implementation of the StatisticsService as an OSGi service.
 * `statistics-service remote`
 The remote implementation of the StatisticsService.
-* `statistics-service-influx`
+* `statistics-provider-influx`
 An implementation of the StatisticsProvider for InfluxDB
-* `statistics-service-random`
+* `statistics-provider-random`
 An implementation of the StatisticsProvider for testing and demo purposes.
 
 Interfaces & Classes
@@ -37,7 +37,7 @@ The Opencast `StatisticsService` implements the two interfaces `StatisticsProvid
 
 **StatisticsProviderRegistry**
 
-This interface is used by `StatisticsProvider` implementation to register and unregister themselves at the
+This interface is used by `StatisticsProvider` implementations to register and unregister themselves at the
 statistics service.
 
 Method         | Description

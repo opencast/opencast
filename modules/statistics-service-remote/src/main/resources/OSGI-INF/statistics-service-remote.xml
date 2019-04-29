@@ -10,7 +10,6 @@
 
   <service>
     <provide interface="org.opencastproject.statistics.api.StatisticsService"/>
-    <provide interface="org.opencastproject.statistics.remote.StatisticsServiceRemoteImpl"/>
   </service>
   <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
              cardinality="1..1" policy="static" bind="setTrustedHttpClient"/>

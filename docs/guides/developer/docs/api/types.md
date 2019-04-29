@@ -459,7 +459,7 @@ Field                    | Type                                                 
 
 ## Statistics
 
-### parameter
+### parameters
 
 The Statistics endpoint can list the available statistics providers. Optionally, the endpoint provides information
 about supported data query parameters using this JSON object.
