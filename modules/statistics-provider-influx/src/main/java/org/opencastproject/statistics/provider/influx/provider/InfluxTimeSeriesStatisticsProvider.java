@@ -47,10 +47,7 @@ public class InfluxTimeSeriesStatisticsProvider extends InfluxStatisticsProvider
 
   private static final Logger logger = LoggerFactory.getLogger(InfluxTimeSeriesStatisticsProvider.class);
 
-  private String aggregation;
-  private String aggregationVariable;
-  private String measurement;
-  private String resourceIdName;
+  private Set<InfluxProviderConfiguration.InfluxProviderSource> sources;
 
 
 
@@ -58,19 +55,12 @@ public class InfluxTimeSeriesStatisticsProvider extends InfluxStatisticsProvider
       StatisticsProviderInfluxService service,
       String id,
       ResourceType resourceType,
-      Set<DataResolution> dataResolutions,
       String title,
       String description,
-      String aggregation,
-      String aggregationVariable,
-      String measurement,
-      String resourceIdName
+      Set<InfluxProviderConfiguration.InfluxProviderSource> sources
   ) {
-    super(service, id, resourceType, dataResolutions, title, description);
-    this.aggregation = aggregation;
-    this.aggregationVariable = aggregationVariable;
-    this.measurement = measurement;
-    this.resourceIdName = resourceIdName;
+    super(service, id, resourceType, title, description);
+    this.sources = sources;
   }
 
   @Override
@@ -79,14 +69,16 @@ public class InfluxTimeSeriesStatisticsProvider extends InfluxStatisticsProvider
     final List<Tuple<Instant, Instant>> periods = getPeriods(from, to, resolution, zoneId);
     final List<String> labels = new ArrayList<>();
     final List<Double> values = new ArrayList<>();
+    final InfluxProviderConfiguration.InfluxProviderSource source = getSource(resolution);
     for (final Tuple<Instant, Instant> period : periods) {
       final Query query = BoundParameterQuery.QueryBuilder
-              .newQuery("SELECT " + aggregation + "(" + aggregationVariable + ") FROM " + measurement + " WHERE "
-                                + resourceIdName + "=$resourceId AND time>=$from AND time<=$to" + influxGrouping)
-              .bind("resourceId", resourceId)
-              .bind("from", period.getA())
-              .bind("to", period.getB())
-              .create();
+          .newQuery("SELECT " + source.getAggregation() + "(" + source.getAggregationVariable() + ") FROM "
+                            + source.getMeasurement() + " WHERE " + source.getResourceIdName()
+                            + "=$resourceId AND time>=$from AND time<=$to" + influxGrouping)
+          .bind("resourceId", resourceId)
+          .bind("from", period.getA())
+          .bind("to", period.getB())
+          .create();
       try {
         final QueryResult results = service.getInfluxDB().query(query);
         final TimeSeries currentViews = queryResultToTimeSeries(results);
@@ -100,8 +92,20 @@ public class InfluxTimeSeriesStatisticsProvider extends InfluxStatisticsProvider
         }
       }
     }
-    final Double total = "SUM".equalsIgnoreCase(aggregation) ? values.stream().mapToDouble(v -> v).sum() : null;
+    final Double total = "SUM".equalsIgnoreCase(source.getAggregation()) ? values.stream().mapToDouble(v -> v).sum() : null;
     return new TimeSeries(labels, values, total);
+  }
+
+  @Override
+  public Set<DataResolution> getDataResolutions() {
+    return sources.stream().flatMap(s -> s.getResolutions().stream()).collect(Collectors.toSet());
+  }
+
+  private InfluxProviderConfiguration.InfluxProviderSource getSource(DataResolution resolution) {
+    return sources.stream()
+        .filter(s -> s.getResolutions().contains(resolution))
+        .findAny()
+        .orElseThrow(() -> new IllegalStateException("No source available for data resolution " + resolution.name()));
   }
 
   protected static TimeSeries queryResultToTimeSeries(QueryResult results) {

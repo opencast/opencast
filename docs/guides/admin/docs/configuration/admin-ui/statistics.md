@@ -65,23 +65,19 @@ For each provider, the following properties have to be configured:
 - **`description`** is the description to be displayed with the chart. This can be a translation key.
 - **`resourceType`** tells Opencast to which type of entity the chart refers to. Valid values are `EPISODE`, `SERIES`,
   and`ORGANIZATION`. This is used by Opencast to decide where to display the chart.
-- **`resolutions`** is a list of resolutions supported by this provider. Opencast allows the user to select a
-  _resolution_ with which the data is displayed. Valid values are `DAILY`, `WEEKLY`, `MONTHLY` and `YEARLY`. E.g. when a
-  chart shows data of two years, a `DAILY` resolution will lead to 2x365=730 values to be plotted while a `MONTHLY`
-  resolution would leave us with 24 values being plotted in the chart.
-- **`source`** is a composite string which holds information about your data schema and how to calculate the
-  actual data to be displayed in the Admin UI. For InfluxDB, the `source` string consists of 5 parts, separated by
-  colons (:). A valid `source` string would be `influx:infinite.impressions_daily:SUM:value:episodeId` which has the
-  following meaning:
-
-    1. `influx` tells Opencast that InfluxDB is the data source.
-    2. `infinite.impressions_daily` tells Opencast that your InfluxDB data retention policy is named `infinite` and your
-        InfluxDB measurement name is `impressions_daily`.
-    3. `SUM` tells Opencast that InfluxDB's `SUM()` function should be used to calculate the values to display in the
-        chart.
-    4. `value` tells Opencast that the InfluxDB field which should be summed is named `value`.
-    5. `episodeId` tells Opencast that the InfluxDB tag identifying the resource type this provider refers to is named
-       `episodeId`.
+- **`sources`** is list of JSON objects, each containing the following fields:
+    - **`measurement`**, e.g. `infinite.impressions_daily` tells Opencast that your InfluxDB data retention policy is
+      named `infinite` and your InfluxDB measurement name is `impressions_daily`.
+    - **`aggregation`**, e.g. `SUM` tells Opencast that InfluxDB's `SUM()` function should be used to calculate the
+      values to display in the chart.
+    - **`aggregationVariable**, e.g. `value` tells Opencast that the InfluxDB field which should be summed is named
+      `value`.
+    - **`resourceIdName`**, e.g. `episodeId` tells Opencast that the InfluxDB tag identifying the resource type this
+       provider refers to is named `episodeId`.
+    - **`resolutions`** is a list of resolutions supported by this provider. Opencast allows the user to select a
+      _resolution_ with which the data is displayed. Valid values are `DAILY`, `WEEKLY`, `MONTHLY` and `YEARLY`. E.g.
+      when a chart shows data of two years, a `DAILY` resolution will lead to 2x365=730 values to be plotted while a
+      `MONTHLY` resolution would leave us with 24 values being plotted in the chart.
 - **`type`** defines the structure of the data provided by this provider. Currently, only `timeseries` is supported.
 
 Here is an example json configuration for a provider which generates charts for episodes showing the number of views:
@@ -94,13 +90,18 @@ Here is an example json configuration for a provider which generates charts for 
   "title": "STATISTICS.TITLE.VIEWS_SUM",
   "description": "STATISTICS.DESCRIPTION.VIEWS_SUM",
   "resourceType": "EPISODE",
-  "resolutions": [
-    "DAILY",
-    "WEEKLY",
-    "MONTHLY",
-    "YEARLY"
-  ],
-  "source": "influx:infinite.impressions_daily:SUM:value:episodeId",
+  "sources": [{
+    "measurement": "infinite.impressions_daily",
+    "aggregation": "SUM",
+    "aggregationVariable": "value",
+    "resourceIdName": "episodeId",
+    "resolutions": [
+      "DAILY",
+      "WEEKLY",
+      "MONTHLY",
+      "YEARLY"
+    ]
+  }],
   "type": "timeseries"
 }
 ```
