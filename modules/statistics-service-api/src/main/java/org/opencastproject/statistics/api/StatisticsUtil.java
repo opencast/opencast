@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,6 +67,12 @@ public final class StatisticsUtil {
                   .withNano(0).toInstant(ZoneOffset.UTC);
           result.add(currentWeekStart); // No min, max here, because influx uses previous monday as bucket label
           localStart = localStart.plusDays(7).plusDays(daysOff).withHour(0).withMinute(0).withSecond(0).withNano(0);
+          break;
+        case HOURLY:
+          final Instant currentHourStart = ZonedDateTime.of(localStart.withMinute(0).withSecond(0).withNano(0), zoneId)
+              .toInstant();
+          result.add(Ordering.natural().min(to, Ordering.natural().max(from, currentHourStart)));
+          localStart = localStart.plusHours(1).withMinute(0).withSecond(0).withNano(0);
           break;
         default:
       }

@@ -50,6 +50,31 @@ public class StatisticsUtilTest {
   }
 
   @Test
+  public void testGetBucketsHourly() {
+    for (int i = 0; i < repetitions / 24; i++) {
+      final Instant a = randomInstant();
+      final Instant b = randomInstant();
+      final Instant from = Ordering.natural().min(a, b);
+      final Instant to = Ordering.natural().max(a, b);
+      logger.info("from {} to {} {}", from, to, DataResolution.HOURLY.name());
+      final List<Instant> buckets = StatisticsUtil.getBuckets(from, to, DataResolution.HOURLY, ZoneId.of("Z"));
+      assertEquals(from, buckets.get(0));
+      if (buckets.size() == 1) {
+        continue;
+      }
+      assertEquals(
+          LocalDateTime.ofInstant(
+              to,
+              ZoneOffset.UTC)
+              .withMinute(0)
+              .withSecond(0)
+              .withNano(0)
+              .toInstant(ZoneOffset.UTC),
+          buckets.get(buckets.size() - 1));
+    }
+  }
+
+  @Test
   public void testGetBucketsDaily() {
     for (int i = 0; i < repetitions; i++) {
       final Instant a = randomInstant();

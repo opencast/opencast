@@ -52,12 +52,16 @@ angular.module('adminNg.resources')
   function createTickCallback(that, idx) {
     return function(value, index, values) {
       var chooseMode = that.statProviderData[idx].timeChooseMode;
+      var dataResolution = that.statProviderData[idx].dataResolution;
       var formatString = 'L';
       if (chooseMode == 'year') {
         formatString = 'MMMM';
-      }
-      if (chooseMode == 'month') {
+      } else if (chooseMode == 'month') {
         formatString = 'dddd, Do';
+      } else {
+        if (dataResolution === 'hourly') {
+          formatString = 'LLL';
+        }
       }
       return moment(value).locale(Language.getLanguageCode()).format(formatString);
     };
@@ -79,8 +83,10 @@ angular.module('adminNg.resources')
           formatString = 'MMMM YYYY';
         } else if (dataResolution === 'yearly') {
           formatString = 'YYYY';
-        } else {
+        } else if (dataResolution === 'daily') {
           formatString = 'dddd, MMMM Do, YYYY';
+        } else {
+          formatString = 'dddd, MMMM Do, YYYY HH:mm';
         }
       }
       var finalDate = moment(itemDate).locale(Language.getLanguageCode()).format(formatString);

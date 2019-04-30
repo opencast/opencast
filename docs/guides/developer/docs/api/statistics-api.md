@@ -248,7 +248,7 @@ Field name       |Type                                  | Description
 `resourceId`     | [`string`](#basic)                   | The technical identifier of the resource the data relates to
 `from`           | [`datetime`](types.md#date-and-time) | Start of time period this query relates to
 `to`             | [`datetime`](types.md#date-and-time) | End of time period this query relates to
-`dataResolution` | [`string`](#basic)                   | `daily`, `monthly` or `yearly` (as described by provider)
+`dataResolution` | [`string`](#basic)                   | `hourly`, `daily`, `monthly` or `yearly` (as described by provider)
 
 Query Result Data Field:
 

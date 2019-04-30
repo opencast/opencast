@@ -75,9 +75,9 @@ For each provider, the following properties have to be configured:
     - **`resourceIdName`**, e.g. `episodeId` tells Opencast that the InfluxDB tag identifying the resource type this
        provider refers to is named `episodeId`.
     - **`resolutions`** is a list of resolutions supported by this provider. Opencast allows the user to select a
-      _resolution_ with which the data is displayed. Valid values are `DAILY`, `WEEKLY`, `MONTHLY` and `YEARLY`. E.g.
-      when a chart shows data of two years, a `DAILY` resolution will lead to 2x365=730 values to be plotted while a
-      `MONTHLY` resolution would leave us with 24 values being plotted in the chart.
+      _resolution_ with which the data is displayed. Valid values are `HOURLY`, `DAILY`, `WEEKLY`, `MONTHLY` and
+      `YEARLY`. E.g. when a chart shows data of two years, a `DAILY` resolution will lead to 2x365=730 values to be
+      plotted while a `MONTHLY` resolution would leave us with 24 values being plotted in the chart.
 - **`type`** defines the structure of the data provided by this provider. Currently, only `timeseries` is supported.
 
 Here is an example json configuration for a provider which generates charts for episodes showing the number of views:

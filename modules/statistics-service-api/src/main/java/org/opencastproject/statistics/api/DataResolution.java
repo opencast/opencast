@@ -27,6 +27,7 @@ import java.util.Arrays;
  * Resolution to get data with (e.g. daily. weekly, ...)
  */
 public enum DataResolution {
+  HOURLY,
   DAILY,
   WEEKLY,
   MONTHLY,
