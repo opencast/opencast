@@ -46,6 +46,10 @@ angular.module('adminNg.controllers')
         label: 'SYSTEMS.JOBS.TABLE.HOST_NAME',
         sortable: true
       }, {
+        name:  'processingNode',
+        label: 'SYSTEMS.JOBS.TABLE.NODE_NAME',
+        sortable: true
+      }, {
         name:  'submitted',
         label: 'SYSTEMS.JOBS.TABLE.SUBMITTED',
         sortable: true

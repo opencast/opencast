@@ -57,10 +57,10 @@ public class TestServerEndpoint extends ServerEndpoint {
     this.serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
 
     List<HostRegistration> hosts = new ArrayList<HostRegistration>();
-    hosts.add(new JaxbHostRegistration(HOST1, "1.1.1.1", 100000, 8, 8, true, false));
-    hosts.add(new JaxbHostRegistration(HOST2, "1.1.1.2", 400000, 4, 8, true, true));
-    hosts.add(new JaxbHostRegistration(HOST3, "1.1.1.3", 200000, 2, 8, false, false));
-    hosts.add(new JaxbHostRegistration(HOST4, "1.1.1.4", 500000, 6, 8, true, true));
+    hosts.add(new JaxbHostRegistration(HOST1, "1.1.1.1", "node1", 100000, 8, 8, true, false));
+    hosts.add(new JaxbHostRegistration(HOST2, "1.1.1.2", "node2", 400000, 4, 8, true, true));
+    hosts.add(new JaxbHostRegistration(HOST3, "1.1.1.3", "node3", 200000, 2, 8, false, false));
+    hosts.add(new JaxbHostRegistration(HOST4, "1.1.1.4", "node4", 500000, 6, 8, true, true));
 
     JaxbServiceRegistration service1 = new JaxbServiceRegistration("test", HOST1, "");
     JaxbServiceRegistration service2 = new JaxbServiceRegistration("test", HOST2, "");
