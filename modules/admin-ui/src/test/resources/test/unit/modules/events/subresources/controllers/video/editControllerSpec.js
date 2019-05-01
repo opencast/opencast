@@ -58,16 +58,6 @@ describe('Video Edit controller', function () {
         });
     });
 
-    describe('#clearSelectedSegment', function () {
-
-        it('removes the selected / middle segment', function () {
-            expect($scope.video.segments.length).toBe(3);
-            $scope.video.segments[1].selected = true;
-            $scope.clearSelectedSegment();
-            expect($scope.video.segments.length).toBe(2);
-        });
-    });
-
     describe('#clearSegments', function () {
 
         it('Remove the middle segment', function () {

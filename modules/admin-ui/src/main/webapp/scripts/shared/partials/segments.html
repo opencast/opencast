@@ -10,7 +10,7 @@
          data-start="{{segment.start}}">
 
       <div class='segment-remove'>
-        <a title="{{'VIDEO_TOOL.SEGMENTS.USE_SEGMENT' | translate}}"
+        <a title="{{segment.deleted ? 'VIDEO_TOOL.SEGMENTS.SHOW_SEGMENT' : 'VIDEO_TOOL.SEGMENTS.HIDE_SEGMENT' | translate}}"
            ng-class="{ unused: segment.deleted, used: !segment.deleted }"
            ng-click="toggleSegment($event, segment)" />
       </div>

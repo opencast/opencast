@@ -269,11 +269,11 @@
                   <div class="video-toolbar">
                     <div class="start-column">
                       <div class="primary-functions function-buttons">
-                        <a class="split" ng-click="split()" translate>VIDEO_TOOL.ACTIONS.SPLIT</a>
-                        <a class="cut" ng-click="cut()" translate>VIDEO_TOOL.ACTIONS.CUT</a>
-                        <a class="replay" ng-click="replay()" translate>VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT</a>
-                        <a class="replay-end-of-segment" ng-click="replayEndOfSegment()" translate>VIDEO_TOOL.ACTIONS.REPLAY_END_OF_SEGMENT</a>
-                        <a class="replay-with-preroll" ng-click="replayPreRoll()" translate>VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_WITH_PREROLL</a>
+                        <a class="split" ng-click="split()" translate title="{{'VIDEO_TOOL.ACTIONS.SPLIT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.SPLIT</a>
+                        <a class="cut" ng-click="cut()" translate title="{{'VIDEO_TOOL.ACTIONS.CUT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.CUT</a>
+                        <a class="replay" ng-click="replay()" translate title="{{'VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT</a>
+                        <a class="replay-end-of-segment" ng-click="replayEndOfSegment()" translate title="{{'VIDEO_TOOL.ACTIONS.REPLAY_END_OF_SEGMENT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.REPLAY_END_OF_SEGMENT</a>
+                        <a class="replay-with-preroll" ng-click="replayPreRoll()" translate title="{{'VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_WITH_PREROLL</a>
                         <!--
                           <a class="switch-feed" translate>VIDEO_TOOL.ACTIONS.SWITCH_FEED</a>
                         -->
@@ -281,8 +281,7 @@
                     </div>
                     <div class="end-column">
                       <div class="destructive-functions function-buttons">
-                        <a class="clear-segments" ng-click="clearSelectedSegment()" translate>VIDEO_TOOL.ACTIONS.CLEAR_SELECTED_SEGMENT</a>
-                        <a class="clear-segments" ng-click="clearSegments()" translate>VIDEO_TOOL.ACTIONS.CLEAR_SEGMENTS</a>
+                        <a class="clear-segments" ng-click="clearSegments()" translate title="{{'VIDEO_TOOL.ACTIONS.CLEAR_SEGMENTS_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.CLEAR_SEGMENTS</a>
                       </div>
                     </div>
                   </div>
