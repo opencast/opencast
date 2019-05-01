@@ -5,7 +5,7 @@
 </div>
 <div id="length-div" style="position: absolute; visibility: hidden; height: auto; width: auto; white-space: nowrap;">
 </div>
-<table class="main-tbl">
+<table ng-class="{'main-tbl highlight-hover': highlight, 'main-tbl': !highlight }">
   <thead>
     <tr>
       <th ng-if="table.multiSelect" class="small">

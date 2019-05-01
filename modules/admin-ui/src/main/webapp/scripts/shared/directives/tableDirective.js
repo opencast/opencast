@@ -62,7 +62,8 @@ angular.module('adminNg.directives')
     templateUrl: 'shared/partials/table.html',
     replace: false,
     scope: {
-      table: '='
+      table: '=',
+      highlight: '<'
     },
     link: function (scope, element) {
       scope.table.fetch(true);
