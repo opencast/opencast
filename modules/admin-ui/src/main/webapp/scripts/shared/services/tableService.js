@@ -271,10 +271,6 @@ angular.module('adminNg.services')
          */
       this.fetch = function (reset) {
 
-        if(me.lastRequest && !me.lastRequest.$resolved) {
-          me.lastRequest.$cancelRequest();
-        }
-
         if (angular.isUndefined(me.apiService)) {
           return;
         }
@@ -321,8 +317,14 @@ angular.module('adminNg.services')
 
         (function(resource){
 
-          me.lastRequest = me.apiService.query(query);
-          me.lastRequest.$promise.then(function (data) {
+          var startTime = new Date();
+          me.apiService.query(query).$promise.then(function (data) {
+
+            if (me.lastStartTime && me.lastStartTime > startTime) {
+              return; // a more recent request got a response earlier, so we ignore this one
+            }
+            me.lastStartTime = startTime;
+
             if(resource != me.resource) {
               return;
             }
