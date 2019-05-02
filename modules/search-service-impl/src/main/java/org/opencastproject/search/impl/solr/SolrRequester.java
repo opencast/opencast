@@ -75,6 +75,8 @@ import java.util.regex.Pattern;
  */
 public class SolrRequester {
 
+  private static final int QUERY_MAX_ROWS = 2000;
+
   /**
    * Logging facility
    */
@@ -745,10 +747,10 @@ public class SolrRequester {
 
     SolrQuery query = new SolrQuery(sb.toString());
 
-    if (q.getLimit() > 0) {
+    if ((q.getLimit() > 0) && (q.getLimit() < QUERY_MAX_ROWS)) {
       query.setRows(q.getLimit());
     } else {
-      query.setRows(Integer.MAX_VALUE);
+      query.setRows(QUERY_MAX_ROWS);
     }
 
     if (q.getOffset() > 0)
