@@ -175,9 +175,11 @@ angular.module('adminNg.controllers')
       $scope.activeTransaction = true;
       $scope.video.thumbnail.loading = $scope.video.thumbnail && $scope.video.thumbnail.type &&
               ($scope.video.thumbnail.type === 'DEFAULT');
+      // Remember $scope.video.workflow as $scope.video.$save will potentially overwrite this value
+      var closeVideoEditor = $scope.video.workflow;
       $scope.video.$save({ id: $scope.id, tool: $scope.tab }, function (response) {
         $scope.activeTransaction = false;
-        if ($scope.video.workflow) {
+        if (closeVideoEditor) {
           Notifications.add('success', 'VIDEO_CUT_PROCESSING');
           $location.url('/events/' + $scope.resource);
         } else {
