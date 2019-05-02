@@ -8,12 +8,17 @@
     <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
   </service>
 
-  <reference name="event-comment-service" interface="org.opencastproject.event.comment.EventCommentService"
-             cardinality="1..1" policy="static" bind="setEventCommentService"/>
-  <reference cardinality="1..1" interface="org.opencastproject.security.api.SecurityService"
-             name="SecurityService" policy="static" bind="setSecurityService"/>
-  <reference name="ServiceRegistry" cardinality="1..1"
+  <reference name="event-comment-service"
+             interface="org.opencastproject.event.comment.EventCommentService"
+             bind="setEventCommentService"/>
+  <reference interface="org.opencastproject.security.api.SecurityService"
+             name="SecurityService"
+             bind="setSecurityService"/>
+  <reference name="ServiceRegistry"
              interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-             policy="static" bind="setServiceRegistry"/>
+             bind="setServiceRegistry"/>
+  <reference name="UserDirectory"
+             interface="org.opencastproject.security.api.UserDirectoryService"
+             bind="setUserDirectoryService"/>
 
 </scr:component>

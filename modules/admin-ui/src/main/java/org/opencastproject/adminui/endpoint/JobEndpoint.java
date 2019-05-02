@@ -39,6 +39,7 @@ import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.IncidentL10n;
 import org.opencastproject.serviceregistry.api.IncidentService;
@@ -125,6 +126,7 @@ public class JobEndpoint {
   private WorkflowService workflowService;
   private ServiceRegistry serviceRegistry;
   private IncidentService incidentService;
+  private UserDirectoryService userDirectoryService;
 
   /** OSGi callback for the workflow service. */
   public void setWorkflowService(WorkflowService workflowService) {
@@ -139,6 +141,10 @@ public class JobEndpoint {
   /** OSGi callback for the incident service. */
   public void setIncidentService(IncidentService incidentService) {
     this.incidentService = incidentService;
+  }
+
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    this.userDirectoryService = userDirectoryService;
   }
 
   protected void activate(BundleContext bundleContext) {
@@ -450,11 +456,7 @@ public class JobEndpoint {
                 instanceId, e), e.getCause());
       }
 
-      String creatorName = null;
-      User creator = instance.getCreator();
-      if (creator != null) {
-        creatorName = creator.getName();
-      }
+      final String creatorName = instance.getCreatorName();
 
       jsonList.add(obj(f("id", v(instanceId)), f("title", v(instance.getTitle(), Jsons.BLANK)),
               f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState().toString())),
@@ -462,9 +464,8 @@ public class JobEndpoint {
               f("submitter", v(creatorName, Jsons.BLANK))));
     }
 
-    JObject json = obj(f("results", arr(jsonList)), f("count", v(workflowInstances.getTotalCount())),
+    return obj(f("results", arr(jsonList)), f("count", v(workflowInstances.getTotalCount())),
             f("offset", v(query.getStartPage())), f("limit", v(jsonList.size())), f("total", v(totalWithoutFilters)));
-    return json;
   }
 
   /**
@@ -478,7 +479,7 @@ public class JobEndpoint {
   public JObject getTasksAsJSON(long id) throws JobEndpointException, NotFoundException {
     WorkflowInstance instance = getWorkflowById(id);
     // Gather user information
-    User user = instance.getCreator();
+    User user = userDirectoryService.loadUser(instance.getCreatorName());
     List<Field> userInformation = new ArrayList<>();
     if (user != null) {
       userInformation.add(f("username", v(user.getUsername())));

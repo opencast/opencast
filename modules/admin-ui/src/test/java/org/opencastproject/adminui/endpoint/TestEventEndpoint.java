@@ -96,6 +96,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.series.impl.SeriesServiceImpl;
@@ -451,10 +452,15 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
             .anyTimes();
     EasyMock.replay(incidentService);
 
+    UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
+    EasyMock.expect(userDirectoryService.loadUser(EasyMock.anyString())).andReturn(userWithPermissions).anyTimes();
+    EasyMock.replay(userDirectoryService);
+
     JobEndpoint endpoint = new JobEndpoint();
     endpoint.setServiceRegistry(serviceRegistry);
     endpoint.setWorkflowService(workflowService);
     endpoint.setIncidentService(incidentService);
+    endpoint.setUserDirectoryService(userDirectoryService);
     endpoint.activate(null);
     env.setJobService(endpoint);
 
