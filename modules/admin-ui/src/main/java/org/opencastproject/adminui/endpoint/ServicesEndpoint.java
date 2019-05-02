@@ -415,15 +415,9 @@ public class ServicesEndpoint {
 
   /**
    * @param hostname of server to find in list
+   * @param servers, list of known servers
    */
   private Optional<HostRegistration> findServerByHost(String hostname, List<HostRegistration> servers) {
-    // Java 1.8 return servers.stream().filter(o -> o.getBaseUrl().equals(hostname)).findFirst();
-    for (HostRegistration server: servers) {
-      if (hostname.equalsIgnoreCase(server.getBaseUrl())) {
-        return Optional.of(server);
-      }
-    }
-
-    return Optional.empty();
+    return servers.stream().filter(o -> o.getBaseUrl().equals(hostname)).findFirst();
   }
 }
