@@ -31,6 +31,7 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static java.lang.String.format;
+import static javax.servlet.http.HttpServletResponse.SC_ACCEPTED;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -239,6 +240,7 @@ public abstract class AbstractEventEndpoint {
   //TODO Move to a constants file instead of declaring it at the top of multiple files?
   protected static final String WORKFLOW_DEFINITION_DEFAULT = "org.opencastproject.workflow.default.definition";
 
+
   /** The default time before a piece of signed content expires. 2 Hours. */
   protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
 
@@ -383,24 +385,30 @@ public abstract class AbstractEventEndpoint {
   @RestQuery(name = "deleteevent", description = "Delete a single event.", returnDescription = "Ok if the event has been deleted.", pathParameters = {
           @RestParameter(name = "eventId", isRequired = true, description = "The id of the event to delete.", type = STRING), }, reponses = {
                   @RestResponse(responseCode = SC_OK, description = "The event has been deleted."),
+                  @RestResponse(responseCode = SC_ACCEPTED, description = "The event will be retracted and deleted afterwards."),
                   @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response deleteEvent(@PathParam("eventId") String id) throws UnauthorizedException, SearchIndexException {
-    try {
-      checkAgentAccessForEvent(id);
-      if (!getIndexService().removeEvent(id))
-        return Response.serverError().build();
-    } catch (NotFoundException e) {
-      // If we couldn't find any trace of the event in the underlying database(s), we can get rid of it
-      // entirely in the index.
+    final Opt<Event> event = checkAgentAccessForEvent(id);
+    if (event.isNone()) {
+      return Response.serverError().build();
+    }
+    final IndexService.EventRemovalResult result = getIndexService().removeEvent(event.get(), () -> {
       try {
         getIndex().delete(Event.DOCUMENT_TYPE,id.concat(getSecurityService().getOrganization().getId()));
       } catch (SearchIndexException e1) {
         logger.error("error removing event {}: {}",id,e1);
-        return Response.serverError().build();
       }
+    }, getAdminUIConfiguration().getRetractWorkflowId());
+    switch (result) {
+      case SUCCESS:
+        return Response.ok().build();
+      case RETRACTING:
+        return Response.accepted().build();
+      case FAILED:
+        return Response.serverError().build();
+      default:
+        throw new RuntimeException("Unknown EventRemovalResult type: " + result.name());
     }
-
-    return Response.ok().build();
   }
 
   @POST
@@ -432,29 +440,35 @@ public abstract class AbstractEventEndpoint {
     for (Object eventIdObject : eventIdsJsonArray) {
       String eventId = eventIdObject.toString();
       try {
-        checkAgentAccessForEvent(eventId);
-        if (!getIndexService().removeEvent(eventId)) {
-          result.addServerError(eventId);
+        final Opt<Event> event = checkAgentAccessForEvent(eventId);
+        IndexService.EventRemovalResult currentResult;
+        if (event.isSome()) {
+          currentResult = getIndexService().removeEvent(
+            event.get(),
+            () -> { result.addNotFound(eventId); },
+            getAdminUIConfiguration().getRetractWorkflowId()
+          );
         } else {
-          result.addOk(eventId);
+          currentResult = IndexService.EventRemovalResult.FAILED;
         }
-      } catch (NotFoundException e) {
-        result.addNotFound(eventId);
+        switch (currentResult) {
+          case SUCCESS:
+            result.addOk(eventId);
+            break;
+          case RETRACTING:
+            result.addAccepted(eventId);
+            break;
+          case FAILED:
+            result.addServerError(eventId);
+            break;
+          default:
+            throw new RuntimeException("Unknown EventRemovalResult type: " + currentResult.name());
+        }
       } catch (UnauthorizedException e) {
         result.addUnauthorized(eventId);
       }
     }
     return Response.ok(result.toJson()).build();
-  }
-
-  @GET
-  @Path("{eventId}/hasSnapshots.json")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "hassnapshots", description = "Returns a JSON object containing a boolean indicating if snapshots exist for this event", returnDescription = "A JSON object", pathParameters = {
-    @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
-    @RestResponse(description = "A JSON object containing a property \"hasSnapshots\"", responseCode = HttpServletResponse.SC_OK) })
-  public Response hasEventSnapshots(@PathParam("eventId") String id) throws Exception {
-    return okJson(obj(f("hasSnapshots",this.getIndexService().hasSnapshots(id))));
   }
 
   @GET
@@ -2529,12 +2543,13 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
-  private void checkAgentAccessForEvent(final String eventId) throws UnauthorizedException, SearchIndexException {
+  private Opt<Event> checkAgentAccessForEvent(final String eventId) throws UnauthorizedException, SearchIndexException {
     final Opt<Event> event = getIndexService().getEvent(eventId, getIndex());
     if (event.isNone() || !event.get().getEventStatus().contains("SCHEDULE")) {
-      return;
+      return event;
     }
     SecurityUtil.checkAgentAccess(getSecurityService(), event.get().getAgentId());
+    return event;
   }
 
   private void checkAgentAccessForAgent(final String agentId) throws UnauthorizedException {

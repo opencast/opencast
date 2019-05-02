@@ -25,6 +25,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
+import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
@@ -53,6 +54,7 @@ import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventHttpServletRequest;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
+import org.opencastproject.index.service.impl.index.event.EventUtils;
 import org.opencastproject.index.service.impl.index.group.Group;
 import org.opencastproject.index.service.impl.index.group.GroupIndexSchema;
 import org.opencastproject.index.service.impl.index.group.GroupSearchQuery;
@@ -98,6 +100,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -117,9 +120,11 @@ import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
+import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
+import org.opencastproject.workflow.api.WorkflowListener;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
@@ -145,6 +150,7 @@ import org.joda.time.DateTimeZone;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,6 +162,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -167,6 +174,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
@@ -219,6 +227,8 @@ public class IndexServiceImpl implements IndexService {
 
   /** The single thread executor service */
   private ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+  private Map<Long, Retraction> retractions = new ConcurrentHashMap<>();
 
   /**
    * OSGi DI.
@@ -475,6 +485,14 @@ public class IndexServiceImpl implements IndexService {
     return seriesCatalogUIAdapter;
   }
 
+  public void activate(ComponentContext cc) {
+    workflowService.addWorkflowListener(new RetractionListener());
+  }
+
+  public void deactivate(ComponentContext cc) {
+    executorService.shutdown();
+  }
+
   @Override
   public String createEvent(HttpServletRequest request) throws IndexServiceException, UnsupportedAssetException {
     JSONObject metadataJson = null;
@@ -682,7 +700,7 @@ public class IndexServiceImpl implements IndexService {
    * "captionHold": "false", "archiveOp": "true", "publishEngage": "true", "publishHarvesting": "true" } }, ....
    *
    * @param metadataJson
-   * @param mp
+   * @param mediaPackage
    * @return the created workflow instance id
    * @throws IndexServiceException
    */
@@ -1519,6 +1537,50 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
+  public EventRemovalResult removeEvent(Event event, Runnable doOnNotFound, String retractWorkflowId) throws UnauthorizedException {
+    final boolean hasOnlyEngageLive = event.getPublications().size() == 1
+        && EventUtils.ENGAGE_LIVE_CHANNEL_ID.equals(event.getPublications().get(0).getChannel());
+    final boolean retract = event.hasPreview()
+        || (!event.getPublications().isEmpty()  && !hasOnlyEngageLive && this.hasSnapshots(event.getIdentifier()));
+    if (retract) {
+      retractAndRemoveEvent(event.getIdentifier(), doOnNotFound, retractWorkflowId);
+      return EventRemovalResult.RETRACTING;
+    } else {
+      try {
+        final boolean success = removeEvent(event.getIdentifier());
+        return success ? EventRemovalResult.SUCCESS : EventRemovalResult.FAILED;
+      } catch (NotFoundException e) {
+        doOnNotFound.run();
+        return EventRemovalResult.FAILED;
+      }
+    }
+  }
+
+  private void retractAndRemoveEvent(String id, Runnable doOnNotFound, String retractWorkflowId) {
+    final WorkflowDefinition wfd;
+    try {
+      wfd = workflowService.getWorkflowDefinitionById(retractWorkflowId);
+    } catch (NotFoundException e) {
+      logger.error("Could not find workflow with id {} to retract the event. Check your configuration.", retractWorkflowId);
+      return;
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Could not access workflow database. This may be a temporary problem.", e);
+      return;
+    }
+    final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
+    final ConfiguredWorkflow workflow = workflow(wfd);
+    final List<WorkflowInstance> result = workflows.applyWorkflowToLatestVersion(Collections.singleton(id), workflow).toList();
+    if (result.size() != 1) {
+        logger.warn("Couldn't start workflow to retract media package {}", id);
+        return;
+    }
+    this.retractions.put(
+        result.get(0).getId(),
+        new Retraction(securityService.getUser(), securityService.getOrganization(), doOnNotFound)
+    );
+  }
+
+  @Override
   public boolean removeEvent(String id) throws NotFoundException, UnauthorizedException {
     boolean unauthorizedScheduler = false;
     boolean notFoundScheduler = false;
@@ -2166,4 +2228,47 @@ public class IndexServiceImpl implements IndexService {
             || WorkflowState.RUNNING.toString().equals(workflowState)
             || WorkflowState.PAUSED.toString().equals(workflowState);
   }
+
+  private static final class Retraction {
+    private User user;
+    private Organization organization;
+    private Runnable doOnNotFound;
+
+    private Retraction(User user, Organization organization, Runnable doOnNotFound) {
+      this.user = user;
+      this.organization = organization;
+      this.doOnNotFound = doOnNotFound;
+    }
+  }
+
+  private final class RetractionListener implements WorkflowListener {
+    private final Logger logger = LoggerFactory.getLogger(RetractionListener.class);
+
+    @Override
+    public void stateChanged(WorkflowInstance workflow) {
+      if (workflow.getState() != WorkflowState.SUCCEEDED) {
+        return;
+      }
+      if (!retractions.containsKey(workflow.getId())) {
+        return;
+      }
+      final Retraction retraction = retractions.get(workflow.getId());
+      SecurityUtil.runAs(securityService, retraction.organization, retraction.user, () -> {
+        final String mpId = workflow.getMediaPackage().getIdentifier().compact();
+        try {
+          final boolean result = removeEvent(mpId);
+          if (!result) {
+            logger.warn("Could not delete retracted media package {}. removeEvent returned false.", mpId);
+          }
+          retractions.remove(workflow.getId());
+        } catch (UnauthorizedException e) {
+          logger.warn("Not authorized to delete retracted media package {}",  mpId);
+        } catch (NotFoundException e) {
+          logger.warn("Unable to delete retracted media package {} because it could not be found",  mpId);
+          retraction.doOnNotFound.run();
+        }
+      });
+    }
+  }
+
 }

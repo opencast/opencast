@@ -67,6 +67,10 @@ public interface IndexService {
     UPLOAD, UPLOAD_LATER, SCHEDULE_SINGLE, SCHEDULE_MULTIPLE
   }
 
+  enum EventRemovalResult {
+    SUCCESS, FAILED, RETRACTING
+  }
+
   SearchResult<Group> getGroups(String filter, Opt<Integer> limit, Opt<Integer> offset, Opt<String> sort,
           AbstractSearchIndex index) throws SearchIndexException, IllegalArgumentException;
 
@@ -214,6 +218,21 @@ public interface IndexService {
    */
   String createEvent(EventHttpServletRequest eventHttpServletRequest) throws ParseException, IOException,
           MediaPackageException, IngestException, NotFoundException, SchedulerException, UnauthorizedException;
+
+  /**
+   * Removes an event and retracts it if necessary.
+   *
+   * @param event
+   *          The event to remove.
+   * @param doOnNotFound
+   *      What to do when the event could not be found.
+   * @param retractWorkflowId
+   *          The id of the workflow to use to retract the event if necessary.
+   * @return A result which tells if the event was removed, removal failed, or the event is being retracted and will be removed later.
+   * @throws UnauthorizedException
+   *           Thrown if the action is unauthorized
+   */
+  EventRemovalResult removeEvent(Event event, Runnable doOnNotFound, String retractWorkflowId) throws UnauthorizedException;
 
   /**
    * Removes an event.

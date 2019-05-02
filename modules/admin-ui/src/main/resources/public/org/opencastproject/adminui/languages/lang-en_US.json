@@ -123,9 +123,11 @@
      "SERIES_NOT_UPDATED":  "The series could not be saved",
      "SERIES_NOT_UPDATED_ID":  "The series {{ id }} could not be saved",
      "SERIES_NOT_UPDATED_ALL":  "None of the series could be saved",
-     "EVENTS_DELETED":      "The event has been deleted",
-     "EVENTS_NOT_DELETED":  "The event(s) could not be deleted",
-     "EVENTS_NOT_DELETED_NOT_AUTHORIZED":  "The event could not be deleted, because you don't have the permission to do so.",
+     "EVENT_DELETED":      "The event has been deleted.",
+     "EVENT_WILL_BE_DELETED": "The event will be unpublished first, and will then be deleted automatically.",
+     "EVENTS_DELETED":      "The events are being deleted. Published events will be unpublished first, and then be deleted automatically.",
+     "EVENTS_NOT_DELETED":  "The event(s) could not be deleted.",
+     "EVENTS_NOT_DELETED_NOT_AUTHORIZED":  "The event(s) could not be deleted, because you don't have the permission to do so.",
      "SERIES_DELETED": "The series has been deleted",
      "SERIES_NOT_DELETED": "The series could not be deleted",
      "LOCATION_DELETED": "The location has been deleted",
@@ -181,22 +183,7 @@
           "EVENTS": {
             "CAPTION": "Delete",
             "DELETE_EVENTS": "Delete Events",
-            "PUBLISHED" : {
-                "NONE": "None of the selected events need to be retracted before they can be deleted.",
-                "WARNING": "The events below cannot be deleted as they have already been published and deleting them would leave no way to delete the published files. Instead choose a workflow below to retract the events first and then delete them."
-            },
-            "RETRACT_EVENTS": "Retract Events",
-            "SELECT_RETRACT_TASK": "Select a Retract Task",
-            "SUMMARY": {
-                "EVENTS_DELETED": "Events to be Deleted",
-                "EVENTS_RETRACTED": "Events to be Retracted",
-                "RETRACT_WORKFLOW": "Workflow to Retract Events"
-            },
             "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue.",
-            "UNPUBLISHED": {
-                "NONE": "None of the selected events can be deleted without leaving orphan files."
-            },
-            "BUTTON": "Delete"
           }
       },
 
@@ -271,9 +258,7 @@
       "NEXT_STEP": "Next",
       "BACK": "Previous",
       "CREATE": "Create",
-      "RETRACT": "Retract",
       "RETRACT_DELETE": "Retract/Delete",
-      "DELETE": "Delete",
       "UPDATE": "Update",
       "DURATION": {
           "HOURS": "Hours",
@@ -314,13 +299,6 @@
      }
    },
    "EVENTS": {
-     "RETRACT": {
-        "CAPTION": "Retract Event",
-        "ID": "ID",
-        "SELECT_TASK": "Select Task",
-        "SUMMARY": "Summary",
-        "WARNING": "This event has been published to at least one publication channel so it has to be retracted before it can be deleted. Select from the tasks below to retract the publications."
-     },
      "LICENSE": {
         "ALLRIGHTS": "All rights reserved",
         "CCBY": "CC BY",

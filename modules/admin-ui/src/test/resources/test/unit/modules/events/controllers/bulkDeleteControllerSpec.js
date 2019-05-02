@@ -12,10 +12,6 @@ describe('Bulk Delete controller', function () {
 
     prepareForSubmit = function () {
         $scope.rows = sampleRows;
-        $scope.processing.ud.workflow.id = 'something';
-        $scope.processing.ud.workflow.selection = {
-            configuration: {}
-        };
     };
 
     beforeEach(module('adminNg'));
@@ -66,66 +62,38 @@ describe('Bulk Delete controller', function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.whenGET('/i18n/languages.json').respond(JSON.stringify(getJSONFixture('i18n/languages.json')));
-        $httpBackend.whenGET('/admin-ng/event/new/processing?tags=delete').respond(JSON.stringify(getJSONFixture('admin-ng/event/new/processing')));
         $httpBackend.whenGET('public/org/opencastproject/adminui/languages/lang-en_US.json').respond(JSON.stringify({}));
-        $httpBackend.whenPOST('/admin-ng/tasks/new').respond(201);
 
         //TODO get JSON String instead of JSON Object
     });
 
     it('instantiates', function () {
-        expect($scope.published.rows).toBeDefined();
-        expect($scope.unpublished.rows).toBeDefined();
+        expect($scope.table.rows).toBeDefined();
         expect($scope.submit).toBeDefined();
-        expect($scope.published.allSelectedChanged).toBeDefined();
-        expect($scope.unpublished.allSelectedChanged).toBeDefined();
+        expect($scope.table.allSelectedChanged).toBeDefined();
     });
 
     describe('#validity', function () {
         it('is true in case everything is right', function () {
-            expect($scope.published.rows.length).toEqual(1);
-            expect($scope.unpublished.rows.length).toEqual(1);
-            $scope.processing.ud.workflow.id = 'default';
-            expect($scope.valid()).toBeTruthy();
-        });
-
-        it('is false if all are published and no workflow is set', function () {
-            $scope.published.rows[0].selected = true;
-            $scope.processing.ud.workflow.id = undefined;
-            expect($scope.valid()).toBeFalsy();
-
-        });
-
-        it('is true if all are unpublished and no workflow is set', function () {
-            $scope.published.rows[0].selected = false;
-            $scope.unpublished.rows[0].selected = true;
-            $scope.processing.ud.workflow.id = undefined;
+            expect($scope.table.rows.length).toEqual(4);
             expect($scope.valid()).toBeTruthy();
         });
 
         it('is false if no rows are selected', function () {
-            $scope.published.rows[0].selected = false;
-            $scope.unpublished.rows[0].selected = false;
+            $scope.table.rows[0].selected = false;
+            $scope.table.rows[1].selected = false;
             expect($scope.valid()).toBeFalsy();
         });
 
     });
 
     describe('#submit', function () {
-        beforeEach(function () {
-            $scope.processing.ud.workflow = {
-                id: 'default',
-                selection: {
-                    configuration: ''
-                }
-            };
-        });
 
         it('submits bulk delete requests', function () {
             successfulSubmit = true;
             spyOn(bulkDeleteResource, 'delete').and.callThrough();
             $scope.submit();
-            var expectedArgument = {resource: 'event', endpoint: 'deleteEvents', eventIds: [2]},
+            var expectedArgument = {resource: 'event', endpoint: 'deleteEvents', eventIds: [1, 2]},
                 actualArguments = bulkDeleteResource.delete.calls.mostRecent();
             expect(actualArguments.args[1]).toEqual(expectedArgument);
         });
