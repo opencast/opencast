@@ -406,9 +406,13 @@ public class ServiceRegistryJpaImplTest {
     JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob);
     try {
       barrier.waitForJobs(2000);
+      //We should never successfully complete the job, so if we get here then something is wrong
       Assert.fail();
     } catch (Exception e) {
       testJob = serviceRegistryJpaImpl.getJob(testJob.getId());
+      //Some explanation here: If the load exceeds the global maximum node load (ie, jobLoad > all individual node max
+      // loads), then we dispatch to the biggest, even if it's not going to normally accept the job.  That node may still
+      // reject the job, but that's AbstractJobProducer's job, not the service registry's
       Assert.assertEquals(TEST_HOST_OTHER, testJob.getProcessingHost());
     }
   }
