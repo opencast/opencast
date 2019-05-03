@@ -123,6 +123,17 @@ public class SystemLoad {
     return false;
   }
 
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Current Loads:\n");
+    for (NodeLoad n : getNodeLoads()) {
+      sb.append(String.format("  %s: %f / %f\n", n.getHost(), n.getCurrentLoad(), n.getMaxLoad()));
+    }
+    return sb.toString();
+  }
+
+
   /** A record of a node in the cluster and its load factor */
   @XmlType(name = "nodetype", namespace = "http://serviceregistry.opencastproject.org")
   @XmlRootElement(name = "nodetype", namespace = "http://serviceregistry.opencastproject.org")
