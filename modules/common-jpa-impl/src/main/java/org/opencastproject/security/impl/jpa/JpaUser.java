@@ -211,14 +211,6 @@ public class JpaUser implements User {
   }
 
   /**
-   * @see org.opencastproject.security.api.User#canLogin()
-   */
-  @Override
-  public boolean canLogin() {
-    return true;
-  }
-
-  /**
    * @see org.opencastproject.security.api.User#getUsername()
    */
   @Override

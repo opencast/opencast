@@ -310,8 +310,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
 
       logger.debug("Returning JaxbRoles: " + roles);
 
-      // JaxbUser(String userName, String password, String name, String email, String provider, boolean canLogin, JaxbOrganization organization, Set<JaxbRole> roles)
-      User user = new JaxbUser(userName, null, displayName, email, PROVIDER_NAME, true, jaxbOrganization, roles);
+      User user = new JaxbUser(userName, null, displayName, email, PROVIDER_NAME, jaxbOrganization, roles);
 
       cache.put(userName, user);
       logger.debug("Returning user {}", userName);
