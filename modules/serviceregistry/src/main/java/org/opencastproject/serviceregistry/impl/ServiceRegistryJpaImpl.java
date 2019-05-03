@@ -3379,7 +3379,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public int compare(ServiceRegistration serviceA, ServiceRegistration serviceB) {
       String hostA = serviceA.getHost();
       String hostB = serviceB.getHost();
-      return Float.compare(loadByHost.get(hostA).getLoadFactor(), loadByHost.get(hostB).getLoadFactor());
+      NodeLoad nodeA = loadByHost.get(hostA);
+      NodeLoad nodeB = loadByHost.get(hostB);
+      //If the load factors are about the same, sort based on maximum load
+      if (Math.abs(nodeA.getLoadFactor() - nodeB.getLoadFactor()) <= 0.01) {
+        //NOTE: The sort order below is *reversed* from what you'd expect
+        //When we're comparing the load factors we want the node with the lowest factor to be first
+        //When we're comparing the maximum load value, we want the node with the highest max to be first
+        return Float.compare(nodeB.getMaxLoad(), nodeA.getMaxLoad());
+      }
+      return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
+
     }
 
   }

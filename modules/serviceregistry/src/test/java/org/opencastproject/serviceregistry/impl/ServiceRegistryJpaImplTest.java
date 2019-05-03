@@ -39,6 +39,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
@@ -86,12 +87,14 @@ public class ServiceRegistryJpaImplTest {
   private static final String TEST_SERVICE = "ingest";
   private static final String TEST_SERVICE_2 = "compose";
   private static final String TEST_SERVICE_3 = "org.opencastproject.workflow";
+  private static final String TEST_SERVICE_FAIRNESS = "fairness";
   private static final String TEST_OPERATION = "ingest";
   private static final String TEST_PATH = "/ingest";
   private static final String TEST_PATH_2 = "/compose";
   private static final String TEST_PATH_3 = "/workflow";
   private static final String TEST_HOST = "http://localhost:8080";
   private static final String TEST_HOST_OTHER = "http://otherhost:8080";
+  private static final String TEST_HOST_THIRD = "http://thirdhost:8080";
 
   @Before
   public void setUp() throws Exception {
@@ -189,9 +192,13 @@ public class ServiceRegistryJpaImplTest {
     // register the hosts, service must be activated at this point
     serviceRegistryJpaImpl.registerHost(TEST_HOST, "127.0.0.1", 1024, 1, 1);
     serviceRegistryJpaImpl.registerHost(TEST_HOST_OTHER, "127.0.0.1", 1024, 1, 2);
+    serviceRegistryJpaImpl.registerHost(TEST_HOST_THIRD, "127.0.0.1", 1024, 1, 4);
     serviceRegistryJpaImpl.registerService(TEST_SERVICE, TEST_HOST, TEST_PATH);
     serviceRegistryJpaImpl.registerService(TEST_SERVICE, TEST_HOST_OTHER, TEST_PATH);
     serviceRegistryJpaImpl.registerService(TEST_SERVICE_2, TEST_HOST, TEST_PATH_2);
+    serviceRegistryJpaImpl.registerService(TEST_SERVICE_FAIRNESS, TEST_HOST, TEST_PATH_2);
+    serviceRegistryJpaImpl.registerService(TEST_SERVICE_FAIRNESS, TEST_HOST_OTHER, TEST_PATH_2);
+    serviceRegistryJpaImpl.registerService(TEST_SERVICE_FAIRNESS, TEST_HOST_THIRD, TEST_PATH_2);
   }
 
   private void setupBundleContext() throws InvalidSyntaxException {
@@ -334,6 +341,55 @@ public class ServiceRegistryJpaImplTest {
       Assert.assertEquals(TEST_HOST, blockingHost);
     }
   }
+
+  private void assertHostloads(Job j, Float a, Float b, Float c) throws Exception {
+    Thread.sleep(1100); //1100 is 100ms more than the minimum job dispatch interval.  Setting this lower causes race conditions.
+    Job k = serviceRegistryJpaImpl.getJob(j.getId());
+    k.setStatus(Status.RUNNING);
+    serviceRegistryJpaImpl.updateJob(k);
+    SystemLoad hostloads = serviceRegistryJpaImpl.getHostLoads(emf.createEntityManager());
+    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", a, hostloads.get(TEST_HOST).getCurrentLoad()),
+            hostloads.get(TEST_HOST).getCurrentLoad() - a >= 0.0f);
+    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", a, hostloads.get(TEST_HOST).getCurrentLoad()),
+            hostloads.get(TEST_HOST).getCurrentLoad() - a < 0.1f);
+    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", b, hostloads.get(TEST_HOST_OTHER).getCurrentLoad()),
+            hostloads.get(TEST_HOST_OTHER).getCurrentLoad() - b >= 0.0f);
+    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", b, hostloads.get(TEST_HOST_OTHER).getCurrentLoad()),
+            hostloads.get(TEST_HOST_OTHER).getCurrentLoad() - b < 0.1f);
+    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", c, hostloads.get(TEST_HOST_THIRD).getCurrentLoad()),
+            hostloads.get(TEST_HOST_THIRD).getCurrentLoad() - c >= 0.0f);
+    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", c, hostloads.get(TEST_HOST_THIRD).getCurrentLoad()),
+            hostloads.get(TEST_HOST_THIRD).getCurrentLoad() - c < 0.1f);
+  }
+
+  @Test
+  public void testJobDispatchingFairness() throws Exception {
+    if (serviceRegistryJpaImpl.scheduledExecutor != null)
+      serviceRegistryJpaImpl.scheduledExecutor.shutdown();
+    serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
+    serviceRegistryJpaImpl.activate(null);
+    Hashtable<String, String> properties = new Hashtable<>();
+    properties.put("dispatchinterval", "1000");
+    serviceRegistryJpaImpl.updated(properties);
+    registerTestHostAndService();
+
+    Job j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    assertHostloads(j, 0.0f, 0.0f, 1.0f);
+    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    assertHostloads(j, 0.0f, 1.0f, 1.0f);
+    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    assertHostloads(j, 1.0f, 1.0f, 1.0f);
+    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    assertHostloads(j,1.0f, 1.0f, 2.0f);
+    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    assertHostloads(j, 1.0f, 1.0f, 3.0f);
+    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    assertHostloads(j, 1.0f, 2.0f, 3.0f);
+    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    assertHostloads(j,1.0f, 2.0f, 4.0f);
+    serviceRegistryJpaImpl.deactivate();
+  }
+
 
   @Test
   public void testDispatchingJobsHigherMaxLoad() throws Exception {
