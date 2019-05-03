@@ -161,7 +161,7 @@ public class ServiceRegistryJpaImplTest {
     serviceRegistryJpaImpl.setUserDirectoryService(userDirectoryService);
 
     final Capture<HttpUriRequest> request = EasyMock.newCapture();
-    final BasicHttpResponse successRespone = new BasicHttpResponse(
+    final BasicHttpResponse successResponse = new BasicHttpResponse(
             new BasicStatusLine(new HttpVersion(1, 1), HttpStatus.SC_NO_CONTENT, "No message"));
     final BasicHttpResponse unavailableResponse = new BasicHttpResponse(
             new BasicStatusLine(new HttpVersion(1, 1), HttpStatus.SC_SERVICE_UNAVAILABLE, "No message"));
@@ -178,7 +178,7 @@ public class ServiceRegistryJpaImplTest {
         if (request.getValue().getURI().toString().contains(TEST_PATH_3))
           return unavailableResponse;
 
-        return successRespone;
+        return successResponse;
       }
     }).anyTimes();
     EasyMock.replay(trustedHttpClient);
