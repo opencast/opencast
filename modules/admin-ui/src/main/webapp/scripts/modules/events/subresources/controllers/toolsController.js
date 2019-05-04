@@ -179,6 +179,7 @@ angular.module('adminNg.controllers')
         $scope.activeRequest = false;
         if ($scope.video.workflow) {
           Notifications.add('success', 'VIDEO_CUT_PROCESSING');
+          Storage.put('pagination', $scope.resource, 'resume', true);
           $location.url('/events/' + $scope.resource);
         } else {
           Notifications.add('success', 'VIDEO_CUT_SAVED');
