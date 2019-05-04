@@ -23,6 +23,7 @@ package org.opencastproject.workflow.api;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -100,6 +101,11 @@ public interface WorkflowDefinition extends Comparable<WorkflowDefinition> {
    * The operations, listed in order, that this workflow definition includes.
    */
   List<WorkflowOperationDefinition> getOperations();
+
+  /**
+   * The custom state mappings to use for this workflow.
+   */
+  Set<WorkflowStateMapping> getStateMappings();
 
   /**
    * Tags the workflow definition with the given tag.

@@ -23,6 +23,13 @@ package org.opencastproject.workflow.impl;
 
 import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
 
+import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.message.broker.api.workflow.SerializableWorkflowStateMapping;
+import org.opencastproject.message.broker.api.workflow.WorkflowDefinitionItem;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowParser;
@@ -69,6 +76,13 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
   /** The current workflow definition being installed */
   private WorkflowDefinition currentWFD = null;
 
+  /** The message broker sender service */
+  private MessageSender messageSender;
+
+  /** The security service */
+  private SecurityService securityService;
+
+
   /**
    * OSGi callback on component activation. private boolean initialized = true;
    *
@@ -82,23 +96,39 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
   }
 
   /**
+   * Sets the message sender
+   *
+   * @param messageSender
+   *          the messageSender to set
+   */
+  public void setMessageSender(MessageSender messageSender) {
+    this.messageSender = messageSender;
+  }
+
+  /**
+   * Sets the security service
+   *
+   * @param securityService
+   *          the securityService to set
+   */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see org.apache.felix.fileinstall.ArtifactInstaller#install(java.io.File)
    */
   public void install(File artifact) throws Exception {
-    WorkflowDefinition def = currentWFD;
-
     // If the current workflow definition is null, it means this is a first install and not an update...
-    if (def == null) {
-      // ... so we have to load the definition first
-      def = parseWorkflowDefinitionFile(artifact);
+    // ... so we have to load the definition first
+    final WorkflowDefinition def = currentWFD != null ? currentWFD : parseWorkflowDefinitionFile(artifact);
 
-      if (def == null) {
-        logger.warn("Unable to install workflow from '{}'", artifact.getName());
-        artifactsWithError.add(artifact);
-        return;
-      }
+    if (def == null) {
+      logger.warn("Unable to install workflow from '{}'", artifact.getName());
+      artifactsWithError.add(artifact);
+      return;
     }
 
     logger.debug("Installing workflow from file '{}'", artifact.getName());
@@ -124,6 +154,23 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
       bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
       isWFSinitiliazed = true;
     }
+
+    // send update message
+    // Felix file install thread doesn't have user/organization, but this is required to send the message (though we
+    // don't actually need it in this particular use case). So we have to create a dummy user/organization...
+    final Organization dummyOrg = new JpaOrganization();
+    SecurityUtil.runAs(securityService, dummyOrg, SecurityUtil.createAnonymousUser(dummyOrg), () ->
+      messageSender.sendObjectMessage(
+        WorkflowDefinitionItem.WORKFLOW_DEFINITION_QUEUE,
+        MessageSender.DestinationType.Queue,
+        new WorkflowDefinitionItem(def.getId(),
+            def.getStateMappings()
+                .stream()
+                .map(m -> new SerializableWorkflowStateMapping(m.getState().name(), m.getValue()))
+                .toArray(SerializableWorkflowStateMapping[]::new)
+        )
+      )
+    );
   }
 
   /**

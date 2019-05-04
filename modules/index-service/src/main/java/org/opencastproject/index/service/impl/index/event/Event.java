@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -86,6 +87,7 @@ public class Event implements IndexObject {
   public static final String XML_SURROUNDING_TAG = "events";
 
   /** The mapping of recording and workflow states */
+  public static final Map<String, Map<String, String>> customWorkflowStatusMapping = new ConcurrentHashMap<>();
   private static final Map<String, String> workflowStatusMapping = new HashMap<>();
   private static final Map<String, String> recordingStatusMapping = new HashMap<>();
 
@@ -884,6 +886,20 @@ public class Event implements IndexObject {
       /* This can be the case if all workflows of an event have been deleted */
       eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
     }
+  }
+
+  /**
+   * Return the displayable status of this event
+   *
+   * @return the displayable status of this event
+   */
+  public String getDisplayableStatus() {
+    if (getWorkflowId() != null && StringUtils.isNotBlank(getWorkflowState())
+          && customWorkflowStatusMapping.containsKey(getWorkflowDefinitionId())
+          && customWorkflowStatusMapping.get(getWorkflowDefinitionId()).containsKey(getWorkflowState())) {
+      return customWorkflowStatusMapping.get(getWorkflowDefinitionId()).get(getWorkflowState());
+    }
+    return getEventStatus();
   }
 
   public boolean isScheduledEvent() {

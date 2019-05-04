@@ -64,7 +64,8 @@
               OSGI-INF/message-receiver-scheduler.xml,
               OSGI-INF/message-receiver-series.xml,
               OSGI-INF/message-receiver-theme.xml,
-              OSGI-INF/message-receiver-workflow.xml
+              OSGI-INF/message-receiver-workflow.xml,
+              OSGI-INF/message-receiver-workflow-definition.xml
             </Service-Component>
           </instructions>
         </configuration>

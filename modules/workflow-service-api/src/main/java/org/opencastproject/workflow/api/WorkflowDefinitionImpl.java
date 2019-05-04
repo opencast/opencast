@@ -25,7 +25,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -75,6 +77,10 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
   @XmlElement(name = "operation")
   @XmlElementWrapper(name = "operations")
   private List<WorkflowOperationDefinition> operations;
+
+  @XmlElement(name = "state-mapping")
+  @XmlElementWrapper(name = "state-mappings")
+  private Set<WorkflowStateMapping> stateMappings;
 
   /**
    * {@inheritDoc}
@@ -158,6 +164,14 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
     if (operations == null)
       operations = new ArrayList<WorkflowOperationDefinition>();
     return operations;
+  }
+
+  @Override
+  public Set<WorkflowStateMapping> getStateMappings() {
+    if (stateMappings == null) {
+      stateMappings = new HashSet<>();
+    }
+    return stateMappings;
   }
 
   /**
