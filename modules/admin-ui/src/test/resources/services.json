@@ -9,6 +9,7 @@
       "meanRunTime": 0,
       "queued": 0,
       "hostname": "host1",
+      "nodeName": "node1",
       "name": "service1",
       "completed": 0,
       "status": "SYSTEMS.SERVICES.STATUS.NORMAL"
@@ -18,6 +19,7 @@
       "meanRunTime": 123,
       "queued": 3,
       "hostname": "host1",
+      "nodeName": "node1",
       "name": "service2",
       "completed": 5,
       "status": "SYSTEMS.SERVICES.STATUS.ERROR"
@@ -27,6 +29,7 @@
       "meanRunTime": 30,
       "queued": 5,
       "hostname": "host2",
+      "nodeName": "node2",
       "name": "service3",
       "completed": 20,
       "status": "SYSTEMS.SERVICES.STATUS.NORMAL"
@@ -36,6 +39,7 @@
       "meanRunTime": 10,
       "queued": 1,
       "hostname": "host3",
+      "nodeName": "node3",
       "name": "service4",
       "completed": 0,
       "status": "SYSTEMS.SERVICES.STATUS.WARNING"
@@ -45,6 +49,7 @@
       "meanRunTime": 0,
       "queued": 0,
       "hostname": "host2",
+      "nodeName": "node2",
       "name": "service5",
       "completed": 10,
       "status": "SYSTEMS.SERVICES.STATUS.NORMAL"
@@ -54,6 +59,7 @@
       "meanRunTime": 0,
       "queued": 1,
       "hostname": "host4",
+      "nodeName": "node4",
       "name": "service6",
       "completed": 0,
       "status": "SYSTEMS.SERVICES.STATUS.NORMAL"

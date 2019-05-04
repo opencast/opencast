@@ -1434,6 +1434,7 @@
          "CREATED":   "Created",
          "CREATOR":   "Creator",
          "HOST_NAME": "Host name",
+         "NODE_NAME": "Node name",
          "OPERATION": "Operation",
          "STARTED":   "Started",
          "STATUS":    "Status",
@@ -1459,6 +1460,7 @@
          "CAPTION":         "Servers",
          "STATUS":          "Status",
          "HOST_NAME":       "Host name",
+         "NODE_NAME":       "Node name",
          "CORES":           "Cores",
          "COMPLETED":       "Jobs completed",
          "RUNNING":         "Jobs running",
@@ -1476,6 +1478,7 @@
          "STATUS":          "Status",
          "NAME":            "Service name",
          "HOST_NAME":       "Host name",
+         "NODE_NAME":       "Node name",
          "COMPLETED":       "Jobs completed",
          "RUNNING":         "Jobs running",
          "QUEUED":          "Jobs queued",
@@ -1750,6 +1753,9 @@
        "HOSTNAME": {
            "LABEL": "Host name"
        },
+       "NODE_NAME": {
+            "LABEL": "Node name"
+       },
        "STATUS": {
            "LABEL": "Status",
            "PAUSED": "Paused",
@@ -1791,6 +1797,9 @@
        "HOSTNAME": {
            "LABEL": "Host name"
        },
+       "NODE_NAME": {
+            "LABEL": "Node name"
+       },
        "STATUS": {
          "LABEL": "Status",
          "MAINTENANCE": "Maintenance",
@@ -1804,6 +1813,9 @@
         },
         "HOSTNAME": {
             "LABEL": "Host name"
+        },
+        "NODE_NAME": {
+            "LABEL": "Node name"
         },
         "NAME": {
             "LABEL": "Name"

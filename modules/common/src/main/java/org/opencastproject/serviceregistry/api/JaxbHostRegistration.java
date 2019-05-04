@@ -45,6 +45,9 @@ public class JaxbHostRegistration implements HostRegistration {
   @XmlElement(name = "address")
   protected String address;
 
+  @XmlElement(name = "node_name")
+  protected String nodeName;
+
   @XmlElement(name = "memory")
   protected long memory;
 
@@ -82,6 +85,8 @@ public class JaxbHostRegistration implements HostRegistration {
    *          the base URL for this host
    * @param address
    *          the IP address for this host
+   * @param nodeName
+   *          descriptive node name for this host
    * @param memory
    *          the allocated memory of this host
    * @param cores
@@ -93,10 +98,11 @@ public class JaxbHostRegistration implements HostRegistration {
    * @param online
    *          whether the host is in maintenance mode
    */
-  public JaxbHostRegistration(String baseUrl, String address, long memory, int cores, float maxLoad, boolean online,
+  public JaxbHostRegistration(String baseUrl, String address, String nodeName, long memory, int cores, float maxLoad, boolean online,
           boolean maintenance) {
     this.baseUrl = baseUrl;
     this.address = address;
+    this.nodeName = nodeName;
     this.memory = memory;
     this.cores = cores;
     this.maxLoad = maxLoad;
@@ -113,6 +119,7 @@ public class JaxbHostRegistration implements HostRegistration {
   public JaxbHostRegistration(HostRegistration hostRegistration) {
     this.baseUrl = hostRegistration.getBaseUrl();
     this.address = hostRegistration.getIpAddress();
+    this.nodeName = hostRegistration.getNodeName();
     this.memory = hostRegistration.getMemory();
     this.cores = hostRegistration.getCores();
     this.maxLoad = hostRegistration.getMaxLoad();
@@ -143,7 +150,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#getIpAddress()
    */
   @Override
@@ -153,7 +160,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#setIpAddress(String)
    */
   @Override
@@ -163,7 +170,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#getMemory()
    */
   @Override
@@ -173,7 +180,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#setMemory(long)
    */
   @Override
@@ -183,7 +190,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#getCores()
    */
   @Override
@@ -193,7 +200,7 @@ public class JaxbHostRegistration implements HostRegistration {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.serviceregistry.api.HostRegistration#setCores(int)
    */
   @Override
@@ -309,4 +316,23 @@ public class JaxbHostRegistration implements HostRegistration {
     return baseUrl;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#getNodeName()
+   */
+  @Override
+  public String getNodeName() {
+    return nodeName;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.HostRegistration#setNodeName(String)
+   */
+  @Override
+  public void setNodeName(String nodeName) {
+    this.nodeName = nodeName;
+  }
 }

@@ -95,9 +95,9 @@ public class ServiceRegistrationTest {
     serviceRegistry.unregisterHost(LOCALHOST);
 
     // register the hosts
-    serviceRegistry.registerHost(LOCALHOST, "127.0.0.1", 1024, 1, 1);
-    serviceRegistry.registerHost(REMOTEHOST_1, "127.0.0.1", 1024, 1, 1);
-    serviceRegistry.registerHost(REMOTEHOST_2, "127.0.0.1", 1024, 1, 1);
+    serviceRegistry.registerHost(LOCALHOST, "127.0.0.1", "local", 1024, 1, 1);
+    serviceRegistry.registerHost(REMOTEHOST_1, "127.0.0.1", "remote1", 1024, 1, 1);
+    serviceRegistry.registerHost(REMOTEHOST_2, "127.0.0.1", "remote2", 1024, 1, 1);
 
     // register some service instances
     regType1Localhost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_1, LOCALHOST, PATH_1);

@@ -98,6 +98,7 @@ CREATE TABLE oc_capture_agent_state (
 CREATE TABLE oc_host_registration (
   id BIGINT NOT NULL,
   host VARCHAR(255) NOT NULL,
+  node_name VARCHAR(255),
   address VARCHAR(39) NOT NULL,
   memory BIGINT NOT NULL,
   cores INTEGER NOT NULL,
