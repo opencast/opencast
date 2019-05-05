@@ -1433,6 +1433,7 @@
             "CREATED": "Aangemaakt",
             "CREATOR": "Auteur",
             "HOST_NAME": "Hostnaam",
+            "NODE_NAME": "Node name",
             "OPERATION": "Operatie",
             "STARTED": "Gestart",
             "STATUS": "Status",
@@ -1458,6 +1459,7 @@
             "CAPTION": "Servers",
             "STATUS": "Status",
             "HOST_NAME": "Hostnaam",
+            "NODE_NAME": "Node name",
             "CORES": "Kernen",
             "COMPLETED": "Jobs afgewerkt",
             "RUNNING": "Jobs in verwerking",
@@ -1475,6 +1477,7 @@
             "STATUS": "Status",
             "NAME": "Servicenaam",
             "HOST_NAME": "Hostnaam",
+            "NODE_NAME": "Node name",
             "COMPLETED": "Jobs afgewerkt",
             "RUNNING": "Jobs in verwerking",
             "QUEUED": "Jobs in wachtrij",
@@ -1749,6 +1752,9 @@
          "HOSTNAME": {
             "LABEL": "Hostnaam"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Status",
             "PAUSED": "Gepauzeerd",
@@ -1790,6 +1796,9 @@
          "HOSTNAME": {
             "LABEL": "Hostnaam"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Status",
             "MAINTENANCE": "Onderhoud",
@@ -1803,6 +1812,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Hostnaam"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "Naam"

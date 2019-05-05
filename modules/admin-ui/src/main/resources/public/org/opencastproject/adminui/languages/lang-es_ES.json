@@ -1433,6 +1433,7 @@
             "CREATED": "Fecha de creación",
             "CREATOR": "Creador",
             "HOST_NAME": "Nombre del equipo",
+            "NODE_NAME": "Node name",
             "OPERATION": "Operación",
             "STARTED": "Iniciado",
             "STATUS": "Estado",
@@ -1458,6 +1459,7 @@
             "CAPTION": "Servidores",
             "STATUS": "Estado",
             "HOST_NAME": "Nombre del equipo",
+            "NODE_NAME": "Node name",
             "CORES": "Núcleos",
             "COMPLETED": "Trabajos completados",
             "RUNNING": "Trabajos en ejecución",
@@ -1475,6 +1477,7 @@
             "STATUS": "Estado",
             "NAME": "Nombre del servicio",
             "HOST_NAME": "Nombre del equipo",
+            "NODE_NAME": "Node name",
             "COMPLETED": "Trabajos completados",
             "RUNNING": "Trabajos en ejecución",
             "QUEUED": "Trabajos en cola",
@@ -1749,6 +1752,9 @@
          "HOSTNAME": {
             "LABEL": "Nombre del equipo"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Estado",
             "PAUSED": "En pausa",
@@ -1790,6 +1796,9 @@
          "HOSTNAME": {
             "LABEL": "Nombre del equipo"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Estado",
             "MAINTENANCE": "Mantenimiento",
@@ -1803,6 +1812,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Nombre del equipo"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "Nombre"

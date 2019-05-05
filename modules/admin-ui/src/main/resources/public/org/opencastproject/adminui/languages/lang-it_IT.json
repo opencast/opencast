@@ -1433,6 +1433,7 @@
             "CREATED": "Creata",
             "CREATOR": "Creatore",
             "HOST_NAME": "Nome host",
+            "NODE_NAME": "Node name",
             "OPERATION": "Operazione",
             "STARTED": "Avviato",
             "STATUS": "Stato",
@@ -1458,6 +1459,7 @@
             "CAPTION": "Server",
             "STATUS": "Stato",
             "HOST_NAME": "Nome host",
+            "NODE_NAME": "Node name",
             "CORES": "Core",
             "COMPLETED": "Processo completato",
             "RUNNING": "Processi in corso",
@@ -1475,6 +1477,7 @@
             "STATUS": "Stato",
             "NAME": "Nome servizio",
             "HOST_NAME": "Nome host",
+            "NODE_NAME": "Node name",
             "COMPLETED": "Processo completato",
             "RUNNING": "Processi in corso",
             "QUEUED": "Processi in coda",
@@ -1749,6 +1752,9 @@
          "HOSTNAME": {
             "LABEL": "Nome host"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Stato",
             "PAUSED": "In pausa",
@@ -1790,6 +1796,9 @@
          "HOSTNAME": {
             "LABEL": "Nome host"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Stato",
             "MAINTENANCE": "Manutenzione",
@@ -1803,6 +1812,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Nome host"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "Nome"

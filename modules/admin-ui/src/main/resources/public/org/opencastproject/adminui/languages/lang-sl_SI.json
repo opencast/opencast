@@ -1433,6 +1433,7 @@
             "CREATED": "Ustvarjeno",
             "CREATOR": "Avtor",
             "HOST_NAME": "Ime gostitelja",
+            "NODE_NAME": "Node name",
             "OPERATION": "Postopek",
             "STARTED": "Začeto",
             "STATUS": "Stanje",
@@ -1458,6 +1459,7 @@
             "CAPTION": "Strežniki",
             "STATUS": "Stanje",
             "HOST_NAME": "Ime gostitelja",
+            "NODE_NAME": "Node name",
             "CORES": "Jedra",
             "COMPLETED": "Dokončani posli",
             "RUNNING": "Posli, ki se izvajajo",
@@ -1475,6 +1477,7 @@
             "STATUS": "Stanje",
             "NAME": "Ime storitve",
             "HOST_NAME": "Ime gostitelja",
+            "NODE_NAME": "Node name",
             "COMPLETED": "Dokončani posli",
             "RUNNING": "Posli, ki se izvajajo",
             "QUEUED": "Posli v čakalni vrsti",
@@ -1749,6 +1752,9 @@
          "HOSTNAME": {
             "LABEL": "Ime gostitelja"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Stanje",
             "PAUSED": "Začasno ustavljeno",
@@ -1790,6 +1796,9 @@
          "HOSTNAME": {
             "LABEL": "Ime gostitelja"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Stanje",
             "MAINTENANCE": "Vzdrževanje",
@@ -1803,6 +1812,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Ime gostitelja"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "Ime"
