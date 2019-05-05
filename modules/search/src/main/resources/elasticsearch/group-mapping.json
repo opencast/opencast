@@ -1,37 +1,28 @@
 {
     "group" : {
         "_source" : { "enabled" : true },
-        "dynamic": "true",
+        "dynamic": false,
         "properties" : {
 
-            "uid": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "uid": { "type" : "keyword", "store" : true },
 
-            "organization": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "organization": { "type" : "keyword", "store" : true },
 
-            "object": { "type" : "string", "index" : "no", "store" : "yes" },
+            "object": { "type" : "text", "index" : false, "store" : true },
 
-            "name": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "name": { "type" : "keyword" },
 
-            "description": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "description": { "type" : "keyword" },
 
-            "role": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "role": { "type" : "keyword" },
 
-            "roles": { "copy_to" : "role", "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "roles": { "copy_to" : "role", "type" : "keyword" },
 
-            "members": { "copy_to" : "member", "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "members": { "copy_to" : "member", "type" : "keyword" },
 
-            "text": { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" },
-            "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" }
+            "text": { "type" : "text", "analyzer": "lowercasespaceanalyzer" },
+            "text_fuzzy": { "type" : "text", "analyzer": "lowercasespaceanalyzer" }
 
-        },
-        "dynamic_templates" : [
-             {
-             "text" : {
-                 "match" : "text_*",
-                 "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" }
-                 }
-             }
-         ]
+        }
     }
 }
