@@ -157,36 +157,6 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       and(EventIndexSchema.RIGHTS, query.getRights());
     }
 
-    // Track mime types
-    if (query.getTrackMimetypes().length > 0) {
-      and(EventIndexSchema.TRACK_MIMETYPE, query.getTrackMimetypes());
-    }
-
-    // Track stream resolutions
-    if (query.getTrackStreamResolution().length > 0) {
-      and(EventIndexSchema.TRACK_STREAM_RESOLUTION, query.getTrackStreamResolution());
-    }
-
-    // Track flavors
-    if (query.getTrackFlavor().length > 0) {
-      and(EventIndexSchema.TRACK_FLAVOR, query.getTrackFlavor());
-    }
-
-    // Metadata flavors
-    if (query.getMetadataFlavor().length > 0) {
-      and(EventIndexSchema.METADATA_FLAVOR, query.getMetadataFlavor());
-    }
-
-    // Metadata mime types
-    if (query.getMetadataMimetype().length > 0) {
-      and(EventIndexSchema.METADATA_MIMETYPE, query.getMetadataMimetype());
-    }
-
-    // Attachment flavors
-    if (query.getAttachmentFlavor().length > 0) {
-      and(EventIndexSchema.ATTACHMENT_FLAVOR, query.getAttachmentFlavor());
-    }
-
     // Access policy
     if (query.getAccessPolicy() != null) {
       and(EventIndexSchema.ACCESS_POLICY, query.getAccessPolicy());
@@ -210,11 +180,6 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     // Workflow definition id
     if (query.getWorkflowDefinition() != null) {
       and(EventIndexSchema.WORKFLOW_DEFINITION_ID, query.getWorkflowDefinition());
-    }
-
-    // Workflow scheduled date
-    if (query.getWorkflowScheduledDate() != null) {
-      and(EventIndexSchema.WORKFLOW_SCHEDULED_DATETIME, query.getWorkflowScheduledDate());
     }
 
     // Event status

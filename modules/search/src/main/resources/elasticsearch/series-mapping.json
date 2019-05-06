@@ -16,8 +16,6 @@
 
             "description": { "type" : "keyword" },
 
-            "abstract": { "type" : "keyword" },
-
             "subject": { "type" : "keyword" },
 
             "language": { "type" : "keyword" },
