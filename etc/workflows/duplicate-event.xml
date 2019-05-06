@@ -67,4 +67,9 @@
 
   </operations>
 
+  <state-mappings>
+    <state-mapping state="running">EVENTS.EVENTS.STATUS.DUPLICATING</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATUS.DUPLICATING</state-mapping>
+  </state-mappings>
+
 </definition>

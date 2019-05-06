@@ -507,7 +507,13 @@
          "PROCESSED": "Finished",
          "RECORDING_FAILURE": "Recording failure",
          "PROCESSING_FAILURE": "Processing failure",
-         "PROCESSING_CANCELED": "Processing canceled"
+         "PROCESSING_CANCELED": "Processing canceled",
+         "RETRACTING": "Retracting",
+         "DUPLICATING": "Duplicating",
+         "PUBLISHING": "Publishing",
+         "IMPORTING": "Importing",
+         "REPUBLISHING": "Republishing",
+         "UPDATING_PREVIEWS": "Updating Previews"
        },
        "DETAILS": {
          "HEADER": "Event details - {{resourceId}}",

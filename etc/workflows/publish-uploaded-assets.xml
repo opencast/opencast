@@ -96,4 +96,9 @@
 
   </operations>
 
+  <state-mappings>
+    <state-mapping state="running">EVENTS.EVENTS.STATUS.PUBLISHING</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATUS.PUBLISHING</state-mapping>
+  </state-mappings>
+
 </definition>
