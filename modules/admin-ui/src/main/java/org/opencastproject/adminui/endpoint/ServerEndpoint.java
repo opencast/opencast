@@ -21,6 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static com.entwinemedia.fn.data.json.Jsons.BLANK;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
@@ -341,8 +342,8 @@ public class ServerEndpoint {
 
       jsonServers.add(obj(f(KEY_ONLINE, v(vOnline)),
               f(KEY_MAINTENANCE, v(vMaintenance)),
-              f(KEY_HOSTNAME, v(vHostname)),
-              f(KEY_NODE_NAME, v(vNodeName)),
+              f(KEY_HOSTNAME, v(vHostname, BLANK)),
+              f(KEY_NODE_NAME, v(vNodeName, BLANK)),
               f(KEY_CORES, v(vCores)),
               f(KEY_RUNNING, v(vRunning)),
               f(KEY_QUEUED, v(vQueued)),
