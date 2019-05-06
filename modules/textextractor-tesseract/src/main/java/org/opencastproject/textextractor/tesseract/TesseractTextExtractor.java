@@ -76,7 +76,8 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
   private static final List<String> stderrFilter = java.util.Arrays.asList(
           "Page",
           "Tesseract Open Source OCR Engine",
-          "Warning. Invalid resolution 0 dpi. Using 70 instead.");
+          "Warning: Invalid resolution 0 dpi. Using 70 instead.",
+          "Estimating resolution as ");
 
   /**
    * Creates a new tesseract command wrapper that will be using the default binary.
