@@ -37,6 +37,9 @@
     <a ng-click="openTab('comments')" data-modal-tab="comments" ng-class="{ active: tab == 'comments' }" translate="EVENTS.EVENTS.DETAILS.TABS.COMMENTS" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW">
       <!-- Comments -->
     </a>
+    <a ng-click="openTab('statistics')" data-modal-tab="statistics" ng-class="{ active: tab == 'statistics' }" translate="EVENTS.EVENTS.DETAILS.TABS.STATISTICS" with-role="ROLE_UI_EVENTS_DETAILS_STATISTICS_VIEW" ng-if="statReusable.hasStatistics()">
+      <!-- Statistics -->
+    </a>
   </nav>
 
   <nav id="breadcrumb"></nav>
@@ -733,6 +736,37 @@
               </form>
             </div>
           </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-content" data-modal-tab-content="statistics">
+    <div class="modal-body">
+      <div class="full-col">
+        <div class="modal-alert danger" ng-if="statReusable.error" translate="STATISTICS.NOT_AVAILABLE"/>
+
+        <div class="obj" ng-repeat="data in statReusable.statProviderData" ng-if="!statReusable.error">
+          <header class="no-expand" translate="{{ data.title }}">
+            <!-- Statistics -->
+          </header>
+          <div class="obj-container" ng-if="data.providerType == 'timeSeries'">
+            <statistics-graph
+              chart-labels="data.labels"
+              chart-options="data.options"
+              data-resolution="data.dataResolution"
+              provider="data.providerId"
+              from="data.from"
+              on-change="statReusable.recalculate(data.providerId, from, to, dataResolution, timeChooseMode)"
+              source-data="data.values"
+              time-choose-mode="data.timeChooseMode"
+              to="data.to"
+              total-value="data.totalValue"
+              description="data.description"
+              >
+            </statistics-graph>
+          </div>
+          <div class="modal-alert danger" ng-if="data.providerType != 'timeSeries'" translate="STATISTICS.UNSUPPORTED_TYPE"/>
+        </div>
       </div>
     </div>
   </div>

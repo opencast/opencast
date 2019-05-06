@@ -199,6 +199,11 @@
     <module>modules/static</module>
     <module>modules/static-file-service-api</module>
     <module>modules/static-file-service-impl</module>
+    <module>modules/statistics-service-api</module>
+    <module>modules/statistics-service-impl</module>
+    <module>modules/statistics-service-remote</module>
+    <module>modules/statistics-provider-influx</module>
+    <module>modules/statistics-provider-random</module>
     <module>modules/textanalyzer-api</module>
     <module>modules/textanalyzer-impl</module>
     <module>modules/textanalyzer-remote</module>
@@ -1113,6 +1118,12 @@
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
         <version>${joda-time.version}</version>
+      </dependency>
+      <!-- influx -->
+      <dependency>
+        <groupId>org.influxdb</groupId>
+        <artifactId>influxdb-java</artifactId>
+        <version>2.15</version>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>

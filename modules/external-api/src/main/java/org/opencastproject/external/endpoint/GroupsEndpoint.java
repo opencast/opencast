@@ -81,7 +81,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0 })
 @RestService(name = "externalapigroups", title = "External API Groups Service", notes = {}, abstractText = "Provides resources and operations related to the groups")
 public class GroupsEndpoint {
 

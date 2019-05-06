@@ -18,6 +18,8 @@ module.exports = function (config) {
             '../../../bower_components/angular-hotkeys/build/hotkeys.js',
             '../../../bower_components/angular-ui-sortable/sortable.js',
             '../../../bower_components/ng-file-upload/angular-file-upload.js',
+            '../../../bower_components/chart.js/dist/Chart.js',
+            '../../../bower_components/angular-chart.js/dist/angular-chart.js',
             '../../../bower_components/angular-mocks/angular-mocks.js',
             // endbower
             '../../main/webapp/scripts/lib/chosen.jquery.js',

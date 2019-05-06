@@ -70,6 +70,12 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-statistics-service-api</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-workflow-service-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
@@ -216,7 +222,8 @@
             </Import-Package>
             <Private-Package>
               org.opencastproject.external.exception,
-              org.opencastproject.external.util
+              org.opencastproject.external.util,
+              org.opencastproject.external.util.statistics
             </Private-Package>
             <Export-Package>
               org.opencastproject.external.api,
@@ -233,6 +240,7 @@
               OSGI-INF/external-groups-endpoint.xml,
               OSGI-INF/external-security-endpoint.xml,
               OSGI-INF/external-series-endpoint.xml,
+              OSGI-INF/external-statistics-endpoint.xml,
               OSGI-INF/external-workflow-definitions-endpoint.xml,
               OSGI-INF/external-workflows-endpoint.xml
             </Service-Component>

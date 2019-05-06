@@ -308,6 +308,9 @@
      },
      "CONFIGURATION": {
        "TITLE": "Configuration"
+     },
+     "STATISTICS": {
+       "TITLE": "Statistics"
      }
    },
    "EVENTS": {
@@ -516,7 +519,8 @@
            "SCHEDULING": "Scheduling",
            "WORKFLOWS":   "Workflows",
            "ACCESS":      "Access policy",
-           "COMMENTS":    "Comments"
+           "COMMENTS":    "Comments",
+           "STATISTICS":    "Statistics"
          },
          "PUBLICATIONS": {
            "CAPTION":                    "Publications",
@@ -758,6 +762,9 @@
              "PROCESSING_FAILURE" : "Processing failure"
            }
          },
+         "STATISTICS": {
+           "CAPTION":     "Statistics"
+         },
          "METADATA": {
            "CAPTION": "Event details",
            "TITLE":          "Title",
@@ -981,7 +988,8 @@
            "EXTENDED_METADATA":    "Metadata II",
            "EVENTS":      "Events",
            "PERMISSIONS": "Access policy",
-           "THEME": "Theme"
+           "THEME": "Theme",
+           "STATISTICS": "Statistics"
          },
          "ACCESS": {
            "CAPTION": "Access policy",
@@ -1961,6 +1969,27 @@
   "EDITABLE": {
     "MULTI": {
       "PLACEHOLDER": "To insert multiple values press Enter in between"
+    }
+  },
+  "STATISTICS": {
+    "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+    "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+    "FROM": "From",
+    "TO": "To",
+    "TOTAL": "Total",
+    "GRANULARITY": "Granularity",
+    "NAVIGATION": {
+      "ORGANIZATION": "Organisation"
+    },
+    "TITLE": {
+      "RANDOM": "Random Data",
+      "VIEWS_SUM": "Total Number of Views",
+      "VIEWS_AVG": "Average Number of Views"
+    },
+    "DESCRIPTION": {
+      "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+      "VIEWS_SUM": "This displays the total number of views per time uinit.",
+      "VIEWS_AVG": "This displays the mean number of daily views per time uinit."
     }
   }
 }

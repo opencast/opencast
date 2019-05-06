@@ -56,6 +56,10 @@ describe('Event controller', function () {
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true')
             .respond(JSON.stringify({"results":[],"total":0}));
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
+        // Until we're actually testing the statistics endpoint, just return an empty set here
+        $httpBackend.whenGET(/\/admin-ng\/statistics.*/).respond('[]');
+        $httpBackend.whenPOST(/\/admin-ng\/statistics.*/).respond('[]');
+
 
         $controller('EventCtrl', {$scope: $scope});
     });

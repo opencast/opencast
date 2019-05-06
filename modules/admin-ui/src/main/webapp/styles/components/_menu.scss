@@ -113,6 +113,10 @@
              @include build-icon(auto, auto, user-group-on, 27px, 24px);
         }
 
+        .statistics {
+            @include build-icon(auto, auto, activity, 27px, 24px);
+        }
+
         .integrations {
             @include build-icon(auto, auto, integrations, 33px, 20px);
         }
