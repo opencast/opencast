@@ -41,7 +41,6 @@ angular.module('adminNg.resources')
           row.inputs = r.inputs;
           row.roomId = r.roomId;
           row.type = 'LOCATION';
-          row.removable = 'AGENTS.STATUS.OFFLINE' === r.Status || 'AGENTS.STATUS.UNKNOWN' === r.Status;
           return row;
         };
 
