@@ -244,6 +244,7 @@
     <bundle start-level="84">mvn:org.opencastproject/opencast-search-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-influx/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-csv/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-random/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-impl/${project.version}</bundle>
@@ -357,6 +358,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-influx/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-csv/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
@@ -489,6 +491,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-search/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-influx/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-csv/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
@@ -658,6 +661,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-search/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-influx/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-csv/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>

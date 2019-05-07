@@ -286,6 +286,11 @@ angular.module('adminNg.controllers')
       fetchChildResources(id);
     });
 
+    $scope.statisticsCsvFileName = function (statsTitle) {
+      var sanitizedStatsTitle = statsTitle.replace(/[^0-9a-z]/gi, '_').toLowerCase();
+      return 'export_series_' + $scope.resourceId + '_' + sanitizedStatsTitle + '.csv';
+    };
+
     $scope.metadataSave = function (id, callback, catalog) {
       catalog.attributeToSend = id;
 

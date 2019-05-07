@@ -199,6 +199,7 @@ angular.module('adminNg.resources')
               currentData.values = [ providerData[i].values ];
               currentData.labels = providerData[i].labels;
               currentData.totalValue = providerData[i].total;
+              currentData.csvUrl = that.getCsvUrl(providerId);
               break;
             }
           }
@@ -211,6 +212,24 @@ angular.module('adminNg.resources')
 
     this.hasStatistics = function () {
       return that.statProviderData.length !== 0;
+    };
+
+    this.getCsvUrl = function(providerId) {
+      for (var j = 0; j < that.statProviderData.length; j++) {
+        var currentData = that.statProviderData[j];
+        if (currentData.providerId === providerId) {
+          var csvRequest = {
+            dataResolution: currentData.dataResolution,
+            providerId: providerId,
+            resourceId: resourceId,
+            resourceType: resourceType,
+            from: moment(currentData.from).toJSON(),
+            to: moment(currentData.to).endOf('day').toJSON()
+          };
+          return '/admin-ng/statistics/export.csv?' + new URLSearchParams(csvRequest);
+        }
+      }
+      return '#';
     };
 
     this.recalculate = function(providerId, from, to, dataResolution, timeChooseMode) {
@@ -234,6 +253,7 @@ angular.module('adminNg.resources')
               currentData.totalValue = newData.total;
               currentData.values = [ newData.values ];
               currentData.labels = newData.labels;
+              currentData.csvUrl = that.getCsvUrl(providerId);
               break;
             }
           }

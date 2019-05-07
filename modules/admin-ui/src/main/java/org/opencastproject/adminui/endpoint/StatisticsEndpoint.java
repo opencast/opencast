@@ -40,6 +40,8 @@ import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsService;
 import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
+import org.opencastproject.statistics.export.api.StatisticsExportCSV;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -92,6 +94,7 @@ public class StatisticsEndpoint {
   private IndexService indexService;
   private AdminUISearchIndex searchIndex;
   private StatisticsService statisticsService;
+  private StatisticsExportCSV statisticsExportCSV;
 
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
@@ -107,6 +110,10 @@ public class StatisticsEndpoint {
 
   public void setStatisticsService(StatisticsService statisticsService) {
     this.statisticsService = statisticsService;
+  }
+
+  public void setStatisticsExportCSV(StatisticsExportCSV statisticsExportCSV) {
+    this.statisticsExportCSV = statisticsExportCSV;
   }
 
   /**
@@ -155,24 +162,55 @@ public class StatisticsEndpoint {
     private DataResolution dataResolution;
 
     ProviderQuery(RawProviderQuery query) {
-      this.providerId = query.providerId;
-      if (isNotIso8601Utc(query.from)) {
-        throw new IllegalArgumentException("Missing value for 'from' or not in ISO 8601 UTC format");
-      }
-      if (isNotIso8601Utc(query.to)) {
-        throw new IllegalArgumentException("Missing value for 'to' or not in ISO 8601 UTC format");
-      }
-      this.from = Instant.parse(query.from);
-      this.to = Instant.parse(query.to);
+      this.setProviderId(query.providerId);
+      this.setFrom(query.from);
+      this.setTo(query.to);
       if (this.to.compareTo(this.from) <= 0) {
         throw new IllegalArgumentException("'from' date must be before 'to' date");
       }
-      Optional<DataResolution> resolution = dataResolutionFromJson(query.dataResolution);
+      this.setDataResolution(query.dataResolution);
+      this.setResourceId(query.getResourceId());
+    }
+
+    ProviderQuery(String providerId, String from, String to, String dataResolution, String resourceId) {
+      this.setProviderId(providerId);
+      this.setFrom(from);
+      this.setTo(to);
+      if (this.to.compareTo(this.from) <= 0) {
+        throw new IllegalArgumentException("'from' date must be before 'to' date");
+      }
+      this.setDataResolution(dataResolution);
+      this.setResourceId(resourceId);
+    }
+
+    private void setProviderId(String providerId) {
+      this.providerId = providerId;
+    }
+
+    private void setFrom(String from) {
+      if (isNotIso8601Utc(from)) {
+        throw new IllegalArgumentException("Missing value for 'from' or not in ISO 8601 UTC format");
+      }
+      this.from = Instant.parse(from);
+    }
+
+    private void setTo(String to) {
+      if (isNotIso8601Utc(to)) {
+        throw new IllegalArgumentException("Missing value for 'to' or not in ISO 8601 UTC format");
+      }
+      this.to = Instant.parse(to);
+    }
+
+    private void setResourceId(String resourceId) {
+      this.resourceId = resourceId;
+    }
+
+    private void setDataResolution(String dataResolution) {
+      Optional<DataResolution> resolution = dataResolutionFromJson(dataResolution);
       if (!resolution.isPresent()) {
         throw new IllegalArgumentException("illegal value for 'resolution'");
       }
       this.dataResolution = resolution.get();
-      this.resourceId = query.resourceId;
     }
 
     public String getProviderId() {
@@ -316,6 +354,44 @@ public class StatisticsEndpoint {
       return RestUtil.R.badRequest(e.getMessage());
     }
     return Response.ok(result.toJSONString()).build();
+  }
+
+  @GET
+  @Path("export.csv")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RestQuery(name = "getcsvdata", description = "Returns the statistical data for a specific provider and a specific resource as CSV.", returnDescription = "The statistical data as CSV", restParameters = {
+    @RestParameter(name = "providerId", isRequired = true, description = "The provider id", type = RestParameter.Type.TEXT),
+    @RestParameter(name = "resourceId", isRequired = true, description = "The resource id", type = RestParameter.Type.TEXT),
+    @RestParameter(name = "from", isRequired = true, description = "The from date in iso 8601 UTC notation", type = RestParameter.Type.TEXT),
+    @RestParameter(name = "to", isRequired = true, description = "The to date in iso 8601 UTC notation", type = RestParameter.Type.TEXT),
+    @RestParameter(name = "dataResolution", isRequired = true, description = "The data resolution", type = RestParameter.Type.TEXT)},
+    reponses = {
+      @RestResponse(description = "Returns the statistical data for the given resource type as csv", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "If the current user is not authorized to perform this action", responseCode = HttpServletResponse.SC_UNAUTHORIZED)
+    })
+  public Response getCSVData(
+    @QueryParam("providerId") String providerId,
+    @QueryParam("resourceId") String resourceId,
+    @QueryParam("from") String fromStr,
+    @QueryParam("to") String toStr,
+    @QueryParam("dataResolution") String dataResolutionStr) {
+    try {
+      final ProviderQuery q = new ProviderQuery(providerId, fromStr, toStr, dataResolutionStr, resourceId);
+      final StatisticsProvider p = statisticsService
+        .getProvider(providerId).orElseThrow(() -> new IllegalArgumentException("Unknown provider: " + providerId));
+      checkAccess(q.resourceId, p.getResourceType());
+      final String csv = statisticsExportCSV.getCSV(p, q.resourceId, q.from, q.to, q.dataResolution, searchIndex,
+        ZoneId.systemDefault());
+      return Response.ok().entity(csv).build();
+    } catch (IllegalArgumentException e) {
+      return RestUtil.R.badRequest(e.getMessage());
+    } catch (SearchIndexException e) {
+      return RestUtil.R.serverError();
+    } catch (NotFoundException e) {
+      return RestUtil.R.notFound(resourceId);
+    } catch (UnauthorizedException e) {
+      return Response.status(Response.Status.UNAUTHORIZED).build();
+    }
   }
 
   private JSONObject timeSeriesToJson(String providerId, TimeSeries timeSeriesData) {

@@ -1,4 +1,5 @@
 <div class="statistics-graph">
+  <div class="download"><a class="download-icon" href="{{$ctrl.exportUrl}}" download="{{$ctrl.exportFileName()}}"></a></div>
   <div class="mode">
       <input ng-repeat-start="mode in $ctrl.timeChooseModes"
              type="radio"

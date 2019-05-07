@@ -897,6 +897,11 @@ angular.module('adminNg.controllers')
       }
     };
 
+    $scope.statisticsCsvFileName = function (statsTitle) {
+      var sanitizedStatsTitle = statsTitle.replace(/[^0-9a-z]/gi, '_').toLowerCase();
+      return 'export_event_' + $scope.resourceId + '_' + sanitizedStatsTitle + '.csv';
+    };
+
     $scope.severityColor = function (severity) {
       switch (severity.toUpperCase()) {
       case 'FAILURE':
