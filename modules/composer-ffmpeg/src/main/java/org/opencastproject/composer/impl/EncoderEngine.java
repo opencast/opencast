@@ -341,6 +341,7 @@ public class EncoderEngine implements AutoCloseable {
           throws EncoderException {
     List<String> command = new ArrayList<>();
     command.add(binary);
+    command.add("-nostdin");
     command.add("-nostats");
 
     String commandline = profile.getExtension(CMD_SUFFIX);
