@@ -1,0 +1,27 @@
+{
+  "id": "episode.views.sum.influx",
+  "title": "STATISTICS.TITLE.VIEWS_SUM",
+  "description": "STATISTICS.DESCRIPTION.VIEWS_SUM",
+  "resourceType": "EPISODE",
+  "sources": [{
+    "measurement": "infinite.impressions_daily",
+    "aggregation": "SUM",
+    "aggregationVariable": "value",
+    "resourceIdName": "episodeId",
+    "resolutions": [
+      "DAILY",
+      "WEEKLY",
+      "MONTHLY",
+      "YEARLY"
+    ]
+  }, {
+    "measurement": "one_year.impressions_hourly",
+    "aggregation": "SUM",
+    "aggregationVariable": "value",
+    "resourceIdName": "episodeId",
+    "resolutions": [
+      "HOURLY"
+    ]
+  }],
+  "type": "timeseries"
+}
