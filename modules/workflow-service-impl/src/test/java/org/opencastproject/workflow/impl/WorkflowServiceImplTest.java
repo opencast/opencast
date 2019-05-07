@@ -674,7 +674,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    def.setPublished(true);
     service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once", null, true);
@@ -695,7 +694,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    def.setPublished(true);
     service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once", null, true);
@@ -717,7 +715,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    def.setPublished(true);
     service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once", null, true);
@@ -748,7 +745,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    def.setPublished(true);
     service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failTwice", "fails twice", null, true);
@@ -805,7 +801,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    def.setPublished(true);
     service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failTwice", "fails twice", null, true);
@@ -864,7 +859,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    def.setPublished(true);
     service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOnHost", "fails on host", null,
