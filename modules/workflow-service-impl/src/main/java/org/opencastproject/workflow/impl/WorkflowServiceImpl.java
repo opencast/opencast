@@ -359,8 +359,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public List<WorkflowDefinition> listAvailableWorkflowDefinitions() {
-    return workflowDefinitionScanner.getAvailableWorkflowDefinitions(securityService.getOrganization())
-            .sorted().collect(Collectors.toList());
+    return workflowDefinitionScanner
+            .getAvailableWorkflowDefinitions(securityService.getOrganization(), securityService.getUser())
+            .sorted()
+            .collect(Collectors.toList());
   }
 
   /**
@@ -886,9 +888,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public WorkflowDefinition getWorkflowDefinitionById(String id) throws NotFoundException {
     final WorkflowIdentifier workflowIdentifier = new WorkflowIdentifier(id, securityService.getOrganization().getId());
-    WorkflowDefinition def = workflowDefinitionScanner.getWorkflowDefinition(workflowIdentifier);
+    final WorkflowDefinition def = workflowDefinitionScanner
+            .getWorkflowDefinition(securityService.getUser(), workflowIdentifier);
     if (def == null) {
-      throw new NotFoundException("Workflow definition '" + workflowIdentifier + "' not found");
+      throw new NotFoundException("Workflow definition '" + workflowIdentifier + "' not found or inaccessible");
     }
     return def;
   }

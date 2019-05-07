@@ -150,6 +150,13 @@ public interface WorkflowDefinition extends Comparable<WorkflowDefinition> {
   String[] getTags();
 
   /**
+   * Returns the roles for this workflow definition
+   *
+   * @return the tags
+   */
+  Collection<String> getRoles();
+
+  /**
    * Removes all tags associated with this workflow definition
    */
   void clearTags();

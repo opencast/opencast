@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -66,7 +67,11 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
 
   @XmlElementWrapper(name = "tags")
   @XmlElement(name = "tag")
-  protected SortedSet<String> tags = new TreeSet<String>();
+  protected SortedSet<String> tags = new TreeSet<>();
+
+  @XmlElementWrapper(name = "roles")
+  @XmlElement(name = "role")
+  protected SortedSet<String> roles = new TreeSet<>();
 
   @XmlElement(name = "description")
   private String description;
@@ -165,7 +170,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    */
   public List<WorkflowOperationDefinition> getOperations() {
     if (operations == null)
-      operations = new ArrayList<WorkflowOperationDefinition>();
+      operations = new ArrayList<>();
     return operations;
   }
 
@@ -185,7 +190,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
   @Override
   public WorkflowOperationDefinition get(int position) throws IndexOutOfBoundsException {
     if (operations == null)
-      operations = new ArrayList<WorkflowOperationDefinition>();
+      operations = new ArrayList<>();
     if (position < 0 || position >= operations.size())
       throw new IndexOutOfBoundsException();
     return operations.get(position);
@@ -199,7 +204,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
   @Override
   public void add(WorkflowOperationDefinition operation) {
     if (operations == null)
-      operations = new ArrayList<WorkflowOperationDefinition>();
+      operations = new ArrayList<>();
     add(operation, this.operations.size());
   }
 
@@ -212,7 +217,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
   @Override
   public void add(WorkflowOperationDefinition operation, int position) {
     if (operations == null)
-      operations = new ArrayList<WorkflowOperationDefinition>();
+      operations = new ArrayList<>();
 
     if (operation == null)
       throw new IllegalArgumentException("Workflow operation cannot be null");
@@ -233,7 +238,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
   @Override
   public WorkflowOperationDefinition remove(int position) throws IndexOutOfBoundsException {
     if (operations == null)
-      operations = new ArrayList<WorkflowOperationDefinition>();
+      operations = new ArrayList<>();
     return operations.remove(position);
   }
 
@@ -286,7 +291,7 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    */
   @Override
   public String[] getTags() {
-    return tags.toArray(new String[tags.size()]);
+    return tags.toArray(new String[0]);
   }
 
   /**
@@ -326,11 +331,11 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
   }
 
   static class Adapter extends XmlAdapter<WorkflowDefinitionImpl, WorkflowDefinition> {
-    public WorkflowDefinitionImpl marshal(WorkflowDefinition op) throws Exception {
+    public WorkflowDefinitionImpl marshal(WorkflowDefinition op) {
       return (WorkflowDefinitionImpl) op;
     }
 
-    public WorkflowDefinition unmarshal(WorkflowDefinitionImpl op) throws Exception {
+    public WorkflowDefinition unmarshal(WorkflowDefinitionImpl op) {
       return op;
     }
   }
@@ -353,6 +358,14 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
   @Override
   public String getOrganization() {
     return organization;
+  }
+
+  @Override
+  public Collection<String> getRoles() {
+    if (roles == null) {
+      return Collections.emptySet();
+    }
+    return roles;
   }
 
   /**
