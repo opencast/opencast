@@ -1,0 +1,19 @@
+{
+  "id": "series.views.sum.influx",
+  "title": "STATISTICS.TITLE.VIEWS_SUM",
+  "description": "STATISTICS.DESCRIPTION.VIEWS_SUM",
+  "resourceType": "SERIES",
+  "sources": [{
+    "measurement": "infinite.impressions_daily",
+    "aggregation": "SUM",
+    "aggregationVariable": "value",
+    "resourceIdName": "seriesId",
+    "resolutions": [
+      "DAILY",
+      "WEEKLY",
+      "MONTHLY",
+      "YEARLY"
+    ]
+  }],
+  "type": "timeseries"
+}
