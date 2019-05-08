@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ncastfiles</id>
+  <title>delte ingested source files on ncast</title>
+  <tags>
+  </tags>
+  <description>
+  </description>
+
+  <operations>
+
+
+    <operation
+      id="ncastfiles"
+      description="delete files"
+      exception-handler-workflow="error">
+      <configurations>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

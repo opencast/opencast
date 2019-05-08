@@ -32,10 +32,7 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.security.api.AuthorizationService;
-import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -45,12 +42,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.net.URI;
 
 /**
  * The workflow definition for handling "series" operations
@@ -71,8 +64,6 @@ public class NcastfilesWorkflowOperationHandler extends AbstractWorkflowOperatio
    */
   protected Workspace workspace;
 
-
-  public static final String SOURCE_FLAVOR = "source-flavor";
 
   /**
    * Callback for the OSGi declarative services configuration.
@@ -112,7 +103,7 @@ public class NcastfilesWorkflowOperationHandler extends AbstractWorkflowOperatio
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
     // get the attachment
-    final String sourceFlavorName = getConfig(workflowInstance, SOURCE_FLAVOR);
+    final String sourceFlavorName = "presenter/source";
 
     final MediaPackageElementFlavor sourceFlavor = parseFlavor(sourceFlavorName);
     final Track[] mediaPackageTracks = mediaPackage.getTracks(sourceFlavor);
@@ -124,7 +115,8 @@ public class NcastfilesWorkflowOperationHandler extends AbstractWorkflowOperatio
       if (track.getURI() != null) {
         // get name for the ACL from filename
         trackname = track.getURI().getPath();
-        trackname = trackname.substring(trackname.lastIndexOf("/") + 1);
+        trackname = trackname.substring(trackname.lastIndexOf("/") + 1, trackname.lastIndexOf("."));
+        trackname = trackname.replace("_","-");
         break;
       }
     }
@@ -144,16 +136,55 @@ public class NcastfilesWorkflowOperationHandler extends AbstractWorkflowOperatio
       logger.error("Agent not found %s",e);
     }
 
+    try {
+
+      String command = "curl -X POST -i --digest -H \"Content-Type: applications/json\" "
+              + "-u 'admin:ncast' "
+              + agentURL + "rest/operations/remove_recording"
+              + " -d '{\"filename\":\"" + trackname + "\"}'";
+      logger.info("Commandline: \n " + command);
+
+      Process p = null;
+      int result = 0;
+
+      ProcessBuilder pb = new ProcessBuilder(command);
+      pb.redirectErrorStream(true);
+
+      p = pb.start();
+      result = p.waitFor();
+
+//      Process process = Runtime.getRuntime().exec(command);
+//      process.waitFor();
+//      logger.info("command result: " + process.exitValue());
+//      BufferedReader reader =
+//              new BufferedReader(new InputStreamReader(process.getInputStream()));
+//
+//      String output="";
+//      String line = "";
+//      while ((line = reader.readLine())!= null) {
+//        output += line + "\n";
+//      }
+//     logger.info("Output" + output);
 
     //send delete
-    HttpGet get = new HttpGet(URI.create(agentURL));
+//    HttpPost post = new HttpPost(URI.create(agentURL + "rest/operations/remove_recording"));
+//    Gson gson = new Gson();
+//    String jsonString = "{'filename':'" + trackname + "'}";
+//
+//
+//
+//    StringEntity postingString = new StringEntity(jsonString);
+//    post.setEntity(postingString);
+//    post.setHeader("Content-type", "applications/json");
+//
+//    TrustedHttpClient httpClientStandAlone;
+//
+//    httpClientStandAlone = new StandAloneTrustedHttpClientImpl("admin","ncast", Option.none(),Option.none(),Option.none());
+//    logger.info("Removing File: %s ", post.getURI().getPath().toString());
+//
+//      HttpResponse response = httpClientStandAlone.execute(post);
+//      logger.info("HTTP Response %i", response.getStatusLine().getStatusCode());
 
-    TrustedHttpClient httpClientStandAlone;
-
-    httpClientStandAlone = new StandAloneTrustedHttpClientImpl("USER","PASSWORD", Option.none(),Option.none(),Option.none());
-
-    try {
-      HttpResponse response = httpClientStandAlone.execute(get);
     }
     catch (Exception e) {
       logger.error("httpclient error %s",e);

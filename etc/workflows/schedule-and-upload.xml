@@ -213,6 +213,16 @@
       </configurations>
     </operation>
 
+
+ <operation
+      id="ncastfiles"
+      description="Delete Files ">
+      <configurations>
+        <configuration key="workflow-id">ncastfiles</configuration>
+      </configurations>
+    </operation>
+
+
     <!-- Prepare work versions of the source material for further processing -->
 
     <operation
