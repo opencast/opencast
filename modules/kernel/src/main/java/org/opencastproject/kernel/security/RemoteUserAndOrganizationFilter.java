@@ -234,7 +234,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
         // Set roles to requested user
         requestedUser = new JaxbUser(requestedUser.getUsername(), requestedUser.getPassword(), requestedUser.getName(),
-                requestedUser.getEmail(), requestedUser.getProvider(), requestedUser.canLogin(),
+                requestedUser.getEmail(), requestedUser.getProvider(),
                 JaxbOrganization.fromOrganization(requestedUser.getOrganization()),
                 Stream.$(requestedRoles).map(toJaxbRole._2(requestedOrganization)).toSet());
         logger.trace("Request roles '{}' are amended to user '{}'", rolesHeader, requestedUser.getUsername());

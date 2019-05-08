@@ -23,20 +23,81 @@ distributed under licenses that are compatible with ECL 2.0.
 List of Included Third-Party Dependencies
 -----------------------------------------
 
+modules/admin-ui/bower_components/angular/.*
+  angular 1.5.11 (https://github.com/angular/angular.js)
+  Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-animate/.*
+  angular-animate 1.5.11 (https://github.com/angular/angular.js)
+  Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-chart-js/.*
+  angular-chart-js 1.1.1 (https://github.com/jtblin/angular-chart.js)
+  Copyright (c) Jerome Touffe-Blin ("Author")
+  Licensed under BSD
+
+modules/admin-ui/bower_components/angular-hotkeys/.*
+  angular-hotkeys 1.7.0 (https://github.com/chieffancypants/angular-hotkeys)
+  Copyright (c) 2014 Wes Cruver
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-local-storage/.*
+  angular-local-storage 0.7.1 (https://github.com/grevory/angular-local-storage.git)
+  Copyright (c) 2016 Gregory Pike
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-messages/.*
+  angular-messages 1.5.11 (https://github.com/angular/angular.js)
+  Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-mocks/.*
+  angular-mocks 1.5.11 (https://github.com/angular/angular.js)
+  Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-resource/.*
+  angular-resource 1.5.11 (https://github.com/angular/angular.js)
+  Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-route/.*
+  angular-route 1.5.11 (https://github.com/angular/angular.js)
+  Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-translate/.*
+  angular-translate 2.18.1 (https://github.com/angular-translate/angular-translate)
+  Copyright (c) 2013-2017 The angular-translate team and Pascal Precht
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-translate-loader-static-files/.*
+  angular-translate-loader-static-files 2.18.1 (https://github.com/angular-translate/bower-angular-translate-loader-static-files.git)
+  Copyright (c) 2013-2017 The angular-translate team and Pascal Precht
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-wizard/.*
+  angular-wizard 0.6.0 (git://github.com/mgonto/angular-wizard.git)
+  Copyright (c) 2013-2014 Martin Gontovnikas http://www.gon.to/
+  Licensed under MIT
+
+modules/admin-ui/bower_components/chart.js/.*
+  chart.js 2.8.0 (https://github.com/chartjs/Chart.js)
+  Copyright (c) 2018 Chart.js Contributors
+  Licensed under MIT
+
+modules/admin-ui/bower_components/ng-file-upload/.*
+  angular-file-upload 2.0.5 (https://github.com/danialfarid/angular-file-upload)
+  Copyright (c) 2013 danialfarid
+  Licensed under MIT
+
 modules/admin-ui/src/main/webapp/css/vendor/chosen.less
   Chosen, a Select Box Enhancer for jQuery and Prototype
   by Patrick Filler for Harvest, http://getharvest.com
   Copyright (c) 2011 - 2016 Harvest http://getharvest.com
   MIT License, https://github.com/harvesthq/chosen/blob/master/LICENSE.md
-
-modules/admin-ui/src/main/webapp/lib/angular/*
-  AngularJS v1.3.6
-  (c) 2010-2014 Google, Inc. http://angularjs.org
-  License: MIT
-
-modules/admin-ui/src/main/webapp/lib/angular-file-upload/*
-  Copyright (c) 2013 danialfarid
-  The MIT License (MIT)
 
 modules/admin-ui/src/main/webapp/lib/angular-sortable.js
   UI.Sortable
@@ -465,16 +526,6 @@ modules/engage-ui/src/main/resources/ui/css/bootstrap.*
   Copyright 2011-2015 Twitter, Inc.
   Licensed under MIT
 
-modules/admin-ui/src/main/webapp/lib/angular-wizard/.*
-  angular-wizard 0.6.1 (https://github.com/mgonto/angular-wizard)
-  Copyright (c) 2013-2014 Martin Gontovnikas http://www.gon.to/
-  Licensed under MIT
-
-modules/admin-ui/bower_components/angular-hotkeys/.*
-  angular-wizard 0.6.1 (https://github.com/chieffancypants/angular-hotkeys)
-  Copyright (c) 2014 Wes Cruver
-  Licensed under MIT
-
 modules/engage-ui/src/main/resources/ui/js/alertify/alertify.js
   AlertifyJS - v0.13.12
   Copyright Fabien Doiron <fabien.doiron@gmail.com>
@@ -628,6 +679,7 @@ admin-ui
   org.mnode.ical4j                       ical4j                                           BSD 3-Clause License
   org.codehaus.groovy                    groovy-all                                       The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
+  org.influxdb                           org.influxdb                                     MIT License
 
 
 annotation-impl
@@ -1254,6 +1306,43 @@ static-file-service-impl
   org.jdom                               com.springsource.org.jdom                        -
   org.slf4j                              slf4j-api                                        MIT License
 
+
+statistics-provider-influx
+  GroupId                                ArtifactId                                       License
+  com.googlecode.json-simple             son-simple                                       The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
+  org.influxdb                           influxdb-java                                    MIT License
+  org.osgi                               org.osgi.core                                    The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.compendium                              The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+statistics-provider-random
+  GroupId                                ArtifactId                                       License
+  com.googlecode.json-simple             son-simple                                       The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.core                                    The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.compendium                              The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+statistics-provider-impl
+  GroupId                                ArtifactId                                       License
+  com.googlecode.json-simple             son-simple                                       The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.core                                    The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.compendium                              The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+statistics-provider-remote
+  GroupId                                ArtifactId                                       License
+  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.core                                    The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.compendium                              The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
 
 textanalyzer-impl
   GroupId                                ArtifactId                                       License

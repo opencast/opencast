@@ -1433,6 +1433,7 @@
             "CREATED": "נוצר",
             "CREATOR": "יוצר",
             "HOST_NAME": "שם מחשב מארח",
+            "NODE_NAME": "Node name",
             "OPERATION": "פעולה",
             "STARTED": "התחילה",
             "STATUS": "מצב",
@@ -1458,6 +1459,7 @@
             "CAPTION": "שרתים",
             "STATUS": "מצב",
             "HOST_NAME": "שם מחשב מארח",
+            "NODE_NAME": "Node name",
             "CORES": "ליבות",
             "COMPLETED": "משימות שהושלמו",
             "RUNNING": "משימות רצות",
@@ -1475,6 +1477,7 @@
             "STATUS": "מצב",
             "NAME": "שם שירות",
             "HOST_NAME": "שם מחשב מארח",
+            "NODE_NAME": "Node name",
             "COMPLETED": "משימות שהושלמו",
             "RUNNING": "משימות רצות",
             "QUEUED": "משימות בתור",
@@ -1749,6 +1752,9 @@
          "HOSTNAME": {
             "LABEL": "שם מחשב מארח"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "מצב",
             "PAUSED": "מושהה",
@@ -1790,6 +1796,9 @@
          "HOSTNAME": {
             "LABEL": "שם מחשב מארח"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "מצב",
             "MAINTENANCE": "תחזוקה",
@@ -1803,6 +1812,9 @@
          },
          "HOSTNAME": {
             "LABEL": "שם מחשב מארח"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "שם"

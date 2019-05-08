@@ -45,6 +45,11 @@
         }
     }
 
+
+    &.highlight-hover tr:hover {
+        background-color: $table-highlight;
+    }
+
     th {
         &.sortable {
             cursor: pointer;

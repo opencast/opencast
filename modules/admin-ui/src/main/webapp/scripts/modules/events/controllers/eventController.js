@@ -28,13 +28,13 @@ angular.module('adminNg.controllers')
   'EventWorkflowDetailsResource', 'ResourcesListResource', 'UserRolesResource', 'EventAccessResource',
   'EventPublicationsResource', 'EventSchedulingResource','NewEventProcessingResource', 'CaptureAgentsResource',
   'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService', 'UploadAssetOptions',
-  'EventUploadAssetResource', 'Table', 'SchedulingHelperService',
+  'EventUploadAssetResource', 'Table', 'SchedulingHelperService', 'StatisticsReusable',
   function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource,
     EventAssetCatalogsResource, CommentResource, EventWorkflowsResource, EventWorkflowActionResource,
     EventWorkflowDetailsResource, ResourcesListResource, UserRolesResource, EventAccessResource,
     EventPublicationsResource, EventSchedulingResource, NewEventProcessingResource, CaptureAgentsResource,
     ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
-    EventUploadAssetResource, Table, SchedulingHelperService) {
+    EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable) {
 
     var roleSlice = 100;
     var roleOffset = 0;
@@ -241,6 +241,14 @@ angular.module('adminNg.controllers')
           me.clearConflicts();
         },
         fetchChildResources = function (id) {
+          var previousProviderData;
+          if ($scope.statReusable !== null) {
+            previousProviderData = $scope.statReusable.statProviderData;
+          }
+          $scope.statReusable = StatisticsReusable.createReusableStatistics(
+            'episode',
+            id,
+            previousProviderData);
 
           var publications = EventPublicationsResource.get({ id: id }, function () {
             angular.forEach(publications.publications, function (publication, index) {
@@ -428,6 +436,7 @@ angular.module('adminNg.controllers')
         },
         tzOffset = (new Date()).getTimezoneOffset() / -60;
 
+    $scope.statReusable = null;
 
     $scope.getMoreRoles = function (value) {
 

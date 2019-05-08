@@ -8,6 +8,7 @@
             "id": 1,
             "operation": "test",
             "processingHost": "host1",
+            "processingNode": "node1",
             "started": "2014-06-05T09:10:00Z",
             "status": "SYSTEMS.JOBS.STATUS.RUNNING",
             "submitted": "2014-06-05T09:10:00Z",

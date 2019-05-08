@@ -1,117 +1,117 @@
 {
     "event" : {
         "_source" : { "enabled" : true },
-        "dynamic": "true",
+        "dynamic": true,
         "properties" : {
 
-            "uid": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "uid": { "type" : "keyword", "store" : true },
 
-            "organization": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "organization": { "type" : "keyword", "store" : true },
 
-            "object": { "type" : "string", "index" : "no", "store" : "yes" },
+            "object": { "type" : "text", "index" : false, "store" : true },
 
-            "title": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "title": { "type" : "keyword" },
 
-            "start_date": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "start_date": { "type" : "keyword" },
 
-            "technical_start": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "technical_start": { "type" : "keyword" },
 
-            "end_date": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "end_date": { "type" : "keyword" },
 
-            "technical_end": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "technical_end": { "type" : "keyword" },
 
-            "duration" : { "type" : "long", "index": "not_analyzed", "store" : "no" },
+            "duration" : { "type" : "long" },
 
-            "contributor": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "contributor": { "type" : "keyword" },
 
-            "presenter": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "presenter": { "type" : "keyword" },
 
-            "technical_presenters": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "technical_presenters": { "type" : "keyword" },
 
-            "subject": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "subject": { "type" : "keyword" },
 
-            "description": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "description": { "type" : "keyword" },
 
-            "location": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "location": { "type" : "keyword" },
 
-            "agent_id": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "agent_id": { "type" : "keyword" },
 
             "agent_configuration": { "type" : "object" },
 
-            "language": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "language": { "type" : "keyword" },
 
-            "series_id": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "series_id": { "type" : "keyword" },
 
-            "series_name": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "series_name": { "type" : "keyword" },
 
-            "source": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "source": { "type" : "keyword" },
 
-            "created": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "created": { "type" : "keyword" },
 
-            "creator": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "creator": { "type" : "keyword" },
 
-            "publisher": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "publisher": { "type" : "keyword" },
 
-            "license": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "license": { "type" : "keyword" },
 
-            "rights": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "rights": { "type" : "keyword" },
 
-            "track_mimetype": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "track_mimetype": { "type" : "keyword" },
 
-            "track_stream_resolution": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "track_stream_resolution": { "type" : "keyword" },
 
-            "track_flavor": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "track_flavor": { "type" : "keyword" },
 
-            "metadata_mimetype": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "metadata_mimetype": { "type" : "keyword" },
 
-            "metadata_flavor": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "metadata_flavor": { "type" : "keyword" },
 
-            "attachment_flavor": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "attachment_flavor": { "type" : "keyword" },
 
-            "access_policy": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "access_policy": { "type" : "keyword" },
 
-            "managed_acl": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "managed_acl": { "type" : "keyword" },
 
-            "workflow_state": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "workflow_state": { "type" : "keyword" },
 
-            "workflow_id": { "type" : "long", "store" : "no" },
+            "workflow_id": { "type" : "long" },
 
-            "workflow_definition": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "workflow_definition": { "type" : "keyword" },
 
-            "workflow_scheduled_datetime": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "workflow_scheduled_datetime": { "type" : "keyword" },
 
-            "event_status": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "event_status": { "type" : "keyword" },
 
-            "has_comments": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+            "has_comments": { "type" : "boolean" },
 
-            "has_open_comments": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+            "has_open_comments": { "type" : "boolean" },
 
-            "needs_cutting": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+            "needs_cutting": { "type" : "boolean" },
 
-            "recording_status": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "recording_status": { "type" : "keyword" },
 
-            "archive_version": { "type" : "long", "store" : "no" },
+            "archive_version": { "type" : "long" },
 
             "publication": {
                 "type" : "nested",
                 "properties": {
-                    "channel": { "type": "string"},
-                    "mimetype": { "type": "string"},
+                    "channel": { "type": "keyword" },
+                    "mimetype": { "type": "keyword" },
 
                     "attachment": {
                         "type": "nested",
                         "properties": {
-                            "id"  : { "type" : "string", "store" : "no" },
-                            "mimetype"  : { "type" : "string", "store" : "no" },
-                            "type"  : { "type" : "string", "store" : "no" },
-                            "tag": { "type" : "string", "store" : "no" },
-                            "url": { "type" : "string", "store" : "no" },
-                            "size": { "type" : "long", "store" : "no" },
+                            "id"  : { "type" : "keyword" },
+                            "mimetype"  : { "type" : "keyword" },
+                            "type"  : { "type" : "keyword" },
+                            "tag": { "type" : "keyword" },
+                            "url": { "type" : "keyword" },
+                            "size": { "type" : "long" },
                             "checksum": {
                                 "type": "nested",
                                 "properties": {
-                                    "value": { "type" : "string", "store" : "no" },
-                                    "type": { "type" : "string", "store" : "no" }
+                                    "value": { "type" : "keyword" },
+                                    "type": { "type" : "keyword" }
                                 }
                             }
                         }
@@ -120,17 +120,17 @@
                     "catalog": {
                         "type": "nested",
                         "properties": {
-                            "id"  : { "type" : "string", "store" : "no" },
-                            "mimetype"  : { "type" : "string", "store" : "no" },
-                            "type"  : { "type" : "string", "store" : "no" },
-                            "tag": { "type" : "string", "store" : "no" },
-                            "url": { "type" : "string", "store" : "no" },
-                            "size": { "type" : "long", "store" : "no" },
+                            "id"  : { "type" : "keyword" },
+                            "mimetype"  : { "type" : "keyword" },
+                            "type"  : { "type" : "keyword" },
+                            "tag": { "type" : "keyword" },
+                            "url": { "type" : "keyword" },
+                            "size": { "type" : "long" },
                             "checksum": {
                                 "type": "nested",
                                 "properties": {
-                                    "value": { "type" : "string", "store" : "no" },
-                                    "type": { "type" : "string", "store" : "no" }
+                                    "value": { "type" : "keyword" },
+                                    "type": { "type" : "keyword" }
                                 }
                             }
                         }
@@ -139,27 +139,27 @@
                     "track": {
                         "type": "nested",
                         "properties": {
-                            "duration"  : { "type" : "long", "store" : "no" },
-                            "transport" : { "type": "string", "store": "no"},
+                            "duration"  : { "type" : "long" },
+                            "transport" : { "type": "keyword" },
                             "audio": {
                                 "type": "nested",
                                 "properties": {
-                                    "bitdepth": { "type": "integer", "store": "no"},
-                                    "channels": { "type": "integer", "store": "no"},
-                                    "samplingrate": { "type": "integer", "store": "no"},
-                                    "bitrate": { "type": "float", "store": "no"},
-                                    "peakleveldb": { "type": "float", "store": "no"},
-                                    "rmsleveldb": { "type": "float", "store": "no"},
-                                    "rmspeakdb": { "type": "float", "store": "no"}
+                                    "bitdepth": { "type": "integer" },
+                                    "channels": { "type": "integer" },
+                                    "samplingrate": { "type": "integer" },
+                                    "bitrate": { "type": "float" },
+                                    "peakleveldb": { "type": "float" },
+                                    "rmsleveldb": { "type": "float" },
+                                    "rmspeakdb": { "type": "float" }
                                 }
                             },
                             "video": {
                                 "type": "nested",
                                 "properties": {
-                                    "bitrate": { "type": "float", "store": "no"},
-                                    "framerate": { "type": "float", "store": "no"},
-                                    "resolution": { "type": "string", "store": "no"},
-                                    "scantype": { "type": "string", "store": "no"}
+                                    "bitrate": { "type": "float" },
+                                    "framerate": { "type": "float" },
+                                    "resolution": { "type": "keyword" },
+                                    "scantype": { "type": "keyword" }
                                 }
                             }
                         }
@@ -168,31 +168,17 @@
                 }
             },
 
-            "text": { "type" : "string", "index" : "analyzed", "analyzer": "lowercasespaceanalyzer", "store" : "no" },
-            "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" }
+            "text": { "type" : "text", "analyzer": "lowercasespaceanalyzer" },
+            "text_fuzzy": { "type" : "text", "analyzer": "lowercasespaceanalyzer" }
 
         },
         "dynamic_templates" : [
              {
-             "title_template" : {
-                 "match" : "title_*",
-                 "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
-                 }
-             },
-             {
-             "text" : {
-                 "match" : "text_*",
-                 "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no" }
-                 }
-             },
-             {
-             "permission_template" : {
+               "permission_template" : {
                  "match" : "acl_permission_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
-                 }
+                 "mapping" : { "type" : "keyword" }
+                }
              }
          ]
     }

@@ -1,6 +1,11 @@
 {
   "wiid": 1,
   "title": "Full",
+  "creator": {
+    "name": "WithPermissions",
+    "email": "with@permissions.com",
+    "username": "sample"
+  },
   "executionTime": 3600000,
   "submittedAt": "2014-06-05T15:00:00Z",
   "wdid": "full",

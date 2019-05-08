@@ -35,4 +35,5 @@ General Configuration
     - [Event Filters](admin-ui/event-filters.md)
     - [Manual Asset Upload](admin-ui/asset-upload.md)
     - [Languages](admin-ui/languages.md)
+    - [Statistics](admin-ui/statistics.md)
     - [Thumbnails](admin-ui/thumbnails.md)

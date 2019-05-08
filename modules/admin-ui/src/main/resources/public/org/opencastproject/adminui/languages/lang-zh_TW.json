@@ -1433,6 +1433,7 @@
             "CREATED": "創建",
             "CREATOR": "建立者",
             "HOST_NAME": "主機名稱",
+            "NODE_NAME": "Node name",
             "OPERATION": "運作",
             "STARTED": "已啟動",
             "STATUS": "狀態",
@@ -1458,6 +1459,7 @@
             "CAPTION": "伺服器",
             "STATUS": "狀態",
             "HOST_NAME": "主機名稱",
+            "NODE_NAME": "Node name",
             "CORES": "核心",
             "COMPLETED": "工作已完成",
             "RUNNING": "工作運行中",
@@ -1475,6 +1477,7 @@
             "STATUS": "狀態",
             "NAME": "服務名稱",
             "HOST_NAME": "主機名稱",
+            "NODE_NAME": "Node name",
             "COMPLETED": "工作已完成",
             "RUNNING": "工作運行中",
             "QUEUED": "工作排序中",
@@ -1749,6 +1752,9 @@
          "HOSTNAME": {
             "LABEL": "主機名稱"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "狀態",
             "PAUSED": "暫停",
@@ -1790,6 +1796,9 @@
          "HOSTNAME": {
             "LABEL": "主機名稱"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "狀態",
             "MAINTENANCE": "維護",
@@ -1803,6 +1812,9 @@
          },
          "HOSTNAME": {
             "LABEL": "主機名稱"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "姓名"

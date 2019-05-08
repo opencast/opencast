@@ -24,8 +24,9 @@
 angular.module('adminNg.controllers')
 .controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource',
   'SeriesThemeResource', 'ResourcesListResource', 'UserRolesResource', 'Notifications', 'AuthService',
+  'StatisticsReusable',
   function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource,
-    ResourcesListResource, UserRolesResource, Notifications, AuthService) {
+    ResourcesListResource, UserRolesResource, Notifications, AuthService, StatisticsReusable) {
 
     var roleSlice = 100;
     var roleOffset = 0;
@@ -145,6 +146,15 @@ angular.module('adminNg.controllers')
     };
 
     fetchChildResources = function (id) {
+      var previousProviderData;
+      if ($scope.statReusable !== null) {
+        previousProviderData = $scope.statReusable.statProviderData;
+      }
+      $scope.statReusable = StatisticsReusable.createReusableStatistics(
+        'series',
+        id,
+        previousProviderData);
+
       $scope.metadata = SeriesMetadataResource.get({ id: id }, function (metadata) {
         var seriesCatalogIndex, keepGoing = true;
         angular.forEach(metadata.entries, function (catalog, index) {
@@ -237,6 +247,8 @@ angular.module('adminNg.controllers')
 
       $scope.getMoreRoles();
     };
+
+    $scope.statReusable = null;
 
     // Generate proxy function for the save metadata function based on the given flavor
     // Do not generate it

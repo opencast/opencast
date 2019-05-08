@@ -1,72 +1,58 @@
 {
     "series" : {
         "_source" : { "enabled" : true },
-        "dynamic": "true",
+        "dynamic": true,
         "properties" : {
 
-            "uid": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "uid": { "type" : "keyword", "store" : true },
 
-            "organization": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "organization": { "type" : "keyword", "store" : true },
 
-            "object": { "type" : "string", "index" : "no", "store" : "yes" },
+            "object": { "type" : "text", "index": false, "store" : true },
 
-            "title": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "title": { "type" : "keyword" },
 
-            "series_json": { "type" : "string", "index" : "no", "store" : "no" },
+            "series_json": { "type" : "keyword" },
 
-            "description": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "description": { "type" : "keyword" },
 
-            "abstract": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "abstract": { "type" : "keyword" },
 
-            "subject": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "subject": { "type" : "keyword" },
 
-            "language": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "language": { "type" : "keyword" },
 
-            "creator": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "creator": { "type" : "keyword" },
 
-            "license": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "license": { "type" : "keyword" },
 
-            "access_policy": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "access_policy": { "type" : "keyword" },
 
-            "managed_acl": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "managed_acl": { "type" : "keyword" },
 
-            "createdDateTime": { "type" : "date", "format" : "yyyy-MM-dd'T'HH:mm:ssZ", "store" : "no" },
+            "createdDateTime": { "type" : "date", "format" : "yyyy-MM-dd'T'HH:mm:ssZ" },
 
-            "organizers": { "copy_to" : "organizer", "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "organizers": { "copy_to" : "organizer", "type" : "keyword" },
 
-            "contributors": { "copy_to" : "contributor", "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "contributors": { "copy_to" : "contributor", "type" : "keyword" },
 
-            "publisher": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "publisher": { "type" : "keyword" },
 
-            "rights_holder": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "rights_holder": { "type" : "keyword" },
 
-            "theme": { "type" : "long", "store" : "no" },
+            "theme": { "type" : "long" },
 
-            "text": { "type" : "string", "index" : "analyzed", "analyzer": "lowercasespaceanalyzer", "store" : "no" },
-            "text_fuzzy": { "type" : "string", "index" : "analyzed", "analyzer": "lowercasespaceanalyzer", "store" : "no" }
+            "text": { "type" : "text", "analyzer": "lowercasespaceanalyzer" },
+            "text_fuzzy": { "type" : "text", "analyzer": "lowercasespaceanalyzer" }
 
         },
         "dynamic_templates" : [
              {
-             "title_template" : {
-                 "match" : "title_*",
-                 "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
-                 }
-             },
-             {
-             "text" : {
-                 "match" : "text_*",
-                 "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" }
-                 }
-             },
-             {
-             "permission_template" : {
+               "permission_template" : {
                  "match" : "acl_permission_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
-                 }
+                 "mapping" : { "type" : "keyword" }
+                }
              }
          ]
     }

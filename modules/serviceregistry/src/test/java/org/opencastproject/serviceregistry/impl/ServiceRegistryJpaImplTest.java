@@ -187,8 +187,8 @@ public class ServiceRegistryJpaImplTest {
 
   private void registerTestHostAndService() throws ServiceRegistryException {
     // register the hosts, service must be activated at this point
-    serviceRegistryJpaImpl.registerHost(TEST_HOST, "127.0.0.1", 1024, 1, 1);
-    serviceRegistryJpaImpl.registerHost(TEST_HOST_OTHER, "127.0.0.1", 1024, 1, 2);
+    serviceRegistryJpaImpl.registerHost(TEST_HOST, "127.0.0.1", "test", 1024, 1, 1);
+    serviceRegistryJpaImpl.registerHost(TEST_HOST_OTHER, "127.0.0.1", "test_other", 1024, 1, 2);
     serviceRegistryJpaImpl.registerService(TEST_SERVICE, TEST_HOST, TEST_PATH);
     serviceRegistryJpaImpl.registerService(TEST_SERVICE, TEST_HOST_OTHER, TEST_PATH);
     serviceRegistryJpaImpl.registerService(TEST_SERVICE_2, TEST_HOST, TEST_PATH_2);

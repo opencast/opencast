@@ -221,6 +221,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** This host's base URL */
   protected String hostName;
 
+  /** This host's descriptive node name eg admin, worker01 */
+  protected String nodeName;
+
   /** The base URL for job URLs */
   protected String jobHost;
 
@@ -316,6 +319,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     // Register this host
     try {
+      if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OpencastConstants.NODE_NAME_PROPERTY))) {
+        nodeName = hostName;
+      } else {
+        nodeName = cc.getBundleContext().getProperty(OpencastConstants.NODE_NAME_PROPERTY);
+      }
+
       float maxLoad = Runtime.getRuntime().availableProcessors();
       if (cc != null && StringUtils.isNotBlank(cc.getBundleContext().getProperty(OPT_MAXLOAD))) {
         try {
@@ -333,7 +342,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       long maxMemory = Runtime.getRuntime().maxMemory();
       int cores = Runtime.getRuntime().availableProcessors();
 
-      registerHost(hostName, address, maxMemory, cores, maxLoad);
+      registerHost(hostName, address, nodeName, maxMemory, cores, maxLoad);
     } catch (Exception e) {
       throw new IllegalStateException("Unable to register host " + hostName + " in the service registry", e);
     }
@@ -355,8 +364,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     }
 
-    localSystemLoad = getHostLoads(emf.createEntityManager()).get(hostName).getLoadFactor();
-    logger.info("Current system load: {}", format("%.1f", localSystemLoad));
+    localSystemLoad = 0;
+    logger.info("Activated");
   }
 
   @Override
@@ -947,6 +956,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               job.getId(), job.getJobType(), job.getStatus());
     }
     logger.debug("Current host load: {}, job load cache size: {}", format("%.1f", localSystemLoad), jobCache.size());
+
+    if (jobCache.isEmpty() && Math.abs(localSystemLoad) > 0.01f) {
+      logger.warn("No jobs in the job load cache, but load is {}: setting job load to 0",
+              format("%.2f", localSystemLoad));
+      localSystemLoad = 0;
+    }
   }
 
   private synchronized void removeFromLoadCache(Long jobId) {
@@ -1177,10 +1192,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(String, String, long, int, float)
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(String, String, String, long, int, float)
    */
   @Override
-  public void registerHost(String host, String address, long memory, int cores, float maxLoad)
+  public void registerHost(String host, String address, String nodeName, long memory, int cores, float maxLoad)
           throws ServiceRegistryException {
     EntityManager em = null;
     EntityTransaction tx = null;
@@ -1191,7 +1206,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       // Find the existing registrations for this host and if it exists, update it
       HostRegistrationJpaImpl hostRegistration = fetchHostRegistration(em, host);
       if (hostRegistration == null) {
-        hostRegistration = new HostRegistrationJpaImpl(host, address, memory, cores, maxLoad, true, false);
+        hostRegistration = new HostRegistrationJpaImpl(host, address, nodeName, memory, cores, maxLoad, true, false);
         em.persist(hostRegistration);
       } else {
         hostRegistration.setIpAddress(address);

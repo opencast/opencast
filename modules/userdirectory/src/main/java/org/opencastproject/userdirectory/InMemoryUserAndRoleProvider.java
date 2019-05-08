@@ -228,7 +228,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider, 
       for (String roleName : SecurityConstants.GLOBAL_SYSTEM_ROLES) {
         roleList.add(new JaxbRole(roleName, jaxbOrganization));
       }
-      User digestUser = new JaxbUser(digestUsername, digestUserPass, DIGEST_USER_NAME, null, getName(), true,
+      User digestUser = new JaxbUser(digestUsername, digestUserPass, DIGEST_USER_NAME, null, getName(),
               jaxbOrganization, roleList);
       users.add(digestUser);
       logger.info("Added system digest user '{}' for organization '{}'", digestUsername, organization.getId());
@@ -251,7 +251,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider, 
 
       // Create the capture agent user
       logger.info("Creating the capture agent digest user '{}'", username);
-      User caUser = new JaxbUser(username, password, CAPTURE_AGENT_USER_NAME, null, getName(), true,
+      User caUser = new JaxbUser(username, password, CAPTURE_AGENT_USER_NAME, null, getName(),
               jaxbOrganization, caRoleList);
       users.add(caUser);
     }

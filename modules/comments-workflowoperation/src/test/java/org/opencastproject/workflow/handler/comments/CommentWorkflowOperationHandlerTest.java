@@ -35,6 +35,7 @@ import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -96,14 +97,18 @@ public class CommentWorkflowOperationHandlerTest {
     // Setup user
     User creator = EasyMock.createMock(User.class);
 
+    // setup user directory
+    UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
+    EasyMock.expect(userDirectoryService.loadUser(EasyMock.anyString())).andReturn(creator).anyTimes();
+
     // Setup WorkflowInstance
     WorkflowInstance workflowInstance = EasyMock.createMock(WorkflowInstance.class);
     EasyMock.expect(workflowInstance.getId()).andReturn(workflowId).anyTimes();
     EasyMock.expect(workflowInstance.getCurrentOperation()).andReturn(workflowOperationInstance).anyTimes();
     EasyMock.expect(workflowInstance.getMediaPackage()).andReturn(mediaPackage).anyTimes();
-    EasyMock.expect(workflowInstance.getCreator()).andReturn(creator).anyTimes();
+    EasyMock.expect(workflowInstance.getCreatorName()).andReturn("user").anyTimes();
 
-    EasyMock.replay(creator, mediaPackage, workflowInstance, workflowOperationInstance);
+    EasyMock.replay(creator, userDirectoryService, mediaPackage, workflowInstance, workflowOperationInstance);
 
     // Test create
     EventCommentService eventCommentService = EasyMock.createMock(EventCommentService.class);
@@ -119,6 +124,7 @@ public class CommentWorkflowOperationHandlerTest {
     CommentWorkflowOperationHandler commentWorkflowOperationHandler = new CommentWorkflowOperationHandler();
     commentWorkflowOperationHandler.setEventCommentService(eventCommentService);
     commentWorkflowOperationHandler.setSecurityService(secSrv);
+    commentWorkflowOperationHandler.setUserDirectoryService(userDirectoryService);
     commentWorkflowOperationHandler.start(workflowInstance, null);
     assertTrue(comment.hasCaptured());
     assertEquals(creator, comment.getValue().getAuthor());
@@ -153,6 +159,7 @@ public class CommentWorkflowOperationHandlerTest {
     commentWorkflowOperationHandler = new CommentWorkflowOperationHandler();
     commentWorkflowOperationHandler.setEventCommentService(eventCommentService);
     commentWorkflowOperationHandler.setSecurityService(secSrv);
+    commentWorkflowOperationHandler.setUserDirectoryService(userDirectoryService);
     commentWorkflowOperationHandler.start(workflowInstance, null);
 
     // Test delete with no result, no delete
@@ -233,14 +240,18 @@ public class CommentWorkflowOperationHandlerTest {
     // Setup user
     User creator = EasyMock.createMock(User.class);
 
+    // setup user directory
+    UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
+    EasyMock.expect(userDirectoryService.loadUser(EasyMock.anyString())).andReturn(creator).anyTimes();
+
     // Setup WorkflowInstance
     WorkflowInstance workflowInstance = EasyMock.createMock(WorkflowInstance.class);
     EasyMock.expect(workflowInstance.getId()).andReturn(workflowId).anyTimes();
     EasyMock.expect(workflowInstance.getCurrentOperation()).andReturn(workflowOperationInstance).anyTimes();
     EasyMock.expect(workflowInstance.getMediaPackage()).andReturn(mediaPackage).anyTimes();
-    EasyMock.expect(workflowInstance.getCreator()).andReturn(creator).anyTimes();
+    EasyMock.expect(workflowInstance.getCreatorName()).andReturn("user").anyTimes();
 
-    EasyMock.replay(creator, mediaPackage, workflowInstance, workflowOperationInstance);
+    EasyMock.replay(creator, userDirectoryService, mediaPackage, workflowInstance, workflowOperationInstance);
 
     // Test no previous comments
     EventCommentService eventCommentService = EasyMock.createMock(EventCommentService.class);
@@ -252,6 +263,7 @@ public class CommentWorkflowOperationHandlerTest {
     CommentWorkflowOperationHandler commentWorkflowOperationHandler = new CommentWorkflowOperationHandler();
     commentWorkflowOperationHandler.setEventCommentService(eventCommentService);
     commentWorkflowOperationHandler.setSecurityService(secSrv);
+    commentWorkflowOperationHandler.setUserDirectoryService(userDirectoryService);
     commentWorkflowOperationHandler.start(workflowInstance, null);
     assertTrue(comment.hasCaptured());
     assertEquals(creator, comment.getValue().getAuthor());
@@ -267,6 +279,7 @@ public class CommentWorkflowOperationHandlerTest {
     commentWorkflowOperationHandler = new CommentWorkflowOperationHandler();
     commentWorkflowOperationHandler.setEventCommentService(eventCommentService);
     commentWorkflowOperationHandler.setSecurityService(secSrv);
+    commentWorkflowOperationHandler.setUserDirectoryService(userDirectoryService);
     commentWorkflowOperationHandler.start(workflowInstance, null);
     assertTrue(comment.hasCaptured());
     assertEquals(creator, comment.getValue().getAuthor());
@@ -282,8 +295,7 @@ public class CommentWorkflowOperationHandlerTest {
     commentWorkflowOperationHandler = new CommentWorkflowOperationHandler();
     commentWorkflowOperationHandler.setEventCommentService(eventCommentService);
     commentWorkflowOperationHandler.setSecurityService(secSrv);
-    commentWorkflowOperationHandler.setSecurityService(secSrv);
-
+    commentWorkflowOperationHandler.setUserDirectoryService(userDirectoryService);
     commentWorkflowOperationHandler.start(workflowInstance, null);
     assertTrue(comment.hasCaptured());
     assertEquals(creator, comment.getValue().getAuthor());
@@ -324,12 +336,16 @@ public class CommentWorkflowOperationHandlerTest {
     // Setup user
     User creator = EasyMock.createMock(User.class);
 
+    // setup user directory
+    UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
+    EasyMock.expect(userDirectoryService.loadUser(EasyMock.anyString())).andReturn(creator).anyTimes();
+
     // Setup WorkflowInstance
     WorkflowInstance workflowInstance = EasyMock.createMock(WorkflowInstance.class);
     EasyMock.expect(workflowInstance.getId()).andReturn(workflowId).anyTimes();
     EasyMock.expect(workflowInstance.getCurrentOperation()).andReturn(workflowOperationInstance).anyTimes();
     EasyMock.expect(workflowInstance.getMediaPackage()).andReturn(mediaPackage).anyTimes();
-    EasyMock.expect(workflowInstance.getCreator()).andReturn(creator).anyTimes();
+    EasyMock.expect(workflowInstance.getCreatorName()).andReturn("user").anyTimes();
 
     // Test no previous comments
     EventCommentService eventCommentService = EasyMock.createMock(EventCommentService.class);
@@ -337,10 +353,12 @@ public class CommentWorkflowOperationHandlerTest {
     Capture<EventComment> comment = EasyMock.newCapture();
     EasyMock.expect(eventCommentService.updateComment(EasyMock.capture(comment)))
             .andReturn(EventComment.create(Option.option(15L), mediaPackageId, org.getId(), description, creator));
-    EasyMock.replay(creator, eventCommentService, mediaPackage, workflowInstance, workflowOperationInstance);
+    EasyMock.replay(creator, userDirectoryService, eventCommentService, mediaPackage, workflowInstance,
+            workflowOperationInstance);
     CommentWorkflowOperationHandler commentWorkflowOperationHandler = new CommentWorkflowOperationHandler();
     commentWorkflowOperationHandler.setEventCommentService(eventCommentService);
     commentWorkflowOperationHandler.setSecurityService(secSrv);
+    commentWorkflowOperationHandler.setUserDirectoryService(userDirectoryService);
     commentWorkflowOperationHandler.start(workflowInstance, null);
     assertTrue(comment.hasCaptured());
     assertEquals(creator, comment.getValue().getAuthor());
@@ -355,6 +373,7 @@ public class CommentWorkflowOperationHandlerTest {
     EasyMock.replay(eventCommentService);
     commentWorkflowOperationHandler = new CommentWorkflowOperationHandler();
     commentWorkflowOperationHandler.setEventCommentService(eventCommentService);
+    commentWorkflowOperationHandler.setUserDirectoryService(userDirectoryService);
     commentWorkflowOperationHandler.start(workflowInstance, null);
     assertTrue(comment.hasCaptured());
     assertEquals(creator, comment.getValue().getAuthor());
@@ -376,6 +395,7 @@ public class CommentWorkflowOperationHandlerTest {
     commentWorkflowOperationHandler = new CommentWorkflowOperationHandler();
     commentWorkflowOperationHandler.setEventCommentService(eventCommentService);
     commentWorkflowOperationHandler.setSecurityService(secSrv);
+    commentWorkflowOperationHandler.setUserDirectoryService(userDirectoryService);
     commentWorkflowOperationHandler.start(workflowInstance, null);
     assertTrue(comment.hasCaptured());
     assertEquals(creator, comment.getValue().getAuthor());

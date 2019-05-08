@@ -169,7 +169,7 @@ final class WorkflowOperationWorker {
       workflow = service.handleOperationResult(workflow, result);
       return workflow;
     } catch (JobCanceledException e) {
-      logger.info(e.getMessage());
+      logger.info("Workflow {} operation {} job cancelled: {}", workflow.getId(), operation, e.getMessage());
       return workflow;
     } catch (WorkflowOperationAbortedException e) {
       // Don't log it as error because it was aborted by the user

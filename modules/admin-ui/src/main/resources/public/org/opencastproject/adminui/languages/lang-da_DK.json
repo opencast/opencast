@@ -1433,6 +1433,7 @@
             "CREATED": "Oprettet",
             "CREATOR": "Opretter",
             "HOST_NAME": "Værtsnavn",
+            "NODE_NAME": "Node name",
             "OPERATION": "Handling",
             "STARTED": "Startet",
             "STATUS": "Status",
@@ -1458,6 +1459,7 @@
             "CAPTION": "Servere",
             "STATUS": "Status",
             "HOST_NAME": "Værtsnavn",
+            "NODE_NAME": "Node name",
             "CORES": "Kerner",
             "COMPLETED": "Jobs fuldført",
             "RUNNING": "Jobs kører",
@@ -1475,6 +1477,7 @@
             "STATUS": "Status",
             "NAME": "Tjenestenavn",
             "HOST_NAME": "Værtsnavn",
+            "NODE_NAME": "Node name",
             "COMPLETED": "Jobs fuldført",
             "RUNNING": "Jobs kører",
             "QUEUED": "Jobs i kø",
@@ -1749,6 +1752,9 @@
          "HOSTNAME": {
             "LABEL": "Værtsnavn"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Status",
             "PAUSED": "På pause",
@@ -1790,6 +1796,9 @@
          "HOSTNAME": {
             "LABEL": "Værtsnavn"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Status",
             "MAINTENANCE": "Vedligeholdelse",
@@ -1803,6 +1812,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Værtsnavn"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "Navn"

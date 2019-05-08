@@ -78,7 +78,7 @@ public class YouTubeV3PublicationServiceImplTest {
     security = createMock(SecurityService.class);
     registry = createMock(ServiceRegistry.class);
     List<HostRegistration> hosts = new LinkedList<HostRegistration>();
-    HostRegistration host = new HostRegistrationInMemory("localhost", "localhost", 1.0F, 1, 1024L);
+    HostRegistration host = new HostRegistrationInMemory("localhost", "localhost", "AllInOne", 1.0F, 1, 1024L);
     hosts.add(host);
     expect(registry.getHostRegistrations()).andReturn(hosts).anyTimes();
     userDirectoryService = createMock(UserDirectoryService.class);
