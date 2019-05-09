@@ -173,7 +173,6 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
-      "WARNING":"Warning",
       "DELETE": {
           "SERIES": {
             "CAPTION": "Delete",
@@ -183,7 +182,7 @@
           "EVENTS": {
             "CAPTION": "Delete",
             "DELETE_EVENTS": "Delete Events",
-            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue.",
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
           }
       },
 
