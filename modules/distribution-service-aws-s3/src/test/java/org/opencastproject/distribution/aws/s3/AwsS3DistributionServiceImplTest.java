@@ -87,10 +87,10 @@ public class AwsS3DistributionServiceImplTest {
 
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
-    URI mpURI = AwsS3DistributionServiceImpl.class.getResource("/media_package.xml").toURI();
+    URI mpURI = AwsS3DistributionServiceImpl.class.getResource("/mediapackage.xml").toURI();
     mp = builder.loadFromXml(mpURI.toURL().openStream());
 
-    mpURI = AwsS3DistributionServiceImpl.class.getResource("/media_package_distributed.xml").toURI();
+    mpURI = AwsS3DistributionServiceImpl.class.getResource("/mediapackage_distributed.xml").toURI();
     distributedMp = builder.loadFromXml(mpURI.toURL().openStream());
   }
 

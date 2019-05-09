@@ -587,7 +587,7 @@ CREATE TABLE oc_themes (
 
 CREATE TABLE oc_ibm_watson_transcript_job (
     id BIGINT(20) NOT NULL,
-    media_package_id VARCHAR(128) NOT NULL,
+    mediapackage_id VARCHAR(128) NOT NULL,
     track_id VARCHAR(128) NOT NULL,
     job_id  VARCHAR(128) NOT NULL,
     date_created datetime NOT NULL,
@@ -599,14 +599,14 @@ CREATE TABLE oc_ibm_watson_transcript_job (
 
 CREATE TABLE oc_aws_asset_mapping (
   id BIGINT(20) NOT NULL,
-  media_package_element VARCHAR(128) NOT NULL,
-  media_package VARCHAR(128) NOT NULL,
+  mediapackage_element VARCHAR(128) NOT NULL,
+  mediapackage VARCHAR(128) NOT NULL,
   version BIGINT(20) NOT NULL,
   organization VARCHAR(128) NOT NULL,
   deletion_date datetime DEFAULT NULL,
   object_key VARCHAR(1024) NOT NULL,
   object_version VARCHAR(1024) NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_aws_archive_mapping_0 UNIQUE (organization, media_package, media_package_element, version)
+  CONSTRAINT UNQ_aws_archive_mapping_0 UNIQUE (organization, mediapackage, mediapackage_element, version)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
