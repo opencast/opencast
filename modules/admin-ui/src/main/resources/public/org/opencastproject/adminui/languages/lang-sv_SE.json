@@ -258,11 +258,11 @@
       },
       "EDIT_EVENTS": {
          "CAPTION": "Redigera schemalagda händelser",
-         "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
+         "CONFLICT_CHECK_RUNNING": "Konfliktöversyn sker…",
          "GENERAL": {
             "CAPTION": "Allmänt",
             "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
-            "NOCHANGES": "No changes to the events detected!",
+            "NOCHANGES": "Ingen förändring i händelsen upptäckt!",
             "CONFLICT_FIRST_EVENT": "Förändrad event",
             "CONFLICT_SECOND_EVENT": "Händelse i konflikt",
             "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
@@ -930,7 +930,7 @@
                   "TIME_IN_QUEUE": "Tid i kön",
                   "STARTED": "Startad",
                   "FINISHED": "Färdig",
-                  "RETRY_STRATEGY": "Retry Strategy",
+                  "RETRY_STRATEGY": "Försök igen-strategi",
                   "FAILED_ATTEMPTS": "Misslyckade försök",
                   "MAX_ATTEMPTS": "Max",
                   "EXCEPTION_HANDLER_WORKFLOW": "Exception-hanterande Workflow",
