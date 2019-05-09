@@ -1,5 +1,5 @@
 describe('adminNg.directives.adminNgEditableMultiSelect', function () {
-    var $compile, $rootScope, $timeout, element;
+    var $compile, $rootScope, $timeout, element, $httpBackend;
 
     beforeEach(module('adminNg'));
     beforeEach(module('shared/partials/editableMultiSelect.html'));
@@ -13,13 +13,15 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function (_$rootScope_, _$compile_, _$timeout_) {
+    beforeEach(inject(function (_$rootScope_, _$compile_, _$httpBackend_, _$timeout_) {
         $rootScope = _$rootScope_;
         $compile = _$compile_;
         $timeout = _$timeout_;
+        $httpBackend = _$httpBackend_;
     }));
 
     beforeEach(function () {
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $rootScope.params = { value: ['item1', 'item3'] };
         $rootScope.collection = { item1: 'Item 1', item2: 'Item 2', item3: 'Item 3' };
         $rootScope.save = jasmine.createSpy();

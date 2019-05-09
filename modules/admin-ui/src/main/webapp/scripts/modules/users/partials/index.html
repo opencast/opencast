@@ -3,13 +3,22 @@
 
   <admin-ng-nav></admin-ng-nav>
   <nav>
-    <a href="#/users/users" ng-class="{active: table.resource == 'users'}" translate="USERS.NAVIGATION.USERS" with-role="ROLE_UI_USERS_VIEW">
+    <a href="#!/users/users"
+       ng-class="{active: table.resource == 'users'}"
+       translate="USERS.NAVIGATION.USERS"
+       with-role="ROLE_UI_USERS_VIEW">
       <!-- Users -->
     </a>
-    <a href="#/users/groups" ng-class="{active: table.resource == 'groups'}" translate="USERS.NAVIGATION.GROUPS" with-role="ROLE_UI_GROUPS_VIEW">
+    <a href="#!/users/groups"
+       ng-class="{active: table.resource == 'groups'}"
+       translate="USERS.NAVIGATION.GROUPS"
+       with-role="ROLE_UI_GROUPS_VIEW">
       <!-- Groups -->
     </a>
-    <a href="#/users/acls" ng-class="{active: table.resource == 'acls'}" translate="USERS.NAVIGATION.PERMISSIONS" with-role="ROLE_UI_ACLS_VIEW">
+    <a href="#!/users/acls"
+       ng-class="{active: table.resource == 'acls'}"
+       translate="USERS.NAVIGATION.PERMISSIONS"
+       with-role="ROLE_UI_ACLS_VIEW">
       <!-- Permissions -->
     </a>
   </nav>

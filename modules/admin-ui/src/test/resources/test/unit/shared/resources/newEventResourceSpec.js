@@ -162,6 +162,10 @@ describe('New Event API Resource', function () {
         };
     }));
 
+    beforeEach(function () {
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
+    });
+
 
     describe('assembles the metadata for', function () {
         var args;

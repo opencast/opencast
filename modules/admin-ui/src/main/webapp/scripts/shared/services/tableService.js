@@ -354,7 +354,7 @@ angular.module('adminNg.services')
 
             me.updatePagination();
             me.updateAllSelected();
-          });
+          }).catch(angular.noop);
         })(me.resource);
 
         if (me.refreshScheduler.on) {
@@ -363,8 +363,8 @@ angular.module('adminNg.services')
       };
 
       /**
-         * Scheduler for the refresh of the fetch
-         */
+       * Scheduler for the refresh of the fetch
+       */
       this.refreshScheduler = {
         on: true,
         newSchedule: function () {

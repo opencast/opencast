@@ -26,6 +26,7 @@ describe('Serie controller', function () {
 
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.whenGET('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/metadata.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/metadata.json')));
         $httpBackend.whenGET('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/events.json')

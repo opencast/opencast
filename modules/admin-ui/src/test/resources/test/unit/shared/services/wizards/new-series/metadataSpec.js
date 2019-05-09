@@ -27,6 +27,7 @@ describe('Metadata Step in New Series Wizard', function () {
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json').respond(JSON.stringify(getJSONFixture('admin-ng/capture-agents/agents.json')));
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond(JSON.stringify(getJSONFixture('admin-ng/resources/ACL.json')));
         $httpBackend.whenGET('/workflow/definitions.json').respond(JSON.stringify(getJSONFixture('workflow/definitions.json')));
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.flush();
     });
 

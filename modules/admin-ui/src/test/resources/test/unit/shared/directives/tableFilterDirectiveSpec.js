@@ -30,6 +30,7 @@ describe('adminNg.directives.adminNgTableFilter', function () {
         $rootScope.resource = 'furniture';
         $rootScope.category = 'furniture';
 
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.whenGET('/admin-ng/resources/furniture/filters.json').respond(JSON.stringify({
             color: {
                 label: 'COLOR',

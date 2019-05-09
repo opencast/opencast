@@ -1,5 +1,5 @@
 describe('adminNg.directives.adminNgEditableMultiValue', function () {
-    var $compile, $rootScope, $timeout, element;
+    var $compile, $rootScope, $timeout, element, $httpBackend;
 
     beforeEach(module('adminNg'));
     beforeEach(module('shared/partials/editableMultiValue.html'));
@@ -13,13 +13,15 @@ describe('adminNg.directives.adminNgEditableMultiValue', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function (_$rootScope_, _$compile_, _$timeout_) {
+    beforeEach(inject(function (_$rootScope_, _$compile_, _$httpBackend_, _$timeout_) {
         $rootScope = _$rootScope_;
         $compile = _$compile_;
         $timeout = _$timeout_;
+        $httpBackend = _$httpBackend_;
     }));
 
     beforeEach(function () {
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $rootScope.params = { value: ['Value 1', 'Value 2'] };
         $rootScope.save = jasmine.createSpy();
         element = $compile('<div admin-ng-editable-multi-value params="params" save="save"></div>')($rootScope);

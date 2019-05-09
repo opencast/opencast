@@ -27,6 +27,7 @@ describe('Event controller', function () {
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
 
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comments')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comments')));
         $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/metadata.json')

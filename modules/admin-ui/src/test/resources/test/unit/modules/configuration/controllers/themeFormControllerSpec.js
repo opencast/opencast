@@ -1,6 +1,6 @@
 describe('Theme Form Controller', function () {
     var $scope, $controller, $parentScope, $timeout, ThemeResourceMock, ThemeUsageResourceMock, NotificationsMock, FormNavigatorServiceMock,
-        NewThemeResourceMock, TableServiceMock, userdata;
+        NewThemeResourceMock, TableServiceMock, userdata, $httpBackend;
 
     userdata = {
         general: {
@@ -51,12 +51,14 @@ describe('Theme Form Controller', function () {
         $provide.value('Table', TableServiceMock);
     }));
 
-    beforeEach(inject(function ($rootScope, _$controller_, _$timeout_) {
+    beforeEach(inject(function ($rootScope, _$controller_, _$timeout_, _$httpBackend_) {
         $controller = _$controller_;
         $timeout = _$timeout_;
-
         $parentScope = $rootScope.$new();
         $scope = $parentScope.$new();
+        $httpBackend = _$httpBackend_;
+
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
     }));
 
     describe('instantiation', function () {

@@ -91,7 +91,7 @@ angular.module('adminNg.directives')
           } else {
             $translate(column.label).then(function (translation) {
               setWidth(translation, column, element);
-            });
+            }).catch(angular.noop);
           }
         });
       };

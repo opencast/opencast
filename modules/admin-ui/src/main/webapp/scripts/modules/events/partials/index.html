@@ -3,10 +3,16 @@
 
   <admin-ng-nav></admin-ng-nav>
   <nav>
-    <a href="#/events/events" ng-class="{active: table.resource == 'events'}" translate="EVENTS.EVENTS.NAVIGATION.EVENTS" with-role="ROLE_UI_EVENTS_VIEW">
+    <a href="#!/events/events"
+       ng-class="{active: table.resource == 'events'}"
+       translate="EVENTS.EVENTS.NAVIGATION.EVENTS"
+       with-role="ROLE_UI_EVENTS_VIEW">
       <!-- Events -->
     </a>
-    <a href="#/events/series" ng-class="{active: table.resource == 'series'}" translate="EVENTS.EVENTS.NAVIGATION.SERIES" with-role="ROLE_UI_SERIES_VIEW">
+    <a href="#!/events/series"
+       ng-class="{active: table.resource == 'series'}"
+       translate="EVENTS.EVENTS.NAVIGATION.SERIES"
+       with-role="ROLE_UI_SERIES_VIEW">
       <!-- Series -->
     </a>
   </nav>

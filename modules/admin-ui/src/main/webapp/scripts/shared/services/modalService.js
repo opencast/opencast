@@ -63,15 +63,15 @@ angular.module('adminNg.services.modal')
       this.$scope = $scope;
 
       /**
-             * @ngdoc function
-             * @name Modal.close
-             * @methodOf adminNg.modal.Modal
-             * @description
-             * Close the currently open modal.
-             *
-             * Fades out the overlay and the tab content and updates the URL by
-             * removing all search parameters.
-             */
+       * @ngdoc function
+       * @name Modal.close
+       * @methodOf adminNg.modal.Modal
+       * @description
+       * Close the currently open modal.
+       *
+       * Fades out the overlay and the tab content and updates the URL by
+       * removing all search parameters.
+       */
       $scope.close = function (fetch) {
         $scope.open = false;
         $location.search({});
@@ -88,14 +88,14 @@ angular.module('adminNg.services.modal')
       };
 
       /**
-             * @ngdoc function
-             * @name Modal.keyUp
-             * @methodOf adminNg.modal.Modal
-             * @description
-             * Closes the modal when pressing ESC.
-             *
-             * @param {event} event Event that triggered this function.
-             */
+       * @ngdoc function
+       * @name Modal.keyUp
+       * @methodOf adminNg.modal.Modal
+       * @description
+       * Closes the modal when pressing ESC.
+       *
+       * @param {event} event Event that triggered this function.
+       */
       $scope.keyUp = function (event) {
         switch (event.keyCode) {
         case 27:
@@ -110,7 +110,7 @@ angular.module('adminNg.services.modal')
       $scope.open = false;
 
       // Fetch the modal markup from the partial named after its ID
-      http = $http.get('shared/partials/modals/' + modalId + '.html', {});
+      http = $http.get('shared/partials/modals/' + modalId + '.html').catch(angular.noop);
 
       http.then(function (html) {
         // Compile modal and overlay and attach them to the DOM.

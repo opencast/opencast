@@ -40,6 +40,7 @@ describe('adminNg.services.language', function () {
 
         $httpBackend.expectGET('/i18n/languages.json').respond(JSON.stringify(getJSONFixture('i18n/languages.json')));
         $httpBackend.whenGET('public/org/opencastproject/adminui/languages/lang-en_US.json').respond('');
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.flush();
     });
 
