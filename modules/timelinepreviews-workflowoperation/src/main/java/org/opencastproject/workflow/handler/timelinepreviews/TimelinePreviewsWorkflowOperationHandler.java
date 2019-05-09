@@ -84,23 +84,6 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
   /** Default value for image size. */
   private static final int DEFAULT_IMAGE_SIZE = 10;
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR_PROPERTY, "The source media file flavor.");
-    CONFIG_OPTIONS.put(SOURCE_TAGS_PROPERTY, "Comma-separated tags of the source media files. "
-            + "Any media that match " + SOURCE_FLAVOR_PROPERTY + " or " + SOURCE_TAGS_PROPERTY
-            + " will be processed.");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR_PROPERTY, "The target timeline previews image flavor.");
-    CONFIG_OPTIONS.put(TARGET_TAGS_PROPERTY, "The timeline previews image (comma separated) target tags.");
-    CONFIG_OPTIONS.put(IMAGE_SIZE_PROPERTY, "The number of timeline previews in the image.");
-    // Only process the first file that matches tags/flavors
-    CONFIG_OPTIONS.put("process-first-match-only",
-            "Set to 'true' indicates only one track will be processed if more are selected");
-  }
-
   /** The timeline previews service. */
   private TimelinePreviewsService timelinePreviewsService = null;
 
@@ -186,13 +169,14 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
 
         Job timelinepreviewsJob = timelinePreviewsService.createTimelinePreviewImages(sourceTrack, imageSize);
         timelinepreviewsJobs.add(timelinepreviewsJob);
+
+        if (processOnlyOne)
+            break;
+
       } catch (MediaPackageException | TimelinePreviewsException ex) {
         logger.error("Creating timeline previews job for track '{}' in media package '{}' failed with error {}",
                 sourceTrack.getIdentifier(), mediaPackage.getIdentifier().compact(), ex.getMessage());
       }
-
-      if (processOnlyOne)
-        break;
     }
 
     logger.info("Wait for timeline previews jobs for media package {}", mediaPackage.getIdentifier().compact());
