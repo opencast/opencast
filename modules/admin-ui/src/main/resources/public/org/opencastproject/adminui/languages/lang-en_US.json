@@ -513,7 +513,7 @@
          "PUBLISHING": "Publishing",
          "IMPORTING": "Importing",
          "REPUBLISHING": "Republishing",
-         "UPDATING_PREVIEWS": "Updating Previews"
+         "UPDATING_PREVIEWS": "Updating previews"
        },
        "DETAILS": {
          "HEADER": "Event details - {{resourceId}}",
