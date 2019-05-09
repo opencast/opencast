@@ -42,6 +42,34 @@
 }
 
 // Alerts
+
+// New notifications
+.global-notifications {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    max-width: 300px;
+    z-index: $max-z;
+
+    .alert {
+        display: inline-block;
+        float:right;
+
+        .close {
+            position: unset;
+            float: right;
+            font-size: unset;
+        }
+        &.sticky {
+            margin: 5px 0 10px;
+        }
+    }
+
+    .alert:hover {
+      filter: brightness(105%);
+    }
+}
+
 .alert {
     min-height: 40px;
     border-radius: $main-border-radius;
