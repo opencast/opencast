@@ -224,11 +224,11 @@
       },
       "EDIT_EVENTS": {
          "CAPTION": "Redigera schemalagda händelser",
-         "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
+         "CONFLICT_CHECK_RUNNING": "Konfliktöversyn sker…",
          "GENERAL": {
             "CAPTION": "Allmänt",
             "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
-            "NOCHANGES": "No changes to the events detected!",
+            "NOCHANGES": "Ingen förändring i händelsen upptäckt!",
             "CONFLICT_FIRST_EVENT": "Förändrad event",
             "CONFLICT_SECOND_EVENT": "Händelse i konflikt",
             "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
@@ -307,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Konfiguration"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistics"
       }
    },
    "EVENTS": {
@@ -515,7 +518,8 @@
                "SCHEDULING": "Schemaläggning",
                "WORKFLOWS": "Workflows",
                "ACCESS": "Åtkomstpolicy",
-               "COMMENTS": "Kommentarer"
+               "COMMENTS": "Kommentarer",
+               "STATISTICS": "Statistics"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publikationer",
@@ -757,6 +761,9 @@
                   "PROCESSING_FAILURE": "Bearbetning misslyckades"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Statistics"
+            },
             "METADATA": {
                "CAPTION": "Händelseinformation",
                "TITLE": "Titel",
@@ -858,7 +865,7 @@
                   "TIME_IN_QUEUE": "Tid i kön",
                   "STARTED": "Startad",
                   "FINISHED": "Färdig",
-                  "RETRY_STRATEGY": "Retry Strategy",
+                  "RETRY_STRATEGY": "Försök igen-strategi",
                   "FAILED_ATTEMPTS": "Misslyckade försök",
                   "MAX_ATTEMPTS": "Max",
                   "EXCEPTION_HANDLER_WORKFLOW": "Exception-hanterande Workflow",
@@ -980,7 +987,8 @@
                "EXTENDED_METADATA": "Metadata II",
                "EVENTS": "Händelser",
                "PERMISSIONS": "Åtkomstpolicy",
-               "THEME": "Tema"
+               "THEME": "Tema",
+               "STATISTICS": "Statistics"
             },
             "ACCESS": {
                "CAPTION": "Åtkomstpolicy",
@@ -1000,7 +1008,7 @@
                   "ACTION": "Åtgärder",
                   "NEW": "Ny policy",
                   "DETAILS": "Detaljer",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS": "Uppdatera event rättigheter",
                   "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
@@ -1433,7 +1441,7 @@
             "CREATED": "Skapad",
             "CREATOR": "Skapare",
             "HOST_NAME": "Hostnamn",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Node namn",
             "OPERATION": "Operation",
             "STARTED": "Startad",
             "STATUS": "Status",
@@ -1459,7 +1467,7 @@
             "CAPTION": "Servrar",
             "STATUS": "Status",
             "HOST_NAME": "Hostnamn",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Node namn",
             "CORES": "Kärnor",
             "COMPLETED": "Avslutade jobb",
             "RUNNING": "Aktiva jobb",
@@ -1477,7 +1485,7 @@
             "STATUS": "Status",
             "NAME": "Tjänstenamn",
             "HOST_NAME": "Hostnamn",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Node namn",
             "COMPLETED": "Avslutade jobb",
             "RUNNING": "Aktiva jobb",
             "QUEUED": "Köade jobb",
@@ -1753,7 +1761,7 @@
             "LABEL": "Hostnamn"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Node namn"
          },
          "STATUS": {
             "LABEL": "Status",
@@ -1797,7 +1805,7 @@
             "LABEL": "Hostnamn"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Node namn"
          },
          "STATUS": {
             "LABEL": "Status",
@@ -1814,7 +1822,7 @@
             "LABEL": "Hostnamn"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Node namn"
          },
          "NAME": {
             "LABEL": "Namn"
@@ -1959,7 +1967,28 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "För att kunna knappa in flera värder, tryck Enter imellan"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "FROM": "Från",
+      "TO": "To",
+      "TOTAL": "Total",
+      "GRANULARITY": "Granularity",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Random Data",
+         "VIEWS_SUM": "Total Number of Views",
+         "VIEWS_AVG": "Average Number of Views"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time uinit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time uinit."
       }
    }
 }

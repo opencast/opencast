@@ -307,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Konfiguration"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistiken"
       }
    },
    "EVENTS": {
@@ -515,7 +518,8 @@
                "SCHEDULING": "Planung",
                "WORKFLOWS": "Workflows",
                "ACCESS": "Zugriffsrechte",
-               "COMMENTS": "Kommentare"
+               "COMMENTS": "Kommentare",
+               "STATISTICS": "Statistik"
             },
             "PUBLICATIONS": {
                "CAPTION": "Veröffentlichungen",
@@ -757,6 +761,9 @@
                   "PROCESSING_FAILURE": "Verarbeitungs-Fehler"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Statistik"
+            },
             "METADATA": {
                "CAPTION": "Aufzeichnungs-Details",
                "TITLE": "Titel",
@@ -980,7 +987,8 @@
                "EXTENDED_METADATA": "Metadaten II",
                "EVENTS": "Ereignisse",
                "PERMISSIONS": "Zugriffsrechte",
-               "THEME": "Branding"
+               "THEME": "Branding",
+               "STATISTICS": "Statistik"
             },
             "ACCESS": {
                "CAPTION": "Zugriffsrechte",
@@ -1433,7 +1441,7 @@
             "CREATED": "Erstellt",
             "CREATOR": "Autor",
             "HOST_NAME": "Hostname",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Knotenname",
             "OPERATION": "Vorgang",
             "STARTED": "Gestartet",
             "STATUS": "Status",
@@ -1459,7 +1467,7 @@
             "CAPTION": "Server",
             "STATUS": "Status",
             "HOST_NAME": "Hostname",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Knotenname",
             "CORES": "Kerne",
             "COMPLETED": "Jobs abgeschlossen",
             "RUNNING": "Jobs in Bearbeitung",
@@ -1477,7 +1485,7 @@
             "STATUS": "Status",
             "NAME": "Dienstname",
             "HOST_NAME": "Hostname",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Knotenname",
             "COMPLETED": "Jobs abgeschlossen",
             "RUNNING": "Jobs in Bearbeitung",
             "QUEUED": "Jobs in Warteschlange",
@@ -1753,7 +1761,7 @@
             "LABEL": "Hostname"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Knotenname"
          },
          "STATUS": {
             "LABEL": "Status",
@@ -1797,7 +1805,7 @@
             "LABEL": "Hostname"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Knotenname"
          },
          "STATUS": {
             "LABEL": "Status",
@@ -1814,7 +1822,7 @@
             "LABEL": "Hostname"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Knotenname"
          },
          "NAME": {
             "LABEL": "Name"
@@ -1960,6 +1968,27 @@
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "Einen Wert mit Enter bestätigen um weitere Werte einzufügen"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Die Statistik kann aktuell nicht angezeigt werden. Bitte versuchen Sie es später nochmals.",
+      "UNSUPPORTED_TYPE": "Diese Statistik-Daten können nicht dargestellt werden.",
+      "FROM": "Von",
+      "TO": "Bis",
+      "TOTAL": "Summe",
+      "GRANULARITY": "Granularität",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Zufallsdaten",
+         "VIEWS_SUM": "Zugriffe",
+         "VIEWS_AVG": "Durchschnittliche Anzahl Zugriffe"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "Diese Zufallsdaten dienen ausschließlich Test- und Demonstrationszwecken. Um diese Darstellung zu deaktivieren, können Sie die entsprechende Konfiguration in etc/providers entfernen",
+         "VIEWS_SUM": "Diese Statistik zeigt die Summe der Zugriffe pro Zeiteinheit.",
+         "VIEWS_AVG": "Diese Statistik zeigt die durchschnittliche Anzahl Zugriffe pro Zeiteinheit."
       }
    }
 }

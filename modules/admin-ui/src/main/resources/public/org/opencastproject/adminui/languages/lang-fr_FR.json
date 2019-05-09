@@ -307,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Configuration"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistiques"
       }
    },
    "EVENTS": {
@@ -515,7 +518,8 @@
                "SCHEDULING": "Planification",
                "WORKFLOWS": "Flux de travail",
                "ACCESS": "Droits d'accès",
-               "COMMENTS": "Commentaires"
+               "COMMENTS": "Commentaires",
+               "STATISTICS": "Statistiques"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publications",
@@ -757,6 +761,9 @@
                   "PROCESSING_FAILURE": "Erreur de traitement"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Statistiques"
+            },
             "METADATA": {
                "CAPTION": "Détails de l'événement",
                "TITLE": "Titre",
@@ -980,7 +987,8 @@
                "EXTENDED_METADATA": "Métadonnées II",
                "EVENTS": "Événements",
                "PERMISSIONS": "Droits d'accès",
-               "THEME": "Thème"
+               "THEME": "Thème",
+               "STATISTICS": "Statistiques"
             },
             "ACCESS": {
                "CAPTION": "Droits d'accès",
@@ -1433,7 +1441,7 @@
             "CREATED": "Créé le",
             "CREATOR": "Auteur",
             "HOST_NAME": "Nom d'hôte",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Nom du nœud",
             "OPERATION": "Opération",
             "STARTED": "Démarré",
             "STATUS": "Statut",
@@ -1459,7 +1467,7 @@
             "CAPTION": "Serveurs",
             "STATUS": "Statut",
             "HOST_NAME": "Nom d'hôte",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Nom du nœud",
             "CORES": "Coeurs",
             "COMPLETED": "Tâches achevées",
             "RUNNING": "Tâches en cours",
@@ -1477,7 +1485,7 @@
             "STATUS": "Statut",
             "NAME": "Nom du service",
             "HOST_NAME": "Nom d'hôte",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Nom du nœud",
             "COMPLETED": "Tâches achevées",
             "RUNNING": "Tâches en cours",
             "QUEUED": "Tâches en attente",
@@ -1753,7 +1761,7 @@
             "LABEL": "Nom d'hôte"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Nom du nœud"
          },
          "STATUS": {
             "LABEL": "Statut",
@@ -1797,7 +1805,7 @@
             "LABEL": "Nom d'hôte"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Nom du nœud"
          },
          "STATUS": {
             "LABEL": "Statut",
@@ -1814,7 +1822,7 @@
             "LABEL": "Nom d'hôte"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Nom du nœud"
          },
          "NAME": {
             "LABEL": "Nom"
@@ -1960,6 +1968,27 @@
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "Pour insérer plusieurs valeurs appuyez sur Entrée après chaque valeur"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Les statistiques ne peuvent pas être affichées pour le moment. Veuillez réessayer plus tard.",
+      "UNSUPPORTED_TYPE": "Désolé, Opencast ne peut pas afficher ce type de données statistiques.",
+      "FROM": "Début",
+      "TO": "A",
+      "TOTAL": "Total",
+      "GRANULARITY": "Granularité",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Données aléatoires",
+         "VIEWS_SUM": "Nombre total de vues",
+         "VIEWS_AVG": "Nombre moyen de vues"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "Ceci affiche des données aléatoires comme exemple. Vous pouvez désactiver ce graphique en supprimant le fichier json du fournisseur de statistiques correspondant dans etc/providers",
+         "VIEWS_SUM": "Ceci affiche le nombre total de vues en fonction du temps.",
+         "VIEWS_AVG": "Ceci affiche la moyenne de vues quotidiennes en fonction du temps."
       }
    }
 }

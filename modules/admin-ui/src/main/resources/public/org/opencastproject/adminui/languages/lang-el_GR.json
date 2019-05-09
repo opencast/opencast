@@ -10,8 +10,8 @@
    "SAVE": "Αποθήκευση",
    "LOGOUT": "Αποσύνδεση",
    "RESET": "Επαναφορά",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "Δεν επιλέχθηκε κάποια επιλογή",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Δεν υπάρχουν διαθέσιμες επιλογές",
    "YES": "Ναί",
    "LANGUAGES": {
       "ARABIC": "Αραβικά",
@@ -245,9 +245,9 @@
          },
          "EDIT": {
             "CAPTION": "Επεξεργασία",
-            "EVENT": "event",
-            "EVENTS": "events",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "EVENT": "εκδήλωση",
+            "EVENTS": "εκδηλώσεις",
+            "HEADER": "Αυτή η σελίδα σας επιτρέπει να επεξεργαστείτε κάποιες προγραμματισμένες εκδηλώσεις ομαδοποιημένες κατά τις εργάσιμες ημέρες. Τα πεδία εισαγωγής είναι προ-συμπληρωμένα σε περίπτωση που όλες οι προγραμματισμένες εκδηλώσεις έχουν την ίδια τιμε σε ένα συγκεκριμένο πεδίο. Σε διαφορετική περίπτωση, όλα τα πεδιά εισαγωγής θα παραμείνουν κενά. Αφήνοντας τα πεδία εισαγωγής λευκά σημαίνει ότι οι αντίστοιχες τιμές δεν πρέπει να αλλάξουν.",
             "METADATA": "Μεταδεδομένα",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -271,7 +271,7 @@
       "BACK": "Προηγούμενη",
       "CREATE": "Δημιουργία",
       "RETRACT": "Ανάκληση",
-      "RETRACT_DELETE": "Retract/Delete",
+      "RETRACT_DELETE": "Ανάκληση/Διαγραφή",
       "DELETE": "Διαγραφή",
       "UPDATE": "Ενημέρωση",
       "DURATION": {
@@ -307,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Ρύθμιση παραμέτρων"
+      },
+      "STATISTICS": {
+         "TITLE": "Στατιστικά"
       }
    },
    "EVENTS": {
@@ -395,7 +398,7 @@
                   "REPEATS": "Επαναλήψεις",
                   "REPEAT_ON": "Επανάληψη τη",
                   "WEEKDAYS": "Ημέρες εβδομάδας",
-                  "WEEKDAY": "Weekday"
+                  "WEEKDAY": "Ημέρες εβδομάδας"
                },
                "NO_SOURCE_AVAILABLE": "Κανένας ατζέντης βιντεοσκόπησης δεν είναι διαθέσιμος για προγραμματισμό"
             },
@@ -489,7 +492,7 @@
                "EDITOR_NEEDS_CUTTING": "Άνοιγμα επεξεργασίας βίντεο (ένα σχόλιο δείχνει ότι έχει ζητηθεί η επεξεργασία του βίντεο)",
                "COMMENTS": "Δείτε σχόλια",
                "PAUSED_WORKFLOW": "Δείτε σταματημένη εκδήλωση",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "Φίλτρο για αυτόν τον παρουσιαστή"
             }
          },
          "STATUS": {
@@ -515,7 +518,8 @@
                "SCHEDULING": "Προγραμματισμός",
                "WORKFLOWS": "Ροές εργασίας",
                "ACCESS": "Πολιτική πρόσβασης",
-               "COMMENTS": "Σχόλια"
+               "COMMENTS": "Σχόλια",
+               "STATISTICS": "Στατιστικά"
             },
             "PUBLICATIONS": {
                "CAPTION": "Δημοσιεύσεις",
@@ -757,6 +761,9 @@
                   "PROCESSING_FAILURE": "Αποτυχία επεξεργασίας"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Στατιστικά"
+            },
             "METADATA": {
                "CAPTION": "Λεπτομέριες εκδήλωσης",
                "TITLE": "Τίτλος",
@@ -796,7 +803,7 @@
                "ACTIONS": "Ενέργειες",
                "DETAILS": "Λεπτομέρειες",
                "DESCRIPTION": "Περιγραφή",
-               "MORE_INFO": "More Information",
+               "MORE_INFO": "Περισσότερες πληροφορίες",
                "ID": "Αναγνωριστικό",
                "TYPE": "Τύπος",
                "TITLE": "Τίτλος",
@@ -804,8 +811,8 @@
                "STARTED": "Ξεκίνησε",
                "SERIES": "Σειρές",
                "SUBMITTED": "Υποβλήθηκε",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
+               "SUBMITTER": "Υποβάλλων",
+               "EXECUTION_TIME": "Χρόνος Εκτέλεσης",
                "WDID": "Ορισμός ροής εργασίας",
                "MIMETYPE": "MimeType",
                "URL": "Διεύθυνση URL",
@@ -813,11 +820,11 @@
                "NO_CONFIGURATION": "Δεν υπάρχουν παράμετροι ρύθμισης για την επιλεγμένη ροή εργασίας.",
                "WORKFLOW": "Ροή εργασίας",
                "TOOLTIP": {
-                  "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
-                  "DETAILS": "Open workflow details"
+                  "STOP": "Παύση ροής εργασίας",
+                  "ABORT": "Ματαίωση της εκτέλεσης της εν ενεργεία ροής εργασίας (να μην επαναληφθεί η αποτυχημένη λειτουργία ξανά)",
+                  "RETRY": "Επανάληψη εκτέλεσης της εν ενεργεία ροής εργασίας",
+                  "DELETE": "Διαγραφή ροής εργασίας",
+                  "DETAILS": "Άνοιγμα λεπτομερειών ροής εργασίας"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Αρχικοποιήθηκε",
@@ -825,9 +832,9 @@
                   "PAUSED": "Σε παύση",
                   "SUCCEEDED": "Ολοκληρώθηκε με επιτυχία",
                   "FAILED": "Απέτυχε",
-                  "FAILING": "Failing",
+                  "FAILING": "Αποτυγχάνει",
                   "SKIPPED": "Παραλείφθηκε",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "Διακόπηκε",
                   "RETRY": "Επανάληψη"
                }
             },
@@ -980,7 +987,8 @@
                "EXTENDED_METADATA": "Μεταδεδομένα ΙΙ",
                "EVENTS": "Εκδηλώσεις",
                "PERMISSIONS": "Πολιτική πρόσβασης",
-               "THEME": "Θέμα"
+               "THEME": "Θέμα",
+               "STATISTICS": "Στατιστικά"
             },
             "ACCESS": {
                "CAPTION": "Πολιτική πρόσβασης",
@@ -1000,8 +1008,8 @@
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
                   "DETAILS": "Λεπτομέρειες",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
+                  "REPLACE_EVENT_ACLS": "Ενημέρωση δικαιωμάτων εκδήλωσης",
+                  "REPLACE_EVENT_ACLS_HINT": "Επιβεβαίωση ότι όλες οι εκδηλώσεις σε αυτή την σειρά έχουν τα ίδια δικαιώματα σε ισχύ"
                },
                "ROLES": {
                   "LABEL": "Επιλέξτε ένα ρόλο",
@@ -1433,7 +1441,7 @@
             "CREATED": "Δημιουργήθηκε",
             "CREATOR": "Δημιουργός",
             "HOST_NAME": "Όνομα κεντρικού υπολογιστή",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Όνομα κόμβου",
             "OPERATION": "Λειτουργία",
             "STARTED": "Ξεκίνησε",
             "STATUS": "Κατάσταση",
@@ -1459,7 +1467,7 @@
             "CAPTION": "Διακομιστές",
             "STATUS": "Κατάσταση",
             "HOST_NAME": "Όνομα κεντρικού υπολογιστή",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Όνομα κόμβου",
             "CORES": "Πυρήνες",
             "COMPLETED": "Ολοκληρωμένες εργασίες",
             "RUNNING": "Εργασίες σε εκτέλεση",
@@ -1477,7 +1485,7 @@
             "STATUS": "Κατάσταση",
             "NAME": "Όνομα υπηρεσίας",
             "HOST_NAME": "Όνομα κεντρικού υπολογιστή",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Όνομα κόμβου",
             "COMPLETED": "Ολοκληρωμένες εργασίες",
             "RUNNING": "Εργασίες σε εκτέλεση",
             "QUEUED": "Εργασίες στην ουρά",
@@ -1753,7 +1761,7 @@
             "LABEL": "Όνομα κεντρικού υπολογιστή"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Όνομα κόμβου"
          },
          "STATUS": {
             "LABEL": "Κατάσταση",
@@ -1797,7 +1805,7 @@
             "LABEL": "Όνομα κεντρικού υπολογιστή"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Όνομα κόμβου"
          },
          "STATUS": {
             "LABEL": "Κατάσταση",
@@ -1814,7 +1822,7 @@
             "LABEL": "Όνομα κεντρικού υπολογιστή"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Όνομα κόμβου"
          },
          "NAME": {
             "LABEL": "Όνομα"
@@ -1959,7 +1967,28 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "Για εισαγωγή πολλαπλώ ν τιμών πατήστε Enter μεταξύ τους"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Δεν είναι δυνατή η εμφάνιση των στατιστικών αυτή τη στιγμή. Παρακαλώ δοκιμάστε αργότερα.",
+      "UNSUPPORTED_TYPE": "Λυπούμαστε, το Opencast δεν μπορεί να προβάλει αυτόν τον τύπο στατιστικών δεδομένων.",
+      "FROM": "Απο",
+      "TO": "Προς",
+      "TOTAL": "Σύνολο",
+      "GRANULARITY": "Διακριτότητα",
+      "NAVIGATION": {
+         "ORGANIZATION": "Οργανισμός"
+      },
+      "TITLE": {
+         "RANDOM": "Τυχαία δεδομένα",
+         "VIEWS_SUM": "Συνολικός αριθμός προβολών",
+         "VIEWS_AVG": "Μέσος αριθμός προβολών"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "Αυτό εμφανίζει τυχαία δεδομένα ως επίδειξη. Μπορείτε να απενεργοποιήσετε αυτό το γράφημα διαγράφοντας τον ορισμό json του αντίστοιχου παροχέα στατιστικών στοιχείων από τον κατάλογο etc/providers",
+         "VIEWS_SUM": "Αυτό εμφανίζει τον συνολικό αριθμό προβολών ανά μονάδα χρόνου.",
+         "VIEWS_AVG": "Αυτό εμφανίζει τον μέσος αριθμός ημερήσιων προβολών ανά μονάδα χρόνου."
       }
    }
 }

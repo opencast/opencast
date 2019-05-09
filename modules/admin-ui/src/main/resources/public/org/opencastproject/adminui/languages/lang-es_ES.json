@@ -307,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Configuración"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistics"
       }
    },
    "EVENTS": {
@@ -515,7 +518,8 @@
                "SCHEDULING": "Programación",
                "WORKFLOWS": "Flujos de Trabajo",
                "ACCESS": "Política de acceso",
-               "COMMENTS": "Comentarios"
+               "COMMENTS": "Comentarios",
+               "STATISTICS": "Statistics"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publicaciones",
@@ -757,6 +761,9 @@
                   "PROCESSING_FAILURE": "Fallo en el procesamiento"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Statistics"
+            },
             "METADATA": {
                "CAPTION": "Detalles del evento",
                "TITLE": "Título",
@@ -980,7 +987,8 @@
                "EXTENDED_METADATA": "Metadatos II",
                "EVENTS": "Eventos",
                "PERMISSIONS": "Política de acceso",
-               "THEME": "Estilo"
+               "THEME": "Estilo",
+               "STATISTICS": "Statistics"
             },
             "ACCESS": {
                "CAPTION": "Política de acceso",
@@ -1433,7 +1441,7 @@
             "CREATED": "Fecha de creación",
             "CREATOR": "Creador",
             "HOST_NAME": "Nombre del equipo",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Nombre del nodo",
             "OPERATION": "Operación",
             "STARTED": "Iniciado",
             "STATUS": "Estado",
@@ -1459,7 +1467,7 @@
             "CAPTION": "Servidores",
             "STATUS": "Estado",
             "HOST_NAME": "Nombre del equipo",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Nombre del nodo",
             "CORES": "Núcleos",
             "COMPLETED": "Trabajos completados",
             "RUNNING": "Trabajos en ejecución",
@@ -1477,7 +1485,7 @@
             "STATUS": "Estado",
             "NAME": "Nombre del servicio",
             "HOST_NAME": "Nombre del equipo",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Nombre del nodo",
             "COMPLETED": "Trabajos completados",
             "RUNNING": "Trabajos en ejecución",
             "QUEUED": "Trabajos en cola",
@@ -1753,7 +1761,7 @@
             "LABEL": "Nombre del equipo"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Nombre del nodo"
          },
          "STATUS": {
             "LABEL": "Estado",
@@ -1797,7 +1805,7 @@
             "LABEL": "Nombre del equipo"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Nombre del nodo"
          },
          "STATUS": {
             "LABEL": "Estado",
@@ -1814,7 +1822,7 @@
             "LABEL": "Nombre del equipo"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Nombre del nodo"
          },
          "NAME": {
             "LABEL": "Nombre"
@@ -1960,6 +1968,27 @@
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "Para insertar varios valores, pulse Enter"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "FROM": "Desde",
+      "TO": "To",
+      "TOTAL": "Total",
+      "GRANULARITY": "Granularity",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Random Data",
+         "VIEWS_SUM": "Total Number of Views",
+         "VIEWS_AVG": "Average Number of Views"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time uinit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time uinit."
       }
    }
 }
