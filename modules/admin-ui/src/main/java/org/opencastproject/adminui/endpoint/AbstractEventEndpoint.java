@@ -390,22 +390,35 @@ public abstract class AbstractEventEndpoint {
   public Response deleteEvent(@PathParam("eventId") String id) throws UnauthorizedException, SearchIndexException {
     final Opt<Event> event = checkAgentAccessForEvent(id);
     if (event.isNone()) {
-      return Response.serverError().build();
+      return RestUtil.R.notFound(id);
     }
-    final IndexService.EventRemovalResult result = getIndexService().removeEvent(event.get(), () -> {
+    final Runnable doOnNotFound = () -> {
       try {
         getIndex().delete(Event.DOCUMENT_TYPE,id.concat(getSecurityService().getOrganization().getId()));
-      } catch (SearchIndexException e1) {
-        logger.error("error removing event {}: {}",id,e1);
+      } catch (SearchIndexException e) {
+        logger.error("error removing event {}: {}", id, e);
       }
-    }, getAdminUIConfiguration().getRetractWorkflowId());
+    };
+    final IndexService.EventRemovalResult result;
+    try {
+      result = getIndexService().removeEvent(event.get(), doOnNotFound, getAdminUIConfiguration().getRetractWorkflowId());
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Workflow database is not reachable. This may be a temporary problem.");
+      return RestUtil.R.serverError();
+    } catch (NotFoundException e) {
+      logger.error("Configured retract workflow not found. Check your configuration.");
+      return RestUtil.R.serverError();
+    }
     switch (result) {
       case SUCCESS:
         return Response.ok().build();
       case RETRACTING:
         return Response.accepted().build();
-      case FAILED:
+      case GENERAL_FAILURE:
         return Response.serverError().build();
+      case NOT_FOUND:
+        doOnNotFound.run();
+        return RestUtil.R.notFound(id);
       default:
         throw new RuntimeException("Unknown EventRemovalResult type: " + result.name());
     }
@@ -438,34 +451,48 @@ public abstract class AbstractEventEndpoint {
     BulkOperationResult result = new BulkOperationResult();
 
     for (Object eventIdObject : eventIdsJsonArray) {
-      String eventId = eventIdObject.toString();
+      final String eventId = eventIdObject.toString();
+      final Runnable doOnNotFound = () -> {
+        try {
+          getIndex().delete(Event.DOCUMENT_TYPE,eventId.concat(getSecurityService().getOrganization().getId()));
+        } catch (SearchIndexException e) {
+          logger.error("error removing event {}: {}", eventId, e);
+        }
+      };
       try {
         final Opt<Event> event = checkAgentAccessForEvent(eventId);
-        IndexService.EventRemovalResult currentResult;
         if (event.isSome()) {
-          currentResult = getIndexService().removeEvent(
-            event.get(),
-            () -> { result.addNotFound(eventId); },
+          final IndexService.EventRemovalResult  currentResult = getIndexService().removeEvent(event.get(), doOnNotFound,
             getAdminUIConfiguration().getRetractWorkflowId()
           );
+          switch (currentResult) {
+            case SUCCESS:
+              result.addOk(eventId);
+              break;
+            case RETRACTING:
+              result.addAccepted(eventId);
+              break;
+            case GENERAL_FAILURE:
+              result.addServerError(eventId);
+              break;
+            case NOT_FOUND:
+              doOnNotFound.run();
+              result.addNotFound(eventId);
+              break;
+            default:
+              throw new RuntimeException("Unknown EventRemovalResult type: " + currentResult.name());
+          }
         } else {
-          currentResult = IndexService.EventRemovalResult.FAILED;
-        }
-        switch (currentResult) {
-          case SUCCESS:
-            result.addOk(eventId);
-            break;
-          case RETRACTING:
-            result.addAccepted(eventId);
-            break;
-          case FAILED:
-            result.addServerError(eventId);
-            break;
-          default:
-            throw new RuntimeException("Unknown EventRemovalResult type: " + currentResult.name());
+          result.addNotFound(eventId);
         }
       } catch (UnauthorizedException e) {
         result.addUnauthorized(eventId);
+      } catch (WorkflowDatabaseException e) {
+        logger.error("Workflow database is not reachable. This may be a temporary problem.");
+        return RestUtil.R.serverError();
+      } catch (NotFoundException e) {
+        logger.error("Configured retract workflow not found. Check your configuration.");
+        return RestUtil.R.serverError();
       }
     }
     return Response.ok(result.toJson()).build();

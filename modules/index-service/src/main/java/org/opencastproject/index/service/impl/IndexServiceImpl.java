@@ -1537,7 +1537,8 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public EventRemovalResult removeEvent(Event event, Runnable doOnNotFound, String retractWorkflowId) throws UnauthorizedException {
+  public EventRemovalResult removeEvent(Event event, Runnable doOnNotFound, String retractWorkflowId)
+      throws UnauthorizedException, WorkflowDatabaseException, NotFoundException {
     final boolean hasOnlyEngageLive = event.getPublications().size() == 1
         && EventUtils.ENGAGE_LIVE_CHANNEL_ID.equals(event.getPublications().get(0).getChannel());
     final boolean retract = event.hasPreview()
@@ -1548,31 +1549,21 @@ public class IndexServiceImpl implements IndexService {
     } else {
       try {
         final boolean success = removeEvent(event.getIdentifier());
-        return success ? EventRemovalResult.SUCCESS : EventRemovalResult.FAILED;
+        return success ? EventRemovalResult.SUCCESS : EventRemovalResult.GENERAL_FAILURE;
       } catch (NotFoundException e) {
-        doOnNotFound.run();
-        return EventRemovalResult.FAILED;
+        return EventRemovalResult.NOT_FOUND;
       }
     }
   }
 
-  private void retractAndRemoveEvent(String id, Runnable doOnNotFound, String retractWorkflowId) {
-    final WorkflowDefinition wfd;
-    try {
-      wfd = workflowService.getWorkflowDefinitionById(retractWorkflowId);
-    } catch (NotFoundException e) {
-      logger.error("Could not find workflow with id {} to retract the event. Check your configuration.", retractWorkflowId);
-      return;
-    } catch (WorkflowDatabaseException e) {
-      logger.error("Could not access workflow database. This may be a temporary problem.", e);
-      return;
-    }
+  private void retractAndRemoveEvent(String id, Runnable doOnNotFound, String retractWorkflowId)
+      throws WorkflowDatabaseException, NotFoundException {
+    final WorkflowDefinition wfd = workflowService.getWorkflowDefinitionById(retractWorkflowId);
     final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
     final ConfiguredWorkflow workflow = workflow(wfd);
     final List<WorkflowInstance> result = workflows.applyWorkflowToLatestVersion(Collections.singleton(id), workflow).toList();
     if (result.size() != 1) {
-        logger.warn("Couldn't start workflow to retract media package {}", id);
-        return;
+        throw new IllegalStateException("Couldn't start workflow to retract media package" + id);
     }
     this.retractions.put(
         result.get(0).getId(),

@@ -44,6 +44,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.userdirectory.ConflictException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
@@ -68,7 +69,7 @@ public interface IndexService {
   }
 
   enum EventRemovalResult {
-    SUCCESS, FAILED, RETRACTING
+    SUCCESS, GENERAL_FAILURE, NOT_FOUND, RETRACTING
   }
 
   SearchResult<Group> getGroups(String filter, Opt<Integer> limit, Opt<Integer> offset, Opt<String> sort,
@@ -231,8 +232,13 @@ public interface IndexService {
    * @return A result which tells if the event was removed, removal failed, or the event is being retracted and will be removed later.
    * @throws UnauthorizedException
    *           Thrown if the action is unauthorized
+   * @throws WorkflowDatabaseException
+   *           Thrown if the workflow database is not reachable. This may be a temporary problem.
+   * @throws NotFoundException
+   *           If the configured retract workflow cannot be found. This is most likely a configuration issue.
    */
-  EventRemovalResult removeEvent(Event event, Runnable doOnNotFound, String retractWorkflowId) throws UnauthorizedException;
+  EventRemovalResult removeEvent(Event event, Runnable doOnNotFound, String retractWorkflowId)
+      throws UnauthorizedException, WorkflowDatabaseException, NotFoundException;
 
   /**
    * Removes an event.
