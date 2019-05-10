@@ -169,16 +169,16 @@ angular.module('adminNg.controllers')
     $scope.player = {};
     $scope.video  = ToolsResource.get({ id: $scope.id, tool: 'editor' });
 
-    $scope.activeRequest = false;
+    $scope.activeSubmission = false;
 
     $scope.submit = function () {
-      $scope.activeRequest = true;
+      $scope.activeSubmission = true;
       $scope.video.thumbnail.loading = $scope.video.thumbnail && $scope.video.thumbnail.type &&
               ($scope.video.thumbnail.type === 'DEFAULT');
       // Remember $scope.video.workflow as $scope.video.$save will potentially overwrite this value
       var closeVideoEditor = $scope.video.workflow;
       $scope.video.$save({ id: $scope.id, tool: $scope.tab }, function (response) {
-        $scope.activeRequest = false;
+        $scope.activeSubmission = false;
         if (closeVideoEditor) {
           Notifications.add('success', 'VIDEO_CUT_PROCESSING');
           $location.url('/events/' + $scope.resource);
@@ -199,7 +199,7 @@ angular.module('adminNg.controllers')
           trackErrorMessageId = null;
         }
       }, function () {
-        $scope.activeRequest = false;
+        $scope.activeSubmission = false;
         $scope.video.thumbnail.loading = false;
         trackErrorMessageId = Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', LOCAL_CONTEXT);
       });

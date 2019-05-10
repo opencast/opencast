@@ -127,7 +127,7 @@
                            translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_VIDEO.LABEL"
                            title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_VIDEO.TOOLTIP' |translate  }}"
                            ng-click="changeThumbnail(undefined, 'single', player.adapter.getCurrentTime())"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
+                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                           <!-- Extract -->
                         </a>
                         <a class="extract-thumbnail"
@@ -135,7 +135,7 @@
                            translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_LEFT_VIDEO.LABEL"
                            title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_LEFT_VIDEO.TOOLTIP' |translate  }}"
                            ng-click="changeThumbnail(undefined, 'left', player.adapter.getCurrentTime())"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
+                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                           <!-- Extract -->
                         </a>
                         <a class="extract-thumbnail"
@@ -143,7 +143,7 @@
                            translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_RIGHT_VIDEO.LABEL"
                            title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_RIGHT_VIDEO.TOOLTIP' | translate }}"
                            ng-click="changeThumbnail(undefined, 'right', player.adapter.getCurrentTime())"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
+                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                           <!-- Extract from video -->
                         </a>
                         <form>
@@ -151,7 +151,7 @@
                              translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.UPLOAD.LABEL"
                              title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.UPLOAD.TOOLTIP' | translate }}"
                              onclick="angular.element('#thumbnail-upload').click()"
-                             ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
+                             ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                             <!-- Upload image -->
                           </a>
                           <input
@@ -167,7 +167,7 @@
                            title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.USE_DEFAULT.TOOLTIP' | translate }}"
                            ng-click="changeThumbnail(undefined, 'DEFAULT', calculateDefaultThumbnailPosition())"
                            ng-if="video.thumbnail.url && video.thumbnail.type !== 'DEFAULT'"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
+                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                           <!-- Use default thumbnail -->
                         </a>
                       </div>
@@ -387,13 +387,13 @@
             <div class="video-save-panel" ng-if="tab === 'editor' && player.adapter">
               <div class="buttons">
                 <select chosen pre-select-from="video.workflows" class="workflow"
-                                                                 ng-disabled="!video.workflows || video.workflows.length === 0"
+                                                                 ng-disabled="!video.workflows || video.workflows.length === 0 || activeTransaction || activeSubmission"
                                                                  data-width="'175px'"
                                                                  ng-model="video.workflow"
                                                                  ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" />
 
                   <a ng-click="submit()"
-                     ng-class="{disabled: activeTransaction || sanityCheckFlags() || activeRequest}"
+                     ng-class="{disabled: activeTransaction || activeSubmission || sanityCheckFlags()}"
                      class="save-and-close-button"
                      translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
                     <!-- Save and Continue -->
