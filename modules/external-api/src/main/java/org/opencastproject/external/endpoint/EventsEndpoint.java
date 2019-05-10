@@ -1373,8 +1373,16 @@ public class EventsEndpoint implements ManagedService {
 
   @GET
   @Path("{eventId}/publications")
-  @RestQuery(name = "geteventpublications", description = "Returns an event's list of publications.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
+  @RestQuery(name = "geteventpublications", description = "Returns an event's list of publications.",
+             returnDescription = "",
+             pathParameters = {
+               @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING)
+             },
+             restParameters = {
+               @RestParameter(name = "sign", description = "Whether public distribution urls should be signed.",
+                              isRequired = false, type = Type.BOOLEAN)
+             },
+             reponses = {
                   @RestResponse(description = "The list of publications is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventPublications(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
@@ -1494,9 +1502,16 @@ public class EventsEndpoint implements ManagedService {
 
   @GET
   @Path("{eventId}/publications/{publicationId}")
-  @RestQuery(name = "geteventpublication", description = "Returns a single publication.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING),
-          @RestParameter(name = "publicationId", description = "The publication id", isRequired = true, type = STRING) }, reponses = {
+  @RestQuery(name = "geteventpublication", description = "Returns a single publication.", returnDescription = "",
+             pathParameters = {
+               @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING),
+               @RestParameter(name = "publicationId", description = "The publication id", isRequired = true, type = STRING)
+             },
+             restParameters = {
+               @RestParameter(name = "sign", description = "Whether public distribution urls should be signed.",
+                              isRequired = false, type = Type.BOOLEAN)
+             },
+             reponses = {
                   @RestResponse(description = "The track details are returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified event or publication does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventPublication(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String eventId,
