@@ -240,6 +240,7 @@
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               net.fortuna.ical4j.*,
+              com.google.common.net,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
               *
