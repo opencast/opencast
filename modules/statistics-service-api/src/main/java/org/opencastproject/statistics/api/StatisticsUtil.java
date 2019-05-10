@@ -46,32 +46,32 @@ public final class StatisticsUtil {
         case MONTHLY:
           final Instant currentMonthStart = YearMonth.of(localStart.getYear(), localStart.getMonth())
                   .atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC);
-          result.add(Ordering.natural().min(to, Ordering.natural().max(from, currentMonthStart)));
+          result.add(Ordering.natural().max(from, currentMonthStart));
           localStart = localStart.plusMonths(1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
           break;
         case YEARLY:
           final Instant currentYearStart = YearMonth.of(localStart.getYear(), 1)
                   .atDay(1).atStartOfDay().toInstant(ZoneOffset.UTC);
-          result.add(Ordering.natural().min(to, Ordering.natural().max(from, currentYearStart)));
+          result.add(Ordering.natural().max(from, currentYearStart));
           localStart = localStart.plusYears(1).withMonth(1).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
           break;
         case DAILY:
           final Instant currentDayStart = localStart.withHour(0).withMinute(0).withSecond(0).withNano(0)
                   .toInstant(ZoneOffset.UTC);
-          result.add(Ordering.natural().min(to, Ordering.natural().max(from, currentDayStart)));
+          result.add(Ordering.natural().max(from, currentDayStart));
           localStart = localStart.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
           break;
         case WEEKLY:
           final int daysOff = 1 - localStart.getDayOfWeek().getValue();
           final Instant currentWeekStart = localStart.plusDays(daysOff).withHour(0).withMinute(0).withSecond(0)
                   .withNano(0).toInstant(ZoneOffset.UTC);
-          result.add(currentWeekStart); // No min, max here, because influx uses previous monday as bucket label
+          result.add(currentWeekStart); // No max here, because influx uses previous monday as bucket label
           localStart = localStart.plusDays(7).plusDays(daysOff).withHour(0).withMinute(0).withSecond(0).withNano(0);
           break;
         case HOURLY:
           final Instant currentHourStart = ZonedDateTime.of(localStart.withMinute(0).withSecond(0).withNano(0), zoneId)
               .toInstant();
-          result.add(Ordering.natural().min(to, Ordering.natural().max(from, currentHourStart)));
+          result.add(Ordering.natural().max(from, currentHourStart));
           localStart = localStart.plusHours(1).withMinute(0).withSecond(0).withNano(0);
           break;
         default:

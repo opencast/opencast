@@ -86,19 +86,19 @@ public class StatisticsUtilTest {
   private void testGetBucketsHourly(Instant from, Instant to) {
     logger.info("from {} to {} {}", from, to, DataResolution.HOURLY.name());
     final List<Instant> buckets = StatisticsUtil.getBuckets(from, to, DataResolution.HOURLY, ZoneId.of("Z"));
-    assertEquals(from, buckets.get(0));
+    assertEquals("from: " + from + " to: " + to, from, buckets.get(0));
     if (buckets.size() == 1) {
       return;
     }
     for (int bucket = 1; bucket < buckets.size() - 1; bucket++) {
-      assertTrue(buckets.get(bucket).isAfter(from));
-      assertTrue(buckets.get(bucket).isBefore(to));
+      assertTrue("from: " + from + " to: " + to, buckets.get(bucket).isAfter(from));
+      assertTrue("from: " + from + " to: " + to, buckets.get(bucket).isBefore(to));
       final LocalDateTime ldt = LocalDateTime.ofInstant(buckets.get(bucket), ZoneOffset.UTC);
-      assertEquals(0, ldt.getMinute());
-      assertEquals(0, ldt.getSecond());
-      assertEquals(0, ldt.getNano());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getMinute());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getSecond());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getNano());
     }
-    assertEquals(
+    assertEquals("from: " + from + " to: " + to,
         LocalDateTime.ofInstant(
             to,
             ZoneOffset.UTC)
@@ -131,20 +131,20 @@ public class StatisticsUtilTest {
   private void testGetBucketsDaily(Instant from, Instant to) {
     logger.info("from {} to {} {}", from, to, DataResolution.DAILY.name());
     final List<Instant> buckets = StatisticsUtil.getBuckets(from, to, DataResolution.DAILY, ZoneId.of("Z"));
-    assertEquals(from, buckets.get(0));
+    assertEquals("from: " + from + " to: " + to, from, buckets.get(0));
     if (buckets.size() == 1) {
       return;
     }
     for (int bucket = 1; bucket < buckets.size() - 1; bucket++) {
-      assertTrue(buckets.get(bucket).isAfter(from));
-      assertTrue(buckets.get(bucket).isBefore(to));
+      assertTrue("from: " + from + " to: " + to, buckets.get(bucket).isAfter(from));
+      assertTrue("from: " + from + " to: " + to, buckets.get(bucket).isBefore(to));
       final LocalDateTime ldt = LocalDateTime.ofInstant(buckets.get(bucket), ZoneOffset.UTC);
-      assertEquals(0, ldt.getHour());
-      assertEquals(0, ldt.getMinute());
-      assertEquals(0, ldt.getSecond());
-      assertEquals(0, ldt.getNano());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getHour());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getMinute());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getSecond());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getNano());
     }
-    assertEquals(
+    assertEquals("from: " + from + " to: " + to,
         LocalDateTime.ofInstant(
             to,
             ZoneOffset.UTC)
@@ -180,7 +180,7 @@ public class StatisticsUtilTest {
     final int fromOffMonday = 1 - LocalDateTime.ofInstant(from, ZoneOffset.UTC).getDayOfWeek().getValue();
     final int toOffMonday = 1 - LocalDateTime.ofInstant(to, ZoneOffset.UTC).getDayOfWeek().getValue();
     final List<Instant> buckets = StatisticsUtil.getBuckets(from, to, DataResolution.WEEKLY, ZoneId.of("Z"));
-    assertEquals(LocalDateTime.ofInstant(
+    assertEquals("from: " + from + " to: " + to, LocalDateTime.ofInstant(
         from,
         ZoneOffset.UTC)
             .plusDays(fromOffMonday)
@@ -194,16 +194,16 @@ public class StatisticsUtilTest {
       return;
     }
     for (int bucket = 1; bucket < buckets.size() - 1; bucket++) {
-      assertTrue(buckets.get(bucket).isAfter(from));
-      assertTrue(buckets.get(bucket).isBefore(to));
+      assertTrue("from: " + from + " to: " + to, buckets.get(bucket).isAfter(from));
+      assertTrue("from: " + from + " to: " + to, buckets.get(bucket).isBefore(to));
       final LocalDateTime ldt = LocalDateTime.ofInstant(buckets.get(bucket), ZoneOffset.UTC);
-      assertEquals(DayOfWeek.MONDAY, ldt.getDayOfWeek());
-      assertEquals(0, ldt.getHour());
-      assertEquals(0, ldt.getMinute());
-      assertEquals(0, ldt.getSecond());
-      assertEquals(0, ldt.getNano());
+      assertEquals("from: " + from + " to: " + to, DayOfWeek.MONDAY, ldt.getDayOfWeek());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getHour());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getMinute());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getSecond());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getNano());
     }
-    assertEquals(
+    assertEquals("from: " + from + " to: " + to,
         LocalDateTime.ofInstant(
             to,
             ZoneOffset.UTC)
@@ -238,21 +238,21 @@ public class StatisticsUtilTest {
   private void testGetBucketsMonthly(Instant from, Instant to) {
     logger.info("from {} to {} {}", from, to, DataResolution.MONTHLY.name());
     final List<Instant> buckets = StatisticsUtil.getBuckets(from, to, DataResolution.MONTHLY, ZoneId.of("Z"));
-    assertEquals(from, buckets.get(0));
+    assertEquals("from: " + from + " to: " + to, from, buckets.get(0));
     if (buckets.size() == 1) {
       return;
     }
     for (int bucket = 1; bucket < buckets.size() - 1; bucket++) {
-      assertTrue(buckets.get(bucket).isAfter(from));
-      assertTrue(buckets.get(bucket).isBefore(to));
+      assertTrue("from: " + from + " to: " + to, buckets.get(bucket).isAfter(from));
+      assertTrue("from: " + from + " to: " + to, buckets.get(bucket).isBefore(to));
       final LocalDateTime ldt = LocalDateTime.ofInstant(buckets.get(bucket), ZoneOffset.UTC);
-      assertEquals(1, ldt.getDayOfMonth());
-      assertEquals(0, ldt.getHour());
-      assertEquals(0, ldt.getMinute());
-      assertEquals(0, ldt.getSecond());
-      assertEquals(0, ldt.getNano());
+      assertEquals("from: " + from + " to: " + to, 1, ldt.getDayOfMonth());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getHour());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getMinute());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getSecond());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getNano());
     }
-    assertEquals(
+    assertEquals("from: " + from + " to: " + to,
         LocalDateTime.ofInstant(
             to,
             ZoneOffset.UTC)
@@ -287,22 +287,22 @@ public class StatisticsUtilTest {
   private void testGetBucketsYearly(Instant from, Instant to) {
     logger.info("from {} to {} {}", from, to, DataResolution.YEARLY.name());
     final List<Instant> buckets = StatisticsUtil.getBuckets(from, to, DataResolution.YEARLY, ZoneId.of("Z"));
-    assertEquals(from, buckets.get(0));
+    assertEquals("from: " + from + " to: " + to, from, buckets.get(0));
     if (buckets.size() == 1) {
       return;
     }
     for (int bucket = 1; bucket < buckets.size() - 1; bucket++) {
-      assertTrue(buckets.get(bucket).isAfter(from));
-      assertTrue(buckets.get(bucket).isBefore(to));
+      assertTrue("from: " + from + " to: " + to, buckets.get(bucket).isAfter(from));
+      assertTrue("from: " + from + " to: " + to, buckets.get(bucket).isBefore(to));
       final LocalDateTime ldt = LocalDateTime.ofInstant(buckets.get(bucket), ZoneOffset.UTC);
-      assertEquals(Month.JANUARY, ldt.getMonth());
-      assertEquals(1, ldt.getDayOfMonth());
-      assertEquals(0, ldt.getHour());
-      assertEquals(0, ldt.getMinute());
-      assertEquals(0, ldt.getSecond());
-      assertEquals(0, ldt.getNano());
+      assertEquals("from: " + from + " to: " + to, Month.JANUARY, ldt.getMonth());
+      assertEquals("from: " + from + " to: " + to, 1, ldt.getDayOfMonth());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getHour());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getMinute());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getSecond());
+      assertEquals("from: " + from + " to: " + to, 0, ldt.getNano());
     }
-    assertEquals(
+    assertEquals("from: " + from + " to: " + to,
         LocalDateTime.ofInstant(
             to,
             ZoneOffset.UTC)
