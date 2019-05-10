@@ -21,33 +21,38 @@
 
 package org.opencastproject.statistics.provider.influx;
 
+import org.opencastproject.statistics.api.ResourceType;
+import org.opencastproject.statistics.api.StatisticsCoordinator;
 import org.opencastproject.statistics.api.StatisticsProvider;
-import org.opencastproject.statistics.api.StatisticsProviderRegistry;
+import org.opencastproject.statistics.api.StatisticsWriter;
 import org.opencastproject.statistics.provider.influx.provider.InfluxProviderConfiguration;
+import org.opencastproject.statistics.provider.influx.provider.InfluxRunningTotalStatisticsProvider;
 import org.opencastproject.statistics.provider.influx.provider.InfluxTimeSeriesStatisticsProvider;
 import org.opencastproject.util.ConfigurationException;
 
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
-import org.json.simple.parser.ParseException;
+import org.influxdb.dto.BatchPoints;
+import org.influxdb.dto.Point;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.time.Duration;
 import java.util.Dictionary;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implements statistics providers using influxdb for permanent storage.
  */
-public class StatisticsProviderInfluxService implements ManagedService, ArtifactInstaller {
+public class StatisticsProviderInfluxService implements ManagedService, ArtifactInstaller, StatisticsWriter {
 
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(StatisticsProviderInfluxService.class);
@@ -65,15 +70,15 @@ public class StatisticsProviderInfluxService implements ManagedService, Artifact
   private volatile InfluxDB influxDB;
 
 
-  private StatisticsProviderRegistry statisticsProviderRegistry;
+  private StatisticsCoordinator statisticsCoordinator;
   private Map<String, StatisticsProvider> fileNameToProvider = new ConcurrentHashMap<>();
 
 
-  public void setStatisticsProviderRegistry(StatisticsProviderRegistry service) {
-    this.statisticsProviderRegistry = service;
+  public void setStatisticsCoordinator(StatisticsCoordinator service) {
+    this.statisticsCoordinator = service;
   }
 
-  public void activate(ComponentContext cc) throws ParseException, IOException {
+  public void activate(ComponentContext cc) {
     logger.info("Activating Statistics Provider Influx Service");
   }
 
@@ -86,28 +91,40 @@ public class StatisticsProviderInfluxService implements ManagedService, Artifact
   public void install(File file) throws Exception {
     final String json = new String(Files.readAllBytes(file.toPath()), Charset.forName("utf-8"));
     final InfluxProviderConfiguration providerCfg = InfluxProviderConfiguration.fromJson(json);
-    if ("timeseries".equalsIgnoreCase(providerCfg.getType())) {
-      final StatisticsProvider provider = new InfluxTimeSeriesStatisticsProvider(
-          this,
-          providerCfg.getId(),
-          providerCfg.getResourceType(),
-          providerCfg.getTitle(),
-          providerCfg.getDescription(),
-          providerCfg.getSources()
-      );
-      fileNameToProvider.put(file.getName(), provider);
-      if (influxDB != null) {
-        statisticsProviderRegistry.addProvider(provider);
+    StatisticsProvider provider;
+    switch (providerCfg.getType().toLowerCase()) {
+      case "timeseries": {
+        provider = new InfluxTimeSeriesStatisticsProvider(
+                this,
+                providerCfg.getId(),
+                providerCfg.getResourceType(),
+                providerCfg.getTitle(),
+                providerCfg.getDescription(),
+                providerCfg.getSources());
       }
-    } else {
-      throw new ConfigurationException("Unknown influx statistics type: " + providerCfg.getType());
+      break;
+      case "runningtotal":
+        provider = new InfluxRunningTotalStatisticsProvider(
+                this,
+                providerCfg.getId(),
+                ResourceType.ORGANIZATION,
+                providerCfg.getTitle(),
+                providerCfg.getDescription(),
+                providerCfg.getSources());
+        break;
+      default:
+        throw new ConfigurationException("Unknown influx statistics type: " + providerCfg.getType());
+    }
+    fileNameToProvider.put(file.getName(), provider);
+    if (influxDB != null) {
+      statisticsCoordinator.addProvider(provider);
     }
   }
 
   @Override
-  public void uninstall(File file) throws Exception {
+  public void uninstall(File file) {
     if (fileNameToProvider.containsKey(file.getName())) {
-      statisticsProviderRegistry.removeProvider(fileNameToProvider.get(file.getName()));
+      statisticsCoordinator.removeProvider(fileNameToProvider.get(file.getName()));
       fileNameToProvider.remove(file.getName());
     }
   }
@@ -159,15 +176,61 @@ public class StatisticsProviderInfluxService implements ManagedService, Artifact
     disconnectInflux();
     influxDB = InfluxDBFactory.connect(influxUri, influxUser, influxPw);
     influxDB.setDatabase(influxDbName);
-    fileNameToProvider.values().forEach(provider -> statisticsProviderRegistry.addProvider(provider));
+    fileNameToProvider.values().forEach(provider -> statisticsCoordinator.addProvider(provider));
+    statisticsCoordinator.addWriter(this);
   }
 
   private void disconnectInflux() {
     if (influxDB != null) {
-      fileNameToProvider.values().forEach(provider -> statisticsProviderRegistry.removeProvider(provider));
+      fileNameToProvider.values().forEach(provider -> statisticsCoordinator.removeProvider(provider));
       influxDB.close();
       influxDB = null;
     }
   }
 
+  @Override
+  public void writeDuration(
+          String organizationId,
+          String measurementName,
+          String retentionPolicy,
+          String organizationIdResourceName,
+          String fieldName,
+          TimeUnit temporalResolution,
+          Duration duration) {
+    double divider;
+    switch (temporalResolution) {
+      case MILLISECONDS:
+        divider = 1.0;
+        break;
+      case SECONDS:
+        divider = 1000.0;
+        break;
+      case MINUTES:
+        divider = 1000.0 * 60.0;
+        break;
+      case HOURS:
+        divider = 1000.0 * 60.0 * 60.0;
+        break;
+      case DAYS:
+        divider = 1000.0 * 60.0 * 60.0 * 24.0;
+        break;
+      default:
+        throw new RuntimeException("nanosecond and microsecond resolution not supported");
+    }
+    final Point point = Point
+            .measurement(measurementName)
+            .tag(organizationIdResourceName, organizationId)
+            .addField(fieldName, duration.toMillis() / divider)
+            .build();
+    if (retentionPolicy == null) {
+      influxDB.write(point);
+    } else {
+      influxDB.write(BatchPoints.builder().point(point).retentionPolicy(retentionPolicy).build());
+    }
+  }
+
+  @Override
+  public String getId() {
+    return "influxdb-writer";
+  }
 }

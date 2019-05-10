@@ -23,10 +23,11 @@ package org.opencastproject.statistics.impl;
 
 import org.opencastproject.statistics.api.DataResolution;
 import org.opencastproject.statistics.api.ResourceType;
+import org.opencastproject.statistics.api.StatisticsCoordinator;
 import org.opencastproject.statistics.api.StatisticsProvider;
-import org.opencastproject.statistics.api.StatisticsProviderRegistry;
 import org.opencastproject.statistics.api.StatisticsService;
 import org.opencastproject.statistics.api.StatisticsUtil;
+import org.opencastproject.statistics.api.StatisticsWriter;
 import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
 
@@ -34,26 +35,31 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
  * Implements {@link StatisticsService}. Uses influxdb for permanent storage.
  */
-public class StatisticsServiceImpl implements StatisticsService, StatisticsProviderRegistry {
+public class StatisticsServiceImpl implements StatisticsService, StatisticsCoordinator {
 
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(StatisticsServiceImpl.class);
 
   private Map<String, StatisticsProvider> providers = new ConcurrentHashMap<>();
+
+  private final Map<String, StatisticsWriter> writers = new HashMap<>();
 
 
   public void activate(ComponentContext cc) {
@@ -98,6 +104,30 @@ public class StatisticsServiceImpl implements StatisticsService, StatisticsProvi
     }
     final List<Instant> buckets = StatisticsUtil.getBuckets(from, to, resolution, zoneId);
     return fill(((TimeSeriesProvider) provider).getValues(resourceId, from, to, resolution, zoneId), buckets);
+  }
+
+  @Override
+  public void addWriter(StatisticsWriter writer) {
+    synchronized (this.writers) {
+      this.writers.put(writer.getId(), writer);
+    }
+  }
+
+  @Override
+  public void removeWriter(String id) {
+    synchronized (this.writers) {
+      this.writers.remove(id);
+    }
+  }
+
+  @Override
+  public void writeDuration(String organizationId, String measurementName, String retentionPolicy,
+          String organizationIdResourceName, String fieldName, TimeUnit temporalResolution, Duration duration) {
+    synchronized (this.writers) {
+      this.writers.values().forEach(writer -> writer
+              .writeDuration(organizationId, measurementName, retentionPolicy, organizationIdResourceName, fieldName,
+                      temporalResolution, duration));
+    }
   }
 
   @Override

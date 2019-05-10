@@ -215,6 +215,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-writer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
@@ -335,6 +336,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-writer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
@@ -466,6 +468,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-writer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>

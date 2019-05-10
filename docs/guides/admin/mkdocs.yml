@@ -167,6 +167,7 @@ nav:
    - Silence: 'workflowoperationhandlers/silence-woh.md'
    - Start Watson Transcription: 'workflowoperationhandlers/start-watson-transcription-woh.md'
    - Start Workflow: 'workflowoperationhandlers/start-workflow-woh.md'
+   - Statistics Writer: 'workflowoperationhandlers/statistics-writer.md'
    - Tag: 'workflowoperationhandlers/tag-woh.md'
    - Tag-By-DCTerm: 'workflowoperationhandlers/tag-by-dcterm-woh.md'
    - Timelinepreviews: 'workflowoperationhandlers/timelinepreviews-woh.md'

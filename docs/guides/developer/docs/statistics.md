@@ -32,10 +32,10 @@ An implementation of the StatisticsProvider for testing and demo purposes.
 Interfaces & Classes
 --------------------
 
-The Opencast `StatisticsService` implements the two interfaces `StatisticsProviderRegistry` and
+The Opencast `StatisticsService` implements the two interfaces `StatisticsCoordinator` and
 `StatisticsService.`
 
-**StatisticsProviderRegistry**
+**StatisticsCoordinator**
 
 This interface is used by `StatisticsProvider` implementations to register and unregister themselves at the
 statistics service.

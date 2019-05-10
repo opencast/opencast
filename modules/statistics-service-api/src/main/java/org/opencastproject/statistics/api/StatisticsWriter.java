@@ -21,65 +21,13 @@
 
 package org.opencastproject.statistics.api;
 
-
 import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Statistics service API.
- *
+ * Interface for a class that can write statistical data of various data types
  */
-public interface StatisticsService {
-
-  /**
-   * Identifier for service registration and location
-   */
-  String JOB_TYPE = "org.opencastproject.statistics";
-
-  /**
-   * @return All active providers.
-   */
-  Set<StatisticsProvider> getProviders();
-
-  /**
-   * @param resourceType
-   *          The resource type.
-   *
-   * @return All active providers for the given resource type.
-   */
-  Set<StatisticsProvider> getProviders(ResourceType resourceType);
-
-  /**
-   * @param providerId
-   *          The provider id.
-   *
-   * @return Optionally return the provider with the given id (if any).
-   */
-  Optional<StatisticsProvider> getProvider(String providerId);
-
-  /**
-   * Get time series statistics data from the given Provider.
-   *
-   * @param provider
-   *          The provider to retrieve statistics from.
-   * @param resourceId
-   *          The id to access the resource to get statistics for (e.g. episode Id, organization Id or series Id).
-   * @param from
-   *          The start date to calculate the statistics for.
-   * @param to
-   *          The end date to calculate the statistics for.
-   * @param resolution
-   *          The resolution to get the statistics with.
-   * @param zoneId
-   *          The timezone to use for date calculations.
-   * @return The time series data.
-   */
-  TimeSeries getTimeSeriesData(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution resolution, ZoneId zoneId);
-
+public interface StatisticsWriter {
   /**
    * Write a duration to a statistics data base
    *
@@ -99,4 +47,10 @@ public interface StatisticsService {
           String fieldName,
           TimeUnit temporalResolution,
           Duration duration);
+
+  /**
+   * Lorem ipsum dolor sit amet
+   * @return the writer's ID
+   */
+  String getId();
 }
