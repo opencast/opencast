@@ -21,9 +21,9 @@
 
 package org.opencastproject.statistics.provider.random;
 
-import org.opencastproject.statistics.api.ConfiguredProvider;
 import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsProviderRegistry;
+import org.opencastproject.statistics.provider.random.provider.RandomProviderConfiguration;
 import org.opencastproject.statistics.provider.random.provider.RandomStatisticsProvider;
 import org.opencastproject.util.ConfigurationException;
 
@@ -65,15 +65,11 @@ public class StatisticsProviderRandomService implements ArtifactInstaller {
   @Override
   public void install(File file) throws Exception {
     final String json = new String(Files.readAllBytes(file.toPath()), Charset.forName("utf-8"));
-    final ConfiguredProvider providerCfg = ConfiguredProvider.fromJson(json);
-    if (!providerCfg.getSource().toUpperCase().startsWith("RANDOM:")) {
-      throw new ConfigurationException("Unexpected source string: " + providerCfg.getSource());
-    }
+    final RandomProviderConfiguration providerCfg = RandomProviderConfiguration.fromJson(json);
     if ("timeseries".equalsIgnoreCase(providerCfg.getType())) {
       final StatisticsProvider provider = new RandomStatisticsProvider(
           providerCfg.getId(),
           providerCfg.getResourceType(),
-          providerCfg.getResolutions(),
           providerCfg.getTitle(),
           providerCfg.getDescription()
       );

@@ -19,25 +19,32 @@
  *
  */
 
-package org.opencastproject.statistics.api;
+package org.opencastproject.statistics.provider.random.provider;
 
-import java.util.Arrays;
+import org.opencastproject.statistics.api.ProviderConfiguration;
+import org.opencastproject.statistics.api.ResourceType;
 
-/**
- * Resolution to get data with (e.g. daily. weekly, ...)
- */
-public enum DataResolution {
-  HOURLY,
-  DAILY,
-  WEEKLY,
-  MONTHLY,
-  YEARLY;
+import com.google.gson.Gson;
 
-  public static DataResolution fromString(final String value) {
-    return DataResolution.valueOf(value.toUpperCase());
+
+public class RandomProviderConfiguration extends ProviderConfiguration {
+  private static final Gson gson = new Gson();
+
+  public RandomProviderConfiguration() {
+    // needed for gson
   }
 
-  public static boolean isValid(final String value) {
-    return Arrays.stream(DataResolution.values()).map(Enum::toString).anyMatch(v -> v.equals(value.toUpperCase()));
+  public RandomProviderConfiguration(
+      String id,
+      String title,
+      String description,
+      ResourceType resourceType,
+      String type
+  ) {
+    super(id, title, description, resourceType, type);
+  }
+
+  public static RandomProviderConfiguration fromJson(String json) {
+    return gson.fromJson(json, RandomProviderConfiguration.class);
   }
 }

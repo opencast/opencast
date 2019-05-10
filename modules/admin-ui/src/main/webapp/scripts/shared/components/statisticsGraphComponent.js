@@ -26,7 +26,8 @@ function StatisticsGraphController($scope, $element, $attrs, Language) {
   ctrl.dataResolutions = [
     { label: 'Yearly', value: 'yearly' },
     { label: 'Monthly', value: 'monthly' },
-    { label: 'Daily', value: 'daily' }
+    { label: 'Daily', value: 'daily' },
+    { label: 'Hourly', value: 'hourly' }
   ];
 
   ctrl.timeChooseModes = [

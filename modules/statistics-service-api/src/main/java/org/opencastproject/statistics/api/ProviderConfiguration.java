@@ -21,42 +21,32 @@
 
 package org.opencastproject.statistics.api;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Model for the json configurations files for statistics providers.
  */
-public final class ConfiguredProvider {
-  private static final JSONParser parser = new JSONParser();
+public abstract class ProviderConfiguration {
   private String id;
   private String title;
   private String description;
   private ResourceType resourceType;
-  private Set<DataResolution> resolutions;
   private String type;
-  private String source;
 
-  private ConfiguredProvider(
+  public ProviderConfiguration() {
+    // needed for gson
+  }
+
+  public ProviderConfiguration(
       String id,
       String title,
       String description,
       ResourceType resourceType,
-      Set<DataResolution> resolutions,
-      String type,
-      String source) {
+      String type
+  ) {
     this.id = id;
     this.title = title;
     this.description = description;
     this.resourceType = resourceType;
-    this.resolutions = resolutions;
     this.type = type;
-    this.source = source;
   }
 
   public String getId() {
@@ -75,33 +65,7 @@ public final class ConfiguredProvider {
     return resourceType;
   }
 
-  public Set<DataResolution> getResolutions() {
-    return resolutions;
-  }
-
   public String getType() {
     return type;
-  }
-
-  public String getSource() {
-    return source;
-  }
-
-  public static ConfiguredProvider fromJson(String json) throws ParseException {
-    final JSONObject jsonObject = (JSONObject) parser.parse(json);
-    final JSONArray resolutionsJson = (JSONArray) jsonObject.get("resolutions");
-    final Set<DataResolution> resolutions = new HashSet<>();
-    for (Object resolution : resolutionsJson) {
-      resolutions.add(DataResolution.fromString((String) resolution));
-    }
-    return new ConfiguredProvider(
-        (String) jsonObject.get("id"),
-        (String) jsonObject.get("title"),
-        (String) jsonObject.get("description"),
-        ResourceType.fromString((String) jsonObject.get("resourceType")),
-        resolutions,
-        (String) jsonObject.get("type"),
-        (String) jsonObject.get("source")
-    );
   }
 }

@@ -21,9 +21,9 @@
 
 package org.opencastproject.statistics.provider.influx;
 
-import org.opencastproject.statistics.api.ConfiguredProvider;
 import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsProviderRegistry;
+import org.opencastproject.statistics.provider.influx.provider.InfluxProviderConfiguration;
 import org.opencastproject.statistics.provider.influx.provider.InfluxTimeSeriesStatisticsProvider;
 import org.opencastproject.util.ConfigurationException;
 
@@ -85,22 +85,15 @@ public class StatisticsProviderInfluxService implements ManagedService, Artifact
   @Override
   public void install(File file) throws Exception {
     final String json = new String(Files.readAllBytes(file.toPath()), Charset.forName("utf-8"));
-    final ConfiguredProvider providerCfg = ConfiguredProvider.fromJson(json);
-    if (!providerCfg.getSource().toUpperCase().startsWith("INFLUX:")) {
-      throw new ConfigurationException("Unexpected source string: " + providerCfg.getSource());
-    }
+    final InfluxProviderConfiguration providerCfg = InfluxProviderConfiguration.fromJson(json);
     if ("timeseries".equalsIgnoreCase(providerCfg.getType())) {
       final StatisticsProvider provider = new InfluxTimeSeriesStatisticsProvider(
           this,
           providerCfg.getId(),
           providerCfg.getResourceType(),
-          providerCfg.getResolutions(),
           providerCfg.getTitle(),
           providerCfg.getDescription(),
-          providerCfg.getSource().split(":")[2],
-          providerCfg.getSource().split(":")[3],
-          providerCfg.getSource().split(":")[1],
-          providerCfg.getSource().split(":")[4]
+          providerCfg.getSources()
       );
       fileNameToProvider.put(file.getName(), provider);
       if (influxDB != null) {

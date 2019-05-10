@@ -39,16 +39,13 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 
 public abstract class InfluxStatisticsProvider implements StatisticsProvider {
 
-
   protected StatisticsProviderInfluxService service;
   private String id;
   private ResourceType resourceType;
-  private Set<DataResolution> dataResolutions;
   private String title;
   private String description;
 
@@ -57,14 +54,12 @@ public abstract class InfluxStatisticsProvider implements StatisticsProvider {
       StatisticsProviderInfluxService service,
       String id,
       ResourceType resourceType,
-      Set<DataResolution> dataResolutions,
       String title,
       String description
   ) {
     this.service = service;
     this.id = id;
     this.resourceType = resourceType;
-    this.dataResolutions = dataResolutions;
     this.title = title;
     this.description = description;
   }
@@ -79,10 +74,6 @@ public abstract class InfluxStatisticsProvider implements StatisticsProvider {
     return resourceType;
   }
 
-  public Set<DataResolution> getDataResolutions() {
-    return dataResolutions;
-  }
-
   @Override
   public String getTitle() {
     return title;
@@ -95,6 +86,8 @@ public abstract class InfluxStatisticsProvider implements StatisticsProvider {
 
   protected static String dataResolutionToInfluxGrouping(DataResolution dataResolution) {
     switch (dataResolution) {
+      case HOURLY:
+        return " GROUP BY time(1h)";
       case DAILY:
         return " GROUP BY time(1d)";
       case WEEKLY:
