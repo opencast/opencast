@@ -215,6 +215,17 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
   @Override
   public User loadUser(String userName) {
     logger.debug("loaduser(" + userName + ")");
+
+    try {
+      if ((userPattern != null) && !userName.matches(userPattern)) {
+        logger.debug("load user {} failed regexp {}", userName, userPattern);
+        return null;
+      }
+    } catch (PatternSyntaxException e) {
+      logger.warn("Invalid regular expression for user pattern {} - disabling checks", userPattern);
+      userPattern = null;
+    }
+
     requests.incrementAndGet();
     try {
       Object user = cache.getUnchecked(userName);
