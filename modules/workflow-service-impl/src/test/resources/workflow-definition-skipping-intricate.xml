@@ -1,0 +1,12 @@
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>definition-skip</id>
+  <title>Workflow Definition with skipping</title>
+  <description>Unit testing workflow</description>
+  <operations>
+    <operation
+      id="op1"
+      if="${executecondition} == 'a'"
+      fail-on-error="true"
+      description="operation 1"/>
+  </operations>
+</definition>

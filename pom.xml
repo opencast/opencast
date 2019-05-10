@@ -242,6 +242,7 @@
     <module>modules/waveform-ffmpeg</module>
     <module>modules/waveform-remote</module>
     <module>modules/waveform-workflowoperation</module>
+    <module>modules/workflow-condition-parser</module>
     <module>modules/workflow-service-api</module>
     <module>modules/workflow-service-impl</module>
     <module>modules/workflow-service-remote</module>
@@ -550,6 +551,11 @@
           <version>3.5</version>
         </plugin>
         <plugin>
+          <groupId>org.antlr</groupId>
+          <artifactId>antlr4-maven-plugin</artifactId>
+          <version>4.7.2</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>3.1.0</version>
@@ -686,6 +692,11 @@
   </build>
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-runtime</artifactId>
+        <version>4.7.2</version>
+      </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
