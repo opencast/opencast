@@ -146,6 +146,9 @@ angular.module('adminNg.controllers')
       $scope.replayEndOfSegment();
     });
 
+
+    $scope.activeTransaction = false;
+
     $scope.$on('ACTIVE_TRANSACTION', function () {
       if (!$scope.activeTransaction) {
         $scope.activeTransaction = true;
@@ -161,6 +164,10 @@ angular.module('adminNg.controllers')
           notificationId = 0;
         }
       }
+    });
+
+    $scope.$on('$destroy', function () {
+      Notifications.removeAll(NOTIFICATION_CONTEXT);
     });
 
     // This shows a confirmation dialog when the user leaves the editor while he has unsaved changes
