@@ -28,8 +28,5 @@
     }
   },
   "appPath": "src/main/webapp",
-  "moduleName": "adminNg",
-  "resolutions": {
-    "angular-translate": "2.18.1"
-  }
+  "moduleName": "adminNg"
 }

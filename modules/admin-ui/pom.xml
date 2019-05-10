@@ -329,6 +329,19 @@
                 </configuration>
               </execution>
               <execution>
+                <id>bower install</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>initialize</phase>
+                <configuration>
+                  <executable>node_modules/.bin/bower</executable>
+                  <arguments>
+                    <argument>install</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
                 <id>frontend build</id>
                 <goals>
                   <goal>exec</goal>
@@ -388,6 +401,15 @@
                 <id>npm install</id>
                 <goals>
                   <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>install</arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>bower install</id>
+                <goals>
+                  <goal>bower</goal>
                 </goals>
                 <configuration>
                   <arguments>install</arguments>
