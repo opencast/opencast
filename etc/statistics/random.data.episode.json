@@ -1,7 +1,0 @@
-{
-  "id": "episode.random",
-  "title": "STATISTICS.TITLE.RANDOM",
-  "description": "STATISTICS.DESCRIPTION.RANDOM",
-  "resourceType": "EPISODE",
-  "type": "timeseries"
-}
