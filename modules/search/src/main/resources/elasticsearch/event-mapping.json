@@ -56,18 +56,6 @@
 
             "rights": { "type" : "keyword" },
 
-            "track_mimetype": { "type" : "keyword" },
-
-            "track_stream_resolution": { "type" : "keyword" },
-
-            "track_flavor": { "type" : "keyword" },
-
-            "metadata_mimetype": { "type" : "keyword" },
-
-            "metadata_flavor": { "type" : "keyword" },
-
-            "attachment_flavor": { "type" : "keyword" },
-
             "access_policy": { "type" : "keyword" },
 
             "managed_acl": { "type" : "keyword" },
@@ -77,8 +65,6 @@
             "workflow_id": { "type" : "long" },
 
             "workflow_definition": { "type" : "keyword" },
-
-            "workflow_scheduled_datetime": { "type" : "keyword" },
 
             "event_status": { "type" : "keyword" },
 
