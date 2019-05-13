@@ -102,8 +102,9 @@ class OpencastToPaellaConverter {
     return source;
   }
 
-  getStreamFromFlavour(episode, mainFlavour) {
-    var currentStream = { sources:{}, preview: '', content: mainFlavour };
+  getStreamFromFlavour(episode, flavour) {
+    var mainFlavour = flavour.split('/')[0],
+        currentStream = { sources:{}, preview: '', content: mainFlavour };
 
     var tracks = episode.mediapackage.media.track;
     var attachments = episode.mediapackage.attachments.attachment;
@@ -112,7 +113,7 @@ class OpencastToPaellaConverter {
 
     // Read the tracks!!
     tracks.forEach((currentTrack) => {
-      if (currentTrack.type == `${mainFlavour}/delivery`) {
+      if (currentTrack.type == flavour) {
         var videoType = this.getVideoTypeFromTrack(currentTrack);
         if (videoType){
           if ( !(currentStream.sources[videoType]) || !(currentStream.sources[videoType] instanceof Array)){
@@ -180,11 +181,7 @@ class OpencastToPaellaConverter {
     var paellaStreams = [];
     var flavours = this.getContentToImport(episode);
     flavours.forEach((flavour) => {
-      var flavourSplit = flavour.split('/');
-      if (flavourSplit[1] == 'delivery') {
-        var s = this.getStreamFromFlavour(episode, flavourSplit[0]);
-        paellaStreams.push(s);
-      }
+      paellaStreams.push(this.getStreamFromFlavour(episode, flavour));
     });
     return paellaStreams;
   }
