@@ -22,23 +22,23 @@
 package org.opencastproject.analysis.text;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
-import org.opencastproject.textextractor.api.TextFrame;
 import org.opencastproject.textextractor.tesseract.TesseractTextExtractor;
 import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.StreamHelper;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Test case for class {@link TesseractTextExtractor}.
@@ -52,16 +52,13 @@ public class TesseractTextExtractorTest {
   protected File testFile = null;
 
   /** Path to the tesseract binary */
-  protected static String tesseractbinary = TesseractTextExtractor.TESSERACT_BINARY_DEFAULT;
+  protected static String tesseractBinary = TesseractTextExtractor.TESSERACT_BINARY_DEFAULT;
 
   /** The tesseract text analyzer */
   protected TesseractTextExtractor analyzer = null;
 
-  /** The text without punctuation */
-  protected String text = "Land and Vegetation Key players on the";
-
   /** Additional options for tesseract */
-  protected String addopts = "--psm 3";
+  protected String additionalOptions = "--psm 3";
 
   /** True to run the tests */
   private static boolean tesseractInstalled = true;
@@ -69,30 +66,23 @@ public class TesseractTextExtractorTest {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(TesseractTextExtractorTest.class);
 
+  @ClassRule
+  public static TemporaryFolder testFolder = new TemporaryFolder();
+
   @BeforeClass
   public static void testTesseract() {
-    StreamHelper stdout = null;
-    StreamHelper stderr = null;
-    StringBuffer errorBuffer = new StringBuffer();
+    final String[] command = { tesseractBinary, "-v"};
     Process p = null;
     try {
-      String[] command = {tesseractbinary, "-v"};
       p = new ProcessBuilder(command).start();
-      stdout = new StreamHelper(p.getInputStream());
-      stderr = new StreamHelper(p.getErrorStream(), errorBuffer);
       int status = p.waitFor();
-      stdout.stopReading();
-      stderr.stopReading();
       if (status != 0)
         throw new IllegalStateException();
     } catch (Throwable t) {
-      logger.warn("Skipping text analysis tests due to unsatisifed tesseract installation");
+      logger.warn("Skipping text analysis tests due to missing tesseract installation");
       logger.warn(t.getMessage(), t);
-      logger.warn(errorBuffer.toString());
       tesseractInstalled = false;
     } finally {
-      IoSupport.closeQuietly(stdout);
-      IoSupport.closeQuietly(stderr);
       IoSupport.closeQuietly(p);
     }
   }
@@ -102,27 +92,11 @@ public class TesseractTextExtractorTest {
    */
   @Before
   public void setUp() throws Exception {
-    URL imageUrl = this.getClass().getResource(testPath);
-    testFile = File.createTempFile("ocrtest", ".jpg");
+    final URL imageUrl = this.getClass().getResource(testPath);
+    testFile = testFolder.newFile();
     FileUtils.copyURLToFile(imageUrl, testFile);
-    analyzer = new TesseractTextExtractor(tesseractbinary);
-    analyzer.setAdditionalOptions(addopts);
-  }
-
-  /**
-   * @throws java.io.File.IOException
-   */
-  @After
-  public void tearDown() throws Exception {
-    FileUtils.deleteQuietly(testFile);
-  }
-
-  /**
-   * Test method for {@link org.opencastproject.textextractor.tesseract.TesseractTextExtractor#getBinary()}.
-   */
-  @Test
-  public void testGetBinary() {
-    assertEquals(tesseractbinary, analyzer.getBinary());
+    analyzer = new TesseractTextExtractor(tesseractBinary);
+    analyzer.setAdditionalOptions(additionalOptions);
   }
 
   /**
@@ -130,7 +104,7 @@ public class TesseractTextExtractorTest {
    */
   @Test
   public void testGetAdditionalOptions() {
-    assertEquals(addopts, analyzer.getAdditionalOptions());
+    assertEquals(additionalOptions, analyzer.getAdditionalOptions());
   }
 
   /**
@@ -141,8 +115,8 @@ public class TesseractTextExtractorTest {
     if (!tesseractInstalled)
       return;
 
-    TextFrame frame = analyzer.extract(testFile);
-    assertTrue(frame.hasText());
+    List<String> output = analyzer.extract(testFile);
+    assertFalse(output.isEmpty());
   }
 
 }
