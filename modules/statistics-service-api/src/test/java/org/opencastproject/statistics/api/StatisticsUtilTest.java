@@ -46,7 +46,7 @@ import java.util.Random;
 public class StatisticsUtilTest {
 
   private static final Logger logger = LoggerFactory.getLogger(StatisticsUtilTest.class);
-  private static final int repetitions = 1000;
+  private static final int repetitions = 50;
   private static Random random = new Random(Instant.now().toEpochMilli());
 
   private static Instant randomInstant() {
