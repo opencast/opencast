@@ -22,22 +22,15 @@
 package org.opencastproject.index.service.catalog.adapter.series;
 
 import static java.util.Objects.requireNonNull;
-import static org.opencastproject.util.OsgiUtil.getCfg;
 
-import org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterConfiguration;
-import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataCollection;
+import org.opencastproject.index.service.catalog.adapter.ConfigurableDCCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
 import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEventDCCatalogUIAdapter;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.mediapackage.EName;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreByteFormat;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
-import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesException;
@@ -47,93 +40,32 @@ import org.opencastproject.util.RequireUtil;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Dictionary;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
+import java.util.Arrays;
 
 /**
  * A series catalog UI adapter that is managed by a configuration.
  */
-public class ConfigurableSeriesDCCatalogUIAdapter implements SeriesCatalogUIAdapter {
+public class ConfigurableSeriesDCCatalogUIAdapter extends ConfigurableDCCatalogUIAdapter
+        implements SeriesCatalogUIAdapter {
 
-  /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(ConfigurableEventDCCatalogUIAdapter.class);
-
-  /** The configuration dublincore catalog UI adapter service PID */
-  public static final String PID = "org.opencastproject.index.service.catalog.adapter";
-
-  /* The collection of keys to read from the OSGI configuration file */
-  public static final String CONF_TYPE_KEY = "type";
-  public static final String CONF_ORGANIZATION_KEY = "organization";
-  public static final String CONF_FLAVOR_KEY = "flavor";
-  public static final String CONF_TITLE_KEY = "title";
 
   private SeriesService seriesService;
   private SecurityService securityService;
 
-  /** The catalog UI adapter configuration */
-  private CatalogUIAdapterConfiguration config;
-
-  /** The organization name */
-  private String organization;
-
-  /** The flavor of this catalog */
-  private MediaPackageElementFlavor flavor;
-
-  /** The title of this catalog */
-  private String title;
-
-  /** Reference to the list providers service */
-  private ListProvidersService listProvidersService;
-
-  /** The metadata fields for all properties of the underlying DublinCore */
-  private Map<String, MetadataField<?>> dublinCoreProperties;
-
-  @Override
-  public String getOrganization() {
-    return organization;
-  }
-
-  @Override
-  public String getFlavor() {
-    return flavor.toString();
-  }
-
-  @Override
-  public String getUITitle() {
-    return title;
-  }
-
-  @Override
-  public MetadataCollection getRawFields() {
-    DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
-    Set<String> emptyFields = new TreeSet<>(dublinCoreProperties.keySet());
-    populateEmptyFields(dublinCoreMetadata, emptyFields);
-    return dublinCoreMetadata;
-  }
-
   @Override
   public Opt<MetadataCollection> getFields(String seriesId) {
+
     final Opt<DublinCoreCatalog> optDCCatalog = loadDublinCoreCatalog(
             RequireUtil.requireNotBlank(seriesId, "seriesId"));
-    if (optDCCatalog.isSome()) {
-      DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
-      Set<String> emptyFields = new TreeSet<>(dublinCoreProperties.keySet());
-      getFieldValuesFromDublinCoreCatalog(dublinCoreMetadata, emptyFields, optDCCatalog.get());
-      populateEmptyFields(dublinCoreMetadata, emptyFields);
-      return Opt.some((MetadataCollection) dublinCoreMetadata);
-    } else {
+    if (optDCCatalog.isNone()) {
       return Opt.none();
     }
+    return Opt.some(getFieldsFromCatalogs(Arrays.asList(optDCCatalog.get())));
   }
 
   @Override
@@ -151,51 +83,9 @@ public class ConfigurableSeriesDCCatalogUIAdapter implements SeriesCatalogUIAdap
     }
   }
 
-  /**
-   * Reconfigures the {@link SeriesCatalogUIAdapter} instance with an updated set of configuration properties;
-   *
-   * @param properties
-   *          the configuration properties
-   * @throws ConfigurationException
-   *           if there is a configuration error
-   */
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
-    config = CatalogUIAdapterConfiguration.loadFromDictionary(properties);
-    organization = getCfg(properties, CONF_ORGANIZATION_KEY);
-    flavor = MediaPackageElementFlavor.parseFlavor(getCfg(properties, CONF_FLAVOR_KEY));
-    title = getCfg(properties, CONF_TITLE_KEY);
-    dublinCoreProperties = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
-  }
-
-  /** OSGi callback to set list provider service instance */
-  public void setListProvidersService(ListProvidersService listProvidersService) {
-    this.listProvidersService = listProvidersService;
-  }
-
-  /** Return the {@link SeriesService} to get access to the metadata catalogs of a series */
-  protected SeriesService getSeriesService() {
-    return seriesService;
-  }
-
-  /** OSGi callback to bind instance of {@link SeriesService} */
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
-  }
-
-  /** Return instance of {@link SecurityService}. */
-  protected SecurityService getSecurityService() {
-    return securityService;
-  }
-
-  /** OSGi callback to bind instance of {@link SecurityService} */
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
   protected Opt<DublinCoreCatalog> loadDublinCoreCatalog(String seriesId) {
     try {
-      Opt<byte[]> seriesElementData = getSeriesService().getSeriesElementData(requireNonNull(seriesId),
-              flavor.getType());
+      Opt<byte[]> seriesElementData = getSeriesService().getSeriesElementData(requireNonNull(seriesId), flavor.getType());
       if (seriesElementData.isSome()) {
         final DublinCoreCatalog dc = DublinCoreByteFormat.read(seriesElementData.get());
         // Make sure that the catalog has its flavor set.
@@ -235,47 +125,32 @@ public class ConfigurableSeriesDCCatalogUIAdapter implements SeriesCatalogUIAdap
     }
   }
 
-  private void populateEmptyFields(DublinCoreMetadataCollection dublinCoreMetadata, Set<String> emptyFields) {
-    // Add all of the rest of the fields that didn't have values as empty.
-    for (String field : emptyFields) {
-      if (dublinCoreProperties.get(field) == null) {
-        logger.warn("Skipping field {} because it is not defined in the properties file.", field);
-      }
-      try {
-        dublinCoreMetadata.addField(dublinCoreProperties.get(field), Collections.emptyList(), listProvidersService);
-      } catch (Exception e) {
-        logger.error("Skipping metadata field '{}' because of error", field, e);
-      }
-    }
+  /**
+   * Return the {@link SeriesService} to get access to the metadata catalogs of a series
+   */
+  protected SeriesService getSeriesService() {
+    return seriesService;
   }
 
-  private void getFieldValuesFromDublinCoreCatalog(DublinCoreMetadataCollection dublinCoreMetadata,
-          Set<String> emptyFields, DublinCoreCatalog dc) {
-    for (EName propertyKey : dc.getValues().keySet()) {
-      for (String metdataFieldKey : dublinCoreProperties.keySet()) {
-        MetadataField<?> metadataField = dublinCoreProperties.get(metdataFieldKey);
-        String namespace = DublinCore.TERMS_NS_URI;
-        if (metadataField.getNamespace().isSome()) {
-          namespace = metadataField.getNamespace().get();
-        }
-        if (namespace.equalsIgnoreCase(propertyKey.getNamespaceURI())
-                && metadataField.getInputID().equalsIgnoreCase(propertyKey.getLocalName())) {
-          List<DublinCoreValue> values = dc.get(propertyKey);
-          if (!values.isEmpty()) {
-            emptyFields.remove(metdataFieldKey);
-            try {
-              dublinCoreMetadata.addField(metadataField, values.stream()
-                      .map(DublinCoreValue::getValue)
-                      .collect(Collectors.toList()), listProvidersService);
-            } catch (IllegalArgumentException e) {
-              logger.error("Skipping metadata field '{}' because of error: {}", metadataField.getInputID(),
-                      ExceptionUtils.getStackTrace(e));
-            }
+  /**
+   * OSGi callback to bind instance of {@link SeriesService}
+   */
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
+  }
 
-          }
-        }
-      }
-    }
+  /**
+   * Return instance of {@link SecurityService}.
+   */
+  protected SecurityService getSecurityService() {
+    return securityService;
+  }
+
+  /**
+   * OSGi callback to bind instance of {@link SecurityService}
+   */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
 }

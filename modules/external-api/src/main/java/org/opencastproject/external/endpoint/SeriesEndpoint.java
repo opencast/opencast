@@ -429,7 +429,7 @@ public class SeriesEndpoint {
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
       final Opt<MetadataCollection> optSeriesMetadata = adapter.getFields(id);
       if (optSeriesMetadata.isSome()) {
-        metadataList.add(adapter.getFlavor(), adapter.getUITitle(), optSeriesMetadata.get());
+        metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), optSeriesMetadata.get());
       }
     }
     MetadataCollection collection = getSeriesMetadata(optSeries.get());
@@ -563,7 +563,7 @@ public class SeriesEndpoint {
     if (StringUtils.trimToNull(type) == null) {
       return false;
     }
-    MediaPackageElementFlavor catalogFlavor = MediaPackageElementFlavor.parseFlavor(catalog.getFlavor());
+    MediaPackageElementFlavor catalogFlavor = MediaPackageElementFlavor.parseFlavor(catalog.getFlavor().toString());
     try {
       MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(type);
       return flavor.equals(catalogFlavor);
@@ -891,7 +891,7 @@ public class SeriesEndpoint {
       SeriesCatalogUIAdapter adapter = null;
       for (SeriesCatalogUIAdapter seriesCatalogUIAdapter : indexService.getSeriesCatalogUIAdapters()) {
         MediaPackageElementFlavor catalogFlavor = MediaPackageElementFlavor
-                .parseFlavor(seriesCatalogUIAdapter.getFlavor());
+                .parseFlavor(seriesCatalogUIAdapter.getFlavor().toString());
         if (catalogFlavor.equals(flavor)) {
           adapter = seriesCatalogUIAdapter;
           collection = seriesCatalogUIAdapter.getRawFields();

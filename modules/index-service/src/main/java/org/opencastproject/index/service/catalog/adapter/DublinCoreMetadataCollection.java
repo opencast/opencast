@@ -95,6 +95,10 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
     addField(metadataField, Collections.singletonList(value), listProvidersService);
   }
 
+  public void addField(MetadataField<?> metadataField, ListProvidersService listProvidersService) {
+    addField(metadataField, Collections.emptyList(), listProvidersService);
+  }
+
   public void addField(MetadataField<?> metadataField, List<String> values, ListProvidersService listProvidersService) {
 
     List<String> filteredValues = values.stream()
