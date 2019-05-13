@@ -168,7 +168,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var interval_initialSeek_ms = 1000;
   var timeout_initialSeek_ms = 250;
   var timer_qualitychange = 1000;
-  var zoom_step_size = 0.05;
+  var zoom_step_size = 0.2;
   var decimal_places = 3;
 
   /* don't change these variables */
@@ -743,20 +743,22 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       var xdiff = relX - vX;
       var ydiff = relY - vY;
 
-      event.preventDefault();
       // zoom in
-      if (event.deltaY > 0) {
-        Engage.trigger(events.setZoomLevel.getName(), [zoom_step_size]);
-        // move towards mouse position
-        var z = zoomLevels[zoomLevels.indexOf($(selector)[0].id) + 1];
+      if (event.shiftKey) {
+        event.preventDefault();
+        if (event.deltaY > 0) {
+          Engage.trigger(events.setZoomLevel.getName(), [zoom_step_size]);
+          // move towards mouse position
+          var z = zoomLevels[zoomLevels.indexOf($(selector)[0].id) + 1];
 
-        moveHorizontal(-((xdiff / 5) / z));
-        moveVertical(-((ydiff / 5) / z));
-      }
+          moveHorizontal(-((xdiff / 5) / z));
+          moveVertical(-((ydiff / 5) / z));
+        }
 
-      // zoom out
-      if (event.deltaY < 0) {
-        Engage.trigger(events.setZoomLevel.getName(), [-zoom_step_size]);
+        // zoom out
+        if (event.deltaY < 0) {
+          Engage.trigger(events.setZoomLevel.getName(), [-zoom_step_size]);
+        }
       }
 
       wheelEvent = event;
