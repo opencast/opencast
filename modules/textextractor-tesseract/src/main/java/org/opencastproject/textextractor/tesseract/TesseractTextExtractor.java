@@ -127,7 +127,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     File outputFile = null;
     File outputFileBase = new File(image.getParentFile(), FilenameUtils.getBaseName(image.getName()));
     // Run tesseract
-    List<String> command = getAnalysisOptions(image, outputFileBase);
+    List<String> command = getTesseractCommand(image, outputFileBase);
     logger.info("Running Tesseract: {}", command);
     try {
       ProcessBuilder processBuilder = new ProcessBuilder(command);
@@ -174,13 +174,15 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
   }
 
   /**
-   * The only parameter to <code>tesseract</code> is the filename, so this is what this method returns.
+   * Generate the command line to run Tesseract
    *
    * @param image
    *          the image file
-   * @return the options to run analysis on the image
+   * @param outputFile
+   *          base name of output file. Tesseract will attach <code>.txt</code>
+   * @return the command line to runn Tesseract on the given input file
    */
-  private List<String> getAnalysisOptions(File image, File outputFile) {
+  private List<String> getTesseractCommand(final File image, final File outputFile) {
     List<String> args = new ArrayList<>();
     args.add(binary);
     args.add(image.getAbsolutePath());
