@@ -10,8 +10,8 @@
    "SAVE": "שמור",
    "LOGOUT": "התנתקות",
    "RESET": "איפוס",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "לא נבחרה כל אופציה",
+   "SELECT_NO_OPTIONS_AVAILABLE": "אין אפשרויות זמינות",
    "YES": "כן",
    "LANGUAGES": {
       "ARABIC": "ערבית",
@@ -271,7 +271,7 @@
       "BACK": "הקודם",
       "CREATE": "צור",
       "RETRACT": "ביטול",
-      "RETRACT_DELETE": "Retract/Delete",
+      "RETRACT_DELETE": "חזרה/מחיקה",
       "DELETE": "מחק",
       "UPDATE": "עדכן",
       "DURATION": {
@@ -309,7 +309,7 @@
          "TITLE": "הגדרות"
       },
       "STATISTICS": {
-         "TITLE": "Statistics"
+         "TITLE": "סטטיסטיקות"
       }
    },
    "EVENTS": {
@@ -492,7 +492,7 @@
                "EDITOR_NEEDS_CUTTING": "פתח עורך וידאו (הערה מציינת כי חיתוך הווידאו התבקש)",
                "COMMENTS": "הצגת הערות",
                "PAUSED_WORKFLOW": "הצגת תהליכי עבודה מושהים",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "מסנן עבור מציג זה"
             }
          },
          "STATUS": {
@@ -519,7 +519,7 @@
                "WORKFLOWS": "תהליכים",
                "ACCESS": "מדיניות גישה",
                "COMMENTS": "הערות",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "סטטיסטיקות"
             },
             "PUBLICATIONS": {
                "CAPTION": "פרסומים",
@@ -762,7 +762,7 @@
                }
             },
             "STATISTICS": {
-               "CAPTION": "Statistics"
+               "CAPTION": "סטטיסטיקות"
             },
             "METADATA": {
                "CAPTION": "פרטי אירוע",
@@ -803,7 +803,7 @@
                "ACTIONS": "פעולות",
                "DETAILS": "פרטים",
                "DESCRIPTION": "תאור",
-               "MORE_INFO": "More Information",
+               "MORE_INFO": "מידע נוסף",
                "ID": "מזהה",
                "TYPE": "סוג",
                "TITLE": "כותרת",
@@ -811,8 +811,8 @@
                "STARTED": "החל",
                "SERIES": "סדרות",
                "SUBMITTED": "נשלח",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
+               "SUBMITTER": "מגיש",
+               "EXECUTION_TIME": "זמן ביצוע",
                "WDID": "הגדרה של תהליך עבודה",
                "MIMETYPE": "Mimetype",
                "URL": "כתובת אינטרנט",
@@ -820,11 +820,11 @@
                "NO_CONFIGURATION": "אין הגדרת פרמטרים למהלך העבודה שנבחר.",
                "WORKFLOW": "מהלך עבודה",
                "TOOLTIP": {
-                  "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
-                  "DETAILS": "Open workflow details"
+                  "STOP": "עצירת התהליך",
+                  "ABORT": "ביטול ביצוע של תהליך עבודה (אל תנסה לבצע שוב פעולות שנכשלו)",
+                  "RETRY": "נסה שנית לבצע מופע תהליך עבודה",
+                  "DELETE": "מחיקת תהליך עבודה",
+                  "DETAILS": "פתח פרטי תהליך העבודה"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "מופעל",
@@ -832,9 +832,9 @@
                   "PAUSED": "מושהה",
                   "SUCCEEDED": "הצליח",
                   "FAILED": "נכשל",
-                  "FAILING": "Failing",
+                  "FAILING": "נכשל",
                   "SKIPPED": "דולג",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "נעצר",
                   "RETRY": "ניסיון נוסף"
                }
             },
@@ -988,7 +988,7 @@
                "EVENTS": "אירועים",
                "PERMISSIONS": "מדיניות גישה",
                "THEME": "ערכת נושא",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "סטטיסטיקות"
             },
             "ACCESS": {
                "CAPTION": "מדיניות גישה",
@@ -1441,7 +1441,7 @@
             "CREATED": "נוצר",
             "CREATOR": "יוצר",
             "HOST_NAME": "שם מחשב מארח",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "שם שרת",
             "OPERATION": "פעולה",
             "STARTED": "התחילה",
             "STATUS": "מצב",
@@ -1467,7 +1467,7 @@
             "CAPTION": "שרתים",
             "STATUS": "מצב",
             "HOST_NAME": "שם מחשב מארח",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "שם שרת",
             "CORES": "ליבות",
             "COMPLETED": "משימות שהושלמו",
             "RUNNING": "משימות רצות",
@@ -1485,7 +1485,7 @@
             "STATUS": "מצב",
             "NAME": "שם שירות",
             "HOST_NAME": "שם מחשב מארח",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "שם שרת",
             "COMPLETED": "משימות שהושלמו",
             "RUNNING": "משימות רצות",
             "QUEUED": "משימות בתור",
@@ -1761,7 +1761,7 @@
             "LABEL": "שם מחשב מארח"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "שם שרת"
          },
          "STATUS": {
             "LABEL": "מצב",
@@ -1805,7 +1805,7 @@
             "LABEL": "שם מחשב מארח"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "שם שרת"
          },
          "STATUS": {
             "LABEL": "מצב",
@@ -1822,7 +1822,7 @@
             "LABEL": "שם מחשב מארח"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "שם שרת"
          },
          "NAME": {
             "LABEL": "שם"
@@ -1967,28 +1967,28 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "על מנת להזין מספר ערכים יש ללחוץ על מקש Enter בין כל ערך"
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
-      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "NOT_AVAILABLE": "סטטיסטיקטות לא ניתנות להצגה ברגע זה. יש לנסות בשלב מאוחר יותר.",
+      "UNSUPPORTED_TYPE": "מצטערים, Opencast לא יכולה לחשב את הנתון הסטטיסטי הזה.",
       "FROM": "מאת",
-      "TO": "To",
-      "TOTAL": "Total",
-      "GRANULARITY": "Granularity",
+      "TO": "עבור",
+      "TOTAL": "סה\"כ",
+      "GRANULARITY": "גרנולריות",
       "NAVIGATION": {
-         "ORGANIZATION": "Organisation"
+         "ORGANIZATION": "ארגון"
       },
       "TITLE": {
-         "RANDOM": "Random Data",
-         "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views"
+         "RANDOM": "מידע אקראי",
+         "VIEWS_SUM": "מספר צפיות כללי",
+         "VIEWS_AVG": "מספר צפיות ממוצע"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time uinit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time uinit."
+         "RANDOM": "מוצג מידע אקראי לצורך הצגת יכולות. ניתן לבטל תצוגת תרשים זה על ידי מחיקת קובץ json המכיל המספק מידע סטטיסטי מתקיית etc/providers",
+         "VIEWS_SUM": "מציג את סה\"כ הצפיות עבור יחידת זמן.",
+         "VIEWS_AVG": "מציג את ממוצע הצפיות היומי עבור יחידת זמן."
       }
    }
 }
