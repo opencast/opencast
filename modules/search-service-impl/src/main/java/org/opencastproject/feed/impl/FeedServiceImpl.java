@@ -97,9 +97,12 @@ public class FeedServiceImpl {
   /** The security service */
   private SecurityService securityService = null;
 
+  /** For Feedlinks */
+  Gson gson = new Gson();
+
   /*
    *
-   * TEST
+   * Feedlinks for Admin UI
    * /feeds/listFeedServices
    *
    */
@@ -109,7 +112,6 @@ public class FeedServiceImpl {
   @Produces(MediaType.APPLICATION_JSON)
   public String listFeedServices() {
 
-    Gson gson = new Gson();
     List<Map<String, String>> feedServices = new ArrayList<>();
 
     for (FeedGenerator generator : feeds) {
