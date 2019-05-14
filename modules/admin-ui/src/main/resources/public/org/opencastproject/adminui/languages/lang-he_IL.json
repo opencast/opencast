@@ -897,9 +897,9 @@
                   "PAUSED": "מושהה",
                   "SUCCEEDED": "הצליח",
                   "FAILED": "נכשל",
-                  "FAILING": "Failing",
+                  "FAILING": "נכשל",
                   "SKIPPED": "דולג",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "נעצר",
                   "RETRY": "ניסיון נוסף"
                }
             },
