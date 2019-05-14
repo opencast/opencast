@@ -44,6 +44,7 @@ Configuration changes
   controlled by Opencast and the routing through capture agents which existed for historical reasons was just an
   additional source for errors. If you rely on the old behavior, it can be configured in
   `etc/org.opencastproject.ingest.impl.IngestServiceImpl.cfg`.
+- The Paella player now respects all tracks published to engage instead of tracks with the flavor `*/delivery` only.
 
 API changes
 -----------
