@@ -91,10 +91,10 @@
     <bundle>mvn:org.springframework.osgi/spring-osgi-core/1.2.1</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-extender/1.2.1</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-io/1.2.1</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-config/3.1.4.RELEASE</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-core/3.1.4.RELEASE</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-ldap/3.1.4.RELEASE</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-web/3.1.4.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-config/3.1.7.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-core/3.1.7.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-ldap/3.1.7.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-web/3.1.7.RELEASE</bundle>
     <bundle>mvn:org.springframework/spring-aop/3.1.4.RELEASE</bundle>
     <bundle>mvn:org.springframework/spring-asm/3.1.4.RELEASE</bundle>
     <bundle>mvn:org.springframework/spring-beans/3.1.4.RELEASE</bundle>
@@ -746,9 +746,9 @@
     <bundle start-level="82">mvn:org.apache.santuario/xmlsec/2.1.2</bundle>
     <bundle start-level="82">mvn:org.bouncycastle/bcprov-jdk15on/1.51</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-cas-client-wrapper/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.springframework.security/spring-security-core/3.1.4.RELEASE</bundle>
-    <bundle start-level="82">mvn:org.springframework.security/spring-security-web/3.1.4.RELEASE</bundle>
-    <bundle start-level="82">mvn:org.springframework.security/spring-security-cas/3.1.4.RELEASE</bundle>
+    <bundle start-level="82">mvn:org.springframework.security/spring-security-core/3.1.7.RELEASE</bundle>
+    <bundle start-level="82">mvn:org.springframework.security/spring-security-web/3.1.7.RELEASE</bundle>
+    <bundle start-level="82">mvn:org.springframework.security/spring-security-cas/3.1.7.RELEASE</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-cas/${project.version}</bundle>
   </feature>
 

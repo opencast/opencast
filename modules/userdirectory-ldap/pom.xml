@@ -31,11 +31,11 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
-      <artifactId>org.springframework.security.core</artifactId>
+      <artifactId>spring-security-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
-      <artifactId>org.springframework.security.web</artifactId>
+      <artifactId>spring-security-web</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.osgi</groupId>
@@ -47,8 +47,8 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
-      <artifactId>org.springframework.security.ldap</artifactId>
-      <version>3.1.1.RELEASE</version>
+      <artifactId>spring-security-ldap</artifactId>
+      <version>3.1.7.RELEASE</version>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
