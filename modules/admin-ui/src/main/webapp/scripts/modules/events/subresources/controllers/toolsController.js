@@ -181,6 +181,7 @@ angular.module('adminNg.controllers')
         $scope.activeSubmission = false;
         if (closeVideoEditor) {
           Notifications.add('success', 'VIDEO_CUT_PROCESSING');
+          Storage.put('pagination', $scope.resource, 'resume', true);
           $location.url('/events/' + $scope.resource);
         } else {
           Notifications.add('success', 'VIDEO_CUT_SAVED');
