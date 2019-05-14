@@ -108,9 +108,9 @@ class OpencastToPaellaConverter {
    * @param episode  result structure from search service
    * @param flavor   flavor used for track selection
    */
-  getStreamFromFlavour(episode, flavour) {
-    var mainFlavour = flavour.split('/')[0],
-        currentStream = { sources:{}, preview: '', content: mainFlavour };
+  getStreamFromFlavor(episode, flavor) {
+    var mainFlavor = flavor.split('/')[0],
+        currentStream = { sources:{}, preview: '', content: mainFlavor };
 
     var tracks = episode.mediapackage.media.track;
     var attachments = episode.mediapackage.attachments.attachment;
@@ -119,7 +119,7 @@ class OpencastToPaellaConverter {
 
     // Read the tracks!!
     tracks.forEach((currentTrack) => {
-      if (currentTrack.type == flavour) {
+      if (currentTrack.type == flavor) {
         var videoType = this.getVideoTypeFromTrack(currentTrack);
         if (videoType){
           if ( !(currentStream.sources[videoType]) || !(currentStream.sources[videoType] instanceof Array)){
@@ -135,17 +135,17 @@ class OpencastToPaellaConverter {
     var imageSource =   {type:'image/jpeg', frames:{}, count:0, duration: duration, res:{w:320, h:180}};
     var imageSourceHD = {type:'image/jpeg', frames:{}, count:0, duration: duration, res:{w:1280, h:720}};
     attachments.forEach((currentAttachment) => {
-      if (currentAttachment.type == `${mainFlavour}/player+preview`) {
+      if (currentAttachment.type == `${mainFlavor}/player+preview`) {
         currentStream.preview = currentAttachment.url;
       }
-      else if (currentAttachment.type == `${mainFlavour}/segment+preview+hires`) {
+      else if (currentAttachment.type == `${mainFlavor}/segment+preview+hires`) {
         if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
           time = parseInt(RegExp.$1) * 60 * 60 + parseInt(RegExp.$2) * 60 + parseInt(RegExp.$3);
           imageSourceHD.frames['frame_' + time] = currentAttachment.url;
           imageSourceHD.count = imageSourceHD.count + 1;
         }
       }
-      else if (currentAttachment.type == `${mainFlavour}/segment+preview`) {
+      else if (currentAttachment.type == `${mainFlavor}/segment+preview`) {
         if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
           var time = parseInt(RegExp.$1) * 60 * 60 + parseInt(RegExp.$2) * 60 + parseInt(RegExp.$3);
           imageSource.frames['frame_' + time] = currentAttachment.url;
@@ -169,25 +169,25 @@ class OpencastToPaellaConverter {
   }
 
   getContentToImport(episode) {
-    var flavours = [];
+    var flavors = [];
     var tracks = episode.mediapackage.media.track;
     if (!(tracks instanceof Array)) { tracks = [tracks]; }
 
     tracks.forEach((currentTrack) => {
-      if (flavours.indexOf(currentTrack.type) < 0) {
-        flavours.push(currentTrack.type);
+      if (flavors.indexOf(currentTrack.type) < 0) {
+        flavors.push(currentTrack.type);
       }
     });
 
-    return flavours;
+    return flavors;
   }
 
   getStreams(episode) {
     // Get the streams
     var paellaStreams = [];
-    var flavours = this.getContentToImport(episode);
-    flavours.forEach((flavour) => {
-      var stream = this.getStreamFromFlavour(episode, flavour);
+    var flavors = this.getContentToImport(episode);
+    flavors.forEach((flavor) => {
+      var stream = this.getStreamFromFlavor(episode, flavor);
       paellaStreams.push(stream);
     });
     return paellaStreams;
