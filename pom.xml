@@ -1525,6 +1525,22 @@
          </roles>
         <timezone>Europe/Madrid</timezone>
      </developer>
+     <developer>
+       <id>jkniephoff</id>
+       <name>Julian Kniephoff</name>
+       <email>kniephoff@elan-ev.de</email>
+       <url>https://juliankniephoff.com</url>
+       <organization>ELAN e.V.</organization>
+       <organizationUrl>https://elan-ev.de/</organizationUrl>
+       <roles>
+         <role>developer</role>
+       </roles>
+       <timezone>Europe/Berlin</timezone>
+      <properties>
+        <irc.nick>jkniephoff</irc.nick>
+        <github.nick>JulianKniephoff</github.nick>
+      </properties>
+    </developer>
   </developers>
   <!-- People having significantly contributed to Opencast in the past -->
   <contributors>
