@@ -27,6 +27,8 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -43,12 +45,15 @@ public class FeedEndpoint extends RemoteBase {
     super("org.opencastproject.feed.impl.FeedServiceImpl");
   }
 
+  /** Logging facility */
+  private static Logger logger = LoggerFactory.getLogger(FeedEndpoint.class);
+
   @GET
-  @Path("/services")
+  @Path("/feeds")
   @Produces(MediaType.APPLICATION_JSON)
   public String listFeedServices() {
 
-    HttpGet get = new HttpGet("/services");
+    HttpGet get = new HttpGet("/feeds");
     HttpResponse response = null;
     String result = null;
 
@@ -56,7 +61,7 @@ public class FeedEndpoint extends RemoteBase {
       response = getResponse(get);
       result = IOUtils.toString(response.getEntity().getContent(), "utf-8");
     } catch (Exception e) {
-
+      logger.error("Could not get /feeds request in FeedEndpoint. " + e.toString());
     }
 
     return result;

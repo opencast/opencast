@@ -103,12 +103,12 @@ public class FeedServiceImpl {
   /*
    *
    * Feedlinks for Admin UI
-   * /feeds/services
+   * /feeds/feeds
    *
    */
 
   @GET
-  @Path("/services")
+  @Path("/feeds")
   @Produces(MediaType.APPLICATION_JSON)
   public String listFeedServices() {
 
