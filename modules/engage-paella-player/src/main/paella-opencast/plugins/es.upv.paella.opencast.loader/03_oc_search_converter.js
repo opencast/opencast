@@ -102,8 +102,15 @@ class OpencastToPaellaConverter {
     return source;
   }
 
-  getStreamFromFlavour(episode, mainFlavour) {
-    var currentStream = { sources:{}, preview: '', content: mainFlavour };
+  /**
+   * Extract a stream identified by a given flavor from the media packages track list and try to find a corresponding
+   * image attachment for the selected track.
+   * @param episode  result structure from search service
+   * @param flavor   flavor used for track selection
+   */
+  getStreamFromFlavour(episode, flavour) {
+    var mainFlavour = flavour.split('/')[0],
+        currentStream = { sources:{}, preview: '', content: mainFlavour };
 
     var tracks = episode.mediapackage.media.track;
     var attachments = episode.mediapackage.attachments.attachment;
@@ -112,7 +119,7 @@ class OpencastToPaellaConverter {
 
     // Read the tracks!!
     tracks.forEach((currentTrack) => {
-      if (currentTrack.type == `${mainFlavour}/delivery`) {
+      if (currentTrack.type == flavour) {
         var videoType = this.getVideoTypeFromTrack(currentTrack);
         if (videoType){
           if ( !(currentStream.sources[videoType]) || !(currentStream.sources[videoType] instanceof Array)){
@@ -180,11 +187,8 @@ class OpencastToPaellaConverter {
     var paellaStreams = [];
     var flavours = this.getContentToImport(episode);
     flavours.forEach((flavour) => {
-      var flavourSplit = flavour.split('/');
-      if (flavourSplit[1] == 'delivery') {
-        var s = this.getStreamFromFlavour(episode, flavourSplit[0]);
-        paellaStreams.push(s);
-      }
+      var stream = this.getStreamFromFlavour(episode, flavour);
+      paellaStreams.push(stream);
     });
     return paellaStreams;
   }
