@@ -98,7 +98,7 @@ public class FeedServiceImpl {
   private SecurityService securityService = null;
 
   /** For Feedlinks */
-  Gson gson = new Gson();
+  private Gson gson = new Gson();
 
   /*
    *
