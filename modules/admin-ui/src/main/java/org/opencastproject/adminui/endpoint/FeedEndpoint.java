@@ -44,11 +44,11 @@ public class FeedEndpoint extends RemoteBase {
   }
 
   @GET
-  @Path("/listFeedServices")
+  @Path("/services")
   @Produces(MediaType.APPLICATION_JSON)
   public String listFeedServices() {
 
-    HttpGet get = new HttpGet("/listFeedServices");
+    HttpGet get = new HttpGet("/services");
     HttpResponse response = null;
     String result = null;
 
