@@ -102,6 +102,12 @@ class OpencastToPaellaConverter {
     return source;
   }
 
+  /**
+   * Extract a stream identified by a given flavor from the media packages track list and try to find a corresponding
+   * image attachment for the selected track.
+   * @param episode  result structure from search service
+   * @param flavor   flavor used for track selection
+   */
   getStreamFromFlavour(episode, flavour) {
     var mainFlavour = flavour.split('/')[0],
         currentStream = { sources:{}, preview: '', content: mainFlavour };
@@ -181,7 +187,8 @@ class OpencastToPaellaConverter {
     var paellaStreams = [];
     var flavours = this.getContentToImport(episode);
     flavours.forEach((flavour) => {
-      paellaStreams.push(this.getStreamFromFlavour(episode, flavour));
+      var stream = this.getStreamFromFlavour(episode, flavour);
+      paellaStreams.push(stream);
     });
     return paellaStreams;
   }
