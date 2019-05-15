@@ -2215,7 +2215,7 @@ public abstract class AbstractEventEndpoint {
     fields.add(f("managedAcl", v(event.getManagedAcl(), BLANK)));
     fields.add(f("workflow_state", v(event.getWorkflowState(), BLANK)));
     fields.add(f("event_status", v(event.getEventStatus())));
-    fields.add(f("displayable_status", v(event.getDisplayableStatus())));
+    fields.add(f("displayable_status", v(event.getDisplayableStatus(getWorkflowService().getWorkflowStateMappings()))));
     fields.add(f("source", v(getIndexService().getEventSource(event).toString())));
     fields.add(f("has_comments", v(event.hasComments())));
     fields.add(f("has_open_comments", v(event.hasOpenComments())));

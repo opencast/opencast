@@ -115,8 +115,8 @@
   </operations>
 
   <state-mappings>
-    <state-mapping state="running">EVENTS.EVENTS.STATUS.REPUBLISHING</state-mapping>
-    <state-mapping state="failing">EVENTS.EVENTS.STATUS.REPUBLISHING</state-mapping>
+    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.REPUBLISHING_METADATA</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.REPUBLISHING_METADATA</state-mapping>
   </state-mappings>
 
 </definition>

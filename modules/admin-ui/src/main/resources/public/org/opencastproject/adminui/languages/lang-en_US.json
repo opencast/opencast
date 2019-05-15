@@ -507,12 +507,14 @@
          "PROCESSED": "Finished",
          "RECORDING_FAILURE": "Recording failure",
          "PROCESSING_FAILURE": "Processing failure",
-         "PROCESSING_CANCELED": "Processing canceled",
+         "PROCESSING_CANCELED": "Processing canceled"
+       },
+       "STATE_MAPPING":{
          "RETRACTING": "Retracting",
          "DUPLICATING": "Duplicating",
          "PUBLISHING": "Publishing",
          "IMPORTING": "Importing",
-         "REPUBLISHING": "Republishing",
+         "REPUBLISHING_METADATA": "Republishing metadata",
          "UPDATING_PREVIEWS": "Updating previews"
        },
        "DETAILS": {

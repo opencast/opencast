@@ -21,6 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.anyString;
 import static org.easymock.EasyMock.expect;
 import static org.opencastproject.capture.CaptureParameters.INGEST_WORKFLOW_DEFINITION;
@@ -578,7 +579,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(event.getTitle()).andReturn(title).anyTimes();
     EasyMock.expect(event.getSeriesId()).andReturn("seriesId").anyTimes();
     EasyMock.expect(event.getEventStatus()).andReturn("EVENTS.EVENTS.STATUS.ARCHIVE").anyTimes();
-    EasyMock.expect(event.getDisplayableStatus()).andReturn("EVENTS.EVENTS.STATUS.ARCHIVE").anyTimes();
+    EasyMock.expect(event.getDisplayableStatus(anyObject())).andReturn("EVENTS.EVENTS.STATUS.ARCHIVE").anyTimes();
     EasyMock.expect(event.getRecordingStartDate()).andReturn("2013-03-20T04:00:00Z").anyTimes();
     EasyMock.expect(event.getRecordingEndDate()).andReturn("2013-03-20T05:00:00Z").anyTimes();
     EasyMock.expect(event.getTechnicalStartTime()).andReturn("2013-03-20T04:00:00Z").anyTimes();

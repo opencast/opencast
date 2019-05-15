@@ -331,8 +331,8 @@
   </operations>
 
   <state-mappings>
-    <state-mapping state="running">EVENTS.EVENTS.STATUS.IMPORTING</state-mapping>
-    <state-mapping state="failing">EVENTS.EVENTS.STATUS.IMPORTING</state-mapping>
+    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.IMPORTING</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.IMPORTING</state-mapping>
   </state-mappings>
 
 </definition>

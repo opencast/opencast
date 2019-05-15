@@ -703,6 +703,17 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     return Response.ok(jsonArray.toJSONString()).header("Content-Type", MediaType.APPLICATION_JSON).build();
   }
 
+  @GET
+  @Path("statemappings.json")
+  @SuppressWarnings("unchecked")
+  @RestQuery(name = "statemappings", description = "Get all workflow state mappings",
+      returnDescription = "A JSON representation of the workflow state mappings.",
+      reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow state mappings") })
+  public Response getStateMappings() {
+    return Response.ok(new JSONObject(service.getWorkflowStateMappings()).toJSONString())
+        .header("Content-Type", MediaType.APPLICATION_JSON).build();
+  }
+
   @Path("/cleanup")
   @RestQuery(name = "cleanup", description = "Cleans up workflow instances", returnDescription = "No return value", reponses = {
           @RestResponse(responseCode = SC_OK, description = "Cleanup OK"),

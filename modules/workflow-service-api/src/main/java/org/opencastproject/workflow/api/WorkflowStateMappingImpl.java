@@ -54,7 +54,6 @@ public class WorkflowStateMappingImpl implements WorkflowStateMapping {
    *          The value to use for the state
    */
   public WorkflowStateMappingImpl(WorkflowInstance.WorkflowState state, String value) {
-    this();
     this.state = state;
     this.value = value;
   }

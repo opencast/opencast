@@ -1,4 +1,4 @@
-Upgrading Opencast from 7.x to 8.x
+Upgrading Opencast from 6.x to 7.x
 ==================================
 
 This guide describes how to upgrade Opencast 7.x to 8.x. In case you need information about how to upgrade older
@@ -11,12 +11,5 @@ How to Upgrade
 2. Replace Opencast with the new version
 3. Back-up Opencast files and database (optional)
 4. [Upgrade the database](#database-migration)
-
-
-Database Migration
-------------------
-
-As part of performance optimizations, some tables were modified. This requires a database schema update. As with all
-database migrations, we strongly recommend to create a database backup before attempting the upgrade.
 
 You can find the database upgrade script in `docs/upgrade/7_to_8/`.

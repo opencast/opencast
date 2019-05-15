@@ -46,7 +46,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -87,7 +86,6 @@ public class Event implements IndexObject {
   public static final String XML_SURROUNDING_TAG = "events";
 
   /** The mapping of recording and workflow states */
-  public static final Map<String, Map<String, String>> customWorkflowStatusMapping = new ConcurrentHashMap<>();
   private static final Map<String, String> workflowStatusMapping = new HashMap<>();
   private static final Map<String, String> recordingStatusMapping = new HashMap<>();
 
@@ -891,9 +889,12 @@ public class Event implements IndexObject {
   /**
    * Return the displayable status of this event
    *
+   * @param customWorkflowStatusMapping
+   *          The mappings used to get the displayable status for the workflow state.
+   *
    * @return the displayable status of this event
    */
-  public String getDisplayableStatus() {
+  public String getDisplayableStatus(Map<String, Map<String, String>> customWorkflowStatusMapping) {
     if (getWorkflowId() != null && StringUtils.isNotBlank(getWorkflowState())
           && customWorkflowStatusMapping.containsKey(getWorkflowDefinitionId())
           && customWorkflowStatusMapping.get(getWorkflowDefinitionId()).containsKey(getWorkflowState())) {

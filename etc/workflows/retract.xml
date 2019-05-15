@@ -155,8 +155,8 @@
   </operations>
 
   <state-mappings>
-    <state-mapping state="running">EVENTS.EVENTS.STATUS.RETRACTING</state-mapping>
-    <state-mapping state="failing">EVENTS.EVENTS.STATUS.RETRACTING</state-mapping>
+    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.RETRACTING</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.RETRACTING</state-mapping>
   </state-mappings>
 
 </definition>

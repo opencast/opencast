@@ -318,4 +318,9 @@ public interface WorkflowService {
    */
   void cleanupWorkflowInstances(int lifetime, WorkflowInstance.WorkflowState state) throws WorkflowDatabaseException,
           UnauthorizedException;
+
+  /**
+   * @return All configured workflow state mappings
+   */
+  Map<String, Map<String, String>> getWorkflowStateMappings();
 }

@@ -107,8 +107,8 @@ Technically, a workflow can be in one of the following states:
 |**failed**| The workflow failed due to an error | "Processing failure" |
 |**failing**| The workflow is still running, but there were errors. It will fail. | "Running" |
 
-Using so-called state mappings, it is possible to refine the labels displayed in the Admin UI events table for a
-particular workflow.
+Using state mappings, it is possible to refine the labels displayed in the Admin UI events table for a particular
+workflow.
 
 Here is an example which displays "Retracting" instead of "Running" for the retract workflow:
 

@@ -146,16 +146,6 @@
               </compositeQueue>
             </virtualDestinations>
           </virtualDestinationInterceptor>
-          <virtualDestinationInterceptor>
-            <virtualDestinations>
-              <compositeQueue name="WORKFLOW_DEFINITION.QUEUE">
-                <forwardTo>
-                  <queue physicalName="WORKFLOW_DEFINITION.Adminui" />
-                  <queue physicalName="WORKFLOW_DEFINITION.Externalapi" />
-                </forwardTo>
-              </compositeQueue>
-            </virtualDestinations>
-          </virtualDestinationInterceptor>
         </destinationInterceptors>
 
         <!--

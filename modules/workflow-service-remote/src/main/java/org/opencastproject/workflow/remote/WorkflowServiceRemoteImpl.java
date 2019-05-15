@@ -46,6 +46,7 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -57,6 +58,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +67,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -658,5 +661,21 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
       closeConnection(response);
     }
     throw new WorkflowDatabaseException("Unable to successfully request the workflow cleanup endpoint");
+  }
+
+  @Override
+  public Map<String, Map<String, String>> getWorkflowStateMappings() {
+    HttpGet get = new HttpGet("/statemappings.json");
+    HttpResponse response = getResponse(get);
+    try {
+      if (response != null) {
+        return (Map<String, Map<String, String>>) new JSONParser().parse(IOUtils.toString(response.getEntity().getContent(), "utf-8"));
+      }
+    } catch (Exception e) {
+      throw new IllegalStateException("Unable to parse workflow state mappings");
+    } finally {
+      closeConnection(response);
+    }
+    return new HashMap<>();
   }
 }
