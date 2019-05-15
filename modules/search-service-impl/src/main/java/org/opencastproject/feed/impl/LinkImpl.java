@@ -39,7 +39,7 @@ public class LinkImpl implements Link {
 
   private String title = null;
 
-  private String flavour = null;
+  private String flavor = null;
 
   private long length = -1;
 
@@ -138,17 +138,17 @@ public class LinkImpl implements Link {
   }
 
   /**
-   * @see org.opencastproject.feed.api.Link#getFlavour()
+   * @see org.opencastproject.feed.api.Link#getFlavor()
    */
-  public String getFlavour() {
-    return flavour;
+  public String getFlavor() {
+    return flavor;
   }
 
   /**
-   * @see org.opencastproject.feed.api.Link#setFlavour(java.lang.String)
+   * @see org.opencastproject.feed.api.Link#setFlavor(java.lang.String)
    */
-  public void setFlavour(String flavor) {
-    this.flavour = flavor;
+  public void setFlavor(String flavor) {
+    this.flavor = flavor;
   }
 
 
