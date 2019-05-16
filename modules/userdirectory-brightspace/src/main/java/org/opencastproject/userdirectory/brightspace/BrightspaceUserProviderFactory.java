@@ -30,6 +30,7 @@ import org.opencastproject.userdirectory.brightspace.client.BrightspaceClientImp
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
@@ -127,12 +128,12 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
     int cacheSize = parseCacheSizeProperty(properties);
     int cacheExpiration = parseCacheExpirationProperty(properties);
 
-    validateOrganization(organization);
     validateUrl(urlStr);
-    validateSystemUserKey(systemUserKey);
-    validateSystemUserId(systemUserId);
-    validateApplicationId(applicationId);
-    validateApplicationKey(applicationKey);
+    validateConfigurationKey(ORGANIZATION_KEY, organization);
+    validateConfigurationKey(BRIGHTSPACE_USER_ID, systemUserId);
+    validateConfigurationKey(BRIGHTSPACE_USER_KEY, systemUserKey);
+    validateConfigurationKey(BRIGHTSPACE_APP_ID, applicationId);
+    validateConfigurationKey(BRIGHTSPACE_APP_KEY, applicationKey);
 
     ServiceRegistration existingRegistration = this.providerRegistrations.remove(pid);
     if (existingRegistration != null) {
@@ -180,48 +181,16 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
   }
 
   private int parseCacheExpirationProperty(Dictionary properties) {
-    try {
-      if (properties.get(CACHE_EXPIRATION) != null) {
-        return Integer.parseInt(properties.get(CACHE_EXPIRATION).toString());
-      }
-    } catch (NumberFormatException nfe) {
-      logger.warn("{} could not be loaded, default value is used: {}", CACHE_EXPIRATION, DEFAULT_CACHE_EXPIRATION_VALUE);
-    }
-    return DEFAULT_CACHE_EXPIRATION_VALUE;
+    return NumberUtils.toInt(properties.get(CACHE_EXPIRATION). toString(), DEFAULT_CACHE_EXPIRATION_VALUE);
   }
 
   private int parseCacheSizeProperty(Dictionary properties) {
-    try {
-      if (properties.get(CACHE_SIZE) != null) {
-        return  Integer.parseInt((String) properties.get(CACHE_SIZE));
-      }
-    } catch (NumberFormatException nfe) {
-      logger.warn("{} could not be loaded, default value is used: {}", CACHE_SIZE, DEFAULT_CACHE_SIZE_VALUE);
-    }
-    return DEFAULT_CACHE_SIZE_VALUE;
+    return NumberUtils.toInt(properties.get(CACHE_SIZE). toString(), DEFAULT_CACHE_SIZE_VALUE);
   }
 
-  private void validateSystemUserKey(String userKey) throws ConfigurationException {
-    if (StringUtils.isBlank(userKey)) {
-      throw new ConfigurationException(BRIGHTSPACE_USER_KEY, "is not set");
-    }
-  }
-
-  private void validateApplicationId(String applicationId) throws ConfigurationException {
-    if (StringUtils.isBlank(applicationId)) {
-      throw new ConfigurationException(BRIGHTSPACE_APP_ID, "is not set");
-    }
-  }
-
-  private void validateApplicationKey(String applicationKey) throws ConfigurationException {
-    if (StringUtils.isBlank(applicationKey)) {
-      throw new ConfigurationException(BRIGHTSPACE_APP_KEY, "is not set");
-    }
-  }
-
-  private void validateSystemUserId(String userId) throws ConfigurationException {
-    if (StringUtils.isBlank(userId)) {
-      throw new ConfigurationException(BRIGHTSPACE_USER_ID, "is not set");
+  private void validateConfigurationKey(String key, String value) throws ConfigurationException {
+    if (StringUtils.isBlank(value)) {
+      throw new ConfigurationException(key, "is not set");
     }
   }
 
@@ -229,18 +198,12 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
     if (StringUtils.isBlank(urlStr)) {
       throw new ConfigurationException(BRIGHTSPACE_URL, "is not set");
     } else {
-      URI url;
       try {
-        url = new URI(urlStr);
-      } catch (URISyntaxException var21) {
+        new URI(urlStr);
+      } catch (URISyntaxException e) {
         throw new ConfigurationException(BRIGHTSPACE_URL, "not a URL");
       }
     }
   }
 
-  private void validateOrganization(String organization) throws ConfigurationException {
-    if (StringUtils.isBlank(organization)) {
-      throw new ConfigurationException(ORGANIZATION_KEY, "is not set");
-    }
-  }
 }
