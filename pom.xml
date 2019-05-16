@@ -1541,6 +1541,22 @@
         <github.nick>JulianKniephoff</github.nick>
       </properties>
     </developer>
+    <developer>
+      <id>mliradelc</id>
+      <name>Maximiliano Lira Del Canto</name>
+      <email>mliradel@uni-koeln.de</email>
+      <url></url>
+      <organization>Computer Center - University of Cologne</organization>
+      <organizationUrl>https://www.uni-koeln.de</organizationUrl>
+      <roles>
+         <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+      <properties>
+        <irc.nick></irc.nick>
+        <github.nick>mliradelc</github.nick>
+      </properties>
+    </developer>
   </developers>
   <!-- People having significantly contributed to Opencast in the past -->
   <contributors>
