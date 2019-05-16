@@ -348,7 +348,7 @@
         "enabled": true
       },
       "es.upv.paella.opencast.userTrackingSaverPlugIn": {
-        "enabled": true
+        "enabled": false
       }
     }
   }
