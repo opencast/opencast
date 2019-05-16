@@ -23,7 +23,6 @@
 package org.opencastproject.userdirectory.brightspace.client;
 
 import org.opencastproject.userdirectory.brightspace.client.api.BrightspaceUser;
-import org.opencastproject.userdirectory.brightspace.client.api.OrgUnitItem;
 
 import java.util.List;
 import java.util.Set;

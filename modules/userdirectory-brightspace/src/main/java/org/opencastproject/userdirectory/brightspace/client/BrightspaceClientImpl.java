@@ -26,9 +26,6 @@ import org.opencastproject.userdirectory.brightspace.client.api.OrgUnitResponse;
 import org.opencastproject.userdirectory.brightspace.client.api.PagingInfo;
 import org.opencastproject.userdirectory.brightspace.client.api.UsersResponse;
 
-import be.ugent.brightspace.idkeyauth.AuthenticationSecurityFactory;
-import be.ugent.brightspace.idkeyauth.ID2LAppContext;
-import be.ugent.brightspace.idkeyauth.ID2LUserContext;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -49,6 +46,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import be.ugent.brightspace.idkeyauth.AuthenticationSecurityFactory;
+import be.ugent.brightspace.idkeyauth.ID2LAppContext;
+import be.ugent.brightspace.idkeyauth.ID2LUserContext;
 
 public class BrightspaceClientImpl implements BrightspaceClient {
 
