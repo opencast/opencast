@@ -160,7 +160,7 @@ public class BrightspaceClientImpl implements BrightspaceClient {
     } catch (MalformedURLException mue) {
       throw new BrightspaceClientException("url was malformed", mue);
     }
-    logger.debug("about to make GET request to : {}", uri.toString());
+    logger.debug("about to make GET request to : {}", uri);
     return url;
   }
 
@@ -191,7 +191,7 @@ public class BrightspaceClientImpl implements BrightspaceClient {
       while ((inputline = bufferedReader.readLine()) != null) {
         content.append(inputline);
       }
-      logger.debug("call to brightspace api: {}", content.toString());
+      logger.debug("call to brightspace api: {}", content);
       return content.toString();
     } catch (IOException io) {
       throw new BrightspaceClientException("Could not read response", io);
