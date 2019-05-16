@@ -261,7 +261,7 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
           return null;
         }
       } catch (BrightspaceClientException e) {
-        logger.error("User {} not found in Brightspace system", username);
+        logger.error("A Brightspace API error occurred, user {} could not be retrieved", username);
         return null;
       } finally {
         currentThread.setContextClassLoader(originalClassloader);
