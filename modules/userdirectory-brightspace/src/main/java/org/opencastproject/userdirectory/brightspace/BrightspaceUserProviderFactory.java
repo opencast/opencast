@@ -174,7 +174,7 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
       try {
         ManagementFactory.getPlatformMBeanServer().unregisterMBean(getObjectName(pid));
       } catch (Exception e) {
-        logger.warn("Unable to unregister mbean for pid='{}': {}", pid, var4.getMessage());
+        logger.warn("Unable to unregister mbean for pid='{}'", pid, e);
       }
     }
   }
