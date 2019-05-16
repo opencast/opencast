@@ -92,7 +92,6 @@ public class BrightspaceClientImpl implements BrightspaceClient {
               });
       return brightspaceUserList.stream().findFirst().orElse(null);
     } catch (IOException e) {
-      logger.error(UNEXPECTED_JSON_RESPONSE);
       throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE, e);
     }
   }
@@ -132,7 +131,6 @@ public class BrightspaceClientImpl implements BrightspaceClient {
       UsersResponse usersResponse = objectMapper.readValue(response, UsersResponse.class);
       return usersResponse.getItems();
     } catch (IOException e) {
-      logger.error(UNEXPECTED_JSON_RESPONSE);
       throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE);
     }
 
