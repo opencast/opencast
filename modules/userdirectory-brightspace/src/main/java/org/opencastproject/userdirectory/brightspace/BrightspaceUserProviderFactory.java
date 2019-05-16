@@ -166,7 +166,7 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
    */
   @Override
   public void deleted(String pid) {
-    logger.debug("delete BrightspaceUserProviderInstance for pid=" + pid);
+    logger.debug("delete BrightspaceUserProviderInstance for pid={}", pid);
     ServiceRegistration registration = providerRegistrations.remove(pid);
     if (registration != null) {
       registration.unregister();
