@@ -147,7 +147,7 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
       throw new ConfigurationException(ORGANIZATION_KEY, "not found");
     }
 
-    logger.debug("creating new MoodleUserProviderInstance for pid=" + pid);
+    logger.debug("creating new brightspace user provider for pid={}", pid);
 
 
     BrightspaceUserProviderInstance provider = new BrightspaceUserProviderInstance(pid,
