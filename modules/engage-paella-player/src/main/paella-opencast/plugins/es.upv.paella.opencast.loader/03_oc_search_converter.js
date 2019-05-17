@@ -182,18 +182,30 @@ class OpencastToPaellaConverter {
     return flavours;
   }
 
+  /**
+   * Check if a flavor passes the configured flavors for tracks.
+   * @param flavor     the tracks flavor
+   * @param subFlavor  the tracks sub-flavor
+   * @return boolean indicating if track shall pass the filter
+   */
+  matchTrackFilter(flavor, subFlavor) {
+    var filters = paella.player.config.plugins.list['es.upv.paella.opencast.loader'].flavors || [['*']];
+    for (const filter of filters) {
+      filter.push('*');
+      if ((filter[0] == '*' || filter[0] == flavor) && (filter[1] == '*' || filter[1] == subFlavor)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   getStreams(episode) {
     // Get the streams
-    var [filter, subFilter] = paella.player.config.plugins.list['es.upv.paella.opencast.loader'].flavor.split('/');
-    if (subFilter === undefined) {
-      subFilter = '*';
-    }
-
     var paellaStreams = [];
     var flavors = this.getContentToImport(episode);
     flavors.forEach((flavorStr) => {
       var [flavor, subFlavor] = flavorStr.split('/');
-      if ((filter == '*' || filter == flavor) && (subFilter == '*' || subFilter == subFlavor)) {
+      if (this.matchTrackFilter(flavor, subFlavor)) {
         var stream = this.getStreamFromFlavor(episode, flavor, subFlavor);
         paellaStreams.push(stream);
       }
