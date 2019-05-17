@@ -286,19 +286,41 @@ operation should be executed. This so-called execution condition is a boolean ex
     <term> ::= <value> ["AND" <term>]
     <value> ::= ["NOT"]* ( "(" <expression> ")" | <relation> | <bool-literal> )
     <relation> ::= <relation-factor> <rel-literal> <relation-factor>
-    <relation-factor> ::= <operation> | <number>
-    <operation> ::= <number> <op-literal> <number>
+    <relation-factor> ::= <operation> | <atom>
+    <operation> ::= <atom> <op-literal> <atom>
     <rel-literal> ::= ">=" | ">" | "<=" | "<" | "==" | "!="
     <op-literal> ::= "+" | "-" | "*" | "/"
     <bool-literal> ::= "true" | "false"
+    <atom> ::= <number> | <string>
 
-As the formal description above explains, such boolean expressions may contain the booelan constants (`true` and
-`false`) and numbers, as well as references to the variables of the workflow instance that contain these data types.
-Workflow instance variables can be accessed by using `${variableName}`.
+As the formal description above explains, such boolean expressions may contain…
 
-Example:
+- …the boolean constants `true` and `false`.
+- …numbers, which may contain a decimal point.
+- …strings, which must be surrounded by single-quotes. Escaping of single quotes is supported, just use two single
+  quotes next to each other: `'foo''bar'`
+- …as well as references to the variables of the workflow instance that contain these data types. Variables
+  are enclosed in in `${}`, as shown below. A default value may be specified for a variable, after the name, 
+  separated by a colon, as such: `${foo:1}`. The default value will be used in case the variable doesn’t exist. 
+  If no default value is specified, `false` will be used. This, of course, only makes sense in boolean contexts. Be
+  aware to specify a default value in relations such as `${foo} < ${bar}`.
+
+Example for simple boolean expressions:
 
     <operation id="..." if="${variableName1} AND NOT (${variableName2} OR ${variableName3})">
+      …
+    </operation>
+
+Example for string comparisons:
+
+    <operation id="..." if="${captureAgentVendor} == 'ACME Corporation'">
+      …
+    </operation>
+
+Note that operations containing strings and numbers are somewhat well-behaved, for example, the following operation
+gets executed because `3` is converted to a string and then added to the string `'4'`:
+
+    <operation id="..." if="3+'4' == '34'">
       …
     </operation>
 
