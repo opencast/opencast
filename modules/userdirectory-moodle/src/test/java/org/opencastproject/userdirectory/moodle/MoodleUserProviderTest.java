@@ -45,7 +45,7 @@ public class MoodleUserProviderTest {
   public void setUp() throws Exception {
     moodleProvider = new MoodleUserProviderInstance("sample_pid",
             new MoodleWebServiceImpl(new URI("http://moodle/webservice/rest/server.php"), "myToken"),
-            new DefaultOrganization(), "^[0-9]+$", "^[0-9a-zA-Z_]+$", "^[0-9]+$", true, 100, 10);
+            new DefaultOrganization(), "^[0-9]+$", "^[0-9a-zA-Z_]+$", "^[0-9]+$", true, 100, 10, "admin");
   }
 
   @Test
