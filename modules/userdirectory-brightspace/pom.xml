@@ -118,19 +118,19 @@
           </instructions>
         </configuration>
       </plugin>
-      <plugin> 
-        <groupId>org.apache.maven.plugins</groupId> 
-        <artifactId>maven-dependency-plugin</artifactId> 
-        <extensions>true</extensions> 
-        <configuration> 
-          <ignoredUnusedDeclaredDependencies>  
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
             <!-- Used for tests -->
             <ignoredUnusedDeclaredDependency>org.hamcrest:hamcrest-core</ignoredUnusedDeclaredDependency>
-            <!-- provide a logger for tests --> 
+            <!-- provide a logger for tests -->
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>log4j:log4j</ignoredUnusedDeclaredDependency>
-          </ignoredUnusedDeclaredDependencies> 
-        </configuration> 
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
       </plugin>
     </plugins>
   </build>
