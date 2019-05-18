@@ -47,8 +47,6 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -60,9 +58,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class StatisticsExportCSVImpl implements StatisticsExportCSV, ManagedService {
@@ -81,17 +81,20 @@ public class StatisticsExportCSVImpl implements StatisticsExportCSV, ManagedServ
 
 
   @Override
-  @SuppressWarnings("unchecked")
   public void updated(Dictionary<String, ?> dictionary) {
     final String providerMappings = (String) dictionary.get(CFG_KEY_SERIES_TO_EVENT_PROVIDER_MAPPINGS);
     if (providerMappings == null) {
       return;
     }
-    try {
-      seriesToEventProviderMapping = (Map<String, String>) new JSONParser().parse(providerMappings);
-    } catch (ParseException e) {
-      throw new ConfigurationException(CFG_KEY_SERIES_TO_EVENT_PROVIDER_MAPPINGS, e);
-    }
+    seriesToEventProviderMapping = Arrays.stream(providerMappings.split(","))
+        .peek(s -> {
+          if (!s.contains(":")) {
+            throw new ConfigurationException("Missing ':' in mapping from series provider to episode provider: " + s);
+          }
+        })
+        .collect(Collectors.toMap(
+            s -> s.split(":")[0], s -> s.split(":")[1]
+        ));
   }
 
   public void activate(ComponentContext cc) {
@@ -144,7 +147,7 @@ public class StatisticsExportCSVImpl implements StatisticsExportCSV, ManagedServ
       throw new IllegalStateException("CSV export not supported for provider of type " + provider.getClass().getName());
     }
     final StringWriter stringWriter = new StringWriter();
-    try (CSVPrinter printer = CSVFormat.EXCEL.withHeader(header).print(stringWriter)) {
+    try (CSVPrinter printer = CSVFormat.RFC4180.withHeader(header).print(stringWriter)) {
       switch (provider.getResourceType()) {
         case EPISODE:
           printEvent(provider, resourceId, from, to, dataResolution, index, zoneId, printer);

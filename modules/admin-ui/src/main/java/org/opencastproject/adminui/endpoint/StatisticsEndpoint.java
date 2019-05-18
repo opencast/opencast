@@ -364,7 +364,7 @@ public class StatisticsEndpoint {
     @RestParameter(name = "resourceId", isRequired = true, description = "The resource id", type = RestParameter.Type.TEXT),
     @RestParameter(name = "from", isRequired = true, description = "The from date in iso 8601 UTC notation", type = RestParameter.Type.TEXT),
     @RestParameter(name = "to", isRequired = true, description = "The to date in iso 8601 UTC notation", type = RestParameter.Type.TEXT),
-    @RestParameter(name = "dataResolution", isRequired = true, description = "The data resolution", type = RestParameter.Type.TEXT)},
+    @RestParameter(name = "dataResolution", isRequired = true, description = "The data resolution. Valid values are 'HOURLY', 'DAILY', 'WEEKLY', 'MONTHLY', and 'YEARLY'", type = RestParameter.Type.TEXT)},
     reponses = {
       @RestResponse(description = "Returns the statistical data for the given resource type as csv", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "If the current user is not authorized to perform this action", responseCode = HttpServletResponse.SC_UNAUTHORIZED)
