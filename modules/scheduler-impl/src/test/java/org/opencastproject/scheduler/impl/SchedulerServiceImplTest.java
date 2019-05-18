@@ -1075,6 +1075,12 @@ public class SchedulerServiceImplTest {
       assertEquals(2, events.size());
     }
     {
+      // No events are contained in the RRule and date range: 2019-02-16T16:00:00Z to 2019-02-16T16:55:00Z, FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0
+      List<MediaPackage> conflicts = schedSvc.findConflictingEvents("Device A",
+              new RRule("FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0"), new Date(1550332800000L), new Date(1550336100000L), 1000, TimeZone.getTimeZone("Africa/Johannesburg"));
+      assertEquals(0, conflicts.size());
+    }
+    {
       //Event A starts before event B, and ends during event B
       List<MediaPackage> conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(23) + minutes(30)), new Date(currentTime + hours(24) + minutes(30)));
       assertEquals(1, conflicts.size());

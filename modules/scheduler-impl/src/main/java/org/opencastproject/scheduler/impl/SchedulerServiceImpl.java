@@ -1098,6 +1098,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     Util.adjustRrule(rrule, start, tz);
     final List<Period> periods =  Util.calculatePeriods(start, end, duration, rrule, tz);
+
+    if (periods.isEmpty()) {
+      return Collections.emptyList();
+    }
+
     return findConflictingEvents(periods, captureAgentId, tz);
   }
 
