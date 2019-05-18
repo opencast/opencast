@@ -530,6 +530,11 @@ modules/engage-ui/src/main/resources/ui/js/jquery-localize.min.js
   Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt)
   and MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses.
 
+modules/engage-ui/src/main/resources/ui/js/lib/js-yaml.min.js
+  js-yaml 3.13.1
+  https://github.com/nodeca/js-yaml
+  MIT License
+
 modules/engage-ui/src/main/resources/ui/js/bootstrap-accessibility.min.js
   bootstrap-accessibility-plugin - v1.0.4 - 2014-11-03
   https://github.com/paypal/bootstrap-accessibility-plugin
