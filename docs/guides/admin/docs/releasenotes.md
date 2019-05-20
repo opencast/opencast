@@ -45,6 +45,12 @@ Configuration changes
   additional source for errors. If you rely on the old behavior, it can be configured in
   `etc/org.opencastproject.ingest.impl.IngestServiceImpl.cfg`.
 - The Paella player now respects all tracks published to engage instead of tracks with the flavor `*/delivery` only.
+- The structure of the configuration files concerning URL signing has changed.
+  See [here](./configuration/stream-security.md). The affected files are:
+    - `etc/org.opencastproject.security.urlsigning.filter.UrlSigningFilter.cfg `
+    - `etc/org.opencastproject.security.urlsigning.provider.impl.GenericUrlSigningProvider.cfg`
+    - `etc/org.opencastproject.security.urlsigning.provider.impl.WowzaUrlSigningProvider.cfg`
+    - `etc/org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl.cfg`
 
 API changes
 -----------
