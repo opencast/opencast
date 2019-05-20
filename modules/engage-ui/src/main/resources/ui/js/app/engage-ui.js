@@ -50,9 +50,6 @@ function($, bootbox, _, alertify) {
         var msg_loginFailed = "Failed to log in.";
         var msg_live_in_progress = "Live (in progress)";
         var msg_live_not_in_progress = "Live (not in progress)";
-        var infoMeURL = "/info/me.json";
-        var springSecurityLoginURL = "/j_spring_security_check";
-        var springSecurityLogoutURL = "/j_spring_security_logout";
         var springLoggedInStrCheck = "j_spring_security_check";
         var $navbarEpisodes = "#navbarEpisodes";
         var $navbarSeries = "#navbarSeries";
@@ -489,8 +486,6 @@ function($, bootbox, _, alertify) {
                             setAnonymousUser();
                         }
                     }
-
-                    log("Chosen player: " + player);
                 }
             })
         }
