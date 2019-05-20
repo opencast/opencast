@@ -1124,7 +1124,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     // the external API, for example; the admin ui should prevent this from happening). Then check for conflicts with
     // existing events.
     if (checkPeriodOverlap(periods)) {
-      throw new SchedulerException("RRULE periods overlap");
+      throw new IllegalArgumentException("RRULE periods overlap");
     }
 
     try {
