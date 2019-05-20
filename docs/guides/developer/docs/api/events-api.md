@@ -275,14 +275,25 @@ acl:
 ]
 ```
 
-scheduling (`rrule` is optional and can be used to schedule multiple events):
+scheduling a single event:
 ```
 {
   "agent_id": "ca24",
   "start": "2018-03-27T16:00:00Z",
   "end": "2018-03-27T19:00:00Z",
   "inputs": ["default"],
-  "rrule":"FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=16;BYMINUTE=0"
+}
+```
+
+scheduling multiple events:
+```
+{
+  "agent_id": "ca24",
+  "start": "2019-05-20T16:00:00Z",
+  "end": "2019-06-10T19:00:00Z",
+  "inputs": ["default"],
+  "rrule":"FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=16;BYMINUTE=0",
+  "duration":1080000;
 }
 ```
 
