@@ -489,8 +489,6 @@ function($, bootbox, _, alertify) {
                             setAnonymousUser();
                         }
                     }
-
-                    log("Chosen player: " + player);
                 }
             })
         }
