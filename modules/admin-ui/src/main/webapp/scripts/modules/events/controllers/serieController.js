@@ -25,9 +25,13 @@ angular.module('adminNg.controllers')
 .controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource','SeriesThemeResource', 'ResourcesListResource', 'UserRolesResource', 'Notifications', 'AuthService','StatisticsReusable','$http',
   function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, UserRolesResource, Notifications, AuthService, StatisticsReusable, $http) {
 
-    $http.get('/admin-ng/feeds/listFeedServices')
-    .then(function(response){
+    $http.get('/admin-ng/feeds/feeds')
+    .then( function(response) {
       $scope.feedContent = response.data;
+    }, function(error) {
+      $scope.feedContent = null;
+      console.error("request to /admin-ng/feeds/feeds failed");
+      console.error(error);
     });
 
     var roleSlice = 100;

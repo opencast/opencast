@@ -48,7 +48,7 @@
        with-role="ROLE_UI_SERIES_DETAILS_STATISTICS_VIEW"
        ng-if="statReusable.hasStatistics()">
       <!-- Statistics -->
-    <a ng-click="openTab('feeds')"
+    <a ng-if="feedContent" ng-click="openTab('feeds')"
       data-modal-tab="feeds"
       ng-class="{ active: tab == 'feeds' }"
       translate="Feeds"
@@ -344,7 +344,7 @@
   </div>
 
   <!-- Feeds view -->
-  <div class="modal-content" data-modal-tab-content="feeds">
+  <div ng-if="feedContent" class="modal-content" data-modal-tab-content="feeds">
     <div class="modal-body">
       <div class="full-col">
         <div class="obj">
@@ -361,7 +361,7 @@
               </tr>
               <tr ng-repeat="row in feedContent">
                 <td> {{ row.type }} </td>
-                <td> {{ row.identifier }} </td>
+                <td> <a href="{{ row.identifier }}"> {{ row.identifier }} </a> </td>
                 <td> {{ row.name }} </td>
                 <td> {{ row.description }} </td>
               </tr>
