@@ -48,6 +48,12 @@
        with-role="ROLE_UI_SERIES_DETAILS_STATISTICS_VIEW"
        ng-if="statReusable.hasStatistics()">
       <!-- Statistics -->
+    <a ng-click="openTab('feeds')"
+      data-modal-tab="feeds"
+      ng-class="{ active: tab == 'feeds' }"
+      translate="FEEDS"
+      with-role="FEEDS">
+      <!-- FEEDS -->
     </a>
   </nav>
 
