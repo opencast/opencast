@@ -88,6 +88,14 @@ within Opencast's `org.springframework.security.oauth:spring-security-oauth` dep
 `CVE-2019-3778`.
 
 
+Additional Notes about 6.5
+--------------------------
+
+Opencast 6.5 contains a change to the job dispatching logic, which will change how your cluster dispatches jobs to its
+workers.  This change means that workers with a higher maximum load will absorb more work before workers with lower
+maximum loads will accept heavy workloads.  This change does not require any configuration changes, however you may
+notice large changes in processing load distribution depending on your cluster configuration.
+
 Release Schedule
 ----------------
 

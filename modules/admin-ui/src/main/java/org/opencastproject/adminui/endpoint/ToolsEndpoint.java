@@ -934,7 +934,7 @@ public class ToolsEndpoint implements ManagedService {
     for (Catalog smilCatalog : mediaPackage.getCatalogs(adminUIConfiguration.getSmilSilenceFlavor())) {
       try {
         Smil smil = smilService.fromXml(workspace.get(smilCatalog.getURI())).getSmil();
-        segments = mergeSegments(segments, getSegmentsFromSmil(smil));
+        segments = getSegmentsFromSmil(smil);
       } catch (NotFoundException e) {
         logger.warn("File '{}' could not be loaded by workspace service: {}", smilCatalog.getURI(), getStackTrace(e));
       } catch (IOException e) {
@@ -1011,17 +1011,24 @@ public class ToolsEndpoint implements ManagedService {
     for (SmilMediaObject elem : smil.getBody().getMediaElements()) {
       if (elem instanceof SmilMediaContainer) {
         SmilMediaContainer mediaContainer = (SmilMediaContainer) elem;
+
+        Tuple tuple = null;
         for (SmilMediaObject video : mediaContainer.getElements()) {
           if (video instanceof SmilMediaElement) {
             SmilMediaElement videoElem = (SmilMediaElement) video;
             try {
-              segments.add(Tuple.tuple(videoElem.getClipBeginMS(), videoElem.getClipEndMS()));
-              break;
+              // pick longest element
+              if (tuple == null || (videoElem.getClipEndMS() - videoElem.getClipBeginMS()) > (Long) tuple.getB() - (Long) tuple.getA()) {
+                tuple = Tuple.tuple(videoElem.getClipBeginMS(), videoElem.getClipEndMS());
+              }
             } catch (SmilException e) {
               logger.warn("Media element '{}' of SMIL catalog '{}' seems to be invalid: {}",
                       videoElem, smil, e);
             }
           }
+        }
+        if (tuple != null) {
+          segments.add(tuple);
         }
       }
     }

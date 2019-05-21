@@ -11,6 +11,7 @@ node/
 # ignore Eclipse project data
 .project
 .classpath
+.factorypath
 .metadata/
 .settings/
 .recommenders/
