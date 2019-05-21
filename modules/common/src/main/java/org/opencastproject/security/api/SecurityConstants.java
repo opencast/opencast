@@ -62,4 +62,7 @@ public interface SecurityConstants {
   /** The roles associated with the Opencast capture agent account */
   String[] GLOBAL_CAPTURE_AGENT_ROLES = new String[] { GLOBAL_CAPTURE_AGENT_ROLE };
 
+  /** The administrator user configuration option */
+  String GLOBAL_ADMIN_USER_PROPERTY = "org.opencastproject.security.admin.user";
+
 }
