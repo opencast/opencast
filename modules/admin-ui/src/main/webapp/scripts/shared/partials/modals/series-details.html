@@ -51,9 +51,9 @@
     <a ng-click="openTab('feeds')"
       data-modal-tab="feeds"
       ng-class="{ active: tab == 'feeds' }"
-      translate="FEEDS"
-      with-role="FEEDS">
-      <!-- FEEDS -->
+      translate="Feeds"
+      with-role="Feeds">
+      <!-- Feeds -->
     </a>
   </nav>
 
@@ -337,6 +337,35 @@
                 <p ng-if="selectedTheme.description">{{ selectedTheme.description }}</p>
               </li>
             </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feeds view -->
+  <div class="modal-content" data-modal-tab-content="feeds">
+    <div class="modal-body">
+      <div class="full-col">
+        <div class="obj">
+          <header class="no-expand" translate="Feeds">
+            <!-- Feeds -->
+          </header>
+          <div class="obj-container">
+            <table class="main-tbl">
+              <tr>
+                <th>Type</th>
+                <th>Identifier</th>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+              <tr ng-repeat="row in feedContent">
+                <td> {{ row.type }} </td>
+                <td> {{ row.identifier }} </td>
+                <td> {{ row.name }} </td>
+                <td> {{ row.description }} </td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>

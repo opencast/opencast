@@ -22,11 +22,13 @@
 
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
-.controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource',
-  'SeriesThemeResource', 'ResourcesListResource', 'UserRolesResource', 'Notifications', 'AuthService',
-  'StatisticsReusable',
-  function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource,
-    ResourcesListResource, UserRolesResource, Notifications, AuthService, StatisticsReusable) {
+.controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource','SeriesThemeResource', 'ResourcesListResource', 'UserRolesResource', 'Notifications', 'AuthService','StatisticsReusable','$http',
+  function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, UserRolesResource, Notifications, AuthService, StatisticsReusable, $http) {
+
+    $http.get('/admin-ng/feeds/listFeedServices')
+    .then(function(response){
+      $scope.feedContent = response.data;
+    });
 
     var roleSlice = 100;
     var roleOffset = 0;
