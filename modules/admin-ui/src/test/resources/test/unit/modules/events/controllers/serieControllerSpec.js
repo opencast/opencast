@@ -45,6 +45,8 @@ describe('Serie controller', function () {
         // Until we're actually testing the statistics endpoint, just return an empty set here
         $httpBackend.whenGET(/\/admin-ng\/statistics.*/).respond('[]');
         $httpBackend.whenPOST(/\/admin-ng\/statistics.*/).respond('[]');
+        $httpBackend.whenGET('/admin-ng/feeds/feeds').respond('{}');
+        $httpBackend.whenGET('/feeds/feeds').respond('{}');
 
         $controller('SerieCtrl', {$scope: $scope});
     });

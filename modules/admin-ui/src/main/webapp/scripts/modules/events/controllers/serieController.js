@@ -30,8 +30,6 @@ angular.module('adminNg.controllers')
       $scope.feedContent = response.data;
     }, function(error) {
       $scope.feedContent = null;
-      console.error("request to /admin-ng/feeds/feeds failed");
-      console.error(error);
     });
 
     var roleSlice = 100;
