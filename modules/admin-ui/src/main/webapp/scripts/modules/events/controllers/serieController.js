@@ -22,8 +22,10 @@
 
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
-.controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource','SeriesThemeResource', 'ResourcesListResource', 'UserRolesResource', 'Notifications', 'AuthService','StatisticsReusable','$http',
-  function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, UserRolesResource, Notifications, AuthService, StatisticsReusable, $http) {
+.controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource','SeriesThemeResource', 
+'ResourcesListResource', 'UserRolesResource', 'Notifications', 'AuthService','StatisticsReusable','$http',
+  function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, 
+    ResourcesListResource, UserRolesResource, Notifications, AuthService, StatisticsReusable, $http) {
 
     $http.get('/admin-ng/feeds/feeds')
     .then( function(response) {
