@@ -48,7 +48,6 @@ import org.opencastproject.index.service.catalog.adapter.MetadataUtils;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
-import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventHttpServletRequest;
@@ -60,8 +59,8 @@ import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.index.service.util.JSONUtils;
+import org.opencastproject.index.service.util.RequestUtils;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
@@ -135,6 +134,7 @@ import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
@@ -155,7 +155,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -170,7 +169,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -516,7 +514,7 @@ public class IndexServiceImpl implements IndexService {
           } else {
             // AngularJS file upload lib appends ".0" to field name, so we cut that off
             fieldName = fieldName.substring(0, fieldName.lastIndexOf("."));
-            checkAcceptedTypes(fieldName, MediaType.parse(item.getContentType()));
+            RequestUtils.checkAcceptedTypes(fieldName, MediaType.parse(item.getContentType()), listProvidersService);
             if ("presenter".equals(item.getFieldName())) {
               mp = ingestService.addTrack(item.openStream(), item.getName(), MediaPackageElements.PRESENTER_SOURCE, mp);
             } else if ("presentation".equals(item.getFieldName())) {
@@ -571,7 +569,8 @@ public class IndexServiceImpl implements IndexService {
       }
 
       return createEvent(metadataJson, mp);
-    } catch (Exception e) {
+    } catch (FileUploadException | UnauthorizedException | ParseException | IngestException | SchedulerException
+        | MediaPackageException | IOException | NotFoundException e) {
       logger.error("Unable to create event: {}", getStackTrace(e));
       throw new IndexServiceException(e.getMessage());
     }
@@ -609,7 +608,7 @@ public class IndexServiceImpl implements IndexService {
         } else {
           // AngularJS file upload lib appends ".0" to field name, so we cut that off
           fieldName = fieldName.substring(0, fieldName.lastIndexOf("."));
-          checkAcceptedTypes(fieldName, MediaType.parse(item.getContentType()));
+          RequestUtils.checkAcceptedTypes(fieldName, MediaType.parse(item.getContentType()), listProvidersService);
           if (item.getFieldName().toLowerCase().matches(attachmentRegex)) {
             assetList.add(item.getFieldName());
             // Add attachment with field name as temporary flavor
@@ -643,7 +642,7 @@ public class IndexServiceImpl implements IndexService {
       }
 
       return startAddAssetWorkflow(metadataJson, mp);
-    } catch (Exception e) {
+    } catch (MediaPackageException | FileUploadException | IOException | IngestException e) {
       logger.error("Unable to create event: {}", getStackTrace(e));
       throw new IndexServiceException(e.getMessage());
     }
@@ -2166,40 +2165,4 @@ public class IndexServiceImpl implements IndexService {
             || WorkflowState.PAUSED.toString().equals(workflowState);
   }
 
-  private void checkAcceptedTypes(String assetUploadId, MediaType mediaType) {
-    if (mediaType.is(MediaType.OCTET_STREAM)) {
-      // No detailed info, so we have to accept...
-      return;
-    }
-    final JSONParser parser = new JSONParser();
-    try {
-      final Collection<String> assetUploadJsons = listProvidersService.getList("eventUploadAssetOptions",
-          new ResourceListQueryImpl(),false).values();
-      for (String assetUploadJson: assetUploadJsons) {
-        if (!assetUploadJson.startsWith("{") || !assetUploadJson.endsWith("}")) {
-          // Ignore non-json-values
-          continue;
-        }
-        @SuppressWarnings("unchecked")
-        final Map<String, String> assetUpload = (Map<String, String>) parser.parse(assetUploadJson);
-        if (assetUploadId.equals(assetUpload.get("id"))) {
-          final List<String> accepts = Arrays.stream(assetUpload.getOrDefault("accept", "*/*").split(","))
-              .map(String::trim).collect(Collectors.toList());
-          for (String accept : accepts) {
-            if (accept.contains("/") && mediaType.is(MediaType.parse(accept))) {
-              return;
-            } else if (mediaType.subtype().equalsIgnoreCase(accept.replace(".", ""))) {
-              return;
-            }
-          }
-          throw new IllegalArgumentException("Provided file format " + mediaType.toString() + " not allowed.");
-        }
-      }
-    } catch (ListProviderException e) {
-      throw new IllegalArgumentException("Invalid assetUploadId: " + assetUploadId);
-    } catch (org.json.simple.parser.ParseException e) {
-      throw new IllegalStateException("cannot parse json list provider for asset upload Id " + assetUploadId, e);
-    }
-    throw new IllegalArgumentException("Invalid assetUploadId: " + assetUploadId);
-  }
 }
