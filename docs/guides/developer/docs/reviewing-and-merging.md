@@ -34,8 +34,7 @@ Reviewing Rules
 Reviewing a Pull Request
 ------------------------
 
-There is no list of things you are required to do as reviewer of a pull request. Our primary goals in doing reviews for
-all pull requests are to ensure that:
+Our goals in doing code reviews for all pull requests are to ensure that:
 
 * There are no bugs in the pull request
     * The feature works as advertised
@@ -44,21 +43,19 @@ all pull requests are to ensure that:
     * [Licenses seem to be fine](license.md)
     * Licenses are added to the `NOTICES` file
 * Feature documentation is in place
-* An upgrade path exists (usually relevant for database changes)
-
-
-The exact review process heavily depends on the type, size and purpose of the pull request.
+* Adopters can easily upgrade to new versions
+    * An upgrade path exists
+    * The upgrade path is documented
 
 Here are some things a reviewer should usually do:
 
 * Check if code looks sensible (e.g. no nonsensical files, no obvious formatting errors, no large binary files, …)
 * Locally run Opencast and verify that the issue has been fixed (as described in the pull request and/or the Jira
   ticket) or the feature does what it is supposed
+* Check whether the database schema is modified. In case it is, a database migration scripts needs to be provided
+  and the upgrade guide needs to contain the information that a database migration is needed including a reference
+  to the Jira ticket(s) the cause the migration
+* Check whether configuration files have been changed in a way that potentially requires Adopters to adjust their
+  configuration. Such configuration changes need to be documented in the upgrade guide including a reference to
+  the Jira ticket(s) that are relevant for the changes
 * Check the documentation
-
-Some changes require special attention:
-
-Folder                         | Description
-:------------------------------|------------
-etc/listproviders              | Changes here might need to be reflected in the static mockup data for the Admin UI facade found in modules/admin-ui/src/test/resources/app/admin-ng/resources
-modules/admin-ui/src/main/java | In case the interface of the Admin UI facade changes, those changes need to be also reflected in the static mockup data for the Admin UI facade found in modules/admin-ui/src/test/resources/app.
