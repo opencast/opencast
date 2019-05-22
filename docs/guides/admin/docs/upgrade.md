@@ -66,6 +66,8 @@ Configuration Changes
   option.
 - `etc/org.opencastproject.scheduler.impl.SchedulerServiceImpl.cfg` has a new option `maintenance` which temporarily
   disables the scheduler if set to `true`.
+- `etc/org.opencastproject.organization-mh_default_org.cfg` the variable `{{id}}` 
+  from `prop.player` has changed to `#{id}`.
 
 Scheduler Migration
 -------------------
