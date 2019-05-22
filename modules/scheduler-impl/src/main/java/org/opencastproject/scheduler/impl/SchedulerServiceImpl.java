@@ -489,6 +489,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     // input Rrule is UTC. Needs to be adjusted to tz
     Util.adjustRrule(rRule, start, tz);
     List<Period> periods = Util.calculatePeriods(start, end, duration, rRule, tz);
+    if (periods.isEmpty()) {
+      return Collections.emptyMap();
+    }
     return addMultipleEventInternal(periods, captureAgentId, userIds, templateMp, wfProperties, caMetadata,
             schedulingSource);
   }
@@ -1098,6 +1101,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     Util.adjustRrule(rrule, start, tz);
     final List<Period> periods =  Util.calculatePeriods(start, end, duration, rrule, tz);
+
+    if (periods.isEmpty()) {
+      return Collections.emptyList();
+    }
+
     return findConflictingEvents(periods, captureAgentId, tz);
   }
 

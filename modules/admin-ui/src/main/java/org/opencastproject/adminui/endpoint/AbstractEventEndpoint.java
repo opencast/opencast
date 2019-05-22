@@ -2024,6 +2024,9 @@ public abstract class AbstractEventEndpoint {
   public Response createNewEvent(@Context HttpServletRequest request) {
     try {
       String result = getIndexService().createEvent(request);
+      if (StringUtils.isEmpty(result)) {
+        return RestUtil.R.badRequest("The date range provided did not include any events");
+      }
       return Response.status(Status.CREATED).entity(result).build();
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());

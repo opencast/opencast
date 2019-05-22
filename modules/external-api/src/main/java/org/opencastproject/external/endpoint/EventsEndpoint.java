@@ -547,6 +547,10 @@ public class EventsEndpoint implements ManagedService {
     try {
       final String eventId = indexService.createEvent(request);
 
+      if (StringUtils.isEmpty(eventId)) {
+        return RestUtil.R.badRequest("The date range provided did not include any events");
+      }
+
       if (eventId.contains(",")) {
         // This the case when SCHEDULE_MULTIPLE is performed.
         return ApiResponses.Json.ok(requestedVersion, arr(
