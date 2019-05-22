@@ -34,7 +34,8 @@ Reviewing Rules
 Reviewing a Pull Request
 ------------------------
 
-Our goals in doing code reviews for all pull requests are to ensure that:
+There is no list of things you are required to do as reviewer of a pull request. Our primary goals in doing reviews for
+all pull requests are to ensure that:
 
 * There are no bugs in the pull request
     * The feature works as advertised
@@ -46,6 +47,8 @@ Our goals in doing code reviews for all pull requests are to ensure that:
 * Adopters can easily upgrade to new versions
     * An upgrade path exists
     * The upgrade path is documented
+
+The exact review process heavily depends on the type, size and purpose of the pull request.
 
 Here are some things a reviewer should usually do:
 
@@ -59,3 +62,10 @@ Here are some things a reviewer should usually do:
   configuration. Such configuration changes need to be documented in the upgrade guide including a reference to
   the Jira ticket(s) that are relevant for the changes
 * Check the documentation
+
+Some changes require special attention:
+
+Folder                         | Description
+:------------------------------|------------
+etc/listproviders              | Changes here might need to be reflected in the static mockup data for the Admin UI facade found in modules/admin-ui/src/test/resources/app/admin-ng/resources
+modules/admin-ui/src/main/java | In case the interface of the Admin UI facade changes, those changes need to be also reflected in the static mockup data for the Admin UI facade found in modules/admin-ui/src/test/resources/app.
