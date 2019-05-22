@@ -44,7 +44,8 @@ Configuration changes
   controlled by Opencast and the routing through capture agents which existed for historical reasons was just an
   additional source for errors. If you rely on the old behavior, it can be configured in
   `etc/org.opencastproject.ingest.impl.IngestServiceImpl.cfg`.
-- The Paella player now respects all tracks published to engage instead of tracks with the flavor `*/delivery` only.
+- By default, the Paella player now respects all tracks published to engage instead of having a hard-coded filter for
+  tracks with the sub-flavor `delivery` only.
 - The structure of the configuration files concerning URL signing has changed.
   See [here](./configuration/stream-security.md). The affected files are:
     - `etc/org.opencastproject.security.urlsigning.filter.UrlSigningFilter.cfg `
@@ -86,6 +87,14 @@ Opencast 6.4 contains a number of bug fixes, some of which are security relevant
 within Opencast's `org.springframework.security.oauth:spring-security-oauth` dependency have been fixed by this release:
 `CVE-2019-3778`.
 
+
+Additional Notes about 6.5
+--------------------------
+
+Opencast 6.5 contains a change to the job dispatching logic, which will change how your cluster dispatches jobs to its
+workers.  This change means that workers with a higher maximum load will absorb more work before workers with lower
+maximum loads will accept heavy workloads.  This change does not require any configuration changes, however you may
+notice large changes in processing load distribution depending on your cluster configuration.
 
 Release Schedule
 ----------------

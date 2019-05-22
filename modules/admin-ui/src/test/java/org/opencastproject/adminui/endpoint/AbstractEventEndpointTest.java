@@ -606,7 +606,7 @@ public class AbstractEventEndpointTest {
     given().expect().statusCode(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE).when().post(rt.host("new"));
 
     // TODO: finish this test
-    given().multiPart("metadata", "some content").expect().statusCode(HttpStatus.SC_CREATED).when()
+    given().multiPart("metadata", "some content").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
             .post(rt.host("new"));
   }
 

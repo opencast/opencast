@@ -55,7 +55,7 @@ public class PlayerRedirect {
 
   private static final Logger logger = LoggerFactory.getLogger(PlayerRedirect.class);
 
-  private static final String PLAYER_DEFAULT = "/engage/theodul/ui/core.html?id={{id}}";
+  private static final String PLAYER_DEFAULT = "/engage/theodul/ui/core.html?id=#{id}";
 
   private SecurityService securityService;
 
@@ -74,7 +74,7 @@ public class PlayerRedirect {
   public Response redirect(@PathParam("id") String id) {
     final Organization org = securityService.getOrganization();
     final String playerPath = Objects.toString(org.getProperties().get("player"), PLAYER_DEFAULT)
-            .replace("{{id}}", id);
+            .replace("#{id}", id);
     logger.debug("redirecting to player: {}", playerPath);
     return Response
             .status(Response.Status.TEMPORARY_REDIRECT)

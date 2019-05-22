@@ -119,6 +119,11 @@
     },
     "//**** For a list of available plugins and configuration, go to": "https://github.com/polimediaupv/paella/blob/master/doc/plugins.md",
     "list": {
+      "es.upv.paella.opencast.loader": {
+        "flavors": [
+          ["*", "*"]
+        ]
+      },
       "//**** Video profile plugins": "",
       "es.upv.paella.singleStreamProfilePlugin": {
           "enabled": true,

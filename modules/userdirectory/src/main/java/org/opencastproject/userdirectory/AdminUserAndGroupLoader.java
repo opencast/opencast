@@ -59,9 +59,6 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(AdminUserAndGroupLoader.class);
 
-  /** The administrator user configuration option */
-  public static final String OPT_ADMIN_USER = "org.opencastproject.security.admin.user";
-
   /** The administrator password configuration option */
   public static final String OPT_ADMIN_PASSWORD = "org.opencastproject.security.admin.pass";
 
@@ -122,7 +119,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
   public void activate(ComponentContext cc) throws Exception {
     logger.debug("Activating admin group loader");
     BundleContext bundleCtx = cc.getBundleContext();
-    adminUserName = StringUtils.trimToNull(bundleCtx.getProperty(OPT_ADMIN_USER));
+    adminUserName = StringUtils.trimToNull(bundleCtx.getProperty(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY));
     adminPassword = StringUtils.trimToNull(bundleCtx.getProperty(OPT_ADMIN_PASSWORD));
     adminEmail = StringUtils.trimToNull(bundleCtx.getProperty(OPT_ADMIN_EMAIL));
     adminRoles = StringUtils.trimToNull(bundleCtx.getProperty(OPT_ADMIN_ROLES));
