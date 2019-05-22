@@ -67,6 +67,7 @@ Configuration Changes
 - `etc/org.opencastproject.scheduler.impl.SchedulerServiceImpl.cfg` has a new option `maintenance` which temporarily
   disables the scheduler if set to `true`.
 
+
 Scheduler Migration
 -------------------
 
