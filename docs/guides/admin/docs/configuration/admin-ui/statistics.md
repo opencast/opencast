@@ -70,7 +70,7 @@ For each provider, the following properties have to be configured:
       named `infinite` and your InfluxDB measurement name is `impressions_daily`.
     - **`aggregation`**, e.g. `SUM` tells Opencast that InfluxDB's `SUM()` function should be used to calculate the
       values to display in the chart.
-    - **`aggregationVariable**, e.g. `value` tells Opencast that the InfluxDB field which should be summed is named
+    - **`aggregationVariable`**, e.g. `value` tells Opencast that the InfluxDB field which should be summed is named
       `value`.
     - **`resourceIdName`**, e.g. `episodeId` tells Opencast that the InfluxDB tag identifying the resource type this
        provider refers to is named `episodeId`.
