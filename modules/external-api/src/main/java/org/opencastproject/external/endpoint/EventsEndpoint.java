@@ -521,7 +521,7 @@ public class EventsEndpoint implements ManagedService {
     } catch (IllegalArgumentException | DateTimeParseException e) {
       logger.debug("Unable to create event", e);
       return RestUtil.R.badRequest(e.getMessage());
-    } catch (IndexServiceException e) {
+    } catch (SchedulerException | IndexServiceException e) {
       if (e.getCause() != null && e.getCause() instanceof NotFoundException
               || e.getCause() instanceof IllegalArgumentException) {
         logger.debug("Unable to create event", e);
