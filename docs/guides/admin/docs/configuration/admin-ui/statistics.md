@@ -113,7 +113,7 @@ Statistics can be exported to CSV files by clicking the "download" button in the
 the export will contain the data which the graph currently displays. For series statistics, it is possible to change this
 behavior in the way that exported series statistics contain the data of all events of a series instead of just the top
 level series data. To enable this, it is necessary to specify which Statistics Provider should be used to get the episode
-data. See the configuration file `org.opencastproject.statistics.export.impl.StatisticsExportCSVImpl.cfg` for details.
+data. See the configuration file `org.opencastproject.statistics.export.impl.StatisticsExportServiceImpl.cfg` for details.
 
 Verifying Your Setup<a name="verify"></a>
 ====================

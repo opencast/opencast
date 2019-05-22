@@ -199,7 +199,7 @@
     <module>modules/static</module>
     <module>modules/static-file-service-api</module>
     <module>modules/static-file-service-impl</module>
-    <module>modules/statistics-export-csv</module>
+    <module>modules/statistics-export-service</module>
     <module>modules/statistics-service-api</module>
     <module>modules/statistics-service-impl</module>
     <module>modules/statistics-service-remote</module>

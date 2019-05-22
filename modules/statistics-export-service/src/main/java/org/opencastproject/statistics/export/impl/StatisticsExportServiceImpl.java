@@ -39,7 +39,7 @@ import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsService;
 import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
-import org.opencastproject.statistics.export.api.StatisticsExportCSV;
+import org.opencastproject.statistics.export.api.StatisticsExportService;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 
@@ -65,10 +65,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
-public class StatisticsExportCSVImpl implements StatisticsExportCSV, ManagedService {
+public class StatisticsExportServiceImpl implements StatisticsExportService, ManagedService {
 
   /** Logging utility */
-  private static final Logger logger = LoggerFactory.getLogger(StatisticsExportCSVImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(StatisticsExportServiceImpl.class);
   private static final String[] header = {"ID", "Name", "Date", "Value"};
   private static final String CFG_KEY_SERIES_TO_EVENT_PROVIDER_MAPPINGS = "series.to.event.provider.mappings";
 

@@ -31,7 +31,7 @@ import org.opencastproject.util.NotFoundException;
 import java.time.Instant;
 import java.time.ZoneId;
 
-public interface StatisticsExportCSV {
+public interface StatisticsExportService {
 
 
   /**
