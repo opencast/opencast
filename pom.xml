@@ -80,7 +80,6 @@
     <module>modules/cover-image-impl</module>
     <module>modules/cover-image-remote</module>
     <module>modules/cover-image-workflowoperation</module>
-    <module>modules/dataloader</module>
     <module>modules/db</module>
     <module>modules/dictionary-api</module>
     <module>modules/dictionary-hunspell</module>
