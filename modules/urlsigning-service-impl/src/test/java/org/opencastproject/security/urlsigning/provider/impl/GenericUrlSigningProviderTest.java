@@ -291,4 +291,33 @@ public class GenericUrlSigningProviderTest {
     }
     assertTrue(exceptionThrown);
   }
+
+  @Test
+  public void testMultipleUrlsPerKey() throws UrlSigningException, ConfigurationException {
+
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_PROPERTY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL + ".1"), MATCHING_URI);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_PROPERTY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL + ".2"), MATCHING_URI_2);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_PROPERTY_PREFIX, KEY_ID, GenericUrlSigningProvider.SECRET), SECRET);
+
+    signer.updated(properties);
+    assertEquals(2, signer.getUris().size());
+
+    DateTime before = new DateTime(2020, 03, 01, 00, 46, 17, 0, DateTimeZone.UTC);
+    // Uses KEY_ID for MATCHING_URI
+    Policy policy = Policy.mkSimplePolicy(RESOURCE_PATH, before);
+    String result = signer.sign(policy);
+    logger.info(result);
+    assertEquals(
+            "http://www.opencast.org/path/to/resource.mp4?policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTU4MzAyMzU3NzAwMH0sIlJlc291cmNlIjoiaHR0cDpcL1wvd3d3Lm9wZW5jYXN0Lm9yZ1wvcGF0aFwvdG9cL3Jlc291cmNlLm1wNCJ9fQ&keyId=theId&signature=5b45e678275e6bc7b06a579f7f42e9a7ea5c58f1da130701db532f121e363e98",
+            result);
+
+    // Uses KEY_ID for MATCHING_URI_2, too
+    policy = Policy.mkSimplePolicy(RESOURCE_PATH_2, before);
+    result = signer.sign(policy);
+    logger.info(result);
+    assertEquals(
+            "http://docs.opencast.org/path/to/resource.mp4?policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTU4MzAyMzU3NzAwMH0sIlJlc291cmNlIjoiaHR0cDpcL1wvZG9jcy5vcGVuY2FzdC5vcmdcL3BhdGhcL3RvXC9yZXNvdXJjZS5tcDQifX0&keyId=theId&signature=94a0a7c2e660dc5eaafca857e49a42a5b3857fe53353093873c8b41fa8d2b9b1",
+            result);
+  }
+
 }

@@ -43,9 +43,11 @@ Each signing key configuration consists of the following attributes:
 
 * **Key ID:** Key identifier, e.g. `demoKeyOne`
 * **Key secret:** Key value, e.g. `25DA2BA549CB62EF297977845259A`. The key-length is not predefined, but a key length of
-  at least 128 bit is recommended. Any larger value will not increase security of the underlying algorithm.
+  at least 128 bit is recommended. Any larger value will not increase security of the underlying algorithm
 * **URL prefix:** The URL signing provider will only sign URLs that start with this value. This allows to support
-  multiple distributions and different key pairs.
+  multiple distributions and different key pairs
+* **Organization:** Keys can be restricted to organizations so that different organizations use different keys.
+  This attribute is optional. If not specified, the key can be used by all organizations
 
 A typical configuration looks like this:
 
@@ -54,6 +56,16 @@ A typical configuration looks like this:
 
     key.demoKeyTwo.secret=6EDB5EDDCF994B7432C371D7C274F
     key.demoKeyTwo.url=http://download.opencast.org/custom
+    key.demoKeyTwo.organization=mh_default_org
+
+It is also possible to use one key for multiple URL prefixes:
+
+    key.demoKeyThree.secret=6EDB5EDDCF994B7432C371D7C274F
+    key.demoKeyThree.url.http=http://download.opencast.org/custom
+    key.demoKeyThree.url.https=https://download.opencast.org/custom
+    key.demoKeyThree.url.streaming=http://streaming.opencast.org/custom
+    key.demoKeyThree.organization=mh_default_org
+
 
 Configuration of URL Signing Timeout Values
 -------------------------------------------
