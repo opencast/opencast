@@ -1,0 +1,11 @@
+{
+  "name": "opencast-engage-ui",
+  "private": true,
+  "scripts": {
+    "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js src/main/resources/ui/js/app/ src/main/resources/ui/js/*.js"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-plugin-header": "^3.0.0"
+  }
+}
