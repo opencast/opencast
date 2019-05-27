@@ -7,7 +7,7 @@ New Features
 - Overhaul of the permission management with the newly added possibility to define how access control lists are
   evaluated and how series permission changes are populated to episodes. For more details take a look at the [access
   control configuration guide](configuration/acl.md).
-- Update Elasticsearch and make is possible to run Elasticsearch as an external service.
+- Update Elasticsearch and make it possible to run Elasticsearch as an external service.
 - Per-Tenant Capture Agent Users
 - Asset manager snaphots clean-up to remove older snapshots for a given media package. In some cases, this can
   drastically reduce Opencast's storage consumption. This feature is implemented as an option for the [asset-delete workflow
