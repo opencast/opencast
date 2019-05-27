@@ -1,9 +1,8 @@
-//$(document).ready(function() {
-define(['jquery', 'bootbox', 'underscore', 'alertify/alertify', 'bootstrap-accessibility',
+define(['jquery', 'bootbox', 'underscore', 'alertify/alertify', 'js-yaml.min', 'bootstrap-accessibility',
         'jquery.liveSearch', 'seedrandom', 'jquery.utils',
         'dropdowns-enhancement'
     ],
-function($, bootbox, _, alertify) {
+function($, bootbox, _, alertify, jsyaml) {
 
         // bool
         var debug = false;
@@ -14,6 +13,7 @@ function($, bootbox, _, alertify) {
         var restEndpoint = "/search/";
         var playerEndpoint = "/play/";
         var infoMeURL = "/info/me.json";
+        var configURL = "/ui/config/engage-ui/config.yml";
         var springSecurityLoginURL = "/j_spring_security_check";
         var springSecurityLogoutURL = "/j_spring_security_logout";
 
@@ -211,6 +211,7 @@ function($, bootbox, _, alertify) {
 
             $("#" + id_mhlogolink).attr("href", location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') + "/engage/ui");
             getInfo();
+            getConfig();
 
             registerHandler();
 
@@ -439,6 +440,19 @@ function($, bootbox, _, alertify) {
             $($nav_loginlogoutLink).click(logout);
         }
 
+        function getConfig() {
+          log("Get config");
+          $.ajax({
+            url: configURL,
+            dataType: "text",
+            success: function(data) {
+              log("Configuration loaded");
+              var config = jsyaml.load(data);
+              $($headerLogo).attr("src", config.logo || "");
+            }
+          })
+        }
+
         function getInfo() {
             log("Get info");
             $.ajax({
@@ -476,13 +490,6 @@ function($, bootbox, _, alertify) {
                             }
                         } else {
                             log("Error: No role");
-                            setAnonymousUser();
-                        }
-                        if (data.org && data.org.properties) {
-                            var logo = data.org.properties.logo_mediamodule ? data.org.properties.logo_mediamodule : "";
-                            $($headerLogo).attr("src", logo);
-                        } else {
-                            log("Error: No info data received.");
                             setAnonymousUser();
                         }
                     }

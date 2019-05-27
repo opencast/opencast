@@ -52,6 +52,8 @@ Configuration changes
     - `etc/org.opencastproject.security.urlsigning.provider.impl.GenericUrlSigningProvider.cfg`
     - `etc/org.opencastproject.security.urlsigning.provider.impl.WowzaUrlSigningProvider.cfg`
     - `etc/org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl.cfg`
+- The configuration for the media module has been moved into the user interface configuration directory at
+  `etc/ui-config`.
 
 API changes
 -----------
