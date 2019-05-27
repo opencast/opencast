@@ -159,9 +159,9 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
 
       if (propertyKey.startsWith(KEY_PROPERTY_PREFIX + ".")) {
 
-        // We expected the parts [KEY_PROPERTY_PREFIX, id, attribute]
+        // We expected the parts [KEY_PROPERTY_PREFIX, id, attribute] or [KEY_PROPERTY_PREFIX, id, URL, name]
         String[] parts = Arrays.stream(propertyKey.split("\\.")).map(String::trim).toArray(String[]::new);
-        if (parts.length != 3) {
+        if ((parts.length != 3) && !(parts.length == 4 && URL.equals(parts[2]))) {
           throw new ConfigurationException(propertyKey, "Wrong property key format");
         }
 
@@ -210,15 +210,19 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
     this.urls = urls;
   }
 
-  @Override
-  public boolean accepts(String baseUrl) {
+  private boolean isValidUrl(String url) {
     try {
-      new URI(baseUrl);
+      new URI(url);
+      return true;
     } catch (URISyntaxException e) {
-      getLogger().debug("Unable to support url {} because", baseUrl, e);
+      getLogger().debug("Unable to support url {} because", url, e);
       return false;
     }
-    return getKey(baseUrl) != null;
+  }
+
+  @Override
+  public boolean accepts(String baseUrl) {
+    return isValidUrl(baseUrl) && getKey(baseUrl) != null;
   }
 
   @Override
