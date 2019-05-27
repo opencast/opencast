@@ -149,8 +149,6 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
     this.userPattern = userPattern;
     this.instructorRoles = instructorRoles;
 
-    JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
-
     logger.info("Creating new SakaiUserProviderInstance(pid={}, url={}, cacheSize={}, cacheExpiration={})",
                  pid, url, cacheSize, cacheExpiration);
 

@@ -41,9 +41,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AclScope;
-import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -61,7 +58,6 @@ import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -263,11 +259,6 @@ public class IngestServiceImplTest {
     EasyMock.expect(httpClient.execute((HttpGet) EasyMock.anyObject())).andReturn(httpResponse).anyTimes();
     EasyMock.replay(httpClient);
 
-    AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
-    EasyMock.expect(authorizationService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
-            .andReturn(Tuple.tuple(new AccessControlList(), AclScope.Series)).anyTimes();
-    EasyMock.replay(authorizationService);
-
     MediaInspectionService mediaInspectionService = EasyMock.createNiceMock(MediaInspectionService.class);
     EasyMock.expect(mediaInspectionService.enrich(EasyMock.anyObject(MediaPackageElement.class), EasyMock.anyBoolean()))
             .andAnswer(new IAnswer<Job>() {
@@ -299,7 +290,6 @@ public class IngestServiceImplTest {
 
     service = new MockedIngestServicve();
     service.setHttpClient(httpClient);
-    service.setAuthorizationService(authorizationService);
     service.setWorkingFileRepository(wfr);
     service.setWorkflowService(workflowService);
     service.setSecurityService(securityService);

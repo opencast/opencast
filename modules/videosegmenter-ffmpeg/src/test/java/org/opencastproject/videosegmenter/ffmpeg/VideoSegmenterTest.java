@@ -324,10 +324,10 @@ public class VideoSegmenterTest {
     Mpeg7Catalog mpeg7 = new Mpeg7CatalogImpl(catalog.getURI().toURL().openStream());
 
     List<OptimizationStep> optimizedList = new LinkedList<OptimizationStep>();
-    OptimizationStep firstStep  = new OptimizationStep(10, 0.015f, 46, 41, mpeg7, null);
-    OptimizationStep secondStep = new OptimizationStep(10, 0.167f, 34, 41, mpeg7, null);
-    OptimizationStep thirdStep  = new OptimizationStep(10, 0.011f, 44, 41, mpeg7, null);
-    OptimizationStep fourthStep = new OptimizationStep(10, 0.200f, 23, 41, mpeg7, null);
+    OptimizationStep firstStep  = new OptimizationStep(0.015f, 46, 41, mpeg7, null);
+    OptimizationStep secondStep = new OptimizationStep(0.167f, 34, 41, mpeg7, null);
+    OptimizationStep thirdStep  = new OptimizationStep(0.011f, 44, 41, mpeg7, null);
+    OptimizationStep fourthStep = new OptimizationStep(0.200f, 23, 41, mpeg7, null);
 
     float error1 = (46 - 41) / (float)41; // ~  0.122
     float error2 = (34 - 41) / (float)41; // ~ -0.171

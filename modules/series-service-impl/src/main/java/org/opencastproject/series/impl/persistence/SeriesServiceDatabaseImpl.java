@@ -130,20 +130,6 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     return writer.toString();
   }
 
-  /**
-   * Parses Dublin core stored as string.
-   *
-   * @param dcXML
-   *          string representation of Dublin core
-   * @return parsed {@link DublinCoreCatalog}
-   * @throws IOException
-   *           if parsing fails
-   */
-  private DublinCoreCatalog parseDublinCore(String dcXML) throws IOException {
-    DublinCoreCatalog dc = dcService.load(IOUtils.toInputStream(dcXML, "UTF-8"));
-    return dc;
-  }
-
   /*
    * (non-Javadoc)
    *

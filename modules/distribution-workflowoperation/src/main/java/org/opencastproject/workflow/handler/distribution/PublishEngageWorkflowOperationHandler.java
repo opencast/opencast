@@ -50,7 +50,6 @@ import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
@@ -125,9 +124,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /** The server url */
   private URL serverUrl;
-
-  /** To get the tenant path to the player URL **/
-  private SecurityService securityService;
 
   private OrganizationDirectoryService organizationDirectoryService = null;
 
@@ -734,10 +730,4 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       logger.error("Retraction failed of Mediapackage: { }", mediaPackage.getIdentifier().toString(), ex);
     }
   }
-
-  /** OSGi DI */
-  protected void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
 }

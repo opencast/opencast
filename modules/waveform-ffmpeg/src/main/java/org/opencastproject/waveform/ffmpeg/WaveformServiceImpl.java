@@ -312,7 +312,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
       binary,
       "-nostats", "-nostdin", "-hide_banner",
       "-i", mediaFile.getAbsolutePath(),
-      "-lavfi", createWaveformFilter(track, width, height, color),
+      "-lavfi", createWaveformFilter(width, height, color),
       "-frames:v", "1",
       "-an", "-vn", "-sn",
       waveformFilePath
@@ -396,7 +396,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
    * @param color color of waveform image
    * @return ffmpeg filter parameter
    */
-  private String createWaveformFilter(Track track, int width, int height, String color) {
+  private String createWaveformFilter(int width, int height, String color) {
     StringBuilder filterBuilder = new StringBuilder("");
     if (waveformFilterPre != null) {
       filterBuilder.append(waveformFilterPre);

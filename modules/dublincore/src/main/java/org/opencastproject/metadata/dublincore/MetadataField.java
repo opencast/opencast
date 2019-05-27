@@ -92,9 +92,6 @@ public class MetadataField<A> {
   protected static final String JSON_KEY_TRANSLATABLE = "translatable";
   protected static final String JSON_KEY_DELIMITER = "delimiter";
 
-  /** Labels for the temporal date fields */
-  private static final String LABEL_METADATA_PREFIX = "EVENTS.EVENTS.DETAILS.METADATA.";
-
   /**
    * Possible types for the metadata field. The types are used in the frontend and backend to know how the metadata
    * fields should be formatted (if needed).

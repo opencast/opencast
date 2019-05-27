@@ -40,7 +40,6 @@ import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -109,7 +108,6 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   public static final String INBOX_TRIES_BETWEEN_SEC = "inbox.tries.between.sec";
 
   private IngestService ingestService;
-  private WorkingFileRepository workingFileRepository;
   private SecurityService securityService;
   private UserDirectoryService userDir;
   private OrganizationDirectoryService orgDir;
@@ -175,7 +173,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
       // set up new file install config
       fileInstallCfg = some(configureFileInstall(cc.getBundleContext(), inbox, interval));
       // create new scanner
-      Ingestor ingestor = new Ingestor(ingestService, workingFileRepository, secCtx.get(), workflowDefinition,
+      Ingestor ingestor = new Ingestor(ingestService, secCtx.get(), workflowDefinition,
               workflowConfig, mediaFlavor, inbox, maxThreads, seriesService, maxTries, secondsBetweenTries);
       this.ingestor = some(ingestor);
       new Thread(ingestor).start();
@@ -268,11 +266,6 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   /** OSGi callback to set the ingest service. */
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
-  }
-
-  /** OSGi callback to set the workspace */
-  public void setWorkingFileRepository(WorkingFileRepository workingFileRepository) {
-    this.workingFileRepository = workingFileRepository;
   }
 
   /** OSGi callback to set the security service. */

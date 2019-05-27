@@ -2594,51 +2594,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Gets the services in WARNING state triggered by this job
-   *
-   * @param job
-   *          the given job to get the related services
-   * @return a list of services triggered by the job
-   * @throws IllegalArgumentException
-   *           if the given job was null
-   * @throws ServiceRegistryException
-   *           if the there was a problem with the query
-   */
-  private List<ServiceRegistrationJpaImpl> getRelatedWarningServices(JpaJob job)
-          throws IllegalArgumentException, ServiceRegistryException {
-    if (job == null)
-      throw new IllegalArgumentException("job must not be null!");
-
-    Query query = null;
-    EntityManager em = null;
-    logger.trace("Finding services put in WARNING state by job {}", job.toJob().getSignature());
-    try {
-      em = emf.createEntityManager();
-      // TODO: modify the query to avoid to go through the list here
-      query = em.createNamedQuery("ServiceRegistration.relatedservices.warning");
-      query.setParameter("serviceType", job.getJobType());
-
-      List<ServiceRegistrationJpaImpl> jpaServices = new ArrayList<ServiceRegistrationJpaImpl>();
-
-      @SuppressWarnings("unchecked")
-      List<ServiceRegistrationJpaImpl> jobResults = query.getResultList();
-      for (ServiceRegistrationJpaImpl relatedService : jobResults) {
-        if (relatedService.getWarningStateTrigger() == job.toJob().getSignature()) {
-          jpaServices.add(relatedService);
-        }
-      }
-      return jpaServices;
-    } catch (NoResultException e) {
-      return null;
-    } catch (Exception e) {
-      throw new ServiceRegistryException(e);
-    } finally {
-      if (em != null)
-        em.close();
-    }
-  }
-
-  /**
    * Gets the services in WARNING or ERROR state triggered by this job
    *
    * @param job

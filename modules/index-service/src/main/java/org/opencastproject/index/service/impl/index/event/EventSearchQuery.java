@@ -74,7 +74,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private Boolean hasOpenComments = null;
   private Boolean needsCutting = null;
   private final List<String> publications = new ArrayList<String>();
-  private String workflowScheduledDate = null;
   private Long archiveVersion = null;
   private String agentId = null;
   private Date technicalStartTime = null;

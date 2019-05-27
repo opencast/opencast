@@ -178,7 +178,7 @@ public class TasksEndpoint {
       return RestUtil.R.serverError();
     }
 
-    final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
+    final Workflows workflows = new Workflows(assetManager, workflowService);
     final List<WorkflowInstance> instances = new ArrayList<>();
     for (final Entry<String, Map<String, String>> entry : configuration.entrySet()) {
       final ConfiguredWorkflow workflow = workflow(wfd, entry.getValue());

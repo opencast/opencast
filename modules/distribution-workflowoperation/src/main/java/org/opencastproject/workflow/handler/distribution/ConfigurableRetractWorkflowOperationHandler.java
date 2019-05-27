@@ -31,8 +31,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * WOH that retracts elements from an internal distribution channel and removes the reflective publication elements from
@@ -40,8 +38,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ConfigurableRetractWorkflowOperationHandler extends ConfigurableWorkflowOperationHandlerBase {
 
-  /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(ConfigurableRetractWorkflowOperationHandler.class);
   private static final String CHANNEL_ID_KEY = "channel-id";
   // service references
   private DownloadDistributionService distributionService;

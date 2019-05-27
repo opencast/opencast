@@ -37,9 +37,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 
 import com.entwinemedia.fn.Fn;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -64,8 +61,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlRootElement(name = "workflow", namespace = "http://workflow.opencastproject.org")
 @XmlAccessorType(XmlAccessType.NONE)
 public class WorkflowInstanceImpl implements WorkflowInstance {
-
-  private final Logger logger = LoggerFactory.getLogger(WorkflowInstance.class);
 
   @XmlAttribute()
   private long id;
