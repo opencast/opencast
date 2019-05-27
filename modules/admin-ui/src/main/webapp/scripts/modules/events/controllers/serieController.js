@@ -33,7 +33,7 @@ angular.module('adminNg.controllers')
     $http.get('/admin-ng/feeds/feeds')
     .then( function(response) {
       $scope.feedContent = response.data;
-    }, function(error) {
+    }).catch(function(error) {
       $scope.feedContent = null;
     });
 
