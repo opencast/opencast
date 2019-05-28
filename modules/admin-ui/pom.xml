@@ -75,6 +75,12 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-statistics-export-service</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-userdirectory</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>

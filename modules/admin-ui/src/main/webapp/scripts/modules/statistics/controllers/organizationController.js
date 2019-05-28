@@ -35,6 +35,11 @@ angular.module('adminNg.controllers')
         undefined);
     });
 
+    $scope.statisticsCsvFileName = function (statsTitle) {
+      var sanitizedStatsTitle = statsTitle.replace(/[^0-9a-z]/gi, '_').toLowerCase();
+      return 'export_organization_' + $scope.resourceId + '_' + sanitizedStatsTitle + '.csv';
+    };
+
     $scope.statReusable = null;
   }
 ]);

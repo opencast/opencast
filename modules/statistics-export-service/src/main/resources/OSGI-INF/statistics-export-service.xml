@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.statistics.export.impl.StatisticsExportServiceImpl"
+               immediate="true" activate="activate" deactivate="deactivate">
+  <implementation
+      class="org.opencastproject.statistics.export.impl.StatisticsExportServiceImpl"/>
+  <property name="service.description" value="Statistics Export Service"/>
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedService"/>
+    <provide interface="org.opencastproject.statistics.export.api.StatisticsExportService"/>
+  </service>
+  <reference name="StatisticsService"
+             interface="org.opencastproject.statistics.api.StatisticsService"
+             bind="setStatisticsService"/>
+  <reference name="IndexService"
+             interface="org.opencastproject.index.service.api.IndexService"
+             bind="setIndexService"/>
+  <reference name="SecurityService"
+             interface="org.opencastproject.security.api.SecurityService"
+             bind="setSecurityService"/>
+</scr:component>

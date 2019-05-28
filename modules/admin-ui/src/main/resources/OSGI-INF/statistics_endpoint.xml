@@ -24,4 +24,7 @@
   <reference name="StatisticsService"
              interface="org.opencastproject.statistics.api.StatisticsService"
              bind="setStatisticsService"/>
+  <reference name="StatisticsExportCSV"
+             interface="org.opencastproject.statistics.export.api.StatisticsExportService"
+             bind="setStatisticsExportService"/>
 </scr:component>

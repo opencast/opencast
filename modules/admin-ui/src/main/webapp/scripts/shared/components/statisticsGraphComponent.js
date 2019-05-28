@@ -140,6 +140,8 @@ angular.module('adminNg.components')
       chartLabels: '<',
       totalValue: '<',
       onChange: '&',
+      exportUrl: '<',
+      exportFileName: '&',
       provider: '<',
       description: '<'
     }

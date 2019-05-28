@@ -25,6 +25,8 @@ import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_RO
 import static org.opencastproject.util.data.functions.Functions.chuck;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.adminui.impl.ProviderQuery;
+import org.opencastproject.adminui.impl.RawProviderQuery;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -40,6 +42,8 @@ import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsService;
 import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
+import org.opencastproject.statistics.export.api.StatisticsExportService;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -55,11 +59,8 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
 import java.time.ZoneId;
-import java.time.format.DateTimeParseException;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -92,6 +93,7 @@ public class StatisticsEndpoint {
   private IndexService indexService;
   private AdminUISearchIndex searchIndex;
   private StatisticsService statisticsService;
+  private StatisticsExportService statisticsExportService;
 
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
@@ -109,91 +111,8 @@ public class StatisticsEndpoint {
     this.statisticsService = statisticsService;
   }
 
-  /**
-   * The provider query as it appears in the JSON document, to be parsed by GSON.
-   *
-   * Things like dates and enums are not validated in this class. This is done by converting it into a
-   * {@link ProviderQuery}.
-   */
-  private static final class RawProviderQuery {
-    private String providerId;
-    private String from;
-    private String to;
-    private String resourceId;
-    private String dataResolution;
-
-    // Needed for gson deserialization
-    RawProviderQuery() {
-    }
-
-    public String getProviderId() {
-      return providerId;
-    }
-
-    public String getFrom() {
-      return from;
-    }
-
-    public String getTo() {
-      return to;
-    }
-
-    public String getResourceId() {
-      return resourceId;
-    }
-
-    public String getDataResolution() {
-      return dataResolution;
-    }
-  }
-
-  private static final class ProviderQuery {
-    private String providerId;
-    private Instant from;
-    private Instant to;
-    private String resourceId;
-    private DataResolution dataResolution;
-
-    ProviderQuery(RawProviderQuery query) {
-      this.providerId = query.providerId;
-      if (isNotIso8601Utc(query.from)) {
-        throw new IllegalArgumentException("Missing value for 'from' or not in ISO 8601 UTC format");
-      }
-      if (isNotIso8601Utc(query.to)) {
-        throw new IllegalArgumentException("Missing value for 'to' or not in ISO 8601 UTC format");
-      }
-      this.from = Instant.parse(query.from);
-      this.to = Instant.parse(query.to);
-      if (this.to.compareTo(this.from) <= 0) {
-        throw new IllegalArgumentException("'from' date must be before 'to' date");
-      }
-      Optional<DataResolution> resolution = dataResolutionFromJson(query.dataResolution);
-      if (!resolution.isPresent()) {
-        throw new IllegalArgumentException("illegal value for 'resolution'");
-      }
-      this.dataResolution = resolution.get();
-      this.resourceId = query.resourceId;
-    }
-
-    public String getProviderId() {
-      return providerId;
-    }
-
-    public Instant getFrom() {
-      return from;
-    }
-
-    public Instant getTo() {
-      return to;
-    }
-
-    public String getResourceId() {
-      return resourceId;
-    }
-
-    public DataResolution getDataResolution() {
-      return dataResolution;
-    }
+  public void setStatisticsExportService(StatisticsExportService statisticsExportService) {
+    this.statisticsExportService = statisticsExportService;
   }
 
   @GET
@@ -258,23 +177,6 @@ public class StatisticsEndpoint {
     return dataResolution.toString().toLowerCase();
   }
 
-  private static Optional<DataResolution> dataResolutionFromJson(final String dataResolution) {
-    try {
-      return Optional.of(Enum.valueOf(DataResolution.class, dataResolution.toUpperCase()));
-    } catch (IllegalArgumentException e) {
-      return Optional.empty();
-    }
-  }
-
-  private static boolean isNotIso8601Utc(final String value) {
-    try {
-      Instant.parse(value);
-      return false;
-    } catch (DateTimeParseException e) {
-      return true;
-    }
-  }
-
   @POST
   @Path("data.json")
   @Produces(MediaType.APPLICATION_JSON)
@@ -304,18 +206,56 @@ public class StatisticsEndpoint {
         .map(ProviderQuery::new)
         .flatMap(q ->
           statisticsService
-            .getProvider(q.providerId)
+            .getProvider(q.getProviderId())
             .map(Stream::of).orElseGet(Stream::empty)
-            .peek(p -> checkAccess(q.resourceId, p.getResourceType()))
+            .peek(p -> checkAccess(q.getResourceId(), p.getResourceType()))
             .map(p -> timeSeriesToJson(
               p.getId(),
-              statisticsService.getTimeSeriesData(p, q.resourceId, q.from, q.to, q.dataResolution,
+              statisticsService.getTimeSeriesData(p, q.getResourceId(), q.getFrom(), q.getTo(), q.getDataResolution(),
                 ZoneId.systemDefault()))))
         .forEach(result::add);
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
     }
     return Response.ok(result.toJSONString()).build();
+  }
+
+  @GET
+  @Path("export.csv")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RestQuery(name = "getcsvdata", description = "Returns the statistical data for a specific provider and a specific resource as CSV.", returnDescription = "The statistical data as CSV", restParameters = {
+    @RestParameter(name = "providerId", isRequired = true, description = "The provider id", type = RestParameter.Type.TEXT),
+    @RestParameter(name = "resourceId", isRequired = true, description = "The resource id", type = RestParameter.Type.TEXT),
+    @RestParameter(name = "from", isRequired = true, description = "The from date in iso 8601 UTC notation", type = RestParameter.Type.TEXT),
+    @RestParameter(name = "to", isRequired = true, description = "The to date in iso 8601 UTC notation", type = RestParameter.Type.TEXT),
+    @RestParameter(name = "dataResolution", isRequired = true, description = "The data resolution. Valid values are 'HOURLY', 'DAILY', 'WEEKLY', 'MONTHLY', and 'YEARLY'", type = RestParameter.Type.TEXT)},
+    reponses = {
+      @RestResponse(description = "Returns the statistical data for the given resource type as csv", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "If the current user is not authorized to perform this action", responseCode = HttpServletResponse.SC_UNAUTHORIZED)
+    })
+  public Response getCSVData(
+    @QueryParam("providerId") String providerId,
+    @QueryParam("resourceId") String resourceId,
+    @QueryParam("from") String fromStr,
+    @QueryParam("to") String toStr,
+    @QueryParam("dataResolution") String dataResolutionStr) {
+    try {
+      final ProviderQuery q = new ProviderQuery(providerId, fromStr, toStr, dataResolutionStr, resourceId);
+      final StatisticsProvider p = statisticsService
+        .getProvider(providerId).orElseThrow(() -> new IllegalArgumentException("Unknown provider: " + providerId));
+      checkAccess(q.getResourceId(), p.getResourceType());
+      final String csv = statisticsExportService.getCSV(p, q.getResourceId(), q.getFrom(), q.getTo(), q.getDataResolution(),
+        searchIndex, ZoneId.systemDefault());
+      return Response.ok().entity(csv).build();
+    } catch (IllegalArgumentException e) {
+      return RestUtil.R.badRequest(e.getMessage());
+    } catch (SearchIndexException e) {
+      return RestUtil.R.serverError();
+    } catch (NotFoundException e) {
+      return RestUtil.R.notFound(resourceId);
+    } catch (UnauthorizedException e) {
+      return Response.status(Response.Status.UNAUTHORIZED).build();
+    }
   }
 
   private JSONObject timeSeriesToJson(String providerId, TimeSeries timeSeriesData) {

@@ -283,6 +283,8 @@
               data-resolution="data.dataResolution"
               from="data.from"
               on-change="statReusable.recalculate(data.providerId, from, to, dataResolution, timeChooseMode)"
+              export-url="data.csvUrl"
+              export-file-name="statisticsCsvFileName(data.title | translate)"
               source-data="data.values"
               provider="data.providerId"
               time-choose-mode="data.timeChooseMode"

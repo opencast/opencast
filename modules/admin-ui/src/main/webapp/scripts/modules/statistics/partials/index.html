@@ -31,6 +31,8 @@
             provider="data.providerId"
             from="data.from"
             on-change="statReusable.recalculate(data.providerId, from, to, dataResolution, timeChooseMode)"
+            export-url="data.csvUrl"
+            export-file-name="statisticsCsvFileName(data.title | translate)"
             source-data="data.values"
             time-choose-mode="data.timeChooseMode"
             to="data.to"
