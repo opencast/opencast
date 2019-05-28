@@ -247,7 +247,6 @@ public class PauseFinalOperationTest {
     is = PauseFinalOperationTest.class.getResourceAsStream("/workflow-definition-pause-last.xml");
     def = WorkflowParser.parseWorkflowDefinition(is);
     IOUtils.closeQuietly(is);
-    service.registerWorkflowDefinition(def);
   }
 
   @After

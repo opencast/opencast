@@ -1,0 +1,17 @@
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>exception-handler</id>
+  <title>Exception Handler Workflow</title>
+  <description>Exception Handler Workflow Definition for Unit Tests</description>
+  <operations>
+    <operation
+      id="op1"
+      fail-on-error="true"
+      description="operation 1"/>
+
+    <operation
+      id="op2"
+      fail-on-error="false"
+      description="operation 2"/>
+  </operations>
+
+</definition>

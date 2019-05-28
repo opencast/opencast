@@ -470,35 +470,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowService#registerWorkflowDefinition(org.opencastproject.workflow.api.WorkflowDefinition)
-   */
-  @Override
-  public void registerWorkflowDefinition(WorkflowDefinition workflow) {
-    if (workflow == null || workflow.getId() == null) {
-      throw new IllegalArgumentException("Workflow must not be null, and must contain an ID");
-    }
-    String id = workflow.getId();
-    if (workflowDefinitionScanner.getWorkflowDefinitions().containsKey(id)) {
-      throw new IllegalStateException("A workflow definition with ID '" + id + "' is already registered.");
-    }
-    workflowDefinitionScanner.putWorkflowDefinition(id, workflow);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#unregisterWorkflowDefinition(java.lang.String)
-   */
-  @Override
-  public void unregisterWorkflowDefinition(String workflowDefinitionId) throws NotFoundException {
-    boolean deleted = workflowDefinitionScanner.removeWorkflowDefinition(workflowDefinitionId) != null;
-    if (deleted)
-      throw new NotFoundException("Workflow definition not found");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowById(long)
    */
   @Override

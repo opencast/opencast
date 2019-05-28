@@ -22,11 +22,9 @@
 package org.opencastproject.workflow.remote;
 
 import static org.apache.http.HttpStatus.SC_CONFLICT;
-import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
-import static org.apache.http.HttpStatus.SC_PRECONDITION_FAILED;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 import org.opencastproject.mediapackage.MediaPackage;
@@ -56,7 +54,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -609,66 +606,6 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     }
     throw new WorkflowDatabaseException(
             "Unable to read the registered workflow definitions from the remote workflow service");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#registerWorkflowDefinition(org.opencastproject.workflow.api.WorkflowDefinition)
-   */
-  @Override
-  public void registerWorkflowDefinition(WorkflowDefinition workflow) throws WorkflowDatabaseException {
-    HttpPut put = new HttpPut("/definition");
-    try {
-      List<BasicNameValuePair> params = new ArrayList<>();
-      params.add(new BasicNameValuePair("workflowDefinition", WorkflowParser.toXml(workflow)));
-      put.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-    } catch (UnsupportedEncodingException e) {
-      throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
-    } catch (Exception e) {
-      throw new IllegalStateException("unable to serialize workflow definition to xml");
-    }
-
-    HttpResponse response = getResponse(put, SC_CREATED, SC_PRECONDITION_FAILED);
-    try {
-      if (response != null) {
-        if (SC_PRECONDITION_FAILED == response.getStatusLine().getStatusCode()) {
-          throw new IllegalStateException("A workflow definition with ID '" + workflow.getId()
-                  + "' is already registered.");
-        } else {
-          logger.info("Workflow definition '{}' registered", workflow);
-          return;
-        }
-      }
-    } finally {
-      closeConnection(response);
-    }
-    throw new WorkflowDatabaseException("Unable to register workflow definition " + workflow.getId());
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#unregisterWorkflowDefinition(java.lang.String)
-   */
-  @Override
-  public void unregisterWorkflowDefinition(String workflowDefinitionId) throws NotFoundException,
-          WorkflowDatabaseException {
-    HttpDelete delete = new HttpDelete("/definition/" + workflowDefinitionId);
-    HttpResponse response = getResponse(delete, SC_NO_CONTENT, SC_NOT_FOUND);
-    try {
-      if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          throw new NotFoundException("Workflow definition '" + workflowDefinitionId + "' not found.");
-        } else {
-          logger.info("Workflow definition '{}' unregistered", workflowDefinitionId);
-          return;
-        }
-      }
-    } finally {
-      closeConnection(response);
-    }
-    throw new WorkflowDatabaseException("Unable to delete workflow definition '" + workflowDefinitionId + "'");
   }
 
   /**
