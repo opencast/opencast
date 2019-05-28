@@ -81,7 +81,6 @@ import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
 import org.opencastproject.index.service.impl.index.event.EventUtils;
-import org.opencastproject.index.service.resources.list.provider.EventCommentsListProvider;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider.Comments;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
 import org.opencastproject.index.service.util.AccessInformationUtil;
@@ -2151,17 +2150,6 @@ public abstract class AbstractEventEndpoint {
           default:
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
-      }
-    }
-
-    // TODO: Add the comment resolution filter to the query
-    EventCommentsListProvider.RESOLUTION resolution = null;
-    if (StringUtils.isNotBlank(resolutionFilter)) {
-      try {
-        resolution = EventCommentsListProvider.RESOLUTION.valueOf(resolutionFilter);
-      } catch (Exception e) {
-        logger.warn("Unable to parse comment resolution filter {}", resolutionFilter);
-        return Response.status(Status.BAD_REQUEST).build();
       }
     }
 

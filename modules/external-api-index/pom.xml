@@ -37,11 +37,6 @@
       <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- logging -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

@@ -44,8 +44,6 @@ public class SearchResultItemImpl implements SearchResultItem {
   private final Date modificationDate;
   private final boolean isDeleted;
   private final List<SearchResultElementItem> mediaPackageElements;
-  private DublinCoreCatalog dublincoreEpisode;
-  private DublinCoreCatalog dublincoreSeries;
 
   public SearchResultItemImpl(final OaiPmhEntity entity) throws MediaPackageException {
     this.mediaPackageId = entity.getMediaPackageId();

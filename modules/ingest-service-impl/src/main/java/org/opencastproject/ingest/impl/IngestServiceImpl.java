@@ -55,7 +55,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
@@ -249,9 +248,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The opencast service registry */
   private ServiceRegistry serviceRegistry;
 
-  /** The authorization service */
-  private AuthorizationService authorizationService = null;
-
   /** The security service */
   protected SecurityService securityService = null;
 
@@ -366,16 +362,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
-  }
-
-  /**
-   * Sets the authorization service
-   *
-   * @param authorizationService
-   *          the authorization service to set
-   */
-  public void setAuthorizationService(AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
   }
 
   /**

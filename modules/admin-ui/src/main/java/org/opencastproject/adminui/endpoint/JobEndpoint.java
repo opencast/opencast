@@ -706,16 +706,6 @@ public class JobEndpoint {
     }
   };
 
-  private final Fn<Job, Boolean> removeWorkflowJobs = new Fn<Job, Boolean>() {
-    @Override
-    public Boolean apply(Job job) {
-      if (WorkflowService.JOB_TYPE.equals(job.getJobType())
-              && ("START_WORKFLOW".equals(job.getOperation()) || "START_OPERATION".equals(job.getOperation())))
-        return false;
-      return true;
-    }
-  };
-
   private class JobComparator implements Comparator<JobExtended> {
 
     private JobSort sortType;

@@ -695,7 +695,7 @@ public class IndexServiceImpl implements IndexService {
       Set<String> mpIds = new HashSet<String>();
       mpIds.add(mpId);
 
-      final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
+      final Workflows workflows = new Workflows(assetManager, workflowService);
       List<WorkflowInstance> wfList = workflows
               .applyWorkflowToLatestVersion(mpIds,
                       ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowDefId), params))

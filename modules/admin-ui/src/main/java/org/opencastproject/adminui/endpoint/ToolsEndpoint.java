@@ -673,7 +673,7 @@ public class ToolsEndpoint implements ManagedService {
         try {
           final Map<String, String> workflowParameters = WorkflowPropertiesUtil
             .getLatestWorkflowProperties(assetManager, mediaPackage.getIdentifier().compact());
-          final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
+          final Workflows workflows = new Workflows(assetManager, workflowService);
           workflows.applyWorkflowToLatestVersion($(mediaPackage.getIdentifier().toString()),
             ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId), workflowParameters))
             .run();

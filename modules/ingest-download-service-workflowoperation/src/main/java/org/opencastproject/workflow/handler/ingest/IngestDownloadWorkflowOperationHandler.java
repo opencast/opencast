@@ -36,17 +36,12 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Downloads all external URI's to the working file repository and optionally deletes external working file repository
  * resources
  */
 public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
-
-  /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(IngestDownloadWorkflowOperationHandler.class);
 
   /** Deleting external working file repository URI's after download config key */
   public static final String DELETE_EXTERNAL = "delete-external";

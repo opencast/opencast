@@ -166,7 +166,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     MediaPackage mediaPackage = (MediaPackage) src.clone();
     CompositeSettings compositeSettings;
     try {
-      compositeSettings = new CompositeSettings(mediaPackage, operation);
+      compositeSettings = new CompositeSettings(operation);
     } catch (IllegalArgumentException e) {
       logger.warn("Unable to parse composite settings because {}", ExceptionUtils.getStackTrace(e));
       return createResult(mediaPackage, Action.SKIP);
@@ -218,7 +218,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         compositeSettings.setSingleTrack(t);
       for (Track t : lowerElements)
         compositeSettings.setSingleTrack(t);
-      return handleSingleTrack(mediaPackage, operation, compositeSettings, watermarkAttachment);
+      return handleSingleTrack(mediaPackage, compositeSettings, watermarkAttachment);
     } else {
       // Look for upper elements matching the tags and flavor
       if (upperElements.size() > 1) {
@@ -248,7 +248,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         compositeSettings.setLowerTrack(t);
       }
 
-      return handleMultipleTracks(mediaPackage, operation, compositeSettings, watermarkAttachment);
+      return handleMultipleTracks(mediaPackage, compositeSettings, watermarkAttachment);
     }
   }
 
@@ -306,8 +306,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
 
     private MediaPackageElementFlavor targetFlavor = null;
 
-    CompositeSettings(MediaPackage mediaPackage, WorkflowOperationInstance operation)
-            throws WorkflowOperationException {
+    CompositeSettings(WorkflowOperationInstance operation) throws WorkflowOperationException {
       // Check which tags have been configured
       sourceAudioName = StringUtils.trimToNull(operation.getConfiguration(SOURCE_AUDIO_NAME));
       sourceTagsUpper = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_UPPER));
@@ -584,7 +583,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     }
   }
 
-  private WorkflowOperationResult handleSingleTrack(MediaPackage mediaPackage, WorkflowOperationInstance operation,
+  private WorkflowOperationResult handleSingleTrack(MediaPackage mediaPackage,
           CompositeSettings compositeSettings, Option<Attachment> watermarkAttachment) throws EncoderException,
           IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
 
@@ -698,7 +697,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     return watermarkOption;
   }
 
-  private WorkflowOperationResult handleMultipleTracks(MediaPackage mediaPackage, WorkflowOperationInstance operation,
+  private WorkflowOperationResult handleMultipleTracks(MediaPackage mediaPackage,
           CompositeSettings compositeSettings, Option<Attachment> watermarkAttachment) throws EncoderException,
           IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
     if (compositeSettings.getMultiSourceLayouts() == null || compositeSettings.getMultiSourceLayouts().size() == 0) {

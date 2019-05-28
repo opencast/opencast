@@ -95,8 +95,4 @@ public final class OpencastMetadataCodec {
       return decodeTemporal(a);
     }
   };
-
-  private static String toStr(String s) {
-    return s != null ? s : "";
-  }
 }

@@ -49,7 +49,6 @@ public final class QueryPreprocessor {
   private static final char MINUS = '-';
   private static final char PLUS = '+';
   private static final char ASTERISK = '*';
-  private static final char QUESTION_MARK = '?';
   private static final char EXPLANATION_MARK = '!';
   private static final char BACKSLASH = '\\';
   private static final char AMPERSAND = '&';
