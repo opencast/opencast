@@ -237,10 +237,8 @@ public class CountWorkflowsTest {
     is = CountWorkflowsTest.class.getResourceAsStream("/workflow-definition-holdstate.xml");
     def = WorkflowParser.parseWorkflowDefinition(is);
     IOUtils.closeQuietly(is);
-    service.registerWorkflowDefinition(def);
 
     serviceRegistry.registerService(service);
-
   }
 
   @After

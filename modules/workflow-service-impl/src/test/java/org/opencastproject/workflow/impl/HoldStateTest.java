@@ -244,7 +244,6 @@ public class HoldStateTest {
     is = HoldStateTest.class.getResourceAsStream("/workflow-definition-holdstate.xml");
     def = WorkflowParser.parseWorkflowDefinition(is);
     IOUtils.closeQuietly(is);
-    service.registerWorkflowDefinition(def);
   }
 
   @After

@@ -234,7 +234,6 @@ public final class WorkflowOperationSkippingIntricateTest {
 
     try (InputStream is = getClass().getResourceAsStream("/workflow-definition-skipping-intricate.xml")) {
       workingDefinition = WorkflowParser.parseWorkflowDefinition(is);
-      service.registerWorkflowDefinition(workingDefinition);
 
       MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
       mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(new File("target/test-classes")));

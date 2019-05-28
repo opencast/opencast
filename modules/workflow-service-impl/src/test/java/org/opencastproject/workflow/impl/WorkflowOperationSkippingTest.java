@@ -243,7 +243,6 @@ public class WorkflowOperationSkippingTest {
     try {
       is = getClass().getResourceAsStream("/workflow-definition-skipping.xml");
       workingDefinition = WorkflowParser.parseWorkflowDefinition(is);
-      service.registerWorkflowDefinition(workingDefinition);
       IOUtils.closeQuietly(is);
 
       MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();

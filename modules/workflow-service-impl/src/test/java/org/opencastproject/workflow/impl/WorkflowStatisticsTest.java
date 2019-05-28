@@ -194,11 +194,6 @@ public class WorkflowStatisticsTest {
     EasyMock.replay(mds);
     service.addMetadataService(mds);
 
-    // Register the workflow definitions
-    for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
-      service.registerWorkflowDefinition(workflowDefinition);
-    }
-
     // Mock the workspace
     workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.getCollectionContents((String) EasyMock.anyObject())).andReturn(new URI[0]);

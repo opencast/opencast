@@ -258,6 +258,14 @@ public class WorkflowServiceImplTest {
 
     InputStream is = null;
     try {
+      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-exception-handler.xml");
+      WorkflowDefinition exceptionHandler = WorkflowParser.parseWorkflowDefinition(is);
+      IOUtils.closeQuietly(is);
+
+      /* The exception handler workflow definition needs to be registered as the reference to it in 
+         workflow-definition-3 will be checked */
+      scanner.putWorkflowDefinition("exception-handler", exceptionHandler);
+
       is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-1.xml");
       workingDefinition = WorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
@@ -273,11 +281,6 @@ public class WorkflowServiceImplTest {
       is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-4.xml");
       pausingWorkflowDefinition = WorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
-
-      service.registerWorkflowDefinition(workingDefinition);
-      service.registerWorkflowDefinition(failingDefinitionWithoutErrorHandler);
-      service.registerWorkflowDefinition(failingDefinitionWithErrorHandler);
-      service.registerWorkflowDefinition(pausingWorkflowDefinition);
 
       MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
       mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(new File("target/test-classes")));
@@ -674,7 +677,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once", null, true);
     def.add(opDef);
@@ -694,7 +696,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once", null, true);
     opDef.setRetryStrategy(RetryStrategy.RETRY);
@@ -715,7 +716,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once", null, true);
     opDef.setRetryStrategy(RetryStrategy.HOLD);
@@ -745,7 +745,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failTwice", "fails twice", null, true);
     opDef.setRetryStrategy(RetryStrategy.HOLD);
@@ -801,7 +800,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failTwice", "fails twice", null, true);
     opDef.setRetryStrategy(RetryStrategy.HOLD);
@@ -859,7 +857,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOnHost", "fails on host", null,
             true);
