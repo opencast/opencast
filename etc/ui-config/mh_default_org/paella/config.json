@@ -117,7 +117,7 @@
     "//**** Instructions: Disable any individual plugin by setting its enable property to false": {
       "enabled": false
     },
-    "//**** For a list of available plugins and configuration, go to": "https://github.com/polimediaupv/paella/blob/master/doc/plugins.md",
+    "//**** For a list of available plugins and configuration, go to": "https://github.com/polimediaupv/paella/blob/develop/doc/adopters/plugins.md",
     "list": {
       "es.upv.paella.opencast.loader": {
         "flavors": [
