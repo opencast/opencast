@@ -19,6 +19,8 @@
  *
  */
 
+/* global $ */
+
 const player = '/play/';
 
 function error() {
