@@ -807,11 +807,6 @@ conductor
   org.slf4j                              slf4j-api                                        MIT License
 
 
-dataloader
-  GroupId                                ArtifactId                                       License
-  org.apache.commons                     commons-csv                                      The Apache Software License, Version 2.0
-
-
 db
   GroupId                                ArtifactId                                       License
   c3p0                                   c3p0                                             GNU LESSER GENERAL PUBLIC LICENSE
