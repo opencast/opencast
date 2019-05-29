@@ -39,17 +39,14 @@ requirejs.config({
     'jquery.utils': {
       deps: ['jquery']
     },
-    'bootbox': {
+    'bootbox.min': {
       deps: ['bootstrap', 'jquery'],
       exports: 'bootbox'
     },
     'dropdowns-enhancement' : {
       deps: ['bootstrap']
     },
-    'redirect' : {
-      deps: ['jquery']
-    },
-    'underscore' : {
+    'underscore-min' : {
       exports: '_'
     }
   }

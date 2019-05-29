@@ -21,8 +21,8 @@
 
 /* global define, pushHistory */
 
-define(['jquery', 'bootbox', 'underscore', 'alertify/alertify', 'js-yaml.min', 'bootstrap-accessibility',
-  'jquery.liveSearch', 'seedrandom', 'jquery.utils',
+define(['jquery', 'bootbox.min', 'underscore-min', 'alertify/alertify', 'js-yaml.min', 'bootstrap-accessibility',
+  'jquery.liveSearch', 'seedrandom.min', 'jquery.utils',
   'dropdowns-enhancement'
 ],
 function($, bootbox, _, alertify, jsyaml) {
@@ -440,10 +440,11 @@ function($, bootbox, _, alertify, jsyaml) {
   function logout() {
     $.ajax({
       type: 'GET',
-      url: springSecurityLogoutURL
-    }).complete(function() {
-      location.reload();
-      loadAndTranslate(initialize);
+      url: springSecurityLogoutURL,
+      complete: function() {
+        location.reload();
+        loadAndTranslate(initialize);
+      }
     });
   }
 
