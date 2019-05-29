@@ -58,6 +58,13 @@ module.exports = function (config) {
 
         browsers : ['PhantomJS'],
 
+        customLaunchers: {
+            FirefoxHeadless: {
+                base: 'Firefox',
+                flags: [ '-headless' ],
+            },
+        },
+
         plugins : [
             'karma-chrome-launcher',
             'karma-phantomjs-launcher',

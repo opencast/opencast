@@ -4,7 +4,7 @@
   "devDependencies": {
     "autoprefixer": "^9.5.1",
     "bower": "^1.8.8",
-    "chromedriver": "^2.46.0",
+    "chromedriver": "^74.0.0",
     "eslint": "^5.16.0",
     "eslint-plugin-header": "^3.0.0",
     "grunt": "^1.0.4",
@@ -54,9 +54,8 @@
     "npm": "5.6.0"
   },
   "scripts": {
-    "test-chrome": "karma start src/test/resources/karma.conf.js --browsers=Chrome --single-run=false",
-    "test-firefox": "karma start src/test/resources/karma.conf.js --browsers=Firefox --single-run=false",
-    "test-ie": "karma start src/test/resources/karma.conf.js --browsers=IE --single-run=false",
+    "test-chrome": "karma start src/test/resources/karma.conf.js --browsers=ChromeHeadless --single-run=true",
+    "test-firefox": "karma start src/test/resources/karma.conf.js --browsers=FirefoxHeadless --single-run=true",
     "build": "grunt",
     "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js --rule 'no-unused-vars: off' --rule 'no-empty: off' src/main/webapp/",
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/main/webapp/**/*.html'"
