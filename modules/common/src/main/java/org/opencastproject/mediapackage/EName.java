@@ -169,6 +169,9 @@ public final class EName implements Serializable, Comparable<EName> {
    *          NameSpace **is** a NameSpace. If this argument is blank or {@code null}, it has no effect.
    */
   public static EName fromString(String strEName, String defaultNameSpace) throws IllegalArgumentException {
+    if (strEName == null) {
+      throw new IllegalArgumentException("Cannot parse 'null' as EName");
+    }
     Matcher m = pattern.matcher(strEName);
 
     if (m.matches()) {

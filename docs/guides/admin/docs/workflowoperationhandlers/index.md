@@ -90,5 +90,6 @@ The following table contains the workflow operations that are available in an ou
 |tag-by-dcterm       |Modify the tags if dublincore term matches value               |[Documentation](tag-by-dcterm-woh.md)|
 |theme               |Make settings of themes available to processing                |[Documentation](theme-woh.md)|
 |timelinepreviews    |Create a preview image stream from a given video track         |[Documentation](timelinepreviews-woh.md)|
+|transfer-metadata   |Transfer metadata fields between catalogs                      |[Documentation](transfer-metadata-woh.md)|
 |waveform            |Create a waveform image of the audio of the mediapackage       |[Documentation](waveform-woh.md)|
 |zip                 |Create zipped archive of the current state of the mediapackage |[Documentation](zip-woh.md)|
