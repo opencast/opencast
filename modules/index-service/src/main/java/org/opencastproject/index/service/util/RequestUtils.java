@@ -82,10 +82,22 @@ public final class RequestUtils {
     return fieldMap;
   }
 
-  public static void checkAcceptedTypes(String assetUploadId, MediaType mediaType, ListProvidersService listProvidersService) {
+  /**
+   * Check if an uploaded asset conforms to the configured list of accepted file types.
+   *
+   * @param assetUploadId
+   *          The id of the uploaded asset
+   * @param mediaType
+   *          The media type sent by the browser
+   * @param listProvidersService
+   *          The ListProviderService to get the configured accepted types from
+   *
+   * @return true if the given mediatype is accepted, false otherwise.
+   */
+  public static boolean typeIsAccepted(String assetUploadId, MediaType mediaType, ListProvidersService listProvidersService) {
     if (mediaType.is(MediaType.OCTET_STREAM)) {
       // No detailed info, so we have to accept...
-      return;
+      return true;
     }
     try {
       final Collection<String> assetUploadJsons = listProvidersService.getList("eventUploadAssetOptions",
@@ -102,12 +114,12 @@ public final class RequestUtils {
               .map(String::trim).collect(Collectors.toList());
           for (String accept : accepts) {
             if (accept.contains("/") && mediaType.is(MediaType.parse(accept))) {
-              return;
+              return true;
             } else if (mediaType.subtype().equalsIgnoreCase(accept.replace(".", ""))) {
-              return;
+              return true;
             }
           }
-          throw new IllegalArgumentException("Provided file format " + mediaType.toString() + " not allowed.");
+          return false;
         }
       }
     } catch (ListProviderException e) {

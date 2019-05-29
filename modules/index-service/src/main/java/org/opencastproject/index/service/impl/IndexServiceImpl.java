@@ -514,7 +514,11 @@ public class IndexServiceImpl implements IndexService {
           } else {
             // AngularJS file upload lib appends ".0" to field name, so we cut that off
             fieldName = fieldName.substring(0, fieldName.lastIndexOf("."));
-            RequestUtils.checkAcceptedTypes(fieldName, MediaType.parse(item.getContentType()), listProvidersService);
+            final MediaType mediaType = MediaType.parse(item.getContentType());
+            final boolean accepted = RequestUtils.typeIsAccepted(fieldName, mediaType, listProvidersService);
+            if (!accepted) {
+              throw new IllegalArgumentException("Provided file format " + mediaType.toString() + " not allowed.");
+            }
             if ("presenter".equals(item.getFieldName())) {
               mp = ingestService.addTrack(item.openStream(), item.getName(), MediaPackageElements.PRESENTER_SOURCE, mp);
             } else if ("presentation".equals(item.getFieldName())) {
@@ -572,7 +576,7 @@ public class IndexServiceImpl implements IndexService {
     } catch (FileUploadException | UnauthorizedException | ParseException | IngestException | SchedulerException
         | MediaPackageException | IOException | NotFoundException e) {
       logger.error("Unable to create event: {}", getStackTrace(e));
-      throw new IndexServiceException(e.getMessage());
+      throw new IndexServiceException("Unable to create event", e);
     }
   }
 
@@ -608,7 +612,11 @@ public class IndexServiceImpl implements IndexService {
         } else {
           // AngularJS file upload lib appends ".0" to field name, so we cut that off
           fieldName = fieldName.substring(0, fieldName.lastIndexOf("."));
-          RequestUtils.checkAcceptedTypes(fieldName, MediaType.parse(item.getContentType()), listProvidersService);
+          final MediaType mediaType = MediaType.parse(item.getContentType());
+          final boolean accepted = RequestUtils.typeIsAccepted(fieldName, mediaType, listProvidersService);
+          if (!accepted) {
+            throw new IllegalArgumentException("Provided file format " + mediaType.toString() + " not allowed.");
+          }
           if (item.getFieldName().toLowerCase().matches(attachmentRegex)) {
             assetList.add(item.getFieldName());
             // Add attachment with field name as temporary flavor
@@ -644,7 +652,7 @@ public class IndexServiceImpl implements IndexService {
       return startAddAssetWorkflow(metadataJson, mp);
     } catch (MediaPackageException | FileUploadException | IOException | IngestException e) {
       logger.error("Unable to create event: {}", getStackTrace(e));
-      throw new IndexServiceException(e.getMessage());
+      throw new IndexServiceException("Unable to create event", e);
     }
   }
 
