@@ -124,3 +124,5 @@ Here is an example which displays "Retracting" instead of "Running" for the retr
 ```
 
 When no state mappings are configured for a workflow, the generic default labels will be displayed.
+
+When a workflow includes other workflows, the event table only shows the state of the including workflow.
