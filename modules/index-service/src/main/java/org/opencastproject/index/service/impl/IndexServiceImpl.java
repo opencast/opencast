@@ -48,6 +48,7 @@ import org.opencastproject.index.service.catalog.adapter.MetadataUtils;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventHttpServletRequest;
@@ -475,7 +476,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public String createEvent(HttpServletRequest request) throws IndexServiceException {
+  public String createEvent(HttpServletRequest request) throws IndexServiceException, UnsupportedAssetException {
     JSONObject metadataJson = null;
     MediaPackage mp = null;
     // regex for form field name matching an attachment or a catalog
@@ -517,7 +518,7 @@ public class IndexServiceImpl implements IndexService {
             final MediaType mediaType = MediaType.parse(item.getContentType());
             final boolean accepted = RequestUtils.typeIsAccepted(fieldName, mediaType, listProvidersService);
             if (!accepted) {
-              throw new IllegalArgumentException("Provided file format " + mediaType.toString() + " not allowed.");
+              throw new UnsupportedAssetException("Provided file format " + mediaType.toString() + " not allowed.");
             }
             if ("presenter".equals(item.getFieldName())) {
               mp = ingestService.addTrack(item.openStream(), item.getName(), MediaPackageElements.PRESENTER_SOURCE, mp);
@@ -581,7 +582,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public String updateEventAssets(MediaPackage mp, HttpServletRequest request) throws IndexServiceException {
+  public String updateEventAssets(MediaPackage mp, HttpServletRequest request) throws IndexServiceException, UnsupportedAssetException {
     JSONObject metadataJson = null;
     // regex for form field name matching an attachment or a catalog
     // The first sub items identifies if the file is an attachment or catalog
@@ -615,7 +616,7 @@ public class IndexServiceImpl implements IndexService {
           final MediaType mediaType = MediaType.parse(item.getContentType());
           final boolean accepted = RequestUtils.typeIsAccepted(fieldName, mediaType, listProvidersService);
           if (!accepted) {
-            throw new IllegalArgumentException("Provided file format " + mediaType.toString() + " not allowed.");
+            throw new UnsupportedAssetException("Provided file format " + mediaType.toString() + " not allowed.");
           }
           if (item.getFieldName().toLowerCase().matches(attachmentRegex)) {
             assetList.add(item.getFieldName());

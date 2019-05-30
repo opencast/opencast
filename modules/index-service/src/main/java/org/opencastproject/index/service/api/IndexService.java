@@ -24,6 +24,7 @@ package org.opencastproject.index.service.api;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventHttpServletRequest;
@@ -159,8 +160,10 @@ public interface IndexService {
    *           Thrown if there was an internal server error while creating the event.
    * @throws IllegalArgumentException
    *           Thrown if the provided request was inappropriate.
+   * @throws UnsupportedAssetException
+   *           Thrown if the provided asset file type is not accepted.
    */
-  String createEvent(HttpServletRequest request) throws IndexServiceException, IllegalArgumentException;
+  String createEvent(HttpServletRequest request) throws IndexServiceException, IllegalArgumentException, UnsupportedAssetException;
 
   /**
    * Creates a new event based on a json string and a media package.
@@ -250,9 +253,11 @@ public interface IndexService {
    *           Thrown if the current user is unable to create the new event.
    * @throws IndexServiceException
    *            Thrown if the update assets workflow cannot be started
+   * @throws UnsupportedAssetException
+   *           Thrown if the provided asset file type is not accepted.
    */
   String updateEventAssets(MediaPackage mp, HttpServletRequest request) throws ParseException, IOException,
-          MediaPackageException, NotFoundException, UnauthorizedException, IndexServiceException;
+          MediaPackageException, NotFoundException, UnauthorizedException, IndexServiceException, UnsupportedAssetException;
 
   /**
    * Update an event's metadata using a {@link MetadataList}
