@@ -65,7 +65,7 @@
 
                 <a title="{{'VIDEO_TOOL.SEGMENTS.REMOVE_SEGMENT' | translate}}"
                    class="remove"
-                   ng-if="video.segments.length > 1 && !$last"
+                   ng-if="video.segments.length > 1"
                    ng-click="mergeSegment($event, segment)">
                 </a>
                 <a title="{{segment.deleted ? 'VIDEO_TOOL.SEGMENTS.SHOW_SEGMENT' : 'VIDEO_TOOL.SEGMENTS.HIDE_SEGMENT' | translate}}"
