@@ -80,6 +80,9 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
   /** Default value of height configuration. */
   private static final int DEFAULT_HEIGHT = 500;
 
+  /** Default value for the waveform color to generate. */
+  private static final String DEFAULT_COLOR = "black";
+
   /** Pixel per minute of waveform image width configuration property name. */
   private static final String PIXELS_PER_MINUTE_PROPERTY = "pixels-per-minute";
 
@@ -155,6 +158,10 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
     );
 
     String color = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(COLOR_PROPERTY));
+    if (StringUtils.isBlank(color)) {
+      logger.info("Waveform color setting is blank, defaulting to {}", DEFAULT_COLOR);
+      color = DEFAULT_COLOR;
+    }
 
     try {
       TrackSelector trackSelector = new TrackSelector();
