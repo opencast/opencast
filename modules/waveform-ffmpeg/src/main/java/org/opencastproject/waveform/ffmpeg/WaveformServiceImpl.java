@@ -402,8 +402,11 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
       filterBuilder.append(waveformFilterPre);
       filterBuilder.append(",");
     }
-    if (color != null) {
-      waveformColor =  StringUtils.split(color, "|");
+    final String[] localWaveformColor;
+    if (StringUtils.isNoneBlank(color)) {
+      localWaveformColor =  StringUtils.split(color, "|");
+    } else {
+      localWaveformColor = waveformColor;
     }
     filterBuilder.append("showwavespic=");
     filterBuilder.append("split_channels=");
@@ -415,7 +418,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     filterBuilder.append(":scale=");
     filterBuilder.append(waveformScale);
     filterBuilder.append(":colors=");
-    filterBuilder.append(StringUtils.join(Arrays.asList(waveformColor), "|"));
+    filterBuilder.append(StringUtils.join(Arrays.asList(localWaveformColor), "|"));
     if (waveformFilterPost != null) {
       filterBuilder.append(",");
       filterBuilder.append(waveformFilterPost);
