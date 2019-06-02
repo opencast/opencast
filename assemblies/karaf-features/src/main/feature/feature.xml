@@ -750,21 +750,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-migration" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
-
-    <!-- Note: This is the minimum set of bundles for the 4.0 migration bundle.  If this is not 4.0 then this list should probably change! -->
-    <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-storage-fs/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-handler/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-solr/${project.version}</bundle>
-    <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
-  </feature>
-
-  <feature name="opencast-security-cas" version="${project.version}">  
+  <feature name="opencast-security-cas" version="${project.version}">
     <bundle start-level="82">mvn:commons-collections/commons-collections/3.2.1</bundle>
     <bundle start-level="82">mvn:org.apache.velocity/velocity/1.7</bundle>
     <bundle start-level="82">mvn:org.apache.santuario/xmlsec/2.1.2</bundle>

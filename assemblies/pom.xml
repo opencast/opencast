@@ -31,7 +31,6 @@
         <module>dist-ingest</module>
         <module>dist-presentation</module>
         <module>dist-worker</module>
-        <module>dist-migration</module>
       </modules>
     </profile>
     <profile>
