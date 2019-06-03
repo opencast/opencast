@@ -159,7 +159,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
 
     String color = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(COLOR_PROPERTY));
     if (StringUtils.isBlank(color)) {
-      logger.info("Waveform color setting is blank, defaulting to {}", DEFAULT_COLOR);
+      logger.debug("Waveform color setting is blank, defaulting to {}", DEFAULT_COLOR);
       color = DEFAULT_COLOR;
     }
 
