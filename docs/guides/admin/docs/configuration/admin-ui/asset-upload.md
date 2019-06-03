@@ -172,6 +172,7 @@ displayOverride.SHORT | 'Video of a Presenter'    | A short source title which o
 displayFallback.SHORT | 'Video of a Presenter'    | A short source title which displays when no translation is found
 displayOverride.DETAIL | 'A recording that showing the lecturer speaking' | A longer source description which overrides all translation
 displayFallback.DETAIL | 'A recording that showing the lecturer speaking' | A longer source description which displays when no translation is found
+accept | 'video/*,.png' | A list of accepted file formats as taken by the HTML \<input\>'s `accept` field. This field is optional. This has to be a list of comma separated values. Each value of the list can either be a IANA MediaType or a file ending.
 
 
 The parameter key is internationalized as the display text in the admin UI

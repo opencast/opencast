@@ -77,6 +77,7 @@ import org.opencastproject.index.service.api.IndexService.Source;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
@@ -1794,7 +1795,7 @@ public abstract class AbstractEventEndpoint {
       return Response.status(Status.CREATED).entity(result).build();
     }  catch (NotFoundException e) {
       return notFound("Cannot find an event with id '%s'.", eventId);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException | UnsupportedAssetException e) {
       return RestUtil.R.badRequest(e.getMessage());
     } catch (Exception e) {
       return RestUtil.R.serverError();
@@ -2027,7 +2028,7 @@ public abstract class AbstractEventEndpoint {
         return RestUtil.R.badRequest("The date range provided did not include any events");
       }
       return Response.status(Status.CREATED).entity(result).build();
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException | UnsupportedAssetException e) {
       return RestUtil.R.badRequest(e.getMessage());
     } catch (Exception e) {
       return RestUtil.R.serverError();
