@@ -4,6 +4,7 @@ Opencast 8: Release Notes
 Features
 --------
 
+- The `adminworker` distribution is no longer available.
 
 Improvements
 ------------
