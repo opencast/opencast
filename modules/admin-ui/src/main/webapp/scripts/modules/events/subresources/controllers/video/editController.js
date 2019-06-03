@@ -56,24 +56,6 @@ angular.module('adminNg.controllers')
       $scope.$root.$broadcast('segmentTimesUpdated');
     };
 
-    $scope.clearSelectedSegment = function () {
-
-      angular.forEach($scope.video.segments, function (segment) {
-        if (segment.selected) {
-
-          var index = $scope.video.segments.indexOf(segment);
-
-          if ($scope.video.segments[index + 1]) {
-            $scope.video.segments[index + 1].start = segment.start;
-            $scope.video.segments.splice(index, 1);
-          } else if ($scope.video.segments[index - 1]) {
-            $scope.video.segments[index - 1].end = segment.end;
-            $scope.video.segments.splice(index, 1);
-          }
-        }
-      });
-    };
-
     $scope.clearSegments = function () {
       $scope.video.segments.splice(1, $scope.video.segments.length - 1);
       $scope.video.segments[0].end = $scope.video.duration;

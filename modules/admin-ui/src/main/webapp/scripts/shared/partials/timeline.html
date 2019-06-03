@@ -68,7 +68,7 @@
                    ng-if="video.segments.length > 1"
                    ng-click="mergeSegment($event, segment)">
                 </a>
-                <a title="{{'VIDEO_TOOL.SEGMENTS.USE_SEGMENT' | translate}}"
+                <a title="{{segment.deleted ? 'VIDEO_TOOL.SEGMENTS.SHOW_SEGMENT' : 'VIDEO_TOOL.SEGMENTS.HIDE_SEGMENT' | translate}}"
                    ng-class="{ unused: segment.deleted, used: !segment.deleted }"
                    ng-click="toggleSegment($event, segment)">
                 </a>
