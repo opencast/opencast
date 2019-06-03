@@ -17,13 +17,16 @@
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-execute-api</artifactId>
-      <version>${project.version}</version>
+      <groupId>com.entwinemedia.common</groupId>
+      <artifactId>functional</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-kernel</artifactId>
+      <artifactId>opencast-execute-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -68,16 +71,17 @@
     </dependency>
   </dependencies>
   <build>
-    <testResources>
-      <!-- Add a log4j configuration file to the test resources -->
-      <testResource>
-        <directory>${project.basedir}/src/test/resources</directory>
-        <includes>
-          <include>log4j.properties</include>
-        </includes>
-      </testResource>
-    </testResources>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <!-- provide a logger for tests -->
+            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

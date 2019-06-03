@@ -21,7 +21,6 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobImpl;
@@ -99,7 +98,7 @@ public class TestJobEndpoint extends JobEndpoint {
             "2014-06-05T09:16:00Z", "2014-06-05T09:16:00Z", "testuser1", "host3"));
     jobs.add(createJob(3, Status.RUNNING, WorkflowService.JOB_TYPE, "RESUME",
             "2014-06-05T09:11:11Z", "2014-06-05T09:11:11Z", "testuser2", "host3"));
-    jobs.add(createJob(4, Status.RUNNING, MediaInspectionService.JOB_TYPE, "Inspect",
+    jobs.add(createJob(4, Status.RUNNING, "org.opencastproject.inspection", "Inspect",
             "2014-06-05T09:16:00Z", "2014-06-05T09:16:00Z", "testuser1", "host2"));
     jobs.add(createJob(5, Status.RUNNING, "org.opencastproject.composer", "Encode",
             "2014-06-05T09:05:00Z", "2014-06-05T09:05:00Z", "testuser3", "host1"));
