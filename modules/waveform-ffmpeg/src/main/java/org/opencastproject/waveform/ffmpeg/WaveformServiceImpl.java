@@ -44,7 +44,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -403,10 +402,12 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
       filterBuilder.append(waveformFilterPre);
       filterBuilder.append(",");
     }
-    String[] waveformOperationColors = ArrayUtils.clone(waveformColor);
+    String[] waveformOperationColors = null;
     //If the color was set, override the defaults
     if (StringUtils.isNotBlank(color)) {
       waveformOperationColors = StringUtils.split(color, "|");
+    } else {
+      waveformOperationColors = waveformColor;
     }
     filterBuilder.append("showwavespic=");
     filterBuilder.append("split_channels=");
