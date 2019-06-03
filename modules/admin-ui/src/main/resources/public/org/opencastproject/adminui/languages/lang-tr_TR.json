@@ -832,7 +832,7 @@
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "İş Akışları"
+               "TITLE": "Workflow instances"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "İş akışı detayları",
