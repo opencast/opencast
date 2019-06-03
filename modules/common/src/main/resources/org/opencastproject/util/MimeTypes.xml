@@ -20,11 +20,6 @@
     <Extensions>json</Extensions>
   </MimeType>
   <MimeType>
-    <Type>application/ogg</Type>
-    <Description>Ogg file</Description>
-    <Extensions>ogg,oga,ogv,ogx</Extensions>
-  </MimeType>
-  <MimeType>
     <Type>application/pdf</Type>
     <Description>Portable Document Format</Description>
     <Extensions>pdf</Extensions>
@@ -115,22 +110,17 @@
     <Extensions>mid,midi,smf,kar</Extensions>
   </MimeType>
   <MimeType>
-    <Type>audio/mp3</Type>
-    <Description>MP3 audio</Description>
-    <Extensions>mp3,swa</Extensions>
-  </MimeType>
-  <MimeType>
-    <Type>audio/mp4</Type>
-    <Description>MPEG-4 media</Description>
-    <Extensions>mp4</Extensions>
-  </MimeType>
-  <MimeType>
     <Type>audio/mpeg</Type>
     <Description>MPEG audio</Description>
     <Extensions>m1a,mp2,mpa,m2a,mp3,swa</Extensions>
   </MimeType>
   <MimeType>
     <Type>audio/mpeg3</Type>
+    <Description>MP3 audio</Description>
+    <Extensions>mp3,swa</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>audio/mp3</Type>
     <Description>MP3 audio</Description>
     <Extensions>mp3,swa</Extensions>
   </MimeType>
@@ -387,7 +377,12 @@
   <MimeType>
     <Type>video/mp4</Type>
     <Description>MPEG-4 media</Description>
-    <Extensions>mp4,m4v</Extensions>
+    <Extensions>mp4,mp4v,m4v</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>audio/mp4</Type>
+    <Description>MPEG-4 media</Description>
+    <Extensions>mp4,mp4a,m4a</Extensions>
   </MimeType>
   <MimeType>
     <Type>video/mpeg</Type>
@@ -403,6 +398,11 @@
     <Type>video/ogg</Type>
     <Description>Ogg video</Description>
     <Extensions>ogg,ogv,ogx</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>application/ogg</Type>
+    <Description>Ogg file</Description>
+    <Extensions>ogg,oga,ogv,ogx</Extensions>
   </MimeType>
   <MimeType>
     <Type>video/quicktime</Type>
