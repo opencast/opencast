@@ -886,6 +886,23 @@ public class Event implements IndexObject {
     }
   }
 
+  /**
+   * Return the displayable status of this event
+   *
+   * @param customWorkflowStatusMapping
+   *          The mappings used to get the displayable status for the workflow state.
+   *
+   * @return the displayable status of this event
+   */
+  public String getDisplayableStatus(Map<String, Map<String, String>> customWorkflowStatusMapping) {
+    if (getWorkflowId() != null && StringUtils.isNotBlank(getWorkflowState())
+          && customWorkflowStatusMapping.containsKey(getWorkflowDefinitionId())
+          && customWorkflowStatusMapping.get(getWorkflowDefinitionId()).containsKey(getWorkflowState())) {
+      return customWorkflowStatusMapping.get(getWorkflowDefinitionId()).get(getWorkflowState());
+    }
+    return getEventStatus();
+  }
+
   public boolean isScheduledEvent() {
     /* Only scheduled events have a capture ID assigned */
     return StringUtils.isNotBlank(getAgentId());

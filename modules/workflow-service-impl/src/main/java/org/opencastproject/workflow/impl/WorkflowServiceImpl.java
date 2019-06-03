@@ -100,6 +100,7 @@ import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStateException;
+import org.opencastproject.workflow.api.WorkflowStateMapping;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.conditionparser.WorkflowConditionInterpreter;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
@@ -2275,6 +2276,15 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       throw new WorkflowDatabaseException("Unable to clean all workflow instances, see logs!");
     }
   }
+
+  @Override
+  public Map<String, Map<String, String>> getWorkflowStateMappings() {
+    return workflowDefinitionScanner.workflowStateMappings.entrySet().stream().collect(Collectors.toMap(
+        Entry::getKey, e -> e.getValue().stream()
+            .collect(Collectors.toMap(m -> m.getState().name(), WorkflowStateMapping::getValue))
+    ));
+  }
+
 
   @Override
   public void repopulate(final String indexName) throws ServiceRegistryException {

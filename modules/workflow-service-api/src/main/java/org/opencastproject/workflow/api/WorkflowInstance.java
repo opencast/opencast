@@ -25,6 +25,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
@@ -33,6 +34,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlJavaTypeAdapter(WorkflowInstanceImpl.Adapter.class)
 public interface WorkflowInstance extends Configurable {
+
   enum WorkflowState {
     INSTANTIATED, RUNNING, STOPPED, PAUSED, SUCCEEDED, FAILED, FAILING;
 
@@ -45,6 +47,19 @@ public interface WorkflowInstance extends Configurable {
         default:
           return false;
       }
+    }
+    public static class Adapter extends XmlAdapter<String, WorkflowState> {
+
+      @Override
+      public String marshal(WorkflowState workflowState) {
+        return workflowState == null ? null : workflowState.toString().toLowerCase();
+      }
+
+      @Override
+      public WorkflowState unmarshal(String val) {
+        return val == null ? null : WorkflowState.valueOf(val.toUpperCase());
+      }
+
     }
   }
 

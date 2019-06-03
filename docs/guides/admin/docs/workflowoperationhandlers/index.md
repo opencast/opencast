@@ -93,3 +93,36 @@ The following table contains the workflow operations that are available in an ou
 |transfer-metadata   |Transfer metadata fields between catalogs                      |[Documentation](transfer-metadata-woh.md)|
 |waveform            |Create a waveform image of the audio of the mediapackage       |[Documentation](waveform-woh.md)|
 |zip                 |Create zipped archive of the current state of the mediapackage |[Documentation](zip-woh.md)|
+
+## State Mappings
+Technically, a workflow can be in one of the following states:
+
+| Technical State | Description | What the Admin UI displays in the events table|
+|-----------------|-------------|-----------------------------------------------|
+|**instantiated**| The workflow is queued and will be started as soon as possible | "Pending" |
+|**running**| The workflow is running, no problems so far | "Running" |
+|**stopped**| The workflow was aborted by the user | "Processing canceled" |
+|**paused**| The workflow was paused and can be continued | "Paused" |
+|**succeeded**| The workflow has completed successfully | "Finished" |
+|**failed**| The workflow failed due to an error | "Processing failure" |
+|**failing**| The workflow is still running, but there were errors. It will fail. | "Running" |
+
+Using state mappings, it is possible to refine the labels displayed in the Admin UI events table for a particular
+workflow.
+
+Here is an example which displays "Retracting" instead of "Running" for the retract workflow:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>retract</id>
+  ...
+  <state-mappings>
+    <state-mapping state="running">retracting</state-mapping>
+    <state-mapping state="failing">retracting</state-mapping>
+  </state-mappings>
+```
+
+When no state mappings are configured for a workflow, the generic default labels will be displayed.
+
+When a workflow includes other workflows, the event table only shows the state of the including workflow.

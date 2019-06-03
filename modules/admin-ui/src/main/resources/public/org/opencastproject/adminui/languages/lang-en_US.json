@@ -509,6 +509,14 @@
          "PROCESSING_FAILURE": "Processing failure",
          "PROCESSING_CANCELED": "Processing canceled"
        },
+       "STATE_MAPPING":{
+         "RETRACTING": "Retracting",
+         "DUPLICATING": "Duplicating",
+         "PUBLISHING": "Publishing",
+         "IMPORTING": "Importing",
+         "REPUBLISHING_METADATA": "Republishing metadata",
+         "UPDATING_PREVIEWS": "Updating previews"
+       },
        "DETAILS": {
          "HEADER": "Event details - {{resourceId}}",
          "TABS": {

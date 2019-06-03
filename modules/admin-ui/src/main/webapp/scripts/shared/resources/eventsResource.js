@@ -55,6 +55,9 @@ angular.module('adminNg.resources')
         $translate(r.event_status).then(function (translation) {
           row.event_status = translation;
         }).catch(angular.noop);
+        $translate(r.displayable_status, {}, undefined, r.displayable_status).then(function (translation) {
+          row.displayable_status = translation;
+        }).catch(angular.noop);
         row.source = r.source;
         row.scheduling_status = r.scheduling_status;
         $translate(r.scheduling_status).then(function (translation) {
