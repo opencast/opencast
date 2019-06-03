@@ -1559,7 +1559,7 @@ public class IndexServiceImpl implements IndexService {
   private void retractAndRemoveEvent(String id, Runnable doOnNotFound, String retractWorkflowId)
       throws WorkflowDatabaseException, NotFoundException {
     final WorkflowDefinition wfd = workflowService.getWorkflowDefinitionById(retractWorkflowId);
-    final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
+    final Workflows workflows = new Workflows(assetManager, workflowService);
     final ConfiguredWorkflow workflow = workflow(wfd);
     final List<WorkflowInstance> result = workflows.applyWorkflowToLatestVersion(Collections.singleton(id), workflow).toList();
     if (result.size() != 1) {
