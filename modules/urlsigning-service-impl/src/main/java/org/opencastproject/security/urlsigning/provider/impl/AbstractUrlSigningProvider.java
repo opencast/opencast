@@ -50,6 +50,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, ManagedService {
   /** The prefix for key configuration keys */
@@ -63,6 +66,9 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
 
   /** Value indicating that the key can be used by any organization */
   public static final String ANY_ORGANIZATION = "*";
+
+  /** The configuration key used for the exlusion list */
+  public static final String EXCLUSION_PROPERTY_KEY = "exclude.url.pattern";
 
   /** The security service */
   protected SecurityService securityService;
@@ -96,6 +102,9 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
 
   /** A mapping of URL prefixes to keys used to lookup keys for a given URL. */
   private TreeMap<String, Key> urls = new TreeMap<>();
+
+  /** A regular expression pattern used to identify URLs that shall not be signed. Can be null */
+  private Pattern exclusionPattern;
 
   /**
    * @param securityService
@@ -149,6 +158,7 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
 
     // Collect configuration in a new map so we don't partially override the old one in case of error
     TreeMap<String, Key> urls = new TreeMap<>();
+    Pattern exclusionPattern = null;
 
     // Temporary list of key entries to simplify building up the keys
     Map<String, Key> keys = new HashMap<>();
@@ -192,6 +202,12 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
           default:
             throw new ConfigurationException(propertyKey, "Unknown attribute " + attribute + " for key " + id);
         }
+      } else if (EXCLUSION_PROPERTY_KEY.equals(propertyKey)) {
+        String propertyValue = Objects.toString(properties.get(propertyKey), "");
+        if (!StringUtils.isEmpty(propertyValue)) {
+          exclusionPattern = Pattern.compile(propertyValue);
+        }
+        getLogger().debug("Exclusion pattern: {}", propertyValue);
       }
     }
 
@@ -208,9 +224,20 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
     }
 
     this.urls = urls;
+    this.exclusionPattern = exclusionPattern;
   }
 
-  private boolean isValidUrl(String url) {
+  private boolean isExcluded(String url) {
+    boolean isExcluded = false;
+    Pattern exclusionPattern = this.exclusionPattern;
+    if (exclusionPattern != null) {
+      Matcher matcher = exclusionPattern.matcher(url);
+      isExcluded = matcher.matches();
+    }
+    return isExcluded;
+  }
+
+  private boolean isValid(String url) {
     try {
       new URI(url);
       return true;
@@ -222,23 +249,24 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
 
   @Override
   public boolean accepts(String baseUrl) {
-    return isValidUrl(baseUrl) && getKey(baseUrl) != null;
+    return isValid(baseUrl) && !isExcluded(baseUrl) && getKey(baseUrl) != null;
   }
 
   @Override
   public String sign(Policy policy) throws UrlSigningException {
-    Key key = getKey(policy.getBaseUrl());
-    if (key == null) {
+    String url = policy.getBaseUrl();
+    Key key = getKey(url);
+    if (isExcluded(url) || key == null) {
       throw UrlSigningException.urlNotSupported();
     }
 
     policy.setResourceStrategy(getResourceStrategy());
 
     try {
-      URI uri = new URI(policy.getBaseUrl());
+      URI uri = new URI(url);
       List<NameValuePair> queryStringParameters = new ArrayList<>();
       if (uri.getQuery() != null) {
-        queryStringParameters = URLEncodedUtils.parse(new URI(policy.getBaseUrl()).getQuery(), StandardCharsets.UTF_8);
+        queryStringParameters = URLEncodedUtils.parse(uri.getQuery(), StandardCharsets.UTF_8);
       }
       queryStringParameters.addAll(URLEncodedUtils.parse(
               ResourceRequestUtil.policyToResourceRequestQueryString(policy, key.id, key.secret),

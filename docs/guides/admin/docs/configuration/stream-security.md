@@ -67,6 +67,12 @@ It is also possible to use one key for multiple URL prefixes:
     key.demoKeyThree.organization=mh_default_org
 
 
+A Java regular expression can be defined to identify URLs to be excluded from URL signing.
+Any URL that matches this anchored regex will not be signed.
+
+    exclude.url.pattern=.*/.*/unprotected/.*/.*
+
+
 Configuration of URL Signing Timeout Values
 -------------------------------------------
 
