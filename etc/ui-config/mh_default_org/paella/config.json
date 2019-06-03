@@ -46,7 +46,18 @@
       },
       {
         "factory": "HLSVideoFactory",
-        "enabled": true
+        "enabled": true,
+        "config": {
+          "*** You can add more hls.js settings here": "https://github.com/video-dev/hls.js/blob/master/docs/API.md",
+          "maxBufferLength": 30,
+          "maxMaxBufferLength": 600,
+          "maxBufferSize": 60000000,
+          "maxBufferHole": 0.5,
+          "lowBufferWatchdogPeriod": 0.5,
+          "highBufferWatchdogPeriod": 3
+        },
+        "iOSMaxStreams": 1,
+        "androidMaxStreams": 1
       },
       {
         "factory": "RTMPVideoFactory",
@@ -117,7 +128,7 @@
     "//**** Instructions: Disable any individual plugin by setting its enable property to false": {
       "enabled": false
     },
-    "//**** For a list of available plugins and configuration, go to": "https://github.com/polimediaupv/paella/blob/master/doc/plugins.md",
+    "//**** For a list of available plugins and configuration, go to": "https://github.com/polimediaupv/paella/blob/develop/doc/adopters/plugins.md",
     "list": {
       "es.upv.paella.opencast.loader": {
         "flavors": [
@@ -279,17 +290,11 @@
       "es.upv.paella.playButtonOnScreenPlugin": {
         "enabled": true
       },
-      "es.upv.paella.test.videoLoadPlugin": {
-        "enabled": false
-      },
       "es.upv.paella.translecture.captionsPlugin": {
         "enabled": true
       },
       "es.upv.paella.trimmingPlayerPlugin": {
         "enabled": true
-      },
-      "es.upv.paella.zoomPlugin": {
-        "enabled": false
       },
       "es.upv.paella.windowTitlePlugin": {
         "enabled": true
