@@ -44,20 +44,21 @@
     </operation>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Prepare asset                                                     -->
+    <!-- Prepare the work media                                            -->
     <!--                                                                   -->
-    <!-- Prepare the recording for asset management, including creation of -->
-    <!-- previews, audio waveforms and storing of the recording data in    -->
-    <!-- the asset area for further processing.                            -->
+    <!-- Ensure the work media is in a format that allows Opencast to do   -->
+    <!-- its work. This includes potentially rewriting the container and   -->
+    <!-- making sure that the audio track is part of each video track.     -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
-    <!-- Prepare work versions of the source material for further processing -->
-
     <operation
-      id="include"
-      description="Prepare the recording for further processing">
+        id="select-tracks"
+        exception-handler-workflow="partial-error"
+        description="Preparing presenter (camera) audio and video work versions">
       <configurations>
-        <configuration key="workflow-id">partial-work</configuration>
+        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="target-flavor">*/work</configuration>
+        <configuration key="target-tags">-archive</configuration>
       </configurations>
     </operation>
 
@@ -95,19 +96,16 @@
       </configurations>
     </operation>
 
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Cleanup                                                           -->
-    <!--                                                                   -->
-    <!-- Remove work artifacts.                                            -->
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-    <!-- Clean the system from work artifacts -->
+    <!-- Clean up work artifacts -->
 
     <operation
-      id="include"
-      description="Remove temporary processing artifacts">
+        id="cleanup"
+        fail-on-error="false"
+        description="Remove temporary processing artifacts">
       <configurations>
-        <configuration key="workflow-id">partial-cleanup</configuration>
+        <configuration key="delete-external">true</configuration>
+        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 
