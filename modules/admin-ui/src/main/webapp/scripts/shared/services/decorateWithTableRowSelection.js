@@ -122,7 +122,7 @@ angular.module('adminNg.services')
         if (target.rowsPromise) {
           target.rowsPromise.then(function () {
             target.allSelected = target.getSelected().length === target.rows.length;
-          });
+          }).catch(angular.noop);
         }
 
         return target;

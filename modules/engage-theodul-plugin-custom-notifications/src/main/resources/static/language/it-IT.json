@@ -1,0 +1,13 @@
+{
+    "value_locale": "it",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "error_videoLoading": "Caricamento del video. Si prega di attendere.",
+    "error_audioLoading": "Caricamento audio. Si prega di attendere.",
+    "msg_videoLoadedSuccessfully": "Il video è stato caricato con successo.",
+    "msg_audioLoadedSuccessfully": "L'audio è stato caricato con successo.",
+    "msg_videoBuffering": "Caricamento del video. Si prega di attendere.",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "Il video è stato recuperato con successo ed è ora in riproduzione automatica.",
+    "msg_videoBufferedSuccessfully": "Il video è stato caricato con successo.",
+    "error": "Errore",
+    "error_AudioCodecNotSupported": "Errore: Il codec audio non è supportato da questo browser"
+}

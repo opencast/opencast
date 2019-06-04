@@ -994,7 +994,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
     try {
       WorkflowDefinition wfDef = workflowService.getWorkflowDefinitionById(wfDefId);
-      Workflows workflows = wfUtil != null ? wfUtil : new Workflows(assetManager, workspace, workflowService);
+      Workflows workflows = wfUtil != null ? wfUtil : new Workflows(assetManager, workflowService);
       Set<String> mpIds = new HashSet<String>();
       mpIds.add(mpId);
       List<WorkflowInstance> wfList = workflows

@@ -28,14 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.spi.PersistenceProvider;
 
 public class TranscriptionDatabase {
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(TranscriptionDatabase.class);
-
-  /** Persistence provider set by OSGi */
-  private PersistenceProvider persistenceProvider;
 
   /** Factory used to create entity managers for transactions */
   protected EntityManagerFactory emf;
@@ -47,11 +43,6 @@ public class TranscriptionDatabase {
 
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
-  }
-
-  /** OSGi callback to set persistence provider. */
-  public void setPersistenceProvider(PersistenceProvider persistenceProvider) {
-    this.persistenceProvider = persistenceProvider;
   }
 
   public TranscriptionJobControl storeJobControl(String mpId, String trackId, String jobId, String jobStatus,

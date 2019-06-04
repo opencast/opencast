@@ -20,6 +20,11 @@
     <Extensions>json</Extensions>
   </MimeType>
   <MimeType>
+    <Type>text/yaml</Type>
+    <Description>YAML Ain't Markup Language</Description>
+    <Extensions>yml,yaml</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>application/ogg</Type>
     <Description>Ogg file</Description>
     <Extensions>ogg,oga,ogv,ogx</Extensions>

@@ -1,5 +1,5 @@
 describe('adminNg.directives.adminNgNotification', function () {
-    var $compile, $rootScope, element;
+    var $compile, $rootScope, element, $httpBackend;
 
     beforeEach(module('adminNg'));
     beforeEach(module('shared/partials/notification.html'));
@@ -14,12 +14,14 @@ describe('adminNg.directives.adminNgNotification', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function (_$rootScope_, _$compile_) {
+    beforeEach(inject(function (_$httpBackend_, _$rootScope_, _$compile_) {
+        $httpBackend = _$httpBackend_;
         $compile = _$compile_;
         $rootScope = _$rootScope_;
     }));
 
     beforeEach(function () {
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         element = $compile('<div admin-ng-notification=""></div>')($rootScope);
         $rootScope.$digest();
     });

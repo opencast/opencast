@@ -48,6 +48,7 @@ import org.opencastproject.index.service.catalog.adapter.MetadataUtils;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventHttpServletRequest;
@@ -57,8 +58,10 @@ import org.opencastproject.index.service.impl.index.group.GroupIndexSchema;
 import org.opencastproject.index.service.impl.index.group.GroupSearchQuery;
 import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
+import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
+import org.opencastproject.index.service.util.RequestUtils;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
@@ -125,12 +128,14 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
+import com.google.common.net.MediaType;
 
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
@@ -202,6 +207,7 @@ public class IndexServiceImpl implements IndexService {
   private CaptureAgentStateService captureAgentStateService;
   private EventCommentService eventCommentService;
   private IngestService ingestService;
+  private ListProvidersService listProvidersService;
   private AssetManager assetManager;
   private SchedulerService schedulerService;
   private SecurityService securityService;
@@ -322,6 +328,16 @@ public class IndexServiceImpl implements IndexService {
    */
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
+  }
+
+  /**
+   * OSGi DI.
+   *
+   * @param listProvidersService
+   *          the service to set
+   */
+  public void setListProvidersService(ListProvidersService listProvidersService) {
+    this.listProvidersService = listProvidersService;
   }
 
   /**
@@ -460,7 +476,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public String createEvent(HttpServletRequest request) throws IndexServiceException {
+  public String createEvent(HttpServletRequest request) throws IndexServiceException, UnsupportedAssetException {
     JSONObject metadataJson = null;
     MediaPackage mp = null;
     // regex for form field name matching an attachment or a catalog
@@ -497,6 +513,13 @@ public class IndexServiceImpl implements IndexService {
               }
             }
           } else {
+            // AngularJS file upload lib appends ".0" to field name, so we cut that off
+            fieldName = fieldName.substring(0, fieldName.lastIndexOf("."));
+            final MediaType mediaType = MediaType.parse(item.getContentType());
+            final boolean accepted = RequestUtils.typeIsAccepted(fieldName, mediaType, listProvidersService);
+            if (!accepted) {
+              throw new UnsupportedAssetException("Provided file format " + mediaType.toString() + " not allowed.");
+            }
             if ("presenter".equals(item.getFieldName())) {
               mp = ingestService.addTrack(item.openStream(), item.getName(), MediaPackageElements.PRESENTER_SOURCE, mp);
             } else if ("presentation".equals(item.getFieldName())) {
@@ -551,14 +574,15 @@ public class IndexServiceImpl implements IndexService {
       }
 
       return createEvent(metadataJson, mp);
-    } catch (Exception e) {
+    } catch (FileUploadException | UnauthorizedException | ParseException | IngestException | SchedulerException
+        | MediaPackageException | IOException | NotFoundException e) {
       logger.error("Unable to create event: {}", getStackTrace(e));
-      throw new IndexServiceException(e.getMessage());
+      throw new IndexServiceException("Unable to create event", e);
     }
   }
 
   @Override
-  public String updateEventAssets(MediaPackage mp, HttpServletRequest request) throws IndexServiceException {
+  public String updateEventAssets(MediaPackage mp, HttpServletRequest request) throws IndexServiceException, UnsupportedAssetException {
     JSONObject metadataJson = null;
     // regex for form field name matching an attachment or a catalog
     // The first sub items identifies if the file is an attachment or catalog
@@ -587,6 +611,13 @@ public class IndexServiceImpl implements IndexService {
             }
           }
         } else {
+          // AngularJS file upload lib appends ".0" to field name, so we cut that off
+          fieldName = fieldName.substring(0, fieldName.lastIndexOf("."));
+          final MediaType mediaType = MediaType.parse(item.getContentType());
+          final boolean accepted = RequestUtils.typeIsAccepted(fieldName, mediaType, listProvidersService);
+          if (!accepted) {
+            throw new UnsupportedAssetException("Provided file format " + mediaType.toString() + " not allowed.");
+          }
           if (item.getFieldName().toLowerCase().matches(attachmentRegex)) {
             assetList.add(item.getFieldName());
             // Add attachment with field name as temporary flavor
@@ -620,9 +651,9 @@ public class IndexServiceImpl implements IndexService {
       }
 
       return startAddAssetWorkflow(metadataJson, mp);
-    } catch (Exception e) {
+    } catch (MediaPackageException | FileUploadException | IOException | IngestException e) {
       logger.error("Unable to create event: {}", getStackTrace(e));
-      throw new IndexServiceException(e.getMessage());
+      throw new IndexServiceException("Unable to create event", e);
     }
   }
 
@@ -695,7 +726,7 @@ public class IndexServiceImpl implements IndexService {
       Set<String> mpIds = new HashSet<String>();
       mpIds.add(mpId);
 
-      final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
+      final Workflows workflows = new Workflows(assetManager, workflowService);
       List<WorkflowInstance> wfList = workflows
               .applyWorkflowToLatestVersion(mpIds,
                       ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowDefId), params))

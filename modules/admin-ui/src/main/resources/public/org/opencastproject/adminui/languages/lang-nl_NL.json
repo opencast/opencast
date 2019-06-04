@@ -57,7 +57,6 @@
             "GROUP": "De volgende groep wordt verwijderd",
             "USER": "De volgende gebruiker wordt verwijderd",
             "THEME": "Het volgende thema wordt verwijderd",
-            "EMAIL": "Het volgende e-mail sjabloon wordt verwijderd",
             "LOCATION": "De volgende locatie wordt verwijderd"
          },
          "NAME": "Naam"
@@ -132,15 +131,6 @@
       "LOCATION_DELETED": "De locatie werd verwijderd",
       "LOCATION_NOT_DELETED": "De locatie kon niet verwijderd worden",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "De locatie kan niet verwijderd worden, omdat u niet gemachtigd bent om dit te doen.",
-      "EMAIL_TEMPLATE_CREATED": "Het sjabloon werd aangemaakt",
-      "EMAIL_TEMPLATE_NOT_CREATED": "Het sjabloon kon niet aangemaakt worden",
-      "EMAIL_TEMPLATE_SAVED": "Het sjabloon werd bewaard",
-      "EMAIL_TEMPLATE_NOT_SAVED": "Het sjabloon kon niet bewaard worden",
-      "EMAIL_TEMPLATE_DELETED": "Het sjabloon werd verwijderd",
-      "EMAIL_TEMPLATE_NOT_DELETED": "Het sjabloon kon niet verwijderd worden",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "Deze naam is reeds in gebruik",
-      "EMAIL_SENT": "Het bericht werd verzonden",
-      "EMAIL_NOT_SENT": "Het bericht kon niet verzonden worden",
       "CONFLICT_DETECTED": "Planning conflict: het nieuwe evenement overlapt met een reeds bestaand evenement. Gelieve de locatie, datum of tijdstippen aan te passen.",
       "CONFLICT_BULK_DETECTED": "Planningsconflict: de wijzigingen aan de gebeurtenis resulteert in conflicten. Wijzig de locatie, datums of tijden.",
       "CONFLICT_ALREADY_ENDED": "Planning fout: het evenement is reeds gestopt.",
@@ -153,11 +143,6 @@
       "SERIES_ACL_LOCKED": "Bewerken van het toegangsbeleid is niet toegestaan wanneer er acties uitgevoerd worden op een evenement dat deel uitmaakt van de series",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "De toegangspolicy vereist ten minste één rol met lees- en/of schrijfrechten.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "De toegangspolicy vereist minstens één rol met lees- en/of schrijfrechten.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "De status van het opt-out evenement is succesvol geüpdatet.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Fout tijdens het bijwerken van de status van het opt-out evenement.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "De participatiestatus kan niet worden bijgewerkt als de geplande begindatum in het verleden ligt.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "De status van het opt-out evenement is succesvol geüpdatet.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Fout tijdens het bijwerken van de series opt-out status.",
       "THEME_NAME_ALREADY_TAKEN": "Deze naam is reeds in gebruik",
       "THEME_NAME_EMPTY": "De naam kan niet leeg zijn",
       "BUMPER_UPLOAD_ERROR": "Fout tijdens uploaden media",
@@ -186,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Acties",
-      "SEND_MESSAGE": "Stuur bericht",
       "WARNING": "Waarschuwing",
-      "EDIT_STATUS": {
-         "CAPTION": "Status bewerken",
-         "READY_FOR_RECORDING": "Klaar voor opname",
-         "OPTED_OUT": "Uitgeschreven"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Verwijderen",
@@ -292,6 +271,8 @@
       "BACK": "Vorige",
       "CREATE": "Creëer",
       "RETRACT": "Intrekken",
+      "RETRACT_DELETE": "Retract/Delete",
+      "DELETE": "Verwijderen",
       "UPDATE": "Updaten",
       "DURATION": {
          "HOURS": "Uren",
@@ -326,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Configuratie"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistics"
       }
    },
    "EVENTS": {
@@ -348,28 +332,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "Stuur bericht",
-         "TABS": {
-            "RECIPIENTS": "Ontvangers",
-            "MESSAGE": "Bericht",
-            "SUMMARY": "Samenvatting"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "Aan audit spoor toevoegen",
-            "AUDIT_TRAIL_DESCRIPTION": "Markeer om het bericht aan het audit spoor toe te voegen",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "Selecteer een e-mail sjabloon",
-            "SUBJECT": "Onderwerp",
-            "MESSAGE": "Bericht",
-            "INCLUDE_SIGNATURE": "Voeg mijn handtekening toe aan de e-mail"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "Samenvatting"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -500,7 +462,6 @@
          "ADD_EVENT": "Evenement toevoegen",
          "TABLE": {
             "CAPTION": "Evenementen",
-            "CREATORS": "Auteurs",
             "TITLE": "Titel",
             "PRESENTERS": "Presentator(en)",
             "SERIES": "Series",
@@ -515,9 +476,7 @@
             "LAST": "Laatste",
             "NEXT": "Volgende",
             "MANAGED_ACL": "Toegangspolicy",
-            "SCHEDULING_STATUS": "Status",
             "WORKFLOW_STATE": "Voortgang",
-            "REVIEW_STATUS": "Status nakijken",
             "PREVIOUS": "Vorige",
             "NOCONTENT": "Geen gegevens beschikbaar",
             "PUBLISHED": "Gepubliceerd",
@@ -536,13 +495,8 @@
                "PRESENTER": "Filter for this presenter"
             }
          },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "Klaar voor opname",
-            "OPTED_OUT": "Uitgeschreven"
-         },
          "STATUS": {
             "SCHEDULED": "Gepland",
-            "OPTEDOUT": "Uitgeschreven",
             "RECORDING": "Opname bezig",
             "UPLOADING": "Uploaden",
             "INGESTING": "Ingesting",
@@ -564,16 +518,14 @@
                "SCHEDULING": "Planning",
                "WORKFLOWS": "Workflows",
                "ACCESS": "Toegangspolicy",
-               "COMMENTS": "Reacties"
+               "COMMENTS": "Reacties",
+               "STATISTICS": "Statistics"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publicaties",
                "NO_PUBLICATIONS_AVAILABLE": "Deze gebeurtenis heeft geen publicaties",
                "PUBLICATION_DESCRIPTION": "Dit evenement is gepubliceerd op de volgende publicatie kanalen:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Deze gebeurtenis wordt niet uitgevoerd",
-               "SCHEDULING_STATUS": "Status",
-               "READY_FOR_RECORDING": "Klaar voor opname",
-               "OPTED_OUT": "Uitgeschreven",
                "CUSTOM": "Aangepast",
                "ENGAGE": "Aan de slag",
                "ENGAGE_LIVE": "Engage live",
@@ -809,6 +761,9 @@
                   "PROCESSING_FAILURE": "Verwerking mislukt"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Statistics"
+            },
             "METADATA": {
                "CAPTION": "Details evenement",
                "TITLE": "Titel",
@@ -840,20 +795,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "De status van de deelname",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Review status"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Opted-out status",
-                  "READY": "Klaar voor opname",
-                  "OPTEDOUT": "Opted out"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Berichten",
-                  "CREATION_DATE": "Aangemaakt op",
-                  "SENDER": "Zender",
-                  "SUBJECT": "Onderwerp"
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Presentator(en)"
                }
@@ -891,9 +832,9 @@
                   "PAUSED": "Gepauzeerd",
                   "SUCCEEDED": "Geslaagd",
                   "FAILED": "Mislukt",
-                  "FAILING": "Failing",
+                  "FAILING": "Mislukt",
                   "SKIPPED": "Overgeslagen",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "Gestopt",
                   "RETRY": "Opnieuw"
                }
             },
@@ -1027,7 +968,7 @@
             "CAPTION": "Series",
             "TITLE": "Series",
             "HAS_EVENTS": "Bevat eventementen",
-            "CREATORS": "Organisator(en)",
+            "ORGANIZERS": "Organisator(en)",
             "CONTRIBUTORS": "Bijdrager(s)",
             "CREATED": "Aangemaakt",
             "MANAGED_ACL": "Toegangspolicy",
@@ -1044,10 +985,10 @@
             "TABS": {
                "METADATA": "Metadata",
                "EXTENDED_METADATA": "Metadata II",
-               "PARTICIPATION": "Deelname",
                "EVENTS": "Evenementen",
                "PERMISSIONS": "Toegangspolicy",
-               "THEME": "Thema"
+               "THEME": "Thema",
+               "STATISTICS": "Statistics"
             },
             "ACCESS": {
                "CAPTION": "Toegangspolicy",
@@ -1089,24 +1030,6 @@
                "LANGUAGE": "Taal",
                "LICENSE": "Licentie",
                "DESCRIPTION": "Beschrijving"
-            },
-            "PARTICIPATION": {
-               "CAPTION": "Deelname status sjabloon",
-               "WARNING_TEMPLATE": "Status van de deelname van de series zal worden gebruikt als standaardwaarde voor nieuwe evenementen die deel uitmaken van de series.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Review Status"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Opted-out Status",
-                  "READY": "Klaar voor opname",
-                  "OPTEDOUT": "Opted out"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Berichten",
-                  "CREATION_DATE": "Aangemaakt op",
-                  "SENDER": "Zender",
-                  "SUBJECT": "Onderwerp"
-               }
             },
             "EVENTS": {
                "TITLE": "Titel",
@@ -1418,34 +1341,7 @@
          "ADD_THEME": "Thema toevoegen"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "E-mail sjablonen",
-         "MAIL_SERVERS": "E-mail settings",
          "THEMES": "Thema's"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "E-mail sjablonen",
-            "NAME": "Naam",
-            "CREATOR": "Auteur",
-            "CREATED": "Aangemaakt",
-            "ACTION": "Acties"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Sjabloon aanmaken",
-            "EDITCAPTION": "Sjabloon bewerken",
-            "TABS": {
-               "MESSAGE": "Bericht",
-               "SUMMARY": "Samenvatting"
-            },
-            "MESSAGE": {
-               "NAME": "Naam",
-               "SUBJECT": "Onderwerp",
-               "MESSAGE": "Bericht"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "Samenvatting bericht"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1541,24 +1437,16 @@
       "JOBS": {
          "TABLE": {
             "ID": "Job ID",
-            "ACTION": "Acties",
             "CAPTION": "Taken",
             "CREATED": "Aangemaakt",
             "CREATOR": "Auteur",
             "HOST_NAME": "Hostnaam",
+            "NODE_NAME": "Node name",
             "OPERATION": "Operatie",
             "STARTED": "Gestart",
             "STATUS": "Status",
             "SUBMITTED": "Ingediend",
             "TYPE": "Type"
-         },
-         "DETAILS": {
-            "HEADER": "Job details {{resourceId}}",
-            "TABS": {
-               "GENERAL": "Algemeen",
-               "OPERATIONS": "Operaties",
-               "INCIDENTS": "Incidenten"
-            }
          },
          "STATUS": {
             "QUEUED": "In wachtrij",
@@ -1579,6 +1467,7 @@
             "CAPTION": "Servers",
             "STATUS": "Status",
             "HOST_NAME": "Hostnaam",
+            "NODE_NAME": "Node name",
             "CORES": "Kernen",
             "COMPLETED": "Jobs afgewerkt",
             "RUNNING": "Jobs in verwerking",
@@ -1586,7 +1475,6 @@
             "MEAN_RUN_TIME": "Gemiddelde looptijd",
             "MEAN_QUEUE_TIME": "Gemiddelde wachttijd",
             "MAINTENANCE": "Onderhoud",
-            "ACTION": "Acties",
             "MAINTENANCE_OFF": "Activeer onderhoudsmodus",
             "MAINTENANCE_ON": "Beëindig onderhoudsmodus"
          }
@@ -1597,6 +1485,7 @@
             "STATUS": "Status",
             "NAME": "Servicenaam",
             "HOST_NAME": "Hostnaam",
+            "NODE_NAME": "Node name",
             "COMPLETED": "Jobs afgewerkt",
             "RUNNING": "Jobs in verwerking",
             "QUEUED": "Jobs in wachtrij",
@@ -1816,9 +1705,6 @@
          "LOCATION": {
             "LABEL": "Locatie"
          },
-         "OPTEDOUT": {
-            "LABEL": "Opted out"
-         },
          "PERIOD": {
             "LABEL": "Periode"
          },
@@ -1830,12 +1716,6 @@
          },
          "PROGRESS": {
             "LABEL": "Vooruitgang"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "Review Status",
-            "CONFIRMED": "Bevestigd",
-            "UNCONFIRMED": "Onbevestigd",
-            "UNSENT": "Niet verzonden"
          },
          "SERIES": {
             "LABEL": "Series"
@@ -1880,6 +1760,9 @@
          "HOSTNAME": {
             "LABEL": "Hostnaam"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Status",
             "PAUSED": "Gepauzeerd",
@@ -1921,6 +1804,9 @@
          "HOSTNAME": {
             "LABEL": "Hostnaam"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Status",
             "MAINTENANCE": "Onderhoud",
@@ -1934,6 +1820,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Hostnaam"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "Naam"
@@ -2079,6 +1968,27 @@
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "To insert multiple values press Enter in between"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "FROM": "Van",
+      "TO": "To",
+      "TOTAL": "Total",
+      "GRANULARITY": "Granularity",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Random Data",
+         "VIEWS_SUM": "Total Number of Views",
+         "VIEWS_AVG": "Average Number of Views"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time uinit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time uinit."
       }
    }
 }

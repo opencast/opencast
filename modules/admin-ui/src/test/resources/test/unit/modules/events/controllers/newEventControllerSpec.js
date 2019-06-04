@@ -26,6 +26,7 @@ describe('New Event Controller', function () {
 
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
     });
 
     it('sports a submit function', function () {

@@ -22,7 +22,6 @@
 package org.opencastproject.util;
 
 import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.functions.Misc.cast;
 
 import org.opencastproject.util.data.Function;
 
@@ -61,13 +60,5 @@ public final class JsonArr implements Iterable<JsonVal> {
   @Override
   public Iterator<JsonVal> iterator() {
     return mlist(val).map(JsonVal.asJsonVal).iterator();
-  }
-
-  private static <A> Function<Object, A> caster(final Class<A> ev) {
-    return new Function<Object, A>() {
-      @Override public A apply(Object o) {
-        return cast(o, ev);
-      }
-    };
   }
 }

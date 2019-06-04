@@ -10,8 +10,8 @@
    "SAVE": "Speichern",
    "LOGOUT": "Ausloggen",
    "RESET": "Zurücksetzen",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "Keine Option ausgewählt",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Keine Optionen verfügbar",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabisch",
@@ -57,7 +57,6 @@
             "GROUP": "Die folgende Gruppe wird gelöscht",
             "USER": "Der folgende Benutzer wird gelöscht",
             "THEME": "Das folgende Branding wird gelöscht",
-            "EMAIL": "Die folgende E-Mail-Vorlage wird gelöscht",
             "LOCATION": "Folgender Raum wird entfernt"
          },
          "NAME": "Name"
@@ -132,15 +131,6 @@
       "LOCATION_DELETED": "Das Aufzeichnungsgerät wurde entfernt",
       "LOCATION_NOT_DELETED": "Das Aufzeichnungsgerät konnte nicht entfernt werden",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Der Raum konnte nicht entfernt werden, weil Sie nicht dazu berechtigt sind.",
-      "EMAIL_TEMPLATE_CREATED": "Die Vorlage wurde erstellt",
-      "EMAIL_TEMPLATE_NOT_CREATED": "Die Vorlage konnte nicht erstellt werden",
-      "EMAIL_TEMPLATE_SAVED": "Die Vorlage wurde gespeichert",
-      "EMAIL_TEMPLATE_NOT_SAVED": "Die Vorlage konnte nicht gespeichert werden",
-      "EMAIL_TEMPLATE_DELETED": "Die Vorlage wurde gelöscht",
-      "EMAIL_TEMPLATE_NOT_DELETED": "Die Vorlage konnte nicht gelöscht werden",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "Dieser Name wird bereits verwendet",
-      "EMAIL_SENT": "Die Nachricht wurde gesendet",
-      "EMAIL_NOT_SENT": "Die Nachricht konnte nicht gesendet werden",
       "CONFLICT_DETECTED": "Planungskonflikt: Die neue Aufzeichnung überlappt zeitlich mit einer bereits bestehenden Aufzeichnung. Bitte Ort, Datum oder Zeit anpassen.",
       "CONFLICT_BULK_DETECTED": "Konflikt: Das Ändern der Aufzeichnungsdaten resultiert in Konflikten. Bitte Ort, Datum oder Zeit anpassen.",
       "CONFLICT_ALREADY_ENDED": "Planungskonflikt: Aufzeichnungen können nicht in der Vergangenheit geplant werden.",
@@ -153,11 +143,6 @@
       "SERIES_ACL_LOCKED": "Das Editieren von Zugriffsrichtlinien ist nicht erlaubt, solange Aufnahmen verarbeitet werden, die Teil der Serie sind",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Der Zugriffsrichtlinie erfordert mindestens eine Rolle mit Lese- und Schreibberechtigungen.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "Der Zugriffsrichtlinie erfordert mindestens eine Rolle mit Lese- und Schreibberechtigungen.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Opt-Out-Status wurde aktualisiert.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Fehler beim Aktualisieren des Opt-Out-Statusses.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "Der Teilnahmestatus kann nicht aktualisiert werden, da das Startdatum in der Vergangenheit liegt.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Opt-Out-Status wurde aktualisiert.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Fehler beim Aktualisieren des Opt-Out-Statusses.",
       "THEME_NAME_ALREADY_TAKEN": "Dieser Name wird bereits verwendet",
       "THEME_NAME_EMPTY": "Der Name darf nicht leer sein",
       "BUMPER_UPLOAD_ERROR": "Fehler beim Hochladen von Medien",
@@ -186,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Aktionen",
-      "SEND_MESSAGE": "Nachricht senden",
       "WARNING": "Achtung",
-      "EDIT_STATUS": {
-         "CAPTION": "Status bearbeiten",
-         "READY_FOR_RECORDING": "Bereit für die Aufnahme",
-         "OPTED_OUT": "Wird nicht aufgezeichnet"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Löschen",
@@ -292,6 +271,8 @@
       "BACK": "Zurück",
       "CREATE": "Anlegen",
       "RETRACT": "Zurückziehen",
+      "RETRACT_DELETE": "Zurückziehen/Löschen",
+      "DELETE": "Löschen",
       "UPDATE": "Aktualisieren",
       "DURATION": {
          "HOURS": "Stunden",
@@ -326,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Konfiguration"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistiken"
       }
    },
    "EVENTS": {
@@ -348,28 +332,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "Nachricht senden",
-         "TABS": {
-            "RECIPIENTS": "Empfänger",
-            "MESSAGE": "Nachricht",
-            "SUMMARY": "Zusammenfassung"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "Protokollieren",
-            "AUDIT_TRAIL_DESCRIPTION": "Auswählen, um Nachtricht zu protokollieren",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "Wählen Sie eine E-Mail-Vorlage",
-            "SUBJECT": "Betreff",
-            "MESSAGE": "Nachricht",
-            "INCLUDE_SIGNATURE": "Signatur an E-Mail anhängen"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "Zusammenfassung"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -500,7 +462,6 @@
          "ADD_EVENT": "Aufzeichnung hinzufügen",
          "TABLE": {
             "CAPTION": "Ereignisse",
-            "CREATORS": "Autoren",
             "TITLE": "Titel",
             "PRESENTERS": "Vortragende(r)",
             "SERIES": "Serien",
@@ -515,9 +476,7 @@
             "LAST": "Letzte",
             "NEXT": "Weiter",
             "MANAGED_ACL": "Zugriffsrechte",
-            "SCHEDULING_STATUS": "Status",
             "WORKFLOW_STATE": "Fortschritt",
-            "REVIEW_STATUS": "Prüfstatus",
             "PREVIOUS": "Zurück",
             "NOCONTENT": "Keine Daten verfügbar",
             "PUBLISHED": "Veröffentlicht",
@@ -536,13 +495,8 @@
                "PRESENTER": "Nach diesem Vortragenden filtern"
             }
          },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "Bereit für die Aufnahme",
-            "OPTED_OUT": "Wird nicht aufgezeichnet"
-         },
          "STATUS": {
             "SCHEDULED": "Geplant",
-            "OPTEDOUT": "Wird nicht aufgezeichnet",
             "RECORDING": "Zeichnet auf",
             "UPLOADING": "Lädt hoch",
             "INGESTING": "Importiert",
@@ -564,16 +518,14 @@
                "SCHEDULING": "Planung",
                "WORKFLOWS": "Workflows",
                "ACCESS": "Zugriffsrechte",
-               "COMMENTS": "Kommentare"
+               "COMMENTS": "Kommentare",
+               "STATISTICS": "Statistik"
             },
             "PUBLICATIONS": {
                "CAPTION": "Veröffentlichungen",
                "NO_PUBLICATIONS_AVAILABLE": "Diese Aufzeichnung wurde noch nicht publiziert",
                "PUBLICATION_DESCRIPTION": "Diese Aufzeichnung wurde zu folgenden Kanälen publiziert:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Diese Aufzeichnung ist momentan nicht verfügbar",
-               "SCHEDULING_STATUS": "Status",
-               "READY_FOR_RECORDING": "Bereit für die Aufnahme",
-               "OPTED_OUT": "Wird nicht aufgezeichnet",
                "CUSTOM": "Benutzerdefiniert",
                "ENGAGE": "Engage",
                "ENGAGE_LIVE": "Enagage Live",
@@ -809,6 +761,9 @@
                   "PROCESSING_FAILURE": "Verarbeitungs-Fehler"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Statistik"
+            },
             "METADATA": {
                "CAPTION": "Aufzeichnungs-Details",
                "TITLE": "Titel",
@@ -840,20 +795,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "Publikations-Status",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Prüfstatus"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Opt-Out-Status",
-                  "READY": "Bereit zur Aufnahme",
-                  "OPTEDOUT": "Wird nicht aufgezeichnet"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Nachrichten",
-                  "CREATION_DATE": "Erstellungsdatum",
-                  "SENDER": "Absender",
-                  "SUBJECT": "Betreff"
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Vortragende(r)"
                }
@@ -1027,7 +968,7 @@
             "CAPTION": "Serie",
             "TITLE": "Serie",
             "HAS_EVENTS": "Enthält Aufzeichnungen",
-            "CREATORS": "Organisator(en)",
+            "ORGANIZERS": "Organisator(en)",
             "CONTRIBUTORS": "Mitwirkende",
             "CREATED": "Erstellt",
             "MANAGED_ACL": "Zugriffsrechte",
@@ -1044,10 +985,10 @@
             "TABS": {
                "METADATA": "Metadaten",
                "EXTENDED_METADATA": "Metadaten II",
-               "PARTICIPATION": "Beteiligung",
                "EVENTS": "Ereignisse",
                "PERMISSIONS": "Zugriffsrechte",
-               "THEME": "Branding"
+               "THEME": "Branding",
+               "STATISTICS": "Statistik"
             },
             "ACCESS": {
                "CAPTION": "Zugriffsrechte",
@@ -1089,24 +1030,6 @@
                "LANGUAGE": "Sprache",
                "LICENSE": "Lizenz",
                "DESCRIPTION": "Beschreibung"
-            },
-            "PARTICIPATION": {
-               "CAPTION": "Teilnahme-Status-Vorlage",
-               "WARNING_TEMPLATE": "Der Serien-Teilnahme-Status wird als Standardwert für alle neuen Aufzeichnungen der Serie verwendet.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Prüfstatus"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Opt-Out-Status",
-                  "READY": "Bereit zur Aufnahme",
-                  "OPTEDOUT": "Wird nicht aufgezeichnet"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Nachrichten",
-                  "CREATION_DATE": "Erstellungsdatum",
-                  "SENDER": "Absender",
-                  "SUBJECT": "Betreff"
-               }
             },
             "EVENTS": {
                "TITLE": "Titel",
@@ -1418,34 +1341,7 @@
          "ADD_THEME": "Branding hinzufügen"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "E-Mail-Vorlagen",
-         "MAIL_SERVERS": "E-Mail-Einstellungen",
          "THEMES": "Brandings"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "E-Mail-Vorlagen",
-            "NAME": "Name",
-            "CREATOR": "Author",
-            "CREATED": "Erstellt",
-            "ACTION": "Aktionen"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Vorlage erstellen",
-            "EDITCAPTION": "Vorlage bearbeiten",
-            "TABS": {
-               "MESSAGE": "Nachricht",
-               "SUMMARY": "Zusammenfassung"
-            },
-            "MESSAGE": {
-               "NAME": "Name",
-               "SUBJECT": "Betreff",
-               "MESSAGE": "Nachricht"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "Zusammenfassung der Nachricht"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1541,24 +1437,16 @@
       "JOBS": {
          "TABLE": {
             "ID": "Job ID",
-            "ACTION": "Aktionen",
             "CAPTION": "Aufgaben",
             "CREATED": "Erstellt",
             "CREATOR": "Autor",
             "HOST_NAME": "Hostname",
+            "NODE_NAME": "Knotenname",
             "OPERATION": "Vorgang",
             "STARTED": "Gestartet",
             "STATUS": "Status",
             "SUBMITTED": "Übermittelt",
             "TYPE": "Typ"
-         },
-         "DETAILS": {
-            "HEADER": "Job-Details {{resourceId}}",
-            "TABS": {
-               "GENERAL": "Allgemein",
-               "OPERATIONS": "Operationen",
-               "INCIDENTS": "Vorfälle"
-            }
          },
          "STATUS": {
             "QUEUED": "In Warteschlange",
@@ -1579,6 +1467,7 @@
             "CAPTION": "Server",
             "STATUS": "Status",
             "HOST_NAME": "Hostname",
+            "NODE_NAME": "Knotenname",
             "CORES": "Kerne",
             "COMPLETED": "Jobs abgeschlossen",
             "RUNNING": "Jobs in Bearbeitung",
@@ -1586,7 +1475,6 @@
             "MEAN_RUN_TIME": "Mittlere Laufzeit",
             "MEAN_QUEUE_TIME": "Mittlere Wartezeit",
             "MAINTENANCE": "Wartungsarbeiten",
-            "ACTION": "Aktionen",
             "MAINTENANCE_OFF": "Wartungsmodus aktivieren",
             "MAINTENANCE_ON": "Wartungsmodus beenden"
          }
@@ -1597,6 +1485,7 @@
             "STATUS": "Status",
             "NAME": "Dienstname",
             "HOST_NAME": "Hostname",
+            "NODE_NAME": "Knotenname",
             "COMPLETED": "Jobs abgeschlossen",
             "RUNNING": "Jobs in Bearbeitung",
             "QUEUED": "Jobs in Warteschlange",
@@ -1816,9 +1705,6 @@
          "LOCATION": {
             "LABEL": "Raum"
          },
-         "OPTEDOUT": {
-            "LABEL": "Wird nicht aufgezeichnet"
-         },
          "PERIOD": {
             "LABEL": "Zeitraum"
          },
@@ -1830,12 +1716,6 @@
          },
          "PROGRESS": {
             "LABEL": "Fortschritt"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "Prüfstatus",
-            "CONFIRMED": "Bestätigt",
-            "UNCONFIRMED": "Unbestätigt",
-            "UNSENT": "Nicht gesendet"
          },
          "SERIES": {
             "LABEL": "Serien"
@@ -1880,6 +1760,9 @@
          "HOSTNAME": {
             "LABEL": "Hostname"
          },
+         "NODE_NAME": {
+            "LABEL": "Knotenname"
+         },
          "STATUS": {
             "LABEL": "Status",
             "PAUSED": "Pausiert",
@@ -1921,6 +1804,9 @@
          "HOSTNAME": {
             "LABEL": "Hostname"
          },
+         "NODE_NAME": {
+            "LABEL": "Knotenname"
+         },
          "STATUS": {
             "LABEL": "Status",
             "MAINTENANCE": "Wartungsarbeiten",
@@ -1934,6 +1820,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Hostname"
+         },
+         "NODE_NAME": {
+            "LABEL": "Knotenname"
          },
          "NAME": {
             "LABEL": "Name"
@@ -2079,6 +1968,27 @@
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "Einen Wert mit Enter bestätigen um weitere Werte einzufügen"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Die Statistik kann aktuell nicht angezeigt werden. Bitte versuchen Sie es später nochmals.",
+      "UNSUPPORTED_TYPE": "Diese Statistik-Daten können nicht dargestellt werden.",
+      "FROM": "Von",
+      "TO": "Bis",
+      "TOTAL": "Summe",
+      "GRANULARITY": "Granularität",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Zufallsdaten",
+         "VIEWS_SUM": "Zugriffe",
+         "VIEWS_AVG": "Durchschnittliche Anzahl Zugriffe"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "Diese Zufallsdaten dienen ausschließlich Test- und Demonstrationszwecken. Um diese Darstellung zu deaktivieren, können Sie die entsprechende Konfiguration in etc/providers entfernen",
+         "VIEWS_SUM": "Diese Statistik zeigt die Summe der Zugriffe pro Zeiteinheit.",
+         "VIEWS_AVG": "Diese Statistik zeigt die durchschnittliche Anzahl Zugriffe pro Zeiteinheit."
       }
    }
 }

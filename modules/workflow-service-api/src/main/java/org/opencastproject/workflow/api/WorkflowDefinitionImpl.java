@@ -25,7 +25,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -69,15 +71,16 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
   @XmlElement(name = "displayOrder")
   private int displayOrder = 0;
 
-  @XmlElement(name = "published")
-  private boolean published;
-
   @XmlElement(name = "configuration_panel")
   private String configurationPanel;
 
   @XmlElement(name = "operation")
   @XmlElementWrapper(name = "operations")
   private List<WorkflowOperationDefinition> operations;
+
+  @XmlElement(name = "state-mapping")
+  @XmlElementWrapper(name = "state-mappings")
+  private Set<WorkflowStateMapping> stateMappings;
 
   /**
    * {@inheritDoc}
@@ -161,6 +164,14 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
     if (operations == null)
       operations = new ArrayList<WorkflowOperationDefinition>();
     return operations;
+  }
+
+  @Override
+  public Set<WorkflowStateMapping> getStateMappings() {
+    if (stateMappings == null) {
+      stateMappings = new HashSet<>();
+    }
+    return stateMappings;
   }
 
   /**
@@ -319,21 +330,6 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
     public WorkflowDefinition unmarshal(WorkflowDefinitionImpl op) throws Exception {
       return op;
     }
-  }
-
-  /**
-   * @return the published
-   */
-  public boolean isPublished() {
-    return published;
-  }
-
-  /**
-   * @param published
-   *          the published to set
-   */
-  public void setPublished(boolean published) {
-    this.published = published;
   }
 
   /**

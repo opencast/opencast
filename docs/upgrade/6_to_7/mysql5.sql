@@ -44,22 +44,14 @@ delete p from oc_assets_properties p where not exists (
     where p.mediapackage_id = s.mediapackage_id
 );
 
-CREATE TABLE oc_transcription_service_provider (
-  id BIGINT(20) NOT NULL,
-  provider VARCHAR(255) NOT NULL,
-  PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- MH-12047 Add series index for efficiency
+CREATE INDEX IX_oc_search_series ON oc_search (series_id);
 
-CREATE TABLE oc_transcription_service_job (
-  id BIGINT(20) NOT NULL,
-  media_package_id VARCHAR(128) NOT NULL,
-  track_id VARCHAR(128) NOT NULL,
-  job_id  VARCHAR(128) NOT NULL,
-  date_created DATETIME NOT NULL,
-  date_completed DATETIME DEFAULT NULL,
-  status VARCHAR(128) DEFAULT NULL,
-  track_duration BIGINT NOT NULL,
-  provider_id BIGINT(20) NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT FK_oc_transcription_service_job_provider_id FOREIGN KEY (provider_id) REFERENCES oc_transcription_service_provider (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+-- MH-13380 Add snapshot_id index for efficiency
+CREATE INDEX IX_oc_assets_asset_snapshot_id ON oc_assets_asset (snapshot_id);
+
+-- MH-13490 Add event index for efficiency
+CREATE INDEX IX_oc_event_comment_event ON oc_event_comment (event, organization);
+
+-- MH-13489 Add index on series_id for efficiency
+CREATE INDEX IX_oc_assets_snapshot_series ON oc_assets_snapshot (series_id, version);

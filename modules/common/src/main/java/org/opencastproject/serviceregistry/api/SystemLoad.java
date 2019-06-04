@@ -85,8 +85,7 @@ public class SystemLoad {
     if (!nodeLoads.containsKey(host)) {
       throw new NotFoundException("Host " + host + " not in this load object");
     }
-    NodeLoad current = nodeLoads.get(host);
-    current.setLoadFactor(current.getLoadFactor() + modifier);
+    nodeLoads.get(host).modifyLoad(modifier);
   }
 
   /**
@@ -124,6 +123,17 @@ public class SystemLoad {
     return false;
   }
 
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Current Loads:\n");
+    for (NodeLoad n : getNodeLoads()) {
+      sb.append(String.format("  %s: %f / %f\n", n.getHost(), n.getCurrentLoad(), n.getMaxLoad()));
+    }
+    return sb.toString();
+  }
+
+
   /** A record of a node in the cluster and its load factor */
   @XmlType(name = "nodetype", namespace = "http://serviceregistry.opencastproject.org")
   @XmlRootElement(name = "nodetype", namespace = "http://serviceregistry.opencastproject.org")
@@ -134,9 +144,10 @@ public class SystemLoad {
     public NodeLoad() {
     }
 
-    public NodeLoad(String host, float load) {
+    public NodeLoad(String host, float currentload, float maxload) {
       this.host = host;
-      this.loadFactor = load;
+      this.currentLoad = currentload;
+      this.maxLoad = maxload;
     }
 
     /** This node's base URL */
@@ -145,7 +156,10 @@ public class SystemLoad {
 
     /** This node's current load */
     @XmlAttribute
-    protected float loadFactor;
+    protected float currentLoad;
+
+    @XmlAttribute
+    protected float maxLoad;
 
     /**
      * @return the host
@@ -163,25 +177,43 @@ public class SystemLoad {
     }
 
     /**
-     * @return the loadFactor
+     * @return the load factor, current / maxload
      */
     public float getLoadFactor() {
-      return loadFactor;
+      return currentLoad / maxLoad;
     }
 
     /**
-     * @param loadFactor
-     *          the loadFactor to set
+     * Modifies the load for this node
+     * @param modifier
+     *              the amount to add or subtract from the current load
      */
-    public void setLoadFactor(float loadFactor) {
-      this.loadFactor = loadFactor;
+    public void modifyLoad(float modifier) {
+      this.currentLoad = this.currentLoad + modifier;
     }
+
+    public float getCurrentLoad() {
+      return currentLoad;
+    }
+
+    public void setCurrentLoad(float load) {
+      this.currentLoad = load;
+    }
+
+    public float getMaxLoad() {
+      return maxLoad;
+    }
+
+    public void setMaxLoad(float load) {
+      this.maxLoad = load;
+    }
+
 
     @Override
     public int compareTo(NodeLoad other) {
-      if (other.getLoadFactor() > this.loadFactor) {
+      if (other.getLoadFactor() > this.getLoadFactor()) {
         return 1;
-      } else if (this.loadFactor > other.getLoadFactor()) {
+      } else if (this.getLoadFactor() > other.getLoadFactor()) {
         return -1;
       } else {
         return 0;

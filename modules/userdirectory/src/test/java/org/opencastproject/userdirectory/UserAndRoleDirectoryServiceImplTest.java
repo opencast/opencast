@@ -74,7 +74,7 @@ public class UserAndRoleDirectoryServiceImplTest {
 
     JaxbUser user1 = new JaxbUser(userName, "matterhorn", org, role1, role2);
     user1.setManageable(true);
-    User user2 = new JaxbUser(userName, "secret", "test", true, org, role2, role3);
+    User user2 = new JaxbUser(userName, "secret", "test", org, role2, role3);
     User user3 = new JaxbUser("userSample", "test", org, role2, role3);
 
     List<User> users = new ArrayList<User>();

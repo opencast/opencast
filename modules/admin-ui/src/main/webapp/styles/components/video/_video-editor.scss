@@ -386,11 +386,11 @@ $segment-deleted-selected: saturate(darken($segment-deleted, 25%), 5%);
                                 }
 
                                 &.unused {
-                                  @include fa-icon($fa-var-square-o , before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
+                                  @include fa-icon($fa-var-eye-slash , before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
                                 }
 
                                 &.used {
-                                  @include fa-icon($fa-var-check-square-o, before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
+                                  @include fa-icon($fa-var-eye, before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
                                 }
 
                                 &.remove {
@@ -703,11 +703,11 @@ $segment-deleted-selected: saturate(darken($segment-deleted, 25%), 5%);
               }
 
               &.unused {
-                @include fa-icon($fa-var-square-o , before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
+                @include fa-icon($fa-var-eye-slash , before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
               }
 
               &.used {
-                @include fa-icon($fa-var-check-square-o, before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
+                @include fa-icon($fa-var-eye, before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
               }
 
               &.remove {

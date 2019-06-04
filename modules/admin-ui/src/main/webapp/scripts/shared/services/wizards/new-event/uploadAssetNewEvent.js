@@ -119,7 +119,7 @@ angular.module('adminNg.services').factory('NewEventUploadAsset',['ResourcesList
             }
           });
           self.wizard.sharedData.uploadNameMap = self.ud.namemap;
-        });
+        }).catch(angular.noop);
       };
 
       // This step is visible when event.upload.asset.options.properties

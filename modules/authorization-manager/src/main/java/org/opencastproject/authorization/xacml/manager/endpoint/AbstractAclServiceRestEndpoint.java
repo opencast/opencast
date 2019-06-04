@@ -26,9 +26,6 @@ import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.opencastproject.authorization.xacml.manager.endpoint.JsonConv.digestManagedAcl;
-import static org.opencastproject.authorization.xacml.manager.endpoint.JsonConv.fullAccessControlList;
-import static org.opencastproject.authorization.xacml.manager.endpoint.JsonConv.nest;
 import static org.opencastproject.authorization.xacml.manager.impl.Util.getManagedAcl;
 import static org.opencastproject.security.api.AccessControlUtil.acl;
 import static org.opencastproject.util.Jsons.obj;
@@ -38,13 +35,8 @@ import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.R.serverError;
-import static org.opencastproject.util.data.Either.left;
-import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Prelude.unexhaustiveMatch;
-import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -58,19 +50,15 @@ import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlUtil;
-import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Functions;
 import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -114,53 +102,6 @@ public abstract class AbstractAclServiceRestEndpoint {
   private static final Jsons.Obj fromSeries = obj(p("isFromSeries", true));
 
   private static final Jsons.Obj fromEpisode = obj(p("isFromSeries", false));
-
-  /** Build the JSON obj for un/managed ACLs. */
-  private Jsons.Obj buildAclObj(final Either<AccessControlList, Tuple<ManagedAcl, AclScope>> acl,
-          final boolean withFlavor) {
-    return acl.fold(nest("unmanagedAcl").o(fullAccessControlList),
-    // managed acl
-            new Function<Tuple<ManagedAcl, AclScope>, Jsons.Obj>() {
-              @Override
-              public Jsons.Obj apply(Tuple<ManagedAcl, AclScope> acl) {
-                final Jsons.Obj digest = digestManagedAcl.apply(acl.getA());
-                final Jsons.Obj enriched;
-                if (withFlavor) {
-                  switch (acl.getB()) {
-                    case Episode:
-                      enriched = digest.append(fromEpisode);
-                      break;
-                    case Series:
-                      enriched = digest.append(fromSeries);
-                      break;
-                    default:
-                      enriched = unexhaustiveMatch();
-                  }
-                } else {
-                  enriched = digest;
-                }
-                return obj(p("managedAcl", enriched));
-              }
-            });
-  }
-
-  private Either<AccessControlList, Tuple<ManagedAcl, AclScope>> getActiveAclForSeries(AclService aclService,
-          String seriesId) {
-    try {
-      final AccessControlList activeAcl = getSeriesService().getSeriesAccessControl(seriesId);
-      for (ManagedAcl macl : matchAcls(aclService, activeAcl)) {
-        return right(tuple(macl, AclScope.Series));
-      }
-      return left(activeAcl);
-    } catch (NotFoundException e) {
-      // series does not exist
-      logger.warn("Series {} cannot be found in SeriesService", seriesId);
-    } catch (SeriesException e) {
-      logger.error("Error accessing SeriesService", e);
-      return chuck(e);
-    }
-    return left(EMPTY_ACL);
-  }
 
   /** Matches the given ACL against all managed ACLs returning the first match. */
   private static Option<ManagedAcl> matchAcls(final AclService aclService, final AccessControlList acl) {

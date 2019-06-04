@@ -34,6 +34,7 @@ describe('adminNg.directives.timelineDirective', function () {
             }
         };
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $rootScope.video = angular.copy(getJSONFixture('admin-ng/tools/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/editor.json'));
         element = $compile('<div data-admin-ng-timeline="" data-video="video" data-player="player"/></div>')($rootScope);
         element.find('.timeline-track').css({ width: '1000px' });
@@ -132,7 +133,7 @@ describe('adminNg.directives.timelineDirective', function () {
             expect(element.isolateScope().zoomLevel).toBe(50);
             expect(element.isolateScope().zoomSelected).toBe('');
             expect(element.find('.zoom-control .zoom-level').val()).toBe('50');
-            var fovWidth = element.find('.field-of-vision .field').width();
+            const fovWidth = parseFloat(element.find('.field-of-vision .field').css('width'));
             expect(fovWidth).toBeGreaterThan(59.5);
             expect(fovWidth).toBeLessThan(59.7);
         });
@@ -146,18 +147,20 @@ describe('adminNg.directives.timelineDirective', function () {
             expect(element.isolateScope().zoomValue).toBe(52125);
             expect(element.isolateScope().zoomOffset).toBe(0);
             expect(element.isolateScope().zoomFieldOffset).toBe(0);
-            expect(element.find('.field-of-vision .field').width()).toBe(100);
+            var fovWidth = parseFloat(element.find('.field-of-vision .field').css('width'));
+            expect(fovWidth).toBe(100);
 
-            element.isolateScope().zoomSelected = { name: '1 Sec', time: 1000 };
-            element.isolateScope().changeZoomSelected($.Event(''));
+            const zoomSelected = { name: '10 Sec', time: 10000 };
+            element.isolateScope().zoomSelected = zoomSelected;
+            element.isolateScope().changeZoomSelected($.Event(zoomSelected));
             $rootScope.$digest();
 
-            expect(element.isolateScope().zoomValue).toBe(1000);
+            expect(element.isolateScope().zoomValue).toBe(10000);
             expect(element.isolateScope().zoomOffset).toBe(0);
             expect(element.isolateScope().zoomFieldOffset).toBe(0);
-            var fovWidth = element.find('.field-of-vision .field').width();
-            expect(fovWidth).toBeGreaterThan(1.9);
-            expect(fovWidth).toBeLessThan(2.0);
+            fovWidth = parseFloat(element.find('.field-of-vision .field').css('width'));
+            expect(fovWidth).toBeGreaterThan(19);
+            expect(fovWidth).toBeLessThan(20);
         });
     });
 

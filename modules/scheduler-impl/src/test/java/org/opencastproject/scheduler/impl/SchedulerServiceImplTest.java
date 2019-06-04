@@ -817,6 +817,40 @@ public class SchedulerServiceImplTest {
   }
 
   @Test
+  public void testAddMultipleEventsEmptyRange() throws Exception {
+    final RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=WE;BYHOUR=7;BYMINUTE=0");
+    final Date start = new Date(1546844400000L); // 2019-01-07T07:00:00Z
+    final Date end = start;
+    final Long duration = 6900000L;
+    final TimeZone tz = TimeZone.getTimeZone("America/Los_Angeles");
+    final String captureAgentId = "Device A";
+    final Set<String> userIds = Collections.emptySet();
+    final String id = "Recording1";
+    final String seriesId = "TestSeries";
+    final MediaPackage mpTemplate = generateEvent(Opt.some(id));
+    mpTemplate.setSeries(seriesId);
+    final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId, Opt.some(mpTemplate.getIdentifier().toString()), Opt.some("Test Title"), start, end);
+    addDublinCore(Opt.some(mpTemplate.getIdentifier().toString()), mpTemplate, dublinCoreCatalog);
+    final Map<String, String> wfProperties = this.wfProperties;
+    final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
+    final Opt<String> schedulingSource = Opt.none();
+    final Map<String, Period> scheduled = schedSvc.addMultipleEvents(
+        rrule,
+        start,
+        end,
+        duration,
+        tz,
+        captureAgentId,
+        userIds,
+        mpTemplate,
+        wfProperties,
+        caProperties,
+        schedulingSource
+    );
+    assertTrue(scheduled.isEmpty());
+  }
+
+  @Test
   public void testAddMultipleEvents() throws Exception {
     final RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=0");
     final Date start = new Date(1546844400000L); // 2019-01-07T07:00:00Z
@@ -1073,6 +1107,12 @@ public class SchedulerServiceImplTest {
               new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA;BYHOUR=" + startZdt.getHour() + ";BYMINUTE=" + startZdt.getMinute()), start, new Date(start.getTime() + hours(48)),
               new Long(seconds(36)), TimeZone.getTimeZone("America/Chicago"));
       assertEquals(2, events.size());
+    }
+    {
+      // No events are contained in the RRule and date range: 2019-02-16T16:00:00Z to 2019-02-16T16:55:00Z, FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0
+      List<MediaPackage> conflicts = schedSvc.findConflictingEvents("Device A",
+              new RRule("FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0"), new Date(1550332800000L), new Date(1550336100000L), 1000, TimeZone.getTimeZone("Africa/Johannesburg"));
+      assertEquals(0, conflicts.size());
     }
     {
       //Event A starts before event B, and ends during event B

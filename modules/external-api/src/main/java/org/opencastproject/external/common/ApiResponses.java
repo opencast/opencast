@@ -25,9 +25,6 @@ import static java.lang.String.format;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.URI;
 
 import javax.ws.rs.core.MediaType;
@@ -39,7 +36,6 @@ import javax.ws.rs.core.Response.Status;
  */
 public final class ApiResponses {
 
-  private static final Logger logger = LoggerFactory.getLogger(ApiResponses.class);
   private static final String APPLICATION_PREFIX = "application/";
 
   private ApiResponses() {

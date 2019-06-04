@@ -40,6 +40,7 @@ describe('Login Controller', function () {
             .respond('{"fallbackLanguage":{"code":"en_US"},"bestLanguage":{"code":"en_US"}}');
         $httpBackend.whenGET('public/org/opencastproject/adminui/languages/lang-en_US.json')
             .respond('');
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
     });
 
     describe('when authentication failed', function () {

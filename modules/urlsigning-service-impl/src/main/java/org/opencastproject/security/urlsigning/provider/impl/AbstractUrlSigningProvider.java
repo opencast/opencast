@@ -20,6 +20,7 @@
  */
 package org.opencastproject.security.urlsigning.provider.impl;
 
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.provider.UrlSigningProvider;
@@ -47,22 +48,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, ManagedService {
-  /** The prefix for key entry configuration keys */
-  public static final String KEY_ENTRY_PREFIX = "key";
-  /** The postfix in the configuration file to define the encryption key. */
+  /** The prefix for key configuration keys */
+  public static final String KEY_PROPERTY_PREFIX = "key";
+  /** The attribute name in the configuration file to define the encryption key. */
   public static final String SECRET = "secret";
-  /** The postfix in the configuration file to define the matching url. */
+  /** The attribute name in the configuration file to define the matching url. */
   public static final String URL = "url";
-  /** The postfix in the configuration file to define the organization owning the key. */
+  /** The attribute name in the configuration file to define the organization owning the key. */
   public static final String ORGANIZATION = "organization";
 
   /** Value indicating that the key can be used by any organization */
   public static final String ANY_ORGANIZATION = "*";
+
+  /** The configuration key used for the exlusion list */
+  public static final String EXCLUSION_PROPERTY_KEY = "exclude.url.pattern";
 
   /** The security service */
   protected SecurityService securityService;
@@ -78,16 +84,27 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
   public abstract Logger getLogger();
 
   /**
-   * A class to contain the necessary key entries for url signing.
+   * A class representing a URL signing key.
    */
-  private static class KeyEntry {
-    private String key = null;
-    private String url = null;
-    private String organization = ANY_ORGANIZATION;
+  private static class Key {
+    private String id = null;
+    private String secret = null;
+    private String organizationId = ANY_ORGANIZATION;
+
+    Key(String id) {
+      this.id = id;
+    }
+
+    boolean supports(String organizationId) {
+      return this.organizationId.equals(ANY_ORGANIZATION) || this.organizationId.equals(organizationId);
+    }
   }
 
-  /** The map to contain the list of keys, their ids and the urls they match. */
-  private Map<String, KeyEntry> keys = new HashMap<>();
+  /** A mapping of URL prefixes to keys used to lookup keys for a given URL. */
+  private TreeMap<String, Key> urls = new TreeMap<>();
+
+  /** A regular expression pattern used to identify URLs that shall not be signed. Can be null */
+  private Pattern exclusionPattern;
 
   /**
    * @param securityService
@@ -101,24 +118,34 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
    * @return The current set of url beginnings this signing provider is looking for.
    */
   public Set<String> getUris() {
-    return keys.values().stream()
-            .map(keyEntry -> keyEntry.url)
-            .collect(Collectors.collectingAndThen(
-                    Collectors.toSet(),
-                    Collections::unmodifiableSet));
+    return Collections.unmodifiableSet(urls.keySet());
   }
 
   /**
-   * If available get a {@link KeyEntry} if there is a matching Url matcher.
+   * Get{@link Key} for a given URL.
+   * This method supports multi-tenancy in means of only returning keys that can be used by the current
+   * organization. In case the current organization cannot be determined, no key will be returned. 
    *
    * @param baseUrl
-   *          The url to check against the possible matchers.
-   * @return The {@link KeyEntry} if it is available.
+   *          The URL that needs to be signed.
+   * @return The {@link Key} if it is available.
    */
-  private Optional<Map.Entry<String, KeyEntry>> getKeyEntry(String baseUrl) {
-    return keys.entrySet().stream()
-            .filter(entry -> baseUrl.startsWith(entry.getValue().url))
-            .findAny();
+  private Key getKey(String baseUrl) {
+    /* Optimization: Use TreeMap.floorEntry that can retrieve the greatest URL equal to or greater than 'baseUrl'
+       in O(log(n)). As we are trying to find an URL that is a prefix of 'baseUrl', candidate.getKey() either is
+       that URL (needs to be checked!) or there is no such URL. */
+    Map.Entry<String, Key> candidate = urls.floorEntry(baseUrl);
+    if (candidate != null && baseUrl.startsWith(candidate.getKey())) {
+      Key key = candidate.getValue();
+
+      // Don't accept URLs without an organization context
+      // (for example from the ServiceRegistry JobProducerHeartbeat)
+      Organization organization = securityService.getOrganization();
+      if (organization != null && key.supports(organization.getId())) {
+        return key;
+      }
+    }
+    return null;
   }
 
   @Override
@@ -130,105 +157,119 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
     }
 
     // Collect configuration in a new map so we don't partially override the old one in case of error
-    Map<String, KeyEntry> keys = new HashMap<>();
+    TreeMap<String, Key> urls = new TreeMap<>();
+    Pattern exclusionPattern = null;
+
+    // Temporary list of key entries to simplify building up the keys
+    Map<String, Key> keys = new HashMap<>();
 
     Enumeration<String> propertyKeys = properties.keys();
     while (propertyKeys.hasMoreElements()) {
       String propertyKey = propertyKeys.nextElement();
 
-      String keyEntryProperty = StringUtils.removeStart(propertyKey, KEY_ENTRY_PREFIX + ".");
-      if (keyEntryProperty == propertyKey) continue;
+      if (propertyKey.startsWith(KEY_PROPERTY_PREFIX + ".")) {
 
-      String[] parts = Arrays.stream(keyEntryProperty.split("\\."))
-              .map(String::trim)
-              .toArray(String[]::new);
-      if (parts.length != 2) {
-        throw new ConfigurationException(propertyKey, "wrong property key format");
-      }
+        // We expected the parts [KEY_PROPERTY_PREFIX, id, attribute] or [KEY_PROPERTY_PREFIX, id, URL, name]
+        String[] parts = Arrays.stream(propertyKey.split("\\.")).map(String::trim).toArray(String[]::new);
+        if ((parts.length != 3) && !(parts.length == 4 && URL.equals(parts[2]))) {
+          throw new ConfigurationException(propertyKey, "Wrong property key format");
+        }
 
-      String id = parts[0];
-      KeyEntry currentKeyEntry = keys.computeIfAbsent(id, __ -> new KeyEntry());
+        String propertyValue = StringUtils.trimToNull(Objects.toString(properties.get(propertyKey), null));
+        if (propertyValue == null) {
+          throw new ConfigurationException(propertyKey, "Can't be null or empty");
+        }
 
-      String attribute = parts[1];
-      String propertyValue = StringUtils.trimToNull(Objects.toString(properties.get(propertyKey), null));
-      if (propertyValue == null) {
-        throw new ConfigurationException(propertyKey, "can't be null or empty");
-      }
-      switch (attribute) {
-        case ORGANIZATION:
-          currentKeyEntry.organization = propertyValue;
-          break;
-        case URL:
-          if (keys.values().stream()
-                  .map(keyEntry -> keyEntry.url)
-                  .filter(Objects::nonNull)
-                  .anyMatch(url -> propertyValue.startsWith(url) || (url != null && url.startsWith(propertyValue)))) {
-            throw new ConfigurationException(propertyKey,
-                    "there is already a key configuration for a URL with the prefix " + propertyValue);
-          }
-          currentKeyEntry.url = propertyValue;
-          break;
-        case SECRET:
-          currentKeyEntry.key = propertyValue;
-          break;
-        default:
-          throw new ConfigurationException(propertyKey, "unknown attribute " + attribute + " for key " + id);
+        String id = parts[1];
+        Key currentKey = keys.computeIfAbsent(id, __ -> new Key(id));
+
+        String attribute = parts[2];
+        switch (attribute) {
+          case ORGANIZATION:
+            currentKey.organizationId = propertyValue;
+            break;
+          case URL:
+            if (urls.keySet().stream().anyMatch(v -> propertyValue.startsWith(v) || (v.startsWith(propertyValue)))) {
+              throw new ConfigurationException(propertyKey,
+                      "There is already a key configuration for a URL with the prefix " + propertyValue);
+            }
+            /* We explicitely support multiple URLs that map to the same key */
+            urls.put(propertyValue, currentKey);
+            break;
+          case SECRET:
+            currentKey.secret = propertyValue;
+            break;
+          default:
+            throw new ConfigurationException(propertyKey, "Unknown attribute " + attribute + " for key " + id);
+        }
+      } else if (EXCLUSION_PROPERTY_KEY.equals(propertyKey)) {
+        String propertyValue = Objects.toString(properties.get(propertyKey), "");
+        if (!StringUtils.isEmpty(propertyValue)) {
+          exclusionPattern = Pattern.compile(propertyValue);
+        }
+        getLogger().debug("Exclusion pattern: {}", propertyValue);
       }
     }
 
-    keys = keys.entrySet().stream()
-            .filter(entry -> entry.getValue().key != null && entry.getValue().url != null)
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    /* Validate key entries */
+    for (Key key : keys.values()) {
+      if (key.secret == null) {
+        throw new ConfigurationException(key.id, "No secret set");
+      }
+    }
 
     // Has the rewriter been fully configured
-    if (keys.size() == 0) {
+    if (urls.size() == 0) {
       getLogger().info("{} configured to not sign any urls.", toString());
     }
 
-    this.keys = keys;
+    this.urls = urls;
+    this.exclusionPattern = exclusionPattern;
+  }
+
+  private boolean isExcluded(String url) {
+    boolean isExcluded = false;
+    Pattern exclusionPattern = this.exclusionPattern;
+    if (exclusionPattern != null) {
+      Matcher matcher = exclusionPattern.matcher(url);
+      isExcluded = matcher.matches();
+    }
+    return isExcluded;
+  }
+
+  private boolean isValid(String url) {
+    try {
+      new URI(url);
+      return true;
+    } catch (URISyntaxException e) {
+      getLogger().debug("Unable to support url {} because", url, e);
+      return false;
+    }
   }
 
   @Override
   public boolean accepts(String baseUrl) {
-    try {
-      new URI(baseUrl);
-    } catch (URISyntaxException e) {
-      getLogger().debug("Unable to support url {} because", baseUrl, e);
-      return false;
-    }
-
-    // Don't accept URLs without an organization context
-    // (for example from the ServiceRegistry JobProducerHeartbeat)
-    if (securityService.getOrganization() == null)
-      return false;
-
-    String orgId = securityService.getOrganization().getId();
-
-    Optional<Map.Entry<String, KeyEntry>> keyEntry = getKeyEntry(baseUrl);
-    return keyEntry
-            .map(entry -> entry.getValue().organization)
-            .map(organization -> organization.equals(ANY_ORGANIZATION) || organization.equals(orgId))
-            .orElse(false);
+    return isValid(baseUrl) && !isExcluded(baseUrl) && getKey(baseUrl) != null;
   }
 
   @Override
   public String sign(Policy policy) throws UrlSigningException {
-    if (!accepts(policy.getBaseUrl())) {
+    String url = policy.getBaseUrl();
+    Key key = getKey(url);
+    if (isExcluded(url) || key == null) {
       throw UrlSigningException.urlNotSupported();
     }
 
     policy.setResourceStrategy(getResourceStrategy());
 
     try {
-      // Get the key that matches this URI since there must be one that matches as the base url has been accepted.
-      Map.Entry<String, KeyEntry> keyEntry = getKeyEntry(policy.getBaseUrl()).get();
-      URI uri = new URI(policy.getBaseUrl());
+      URI uri = new URI(url);
       List<NameValuePair> queryStringParameters = new ArrayList<>();
       if (uri.getQuery() != null) {
-        queryStringParameters = URLEncodedUtils.parse(new URI(policy.getBaseUrl()).getQuery(), StandardCharsets.UTF_8);
+        queryStringParameters = URLEncodedUtils.parse(uri.getQuery(), StandardCharsets.UTF_8);
       }
       queryStringParameters.addAll(URLEncodedUtils.parse(
-              ResourceRequestUtil.policyToResourceRequestQueryString(policy, keyEntry.getKey(), keyEntry.getValue().key),
+              ResourceRequestUtil.policyToResourceRequestQueryString(policy, key.id, key.secret),
               StandardCharsets.UTF_8));
       return new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), uri.getPath(),
               URLEncodedUtils.format(queryStringParameters, StandardCharsets.UTF_8), null).toString();

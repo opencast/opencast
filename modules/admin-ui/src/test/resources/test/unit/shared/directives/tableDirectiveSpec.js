@@ -1,5 +1,5 @@
 describe('adminNg.directives.myTable', function () {
-    var $compile, $rootScope, element, Storage;
+    var $compile, $rootScope, $httpBackend, element, Storage;
 
     beforeEach(module('adminNg'));
     beforeEach(module('LocalStorageModule'));
@@ -11,8 +11,9 @@ describe('adminNg.directives.myTable', function () {
         });
     }));
 
-    beforeEach(inject(function (_$rootScope_, _$compile_, _Storage_) {
+    beforeEach(inject(function (_$rootScope_, _$compile_, _$httpBackend_, _Storage_) {
         $compile = _$compile_;
+        $httpBackend = _$httpBackend_;
         $rootScope = _$rootScope_;
         Storage = _Storage_;
     }));
@@ -20,6 +21,7 @@ describe('adminNg.directives.myTable', function () {
     beforeEach(function () {
         $rootScope.table = { fetch: jasmine.createSpy() };
         element = $compile('<div data-admin-ng-table="" table="table"></div>')($rootScope);
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
     });
 
     it('fetches the table records', function () {

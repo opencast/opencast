@@ -15,6 +15,7 @@ describe('Servers controller', function () {
         $scope = $rootScope.$new();
         $controller('ServersCtrl', {$scope: $scope});
         $httpBackend = _$httpBackend_;
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
     }));
 
     it('instantiates', function () {

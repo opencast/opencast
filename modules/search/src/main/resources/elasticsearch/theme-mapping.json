@@ -1,63 +1,54 @@
 {
     "theme" : {
         "_source" : { "enabled" : true },
-        "dynamic": "true",
+        "dynamic": false,
         "properties" : {
 
-            "id": { "type" : "long", "index" : "not_analyzed", "store" : "yes" },
+            "id": { "type" : "long", "store" : true },
 
-            "organization": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
+            "organization": { "type" : "keyword", "store" : true },
 
-            "object": { "type" : "string", "index" : "no", "store" : "yes" },
+            "object": { "type" : "text", "index" : false, "store" : true },
 
-            "creation_date": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "creation_date": { "type" : "keyword" },
 
-            "default": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+            "default": { "type" : "boolean" },
 
-            "creator": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "creator": { "type" : "keyword" },
 
-            "name": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "name": { "type" : "keyword" },
 
-            "description": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "description": { "type" : "keyword" },
 
-            "bumper_active": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+            "bumper_active": { "type" : "boolean" },
 
-            "bumper_file": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "bumper_file": { "type" : "keyword" },
 
-            "trailer_active": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+            "trailer_active": { "type" : "boolean" },
 
-            "trailer_file": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "trailer_file": { "type" : "keyword" },
 
-            "title_slide_active": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+            "title_slide_active": { "type" : "boolean" },
 
-            "title_slide_metadata": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "title_slide_metadata": { "type" : "keyword" },
 
-            "title_slide_background": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "title_slide_background": { "type" : "keyword" },
 
-            "license_slide_active": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+            "license_slide_active": { "type" : "boolean" },
 
-            "license_slide_description": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "license_slide_description": { "type" : "keyword" },
 
-            "license_slide_background": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "license_slide_background": { "type" : "keyword" },
 
-            "watermark_active": { "type" : "boolean", "index" : "not_analyzed", "store" : "no" },
+            "watermark_active": { "type" : "boolean" },
 
-            "watermark_file": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "watermark_file": { "type" : "keyword" },
 
-            "watermark_position": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "watermark_position": { "type" : "keyword" },
 
-            "text": { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" },
-            "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" }
+            "text": { "type" : "text", "analyzer": "lowercasespaceanalyzer" },
+            "text_fuzzy": { "type" : "text", "analyzer": "lowercasespaceanalyzer" }
 
-        },
-        "dynamic_templates" : [
-             {
-             "text" : {
-                 "match" : "text_*",
-                 "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" }
-                 }
-             }
-         ]
+        }
     }
 }

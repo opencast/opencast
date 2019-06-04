@@ -42,7 +42,7 @@ angular.module('adminNg.controllers')
         resource:   'events',
         apiService: EventsResource
       });
-    });
+    }).catch(angular.noop);
 
     $scope.table = Table;
     $scope.table.configure({

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.workflow.handler.workflow.TransferMetadataWorkflowOperationHandler"
+               immediate="true">
+
+  <implementation class="org.opencastproject.workflow.handler.workflow.TransferMetadataWorkflowOperationHandler" />
+  <property name="service.description" value="Transfer metadata fields between catalogs" />
+  <property name="workflow.operation" value="transfer-metadata" />
+
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+
+  <reference name="Workspace"
+             interface="org.opencastproject.workspace.api.Workspace"
+             bind="setWorkspace" />
+</scr:component>

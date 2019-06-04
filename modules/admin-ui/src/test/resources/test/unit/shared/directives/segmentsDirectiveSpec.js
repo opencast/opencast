@@ -32,6 +32,7 @@ describe('adminNg.directives.segmentsDirective', function () {
         };
         $rootScope.setChanges = function() {};
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.expectGET('/admin-ng/tools/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/editor.json').respond(JSON.stringify(
             getJSONFixture('admin-ng/tools/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/editor.json')));
         $rootScope.video =  ToolsResource.get({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a', tool: 'editor' });

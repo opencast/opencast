@@ -10,8 +10,8 @@
    "SAVE": "Kaydet",
    "LOGOUT": "Çıkış yap",
    "RESET": "Sıfırla",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "Seçili seçenek yok",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Mevcut Seçenek yok",
    "YES": "Evet",
    "LANGUAGES": {
       "ARABIC": "Arapça",
@@ -57,7 +57,6 @@
             "GROUP": "Aşağıdaki grup silinecek",
             "USER": "Aşağıdaki kullanıcı silinecek",
             "THEME": "Aşağıdaki tema silinecek",
-            "EMAIL": "Aşağıdaki email teması silinecek",
             "LOCATION": "Aşağıdaki konum silinecek"
          },
          "NAME": "İsim"
@@ -132,17 +131,8 @@
       "LOCATION_DELETED": "Konum silindi",
       "LOCATION_NOT_DELETED": "Konum silinemedi",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Lokasyon silinemedi çünkü bunu yapma izniniz yok.",
-      "EMAIL_TEMPLATE_CREATED": "Şablon oluşturuldu",
-      "EMAIL_TEMPLATE_NOT_CREATED": "Şablon oluşturulamadı",
-      "EMAIL_TEMPLATE_SAVED": "Şablon kaydedildi",
-      "EMAIL_TEMPLATE_NOT_SAVED": "Şablon kaydedilemedi",
-      "EMAIL_TEMPLATE_DELETED": "Şablon silindi",
-      "EMAIL_TEMPLATE_NOT_DELETED": "Şablon silinemedi",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "Bu isim zaten kullanılıyor",
-      "EMAIL_SENT": "Mesaj gönderildi",
-      "EMAIL_NOT_SENT": "Mesaj gönderilemedi",
       "CONFLICT_DETECTED": "Zamanlama sorunu: yeni etkinlik eski etkinlikle çakışmakta. Lütfen konumu, tarihi ve zamanı değiştirin.",
-      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "Zamanlamada Çatışma: etkinliklerin değiştirilmesi çatışmalara neden olur. Lütfen yer, tarih veya saatleri değiştirin.",
       "CONFLICT_ALREADY_ENDED": "Zamanlama hatası: Etkinlik zaten bitmiş durumda.",
       "CONFLICT_END_BEFORE_START": "Zamanlama hatası: Bitiş zamanlaması başlangıçtan daha sonra olmalı.",
       "CONFLICT_IN_THE_PAST": "Zamanlama planı güncelleştirilemedi: Bir etkinliği geçmişe planlayamazsınız.",
@@ -153,11 +143,6 @@
       "SERIES_ACL_LOCKED": "Dizideki etkinlikler üzerinde işlem yapılırken Erişim İlkelerinin düzenlenmesine izin verilmez",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Erişim İlkesi en az 1 Okuma ve Yazma yetkisi gerektirir.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "Erişim İlkesi en az bir Okuma ve Yazma yetkisi gerektirir.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Etkinlik devre dışı durumu başarıyla güncellendi.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Etkinliğin devre dışı durumunu güncellerken hata oluştu.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "Katılım durumu planlama başlangıç tarihi geçmişte olduğu için güncellenemez.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Serinin devre dışı durumu başarıyla güncellendi.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Serinin devre dışı durumunu güncellerken hata oluştu.",
       "THEME_NAME_ALREADY_TAKEN": "Bu isim zaten kullanılıyor",
       "THEME_NAME_EMPTY": "İsim boş bırakılamaz",
       "BUMPER_UPLOAD_ERROR": "Medyayı yüklerken bir hata oluştu",
@@ -179,25 +164,19 @@
       "VIDEO_CUT_PROCESSING": "Video işeniyor…",
       "THUMBNAIL_CHANGE_FAILED": "Küçük resim değiştirilemedi.",
       "VIDEO_SOURCE_TRACKS_INVALID": "İşlenecek video kaydı seçmediniz",
-      "VIDEO_TOO_MANY_AUDIOS": "You cannot have more than one audio stream on a single video stream",
+      "VIDEO_TOO_MANY_AUDIOS": "Tek bir video akışında birden fazla ses akışına sahip olamazsınız",
       "SERVER_UNRESPONSIVE": "Hop! Sunucu yanıt vermiyor. Lütfen daha sonra tekrar deneyin.",
       "SERVICE_UNAVAILABLE": "Hop! Sunucu yanıt vermiyor. Lütfen daha sonra tekrar deneyin.",
       "ACTIVE_TRANSACTION": "Bu etkinlik iş akışında aktif bir işem olduğu sürece düzenlenemez."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Hareketler",
-      "SEND_MESSAGE": "İleti gönder",
       "WARNING": "Uyarı",
-      "EDIT_STATUS": {
-         "CAPTION": "Durumu Düzenle",
-         "READY_FOR_RECORDING": "Kayıt için hazır",
-         "OPTED_OUT": "Vazgeçildi"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Sil",
             "BUTTON": "Sil",
-            "CANNOT_DELETE": "The highlighted series cannot be deleted as they still contain events."
+            "CANNOT_DELETE": "Bu seri, hala etkinlik içerdiğinden silinemez."
          },
          "EVENTS": {
             "CAPTION": "Sil",
@@ -213,7 +192,7 @@
                "EVENTS_RETRACTED": "Geri alınacak Etkinlikler",
                "RETRACT_WORKFLOW": "Etkinliklerin geri alınacaği iş akışı"
             },
-            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue.",
+            "UNAUTHORIZED": "Vurgulanan etkinlikleri silme yetkiniz yok. Lütfen devam etmek için bu seçimleri kaldırın.",
             "UNPUBLISHED": {
                "NONE": "Seçilen etkinliklerin hiçbiri atık dosyalar bırakmadan silinmez."
             },
@@ -248,11 +227,11 @@
          "CONFLICT_CHECK_RUNNING": "Çakışma kontrolü çalışıyor…",
          "GENERAL": {
             "CAPTION": "Genel",
-            "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
+            "CANNOTSTART": "Vurgulanan etkinlikler işlenemiyor, yalnızca planlanan etkinlikler destekleniyor.",
             "NOCHANGES": "Saptanan olaylarda değişiklik bulunmadı!",
             "CONFLICT_FIRST_EVENT": "Değiştirilen etkinlik",
             "CONFLICT_SECOND_EVENT": "Çatışmada bulunan etkenlik",
-            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
+            "CANNOTEDITSCHEDULE": "Vurgulanan etkinlikler için zamanlama bilgilerini düzenleme izniniz yoktur. Devam edebilirsiniz, ancak hiçbir etkinliğin zamanlama bilgilerini düzenleyemezsiniz."
          },
          "METADATA": {
             "EDIT": "Meta verileri düzenle"
@@ -266,8 +245,8 @@
          },
          "EDIT": {
             "CAPTION": "Düzenle",
-            "EVENT": "event",
-            "EVENTS": "events",
+            "EVENT": "etkinlik",
+            "EVENTS": "etkinlikler",
             "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Üstveri",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
@@ -292,6 +271,8 @@
       "BACK": "Önceki",
       "CREATE": "Oluştur",
       "RETRACT": "Geri al",
+      "RETRACT_DELETE": "Geri Çek/Sil",
+      "DELETE": "Sil",
       "UPDATE": "Güncelle",
       "DURATION": {
          "HOURS": "Saat",
@@ -326,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Yapılandırma"
+      },
+      "STATISTICS": {
+         "TITLE": "İstatistikler"
       }
    },
    "EVENTS": {
@@ -348,28 +332,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "Mesaj Gönder",
-         "TABS": {
-            "RECIPIENTS": "Alıcılar",
-            "MESSAGE": "Mesaj",
-            "SUMMARY": "Özet"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "Denetim izi ekle",
-            "AUDIT_TRAIL_DESCRIPTION": "Denetim izine mesaj eklemek için kontrol et",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "E-posta şablonunu seç",
-            "SUBJECT": "Konu",
-            "MESSAGE": "Mesaj",
-            "INCLUDE_SIGNATURE": "İmzamı e-postaya ekle"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "Özet"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -436,7 +398,7 @@
                   "REPEATS": "Tekrarlar",
                   "REPEAT_ON": "Tekrarlama açık",
                   "WEEKDAYS": "Hafta içi",
-                  "WEEKDAY": "Weekday"
+                  "WEEKDAY": "Hafta içi günü"
                },
                "NO_SOURCE_AVAILABLE": "Zamanlama için kullanılabilecek yakalama aracı yok"
             },
@@ -500,7 +462,6 @@
          "ADD_EVENT": "Etkinlik ekle",
          "TABLE": {
             "CAPTION": "Etkinlikler",
-            "CREATORS": "Yapımcılar",
             "TITLE": "Başlık",
             "PRESENTERS": "Sununlar",
             "SERIES": "Seriler",
@@ -515,9 +476,7 @@
             "LAST": "Son",
             "NEXT": "İleri",
             "MANAGED_ACL": "Erişim İlkesi",
-            "SCHEDULING_STATUS": "Durum",
             "WORKFLOW_STATE": "İlerleme Durumu",
-            "REVIEW_STATUS": "İnceleme durumu",
             "PREVIOUS": "Önceki",
             "NOCONTENT": "Veri yok",
             "PUBLISHED": "Yayınlandı",
@@ -533,16 +492,11 @@
                "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "Yorumları görüntüle",
                "PAUSED_WORKFLOW": "Duraklatılmış iş akışını görüntüle",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "Bu sunucu için filtre"
             }
-         },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "Kayıt için hazır",
-            "OPTED_OUT": "Vazgeçildi"
          },
          "STATUS": {
             "SCHEDULED": "Zamanlandı",
-            "OPTEDOUT": "Vazgeçildi",
             "RECORDING": "Kaydediliyor",
             "UPLOADING": "Yükleniyor",
             "INGESTING": "Toplanıyor",
@@ -564,16 +518,14 @@
                "SCHEDULING": "Zamanlanıyor",
                "WORKFLOWS": "İş Akışları",
                "ACCESS": "Erişim İlkesi",
-               "COMMENTS": "Yorumlar"
+               "COMMENTS": "Yorumlar",
+               "STATISTICS": "İstatistikler"
             },
             "PUBLICATIONS": {
                "CAPTION": "Yayınlar",
                "NO_PUBLICATIONS_AVAILABLE": "Etkinliğin hiçbir yayını yok",
                "PUBLICATION_DESCRIPTION": "Bu etkinlik aşağıdaki yayın kanallarına yayınlanmıştır:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Bu etkinlik su anda devam etmiyor",
-               "SCHEDULING_STATUS": "Durum",
-               "READY_FOR_RECORDING": "Kayıt için hazır",
-               "OPTED_OUT": "Vazgeçildi",
                "CUSTOM": "Özel",
                "ENGAGE": "Katıl",
                "ENGAGE_LIVE": "Engage Live",
@@ -809,6 +761,9 @@
                   "PROCESSING_FAILURE": "İşem hatası"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "İstatistikler"
+            },
             "METADATA": {
                "CAPTION": "Etkinlik ayrıntıları",
                "TITLE": "Başlık",
@@ -840,20 +795,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "Participation status",
-               "REVIEW_STATUS": {
-                  "CAPTION": "İnceleme durumu"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Kapatılan Durum",
-                  "READY": "Kayıt için hazır",
-                  "OPTEDOUT": "Vazgeçildi"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Mesajlar",
-                  "CREATION_DATE": "Oluşturma tarihi",
-                  "SENDER": "Gönderici",
-                  "SUBJECT": "Konu"
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Sunun(lar)"
                }
@@ -862,7 +803,7 @@
                "ACTIONS": "Hareketler",
                "DETAILS": "Ayrıntılar",
                "DESCRIPTION": "Açıklama",
-               "MORE_INFO": "More Information",
+               "MORE_INFO": "Daha Fazla Bilgi",
                "ID": "KİMLİK",
                "TYPE": "Tür",
                "TITLE": "Başlık",
@@ -870,8 +811,8 @@
                "STARTED": "Başlatıldı",
                "SERIES": "Diziler",
                "SUBMITTED": "Gönderildi",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
+               "SUBMITTER": "Gönderen",
+               "EXECUTION_TIME": "Yürütme süresi",
                "WDID": "İş akışı tanımı",
                "MIMETYPE": "Mime Türü",
                "URL": "Bağlantı Adresi",
@@ -879,11 +820,11 @@
                "NO_CONFIGURATION": "Seçilen iş akışı tanımı için mevcut yapılandırma parametreleri yok.",
                "WORKFLOW": "İş akışı",
                "TOOLTIP": {
-                  "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
-                  "DETAILS": "Open workflow details"
+                  "STOP": "İş akışını durdur",
+                  "ABORT": "Bu iş akışı yürütümünü iptal et (başarısız işlemi yeniden deneme)",
+                  "RETRY": "Bu iş akışı yürütümünü yeniden dene",
+                  "DELETE": "İş akışını sil",
+                  "DETAILS": "İş akışı ayrıntılarını aç"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "İlklendirildi",
@@ -891,14 +832,14 @@
                   "PAUSED": "Duraklatıldı",
                   "SUCCEEDED": "Başarılı oldu",
                   "FAILED": "Başarısız",
-                  "FAILING": "Failing",
+                  "FAILING": "Arızalı",
                   "SKIPPED": "Atlandı",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "Durduruldu",
                   "RETRY": "Yeniden Dene"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "İş Akışları"
+               "TITLE": "Workflow instances"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "İş akışı detayları",
@@ -919,7 +860,7 @@
                   "TITLE": "Başlık",
                   "STATE": "Ülke",
                   "DESCRIPTION": "Açıklama",
-                  "EXECUTION_HOST": "Execution Host",
+                  "EXECUTION_HOST": "Yürütme Ana Bilgisayarı",
                   "JOB": "Görev",
                   "TIME_IN_QUEUE": "Sirada Bekleme Süresi",
                   "STARTED": "Başlatıldı",
@@ -1027,7 +968,7 @@
             "CAPTION": "Diziler",
             "TITLE": "Diziler",
             "HAS_EVENTS": "Etkinlikler içerir",
-            "CREATORS": "Organizatör(ler)",
+            "ORGANIZERS": "Organizatör(ler)",
             "CONTRIBUTORS": "Katkı Sağlayan(lar)",
             "CREATED": "Oluşturuldu",
             "MANAGED_ACL": "Erişim İlkesi",
@@ -1044,10 +985,10 @@
             "TABS": {
                "METADATA": "Meta verisi",
                "EXTENDED_METADATA": "Meta Verisi II",
-               "PARTICIPATION": "Katılım",
                "EVENTS": "Etkinlikler",
                "PERMISSIONS": "Erişim ilkesi",
-               "THEME": "Tema"
+               "THEME": "Tema",
+               "STATISTICS": "İstatistikler"
             },
             "ACCESS": {
                "CAPTION": "Erişim İlkesi",
@@ -1067,7 +1008,7 @@
                   "ACTION": "Eylemler",
                   "NEW": "Yeni sözleşme",
                   "DETAILS": "Ayrıntılar",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS": "Etkinlik izinlerini güncelle",
                   "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
@@ -1089,24 +1030,6 @@
                "LANGUAGE": "Dil",
                "LICENSE": "Sürüm",
                "DESCRIPTION": "Açıklama"
-            },
-            "PARTICIPATION": {
-               "CAPTION": "Katılımm durum şablonu",
-               "WARNING_TEMPLATE": "Serinin katılım durumu serinin parçası olan yeni etkinlikler için varsayılan değer olarak kullanılacaktır.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "İnceleme durumu"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Vazgeçilen Durum",
-                  "READY": "Kayıt için hazır",
-                  "OPTEDOUT": "Vazgeçildi"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Mesajlar",
-                  "CREATION_DATE": "Oluşturma tarihi",
-                  "SENDER": "Gönderici",
-                  "SUBJECT": "Konu"
-               }
             },
             "EVENTS": {
                "TITLE": "Başlık",
@@ -1418,34 +1341,7 @@
          "ADD_THEME": "Tema ekle"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "Email şablonları",
-         "MAIL_SERVERS": "Email ayarları",
          "THEMES": "Temalar"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "Email teması",
-            "NAME": "İsim",
-            "CREATOR": "Oluşturan",
-            "CREATED": "Oluşturdu",
-            "ACTION": "Eylemler"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Şablon oluştur",
-            "EDITCAPTION": "Şablon düzenle",
-            "TABS": {
-               "MESSAGE": "Mesaj",
-               "SUMMARY": "Özet"
-            },
-            "MESSAGE": {
-               "NAME": "İsim",
-               "SUBJECT": "Konu",
-               "MESSAGE": "Mesaj"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "Mesaj özeti"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1541,24 +1437,16 @@
       "JOBS": {
          "TABLE": {
             "ID": "Meslek Tanımlayıcı",
-            "ACTION": "Eylemler",
             "CAPTION": "İşler",
             "CREATED": "Oluşturuldu",
             "CREATOR": "Yapımcı",
             "HOST_NAME": "Ana bilgisayar adı",
+            "NODE_NAME": "Düğüm adı",
             "OPERATION": "İşlem",
             "STARTED": "Başlatıldı",
             "STATUS": "Durum",
             "SUBMITTED": "Gönderildi",
             "TYPE": "Tür"
-         },
-         "DETAILS": {
-            "HEADER": "Meslek detayları {{resourceId}}",
-            "TABS": {
-               "GENERAL": "Genel",
-               "OPERATIONS": "İşlemler",
-               "INCIDENTS": "Olaylar"
-            }
          },
          "STATUS": {
             "QUEUED": "Sıraya alındı",
@@ -1579,6 +1467,7 @@
             "CAPTION": "Sunucular",
             "STATUS": "Durum",
             "HOST_NAME": "Ana bilgisayar adı",
+            "NODE_NAME": "Düğüm adı",
             "CORES": "Çekirdekler",
             "COMPLETED": "Tamamlanan işler",
             "RUNNING": "Çalışan işler",
@@ -1586,7 +1475,6 @@
             "MEAN_RUN_TIME": "Ortalama çalışma süresi",
             "MEAN_QUEUE_TIME": "Ortalama kuyruk süresi",
             "MAINTENANCE": "Bakım",
-            "ACTION": "Eylemler",
             "MAINTENANCE_OFF": "Bakım moduna gir",
             "MAINTENANCE_ON": "Bakım modundan çık"
          }
@@ -1597,6 +1485,7 @@
             "STATUS": "Durum",
             "NAME": "Hizmet adı",
             "HOST_NAME": "Ana bilgisayar adı",
+            "NODE_NAME": "Düğüm adı",
             "COMPLETED": "Tamamlanan işler",
             "RUNNING": "Çalışan işler",
             "QUEUED": "Kuyruktaki işler",
@@ -1816,9 +1705,6 @@
          "LOCATION": {
             "LABEL": "Konum"
          },
-         "OPTEDOUT": {
-            "LABEL": "Vazgeçildi"
-         },
          "PERIOD": {
             "LABEL": "Dönem"
          },
@@ -1830,12 +1716,6 @@
          },
          "PROGRESS": {
             "LABEL": "İlerleme Durumu"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "İnceleme Durumu",
-            "CONFIRMED": "Onaylandı",
-            "UNCONFIRMED": "Onaylanmadı",
-            "UNSENT": "Gönderilmemiş"
          },
          "SERIES": {
             "LABEL": "Seriler"
@@ -1880,6 +1760,9 @@
          "HOSTNAME": {
             "LABEL": "Sunucu adı"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Durum",
             "PAUSED": "Duraklatıldı",
@@ -1921,6 +1804,9 @@
          "HOSTNAME": {
             "LABEL": "Ana bilgisayar adı"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Durum",
             "MAINTENANCE": "Bakım",
@@ -1934,6 +1820,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Ana bilgisayar adı"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "İsim"
@@ -2019,8 +1908,8 @@
          "CAPSLOCK": "⇪",
          "ESC": "Esc",
          "ESCAPE": "Esc",
-         "PAGEUP": "Page↑",
-         "PAGEDOWN": "Page↓",
+         "PAGEUP": "Page up",
+         "PAGEDOWN": "Page down",
          "END": "End",
          "HOME": "Home",
          "INS": "Ins",
@@ -2028,12 +1917,12 @@
       },
       "GROUPS": {
          "GENERAL": "Genel",
-         "PLAYER": "Player",
+         "PLAYER": "Oynatıcı",
          "EDITOR": "Düzenleyici"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
-            "MAIN_MENU": "Main menu",
+            "MAIN_MENU": "Ana menü",
             "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
             "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
             "REMOVE_FILTERS": "Tüm filtreleri temizle",
@@ -2041,25 +1930,25 @@
             "SERIES_VIEW": "Seri",
             "NEW_EVENT": "Etkinlik ekle",
             "NEW_SERIES": "Seri ekle",
-            "CHEAT_SHEET": "Keyboard shortcuts"
+            "CHEAT_SHEET": "Klavye Kısayolları"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Play/pause",
+            "PLAY_PAUSE": "Oynat/Duraklat",
             "PREVIOUS_FRAME": "Önceki kare",
             "NEXT_FRAME": "Sonraki kare",
             "STEP_BACKWARD": "Jump 10s back",
             "STEP_FORWARD": "Jump 10s forward",
-            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
-            "NEXT_SEGMENT": "Next segment/jump to end",
-            "VOLUME_UP": "Volume up",
-            "VOLUME_DOWN": "Volume down",
-            "MUTE": "Mute/unmute"
+            "PREVIOUS_SEGMENT": "Önceki bölüm / Başa atla",
+            "NEXT_SEGMENT": "Sonraki bölüm / Sona atla",
+            "VOLUME_UP": "Sesi artır",
+            "VOLUME_DOWN": "Sesi azalt",
+            "MUTE": "Sesi kapat/aç"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Ayır",
             "CUT_SELECTED_SEGMENT": "Kes",
-            "PLAY_CURRENT_SEGMENT": "Play current segment",
-            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT": "Geçerli bölümü oynat",
+            "CLEAR_LIST": "Bölümü temizle",
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Böüm sonu"
          }
@@ -2069,16 +1958,37 @@
       "STATUS": {
          "CAPTURING": "Capturing",
          "ERROR": "Hata",
-         "IDLE": "Idle",
+         "IDLE": "Boşta",
          "OFFLINE": "Çevirim dışı",
-         "SHUTTING_DOWN": "Shutting down",
-         "UNKNOWN": "Unknown",
+         "SHUTTING_DOWN": "Kapatılıyor",
+         "UNKNOWN": "Bilinmiyor",
          "UPLOADING": "Yükleniyor"
       }
    },
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "To insert multiple values press Enter in between"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "FROM": "den",
+      "TO": "To",
+      "TOTAL": "Toplam",
+      "GRANULARITY": "Granularity",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organizasyon"
+      },
+      "TITLE": {
+         "RANDOM": "Random Data",
+         "VIEWS_SUM": "Total Number of Views",
+         "VIEWS_AVG": "Average Number of Views"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time uinit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time uinit."
       }
    }
 }

@@ -10,8 +10,8 @@
    "SAVE": "Enregistrer",
    "LOGOUT": "Déconnexion",
    "RESET": "Remise à zéro",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "Aucune option sélectionnée",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Aucune option disponible",
    "YES": "Oui",
    "LANGUAGES": {
       "ARABIC": "Arabe",
@@ -57,7 +57,6 @@
             "GROUP": "Le groupe suivant sera supprimé",
             "USER": "L’utilisateur suivant sera supprimée",
             "THEME": "Le thème suivant sera supprimé",
-            "EMAIL": "Le modèle d'email suivant sera supprimé",
             "LOCATION": "L’emplacement suivant sera supprimé"
          },
          "NAME": "Nom"
@@ -132,15 +131,6 @@
       "LOCATION_DELETED": "L’emplacement a été supprimé",
       "LOCATION_NOT_DELETED": "L’emplacement n’a pas pu être supprimé",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Vous n’avez pas la permission de supprimer cet emplacement.",
-      "EMAIL_TEMPLATE_CREATED": "Le modèle a été créé",
-      "EMAIL_TEMPLATE_NOT_CREATED": "Le modèle n'a pas pu être créé",
-      "EMAIL_TEMPLATE_SAVED": "Le modèle a été enregistré",
-      "EMAIL_TEMPLATE_NOT_SAVED": "Le modèle n'a pas pu être enregistré",
-      "EMAIL_TEMPLATE_DELETED": "Le modèle a été supprimé",
-      "EMAIL_TEMPLATE_NOT_DELETED": "Le modèle n'a pas pu être supprimé",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "Ce nom est déjà utilisé",
-      "EMAIL_SENT": "Le messag a été envoyé",
-      "EMAIL_NOT_SENT": "Le message n'a pas pu être envoyé",
       "CONFLICT_DETECTED": "Conflit de programmation: le nouvel événement entre en conflit avec un événement existant. Veuillez changer l'emplacement ou les dates.",
       "CONFLICT_BULK_DETECTED": "Conflit dans la planification: la modification des événements entraîne des conflits. S'il vous plaît changer l'emplacement, les dates ou les heures.",
       "CONFLICT_ALREADY_ENDED": "Erreur de programmation : l’événement est déjà terminée.",
@@ -153,11 +143,6 @@
       "SERIES_ACL_LOCKED": "Modification des droits d'accès n'est pas autorisée lorsque des opérations sont en cours d'exécution sur un événement appartenant à cette série",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Sélectionner au moins un role avec permission de lecture et écriture.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "Sélectionner au moins un role avec permission de lecture et écriture.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Le statut de l'événement opt-out a été mis à jour avec succès.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Erreur lors de la mise à jour du statut de l’événement opt-out.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "Le statut de l’événement de participation ne peut pas être mis à jour car la date de début programmée est dans le passé.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Le statut opt-out de la série a été mis à jour avec succès.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Erreur lors de la mise à jour du statut opt-out de la série.",
       "THEME_NAME_ALREADY_TAKEN": "Ce nom est déjà utilisé",
       "THEME_NAME_EMPTY": "Le nom ne peux pas rester vide",
       "BUMPER_UPLOAD_ERROR": "Erreur lors de l'envoi du ficher",
@@ -186,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
-      "SEND_MESSAGE": "Envoyer un message",
       "WARNING": "Avertissement",
-      "EDIT_STATUS": {
-         "CAPTION": "Modifier statut",
-         "READY_FOR_RECORDING": "Prêt pour l'enregistrement",
-         "OPTED_OUT": "Abstention"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Supprimer",
@@ -266,9 +245,9 @@
          },
          "EDIT": {
             "CAPTION": "Éditer",
-            "EVENT": "event",
-            "EVENTS": "events",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "EVENT": "événement",
+            "EVENTS": "événements",
+            "HEADER": "Cette page vous permet de modifier les événements planifiés regroupés par semaine. Les champs d'entrée sont pré-remplis au cas où tous les événements planifiés ont la même valeur pour un champ spécifique. Sinon, les champs d'entrée sont laissés vides. Laisser les champs d'entrée vide signifie que les valeurs respectives ne devraient pas être modifiées.",
             "METADATA": "Métadonnées",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -292,6 +271,8 @@
       "BACK": "Précédent",
       "CREATE": "Créer",
       "RETRACT": "Retirer",
+      "RETRACT_DELETE": "Retrait/Supprimer",
+      "DELETE": "Supprimer",
       "UPDATE": "Appliquer",
       "DURATION": {
          "HOURS": "Heures",
@@ -326,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Configuration"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistiques"
       }
    },
    "EVENTS": {
@@ -348,28 +332,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "Envoyer Message",
-         "TABS": {
-            "RECIPIENTS": "Destinataires",
-            "MESSAGE": "Message",
-            "SUMMARY": "Résumé"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "Ajouter à la liste d'audit",
-            "AUDIT_TRAIL_DESCRIPTION": "Cocher pour ajouter le message à la trace d'audit",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "Sélectionnez le modèle de courriel",
-            "SUBJECT": "Objet ",
-            "MESSAGE": "Message",
-            "INCLUDE_SIGNATURE": "Inclure ma signature dans le courriel"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "Résumé"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -436,7 +398,7 @@
                   "REPEATS": "Répétitions",
                   "REPEAT_ON": "Répéter",
                   "WEEKDAYS": "Jours de la semaine",
-                  "WEEKDAY": "Weekday"
+                  "WEEKDAY": "Jour de la semaine"
                },
                "NO_SOURCE_AVAILABLE": "Aucun agent de capture disponibles pour la planification"
             },
@@ -500,7 +462,6 @@
          "ADD_EVENT": "Ajouter événement",
          "TABLE": {
             "CAPTION": "Événements",
-            "CREATORS": "Créateurs",
             "TITLE": "Titre",
             "PRESENTERS": "Présentateur(s)",
             "SERIES": "Séries",
@@ -515,9 +476,7 @@
             "LAST": "Dernière",
             "NEXT": "Suivante",
             "MANAGED_ACL": "Droits d'accès",
-            "SCHEDULING_STATUS": "Statut",
             "WORKFLOW_STATE": "Progression",
-            "REVIEW_STATUS": "État de la révision",
             "PREVIOUS": "Précédente",
             "NOCONTENT": "Aucune donnée disponible",
             "PUBLISHED": "Publié",
@@ -533,16 +492,11 @@
                "EDITOR_NEEDS_CUTTING": "Ouvrir l'éditeur vidéo (un commentaire indique que la découpe de la vidéo a été demandée)",
                "COMMENTS": "Voir commentaires",
                "PAUSED_WORKFLOW": "Voir événement en pause",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "Filtrer pour ce présentateur"
             }
-         },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "Prêt pour l'enregistrement",
-            "OPTED_OUT": "Abstention"
          },
          "STATUS": {
             "SCHEDULED": "Programmé",
-            "OPTEDOUT": "Abstention",
             "RECORDING": "Enregistrement en cours",
             "UPLOADING": "Transfert",
             "INGESTING": "Préparation",
@@ -564,16 +518,14 @@
                "SCHEDULING": "Planification",
                "WORKFLOWS": "Flux de travail",
                "ACCESS": "Droits d'accès",
-               "COMMENTS": "Commentaires"
+               "COMMENTS": "Commentaires",
+               "STATISTICS": "Statistiques"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publications",
                "NO_PUBLICATIONS_AVAILABLE": "Cet événement n’a pas de publications",
                "PUBLICATION_DESCRIPTION": "Cet événement a été publié sur les chaînes de publication suivantes :",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Cet événement n'est actuellement pas en cours",
-               "SCHEDULING_STATUS": "Statut",
-               "READY_FOR_RECORDING": "Prêt pour l'enregistrement",
-               "OPTED_OUT": "Abstention",
                "CUSTOM": "Personnalisé",
                "ENGAGE": "Engage",
                "ENGAGE_LIVE": "Engage Live",
@@ -809,6 +761,9 @@
                   "PROCESSING_FAILURE": "Erreur de traitement"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Statistiques"
+            },
             "METADATA": {
                "CAPTION": "Détails de l'événement",
                "TITLE": "Titre",
@@ -840,20 +795,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "Statut de participation",
-               "REVIEW_STATUS": {
-                  "CAPTION": "État de la révision"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Statut désinscrit",
-                  "READY": "Prêt pour l'enregistrement",
-                  "OPTEDOUT": "Abstention"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Messages",
-                  "CREATION_DATE": "Date de création ",
-                  "SENDER": "Expéditeur",
-                  "SUBJECT": "Objet "
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Présentateur(s)"
                }
@@ -862,7 +803,7 @@
                "ACTIONS": "Actions",
                "DETAILS": "Détails",
                "DESCRIPTION": "Description",
-               "MORE_INFO": "More Information",
+               "MORE_INFO": "Plus d'informations",
                "ID": "ID",
                "TYPE": "Type",
                "TITLE": "Titre",
@@ -870,8 +811,8 @@
                "STARTED": "Démarré",
                "SERIES": "Séries",
                "SUBMITTED": "Soumis le",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
+               "SUBMITTER": "Soumettre",
+               "EXECUTION_TIME": "Temps d'exécution",
                "WDID": "Définition de workflow",
                "MIMETYPE": "Type MIME",
                "URL": "URL",
@@ -879,11 +820,11 @@
                "NO_CONFIGURATION": "Aucun paramètre de configuration existant pour la définition du flux de travail sélectionné.",
                "WORKFLOW": "Flux de travail",
                "TOOLTIP": {
-                  "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
-                  "DETAILS": "Open workflow details"
+                  "STOP": "Arrêter le flux de travail",
+                  "ABORT": "Annuler l’exécution du flux de travail (ne pas réessayer l’opération qui a échoué)",
+                  "RETRY": "Réessayer l'exécution du flux de travail",
+                  "DELETE": "Supprimer le flux de travail",
+                  "DETAILS": "Voir détails du flux de travail"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instancié",
@@ -891,9 +832,9 @@
                   "PAUSED": "Suspendu",
                   "SUCCEEDED": "Réussi",
                   "FAILED": "Echoué",
-                  "FAILING": "Failing",
+                  "FAILING": "En Echec",
                   "SKIPPED": "Ignoré",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "Arrêté",
                   "RETRY": "Réessayer"
                }
             },
@@ -1027,7 +968,7 @@
             "CAPTION": "Séries",
             "TITLE": "Séries",
             "HAS_EVENTS": "Contient des événements",
-            "CREATORS": "Organisateur(s)",
+            "ORGANIZERS": "Organisateur(s)",
             "CONTRIBUTORS": "Contributeur(s)",
             "CREATED": "Création",
             "MANAGED_ACL": "Droits d'accès",
@@ -1044,10 +985,10 @@
             "TABS": {
                "METADATA": "Métadonnées",
                "EXTENDED_METADATA": "Métadonnées II",
-               "PARTICIPATION": "Participation",
                "EVENTS": "Événements",
                "PERMISSIONS": "Droits d'accès",
-               "THEME": "Thème"
+               "THEME": "Thème",
+               "STATISTICS": "Statistiques"
             },
             "ACCESS": {
                "CAPTION": "Droits d'accès",
@@ -1067,8 +1008,8 @@
                   "ACTION": "Actions",
                   "NEW": "Add row",
                   "DETAILS": "Détails",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
+                  "REPLACE_EVENT_ACLS": "Mettre à jour les permissions de l'événement",
+                  "REPLACE_EVENT_ACLS_HINT": "Assurez-vous que tous les événements de cette série ont ces permissions en vigueur"
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
@@ -1089,24 +1030,6 @@
                "LANGUAGE": "Langue",
                "LICENSE": "Licence",
                "DESCRIPTION": "Description"
-            },
-            "PARTICIPATION": {
-               "CAPTION": "Modèle de statut de participation",
-               "WARNING_TEMPLATE": "L'état de participation de la série servira de valeur par défaut pour les nouveaux événements qui feront partie de la série.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "État de la révision"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Statut désinscrit",
-                  "READY": "Prêt pour l'enregistrement",
-                  "OPTEDOUT": "Abstention"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Messages",
-                  "CREATION_DATE": "Date de création ",
-                  "SENDER": "Expéditeur",
-                  "SUBJECT": "Sujet"
-               }
             },
             "EVENTS": {
                "TITLE": "Titre",
@@ -1418,34 +1341,7 @@
          "ADD_THEME": "Ajouter thème"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "Modèles de courriel",
-         "MAIL_SERVERS": "Paramètres du courriel",
          "THEMES": "Thèmes"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "Modèles de courriel",
-            "NAME": "Nom",
-            "CREATOR": "Auteur",
-            "CREATED": "Créé le",
-            "ACTION": "Actions"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Créer un modèle",
-            "EDITCAPTION": "Modifier le modèle",
-            "TABS": {
-               "MESSAGE": "Message",
-               "SUMMARY": "Résumé"
-            },
-            "MESSAGE": {
-               "NAME": "Nom",
-               "SUBJECT": "Sujet",
-               "MESSAGE": "Message"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "Résumé"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1541,24 +1437,16 @@
       "JOBS": {
          "TABLE": {
             "ID": "Identifiant de la tâche",
-            "ACTION": "Actions",
             "CAPTION": "Tâches",
             "CREATED": "Créé le",
             "CREATOR": "Auteur",
             "HOST_NAME": "Nom d'hôte",
+            "NODE_NAME": "Nom du nœud",
             "OPERATION": "Opération",
             "STARTED": "Démarré",
             "STATUS": "Statut",
             "SUBMITTED": "Envoyée",
             "TYPE": "Type"
-         },
-         "DETAILS": {
-            "HEADER": "Détails de l'opération {{resourceId}}",
-            "TABS": {
-               "GENERAL": "Général",
-               "OPERATIONS": "Opérations",
-               "INCIDENTS": "Incidents"
-            }
          },
          "STATUS": {
             "QUEUED": "En attente",
@@ -1579,6 +1467,7 @@
             "CAPTION": "Serveurs",
             "STATUS": "Statut",
             "HOST_NAME": "Nom d'hôte",
+            "NODE_NAME": "Nom du nœud",
             "CORES": "Coeurs",
             "COMPLETED": "Tâches achevées",
             "RUNNING": "Tâches en cours",
@@ -1586,7 +1475,6 @@
             "MEAN_RUN_TIME": "Temps moyen d'exécution",
             "MEAN_QUEUE_TIME": "Temps moyen d'attente",
             "MAINTENANCE": "Maintenance",
-            "ACTION": "Actions",
             "MAINTENANCE_OFF": "Activer mode de maintenance",
             "MAINTENANCE_ON": "Désactiver mode de maintenance"
          }
@@ -1597,6 +1485,7 @@
             "STATUS": "Statut",
             "NAME": "Nom du service",
             "HOST_NAME": "Nom d'hôte",
+            "NODE_NAME": "Nom du nœud",
             "COMPLETED": "Tâches achevées",
             "RUNNING": "Tâches en cours",
             "QUEUED": "Tâches en attente",
@@ -1816,9 +1705,6 @@
          "LOCATION": {
             "LABEL": "Emplacement"
          },
-         "OPTEDOUT": {
-            "LABEL": "Désinscrit"
-         },
          "PERIOD": {
             "LABEL": "Période"
          },
@@ -1830,12 +1716,6 @@
          },
          "PROGRESS": {
             "LABEL": "Progression"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "État de la révision",
-            "CONFIRMED": "Confirmé",
-            "UNCONFIRMED": "Non confirmé",
-            "UNSENT": "Non envoyé"
          },
          "SERIES": {
             "LABEL": "Séries"
@@ -1880,6 +1760,9 @@
          "HOSTNAME": {
             "LABEL": "Nom d'hôte"
          },
+         "NODE_NAME": {
+            "LABEL": "Nom du nœud"
+         },
          "STATUS": {
             "LABEL": "Statut",
             "PAUSED": "Suspendu",
@@ -1921,6 +1804,9 @@
          "HOSTNAME": {
             "LABEL": "Nom d'hôte"
          },
+         "NODE_NAME": {
+            "LABEL": "Nom du nœud"
+         },
          "STATUS": {
             "LABEL": "Statut",
             "MAINTENANCE": "Maintenance",
@@ -1934,6 +1820,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Nom d'hôte"
+         },
+         "NODE_NAME": {
+            "LABEL": "Nom du nœud"
          },
          "NAME": {
             "LABEL": "Nom"
@@ -2078,7 +1967,28 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "Pour insérer plusieurs valeurs appuyez sur Entrée après chaque valeur"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Les statistiques ne peuvent pas être affichées pour le moment. Veuillez réessayer plus tard.",
+      "UNSUPPORTED_TYPE": "Désolé, Opencast ne peut pas afficher ce type de données statistiques.",
+      "FROM": "Début",
+      "TO": "A",
+      "TOTAL": "Total",
+      "GRANULARITY": "Granularité",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Données aléatoires",
+         "VIEWS_SUM": "Nombre total de vues",
+         "VIEWS_AVG": "Nombre moyen de vues"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "Ceci affiche des données aléatoires comme exemple. Vous pouvez désactiver ce graphique en supprimant le fichier json du fournisseur de statistiques correspondant dans etc/providers",
+         "VIEWS_SUM": "Ceci affiche le nombre total de vues en fonction du temps.",
+         "VIEWS_AVG": "Ceci affiche la moyenne de vues quotidiennes en fonction du temps."
       }
    }
 }

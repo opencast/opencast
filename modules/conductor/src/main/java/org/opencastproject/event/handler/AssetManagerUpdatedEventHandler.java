@@ -242,10 +242,9 @@ public class AssetManagerUpdatedEventHandler {
           logger.error("Error updating mediapackage {}", mp.getIdentifier().compact(), e);
         }
       }
-    } catch (NotFoundException e) {
-      logger.warn(e.getMessage());
-    } catch (IOException e) {
-      logger.warn(e.getMessage());
+    } catch (IOException | NotFoundException e) {
+      logger.warn("Unable to handle update event for series {} for user {}: {}",
+                  seriesItem, prevUser.getUsername(), e.getMessage());
     } finally {
       securityService.setOrganization(prevOrg);
       securityService.setUser(prevUser);

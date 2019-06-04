@@ -50,7 +50,7 @@ public final class TestServiceRegistryFactory {
     testData = new ArrayList<ServiceStatistics>();
     testServers = new ArrayList<HostRegistration>();
     testData.add(new TestServiceStatistics());
-    testServers.add(new JaxbHostRegistration("test", null, 0, 0, 0, false, false));
+    testServers.add(new JaxbHostRegistration("test", null, "test", 0, 0, 0, false, false));
     serviceRegistry = createMock(ServiceRegistry.class);
   }
 

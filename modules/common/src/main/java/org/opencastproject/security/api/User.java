@@ -71,13 +71,6 @@ public interface User {
   boolean isManageable();
 
   /**
-   * Returns <code>true</code> if this user object can be used to log into Opencast.
-   *
-   * @return <code>true</code> if this user can login
-   */
-  boolean canLogin();
-
-  /**
    * Returns the user's organization identifier.
    *
    * @return the organization

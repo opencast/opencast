@@ -58,6 +58,9 @@ public class HostRegistrationJpaImpl implements HostRegistration {
   @Column(name = "address", nullable = false, length = 39)
   private String ipAddress;
 
+  @Column(name = "node_name", nullable = false, length = 39)
+  private String nodeName;
+
   @Column(name = "memory", nullable = false)
   private long memory;
 
@@ -85,10 +88,11 @@ public class HostRegistrationJpaImpl implements HostRegistration {
   public HostRegistrationJpaImpl() {
   }
 
-  public HostRegistrationJpaImpl(String baseUrl, String address, long memory, int cores, float maxLoad, boolean online,
+  public HostRegistrationJpaImpl(String baseUrl, String address, String nodeName, long memory, int cores, float maxLoad, boolean online,
           boolean maintenance) {
     this.baseUrl = baseUrl;
     this.ipAddress = address;
+    this.nodeName = nodeName;
     this.memory = memory;
     this.cores = cores;
     this.maxLoad = maxLoad;
@@ -123,6 +127,16 @@ public class HostRegistrationJpaImpl implements HostRegistration {
   @Override
   public void setIpAddress(String address) {
     this.ipAddress = address;
+  }
+
+  @Override
+  public String getNodeName() {
+    return nodeName;
+  }
+
+  @Override
+  public void setNodeName(String nodeName) {
+    this.nodeName = nodeName;
   }
 
   @Override

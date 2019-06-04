@@ -606,7 +606,7 @@ public class AbstractEventEndpointTest {
     given().expect().statusCode(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE).when().post(rt.host("new"));
 
     // TODO: finish this test
-    given().multiPart("metadata", "some content").expect().statusCode(HttpStatus.SC_CREATED).when()
+    given().multiPart("metadata", "some content").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
             .post(rt.host("new"));
   }
 
@@ -616,7 +616,7 @@ public class AbstractEventEndpointTest {
 
     String result = given().expect().statusCode(HttpStatus.SC_OK).when().get(rt.host("events.json")).asString();
 
-    assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
+    assertThat(result, SameJSONAs.sameJSONAs(eventMetadataString));
   }
 
   private Recording createRecording(String id, long checkin, String state) {

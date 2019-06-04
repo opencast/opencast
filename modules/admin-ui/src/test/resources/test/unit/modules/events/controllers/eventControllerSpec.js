@@ -27,6 +27,7 @@ describe('Event controller', function () {
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
 
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comments')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comments')));
         $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/metadata.json')
@@ -56,6 +57,10 @@ describe('Event controller', function () {
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true')
             .respond(JSON.stringify({"results":[],"total":0}));
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
+        // Until we're actually testing the statistics endpoint, just return an empty set here
+        $httpBackend.whenGET(/\/admin-ng\/statistics.*/).respond('[]');
+        $httpBackend.whenPOST(/\/admin-ng\/statistics.*/).respond('[]');
+
 
         $controller('EventCtrl', {$scope: $scope});
     });

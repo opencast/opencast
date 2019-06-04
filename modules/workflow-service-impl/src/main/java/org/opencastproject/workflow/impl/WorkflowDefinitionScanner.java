@@ -26,6 +26,7 @@ import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
 import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowParser;
+import org.opencastproject.workflow.api.WorkflowStateMapping;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
@@ -43,6 +44,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Loads, unloads, and reloads {@link WorkflowDefinition}s from "*workflow.xml" files in any of fileinstall's watch
@@ -53,6 +55,9 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
 
   /** An internal collection of workflows that we have installed */
   protected Map<String, WorkflowDefinition> installedWorkflows = new HashMap<String, WorkflowDefinition>();
+
+  /** All workflow state mappings which are configured for the workflow defintions */
+  protected Map<String, Set<WorkflowStateMapping>> workflowStateMappings = new HashMap<>();
 
   /** An internal collection of artifact id, bind the workflow definition files and their id */
   protected Map<File, String> artifactIds = new HashMap<File, String>();
@@ -124,6 +129,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
       bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
       isWFSinitiliazed = true;
     }
+    workflowStateMappings.put(def.getId(), def.getStateMappings());
   }
 
   /**

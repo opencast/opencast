@@ -8,7 +8,7 @@ The delete handler is responsible for deleting an episode, identified by the wor
 asset manager.
 
 If no parameter is given, the whole episode and all of its snapshots are deleted.
-If the keep-last-snapshot parameter is used, it is advised to use the *ingest-download* workflow before *asset-delte*.
+If the keep-last-snapshot parameter is used, it is advised to use the *ingest-download* workflow before *asset-delete*.
 Otherwise there will be logged a lot of errors for unreferenced snapshots.
 
 
@@ -16,7 +16,7 @@ Otherwise there will be logged a lot of errors for unreferenced snapshots.
 
 |Configuration Key         |Example           |Description                                       |
 |--------------------------|------------------|--------------------------------------------------|
-|keep-last-snapshot        |true              |Deltes every snapshot except the last one.        |
+|keep-last-snapshot        |true              |Deletes every snapshot except the last one.        |
 
 
 Operation Example

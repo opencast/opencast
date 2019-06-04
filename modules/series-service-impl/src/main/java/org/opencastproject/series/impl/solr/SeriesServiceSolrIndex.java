@@ -603,21 +603,6 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     return append(sb, "AND", key, values);
   }
 
-  /**
-   * Appends a multivalued query parameter to a solr query
-   *
-   * @param sb
-   *          The {@link StringBuilder} containing the query
-   * @param key
-   *          the key for this search parameter
-   * @param values
-   *          the values for this search parameter
-   * @return the appended {@link StringBuilder}
-   */
-  private StringBuilder appendOr(StringBuilder sb, String key, String[] values) {
-    return append(sb, "OR", key, values);
-  }
-
   private StringBuilder append(StringBuilder sb, String bool, String key, String[] values) {
     if (StringUtils.isBlank(key) || values.length == 0) {
       return sb;

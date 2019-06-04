@@ -35,7 +35,6 @@ import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -119,7 +118,7 @@ public class TestWorkflowsEndpoint extends WorkflowsEndpoint {
     expect(runningWorkflow.getDescription()).andReturn("A running workflow");
     expect(runningWorkflow.getTemplate()).andReturn("fast");
     expect(runningWorkflow.getMediaPackage()).andReturn(mp);
-    expect(runningWorkflow.getCreator()).andReturn(new JpaUser("User1", null, null, "User Name", null, null, true));
+    expect(runningWorkflow.getCreatorName()).andReturn("User1");
     expect(runningWorkflow.getState()).andReturn(WorkflowInstance.WorkflowState.RUNNING);
     expect(runningWorkflow.getOperations()).andReturn(Lists.newArrayList(woi1));
     expect(runningWorkflow.getConfigurationKeys()).andReturn(Sets.newHashSet("efgh"));
@@ -132,7 +131,7 @@ public class TestWorkflowsEndpoint extends WorkflowsEndpoint {
     expect(stoppedWorkflow.getDescription()).andReturn("A stopped workflow");
     expect(stoppedWorkflow.getTemplate()).andReturn("fast");
     expect(stoppedWorkflow.getMediaPackage()).andReturn(mp);
-    expect(stoppedWorkflow.getCreator()).andReturn(new JpaUser("User2", null, null, "User Name2", null, null, true));
+    expect(stoppedWorkflow.getCreatorName()).andReturn("User2");
     expect(stoppedWorkflow.getState()).andReturn(WorkflowInstance.WorkflowState.STOPPED);
     expect(stoppedWorkflow.getOperations()).andReturn(Lists.newArrayList(woi2));
     expect(stoppedWorkflow.getConfigurationKeys()).andReturn(Sets.newHashSet("ijklm"));
@@ -145,8 +144,7 @@ public class TestWorkflowsEndpoint extends WorkflowsEndpoint {
     expect(startedStoppedWorkflow.getDescription()).andReturn("A stopped workflow");
     expect(startedStoppedWorkflow.getTemplate()).andReturn("fast");
     expect(startedStoppedWorkflow.getMediaPackage()).andReturn(mp);
-    expect(startedStoppedWorkflow.getCreator()).andReturn(
-            new JpaUser("User2", null, null, "User Name2", null, null, true));
+    expect(startedStoppedWorkflow.getCreatorName()).andReturn("User2");
     expect(startedStoppedWorkflow.getState()).andReturn(WorkflowInstance.WorkflowState.PAUSED);
     expect(startedStoppedWorkflow.getOperations()).andReturn(Lists.newArrayList(woi2));
     expect(startedStoppedWorkflow.getConfigurationKeys()).andReturn(Sets.newHashSet("abc"));

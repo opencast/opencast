@@ -36,6 +36,30 @@ __Examples__
 []
 ```
 
+### object
+
+The External API makes use of JSON objects.
+
+The empty object {} might be allowed.
+
+__Examples__
+
+```
+{
+  "myObject1": {
+    "key": "value";
+  },
+  "myObject2": {
+    "array": [1, 2, 3]
+  },
+  "valid": false
+}
+```
+
+```
+{}
+```
+
 ### file
 
 This data type indicates that a file is needed as parameter.
@@ -432,3 +456,30 @@ Field                    | Type                                                 
 `retry_strategy`         | [`workflow_retry_strategy`](#workflow_retry_strategy)   | The retry strategy of this workflow operation instance in case of an error
 `max_attempts`           | [`integer`](#basic)                                     | The number of attempts made to execute this workflow operation instance
 `failed_attempts`        | [`integer`](#basic)                                     | The number of failed attempts to execute this workflow operation instance
+
+## Statistics
+
+### parameters
+
+The Statistics endpoint can list the available statistics providers. Optionally, the endpoint provides information
+about supported data query parameters using this JSON object.
+
+Field      | Type                | Description
+:----------|:--------------------|:-----------
+`name`     | [`string`](#basic)  | The name of the parameter to be used in requests
+`type`     | [`string`](#basic)  | The type of this parameter to be used in requests
+`optional` | [`boolean`](#basic) | Whether the parameter must be specified in queries
+`values`   | [`array`](#basic)   | Values to be used for enumeration types (only for type `enumeration`)
+
+The following types are available:
+
+Type          | Description
+:-------------|:-----------
+`string`      | UTF-8 encoded string
+`date`        | [ISO 8601][4] encoded date
+`datetime`    | [ISO 8601][4] encoded date and time
+`integer`     | An integer number, i.e. [-][0-9]+[0-9]*
+`boolean`     | `true` or `false`
+`enumeration` | One of the values provided by the field `values`
+
+
