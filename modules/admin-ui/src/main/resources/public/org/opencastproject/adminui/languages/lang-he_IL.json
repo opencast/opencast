@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "לא ניתן למחוק את ערכת הנושא",
       "TASK_CREATED": "המשימה נוצרה",
       "TASK_NOT_CREATED": "לא היתה אפשרות ליצור את המשימה",
-      "VIDEO_CUT_NOT_SAVED": "לא היתה אפשרות לשמור את המידע העריכה",
-      "VIDEO_CUT_SAVED": "מידע העריכה נשמר",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
       "VIDEO_CUT_PROCESSING": "מעבד את הוידאו…",
       "THUMBNAIL_CHANGE_FAILED": "החלפת תמונה ממוזערת נכשלה.",
       "VIDEO_SOURCE_TRACKS_INVALID": "לא נבחרו רצועות וידאו",
@@ -507,6 +507,14 @@
             "RECORDING_FAILURE": "הקלטה נכשלה",
             "PROCESSING_FAILURE": "עיבוד נכשל",
             "PROCESSING_CANCELED": "עיבוד בוטל"
+         },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
          },
          "DETAILS": {
             "HEADER": "פרטי אירוע - {{resourceId}}",
@@ -1531,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "פצל",
-         "CUT": "גזור",
-         "REPLAY_SEGMENT": "הפעל מחדש מקטע",
-         "REPLAY_END_OF_SEGMENT": "סוף קטע",
-         "REPLAY_SEGMENT_WITH_PREROLL": "בדוק את המעבר",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "בטל",
          "REDO": "בצע שוב",
-         "CLEAR_SEGMENTS": "נקה מקטעים",
-         "CLEAR_SELECTED_SEGMENT": "נקטע מקטעים שנבחרו"
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "הסר מקטע",
-         "USE_SEGMENT": "השתמש במקטע זה",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
          "START": "התחל",
          "END": "סוף"
       },

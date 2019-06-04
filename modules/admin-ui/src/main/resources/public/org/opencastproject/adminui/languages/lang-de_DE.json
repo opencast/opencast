@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "Das Branding konnte nicht gelöscht werden",
       "TASK_CREATED": "Der Task wurde erstellt",
       "TASK_NOT_CREATED": "Der Task konnte nicht erstellt werden",
-      "VIDEO_CUT_NOT_SAVED": "Die Bearbeitungsinformationen konnten nicht gespeichert werden",
-      "VIDEO_CUT_SAVED": "Die Bearbeitungsinformationen wurden gespeichert",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
       "VIDEO_CUT_PROCESSING": "Das Video wird verarbeitet…",
       "THUMBNAIL_CHANGE_FAILED": "Das Vorschaubild konnte nicht aktualisiert werden.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Keine Videospuren selektiert",
@@ -507,6 +507,14 @@
             "RECORDING_FAILURE": "Aufnahme-Fehler",
             "PROCESSING_FAILURE": "Verarbeitungs-Fehler",
             "PROCESSING_CANCELED": "Verarbeitung abgebrochen"
+         },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
          },
          "DETAILS": {
             "HEADER": "Aufzeichnungs-Details - {{resourceId}}",
@@ -1531,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Auftrennen",
-         "CUT": "Schneiden",
-         "REPLAY_SEGMENT": "Segment erneut abspielen",
-         "REPLAY_END_OF_SEGMENT": "Segmentende",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Übergang testen",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "Widerrufen",
          "REDO": "Wiederholen",
-         "CLEAR_SEGMENTS": "Segmente löschen",
-         "CLEAR_SELECTED_SEGMENT": "Ausgewähltes Segment löschen"
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Segment löschen",
-         "USE_SEGMENT": "Dieses Segment nutzen",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
          "START": "Start",
          "END": "Ende"
       },

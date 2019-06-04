@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "Temaet kunne ikke slettes",
       "TASK_CREATED": "Opgaven er blevet oprettet",
       "TASK_NOT_CREATED": "Opgaven kunne ikke oprettes",
-      "VIDEO_CUT_NOT_SAVED": "Redigeringen kunne ikke gemmes",
-      "VIDEO_CUT_SAVED": "Redigeringen er blevet gemt",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
       "VIDEO_CUT_PROCESSING": "Videoen bearbejdes…",
       "THUMBNAIL_CHANGE_FAILED": "Mislykkedes at skifte miniaturebillede.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Du har ikke valgt nogen videospor at behandle",
@@ -507,6 +507,14 @@
             "RECORDING_FAILURE": "Optagefejl",
             "PROCESSING_FAILURE": "Behandlingsfejl",
             "PROCESSING_CANCELED": "Behandling annulleret"
+         },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
          },
          "DETAILS": {
             "HEADER": "Begivenhedsoplydninger - {{resourceId}}",
@@ -1531,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Opdel",
-         "CUT": "Klip",
-         "REPLAY_SEGMENT": "Genafspil segmrent",
-         "REPLAY_END_OF_SEGMENT": "Slut på segment",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Tjek overgang",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "Fortryd",
          "REDO": "Gentag",
-         "CLEAR_SEGMENTS": "Ryd segmenter",
-         "CLEAR_SELECTED_SEGMENT": "Ryd valgte segment"
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Fjern segment",
-         "USE_SEGMENT": "Benyt dette segment",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
          "START": "Start",
          "END": "Slut"
       },

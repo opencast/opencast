@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "Il tema non può essere eliminato",
       "TASK_CREATED": "L'attività è stata creata",
       "TASK_NOT_CREATED": "L'attività non può essere creata",
-      "VIDEO_CUT_NOT_SAVED": "Le informazioni modificate non sono state salvate",
-      "VIDEO_CUT_SAVED": "Le informazioni di editing sono state salvate",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
       "VIDEO_CUT_PROCESSING": "Il video è in fase di elaborazione…",
       "THUMBNAIL_CHANGE_FAILED": "Fallimento nel cambiare la thumbnail.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Non hai selezionato alcuna traccia video da processare",
@@ -507,6 +507,14 @@
             "RECORDING_FAILURE": "Registrazione fallita",
             "PROCESSING_FAILURE": "Elaborazione fallita",
             "PROCESSING_CANCELED": "Elaborazione annullata"
+         },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
          },
          "DETAILS": {
             "HEADER": "Dettagli evento {{resourceId}}",
@@ -1531,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Dividi",
-         "CUT": "Taglia",
-         "REPLAY_SEGMENT": "Replay segmento",
-         "REPLAY_END_OF_SEGMENT": "Fine del segmento",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Verifica transizione",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "Annulla",
          "REDO": "Ripristina",
-         "CLEAR_SEGMENTS": "Cancella segmento",
-         "CLEAR_SELECTED_SEGMENT": "Cancella segmento selezionato"
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Cancella segmento",
-         "USE_SEGMENT": "Usa questo segmento",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
          "START": "Avvio",
          "END": "Fine"
       },

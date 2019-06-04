@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "Tema silinemedi",
       "TASK_CREATED": "Görev oluşturuldu",
       "TASK_NOT_CREATED": "Görev oluşturulamadı",
-      "VIDEO_CUT_NOT_SAVED": "Düzenleme bilgileri kaydedilemedi",
-      "VIDEO_CUT_SAVED": "Düzenleme bilgileri kaydedildi",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
       "VIDEO_CUT_PROCESSING": "Video işeniyor…",
       "THUMBNAIL_CHANGE_FAILED": "Küçük resim değiştirilemedi.",
       "VIDEO_SOURCE_TRACKS_INVALID": "İşlenecek video kaydı seçmediniz",
@@ -508,6 +508,14 @@
             "PROCESSING_FAILURE": "İşlem hatası",
             "PROCESSING_CANCELED": "İşlem iptal edildi"
          },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
+         },
          "DETAILS": {
             "HEADER": "Etkinlik detayları - {{resourceId}}",
             "TABS": {
@@ -839,7 +847,7 @@
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Workflow instances"
+               "TITLE": "İş Akışları"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "İş akışı detayları",
@@ -1531,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Ayır",
-         "CUT": "Kes",
-         "REPLAY_SEGMENT": "Yeniden yürütme bölütü",
-         "REPLAY_END_OF_SEGMENT": "Böüm sonu",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Geçiş kontrolu",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "Geri Al",
          "REDO": "İleri Al",
-         "CLEAR_SEGMENTS": "Bölümleri temizle",
-         "CLEAR_SELECTED_SEGMENT": "Seçilen bölümleri temizle"
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Bölümü Sil",
-         "USE_SEGMENT": "Bu Bölümü kullan",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
          "START": "Başla",
          "END": "Son"
       },
