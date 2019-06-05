@@ -1001,7 +1001,7 @@
               </thead>
               <tbody>
                 <tr ng-repeat="item in subNavData">
-                  <td>{{ item.id }}</td>
+                  <td><a ng-href="{{item.url}}">{{item.id}}</a></td>
                   <td>{{ item.type }}</td>
                   <td>{{ item.mimetype }}</td>
                   <td>{{ item.tags|joinBy:', ' }}</td>
