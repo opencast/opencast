@@ -169,7 +169,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     if (logger.isDebugEnabled()) {
       debug("Returning user {} with authorities:", username);
       for (GrantedAuthority authority : authorities) {
-        logger.error("\t{}", authority);
+        logger.debug("\t{}", authority);
       }
     }
 

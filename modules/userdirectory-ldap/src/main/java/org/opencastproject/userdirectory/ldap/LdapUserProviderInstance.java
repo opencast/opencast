@@ -335,33 +335,31 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       authorities.addAll(setExtraRoles);
 
       Set<JaxbRole> roles = new HashSet<>();
-      if (authorities != null) {
-        /*
-         * Please note the prefix logic for roles:
-         *
-         * - Roles that start with any of the "exclude prefixes" are left intact
-         * - In any other case, the "role prefix" is prepended to the roles read from LDAP
-         *
-         * This only applies to the prefix addition. The conversion to uppercase is independent from these
-         * considerations
-         */
-        for (GrantedAuthority authority : authorities) {
-          String strAuthority = authority.getAuthority();
+      /*
+       * Please note the prefix logic for roles:
+       *
+       * - Roles that start with any of the "exclude prefixes" are left intact
+       * - In any other case, the "role prefix" is prepended to the roles read from LDAP
+       *
+       * This only applies to the prefix addition. The conversion to uppercase is independent from these
+       * considerations
+       */
+      for (GrantedAuthority authority : authorities) {
+        String strAuthority = authority.getAuthority();
 
-          boolean hasExcludePrefix = false;
-          for (String excludePrefix : setExcludePrefixes) {
-            if (strAuthority.startsWith(excludePrefix)) {
-              hasExcludePrefix = true;
-              break;
-            }
+        boolean hasExcludePrefix = false;
+        for (String excludePrefix : setExcludePrefixes) {
+          if (strAuthority.startsWith(excludePrefix)) {
+            hasExcludePrefix = true;
+            break;
           }
-          if (!hasExcludePrefix) {
-            strAuthority = rolePrefix + strAuthority;
-          }
-
-          // Finally, add the role itself
-          roles.add(new JaxbRole(strAuthority, jaxbOrganization));
         }
+        if (!hasExcludePrefix) {
+          strAuthority = rolePrefix + strAuthority;
+        }
+
+        // Finally, add the role itself
+        roles.add(new JaxbRole(strAuthority, jaxbOrganization));
       }
       User user = new JaxbUser(userDetails.getUsername(), PROVIDER_NAME, jaxbOrganization, roles);
       cache.put(userName, user);
@@ -397,7 +395,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       retVal.add(securityService.getUser());
       return retVal.iterator();
     }
-    return Collections.<User> emptyList().iterator();
+    return Collections.emptyIterator();
   }
 
   @Override
@@ -411,7 +409,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       retVal.add(securityService.getUser());
       return retVal.iterator();
     }
-    return Collections.<User> emptyList().iterator();
+    return Collections.emptyIterator();
   }
 
   @Override
