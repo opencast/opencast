@@ -603,6 +603,16 @@ public interface ServiceRegistry {
   List<HostRegistration> getHostRegistrations() throws ServiceRegistryException;
 
   /**
+   * Finds host registration for the given hostname.
+   *
+   * @param hostname to lookup
+   * @return host registrations
+   * @throws ServiceRegistryException
+   *           if there is a problem accessing the service registry or the hostname is not found
+   */
+  HostRegistration getHostRegistration(String hostname) throws ServiceRegistryException;
+
+  /**
    * Gets performance and runtime statistics for each known service registration.
    *
    * @return the service statistics

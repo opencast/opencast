@@ -240,10 +240,9 @@
     <!-- Enable anonymous access to the admin ui -->
     <sec:intercept-url pattern="/admin-ng/public/**" access="ROLE_ANONYMOUS" />
 
-    <!-- Enable anonymous access to the /info/me.json resource -->
-    <sec:intercept-url pattern="/info/me.json" method="GET" access="ROLE_ANONYMOUS" />
+    <!-- Enable anonymous access to the /info/** resource -->
+    <sec:intercept-url pattern="/info/**" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/i18n/languages.json" method="GET" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/info/components.json" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- anonymous access to user interface configuration -->
     <sec:intercept-url pattern="/ui/config/**" access="ROLE_ANONYMOUS" />
