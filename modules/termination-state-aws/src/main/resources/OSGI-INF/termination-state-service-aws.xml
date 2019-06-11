@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.terminationstate.aws.AutoScalingTerminationStateService"
+               immediate="true" activate="activate" deactivate="deactivate">
+  <implementation class="org.opencastproject.terminationstate.aws.AutoScalingTerminationStateService" />
+  <property name="service.description" value="Termination State Service: AWS Auto Scaling" />
+  <property name="service.pid" value="org.opencastproject.terminationstate.aws.AutoScalingTerminationStateService" />
+  <property name="vendor.name" value="aws" />
+  <property name="vendor.service" value="autoscaling" />
+
+  <service>
+    <provide interface="org.opencastproject.terminationstate.api.TerminationStateService" />
+  </service>
+  <reference name="serviceRegistry"
+             interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             cardinality="1..1" policy="static" bind="setServiceRegistry" />
+</scr:component>
+

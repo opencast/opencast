@@ -131,6 +131,8 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-static/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-static-file-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-static-file-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-termination-state-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-termination-state-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-ldap/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-user-interface-configuration/${project.version}</bundle>
@@ -517,6 +519,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-runtime-info-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-termination-state-aws/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
   </feature>
 
@@ -574,6 +577,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-youtube-v3/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-runtime-info-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-termination-state-aws/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
   </feature>
 
@@ -616,6 +620,7 @@
     <bundle start-level="84">mvn:org.opencastproject/opencast-search-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-solr/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-termination-state-aws/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>

@@ -204,6 +204,9 @@
     <module>modules/statistics-service-remote</module>
     <module>modules/statistics-provider-influx</module>
     <module>modules/statistics-provider-random</module>
+    <module>modules/termination-state-api</module>
+    <module>modules/termination-state-aws</module>
+    <module>modules/termination-state-impl</module>
     <module>modules/textanalyzer-api</module>
     <module>modules/textanalyzer-impl</module>
     <module>modules/textanalyzer-remote</module>
