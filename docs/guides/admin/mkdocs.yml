@@ -89,6 +89,9 @@ nav:
       - Solr: 'modules/searchindex/solr.md'
       - Elasticsearch: 'modules/searchindex/elasticsearch.md'
    - Stream Security: 'modules/stream-security.md'
+   - Termination State:
+      - Basic: 'modules/terminationstate.md'
+      - AWS AutoScaling: 'modules/terminationstate.aws.autoscaling.md'
    - Text Extraction: 'modules/textextraction.md'
    - Timeline Previews: 'modules/timelinepreviews.md'
    - Transcripts (IBM Watson): 'modules/watsontranscripts.md'
