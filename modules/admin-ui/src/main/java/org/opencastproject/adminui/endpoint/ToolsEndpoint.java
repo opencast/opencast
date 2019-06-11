@@ -339,6 +339,7 @@ public class ToolsEndpoint implements ManagedService {
     final Event event = getEvent(mediaPackageId).get();
     final MediaPackage mp = index.getEventMediapackage(event);
     List<MediaPackageElement> previewPublications = getPreviewElementsFromPublication(getInternalPublication(mp));
+    long previewDuration = 0;
 
     // Collect previews and tracks
     List<JValue> jPreviews = new ArrayList<>();
@@ -367,6 +368,13 @@ public class ToolsEndpoint implements ManagedService {
       // Note that this assumes that the resulting video will have the same frame rate as the preview
       // and also that there is only one video stream for any preview element.
       if (element instanceof Track) {
+        long trackDuration = ((Track) element).getDuration();
+        // use duration of preview instead of mp since they can differ slightly
+        // there should be only one preview track, but just in case, pick the longest
+        if (trackDuration > previewDuration) {
+          previewDuration = trackDuration;
+        }
+
         for (Stream stream: ((Track) element).getStreams()) {
           if (stream instanceof VideoStream) {
             jPreview = jPreview.merge(obj(f("frameRate", v(((VideoStream) stream).getFrameRate()))));
@@ -493,12 +501,16 @@ public class ToolsEndpoint implements ManagedService {
 
     return RestUtils.okJson(obj(f("title", v(mp.getTitle(), Jsons.BLANK)),
             f("date", v(event.getRecordingStartDate(), Jsons.BLANK)),
-            f("series", obj(f("id", v(event.getSeriesId(), Jsons.BLANK)), f("title", v(event.getSeriesName(), Jsons.BLANK)))),
+            f("series", obj(f("id", v(event.getSeriesId(), Jsons.BLANK)),
+            f("title", v(event.getSeriesName(), Jsons.BLANK)))),
             f("presenters", arr($(event.getPresenters()).map(Functions.stringToJValue))),
             f(SOURCE_TRACKS_KEY, arr(sourceTracks)),
-            f("previews", arr(jPreviews)), f(TRACKS_KEY, arr(jTracks)),
+            f("previews", arr(jPreviews)),
+            f(TRACKS_KEY, arr(jTracks)),
             f("thumbnail", obj(thumbnailFields)),
-            f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, arr(jSegments)), f("workflows", arr(jWorkflows))));
+            f("duration", v(previewDuration)),
+            f(SEGMENTS_KEY, arr(jSegments)),
+            f("workflows", arr(jWorkflows))));
   }
 
   private ThumbnailImpl newThumbnailImpl() {
