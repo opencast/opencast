@@ -46,6 +46,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -61,6 +63,8 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(AbstractOaiPmhDatabase.class);
 
+  private ReadWriteLock dbAccessLock = new ReentrantReadWriteLock();
+
   public abstract EntityManagerFactory getEmf();
 
   public abstract SecurityService getSecurityService();
@@ -74,6 +78,15 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
 
   @Override
   public void store(MediaPackage mediaPackage, String repository) throws OaiPmhDatabaseException {
+    try {
+      dbAccessLock.writeLock().lock();
+      storeInternal(mediaPackage, repository);
+    } finally {
+      dbAccessLock.writeLock().unlock();
+    }
+  }
+
+  private void storeInternal(MediaPackage mediaPackage, String repository) throws OaiPmhDatabaseException {
     int i = 0;
     boolean success = false;
     while (!success && i < 5) {
@@ -172,6 +185,15 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
 
   @Override
   public void delete(String mediaPackageId, String repository) throws OaiPmhDatabaseException, NotFoundException {
+    try {
+      dbAccessLock.writeLock().lock();
+      deleteInternal(mediaPackageId, repository);
+    } finally {
+      dbAccessLock.writeLock().unlock();
+    }
+  }
+
+  private void deleteInternal(String mediaPackageId, String repository) throws OaiPmhDatabaseException, NotFoundException {
     int i = 0;
     boolean success = false;
     while (!success && i < 5) {
@@ -220,6 +242,15 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
 
   @Override
   public SearchResult search(Query query) {
+    try {
+      dbAccessLock.readLock().lock();
+      return searchInternal(query);
+    } finally {
+      dbAccessLock.readLock().unlock();
+    }
+  }
+
+  private SearchResult searchInternal(Query query) {
     EntityManager em = null;
     try {
       em = getEmf().createEntityManager();
