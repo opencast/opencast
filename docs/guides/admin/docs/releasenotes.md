@@ -9,6 +9,9 @@ Features
 Improvements
 ------------
 
+- Media package elements retrieved from the asset manager (e.g. using “start task”) now always get tagged `archive` even
+  when they have not been tagged thus before.
+
 
 Configuration changes
 ---------------------
