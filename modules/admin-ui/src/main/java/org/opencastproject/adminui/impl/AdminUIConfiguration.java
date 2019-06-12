@@ -144,7 +144,7 @@ public class AdminUIConfiguration implements ManagedService {
   private static final String DEFAULT_SOURCE_TRACK_LEFT_FLAVOR = "presenter/source";
   private static final String DEFAULT_SOURCE_TRACK_RIGHT_FLAVOR = "presentation/source";
 
-  private static final String DEFAULT_RETRACT_WORKFLOW_ID = "retract";
+  private static final String DEFAULT_RETRACT_WORKFLOW_ID = "delete";
 
   private String previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
   private String waveformSubtype = DEFAULT_WAVEFORM_SUBTYPE;

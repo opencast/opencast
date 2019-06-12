@@ -488,6 +488,7 @@
        },
        "STATE_MAPPING":{
          "RETRACTING": "Retracting",
+         "DELETING": "Deleting",
          "DUPLICATING": "Duplicating",
          "PUBLISHING": "Publishing",
          "IMPORTING": "Importing",
