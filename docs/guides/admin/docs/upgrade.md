@@ -18,5 +18,5 @@ Configuration Changes
 ---------------------
 
 The admin UI configuration (`etc/org.opencastproject.adminui.cfg`) now has a new option `retract.workflow.id` which
-holds the id of the workflow used to retracted events when deleting. This is used by the new single step event deletion
-fearure [MH-13516](https://opencast.jira.com/browse/MH-13516).
+holds the id of the workflow used to retract events when deleting. This is used by the new single step event deletion
+feature [MH-13516](https://opencast.jira.com/browse/MH-13516).
