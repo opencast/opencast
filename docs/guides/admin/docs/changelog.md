@@ -65,7 +65,8 @@ Opencast 7
 - [[MH-13472](https://opencast.jira.com/browse/MH-13472)][[#813](https://github.com/opencast/opencast/pull/813)] -
   Permissions for /play/ missing
 - [[MH-13471](https://opencast.jira.com/browse/MH-13471)][[#812](https://github.com/opencast/opencast/pull/812)] -
-  Shibboleth SSO plugin to add roles for users on OC according to their EDUPERSONAFFILIATION. eg: "ROLE_AAI_USER_AFFILIATION_student" for "student"
+  Shibboleth SSO plugin to add roles for users on OC according to their EDUPERSONAFFILIATION. eg:
+  "ROLE_AAI_USER_AFFILIATION_student" for "student"
 - [[MH-13469](https://opencast.jira.com/browse/MH-13469)][[#811](https://github.com/opencast/opencast/pull/811)] -
   Drop LastHeardFrom On Scheduler Messages
 - [[MH-13468](https://opencast.jira.com/browse/MH-13468)][[#810](https://github.com/opencast/opencast/pull/810)] -
@@ -1459,7 +1460,8 @@ Opencast 4
 
 - [[MH-12923]](https://opencast.jira.com/browse/MH-12923) - ServiceRegistry does not close db connction
 - [[MH-12841]](https://opencast.jira.com/browse/MH-12841) - Opencast is ignoring permissions
-- [[MH-12840]](https://opencast.jira.com/browse/MH-12840) - LTI user provider may allow LMS admins to become Opencast admins
+- [[MH-12840]](https://opencast.jira.com/browse/MH-12840) - LTI user provider may allow LMS admins to become Opencast
+  admins
 
 ### Opencast 4.3
 

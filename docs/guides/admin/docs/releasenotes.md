@@ -10,8 +10,8 @@ New Features
 - Update Elasticsearch and make it possible to run Elasticsearch as an external service.
 - Per-Tenant Capture Agent Users
 - Asset manager snaphots clean-up to remove older snapshots for a given media package. In some cases, this can
-  drastically reduce Opencast's storage consumption. This feature is implemented as an option for the [asset-delete workflow
-  operation handler](workflowoperationhandlers/asset-delete-woh.md).
+  drastically reduce Opencast's storage consumption. This feature is implemented as an option for the
+  [asset-delete workflow operation handler](workflowoperationhandlers/asset-delete-woh.md).
 - Allow the workflow to select the audio track for composite video
 - Add multi-tenant support for all list providers
 - Make waveform size configurable
