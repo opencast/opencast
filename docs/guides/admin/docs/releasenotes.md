@@ -20,6 +20,13 @@ New Features
 - Add Internationalization support for series LTI tools
 - Display responsible person for workflows
 - Allow the Ingest Service to make authenticated requests to other servers
+- Group edit scheduled events by weekday
+- Make admin UI statistics configurable
+- Process-smil edit-encode
+- Enable Asset Manager to reply NOT_Modified
+- Add override support to external api
+- Adds an WOH, witch can add catalogs to the MediaPackage of an workflow instance.
+- Workflow for track replacement and cleanup Snapshots
 - Some modules are now plugins. These are not started by default to reduce the amount of code running unnecessarily.
   They can easily be enabled in `etc/org.apache.karaf.features.cfg`. Modified modules are:
     - Moodle user directory
@@ -80,21 +87,6 @@ Due to [MH-13446](https://opencast.jira.com/browse/MH-13446):
 - Removed PUT /acl-manager/episode/{transitionId}
 - Removed PUT /acl-manager/series/{transitionId}
 
-Additional Notes about 6.4
---------------------------
-
-Opencast 6.4 contains a number of bug fixes, some of which are security relevant. The following known vulnerability
-within Opencast's `org.springframework.security.oauth:spring-security-oauth` dependency have been fixed by this release:
-`CVE-2019-3778`.
-
-
-Additional Notes about 6.5
---------------------------
-
-Opencast 6.5 contains a change to the job dispatching logic, which will change how your cluster dispatches jobs to its
-workers.  This change means that workers with a higher maximum load will absorb more work before workers with lower
-maximum loads will accept heavy workloads.  This change does not require any configuration changes, however you may
-notice large changes in processing load distribution depending on your cluster configuration.
 
 Release Schedule
 ----------------
