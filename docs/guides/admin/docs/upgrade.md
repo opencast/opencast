@@ -1,3 +1,4 @@
+
 Upgrading Opencast from 6.x to 7.x
 ==================================
 
@@ -9,13 +10,13 @@ How to Upgrade
 
 1. Stop your current Opencast instance
 2. Replace Opencast 6.x with 7.x
-3. Back-up Opencast files and database (optional)
+3. Optionally back-up Opencast files and database
 4. [Upgrade the database](#database-migration)
-5. [Upgrade the ActiveMQ configuration](#activemq-migration)
-6. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
-7. Migrate the scheduled events
-8. [Optionally update the player links](#update-player-links)
-9. Rebuild the Elastic Search indexes
+5. Optionally [check for old ACL rule sets](#removal-of-deprecated-access-control-rule-set)
+6. Optionally [migrate the scheduled events](#scheduler-migration)
+7. Optionally [update the player links](#update-player-links)
+8. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
+9. Review the configuration changes and adjust your configuration accordingly
 
 Database Migration
 ------------------
@@ -28,18 +29,12 @@ You can find the database upgrade script in `docs/upgrade/6_to_7/`. This script 
 MySQL.
 
 
-ActiveMQ Migration
-------------------
-
-*So far, this is not required*
-
-
-Removal of Deprecated Access Control Ruleset
+Removal of Deprecated Access Control Rules Set
 --------------------------------------------
 
 Opencast 7 finally removes the long-since deprecated `security/xacml` flavor for access control lists. This had not been
 used since before Opencast 1.2 (we could not track down its exact deprecation date due to its age). Additionally, all
-rule-sets which had been modified since had also been automnatically been updated to `security/xacml+series` which
+rule-sets which had been modified since had also been automatically been updated to `security/xacml+series` which
 serves as replacement for the old flavor.
 
 In case Opencast still encounters such a rule set, it will now be ignored and access will be denied by default. A simple
@@ -59,27 +54,17 @@ select * from oc_assets_snapshot where mediapackage_xml like '%"security/xacml"%
 ```
 
 
-Configuration Changes
----------------------
-
-- `etc/org.opencastproject.scheduler.impl.SchedulerServiceImpl.cfg` no longer needs the `transaction_cleanup_offset`
-  option.
-- `etc/org.opencastproject.scheduler.impl.SchedulerServiceImpl.cfg` has a new option `maintenance` which temporarily
-  disables the scheduler if set to `true`.
-
-
 Scheduler Migration
 -------------------
 
-The way the Scheduler stores its data was changed in Opencast 7 to improve performance when checking for conflicts.
-
+The way the scheduler stores its data was changed in Opencast 7 to improve performance when checking for conflicts.
 The necessary database schema changes are part of the upgrade script in `docs/upgrade/6_to_7/`.
 
-To actually migrate the data, set the `maintenance` configuration option of
-`etc/org.opencastproject.scheduler.impl.SchedulerServiceImpl.cfg` to `true` and start opencast. The migration will start
-automatically. Wait until the migration is complete. Once complete, the opencast log will contain a line saying
-`Finished migrating scheduled events`. Check if there were any errors during the migration. If not, stop opencast and
-change `maintenance` back to `false` to put the scheduler back into its normal mode of operation.
+This migration is only necessary if you have scheduled events in your system. For this, set the `maintenance`
+configuration option of `etc/org.opencastproject.scheduler.impl.SchedulerServiceImpl.cfg` to `true` and start opencast.
+The migration will start automatically. Wait until the migration is complete. Once complete, the opencast log will
+contain a line saying `Finished migrating scheduled events`. Check if there were any errors during the migration. If
+not, stop opencast and change `maintenance` back to `false` to put the scheduler back into its normal mode of operation.
 
 You should avoid running Opencast 7 without migrating the scheduled events first. Otherwise, your capture agents may
 fetch an empty calendar.
@@ -135,10 +120,41 @@ Alternatively, you can rewrite the old links all at once without re-publication 
 Please ensure to execute these steps before rebuilding the index.
 
 
-Rebuild the Elastic Search Indexes
+Rebuild the Elasticsearch Indexes
 ----------------------------------
 
-Due to [MH-13396](https://opencast.jira.com/browse/MH-13396), the configuration of the Elastic Search indexes of both
-the Admin UI and the External API have changed.
+Due to [MH-13396](https://opencast.jira.com/browse/MH-13396), the configuration of the Elasticsearch indexes of both
+the admin ui and the external API have changed. Therefore, those indexes both need to be rebuilt.
 
-Therefore, those indexes both need to be rebuilt.
+### Admin Interface
+
+Stop Opencast, delete the index directory at `data/index`, restart Opencast and make an HTTP POST request to
+`/admin-ng/index/recreateIndex`.
+
+Example (using cURL):
+
+    curl -i --digest -u <digest_user>:<digest_password> -H "X-Requested-Auth: Digest" -s -X POST \
+      https://example.opencast.org/admin-ng/index/recreateIndex
+
+You can also just open the REST documentation, which can be found under the “Help” section in the admin interface (the
+“?” symbol at the top right corner). Then go to the “Admin UI - Index Endpoint” section and use the testing form on
+`/recreateIndex` to issue a POST request.
+
+In both cases you should get a 200 HTTP status.
+
+
+### External API
+
+If you are using the External API, then also trigger a rebuilt of its index by sending an HTTP POST request to
+`/api/recreateIndex`.
+
+Example (using cURL):
+
+    curl -i --digest -u <digest_user>:<digest_password> -H "X-Requested-Auth: Digest" -s -X POST \
+      https://example.opencast.org/api/recreateIndex
+
+You can also just open the REST documentation, which can be found under the “Help” section in the admin interface (the
+“?” symbol at the top right corner). Then go to the “External API - Base Endpoint” section and use the testing form on
+`/recreateIndex`.
+
+In both cases you should again get a 200 HTTP status.
