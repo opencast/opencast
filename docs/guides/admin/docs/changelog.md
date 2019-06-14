@@ -1,5 +1,5 @@
 Changelog
-========
+=========
 
 Opencast 7
 ----------
@@ -450,6 +450,57 @@ Opencast 7
 
 Opencast 6
 ----------
+
+### Opencast 6.5
+
+*Released on June 14, 2019*
+
+- [[MH-13607](https://opencast.jira.com/browse/MH-13607)][[#946](https://github.com/opencast/opencast/pull/946)] -
+  Show composite duration in video editor
+- [[MH-13606](https://opencast.jira.com/browse/MH-13606)][[#944](https://github.com/opencast/opencast/pull/944)] -
+  Don't archive smil on publication
+- [[MH-13601](https://opencast.jira.com/browse/MH-13601)][[#939](https://github.com/opencast/opencast/pull/939)] -
+  OAI-PMH database access syncronization
+- [[MH-13575](https://opencast.jira.com/browse/MH-13575)][[#916](https://github.com/opencast/opencast/pull/916)] -
+  Update paella player to 6.1.3
+- [[MH-13573](https://opencast.jira.com/browse/MH-13573)][[#914](https://github.com/opencast/opencast/pull/914)] -
+  Add .factorypath to .gitignore
+- [[MH-13560](https://opencast.jira.com/browse/MH-13560)][[#902](https://github.com/opencast/opencast/pull/902)] -
+  Admin Role in Moodle User Provider
+- [[MH-13546](https://opencast.jira.com/browse/MH-13546)][[#888](https://github.com/opencast/opencast/pull/888)] -
+  textextraction performance improvement
+- [[MH-13544](https://opencast.jira.com/browse/MH-13544)][[#886](https://github.com/opencast/opencast/pull/886)] -
+  Video editor shows incorrect notification
+- [[MH-13536](https://opencast.jira.com/browse/MH-13536)][[#877](https://github.com/opencast/opencast/pull/877)] -
+  OAI-PMH Remote Broken
+- [[MH-13533](https://opencast.jira.com/browse/MH-13533)][[#875](https://github.com/opencast/opencast/pull/875)] -
+  Document parameter "sign" of `GET /api/events/{id}/publications/*`
+- [[MH-13526](https://opencast.jira.com/browse/MH-13526)][[#868](https://github.com/opencast/opencast/pull/868)] -
+  Show unequal tracks correctly in editor
+- [[MH-13521](https://opencast.jira.com/browse/MH-13521)][[#859](https://github.com/opencast/opencast/pull/859)] -
+  Switch to openJDK 8 on Travis
+- [[MH-13503](https://opencast.jira.com/browse/MH-13503)][[#856](https://github.com/opencast/opencast/pull/856)] -
+  Job Dispatch Fairness
+- [[MH-13330](https://opencast.jira.com/browse/MH-13330)][[#853](https://github.com/opencast/opencast/pull/853)] -
+  The video editor does not always close after the user presses "Publish"
+- [[MH-13511](https://opencast.jira.com/browse/MH-13511)][[#852](https://github.com/opencast/opencast/pull/852)] -
+  Adding events in parallel does not work correctly
+- [[MH-13501](https://opencast.jira.com/browse/MH-13501)][[#840](https://github.com/opencast/opencast/pull/840)] -
+  Match against user pattern for loadUser() lookups
+- [[MH-13495](https://opencast.jira.com/browse/MH-13495)][[#839](https://github.com/opencast/opencast/pull/839)] -
+  Ignore old requests instead of cancelling
+- [[#837](https://github.com/opencast/opencast/pull/837)] -
+  Fix adaptive streaming configuration guide
+- [[MH-13492](https://opencast.jira.com/browse/MH-13492)][[#833](https://github.com/opencast/opencast/pull/833)] -
+  Add language support for Italian
+- [[MH-13486](https://opencast.jira.com/browse/MH-13486)][[#829](https://github.com/opencast/opencast/pull/829)] -
+  Cleanup NOTICES 6.x
+- [[MH-13485](https://opencast.jira.com/browse/MH-13485)][[#828](https://github.com/opencast/opencast/pull/828)] -
+  Update paella player to 6.1.2
+- [[#827](https://github.com/opencast/opencast/pull/827)] -
+  Change url query syntax to ?
+- [[MH-13476](https://opencast.jira.com/browse/MH-13476)][[#818](https://github.com/opencast/opencast/pull/818)] -
+  Filter capture agent roles for ACLs
 
 ### Opencast 6.4
 
