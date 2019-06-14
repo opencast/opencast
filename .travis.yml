@@ -72,8 +72,8 @@ jobs:
         - (! grep -rn ' $' modules assemblies pom.xml --include=pom.xml)
         - (! grep -rn '	' etc)
         - (! grep -rn ' $' etc)
-        # build number must be present in all but four modules
-        - grep -L '<Build-Number>${buildNumber}</Build-Number>' modules/*/pom.xml | wc -l | grep -q 4
+        # build number must be present in all modules
+        - grep -L '<Build-Number>${buildNumber}</Build-Number>' modules/*/pom.xml | wc -l | grep -q '^0$'
         - >
           ( cd docs/guides/admin &&
             mkdocs build > mkdocs.log 2>&1 &&
