@@ -80,6 +80,7 @@ import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
+import org.opencastproject.workflow.api.WorkflowIdentifier;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
@@ -358,12 +359,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public List<WorkflowDefinition> listAvailableWorkflowDefinitions() {
-    List<WorkflowDefinition> list = new ArrayList<>();
-    for (Entry<String, WorkflowDefinition> entry : workflowDefinitionScanner.getWorkflowDefinitions().entrySet()) {
-      list.add(entry.getValue());
-    }
-    Collections.sort(list); //sorts by title
-    return list;
+    return workflowDefinitionScanner.getAvailableWorkflowDefinitions(securityService.getOrganization())
+            .sorted().collect(Collectors.toList());
   }
 
   /**
@@ -888,9 +885,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   @Override
   public WorkflowDefinition getWorkflowDefinitionById(String id) throws NotFoundException {
-    WorkflowDefinition def = workflowDefinitionScanner.getWorkflowDefinition(id);
-    if (def == null)
-      throw new NotFoundException("Workflow definition '" + id + "' not found");
+    final WorkflowIdentifier workflowIdentifier = new WorkflowIdentifier(id, securityService.getOrganization().getId());
+    WorkflowDefinition def = workflowDefinitionScanner.getWorkflowDefinition(workflowIdentifier);
+    if (def == null) {
+      throw new NotFoundException("Workflow definition '" + workflowIdentifier + "' not found");
+    }
     return def;
   }
 

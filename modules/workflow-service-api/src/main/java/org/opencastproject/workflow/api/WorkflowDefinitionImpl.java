@@ -61,6 +61,9 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
   @XmlElement(name = "title")
   private String title;
 
+  @XmlElement(name = "organization")
+  private String organization;
+
   @XmlElementWrapper(name = "tags")
   @XmlElement(name = "tag")
   protected SortedSet<String> tags = new TreeSet<String>();
@@ -347,12 +350,20 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
     this.title = title;
   }
 
+  @Override
+  public String getOrganization() {
+    return organization;
+  }
+
   /**
    * {@inheritDoc}
    *
    * @see java.lang.Object#toString()
    */
   public String toString() {
+    if (organization != null) {
+      return "Workflow definition {" + id + "/" + organization + "}";
+    }
     return "Workflow definition {" + id + "}";
   }
 

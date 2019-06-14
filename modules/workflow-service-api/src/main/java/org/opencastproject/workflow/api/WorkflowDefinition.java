@@ -155,6 +155,12 @@ public interface WorkflowDefinition extends Comparable<WorkflowDefinition> {
   void clearTags();
 
   /**
+   * Gets the organization associated with this workflow (or <code>null</code>, if it's global)
+   * @return the organization
+   */
+  String getOrganization();
+
+  /**
    * Appends the operation to the workflow definition.
    *
    * @param operation
