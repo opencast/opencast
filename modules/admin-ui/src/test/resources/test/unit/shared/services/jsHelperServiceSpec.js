@@ -127,7 +127,7 @@ describe('JsHelper service', function () {
     describe('#assembleRrule', function () {
         var testData;
         beforeEach(function () {
-            jasmine.getJSONFixtures().fixturesPath = 'base/test/unit/fixtures';
+            jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
             testData = getJSONFixture('newEventMultipleFixture.json');
         });
 
