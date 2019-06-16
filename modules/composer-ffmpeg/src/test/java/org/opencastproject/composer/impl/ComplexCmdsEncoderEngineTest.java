@@ -50,7 +50,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.BasicConfigurator;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -133,7 +132,6 @@ public class ComplexCmdsEncoderEngineTest {
   public void setUp() throws Exception {
     // Skip tests if FFmpeg is not installed
     Assume.assumeTrue(ffmpegInstalled);
-    BasicConfigurator.configure();
     engine = new EncoderEngine(FFMPEG_BINARY);
 
     File f = getFile("/video.mp4");
