@@ -23,6 +23,7 @@ package org.opencastproject.composer.impl;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.opencastproject.composer.impl.EncoderEngine.CMD_SUFFIX;
 import static org.opencastproject.serviceregistry.api.Incidents.NO_DETAILS;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
@@ -49,6 +50,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.identifier.IdBuilder;
 import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -429,13 +431,29 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     final EncodingProfile profile = getProfile(profileId);
     final EncoderEngine encoderEngine = getEncoderEngine();
 
+    // conditional settings based on frame height
+    final int height = Arrays.stream(mediaTrack.getStreams())
+            .filter((stream -> stream instanceof VideoStream))
+            .map(stream -> ((VideoStream) stream).getFrameHeight())
+            .findFirst()
+            .orElse(0);
+    Map<String, String> properties = new HashMap<>();
+    for (String key: profile.getExtensions().keySet()) {
+      if (key.startsWith(CMD_SUFFIX + ".if-height-geq-")) {
+        final int heightCondition = Integer.parseInt(key.substring((CMD_SUFFIX + ".if-height-geq-").length()));
+        if (heightCondition <= height) {
+          properties.put(key, profile.getExtension(key));
+        }
+      }
+    }
+
     // List of encoded tracks
     LinkedList<Track> encodedTracks = new LinkedList<>();
     // Do the work
     int i = 0;
     Map<String, File> source = new HashMap<>();
     source.put("video", mediaFile);
-    List<File> outputFiles = encoderEngine.process(source, profile, null);
+    List<File> outputFiles = encoderEngine.process(source, profile, properties);
     activeEncoder.remove(encoderEngine);
     for (File encodingOutput: outputFiles) {
       // Put the file in the workspace
@@ -708,7 +726,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
               upperLaidOutElement, upperVideoFile, watermarkOption, watermarkFile, backgroundColor, audioSourceName);
 
       Map<String, String> properties = new HashMap<>();
-      properties.put(EncoderEngine.CMD_SUFFIX + ".compositeCommand", compositeCommand);
+      properties.put(CMD_SUFFIX + ".compositeCommand", compositeCommand);
       List<File> output;
       try {
         Map<String, File> source = new HashMap<>();
@@ -871,7 +889,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
 
     Map<String, String> properties = new HashMap<>();
-    properties.put(EncoderEngine.CMD_SUFFIX + ".concatCommand", concatCommand);
+    properties.put(CMD_SUFFIX + ".concatCommand", concatCommand);
 
     File output;
     try {
