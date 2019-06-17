@@ -258,23 +258,25 @@ public class DublinCoreCatalogUIAdapterTest {
     DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
 
     MetadataField<String> titleField = MetadataField.createTextMetadataField(title, Opt.some(title),
-            "New Label for Title", true, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(),
-            Opt.<String> none(), Opt.<Integer> none(), Opt.<String> none());
+            "New Label for Title", true, false, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none());
     dublinCoreMetadata.addField(titleField, expectedTitle, listProvidersService);
+    titleField.setUpdated(true);
 
-    MetadataField<String> missingField = MetadataField.createTextMetadataField("missing", Opt.<String> none(),
-            "The Missing's Label", false, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(),
-            Opt.<String> none(), Opt.<Integer> none(), Opt.<String> none());
+    MetadataField<String> missingField = MetadataField.createTextMetadataField("missing", Opt.none(),
+            "The Missing's Label", false, false, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none());
     dublinCoreMetadata.addField(missingField, expectedMissing, listProvidersService);
+    missingField.setUpdated(true);
 
     MetadataField<String> durationField = MetadataField.createDurationMetadataField(temporal, Opt.some("duration"),
-            label, true, true, Opt.<Integer> none(), Opt.<String> none());
+            label, true, true, Opt.none(), Opt.none());
     dublinCoreMetadata.addField(durationField, "start=2016-03-01T09:27:35Z; end=2016-03-01T11:43:12Z; scheme=W3C-DTF;",
             listProvidersService);
+    durationField.setUpdated(true);
 
     MetadataField<String> startDate = MetadataField.createTemporalStartDateMetadata(temporal, Opt.some("startDate"),
-            label, true, true, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Opt.<Integer> none(), Opt.<String> none());
+            label, true, true, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Opt.none(), Opt.none());
     dublinCoreMetadata.addField(startDate, "2016-03-01T09:27:35.000Z", listProvidersService);
+    startDate.setUpdated(true);
 
     configurationDublinCoreCatalogUIAdapter.storeFields(mediapackage, dublinCoreMetadata);
     assertTrue(writtenCatalog.hasCaptured());
