@@ -21,10 +21,12 @@
 
 package org.opencastproject.workflow.impl;
 
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowIdentifier;
@@ -204,19 +206,32 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
     }
   }
 
+  private boolean userCanAccessWorkflow(final User user, final WorkflowIdentifier wfi) {
+    final WorkflowDefinition wd = installedWorkflows.get(wfi);
+    return userCanAccessWorkflowDefinition(user, wd);
+  }
+
+  private boolean userCanAccessWorkflowDefinition(final User user, final WorkflowDefinition wd) {
+    return wd.getRoles().isEmpty() || user.hasRole(GLOBAL_ADMIN_ROLE) || wd.getRoles().stream()
+            .anyMatch(user::hasRole);
+  }
+
   /**
    * Return available workflow definitions
    *
-   * This method finds workflows that are either globally defined or have the correct organization set.
+   * This method finds workflows that are either globally defined or have the correct organization/roles
+   * set.
    * @param organization The organization to check for (must not be <code>null</code>)
+   * @param user The user to check for (must not be <code>null</code>)
    * @return A stream of available organizations
    */
-  public Stream<WorkflowDefinition> getAvailableWorkflowDefinitions(final Organization organization) {
+  public Stream<WorkflowDefinition> getAvailableWorkflowDefinitions(final Organization organization, final User user) {
     return installedWorkflows.keySet().stream()
             .filter(wfi -> wfi.getOrganization() == null || wfi.getOrganization().equals(organization.getId()))
+            .filter(wfi -> userCanAccessWorkflow(user, wfi))
             .map(WorkflowIdentifier::getId)
             .distinct()
-            .map(identifier -> getWorkflowDefinition(new WorkflowIdentifier(identifier, organization.getId())));
+            .map(identifier -> getWorkflowDefinition(user, new WorkflowIdentifier(identifier, organization.getId())));
   }
 
   /**
@@ -225,12 +240,13 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    * This method tries to get the workflow using the exact identifier and falls back to the global workflow (without
    * the organization) if that fails.
    *
+   * @param user The user to check for
    * @param workflowIdentifier The workflow identifier
    * @return Either <code>null</code> if no workflow is found for this identifier, or the workflow definition.
    */
-  public WorkflowDefinition getWorkflowDefinition(WorkflowIdentifier workflowIdentifier) {
-    WorkflowDefinition result = installedWorkflows.get(workflowIdentifier);
-    if (result != null) {
+  public WorkflowDefinition getWorkflowDefinition(final User user, final WorkflowIdentifier workflowIdentifier) {
+    final WorkflowDefinition result = installedWorkflows.get(workflowIdentifier);
+    if (result != null && userCanAccessWorkflowDefinition(user, result)) {
       return result;
     }
     return installedWorkflows.get(new WorkflowIdentifier(workflowIdentifier.getId(), null));
