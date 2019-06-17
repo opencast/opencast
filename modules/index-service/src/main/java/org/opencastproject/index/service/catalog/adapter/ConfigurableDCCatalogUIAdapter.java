@@ -88,10 +88,11 @@ public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter
 
   @Override
   public DublinCoreMetadataCollection getRawFields() {
+
     DublinCoreMetadataCollection rawFields = new DublinCoreMetadataCollection();
     for (MetadataField metadataField : dublinCoreProperties.values()) {
       try {
-        rawFields.addField(metadataField, listProvidersService);
+        rawFields.addEmptyField(new MetadataField(metadataField), listProvidersService);
       } catch (IllegalArgumentException e) {
         logger.error("Skipping metadata field '{}' because of error", metadataField, e);
       }
@@ -132,7 +133,8 @@ public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter
             List<DublinCoreValue> values = dc.get(propertyKey);
             if (!values.isEmpty()) {
               try {
-                dublinCoreMetadata.addField(metadataField, values.stream().map(DublinCoreValue::getValue).collect(Collectors.toList()),
+                dublinCoreMetadata.addField(new MetadataField(metadataField),
+                        values.stream().map(DublinCoreValue::getValue).collect(Collectors.toList()),
                         getListProvidersService());
                 emptyFields.remove(metadataField);
               } catch (IllegalArgumentException e) {
@@ -148,7 +150,7 @@ public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter
     // Add all of the rest of the fields that didn't have values as empty.
     for (MetadataField metadataField: emptyFields) {
       try {
-        dublinCoreMetadata.addField(metadataField, getListProvidersService());
+        dublinCoreMetadata.addEmptyField(new MetadataField(metadataField), getListProvidersService());
       } catch (IllegalArgumentException e) {
         logger.error("Skipping metadata field '{}' because of error", metadataField, e);
       }
