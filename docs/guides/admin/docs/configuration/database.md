@@ -68,10 +68,19 @@ create a database called `opencast` by executing:
 
 Then create a user `opencast` with a password and grant it all necessary rights:
 
-    GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,INDEX,TRIGGER,CREATE TEMPORARY TABLES,REFERENCES ON opencast.*
+    GRANT SELECT,INSERT,UPDATE,DELETE ON opencast.*
       TO 'opencast'@'localhost' IDENTIFIED BY 'opencast_password';
 
-You can choose another name for the user and database and should use a different password.
+The rights granted here are all that is needed to *run* Opencast. To execute the migration scripts
+used to initialize (see next section) and upgrade the database schema upon releases of new versions
+of Opencast, you need more. If you don't want to do this using the `root` user (which normally
+can do anything), but with a dedicated user called `admin` for the sake of the example,
+you should grant that user the following rights:
+
+    GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,ALTER,DROP,INDEX,TRIGGER,CREATE TEMPORARY TABLES,REFERENCES ON opencast.*
+      TO 'admin'@'localhost' IDENTIFIED BY 'opencast_admin_password';
+
+You can choose other names for the users and the database, and you **should** use a different password.
 
 In a distributed system, apart from `'username'@'localhost'` (which would allow access from the local machine only),
 you should grant a external user access to the database by running the same command for a user like
