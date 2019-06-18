@@ -121,6 +121,8 @@
     <module>modules/external-api</module>
     <module>modules/external-api-index</module>
     <module>modules/fileupload</module>
+    <module>modules/hello-world-api</module>
+    <module>modules/hello-world-impl</module>
     <module>modules/incident-workflowoperation</module>
     <module>modules/index-service</module>
     <module>modules/ingest-download-service-api</module>
