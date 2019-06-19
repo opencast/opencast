@@ -136,10 +136,10 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     return distributionService;
   }
 
-  private void addMetadataCatalogsToTemplateData(Map<String, Object> values, MediaPackage mp) {
+  private Map<String, Object> addMetadataCatalogsToTemplateData(Map<String, Object> values, MediaPackage mp) {
     if (! mp.hasCatalogs()) {
       logger.info("No metdata catalogs found.");
-      return;
+      return values;
     }
     if (values == null) values = new HashMap<>();
 
@@ -159,11 +159,12 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
           }
           ((Map<String, Object>)values.get(mainflavor)).put(subflavor, metadata);
         } catch (Exception e) {
-          logger.error("Catalog from URL %s with flavor %s could not be loaded", catalog.getURI(),
-                  mainflavor + "/" + subflavor);
+          logger.warn("Catalog from URL {} with flavor {}/{} could not be loaded", catalog.getURI(),
+                  mainflavor, subflavor);
         }
       }
     }
+    return values;
    }
 
   /**
@@ -187,7 +188,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     String playerPath = securityService.getOrganization().getProperties().get(PLAYER_PROPERTY);
     values.put(PLAYER_PATH_TEMPLATE_KEY, playerPath);
     values.put(SERIES_ID_TEMPLATE_KEY, StringUtils.trimToEmpty(mp.getSeries()));
-    addMetadataCatalogsToTemplateData(values, mp);
+    values = addMetadataCatalogsToTemplateData(values, mp);
     String uriWithVariables = DocUtil.processTextTemplate("Replacing Variables in Publish URL", urlPattern, values);
     URI publicationURI;
     try {

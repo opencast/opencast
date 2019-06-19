@@ -100,13 +100,13 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
 
     String configuredCatalog = StringUtils.trimToEmpty(currentOperation.getConfiguration(DCCATALOG_PROPERTY));
     String configuredDCTerm = StringUtils.trimToEmpty(currentOperation.getConfiguration(DCTERM_PROPERTY));
-    String configuredExternalCatalog = StringUtils.trimToEmpty(currentOperation.getConfiguration(EXTERNAL_CATALOG_PROPERTY));
+    String configuredExternalCatalog = currentOperation.getConfiguration(EXTERNAL_CATALOG_PROPERTY);
     String configuredDefaultValue = StringUtils.trimToNull(currentOperation.getConfiguration(DEFAULT_VALUE_PROPERTY));
     String configuredMatchValue = StringUtils.trimToEmpty(currentOperation.getConfiguration(MATCH_VALUE_PROPERTY));
 
     // Set Default
     EName dcterm = null;
-    if (("").equals(configuredExternalCatalog)) {
+    if (StringUtils.isBlank(configuredExternalCatalog)) {
       configuredExternalCatalog = "dublincore";
       dcterm = new EName(TERMS_NS_URI, configuredDCTerm);
     }
@@ -121,13 +121,13 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
       List<DublinCoreValue> values = new LinkedList<>();
       for (Catalog catalog : catalogs) {
         DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(workspace, catalog);
-          for (Map.Entry<EName, List<DublinCoreValue>> entry : dc.getValues().entrySet()) {
-            if (dcterm != null && dcterm.equals(entry)) {
-              values.addAll(entry.getValue());
-            } else if (entry.getKey().getLocalName().equals(configuredDCTerm)) {
-              values.addAll(entry.getValue());
-            }
+        for (Map.Entry<EName, List<DublinCoreValue>> entry : dc.getValues().entrySet()) {
+          if (dcterm != null && dcterm.equals(entry)) {
+            values.addAll(entry.getValue());
+          } else if (entry.getKey().getLocalName().equals(configuredDCTerm)) {
+            values.addAll(entry.getValue());
           }
+        }
       }
       // Match Value
       if (values.isEmpty()) {

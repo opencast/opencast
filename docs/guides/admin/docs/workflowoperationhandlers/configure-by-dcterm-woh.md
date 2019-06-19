@@ -33,7 +33,7 @@ catalogs can be accessed here.
 
 ### match-value
 The value of the `dcterm` which to match against. The comparison is case sensitive. You can also use and regular
-expression.
+expression. As dcterm creator can be a list of creators, only the first entry is currently regarded.  
 
 ### default-value
 If `default-value` is used when the `dcterm` is not found in the catalog. If not specified the operation will treat the
