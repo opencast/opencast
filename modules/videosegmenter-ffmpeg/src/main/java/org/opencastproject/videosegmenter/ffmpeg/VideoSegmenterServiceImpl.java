@@ -636,7 +636,7 @@ VideoSegmenterService, ManagedService {
     String[] command = new String[] { binary, "-nostats", "-i", mediaFile.getAbsolutePath(),
       "-filter:v", "select=gt(scene\\," + changesThreshold + "),showinfo", "-f", "null", "-"};
 
-    logger.info("Detecting video segments using command: {}", command);
+    logger.info("Detecting video segments using command: {}", (Object) command);
 
     ProcessBuilder pbuilder = new ProcessBuilder(command);
     List<String> segmentsStrings = new LinkedList<String>();
