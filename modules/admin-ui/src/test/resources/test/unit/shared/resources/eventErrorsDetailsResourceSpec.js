@@ -9,6 +9,10 @@ describe('Event Error Details API Resource', function () {
         EventErrorDetailsResource = _EventErrorDetailsResource_;
     }));
 
+    beforeEach(function () {
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
+    });
+
     it('provides the resource', function () {
         $httpBackend.expectGET('/admin-ng/event/831/workflows/612/errors/9371.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows/1676/errors/9371.json')));

@@ -7,10 +7,10 @@ describe('VideoService', function () {
 
     beforeEach(inject(function (_VideoService_) {
         VideoService = _VideoService_;
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
     }));
 
     it('instantiates', function () {
-        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         expect(VideoService.getCurrentSegment).toBeDefined();
     });
 
