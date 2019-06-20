@@ -42,6 +42,7 @@
   <operations>
 
     <!-- Create the new events -->
+
     <operation
       id="duplicate-event"
       fail-on-error="true"
@@ -56,12 +57,16 @@
       </configurations>
     </operation>
 
-    <!-- Cleanup the working file repository -->
+    <!-- Clean up work artifacts -->
+
     <operation
-        id="include"
+        id="cleanup"
+        fail-on-error="false"
         description="Remove temporary processing artifacts">
       <configurations>
-        <configuration key="workflow-id">partial-cleanup</configuration>
+        <configuration key="delete-external">true</configuration>
+        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 

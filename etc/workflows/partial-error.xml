@@ -6,10 +6,9 @@
   <operations>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Notify                                                            -->
+    <!-- Mark as failed                                                    -->
     <!--                                                                   -->
-    <!-- Add comments in order to mark the recording for review and send   -->
-    <!-- e-mails to administrators.                                        -->
+    <!-- Mark recording as failed,                               -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <!-- Mark the recording for review -->
@@ -36,7 +35,7 @@
       </configurations>
     </operation>
 
-    <!-- Cleanup the temporary files from the working file repository -->
+    <!-- Clean up the temporary files from the working file repository -->
 
     <operation
       id="cleanup"
