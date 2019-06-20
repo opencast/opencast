@@ -9,6 +9,10 @@
 ## Then, fill in the properties for the new LDAP connection below and ideally delete this header to avoid confusion
 
 
+#########
+## Required configuration properties
+######
+
 ## A unique identifier for this connection. It only has effect within Opencast.
 ## May be different as the <ID> used above, but this is not recommended for clarity
 ## IMPORTANT: This identifier must be the same as the one used in the security.xml
@@ -19,51 +23,62 @@ org.opencastproject.userdirectory.ldap.id=
 ## Example: ldap://ldap.berkeley.edu
 org.opencastproject.userdirectory.ldap.url=
 
-## The user and password used for LDAP authentication.  If left commented, the LDAP provider will use an anonymous bind.
-#org.opencastproject.userdirectory.ldap.userDn=
-#org.opencastproject.userdirectory.ldap.password=
-
 ## The base path within LDAP to search for users
 ## Example: ou=people,dc=berkeley,dc=edu
 org.opencastproject.userdirectory.ldap.searchbase=
 
 ## The search filter to use for identifying users by ID
-org.opencastproject.userdirectory.ldap.searchfilter=(uid={0})
-
-## The maximum number of users to cache
-org.opencastproject.userdirectory.ldap.cache.size=1000
-
-## The maximum number of minutes to cache a user
-org.opencastproject.userdirectory.ldap.cache.expiration=5
+## Example: (uid={0})
+org.opencastproject.userdirectory.ldap.searchfilter=
 
 ## The comma-separated list of attributes that will be translated into roles.
-## Note that the attributes will be converted to uppercase and that they may be prefixed with a string, as defined in the
-## configuration below. Please refer to the documentation of the "roleprefix" property below.
+## Note that the attributes may be converted to uppercase and prefixed depending on the configuration below.
+## Please refer to the documentation of the "roleprefix" property.
 ## Example: berkeleyEduAffiliations,departmentNumber
 org.opencastproject.userdirectory.ldap.roleattributes=
 
-## The organization for this provider
-org.opencastproject.userdirectory.ldap.org=mh_default_org
 
-## A prefix to be added to the roles read by this provider. It defaults to an empty string "", i.e. no prefix added.
-## Please note that this property had previous a default value of "ROLE_", which is still recommended, but not mandatory.
-##
-## The prefix is *NOT* added to a role if any of the following conditions is met:
-##
-##   * The role starts with any of the prefixes defined in the parameter 'exclude.prefixes'
-##   * The role was not actually read from the provider, but defined in the 'extra.roles' list below
-org.opencastproject.userdirectory.ldap.roleprefix=
+#########
+## Optional configuration properties
+######
+
+## The user and password used for LDAP authentication.
+## If left commented, the LDAP provider will use an anonymous bind.
+#org.opencastproject.userdirectory.ldap.userDn=
+#org.opencastproject.userdirectory.ldap.password=
+
+## The maximum number of users to cache
+## Default: 1000
+#org.opencastproject.userdirectory.ldap.cache.size=1000
+
+## The maximum number of minutes to cache a user
+## Default: 5
+#org.opencastproject.userdirectory.ldap.cache.expiration=5
+
+## The organization for this provider
+## Default: First available organization
+#org.opencastproject.userdirectory.ldap.org=mh_default_org
+
+## A prefix to be added to the roles read by this provider
+## The prefix is not added to a role if any of the following conditions is met:
+## - The role starts with any of the prefixes defined in the parameter 'exclude.prefixes'
+## - The role was not actually read from the provider, but defined in the 'extra.roles' list below
+## Default: ROLE_
+#org.opencastproject.userdirectory.ldap.roleprefix=ROLE_
 
 ## A comma-separated list of prefixes. When the roles read from LDAP start with any of these, then the prefix defined
 ## above is not prepended to the role.
 ## Please note that if the "uppercase" parameter was provided, these prefixes are converted accordingly
-org.opencastproject.userdirectory.ldap.exclude.prefixes=
+## Default: <empty>
+#org.opencastproject.userdirectory.ldap.exclude.prefixes=
 
 ## Whether or not the role names should be converted to uppercase. It defaults to "true".
 ## Please note that this setting affects the prefix defined above.
-org.opencastproject.userdirectory.ldap.uppercase=true
+## Default: true
+#org.opencastproject.userdirectory.ldap.uppercase=true
 
 ## A comma-separated list of extra roles to apply to all the users authenticated with this LDAP instance
 ## The roles in this list are converted to uppercase if the corresponding parameter is set. However, the 'roleprefix'
 ## setting does not affect them -i.e. they will not be further modified even if 'roleprefix' is set.
-org.opencastproject.userdirectory.ldap.extra.roles=
+## Defaut: <empty>
+#org.opencastproject.userdirectory.ldap.extra.roles=
