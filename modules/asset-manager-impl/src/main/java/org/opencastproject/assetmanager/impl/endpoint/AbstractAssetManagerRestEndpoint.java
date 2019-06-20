@@ -232,7 +232,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
       Opt<MediaPackage> mp = getAssetManager().getMediaPackage(mediaPackageId);
 
       if (mp.isSome()) {
-        return ok(mp);
+        return ok(mp.get());
       } else {
         return notFound();
       }
