@@ -28,7 +28,9 @@ import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.NotFoundException;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
@@ -42,6 +44,7 @@ import java.lang.management.ManagementFactory;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.MalformedObjectNameException;
@@ -53,10 +56,10 @@ import javax.management.ObjectName;
 public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /** The logger */
-  protected static final Logger logger = LoggerFactory.getLogger(LdapUserProviderFactory.class);
+  private static final Logger logger = LoggerFactory.getLogger(LdapUserProviderFactory.class);
 
   /** This service factory's PID */
-  public static final String PID = "org.opencastproject.userdirectory.ldap";
+  private static final String PID = "org.opencastproject.userdirectory.ldap";
 
   /** The key to look up the ldap search filter in the service configuration properties */
   private static final String SEARCH_FILTER_KEY = "org.opencastproject.userdirectory.ldap.searchfilter";
@@ -113,7 +116,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   private Map<String, ServiceRegistration> authoritiesPopulatorRegistrations = new ConcurrentHashMap<>();
 
   /** The OSGI bundle context */
-  protected BundleContext bundleContext = null;
+  private BundleContext bundleContext = null;
 
   /** The organization directory service */
   private OrganizationDirectoryService orgDirectory;
@@ -161,6 +164,26 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   }
 
   /**
+   * Retrieve configuration values and check for a proper value.
+   *
+   * @param properties
+   *      Configuration dictionary
+   * @param key
+   *      Configuration key to check for
+   * @return
+   *      The configuration value
+   * @throws ConfigurationException
+   *      Thrown if the configuration value is blank
+   */
+  private String getRequiredProperty(final Dictionary properties, final String key) throws ConfigurationException {
+    final String value = (String) properties.get(key);
+    if (StringUtils.isBlank(value)) {
+      throw new ConfigurationException(key, "missing configuration value");
+    }
+    return value;
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see org.osgi.service.cm.ManagedServiceFactory#updated(java.lang.String, java.util.Dictionary)
@@ -168,66 +191,26 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
   @Override
   public void updated(String pid, Dictionary properties) throws ConfigurationException {
     logger.debug("Updating LdapUserProviderFactory");
+
+    // required settings
+    String searchBase = getRequiredProperty(properties, SEARCH_BASE_KEY);
+    String searchFilter = getRequiredProperty(properties, SEARCH_FILTER_KEY);
+    String url = getRequiredProperty(properties, LDAP_URL_KEY);
+    String instanceId = getRequiredProperty(properties, INSTANCE_ID_KEY);
+    String roleAttributes = getRequiredProperty(properties, ROLE_ATTRIBUTES_KEY);
+
+    // optional settings
     String organization = (String) properties.get(ORGANIZATION_KEY);
-    if (StringUtils.isBlank(organization))
-      throw new ConfigurationException(ORGANIZATION_KEY, "is not set");
-    String searchBase = (String) properties.get(SEARCH_BASE_KEY);
-    if (StringUtils.isBlank(searchBase))
-      throw new ConfigurationException(SEARCH_BASE_KEY, "is not set");
-    String searchFilter = (String) properties.get(SEARCH_FILTER_KEY);
-    if (StringUtils.isBlank(searchFilter))
-      throw new ConfigurationException(SEARCH_FILTER_KEY, "is not set");
-    String url = (String) properties.get(LDAP_URL_KEY);
-    if (StringUtils.isBlank(url))
-      throw new ConfigurationException(LDAP_URL_KEY, "is not set");
-    String instanceId = (String) properties.get(INSTANCE_ID_KEY);
-    if (StringUtils.isBlank(instanceId))
-      throw new ConfigurationException(INSTANCE_ID_KEY, "is not set");
     String userDn = (String) properties.get(SEARCH_USER_DN);
     String password = (String) properties.get(SEARCH_PASSWORD);
-    String roleAttributes = (String) properties.get(ROLE_ATTRIBUTES_KEY);
-    String rolePrefix = (String) properties.get(ROLE_PREFIX_KEY);
 
-    String[] excludePrefixes = null;
-    String strExcludePrefixes = (String) properties.get(EXCLUDE_PREFIXES_KEY);
-    if (StringUtils.isNotBlank(strExcludePrefixes)) {
-      excludePrefixes = strExcludePrefixes.split(",");
-    }
-
-    // Make sure that property convertToUppercase is true by default
-    String strUppercase = (String) properties.get(UPPERCASE_KEY);
-    boolean convertToUppercase = StringUtils.isBlank(strUppercase) ? true : Boolean.valueOf(strUppercase);
-
-    String[] extraRoles = new String[0];
-    String strExtraRoles = (String) properties.get(EXTRA_ROLES_KEY);
-    if (StringUtils.isNotBlank(strExtraRoles)) {
-      extraRoles = strExtraRoles.split(",");
-    }
-
-    int cacheSize = 1000;
-    logger.debug("Using cache size {} for {}", properties.get(CACHE_SIZE), LdapUserProviderFactory.class.getName());
-    try {
-      if (properties.get(CACHE_SIZE) != null) {
-        Integer configuredCacheSize = Integer.parseInt(properties.get(CACHE_SIZE).toString());
-        if (configuredCacheSize != null) {
-          cacheSize = configuredCacheSize.intValue();
-        }
-      }
-    } catch (Exception e) {
-      logger.warn("{} could not be loaded, default value is used: {}", CACHE_SIZE, cacheSize);
-    }
-
-    int cacheExpiration = 1;
-    try {
-      if (properties.get(CACHE_EXPIRATION) != null) {
-        Integer configuredCacheExpiration = Integer.parseInt(properties.get(CACHE_EXPIRATION).toString());
-        if (configuredCacheExpiration != null) {
-          cacheExpiration = configuredCacheExpiration.intValue();
-        }
-      }
-    } catch (Exception e) {
-      logger.warn("{} could not be loaded, default value is used: {}", CACHE_EXPIRATION, cacheExpiration);
-    }
+    // optional with default values
+    String rolePrefix = Objects.toString(properties.get(ROLE_PREFIX_KEY), "ROLE_");
+    String[] excludePrefixes = StringUtils.split((String) properties.get(EXCLUDE_PREFIXES_KEY), ",");
+    String[] extraRoles =  StringUtils.split(Objects.toString(properties.get(EXTRA_ROLES_KEY), ""), ",");
+    boolean convertToUppercase = BooleanUtils.toBoolean(Objects.toString(properties.get(UPPERCASE_KEY), "true"));
+    int cacheSize = NumberUtils.toInt((String) properties.get(CACHE_SIZE), 1000);
+    int cacheExpiration = NumberUtils.toInt((String) properties.get(CACHE_EXPIRATION), 5);
 
     // Now that we have everything we need, go ahead and activate a new provider, removing an old one if necessary
     ServiceRegistration existingRegistration = providerRegistrations.remove(pid);
@@ -235,12 +218,19 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
       existingRegistration.unregister();
     }
 
+    // Defaults to first available organization
     Organization org;
     try {
-      org = orgDirectory.getOrganization(organization);
+      if (StringUtils.isNoneBlank(organization)) {
+        org = orgDirectory.getOrganization(organization);
+      } else {
+        if (orgDirectory.getOrganizations().size() != 1) {
+          throw new NotFoundException("Multiple organizations exist but none is specified");
+        }
+        org = orgDirectory.getOrganizations().get(0);
+      }
     } catch (NotFoundException e) {
-      logger.warn("Organization {} not found!", organization);
-      throw new ConfigurationException(ORGANIZATION_KEY, "not found");
+      throw new ConfigurationException(ORGANIZATION_KEY, "no organization with configured id", e);
     }
 
     // Dictionary to include a property to identify this LDAP instance in the security.xml file
