@@ -326,13 +326,13 @@ public class RuntimeInfo {
         } catch (ServiceRegistryException e) {
           logger.error("Failed to get services: ", e);
           status = HEALTH_CHECK_STATUS_FAIL;
-          notes.add("Internal health check error!");
+          notes.add("internal health check error!");
         }
       }
     } catch (ServiceRegistryException e) {
       logger.error("Failed to get host registration: ", e);
       status = HEALTH_CHECK_STATUS_FAIL;
-      notes.add("Internal health check error!");
+      notes.add("internal health check error!");
     }
 
     // format response
