@@ -42,6 +42,9 @@ import com.entwinemedia.fn.data.Opt;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +63,13 @@ import javax.persistence.Query;
 /**
  * Implements {@link SeriesServiceDatabase}. Defines permanent storage for series.
  */
+@Component(
+  property = {
+    "service.description=Series Service"
+  },
+  immediate = true,
+  service = { SeriesServiceDatabase.class }
+)
 public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /** Logging utilities */
@@ -78,6 +88,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   protected SecurityService securityService;
 
   /** OSGi DI */
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.series.impl.persistence)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -87,6 +98,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    *
    * @param cc
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for series");
   }
@@ -97,6 +109,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -107,6 +120,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    * @param dcService
    *          {@link DublinCoreCatalogService} object
    */
+  @Reference(name = "dc")
   public void setDublinCoreService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }

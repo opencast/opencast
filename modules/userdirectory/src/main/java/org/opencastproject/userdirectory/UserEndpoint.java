@@ -36,6 +36,8 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -55,6 +57,16 @@ import javax.ws.rs.core.Response.Status;
 @Path("/")
 @RestService(name = "users", title = "User account manager", notes = "This service offers the ability to manage the roles for internal accounts.", abstractText = "Displays the users available in "
         + "the current user's organization")
+@Component(
+  property = {
+    "service.description=User listing REST endpoint",
+    "opencast.service.type=org.opencastproject.userdirectory.users",
+    "opencast.service.path=/users",
+    "opencast.service.jobproducer=false"
+  },
+  immediate = true,
+  service = { UserEndpoint.class }
+)
 public class UserEndpoint {
 
   /** The role directory service */
@@ -66,6 +78,7 @@ public class UserEndpoint {
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference(name = "userDirectoryService")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }

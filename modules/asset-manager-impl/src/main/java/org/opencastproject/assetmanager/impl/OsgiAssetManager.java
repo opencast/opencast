@@ -45,6 +45,12 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +70,13 @@ import javax.persistence.EntityManagerFactory;
  * Composes the core asset manager with the {@link AssetManagerWithMessaging} and {@link AssetManagerWithSecurity}
  * implementations.
  */
+@Component(
+  property = {
+    "service.description=Opencast Asset Manager"
+  },
+  immediate = true,
+  service = { AssetManager.class, TieredStorageAssetManager.class }
+)
 public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager {
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(OsgiAssetManager.class);
@@ -85,6 +98,7 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   private TieredStorageAssetManager delegate;
 
   /** OSGi callback. */
+  @Activate
   public synchronized void activate(ComponentContext cc) {
     logger.info("Activating AssetManager");
     final Database db = new Database(emf);
@@ -171,6 +185,7 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   }
 
   /** OSGi callback. Close the database. */
+  @Deactivate
   public void deactivate(ComponentContext cc) throws Exception {
     toClose.close();
   }
@@ -248,30 +263,37 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   // OSGi depedency injection
   //
 
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.assetmanager.impl)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
 
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.secSvc = securityService;
   }
 
+  @Reference(name = "authSvc")
   public void setAuthSvc(AuthorizationService authSvc) {
     this.authSvc = authSvc;
   }
 
+  @Reference(name = "orgDir")
   public void setOrgDir(OrganizationDirectoryService orgDir) {
     this.orgDir = orgDir;
   }
 
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Reference(name = "assetStore")
   public void setAssetStore(AssetStore assetStore) {
     this.assetStore = assetStore;
   }
 
+  @Reference(name = "remoteAssetStores", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, unbind = "removeRemoteAssetStore")
   public synchronized void addRemoteAssetStore(RemoteAssetStore assetStore) {
     if (null == delegate) {
       remotes.add(assetStore);
@@ -288,14 +310,17 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
     }
   }
 
+  @Reference(name = "httpAssetProvider")
   public void setHttpAssetProvider(HttpAssetProvider httpAssetProvider) {
     this.httpAssetProvider = httpAssetProvider;
   }
 
+  @Reference(name = "messageSender")
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
   }
 
+  @Reference(name = "messageReceiver")
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
   }

@@ -131,9 +131,6 @@
               org.opencastproject.workspace.impl;version=${project.version},
               org.opencastproject.workspace.impl.jmx;version=${project.version}
             </Private-Package>
-            <Service-Component>
-              OSGI-INF/workspace.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

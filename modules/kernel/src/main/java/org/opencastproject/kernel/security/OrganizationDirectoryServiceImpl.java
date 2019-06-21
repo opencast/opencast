@@ -39,6 +39,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +58,14 @@ import java.util.concurrent.Executors;
  * Implements the organizational directory. As long as no organizations are published in the service registry, the
  * directory will contain the default organization as the only instance.
  */
+@Component(
+  property = {
+    "service.pid=org.opencastproject.organization",
+    "service.description=Organization Directory Service"
+  },
+  immediate = true,
+  service = { OrganizationDirectoryService.class, ManagedServiceFactory.class }
+)
 public class OrganizationDirectoryServiceImpl implements OrganizationDirectoryService, ManagedServiceFactory {
 
   /** The logger */
@@ -100,6 +110,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   private OrgCache cache;
 
   /** OSGi DI */
+  @Reference(name = "persistence")
   public void setOrgPersistence(OrganizationDatabase setOrgPersistence) {
     this.persistence = setOrgPersistence;
     this.cache = new OrgCache(60000, persistence);
@@ -109,6 +120,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    * @param configAdmin
    *          the configAdmin to set
    */
+  @Reference(name = "configAdmin")
   public void setConfigurationAdmin(ConfigurationAdmin configAdmin) {
     this.configAdmin = configAdmin;
   }

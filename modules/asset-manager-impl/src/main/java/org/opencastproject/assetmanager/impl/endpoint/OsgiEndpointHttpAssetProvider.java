@@ -42,6 +42,9 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +58,14 @@ import java.net.URI;
  * <p>
  * Because of its tight coupling to the OSGi runtime, the implementation goes without an abstract base class.
  */
+@Component(
+  property = {
+    "service.description=HttpAssetProvider for the AssetManager",
+    "assetmanager.service.path=/assets"
+  },
+  immediate = true,
+  service = { HttpAssetProvider.class }
+)
 public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
   private static final Logger logger = LoggerFactory.getLogger(OsgiEndpointHttpAssetProvider.class);
 
@@ -115,12 +126,14 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
   }
 
   /** OSGi callback. */
+  @Activate
   public void activate(ComponentContext cc) {
     serverUrl = getContextProperty(cc, "org.opencastproject.server.url");
     mountPoint = getComponentContextProperty(cc, "assetmanager.service.path");
   }
 
   /** OSGi DI */
+  @Reference(name = "orgDir")
   public void setOrgDir(OrganizationDirectoryService orgDir) {
     this.orgDir = orgDir;
   }

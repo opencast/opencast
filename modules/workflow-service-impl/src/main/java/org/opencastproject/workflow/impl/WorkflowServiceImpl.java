@@ -73,6 +73,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
@@ -117,6 +118,12 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
@@ -155,6 +162,14 @@ import javax.management.ObjectInstance;
  * WorkflowOperation.getName(), then the factory returns a WorkflowOperationRunner to handle that operation. This allows
  * for custom runners to be added or modified without affecting the workflow service itself.
  */
+@Component(
+  property = {
+    "service.description=Workflow Service",
+    "service.pid=org.opencastproject.workflow.impl.WorkflowServiceImpl"
+  },
+  immediate = true,
+  service = { WorkflowService.class, WorkflowServiceImpl.class }
+)
 public class WorkflowServiceImpl extends AbstractIndexProducer implements WorkflowService, JobProducer, ManagedService {
 
   /** Retry strategy property name */
@@ -266,6 +281,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param componentContext
    *          the component context
    */
+  @Activate
   public void activate(ComponentContext componentContext) {
     this.componentContext = componentContext;
     executorService = (ThreadPoolExecutor) Executors.newCachedThreadPool();
@@ -281,6 +297,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   @Override
+  @Deactivate
   public void deactivate() {
     for (ObjectInstance mxbean : jmxBeans) {
       JmxUtil.unregisterMXBean(mxbean);
@@ -1965,11 +1982,21 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   /**
+   * Dummy callback for osgi
+   *
+   * @param unused
+   *          the unused ReadinessIndicator
+   */
+  @Reference(name = "profilesReadyIndicator", target = "(artifact=workflowdefinition)")
+  protected void setProfilesReadyIndicator(ReadinessIndicator unused) { }
+
+  /**
    * Callback for the OSGi environment to register with the <code>Workspace</code>.
    *
    * @param workspace
    *          the workspace
    */
+  @Reference(name = "workspace")
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -1980,6 +2007,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param registry
    *          the service registry
    */
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry registry) {
     this.serviceRegistry = registry;
   }
@@ -1994,6 +2022,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -2004,6 +2033,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param authorizationService
    *          the authorizationService to set
    */
+  @Reference(name = "authorization")
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -2014,6 +2044,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -2024,6 +2055,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
@@ -2034,6 +2066,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param index
    *          The search index
    */
+  @Reference(name = "index")
   protected void setDao(WorkflowServiceIndex index) {
     this.index = index;
   }
@@ -2044,6 +2077,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param seriesService
    *          the seriesService to set
    */
+  @Reference(name = "series")
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
@@ -2054,6 +2088,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param assetManager
    *          the assetManager to set
    */
+  @Reference(name = "assetManager")
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
@@ -2064,6 +2099,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param messageReceiver
    *          the messageReceiver to set
    */
+  @Reference(name = "message-broker-receiver")
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
   }
@@ -2074,6 +2110,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param messageSender
    *          the messageSender to set
    */
+  @Reference(name = "message-broker-sender")
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
   }
@@ -2084,6 +2121,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param service
    *          the metadata service
    */
+  @Reference(name = "metadata", cardinality = ReferenceCardinality.AT_LEAST_ONE, policy = ReferencePolicy.DYNAMIC, unbind = "removeMetadataService")
   protected void addMetadataService(MediaPackageMetadataService service) {
     metadataServices.add(service);
   }
@@ -2104,6 +2142,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param scanner
    *          the workflow definition scanner
    */
+  @Reference(name = "scanner")
   protected void addWorkflowDefinitionScanner(WorkflowDefinitionScanner scanner) {
     workflowDefinitionScanner = scanner;
   }

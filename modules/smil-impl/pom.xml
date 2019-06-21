@@ -42,6 +42,10 @@
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
@@ -76,9 +80,6 @@
               org.opencastproject.smil.impl.*;version=${project.version},
               org.opencastproject.smil.util;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/smil-service.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

@@ -144,9 +144,6 @@
             <Export-Package>
               org.opencastproject.authorization.xacml;version=${project.version},
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/authorization-service.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

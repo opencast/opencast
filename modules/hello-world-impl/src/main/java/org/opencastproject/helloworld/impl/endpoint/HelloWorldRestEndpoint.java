@@ -27,6 +27,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,16 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint for the {@link HelloWorldService} service
  */
+@Component(
+  property = {
+    "service.description=Hello World REST Endpoint",
+    "opencast.service.type=org.opencastproject.helloworld",
+    "opencast.service.path=/helloworld",
+    "opencast.service.jobproducer=false"
+  },
+  immediate = true,
+  service = HelloWorldRestEndpoint.class
+)
 @Path("/")
 @RestService(name = "HelloWorldServiceEndpoint",
     title = "Hello World Service Endpoint",
@@ -110,6 +122,7 @@ public class HelloWorldRestEndpoint {
     return docs;
   }
 
+  @Reference(name = "helloworld-service")
   public void setHelloWorldService(HelloWorldService service) {
     this.helloWorldService = service;
   }

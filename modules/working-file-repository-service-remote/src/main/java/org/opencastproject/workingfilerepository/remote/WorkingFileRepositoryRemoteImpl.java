@@ -25,7 +25,9 @@ import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
 
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
@@ -43,6 +45,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +58,13 @@ import java.net.URI;
 /**
  * A remote service proxy for a working file repository
  */
+@Component(
+  property = {
+    "service.description=Working File Repository Remote Service Proxy"
+  },
+  immediate = true,
+  service = { WorkingFileRepository.class }
+)
 public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements WorkingFileRepository {
 
   /** the logger */
@@ -61,6 +72,28 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
 
   public WorkingFileRepositoryRemoteImpl() {
     super(SERVICE_TYPE);
+  }
+
+  /**
+   * Sets the trusted http client
+   *
+   * @param client
+   */
+  @Override
+  @Reference(name = "trustedHttpClient")
+  public void setTrustedHttpClient(TrustedHttpClient client) {
+    super.setTrustedHttpClient(client);
+  }
+
+  /**
+   * Sets the remote service manager.
+   *
+   * @param remoteServiceManager
+   */
+  @Override
+  @Reference(name = "remoteServiceManager")
+  public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
+    super.setRemoteServiceManager(remoteServiceManager);
   }
 
   /**

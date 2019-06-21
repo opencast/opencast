@@ -61,6 +61,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -89,6 +92,15 @@ import javax.ws.rs.core.Response.Status;
  */
 @Path("/")
 @RestService(name = "serviceregistry", title = "Service Registry", notes = { "All paths above are relative to the REST endpoint base" }, abstractText = "Provides registration and management functions for servers and services in this Opencast instance or cluster.")
+@Component(
+  property = {
+    "service.description=Service Registry REST Endpoint",
+    "opencast.service.type=org.opencastproject.serviceregistry",
+    "opencast.service.path=/services"
+  },
+  immediate = true,
+  service = { ServiceRegistryEndpoint.class }
+)
 public class ServiceRegistryEndpoint {
 
   /** The remote service maanger */
@@ -101,6 +113,7 @@ public class ServiceRegistryEndpoint {
   protected String servicePath = "/";
 
   /** Sets the service registry instance for delegation */
+  @Reference(name = "serviceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -111,6 +124,7 @@ public class ServiceRegistryEndpoint {
    * @param cc
    *          OSGi component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     serverUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
     servicePath = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);

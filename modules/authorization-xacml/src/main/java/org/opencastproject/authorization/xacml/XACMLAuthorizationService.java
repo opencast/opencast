@@ -47,6 +47,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +67,12 @@ import javax.xml.bind.JAXBException;
 /**
  * A XACML implementation of the {@link AuthorizationService}.
  */
+@Component(
+  property = {
+    "service.description=Provides translation between access control entries and xacml documents"
+  },
+  service = { AuthorizationService.class, ManagedService.class }
+)
 public class XACMLAuthorizationService implements AuthorizationService, ManagedService {
 
   /** The logger */
@@ -89,10 +99,12 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
     OVERRIDE, ROLES, ACTIONS
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     updated(cc.getProperties());
   }
 
+  @Modified
   public void modified(Map<String, Object> config) {
     // this prevents the service from restarting on configuration updated.
     // updated() will handle the configuration update.
@@ -314,6 +326,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
    * @param workspace
    *          the workspace to set
    */
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -324,6 +337,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
    * @param securityService
    *          the security service
    */
+  @Reference(name = "security")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -334,6 +348,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
    * @param seriesService
    *          the series service
    */
+  @Reference(name = "series")
   protected void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }

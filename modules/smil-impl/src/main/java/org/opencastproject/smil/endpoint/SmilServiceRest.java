@@ -34,6 +34,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +56,15 @@ import javax.ws.rs.core.Response;
 @RestService(name = "smil", title = "SmilService Rest Endpoint",
         abstractText = "SmilRestService provide other services to create and modify Smil objects.",
         notes = {"All paths above are relative to the REST endpoint base (something like http://your.server/smil)"})
+@Component(
+  property = {
+    "service.description=Smil Service REST Endpoint",
+    "opencast.service.type=org.opencastproject.smil",
+    "opencast.service.path=/smil"
+  },
+  immediate = true,
+  service = { SmilServiceRest.class }
+)
 public class SmilServiceRest {
 
   /**
@@ -332,6 +343,7 @@ public class SmilServiceRest {
    *
    * @param smilService {@link SmilService} to set
    */
+  @Reference(name = "smil-service")
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }

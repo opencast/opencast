@@ -36,6 +36,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +60,13 @@ import javax.persistence.Query;
 /**
  * Manages and locates users references using JPA.
  */
+@Component(
+  property = {
+    "service.description=Provides a user reference directory"
+  },
+  immediate = true,
+  service = { UserProvider.class, RoleProvider.class, UserReferenceProvider.class }
+)
 public class JpaUserReferenceProvider implements UserReferenceProvider, UserProvider, RoleProvider {
 
   /** The logger */
@@ -89,6 +99,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   protected EntityManagerFactory emf = null;
 
   /** OSGi DI */
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -97,6 +108,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -107,6 +119,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    * @param cc
    *          the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("activate");
 

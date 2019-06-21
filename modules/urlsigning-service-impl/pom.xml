@@ -105,7 +105,6 @@
               OSGI-INF/generic-signing-provider.xml,
               OSGI-INF/mediapackage-serializer.xml,
               OSGI-INF/signing-endpoint.xml,
-              OSGI-INF/signing-service.xml,
               OSGI-INF/wowza-signing-provider.xml
             </Service-Component>
           </instructions>

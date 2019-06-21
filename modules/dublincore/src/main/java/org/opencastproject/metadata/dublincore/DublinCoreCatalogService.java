@@ -36,6 +36,9 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +58,14 @@ import javax.xml.transform.stream.StreamResult;
 /**
  * Parses {@link DublinCoreCatalog}s from serialized DC representations.
  */
+@Component(
+  property = {
+    "service.description=Dublin Core Catalog Service",
+    "priority=1"
+  },
+  immediate = true,
+  service = { CatalogService.class, MediaPackageMetadataService.class, DublinCoreCatalogService.class }
+)
 public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalog>, MediaPackageMetadataService {
 
   private static final Logger logger = LoggerFactory.getLogger(DublinCoreCatalogService.class);
@@ -63,10 +74,12 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
 
   protected Workspace workspace = null;
 
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Activate
   public void activate(Map<String, ?> properties) {
     logger.debug("activate()");
     if (properties != null) {

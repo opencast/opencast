@@ -70,6 +70,7 @@ import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
@@ -86,6 +87,11 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,6 +121,14 @@ import java.util.Properties;
 import java.util.Set;
 
 /** FFMPEG based implementation of the composer service api. */
+@Component(
+  property = {
+    "service.description=Composer (Encoder) Local Service",
+    "service.pid=org.opencastproject.composer.impl.ComposerServiceImpl"
+  },
+  immediate = true,
+  service = { ComposerService.class, ManagedService.class }
+)
 public class ComposerServiceImpl extends AbstractJobProducer implements ComposerService, ManagedService {
   /**
    * The indexes the composite job uses to create a Job
@@ -242,6 +256,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    *          the component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
     ffmpegBinary = StringUtils.defaultString(cc.getBundleContext().getProperty(CONFIG_FFMPEG_PATH),
@@ -253,6 +268,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /**
    * OSGi callback on component deactivation.
    */
+  @Deactivate
   public void deactivate() {
     logger.info("Deactivating composer service");
     for (EncoderEngine engine: activeEncoder) {
@@ -1882,6 +1898,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param mediaInspectionService
    *          an instance of the media inspection service
    */
+  @Reference(name = "inspection-service")
   protected void setMediaInspectionService(MediaInspectionService mediaInspectionService) {
     this.inspectionService = mediaInspectionService;
   }
@@ -1892,6 +1909,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference(name = "workspace")
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -1902,6 +1920,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -1922,6 +1941,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param scanner
    *          the profile scanner
    */
+  @Reference(name = "profileScanner")
   protected void setProfileScanner(EncodingProfileScanner scanner) {
     this.profileScanner = scanner;
   }
@@ -1932,6 +1952,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -1942,6 +1963,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -1952,6 +1974,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
@@ -1966,6 +1989,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     return securityService;
   }
 
+  @Reference(name = "smil-service")
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
@@ -1988,6 +2012,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   @Override
   protected OrganizationDirectoryService getOrganizationDirectoryService() {
     return organizationDirectoryService;
+  }
+
+  @Reference(name = "profilesReadyIndicator", target = "(artifact=encodingprofile)")
+  public void setEncodingProfileReadinessIndicator(ReadinessIndicator unused) {
+    //  Wait for the encoding profiles to load
   }
 
   @Override
@@ -2054,6 +2083,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * configuration admin service from calling the service deactivate and activate methods
    * for a config update. It does not have to do anything as the updates are handled by updated().
    */
+  @Modified
   public void modified(Map<String, Object> config)
      throws ConfigurationException {
     logger.debug("Modified");

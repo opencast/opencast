@@ -139,10 +139,6 @@
               com.amazonaws.services.s3.*,
               *;resolution:=optional
             </Import-Package>
-            <Service-Component>
-              OSGI-INF/aws-asset-persistence.xml,
-              OSGI-INF/aws-s3-asset-store.xml
-            </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>
