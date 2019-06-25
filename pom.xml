@@ -39,8 +39,8 @@
     <json-simple.version>1.1.1</json-simple.version>
     <karaf.version>4.2.2</karaf.version>
     <mina.version>2.1.0</mina.version>
-    <node.version>v10.15.1</node.version>
-    <npm.version>6.4.1</npm.version>
+    <node.version>v10.16.0</node.version>
+    <npm.version>6.9.0</npm.version>
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
@@ -121,6 +121,8 @@
     <module>modules/external-api</module>
     <module>modules/external-api-index</module>
     <module>modules/fileupload</module>
+    <module>modules/hello-world-api</module>
+    <module>modules/hello-world-impl</module>
     <module>modules/incident-workflowoperation</module>
     <module>modules/index-service</module>
     <module>modules/ingest-download-service-api</module>
@@ -348,12 +350,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.0</version>
         <dependencies>
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>8.18</version>
+            <version>8.21</version>
           </dependency>
         </dependencies>
         <configuration>
@@ -429,7 +431,7 @@
                   <pluginExecutionFilter>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <versionRange>[1.5,)</versionRange>
+                    <versionRange>[1.7.6,)</versionRange>
                     <goals>
                       <goal>install-node-and-npm</goal>
                       <goal>npm</goal>
@@ -528,7 +530,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>3.1.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -659,7 +661,7 @@
         <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
-          <version>1.5</version>
+          <version>1.7.6</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -955,7 +957,7 @@
       <dependency>
         <groupId>org.springframework.security.oauth</groupId>
         <artifactId>spring-security-oauth</artifactId>
-        <version>2.3.5.RELEASE</version>
+        <version>2.3.6.RELEASE</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
@@ -1054,23 +1056,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.21</version>
+        <version>1.7.26</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
-        <version>1.7.21</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>1.6.4</version>
-      </dependency>
-      <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>1.2.17</version>
-        <scope>test</scope>
+        <version>1.7.26</version>
       </dependency>
       <!-- apache commons syncing -->
       <dependency>

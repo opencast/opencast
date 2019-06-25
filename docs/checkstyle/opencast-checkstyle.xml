@@ -27,8 +27,6 @@
   <module name="Translation" />
 
   <module name="TreeWalker">
-    <property name="cacheFile" value="${checkstyle.cache.file}" />
-
     <!-- Allow Java code to suppress checkstyle audits via CHECKSTYLE:OFF and CHECKSTYLE:ON comments -->
     <module name="SuppressionCommentFilter"/>
 

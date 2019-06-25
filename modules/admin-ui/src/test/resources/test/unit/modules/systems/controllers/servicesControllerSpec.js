@@ -16,6 +16,7 @@ describe('Services controller', function () {
         $controller('ServicesCtrl', {$scope: $scope});
         $httpBackend = _$httpBackend_;
         $httpBackend.whenGET('modules/events/partials/index.html').respond('');
+        $httpBackend.whenGET('/admin-ng/services/services.json?limit=10&offset=0&sort=status:ASC').respond('[]');
     }));
 
     it('instantiates', function () {
@@ -42,6 +43,7 @@ describe('Services controller', function () {
 
         describe('on success', function () {
             beforeEach(function () {
+                $httpBackend.whenGET('/admin-ng/services/services.json?limit=10&offset=0&sort=status:ASC').respond('[]');
                 $httpBackend.whenPOST('/services/sanitize').respond(204);
             });
 

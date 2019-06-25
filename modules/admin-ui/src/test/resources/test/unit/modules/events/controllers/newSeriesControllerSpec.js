@@ -28,6 +28,7 @@ describe('New Series Controller', function () {
 
     describe('#submit', function () {
         beforeEach(function () {
+            jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
             $httpBackend.whenGET('/admin-ng/resources/THEMES.NAME.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/series/new/metadata').respond('{}');
             $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');

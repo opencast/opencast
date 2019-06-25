@@ -127,14 +127,14 @@ describe('adminNg.directives.adminNgEditableMultiValue', function () {
     });
 
     describe('#keyUp', function () {
-        var event = { target: { value: 'a' } };
-        var scope;
+        var event,
+            scope;
 
         beforeEach(function () {
+            event = { target: { value: 'a' } };
             event.stopPropagation = jasmine.createSpy();
             scope = element.find('ul').scope();
             scope.editMode = true;
-
         });
 
         it('does nothing by default', function () {

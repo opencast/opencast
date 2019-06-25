@@ -69,6 +69,7 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
+import org.opencastproject.workflow.api.WorkflowIdentifier;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
@@ -264,7 +265,8 @@ public class WorkflowServiceImplTest {
 
       /* The exception handler workflow definition needs to be registered as the reference to it in 
          workflow-definition-3 will be checked */
-      scanner.putWorkflowDefinition("exception-handler", exceptionHandler);
+      scanner.putWorkflowDefinition(
+              new WorkflowIdentifier("exception-handler", securityService.getOrganization().getId()), exceptionHandler);
 
       is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-1.xml");
       workingDefinition = WorkflowParser.parseWorkflowDefinition(is);

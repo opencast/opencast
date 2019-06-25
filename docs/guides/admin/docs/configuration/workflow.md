@@ -55,6 +55,12 @@ Start by naming the workflow and giving it a meaningful description:
 
       <!-- Description -->
       <id>example</id>
+      <!-- Optionally specify an organization -->
+      <organization>mh_default_org</organization>
+      <!-- optionally specify roles for this workflow -->
+      <roles>
+        <role>ROLE_ADMIN</role>
+      </roles>
       <title>Encode Mp4, Distribute and Publish</title>
       <tags>
         <!-- Tell the UI where to show this workflow -->
@@ -77,7 +83,15 @@ Start by naming the workflow and giving it a meaningful description:
     </definition>
 
 * The `id` is used in several Opencast endpoints to identify and select this workflow. Make sure that this identifier
-  is unique among all endpoints in the system.
+  is unique among all endpoints in the system (except in multitenant workflows, see `organization` below).
+* The `organization` specifies the organization this workflow is valid for (thus, it only makes sense in multitenant
+  installations). If there are two workflows with the same id, the one corresponding to the user’s organization is
+  always chosen. This pertains workflow dropdowns (for example, the “Add new event” dropdown) as well as workflows
+  included in other workflows via the `include` workflow operation handler.
+* The `roles` define which user roles are allowed to see and start this workflow (a user needs one of the roles provided
+  in the definition). If this is omitted or no roles are specified, everyone can see and start the workflow (provided
+  the `organization` constraints are satisfied). Also, users with `ROLE_ADMIN` can see and start every workflow. Note
+  that the workflows included in Opencast do not set roles.
 * The `tags` define where the user interfaces may use these workflows. Useful tags are:
     * *upload*: Usable for uploaded media
     * *schedule*: Usable for scheduled events

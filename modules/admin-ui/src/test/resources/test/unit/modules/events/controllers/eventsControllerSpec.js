@@ -16,6 +16,7 @@ describe('Events controller', function () {
         $controller('EventsCtrl', {$scope: $scope});
         $httpBackend = _$httpBackend_;
         EventsResource = _EventsResource_;
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $httpBackend.whenGET('modules/events/partials/index.html').respond('');
     }));
 
@@ -36,7 +37,7 @@ describe('Events controller', function () {
             $httpBackend.expectGET('/admin-ng/resources/events/filters.json').respond('[]');
             $httpBackend.expectGET('/admin-ng/resources/PUBLICATION.CHANNELS.json').respond('{}');
             $httpBackend.expectDELETE('/admin-ng/event/12').respond('12');
-            $httpBackend.expectGET('/admin-ng/event/events.json?limit=10&offset=0&sort=title:ASC').respond(JSON.stringify(getJSONFixture('admin-ng/event/events.json')));
+            $httpBackend.whenGET('/admin-ng/event/events.json?limit=10&offset=0&sort=title:ASC').respond(JSON.stringify(getJSONFixture('admin-ng/event/events.json')));
 
             $scope.table.delete({'id': 12});
 

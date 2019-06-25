@@ -76,7 +76,7 @@ describe('adminNg.directives.adminNgEditableSingleValue', function () {
         });
 
         it('does nothing by default', function () {
-            element.find('span').scope().keyUp(event);
+            element.find('span').scope().keyUp({});
             expect(element.find('span').scope().editMode).toBe(true);
         });
 
