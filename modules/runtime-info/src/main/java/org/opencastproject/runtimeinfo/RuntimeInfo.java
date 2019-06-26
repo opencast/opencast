@@ -18,7 +18,6 @@
  * the License.
  *
  */
-
 package org.opencastproject.runtimeinfo;
 
 import static org.opencastproject.rest.RestConstants.SERVICES_FILTER;
@@ -186,7 +185,6 @@ public class RuntimeInfo {
       targetAdminBaseUrl = new URL(targetScheme, serverUrl.getHost(), serverUrl.getPort(), serverUrl.getFile());
     }
 
-
     Map<String, Object> json = new HashMap<>();
     json.put("engage", targetEngageBaseUrl.toString());
     json.put("admin", targetAdminBaseUrl.toString());
@@ -277,91 +275,141 @@ public class RuntimeInfo {
         "version" : "1"
     }
      */
-    String status = HEALTH_CHECK_STATUS_PASS; // pass, warn or fail
+
     // Conditional workaround for unit tests
     String releaseId = this.bundleContext != null ? this.bundleContext.getBundle().getVersion().toString() : "TEST";
     String hostname = serviceRegistry.getRegistryHostname();
-    Gson gson = new Gson();
-
-    List<String> notes = new ArrayList<>();
-    List<Object> serviceStates = new ArrayList<>();
+    Health health;
     Map<String, Object> checks = new HashMap<>();
 
     try {
       HostRegistration host = serviceRegistry.getHostRegistration(hostname);
-
-      // check most severe conditions first
-      if (!host.isOnline()) {
-        // NOTE: This is not strictly possible as a node can't test if it's offline
-        status = HEALTH_CHECK_STATUS_FAIL;
-        notes.add("node is offline");
-      } else if (!host.isActive()) {
-        status = HEALTH_CHECK_STATUS_FAIL;
-        notes.add("node is disabled");
-      } else if (host.isMaintenanceMode()) {
-        status = HEALTH_CHECK_STATUS_FAIL;
-        notes.add("node is in maintenance");
-      } else {
-        // find non normal services
-        try {
-          List<ServiceRegistration> services = serviceRegistry.getServiceRegistrationsByHost(hostname);
-          for (ServiceRegistration service : services) {
-            switch (service.getServiceState()) {
-              case WARNING: {
-                status = HEALTH_CHECK_STATUS_WARN;
-                notes.add("service(s) in WARN state");
-                serviceStates.add(getServiceStateAsJson(service));
-                break;
-              }
-              case ERROR: {
-                status = HEALTH_CHECK_STATUS_WARN;
-                notes.add("service(s) in ERROR state");
-                serviceStates.add(getServiceStateAsJson(service));
-                break;
-              }
-              default:
-                break;
-            }
-          }
-        } catch (ServiceRegistryException e) {
-          logger.error("Failed to get services: ", e);
-          status = HEALTH_CHECK_STATUS_FAIL;
-          notes.add("internal health check error!");
-        }
-      }
+      health = checkHostHealth(host);
     } catch (ServiceRegistryException e) {
       logger.error("Failed to get host registration: ", e);
-      status = HEALTH_CHECK_STATUS_FAIL;
-      notes.add("internal health check error!");
+      health = new Health();
+      health.setStatus(HEALTH_CHECK_STATUS_FAIL);
+      health.addNote("internal health check error!");
     }
 
     // format response
     Map<String, Object> json = new HashMap<>();
-    json.put("status", status);
+    json.put("status", health.getStatus());
     json.put("version", HEALTH_CHECK_VERSION);
     json.put("releaseId", releaseId);
     json.put("serviceId", hostname);
     json.put("description", "Opencast node's health status");
 
-    if (!notes.isEmpty()) {
-      json.put("notes", notes);
+    if (!health.getNotes().isEmpty()) {
+      json.put("notes", health.getNotes());
     }
 
-    if (!serviceStates.isEmpty()) {
-      checks.put("service:states", serviceStates);
+    if (!health.getServiceStates().isEmpty()) {
+      checks.put("service:states", health.getServiceStates());
     }
 
     if (!checks.isEmpty()) {
       json.put("checks", checks);
     }
 
-    if (HEALTH_CHECK_STATUS_FAIL.equalsIgnoreCase(status)) {
+    if (HEALTH_CHECK_STATUS_FAIL.equalsIgnoreCase(health.getStatus())) {
       response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
     } else {
       response.setStatus(HttpServletResponse.SC_OK);
     }
 
     return gson.toJson(json);
+  }
+
+  private class Health {
+
+    private String status;
+    private List<String> notes;
+    private List<Object> serviceStates;
+
+    Health() {
+      status = HEALTH_CHECK_STATUS_PASS;
+      notes = new ArrayList<>();
+      serviceStates = new ArrayList<>();
+    }
+
+    public String getStatus() {
+      return status;
+    }
+
+    public void setStatus(String status) {
+      this.status = status;
+    }
+
+    public List<String> getNotes() {
+      return notes;
+    }
+
+    public void setNotes(List<String> notes) {
+      this.notes = notes;
+    }
+
+    public List<Object> getServiceStates() {
+      return serviceStates;
+    }
+
+    public void setServiceStates(List<Object> serviceStates) {
+      this.serviceStates = serviceStates;
+    }
+
+    public void addNote(String note) {
+      notes.add(note);
+    }
+
+    public void addServiceState(Object serviceState) {
+      serviceStates.add(serviceState);
+    }
+  }
+
+  private Health checkHostHealth(HostRegistration host) {
+    Health health = new Health();
+
+    // check most severe conditions first
+    if (!host.isOnline()) {
+      // NOTE: This is not strictly possible as a node can't test if it's offline
+      health.setStatus(HEALTH_CHECK_STATUS_FAIL);
+      health.addNote("node is offline");
+    } else if (!host.isActive()) {
+      health.setStatus(HEALTH_CHECK_STATUS_FAIL);
+      health.addNote("node is disabled");
+    } else if (host.isMaintenanceMode()) {
+      health.setStatus(HEALTH_CHECK_STATUS_FAIL);
+      health.addNote("node is in maintenance");
+    } else {
+      // find non normal services
+      try {
+        List<ServiceRegistration> services = serviceRegistry.getServiceRegistrationsByHost(host.getBaseUrl());
+        for (ServiceRegistration service : services) {
+          switch (service.getServiceState()) {
+            case WARNING: {
+              health.setStatus(HEALTH_CHECK_STATUS_WARN);
+              health.addNote("service(s) in WARN state");
+              health.addServiceState(getServiceStateAsJson(service));
+              break;
+            }
+            case ERROR: {
+              health.setStatus(HEALTH_CHECK_STATUS_WARN);
+              health.addNote("service(s) in ERROR state");
+              health.addServiceState(getServiceStateAsJson(service));
+              break;
+            }
+            default:
+              break;
+          }
+        }
+      } catch (ServiceRegistryException e) {
+        logger.error("Failed to get services: ", e);
+        health.setStatus(HEALTH_CHECK_STATUS_FAIL);
+        health.addNote("internal health check error!");
+      }
+    }
+
+    return health;
   }
 
   protected Map<String, Object> getServiceStateAsJson(ServiceRegistration service) {
@@ -380,8 +428,9 @@ public class RuntimeInfo {
           throws MalformedURLException, InvalidSyntaxException {
     List<Map<String, String>> result = new ArrayList<>();
     ServiceReference[] serviceRefs = getRestServiceReferences();
-    if (serviceRefs == null)
+    if (serviceRefs == null) {
       return result;
+    }
     for (ServiceReference servletRef : sort(serviceRefs)) {
       final String servletContextPath = (String) servletRef.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
       final Map<String, String> endpoint = new HashMap<>();
@@ -399,8 +448,9 @@ public class RuntimeInfo {
   private List<Map<String, String>> getUserInterfacesAsJson() throws InvalidSyntaxException {
     List<Map<String, String>> result = new ArrayList<>();
     ServiceReference[] serviceRefs = getUserInterfaceServiceReferences();
-    if (serviceRefs == null)
+    if (serviceRefs == null) {
       return result;
+    }
     for (ServiceReference ref : sort(serviceRefs)) {
       String description = (String) ref.getProperty(Constants.SERVICE_DESCRIPTION);
       String version = ref.getBundle().getVersion().toString();
@@ -420,7 +470,7 @@ public class RuntimeInfo {
    * Returns the array of references sorted by their Constants.SERVICE_DESCRIPTION property.
    *
    * @param references
-   *          the referencens
+   *          the references
    * @return the sorted set of references
    */
   private static SortedSet<ServiceReference> sort(ServiceReference[] references) {
