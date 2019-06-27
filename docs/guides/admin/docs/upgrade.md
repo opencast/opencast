@@ -13,7 +13,7 @@ How to Upgrade
 3. Optionally back-up Opencast files and database
 4. [Upgrade the database](#database-migration)
 5. Optionally [check for old ACL rule sets](#removal-of-deprecated-access-control-rule-set)
-6. Optionally [migrate the scheduled events](#scheduler-migration)
+6. [Migrate the scheduled events](#scheduler-migration)
 7. Optionally [update the player links](#update-player-links)
 8. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
 9. Review the configuration changes and adjust your configuration accordingly
@@ -60,11 +60,12 @@ Scheduler Migration
 The way the scheduler stores its data was changed in Opencast 7 to improve performance when checking for conflicts.
 The necessary database schema changes are part of the upgrade script in `docs/upgrade/6_to_7/`.
 
-This migration is only necessary if you have scheduled events in your system. For this, set the `maintenance`
-configuration option of `etc/org.opencastproject.scheduler.impl.SchedulerServiceImpl.cfg` to `true` and start opencast.
-The migration will start automatically. Wait until the migration is complete. Once complete, the opencast log will
-contain a line saying `Finished migrating scheduled events`. Check if there were any errors during the migration. If
-not, stop opencast and change `maintenance` back to `false` to put the scheduler back into its normal mode of operation.
+Additionally, old events need to be migrated to the new structure to preserve metadata related to scheduling. For this,
+set the `maintenance` configuration option of `etc/org.opencastproject.scheduler.impl.SchedulerServiceImpl.cfg` to
+`true` and start opencast.  The migration will start automatically. Wait until the migration is complete. Once complete,
+the opencast log will contain a line saying `Finished migrating scheduled events`. Check if there were any errors during
+the migration. If not, stop opencast and change `maintenance` back to `false` to put the scheduler back into its normal
+mode of operation.
 
 You should avoid running Opencast 7 without migrating the scheduled events first. Otherwise, your capture agents may
 fetch an empty calendar.
