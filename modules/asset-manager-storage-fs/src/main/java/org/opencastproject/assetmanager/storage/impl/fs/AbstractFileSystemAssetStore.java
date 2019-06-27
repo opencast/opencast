@@ -176,7 +176,11 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
 
   /** Create this directory and all of its parents. */
   protected void mkDirs(File d) {
-    if (d != null && !d.exists() && !d.mkdirs()) {
+    if (d == null) {
+      return;
+    }
+    // mkdirs *may* not have succeeded if it returns false, so check if the directory exists in that case
+    if (!d.mkdirs() && !d.exists()) {
       final String msg = "Cannot create directory " + d;
       logger.error(msg);
       throw new AssetStoreException(msg);
