@@ -162,13 +162,13 @@ public abstract class AbstractAssetManager implements AssetManager {
   }
 
   @Override
-  public void deleteProperties(final String mediaPackageId) {
-    getDb().deleteProperties(mediaPackageId);
+  public int deleteProperties(final String mediaPackageId) {
+    return getDb().deleteProperties(mediaPackageId);
   }
 
   @Override
-  public void deleteProperties(final String mediaPackageId, final String namespace) {
-    getDb().deleteProperties(mediaPackageId, namespace);
+  public int deleteProperties(final String mediaPackageId, final String namespace) {
+    return getDb().deleteProperties(mediaPackageId, namespace);
   }
 
   @Override
