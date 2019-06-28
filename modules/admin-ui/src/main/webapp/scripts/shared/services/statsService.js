@@ -42,8 +42,8 @@ angular.module('adminNg.services')
       };
 
       /**
-        * Retrieve data from the defined API with the given filter values.
-        */
+       * Retrieve data from the defined API with the given filter values.
+       */
       this.fetch = function () {
         me.runningQueries = 0;
 
@@ -57,7 +57,7 @@ angular.module('adminNg.services')
             var name = filter.name;
             var value = filter.value;
 
-            if (value.hasOwnProperty('relativeDateSpan')) {
+            if (Object.prototype.hasOwnProperty.call(value, 'relativeDateSpan')) {
               value = RelativeDatesService.relativeDateSpanToFilterValue(value.relativeDateSpan.from,
                 value.relativeDateSpan.to,
                 value.relativeDateSpan.unit);

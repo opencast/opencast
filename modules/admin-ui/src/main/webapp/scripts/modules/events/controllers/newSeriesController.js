@@ -29,7 +29,7 @@ angular.module('adminNg.controllers')
 
     function pushAllPropertiesIntoArray(object, array) {
       for (var o in object) {
-        if (object.hasOwnProperty(o)) {
+        if (Object.prototype.hasOwnProperty.call(object, o)) {
           array.push(object[o]);
         }
       }

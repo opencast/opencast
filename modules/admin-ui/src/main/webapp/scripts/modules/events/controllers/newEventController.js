@@ -89,13 +89,13 @@ angular.module('adminNg.controllers')
         var o;
         if (state.stateController.isMetadataState) {
           for (o in state.stateController.ud) {
-            if (state.stateController.ud.hasOwnProperty(o)) {
+            if (Object.prototype.hasOwnProperty.call(state.stateController.ud, o)) {
               userdata.metadata.push(state.stateController.ud[o]);
             }
           }
         } else if (state.stateController.isMetadataExtendedState) {
           for (o in state.stateController.ud) {
-            if (state.stateController.ud.hasOwnProperty(o)) {
+            if (Object.prototype.hasOwnProperty.call(state.stateController.ud, o)) {
               userdata.metadata.push(state.stateController.ud[o]);
             }
           }
