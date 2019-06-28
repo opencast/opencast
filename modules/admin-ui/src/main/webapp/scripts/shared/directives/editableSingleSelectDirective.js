@@ -105,7 +105,7 @@ angular.module('adminNg.directives')
       });
 
       element.on('chosen:hiding_dropdown', 'select', function(evt, params) {
-        scope.submit();
+        scope.leaveEditMode();
       });
 
       // get tab event before chosen can swallow it so we don't have to hit tab twice
