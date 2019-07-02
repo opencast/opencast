@@ -125,6 +125,9 @@ class OpencastToPaellaConverter {
           if ( !(currentStream.sources[videoType]) || !(currentStream.sources[videoType] instanceof Array)){
             currentStream.sources[videoType] = [];
           }
+          if (currentTrack.audio) {
+            currentStream.audioTag = base.dictionary.currentLanguage();
+          }
           currentStream.sources[videoType].push(this.getStreamSourceFromTrack(currentTrack));
         }
       }
