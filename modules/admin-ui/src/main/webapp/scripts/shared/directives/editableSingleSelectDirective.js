@@ -93,6 +93,8 @@ angular.module('adminNg.directives')
         });
       };
 
+      scope.oldValue = scope.params.value;
+
       //transform map to array so that orderBy can be used
       scope.collection = scope.ordered ? mapToArrayOrdered(scope.collection, scope.params.translatable) :
         mapToArray(scope.collection, scope.params.translatable);
@@ -169,9 +171,11 @@ angular.module('adminNg.directives')
       scope.submit = function () {
         // Wait until the change of the value propagated to the parent's metadata object.
         scope.submitTimer = $timeout(function () {
-          scope.save(scope.params.id);
+          if (scope.params.value !== scope.oldValue) {
+            scope.save(scope.params.id);
+            scope.oldValue = scope.params.value;
+          }
         });
-        scope.leaveEditMode();
       };
 
       scope.enterEditMode = function (event) {
