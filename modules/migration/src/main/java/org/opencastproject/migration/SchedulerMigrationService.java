@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 
@@ -246,9 +247,10 @@ public class SchedulerMigrationService {
       tx.commit();
       try {
         // Remove obsolete asset manager properties
-        final AQueryBuilder query = assetManager.createQuery();
-        final long deleted = query.delete(SNAPSHOT_OWNER, query.propertiesOf(SCHEDULER_NAMESPACE, CA_NAMESPACE, WORKFLOW_NAMESPACE))
-            .where(query.mediaPackageId(event.getMediaPackageId()).and(withOrganization(query))).run();
+        int deleted = 0;
+        for (String namespace: Arrays.asList(SCHEDULER_NAMESPACE, CA_NAMESPACE, WORKFLOW_NAMESPACE)) {
+          deleted += assetManager.deleteProperties(event.getMediaPackageId(), namespace);
+        }
         logger.debug("Deleted {} migrated properties", deleted);
       } catch (Exception e) {
         logger.error("Could not delete obsolete properties for event {}", event.getMediaPackageId());

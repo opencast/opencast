@@ -160,11 +160,11 @@ public class PropertyDto {
             }.toFn());
   }
 
-  public static void delete(EntityManager em, final String mediaPackageId) {
-    delete(em, mediaPackageId, null);
+  public static int delete(EntityManager em, final String mediaPackageId) {
+    return delete(em, mediaPackageId, null);
   }
 
-  public static void delete(EntityManager em, final String mediaPackageId, final String namespace) {
+  public static int delete(EntityManager em, final String mediaPackageId, final String namespace) {
     TypedQuery<PropertyDto> query;
     if (namespace == null) {
       query = em.createNamedQuery("Property.delete", PropertyDto.class)
@@ -177,8 +177,9 @@ public class PropertyDto {
     logger.debug("Executing query {}", query);
     EntityTransaction tx = em.getTransaction();
     tx.begin();
-    query.executeUpdate();
+    final int num = query.executeUpdate();
     tx.commit();
+    return num;
   }
 
   public static List<Property> select(EntityManager em, final String mediaPackageId, final String namespace) {

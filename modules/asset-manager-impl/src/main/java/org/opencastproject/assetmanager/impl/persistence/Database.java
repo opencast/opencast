@@ -330,9 +330,10 @@ public class Database implements EntityPaths {
    *
    * @param mediaPackageId
    *          Media package identifier
+   * @return Number of deleted rows
    */
-  public void deleteProperties(final String mediaPackageId) {
-    PropertyDto.delete(entityManagerFactory.createEntityManager(), mediaPackageId);
+  public int deleteProperties(final String mediaPackageId) {
+    return PropertyDto.delete(entityManagerFactory.createEntityManager(), mediaPackageId);
   }
 
   /**
@@ -342,13 +343,13 @@ public class Database implements EntityPaths {
    *          Media package identifier
    * @param namespace
    *          A namespace prefix to use for deletion
+   * @return Number of deleted rows
    */
-  public void deleteProperties(final String mediaPackageId, final String namespace) {
+  public int deleteProperties(final String mediaPackageId, final String namespace) {
     if (StringUtils.isBlank(namespace)) {
-      PropertyDto.delete(entityManagerFactory.createEntityManager(), mediaPackageId);
-    } else {
-      PropertyDto.delete(entityManagerFactory.createEntityManager(), mediaPackageId, namespace);
+      return PropertyDto.delete(entityManagerFactory.createEntityManager(), mediaPackageId);
     }
+    return PropertyDto.delete(entityManagerFactory.createEntityManager(), mediaPackageId, namespace);
   }
 
   /**
