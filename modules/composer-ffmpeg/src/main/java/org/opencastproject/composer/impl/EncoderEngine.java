@@ -965,7 +965,6 @@ public class EncoderEngine implements AutoCloseable {
         clauses.add(outmaps.getVideoFilter());
       }
       clauses.removeIf(Objects::isNull); // remove all empty filters
-      command.add("-y"); // overwrite old files
       command.add("-nostats"); // no progress report
       for (File o : inputs) {
         command.add("-i"); // Add inputfile in the order of entry
