@@ -68,7 +68,7 @@ create a database called `opencast` by executing:
 
 Then create a user `opencast` with a password and grant it all necessary rights:
 
-    GRANT SELECT,INSERT,UPDATE,DELETE ON opencast.*
+    GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON opencast.*
       TO 'opencast'@'localhost' IDENTIFIED BY 'opencast_password';
 
 The rights granted here are all that is needed to *run* Opencast. To execute the migration scripts
