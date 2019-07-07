@@ -155,8 +155,7 @@ public class SchedulerMigrationService {
   private Stream<ARecord> getScheduledEvents() {
     final AQueryBuilder query = assetManager.createQuery();
     // query filter for organization could be helpful to split up big migrations
-    final Predicate predicate = withOrganization(query).and(withVersion(query)).and(withOwner(query))
-        .and(withProperties(query));
+    final Predicate predicate = withOrganization(query).and(withVersion(query)).and(withProperties(query));
     // select necessary properties when assembling query
     return query.select(query.propertiesOf(SCHEDULER_NAMESPACE, WORKFLOW_NAMESPACE, CA_NAMESPACE))
         .where(predicate).run().getRecords();
@@ -164,10 +163,6 @@ public class SchedulerMigrationService {
 
   private Predicate withOrganization(AQueryBuilder query) {
     return query.organizationId().eq(securityService.getOrganization().getId());
-  }
-
-  private Predicate withOwner(AQueryBuilder query) {
-    return query.owner().eq(SNAPSHOT_OWNER);
   }
 
   private Predicate withVersion(AQueryBuilder query) {
