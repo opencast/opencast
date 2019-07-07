@@ -21,6 +21,7 @@
 
 package org.opencastproject.statistics.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
@@ -41,9 +42,11 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -90,6 +93,32 @@ public class StatisticsRestService {
    *          ComponentContext
    */
   public void activate(ComponentContext cc) {
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("writeDuration")
+  @RestQuery(name = "writeDuration", description = "Writes a duration", returnDescription = "",
+          reponses = {
+                  @RestResponse(responseCode = SC_NO_CONTENT, description = "Writing worked")
+          })
+  public Response writeDuration(
+          @QueryParam("organizationId") final String organizationId,
+          @QueryParam("measurementName") final String measurementName,
+          @QueryParam("retentionPolicy") final String retentionPolicy,
+          @QueryParam("organizationIdResourceName") final String organizationIdResourceName,
+          @QueryParam("fieldName") final String fieldName,
+          @QueryParam("temporalResolution") final String temporalResolution,
+          @QueryParam("duration") final String duration) {
+    try {
+      statisticsService
+              .writeDuration(organizationId, measurementName, retentionPolicy, organizationIdResourceName, fieldName,
+                      TimeUnit.valueOf(temporalResolution), Duration.parse(duration));
+      return Response.ok(Response.Status.NO_CONTENT).build();
+    } catch (Exception e) {
+      logger.error("Could not retrieve providers: {}", e.getMessage());
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @GET

@@ -78,7 +78,8 @@ For each provider, the following properties have to be configured:
       _resolution_ with which the data is displayed. Valid values are `HOURLY`, `DAILY`, `WEEKLY`, `MONTHLY` and
       `YEARLY`. E.g. when a chart shows data of two years, a `DAILY` resolution will lead to 2x365=730 values to be
       plotted while a `MONTHLY` resolution would leave us with 24 values being plotted in the chart.
-- **`type`** defines the structure of the data provided by this provider. Currently, only `timeseries` is supported.
+- **`type`** defines the structure of the data provided by this provider. Currently, `timeseries` and `runningtotal`
+  are supported.
 
 Here is an example json configuration for a provider which generates charts for episodes showing the number of views:
 
@@ -114,6 +115,66 @@ the export will contain the data which the graph currently displays. For series 
 behavior in the way that exported series statistics contain the data of all events of a series instead of just the top
 level series data. To enable this, it is necessary to specify which Statistics Provider should be used to get the episode
 data. See the configuration file `org.opencastproject.statistics.export.impl.StatisticsExportServiceImpl.cfg` for details.
+
+Using the `runningtotal` provider
+-----------
+
+The `runningtotal` statistics provider is a special type of time series statistics provider. To illustrate what it
+can be used for, let’s assume we want to track the number of hours of videos per organization (this is actually
+what the provider was initially designed for). We create a JSON file for the provider as such:
+
+```json
+{
+  "id": "organization.publishedhours.influx",
+  "title": "STATISTICS.TITLE.PUBLISHEDHOURS",
+  "description": "STATISTICS.DESCRIPTION.PUBLISHEDHOURS",
+  "resourceType": "ORGANIZATION",
+  "sources": [{
+    "measurement": "infinite.publishedhours",
+    "aggregation": "SUM",
+    "aggregationVariable": "hours",
+    "resourceIdName": "organizationId",
+    "resolutions": [
+      "DAILY",
+      "WEEKLY",
+      "MONTHLY",
+      "YEARLY"
+    ]
+  }],
+  "type": "runningtotal"
+}
+```
+
+Note that the published hours entries can be negative, in case we retract a video.
+
+When the `runningtotal` provider is asked to report on, for example, the monthly hours of video for a specific year,
+it will first take the sum of all video lengths _up until_ that year. Then, for each month, it will take the sum of
+all the entries in that month, and add it to the previous value. And so on for the next months.
+
+To actually _write_ these hours to the statistics data base, you have to add the `statistics-writer` workflow
+operation handler to your workflows. Specifically, somewhere in your publishing workflow, you have to add an entry
+such as this:
+
+```XML
+<operation
+  id="statistics-writer"
+  fail-on-error="true"
+  exception-handler-workflow="partial-error"
+  description="Collect video statistics">
+  <configurations>
+    <configuration key="flavor">presenter/video</configuration>
+    <configuration key="retract">false</configuration>
+    <configuration key="measurement-name">publishedhours</configuration>
+    <configuration key="organization-resource-id-name">organizationId</configuration>
+    <configuration key="length-field-name">hours</configuration>
+    <configuration key="temporal-resolution">hours</configuration>
+  </configurations>
+</operation>
+```
+
+To _decrement_ the running total of hours in the case of retractions, set the `retract` property to `true`.
+In the default case, or when the `retract` property is `false` the running total is not decremented when a
+retraction occurs.
 
 Verifying Your Setup<a name="verify"></a>
 ====================

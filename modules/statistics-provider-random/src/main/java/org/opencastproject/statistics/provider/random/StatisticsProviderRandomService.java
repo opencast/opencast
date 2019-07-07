@@ -21,8 +21,8 @@
 
 package org.opencastproject.statistics.provider.random;
 
+import org.opencastproject.statistics.api.StatisticsCoordinator;
 import org.opencastproject.statistics.api.StatisticsProvider;
-import org.opencastproject.statistics.api.StatisticsProviderRegistry;
 import org.opencastproject.statistics.provider.random.provider.RandomProviderConfiguration;
 import org.opencastproject.statistics.provider.random.provider.RandomStatisticsProvider;
 import org.opencastproject.util.ConfigurationException;
@@ -46,11 +46,11 @@ public class StatisticsProviderRandomService implements ArtifactInstaller {
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(StatisticsProviderRandomService.class);
 
-  private StatisticsProviderRegistry statisticsProviderRegistry;
+  private StatisticsCoordinator statisticsCoordinator;
   private Map<String, StatisticsProvider> fileNameToProvider = new ConcurrentHashMap<>();
 
-  public void setStatisticsProviderRegistry(StatisticsProviderRegistry service) {
-    this.statisticsProviderRegistry = service;
+  public void setStatisticsCoordinator(StatisticsCoordinator service) {
+    this.statisticsCoordinator = service;
   }
 
   public void activate(ComponentContext cc) {
@@ -59,7 +59,7 @@ public class StatisticsProviderRandomService implements ArtifactInstaller {
 
   public void deactivate(ComponentContext cc) {
     logger.info("Deactivating Statistics Provider Random Service");
-    fileNameToProvider.values().forEach(provider -> statisticsProviderRegistry.removeProvider(provider));
+    fileNameToProvider.values().forEach(provider -> statisticsCoordinator.removeProvider(provider));
   }
 
   @Override
@@ -74,7 +74,7 @@ public class StatisticsProviderRandomService implements ArtifactInstaller {
           providerCfg.getDescription()
       );
       fileNameToProvider.put(file.getName(), provider);
-      statisticsProviderRegistry.addProvider(provider);
+      statisticsCoordinator.addProvider(provider);
     } else {
       throw new ConfigurationException("Unknown random statistics type: " + providerCfg.getType());
     }
@@ -83,7 +83,7 @@ public class StatisticsProviderRandomService implements ArtifactInstaller {
   @Override
   public void uninstall(File file) throws Exception {
     if (fileNameToProvider.containsKey(file.getName())) {
-      statisticsProviderRegistry.removeProvider(fileNameToProvider.get(file.getName()));
+      statisticsCoordinator.removeProvider(fileNameToProvider.get(file.getName()));
       fileNameToProvider.remove(file.getName());
     }
   }
