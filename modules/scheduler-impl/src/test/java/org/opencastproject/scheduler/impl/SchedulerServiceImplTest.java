@@ -1594,7 +1594,8 @@ public class SchedulerServiceImplTest {
     MessageSender messageSender = schedSvc.getMessageSender();
     EasyMock.reset(messageSender);
     Capture<SchedulerItemList> schedulerItemsCapture = Capture.newInstance(CaptureType.ALL);
-    messageSender.sendObjectMessage(eq(SchedulerItem.SCHEDULER_QUEUE), eq(MessageSender.DestinationType.Queue),
+    messageSender.sendObjectMessage(eq(SchedulerItem.SCHEDULER_QUEUE_PREFIX + "Adminui"),
+            eq(MessageSender.DestinationType.Queue),
             capture(schedulerItemsCapture));
     EasyMock.expectLastCall().anyTimes();
     EasyMock.replay(messageSender);
