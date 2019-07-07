@@ -65,7 +65,7 @@ jobs:
       language: python
       python: "3.6"
       install:
-        - pip install mkdocs
+        - pip install mkdocs markdown_inline_graphviz_extension
         - (cd docs/guides && npm install)
       script:
         - (! grep -rn '	' modules assemblies pom.xml --include=pom.xml)
