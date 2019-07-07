@@ -5,6 +5,6 @@
     "markdownlint-cli": "^0.17.0"
   },
   "scripts": {
-    "test": "markdownlint ./admin/**/*.md ./developer/**/*.md ./user/**/*.md ../../*.md"
+    "test": "markdownlint *.md ./admin/**/*.md ./developer/**/*.md ./user/**/*.md ../../*.md"
   }
 }
