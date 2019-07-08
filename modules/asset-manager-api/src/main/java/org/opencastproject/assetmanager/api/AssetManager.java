@@ -111,8 +111,9 @@ public interface AssetManager {
    *
    * @param mediaPackageId
    *          Media package identifier
+   * @return Number of deleted properties
    */
-  void deleteProperties(String mediaPackageId);
+  int deleteProperties(String mediaPackageId);
 
   /**
    * Delete all properties for a given media package identifier and namespace.
@@ -121,8 +122,9 @@ public interface AssetManager {
    *          Media package identifier
    * @param namespace
    *          A namespace prefix to use for deletion
+   * @return Number of deleted properties
    */
-  void deleteProperties(String mediaPackageId, String namespace);
+  int deleteProperties(String mediaPackageId, String namespace);
 
   /**
    * Check if any snapshot with the given media package identifier exists.

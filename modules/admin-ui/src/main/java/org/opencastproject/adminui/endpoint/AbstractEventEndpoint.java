@@ -1109,7 +1109,18 @@ public abstract class AbstractEventEndpoint {
     MetadataList metadataList = new MetadataList();
     List<EventCatalogUIAdapter> catalogUIAdapters = getIndexService().getEventCatalogUIAdapters();
     catalogUIAdapters.remove(getIndexService().getCommonEventCatalogUIAdapter());
-    MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
+    MediaPackage mediaPackage;
+    try {
+      mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
+    } catch (IndexServiceException e) {
+      if (e.getCause() instanceof NotFoundException) {
+        return notFound("Cannot find data for event %s", eventId);
+      } else if (e.getCause() instanceof UnauthorizedException) {
+        return Response.status(Status.FORBIDDEN).entity("Not authorized to access " + eventId).build();
+      }
+      logger.error("Internal error when trying to access metadata for " + eventId, e);
+      return serverError();
+    }
     for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
       metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
     }
@@ -1333,7 +1344,18 @@ public abstract class AbstractEventEndpoint {
     Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", id);
-    MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
+    MediaPackage mp;
+    try {
+      mp = getIndexService().getEventMediapackage(optEvent.get());
+    } catch (IndexServiceException e) {
+      if (e.getCause() instanceof NotFoundException) {
+        return notFound("Cannot find data for event %s", id);
+      } else if (e.getCause() instanceof UnauthorizedException) {
+        return Response.status(Status.FORBIDDEN).entity("Not authorized to access " + id).build();
+      }
+      logger.error("Internal error when trying to access metadata for " + id, e);
+      return serverError();
+    }
     int attachments = mp.getAttachments().length;
     int catalogs = mp.getCatalogs().length;
     int media = mp.getTracks().length;
