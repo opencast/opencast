@@ -18,7 +18,57 @@ General Mode
 
 This will re-encode the videos first to the same format (framerate/timebase/codec, etc) before concatenation.
 
-![Concat](Concat.png)
+{% dot concat.svg
+
+/**
+Input                                                   Output
+
++----------------------+
+| outro                |--+
+| source-flavor-part-2 |  |
++----------------------+  |    /------------------\    +---------------------------+
+| intro                |--+--->| concat operation |--->| intro + presenter + outro |
+| source-flavor-part-0 |  |    \------------------/    +---------------------------+
++----------------------+  |
+| presenter            |--+
+| source-flavor-part-2 |
++----------------------+
+**/
+
+digraph G {
+  rankdir="LR";
+  bgcolor="transparent";
+  compound=true;
+  fontname=helvetica;
+  fontcolor=black;
+  node[shape=box, fontsize=8.0];
+  edge[weight=2, arrowsize=0.6, color=black, fontsize=8.0];
+
+  subgraph cluster_inputs {
+    label = "Input";
+    color=lightgrey;
+    outro [label="outro\nsource-flavor-part-2"];
+    intro [label="intro\nsource-flavor-part-0"];
+    presenter [label="presenter\nsource-flavor-part-2"];
+  }
+
+  subgraph cluster_output {
+    label = "Output";
+    color=lightgrey;
+    o_intro -> o_presenter -> o_outro ;
+    o_intro    [label=intro];
+    o_presenter[label=presenter];
+    o_outro    [label=outro];
+  }
+
+  concat[shape=ellipse];
+  outro     -> concat;
+  intro     -> concat;
+  presenter -> concat;
+
+  concat -> o_intro [lhead=cluster_output];
+}
+%}
 
 The internal FFmpeg command for re-encoding is using the following filters: fps, scale, pad and setdar for scaling all
 videos to a similar size including letterboxing, aevalsrc for creating silent audio streams and of course the concat for
