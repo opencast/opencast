@@ -266,7 +266,7 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
                   .collect(Collectors.toSet());
 
           return new JaxbUser(brightspaceUser.getUserName(), null, brightspaceUser.getDisplayName(),
-                  brightspaceUser.getExternalEmail(), this.getName(), true, jaxbOrganization, roles);
+                  brightspaceUser.getExternalEmail(), this.getName(), jaxbOrganization, roles);
         } else {
           cache.put(username, nullToken);
           logger.debug("User {} not found in Brightspace system", username);
