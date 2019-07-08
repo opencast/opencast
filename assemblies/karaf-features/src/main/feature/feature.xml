@@ -70,7 +70,7 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlbeans/2.6.0_2</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/1.2_1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlschema/1.4.3_1</bundle>
-    <bundle>mvn:org.codehaus.jettison/jettison/1.3.1</bundle>
+    <bundle>mvn:org.codehaus.jettison/jettison/1.4.0</bundle>
     <bundle>mvn:org.codehaus.groovy/groovy/2.4.3</bundle>
     <!-- At least ingest-service-impl need JDOM in version 1.x -->
     <!-- JDOM 1.x updates will be bug fixes as new features are gone to 2.x (see http://www.jdom.org/) -->
@@ -148,11 +148,11 @@
 
   <feature name="opencast-allinone" version="${project.version}">
     <feature start-level="80">opencast-core</feature>
+    <feature start-level="80">opencast-services-processing-heavy-load</feature>
+    <feature start-level="80">opencast-services-processing-light-load</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-index/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-animate-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-impl/${project.version}</bundle>
@@ -161,19 +161,12 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-storage-fs/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-authorization-manager/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-caption-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-comments-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-composer-ffmpeg/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-composer-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-conductor/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-dataloader/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-regexp/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
@@ -200,20 +193,17 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-video-videojs/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-event-comment/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-execute-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-execute-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-execute-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-external-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-external-api-index/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-incident-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-index-service/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-writer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
@@ -243,37 +233,26 @@
     <!-- load search impl later than its optional index rebuilding resources to have maximium support during search index rebuild -->
     <bundle start-level="84">mvn:org.opencastproject/opencast-search-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-smil-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-smil-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-influx/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-service/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-random/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-solr/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-sox-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-sox-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-textextractor-tesseract/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-themes/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-themes-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-ibm-watson-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-ffmpeg-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-condition-parser/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-workflowoperation/${project.version}</bundle>
   </feature>
@@ -303,7 +282,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-dataloader/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-remote/${project.version}</bundle>
@@ -321,12 +299,15 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-incident-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-index-service/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-writer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
@@ -352,6 +333,10 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-influx/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-service/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-smil-api/${project.version}</bundle>
@@ -382,6 +367,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-condition-parser/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-workflowoperation/${project.version}</bundle>
   </feature>
@@ -413,7 +399,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-dataloader/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3/${project.version}</bundle>
@@ -446,12 +431,15 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-incident-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-index-service/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-writer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
@@ -481,6 +469,10 @@
     <bundle start-level="84">mvn:org.opencastproject/opencast-search-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-influx/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-service/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-smil-api/${project.version}</bundle>
@@ -511,6 +503,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-condition-parser/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-workflowoperation/${project.version}</bundle>
   </feature>
@@ -530,156 +523,61 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-worker" version="${project.version}">
+  <feature name="opencast-services-processing-heavy-load" version="${project.version}">
     <feature start-level="80">opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-animate-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-animate-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-caption-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-ffmpeg/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-smil-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-smil-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-ffmpeg-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-ffmpeg/${project.version}</bundle>
+  </feature>
+
+  <feature name="opencast-services-processing-light-load" version="${project.version}">
+    <feature start-level="80">opencast-core</feature>
+
+    <bundle start-level="82">mvn:org.opencastproject/opencast-caption-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-regexp/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-execute-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-execute-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-ffmpeg/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-sox-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-sox-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-textextractor-tesseract/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-ffmpeg/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-ffmpeg/${project.version}</bundle>
+  </feature>
+
+  <feature name="opencast-worker" version="${project.version}">
+    <feature start-level="80">opencast-core</feature>
+    <feature start-level="80">opencast-services-processing-heavy-load</feature>
+    <feature start-level="80">opencast-services-processing-light-load</feature>
+
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-youtube-v3/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-runtime-info-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-remote/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-smil-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-smil-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-sox-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-sox-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-textextractor-tesseract/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-ffmpeg/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-ffmpeg-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-ffmpeg/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
-  </feature>
-
-  <feature name="opencast-adminworker" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
-
-    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-index/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-storage-aws/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-storage-fs/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-authorization-manager/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-caption-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-comments-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-composer-ffmpeg/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-composer-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-composer-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-conductor/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-dataloader/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-regexp/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-remote/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-download-remote/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-streaming-remote/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-event-comment/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-execute-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-execute-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-execute-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-external-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-external-api-index/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-fileupload/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-incident-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-index-service/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-ffmpeg/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-mattermost-notification-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
-    <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-notification-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-persistence/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-presets/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-configurable-remote/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-oaipmh-remote/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-youtube-v3/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-runtime-info-ui-ng/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-handler/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-notifier-comment/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-notifier-email/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-schema/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-search-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-remote/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-search/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-smil-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-smil-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-solr/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-sox-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-sox-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-sox-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-textextractor-tesseract/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-themes-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-themes/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-ffmpeg/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-ibm-watson-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-ffmpeg-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-ffmpeg/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-ffmpeg/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-workflowoperation/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-presentation" version="${project.version}">
@@ -726,21 +624,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-migration" version="${project.version}">
-    <feature start-level="80">opencast-core</feature>
-
-    <!-- Note: This is the minimum set of bundles for the 4.0 migration bundle.  If this is not 4.0 then this list should probably change! -->
-    <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-storage-fs/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-handler/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-solr/${project.version}</bundle>
-    <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
-  </feature>
-
-  <feature name="opencast-security-cas" version="${project.version}">  
+  <feature name="opencast-security-cas" version="${project.version}">
     <bundle start-level="82">mvn:commons-collections/commons-collections/3.2.1</bundle>
     <bundle start-level="82">mvn:org.apache.velocity/velocity/1.7</bundle>
     <bundle start-level="82">mvn:org.apache.santuario/xmlsec/2.1.2</bundle>

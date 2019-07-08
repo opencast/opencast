@@ -70,10 +70,8 @@ public class EventHttpServletRequest {
 
   private static final String ACTION_JSON_KEY = "action";
   private static final String ALLOW_JSON_KEY = "allow";
-  private static final String ID_JSON_KEY = "id";
   private static final String METADATA_JSON_KEY = "metadata";
   private static final String ROLE_JSON_KEY = "role";
-  private static final String VALUE_JSON_KEY = "value";
 
   private Opt<AccessControlList> acl = Opt.none();
   private Opt<MediaPackage> mediaPackage = Opt.none();

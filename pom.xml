@@ -26,21 +26,21 @@
     <commons-csv.version>1.6</commons-csv.version>
     <commons-fileupload.version>1.4</commons-fileupload.version>
     <commons-lang3.version>3.8.1</commons-lang3.version>
-    <commons-text.version>1.6</commons-text.version>
+    <commons-text.version>1.7</commons-text.version>
     <cxf.version>3.2.6</cxf.version>
     <eclipselink.version>2.7.3</eclipselink.version>
     <functional.version>1.4.2</functional.version>
     <guava.version>23.0</guava.version>
     <httpcomponents-httpclient.version>4.5.7</httpcomponents-httpclient.version>
     <httpcomponents-httpcore.version>4.4.11</httpcomponents-httpcore.version>
-    <jackson.version>2.9.8</jackson.version>
+    <jackson.version>2.9.9</jackson.version>
     <jdk.version>1.8</jdk.version>
     <joda-time.version>2.10.1</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
     <karaf.version>4.2.2</karaf.version>
     <mina.version>2.1.0</mina.version>
-    <node.version>v10.15.1</node.version>
-    <npm.version>6.4.1</npm.version>
+    <node.version>v10.16.0</node.version>
+    <npm.version>6.9.0</npm.version>
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
@@ -80,7 +80,6 @@
     <module>modules/cover-image-impl</module>
     <module>modules/cover-image-remote</module>
     <module>modules/cover-image-workflowoperation</module>
-    <module>modules/dataloader</module>
     <module>modules/db</module>
     <module>modules/dictionary-api</module>
     <module>modules/dictionary-hunspell</module>
@@ -92,7 +91,6 @@
     <module>modules/distribution-service-aws-s3-remote</module>
     <module>modules/distribution-service-download</module>
     <module>modules/distribution-service-download-remote</module>
-    <module>modules/distribution-service-streaming</module>
     <module>modules/distribution-service-adaptive-streaming-wowza</module>
     <module>modules/distribution-service-streaming-remote</module>
     <module>modules/distribution-workflowoperation</module>
@@ -127,13 +125,17 @@
     <module>modules/hello-world-impl</module>
     <module>modules/incident-workflowoperation</module>
     <module>modules/index-service</module>
+    <module>modules/ingest-download-service-api</module>
+    <module>modules/ingest-download-service-impl</module>
+    <module>modules/ingest-download-service-remote</module>
     <module>modules/ingest-service-api</module>
     <module>modules/ingest-service-impl</module>
-    <module>modules/ingest-workflowoperation</module>
+    <module>modules/ingest-download-service-workflowoperation</module>
     <module>modules/inspection-service-api</module>
     <module>modules/inspection-service-ffmpeg</module>
     <module>modules/inspection-service-remote</module>
     <module>modules/inspection-workflowoperation</module>
+    <module>modules/statistics-writer-workflowoperation</module>
     <module>modules/kernel</module>
     <module>modules/live-schedule-api</module>
     <module>modules/live-schedule-impl</module>
@@ -199,6 +201,12 @@
     <module>modules/static</module>
     <module>modules/static-file-service-api</module>
     <module>modules/static-file-service-impl</module>
+    <module>modules/statistics-export-service</module>
+    <module>modules/statistics-service-api</module>
+    <module>modules/statistics-service-impl</module>
+    <module>modules/statistics-service-remote</module>
+    <module>modules/statistics-provider-influx</module>
+    <module>modules/statistics-provider-random</module>
     <module>modules/textanalyzer-api</module>
     <module>modules/textanalyzer-impl</module>
     <module>modules/textanalyzer-remote</module>
@@ -238,6 +246,7 @@
     <module>modules/waveform-ffmpeg</module>
     <module>modules/waveform-remote</module>
     <module>modules/waveform-workflowoperation</module>
+    <module>modules/workflow-condition-parser</module>
     <module>modules/workflow-service-api</module>
     <module>modules/workflow-service-impl</module>
     <module>modules/workflow-service-remote</module>
@@ -343,12 +352,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.0</version>
         <dependencies>
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>8.18</version>
+            <version>8.21</version>
           </dependency>
         </dependencies>
         <configuration>
@@ -424,7 +433,7 @@
                   <pluginExecutionFilter>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <versionRange>[1.5,)</versionRange>
+                    <versionRange>[1.7.6,)</versionRange>
                     <goals>
                       <goal>install-node-and-npm</goal>
                       <goal>npm</goal>
@@ -509,7 +518,7 @@
           <configuration>
             <instructions>
               <Bundle-Category>opencastproject</Bundle-Category>
-              <Bundle-DocURL>http://opencastproject.org/</Bundle-DocURL>
+              <Bundle-DocURL>https://opencast.org/</Bundle-DocURL>
               <Bundle-Vendor>The Opencast Project</Bundle-Vendor>
               <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             </instructions>
@@ -523,7 +532,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>3.1.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -544,6 +553,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
           <version>3.5</version>
+        </plugin>
+        <plugin>
+          <groupId>org.antlr</groupId>
+          <artifactId>antlr4-maven-plugin</artifactId>
+          <version>4.7.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -649,7 +663,7 @@
         <plugin>
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
-          <version>1.5</version>
+          <version>1.7.6</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -682,6 +696,11 @@
   </build>
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-runtime</artifactId>
+        <version>4.7.2</version>
+      </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
@@ -940,7 +959,7 @@
       <dependency>
         <groupId>org.springframework.security.oauth</groupId>
         <artifactId>spring-security-oauth</artifactId>
-        <version>2.3.5.RELEASE</version>
+        <version>2.3.6.RELEASE</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
@@ -1039,23 +1058,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.21</version>
+        <version>1.7.26</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
-        <version>1.7.21</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-simple</artifactId>
-        <version>1.6.4</version>
-      </dependency>
-      <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>1.2.17</version>
-        <scope>test</scope>
+        <version>1.7.26</version>
       </dependency>
       <!-- apache commons syncing -->
       <dependency>
@@ -1114,6 +1122,12 @@
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
         <version>${joda-time.version}</version>
+      </dependency>
+      <!-- influx -->
+      <dependency>
+        <groupId>org.influxdb</groupId>
+        <artifactId>influxdb-java</artifactId>
+        <version>2.15</version>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
@@ -1245,6 +1259,17 @@
         <groupId>be.ugent.brightspace</groupId>
         <artifactId>valence-sdk-java</artifactId>
         <version>1.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.jettison</groupId>
+        <artifactId>jettison</artifactId>
+        <version>1.4.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>stax</groupId>
+            <artifactId>stax-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1520,6 +1545,38 @@
          </roles>
         <timezone>Europe/Madrid</timezone>
      </developer>
+     <developer>
+       <id>jkniephoff</id>
+       <name>Julian Kniephoff</name>
+       <email>kniephoff@elan-ev.de</email>
+       <url>https://juliankniephoff.com</url>
+       <organization>ELAN e.V.</organization>
+       <organizationUrl>https://elan-ev.de/</organizationUrl>
+       <roles>
+         <role>developer</role>
+       </roles>
+       <timezone>Europe/Berlin</timezone>
+      <properties>
+        <irc.nick>jkniephoff</irc.nick>
+        <github.nick>JulianKniephoff</github.nick>
+      </properties>
+    </developer>
+    <developer>
+      <id>mliradelc</id>
+      <name>Maximiliano Lira Del Canto</name>
+      <email>mliradel@uni-koeln.de</email>
+      <url></url>
+      <organization>Computer Center - University of Cologne</organization>
+      <organizationUrl>https://www.uni-koeln.de</organizationUrl>
+      <roles>
+         <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+      <properties>
+        <irc.nick></irc.nick>
+        <github.nick>mliradelc</github.nick>
+      </properties>
+    </developer>
   </developers>
   <!-- People having significantly contributed to Opencast in the past -->
   <contributors>
@@ -1640,7 +1697,7 @@
   <licenses>
     <license>
       <name>Educational Community License, Version 2.0</name>
-      <url>http://www.osedu.org/licenses/ECL-2.0/ecl2.txt</url>
+      <url>https://opensource.org/licenses/ECL-2.0</url>
     </license>
   </licenses>
   <scm>

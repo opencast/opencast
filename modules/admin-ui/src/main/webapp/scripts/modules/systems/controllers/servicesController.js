@@ -38,6 +38,10 @@ angular.module('adminNg.controllers')
         label: 'SYSTEMS.SERVICES.TABLE.HOST_NAME',
         sortable: true
       }, {
+        name:  'nodeName',
+        label: 'SYSTEMS.SERVICES.TABLE.NODE_NAME',
+        sortable: true
+      }, {
         name:  'completed',
         label: 'SYSTEMS.SERVICES.TABLE.COMPLETED',
         sortable: true

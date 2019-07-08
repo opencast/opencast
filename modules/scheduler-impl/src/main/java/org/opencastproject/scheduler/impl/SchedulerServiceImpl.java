@@ -121,7 +121,6 @@ import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.osgi.framework.ServiceException;
@@ -489,6 +488,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     // input Rrule is UTC. Needs to be adjusted to tz
     Util.adjustRrule(rRule, start, tz);
     List<Period> periods = Util.calculatePeriods(start, end, duration, rRule, tz);
+    if (periods.isEmpty()) {
+      return Collections.emptyMap();
+    }
     return addMultipleEventInternal(periods, captureAgentId, userIds, templateMp, wfProperties, caMetadata,
             schedulingSource);
   }
@@ -690,7 +692,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       Date start = extendedEventDto.getStartDate();
       Date end = extendedEventDto.getEndDate();
 
-      verifyActive(mpId, record, end);
+      verifyActive(mpId, end);
 
       if ((startDateTime.isSome() || endDateTime.isSome()) && endDateTime.getOr(end).before(startDateTime.getOr(start)))
         throw new SchedulerException("The end date is before the start date");
@@ -857,7 +859,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
   }
 
-  private void verifyActive(String eventId, ARecord record, Date end) throws SchedulerException {
+  private void verifyActive(String eventId, Date end) throws SchedulerException {
     if (end == null) {
       throw new IllegalArgumentException("Start and/or end date for event ID " + eventId + " is not set");
     }
@@ -1098,6 +1100,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     Util.adjustRrule(rrule, start, tz);
     final List<Period> periods =  Util.calculatePeriods(start, end, duration, rrule, tz);
+
+    if (periods.isEmpty()) {
+      return Collections.emptyList();
+    }
+
     return findConflictingEvents(periods, captureAgentId, tz);
   }
 
@@ -1124,7 +1131,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     // the external API, for example; the admin ui should prevent this from happening). Then check for conflicts with
     // existing events.
     if (checkPeriodOverlap(periods)) {
-      throw new SchedulerException("RRULE periods overlap");
+      throw new IllegalArgumentException("RRULE periods overlap");
     }
 
     try {
@@ -1587,7 +1594,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   public void repopulate(final String indexName) {
     notEmpty(indexName, "indexName");
 
-    final String destinationId = SchedulerItem.SCHEDULER_QUEUE_PREFIX + WordUtils.capitalize(indexName);
     final Organization organization = new DefaultOrganization();
     final User user = SecurityUtil.createSystemUser(systemUserName, organization);
     SecurityUtil.runAs(securityService, organization, user, () -> {

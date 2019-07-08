@@ -311,7 +311,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     Map<Job, JobInformation> encodingJobs = new HashMap<Job, JobInformation>();
     for (int i = 0; i < profilesSections.length; i++) {
       // Each section is one multiconcatTrim job - set up the jobs
-      processSection(encodingJobs, mediaPackage, operation, (srcFlavors.length > 1) ? srcFlavors[i] : srcFlavors[0],
+      processSection(encodingJobs, mediaPackage, (srcFlavors.length > 1) ? srcFlavors[i] : srcFlavors[0],
               (targetFlavors != null) ? ((targetFlavors.length > 1) ? targetFlavors[i] : targetFlavors[0]) : null,
               (targetTags != null) ? ((targetTags.length > 1) ? targetTags[i] : targetTags[0]) : null,
               (profilesSections.length > 0) ? profilesSections[i] : profilesSections[0], smilFlavorOption,
@@ -341,7 +341,6 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    *
    * @param encodingJobs
    * @param mediaPackage
-   * @param operation
    * @param srcFlavors
    *          - used to select which param group/tracks to process
    * @param targetFlavors
@@ -365,7 +364,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    * @throws IOException
    */
   private void processSection(Map<Job, JobInformation> encodingJobs, MediaPackage mediaPackage,
-          WorkflowOperationInstance operation, String srcFlavors, String targetFlavors, String targetTags,
+          String srcFlavors, String targetFlavors, String targetTags,
           String encodingProfiles, String smilFlavor, boolean tagWithProfile) throws WorkflowOperationException,
           EncoderException, MediaPackageException, IllegalArgumentException, NotFoundException, IOException {
     // Select the source flavors

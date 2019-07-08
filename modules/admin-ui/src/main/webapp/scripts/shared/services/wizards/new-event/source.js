@@ -83,7 +83,7 @@ angular.module('adminNg.services')
       this.loadCaptureAgents = function () {
         CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
           self.captureAgents = data.rows;
-        });
+        }).catch(angular.noop);
       };
       this.loadCaptureAgents();
 
@@ -548,7 +548,7 @@ angular.module('adminNg.services')
 
           self.reset(defaults);
           self.defaultsSet = true;
-        });
+        }).catch(angular.noop);
       };
 
       this.onTemporalValueChange = function(type) {

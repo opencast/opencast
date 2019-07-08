@@ -55,7 +55,7 @@ public final class TranscriptionJobControlDto {
   @XmlAttribute
   private long id;
 
-  @Column(name = "media_package_id", nullable = false, length = 128)
+  @Column(name = "mediapackage_id", nullable = false, length = 128)
   private String mediaPackageId;
 
   @Column(name = "track_id", nullable = false, length = 128)

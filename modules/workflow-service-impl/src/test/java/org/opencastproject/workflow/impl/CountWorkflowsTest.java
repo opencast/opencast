@@ -79,6 +79,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -182,28 +183,12 @@ public class CountWorkflowsTest {
 
     {
       final AssetManager assetManager = createNiceMock(AssetManager.class);
-      final AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
-      final Target t = EasyMock.createNiceMock(Target.class);
-      final Predicate p = EasyMock.createNiceMock(Predicate.class);
-      EasyMock.expect(p.and(EasyMock.anyObject(Predicate.class))).andReturn(p).anyTimes();
-      EasyMock.expect(query.snapshot()).andReturn(t).anyTimes();
-      EasyMock.expect(query.propertiesOf(EasyMock.anyString())).andReturn(t).anyTimes();
-      final VersionField v = EasyMock.createNiceMock(VersionField.class);
-      EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
-      EasyMock.expect(query.version()).andReturn(v).anyTimes();
+      EasyMock.expect(assetManager.selectProperties(EasyMock.anyString(), EasyMock.anyString()))
+              .andReturn(Collections.emptyList())
+              .anyTimes();
       EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
-      EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(p).anyTimes();
-      final ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
-      EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
-      final AResult r = EasyMock.createNiceMock(AResult.class);
-      EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
-      final Stream<ARecord> recStream = Stream.mk();
-      EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
-      EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class))).
-              andReturn(selectQuery).anyTimes();
-      EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
-      EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
-      EasyMock.replay(query, t, r, selectQuery, assetManager, p, v);
+      EasyMock.expect(assetManager.snapshotExists(EasyMock.anyString())).andReturn(true).anyTimes();
+      EasyMock.replay(assetManager);
       service.setAssetManager(assetManager);
     }
 
@@ -252,10 +237,8 @@ public class CountWorkflowsTest {
     is = CountWorkflowsTest.class.getResourceAsStream("/workflow-definition-holdstate.xml");
     def = WorkflowParser.parseWorkflowDefinition(is);
     IOUtils.closeQuietly(is);
-    service.registerWorkflowDefinition(def);
 
     serviceRegistry.registerService(service);
-
   }
 
   @After

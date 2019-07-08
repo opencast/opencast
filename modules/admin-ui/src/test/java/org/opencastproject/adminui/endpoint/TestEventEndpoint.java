@@ -21,6 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.anyString;
 import static org.easymock.EasyMock.expect;
 import static org.opencastproject.capture.CaptureParameters.INGEST_WORKFLOW_DEFINITION;
@@ -96,6 +97,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.series.impl.SeriesServiceImpl;
@@ -451,10 +453,15 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
             .anyTimes();
     EasyMock.replay(incidentService);
 
+    UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
+    EasyMock.expect(userDirectoryService.loadUser(EasyMock.anyString())).andReturn(userWithPermissions).anyTimes();
+    EasyMock.replay(userDirectoryService);
+
     JobEndpoint endpoint = new JobEndpoint();
     endpoint.setServiceRegistry(serviceRegistry);
     endpoint.setWorkflowService(workflowService);
     endpoint.setIncidentService(incidentService);
+    endpoint.setUserDirectoryService(userDirectoryService);
     endpoint.activate(null);
     env.setJobService(endpoint);
 
@@ -572,6 +579,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(event.getTitle()).andReturn(title).anyTimes();
     EasyMock.expect(event.getSeriesId()).andReturn("seriesId").anyTimes();
     EasyMock.expect(event.getEventStatus()).andReturn("EVENTS.EVENTS.STATUS.ARCHIVE").anyTimes();
+    EasyMock.expect(event.getDisplayableStatus(anyObject())).andReturn("EVENTS.EVENTS.STATUS.ARCHIVE").anyTimes();
     EasyMock.expect(event.getRecordingStartDate()).andReturn("2013-03-20T04:00:00Z").anyTimes();
     EasyMock.expect(event.getRecordingEndDate()).andReturn("2013-03-20T05:00:00Z").anyTimes();
     EasyMock.expect(event.getTechnicalStartTime()).andReturn("2013-03-20T04:00:00Z").anyTimes();

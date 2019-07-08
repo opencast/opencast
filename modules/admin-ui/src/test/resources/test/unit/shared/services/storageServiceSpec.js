@@ -31,7 +31,7 @@ describe('Storage', function () {
 
         it('returns an empty hash if the namespace is empty', function () {
             Storage.put('typeA', 'namespace1', 'attributeOne', 'valueOne');
-            expect(Storage.get('typeA', 'namespace2')).toEqual({});
+            expect(Storage.get('typeA', 'namespaceEMPTY')).toEqual({});
         });
     });
 

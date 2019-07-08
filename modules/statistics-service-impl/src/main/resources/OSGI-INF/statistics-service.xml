@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.statistics.impl.StatisticsServiceImpl"
+               immediate="true" activate="activate" deactivate="deactivate">
+  <implementation
+      class="org.opencastproject.statistics.impl.StatisticsServiceImpl"/>
+  <property name="service.description" value="Statistics Service"/>
+  <service>
+    <provide interface="org.opencastproject.statistics.api.StatisticsService"/>
+    <provide interface="org.opencastproject.statistics.api.StatisticsCoordinator"/>
+  </service>
+</scr:component>

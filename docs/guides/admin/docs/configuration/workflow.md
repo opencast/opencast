@@ -55,6 +55,12 @@ Start by naming the workflow and giving it a meaningful description:
 
       <!-- Description -->
       <id>example</id>
+      <!-- Optionally specify an organization -->
+      <organization>mh_default_org</organization>
+      <!-- optionally specify roles for this workflow -->
+      <roles>
+        <role>ROLE_ADMIN</role>
+      </roles>
       <title>Encode Mp4, Distribute and Publish</title>
       <tags>
         <!-- Tell the UI where to show this workflow -->
@@ -77,7 +83,15 @@ Start by naming the workflow and giving it a meaningful description:
     </definition>
 
 * The `id` is used in several Opencast endpoints to identify and select this workflow. Make sure that this identifier
-  is unique among all endpoints in the system.
+  is unique among all endpoints in the system (except in multitenant workflows, see `organization` below).
+* The `organization` specifies the organization this workflow is valid for (thus, it only makes sense in multitenant
+  installations). If there are two workflows with the same id, the one corresponding to the user’s organization is
+  always chosen. This pertains workflow dropdowns (for example, the “Add new event” dropdown) as well as workflows
+  included in other workflows via the `include` workflow operation handler.
+* The `roles` define which user roles are allowed to see and start this workflow (a user needs one of the roles provided
+  in the definition). If this is omitted or no roles are specified, everyone can see and start the workflow (provided
+  the `organization` constraints are satisfied). Also, users with `ROLE_ADMIN` can see and start every workflow. Note
+  that the workflows included in Opencast do not set roles.
 * The `tags` define where the user interfaces may use these workflows. Useful tags are:
     * *upload*: Usable for uploaded media
     * *schedule*: Usable for scheduled events
@@ -286,19 +300,41 @@ operation should be executed. This so-called execution condition is a boolean ex
     <term> ::= <value> ["AND" <term>]
     <value> ::= ["NOT"]* ( "(" <expression> ")" | <relation> | <bool-literal> )
     <relation> ::= <relation-factor> <rel-literal> <relation-factor>
-    <relation-factor> ::= <operation> | <number>
-    <operation> ::= <number> <op-literal> <number>
+    <relation-factor> ::= <operation> | <atom>
+    <operation> ::= <atom> <op-literal> <atom>
     <rel-literal> ::= ">=" | ">" | "<=" | "<" | "==" | "!="
     <op-literal> ::= "+" | "-" | "*" | "/"
     <bool-literal> ::= "true" | "false"
+    <atom> ::= <number> | <string>
 
-As the formal description above explains, such boolean expressions may contain the booelan constants (`true` and
-`false`) and numbers, as well as references to the variables of the workflow instance that contain these data types.
-Workflow instance variables can be accessed by using `${variableName}`.
+As the formal description above explains, such boolean expressions may contain…
 
-Example:
+- …the boolean constants `true` and `false`.
+- …numbers, which may contain a decimal point.
+- …strings, which must be surrounded by single-quotes. Escaping of single quotes is supported, just use two single
+  quotes next to each other: `'foo''bar'`
+- …as well as references to the variables of the workflow instance that contain these data types. Variables
+  are enclosed in in `${}`, as shown below. A default value may be specified for a variable, after the name, 
+  separated by a colon, as such: `${foo:1}`. The default value will be used in case the variable doesn’t exist. 
+  If no default value is specified, `false` will be used. This, of course, only makes sense in boolean contexts. Be
+  aware to specify a default value in relations such as `${foo} < ${bar}`.
+
+Example for simple boolean expressions:
 
     <operation id="..." if="${variableName1} AND NOT (${variableName2} OR ${variableName3})">
+      …
+    </operation>
+
+Example for string comparisons:
+
+    <operation id="..." if="${captureAgentVendor} == 'ACME Corporation'">
+      …
+    </operation>
+
+Note that operations containing strings and numbers are somewhat well-behaved, for example, the following operation
+gets executed because `3` is converted to a string and then added to the string `'4'`:
+
+    <operation id="..." if="3+'4' == '34'">
       …
     </operation>
 

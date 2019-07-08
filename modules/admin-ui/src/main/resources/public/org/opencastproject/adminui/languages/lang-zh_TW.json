@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "主題無法刪除",
       "TASK_CREATED": "任務已創建",
       "TASK_NOT_CREATED": "任務無法創建",
-      "VIDEO_CUT_NOT_SAVED": "視訊剪輯無法儲存",
-      "VIDEO_CUT_SAVED": "視訊剪輯已儲存",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
       "VIDEO_CUT_PROCESSING": "正在處理的視頻...",
       "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
       "VIDEO_SOURCE_TRACKS_INVALID": "You have selected no video tracks to process",
@@ -307,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "設定"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistics"
       }
    },
    "EVENTS": {
@@ -505,6 +508,14 @@
             "PROCESSING_FAILURE": "處理程序失敗",
             "PROCESSING_CANCELED": "處理程序已取消"
          },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
+         },
          "DETAILS": {
             "HEADER": "事件的細節 - {{resourceId}}",
             "TABS": {
@@ -515,7 +526,8 @@
                "SCHEDULING": "排程",
                "WORKFLOWS": "工作流程",
                "ACCESS": "存取權限",
-               "COMMENTS": "意見"
+               "COMMENTS": "意見",
+               "STATISTICS": "Statistics"
             },
             "PUBLICATIONS": {
                "CAPTION": "出版",
@@ -757,6 +769,9 @@
                   "PROCESSING_FAILURE": "處理程序失敗"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Statistics"
+            },
             "METADATA": {
                "CAPTION": "事件詳細資訊",
                "TITLE": "標題",
@@ -980,7 +995,8 @@
                "EXTENDED_METADATA": "後設資料II",
                "EVENTS": "事件",
                "PERMISSIONS": "存取權限",
-               "THEME": "主題"
+               "THEME": "主題",
+               "STATISTICS": "Statistics"
             },
             "ACCESS": {
                "CAPTION": "存取權限",
@@ -1433,6 +1449,7 @@
             "CREATED": "創建",
             "CREATOR": "建立者",
             "HOST_NAME": "主機名稱",
+            "NODE_NAME": "Node name",
             "OPERATION": "運作",
             "STARTED": "已啟動",
             "STATUS": "狀態",
@@ -1458,6 +1475,7 @@
             "CAPTION": "伺服器",
             "STATUS": "狀態",
             "HOST_NAME": "主機名稱",
+            "NODE_NAME": "Node name",
             "CORES": "核心",
             "COMPLETED": "工作已完成",
             "RUNNING": "工作運行中",
@@ -1475,6 +1493,7 @@
             "STATUS": "狀態",
             "NAME": "服務名稱",
             "HOST_NAME": "主機名稱",
+            "NODE_NAME": "Node name",
             "COMPLETED": "工作已完成",
             "RUNNING": "工作運行中",
             "QUEUED": "工作排序中",
@@ -1520,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "分割",
-         "CUT": "切段",
-         "REPLAY_SEGMENT": "重播段",
-         "REPLAY_END_OF_SEGMENT": "區段結束",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Check transition",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "還原",
          "REDO": "重做",
-         "CLEAR_SEGMENTS": "清除片段",
-         "CLEAR_SELECTED_SEGMENT": "清除選定區段"
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "刪除區段",
-         "USE_SEGMENT": "使用此區段",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
          "START": "開始",
          "END": "End"
       },
@@ -1749,6 +1774,9 @@
          "HOSTNAME": {
             "LABEL": "主機名稱"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "狀態",
             "PAUSED": "暫停",
@@ -1790,6 +1818,9 @@
          "HOSTNAME": {
             "LABEL": "主機名稱"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "狀態",
             "MAINTENANCE": "維護",
@@ -1803,6 +1834,9 @@
          },
          "HOSTNAME": {
             "LABEL": "主機名稱"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "姓名"
@@ -1948,6 +1982,27 @@
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "To insert multiple values press Enter in between"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "FROM": "從",
+      "TO": "To",
+      "TOTAL": "Total",
+      "GRANULARITY": "Granularity",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Random Data",
+         "VIEWS_SUM": "Total Number of Views",
+         "VIEWS_AVG": "Average Number of Views"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time uinit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time uinit."
       }
    }
 }

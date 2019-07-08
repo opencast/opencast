@@ -28,7 +28,6 @@ import org.opencastproject.smil.entity.media.SmilMediaObjectImpl;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.container.SmilMediaContainerImpl;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
-import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -94,7 +93,6 @@ public class SmilBodyImpl extends SmilObjectImpl implements SmilBody {
     if (getId().equals(parentId)) {
       mediaElements.add(mediaObject);
     } else {
-      SmilMediaElement parent = null;
       for (SmilMediaObject element : mediaElements) {
         if (element.isContainer() && (element.getId().equals(parentId)
                 || ((SmilMediaContainer) element).isParentOf(parentId))) {

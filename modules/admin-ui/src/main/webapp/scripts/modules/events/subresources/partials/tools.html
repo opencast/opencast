@@ -1,10 +1,16 @@
 <section class="action-nav-bar">
   <admin-ng-nav></admin-ng-nav>
   <nav>
-    <a href="#/events/events" ng-class="{active: resource == 'events'}" translate="EVENTS.EVENTS.NAVIGATION.EVENTS" with-role="ROLE_UI_EVENTS_VIEW">
+    <a href="#!/events/events"
+       ng-class="{active: resource == 'events'}"
+       translate="EVENTS.EVENTS.NAVIGATION.EVENTS"
+       with-role="ROLE_UI_EVENTS_VIEW">
       <!-- Events -->
     </a>
-    <a href="#/events/series" ng-class="{active: resource == 'series'}" translate="EVENTS.EVENTS.NAVIGATION.SERIES" with-role="ROLE_UI_SERIES_VIEW">
+    <a href="#!/events/series"
+       ng-class="{active: resource == 'series'}"
+       translate="EVENTS.EVENTS.NAVIGATION.SERIES"
+       with-role="ROLE_UI_SERIES_VIEW">
       <!-- Series -->
     </a>
   </nav>
@@ -127,7 +133,7 @@
                            translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_VIDEO.LABEL"
                            title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_VIDEO.TOOLTIP' |translate  }}"
                            ng-click="changeThumbnail(undefined, 'single', player.adapter.getCurrentTime())"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
+                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                           <!-- Extract -->
                         </a>
                         <a class="extract-thumbnail"
@@ -135,7 +141,7 @@
                            translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_LEFT_VIDEO.LABEL"
                            title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_LEFT_VIDEO.TOOLTIP' |translate  }}"
                            ng-click="changeThumbnail(undefined, 'left', player.adapter.getCurrentTime())"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
+                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                           <!-- Extract -->
                         </a>
                         <a class="extract-thumbnail"
@@ -143,7 +149,7 @@
                            translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_RIGHT_VIDEO.LABEL"
                            title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_RIGHT_VIDEO.TOOLTIP' | translate }}"
                            ng-click="changeThumbnail(undefined, 'right', player.adapter.getCurrentTime())"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
+                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                           <!-- Extract from video -->
                         </a>
                         <form>
@@ -151,7 +157,7 @@
                              translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.UPLOAD.LABEL"
                              title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.UPLOAD.TOOLTIP' | translate }}"
                              onclick="angular.element('#thumbnail-upload').click()"
-                             ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
+                             ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                             <!-- Upload image -->
                           </a>
                           <input
@@ -167,7 +173,7 @@
                            title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.USE_DEFAULT.TOOLTIP' | translate }}"
                            ng-click="changeThumbnail(undefined, 'DEFAULT', calculateDefaultThumbnailPosition())"
                            ng-if="video.thumbnail.url && video.thumbnail.type !== 'DEFAULT'"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
+                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction || activeSubmission}">
                           <!-- Use default thumbnail -->
                         </a>
                       </div>
@@ -269,11 +275,11 @@
                   <div class="video-toolbar">
                     <div class="start-column">
                       <div class="primary-functions function-buttons">
-                        <a class="split" ng-click="split()" translate>VIDEO_TOOL.ACTIONS.SPLIT</a>
-                        <a class="cut" ng-click="cut()" translate>VIDEO_TOOL.ACTIONS.CUT</a>
-                        <a class="replay" ng-click="replay()" translate>VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT</a>
-                        <a class="replay-end-of-segment" ng-click="replayEndOfSegment()" translate>VIDEO_TOOL.ACTIONS.REPLAY_END_OF_SEGMENT</a>
-                        <a class="replay-with-preroll" ng-click="replayPreRoll()" translate>VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_WITH_PREROLL</a>
+                        <a class="split" ng-click="split()" translate title="{{'VIDEO_TOOL.ACTIONS.SPLIT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.SPLIT</a>
+                        <a class="cut" ng-click="cut()" translate title="{{'VIDEO_TOOL.ACTIONS.CUT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.CUT</a>
+                        <a class="replay" ng-click="replay()" translate title="{{'VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT</a>
+                        <a class="replay-end-of-segment" ng-click="replayEndOfSegment()" translate title="{{'VIDEO_TOOL.ACTIONS.REPLAY_END_OF_SEGMENT_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.REPLAY_END_OF_SEGMENT</a>
+                        <a class="replay-with-preroll" ng-click="replayPreRoll()" translate title="{{'VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_WITH_PREROLL</a>
                         <!--
                           <a class="switch-feed" translate>VIDEO_TOOL.ACTIONS.SWITCH_FEED</a>
                         -->
@@ -281,8 +287,7 @@
                     </div>
                     <div class="end-column">
                       <div class="destructive-functions function-buttons">
-                        <a class="clear-segments" ng-click="clearSelectedSegment()" translate>VIDEO_TOOL.ACTIONS.CLEAR_SELECTED_SEGMENT</a>
-                        <a class="clear-segments" ng-click="clearSegments()" translate>VIDEO_TOOL.ACTIONS.CLEAR_SEGMENTS</a>
+                        <a class="clear-segments" ng-click="clearSegments()" translate title="{{'VIDEO_TOOL.ACTIONS.CLEAR_SEGMENTS_TOOLTIP' | translate}}">VIDEO_TOOL.ACTIONS.CLEAR_SEGMENTS</a>
                       </div>
                     </div>
                   </div>
@@ -387,13 +392,13 @@
             <div class="video-save-panel" ng-if="tab === 'editor' && player.adapter">
               <div class="buttons">
                 <select chosen pre-select-from="video.workflows" class="workflow"
-                                                                 ng-disabled="!video.workflows || video.workflows.length === 0"
+                                                                 ng-disabled="!video.workflows || video.workflows.length === 0 || activeTransaction || activeSubmission"
                                                                  data-width="'175px'"
                                                                  ng-model="video.workflow"
                                                                  ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" />
 
                   <a ng-click="submit()"
-                     ng-class="{disabled: activeTransaction || sanityCheckFlags() || activeRequest}"
+                     ng-class="{disabled: activeTransaction || activeSubmission || sanityCheckFlags()}"
                      class="save-and-close-button"
                      translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
                     <!-- Save and Continue -->

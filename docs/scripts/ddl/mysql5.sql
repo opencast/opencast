@@ -98,6 +98,7 @@ CREATE TABLE oc_capture_agent_state (
 CREATE TABLE oc_host_registration (
   id BIGINT NOT NULL,
   host VARCHAR(255) NOT NULL,
+  node_name VARCHAR(255),
   address VARCHAR(39) NOT NULL,
   memory BIGINT NOT NULL,
   cores INTEGER NOT NULL,
@@ -262,6 +263,7 @@ CREATE TABLE oc_search (
   mediapackage_xml MEDIUMTEXT,
   modification_date DATETIME,
   PRIMARY KEY (id),
+  KEY `IX_oc_search_series` (`series_id`),
   CONSTRAINT FK_oc_search_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -366,7 +368,8 @@ CREATE TABLE oc_assets_snapshot (
   INDEX IX_oc_assets_snapshot_archival_date (archival_date),
   INDEX IX_oc_assets_snapshot_mediapackage_id (mediapackage_id),
   INDEX IX_oc_assets_snapshot_organization_id (organization_id),
-  INDEX IX_oc_assets_snapshot_owner (owner)
+  INDEX IX_oc_assets_snapshot_owner (owner),
+  INDEX IX_oc_assets_snapshot_series (series_id, version)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE oc_assets_asset (
@@ -380,7 +383,8 @@ CREATE TABLE oc_assets_asset (
   --
   CONSTRAINT FK_oc_assets_asset_snapshot_id FOREIGN KEY (snapshot_id) REFERENCES oc_assets_snapshot (id) ON DELETE CASCADE,
   INDEX IX_oc_assets_asset_checksum (checksum),
-  INDEX IX_oc_assets_asset_mediapackage_element_id (mediapackage_element_id)
+  INDEX IX_oc_assets_asset_mediapackage_element_id (mediapackage_element_id),
+  INDEX IX_oc_assets_asset_snapshot_id (snapshot_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE oc_assets_properties (
@@ -522,7 +526,8 @@ CREATE TABLE oc_event_comment (
   reason VARCHAR(255) DEFAULT NULL,
   modification_date DATETIME NOT NULL,
   resolved_status TINYINT(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  KEY IX_oc_event_comment_event (event, organization)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE oc_event_comment_reply (
@@ -582,7 +587,7 @@ CREATE TABLE oc_themes (
 
 CREATE TABLE oc_ibm_watson_transcript_job (
     id BIGINT(20) NOT NULL,
-    media_package_id VARCHAR(128) NOT NULL,
+    mediapackage_id VARCHAR(128) NOT NULL,
     track_id VARCHAR(128) NOT NULL,
     job_id  VARCHAR(128) NOT NULL,
     date_created datetime NOT NULL,
@@ -594,14 +599,14 @@ CREATE TABLE oc_ibm_watson_transcript_job (
 
 CREATE TABLE oc_aws_asset_mapping (
   id BIGINT(20) NOT NULL,
-  media_package_element VARCHAR(128) NOT NULL,
-  media_package VARCHAR(128) NOT NULL,
+  mediapackage_element VARCHAR(128) NOT NULL,
+  mediapackage VARCHAR(128) NOT NULL,
   version BIGINT(20) NOT NULL,
   organization VARCHAR(128) NOT NULL,
   deletion_date datetime DEFAULT NULL,
   object_key VARCHAR(1024) NOT NULL,
   object_version VARCHAR(1024) NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_aws_archive_mapping_0 UNIQUE (organization, media_package, media_package_element, version)
+  CONSTRAINT UNQ_aws_archive_mapping_0 UNIQUE (organization, mediapackage, mediapackage_element, version)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 

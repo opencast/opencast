@@ -102,8 +102,15 @@ class OpencastToPaellaConverter {
     return source;
   }
 
-  getStreamFromFlavour(episode, mainFlavour) {
-    var currentStream = { sources:{}, preview: '', content: mainFlavour };
+  /**
+   * Extract a stream identified by a given flavor from the media packages track list and try to find a corresponding
+   * image attachment for the selected track.
+   * @param episode   result structure from search service
+   * @param flavor    flavor used for track selection
+   * @param subFlavor subflavor used for track selection
+   */
+  getStreamFromFlavor(episode, flavor, subFlavor) {
+    var currentStream = { sources:{}, preview: '', content: flavor };
 
     var tracks = episode.mediapackage.media.track;
     var attachments = episode.mediapackage.attachments.attachment;
@@ -112,7 +119,7 @@ class OpencastToPaellaConverter {
 
     // Read the tracks!!
     tracks.forEach((currentTrack) => {
-      if (currentTrack.type == `${mainFlavour}/delivery`) {
+      if (currentTrack.type == flavor + '/' + subFlavor) {
         var videoType = this.getVideoTypeFromTrack(currentTrack);
         if (videoType){
           if ( !(currentStream.sources[videoType]) || !(currentStream.sources[videoType] instanceof Array)){
@@ -128,17 +135,17 @@ class OpencastToPaellaConverter {
     var imageSource =   {type:'image/jpeg', frames:{}, count:0, duration: duration, res:{w:320, h:180}};
     var imageSourceHD = {type:'image/jpeg', frames:{}, count:0, duration: duration, res:{w:1280, h:720}};
     attachments.forEach((currentAttachment) => {
-      if (currentAttachment.type == `${mainFlavour}/player+preview`) {
+      if (currentAttachment.type == `${flavor}/player+preview`) {
         currentStream.preview = currentAttachment.url;
       }
-      else if (currentAttachment.type == `${mainFlavour}/segment+preview+hires`) {
+      else if (currentAttachment.type == `${flavor}/segment+preview+hires`) {
         if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
           time = parseInt(RegExp.$1) * 60 * 60 + parseInt(RegExp.$2) * 60 + parseInt(RegExp.$3);
           imageSourceHD.frames['frame_' + time] = currentAttachment.url;
           imageSourceHD.count = imageSourceHD.count + 1;
         }
       }
-      else if (currentAttachment.type == `${mainFlavour}/segment+preview`) {
+      else if (currentAttachment.type == `${flavor}/segment+preview`) {
         if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
           var time = parseInt(RegExp.$1) * 60 * 60 + parseInt(RegExp.$2) * 60 + parseInt(RegExp.$3);
           imageSource.frames['frame_' + time] = currentAttachment.url;
@@ -162,28 +169,45 @@ class OpencastToPaellaConverter {
   }
 
   getContentToImport(episode) {
-    var flavours = [];
+    var flavors = [];
     var tracks = episode.mediapackage.media.track;
     if (!(tracks instanceof Array)) { tracks = [tracks]; }
 
     tracks.forEach((currentTrack) => {
-      if (flavours.indexOf(currentTrack.type) < 0) {
-        flavours.push(currentTrack.type);
+      if (flavors.indexOf(currentTrack.type) < 0) {
+        flavors.push(currentTrack.type);
       }
     });
 
-    return flavours;
+    return flavors;
+  }
+
+  /**
+   * Check if a flavor passes the configured flavors for tracks.
+   * @param flavor     the tracks flavor
+   * @param subFlavor  the tracks sub-flavor
+   * @return boolean indicating if track shall pass the filter
+   */
+  matchTrackFilter(flavor, subFlavor) {
+    var filters = paella.player.config.plugins.list['es.upv.paella.opencast.loader'].flavors || [['*']];
+    for (const filter of filters) {
+      filter.push('*');
+      if ((filter[0] == '*' || filter[0] == flavor) && (filter[1] == '*' || filter[1] == subFlavor)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   getStreams(episode) {
     // Get the streams
     var paellaStreams = [];
-    var flavours = this.getContentToImport(episode);
-    flavours.forEach((flavour) => {
-      var flavourSplit = flavour.split('/');
-      if (flavourSplit[1] == 'delivery') {
-        var s = this.getStreamFromFlavour(episode, flavourSplit[0]);
-        paellaStreams.push(s);
+    var flavors = this.getContentToImport(episode);
+    flavors.forEach((flavorStr) => {
+      var [flavor, subFlavor] = flavorStr.split('/');
+      if (this.matchTrackFilter(flavor, subFlavor)) {
+        var stream = this.getStreamFromFlavor(episode, flavor, subFlavor);
+        paellaStreams.push(stream);
       }
     });
     return paellaStreams;

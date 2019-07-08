@@ -31,8 +31,6 @@ import org.opencastproject.security.api.User;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
@@ -43,8 +41,6 @@ import javax.xml.bind.Unmarshaller;
  * Utility implementation to deal with the conversion of groups and its corresponding index data structures.
  */
 public final class GroupIndexUtils {
-
-  private static final Logger logger = LoggerFactory.getLogger(GroupIndexUtils.class);
 
   /**
    * This is a utility class and should therefore not be instantiated.

@@ -312,7 +312,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
       binary,
       "-nostats", "-nostdin", "-hide_banner",
       "-i", mediaFile.getAbsolutePath(),
-      "-lavfi", createWaveformFilter(track, width, height, color),
+      "-lavfi", createWaveformFilter(width, height, color),
       "-frames:v", "1",
       "-an", "-vn", "-sn",
       waveformFilePath
@@ -396,14 +396,18 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
    * @param color color of waveform image
    * @return ffmpeg filter parameter
    */
-  private String createWaveformFilter(Track track, int width, int height, String color) {
+  private String createWaveformFilter(int width, int height, String color) {
     StringBuilder filterBuilder = new StringBuilder("");
     if (waveformFilterPre != null) {
       filterBuilder.append(waveformFilterPre);
       filterBuilder.append(",");
     }
-    if (color != null) {
-      waveformColor =  StringUtils.split(color, "|");
+    String[] waveformOperationColors = null;
+    //If the color was set, override the defaults
+    if (StringUtils.isNotBlank(color)) {
+      waveformOperationColors = StringUtils.split(color, "|");
+    } else {
+      waveformOperationColors = waveformColor;
     }
     filterBuilder.append("showwavespic=");
     filterBuilder.append("split_channels=");
@@ -415,7 +419,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     filterBuilder.append(":scale=");
     filterBuilder.append(waveformScale);
     filterBuilder.append(":colors=");
-    filterBuilder.append(StringUtils.join(Arrays.asList(waveformColor), "|"));
+    filterBuilder.append(StringUtils.join(Arrays.asList(waveformOperationColors), "|"));
     if (waveformFilterPost != null) {
       filterBuilder.append(",");
       filterBuilder.append(waveformFilterPost);

@@ -43,7 +43,7 @@ function tryPretty(data) {
 function updatePath(path, params) {
   var newPath = path;
   for (var key in params) {
-    if (params.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(params, key)) {
       var value = params[key];
       if (value !== undefined && value !== null && value !== '') {
         // The Regex here handles syntax like /episode.{format:xml|json}.

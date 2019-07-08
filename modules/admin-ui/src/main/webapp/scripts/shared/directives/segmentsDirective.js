@@ -341,10 +341,10 @@ angular.module('adminNg.directives')
         };
 
         /**
-             * Gets the next segment to the provided segment
-             * @param {type} currentSegment the reference segment
-             * @returns {unresolved} the next segment or "undefined" if the current segment is the last.
-             */
+         * Gets the next segment to the provided segment
+         * @param {type} currentSegment the reference segment
+         * @returns {unresolved} the next segment or "undefined" if the current segment is the last.
+         */
         scope.getNextSegment = function (currentSegment) {
           var index = scope.video.segments.indexOf(currentSegment);
           if (index < (scope.video.segments.length - 1))
@@ -362,7 +362,7 @@ angular.module('adminNg.directives')
           }
 
           scope.$root.$broadcast('segmentTimesUpdated');
-        });
+        }).catch(angular.noop);
       }
     };
   }]);

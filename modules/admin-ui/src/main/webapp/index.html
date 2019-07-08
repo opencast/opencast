@@ -8,6 +8,7 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
     <!-- build:css(src/main) styles/vendor.css -->
     <!-- bower:css -->
+    <link rel="stylesheet" href="../../bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.css" />
     <link rel="stylesheet" href="../../bower_components/angular-hotkeys/build/hotkeys.css" />
     <!-- endbower -->
     <!-- endbuild -->
@@ -15,7 +16,6 @@
     <link rel="stylesheet" href="styles/main.css">
     <!-- endbuild -->
     <link type="text/css" href="lib/datepicker/themes/smoothness/jquery-ui-1.10.3.min.css" rel="stylesheet">
-    <link type="text/css" href="lib/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet">
     <link rel="shortcut icon" href="img/favicon.ico">
   </head>
   <body ng-cloak ng-controller="ApplicationCtrl" ng-click="bodyClicked()">
@@ -113,8 +113,9 @@
 
     <!-- build:js(src/main) scripts/bower.js -->
     <!-- bower:js -->
-    <script src="../../bower_components/jquery/jquery.js"></script>
+    <script src="../../bower_components/jquery/dist/jquery.js"></script>
     <script src="../../bower_components/jquery-ui/jquery-ui.js"></script>
+    <script src="../../bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.js"></script>
     <script src="../../bower_components/angular/angular.js"></script>
     <script src="../../bower_components/angular-route/angular-route.js"></script>
     <script src="../../bower_components/angular-resource/angular-resource.js"></script>
@@ -127,18 +128,17 @@
     <script src="../../bower_components/angular-hotkeys/build/hotkeys.js"></script>
     <script src="../../bower_components/angular-ui-sortable/sortable.js"></script>
     <script src="../../bower_components/ng-file-upload/angular-file-upload.js"></script>
+    <script src="../../bower_components/chart.js/dist/Chart.js"></script>
+    <script src="../../bower_components/angular-chart.js/dist/angular-chart.js"></script>
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:js(src/main/webapp) scripts/vendor.js -->
     <script type="text/javascript" src="scripts/lib/datepicker/i18n/jquery-ui-i18n.js"></script>
-    <script type="text/javascript" src="scripts/lib/timepicker/jquery-ui-timepicker-addon.js"></script>
-    <script type="text/javascript" src="scripts/lib/timepicker/i18n/jquery-ui-timepicker-addon-i18n.js"></script>
     <script type="text/javascript" src="scripts/lib/underscore-1.5.2.js"></script>
     <script type="text/javascript" src="scripts/lib/chosen.jquery.js"></script>
     <script type="text/javascript" src="scripts/lib/moment-with-locales.js"></script>
     <script src="scripts/lib/angular-chosen.js"></script>
     <script src="scripts/lib/video-js/video.js"></script>
-    <script src="scripts/lib/javascript-md5/js/md5.min.js"></script>
     <!-- endbuild -->
 
     <!-- build:js(src/main/webapp) scripts/scripts.js -->
@@ -146,7 +146,6 @@
     <script src="scripts/shared/services/services.js"></script>
     <script src="scripts/shared/services/resourceHelperService.js"></script>
     <script src="scripts/shared/services/authService.js"></script>
-    <script src="scripts/shared/services/cryptService.js"></script>
     <script src="scripts/shared/services/relativeDatesService.js"></script>
     <script src="scripts/shared/services/jsHelperService.js"></script>
     <script src="scripts/shared/services/languageService.js"></script>
@@ -223,13 +222,13 @@
     <script src="scripts/shared/resources/serversResource.js"></script>
     <script src="scripts/shared/resources/servicesResource.js"></script>
     <script src="scripts/shared/resources/serviceResource.js"></script>
+    <script src="scripts/shared/resources/statisticsResource.js"></script>
     <script src="scripts/shared/resources/jobsResource.js"></script>
     <script src="scripts/shared/resources/resourcesFilterResource.js"></script>
     <script src="scripts/shared/resources/resourcesListResource.js"></script>
     <script src="scripts/shared/resources/workflowsResource.js"></script>
     <script src="scripts/shared/resources/themesResource.js"></script>
     <script src="scripts/shared/resources/newThemeResource.js"></script>
-    <script src="scripts/shared/resources/signatureResource.js"></script>
     <script src="scripts/shared/resources/taskResource.js"></script>
     <script src="scripts/shared/services/wizards/new-event/access.js"></script>
     <script src="scripts/shared/services/wizards/new-event/metadata.js"></script>
@@ -269,6 +268,8 @@
     <script src="scripts/shared/filters/removeQueryParams.js"></script>
     <script src="scripts/shared/filters/translateOverrideFallbackFilter.js"></script>
     <script src="scripts/shared/filters/trustedResourceUrlFilter.js"></script>
+    <script src="scripts/shared/components/components.js"></script>
+    <script src="scripts/shared/components/statisticsGraphComponent.js"></script>
     <script src="scripts/shared/directives/directives.js"></script>
     <script src="scripts/shared/directives/customIcon.js"></script>
     <script src="scripts/shared/directives/datepickerDirective.js"></script>
@@ -314,8 +315,6 @@
     <script src="scripts/shared/controllers/controllers.js"></script>
     <script src="scripts/shared/controllers/navigationController.js"></script>
     <script src="scripts/shared/controllers/applicationController.js"></script>
-    <script src="scripts/shared/controllers/applicationController.js"></script>
-    <script src="scripts/shared/controllers/userPreferencesController.js"></script>
     <script src="scripts/shared/controllers/tablePreferencesController.js"></script>
     <script src="scripts/shared/controllers/hotkeyCheatSheetController.js"></script>
     <script src="scripts/modules/events/controllers/eventsController.js"></script>
@@ -325,7 +324,6 @@
     <script src="scripts/modules/events/controllers/newSeriesController.js"></script>
     <script src="scripts/modules/events/controllers/seriesController.js"></script>
     <script src="scripts/modules/events/controllers/serieController.js"></script>
-    <script src="scripts/modules/events/controllers/bulkMessageController.js"></script>
     <script src="scripts/modules/events/controllers/bulkDeleteController.js"></script>
     <script src="scripts/modules/events/controllers/retractEventController.js"></script>
     <script src="scripts/modules/events/controllers/scheduleTaskController.js"></script>
@@ -345,6 +343,7 @@
     <script src="scripts/modules/users/controllers/aclController.js"></script>
     <script src="scripts/modules/users/controllers/aclsController.js"></script>
     <script src="scripts/modules/login/controllers/loginController.js"></script>
+    <script src="scripts/modules/statistics/controllers/organizationController.js"></script>
     <script src="scripts/modules/systems/controllers/serversController.js"></script>
     <script src="scripts/modules/systems/controllers/jobsController.js"></script>
     <script src="scripts/modules/systems/controllers/servicesController.js"></script>

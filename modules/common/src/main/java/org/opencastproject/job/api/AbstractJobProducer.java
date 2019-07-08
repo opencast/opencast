@@ -175,30 +175,30 @@ public abstract class AbstractJobProducer implements JobProducer {
     float currentLoad = getServiceRegistry().getOwnLoad();
     logger.debug("{} Current load on this host: {}, job's load: {}, job's status: {}, max load: {}",
             Thread.currentThread().getId(), currentLoad, job.getJobLoad(), job.getStatus().name(),
-            maxload.getLoadFactor());
+            maxload.getMaxLoad());
     // Add the current job load to compare below
     currentLoad += job.getJobLoad();
 
     /* Note that this first clause looks at the *job's*, the other two look at the *node's* load
      * We're assuming that if this case is true, then we're also the most powerful node in the system for this service,
      * per the current job dispatching code in ServiceRegistryJpaImpl */
-    if (job.getJobLoad() > maxload.getLoadFactor() && acceptJobLoadsExeedingMaxLoad) {
+    if (job.getJobLoad() > maxload.getMaxLoad() && acceptJobLoadsExeedingMaxLoad) {
       logger.warn(
               "{} Accepting job {} of type {} with load {} even though load of {} is above this node's limit of {}.",
               Thread.currentThread().getId(), job.getId(), job.getJobType(), df.format(job.getJobLoad()),
-              df.format(currentLoad), df.format(maxload.getLoadFactor()));
+              df.format(currentLoad), df.format(maxload.getMaxLoad()));
       logger.warn("This is a configuration issue that you should resolve in a production system!");
       return true;
-    } else if (currentLoad > maxload.getLoadFactor()) {
+    } else if (currentLoad > maxload.getMaxLoad()) {
       logger.debug(
               "{} Declining job {} of type {} with load {} because load of {} would exceed this node's limit of {}.",
               Thread.currentThread().getId(), job.getId(), job.getJobType(), df.format(job.getJobLoad()),
-              df.format(currentLoad), df.format(maxload.getLoadFactor()));
+              df.format(currentLoad), df.format(maxload.getMaxLoad()));
       return false;
     } else  {
       logger.debug("{} Accepting job {} of type {} with load {} because load of {} is within this node's limit of {}.",
               Thread.currentThread().getId(), job.getId(), job.getJobType(), df.format(job.getJobLoad()),
-              df.format(currentLoad), df.format(maxload.getLoadFactor()));
+              df.format(currentLoad), df.format(maxload.getMaxLoad()));
       return true;
     }
   }

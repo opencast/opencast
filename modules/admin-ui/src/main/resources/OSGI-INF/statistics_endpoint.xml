@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.adminui.endpoint.StatisticsEndpoint"
+               immediate="true">
+
+  <implementation class="org.opencastproject.adminui.endpoint.StatisticsEndpoint"/>
+
+  <property name="service.description" value="Admin UI - Statistics Facade Endpoint"/>
+  <property name="opencast.service.type" value="org.opencastproject.adminui.endpoint.statistics"/>
+  <property name="opencast.service.path" value="/admin-ng/statistics"/>
+
+  <service>
+    <provide interface="org.opencastproject.adminui.endpoint.StatisticsEndpoint"/>
+  </service>
+  <reference name="security-service"
+             interface="org.opencastproject.security.api.SecurityService"
+             bind="setSecurityService"/>
+  <reference name="IndexService"
+             interface="org.opencastproject.index.service.api.IndexService"
+             bind="setIndexService"/>
+  <reference name="SearchIndex"
+             interface="org.opencastproject.adminui.index.AdminUISearchIndex"
+             bind="setSearchIndex"/>
+  <reference name="StatisticsService"
+             interface="org.opencastproject.statistics.api.StatisticsService"
+             bind="setStatisticsService"/>
+  <reference name="StatisticsExportCSV"
+             interface="org.opencastproject.statistics.export.api.StatisticsExportService"
+             bind="setStatisticsExportService"/>
+</scr:component>

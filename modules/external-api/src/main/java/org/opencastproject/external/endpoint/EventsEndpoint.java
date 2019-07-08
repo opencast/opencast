@@ -166,7 +166,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {}, abstractText = "Provides resources and operations related to the events")
 public class EventsEndpoint implements ManagedService {
   private static final String METADATA_JSON_KEY = "metadata";
@@ -521,7 +521,7 @@ public class EventsEndpoint implements ManagedService {
     } catch (IllegalArgumentException | DateTimeParseException e) {
       logger.debug("Unable to create event", e);
       return RestUtil.R.badRequest(e.getMessage());
-    } catch (IndexServiceException e) {
+    } catch (SchedulerException | IndexServiceException e) {
       if (e.getCause() != null && e.getCause() instanceof NotFoundException
               || e.getCause() instanceof IllegalArgumentException) {
         logger.debug("Unable to create event", e);
@@ -546,6 +546,10 @@ public class EventsEndpoint implements ManagedService {
 
     try {
       final String eventId = indexService.createEvent(request);
+
+      if (StringUtils.isEmpty(eventId)) {
+        return RestUtil.R.badRequest("The date range provided did not include any events");
+      }
 
       if (eventId.contains(",")) {
         // This the case when SCHEDULE_MULTIPLE is performed.
@@ -1373,8 +1377,16 @@ public class EventsEndpoint implements ManagedService {
 
   @GET
   @Path("{eventId}/publications")
-  @RestQuery(name = "geteventpublications", description = "Returns an event's list of publications.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
+  @RestQuery(name = "geteventpublications", description = "Returns an event's list of publications.",
+             returnDescription = "",
+             pathParameters = {
+               @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING)
+             },
+             restParameters = {
+               @RestParameter(name = "sign", description = "Whether public distribution urls should be signed.",
+                              isRequired = false, type = Type.BOOLEAN)
+             },
+             reponses = {
                   @RestResponse(description = "The list of publications is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventPublications(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
@@ -1494,9 +1506,16 @@ public class EventsEndpoint implements ManagedService {
 
   @GET
   @Path("{eventId}/publications/{publicationId}")
-  @RestQuery(name = "geteventpublication", description = "Returns a single publication.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING),
-          @RestParameter(name = "publicationId", description = "The publication id", isRequired = true, type = STRING) }, reponses = {
+  @RestQuery(name = "geteventpublication", description = "Returns a single publication.", returnDescription = "",
+             pathParameters = {
+               @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING),
+               @RestParameter(name = "publicationId", description = "The publication id", isRequired = true, type = STRING)
+             },
+             restParameters = {
+               @RestParameter(name = "sign", description = "Whether public distribution urls should be signed.",
+                              isRequired = false, type = Type.BOOLEAN)
+             },
+             reponses = {
                   @RestResponse(description = "The track details are returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified event or publication does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventPublication(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String eventId,

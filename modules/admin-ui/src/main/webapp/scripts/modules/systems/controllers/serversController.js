@@ -34,6 +34,10 @@ angular.module('adminNg.controllers')
         label: 'SYSTEMS.SERVERS.TABLE.HOST_NAME',
         sortable: true
       }, {
+        name:  'nodeName',
+        label: 'SYSTEMS.SERVERS.TABLE.NODE_NAME',
+        sortable: true
+      }, {
         name:  'cores',
         label: 'SYSTEMS.SERVERS.TABLE.CORES',
         sortable: true

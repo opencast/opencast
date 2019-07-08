@@ -1,0 +1,8 @@
+{
+    "value_locale": "it",
+    "error_mediaPackageInformationNotLoaded": "Ci sono due possibili motivi per questo errore:",
+    "error_mediaPackageInformationNotLoaded_reason1": "Il media non è più disponibile",
+    "error_mediaPackageInformationNotLoaded_reason2": "I media sono protetti ed è necessario accedere",
+    "error_noMediaInformationAvailable": "Nessuna informazione sul file disponibile.",
+    "error_endpointNotAvailable": "Il servizio di ricerca è attualmente non disponibile."
+}

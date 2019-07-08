@@ -10,10 +10,16 @@
     <provide interface="org.opencastproject.adminui.endpoint.JobEndpoint"/>
   </service>
 
-  <reference name="workflowService" interface="org.opencastproject.workflow.api.WorkflowService"
-             cardinality="1..1" policy="static" bind="setWorkflowService"/>
-  <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-             cardinality="1..1" policy="static" bind="setServiceRegistry"/>
-  <reference name="incidentService" interface="org.opencastproject.serviceregistry.api.IncidentService"
-             cardinality="1..1" policy="static" bind="setIncidentService"/>
+  <reference name="workflowService"
+             interface="org.opencastproject.workflow.api.WorkflowService"
+             bind="setWorkflowService"/>
+  <reference name="serviceRegistry"
+             interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             bind="setServiceRegistry"/>
+  <reference name="incidentService"
+             interface="org.opencastproject.serviceregistry.api.IncidentService"
+             bind="setIncidentService"/>
+  <reference name="UserDirectory"
+             interface="org.opencastproject.security.api.UserDirectoryService"
+             bind="setUserDirectoryService"/>
 </scr:component>

@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "No se ha podido eliminar el estilo",
       "TASK_CREATED": "Se ha creado la tarea",
       "TASK_NOT_CREATED": "No se ha podido crear la tarea",
-      "VIDEO_CUT_NOT_SAVED": "No se han podido guardar los datos de edición",
-      "VIDEO_CUT_SAVED": "Se han guardado los datos de edición",
+      "VIDEO_CUT_NOT_SAVED": "No se han podido guardar los cambios",
+      "VIDEO_CUT_SAVED": "Los cambios se han guardado",
       "VIDEO_CUT_PROCESSING": "Se está procesando el vídeo…",
       "THUMBNAIL_CHANGE_FAILED": "No se pudo cambiar la miniatura.",
       "VIDEO_SOURCE_TRACKS_INVALID": "No ha seleccionado pistas de vídeo para procesar",
@@ -307,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Configuración"
+      },
+      "STATISTICS": {
+         "TITLE": "Estatísticas"
       }
    },
    "EVENTS": {
@@ -505,6 +508,14 @@
             "PROCESSING_FAILURE": "Fallo en el procesamiento",
             "PROCESSING_CANCELED": "Procesamiento cancelado"
          },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retirando",
+            "DUPLICATING": "Duplicando",
+            "PUBLISHING": "Publicando",
+            "IMPORTING": "Importando",
+            "REPUBLISHING_METADATA": "Republicando metadatos",
+            "UPDATING_PREVIEWS": "Actualizando vistas previas"
+         },
          "DETAILS": {
             "HEADER": "Detalles del evento - {{resourceId}}",
             "TABS": {
@@ -515,7 +526,8 @@
                "SCHEDULING": "Programación",
                "WORKFLOWS": "Flujos de Trabajo",
                "ACCESS": "Política de acceso",
-               "COMMENTS": "Comentarios"
+               "COMMENTS": "Comentarios",
+               "STATISTICS": "Estatísticas"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publicaciones",
@@ -757,6 +769,9 @@
                   "PROCESSING_FAILURE": "Fallo en el procesamiento"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Estadísticas"
+            },
             "METADATA": {
                "CAPTION": "Detalles del evento",
                "TITLE": "Título",
@@ -980,7 +995,8 @@
                "EXTENDED_METADATA": "Metadatos II",
                "EVENTS": "Eventos",
                "PERMISSIONS": "Política de acceso",
-               "THEME": "Estilo"
+               "THEME": "Estilo",
+               "STATISTICS": "Estadísticas"
             },
             "ACCESS": {
                "CAPTION": "Política de acceso",
@@ -1433,6 +1449,7 @@
             "CREATED": "Fecha de creación",
             "CREATOR": "Creador",
             "HOST_NAME": "Nombre del equipo",
+            "NODE_NAME": "Nombre del nodo",
             "OPERATION": "Operación",
             "STARTED": "Iniciado",
             "STATUS": "Estado",
@@ -1458,6 +1475,7 @@
             "CAPTION": "Servidores",
             "STATUS": "Estado",
             "HOST_NAME": "Nombre del equipo",
+            "NODE_NAME": "Nombre del nodo",
             "CORES": "Núcleos",
             "COMPLETED": "Trabajos completados",
             "RUNNING": "Trabajos en ejecución",
@@ -1475,6 +1493,7 @@
             "STATUS": "Estado",
             "NAME": "Nombre del servicio",
             "HOST_NAME": "Nombre del equipo",
+            "NODE_NAME": "Nombre del nodo",
             "COMPLETED": "Trabajos completados",
             "RUNNING": "Trabajos en ejecución",
             "QUEUED": "Trabajos en cola",
@@ -1520,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Dividir",
-         "CUT": "Cortar",
-         "REPLAY_SEGMENT": "Reproducir segmento",
-         "REPLAY_END_OF_SEGMENT": "Fin de segmento",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Comprobar la transición",
+         "SPLIT_TOOLTIP": "Dividir segmento en la posición actual del cursor.",
+         "CUT": "Ocultar/Mostrar",
+         "CUT_TOOLTIP": "Ocultar o mostrar la parte seleccionada del vídeo.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Reproducir el segmento actual desde el principio.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Reproducir transición",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "Deshacer",
          "REDO": "Rehacer",
-         "CLEAR_SEGMENTS": "Borrar segmentos",
-         "CLEAR_SELECTED_SEGMENT": "Borrar segmento seleccionado"
+         "CLEAR_SEGMENTS": "Borrar todos los segmentos",
+         "CLEAR_SEGMENTS_TOOLTIP": "Borrar todos los segmentos, dejando un segmento grande."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Eliminar Segmento",
-         "USE_SEGMENT": "Usar este segmento",
+         "SHOW_SEGMENT": "Mostrar este segmento",
+         "HIDE_SEGMENT": "Ocultar este segmento",
          "START": "Inicio",
          "END": "Fin"
       },
@@ -1749,6 +1774,9 @@
          "HOSTNAME": {
             "LABEL": "Nombre del equipo"
          },
+         "NODE_NAME": {
+            "LABEL": "Nombre del nodo"
+         },
          "STATUS": {
             "LABEL": "Estado",
             "PAUSED": "En pausa",
@@ -1790,6 +1818,9 @@
          "HOSTNAME": {
             "LABEL": "Nombre del equipo"
          },
+         "NODE_NAME": {
+            "LABEL": "Nombre del nodo"
+         },
          "STATUS": {
             "LABEL": "Estado",
             "MAINTENANCE": "Mantenimiento",
@@ -1803,6 +1834,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Nombre del equipo"
+         },
+         "NODE_NAME": {
+            "LABEL": "Nombre del nodo"
          },
          "NAME": {
             "LABEL": "Nombre"
@@ -1948,6 +1982,27 @@
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "Para insertar varios valores, pulse Enter"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Las estadísticas no se pueden mostrar en este momento. Por favor, inténtalo de nuevo más tarde.",
+      "UNSUPPORTED_TYPE": "Lo sentimos, Opencast no puede procesar este tipo de datos estadísticos.",
+      "FROM": "Desde",
+      "TO": "Hasta",
+      "TOTAL": "Total",
+      "GRANULARITY": "Granularidad",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organización"
+      },
+      "TITLE": {
+         "RANDOM": "Datos aleatorios",
+         "VIEWS_SUM": "Número total de vistas",
+         "VIEWS_AVG": "Promedio de visitas"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "Esto muestra datos aleatorios como muestra. Puede desactivar este gráfico eliminando la definición json del proveedor de estadísticas correspondiente de etc/providers",
+         "VIEWS_SUM": "Esto muestra el número total de vistas por cada unidad de tiempo.",
+         "VIEWS_AVG": "Esto muestra el número medio de vistas diarias por unidad de tiempo."
       }
    }
 }

@@ -10,7 +10,7 @@
     <operation
       id="op3"
       fail-on-error="true"
-      exception-handler-workflow="definition-1"
+      exception-handler-workflow="exception-handler"
       description="operation 3"/>
 
     <operation

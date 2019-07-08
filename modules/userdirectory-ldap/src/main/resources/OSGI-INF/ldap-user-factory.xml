@@ -8,10 +8,13 @@
   <service>
     <provide interface="org.osgi.service.cm.ManagedServiceFactory"/>
   </service>
-  <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-             cardinality="1..1" policy="static" bind="setOrgDirectory"/>
-  <reference name="groupRoleProvider" interface="org.opencastproject.userdirectory.JpaGroupRoleProvider"
-             cardinality="1..1" policy="static" bind="setGroupRoleProvider"/>
-  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
-             cardinality="1..1" policy="static" bind="setSecurityService"/>
+  <reference name="orgDirectory"
+             interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             bind="setOrgDirectory"/>
+  <reference name="groupRoleProvider"
+             interface="org.opencastproject.userdirectory.JpaGroupRoleProvider"
+             bind="setGroupRoleProvider"/>
+  <reference name="securityService"
+             interface="org.opencastproject.security.api.SecurityService"
+             bind="setSecurityService"/>
 </scr:component>

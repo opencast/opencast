@@ -20,6 +20,7 @@ describe('Users API Resource', function () {
 
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
     });
 
     describe('#query', function () {

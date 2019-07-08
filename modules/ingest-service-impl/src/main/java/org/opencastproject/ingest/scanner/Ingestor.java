@@ -33,7 +33,6 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import com.google.common.util.concurrent.RateLimiter;
 
@@ -224,7 +223,6 @@ public class Ingestor implements Runnable {
    * Create new ingestor.
    *
    * @param ingestService         media packages are passed to the ingest service
-   * @param workingFileRepository inbox files are put in the working file repository collection {@link #WFR_COLLECTION}.
    * @param secCtx                security context needed for ingesting with the IngestService or for putting files into the working file
    *                              repository
    * @param workflowDefinition    workflow to apply to ingested media packages
@@ -234,7 +232,7 @@ public class Ingestor implements Runnable {
    * @param maxThreads            maximum worker threads doing the actual ingest
    * @param maxTries              maximum tries for a ingest job
    */
-  public Ingestor(IngestService ingestService, WorkingFileRepository workingFileRepository, SecurityContext secCtx,
+  public Ingestor(IngestService ingestService, SecurityContext secCtx,
           String workflowDefinition, Map<String, String> workflowConfig, String mediaFlavor, File inbox, int maxThreads,
           SeriesService seriesService, int maxTries, int secondsBetweenTries) {
     this.ingestService = ingestService;

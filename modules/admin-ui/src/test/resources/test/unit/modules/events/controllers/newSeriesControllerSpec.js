@@ -14,6 +14,7 @@ describe('New Series Controller', function () {
         Table = _Table_;
         $httpBackend = _$httpBackend_;
 
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.expectGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=100&offset=0').respond('{"ROLE_ANONYMOUS": "ROLE_ANONYMOUS"}');
 
         $parentScope = $rootScope.$new();
@@ -27,6 +28,7 @@ describe('New Series Controller', function () {
 
     describe('#submit', function () {
         beforeEach(function () {
+            jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
             $httpBackend.whenGET('/admin-ng/resources/THEMES.NAME.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/series/new/metadata').respond('{}');
             $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');

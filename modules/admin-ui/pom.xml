@@ -69,6 +69,18 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-statistics-service-api</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-statistics-export-service</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-userdirectory</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
@@ -323,6 +335,19 @@
                 </configuration>
               </execution>
               <execution>
+                <id>bower install</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>initialize</phase>
+                <configuration>
+                  <executable>node_modules/.bin/bower</executable>
+                  <arguments>
+                    <argument>install</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
                 <id>frontend build</id>
                 <goals>
                   <goal>exec</goal>
@@ -382,6 +407,15 @@
                 <id>npm install</id>
                 <goals>
                   <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>install</arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>bower install</id>
+                <goals>
+                  <goal>bower</goal>
                 </goals>
                 <configuration>
                   <arguments>install</arguments>
@@ -487,6 +521,7 @@
               OSGI-INF/server_endpoint.xml,
               OSGI-INF/series_endpoint.xml,
               OSGI-INF/services_endpoint.xml,
+              OSGI-INF/statistics_endpoint.xml,
               OSGI-INF/tasks_endpoint.xml,
               OSGI-INF/themes_endpoint.xml,
               OSGI-INF/tools_endpoint.xml,

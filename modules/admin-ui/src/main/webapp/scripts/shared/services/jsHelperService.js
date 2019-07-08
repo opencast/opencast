@@ -180,7 +180,7 @@ angular.module('adminNg.services')
         var pathAsArray = pathToProperty.split('.'), i = 0, obj = targetObject;
 
         for (; i < pathAsArray.length; i++) {
-          if (!obj.hasOwnProperty(pathAsArray[i])) {
+          if (!Object.prototype.hasOwnProperty.call(obj, pathAsArray[i])) {
             return null;
           }
           obj = obj[pathAsArray[i]];

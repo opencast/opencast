@@ -38,6 +38,8 @@ public interface ServiceRegistry {
    *          The base URL for this server
    * @param address
    *          The IP address of this host
+   * @param nodeName
+   *          Human readable description of this node
    * @param memory
    *          The allocated memory of this host
    * @param cores
@@ -47,7 +49,7 @@ public interface ServiceRegistry {
    * @throws ServiceRegistryException
    *           if communication with the service registry fails
    */
-  void registerHost(String host, String address, long memory, int cores, float maxLoad)
+  void registerHost(String host, String address, String nodeName, long memory, int cores, float maxLoad)
           throws ServiceRegistryException;
 
   /**
@@ -599,6 +601,16 @@ public interface ServiceRegistry {
    *           if there is a problem accessing the service registry
    */
   List<HostRegistration> getHostRegistrations() throws ServiceRegistryException;
+
+  /**
+   * Finds host registration for the given hostname.
+   *
+   * @param hostname to lookup
+   * @return host registrations
+   * @throws ServiceRegistryException
+   *           if there is a problem accessing the service registry or the hostname is not found
+   */
+  HostRegistration getHostRegistration(String hostname) throws ServiceRegistryException;
 
   /**
    * Gets performance and runtime statistics for each known service registration.

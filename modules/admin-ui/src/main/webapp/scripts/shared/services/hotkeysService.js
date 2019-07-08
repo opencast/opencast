@@ -48,7 +48,7 @@ angular.module('adminNg.services')
             } else {
               reject(); // as no hotkeys have been loaded
             }
-          });
+          }).catch(angular.noop);
         });
       };
 

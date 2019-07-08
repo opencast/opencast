@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "Das Branding konnte nicht gelöscht werden",
       "TASK_CREATED": "Der Task wurde erstellt",
       "TASK_NOT_CREATED": "Der Task konnte nicht erstellt werden",
-      "VIDEO_CUT_NOT_SAVED": "Die Bearbeitungsinformationen konnten nicht gespeichert werden",
-      "VIDEO_CUT_SAVED": "Die Bearbeitungsinformationen wurden gespeichert",
+      "VIDEO_CUT_NOT_SAVED": "Die Änderungen konnte nicht gespeichert werden",
+      "VIDEO_CUT_SAVED": "Die Änderungen wurden gespeichert",
       "VIDEO_CUT_PROCESSING": "Das Video wird verarbeitet…",
       "THUMBNAIL_CHANGE_FAILED": "Das Vorschaubild konnte nicht aktualisiert werden.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Keine Videospuren selektiert",
@@ -307,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Konfiguration"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistiken"
       }
    },
    "EVENTS": {
@@ -505,6 +508,14 @@
             "PROCESSING_FAILURE": "Verarbeitungs-Fehler",
             "PROCESSING_CANCELED": "Verarbeitung abgebrochen"
          },
+         "STATE_MAPPING": {
+            "RETRACTING": "Wird zurückgezogen",
+            "DUPLICATING": "Wird dupliziert",
+            "PUBLISHING": "Wird veröffentlicht",
+            "IMPORTING": "Wird importiert",
+            "REPUBLISHING_METADATA": "Metadaten werden neu publiziert",
+            "UPDATING_PREVIEWS": "Vorschauen werden aktualisiert"
+         },
          "DETAILS": {
             "HEADER": "Aufzeichnungs-Details - {{resourceId}}",
             "TABS": {
@@ -515,7 +526,8 @@
                "SCHEDULING": "Planung",
                "WORKFLOWS": "Workflows",
                "ACCESS": "Zugriffsrechte",
-               "COMMENTS": "Kommentare"
+               "COMMENTS": "Kommentare",
+               "STATISTICS": "Statistik"
             },
             "PUBLICATIONS": {
                "CAPTION": "Veröffentlichungen",
@@ -757,6 +769,9 @@
                   "PROCESSING_FAILURE": "Verarbeitungs-Fehler"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Statistik"
+            },
             "METADATA": {
                "CAPTION": "Aufzeichnungs-Details",
                "TITLE": "Titel",
@@ -980,7 +995,8 @@
                "EXTENDED_METADATA": "Metadaten II",
                "EVENTS": "Ereignisse",
                "PERMISSIONS": "Zugriffsrechte",
-               "THEME": "Branding"
+               "THEME": "Branding",
+               "STATISTICS": "Statistik"
             },
             "ACCESS": {
                "CAPTION": "Zugriffsrechte",
@@ -1433,6 +1449,7 @@
             "CREATED": "Erstellt",
             "CREATOR": "Autor",
             "HOST_NAME": "Hostname",
+            "NODE_NAME": "Knotenname",
             "OPERATION": "Vorgang",
             "STARTED": "Gestartet",
             "STATUS": "Status",
@@ -1458,6 +1475,7 @@
             "CAPTION": "Server",
             "STATUS": "Status",
             "HOST_NAME": "Hostname",
+            "NODE_NAME": "Knotenname",
             "CORES": "Kerne",
             "COMPLETED": "Jobs abgeschlossen",
             "RUNNING": "Jobs in Bearbeitung",
@@ -1475,6 +1493,7 @@
             "STATUS": "Status",
             "NAME": "Dienstname",
             "HOST_NAME": "Hostname",
+            "NODE_NAME": "Knotenname",
             "COMPLETED": "Jobs abgeschlossen",
             "RUNNING": "Jobs in Bearbeitung",
             "QUEUED": "Jobs in Warteschlange",
@@ -1520,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Auftrennen",
-         "CUT": "Schneiden",
-         "REPLAY_SEGMENT": "Segment erneut abspielen",
-         "REPLAY_END_OF_SEGMENT": "Segmentende",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Übergang testen",
+         "SPLIT_TOOLTIP": "Segment an der aktuellen Cursor-Position teilen.",
+         "CUT": "Aus-/Einblenden",
+         "CUT_TOOLTIP": "Verstecke oder zeige den ausgewählten Teil des Videos.",
+         "REPLAY_SEGMENT": "Anfang des Segments abspielen",
+         "REPLAY_SEGMENT_TOOLTIP": "Spiele das aktuelle Segment von Anfang an.",
+         "REPLAY_END_OF_SEGMENT": "Ende des Segments abspielen",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Spiele ein paar Sekunden am Ende des aktuellen Segments ab.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Übergang abspielen",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Spiele das Ende des vorherigen und den Beginn des nächsten Segments ab.",
          "UNDO": "Widerrufen",
          "REDO": "Wiederholen",
-         "CLEAR_SEGMENTS": "Segmente löschen",
-         "CLEAR_SELECTED_SEGMENT": "Ausgewähltes Segment löschen"
+         "CLEAR_SEGMENTS": "Alle Segmente entfernen",
+         "CLEAR_SEGMENTS_TOOLTIP": "Alle Segmente zu einem großen Segment zusammenfassen."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Segment löschen",
-         "USE_SEGMENT": "Dieses Segment nutzen",
+         "SHOW_SEGMENT": "Segment anzeigen",
+         "HIDE_SEGMENT": "Segment verbergen",
          "START": "Start",
          "END": "Ende"
       },
@@ -1749,6 +1774,9 @@
          "HOSTNAME": {
             "LABEL": "Hostname"
          },
+         "NODE_NAME": {
+            "LABEL": "Knotenname"
+         },
          "STATUS": {
             "LABEL": "Status",
             "PAUSED": "Pausiert",
@@ -1790,6 +1818,9 @@
          "HOSTNAME": {
             "LABEL": "Hostname"
          },
+         "NODE_NAME": {
+            "LABEL": "Knotenname"
+         },
          "STATUS": {
             "LABEL": "Status",
             "MAINTENANCE": "Wartungsarbeiten",
@@ -1803,6 +1834,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Hostname"
+         },
+         "NODE_NAME": {
+            "LABEL": "Knotenname"
          },
          "NAME": {
             "LABEL": "Name"
@@ -1948,6 +1982,27 @@
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "Einen Wert mit Enter bestätigen um weitere Werte einzufügen"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Die Statistik kann aktuell nicht angezeigt werden. Bitte versuchen Sie es später nochmals.",
+      "UNSUPPORTED_TYPE": "Diese Statistik-Daten können nicht dargestellt werden.",
+      "FROM": "Von",
+      "TO": "Bis",
+      "TOTAL": "Summe",
+      "GRANULARITY": "Granularität",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Zufallsdaten",
+         "VIEWS_SUM": "Zugriffe",
+         "VIEWS_AVG": "Durchschnittliche Anzahl Zugriffe"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "Diese Zufallsdaten dienen ausschließlich Test- und Demonstrationszwecken. Um diese Darstellung zu deaktivieren, können Sie die entsprechende Konfiguration in etc/providers entfernen",
+         "VIEWS_SUM": "Diese Statistik zeigt die Summe der Zugriffe pro Zeiteinheit.",
+         "VIEWS_AVG": "Diese Statistik zeigt die durchschnittliche Anzahl Zugriffe pro Zeiteinheit."
       }
    }
 }

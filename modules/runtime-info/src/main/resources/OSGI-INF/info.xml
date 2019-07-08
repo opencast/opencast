@@ -12,6 +12,8 @@
   </service>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
              bind="setSecurityService"/>
+  <reference name="service-registry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             bind="setServiceRegistry" />
   <reference name="userid-role-provider" interface="org.opencastproject.userdirectory.UserIdRoleProvider"
              cardinality="0..1" policy="dynamic" bind="setUserIdRoleProvider"/>
 </scr:component>

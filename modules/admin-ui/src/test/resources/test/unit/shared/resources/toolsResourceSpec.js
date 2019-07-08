@@ -14,6 +14,10 @@ describe('Tools API Resource', function () {
         ToolsResource = _ToolsResource_;
     }));
 
+    beforeEach(function () {
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
+    });
+
     describe('#get', function () {
 
         it('selects the first segment', function () {

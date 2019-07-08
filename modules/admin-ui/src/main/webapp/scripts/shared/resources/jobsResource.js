@@ -37,6 +37,7 @@ angular.module('adminNg.resources')
         row.started = Language.formatDateTime('short', r.started);
         row.creator = r.creator;
         row.processingHost = r.processingHost;
+        row.processingNode = r.processingNode;
         return row;
       };
 

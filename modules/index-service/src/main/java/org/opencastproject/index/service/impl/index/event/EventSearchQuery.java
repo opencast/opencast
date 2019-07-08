@@ -62,12 +62,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private String publisher = null;
   private String license = null;
   private String rights = null;
-  private final List<String> trackMimetypes = new ArrayList<String>();
-  private final List<String> trackStreamResolutions = new ArrayList<String>();
-  private final List<String> trackFlavors = new ArrayList<String>();
-  private final List<String> metadataFlavors = new ArrayList<String>();
-  private final List<String> metadataMimetypes = new ArrayList<String>();
-  private final List<String> attachmentFlavors = new ArrayList<String>();
   private String accessPolicy = null;
   private String managedAcl = null;
   private String workflowState = null;
@@ -80,7 +74,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private Boolean hasOpenComments = null;
   private Boolean needsCutting = null;
   private final List<String> publications = new ArrayList<String>();
-  private String workflowScheduledDate = null;
   private Long archiveVersion = null;
   private String agentId = null;
   private Date technicalStartTime = null;
@@ -598,162 +591,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   }
 
   /**
-   * Selects recording events with the given track type.
-   * <p>
-   * Note that this method may be called multiple times to support selection of multiple recording events.
-   *
-   * @param trackMimetypes
-   *          the track type
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withTrackMimetype(String trackMimetypes) {
-    if (StringUtils.isBlank(trackMimetypes))
-      throw new IllegalArgumentException("Track mimetype cannot be null");
-    clearExpectations();
-    this.trackMimetypes.add(trackMimetypes);
-    return this;
-  }
-
-  /**
-   * Returns the list of track types or an empty array if no track type have been specified.
-   *
-   * @return the track types
-   */
-  public String[] getTrackMimetypes() {
-    return trackMimetypes.toArray(new String[trackMimetypes.size()]);
-  }
-
-  /**
-   * Selects recording events with the given track stream resolution.
-   * <p>
-   * Note that this method may be called multiple times to support selection of multiple recording events.
-   *
-   * @param trackStreamResolution
-   *          the track stream resolution
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withTrackStreamResolution(String trackStreamResolution) {
-    if (StringUtils.isBlank(trackStreamResolution))
-      throw new IllegalArgumentException("Track stream resolution cannot be null");
-    clearExpectations();
-    this.trackStreamResolutions.add(trackStreamResolution);
-    return this;
-  }
-
-  /**
-   * Returns the list of track stream resolution or an empty array if no track type have been specified.
-   *
-   * @return the track stream resolution
-   */
-  public String[] getTrackStreamResolution() {
-    return trackStreamResolutions.toArray(new String[trackStreamResolutions.size()]);
-  }
-
-  /**
-   * Selects recording events with the given track flavor.
-   * <p>
-   * Note that this method may be called multiple times to support selection of multiple recording events.
-   *
-   * @param trackFlavor
-   *          the track flavor
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withTrackFlavor(String trackFlavor) {
-    if (StringUtils.isBlank(trackFlavor))
-      throw new IllegalArgumentException("Track flavor cannot be null");
-    clearExpectations();
-    this.trackFlavors.add(trackFlavor);
-    return this;
-  }
-
-  /**
-   * Returns the list of track flavors or an empty array if no track type have been specified.
-   *
-   * @return the track flavor
-   */
-  public String[] getTrackFlavor() {
-    return trackFlavors.toArray(new String[trackFlavors.size()]);
-  }
-
-  /**
-   * Selects recording events with the given track flavor.
-   * <p>
-   * Note that this method may be called multiple times to support selection of multiple recording events.
-   *
-   * @param metadataFlavor
-   *          the metadata flavor
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withMetadataFlavor(String metadataFlavor) {
-    if (StringUtils.isBlank(metadataFlavor))
-      throw new IllegalArgumentException("Metadata flavor cannot be null");
-    clearExpectations();
-    this.metadataFlavors.add(metadataFlavor);
-    return this;
-  }
-
-  /**
-   * Returns the list of track flavors or an empty array if no track type have been specified.
-   *
-   * @return the metadata flavor
-   */
-  public String[] getMetadataFlavor() {
-    return metadataFlavors.toArray(new String[metadataFlavors.size()]);
-  }
-
-  /**
-   * Selects recording events with the given metadata mimetype.
-   * <p>
-   * Note that this method may be called multiple times to support selection of multiple recording events.
-   *
-   * @param metadataMimetype
-   *          the metadata mimetype
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withMetadataMimetype(String metadataMimetype) {
-    if (StringUtils.isBlank(metadataMimetype))
-      throw new IllegalArgumentException("Metadata mimetype cannot be null");
-    clearExpectations();
-    this.metadataMimetypes.add(metadataMimetype);
-    return this;
-  }
-
-  /**
-   * Returns the list of metadata mimetypes or an empty array if no track type have been specified.
-   *
-   * @return the metadata mimetypes
-   */
-  public String[] getMetadataMimetype() {
-    return metadataMimetypes.toArray(new String[metadataMimetypes.size()]);
-  }
-
-  /**
-   * Selects recording events with the given attachment flavor.
-   * <p>
-   * Note that this method may be called multiple times to support selection of multiple recording events.
-   *
-   * @param attachmentFlavor
-   *          the attachment flavor
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withAttachmentFlavor(String attachmentFlavor) {
-    if (StringUtils.isBlank(attachmentFlavor))
-      throw new IllegalArgumentException("Attachment flavor cannot be null");
-    clearExpectations();
-    this.attachmentFlavors.add(attachmentFlavor);
-    return this;
-  }
-
-  /**
-   * Returns the list of attachment flavors or an empty array if no track type have been specified.
-   *
-   * @return the attachement flavors
-   */
-  public String[] getAttachmentFlavor() {
-    return attachmentFlavors.toArray(new String[attachmentFlavors.size()]);
-  }
-
-  /**
    * Selects recordings with the given access policy.
    *
    * @param accessPolicy
@@ -1019,28 +856,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public String[] getPublications() {
     return publications.toArray(new String[publications.size()]);
-  }
-
-  /**
-   * Selects events with the given workflow scheduled date.
-   *
-   * @param workflowScheduledDate
-   *          the workflow scheduled date
-   * @return the enhanced search query
-   */
-  public EventSearchQuery withWorkflowScheduledDate(String workflowScheduledDate) {
-    clearExpectations();
-    this.workflowScheduledDate = workflowScheduledDate;
-    return this;
-  }
-
-  /**
-   * Returns the workflow scheduled date of the event.
-   *
-   * @return the workflow scheduled date
-   */
-  public String getWorkflowScheduledDate() {
-    return workflowScheduledDate;
   }
 
   /**

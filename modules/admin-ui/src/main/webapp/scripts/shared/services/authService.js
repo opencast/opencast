@@ -56,7 +56,7 @@ angular.module('adminNg.services')
         angular.forEach(callbacks, function (item) {
           isAuthorizedAs(item.role) ? item.success() : item.error();
         });
-      });
+      }).catch(angular.noop);
     };
 
     this.getUser = function () {

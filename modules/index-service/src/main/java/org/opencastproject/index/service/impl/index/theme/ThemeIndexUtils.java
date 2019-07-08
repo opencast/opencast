@@ -31,8 +31,6 @@ import org.opencastproject.security.api.User;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
@@ -41,8 +39,6 @@ import java.util.Map;
  * Utility implementation to deal with the conversion of theme and its corresponding index data structures.
  */
 public final class ThemeIndexUtils {
-
-  private static final Logger logger = LoggerFactory.getLogger(ThemeIndexUtils.class);
 
   /**
    * This is a utility class and should therefore not be instantiated.

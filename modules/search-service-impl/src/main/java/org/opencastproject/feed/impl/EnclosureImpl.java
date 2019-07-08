@@ -35,7 +35,7 @@ public class EnclosureImpl implements Enclosure {
   /** Enclosure type */
   private String type = null;
 
-  /** Enclosure flavour */
+  /** Enclosure flavor */
   private String flavor = null;
 
   /** Enclosure length */
@@ -48,15 +48,15 @@ public class EnclosureImpl implements Enclosure {
    *          the enclosure's url
    * @param type
    *          the type
-   * @param flavour
-   *          the mediapackage element flavour
+   * @param flavor
+   *          the mediapackage element flavor
    * @param length
    *          the lenght
    */
-  public EnclosureImpl(String url, String type, String flavour, long length) {
+  public EnclosureImpl(String url, String type, String flavor, long length) {
     this.url = url;
     this.type = type;
-    this.flavor = flavour;
+    this.flavor = flavor;
     this.length = length;
   }
 

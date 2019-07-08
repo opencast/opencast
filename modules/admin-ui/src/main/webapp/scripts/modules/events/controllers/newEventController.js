@@ -89,13 +89,13 @@ angular.module('adminNg.controllers')
         var o;
         if (state.stateController.isMetadataState) {
           for (o in state.stateController.ud) {
-            if (state.stateController.ud.hasOwnProperty(o)) {
+            if (Object.prototype.hasOwnProperty.call(state.stateController.ud, o)) {
               userdata.metadata.push(state.stateController.ud[o]);
             }
           }
         } else if (state.stateController.isMetadataExtendedState) {
           for (o in state.stateController.ud) {
-            if (state.stateController.ud.hasOwnProperty(o)) {
+            if (Object.prototype.hasOwnProperty.call(state.stateController.ud, o)) {
               userdata.metadata.push(state.stateController.ud[o]);
             }
           }
@@ -145,15 +145,14 @@ angular.module('adminNg.controllers')
 
         Notifications.add('success', 'EVENTS_CREATED');
         Notifications.remove(messageId);
-        resetStates();
         window.onbeforeunload = null;
       }, function () {
         Notifications.add('error', 'EVENTS_NOT_CREATED');
         Notifications.remove(messageId);
-        resetStates();
         window.onbeforeunload = null;
       });
 
+      resetStates();
       Modal.$scope.close();
       // add message that never disappears
       messageId = Notifications.add('success', 'EVENTS_UPLOAD_STARTED', 'global', -1);
