@@ -149,24 +149,18 @@ digraph G {
 %}
 
 As described above, `develop` is the branch used for preparing the next version. At some point marked in the release
-schedule, the release branch is cut from `develop`. This action also marks the feature freeze for such Opencast version,
-i.e. the moment when no new features will be included in that specific version. This is because all the new features
-must be merged only into the `develop` branch; therefore, the release branches (such as `r/7.x` in our example) can
-only contain features that were merged before the branch was forked off. Any features merged after the creation of the
-release branch can only make it into the next release, but not into this one.
+schedule, the release branch is cut from `develop`. This action also marks the feature freeze for that version since
+features may be merged only into the `develop` branch.
 
 After the release branch is cut, the development on the `develop` branch may continue as before. Features can (and
 should) be merged without waiting for the next version to be released. Thus, the creation of a release branch also marks
 the beginning of the development for the next version.
 
-In contrast to that, only bug fixes may be merged into the release branch. At this point, the code contained in this
-branch should be tested, so that bugs can be identified and fixed.
+In contrast to that, only bug fixes may be merged into the release branch. This branch should be tested with care, so
+that bugs can be identified and fixed before the release.
 
 During the whole process the release manager will regularly merge back the release branch into `develop` or, if
-existent, the next active release branch so that bug fixes from the release branch will automatically become part of the
-next Opencast versions and finally `develop`, without having to create additional pull requests. For example, a pull
-request may be merged into `r/3.x`, `r/3.x` will then be merged into `develop` or, if it already exists, `r/4.x` and
-from there into `develop`. That way patches bubble through all newer versions and finally end up in `develop`.
+existent, the next active release branch.
 
 The releases themselves are not part of the release branch. Instead, the release manager branches off, makes the
 necessary changes to the pom files (and possibly the UI) and creates a separately tagged commit.
@@ -177,6 +171,81 @@ if there are enough commits to be put into a maintenance release.
 Even after an Opencast version has been released, more bugs may be found and fixes for them merged into the release
 branch. When the release manager considers that the number or importance of such bug fixes is sufficient, he may decide
 to create a new maintenance release. The version `6.1` above is an example of that.
+
+With Opencast supporting two major releases, you may find not one, but up to three active release branches.
+
+{% dot branching-two-versions.svg
+
+/**
+    develop ---*-----*-----*------*-----*- ... -----------*------*------*---->
+                \         /      /       \               /             /
+                 \       /      /   r/7.x *---*---*-----*----- ... ---*--->
+                  \     /      /             /         /
+            r/6.x  *---*------*------*------*------*--*----- ... ---*-->
+                              \              \         \             \
+                           6.0 *          6.1 *     6.2 *         6.3 *
+**/
+
+digraph G {
+  rankdir="LR";
+  bgcolor="transparent";
+  node[width=0.1, height=0.1, shape=point,fontsize=8.0,color=black,fontcolor=black];
+  edge[weight=2, arrowhead=none,color=black];
+  node[group=develop];
+  dbegin -> d1 -> d2 -> d3 -> d4 -> d5 -> d6 -> d7 -> d8 -> d9 -> d10 -> d11;
+  node[group=releasebranch];
+  edge[color=transparent];
+  rbegin -> r1;
+  edge[color=black];
+  r1 -> r2 -> r3 -> r4 -> r5 -> r6;
+  d1 -> r1;
+
+  node[group=releasebranch2];
+  edge[color=transparent];
+  r2begin -> r21;
+  edge[color=black];
+  r21 -> r22 -> r23 -> r24 -> r25;
+  d5 -> r21;
+
+
+  // releases
+  node[group=released]
+  edge[color=gray];
+  release1[shape=point, xlabel="7.0", color=gray]
+  r3 -> release1;
+  release2[shape=point, xlabel="7.1", color=gray]
+  r5 -> release2;
+  release3[shape=point, xlabel="8.0", color=gray]
+  r24 -> release3;
+
+  // end arrows
+  edge[arrowhead=normal, color=black];
+  dend,rend,r2end[shape=none, label=""];
+  d11 -> dend;
+  r6 -> rend;
+  r25 -> r2end;
+
+  // branch names
+  dbegin[shape=plaintext,label=develop];
+  rbegin[shape=plain,label="r/7.x"];
+  r2begin[shape=plain,label="r/8.x"];
+
+  // merge backs
+  edge[style=dashed, arrowhead=none, color=black];
+  r2 -> d4;
+  r5 -> r22;
+  r23 -> d9;
+  r25 -> d11;
+}
+%}
+
+Mostly, this is just the same as the simpler model from before. The branches exist separately from each other and only
+interact through merges from older to newer versions so that bug fixes from a release branch will automatically become
+part of the next Opencast versions (and `develop`), without having to create additional pull requests.
+
+For example, a pull request may be merged into `r/7.x`, `r/7.x` will then be merged into `develop` or, if it already
+exists, `r/8.x` and from there into `develop`. That way patches bubble through all newer versions and finally end up in
+`develop`.
 
 
 Release Process
