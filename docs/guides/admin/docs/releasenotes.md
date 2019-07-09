@@ -75,6 +75,13 @@ Due to [MH-13446](https://opencast.jira.com/browse/MH-13446):
 - Removed PUT /acl-manager/episode/{transitionId}
 - Removed PUT /acl-manager/series/{transitionId}
 
+Additional Notes About 7.1
+--------------------------
+
+Opencast 7.1 is the first maintenance release for Opencast 7. It fixes a bug with the scheduler migration which may have
+caused minor issues for old, process events which were missing some meta-data. If you have already migrated to Opencast
+7.0 and experience this problem, simply re-start the scheduler migration and re-build the index once more.
+
 Release Schedule
 ----------------
 
