@@ -247,7 +247,7 @@
             "CAPTION": "Düzenle",
             "EVENT": "etkinlik",
             "EVENTS": "etkinlikler",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "HEADER": "Bu sayfa, hafta içi gruplara göre düzenlenmiş etkinlikleri düzenlemenizi sağlar. Tüm zamanlanmış olayların belirli bir alan için aynı değere sahip olması durumunda giriş alanları önceden doldurulur. Aksi takdirde, giriş alanları boş bırakılır. Giriş alanlarını boş bırakmak, ilgili değerlerin değiştirilmemesi gerektiği anlamına gelir.",
             "METADATA": "Üstveri",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -409,7 +409,7 @@
                "CAPTION": "Kıymet Yükle",
                "SELECT_TYPE": "Kıymet türü seç",
                "ADD": "Varlık Ekle",
-               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
+               "NO_OPTIONS": "Web sayfasının bu bölümüne varlık seçeneklerinin bir listesi verilmemiştir!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Sınıfta verilen ders kağatları hakkında notlar",
                   "CAPTIONS_DFXP": "Altyazı DFXP",
@@ -486,7 +486,7 @@
                "DETAILS": "Etkinlik detaylarını görüntüle",
                "DELETE": "Etkinliği sil",
                "EDITOR": "Video editörünü aç",
-               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
+               "EDITOR_NEEDS_CUTTING": "Video Editörünü aç (videonun kesilmesini isteyen bir yorum var)",
                "COMMENTS": "Yorumları görüntüle",
                "PAUSED_WORKFLOW": "Duraklatılmış iş akışını görüntüle",
                "PRESENTER": "Bu sunucu için filtre"
@@ -862,7 +862,7 @@
                   "FAILED_ATTEMPTS": "Hatalı Girişimler",
                   "MAX_ATTEMPTS": "Maks",
                   "EXCEPTION_HANDLER_WORKFLOW": "Özel durum işleyicisi iş akışı",
-                  "FAIL_ON_ERROR": "Fail on Error"
+                  "FAIL_ON_ERROR": "Hata ile başarısız oldu"
                }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
@@ -1001,7 +1001,7 @@
                   "NEW": "Yeni sözleşme",
                   "DETAILS": "Ayrıntılar",
                   "REPLACE_EVENT_ACLS": "Etkinlik izinlerini güncelle",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
+                  "REPLACE_EVENT_ACLS_HINT": "Bu dizinin tüm etkinliklerinin geçerli izinlere sahip olduğundan emin olun"
                },
                "ROLES": {
                   "LABEL": "Bir rol seç",
@@ -1540,15 +1540,15 @@
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
-                  "LABEL": "Extract from video",
+                  "LABEL": "Videodan çıkarıp al",
                   "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
                },
                "FROM_LEFT_VIDEO": {
-                  "LABEL": "Extract from left video",
+                  "LABEL": "Sol taraftaki videodan çıkarıp al",
                   "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
                },
                "FROM_RIGHT_VIDEO": {
-                  "LABEL": "Extract from right video",
+                  "LABEL": "Sağ taraftaki videodan çıkarıp al",
                   "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
                }
             },
@@ -1873,7 +1873,7 @@
          "CTRL": "Ctrl",
          "ALT": "Alt",
          "OPTION": "⌥",
-         "SPACE": "Space",
+         "SPACE": "Boşluk",
          "BACKSPACE": "⌫",
          "LEFT": "←",
          "RIGHT": "→",
@@ -1916,8 +1916,8 @@
             "PLAY_PAUSE": "Oynat/Duraklat",
             "PREVIOUS_FRAME": "Önceki kare",
             "NEXT_FRAME": "Sonraki kare",
-            "STEP_BACKWARD": "Jump 10s back",
-            "STEP_FORWARD": "Jump 10s forward",
+            "STEP_BACKWARD": "10s geriye atla",
+            "STEP_FORWARD": "10s ileri atla",
             "PREVIOUS_SEGMENT": "Önceki bölüm / Başa atla",
             "NEXT_SEGMENT": "Sonraki bölüm / Sona atla",
             "VOLUME_UP": "Sesi artır",
@@ -1929,14 +1929,14 @@
             "CUT_SELECTED_SEGMENT": "Kes",
             "PLAY_CURRENT_SEGMENT": "Geçerli bölümü oynat",
             "CLEAR_LIST": "Bölümü temizle",
-            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Bölütü 'pre-roll' ile oynat",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Böüm sonu"
          }
       }
    },
    "AGENTS": {
       "STATUS": {
-         "CAPTURING": "Capturing",
+         "CAPTURING": "Yakalanıyor",
          "ERROR": "Hata",
          "IDLE": "Boşta",
          "OFFLINE": "Çevirim dışı",
@@ -1947,7 +1947,7 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "Birden çok değer eklemek için her değer arasında Giriş/Enter tuşuna basın"
       }
    }
 }
