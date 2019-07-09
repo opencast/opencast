@@ -4,6 +4,40 @@ Changelog
 Opencast 7
 ----------
 
+### Opencast 7.1
+
+*Released on July 09, 2019*
+
+- [[MH-13656](https://opencast.jira.com/browse/MH-13656)][[#993](https://github.com/opencast/opencast/pull/993)] -
+  Fix Scheduler Index Rebuild
+- [[MH-13655](https://opencast.jira.com/browse/MH-13655)][[#991](https://github.com/opencast/opencast/pull/991)] -
+  Scheduler Message Logging
+- [[MH-13653](https://opencast.jira.com/browse/MH-13653)][[#989](https://github.com/opencast/opencast/pull/989)] -
+  Fully Migrate Scheduled Events
+- [[MH-13652](https://opencast.jira.com/browse/MH-13652)][[#988](https://github.com/opencast/opencast/pull/988)] -
+  Don't save unchanged values in dropdown menus
+- [[MH-13651](https://opencast.jira.com/browse/MH-13651)][[#987](https://github.com/opencast/opencast/pull/987)] -
+  Don't call submit of SingleSelect twice
+- [[MH-13650](https://opencast.jira.com/browse/MH-13650)][[#986](https://github.com/opencast/opencast/pull/986)] -
+  Scheduler Migration Performance
+- [[MH-13646](https://opencast.jira.com/browse/MH-13646)][[#982](https://github.com/opencast/opencast/pull/982)] -
+  Delete scheduled events
+- [[MH-13645](https://opencast.jira.com/browse/MH-13645)][[#981](https://github.com/opencast/opencast/pull/981)] -
+  Only send delete comments message if we delete something
+- [[MH-13642](https://opencast.jira.com/browse/MH-13642)][[#977](https://github.com/opencast/opencast/pull/977)] -
+  Fix Index Update Logging
+- [[MH-13639](https://opencast.jira.com/browse/MH-13639)][[#976](https://github.com/opencast/opencast/pull/976)] -
+  Admin interface does not handle missing metadata well
+- [[MH-13638](https://opencast.jira.com/browse/MH-13638)][[#975](https://github.com/opencast/opencast/pull/975)] -
+  Update NPM
+- [[MH-13619](https://opencast.jira.com/browse/MH-13619)][[#958](https://github.com/opencast/opencast/pull/958)] -
+  Fix Logging in Video Segmenter
+- [[MH-13615](https://opencast.jira.com/browse/MH-13615)][[#953](https://github.com/opencast/opencast/pull/953)] -
+  Fix Italian Translation
+- [[MH-13610](https://opencast.jira.com/browse/MH-13610)][[#947](https://github.com/opencast/opencast/pull/947)] -
+  LDAP User Directory Fixes
+
+
 ### Opencast 7.0
 
 *Released on June 13, 2019*
