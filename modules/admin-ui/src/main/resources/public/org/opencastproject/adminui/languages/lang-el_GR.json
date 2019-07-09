@@ -1997,12 +1997,14 @@
       "TITLE": {
          "RANDOM": "Τυχαία δεδομένα",
          "VIEWS_SUM": "Συνολικός αριθμός προβολών",
-         "VIEWS_AVG": "Μέσος αριθμός προβολών"
+         "VIEWS_AVG": "Μέσος αριθμός προβολών",
+         "PUBLISHEDHOURS": "Published Hours of Video"
       },
       "DESCRIPTION": {
          "RANDOM": "Αυτό εμφανίζει τυχαία δεδομένα ως επίδειξη. Μπορείτε να απενεργοποιήσετε αυτό το γράφημα διαγράφοντας τον ορισμό json του αντίστοιχου παροχέα στατιστικών στοιχείων από τον κατάλογο etc/providers",
-         "VIEWS_SUM": "Αυτό εμφανίζει τον συνολικό αριθμό προβολών ανά μονάδα χρόνου.",
-         "VIEWS_AVG": "Αυτό εμφανίζει τον μέσος αριθμός ημερήσιων προβολών ανά μονάδα χρόνου."
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the running total published hours of video"
       }
    }
 }

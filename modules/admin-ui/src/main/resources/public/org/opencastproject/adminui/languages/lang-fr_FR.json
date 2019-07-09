@@ -1997,12 +1997,14 @@
       "TITLE": {
          "RANDOM": "Données aléatoires",
          "VIEWS_SUM": "Nombre total de vues",
-         "VIEWS_AVG": "Nombre moyen de vues"
+         "VIEWS_AVG": "Nombre moyen de vues",
+         "PUBLISHEDHOURS": "Published Hours of Video"
       },
       "DESCRIPTION": {
          "RANDOM": "Ceci affiche des données aléatoires comme exemple. Vous pouvez désactiver ce graphique en supprimant le fichier json du fournisseur de statistiques correspondant dans etc/providers",
-         "VIEWS_SUM": "Ceci affiche le nombre total de vues en fonction du temps.",
-         "VIEWS_AVG": "Ceci affiche la moyenne de vues quotidiennes en fonction du temps."
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the running total published hours of video"
       }
    }
 }
