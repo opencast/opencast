@@ -26,6 +26,7 @@ import org.opencastproject.index.service.resources.list.api.ListProvidersService
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
 import com.entwinemedia.fn.data.Opt;
@@ -58,6 +59,16 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
       }
     }
     return Opt.none();
+  }
+
+  @Override
+  public MetadataCollection getCopy() {
+    MetadataCollection copiedCollection = new DublinCoreMetadataCollection();
+    for (MetadataField field : getFields()) {
+      MetadataField copiedField = new MetadataField(field);
+      copiedCollection.addField(copiedField);
+    }
+    return copiedCollection;
   }
 
   private String getCollectionDefault(MetadataField<?> metadataField,
