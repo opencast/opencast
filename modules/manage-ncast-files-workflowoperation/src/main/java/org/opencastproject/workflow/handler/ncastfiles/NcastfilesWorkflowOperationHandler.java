@@ -45,6 +45,11 @@ import com.entwinemedia.fn.data.Opt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The workflow definition for handling "series" operations
  */
@@ -136,60 +141,56 @@ public class NcastfilesWorkflowOperationHandler extends AbstractWorkflowOperatio
       logger.error("Agent not found %s",e);
     }
 
+    final List<String> stderrFilter = java.util.Arrays.asList(
+            "Page",
+            "something went wring with the Task",
+            "Try Again");
+
     try {
 
-      String command = "curl -X POST -i --digest -H \"Content-Type: applications/json\" "
-              + "-u 'admin:ncast' "
-              + agentURL + "rest/operations/remove_recording"
-              + " -d '{\"filename\":\"" + trackname + "\"}'";
-      logger.info("Commandline: \n " + command);
+      List<String> command = new ArrayList<>();
 
-      Process p = null;
-      int result = 0;
+      command.add("curl");
+      command.add("-X");
+      command.add("POST");
+      command.add("-i");
+      command.add("--digest");
+      command.add("-H");
+      command.add("Content-Type: applications/json");
+      command.add("-u");
+      command.add("admin:ncast");
+      command.add((agentURL + "rest/operations/remove_recording"));
+      command.add("-d");
+      command.add("{\"filename\":" + "\"" +  trackname + "\"}");
 
-      ProcessBuilder pb = new ProcessBuilder(command);
-      pb.redirectErrorStream(true);
+      ProcessBuilder processBuilder = new ProcessBuilder(command);
+      processBuilder.redirectErrorStream(true);
+      Process ps = processBuilder.start();
+      logger.info("Running Command", command);
 
-      p = pb.start();
-      result = p.waitFor();
 
-//      Process process = Runtime.getRuntime().exec(command);
-//      process.waitFor();
-//      logger.info("command result: " + process.exitValue());
-//      BufferedReader reader =
-//              new BufferedReader(new InputStreamReader(process.getInputStream()));
-//
-//      String output="";
-//      String line = "";
-//      while ((line = reader.readLine())!= null) {
-//        output += line + "\n";
-//      }
-//     logger.info("Output" + output);
+      try (BufferedReader in = new BufferedReader(new InputStreamReader(ps.getInputStream()))) {
+        String line;
+        while ((line = in.readLine()) != null) {
+          final String trimmedLine = line.trim();
+          if (stderrFilter.parallelStream().noneMatch(trimmedLine::startsWith)) {
+            logger.info(line);
+          } else {
+            logger.debug(line);
+          }
+        }
+      }
 
-    //send delete
-//    HttpPost post = new HttpPost(URI.create(agentURL + "rest/operations/remove_recording"));
-//    Gson gson = new Gson();
-//    String jsonString = "{'filename':'" + trackname + "'}";
-//
-//
-//
-//    StringEntity postingString = new StringEntity(jsonString);
-//    post.setEntity(postingString);
-//    post.setHeader("Content-type", "applications/json");
-//
-//    TrustedHttpClient httpClientStandAlone;
-//
-//    httpClientStandAlone = new StandAloneTrustedHttpClientImpl("admin","ncast", Option.none(),Option.none(),Option.none());
-//    logger.info("Removing File: %s ", post.getURI().getPath().toString());
-//
-//      HttpResponse response = httpClientStandAlone.execute(post);
-//      logger.info("HTTP Response %i", response.getStatusLine().getStatusCode());
+      // wait until the task is finished
+      int exitCode = ps.waitFor();
+      if (exitCode != 0) {
+        throw new Exception("Task exited abnormally with status " + exitCode);
+      }
 
     }
     catch (Exception e) {
       logger.error("httpclient error %s",e);
     }
-
     return createResult(mediaPackage, Action.CONTINUE);
   }
 }
