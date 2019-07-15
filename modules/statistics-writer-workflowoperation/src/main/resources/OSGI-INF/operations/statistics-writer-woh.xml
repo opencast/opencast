@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.workflow.handler.statisticswriter.StatisticsWriterWorkflowOperationHandler" immediate="true">
+  <implementation class="org.opencastproject.workflow.handler.statisticswriter.StatisticsWriterWorkflowOperationHandler"/>
+  <property name="service.description" value="Write statistical data about video/audio tracks"/>
+  <property name="workflow.operation" value="statistics-writer"/>
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
+  </service>
+  <reference name="security-service"
+             interface="org.opencastproject.security.api.SecurityService"
+             bind="setSecurityService"/>
+  <reference name="StatisticsWriter" cardinality="1..1"
+             interface="org.opencastproject.statistics.api.StatisticsWriter"
+             policy="static" bind="setStatisticsWriter"/>
+  <reference name="ServiceRegistry" cardinality="1..1"
+             interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             policy="static" bind="setServiceRegistry"/>
+</scr:component>

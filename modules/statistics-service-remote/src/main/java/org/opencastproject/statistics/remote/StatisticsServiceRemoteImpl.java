@@ -45,6 +45,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Path;
@@ -120,6 +122,24 @@ public class StatisticsServiceRemoteImpl extends RemoteBase implements Statistic
     } finally {
       closeConnection(response);
     }
+    throw new RuntimeException("Unable to get time series data from remote service");
+  }
+
+  @Override
+  public void writeDuration(String organizationId, String measurementName, String retentionPolicy,
+          String organizationIdResourceName, String fieldName, TimeUnit temporalResolution, Duration duration) {
+    final List<NameValuePair> queryStringParams = new ArrayList<>();
+    queryStringParams.add(new BasicNameValuePair("organizationId", organizationId));
+    queryStringParams.add(new BasicNameValuePair("measurementName", measurementName));
+    queryStringParams.add(new BasicNameValuePair("retentionPolicy", retentionPolicy));
+    queryStringParams.add(new BasicNameValuePair("organizationIdResourceName", organizationIdResourceName));
+    queryStringParams.add(new BasicNameValuePair("fieldName", fieldName));
+    queryStringParams.add(new BasicNameValuePair("temporalResolution", temporalResolution.toString()));
+    queryStringParams.add(new BasicNameValuePair("duration", duration.toString()));
+
+    final HttpGet get = new HttpGet("/writeDuration?" + URLEncodedUtils.format(queryStringParams, UTF_8));
+    final HttpResponse response = getResponse(get, SC_OK);
+    closeConnection(response);
     throw new RuntimeException("Unable to get time series data from remote service");
   }
 

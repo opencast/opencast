@@ -206,6 +206,16 @@ public interface SchedulerServiceDatabase {
   Opt<ExtendedEventDto> getEvent(String mediapackageId, String orgId) throws SchedulerServiceDatabaseException;
 
   /**
+   * Get all events from the scheduler for the current organizations.
+   *
+   * @return The list of events.
+   *
+   * @throws SchedulerServiceDatabaseException
+   *           If the database cannot be queried.
+   */
+  List<ExtendedEventDto> getEvents() throws SchedulerServiceDatabaseException;
+
+  /**
    * Nulls recording state and recording last heard of of the given media package.
    * @param mediapackageId
    *          The mediapackage id to look for

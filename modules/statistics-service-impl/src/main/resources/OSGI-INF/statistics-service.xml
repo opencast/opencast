@@ -7,6 +7,6 @@
   <property name="service.description" value="Statistics Service"/>
   <service>
     <provide interface="org.opencastproject.statistics.api.StatisticsService"/>
-    <provide interface="org.opencastproject.statistics.api.StatisticsProviderRegistry"/>
+    <provide interface="org.opencastproject.statistics.api.StatisticsCoordinator"/>
   </service>
 </scr:component>

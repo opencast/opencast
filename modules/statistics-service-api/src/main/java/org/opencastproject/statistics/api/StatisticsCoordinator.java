@@ -24,7 +24,7 @@ package org.opencastproject.statistics.api;
 /**
  * Register or unregister statistics providers.
  */
-public interface StatisticsProviderRegistry {
+public interface StatisticsCoordinator {
   /**
    * Add the given provider to the list of active providers.
    *
@@ -39,4 +39,17 @@ public interface StatisticsProviderRegistry {
    * @param provider The provider to remove.
    */
   void removeProvider(StatisticsProvider provider);
+
+  /**
+   * Add a new writer instance
+   * @param writer the writer instance
+   */
+  void addWriter(StatisticsWriter writer);
+
+  /**
+   * Remove a writer
+   * @param id the writer's ID
+   */
+  void removeWriter(String id);
+
 }

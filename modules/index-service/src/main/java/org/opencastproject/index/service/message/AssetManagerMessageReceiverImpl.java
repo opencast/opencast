@@ -139,7 +139,7 @@ public class AssetManagerMessageReceiverImpl extends BaseMessageReceiverImpl<Ass
     // Remove the archived entry from the search index
     try {
       getSearchIndex().deleteAssets(organization, user, eventId);
-      logger.debug("Archived media package {} removed from admin ui search index", eventId);
+      logger.debug("Archived media package {} removed from {} search index", eventId, getSearchIndex().getIndexName());
     } catch (NotFoundException e) {
       logger.warn("Archived media package {} not found for deletion", eventId);
     } catch (SearchIndexException e) {

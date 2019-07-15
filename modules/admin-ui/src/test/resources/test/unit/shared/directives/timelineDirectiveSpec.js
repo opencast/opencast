@@ -1,5 +1,6 @@
 describe('adminNg.directives.timelineDirective', function () {
-    var $compile, $httpBackend, $rootScope, $document, element, spy;
+    var $compile, $httpBackend, $rootScope, $document, element;
+    var spy = {};
 
     beforeEach(module('adminNg'));
     beforeEach(module('shared/partials/timeline.html'));
@@ -10,11 +11,13 @@ describe('adminNg.directives.timelineDirective', function () {
         });
     }));
 
-    beforeEach(inject(function (_$httpBackend_, _$rootScope_, _$compile_, _$document_) {
+  beforeEach(inject(function (_$httpBackend_, _$rootScope_, _$compile_, _$document_, _$interval_, _PlayerAdapter_) {
         $compile = _$compile_;
         $httpBackend = _$httpBackend_;
         $rootScope = _$rootScope_;
         $document = _$document_;
+        $interval = _$interval_;
+        PlayerAdapter = _PlayerAdapter_;
 
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
@@ -25,12 +28,15 @@ describe('adminNg.directives.timelineDirective', function () {
         $rootScope.player = {
             adapter: {
                 addListener: function (event, callback) {
-                    spy = callback;
+                    spy[event] = callback;
                 },
                 getCurrentTime: function () {
                     return 52;
                 },
-                setCurrentTime: jasmine.createSpy()
+              setCurrentTime: jasmine.createSpy(),
+              getStatus: function() {
+                return PlayerAdapter.STATUS.PAUSED;
+              }
             }
         };
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
@@ -108,7 +114,7 @@ describe('adminNg.directives.timelineDirective', function () {
 
         it('sets the position on the time scale', function () {
             expect(element.isolateScope().positionStyle).toBe(0);
-            spy();
+            $interval.flush(3000);
             expect(element.isolateScope().positionStyle).toContain('15.');
         });
     });
@@ -145,8 +151,6 @@ describe('adminNg.directives.timelineDirective', function () {
             $rootScope.$digest();
 
             expect(element.isolateScope().zoomValue).toBe(52125);
-            expect(element.isolateScope().zoomOffset).toBe(0);
-            expect(element.isolateScope().zoomFieldOffset).toBe(0);
             var fovWidth = parseFloat(element.find('.field-of-vision .field').css('width'));
             expect(fovWidth).toBe(100);
 
@@ -156,8 +160,6 @@ describe('adminNg.directives.timelineDirective', function () {
             $rootScope.$digest();
 
             expect(element.isolateScope().zoomValue).toBe(10000);
-            expect(element.isolateScope().zoomOffset).toBe(0);
-            expect(element.isolateScope().zoomFieldOffset).toBe(0);
             fovWidth = parseFloat(element.find('.field-of-vision .field').css('width'));
             expect(fovWidth).toBeGreaterThan(19);
             expect(fovWidth).toBeLessThan(20);
@@ -253,6 +255,7 @@ describe('adminNg.directives.timelineDirective', function () {
         beforeEach(function () {
             $rootScope.video = angular.
                 copy(getJSONFixture('admin-ng/tools/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/editor.json'));
+            spy[PlayerAdapter.EVENTS.DURATION_CHANGE]();
             $rootScope.$digest();
             element.find('.timeline-track').css({ width: '1000px' });
         });
@@ -287,11 +290,10 @@ describe('adminNg.directives.timelineDirective', function () {
             });
 
             it('sets the video cursor', function () {
-                expect(element.isolateScope().positionStyle).toEqual('40%');
+              expect(element.isolateScope().positionStyle).toEqual('40.02%');
             });
 
             it('updates the player when the mouse button is released', function () {
-                expect($rootScope.player.adapter.setCurrentTime).not.toHaveBeenCalled();
                 $document.mouseup();
                 expect($rootScope.player.adapter.setCurrentTime).toHaveBeenCalledWith(20.85);
             });

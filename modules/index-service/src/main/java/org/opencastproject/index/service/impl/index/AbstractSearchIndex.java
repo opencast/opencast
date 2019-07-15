@@ -438,7 +438,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     if (event == null)
       throw new NotFoundException("No event with id " + uid + " found.");
 
-    event.setRecordingStatus(null);
+    event.setAgentId(null);
 
     if (toDelete(event)) {
       delete(Event.DOCUMENT_TYPE, uid.concat(organization));

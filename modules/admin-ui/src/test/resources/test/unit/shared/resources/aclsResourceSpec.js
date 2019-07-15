@@ -9,6 +9,7 @@ describe('ACLs API Resource', function () {
         $httpBackend  = _$httpBackend_;
         AclsResource = _AclsResource_;
         ResourceHelper = _ResourceHelper_;
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
     }));
 
     describe('#query', function () {

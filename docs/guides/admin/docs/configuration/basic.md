@@ -48,7 +48,8 @@ Step 2: Setting the Login Details
 ---------------------------------
 
 There are two authentication methods for Opencast. HTTP Digest authentication and form-based authentication. Both
-methods need a username and a password. Change the password for both! The important keys for this are:
+methods need a username and a password. Change the password for both! The important keys in the 'custom.properties'
+configuration file are:
 
 * `org.opencastproject.security.admin.user`
     * The user for the administrative account. This is set to `admin` by default.

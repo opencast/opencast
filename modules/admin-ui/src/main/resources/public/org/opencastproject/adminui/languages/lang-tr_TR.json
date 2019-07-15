@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "Tema silinemedi",
       "TASK_CREATED": "Görev oluşturuldu",
       "TASK_NOT_CREATED": "Görev oluşturulamadı",
-      "VIDEO_CUT_NOT_SAVED": "Düzenleme bilgileri kaydedilemedi",
-      "VIDEO_CUT_SAVED": "Düzenleme bilgileri kaydedildi",
+      "VIDEO_CUT_NOT_SAVED": "Değişiklikler kaydedilemedi",
+      "VIDEO_CUT_SAVED": "Değişiklikler kaydedildi",
       "VIDEO_CUT_PROCESSING": "Video işeniyor…",
       "THUMBNAIL_CHANGE_FAILED": "Küçük resim değiştirilemedi.",
       "VIDEO_SOURCE_TRACKS_INVALID": "İşlenecek video kaydı seçmediniz",
@@ -247,7 +247,7 @@
             "CAPTION": "Düzenle",
             "EVENT": "etkinlik",
             "EVENTS": "etkinlikler",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "HEADER": "Bu sayfa, hafta içi gruplara göre düzenlenmiş etkinlikleri düzenlemenizi sağlar. Tüm zamanlanmış olayların belirli bir alan için aynı değere sahip olması durumunda giriş alanları önceden doldurulur. Aksi takdirde, giriş alanları boş bırakılır. Giriş alanlarını boş bırakmak, ilgili değerlerin değiştirilmemesi gerektiği anlamına gelir.",
             "METADATA": "Üstveri",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -412,7 +412,7 @@
                "CAPTION": "Kıymet Yükle",
                "SELECT_TYPE": "Kıymet türü seç",
                "ADD": "Varlık Ekle",
-               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
+               "NO_OPTIONS": "Web sayfasının bu bölümüne varlık seçeneklerinin bir listesi verilmemiştir!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Sınıfta verilen ders kağatları hakkında notlar",
                   "CAPTIONS_DFXP": "Altyazı DFXP",
@@ -489,7 +489,7 @@
                "DETAILS": "Etkinlik detaylarını görüntüle",
                "DELETE": "Etkinliği sil",
                "EDITOR": "Video editörünü aç",
-               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
+               "EDITOR_NEEDS_CUTTING": "Video Editörünü aç (videonun kesilmesini isteyen bir yorum var)",
                "COMMENTS": "Yorumları görüntüle",
                "PAUSED_WORKFLOW": "Duraklatılmış iş akışını görüntüle",
                "PRESENTER": "Bu sunucu için filtre"
@@ -507,6 +507,14 @@
             "RECORDING_FAILURE": "Kayıt hatası",
             "PROCESSING_FAILURE": "İşlem hatası",
             "PROCESSING_CANCELED": "İşlem iptal edildi"
+         },
+         "STATE_MAPPING": {
+            "RETRACTING": "Geri çekilmekte",
+            "DUPLICATING": "Kopyalanıyor",
+            "PUBLISHING": "Yayınlanıyor",
+            "IMPORTING": "İçeri aktarılıyor",
+            "REPUBLISHING_METADATA": "Meta veriler yeniden yayınlanıyor",
+            "UPDATING_PREVIEWS": "Önizlemeler güncelleniyor"
          },
          "DETAILS": {
             "HEADER": "Etkinlik detayları - {{resourceId}}",
@@ -839,7 +847,7 @@
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Workflow instances"
+               "TITLE": "İş Akışları"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "İş akışı detayları",
@@ -869,7 +877,7 @@
                   "FAILED_ATTEMPTS": "Hatalı Girişimler",
                   "MAX_ATTEMPTS": "Maks",
                   "EXCEPTION_HANDLER_WORKFLOW": "Özel durum işleyicisi iş akışı",
-                  "FAIL_ON_ERROR": "Fail on Error"
+                  "FAIL_ON_ERROR": "Hata ile başarısız oldu"
                }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
@@ -1009,7 +1017,7 @@
                   "NEW": "Yeni sözleşme",
                   "DETAILS": "Ayrıntılar",
                   "REPLACE_EVENT_ACLS": "Etkinlik izinlerini güncelle",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
+                  "REPLACE_EVENT_ACLS_HINT": "Bu dizinin tüm etkinliklerinin geçerli izinlere sahip olduğundan emin olun"
                },
                "ROLES": {
                   "LABEL": "Bir rol seç",
@@ -1531,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Ayır",
-         "CUT": "Kes",
-         "REPLAY_SEGMENT": "Yeniden yürütme bölütü",
-         "REPLAY_END_OF_SEGMENT": "Böüm sonu",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Geçiş kontrolu",
+         "SPLIT_TOOLTIP": "Şu andaki imleç konumunda bölütü böl.",
+         "CUT": "Gizle/Göster",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Bölümün başlangıcını oynat",
+         "REPLAY_SEGMENT_TOOLTIP": "Mevcut bölümü en baştan oynat.",
+         "REPLAY_END_OF_SEGMENT": "Bölümün Sonunu Oynat",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Geçişi Oynat",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "Geri Al",
          "REDO": "İleri Al",
-         "CLEAR_SEGMENTS": "Bölümleri temizle",
-         "CLEAR_SELECTED_SEGMENT": "Seçilen bölümleri temizle"
+         "CLEAR_SEGMENTS": "Bölümlerin Tümünü Temizle",
+         "CLEAR_SEGMENTS_TOOLTIP": "Tüm bölümleri temizleyip yerine tek bir büyük bölüm bırak."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Bölümü Sil",
-         "USE_SEGMENT": "Bu Bölümü kullan",
+         "SHOW_SEGMENT": "Bu Bölütü Göster",
+         "HIDE_SEGMENT": "Bu Bölütü Gizle",
          "START": "Başla",
          "END": "Son"
       },
@@ -1551,15 +1565,15 @@
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
-                  "LABEL": "Extract from video",
+                  "LABEL": "Videodan çıkarıp al",
                   "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
                },
                "FROM_LEFT_VIDEO": {
-                  "LABEL": "Extract from left video",
+                  "LABEL": "Sol taraftaki videodan çıkarıp al",
                   "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
                },
                "FROM_RIGHT_VIDEO": {
-                  "LABEL": "Extract from right video",
+                  "LABEL": "Sağ taraftaki videodan çıkarıp al",
                   "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
                }
             },
@@ -1761,7 +1775,7 @@
             "LABEL": "Sunucu adı"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Düğüm adı"
          },
          "STATUS": {
             "LABEL": "Durum",
@@ -1805,7 +1819,7 @@
             "LABEL": "Ana bilgisayar adı"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Düğüm adı"
          },
          "STATUS": {
             "LABEL": "Durum",
@@ -1822,7 +1836,7 @@
             "LABEL": "Ana bilgisayar adı"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Düğüm adı"
          },
          "NAME": {
             "LABEL": "İsim"
@@ -1893,7 +1907,7 @@
          "CTRL": "Ctrl",
          "ALT": "Alt",
          "OPTION": "⌥",
-         "SPACE": "Space",
+         "SPACE": "Boşluk",
          "BACKSPACE": "⌫",
          "LEFT": "←",
          "RIGHT": "→",
@@ -1936,8 +1950,8 @@
             "PLAY_PAUSE": "Oynat/Duraklat",
             "PREVIOUS_FRAME": "Önceki kare",
             "NEXT_FRAME": "Sonraki kare",
-            "STEP_BACKWARD": "Jump 10s back",
-            "STEP_FORWARD": "Jump 10s forward",
+            "STEP_BACKWARD": "10s geriye atla",
+            "STEP_FORWARD": "10s ileri atla",
             "PREVIOUS_SEGMENT": "Önceki bölüm / Başa atla",
             "NEXT_SEGMENT": "Sonraki bölüm / Sona atla",
             "VOLUME_UP": "Sesi artır",
@@ -1949,14 +1963,14 @@
             "CUT_SELECTED_SEGMENT": "Kes",
             "PLAY_CURRENT_SEGMENT": "Geçerli bölümü oynat",
             "CLEAR_LIST": "Bölümü temizle",
-            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Bölütü 'pre-roll' ile oynat",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Böüm sonu"
          }
       }
    },
    "AGENTS": {
       "STATUS": {
-         "CAPTURING": "Capturing",
+         "CAPTURING": "Yakalanıyor",
          "ERROR": "Hata",
          "IDLE": "Boşta",
          "OFFLINE": "Çevirim dışı",
@@ -1967,28 +1981,30 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "Birden çok değer eklemek için her değer arasında Giriş/Enter tuşuna basın"
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
-      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "NOT_AVAILABLE": "İstatistiklere şu anda erişilemiyor. Lütfen daha sonra tekrar deneyin.",
+      "UNSUPPORTED_TYPE": "Üzgünüz, Opencast bu tür istatistiksel veriyi oluşturamıyor.",
       "FROM": "den",
-      "TO": "To",
+      "TO": "Kime",
       "TOTAL": "Toplam",
-      "GRANULARITY": "Granularity",
+      "GRANULARITY": "Ayrıntı Düzeyi",
       "NAVIGATION": {
          "ORGANIZATION": "Organizasyon"
       },
       "TITLE": {
-         "RANDOM": "Random Data",
-         "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views"
+         "RANDOM": "Rastgele Veriler",
+         "VIEWS_SUM": "Toplam Görüntülenme Sayısı",
+         "VIEWS_AVG": "Ortalama Görüntülenme Sayısı",
+         "PUBLISHEDHOURS": "Published Hours of Video"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time uinit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time uinit."
+         "RANDOM": "Bu rastgele veriler sadece deneme ve tanıtım amaçlıdır. Bu grafiğin istatistik sağlayıcısının json tanımını 'etc/providers' klasörün içinden silerek bu grafiği devre dışı bırakabilirsiniz.",
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the running total published hours of video"
       }
    }
 }

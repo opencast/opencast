@@ -8,6 +8,6 @@
   <service>
     <provide interface="org.apache.felix.fileinstall.ArtifactInstaller"/>
   </service>
-  <reference name="statistics-service" interface="org.opencastproject.statistics.api.StatisticsProviderRegistry"
-             cardinality="1..1" policy="static" bind="setStatisticsProviderRegistry"/>
+  <reference name="statistics-service" interface="org.opencastproject.statistics.api.StatisticsCoordinator"
+             cardinality="1..1" policy="static" bind="setStatisticsCoordinator"/>
 </scr:component>

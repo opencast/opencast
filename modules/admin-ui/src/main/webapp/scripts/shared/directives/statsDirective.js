@@ -76,7 +76,7 @@ angular.module('adminNg.directives')
             var value = filter.value;
             var name = filter.name;
 
-            if (value.hasOwnProperty('relativeDateSpan')) {
+            if (Object.prototype.hasOwnProperty.call(value, 'relativeDateSpan')) {
               value = RelativeDatesService.relativeDateSpanToFilterValue(value.relativeDateSpan.from,
                 value.relativeDateSpan.to,
                 value.relativeDateSpan.unit);

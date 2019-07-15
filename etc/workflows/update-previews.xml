@@ -12,7 +12,6 @@
 
   <operations>
 
-
       <!-- Apply the default workflow configuration -->
 
       <operation
@@ -24,22 +23,18 @@
         </configurations>
       </operation>
 
-      <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-      <!-- Prepare asset                                                     -->
-      <!--                                                                   -->
-      <!-- Creat previews, audio waveforms and make those artifacts availabe -->
-      <!-- for use in the preview and cutting tool.                          -->
-      <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Prepare the work media                                            -->
 
-      <!-- Prepare work versions of the source material for further processing -->
-
-      <operation
-        id="include"
-        description="Prepare the recording for further processing">
-        <configurations>
-          <configuration key="workflow-id">partial-work</configuration>
-        </configurations>
-      </operation>
+    <operation
+        id="select-tracks"
+        exception-handler-workflow="partial-error"
+        description="Preparing presenter (camera) audio and video work versions">
+      <configurations>
+        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="target-flavor">*/work</configuration>
+        <configuration key="target-tags">-archive</configuration>
+      </configurations>
+    </operation>
 
       <!-- Create preview artifacts -->
 
@@ -61,21 +56,18 @@
         </configurations>
       </operation>
 
-      <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-      <!-- Cleanup                                                           -->
-      <!--                                                                   -->
-      <!-- Remove work artifacts.                                            -->
-      <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Clean up work artifacts -->
 
-      <!-- Clean the system from work artifacts -->
-
-      <operation
-        id="include"
+    <operation
+        id="cleanup"
+        fail-on-error="false"
         description="Remove temporary processing artifacts">
-        <configurations>
-          <configuration key="workflow-id">partial-cleanup</configuration>
-        </configurations>
-      </operation>
+      <configurations>
+        <configuration key="delete-external">true</configuration>
+        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <configuration key="preserve-flavors">security/*</configuration>
+      </configurations>
+    </operation>
 
   </operations>
 

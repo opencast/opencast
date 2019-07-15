@@ -7,4 +7,6 @@
     <provide interface="org.apache.felix.fileinstall.ArtifactInstaller"/>
     <provide interface="org.opencastproject.workflow.impl.WorkflowDefinitionScanner"/>
   </service>
+  <reference name="index" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             bind="setOrganizationDirectoryService"/>
 </scr:component>

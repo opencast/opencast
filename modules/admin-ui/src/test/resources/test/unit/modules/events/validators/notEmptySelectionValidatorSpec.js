@@ -17,6 +17,7 @@ describe('adminNg.modules.events.validators.notEmptySelectionValidator', functio
     }));
 
     beforeEach(function () {
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $rootScope.listoptions = getJSONFixture('admin-ng/event/new/processing');
         $rootScope.somemodel = {};
         $rootScope.processing = {

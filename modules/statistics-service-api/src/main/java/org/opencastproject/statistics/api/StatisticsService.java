@@ -22,10 +22,12 @@
 package org.opencastproject.statistics.api;
 
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Statistics service API.
@@ -78,4 +80,23 @@ public interface StatisticsService {
    */
   TimeSeries getTimeSeriesData(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution resolution, ZoneId zoneId);
 
+  /**
+   * Write a duration to a statistics data base
+   *
+   * @param organizationId Organization ID of the data point
+   * @param measurementName Measurement name of the data point
+   * @param retentionPolicy Retention policy of the data point
+   * @param organizationIdResourceName Resource name for the organization
+   * @param fieldName Field name to write
+   * @param temporalResolution The temporal resolution to store it in
+   * @param duration The actual duration to write
+   */
+  void writeDuration(
+          String organizationId,
+          String measurementName,
+          String retentionPolicy,
+          String organizationIdResourceName,
+          String fieldName,
+          TimeUnit temporalResolution,
+          Duration duration);
 }

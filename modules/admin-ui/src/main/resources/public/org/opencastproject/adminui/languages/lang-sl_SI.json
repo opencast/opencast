@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "Teme ni bilo mogoče izbrisati",
       "TASK_CREATED": "Opravilo je ustvarjeno",
       "TASK_NOT_CREATED": "Opravila ni bilo mogoče ustvariti",
-      "VIDEO_CUT_NOT_SAVED": "Podatkov o urejanju ni bilo mogoče shraniti",
-      "VIDEO_CUT_SAVED": "Podatki o urejanju so shranjeni",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
       "VIDEO_CUT_PROCESSING": "Video je v obdelavi ...",
       "THUMBNAIL_CHANGE_FAILED": "Spreminjanje sličice je spodletelo.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Niste izbrali video posnetkov za obdelavo",
@@ -507,6 +507,14 @@
             "RECORDING_FAILURE": "Napaka pri snemanju",
             "PROCESSING_FAILURE": "Napaka pri obdelavi",
             "PROCESSING_CANCELED": "Obdelava preklicana"
+         },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
          },
          "DETAILS": {
             "HEADER": "Podrobnosti dogodka – {{resourceId}}",
@@ -1531,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Razdelitev",
-         "CUT": "Izreži",
-         "REPLAY_SEGMENT": "Znova predvajaj segment",
-         "REPLAY_END_OF_SEGMENT": "Konec segmenta",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Preveri prehod",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "Razveljavi",
          "REDO": "Uveljavi",
-         "CLEAR_SEGMENTS": "Počisti segmente",
-         "CLEAR_SELECTED_SEGMENT": "Počisti izbrani segment"
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Odstrani segment",
-         "USE_SEGMENT": "Uporabi ta segment",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
          "START": "Začetek",
          "END": "Konec"
       },
@@ -1983,12 +1997,14 @@
       "TITLE": {
          "RANDOM": "Random Data",
          "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views"
+         "VIEWS_AVG": "Average Number of Views",
+         "PUBLISHEDHOURS": "Published Hours of Video"
       },
       "DESCRIPTION": {
          "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time uinit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time uinit."
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the running total published hours of video"
       }
    }
 }

@@ -447,6 +447,14 @@ $segment-deleted-selected: saturate(darken($segment-deleted, 25%), 5%);
              border-radius: 4px;
         }
 
+        #hover-cursor {
+            width: 1px;
+            background-color: #777;
+            height: 60px;
+            position: absolute;
+            z-index: $z-80;
+        }
+
         #cursor, #cursor_fake {
             width: 1px;
             height: calc(100% - 23px);
@@ -578,6 +586,14 @@ $segment-deleted-selected: saturate(darken($segment-deleted, 25%), 5%);
             position: relative;
             width: 100%;
             z-index: 100;
+
+            #timeline-cursor {
+                width: 1px;
+                background-color: #777;
+                height: 30px;
+                position: absolute;
+                z-index: $z-80;
+            }
 
             &::before {
               content: "";

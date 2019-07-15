@@ -40,7 +40,7 @@ angular.module('adminNg.services')
     this.postProcessMetadata = function (data) {
       var fields = [], chunk;
       for (chunk in data) {
-        if (data.hasOwnProperty(chunk)) {
+        if (Object.prototype.hasOwnProperty.call(data, chunk)) {
           // extended metadata is every object in the returned data which
           // does not start with a dollar sign and which isn't dublincore/episode
           if (chunk !== 'dublincore/series' && chunk.charAt(0) !== '$') {

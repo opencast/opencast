@@ -247,8 +247,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "definitionasjson", description = "Returns a single workflow definition", returnDescription = "Returns a JSON representation of the workflow definition with the specified identifier", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow definition identifier", type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "The workflow definition."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Workflow definition not found.") })
-  public Response getWorkflowDefinitionAsJson(@PathParam("id") String workflowDefinitionId) throws NotFoundException {
-    WorkflowDefinition def = null;
+  public Response getWorkflowDefinitionAsJson(@PathParam("id") String workflowDefinitionId)
+          throws NotFoundException {
+    WorkflowDefinition def;
     try {
       def = service.getWorkflowDefinitionById(workflowDefinitionId);
     } catch (WorkflowDatabaseException e) {
@@ -263,7 +264,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "definitionasxml", description = "Returns a single workflow definition", returnDescription = "Returns an XML representation of the workflow definition with the specified identifier", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow definition identifier", type = STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "The workflow definition."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Workflow definition not found.") })
-  public Response getWorkflowDefinitionAsXml(@PathParam("id") String workflowDefinitionId) throws NotFoundException {
+  public Response getWorkflowDefinitionAsXml(@PathParam("id") String workflowDefinitionId)
+          throws NotFoundException {
     return getWorkflowDefinitionAsJson(workflowDefinitionId);
   }
 
@@ -277,11 +279,11 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_HTML)
   @Path("configurationPanel")
   @RestQuery(name = "configpanel", description = "Get the configuration panel for a specific workflow", returnDescription = "The HTML workflow configuration panel", restParameters = { @RestParameter(name = "definitionId", isRequired = false, description = "The workflow definition identifier", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The workflow configuration panel.") })
-  public Response getConfigurationPanel(@QueryParam("definitionId") String definitionId) throws NotFoundException {
-    WorkflowDefinition def = null;
+  public Response getConfigurationPanel(@QueryParam("definitionId") String definitionId)
+          throws NotFoundException {
     try {
-      def = service.getWorkflowDefinitionById(definitionId);
-      String out = def.getConfigurationPanel();
+      final WorkflowDefinition def = service.getWorkflowDefinitionById(definitionId);
+      final String out = def.getConfigurationPanel();
       return Response.ok(out).build();
     } catch (WorkflowDatabaseException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
