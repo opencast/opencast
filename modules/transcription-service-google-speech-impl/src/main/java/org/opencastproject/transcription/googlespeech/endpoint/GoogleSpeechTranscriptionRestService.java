@@ -103,7 +103,8 @@ public class GoogleSpeechTranscriptionRestService extends AbstractJobProducerEnd
     try {
       jobResult = service.getTranscriptionResults(jobId);
     } catch (TranscriptionServiceException e) {
-      throw new TranscriptionServiceException("Could not get transcription result", e);
+      logger.warn("Could not get transcription result for jobId : {}", jobId);
+      return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
     }
     return Response.ok(jobResult).build();
   }
@@ -122,7 +123,8 @@ public class GoogleSpeechTranscriptionRestService extends AbstractJobProducerEnd
     try {
       status = service.getTranscriptionStatus(mpId);
     } catch (TranscriptionServiceException e) {
-      throw new TranscriptionServiceException("Could not get mediapackage transcription status", e);
+      logger.warn("Could not get mediapackage transcription status for mediapackageId : {}", mpId);
+      return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
     }
     return Response.ok(status).build();
   }

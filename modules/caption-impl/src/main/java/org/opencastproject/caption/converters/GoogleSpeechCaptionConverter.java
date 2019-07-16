@@ -62,6 +62,7 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
     try {
       // No language to specify so define size of a transcripts line
       transcriptionLineSize = Integer.parseInt(languageLineSize.trim());
+      logger.info("Transcripts line size {} used", LINE_SIZE);
     } catch (NumberFormatException nfe) {
       transcriptionLineSize = LINE_SIZE;
       logger.info("Default transcripts line size {} used", LINE_SIZE);
@@ -113,13 +114,13 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
                   JSONObject wordTSList = (JSONObject) timestampsArray.get(indexFirst);
                   if (wordTSList.size() == 3) {
                     // Remove 's' at the end
-                    Number startNumber = NumberFormat.getInstance().parse(removeCharacter((wordTSList.get("startTime").toString()), 's'));
+                    Number startNumber = NumberFormat.getInstance().parse(removeEndCharacter((wordTSList.get("startTime").toString()), "s"));
                     start = startNumber.doubleValue();
                   }
                   // Get end time of last element
                   wordTSList = (JSONObject) timestampsArray.get(indexLast);
                   if (wordTSList.size() == 3) {
-                    Number endNumber = NumberFormat.getInstance().parse(removeCharacter((wordTSList.get("endTime").toString()), 's'));
+                    Number endNumber = NumberFormat.getInstance().parse(removeEndCharacter((wordTSList.get("endTime").toString()), "s"));
                     end = endNumber.doubleValue();
                   }
                 }
@@ -178,9 +179,9 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
     return new TimeImpl(h, m, s, (int) ms);
   }
 
-  private String removeCharacter(String str, char car) {
-    if (str != null && str.length() > 0 && str.charAt(str.length() - 1) == car) {
-      str = str.substring(0, str.length() - 1);
+  private String removeEndCharacter(String str, String end) {
+    if (str.endsWith(end)) {
+      str = str.replace(end, "");
     }
     return str;
   }

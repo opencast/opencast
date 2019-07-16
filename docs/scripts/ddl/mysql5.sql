@@ -618,7 +618,7 @@ CREATE TABLE oc_transcription_service_provider (
 
 CREATE TABLE oc_transcription_service_job (
   id BIGINT(20) NOT NULL,
-  media_package_id VARCHAR(128) NOT NULL,
+  mediapackage_id VARCHAR(128) NOT NULL,
   track_id VARCHAR(128) NOT NULL,
   job_id  VARCHAR(128) NOT NULL,
   date_created DATETIME NOT NULL,

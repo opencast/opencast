@@ -101,7 +101,6 @@ public class GoogleSpeechStartTranscriptionOperationHandlerTest {
     // Workflow set up
     WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
     def.setId("google-speech-start-transcription");
-    def.setPublished(true);
     workflowInstance = new WorkflowInstanceImpl(def, mediaPackage, null, null, null, null);
     workflowInstance.setId(1);
     operation = new WorkflowOperationInstanceImpl("start-transcript", OperationState.RUNNING);

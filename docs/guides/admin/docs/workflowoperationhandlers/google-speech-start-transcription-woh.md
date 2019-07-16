@@ -12,7 +12,7 @@ text.
 |source-flavor|The flavor of the audio file to be sent for translation.|EMPTY|presenter/delivery|
 |source-tag|The flavor of the audio file to be sent for translation.|EMPTY|transcript|
 |skip-if-flavor-exists|If this flavor already exists in the media package, skip this operation.<br/>To be used when the media package already has a transcript file. Optional|false|captions/timedtext|
-|language-code|The language code to use for the transcription. Optional. If set, it will override the configuration language code|EMPTY|en-US|
+|language-code|The language code to use for the transcription. Optional. If set, it will override the configuration language code|EMPTY|en-US, supported language: https://cloud.google.com/speech-to-text/docs/languages|
 
 **One of source-flavor or source-tag must be specified.**
 

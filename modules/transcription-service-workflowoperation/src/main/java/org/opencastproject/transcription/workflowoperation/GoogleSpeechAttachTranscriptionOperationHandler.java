@@ -59,6 +59,7 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
   static final String TARGET_TAG = "target-tag";
   static final String TARGET_CAPTION_FORMAT = "target-caption-format";
   static final String TRANSCRIPTION_LINE_SIZE = "line-size";
+  static final String DEFAULT_LINE_SIZE = "100";
 
   /**
    * The transcription service
@@ -103,7 +104,7 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
 
     // Get job id.
     String jobId = StringUtils.trimToNull(operation.getConfiguration(TRANSCRIPTION_JOB_ID));
-    if (jobId == null) {
+    if (StringUtils.isBlank(jobId)) {
       throw new WorkflowOperationException(TRANSCRIPTION_JOB_ID + " missing");
     }
 
@@ -111,7 +112,7 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
     String targetTagOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAG));
     String targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR));
     // Target flavor is mandatory
-    if (targetFlavorOption == null) {
+    if (StringUtils.isBlank(targetFlavorOption)) {
       throw new WorkflowOperationException(TARGET_FLAVOR + " missing");
     }
     MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
@@ -119,8 +120,8 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
 
     // Get line size if set
     String lineSize = StringUtils.trimToNull(operation.getConfiguration(TRANSCRIPTION_LINE_SIZE));
-    if (lineSize == null) {
-      lineSize = "100"; // Use default line size
+    if (StringUtils.isBlank(lineSize)) {
+      lineSize = DEFAULT_LINE_SIZE; // Use default line size
     }
 
     try {
@@ -129,7 +130,7 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
       MediaPackageElement transcription = original;
 
       // If caption format passed, convert to desired format
-      if (captionFormatOption != null) {
+      if (StringUtils.isNotBlank(captionFormatOption)) {
         Job job = captionService.convert(transcription, "google-speech", captionFormatOption, lineSize);
         if (!waitForStatus(job).isSuccess()) {
           throw new WorkflowOperationException("Transcription format conversion job did not complete successfully");
@@ -141,9 +142,9 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
       transcription.setFlavor(flavor);
 
       // Add tags
-      if (targetTagOption != null) {
+      if (StringUtils.isNotBlank(targetTagOption)) {
         for (String tag : asList(targetTagOption)) {
-          if (StringUtils.trimToNull(tag) != null) {
+          if (StringUtils.isNotBlank(StringUtils.trimToNull(tag))) {
             transcription.addTag(tag);
           }
         }

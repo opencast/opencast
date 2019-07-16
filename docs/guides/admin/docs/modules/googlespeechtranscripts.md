@@ -4,11 +4,14 @@ Transcripts (Automated by Google Speech)
 Overview
 --------
 
-The GoogleSpeechTranscriptionService invokes the Google Speech-to-Text service via REST API to translate audio to text.
+The GoogleSpeechTranscriptionService invokes the Google Speech-to-Text service via REST API to transcribe audio to text.
 
 During the execution of an Opencast workflow, an audio file is extracted from one of the presenter videos and sent 
 to the Google Speech-to-Text service. When the results are received, they are converted to the desired caption format 
 and attached to the media package.
+
+**Note that because Google's Speech-to-Text service can take a while to process a recording, 
+we do not wait for it to finish before proceeding with the rest of Opencast's normal processing, the transcription process is asynchronous.**
 
 * Workflow 1 runs:
     * Audio file is created
@@ -26,6 +29,8 @@ Google Speech-to-Text service documentation, including which languages are curre
 
 Configuration
 -------------
+**Notes**: Instructions and screenshots provided in this section are based on Google Speech-to-Text documentation at the time of writing this document. 
+For up to date instructions please search for _'google speech to text configuration'_ or visit [Google Cloud service page](https://console.cloud.google.com/getting-started).
 
 ### Step 1: Activate Google Speech and Google Cloud Storage APIs
 * Log in to your Google account and [Activate a 12 months free trial Google Cloud Platform services](https://cloud.google.com/free/)
@@ -103,6 +108,7 @@ Edit  _etc/org.opencastproject.transcription.googlespeech.GoogleSpeechTranscript
 If no email address specified in either _notification.email_ or _org.opencastproject.admin.email_,
 email notifications will be disabled. 
 
+Example of configuration file: 
 ```
 # Change enabled to true to enable this service. 
 enabled=false
@@ -153,7 +159,7 @@ notification.email=localadmin@domain
 ### Step 4: Add encoding profile for extracting audio
 
 The Google Speech-to-Text service has limitations on audio types. [Supported audio type are here](https://cloud.google.com/speech-to-text/docs/reference/rest/v1p1beta1/RecognitionConfig#AudioEncoding).
-Try using the encoding profile suggested in etc/encoding/googlespeech-audio.properties.
+By default Opencast will use the encoding settings in etc/encoding/googlespeech-audio.properties.
 
 ### Step 5: Add workflow operations and create new workflow
 
@@ -214,8 +220,6 @@ A sample one can be found in etc/workflows/google-speech-attach-transcripts.xml
         <configuration key="target-caption-format">vtt</configuration>
       </configurations>
     </operation>
-
-    <!-- Merge caption/transcript to existing publication and republish -->
 
     <!-- Publish to engage player -->
 

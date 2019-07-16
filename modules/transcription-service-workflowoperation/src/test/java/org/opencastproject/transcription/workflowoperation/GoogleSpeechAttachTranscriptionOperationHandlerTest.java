@@ -135,7 +135,6 @@ public class GoogleSpeechAttachTranscriptionOperationHandlerTest {
     // Workflow set up
     WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
     def.setId("google-start-transcription");
-    def.setPublished(true);
     workflowInstance = new WorkflowInstanceImpl(def, mediaPackage, null, null, null, null);
     workflowInstance.setId(1);
     operation = new WorkflowOperationInstanceImpl("attach-transcript", OperationState.RUNNING);

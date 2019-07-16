@@ -56,7 +56,7 @@ public class TranscriptionJobControlDto implements Serializable {
   @XmlAttribute
   private long id;
 
-  @Column(name = "media_package_id", nullable = false, length = 128)
+  @Column(name = "mediapackage_id", nullable = false, length = 128)
   private String mediaPackageId;
 
   @Column(name = "track_id", nullable = false, length = 128)
@@ -173,6 +173,9 @@ public class TranscriptionJobControlDto implements Serializable {
   public static List<TranscriptionJobControlDto> findByStatus(EntityManager em, final String... status)
           throws TranscriptionDatabaseException {
     Collection<String> statusCol = new HashSet<String>();
+    if (status == null) {
+      throw new TranscriptionDatabaseException("status is null");
+    }
     for (String st : status) {
       statusCol.add(st);
     }

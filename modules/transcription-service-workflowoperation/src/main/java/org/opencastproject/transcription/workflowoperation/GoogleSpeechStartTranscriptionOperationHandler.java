@@ -117,11 +117,11 @@ public class GoogleSpeechStartTranscriptionOperationHandler extends AbstractWork
     logger.debug("Start transcription for mediapackage {} started", mediaPackage);
 
     // Get language code if configured
-    String langCode = StringUtils.trimToNull(operation.getConfiguration(LANGUAGE_CODE));
+    String langCode = operation.getConfiguration(LANGUAGE_CODE);
 
     // Check which tags have been configured
-    String sourceTagOption = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAG));
-    String sourceFlavorOption = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR));
+    String sourceTagOption = operation.getConfiguration(SOURCE_TAG);
+    String sourceFlavorOption = operation.getConfiguration(SOURCE_FLAVOR);
 
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
@@ -141,8 +141,8 @@ public class GoogleSpeechStartTranscriptionOperationHandler extends AbstractWork
     if (StringUtils.isNotBlank(langCode)) {
       language = StringUtils.trim(langCode);
     }
-    if (sourceTagOption != null) {
-      elementSelector.addTag(sourceTagOption);
+    if (StringUtils.isNotBlank(sourceTagOption)) {
+      elementSelector.addTag(StringUtils.trim(sourceTagOption));
     }
 
     Collection<Track> elements = elementSelector.select(mediaPackage, false);

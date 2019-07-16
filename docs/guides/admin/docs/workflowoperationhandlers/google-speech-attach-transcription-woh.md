@@ -34,8 +34,6 @@ into the desired caption format and adds it to the media package.
       </configurations>
     </operation>
 
-    <!-- Merge caption/transcript to existing publication and republish -->
-
     <!-- Publish to engage player -->
 
     <operation id="publish-engage"

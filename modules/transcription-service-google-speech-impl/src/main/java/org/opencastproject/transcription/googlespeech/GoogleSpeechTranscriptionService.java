@@ -44,6 +44,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.transcription.api.TranscriptionServiceException;
 import org.opencastproject.transcription.persistence.TranscriptionDatabase;
@@ -52,6 +53,7 @@ import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -62,6 +64,7 @@ import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
@@ -104,6 +107,10 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   private static final String JOB_TYPE = "org.opencastproject.transcription.googlespeech";
 
   static final String TRANSCRIPT_COLLECTION = "transcripts";
+  static final String TRANSCRIPTION_ERROR = "Transcription ERROR";
+  static final String TRANSCRIPTION_JOB_ID_KEY = "transcriptionJobId";
+  static final String ACCESS_TOKEN_NAME = "access_token";
+  static final String ACCESS_TOKEN_EXPIRY_NAME = "expires_in";
   private static final int CONNECTION_TIMEOUT = 60000; // ms, 1 minute
   private static final int SOCKET_TIMEOUT = 60000; // ms, 1 minute
   private static final int ACCESS_TOKEN_MINIMUN_TIME = 60000; // ms , 1 minute
@@ -118,18 +125,13 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   private static final String DEFAULT_LANGUAGE = "en-US";
   private static final String GOOGLE_SPEECH_URL = "https://speech.googleapis.com/v1";
   private static final String GOOGLE_AUTH2_URL = "https://www.googleapis.com/oauth2/v4/token";
-  private static final String REQUEST_PATH = "/speech:longrunningrecognize";
-  private static final String RESULT_PATH = "/operations/";
+  private static final String REQUEST_METHOD = "speech:longrunningrecognize";
+  private static final String RESULT_PATH = "operations";
   private static final String INVALID_TOKEN = "-1";
   private static final String PROVIDER = "Google Speech";
-
-  // Global configuration (custom.properties)
-  public static final String ADMIN_URL_PROPERTY = "org.opencastproject.admin.ui.url";
-  private static final String ADMIN_EMAIL_PROPERTY = "org.opencastproject.admin.email";
-  private static final String DIGEST_USER_PROPERTY = "org.opencastproject.security.digest.user";
+  private static final String DEFAULT_ENCODING = "flac";
 
   // Cluster name
-  private static final String CLUSTER_NAME_PROPERTY = "org.opencastproject.environment.name";
   private String clusterName = "";
 
   // The events we are interested in receiving notifications
@@ -177,13 +179,15 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   public static final String GOOGLE_CLOUD_REFRESH_TOKEN = "google.cloud.refresh.token";
   public static final String GOOGLE_CLOUD_BUCKET = "google.cloud.storage.bucket";
   public static final String GOOGLE_CLOUD_TOKEN_ENDPOINT_URL = "google.cloud.token.endpoint.url";
+  public static final String ENCODING_EXTENSION = "encoding.extension";
 
   /**
    * Service configuration values
    */
   private boolean enabled = false; // Disabled by default
   private boolean profanityFilter = DEFAULT_PROFANITY_FILTER;
-  private String language = DEFAULT_LANGUAGE;
+  private String defaultLanguage = DEFAULT_LANGUAGE;
+  private String defaultEncoding = DEFAULT_ENCODING;
   private String workflowDefinitionId = DEFAULT_WF_DEF;
   private long workflowDispatchInterval = DEFAULT_DISPATCH_INTERVAL;
   private long completionCheckBuffer = DEFAULT_COMPLETION_BUFFER;
@@ -205,130 +209,138 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   }
 
   public void activate(ComponentContext cc) {
-    if (cc != null) {
-      // Has this service been enabled?
-      enabled = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), ENABLED_CONFIG).get();
-
-      if (enabled) {
-        // Mandatory API access properties
-        clientId = OsgiUtil.getComponentContextProperty(cc, GOOGLE_CLOUD_CLIENT_ID);
-        clientSecret = OsgiUtil.getComponentContextProperty(cc, GOOGLE_CLOUD_CLIENT_SECRET);
-        clientToken = OsgiUtil.getComponentContextProperty(cc, GOOGLE_CLOUD_REFRESH_TOKEN);
-        storageBucket = OsgiUtil.getComponentContextProperty(cc, GOOGLE_CLOUD_BUCKET);
-
-        // access token endpoint
-        Option<String> tokenOpt = OsgiUtil.getOptCfg(cc.getProperties(), GOOGLE_CLOUD_TOKEN_ENDPOINT_URL);
-        if (tokenOpt.isSome()) {
-          tokenEndpoint = tokenOpt.get();
-          logger.info("Access token endpoint is set to {}", tokenEndpoint);
-        } else {
-          logger.info("Default access token endpoint will be used");
-        }
-
-        // profanity filter to use
-        Option<String> profanityOpt = OsgiUtil.getOptCfg(cc.getProperties(), PROFANITY_FILTER);
-        if (profanityOpt.isSome()) {
-          profanityFilter = Boolean.parseBoolean(profanityOpt.get());
-          logger.info("Profanity filter is set to {}", profanityFilter);
-        } else {
-          logger.info("Default profanity filter will be used");
-        }
-        // Language model to be used
-        Option<String> languageOpt = OsgiUtil.getOptCfg(cc.getProperties(), GOOGLE_SPEECH_LANGUAGE);
-        if (languageOpt.isSome()) {
-          language = languageOpt.get();
-          logger.info("Language used is {}", language);
-        } else {
-          logger.info("Default language will be used");
-        }
-        // Workflow to execute when getting callback (optional, with default)
-        Option<String> wfOpt = OsgiUtil.getOptCfg(cc.getProperties(), WORKFLOW_CONFIG);
-        if (wfOpt.isSome()) {
-          workflowDefinitionId = wfOpt.get();
-        }
-        logger.info("Workflow definition is {}", workflowDefinitionId);
-        // Interval to check for completed transcription jobs and start workflows to attach transcripts
-        Option<String> intervalOpt = OsgiUtil.getOptCfg(cc.getProperties(), DISPATCH_WORKFLOW_INTERVAL_CONFIG);
-        if (intervalOpt.isSome()) {
-          try {
-            workflowDispatchInterval = Long.parseLong(intervalOpt.get());
-          } catch (NumberFormatException e) {
-            // Use default
-          }
-        }
-        logger.info("Workflow dispatch interval is {} seconds", workflowDispatchInterval);
-        // How long to wait after a transcription is supposed to finish before starting checking
-        Option<String> bufferOpt = OsgiUtil.getOptCfg(cc.getProperties(), COMPLETION_CHECK_BUFFER_CONFIG);
-        if (bufferOpt.isSome()) {
-          try {
-            completionCheckBuffer = Long.parseLong(bufferOpt.get());
-          } catch (NumberFormatException e) {
-            // Use default
-            logger.warn("Invalid configuration for {} : {}. Default used instead: {}",
-                    new Object[]{COMPLETION_CHECK_BUFFER_CONFIG, bufferOpt.get(), completionCheckBuffer});
-          }
-        }
-        logger.info("Completion check buffer is {} seconds", completionCheckBuffer);
-        // How long to wait after a transcription is supposed to finish before marking the job as canceled in the db
-        Option<String> maxProcessingOpt = OsgiUtil.getOptCfg(cc.getProperties(), MAX_PROCESSING_TIME_CONFIG);
-        if (maxProcessingOpt.isSome()) {
-          try {
-            maxProcessingSeconds = Long.parseLong(maxProcessingOpt.get());
-          } catch (NumberFormatException e) {
-            // Use default
-          }
-        }
-        logger.info("Maximum time a job is checked after it should have ended is {} seconds", maxProcessingSeconds);
-        // How long to keep result files in the working file repository
-        Option<String> cleaupOpt = OsgiUtil.getOptCfg(cc.getProperties(), CLEANUP_RESULTS_DAYS_CONFIG);
-        if (cleaupOpt.isSome()) {
-          try {
-            cleanupResultDays = Integer.parseInt(cleaupOpt.get());
-          } catch (NumberFormatException e) {
-            // Use default
-          }
-        }
-        logger.info("Cleanup result files after {} days", cleanupResultDays);
-
-        systemAccount = OsgiUtil.getContextProperty(cc, DIGEST_USER_PROPERTY);
-
-        // Schedule the workflow dispatching, starting in 2 minutes
-        scheduledExecutor.scheduleWithFixedDelay(new WorkflowDispatcher(), 120, workflowDispatchInterval,
-                TimeUnit.SECONDS);
-
-        // Schedule the cleanup of old results jobs from the collection in the wfr once a day
-        scheduledExecutor.scheduleWithFixedDelay(new ResultsFileCleanup(), 1, 1, TimeUnit.DAYS);
-
-        // Notification email passed in this service configuration?
-        Option<String> optTo = OsgiUtil.getOptCfg(cc.getProperties(), NOTIFICATION_EMAIL_CONFIG);
-        if (optTo.isSome()) {
-          toEmailAddress = optTo.get();
-        } else {
-          // Use admin email informed in custom.properties
-          optTo = OsgiUtil.getOptContextProperty(cc, ADMIN_EMAIL_PROPERTY);
-          if (optTo.isSome()) {
-            toEmailAddress = optTo.get();
-          }
-        }
-        if (toEmailAddress != null) {
-          logger.info("Notification email set to {}", toEmailAddress);
-        } else {
-          logger.warn("Email notification disabled");
-        }
-
-        Option<String> optCluster = OsgiUtil.getOptContextProperty(cc, CLUSTER_NAME_PROPERTY);
-        if (optCluster.isSome()) {
-          clusterName = optCluster.get();
-        }
-        logger.info("Environment name is {}", clusterName);
-
-        logger.info("Activated!");
-      } else {
-        logger.info("Service disabled. If you want to enable it, please update the service configuration.");
-      }
-    } else {
-      throw new IllegalArgumentException("Missing component context");
+    // Has this service been enabled?
+    enabled = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), ENABLED_CONFIG).get();
+    if (!enabled) {
+      logger.info("Service disabled. If you want to enable it, please update the service configuration.");
+      return;
     }
+    // Mandatory API access properties
+    clientId = OsgiUtil.getComponentContextProperty(cc, GOOGLE_CLOUD_CLIENT_ID);
+    clientSecret = OsgiUtil.getComponentContextProperty(cc, GOOGLE_CLOUD_CLIENT_SECRET);
+    clientToken = OsgiUtil.getComponentContextProperty(cc, GOOGLE_CLOUD_REFRESH_TOKEN);
+    storageBucket = OsgiUtil.getComponentContextProperty(cc, GOOGLE_CLOUD_BUCKET);
+
+    // access token endpoint
+    Option<String> tokenOpt = OsgiUtil.getOptCfg(cc.getProperties(), GOOGLE_CLOUD_TOKEN_ENDPOINT_URL);
+    if (tokenOpt.isSome()) {
+      tokenEndpoint = tokenOpt.get();
+      logger.info("Access token endpoint is set to {}", tokenEndpoint);
+    } else {
+      logger.info("Default access token endpoint will be used");
+    }
+
+    // profanity filter to use
+    Option<String> profanityOpt = OsgiUtil.getOptCfg(cc.getProperties(), PROFANITY_FILTER);
+    if (profanityOpt.isSome()) {
+      profanityFilter = Boolean.parseBoolean(profanityOpt.get());
+      logger.info("Profanity filter is set to {}", profanityFilter);
+    } else {
+      logger.info("Default profanity filter will be used");
+    }
+    // Language model to be used
+    Option<String> languageOpt = OsgiUtil.getOptCfg(cc.getProperties(), GOOGLE_SPEECH_LANGUAGE);
+    if (languageOpt.isSome()) {
+      defaultLanguage = languageOpt.get();
+      logger.info("Language used is {}", defaultLanguage);
+    } else {
+      logger.info("Default language will be used");
+    }
+
+    // Encoding to be used
+    Option<String> encodingOpt = OsgiUtil.getOptCfg(cc.getProperties(), ENCODING_EXTENSION);
+    if (encodingOpt.isSome()) {
+      defaultEncoding = encodingOpt.get();
+      logger.info("Encoding used is {}", defaultEncoding);
+    } else {
+      logger.info("Default encoding will be used");
+    }
+
+    // Workflow to execute when getting callback (optional, with default)
+    Option<String> wfOpt = OsgiUtil.getOptCfg(cc.getProperties(), WORKFLOW_CONFIG);
+    if (wfOpt.isSome()) {
+      workflowDefinitionId = wfOpt.get();
+    }
+    logger.info("Workflow definition is {}", workflowDefinitionId);
+    // Interval to check for completed transcription jobs and start workflows to attach transcripts
+    Option<String> intervalOpt = OsgiUtil.getOptCfg(cc.getProperties(), DISPATCH_WORKFLOW_INTERVAL_CONFIG);
+    if (intervalOpt.isSome()) {
+      try {
+        workflowDispatchInterval = Long.parseLong(intervalOpt.get());
+      } catch (NumberFormatException e) {
+        // Use default
+        logger.warn("Invalid configuration for Workflow dispatch interval. Default used instead: {}", workflowDispatchInterval);
+      }
+    }
+    logger.info("Workflow dispatch interval is {} seconds", workflowDispatchInterval);
+    // How long to wait after a transcription is supposed to finish before starting checking
+    Option<String> bufferOpt = OsgiUtil.getOptCfg(cc.getProperties(), COMPLETION_CHECK_BUFFER_CONFIG);
+    if (bufferOpt.isSome()) {
+      try {
+        completionCheckBuffer = Long.parseLong(bufferOpt.get());
+      } catch (NumberFormatException e) {
+        // Use default
+        logger.warn("Invalid configuration for {} : {}. Default used instead: {}",
+                new Object[]{COMPLETION_CHECK_BUFFER_CONFIG, bufferOpt.get(), completionCheckBuffer});
+      }
+    }
+    logger.info("Completion check buffer is {} seconds", completionCheckBuffer);
+    // How long to wait after a transcription is supposed to finish before marking the job as canceled in the db
+    Option<String> maxProcessingOpt = OsgiUtil.getOptCfg(cc.getProperties(), MAX_PROCESSING_TIME_CONFIG);
+    if (maxProcessingOpt.isSome()) {
+      try {
+        maxProcessingSeconds = Long.parseLong(maxProcessingOpt.get());
+      } catch (NumberFormatException e) {
+        // Use default
+        logger.warn("Invalid configuration for maximum processing time. Default used instead: {}", maxProcessingSeconds);
+      }
+    }
+    logger.info("Maximum time a job is checked after it should have ended is {} seconds", maxProcessingSeconds);
+    // How long to keep result files in the working file repository
+    Option<String> cleaupOpt = OsgiUtil.getOptCfg(cc.getProperties(), CLEANUP_RESULTS_DAYS_CONFIG);
+    if (cleaupOpt.isSome()) {
+      try {
+        cleanupResultDays = Integer.parseInt(cleaupOpt.get());
+      } catch (NumberFormatException e) {
+        // Use default
+        logger.warn("Invalid configuration for clean up days. Default used instead: {}", cleanupResultDays);
+      }
+    }
+    logger.info("Cleanup result files after {} days", cleanupResultDays);
+
+    systemAccount = OsgiUtil.getContextProperty(cc, OpencastConstants.DIGEST_USER_PROPERTY);
+
+    // Schedule the workflow dispatching, starting in 2 minutes
+    scheduledExecutor.scheduleWithFixedDelay(new WorkflowDispatcher(), 120, workflowDispatchInterval,
+            TimeUnit.SECONDS);
+
+    // Schedule the cleanup of old results jobs from the collection in the wfr once a day
+    scheduledExecutor.scheduleWithFixedDelay(new ResultsFileCleanup(), 1, 1, TimeUnit.DAYS);
+
+    // Notification email passed in this service configuration?
+    Option<String> optTo = OsgiUtil.getOptCfg(cc.getProperties(), NOTIFICATION_EMAIL_CONFIG);
+    if (optTo.isSome()) {
+      toEmailAddress = optTo.get();
+    } else {
+      // Use admin email informed in custom.properties
+      optTo = OsgiUtil.getOptContextProperty(cc, OpencastConstants.ADMIN_EMAIL_PROPERTY);
+      if (optTo.isSome()) {
+        toEmailAddress = optTo.get();
+      }
+    }
+    if (toEmailAddress != null) {
+      logger.info("Notification email set to {}", toEmailAddress);
+    } else {
+      logger.warn("Email notification disabled");
+    }
+
+    Option<String> optCluster = OsgiUtil.getOptContextProperty(cc, OpencastConstants.ENVIRONMENT_NAME_PROPERTY);
+    if (optCluster.isSome()) {
+      clusterName = optCluster.get();
+    }
+    logger.info("Environment name is {}", clusterName);
+
+    logger.info("Activated!");
   }
 
   @Override
@@ -388,7 +400,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       logger.warn("Could not save transcription results file for mpId {}, jobId {}: {}",
               new Object[]{mpId, jobId, jsonObj == null ? "null" : jsonObj.toJSONString()});
       throw new TranscriptionServiceException("Could not save transcription results file", e);
-    } catch (TranscriptionDatabaseException e) {
+    }
+    catch (TranscriptionDatabaseException e) {
       logger.warn("Transcription results file were saved but state in db not updated for mpId {}, jobId {}", mpId,
               jobId);
       throw new TranscriptionServiceException("Could not update transcription job control db", e);
@@ -397,7 +410,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
 
   @Override
   public String getLanguage() {
-    return language;
+    return defaultLanguage;
   }
 
   @Override
@@ -413,7 +426,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       logger.warn(String.format("Error received for media package %s, job id %s",
               jobControl.getMediaPackageId(), jobId));
       // Send notification email
-      sendEmail("Transcription ERROR",
+      sendEmail(TRANSCRIPTION_ERROR,
               String.format("There was a transcription error for for media package %s, job id %s.",
                       jobControl.getMediaPackageId(), jobId));
     } catch (TranscriptionDatabaseException e) {
@@ -447,9 +460,9 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
    * https://cloud.google.com/speech-to-text/docs/basics
    */
   void createRecognitionsJob(String mpId, Track track, String languageCode) throws TranscriptionServiceException, IOException {
-    // Use default language if not set by workflow
-    if (languageCode == null || languageCode.isEmpty()) {
-      languageCode = language;
+    // Use default defaultlanguage if not set by workflow
+    if (StringUtils.isBlank(languageCode)) {
+      languageCode = defaultLanguage;
     }
     String audioUrl;
     audioUrl = uploadAudioFileToGoogleStorage(mpId, track);
@@ -472,7 +485,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     container.put("audio", audioValues);
 
     try {
-      HttpPost httpPost = new HttpPost(GOOGLE_SPEECH_URL + REQUEST_PATH);
+      HttpPost httpPost = new HttpPost(UrlSupport.concat(GOOGLE_SPEECH_URL, REQUEST_METHOD));
       logger.debug("Url to invoke Google speech service: {}", httpPost.getURI().toString());
       StringEntity params = new StringEntity(container.toJSONString());
       httpPost.addHeader("Authorization", "Bearer " + token); // add the authorization header to the request;
@@ -501,7 +514,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
                   "Transcription for mp %s has been submitted. Job id: %s", mpId,
                   jobId));
 
-          database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.Progress.name(),
+          database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.InProgress.name(),
                   track.getDuration() == null ? 0 : track.getDuration().longValue(), PROVIDER);
           EntityUtils.consume(entity);
           return;
@@ -547,7 +560,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       return false;
     }
     try {
-      HttpGet httpGet = new HttpGet(GOOGLE_SPEECH_URL + RESULT_PATH + jobId);
+      HttpGet httpGet = new HttpGet(UrlSupport.concat(GOOGLE_SPEECH_URL, RESULT_PATH, jobId));
       logger.debug("Url to invoke Google speech service: {}", httpGet.getURI().toString());
       // add the authorization header to the request;
       httpGet.addHeader("Authorization", "Bearer " + token);
@@ -595,7 +608,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     } catch (Exception e) {
       String msg = String.format("Exception when calling the recognitions endpoint for media package %s, job id %s",
               mpId, jobId);
-      logger.warn(String.format(msg, mpId, jobId), e);
+      logger.warn(msg, e);
       throw new TranscriptionServiceException(String.format(
               "Exception when calling the recognitions endpoint for media package %s, job id %s", mpId, jobId), e);
     } finally {
@@ -628,7 +641,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       return "No results found";
     }
     try {
-      HttpGet httpGet = new HttpGet(GOOGLE_SPEECH_URL + RESULT_PATH + jobId);
+      HttpGet httpGet = new HttpGet(UrlSupport.concat(GOOGLE_SPEECH_URL, RESULT_PATH, jobId));
       logger.debug("Url to invoke Google speech service: {}", httpGet.getURI().toString());
       // add the authorization header to the request;
       httpGet.addHeader("Authorization", "Bearer " + token);
@@ -728,10 +741,12 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   }
 
   protected CloseableHttpClient makeHttpClient() throws IOException {
-    RequestConfig reqConfig = RequestConfig.custom().setConnectTimeout(CONNECTION_TIMEOUT)
-            .setSocketTimeout(SOCKET_TIMEOUT).setConnectionRequestTimeout(CONNECTION_TIMEOUT).build();
-    return HttpClients.custom().setDefaultRequestConfig(reqConfig)
+    RequestConfig reqConfig = RequestConfig.custom()
+            .setConnectTimeout(CONNECTION_TIMEOUT)
+            .setSocketTimeout(SOCKET_TIMEOUT)
+            .setConnectionRequestTimeout(CONNECTION_TIMEOUT)
             .build();
+    return HttpClients.custom().setDefaultRequestConfig(reqConfig).build();
   }
 
   protected String refreshAccessToken(String clientId, String clientSecret, String refreshToken)
@@ -751,14 +766,15 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
       switch (code) {
         case HttpStatus.SC_OK: // 200
-          accessToken = (String) jsonObject.get("access_token");
-          long duration = (long) jsonObject.get("expires_in"); // Duration in second
+          accessToken = (String) jsonObject.get(ACCESS_TOKEN_NAME);
+          long duration = (long) jsonObject.get(ACCESS_TOKEN_EXPIRY_NAME); // Duration in second
           tokenExpiryTime = (System.currentTimeMillis() + (duration * 1000)); // time in millisecond
           if (!INVALID_TOKEN.equals(accessToken)) {
             logger.info("Google Cloud Service access token created");
             return accessToken;
           }
-          return INVALID_TOKEN;
+          throw new TranscriptionServiceException(
+              String.format("Created token is invalid. Status returned: %d", code), code);
         case HttpStatus.SC_BAD_REQUEST: // 400
         case HttpStatus.SC_UNAUTHORIZED: // 401
           String error = (String) jsonObject.get("error");
@@ -832,7 +848,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   protected void deleteStorageFile(String mpId, String token) throws IOException {
     CloseableHttpClient httpClientDel = makeHttpClient();
     GoogleSpeechTranscriptionServiceStorage storage = new GoogleSpeechTranscriptionServiceStorage();
-    storage.deleteGoogleStorageFile(httpClientDel, storageBucket, mpId + ".flac", token);
+    storage.deleteGoogleStorageFile(httpClientDel, storageBucket, mpId + "." + defaultEncoding, token);
   }
 
   private void sendEmail(String subject, String body) {
@@ -931,17 +947,18 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
 
       try {
         // Find jobs that are in progress and jobs that had transcription complete
-        List<TranscriptionJobControl> jobs = database.findByStatus(TranscriptionJobControl.Status.Progress.name(),
+        List<TranscriptionJobControl> jobs = database.findByStatus(TranscriptionJobControl.Status.InProgress.name(),
                 TranscriptionJobControl.Status.TranscriptionComplete.name());
         for (TranscriptionJobControl j : jobs) {
           String mpId = j.getMediaPackageId();
           String jobId = j.getTranscriptionJobId();
 
           // If the job in progress, check if it should already have finished.
-          if (TranscriptionJobControl.Status.Progress.name().equals(j.getStatus())) {
+          if (TranscriptionJobControl.Status.InProgress.name().equals(j.getStatus())) {
             // If job should already have been completed, try to get the results. Consider a buffer factor so that we
-            // don't try it too early.
-            if (j.getDateCreated().getTime() + j.getTrackDuration() + completionCheckBuffer * 1000 < System
+            // don't try it too early. Results normally should be ready half of the time of the track duration.
+            // The completionCheckBuffer can be used to delay results check.
+            if (j.getDateCreated().getTime() + (j.getTrackDuration() / 2) + completionCheckBuffer * 1000 < System
                     .currentTimeMillis()) {
               try {
                 if (!getAndSaveJobResults(jobId)) {
@@ -954,7 +971,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
                     String token = getRefreshAccessToken();
                     deleteStorageFile(mpId, token);
                     // Send notification email
-                    sendEmail("Transcription ERROR", String.format(
+                    sendEmail(TRANSCRIPTION_ERROR, String.format(
                             "Transcription job was in processing state for too long and was marked as cancelled (media package %s, job id %s).",
                             mpId, jobId));
                   }
@@ -966,7 +983,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
                   // Job not found there, update job state to canceled
                   database.updateJobControl(jobId, TranscriptionJobControl.Status.Canceled.name());
                   // Send notification email
-                  sendEmail("Transcription ERROR",
+                  sendEmail(TRANSCRIPTION_ERROR,
                           String.format("Transcription job was not found (media package %s, job id %s).", mpId, jobId));
                 }
                 continue; // Skip this one, exception was already logged
@@ -983,7 +1000,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
 
             // Apply workflow to attach transcripts
             Map<String, String> params = new HashMap<String, String>();
-            params.put("transcriptionJobId", jobId);
+            params.put(TRANSCRIPTION_JOB_ID_KEY, jobId);
             String wfId = startWorkflow(mpId, workflowDefinitionId, params);
             if (wfId == null) {
               logger.warn("Attach transcription workflow could NOT be scheduled for mp {}, google speech job {}", mpId, jobId);
@@ -1034,7 +1051,12 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
 
     try {
       WorkflowDefinition wfDef = workflowService.getWorkflowDefinitionById(wfDefId);
-      Workflows workflows = wfUtil != null ? wfUtil : new Workflows(assetManager, workspace, workflowService);
+      Workflows workflows;
+      if (wfUtil != null) {
+        workflows = wfUtil;
+      } else {
+        workflows = new Workflows(assetManager, workflowService);
+      }
       Set<String> mpIds = new HashSet<String>();
       mpIds.add(mpId);
       List<WorkflowInstance> wfList = workflows
