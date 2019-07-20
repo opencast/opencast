@@ -24,37 +24,9 @@ import com.entwinemedia.fn.data.Opt;
 
 /**
  * A {@link SeriesCatalogUIAdapter} converts between a concrete {@link org.opencastproject.metadata.api.MetadataCatalog}
- * implementation and a {@link MetadataCollection} that
+ * implementation and a {@link MetadataCollection}
  */
-public interface SeriesCatalogUIAdapter {
-
-  /**
-   * Returns the name of the organization (tenant) this catalog UI adapter belongs to or {@code Opt.none()} if this is a
-   * tenant-agnostic adapter.
-   *
-   * @return The organization name or {@code Opt.none()}
-   */
-  String getOrganization();
-
-  /**
-   * Returns the media type of catalogs managed by this catalog UI adapter.
-   *
-   * @return The media type of the catalog
-   */
-  String getFlavor();
-
-  /**
-   * @return Get the human readable title for this catalog ui adapter for various languages.
-   */
-  String getUITitle();
-
-  /**
-   * Returns all fields of this catalog in a raw data format. This is a good starting point to create a new instance of
-   * this catalog.
-   *
-   * @return The fields with raw data
-   */
-  MetadataCollection getRawFields();
+public interface SeriesCatalogUIAdapter extends CatalogUIAdapter {
 
   /**
    * Returns all fields of this catalog containing the data in an abstract, editable form. If the series cannot be
@@ -67,14 +39,13 @@ public interface SeriesCatalogUIAdapter {
   Opt<MetadataCollection> getFields(String seriesId);
 
   /**
-   * Store changes made to the fields of the metadata collection in the catalog and return an updated version of it.
+   * Store changes made to the fields of the metadata collection in the catalog and return if successful.
    *
    * @param seriesId
    *          The series identifier
    * @param metadata
-   *          The new metadata to update the mediapackage with
+   *          The new metadata to update the media package with
    * @return true, if the metadata could be saved successfully
    */
   boolean storeFields(String seriesId, MetadataCollection metadata);
-
 }

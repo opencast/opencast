@@ -2111,7 +2111,7 @@ public class IndexServiceImpl implements IndexService {
    */
   private MetadataList getMetadataListWithCommonSeriesCatalogUIAdapters() {
     MetadataList metadataList = new MetadataList();
-    metadataList.add(seriesCatalogUIAdapter.getFlavor(), seriesCatalogUIAdapter.getUITitle(),
+    metadataList.add(seriesCatalogUIAdapter.getFlavor().toString(), seriesCatalogUIAdapter.getUITitle(),
             seriesCatalogUIAdapter.getRawFields());
     return metadataList;
   }
@@ -2124,7 +2124,7 @@ public class IndexServiceImpl implements IndexService {
   public MetadataList getMetadataListWithAllSeriesCatalogUIAdapters() {
     MetadataList metadataList = new MetadataList();
     for (SeriesCatalogUIAdapter adapter : getSeriesCatalogUIAdapters()) {
-      metadataList.add(adapter.getFlavor(), adapter.getUITitle(), adapter.getRawFields());
+      metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), adapter.getRawFields());
     }
     return metadataList;
   }
@@ -2154,7 +2154,7 @@ public class IndexServiceImpl implements IndexService {
    */
   private void updateSeriesMetadata(String seriesId, MetadataList metadataList) {
     for (SeriesCatalogUIAdapter adapter : seriesCatalogUIAdapters) {
-      Opt<MetadataCollection> metadata = metadataList.getMetadataByFlavor(adapter.getFlavor());
+      Opt<MetadataCollection> metadata = metadataList.getMetadataByFlavor(adapter.getFlavor().toString());
       if (metadata.isSome() && metadata.get().isUpdated()) {
         adapter.storeFields(seriesId, metadata.get());
       }
@@ -2166,5 +2166,4 @@ public class IndexServiceImpl implements IndexService {
             || WorkflowState.RUNNING.toString().equals(workflowState)
             || WorkflowState.PAUSED.toString().equals(workflowState);
   }
-
 }

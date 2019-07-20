@@ -24,6 +24,7 @@ import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
@@ -107,12 +108,14 @@ public class SeriesWorkflowOperationHandlerTest {
 
     SeriesCatalogUIAdapter adapter = EasyMock.createNiceMock(SeriesCatalogUIAdapter.class);
     EasyMock.expect(adapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
-    EasyMock.expect(adapter.getFlavor()).andReturn("creativecommons/series").anyTimes();
+    EasyMock.expect(adapter.getFlavor()).andReturn(MediaPackageElementFlavor.parseFlavor("creativecommons/series"))
+            .anyTimes();
     EasyMock.replay(adapter);
 
     SeriesCatalogUIAdapter seriesAdapter = EasyMock.createNiceMock(SeriesCatalogUIAdapter.class);
     EasyMock.expect(seriesAdapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
-    EasyMock.expect(seriesAdapter.getFlavor()).andReturn("dublincore/series").anyTimes();
+    EasyMock.expect(seriesAdapter.getFlavor()).andReturn(MediaPackageElementFlavor.parseFlavor("dublincore/series"))
+            .anyTimes();
     EasyMock.replay(seriesAdapter);
 
     // set up the handler
