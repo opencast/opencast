@@ -23,11 +23,10 @@
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
 .controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource',
-  'SeriesThemeResource', 'ResourcesListResource', 'UserRolesResource', 'Notifications', 'OptoutSingleResource',
-  'SeriesParticipationResource', 'AuthService',
+  'SeriesThemeResource', 'ResourcesListResource', 'UserRolesResource', 'Notifications', 'AuthService',
+  'StatisticsReusable',
   function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource,
-    ResourcesListResource, UserRolesResource, Notifications, OptoutSingleResource, SeriesParticipationResource,
-    AuthService) {
+    ResourcesListResource, UserRolesResource, Notifications, AuthService, StatisticsReusable) {
 
     var roleSlice = 100;
     var roleOffset = 0;
@@ -86,7 +85,7 @@ angular.module('adminNg.controllers')
         mode = 'optional'; // defaults to optional
       }
       $scope.updateMode = mode;
-    });
+    }).catch(angular.noop);
 
     $scope.changeBaseAcl = function () {
       $scope.baseAcl = SeriesAccessResource.getManagedAcl({id: this.baseAclId}, function () {
@@ -118,19 +117,6 @@ angular.module('adminNg.controllers')
       $scope.accessSave();
     };
 
-    $scope.updateOptout = function (newBoolean) {
-
-      OptoutSingleResource.save({
-        resource: 'series',
-        id: $scope.resourceId,
-        optout: newBoolean
-      }, function () {
-        Notifications.add('success', 'SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS', 'series-participation');
-      }, function () {
-        Notifications.add('error', 'SERIES_PARTICIPATION_STATUS_UPDATE_ERROR', 'series-participation');
-      });
-    };
-
     $scope.getMoreRoles = function (value) {
 
       if (loading)
@@ -153,13 +139,24 @@ angular.module('adminNg.controllers')
           $scope.roles[role.name] = role.value;
         });
         roleOffset = Object.keys($scope.roles).length;
-      }).finally(function () {
+      }).catch(
+        angular.noop
+      ).finally(function () {
         loading = false;
       });
       return rolePromise;
     };
 
     fetchChildResources = function (id) {
+      var previousProviderData;
+      if ($scope.statReusable !== null) {
+        previousProviderData = $scope.statReusable.statProviderData;
+      }
+      $scope.statReusable = StatisticsReusable.createReusableStatistics(
+        'series',
+        id,
+        previousProviderData);
+
       $scope.metadata = SeriesMetadataResource.get({ id: id }, function (metadata) {
         var seriesCatalogIndex, keepGoing = true;
         angular.forEach(metadata.entries, function (catalog, index) {
@@ -207,7 +204,6 @@ angular.module('adminNg.controllers')
         }
       });
 
-      $scope.participation = SeriesParticipationResource.get({ id: id });
       $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
       $scope.actions = {};
       $scope.hasActions = false;
@@ -254,6 +250,8 @@ angular.module('adminNg.controllers')
       $scope.getMoreRoles();
     };
 
+    $scope.statReusable = null;
+
     // Generate proxy function for the save metadata function based on the given flavor
     // Do not generate it
     $scope.getSaveFunction = function (flavor) {
@@ -287,6 +285,11 @@ angular.module('adminNg.controllers')
     $scope.$on('change', function (event, id) {
       fetchChildResources(id);
     });
+
+    $scope.statisticsCsvFileName = function (statsTitle) {
+      var sanitizedStatsTitle = statsTitle.replace(/[^0-9a-z]/gi, '_').toLowerCase();
+      return 'export_series_' + $scope.resourceId + '_' + sanitizedStatsTitle + '.csv';
+    };
 
     $scope.metadataSave = function (id, callback, catalog) {
       catalog.attributeToSend = id;

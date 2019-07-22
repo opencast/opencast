@@ -69,8 +69,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * The workflow definition for handling "compose" operations
@@ -79,22 +77,6 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
   static final String SEPARATOR = ";";
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ProcessSmilWorkflowOperationHandler.class);
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put("smil-flavor", "The flavor of the smil file");
-    CONFIG_OPTIONS.put("source-flavors", "The \"flavor\" of the track to use as a source input, use \"" + SEPARATOR
-            + "\" to separate sections when using multiple target flavors");
-    CONFIG_OPTIONS.put("encoding-profiles", "The encoding profile(s) to use, use \"" + SEPARATOR
-            + "\" to separate sections mapped to each source-flavor section in the same order");
-    CONFIG_OPTIONS.put("target-flavors", "The flavors to apply to the encoded file, use \"" + SEPARATOR
-            + "\" to separate sections mapped to each source-flavor section in the same order");
-    CONFIG_OPTIONS.put("target-tags", "The tags to apply to the encoded file");
-    CONFIG_OPTIONS.put("tag-with-profile",
-            "Set to 'true' to tag target tracks with corresponding encoding profile Id, false by default");
-  }
 
   /** The composer service */
   private ComposerService composerService = null;
@@ -217,16 +199,6 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
@@ -339,7 +311,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     Map<Job, JobInformation> encodingJobs = new HashMap<Job, JobInformation>();
     for (int i = 0; i < profilesSections.length; i++) {
       // Each section is one multiconcatTrim job - set up the jobs
-      processSection(encodingJobs, mediaPackage, operation, (srcFlavors.length > 1) ? srcFlavors[i] : srcFlavors[0],
+      processSection(encodingJobs, mediaPackage, (srcFlavors.length > 1) ? srcFlavors[i] : srcFlavors[0],
               (targetFlavors != null) ? ((targetFlavors.length > 1) ? targetFlavors[i] : targetFlavors[0]) : null,
               (targetTags != null) ? ((targetTags.length > 1) ? targetTags[i] : targetTags[0]) : null,
               (profilesSections.length > 0) ? profilesSections[i] : profilesSections[0], smilFlavorOption,
@@ -369,7 +341,6 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    *
    * @param encodingJobs
    * @param mediaPackage
-   * @param operation
    * @param srcFlavors
    *          - used to select which param group/tracks to process
    * @param targetFlavors
@@ -393,7 +364,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    * @throws IOException
    */
   private void processSection(Map<Job, JobInformation> encodingJobs, MediaPackage mediaPackage,
-          WorkflowOperationInstance operation, String srcFlavors, String targetFlavors, String targetTags,
+          String srcFlavors, String targetFlavors, String targetTags,
           String encodingProfiles, String smilFlavor, boolean tagWithProfile) throws WorkflowOperationException,
           EncoderException, MediaPackageException, IllegalArgumentException, NotFoundException, IOException {
     // Select the source flavors

@@ -22,11 +22,10 @@
 package org.opencastproject.workflow.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.User;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
@@ -35,6 +34,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlJavaTypeAdapter(WorkflowInstanceImpl.Adapter.class)
 public interface WorkflowInstance extends Configurable {
+
   enum WorkflowState {
     INSTANTIATED, RUNNING, STOPPED, PAUSED, SUCCEEDED, FAILED, FAILING;
 
@@ -47,6 +47,19 @@ public interface WorkflowInstance extends Configurable {
         default:
           return false;
       }
+    }
+    public static class Adapter extends XmlAdapter<String, WorkflowState> {
+
+      @Override
+      public String marshal(WorkflowState workflowState) {
+        return workflowState == null ? null : workflowState.toString().toLowerCase();
+      }
+
+      @Override
+      public WorkflowState unmarshal(String val) {
+        return val == null ? null : WorkflowState.valueOf(val.toUpperCase());
+      }
+
     }
   }
 
@@ -84,18 +97,18 @@ public interface WorkflowInstance extends Configurable {
   Long getParentId();
 
   /**
-   * Returns the user that created this workflow.
+   * Returns the username of the user that created this workflow.
    *
-   * @return the workflow's creator
+   * @return username of the workflow's creator
    */
-  User getCreator();
+  String getCreatorName();
 
   /**
    * Returns the organization that this workflow belongs to.
    *
    * @return the organization
    */
-  Organization getOrganization();
+  String getOrganizationId();
 
   /**
    * Returns a copy of the {@link WorkflowOperationInstance}s that make up this workflow. In order to modify the

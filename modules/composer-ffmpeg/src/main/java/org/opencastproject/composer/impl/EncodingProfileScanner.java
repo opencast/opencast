@@ -303,8 +303,9 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     try {
       Map<String, EncodingProfile> profileMap = loadFromProperties(artifact);
       for (Map.Entry<String, EncodingProfile> entry : profileMap.entrySet()) {
-        logger.info("Installed profile {}", entry.getValue().getIdentifier());
-        profiles.put(entry.getKey(), entry.getValue());
+        EncodingProfile profile = entry.getValue();
+        logger.info("Installed profile {} (load {})", profile.getIdentifier(), profile.getJobLoad());
+        profiles.put(entry.getKey(), profile);
       }
       sumInstalledFiles++;
     } catch (Exception e) {

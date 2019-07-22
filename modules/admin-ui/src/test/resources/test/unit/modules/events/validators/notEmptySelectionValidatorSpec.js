@@ -17,12 +17,13 @@ describe('adminNg.modules.events.validators.notEmptySelectionValidator', functio
     }));
 
     beforeEach(function () {
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $rootScope.listoptions = getJSONFixture('admin-ng/event/new/processing');
         $rootScope.somemodel = {};
         $rootScope.processing = {
             ud: {}
         };
-        //$httpBackend.whenGET('/admin-ng/themes/themes.json').respond(JSON.stringify(getJSONFixture('admin-ng/themes/themes.json')));
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         element = '<form name="testform"><select chosen data-disable-search-threshold="0" not-empty-selection ng-model="somemodel"' +
                   'ng-model-options="{ allowInvalid: true }" ng-options="w.title for (obj, w) in listoptions"/></form>';
         $compile(element)($rootScope);

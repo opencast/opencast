@@ -76,9 +76,7 @@ public class OaiPmhPublicationServiceRemoteImpl extends RemoteBase implements Oa
     final HttpPost post = new HttpPost();
     HttpResponse response = null;
     try {
-      final UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, UTF_8);
-      entity.setContentEncoding(UTF_8.toString());
-      post.setEntity(entity);
+      post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
       response = getResponse(post);
       if (response != null) {
         logger.info("Publishing media package {} to OAI-PMH channel {} using a remote publication service",
@@ -193,9 +191,7 @@ public class OaiPmhPublicationServiceRemoteImpl extends RemoteBase implements Oa
     params.add(new BasicNameValuePair("channel", repository));
     HttpPost post = new HttpPost("/retract");
     HttpResponse response = null;
-    UrlEncodedFormEntity entity = new UrlEncodedFormEntity(params, UTF_8);
-    entity.setContentEncoding(UTF_8.toString());
-    post.setEntity(entity);
+    post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
     try {
       response = getResponse(post);
       Job receipt = null;

@@ -92,6 +92,7 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
       }
     }
 
+    // Mediapackage start date is set by event metadata start date. The "created" metadata field is not used.
     MetadataField<?> startDate = abstractMetadata.getOutputFields().get("startDate");
     if (startDate != null && startDate.getValue().isSome() && startDate.isUpdated()
             && isNotBlank(startDate.getValue().get().toString())) {

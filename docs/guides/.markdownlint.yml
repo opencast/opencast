@@ -1,0 +1,45 @@
+# disable all rules to enable them on a one-by-one basis
+default: false
+
+# unordered list style
+MD004:
+  style: "consistent"
+
+# inconsistent indentation for list items at the same level
+MD005: true
+
+# consider starting bulleted lists at the beginning of the line
+MD006: true
+
+# unordered list indentation
+MD007:
+  # python-markdown requires 4 spaces of indentation.
+  # see https://python-markdown.github.io/#differences
+  indent: 4
+
+# prevent trailing spaces
+MD009: true
+
+# prevent usage of tabs
+MD010: true
+
+# line-length
+MD013:
+  line_length: 120
+  code_blocks: false
+  tables: false
+
+# require space after hash on atx style header
+MD018: true
+
+# prohibit multiple spaces after hash on atx style header
+MD019: true
+
+# prevent multiple top level headers in the same document
+MD025: true
+
+# no empty links
+MD042: true
+
+# accessibility
+MD045: true

@@ -41,6 +41,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,7 +185,6 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
-    String orgId = securityService.getOrganization().getId();
 
     // This provider persists roles but is not authoritative for any roles, so return an empty set
     return new ArrayList<Role>().iterator();
@@ -337,22 +337,22 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       throw new UnauthorizedException("The user is not allowed to set the admin role on other users");
 
     JpaUser updateUser = UserDirectoryPersistenceUtil.findUser(user.getUsername(), user.getOrganization().getId(), emf);
-    if (updateUser == null)
+    if (updateUser == null) {
       throw new NotFoundException("User " + user.getUsername() + " not found.");
+    }
 
     logger.debug("updateUser({})", user.getUsername());
 
     if (!UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, updateUser.getRoles()))
       throw new UnauthorizedException("The user is not allowed to update an admin user");
 
-    String encodedPassword = null;
+    String encodedPassword;
     //only update Password if a value is set
-    if (user.getPassword().isEmpty()) {
-        JpaUser old = UserDirectoryPersistenceUtil.findUser(user.getUsername(),user.getOrganization().getId(), emf);
-        encodedPassword = old.getPassword();
+    if (StringUtils.isEmpty(user.getPassword())) {
+      encodedPassword = updateUser.getPassword();
     } else  {
-    // Update an JPA user with an encoded password.
-    encodedPassword = PasswordEncoder.encode(user.getPassword(), user.getUsername());
+      // Update an JPA user with an encoded password.
+      encodedPassword = PasswordEncoder.encode(user.getPassword(), user.getUsername());
     }
 
     // Only save internal roles

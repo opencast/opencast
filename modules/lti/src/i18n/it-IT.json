@@ -1,0 +1,4 @@
+{
+  "RESULTS": "Risultati {{{range.begin}}}-{{{range.end}}} di {{{total}}}",
+  "CREATOR": "da {{{creator}}}"
+}

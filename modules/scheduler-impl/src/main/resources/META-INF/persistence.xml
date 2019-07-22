@@ -10,7 +10,6 @@
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/opencast)</non-jta-data-source>
     <class>org.opencastproject.scheduler.impl.persistence.ExtendedEventDto</class>
     <class>org.opencastproject.scheduler.impl.persistence.LastModifiedDto</class>
-    <class>org.opencastproject.scheduler.impl.persistence.TransactionDto</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
       <property name="eclipselink.ddl-generation" value="create-tables" />

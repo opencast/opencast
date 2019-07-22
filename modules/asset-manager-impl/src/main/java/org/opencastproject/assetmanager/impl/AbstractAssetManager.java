@@ -75,7 +75,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Core implementation of the asset manager interface.
@@ -106,7 +108,20 @@ public abstract class AbstractAssetManager implements AssetManager {
 
   /* ------------------------------------------------------------------------------------------------------------------ */
 
-  @Override public Snapshot takeSnapshot(final String owner, final MediaPackage mp) {
+  @Override
+  public Opt<MediaPackage> getMediaPackage(String mediaPackageId) {
+    final AQueryBuilder q = createQuery();
+    final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest()))
+            .run();
+
+    if (r.getSize() == 0) {
+      return Opt.none();
+    }
+    return Opt.some(r.getRecords().head2().getSnapshot().get().getMediaPackage());
+  }
+
+  @Override
+  public Snapshot takeSnapshot(final String owner, final MediaPackage mp) {
     if (owner == null)
       return takeSnapshot(mp);
 
@@ -146,6 +161,31 @@ public abstract class AbstractAssetManager implements AssetManager {
     return getDb().saveProperty(property);
   }
 
+  @Override
+  public int deleteProperties(final String mediaPackageId) {
+    return getDb().deleteProperties(mediaPackageId);
+  }
+
+  @Override
+  public int deleteProperties(final String mediaPackageId, final String namespace) {
+    return getDb().deleteProperties(mediaPackageId, namespace);
+  }
+
+  @Override
+  public boolean snapshotExists(final String mediaPackageId) {
+    return getDb().snapshotExists(mediaPackageId);
+  }
+
+  @Override
+  public boolean snapshotExists(final String mediaPackageId, final String organization) {
+    return getDb().snapshotExists(mediaPackageId, organization);
+  }
+
+  @Override
+  public List<Property> selectProperties(final String mediaPackageId, final String namespace) {
+    return getDb().selectProperties(mediaPackageId, namespace);
+  }
+
   @Override public AQueryBuilder createQuery() {
     return new AQueryBuilderImpl(this);
   }
@@ -154,13 +194,22 @@ public abstract class AbstractAssetManager implements AssetManager {
     // try to fetch the asset
     for (final AssetDtos.Medium asset : getDb().getAsset(RuntimeTypes.convert(version), mpId, mpeId)) {
       for (final InputStream assetStream : getLocalAssetStore().get(StoragePath.mk(asset.getOrganizationId(), mpId, version, mpeId))) {
+
+        Checksum checksum = null;
+        try {
+          checksum = Checksum.fromString(asset.getAssetDto().getChecksum());
+        } catch (NoSuchAlgorithmException e) {
+          logger.warn("Invalid checksum for asset {} of media package {}", mpeId, mpId, e);
+        }
+
         final Asset a = new AssetImpl(
                 AssetId.mk(version, mpId, mpeId),
                 assetStream,
                 asset.getAssetDto().getMimeType(),
                 asset.getAssetDto().getSize(),
                 asset.getStorageId(),
-                asset.getAvailability());
+                asset.getAvailability(),
+                checksum);
         return Opt.some(a);
       }
     }
@@ -269,9 +318,10 @@ public abstract class AbstractAssetManager implements AssetManager {
     final String orgId = getCurrentOrgId();
     // store the manifest.xml
     // TODO make use of checksums
-    logger.debug(format("Archiving manifest of media package %s", mpId));
+    logger.debug("Archiving manifest of media package {} version {}", mpId, version);
     // temporarily save the manifest XML into the workspace to
-    final String manifestFileName = format("manifest_%s.xml", pmp.getMediaPackage().getIdentifier().toString());
+    // Fix file not found exception when several snapshots are taken at the same time
+    final String manifestFileName = format("manifest_%s_%s.xml", pmp.getMediaPackage().getIdentifier(), version);
     final URI manifestTmpUri = getWorkspace().putInCollection(
             "archive",
             manifestFileName,

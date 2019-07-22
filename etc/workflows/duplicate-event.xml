@@ -42,6 +42,7 @@
   <operations>
 
     <!-- Create the new events -->
+
     <operation
       id="duplicate-event"
       fail-on-error="true"
@@ -51,20 +52,29 @@
         <configuration key="source-flavors">*/*</configuration>
         <configuration key="number-of-events">${numberOfEvents}</configuration>
         <configuration key="target-tags"></configuration>
-        <configuration key="property-namespaces">org.opencastproject.assetmanager.security</configuration>
+        <configuration key="property-namespaces">org.opencastproject.assetmanager.security,org.opencastproject.workflow.configuration</configuration>
         <configuration key="copy-number-prefix">copy</configuration>
       </configurations>
     </operation>
 
-    <!-- Cleanup the working file repository -->
+    <!-- Clean up work artifacts -->
+
     <operation
-        id="include"
+        id="cleanup"
+        fail-on-error="false"
         description="Remove temporary processing artifacts">
       <configurations>
-        <configuration key="workflow-id">partial-cleanup</configuration>
+        <configuration key="delete-external">true</configuration>
+        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 
   </operations>
+
+  <state-mappings>
+    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.DUPLICATING</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.DUPLICATING</state-mapping>
+  </state-mappings>
 
 </definition>

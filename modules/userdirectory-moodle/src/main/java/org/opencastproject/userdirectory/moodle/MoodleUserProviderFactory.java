@@ -24,6 +24,7 @@ package org.opencastproject.userdirectory.moodle;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.RoleProvider;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.util.NotFoundException;
 
@@ -168,6 +169,8 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
   public void updated(String pid, Dictionary properties) throws ConfigurationException {
     logger.debug("updated MoodleUserProviderFactory");
 
+    String adminUserName = StringUtils.trimToNull(bundleContext.getProperty(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY));
+
     String organization = (String) properties.get(ORGANIZATION_KEY);
     if (StringUtils.isBlank(organization))
       throw new ConfigurationException(ORGANIZATION_KEY, "is not set");
@@ -226,7 +229,7 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
 
     logger.debug("creating new MoodleUserProviderInstance for pid=" + pid);
     MoodleUserProviderInstance provider = new MoodleUserProviderInstance(pid, new MoodleWebServiceImpl(url, token), org,
-            coursePattern, userPattern, groupPattern, groupRoles, cacheSize, cacheExpiration);
+            coursePattern, userPattern, groupPattern, groupRoles, cacheSize, cacheExpiration, adminUserName);
 
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
     providerRegistrations.put(pid, bundleContext.registerService(RoleProvider.class.getName(), provider, null));

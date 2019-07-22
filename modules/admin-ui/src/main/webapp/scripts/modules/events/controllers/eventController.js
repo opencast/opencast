@@ -26,16 +26,15 @@ angular.module('adminNg.controllers')
   '$scope', 'Notifications', 'EventTransactionResource', 'EventMetadataResource', 'EventAssetsResource',
   'EventAssetCatalogsResource', 'CommentResource', 'EventWorkflowsResource', 'EventWorkflowActionResource',
   'EventWorkflowDetailsResource', 'ResourcesListResource', 'UserRolesResource', 'EventAccessResource',
-  'EventPublicationsResource', 'OptoutsResource', 'EventParticipationResource', 'EventSchedulingResource',
-  'NewEventProcessingResource', 'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language',
-  'JsHelper', '$sce', '$timeout', 'EventHelperService', 'UploadAssetOptions', 'EventUploadAssetResource', 'Table',
-  'SchedulingHelperService',
+  'EventPublicationsResource', 'EventSchedulingResource','NewEventProcessingResource', 'CaptureAgentsResource',
+  'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService', 'UploadAssetOptions',
+  'EventUploadAssetResource', 'Table', 'SchedulingHelperService', 'StatisticsReusable',
   function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource,
     EventAssetCatalogsResource, CommentResource, EventWorkflowsResource, EventWorkflowActionResource,
     EventWorkflowDetailsResource, ResourcesListResource, UserRolesResource, EventAccessResource,
-    EventPublicationsResource, OptoutsResource, EventParticipationResource, EventSchedulingResource,
-    NewEventProcessingResource, OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper,
-    $sce, $timeout, EventHelperService, UploadAssetOptions, EventUploadAssetResource, Table, SchedulingHelperService) {
+    EventPublicationsResource, EventSchedulingResource, NewEventProcessingResource, CaptureAgentsResource,
+    ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
+    EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable) {
 
     var roleSlice = 100;
     var roleOffset = 0;
@@ -230,7 +229,7 @@ angular.module('adminNg.controllers')
                 }
               }, this);
               return roles;
-            });
+            }).catch(angular.noop);
           }, this);
         },
         cleanupScopeResources = function() {
@@ -242,6 +241,14 @@ angular.module('adminNg.controllers')
           me.clearConflicts();
         },
         fetchChildResources = function (id) {
+          var previousProviderData;
+          if ($scope.statReusable !== null) {
+            previousProviderData = $scope.statReusable.statProviderData;
+          }
+          $scope.statReusable = StatisticsReusable.createReusableStatistics(
+            'episode',
+            id,
+            previousProviderData);
 
           var publications = EventPublicationsResource.get({ id: id }, function () {
             angular.forEach(publications.publications, function (publication, index) {
@@ -375,13 +382,6 @@ angular.module('adminNg.controllers')
 
           $scope.assets = EventAssetsResource.get({ id: id });
 
-          $scope.participation = EventParticipationResource.get({ id: id }, function (data) {
-            if (data.read_only) {
-              $scope.lastNotificationId = Notifications.add('warning', 'EVENT_PARTICIPATION_STATUS_READONLY',
-                'event-scheduling', -1);
-            }
-          });
-
           $scope.setWorkflowDefinitions = function (workflowDefinitions) {
             $scope.workflowDefinitions = workflowDefinitions;
             $scope.workflowDefinitionIds = workflowDefinitions.map(function (w) {return w.id;});
@@ -421,7 +421,7 @@ angular.module('adminNg.controllers')
                   }
                 }
               });
-            });
+            }).catch(angular.noop);
           }, function () {
             $scope.scheduling.hasProperties = false;
           });
@@ -436,6 +436,7 @@ angular.module('adminNg.controllers')
         },
         tzOffset = (new Date()).getTimezoneOffset() / -60;
 
+    $scope.statReusable = null;
 
     $scope.getMoreRoles = function (value) {
 
@@ -459,16 +460,17 @@ angular.module('adminNg.controllers')
           $scope.roles[role.name] = role.value;
         });
         roleOffset = Object.keys($scope.roles).length;
-      }).finally(function () {
+      }).catch(angular.noop
+      ).finally(function () {
         loading = false;
       });
       return rolePromise;
     };
 
     /**
-         * <===============================
-         * START Scheduling related resources
-         */
+     * <===============================
+     * START Scheduling related resources
+     */
 
     /* Get the current client timezone */
     $scope.tz = 'UTC' + (tzOffset < 0 ? '-' : '+') + tzOffset;
@@ -541,12 +543,11 @@ angular.module('adminNg.controllers')
             resolve();
           } else {
             ConflictCheckResource.check($scope.source, me.noConflictsDetected, me.conflictsDetected)
-                            .$promise.then(function() {
-                              resolve();
-                            })
-                            .catch(function(err) {
-                              reject();
-                            });
+              .$promise.then(function() {
+                resolve();
+              }).catch(function(err) {
+                reject();
+              });
           }
         } else {
           $scope.checkingConflicts = false;
@@ -641,20 +642,6 @@ angular.module('adminNg.controllers')
       return [{
         uri: url
       }];
-    };
-
-    $scope.updateOptout = function (newBoolean) {
-
-      OptoutSingleResource.save({
-        resource: 'event',
-        id: $scope.resourceId,
-        optout: newBoolean
-      }, function () {
-        Notifications.add('success', 'EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS', 'event-scheduling');
-      }, function () {
-        Notifications.add('error', 'EVENT_PARTICIPATION_STATUS_UPDATE_ERROR', 'event-scheduling');
-      });
-
     };
 
     me.loadingWorkflow = true;
@@ -908,6 +895,11 @@ angular.module('adminNg.controllers')
           override: true
         }, me.accessSaved, me.accessNotSaved);
       }
+    };
+
+    $scope.statisticsCsvFileName = function (statsTitle) {
+      var sanitizedStatsTitle = statsTitle.replace(/[^0-9a-z]/gi, '_').toLowerCase();
+      return 'export_event_' + $scope.resourceId + '_' + sanitizedStatsTitle + '.csv';
     };
 
     $scope.severityColor = function (severity) {

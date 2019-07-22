@@ -35,3 +35,4 @@
 # export KARAF_REDIRECT    # Enable/set the std/err redirection when using bin/start
 
 export EXTRA_JAVA_OPTS="-Dorg.eclipse.jetty.server.Request.maxFormContentSize=1500000 -Dfile.encoding=UTF-8"
+export KARAF_NOROOT=true

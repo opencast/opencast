@@ -5,7 +5,6 @@
    "limit":0,
    "results":[
       {
-         "optedOut":false,
          "organizers":[
             "organizer 3"
          ],
@@ -17,7 +16,6 @@
          "title":"title 3"
       },
       {
-         "optedOut":false,
          "organizers":[
             "organizer 2"
          ],
@@ -29,7 +27,6 @@
          "title":"title 2"
       },
       {
-         "optedOut":false,
          "organizers":[
             "organizer 1"
          ],

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.ingestdownloadservice.impl.endpoint.IngestDownloadServiceEndpoint"
+               immediate="true">
+  <implementation class="org.opencastproject.ingestdownloadservice.impl.endpoint.IngestDownloadServiceEndpoint"/>
+  <property name="service.description" value="Ingest download service Endpoint"/>
+  <property name="opencast.service.type" value="org.opencastproject.ingestdownload"/>
+  <property name="opencast.service.path" value="/ingestdownload"/>
+  <property name="opencast.service.jobproducer" value="true"/>
+  <service>
+    <provide interface="org.opencastproject.ingestdownloadservice.impl.endpoint.IngestDownloadServiceEndpoint"/>
+  </service>
+  <reference name="ingest-download-service"
+             interface="org.opencastproject.ingestdownloadservice.api.IngestDownloadService"
+             bind="setIngestDownloadService"/>
+  <reference name="serviceRegistry"
+             interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             bind="setServiceRegistry"/>
+</scr:component>

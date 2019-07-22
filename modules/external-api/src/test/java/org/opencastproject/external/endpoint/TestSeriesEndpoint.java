@@ -110,7 +110,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     series1.setSubject("Topic");
     series1.setCreator("Gracie Walsh");
     series1.setCreatedDateTime(new Date(1429175556000L));
-    series1.setOptOut(true);
     series1.addContributor("Nu'man Farooq Morcos");
     series1.addContributor("Alfie Gibbons");
     series1.addPublisher("Sophie Chandler");

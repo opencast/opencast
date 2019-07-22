@@ -18,7 +18,6 @@
  * the License.
  *
  */
-
 package org.opencastproject.runtimeinfo;
 
 import static org.opencastproject.rest.RestConstants.SERVICES_FILTER;
@@ -28,6 +27,10 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.ServiceRegistration;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.userdirectory.UserIdRoleProvider;
 import org.opencastproject.util.UrlSupport;
@@ -91,6 +94,12 @@ public class RuntimeInfo {
 
   private static final Gson gson = new Gson();
 
+  /* Health Check values */
+  public static final String HEALTH_CHECK_VERSION = "1";
+  public static final String HEALTH_CHECK_STATUS_PASS = "pass";
+  public static final String HEALTH_CHECK_STATUS_WARN = "warn";
+  public static final String HEALTH_CHECK_STATUS_FAIL = "fail";
+
   /**
    * The rest publisher looks for any non-servlet with the 'opencast.service.path' property
    */
@@ -99,6 +108,7 @@ public class RuntimeInfo {
 
   private UserIdRoleProvider userIdRoleProvider;
   private SecurityService securityService;
+  private ServiceRegistry serviceRegistry;
   private BundleContext bundleContext;
   private URL serverUrl;
 
@@ -108,6 +118,10 @@ public class RuntimeInfo {
 
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
   }
 
   private ServiceReference[] getRestServiceReferences() throws InvalidSyntaxException {
@@ -171,7 +185,6 @@ public class RuntimeInfo {
       targetAdminBaseUrl = new URL(targetScheme, serverUrl.getHost(), serverUrl.getPort(), serverUrl.getFile());
     }
 
-
     Map<String, Object> json = new HashMap<>();
     json.put("engage", targetEngageBaseUrl.toString());
     json.put("admin", targetAdminBaseUrl.toString());
@@ -218,12 +231,206 @@ public class RuntimeInfo {
     return gson.toJson(result);
   }
 
+  @GET
+  @Path("health")
+  @Produces("application/health+json")
+  @RestQuery(name = "health", description = "Opencast node health check. Implements this internet-draft health check api https://inadarei.github.io/rfc-healthcheck",
+          reponses = {
+            @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Node is running, check reponse for details"),
+            @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "Node is offline or unresponsive, check response for details")},
+          returnDescription = "Details of the Opencast node's health status")
+
+  public String getHealth(@Context HttpServletResponse response) {
+    /* Response implements https://inadarei.github.io/rfc-healthcheck
+     * Example reponse
+    {
+        "description" : "Opencast node's health status",
+        "releaseId" : "TEST",
+        "checks" : {
+           "service:states" : [
+              {
+                 "observedValue" : "WARNING",
+                 "links" : {
+                    "path" : "service1"
+                 },
+                 "changed" : "Tue Jun 04 11:15:27 BST 2019",
+                 "componentId" : "service1"
+              },
+              {
+                 "changed" : "Tue Jun 04 11:15:27 BST 2019",
+                 "links" : {
+                    "path" : "service2"
+                 },
+                 "observedValue" : "ERROR",
+                 "componentId" : "service2"
+              }
+           ]
+        },
+        "notes" : [
+           "service(s) in WARN state",
+           "service(s) in ERROR state"
+        ],
+        "status" : "warn",
+        "serviceId" : "http://localhost",
+        "version" : "1"
+    }
+     */
+
+    // Conditional workaround for unit tests
+    String releaseId = this.bundleContext != null ? this.bundleContext.getBundle().getVersion().toString() : "TEST";
+    String hostname = serviceRegistry.getRegistryHostname();
+    Health health;
+    Map<String, Object> checks = new HashMap<>();
+
+    try {
+      HostRegistration host = serviceRegistry.getHostRegistration(hostname);
+      health = checkHostHealth(host);
+    } catch (ServiceRegistryException e) {
+      logger.error("Failed to get host registration: ", e);
+      health = new Health();
+      health.setStatus(HEALTH_CHECK_STATUS_FAIL);
+      health.addNote("internal health check error!");
+    }
+
+    // format response
+    Map<String, Object> json = new HashMap<>();
+    json.put("status", health.getStatus());
+    json.put("version", HEALTH_CHECK_VERSION);
+    json.put("releaseId", releaseId);
+    json.put("serviceId", hostname);
+    json.put("description", "Opencast node's health status");
+
+    if (!health.getNotes().isEmpty()) {
+      json.put("notes", health.getNotes());
+    }
+
+    if (!health.getServiceStates().isEmpty()) {
+      checks.put("service:states", health.getServiceStates());
+    }
+
+    if (!checks.isEmpty()) {
+      json.put("checks", checks);
+    }
+
+    if (HEALTH_CHECK_STATUS_FAIL.equalsIgnoreCase(health.getStatus())) {
+      response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+    } else {
+      response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    return gson.toJson(json);
+  }
+
+  private class Health {
+
+    private String status;
+    private List<String> notes;
+    private List<Object> serviceStates;
+
+    Health() {
+      status = HEALTH_CHECK_STATUS_PASS;
+      notes = new ArrayList<>();
+      serviceStates = new ArrayList<>();
+    }
+
+    public String getStatus() {
+      return status;
+    }
+
+    public void setStatus(String status) {
+      this.status = status;
+    }
+
+    public List<String> getNotes() {
+      return notes;
+    }
+
+    public void setNotes(List<String> notes) {
+      this.notes = notes;
+    }
+
+    public List<Object> getServiceStates() {
+      return serviceStates;
+    }
+
+    public void setServiceStates(List<Object> serviceStates) {
+      this.serviceStates = serviceStates;
+    }
+
+    public void addNote(String note) {
+      notes.add(note);
+    }
+
+    public void addServiceState(Object serviceState) {
+      serviceStates.add(serviceState);
+    }
+  }
+
+  private Health checkHostHealth(HostRegistration host) {
+    Health health = new Health();
+
+    // check most severe conditions first
+    if (!host.isOnline()) {
+      // NOTE: This is not strictly possible as a node can't test if it's offline
+      health.setStatus(HEALTH_CHECK_STATUS_FAIL);
+      health.addNote("node is offline");
+    } else if (!host.isActive()) {
+      health.setStatus(HEALTH_CHECK_STATUS_FAIL);
+      health.addNote("node is disabled");
+    } else if (host.isMaintenanceMode()) {
+      health.setStatus(HEALTH_CHECK_STATUS_FAIL);
+      health.addNote("node is in maintenance");
+    } else {
+      // find non normal services
+      try {
+        List<ServiceRegistration> services = serviceRegistry.getServiceRegistrationsByHost(host.getBaseUrl());
+        for (ServiceRegistration service : services) {
+          switch (service.getServiceState()) {
+            case WARNING: {
+              health.setStatus(HEALTH_CHECK_STATUS_WARN);
+              health.addNote("service(s) in WARN state");
+              health.addServiceState(getServiceStateAsJson(service));
+              break;
+            }
+            case ERROR: {
+              health.setStatus(HEALTH_CHECK_STATUS_WARN);
+              health.addNote("service(s) in ERROR state");
+              health.addServiceState(getServiceStateAsJson(service));
+              break;
+            }
+            default:
+              break;
+          }
+        }
+      } catch (ServiceRegistryException e) {
+        logger.error("Failed to get services: ", e);
+        health.setStatus(HEALTH_CHECK_STATUS_FAIL);
+        health.addNote("internal health check error!");
+      }
+    }
+
+    return health;
+  }
+
+  protected Map<String, Object> getServiceStateAsJson(ServiceRegistration service) {
+    Map<String, Object> json = new HashMap<>();
+    json.put("componentId", service.getServiceType());
+    json.put("observedValue", service.getServiceState().toString());
+    json.put("changed", service.getStateChanged().toString());
+    Map<String, Object> links = new HashMap<>();
+    links.put("path", service.getPath());
+    json.put("links", links);
+
+    return json;
+  }
+
   private List<Map<String, String>> getRestEndpointsAsJson(HttpServletRequest request)
           throws MalformedURLException, InvalidSyntaxException {
     List<Map<String, String>> result = new ArrayList<>();
     ServiceReference[] serviceRefs = getRestServiceReferences();
-    if (serviceRefs == null)
+    if (serviceRefs == null) {
       return result;
+    }
     for (ServiceReference servletRef : sort(serviceRefs)) {
       final String servletContextPath = (String) servletRef.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
       final Map<String, String> endpoint = new HashMap<>();
@@ -241,8 +448,9 @@ public class RuntimeInfo {
   private List<Map<String, String>> getUserInterfacesAsJson() throws InvalidSyntaxException {
     List<Map<String, String>> result = new ArrayList<>();
     ServiceReference[] serviceRefs = getUserInterfaceServiceReferences();
-    if (serviceRefs == null)
+    if (serviceRefs == null) {
       return result;
+    }
     for (ServiceReference ref : sort(serviceRefs)) {
       String description = (String) ref.getProperty(Constants.SERVICE_DESCRIPTION);
       String version = ref.getBundle().getVersion().toString();
@@ -262,7 +470,7 @@ public class RuntimeInfo {
    * Returns the array of references sorted by their Constants.SERVICE_DESCRIPTION property.
    *
    * @param references
-   *          the referencens
+   *          the references
    * @return the sorted set of references
    */
   private static SortedSet<ServiceReference> sort(ServiceReference[] references) {

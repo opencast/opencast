@@ -36,7 +36,6 @@ import org.opencastproject.adminui.util.TextFilter;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentState;
-import org.opencastproject.capture.admin.api.CaptureAgentAdminRoleProvider;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
@@ -99,8 +98,6 @@ public class CaptureAgentsEndpoint {
   /** The capture agent service */
   private CaptureAgentStateService service;
 
-  private CaptureAgentAdminRoleProvider roleProvider;
-
   private SecurityService securityService;
 
   /**
@@ -111,10 +108,6 @@ public class CaptureAgentsEndpoint {
    */
   public void setCaptureAgentService(CaptureAgentStateService service) {
     this.service = service;
-  }
-
-  public void setRoleProvider(CaptureAgentAdminRoleProvider roleProvider) {
-    this.roleProvider = roleProvider;
   }
 
   public void setSecurityService(SecurityService securityService) {
@@ -208,7 +201,7 @@ public class CaptureAgentsEndpoint {
     // Run through and build a map of updates (rather than states)
     List<JValue> agentsJSON = new ArrayList<>();
     for (Agent agent : filteredAgents) {
-      agentsJSON.add(generateJsonAgent(agent, /* Option.option(room), blacklist, */ inputs, false));
+      agentsJSON.add(generateJsonAgent(agent, inputs, false));
     }
 
     return okJsonList(agentsJSON, offset, limit, total);
@@ -227,9 +220,6 @@ public class CaptureAgentsEndpoint {
     SecurityUtil.checkAgentAccess(securityService, agentName);
 
     service.removeAgent(agentName);
-
-    // Remove the corresponding capture agent roles
-    this.roleProvider.removeRole(agentName);
 
     logger.debug("The agent {} was successfully removed", agentName);
     return Response.status(SC_OK).build();
@@ -262,7 +252,7 @@ public class CaptureAgentsEndpoint {
   }
 
   /**
-   * Generate a JSON Object for the given capture agent with its related blacklist periods
+   * Generate a JSON Object for the given capture agent
    *
    * @param agent
    *          The target capture agent

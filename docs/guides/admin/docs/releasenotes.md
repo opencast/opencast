@@ -1,64 +1,38 @@
-Opencast 7: Release Notes
+Opencast 8: Release Notes
 =========================
 
-New Features
-------------
+Features
+--------
 
-- Overhaul of the permission management with the newly added possibility to define how access control lists are
-  evaluated and how series permission changes are populated to episodes. For more details take a look at the [access
-  control configuration guide](configuration/acl.md).
-- Canvas user and role provider
-- Update Elasticsearch and make is possible to run Elasticsearch as an external service.
-- Per-Tenant Capture Agent Users
-- Asset manager snaphots clean-up to remove older snapshots for a given media package. In some cases, this can
-  drasticaly reduce Opencast's storage consumption. This feature is implemented as option to the [asset-delete workflow
-  operation handler](workflowoperationhandlers/asset-delete-woh.md).
-- Allows the workflow to select the audio track for composite video
-- Improve scheduler performance, reducing the time for adding multiple schedules by up to 90% compared to the previous
-  implementation.
-- Add multi-tenant support for all list providers
-- Make waveform size configurable
-- Create a generic user interface configuration service
-- Add link to series details, out of the eventstable-view
-- Internationalization support for series LTI tools
-- Display responsible person for workflows
-- Allow the Ingest Service to make authenticated requests to other servers
-- Crop service
+- The `adminworker` distribution is no longer available.
 
 Improvements
 ------------
 
-A non-comprehensive list of improvements:
+- Media package elements retrieved from the asset manager (e.g. using “start task”) now always get tagged `archive` even
+  when they have not been tagged thus before.
 
-- improvement 1
-- improvement 2
 
 Configuration changes
 ---------------------
 
-- …
+
+API changes
+-----------
+
+- Removed REST endpoints for modifying workflow definitions
+    - DELETE /workflow/definition/{id}
+    - PUT /workflow/definition
 
 
-Additional Notes about 6.1
+Additional Notes About 7.1
 --------------------------
 
-Opencast 6.1 contains a number of bug fixes, some of which are security relevant. The following known vulnerabilities
-within Opencast's `com.fasterxml.jackson.core:jackson-databind` dependency have been fixed by this release:
-`CVE-2018-19361`, `CVE-2018-19362`, `CVE-2018-19360`.
-
+Opencast 7.1 is the first maintenance release for Opencast 7. It fixes a bug with the scheduler migration which may have
+caused minor issues for old, process events which were missing some meta-data. If you have already migrated to Opencast
+7.0 and experience this problem, simply re-start the scheduler migration and re-build the index once more.
 
 Release Schedule
 ----------------
 
-|Date                         |Phase
-|-----------------------------|------------------------------------------
-|April 1st 2019               |Feature Freeze
-|May 6th - May 12th 2019      |Translation week
-|May 13th - May 26th 2019     |Public QA phase
-|June 13th 2019               |Release of Opencast 7.0
-
-Release Managers
-----------------
-
-- Maximiliano Lira Del Canto (University of Cologne)
-- Katrin Ihler (ELAN e.V.)
+TBD

@@ -24,6 +24,7 @@ package org.opencastproject.index.service.api;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventHttpServletRequest;
@@ -159,8 +160,10 @@ public interface IndexService {
    *           Thrown if there was an internal server error while creating the event.
    * @throws IllegalArgumentException
    *           Thrown if the provided request was inappropriate.
+   * @throws UnsupportedAssetException
+   *           Thrown if the provided asset file type is not accepted.
    */
-  String createEvent(HttpServletRequest request) throws IndexServiceException, IllegalArgumentException;
+  String createEvent(HttpServletRequest request) throws IndexServiceException, IllegalArgumentException, UnsupportedAssetException;
 
   /**
    * Creates a new event based on a json string and a media package.
@@ -250,9 +253,11 @@ public interface IndexService {
    *           Thrown if the current user is unable to create the new event.
    * @throws IndexServiceException
    *            Thrown if the update assets workflow cannot be started
+   * @throws UnsupportedAssetException
+   *           Thrown if the provided asset file type is not accepted.
    */
   String updateEventAssets(MediaPackage mp, HttpServletRequest request) throws ParseException, IOException,
-          MediaPackageException, NotFoundException, UnauthorizedException, IndexServiceException;
+          MediaPackageException, NotFoundException, UnauthorizedException, IndexServiceException, UnsupportedAssetException;
 
   /**
    * Update an event's metadata using a {@link MetadataList}
@@ -468,27 +473,6 @@ public interface IndexService {
   List<SeriesCatalogUIAdapter> getSeriesCatalogUIAdapters();
 
   /**
-   * Changes the opt out status of a single event (by its mediapackage id)
-   *
-   * @param eventId
-   *          The event's unique id formally the mediapackage id
-   * @param optout
-   *          Whether the event should be moved into opted out.
-   * @param index
-   *          The index to update the event in.
-   * @throws NotFoundException
-   *           Thrown if the event could not be found.
-   * @throws SchedulerException
-   *           Thrown if there was an error in the scheduler service
-   * @throws SearchIndexException
-   *           Thrown if there was and error in search index
-   * @throws UnauthorizedException
-   *           Thrown if the current user is unable to update the event.
-   */
-  void changeOptOutStatus(String eventId, boolean optout, AbstractSearchIndex index)
-          throws NotFoundException, SchedulerException, SearchIndexException, UnauthorizedException;
-
-  /**
    * Update only the common default series metadata.
    *
    * @param id
@@ -566,21 +550,6 @@ public interface IndexService {
    */
   void removeCatalogByFlavor(Series series, MediaPackageElementFlavor flavor)
           throws IndexServiceException, NotFoundException;
-
-  /**
-   * Checks if the given event as an active transaction
-   *
-   * @param eventId
-   *          the event to check
-   * @return Whether the event has an active transaction or not
-   * @throws NotFoundException
-   *           Thrown if the {@link Event} could not be found.
-   * @throws UnauthorizedException
-   *           Thrown if the current user is unable to access the given event.
-   * @throws IndexServiceException
-   *           Thrown if there was an error reading the given event.
-   */
-  boolean hasActiveTransaction(String eventId) throws NotFoundException, UnauthorizedException, IndexServiceException;
 
   /**
    * Checks if the given event has snapshots

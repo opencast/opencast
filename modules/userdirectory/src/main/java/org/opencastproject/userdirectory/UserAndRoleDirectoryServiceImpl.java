@@ -365,7 +365,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
     // Create and return the final user
     JaxbUser mergedUser = new JaxbUser(user.getUsername(), user.getPassword(), user.getName(), user.getEmail(),
-            user.getProvider(), user.canLogin(), JaxbOrganization.fromOrganization(user.getOrganization()), roles);
+            user.getProvider(), JaxbOrganization.fromOrganization(user.getOrganization()), roles);
     mergedUser.setManageable(user.isManageable());
     return mergedUser;
   }
@@ -376,8 +376,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    * @see org.springframework.security.core.userdetails.UserDetailsService#loadUserByUsername(java.lang.String)
    */
   @Override
-  public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException,
-          org.springframework.dao.DataAccessException {
+  public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
     User user = loadUser(userName);
     if (user == null)
       throw new UsernameNotFoundException(userName);
@@ -403,7 +402,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     // need a non null password to instantiate org.springframework.security.core.userdetails.User
     // but CAS authenticated users have no password
     String password = user.getPassword() == null ? DEFAULT_PASSWORD : user.getPassword();
-    return new org.springframework.security.core.userdetails.User(user.getUsername(), password, user.canLogin(), true,
+    return new org.springframework.security.core.userdetails.User(user.getUsername(), password, true, true,
             true, true, authorities);
 
   }

@@ -8,8 +8,6 @@
   <persistence-unit name="org.opencastproject.authorization.xacml.manager" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/opencast)</non-jta-data-source>
-    <class>org.opencastproject.authorization.xacml.manager.impl.persistence.EpisodeAclTransitionEntity</class>
-    <class>org.opencastproject.authorization.xacml.manager.impl.persistence.SeriesAclTransitionEntity</class>
     <class>org.opencastproject.authorization.xacml.manager.impl.persistence.ManagedAclEntity</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>

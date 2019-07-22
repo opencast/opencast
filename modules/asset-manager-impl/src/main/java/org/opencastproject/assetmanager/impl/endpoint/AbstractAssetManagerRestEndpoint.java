@@ -25,6 +25,7 @@ import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
@@ -48,9 +49,12 @@ import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.impl.TieredStorageAssetManager;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageImpl;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.util.Checksum;
+import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.MimeTypeUtil;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -59,6 +63,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.entwinemedia.fn.data.Opt;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -72,6 +77,7 @@ import java.util.Map;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -221,17 +227,15 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
           @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "There has been an internal error.")
       })
   public Response getMediaPackage(@PathParam("mediaPackageID") final String mediaPackageId) {
+
     try {
-      final AQueryBuilder q = getAssetManager().createQuery();
-      final AResult r = q.select(q.snapshot())
-              .where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest()))
-              .run();
-      if (r.getSize() == 1) {
-        return ok(r.getRecords().head2().getSnapshot().get().getMediaPackage());
-      } else if (r.getSize() == 0) {
+      Opt<MediaPackage> mp = getAssetManager().getMediaPackage(mediaPackageId);
+
+      if (mp.isSome()) {
+        return ok(mp.get());
+      } else {
         return notFound();
       }
-      return serverError();
     } catch (Exception e) {
       return handleException(e);
     }
@@ -271,6 +275,9 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               responseCode = SC_NOT_FOUND,
               description = "Not found"),
           @RestResponse(
+              responseCode = SC_NOT_MODIFIED,
+              description = "If file not modified"),
+          @RestResponse(
               description = "Not allowed to read assets of this snapshot.",
               responseCode = SC_FORBIDDEN),
           @RestResponse(
@@ -278,13 +285,33 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               responseCode = SC_INTERNAL_SERVER_ERROR)})
   public Response getAsset(@PathParam("mediaPackageID") final String mediaPackageID,
                            @PathParam("mediaPackageElementID") final String mediaPackageElementID,
-                           @PathParam("version") final String version) {
+                           @PathParam("version") final String version,
+                           @HeaderParam("If-None-Match") String ifNoneMatch) {
+
     try {
       for (final Version v : getAssetManager().toVersion(version)) {
         for (Asset asset : getAssetManager().getAsset(v, mediaPackageID, mediaPackageElementID)) {
+
+          if (StringUtils.isNotBlank(ifNoneMatch)) {
+            Checksum checksum = asset.getChecksum();
+
+            if (checksum != null && checksum.getType().equals(ChecksumType.DEFAULT_TYPE)) {
+              String md5 = checksum.getValue();
+
+              if (md5.equals(ifNoneMatch)) {
+                return Response.notModified(md5).build();
+              }
+            }
+            else {
+              logger.warn("Checksum of asset {} of media package {} is of incorrect type or missing",
+                      mediaPackageElementID, mediaPackageID);
+            }
+          }
+
           final String fileName = mediaPackageElementID
                   .concat(".")
                   .concat(asset.getMimeType().bind(suffix).getOr("unknown"));
+
           asset.getMimeType().map(MimeTypeUtil.Fns.toString);
           // Write the file contents back
           Option<Long> length = asset.getSize() > 0 ? Option.some(asset.getSize()) : Option.none();

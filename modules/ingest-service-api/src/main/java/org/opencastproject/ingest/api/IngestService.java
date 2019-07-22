@@ -25,7 +25,6 @@ import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.identifier.HandleException;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.ConfigurationException;
@@ -147,14 +146,12 @@ public interface IngestService extends JobProducer {
    *
    * @return The created MediaPackage
    * @throws MediaPackageException
-   * @throws HandleException
    * @throws ConfigurationException
    * @throws IOException
    * @throws IngestException
    *           if an unexpected error occurs
    */
-  MediaPackage createMediaPackage() throws MediaPackageException, ConfigurationException, HandleException, IOException,
-          IngestException;
+  MediaPackage createMediaPackage() throws MediaPackageException, ConfigurationException, IOException, IngestException;
 
  /**
    * Create a new MediaPackage in the repository.
@@ -162,14 +159,13 @@ public interface IngestService extends JobProducer {
    *   The Id for the new Mediapackage
    * @return The created MediaPackage
    * @throws MediaPackageException
-   * @throws HandleException
    * @throws ConfigurationException
    * @throws IOException
    * @throws IngestException
    *           if an unexpected error occurs
    */
-  MediaPackage createMediaPackage(String mediaPackageID) throws MediaPackageException, ConfigurationException, HandleException, IOException,
-          IngestException;
+  MediaPackage createMediaPackage(String mediaPackageID) throws MediaPackageException, ConfigurationException,
+          IOException, IngestException;
 
 
   /**

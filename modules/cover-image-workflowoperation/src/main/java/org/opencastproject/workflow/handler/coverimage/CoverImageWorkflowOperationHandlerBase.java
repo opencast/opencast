@@ -63,8 +63,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
 
 /**
@@ -82,23 +80,8 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
   private static final String TARGET_FLAVOR = "target-flavor";
   private static final String TARGET_TAGS = "target-tags";
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CoverImageWorkflowOperationHandlerBase.class);
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(XSL_FILE_URL, "URL to the XSL stylesheet");
-    CONFIG_OPTIONS.put(XML_METADATA, "XML metadata");
-    CONFIG_OPTIONS.put(WIDTH, "Width of the resulting cover image");
-    CONFIG_OPTIONS.put(HEIGHT, "Height of the resulting cover image");
-    CONFIG_OPTIONS.put(POSTERIMAGE_FLAVOR, "Poster image flavor");
-    CONFIG_OPTIONS.put(POSTERIMAGE_URL, "URL to a poster image");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR, "Target flavor");
-    CONFIG_OPTIONS.put(TARGET_TAGS, "Target tags");
-  }
 
   /** Returns a cover image service */
   protected abstract CoverImageService getCoverImageService();

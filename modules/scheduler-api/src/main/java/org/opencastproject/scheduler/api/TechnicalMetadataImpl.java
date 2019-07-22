@@ -37,7 +37,6 @@ public class TechnicalMetadataImpl implements TechnicalMetadata {
   private String agentId;
   private Date startDate;
   private Date endDate;
-  private boolean optOut;
   private Set<String> presenters = new HashSet<>();
   private Map<String, String> workflowProperties = new HashMap<>();
   private Map<String, String> agentConfig = new HashMap<>();
@@ -54,8 +53,6 @@ public class TechnicalMetadataImpl implements TechnicalMetadata {
    *          the start date
    * @param endDate
    *          the end date
-   * @param optOut
-   *          the opt out status
    * @param presenters
    *          the list of presenters
    * @param workflowProperties
@@ -65,14 +62,13 @@ public class TechnicalMetadataImpl implements TechnicalMetadata {
    * @param recording
    *          the recording
    */
-  public TechnicalMetadataImpl(String eventId, String agentId, Date startDate, Date endDate, boolean optOut,
+  public TechnicalMetadataImpl(String eventId, String agentId, Date startDate, Date endDate,
           Set<String> presenters, Map<String, String> workflowProperties, Map<String, String> agentConfig,
           Opt<Recording> recording) {
     this.eventId = eventId;
     this.agentId = agentId;
     this.startDate = startDate;
     this.endDate = endDate;
-    this.optOut = optOut;
     this.presenters = presenters;
     this.workflowProperties = workflowProperties;
     this.agentConfig = agentConfig;
@@ -113,15 +109,6 @@ public class TechnicalMetadataImpl implements TechnicalMetadata {
 
   public void setEndDate(Date endDate) {
     this.endDate = endDate;
-  }
-
-  @Override
-  public boolean isOptOut() {
-    return optOut;
-  }
-
-  public void setOptOut(boolean optOut) {
-    this.optOut = optOut;
   }
 
   @Override

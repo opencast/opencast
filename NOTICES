@@ -23,26 +23,104 @@ distributed under licenses that are compatible with ECL 2.0.
 List of Included Third-Party Dependencies
 -----------------------------------------
 
+modules/admin-ui/bower_components/angular/.*
+  angular 1.7.8 (https://github.com/angular/angular.js)
+  Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-animate/.*
+  angular-animate 1.7.8 (https://github.com/angular/angular.js)
+  Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-chart-js/.*
+  angular-chart-js 1.1.1 (https://github.com/jtblin/angular-chart.js)
+  Copyright (c) Jerome Touffe-Blin ("Author")
+  Licensed under BSD
+
+modules/admin-ui/bower_components/angular-hotkeys/.*
+  angular-hotkeys 1.7.0 (https://github.com/chieffancypants/angular-hotkeys)
+  Copyright (c) 2014 Wes Cruver
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-local-storage/.*
+  angular-local-storage 0.7.1 (https://github.com/grevory/angular-local-storage.git)
+  Copyright (c) 2016 Gregory Pike
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-messages/.*
+  angular-messages 1.7.8 (https://github.com/angular/angular.js)
+  Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-mocks/.*
+  angular-mocks 1.7.8 (https://github.com/angular/angular.js)
+  Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-resource/.*
+  angular-resource 1.7.8 (https://github.com/angular/angular.js)
+  Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-route/.*
+  angular-route 1.7.8 (https://github.com/angular/angular.js)
+  Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-translate/.*
+  angular-translate 2.18.1 (https://github.com/angular-translate/angular-translate)
+  Copyright (c) 2013-2017 The angular-translate team and Pascal Precht
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-translate-loader-static-files/.*
+  angular-translate-loader-static-files 2.18.1 (https://github.com/angular-translate/bower-angular-translate-loader-static-files.git)
+  Copyright (c) 2013-2017 The angular-translate team and Pascal Precht
+  Licensed under MIT
+
+modules/admin-ui/bower_components/angular-ui-sortable/.*
+  angular-ui-sortable - This directive allows you to jQueryUI Sortable.
+  @version v0.19.0 - 2018-01-14
+  @link http://angular-ui.github.com
+  @license MIT
+
+modules/admin-ui/bower_components/angular-wizard/.*
+  angular-wizard 1.1.1 (git://github.com/mgonto/angular-wizard.git)
+  Copyright (c) 2013-2014 Martin Gontovnikas http://www.gon.to/
+  Licensed under MIT
+
+modules/admin-ui/bower_components/chart.js/.*
+  chart.js 2.8.0 (https://github.com/chartjs/Chart.js)
+  Copyright (c) 2018 Chart.js Contributors
+  Licensed under MIT
+
+modules/admin-ui/bower_components/ng-file-upload/.*
+  angular-file-upload 2.2.2 (https://github.com/danialfarid/angular-file-upload)
+  Copyright (c) 2013 danialfarid
+  Licensed under MIT
+
+modules/admin-ui/bower_components/jquery/*
+  jQuery JavaScript Library v3.4.1
+  http://jquery.com/
+  Copyright JS Foundation and other contributors
+  Released under the MIT license
+  http://jquery.org/license
+
+modules/admin-ui/bower_components/jquery-ui/*
+  jQuery UI - v1.12.1 - 2016-09-14
+  http://jqueryui.com
+  Copyright 2014 jQuery Foundation and other contributors; Licensed MIT */
+
+modules/admin-ui/bower_components/jqueryui-timepicker-addon/*
+  jQuery Timepicker Addon - v1.6.3 - 2016-04-20
+  http://trentrichardson.com/examples/timepicker
+  Copyright (c) 2016 Trent Richardson; Licensed MIT
+
 modules/admin-ui/src/main/webapp/css/vendor/chosen.less
   Chosen, a Select Box Enhancer for jQuery and Prototype
   by Patrick Filler for Harvest, http://getharvest.com
   Copyright (c) 2011 - 2016 Harvest http://getharvest.com
   MIT License, https://github.com/harvesthq/chosen/blob/master/LICENSE.md
-
-modules/admin-ui/src/main/webapp/lib/angular/*
-  AngularJS v1.3.6
-  (c) 2010-2014 Google, Inc. http://angularjs.org
-  License: MIT
-
-modules/admin-ui/src/main/webapp/lib/angular-file-upload/*
-  Copyright (c) 2013 danialfarid
-  The MIT License (MIT)
-
-modules/admin-ui/src/main/webapp/lib/angular-sortable.js
-  UI.Sortable
-  https://github.com/angular-ui/ui-sortable
-  Copyright (c) 2012 the AngularUI Team, http://angular-ui.github.com
-  MIT License
 
 modules/admin-ui/src/main/webapp/lib/chosen.js
 modules/admin-ui/src/main/webapp/lib/chosen.jquery.*
@@ -55,7 +133,7 @@ modules/admin-ui/src/main/webapp/lib/chosen.jquery.*
 modules/admin-ui/src/main/webapp/lib/angular-chosen.js
 modules/admin-ui/src/main/webapp/lib/angular-chosen.min.js
   Angular Binding for Harvest Chosen
-  Version 1.6.0
+  Version 1.8.0, 1.8.2
   Copyright (c) 2013 Localytics http://www.localytics.com
   MIT License
 
@@ -63,11 +141,6 @@ modules/admin-ui/src/main/webapp/lib/datepicker/*
   jQuery UI - v1.10.3 - 2013-12-13
   http://jqueryui.com
   Copyright 2013 jQuery Foundation and other contributors; Licensed MIT
-
-modules/admin-ui/src/main/webapp/lib/timepicker/*
-  jQuery Timepicker Addon - v1.6.3 - 2016-04-20
-  http://trentrichardson.com/examples/timepicker
-  Copyright (c) 2016 Trent Richardson; Licensed MIT 
 
 modules/admin-ui/src/main/webapp/lib/font-awesome/*
   Font Awesome 4.2.0 by @davegandy - http://fontawesome.io - @fontawesome
@@ -78,25 +151,6 @@ modules/admin-ui/src/main/webapp/lib/google-fonts/*
   Steve Matteson
   https://www.google.com/fonts/specimen/Open+Sans
   Apache License, version 2.0
-
-modules/admin-ui/src/main/webapp/lib/javascript-md5/*
-  JavaScript MD5
-  https://github.com/blueimp/JavaScript-MD5
-  Copyright 2011, Sebastian Tschan https://blueimp.net
-  Licensed under the MIT license:
-  http://www.opensource.org/licenses/MIT
-
-modules/admin-ui/src/main/webapp/lib/jquery-1.10.2.js
-  jQuery JavaScript Library v1.10.2
-  http://jquery.com/
-  Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors
-  Released under the MIT license
-  http://jquery.org/license
-
-modules/admin-ui/src/main/webapp/lib/jquery-ui.js
-  jQuery UI - v1.10.4 - 2014-01-17
-  http://jqueryui.com
-  Copyright 2014 jQuery Foundation and other contributors; Licensed MIT */
 
 modules/admin-ui/src/main/webapp/lib/moment.min.js
   version : 2.9.0
@@ -465,16 +519,6 @@ modules/engage-ui/src/main/resources/ui/css/bootstrap.*
   Copyright 2011-2015 Twitter, Inc.
   Licensed under MIT
 
-modules/admin-ui/src/main/webapp/lib/angular-wizard/.*
-  angular-wizard 0.6.1 (https://github.com/mgonto/angular-wizard)
-  Copyright (c) 2013-2014 Martin Gontovnikas http://www.gon.to/
-  Licensed under MIT
-
-modules/admin-ui/bower_components/angular-hotkeys/.*
-  angular-wizard 0.6.1 (https://github.com/chieffancypants/angular-hotkeys)
-  Copyright (c) 2014 Wes Cruver
-  Licensed under MIT
-
 modules/engage-ui/src/main/resources/ui/js/alertify/alertify.js
   AlertifyJS - v0.13.12
   Copyright Fabien Doiron <fabien.doiron@gmail.com>
@@ -485,6 +529,11 @@ modules/engage-ui/src/main/resources/ui/js/jquery-localize.min.js
   Copyright (c) Jim Garvin (http://github.com/coderifous), 2008.
   Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt)
   and MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses.
+
+modules/engage-ui/src/main/resources/ui/js/lib/js-yaml.min.js
+  js-yaml 3.13.1
+  https://github.com/nodeca/js-yaml
+  MIT License
 
 modules/engage-ui/src/main/resources/ui/js/bootstrap-accessibility.min.js
   bootstrap-accessibility-plugin - v1.0.4 - 2014-11-03
@@ -625,9 +674,10 @@ admin-ui
   com.jayway.restassured                 rest-assured                                     Apache 2.0
   javax.ws.rs                            jsr311-api                                       -
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  net.fortuna.ical4j                     ical4j                                           -
+  org.mnode.ical4j                       ical4j                                           BSD 3-Clause License
   org.codehaus.groovy                    groovy-all                                       The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
+  org.influxdb                           org.influxdb                                     MIT License
 
 
 annotation-impl
@@ -755,11 +805,6 @@ conductor
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
-
-
-dataloader
-  GroupId                                ArtifactId                                       License
-  org.apache.commons                     commons-csv                                      The Apache Software License, Version 2.0
 
 
 db
@@ -1013,19 +1058,6 @@ message-broker-impl
   org.slf4j                              slf4j-api                                        MIT License
 
 
-messages
-  GroupId                                ArtifactId                                       License
-  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
-  commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
-  commons-collections                    commons-collections                              The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.cxf                         cxf-bundle-jaxrs                                 The Apache Software License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.slf4j                              slf4j-api                                        MIT License
-
-
 metadata
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
@@ -1092,7 +1124,7 @@ scheduler-impl
   commons-logging                        commons-logging                                  The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  net.fortuna.ical4j                     ical4j                                           -
+  org.mnode.ical4j                       ical4j                                           BSD 3-Clause License
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 
@@ -1267,6 +1299,43 @@ static-file-service-impl
   org.jdom                               com.springsource.org.jdom                        -
   org.slf4j                              slf4j-api                                        MIT License
 
+
+statistics-provider-influx
+  GroupId                                ArtifactId                                       License
+  com.googlecode.json-simple             son-simple                                       The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
+  org.influxdb                           influxdb-java                                    MIT License
+  org.osgi                               org.osgi.core                                    The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.compendium                              The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+statistics-provider-random
+  GroupId                                ArtifactId                                       License
+  com.googlecode.json-simple             son-simple                                       The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.core                                    The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.compendium                              The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+statistics-provider-impl
+  GroupId                                ArtifactId                                       License
+  com.googlecode.json-simple             son-simple                                       The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.core                                    The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.compendium                              The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+statistics-provider-remote
+  GroupId                                ArtifactId                                       License
+  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.core                                    The Apache Software License, Version 2.0
+  org.osgi                               org.osgi.compendium                              The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
 
 textanalyzer-impl
   GroupId                                ArtifactId                                       License

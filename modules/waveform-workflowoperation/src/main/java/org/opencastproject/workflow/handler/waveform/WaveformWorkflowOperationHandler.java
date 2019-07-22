@@ -92,6 +92,9 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
   /** Height of waveform image configuration property name. */
   private static final String HEIGHT_PROPERTY = "height";
 
+  /** Color of waveform image configuration property name. */
+  private static final String COLOR_PROPERTY = "color";
+
   /** The waveform service. */
   private WaveformService waveformService = null;
 
@@ -151,6 +154,8 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
       DEFAULT_HEIGHT
     );
 
+    String color = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(COLOR_PROPERTY));
+
     try {
       TrackSelector trackSelector = new TrackSelector();
       for (String flavor : asList(sourceFlavorProperty)) {
@@ -178,7 +183,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
           logger.info("Creating waveform extraction job for track '{}' in mediapackage '{}'", sourceTrack.getIdentifier(), mediaPackage);
 
           Job waveformJob = waveformService.createWaveformImage(sourceTrack, pixelsPerMinute, minWidth, maxWidth,
-            height);
+            height, color);
           waveformJobs.add(waveformJob);
         } catch (MediaPackageException | WaveformServiceException e) {
           logger.error("Creating waveform extraction job for track '{}' in media package '{}' failed", sourceTrack.getIdentifier(), mediaPackage, e);

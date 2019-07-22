@@ -86,7 +86,7 @@ angular.module('adminNg.directives')
           }
 
           scope.restoreFilters();
-        });
+        }).catch(angular.noop);
 
         scope.removeFilters = function () {
           angular.forEach(scope.filters.map, function (filter) {
@@ -134,7 +134,7 @@ angular.module('adminNg.directives')
 
         scope.selectFilterPeriodValue = function (filter, dateField, otherDateField) {
 
-          if (!filter.hasOwnProperty('prefilled')) {
+          if (!Object.prototype.hasOwnProperty.call(filter, 'prefilled')) {
             filter.prefilled = {};
             filter.prefilled[otherDateField] = false;
           }

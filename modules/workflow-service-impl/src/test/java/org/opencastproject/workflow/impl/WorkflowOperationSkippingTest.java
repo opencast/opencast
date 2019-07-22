@@ -21,12 +21,16 @@
 
 package org.opencastproject.workflow.impl;
 
+import static org.easymock.EasyMock.createNiceMock;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
 import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Property;
+import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
@@ -52,6 +56,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -82,13 +87,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import junit.framework.Assert;
 
@@ -102,6 +106,7 @@ public class WorkflowOperationSkippingTest {
   private WorkflowServiceSolrIndex dao = null;
   protected Set<HandlerRegistration> handlerRegistrations = null;
   private Workspace workspace = null;
+  private Property property = null;
 
   private File sRoot = null;
 
@@ -182,6 +187,18 @@ public class WorkflowOperationSkippingTest {
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
+    {
+      final AssetManager assetManager = createNiceMock(AssetManager.class);
+      property = EasyMock.createMock(Property.class);
+      EasyMock.expect(assetManager.selectProperties(EasyMock.anyString(), EasyMock.anyString()))
+              .andReturn(Collections.singletonList(property))
+              .anyTimes();
+      EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
+      EasyMock.expect(assetManager.snapshotExists(EasyMock.anyString())).andReturn(true).anyTimes();
+      EasyMock.replay(assetManager);
+      service.setAssetManager(assetManager);
+    }
+
     AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
     Version version = EasyMock.createNiceMock(Version.class);
     Snapshot snapshot = EasyMock.createNiceMock(Snapshot.class);
@@ -208,7 +225,7 @@ public class WorkflowOperationSkippingTest {
     EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
     EasyMock.expect(query.version()).andReturn(v).anyTimes();
     EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
-    EasyMock.replay(assetManager, version, snapshot, aRec, p, r, t, selectQuery, query, v);
+    EasyMock.replay(assetManager, version, snapshot, p, r, t, selectQuery, query, v, aRec);
 
     dao.setServiceRegistry(serviceRegistry);
     dao.setSecurityService(securityService);
@@ -222,11 +239,10 @@ public class WorkflowOperationSkippingTest {
     service.setUserDirectoryService(userDirectoryService);
     service.activate(null);
 
-    InputStream is = null;
+    InputStream is;
     try {
-      is = WorkflowOperationSkippingTest.class.getResourceAsStream("/workflow-definition-skipping.xml");
+      is = getClass().getResourceAsStream("/workflow-definition-skipping.xml");
       workingDefinition = WorkflowParser.parseWorkflowDefinition(is);
-      service.registerWorkflowDefinition(workingDefinition);
       IOUtils.closeQuietly(is);
 
       MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
@@ -236,6 +252,7 @@ public class WorkflowOperationSkippingTest {
       IOUtils.closeQuietly(is);
       Assert.assertNotNull(mediapackage1.getIdentifier());
     } catch (Exception e) {
+      e.printStackTrace();
       Assert.fail(e.getMessage());
     }
   }
@@ -248,6 +265,14 @@ public class WorkflowOperationSkippingTest {
 
   @Test
   public void testIf() throws Exception {
+
+    EasyMock.expect(property.getId()).andReturn(new PropertyId(mediapackage1.getIdentifier().toString(),
+            OpencastConstants.WORKFLOW_PROPERTIES_NAMESPACE, "executecondition")).anyTimes();
+    EasyMock.expect(property.getValue()).andReturn(new Value.StringValue("true")).once();
+    EasyMock.expect(property.getValue()).andReturn(new Value.StringValue("false")).once();
+
+    EasyMock.replay(property);
+
     Map<String, String> properties1 = new HashMap<String, String>();
     properties1.put("executecondition", "true");
 
@@ -325,11 +350,6 @@ public class WorkflowOperationSkippingTest {
 
     SucceedingWorkflowOperationHandler(MediaPackage mp) {
       this.mp = mp;
-    }
-
-    @Override
-    public SortedMap<String, String> getConfigurationOptions() {
-      return new TreeMap<String, String>();
     }
 
     @Override

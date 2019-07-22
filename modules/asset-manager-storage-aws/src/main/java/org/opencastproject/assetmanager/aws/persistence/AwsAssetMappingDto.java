@@ -63,10 +63,10 @@ public final class AwsAssetMappingDto {
   @Column(name = "organization", nullable = false, length = 128)
   private String organizationId;
 
-  @Column(name = "media_package", nullable = false, length = 128)
+  @Column(name = "mediapackage", nullable = false, length = 128)
   private String mediaPackageId;
 
-  @Column(name = "media_package_element", nullable = false, length = 128)
+  @Column(name = "mediapackage_element", nullable = false, length = 128)
   private String mediaPackageElementId;
 
   @Column(name = "version", nullable = false)

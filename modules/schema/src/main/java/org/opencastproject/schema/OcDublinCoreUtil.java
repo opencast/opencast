@@ -44,12 +44,6 @@ public final class OcDublinCoreUtil {
   private OcDublinCoreUtil() {
   }
 
-  private static final Function<DublinCoreValue, String> value = new Function<DublinCoreValue, String>() {
-    @Override public String apply(DublinCoreValue dublinCoreValue) {
-      return dublinCoreValue.getValue();
-    }
-  };
-
   private static Function<String, Date> decodeDate = new Function<String, Date>() {
     @Override public Date apply(String s) {
       final Date d = EncodingSchemeUtils.decodeDate(s);

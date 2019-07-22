@@ -30,7 +30,8 @@ import org.opencastproject.urlsigning.utils.ResourceRequestUtil;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import java.util.Properties;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 public class UrlSigningVerifierImplTest {
   private static final String CLIENT_IP = "10.0.0.1";
@@ -51,40 +52,34 @@ public class UrlSigningVerifierImplTest {
 
     // Test no matching key
     urlSigningVerifierImpl = new UrlSigningVerifierImpl();
-    Properties keys = new Properties();
-    keys.put(UrlSigningVerifierImpl.ID_PREFIX + ".1", "otherKey");
-    keys.put(UrlSigningVerifierImpl.KEY_PREFIX + ".1", "ThisIsTheOtherKey");
+    Dictionary<String, String> keys = new Hashtable<>();
+    keys.put(UrlSigningVerifierImpl.KEY_PREFIX + "otherKey", "ThisIsTheOtherKey");
     urlSigningVerifierImpl.updated(keys);
     result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL, true);
     assertEquals(Status.Forbidden, result.getStatus());
 
     // Test only matching keys
     urlSigningVerifierImpl = new UrlSigningVerifierImpl();
-    keys = new Properties();
-    keys.put(UrlSigningVerifierImpl.ID_PREFIX + ".1", keyId);
-    keys.put(UrlSigningVerifierImpl.KEY_PREFIX + ".1", key);
+    keys = new Hashtable<>();
+    keys.put(UrlSigningVerifierImpl.KEY_PREFIX + keyId, key);
     urlSigningVerifierImpl.updated(keys);
     result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL, true);
     assertEquals(Status.Ok, result.getStatus());
 
     // Test matching and non-matching keys
     urlSigningVerifierImpl = new UrlSigningVerifierImpl();
-    keys = new Properties();
-    keys.put(UrlSigningVerifierImpl.ID_PREFIX + ".1", "otherKey");
-    keys.put(UrlSigningVerifierImpl.KEY_PREFIX + ".1", "ThisIsTheOtherKey");
-    keys.put(UrlSigningVerifierImpl.ID_PREFIX + ".2", keyId);
-    keys.put(UrlSigningVerifierImpl.KEY_PREFIX + ".2", key);
+    keys = new Hashtable<>();
+    keys.put(UrlSigningVerifierImpl.KEY_PREFIX + "otherKey", "ThisIsTheOtherKey");
+    keys.put(UrlSigningVerifierImpl.KEY_PREFIX + keyId, key);
     urlSigningVerifierImpl.updated(keys);
     result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL, true);
     assertEquals(Status.Ok, result.getStatus());
 
     // Test correct key id and wrong key
     urlSigningVerifierImpl = new UrlSigningVerifierImpl();
-    keys = new Properties();
-    keys.put(UrlSigningVerifierImpl.ID_PREFIX + ".1", "otherKey");
-    keys.put(UrlSigningVerifierImpl.KEY_PREFIX + ".1", "ThisIsTheOtherKey");
-    keys.put(UrlSigningVerifierImpl.ID_PREFIX + ".2", keyId);
-    keys.put(UrlSigningVerifierImpl.KEY_PREFIX + ".2", "The Wrong Key");
+    keys = new Hashtable<>();
+    keys.put(UrlSigningVerifierImpl.KEY_PREFIX + "otherKey", "ThisIsTheOtherKey");
+    keys.put(UrlSigningVerifierImpl.KEY_PREFIX + keyId, "The Wrong Key");
     urlSigningVerifierImpl.updated(keys);
     result = urlSigningVerifierImpl.verify(queryString, CLIENT_IP, URL, true);
     assertEquals(Status.Forbidden, result.getStatus());

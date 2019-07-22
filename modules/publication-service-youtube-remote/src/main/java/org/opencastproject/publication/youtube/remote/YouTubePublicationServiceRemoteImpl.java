@@ -61,7 +61,7 @@ public class YouTubePublicationServiceRemoteImpl extends RemoteBase implements Y
     HttpPost post = new HttpPost();
     HttpResponse response = null;
     try {
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
       response = getResponse(post);
       if (response != null) {
         logger.info("Publishing {} to youtube", trackId);
@@ -84,7 +84,7 @@ public class YouTubePublicationServiceRemoteImpl extends RemoteBase implements Y
     HttpPost post = new HttpPost("/retract");
     HttpResponse response = null;
     try {
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
       response = getResponse(post);
       if (response != null) {
         logger.info("Retracting {} from youtube", mediaPackage);

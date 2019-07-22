@@ -24,6 +24,7 @@ package org.opencastproject.workflow.impl;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.workflow.impl.SecurityServiceStub.DEFAULT_ORG_ADMIN;
 
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
@@ -58,6 +59,8 @@ import org.opencastproject.workflow.api.WorkflowStatistics.WorkflowDefinitionRep
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -70,6 +73,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -143,6 +147,15 @@ public class WorkflowStatisticsTest {
     scanner = new WorkflowDefinitionScanner();
     service.addWorkflowDefinitionScanner(scanner);
 
+    final AssetManager assetManager = EasyMock.createMock(AssetManager.class);
+    EasyMock.expect(assetManager.selectProperties(EasyMock.anyString(), EasyMock.anyString()))
+            .andReturn(Collections.emptyList())
+            .anyTimes();
+    EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
+    EasyMock.expect(assetManager.snapshotExists(EasyMock.anyString())).andReturn(true).anyTimes();
+    EasyMock.replay(assetManager);
+    service.setAssetManager(assetManager);
+
     // security service
     securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(SecurityServiceStub.DEFAULT_ORG_ADMIN).anyTimes();
@@ -180,11 +193,6 @@ public class WorkflowStatisticsTest {
     MediaPackageMetadataService mds = EasyMock.createNiceMock(MediaPackageMetadataService.class);
     EasyMock.replay(mds);
     service.addMetadataService(mds);
-
-    // Register the workflow definitions
-    for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
-      service.registerWorkflowDefinition(workflowDefinition);
-    }
 
     // Mock the workspace
     workspace = EasyMock.createNiceMock(Workspace.class);

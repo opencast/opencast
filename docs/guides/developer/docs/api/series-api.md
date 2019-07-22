@@ -461,11 +461,12 @@ __Example__
 
 Updates a series' access policy.
 
-Parameters | Required | Type                  | Description
-:----------|:---------|:----------------------|:-----------
-`acl`      | yes      | [`acl`](types.md#acl) | Access policy to be applied
+Parameters | Required | Type                        | Description                 | Default | Version
+:----------|:---------|:----------------------------|:----------------------------|:--------|:-------
+`acl`      | yes      | [`acl`](types.md#acl)       | Access policy to be applied |         |
+`override` | no       | [`boolean`](types.md#basic) | Whether the episode ACL of all events of this series should be removed | false | 1.2.0
 
-Note that the existing access policy will be overwritten.
+Note that the existing access policy of the series will be overwritten.
 
 __Response__
 

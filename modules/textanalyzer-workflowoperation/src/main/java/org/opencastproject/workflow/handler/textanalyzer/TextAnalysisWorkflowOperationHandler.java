@@ -84,8 +84,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -107,18 +105,8 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
   /** Name of the constant used to retreive the stability threshold */
   public static final String OPT_STABILITY_THRESHOLD = "stabilitythreshold";
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
   /** The stability threshold */
   private int stabilityThreshold = DEFAULT_STABILITY_THRESHOLD;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put("source-flavor", "The flavor of the input tracks");
-    CONFIG_OPTIONS.put("source-tags", "The required tags that must exist on the segments catalog");
-    CONFIG_OPTIONS.put("target-tags", "The tags to apply to the resulting mpeg-7 catalog");
-  }
 
   /** The local workspace */
   private Workspace workspace = null;
@@ -131,16 +119,6 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /** The composer service */
   protected ComposerService composer = null;
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
 
   /**
    * Callback for the OSGi declarative services configuration that will set the text analysis service.
@@ -267,7 +245,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
         }
 
         // argument array for image extraction
-        long[] times = new long[videoSegments.size()];
+        double[] times = new double[videoSegments.size()];
 
         for (int i = 0; i < videoSegments.size(); i++) {
           VideoSegment videoSegment = videoSegments.get(i);
@@ -292,27 +270,22 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
         // Have the ocr image(s) created.
 
-        // TODO: Note that the way of having one image extracted after the other is suited for
-        // the ffmpeg-based encoder. When switching to other encoding engines such as gstreamer, it might be preferable
-        // to pass in all timepoints to the image extraction method at once.
-        SortedMap<Long, Job> extractImageJobs = new TreeMap<Long, Job>();
+        Job imageJob = composer.image(sourceTrack, IMAGE_EXTRACTION_PROFILE, times);
+        if (!waitForStatus(imageJob).isSuccess())
+          throw new WorkflowOperationException("Extracting scene images from " + sourceTrack + " failed");
+        if (imageJob.getPayload() == null)
+          throw new WorkflowOperationException(
+                  "The payload of extracting images job from " + sourceTrack + " was null");
 
-        try {
-          for (long time : times) {
-            extractImageJobs.put(time, composer.image(sourceTrack, IMAGE_EXTRACTION_PROFILE, time));
-          }
-          if (!waitForStatus(extractImageJobs.values().toArray(new Job[extractImageJobs.size()])).isSuccess())
-            throw new WorkflowOperationException("Extracting scene image from " + sourceTrack + " failed");
-          for (Map.Entry<Long, Job> entry : extractImageJobs.entrySet()) {
-            Job job = serviceRegistry.getJob(entry.getValue().getId());
-            Attachment image = (Attachment) MediaPackageElementParser.getFromXml(job.getPayload());
-            images.add(image);
-            totalTimeInQueue += job.getQueueTime();
-          }
-        } catch (EncoderException e) {
-          logger.error("Error creating still image(s) from {}", sourceTrack);
-          throw e;
+        totalTimeInQueue += imageJob.getQueueTime();
+        for (MediaPackageElement imageMpe : MediaPackageElementParser.getArrayFromXml(imageJob.getPayload())) {
+          Attachment image = (Attachment) imageMpe;
+          images.add(image);
         }
+        if (images.isEmpty() || images.size() != times.length)
+          throw new WorkflowOperationException(
+                  "There are no images produced for " + sourceTrack
+                          + " or the images count isn't equal the count of the video segments.");
 
         // Run text extraction on each of the images
         Iterator<VideoSegment> it = videoSegments.iterator();

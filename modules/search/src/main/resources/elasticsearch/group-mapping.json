@@ -1,0 +1,28 @@
+{
+    "group" : {
+        "_source" : { "enabled" : true },
+        "dynamic": false,
+        "properties" : {
+
+            "uid": { "type" : "keyword", "store" : true },
+
+            "organization": { "type" : "keyword", "store" : true },
+
+            "object": { "type" : "text", "index" : false, "store" : true },
+
+            "name": { "type" : "keyword" },
+
+            "description": { "type" : "keyword" },
+
+            "role": { "type" : "keyword" },
+
+            "roles": { "copy_to" : "role", "type" : "keyword" },
+
+            "members": { "copy_to" : "member", "type" : "keyword" },
+
+            "text": { "type" : "text", "analyzer": "lowercasespaceanalyzer" },
+            "text_fuzzy": { "type" : "text", "analyzer": "lowercasespaceanalyzer" }
+
+        }
+    }
+}

@@ -46,6 +46,10 @@ angular.module('adminNg.controllers')
         label: 'SYSTEMS.JOBS.TABLE.HOST_NAME',
         sortable: true
       }, {
+        name:  'processingNode',
+        label: 'SYSTEMS.JOBS.TABLE.NODE_NAME',
+        sortable: true
+      }, {
         name:  'submitted',
         label: 'SYSTEMS.JOBS.TABLE.SUBMITTED',
         sortable: true
@@ -57,9 +61,6 @@ angular.module('adminNg.controllers')
         name:  'creator',
         label: 'SYSTEMS.JOBS.TABLE.CREATOR',
         sortable: true
-        //}, {
-        //    template: 'modules/systems/partials/jobActionsCell.html',
-        //    label:    'SYSTEMS.JOBS.TABLE.ACTION'
       }],
       caption:    'SYSTEMS.JOBS.TABLE.CAPTION',
       resource:   'jobs',

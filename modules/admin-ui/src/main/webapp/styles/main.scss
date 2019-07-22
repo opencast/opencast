@@ -99,10 +99,6 @@ $disable-warnings: true !default; // disables deprecation warnings
   }
 }
 
-[data-title]:hover:after {
-  white-space: nowrap;
-}
-
 // All anchors should behave clickable (even without href attributes)
 a {
   cursor: pointer;
@@ -448,15 +444,6 @@ input.disabled, select.disabled {
   hidden: false !important;
 }
 
-#user-blacklist-modal,
-#location-blacklist-modal {
-  [data-modal-tab-content="dates"] input {
-    width: initial;
-    float: left;
-    margin-right: 10px;
-  }
-}
-
 // Notification alias error to danger
 .alert {
   &.error {
@@ -504,6 +491,12 @@ input.disabled, select.disabled {
 }
 
 table.main-tbl {
+  &.vertical-headers {
+    tr > td:first-of-type {
+      white-space: nowrap;
+    }
+  }
+
   /* we don't want to let the angular animation show up*/
   .ng-hide-add, .ng-hide-remove {
     display: none !important;

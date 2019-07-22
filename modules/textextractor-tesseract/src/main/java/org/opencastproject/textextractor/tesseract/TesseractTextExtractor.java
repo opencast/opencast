@@ -22,27 +22,28 @@
 
 package org.opencastproject.textextractor.tesseract;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import org.opencastproject.textextractor.api.TextExtractor;
 import org.opencastproject.textextractor.api.TextExtractorException;
-import org.opencastproject.textextractor.api.TextFrame;
-import org.opencastproject.util.ProcessRunner;
-
-import com.entwinemedia.fn.Pred;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
-import org.osgi.service.cm.ConfigurationException;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.List;
 
 /**
  * Commandline wrapper around tesseract' <code>tesseract</code> command.
@@ -66,10 +67,17 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     "org.opencastproject.textanalyzer.tesseract.options";
 
   /** Binary of the tesseract command */
-  protected String binary = null;
+  private String binary;
 
   /** Additional options for the tesseract command */
-  protected String addOptions = "";
+  private String addOptions = "";
+
+  /** Tesseract stderr lines not to log */
+  private static final List<String> stderrFilter = java.util.Arrays.asList(
+          "Page",
+          "Tesseract Open Source OCR Engine",
+          "Warning: Invalid resolution 0 dpi. Using 70 instead.",
+          "Estimating resolution as ");
 
   /**
    * Creates a new tesseract command wrapper that will be using the default binary.
@@ -86,15 +94,6 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
    */
   public TesseractTextExtractor(String binary) {
     this.binary = binary;
-  }
-
-  /**
-   * Returns the path to the <code>tesseract</code> binary.
-   *
-   * @return path to the binary
-   */
-  public String getBinary() {
-    return binary;
   }
 
   /**
@@ -116,75 +115,84 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
   }
 
   /**
-   * Sets the path to the <code>tesseract</code> binary.
-   *
-   * @param binary
-   */
-  public void setBinary(String binary) {
-    this.binary = binary;
-  }
-
-  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.textextractor.api.TextExtractor#extract(java.io.File)
    */
   @Override
-  public TextFrame extract(File image) throws TextExtractorException {
+  public List<String> extract(File image) throws TextExtractorException {
     if (binary == null)
       throw new IllegalStateException("Binary is not set");
 
-    InputStream is = null;
     File outputFile = null;
     File outputFileBase = new File(image.getParentFile(), FilenameUtils.getBaseName(image.getName()));
     // Run tesseract
-    String opts = getAnalysisOptions(image, outputFileBase);
-    logger.info("Running Tesseract: {} {}", binary, opts);
+    List<String> command = getTesseractCommand(image, outputFileBase);
+    logger.info("Running Tesseract: {}", command);
     try {
-      final int exitCode = ProcessRunner.run(ProcessRunner.mk(binary, opts), fnLogDebug, new Pred<String>() {
-        @Override public Boolean apply(String line) {
-          if (!line.trim().startsWith("Page") && !line.trim().startsWith("Tesseract Open Source OCR Engine")) {
-            logger.warn(line);
+      ProcessBuilder processBuilder = new ProcessBuilder(command);
+      processBuilder.redirectErrorStream(true);
+      Process tesseractProcess = processBuilder.start();
+
+      // listen to output
+      try (BufferedReader in = new BufferedReader(new InputStreamReader(tesseractProcess.getInputStream()))) {
+        String line;
+        while ((line = in.readLine()) != null) {
+          final String trimmedLine = line.trim();
+          if (stderrFilter.parallelStream().noneMatch(trimmedLine::startsWith)) {
+            logger.info(line);
+          } else {
+            logger.debug(line);
           }
-          return true;
         }
-      });
-      if (exitCode != 0) {
-        throw new TextExtractorException("Text analyzer " + binary + " exited with code " + exitCode);
       }
+
+      // wait until the task is finished
+      int exitCode = tesseractProcess.waitFor();
+      if (exitCode != 0) {
+        throw new TextExtractorException("Tesseract exited abnormally with status " + exitCode);
+      }
+
       // Read the tesseract output file
       outputFile = new File(outputFileBase.getAbsolutePath() + ".txt");
-      is = new FileInputStream(outputFile);
-      TextFrame textFrame = TesseractTextFrame.parse(is);
-      is.close();
-      return textFrame;
-    } catch (IOException e) {
+      ArrayList<String> output = new ArrayList<>();
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(outputFile), UTF_8))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+          final String trimmedLine = line.trim();
+          if (!trimmedLine.isEmpty()) {
+            output.add(trimmedLine);
+          }
+        }
+      }
+      return output;
+    } catch (IOException | InterruptedException e) {
       throw new TextExtractorException("Error running text extractor " + binary, e);
     } finally {
-      IOUtils.closeQuietly(is);
       FileUtils.deleteQuietly(outputFile);
     }
   }
 
   /**
-   * The only parameter to <code>tesseract</code> is the filename, so this is what this method returns.
+   * Generate the command line to run Tesseract
    *
    * @param image
    *          the image file
-   * @return the options to run analysis on the image
+   * @param outputFile
+   *          base name of output file. Tesseract will attach <code>.txt</code>
+   * @return the command line to runn Tesseract on the given input file
    */
-  protected String getAnalysisOptions(File image, File outputFile) {
-    StringBuilder options = new StringBuilder();
-    options.append(image.getAbsolutePath());
-    options.append(" ");
-    options.append(outputFile.getAbsolutePath());
-    options.append(" ");
-    options.append(this.addOptions);
-    return options.toString();
+  private List<String> getTesseractCommand(final File image, final File outputFile) {
+    List<String> args = new ArrayList<>();
+    args.add(binary);
+    args.add(image.getAbsolutePath());
+    args.add(outputFile.getAbsolutePath());
+    args.addAll(Arrays.asList(StringUtils.split(addOptions)));
+    return args;
   }
 
   @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary properties) {
     String path = (String) properties.get(TESSERACT_BINARY_CONFIG_KEY);
     if (path != null) {
       logger.info("Setting Tesseract path to {}", path);
@@ -200,15 +208,15 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
 
   public void activate(ComponentContext cc) {
     // Configure ffmpeg
-    String path = (String) cc.getBundleContext().getProperty(TESSERACT_BINARY_CONFIG_KEY);
+    String path = cc.getBundleContext().getProperty(TESSERACT_BINARY_CONFIG_KEY);
     if (path == null) {
       logger.debug("DEFAULT " + TESSERACT_BINARY_CONFIG_KEY + ": " + TESSERACT_BINARY_DEFAULT);
     } else {
-      setBinary(path);
+      this.binary = path;
       logger.info("Setting Tesseract path to binary from config: {}", path);
     }
     /* Set additional options for tesseract (i.e. language to use) */
-    String addopts = (String) cc.getBundleContext().getProperty(TESSERACT_OPTS_CONFIG_KEY);
+    String addopts = cc.getBundleContext().getProperty(TESSERACT_OPTS_CONFIG_KEY);
     if (addopts != null) {
       logger.info("Setting additional options for Tesseract to '{}'", addopts);
       this.addOptions = addopts;
@@ -218,10 +226,4 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     }
   }
 
-  private static final Pred<String> fnLogDebug = new Pred<String>() {
-    @Override public Boolean apply(String s) {
-      logger.debug(s);
-      return true;
-    }
-  };
 }

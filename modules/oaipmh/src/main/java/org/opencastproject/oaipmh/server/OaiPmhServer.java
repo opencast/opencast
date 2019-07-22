@@ -72,8 +72,6 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
 
   private String defaultRepo;
 
-  private boolean published = false;
-
   /**
    * The alias under which the servlet is currently registered.
    */

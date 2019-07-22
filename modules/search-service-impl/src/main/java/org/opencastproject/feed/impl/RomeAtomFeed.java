@@ -223,7 +223,7 @@ public class RomeAtomFeed extends com.rometools.rome.feed.atom.Feed {
       romeLink.setRel(link.getRel());
       romeLink.setTitle(link.getTitle());
       romeLink.setType(link.getType());
-      romeLink.setTitle(link.getFlavour());
+      romeLink.setTitle(link.getFlavor());
       romeLink.setLength(1);
       romeLinks.add(romeLink);
     }

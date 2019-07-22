@@ -67,10 +67,10 @@ angular.module('adminNg.controllers')
       $scope.activeColumns = filteredColumns(false);
       $translate(Table.caption).then(function (translation) {
         $scope.tableName = translation;
-      });
+      }).catch(angular.noop);
       $translate('RESET').then(function (translation) {
         $scope.resetTranslation = translation;
-      });
+      }).catch(angular.noop);
     };
     $scope.initialize();
   }

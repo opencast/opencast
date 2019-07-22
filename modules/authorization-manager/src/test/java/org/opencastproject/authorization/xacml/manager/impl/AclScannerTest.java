@@ -31,10 +31,7 @@ import static org.junit.Assert.fail;
 import org.opencastproject.authorization.xacml.XACMLParsingException;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
-import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -85,21 +82,13 @@ public class AclScannerTest {
 
     final MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
 
-    final AclTransitionDb aclTransitionDb = EasyMock.createNiceMock(AclTransitionDb.class);
-    List<EpisodeACLTransition> episodeTransitions = new ArrayList<>();
-    List<SeriesACLTransition> seriesTransitions = new ArrayList<>();
-    EasyMock.expect(aclTransitionDb.getByQuery(EasyMock.anyObject(Organization.class),
-            EasyMock.anyObject(TransitionQuery.class)))
-            .andReturn(new TransitionResultImpl(episodeTransitions, seriesTransitions)).anyTimes();
-
-    // EasyMock.replay(aclDb);
-    EasyMock.replay(orgService, messageSender, aclTransitionDb, securityService);
+    EasyMock.replay(orgService, messageSender, securityService);
 
     AclServiceFactory aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
-        return new AclServiceImpl(new DefaultOrganization(), aclDb, aclTransitionDb, null, null, null, null,
-                messageSender, null);
+        return new AclServiceImpl(new DefaultOrganization(), aclDb, null, null, null,
+                messageSender);
       }
     };
 

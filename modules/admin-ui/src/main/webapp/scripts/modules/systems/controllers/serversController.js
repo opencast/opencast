@@ -34,6 +34,10 @@ angular.module('adminNg.controllers')
         label: 'SYSTEMS.SERVERS.TABLE.HOST_NAME',
         sortable: true
       }, {
+        name:  'nodeName',
+        label: 'SYSTEMS.SERVERS.TABLE.NODE_NAME',
+        sortable: true
+      }, {
         name:  'cores',
         label: 'SYSTEMS.SERVERS.TABLE.CORES',
         sortable: true
@@ -62,9 +66,6 @@ angular.module('adminNg.controllers')
         template: 'modules/systems/partials/serverMaintenanceCell.html',
         label:    'SYSTEMS.SERVERS.TABLE.MAINTENANCE',
         sortable: true
-        //}, {
-        //    template: 'modules/systems/partials/serverActionsCell.html',
-        //    label:    'SYSTEMS.SERVERS.TABLE.ACTION'
       }],
       caption:    'SYSTEMS.SERVERS.TABLE.CAPTION',
       resource:   'servers',

@@ -28,7 +28,6 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 
 import org.easymock.EasyMock;
@@ -41,7 +40,6 @@ import java.util.Map;
 
 public class PublishEngageWorkflowOperationHandlerTest {
   private Organization org;
-  private String examplePlayer = "/engage/theodul/ui/watch.html";
 
   @Test
   public void testPlayerUrl() throws WorkflowOperationException, URISyntaxException {
@@ -52,15 +50,12 @@ public class PublishEngageWorkflowOperationHandlerTest {
     Id id = new IdImpl(mpId);
     EasyMock.expect(mp.getIdentifier()).andStubReturn(id);
     MediaPackageElement element = EasyMock.createNiceMock(MediaPackageElement.class);
-    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(securityService.getOrganization()).andReturn(getOrgWithPlayerPath()).once();
-    EasyMock.replay(element, mp, securityService);
+    EasyMock.replay(element, mp);
 
     // Test configured organization player path
     PublishEngageWorkflowOperationHandler publishEngagePublish = new PublishEngageWorkflowOperationHandler();
-    publishEngagePublish.setSecurityService(securityService);
     URI result = publishEngagePublish.createEngageUri(engageURI, mp);
-    assertEquals(engageURI.toString() + examplePlayer + "?id=" + mpId, result.toString());
+    assertEquals(engageURI.toString() + "/play/" + mpId, result.toString());
   }
 
   @Test
@@ -72,25 +67,19 @@ public class PublishEngageWorkflowOperationHandlerTest {
     Id id = new IdImpl(mpId);
     EasyMock.expect(mp.getIdentifier()).andStubReturn(id);
     MediaPackageElement element = EasyMock.createNiceMock(MediaPackageElement.class);
-    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(securityService.getOrganization()).andReturn(getOrgWithoutPlayerPath()).once();
-    EasyMock.replay(element, mp, securityService);
+    EasyMock.replay(element, mp);
 
     // Test default player path
     PublishEngageWorkflowOperationHandler publishEngagePublish = new PublishEngageWorkflowOperationHandler();
-    publishEngagePublish.setSecurityService(securityService);
     URI result = publishEngagePublish.createEngageUri(engageURI, mp);
-    assertEquals(engageURI.toString() + PublishEngageWorkflowOperationHandler.DEFAULT_PLAYER_PATH + "?id=" + mpId,
+    assertEquals(engageURI.toString() + PublishEngageWorkflowOperationHandler.PLAYER_PATH + mpId,
             result.toString());
 
   }
 
   // Util to set org properties with player path
-  public Organization getOrgWithPlayerPath() {
-    Map<String, String> properties = new HashMap<String, String>();
-    properties.put(ConfigurablePublishWorkflowOperationHandler.PLAYER_PROPERTY, examplePlayer);
+  private Organization getOrgWithPlayerPath() {
     org = EasyMock.createNiceMock(Organization.class);
-    EasyMock.expect(org.getProperties()).andStubReturn(properties);
     EasyMock.replay(org);
     return org;
   }

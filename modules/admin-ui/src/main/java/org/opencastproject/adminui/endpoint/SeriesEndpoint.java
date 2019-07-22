@@ -50,17 +50,14 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
-import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
-import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
-import org.opencastproject.index.service.catalog.adapter.MetadataUtils;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
@@ -84,7 +81,6 @@ import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
-import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -265,21 +261,6 @@ public class SeriesEndpoint implements ManagedService {
       systemAclsJson.add(AccessInformationUtil.serializeManagedAcl(acl));
     }
 
-    final TransitionQuery q = TransitionQuery.query().withId(seriesId).withScope(AclScope.Series);
-    List<SeriesACLTransition> seriesTransistions;
-    JSONArray transitionsJson = new JSONArray();
-    try {
-      seriesTransistions = getAclService().getTransitions(q).getSeriesTransistions();
-      for (SeriesACLTransition trans : seriesTransistions) {
-        transitionsJson.add(AccessInformationUtil.serializeSeriesACLTransition(trans));
-      }
-    } catch (AclServiceException e) {
-      logger.error(
-              "There was an error while trying to get the ACL transitions for serie '{}' from the ACL service: {}",
-              seriesId, e);
-      return RestUtil.R.serverError();
-    }
-
     JSONObject seriesAccessJson = new JSONObject();
     try {
       AccessControlList seriesAccessControl = seriesService.getSeriesAccessControl(seriesId);
@@ -287,7 +268,6 @@ public class SeriesEndpoint implements ManagedService {
       seriesAccessJson.put("current_acl", currentAcl.isSome() ? currentAcl.get().getId() : 0);
       seriesAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(seriesAccessControl));
       seriesAccessJson.put("acl", AccessControlParser.toJsonSilent(seriesAccessControl));
-      seriesAccessJson.put("transitions", transitionsJson);
       seriesAccessJson.put("locked", hasProcessingEvents);
     } catch (SeriesException e) {
       logger.error("Unable to get ACL from series {}", seriesId, e);
@@ -299,87 +279,6 @@ public class SeriesEndpoint implements ManagedService {
     jsonReturnObj.put("series_access", seriesAccessJson);
 
     return Response.ok(jsonReturnObj.toString()).build();
-  }
-
-  @GET
-  @Path("{seriesId}/participation.json")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getseriesparticipationinformation", description = "Get the particition information of a series", returnDescription = "The participation information", pathParameters = {
-          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
-                  @RestResponse(responseCode = SC_OK, description = "The access information ") })
-  public Response getSeriesParticipationInformation(@PathParam("seriesId") String seriesId) throws Exception {
-    if (StringUtils.isBlank(seriesId))
-      return RestUtil.R.badRequest("Path parameter series ID is missing");
-
-    Opt<Series> optSeries = indexService.getSeries(seriesId, searchIndex);
-
-    if (optSeries.isNone()) {
-      logger.warn("Unable to find the series '{}'", seriesId);
-      return notFound();
-    }
-
-    Series series = optSeries.get();
-
-    return okJson(obj(f("opt_out", v(series.isOptedOut()))));
-  }
-
-  @PUT
-  @Path("{seriesId}/optout/{optout}")
-  @RestQuery(name = "updateSeriesOptoutStatus", description = "Updates a series opt out status.", returnDescription = "The method doesn't return any content", pathParameters = {
-          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = RestParameter.Type.STRING),
-          @RestParameter(name = "optout", isRequired = true, description = "True or false, true to opt out of this series.", type = RestParameter.Type.BOOLEAN) }, restParameters = {}, reponses = {
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
-                  @RestResponse(responseCode = SC_NO_CONTENT, description = "The method doesn't return any content") })
-  public Response updateSeriesOptOut(@PathParam("seriesId") String seriesId, @PathParam("optout") boolean optout)
-          throws NotFoundException {
-    try {
-      seriesService.updateOptOutStatus(seriesId, optout);
-      return Response.noContent().build();
-    } catch (SeriesException e) {
-      logger.error("Unable to updated opt out status for series with id {}", seriesId);
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @POST
-  @Path("optouts")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "changeOptOuts", description = "Change the opt out status of many series", returnDescription = "A JSON array listing which series were or were not opted out.", restParameters = {
-          @RestParameter(name = "seriesIds", description = "A JSON array of ids of the series to opt out or in", defaultValue = "[]", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "optout", description = "Whether to opt out or not either true or false.", defaultValue = "false", isRequired = true, type = RestParameter.Type.BOOLEAN), }, reponses = {
-                  @RestResponse(description = "Returns a JSON object with the results for the different opted out or in elements such as ok, notFound or error.", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "Unable to parse boolean value to opt out, or parse JSON array of opt out series", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
-  public Response changeOptOuts(@FormParam("optout") boolean optout, @FormParam("seriesIds") String seriesIds) {
-    JSONParser parser = new JSONParser();
-    JSONArray seriesIdsArray;
-    try {
-      seriesIdsArray = (JSONArray) parser.parse(seriesIds);
-    } catch (org.json.simple.parser.ParseException e) {
-      logger.warn("Unable to parse series ids {} ", seriesIds, e);
-      return Response.status(Status.BAD_REQUEST).build();
-    } catch (NullPointerException e) {
-      logger.warn("Unable to parse series ids because it was null {}", seriesIds);
-      return Response.status(Status.BAD_REQUEST).build();
-    } catch (ClassCastException e) {
-      logger.warn("Unable to parse series ids because it was the wrong class {}", seriesIds, e);
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-
-    BulkOperationResult result = new BulkOperationResult();
-    for (Object seriesId : seriesIdsArray) {
-      try {
-        seriesService.updateOptOutStatus(seriesId.toString(), optout);
-        result.addOk(seriesId.toString());
-      } catch (NotFoundException e) {
-        result.addNotFound(seriesId.toString());
-      } catch (Exception e) {
-        logger.error("Could not update opt out status of series {}", seriesId.toString(), e);
-        result.addServerError(seriesId.toString());
-      }
-    }
-    return Response.ok(result.toJson()).build();
   }
 
   @GET
@@ -401,7 +300,7 @@ public class SeriesEndpoint implements ManagedService {
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
       final Opt<MetadataCollection> optSeriesMetadata = adapter.getFields(series);
       if (optSeriesMetadata.isSome()) {
-        metadataList.add(adapter.getFlavor(), adapter.getUITitle(), optSeriesMetadata.get());
+        metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), optSeriesMetadata.get());
       }
     }
     metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), getSeriesMetadata(optSeries.get()));
@@ -421,55 +320,55 @@ public class SeriesEndpoint implements ManagedService {
 
     MetadataField<?> title = metadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
     metadata.removeField(title);
-    MetadataField<String> newTitle = MetadataUtils.copyMetadataField(title);
+    MetadataField<String> newTitle = new MetadataField(title);
     newTitle.setValue(series.getTitle());
     metadata.addField(newTitle);
 
     MetadataField<?> subject = metadata.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     metadata.removeField(subject);
-    MetadataField<String> newSubject = MetadataUtils.copyMetadataField(subject);
+    MetadataField<String> newSubject = new MetadataField(subject);
     newSubject.setValue(series.getSubject());
     metadata.addField(newSubject);
 
     MetadataField<?> description = metadata.getOutputFields().get(DublinCore.PROPERTY_DESCRIPTION.getLocalName());
     metadata.removeField(description);
-    MetadataField<String> newDescription = MetadataUtils.copyMetadataField(description);
+    MetadataField<String> newDescription = new MetadataField(description);
     newDescription.setValue(series.getDescription());
     metadata.addField(newDescription);
 
     MetadataField<?> language = metadata.getOutputFields().get(DublinCore.PROPERTY_LANGUAGE.getLocalName());
     metadata.removeField(language);
-    MetadataField<String> newLanguage = MetadataUtils.copyMetadataField(language);
+    MetadataField<String> newLanguage = new MetadataField(language);
     newLanguage.setValue(series.getLanguage());
     metadata.addField(newLanguage);
 
     MetadataField<?> rightsHolder = metadata.getOutputFields().get(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName());
     metadata.removeField(rightsHolder);
-    MetadataField<String> newRightsHolder = MetadataUtils.copyMetadataField(rightsHolder);
+    MetadataField<String> newRightsHolder = new MetadataField(rightsHolder);
     newRightsHolder.setValue(series.getRightsHolder());
     metadata.addField(newRightsHolder);
 
     MetadataField<?> license = metadata.getOutputFields().get(DublinCore.PROPERTY_LICENSE.getLocalName());
     metadata.removeField(license);
-    MetadataField<String> newLicense = MetadataUtils.copyMetadataField(license);
+    MetadataField<String> newLicense = new MetadataField(license);
     newLicense.setValue(series.getLicense());
     metadata.addField(newLicense);
 
     MetadataField<?> organizers = metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
     metadata.removeField(organizers);
-    MetadataField<List<String>> newOrganizers = MetadataUtils.copyMetadataField(organizers);
+    MetadataField<List<String>> newOrganizers = new MetadataField(organizers);
     newOrganizers.setValue(series.getOrganizers());
     metadata.addField(newOrganizers);
 
     MetadataField<?> contributors = metadata.getOutputFields().get(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName());
     metadata.removeField(contributors);
-    MetadataField<List<String>> newContributors = MetadataUtils.copyMetadataField(contributors);
+    MetadataField<List<String>> newContributors = new MetadataField(contributors);
     newContributors.setValue(series.getContributors());
     metadata.addField(newContributors);
 
     MetadataField<?> publishers = metadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
     metadata.removeField(publishers);
-    MetadataField<List<String>> newPublishers = MetadataUtils.copyMetadataField(publishers);
+    MetadataField<List<String>> newPublishers = new MetadataField(publishers);
     newPublishers.setValue(series.getPublishers());
     metadata.addField(newPublishers);
 
@@ -482,7 +381,7 @@ public class SeriesEndpoint implements ManagedService {
 
     MetadataField<?> uid = metadata.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName());
     metadata.removeField(uid);
-    MetadataField<String> newUID = MetadataUtils.copyMetadataField(uid);
+    MetadataField<String> newUID = new MetadataField(uid);
     newUID.setValue(series.getIdentifier());
     metadata.addField(newUID);
 
@@ -642,12 +541,11 @@ public class SeriesEndpoint implements ManagedService {
           @RestParameter(name = "sort", description = "The order instructions used to sort the query result. Must be in the form '<field name>:(ASC|DESC)'", isRequired = false, type = STRING),
           @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2,value2'", type = STRING),
           @RestParameter(name = "offset", isRequired = false, description = "The page offset", type = INTEGER, defaultValue = "0"),
-          @RestParameter(name = "optedOut", isRequired = false, description = "Whether this series is opted out", type = BOOLEAN),
           @RestParameter(name = "limit", isRequired = false, description = "The limit to define the number of returned results (-1 for all)", type = INTEGER, defaultValue = "100") }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "The access control list."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response getSeries(@QueryParam("filter") String filter, @QueryParam("sort") String sort,
-          @QueryParam("offset") int offset, @QueryParam("limit") int limit, @QueryParam("optedOut") Boolean optedOut)
+          @QueryParam("offset") int offset, @QueryParam("limit") int limit)
           throws UnauthorizedException {
     try {
       logger.debug("Requested series list");
@@ -661,9 +559,6 @@ public class SeriesEndpoint implements ManagedService {
 
       // If limit is 0, we set the default limit
       query.withLimit(limit == 0 ? DEFAULT_LIMIT : limit);
-
-      if (optedOut != null)
-        query.withOptedOut(optedOut);
 
       Map<String, String> filters = RestUtils.parseFilter(filter);
       for (String name : filters.keySet()) {
@@ -743,7 +638,6 @@ public class SeriesEndpoint implements ManagedService {
         Series s = item.getSource();
         String sId = s.getIdentifier();
         fields.add(f("id", v(sId)));
-        fields.add(f("optedOut", v(s.isOptedOut())));
         fields.add(f("title", v(s.getTitle(), Jsons.BLANK)));
         fields.add(f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))));
         fields.add(f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))));
@@ -1054,7 +948,7 @@ public class SeriesEndpoint implements ManagedService {
     }
 
     try {
-      if (getAclService().applyAclToSeries(seriesId, accessControlList, override, Option.none()))
+      if (getAclService().applyAclToSeries(seriesId, accessControlList, override))
         return ok();
       else {
         logger.warn("Unable to find series '{}' to apply the ACL.", seriesId);

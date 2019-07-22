@@ -47,13 +47,13 @@ angular.module('adminNg.resources')
           row.roles = roleNames.join(', ');
           row.provider = r.provider;
           row.email = r.email;
-          if (!angular.isUndefined(r.blacklist)) {
-            row.blacklist_from = Language.formatDateTime('short', r.blacklist.start);
-            row.blacklist_to   = Language.formatDateTime('short', r.blacklist.end);
-          }
           row.type = 'USER';
           return row;
         };
+
+        if (!data) {
+          return;
+        }
 
         for (i = 0; i < data.results.length; i++) {
           result.push(parse(data.results[i]));

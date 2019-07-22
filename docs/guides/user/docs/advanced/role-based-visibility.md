@@ -57,11 +57,18 @@ administrative user interface.
 |ROLE_UI_NAV_SYSTEMS_VIEW       |Display navigation menu entry *Systems*       |
 |ROLE_UI_NAV_ORGANIZATION_VIEW  |Display navigation menu entry *Organization*  |
 |ROLE_UI_NAV_CONFIGURATION_VIEW |Display navigation menu entry *Configuration* |
+|ROLE_UI_NAV_STATISTICS_VIEW    |Display navigation menu entry *Statistics*    |
 
 If you want to provide access to the navigation menu, *ROLE_UI_NAV* is needed. Then, for each of the
 navigation menu entries, include the respective role if the menu entry should be accessible by the user.
 
 Note that this really just controls the navigation menu and its menu entries. Not less, not more.
+
+### Statistics: Organization
+
+|Role                                 |User Interface              |
+|-------------------------------------|----------------------------|
+|ROLE_UI_STATISTICS_ORGANIZATION_VIEW |Display *Organization* page |
 
 ### Recordings: Events
 
@@ -92,6 +99,7 @@ There are quite a number of roles to provide selective access to the tabs offere
 |ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW   |Display tab *Scheduling*                 |
 |ROLE_UI_EVENTS_DETAILS_ACL_VIEW          |Display tab *Access Policy*              |
 |ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW     |Display tab *Comments*                   |
+|ROLE_UI_EVENTS_DETAILS_STATISTICS_VIEW   |Display tab *Statistics*                 |
 
 For the individual tabs, it is possible to further provide access:
 
@@ -119,11 +127,12 @@ For the individual tabs, it is possible to further provide access:
 
 There are quite a number of roles to provide selective access to the tabs offered by the *Series Details* modal:
 
-|Role                                  |User Interface                           |
-|--------------------------------------|-----------------------------------------|
-|ROLE_UI_SERIES_DETAILS_METADATA_VIEW  |Display tab *Metadata*                   |
-|ROLE_UI_SERIES_DETAILS_ACL_VIEW       |Display tab *Access Policy*              |
-|ROLE_UI_SERIES_DETAILS_THEMES_VIEW    |Display tab *Theme*                      |
+|Role                                   |User Interface                           |
+|---------------------------------------|-----------------------------------------|
+|ROLE_UI_SERIES_DETAILS_METADATA_VIEW   |Display tab *Metadata*                   |
+|ROLE_UI_SERIES_DETAILS_ACL_VIEW        |Display tab *Access Policy*              |
+|ROLE_UI_SERIES_DETAILS_THEMES_VIEW     |Display tab *Theme*                      |
+|ROLE_UI_SERIES_DETAILS_STATISTICS_VIEW |Display tab *Statistics*                 |
 
 For the individual tabs, it is possible to further provide access:
 

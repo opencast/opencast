@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Utility class to store and retrieve Workflow Properties (which are stored in specially prefixed Asset Manager
@@ -78,17 +79,11 @@ public final class WorkflowPropertiesUtil {
    */
   public static Map<String, String> getLatestWorkflowProperties(final AssetManager assetManager,
           final String mediaPackageId) {
-    final AQueryBuilder query = assetManager.createQuery();
-    final List<ARecord> queryResults = query.select(query.snapshot(), query.propertiesOf(WORKFLOW_PROPERTIES_NAMESPACE))
-            .where(query.mediaPackageId(mediaPackageId).and(query.version().isLatest())).run()
-            .getRecords().toList();
-    final Map<String, String> workflowParameters = new HashMap<>(0);
-    if (!queryResults.isEmpty()) {
-      for (final Property property : queryResults.get(0).getProperties()) {
-        workflowParameters.put(property.getId().getName(), property.getValue().get(Value.STRING));
-      }
-    }
-    return workflowParameters;
+    return assetManager.selectProperties(mediaPackageId, WORKFLOW_PROPERTIES_NAMESPACE)
+            .parallelStream()
+            .collect(Collectors.toMap(
+                    p -> p.getId().getName(),
+                    p -> p.getValue().get(Value.STRING)));
   }
 
   /**
@@ -99,7 +94,13 @@ public final class WorkflowPropertiesUtil {
    */
   public static void storeProperties(final AssetManager assetManager, final MediaPackage mediaPackage,
           final Map<String, String> properties) {
-    assetManager.takeSnapshot(DEFAULT_OWNER,mediaPackage);
+
+    // Properties can only be created if a snapshot exists. Hence, we create a snapshot if there is none right now.
+    if (!assetManager.snapshotExists(mediaPackage.getIdentifier().toString())) {
+      assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+    }
+
+    // Store all properties
     for (final Map.Entry<String, String> entry : properties.entrySet()) {
       final PropertyId propertyId = PropertyId
               .mk(mediaPackage.getIdentifier().compact(), WORKFLOW_PROPERTIES_NAMESPACE, entry.getKey());

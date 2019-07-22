@@ -10,7 +10,8 @@
    "SAVE":         "Save",
    "LOGOUT":       "Logout",
    "RESET":        "Reset",
-   "SELECT_NO_OPTIONS": "No option",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES":          "Yes",
    "LANGUAGES": {
       "ARABIC":"Arabic",
@@ -55,11 +56,8 @@
          "ACL"                : "The following ACL will be deleted",
          "GROUP"              : "The following group will be deleted",
          "USER"               : "The following user will be deleted",
-         "USER_BLACKLIST"     : "The following user blacklist will be deleted",
          "THEME"              : "The following theme will be deleted",
-         "EMAIL"              : "The following email template will be deleted",
-         "LOCATION"           : "The following location will be deleted",
-         "LOCATION_BLACKLIST" : "The following location blacklist will be deleted"
+         "LOCATION"           : "The following location will be deleted"
        },
        "NAME" : "Name"
      },
@@ -130,30 +128,9 @@
      "EVENTS_NOT_DELETED_NOT_AUTHORIZED":  "The event could not be deleted, because you don't have the permission to do so.",
      "SERIES_DELETED": "The series has been deleted",
      "SERIES_NOT_DELETED": "The series could not be deleted",
-     "USER_BLACKLIST_CREATED": "The blacklist has been created",
-     "USER_BLACKLIST_NOT_CREATED":  "The blacklist could not be created",
-     "USER_BLACKLIST_SAVED": "The blacklist has been saved",
-     "USER_BLACKLIST_NOT_SAVED":  "The blacklist could not be saved",
-     "USER_BLACKLIST_DELETED":  "The blacklist has been deleted",
-     "USER_BLACKLIST_NOT_DELETED":  "The blacklist could not be deleted",
      "LOCATION_DELETED": "The location has been deleted",
      "LOCATION_NOT_DELETED": "The location could not be deleted",
      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
-     "LOCATION_BLACKLIST_CREATED": "The blacklist has been created",
-     "LOCATION_BLACKLIST_NOT_CREATED":  "The blacklist could not be created",
-     "LOCATION_BLACKLIST_SAVED": "The blacklist has been saved",
-     "LOCATION_BLACKLIST_NOT_SAVED":  "The blacklist could not be saved",
-     "LOCATION_BLACKLIST_DELETED":  "The blacklist has been deleted",
-     "LOCATION_BLACKLIST_NOT_DELETED":  "The blacklist could not be deleted",
-     "EMAIL_TEMPLATE_CREATED": "The template has been created",
-     "EMAIL_TEMPLATE_NOT_CREATED":  "The template could not be created",
-     "EMAIL_TEMPLATE_SAVED": "The template has been saved",
-     "EMAIL_TEMPLATE_NOT_SAVED":  "The template could not be saved",
-     "EMAIL_TEMPLATE_DELETED":  "The template has been deleted",
-     "EMAIL_TEMPLATE_NOT_DELETED":  "The template could not be deleted",
-     "EMAIL_TEMPLATE_NAME_TAKEN": "This name is already in use",
-     "EMAIL_SENT": "The message has been sent",
-     "EMAIL_NOT_SENT": "The message could not be sent",
      "CONFLICT_DETECTED":   "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
      "CONFLICT_BULK_DETECTED":   "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
      "CONFLICT_ALREADY_ENDED":   "Scheduling error: The event has already ended.",
@@ -166,11 +143,6 @@
      "SERIES_ACL_LOCKED": "Editing Access Policies is not allowed when operations are running on an event that is part of the series",
      "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
      "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
-     "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "The event opt-out status has been successfully updated.",
-     "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Error while updating the event opt-out status.",
-     "EVENT_PARTICIPATION_STATUS_READONLY": "The participation status can not be updated as the scheduling start date is in the past.",
-     "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "The series opt-out status has been successfully updated.",
-     "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Error while updating the series opt-out status.",
      "THEME_NAME_ALREADY_TAKEN": "This name is already in use",
      "THEME_NAME_EMPTY": "The name cannot be empty",
      "BUMPER_UPLOAD_ERROR": "Error while uploading media",
@@ -187,8 +159,8 @@
      "THEME_NOT_DELETED":    "The theme could not be deleted",
      "TASK_CREATED": "The task has been created",
      "TASK_NOT_CREATED": "The task could not be created",
-     "VIDEO_CUT_NOT_SAVED": "The editing information could not be saved",
-     "VIDEO_CUT_SAVED": "The editing information has been saved",
+     "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+     "VIDEO_CUT_SAVED": "The changes have been saved",
      "VIDEO_CUT_PROCESSING": "The video is being processed…",
      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
      "VIDEO_SOURCE_TRACKS_INVALID": "You have selected no video tracks to process",
@@ -199,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
-      "SEND_MESSAGE": "Send message",
       "WARNING":"Warning",
-      "EDIT_STATUS": {
-          "CAPTION": "Edit Status",
-          "READY_FOR_RECORDING": "Ready for recording",
-          "OPTED_OUT": "Opted-out"
-      },
       "DELETE": {
           "SERIES": {
             "CAPTION": "Delete",
@@ -306,6 +272,8 @@
       "BACK": "Previous",
       "CREATE": "Create",
       "RETRACT": "Retract",
+      "RETRACT_DELETE": "Retract/Delete",
+      "DELETE": "Delete",
       "UPDATE": "Update",
       "DURATION": {
           "HOURS": "Hours",
@@ -340,6 +308,9 @@
      },
      "CONFIGURATION": {
        "TITLE": "Configuration"
+     },
+     "STATISTICS": {
+       "TITLE": "Statistics"
      }
    },
    "EVENTS": {
@@ -363,28 +334,6 @@
         "CCND":"CCND",
         "GPL":"GPL"
       },
-     "SEND_MESSAGE": {
-       "CAPTION": "Send message",
-       "TABS": {
-         "RECIPIENTS": "Recipients",
-         "MESSAGE":    "Message",
-         "SUMMARY":    "Summary"
-       },
-       "RECIPIENTS": {
-         "AUDIT_TRAIL_CAPTION": "Add to audit trail",
-         "AUDIT_TRAIL_DESCRIPTION": "Check to add the message to the audit trail",
-         "AUDIT_TRAIL_LABEL": ""
-       },
-       "MESSAGE": {
-         "EMAIL_TEMPLATE": "Select email template",
-         "SUBJECT": "Subject",
-         "MESSAGE": "Message",
-         "INCLUDE_SIGNATURE": "Include my signature in the email"
-       },
-       "SUMMARY": {
-         "MESSAGE_SUMMARY": "Summary"
-       }
-     },
      "EVENTS": {
        "NEW": {
          "CAPTION": "Create event",
@@ -514,7 +463,6 @@
        "ADD_EVENT": "Add event",
        "TABLE": {
          "CAPTION":  "Events",
-         "CREATORS": "Creators",
          "TITLE":    "Title",
          "PRESENTERS": "Presenter(s)",
          "SERIES":   "Series",
@@ -529,9 +477,7 @@
          "LAST":     "Last",
          "NEXT":     "Next",
          "MANAGED_ACL": "Access policy",
-         "SCHEDULING_STATUS": "Status",
          "WORKFLOW_STATE": "Progress",
-         "REVIEW_STATUS": "Review status",
          "PREVIOUS": "Previous",
          "NOCONTENT": "No data available",
          "PUBLISHED": "Published",
@@ -546,18 +492,12 @@
            "EDITOR": "Open video Editor",
            "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
            "COMMENTS": "View comments",
-           "PAUSED_WORKFLOW": "View paused workflow"
+           "PAUSED_WORKFLOW": "View paused workflow",
+           "PRESENTER": "Filter for this presenter"
          }
-       },
-       "SCHEDULING_STATUS": {
-         "READY_FOR_RECORDING": "Ready for recording",
-         "BLACKLISTED": "Blacklisted",
-         "OPTED_OUT": "Opted-out"
        },
        "STATUS": {
          "SCHEDULED": "Scheduled",
-         "OPTEDOUT": "Opted out",
-         "BLACKLISTED": "Blacklisted",
          "RECORDING": "Recording",
          "UPLOADING": "Uploading",
          "INGESTING": "Ingesting",
@@ -569,6 +509,14 @@
          "PROCESSING_FAILURE": "Processing failure",
          "PROCESSING_CANCELED": "Processing canceled"
        },
+       "STATE_MAPPING":{
+         "RETRACTING": "Retracting",
+         "DUPLICATING": "Duplicating",
+         "PUBLISHING": "Publishing",
+         "IMPORTING": "Importing",
+         "REPUBLISHING_METADATA": "Republishing metadata",
+         "UPDATING_PREVIEWS": "Updating previews"
+       },
        "DETAILS": {
          "HEADER": "Event details - {{resourceId}}",
          "TABS": {
@@ -579,16 +527,14 @@
            "SCHEDULING": "Scheduling",
            "WORKFLOWS":   "Workflows",
            "ACCESS":      "Access policy",
-           "COMMENTS":    "Comments"
+           "COMMENTS":    "Comments",
+           "STATISTICS":    "Statistics"
          },
          "PUBLICATIONS": {
            "CAPTION":                    "Publications",
            "NO_PUBLICATIONS_AVAILABLE":  "This event has not been published",
            "PUBLICATION_DESCRIPTION":    "This event has been published to the following publication channels:",
            "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
-           "SCHEDULING_STATUS":          "Status",
-           "READY_FOR_RECORDING":        "Ready for recording",
-           "OPTED_OUT":                  "Opted-out",
            "CUSTOM":                     "Custom",
            "ENGAGE":                     "Engage",
            "ENGAGE_LIVE":                "Engage Live",
@@ -824,6 +770,9 @@
              "PROCESSING_FAILURE" : "Processing failure"
            }
          },
+         "STATISTICS": {
+           "CAPTION":     "Statistics"
+         },
          "METADATA": {
            "CAPTION": "Event details",
            "TITLE":          "Title",
@@ -855,20 +804,6 @@
          },
           "SCHEDULING": {
             "CAPTION": "Scheduling configuration",
-            "REVIEW_STATUS": {
-              "CAPTION": "Review status"
-            },
-            "OPTEDOUT": {
-              "CAPTION": "Opted-out Status",
-              "READY": "Ready for recording",
-              "OPTEDOUT": "Opted out"
-            },
-            "MESSAGES": {
-              "CAPTION": "Messages",
-              "CREATION_DATE": "Creation date",
-              "SENDER": "Sender",
-              "SUBJECT": "Subject"
-            },
             "PLACEHOLDER": {
               "PRESENTERS": "Presenter(s)"
            }
@@ -876,25 +811,29 @@
           "WORKFLOWS": {
             "ACTIONS": "Actions",
             "DETAILS": "Details",
-            "DESCRIPTION": "",
-            "MORE_INFO": "More Information & Actions",
+            "DESCRIPTION": "Description",
+            "MORE_INFO": "More Information",
             "ID": "ID",
             "TYPE": "Type",
             "TITLE": "Title",
-            "STATE": "State",
+            "STATUS": "Status",
             "STARTED": "Started",
             "SERIES": "Series",
             "SUBMITTED": "Submitted",
+            "SUBMITTER": "Submitter",
+            "EXECUTION_TIME": "Execution time",
+            "WDID": "Workflow definition",
             "MIMETYPE": "Mimetype",
             "URL": "URL",
             "CONFIGURATION": "Configuration",
             "NO_CONFIGURATION": "No existing configuration parameters for the selected workflow definition.",
             "WORKFLOW": "Workflow",
             "TOOLTIP": {
-              "STOP": "Stop execution workflow instance",
-              "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
-              "RETRY": "Retry execution of workflow instance",
-              "DELETE": "Delete workflow instance"
+              "STOP": "Stop workflow",
+              "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+              "RETRY": "Retry execution of workflow",
+              "DELETE": "Delete workflow",
+              "DETAILS": "Open workflow details"
             },
             "OPERATION_STATUS": {
               "INSTANTIATED": "Instantiated",
@@ -902,12 +841,14 @@
               "PAUSED": "Paused",
               "SUCCEEDED": "Succeeded",
               "FAILED": "Failed",
+              "FAILING": "Failing",
               "SKIPPED": "Skipped",
+              "STOPPED": "Stopped",
               "RETRY": "Retry"
             }
           },
          "WORKFLOW_INSTANCES": {
-           "TITLE": "Workflow instances"
+           "TITLE": "Workflows"
          },
          "WORKFLOW_DETAILS": {
            "TITLE": "Workflow details",
@@ -1035,8 +976,8 @@
        "TABLE": {
          "CAPTION":      "Series",
          "TITLE":        "Series",
-         "HAS_EVENTS":    "Contains events",
-         "CREATORS":     "Organizer(s)",
+         "HAS_EVENTS":   "Contains events",
+         "ORGANIZERS":   "Organizer(s)",
          "CONTRIBUTORS": "Contributor(s)",
          "CREATED":      "Created",
          "MANAGED_ACL":  "Access policy",
@@ -1053,10 +994,10 @@
           "TABS": {
            "METADATA":    "Metadata",
            "EXTENDED_METADATA":    "Metadata II",
-           "PARTICIPATION": "Participation",
            "EVENTS":      "Events",
            "PERMISSIONS": "Access policy",
-           "THEME": "Theme"
+           "THEME": "Theme",
+           "STATISTICS": "Statistics"
          },
          "ACCESS": {
            "CAPTION": "Access policy",
@@ -1099,24 +1040,6 @@
            "LICENSE":        "License",
            "DESCRIPTION":    "Description"
          },
-         "PARTICIPATION": {
-            "CAPTION": "Participation status template",
-            "WARNING_TEMPLATE": "Series participation status will be used as default value for new events that are part of the series.",
-            "REVIEW_STATUS": {
-              "CAPTION": "Review status"
-            },
-            "OPTEDOUT": {
-              "CAPTION": "Opted-out Status",
-              "READY": "Ready for recording",
-              "OPTEDOUT": "Opted out"
-            },
-            "MESSAGES": {
-              "CAPTION": "Messages",
-              "CREATION_DATE": "Creation date",
-              "SENDER": "Sender",
-              "SUBJECT": "Subject"
-            }
-          },
          "EVENTS": {
            "TITLE":     "Title",
            "PRESENTER": "Presenter(s)",
@@ -1131,12 +1054,10 @@
    },
    "RECORDINGS": {
      "NAVIGATION": {
-       "LOCATIONS":  "Locations",
-       "BLACKLISTS": "Blacklists"
+       "LOCATIONS":  "Locations"
      },
      "ACTIONS": {
        "EXPORT": "Export",
-       "ADD_BLACKLIST": "Add blacklist",
        "REMOVE": "Remove"
      },
      "RECORDINGS": {
@@ -1150,8 +1071,6 @@
          "NEXT_NAME": "Next event title",
          "STATUS":    "Status",
          "VERSION":   "Version",
-         "BLACKLIST_FROM": "Blacklisted from",
-         "BLACKLIST_TO":   "Blacklisted until",
          "ACTION":    "Actions",
          "TOOLTIP": {
            "NAME": "Filter events for this location",
@@ -1182,60 +1101,18 @@
             "NO_CAPABILITIES": "No capabilities provided"
           }
        }
-     },
-     "BLACKLISTS": {
-       "TABLE": {
-         "CAPTION":   "Location blacklist",
-         "NAME":      "Name",
-         "ACTIONS":   "Actions"
-       },
-       "DETAILS": {
-         "NEWCAPTION":  "Create blacklist",
-         "EDITCAPTION": "Edit blacklist",
-         "TABS": {
-           "LOCATIONS": "Locations",
-           "DATES":     "Dates",
-           "REASON":    "Reason",
-           "SUMMARY":   "Summary"
-         },
-         "LOCATIONS": {
-           "REMOVE":          "Remove",
-           "ADD_LOCATION":    "Choose location",
-           "ALL_LOCATIONS":   "All locations",
-           "SELECT_LOCATION": "Select"
-         },
-         "DATES": {
-           "START_DATE": "Start date",
-           "END_DATE": "End date"
-         },
-         "REASON": {
-           "SELECT_REASON": "Select",
-           "REASON": "Reason",
-           "COMMENTS": "Comments"
-         },
-         "SUMMARY": {
-           "SUMMARY": "Summary",
-           "LOCATION": "Location",
-           "DATE_FROM": "From",
-           "DATE_TO": "Until",
-           "REASON": "Reason",
-           "COMMENTS": "Comments"
-         }
-       }
      }
    },
    "USERS": {
      "ACTIONS": {
        "ADD_USER":  "Add user",
        "ADD_GROUP": "Add group",
-       "ADD_ACL":   "Add access policy",
-       "ADD_BLACKLIST": "Add blacklist"
+       "ADD_ACL":   "Add access policy"
      },
      "NAVIGATION": {
        "USERS":       "Users",
        "GROUPS":      "Groups",
-       "PERMISSIONS": "Access policies",
-       "BLACKLISTS":  "Blacklist"
+       "PERMISSIONS": "Access policies"
      },
      "USERS": {
        "TABLE": {
@@ -1246,8 +1123,6 @@
          "ROLES":    "Roles",
          "TYPE":     "Type",
          "PROVIDER":  "Provider",
-         "BLACKLIST_FROM": "Blacklisted from",
-         "BLACKLIST_TO":   "Blacklisted until",
          "ACTION":   "Actions",
          "TOOLTIP": {
            "DELETE": "Delete user",
@@ -1417,49 +1292,6 @@
               "EMPTY": "No role found"
            }
          }
-        }
-     },
-     "BLACKLISTS": {
-       "TABLE": {
-         "CAPTION":   "Users blacklist",
-         "NAME":      "Name",
-         "DATE_FROM": "From",
-         "DATE_TO":   "Until",
-         "REASON":    "Reason",
-         "ACTION":    "Actions"
-       },
-       "DETAILS": {
-         "NEWCAPTION":  "Create blacklist",
-         "EDITCAPTION": "Edit blacklist",
-         "TABS": {
-           "USERS":   "Users",
-           "DATES":   "Dates",
-           "REASON":  "Reason",
-           "SUMMARY": "Summary"
-         },
-         "USERS": {
-           "REMOVE":      "Remove",
-           "ADD_USER":    "Choose user",
-           "ALL_USERS":   "All users",
-           "SELECT_USER": "Select"
-         },
-         "DATES": {
-           "START_DATE": "Start date",
-           "END_DATE": "End date"
-         },
-         "REASON": {
-           "SELECT_REASON": "Select",
-           "REASON": "Reason",
-           "COMMENTS": "Comments"
-         },
-         "SUMMARY": {
-           "SUMMARY": "Summary",
-           "USER": "User",
-           "DATE_FROM": "From",
-           "DATE_TO": "Until",
-           "REASON": "Reason",
-           "COMMENTS": "Comments"
-         }
        }
      }
    },
@@ -1518,34 +1350,7 @@
        "ADD_THEME": "Add theme"
      },
      "NAVIGATION": {
-       "MAIL_TEMPLATES": "Email templates",
-       "MAIL_SERVERS":   "Email settings",
        "THEMES": "Themes"
-     },
-     "EMAIL_TEMPLATES": {
-       "TABLE": {
-         "CAPTION":  "Email templates",
-         "NAME":     "Name",
-         "CREATOR":  "Creator",
-         "CREATED":  "Created",
-         "ACTION":   "Actions"
-       },
-       "DETAILS": {
-         "NEWCAPTION":  "Create template",
-         "EDITCAPTION": "Edit template",
-         "TABS": {
-           "MESSAGE": "Message",
-           "SUMMARY": "Summary"
-         },
-         "MESSAGE": {
-           "NAME":    "Name",
-           "SUBJECT": "Subject",
-           "MESSAGE": "Message"
-         },
-         "SUMMARY": {
-           "MESSAGE_SUMMARY": "Message summary"
-         }
-       }
      },
      "THEMES": {
        "TABLE": {
@@ -1641,24 +1446,16 @@
      "JOBS": {
        "TABLE": {
          "ID":        "Job Identifier",
-         "ACTION":    "Actions",
          "CAPTION":   "Jobs",
          "CREATED":   "Created",
          "CREATOR":   "Creator",
          "HOST_NAME": "Host name",
+         "NODE_NAME": "Node name",
          "OPERATION": "Operation",
          "STARTED":   "Started",
          "STATUS":    "Status",
          "SUBMITTED": "Submitted",
          "TYPE":      "Type"
-       },
-       "DETAILS": {
-         "HEADER": "Job details {{resourceId}}",
-         "TABS": {
-           "GENERAL":    "General",
-           "OPERATIONS": "Operations",
-           "INCIDENTS":  "Incidents"
-         }
        },
        "STATUS": {
          "QUEUED": "Queued",
@@ -1679,6 +1476,7 @@
          "CAPTION":         "Servers",
          "STATUS":          "Status",
          "HOST_NAME":       "Host name",
+         "NODE_NAME":       "Node name",
          "CORES":           "Cores",
          "COMPLETED":       "Jobs completed",
          "RUNNING":         "Jobs running",
@@ -1686,7 +1484,6 @@
          "MEAN_RUN_TIME":   "Mean run time",
          "MEAN_QUEUE_TIME": "Mean queue time",
          "MAINTENANCE":     "Maintenance",
-         "ACTION":          "Actions",
          "MAINTENANCE_OFF": "Enter maintenance mode",
          "MAINTENANCE_ON":  "Leave maintenance mode"
        }
@@ -1697,6 +1494,7 @@
          "STATUS":          "Status",
          "NAME":            "Service name",
          "HOST_NAME":       "Host name",
+         "NODE_NAME":       "Node name",
          "COMPLETED":       "Jobs completed",
          "RUNNING":         "Jobs running",
          "QUEUED":          "Jobs queued",
@@ -1742,18 +1540,24 @@
      },
      "ACTIONS": {
        "SPLIT": "Split",
-       "CUT":   "Cut",
-       "REPLAY_SEGMENT": "Replay segment",
-       "REPLAY_END_OF_SEGMENT": "End of segment",
-       "REPLAY_SEGMENT_WITH_PREROLL": "Check transition",
+       "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+       "CUT":   "Hide/Show",
+       "CUT_TOOLTIP":   "Hide or show the selected part of the video.",
+       "REPLAY_SEGMENT": "Play Start of Segment",
+       "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+       "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+       "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+       "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+       "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
        "UNDO": "Undo",
        "REDO": "Redo",
-       "CLEAR_SEGMENTS": "Clear segments",
-       "CLEAR_SELECTED_SEGMENT": "Clear selected segment"
+       "CLEAR_SEGMENTS": "Clear All Segments",
+       "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
      },
      "SEGMENTS": {
        "REMOVE_SEGMENT":  "Remove Segment",
-       "USE_SEGMENT":     "Use this Segment",
+       "SHOW_SEGMENT":     "Show this Segment",
+       "HIDE_SEGMENT":     "Hide this Segment",
        "START":           "Start",
        "END":             "End"
      },
@@ -1916,9 +1720,6 @@
        "LOCATION": {
          "LABEL": "Location"
        },
-       "OPTEDOUT": {
-         "LABEL": "Opted Out"
-       },
        "PERIOD": {
          "LABEL": "Period"
        },
@@ -1930,12 +1731,6 @@
        },
        "PROGRESS": {
          "LABEL": "Progress"
-       },
-       "REVIEW_STATUS": {
-         "LABEL": "Review Status",
-         "CONFIRMED": "Confirmed",
-         "UNCONFIRMED": "Unconfirmed",
-         "UNSENT": "Unsent"
        },
        "SERIES": {
          "LABEL": "Series"
@@ -1980,6 +1775,9 @@
        "HOSTNAME": {
            "LABEL": "Host name"
        },
+       "NODE_NAME": {
+            "LABEL": "Node name"
+       },
        "STATUS": {
            "LABEL": "Status",
            "PAUSED": "Paused",
@@ -2021,6 +1819,9 @@
        "HOSTNAME": {
            "LABEL": "Host name"
        },
+       "NODE_NAME": {
+            "LABEL": "Node name"
+       },
        "STATUS": {
          "LABEL": "Status",
          "MAINTENANCE": "Maintenance",
@@ -2034,6 +1835,9 @@
         },
         "HOSTNAME": {
             "LABEL": "Host name"
+        },
+        "NODE_NAME": {
+            "LABEL": "Node name"
         },
         "NAME": {
             "LABEL": "Name"
@@ -2086,16 +1890,6 @@
    "TABLE_NO_RESULT": "No results found",
    "TABLE_LOADING": "Loading…",
    "TABLE_EDIT": "Edit",
-   "PM": {
-     "BLACKLIST": {
-       "REASONS": {
-         "SICK_LEAVE":       "Sick leave",
-         "LEAVE":            "Leave",
-         "FAMILY_EMERGENCY": "Family emergency",
-         "CONSTRUCTION":     "Construction"
-       }
-     }
-   },
    "DASHBOARD": {
        "RUNNING":   "Running",
        "FINISHED":  "Finished",
@@ -2184,6 +1978,34 @@
       "SHUTTING_DOWN": "Shutting down",
       "UNKNOWN": "Unknown",
       "UPLOADING": "Uploading"
+    }
+  },
+  "EDITABLE": {
+    "MULTI": {
+      "PLACEHOLDER": "To insert multiple values press Enter in between"
+    }
+  },
+  "STATISTICS": {
+    "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+    "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+    "FROM": "From",
+    "TO": "To",
+    "TOTAL": "Total",
+    "GRANULARITY": "Granularity",
+    "NAVIGATION": {
+      "ORGANIZATION": "Organisation"
+    },
+    "TITLE": {
+      "RANDOM": "Random Data",
+      "VIEWS_SUM": "Total Number of Views",
+      "VIEWS_AVG": "Average Number of Views",
+      "PUBLISHEDHOURS": "Published Hours of Video"
+    },
+    "DESCRIPTION": {
+      "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+      "VIEWS_SUM": "This displays the total number of views per time unit.",
+      "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+      "PUBLISHEDHOURS": "This displays the running total published hours of video"
     }
   }
 }

@@ -1,0 +1,10 @@
+{
+   "created": "2019-02-05T01:28:11.852Z",
+   "details": [{
+      "code": 500,
+      "error": "failed when posting audio to the STT service"
+   }],
+   "id": "4d27ce28-28e5-11e9-b578-8b39836f7d7a",
+   "updated": "2019-02-05T01:28:14.943Z",
+   "status": "failed"
+}

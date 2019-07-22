@@ -20,72 +20,39 @@
  */
 package org.opencastproject.migration;
 
-import static com.entwinemedia.fn.Equality.eq;
-import static com.entwinemedia.fn.Prelude.chuck;
-import static com.entwinemedia.fn.data.Opt.none;
-
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.metadata.dublincore.DCMIPeriod;
-import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreUtil;
-import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
-import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
-import org.opencastproject.scheduler.api.SchedulerException;
-import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
-import org.opencastproject.scheduler.api.SchedulerService.SchedulerTransaction;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AccessControlParser;
-import org.opencastproject.security.api.AccessControlUtil;
-import org.opencastproject.security.api.AclScope;
-import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Property;
+import org.opencastproject.assetmanager.api.Version;
+import org.opencastproject.assetmanager.api.fn.Properties;
+import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.ARecord;
+import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PropertiesUtil;
-import org.opencastproject.util.data.Tuple;
-import org.opencastproject.workspace.api.Workspace;
+import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.OsgiUtil;
 
-import com.entwinemedia.fn.Equality;
+import com.entwinemedia.fn.Fn;
+import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
+import com.google.gson.Gson;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
-import org.osgi.service.cm.ConfigurationException;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.Dictionary;
 
-import javax.sql.DataSource;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 
 /**
  * This class provides index and DB migrations to Opencast.
@@ -94,323 +61,256 @@ public class SchedulerMigrationService {
 
   private static final Logger logger = LoggerFactory.getLogger(SchedulerMigrationService.class);
 
-  private static final MediaPackageBuilderFactory mpbf = MediaPackageBuilderFactory.newInstance();
+  /** JPA persistence unit name */
+  public static final String PERSISTENCE_UNIT = "org.opencastproject.migration";
 
-  public static final String CFG_ORGANIZATION = "org.opencastproject.migration.organization";
+  /** Configuration keys */
+  static final String SCHEDULER_NAMESPACE = "org.opencastproject.scheduler";
+  static final String SNAPSHOT_OWNER = SCHEDULER_NAMESPACE;
+  static final String WORKFLOW_NAMESPACE = SCHEDULER_NAMESPACE + ".workflow.configuration";
+  static final String CA_NAMESPACE = SCHEDULER_NAMESPACE + ".ca.configuration";
+  static final String RECORDING_LAST_HEARD_CONFIG = "recording_last_heard";
+  static final String RECORDING_STATE_CONFIG = "recording_state";
+  static final String SOURCE_CONFIG = "source";
+  static final String PRESENTERS_CONFIG = "presenters";
+  static final String AGENT_CONFIG = "agent";
+  static final String START_DATE_CONFIG = "start";
+  static final String END_DATE_CONFIG = "end";
+  static final String OPTOUT_CONFIG = "optout";
+  static final String VERSION = "version";
+  static final String LAST_MODIFIED_DATE = "last_modified_date";
+  static final String LAST_CONFLICT = "last_conflict";
+  static final String CHECKSUM = "checksum";
 
   /** The security service */
   private SecurityService securityService;
 
-  /** The organization directory service */
-  private OrganizationDirectoryService organizationDirectoryService;
+  /** The asset manager */
+  private AssetManager assetManager;
 
-  /** The authorization service */
-  private AuthorizationService authorizationService;
+  private OrganizationDirectoryService orgDirectoryService;
 
-  /** The scheduler service */
-  private SchedulerService schedulerService;
+  private EntityManagerFactory emf;
 
-  /** The workspace */
-  private Workspace workspace;
-
-  /** The data source */
-  private DataSource dataSource;
+  private final Gson gson = new Gson();
 
   /** OSGi DI callback. */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  /** OSGi DI callback. */
-  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
-    this.organizationDirectoryService = organizationDirectoryService;
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 
-  /** OSGi DI callback. */
-  public void setAuthorizationService(AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
+  public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
+    this.orgDirectoryService = orgDirectoryService;
   }
 
-  /** OSGi DI callback. */
-  public void setSchedulerService(SchedulerService schedulerService) {
-    this.schedulerService = schedulerService;
+  public void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
   }
 
-  /** OSGi DI callback. */
-  public void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
-  }
-
-  /** OSGi DI callback. */
-  public void setDataSource(DataSource dataSource) {
-    this.dataSource = dataSource;
-  }
-
-  public void activate(final ComponentContext cc) throws ConfigurationException, SQLException {
-    logger.info("Start migrating scheduled events");
-
-    // read config
-    final String orgId = StringUtils.trimToNull((String) cc.getBundleContext().getProperty(CFG_ORGANIZATION));
-
-    if (StringUtils.isBlank(orgId)) {
-      logger.debug("No organization set for migration. Aborting.");
+  public void activate(final ComponentContext cc) throws IOException {
+    int ocVersion = cc.getBundleContext().getBundle().getVersion().getMajor();
+    if (ocVersion > 7) {
+      logger.info("Scheduler migration can only be run when upgrading from opencast 6.x to 7.x. Skipping.");
       return;
     }
-
-    // create security context
-    final Organization org;
-    try {
-      org = organizationDirectoryService.getOrganization(orgId);
-    } catch (NotFoundException e) {
-      throw new ConfigurationException(CFG_ORGANIZATION, String.format("Could not find organization '%s'", orgId), e);
+    final ServiceReference<ConfigurationAdmin> svcReference = cc.getBundleContext().getServiceReference(ConfigurationAdmin.class);
+    final Dictionary<String, Object> props = cc.getBundleContext().getService(svcReference)
+        .getConfiguration("org.opencastproject.scheduler.impl.SchedulerServiceImpl").getProperties();
+    final boolean maintenance = props != null && OsgiUtil.getOptCfgAsBoolean(props, "maintenance").getOrElse(false);
+    if (!maintenance) {
+      logger.info("Scheduler is not in maintenance mode. Skipping migration.");
+      return;
     }
-    SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), () -> {
-      // check if migration is needed
-      try {
-        int size = schedulerService.search(none(), none(), none(), none(), none()).size();
-        if (size > 0) {
-          logger.info("There are already '{}' existing scheduled events, skip scheduler migration!", size);
-          return;
+    logger.info("Start migrating scheduled events");
+    final String systemUserName = SecurityUtil.getSystemUserName(cc);
+    for (final Organization org : orgDirectoryService.getOrganizations()) {
+      SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(systemUserName, org), () -> {
+        try {
+          migrateScheduledEvents();
+        } catch (Exception e) {
+          throw new RuntimeException(e);
         }
-      } catch (UnauthorizedException | SchedulerException e) {
-        logger.error("Unable to read existing scheduled events, skip scheduler migration!", e);
-      }
-
-      try {
-        migrateScheduledEvents();
-      } catch (SQLException e) {
-        chuck(e);
-      }
-    });
-    logger.info("Finished migrating scheduled events");
+      });
+    }
+    logger.info("Finished migrating scheduled events. You can now disable maintenance mode of scheduler and restart opencast.");
   }
 
-  private void migrateScheduledEvents() throws SQLException {
-    SchedulerTransaction tx = null;
-    ResultSet result = null;
-    Statement stm = null;
-    try (Connection connection = dataSource.getConnection()) {
-      logger.info("Scheduler transaction | start");
-      tx = schedulerService.createTransaction("opencast");
-      stm = connection.createStatement();
-      result = stm.executeQuery("SELECT id, access_control, blacklisted, capture_agent_metadata, dublin_core, mediapackage_id, opt_out, review_date, review_status FROM mh_scheduled_event");
-      List<Event> events = transform(result);
-      for (Event event : events) {
-        // Outdated events have to be removed just before schedule time.
-        // Filtering in advance is dangerous because the whole process lasts very long
-        if (!isOutdated(event)) {
-          schedule(tx, event);
-          logger.info("Migrated event '{}'", event.mediaPackageId);
-        } else {
-          logger.info("Ignoring outdated event '{}'", event.mediaPackageId);
-        }
+  private void migrateScheduledEvents() throws Exception {
+    // migrate all events for current organization
+    final String org = securityService.getOrganization().getId();
+    logger.info("Migrating scheduled events for organization {}", org);
+    final Stream<ARecord> allEvents = getScheduledEvents();
+    int count = 0;
+    for (final ARecord record : allEvents) {
+      migrateProperties(record);
+      count++;
+    }
+    logger.info("Migrated {} scheduled events for organization {}.", count, org);
+  }
+
+  private Stream<ARecord> getScheduledEvents() {
+    final AQueryBuilder query = assetManager.createQuery();
+    // query filter for organization could be helpful to split up big migrations
+    final Predicate predicate = withOrganization(query).and(withVersion(query)).and(withProperties(query));
+    // select necessary properties when assembling query
+    return query.select(query.propertiesOf(SCHEDULER_NAMESPACE, WORKFLOW_NAMESPACE, CA_NAMESPACE))
+        .where(predicate).run().getRecords();
+  }
+
+  private Predicate withOrganization(AQueryBuilder query) {
+    return query.organizationId().eq(securityService.getOrganization().getId());
+  }
+
+  private Predicate withVersion(AQueryBuilder query) {
+    return query.version().isLatest();
+  }
+
+  private Predicate withProperties(AQueryBuilder query) {
+    return query.hasPropertiesOf(SCHEDULER_NAMESPACE);
+  }
+
+  private Opt<ExtendedEventDto> getExtendedEventDto(String id, String orgId, EntityManager em) {
+    return Opt.nul(em.find(ExtendedEventDto.class, new EventIdPK(id, orgId)));
+  }
+
+  private void migrateProperties(ARecord event) throws Exception {
+    final String orgID = securityService.getOrganization().getId();
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      final Opt<ExtendedEventDto> entityOpt = getExtendedEventDto(event.getMediaPackageId(), orgID, em);
+      if (entityOpt.isSome()) {
+        logger.warn("Migration for event {} of organization {} seems to be done already. Migrating again.",
+            event.getMediaPackageId(), orgID);
+      }
+      // Store all properties in extended events database
+      final ExtendedEventDto entity = entityOpt.getOr(new ExtendedEventDto());
+      entity.setMediaPackageId(event.getMediaPackageId());
+      entity.setOrganization(orgID);
+      final Opt<String> agent = event.getProperties().apply(Properties.getStringOpt(AGENT_CONFIG));
+      if (agent.isSome()) {
+        entity.setCaptureAgentId(agent.get());
+      }
+      final Opt<String> checksum = event.getProperties().apply(Properties.getStringOpt(CHECKSUM));
+      if (checksum.isSome()) {
+        entity.setChecksum(checksum.get());
+      }
+      final Opt<Date> endDate = event.getProperties().apply(Properties.getDateOpt(END_DATE_CONFIG));
+      if (endDate.isSome()) {
+        entity.setEndDate(endDate.get());
+      }
+      final Opt<Date> lastModifiedDate = event.getProperties().apply(Properties.getDateOpt(LAST_MODIFIED_DATE));
+      if (lastModifiedDate.isSome()) {
+        entity.setLastModifiedDate(lastModifiedDate.get());
+      }
+      final Opt<String> presenters = event.getProperties().apply(Properties.getStringOpt(PRESENTERS_CONFIG));
+      if (presenters.isSome()) {
+        entity.setPresenters(presenters.get());
+      }
+      final Opt<Long> recLastHeard = event.getProperties().apply(Properties.getLongOpt(RECORDING_LAST_HEARD_CONFIG));
+      if (recLastHeard.isSome()) {
+        entity.setRecordingLastHeard(recLastHeard.get());
+      }
+      final Opt<String> recState = event.getProperties().apply(Properties.getStringOpt(RECORDING_STATE_CONFIG));
+      if (recState.isSome()) {
+        entity.setRecordingState(recState.get());
+      }
+      final Opt<String> source = event.getProperties().apply(Properties.getStringOpt(SOURCE_CONFIG));
+      if (source.isSome()) {
+        entity.setSource(source.get());
+      }
+      final Opt<Date> startDate = event.getProperties().apply(Properties.getDateOpt(START_DATE_CONFIG));
+      if (startDate.isSome()) {
+        entity.setStartDate(startDate.get());
+      }
+      entity.setCaptureAgentProperties(gson.toJson(event.getProperties().filter(Properties.byNamespace(CA_NAMESPACE))
+          .group(toKey, toValue)));
+      entity.setWorkflowProperties(gson.toJson(event.getProperties().filter(Properties.byNamespace(WORKFLOW_NAMESPACE))
+          .group(toKey, toValue)));
+      if (entityOpt.isSome()) {
+        em.merge(entity);
+      } else {
+        em.persist(entity);
       }
       tx.commit();
-
-      // Update review status
-      for (Event event : events) {
-        if (!isOutdated(event)) {
-          schedulerService.updateReviewStatus(event.mediaPackageId, event.reviewStatus);
-        }
-      }
-      logger.info("Scheduler transaction | end");
-    } catch (Exception e) {
-      logger.error("Scheduler transaction | error", e);
-      if (tx != null) {
-        logger.error("Scheduler transaction | rollback transaction");
-        try {
-          tx.rollback();
-        } catch (Exception e2) {
-          logger.error("Scheduler transaction | error doing rollback", e2);
-        }
-      }
-    } finally {
-      if (result != null)
-        result.close();
-      if (stm != null)
-        stm.close();
-    }
-  }
-
-  void schedule(SchedulerTransaction tx, Event event) {
-    final Map<String, String> wfProperties = Collections.emptyMap();
-    final Map<String, String> caMetadata = PropertiesUtil.toMap(event.captureAgentProperites);
-    final MediaPackage mp = mkMediaPackage();
-    mp.setIdentifier(new IdImpl(event.mediaPackageId));
-    // create the catalog
-    final DublinCoreCatalog dc = event.dublinCore;
-    mp.setSeries(dc.getFirst(DublinCore.PROPERTY_IS_PART_OF));
-    // and make them available for download in the workspace
-    dc.setURI(storeInWs(event.mediaPackageId, dc.getIdentifier(), "dc-episode.xml", inputStream(dc)));
-    // add them to the media package
-    mp.add(dc);
-    // add acl to the media package
-    for (AccessControlList acl : event.accessControlList) {
       try {
-        authorizationService.setAcl(mp, AclScope.Episode, acl);
-      } catch (MediaPackageException e) {
-        logger.error("Error setting ACL for media package {}", mp.getIdentifier(), e);
+        // Remove obsolete asset manager properties
+        int deleted = 0;
+        for (String namespace: Arrays.asList(SCHEDULER_NAMESPACE, CA_NAMESPACE, WORKFLOW_NAMESPACE)) {
+          deleted += assetManager.deleteProperties(event.getMediaPackageId(), namespace);
+        }
+        logger.debug("Deleted {} migrated properties", deleted);
+      } catch (Exception e) {
+        logger.error("Could not delete obsolete properties for event {}", event.getMediaPackageId());
       }
-    }
-    //
-    // add to scheduler service
-    Tuple<Date, Date> schedulingDate = getSchedulingDate(dc);
-    String caId = dc.getFirst(DublinCore.PROPERTY_SPATIAL);
-    try {
-      tx.addEvent(schedulingDate.getA(), schedulingDate.getB(), caId, Collections.<String> emptySet(), mp, wfProperties,
-              caMetadata, Opt.some(event.optOut));
-    } catch (UnauthorizedException e) {
-      logger.error("Not authorized to schedule an event", e);
-      chuck(e);
-    } catch (SchedulerException e) {
-      logger.warn("Not able to schedule event.", e);
-      chuck(e);
-    } catch (NotFoundException e) {
-      logger.error("Transaction disappeared");
-      chuck(e);
-    }
-  }
-
-  /**
-   * Transform the event result set into {@link Event}s.
-   */
-  List<Event> transform(ResultSet resultSet) {
-    try {
-      List<Event> events = new ArrayList<>();
-      while (resultSet.next()) {
-        DublinCoreCatalog dc = readDublinCoreSilent(resultSet.getString(5));
-        dc.setIdentifier(UUID.randomUUID().toString());
-        dc.setFlavor(MediaPackageElements.EPISODE);
-        dc.remove(DublinCore.PROPERTY_IDENTIFIER);
-        Properties properties = parseProperties(resultSet.getString(4));
-        AccessControlList acl = resultSet.getString(2) != null
-                ? AccessControlParser.parseAclSilent(resultSet.getString(2)) : null;
-        events.add(new Event(resultSet.getLong(1), resultSet.getString(6), dc, properties, acl, resultSet.getBoolean(7),
-                ReviewStatus.valueOf(resultSet.getString(9)), resultSet.getDate(8)));
-      }
-      return events;
     } catch (Exception e) {
-      return chuck(e);
+      logger.error("Could not store extended event: ", e);
+      if (tx != null) {
+        tx.rollback();
+      }
+      throw (e);
+    } finally {
+      if (em != null)
+        em.close();
     }
   }
 
-  Properties parseProperties(String serializedProperties) {
-    try {
-      Properties caProperties = new Properties();
-      caProperties.load(new StringReader(serializedProperties));
-      return caProperties;
-    } catch (IOException e) {
-      return chuck(e);
-    }
-  }
 
-  MediaPackage mkMediaPackage() {
-    try {
-      return mpbf.newMediaPackageBuilder().createNew();
-    } catch (MediaPackageException e) {
-      return chuck(e);
-    }
-  }
-
-  DublinCoreCatalog readDublinCoreSilent(String serializedForm) {
-    try {
-      return DublinCoreXmlFormat.read(serializedForm);
-    } catch (IOException | SAXException | ParserConfigurationException e) {
-      return chuck(e);
-    }
-  }
-
-  InputStream inputStream(DublinCoreCatalog dc) {
-    try {
-      return IOUtils.toInputStream(dc.toXmlString());
-    } catch (IOException e) {
-      return chuck(e);
-    }
-  }
-
-  /** Serialize a DublinCore catalog to a byte array. Use UTF-8 charset. */
-  byte[] serialize(DublinCoreCatalog dc) {
-    try {
-      return dc.toXmlString().getBytes(StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      return chuck(e);
-    }
-  }
-
-  URI storeInWs(String mpId, String mpeId, String fileName, InputStream data) {
-    try {
-      return workspace.put(mpId, mpeId, fileName, data);
-    } catch (IOException e) {
-      chuck(e);
-    }
-    return null;
-  }
-
-  Tuple<Date, Date> getSchedulingDate(DublinCoreCatalog dc) {
-    String eventId = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-    DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(dc.getFirst(DublinCore.PROPERTY_TEMPORAL));
-    if (!period.hasStart()) {
-      logger.error("Couldn't get startdate from event {}!", eventId);
-    }
-    if (!period.hasEnd()) {
-      logger.error("Couldn't get enddate from event {}!", eventId);
-    }
-    return Tuple.tuple(period.getStart(), period.getEnd());
-  }
-
-  boolean isOutdated(Event event) {
-    Tuple<Date, Date> schedulingDate = getSchedulingDate(event.dublinCore);
-    Interval interval = new Interval(new DateTime(schedulingDate.getA()), new DateTime(schedulingDate.getB()));
-    return interval.containsNow() || interval.isBeforeNow();
-  }
-
-  // CHECKSTYLE:OFF
-  static final class Event {
-    final long eventId;
-    final String mediaPackageId;
-    final DublinCoreCatalog dublinCore;
-    final Properties captureAgentProperites;
-    final Opt<AccessControlList> accessControlList;
-    final boolean optOut;
-    final ReviewStatus reviewStatus;
-    final Date reviewDate;
-
-    public Event(long eventId, String mediaPackageId, DublinCoreCatalog dublinCore, Properties captureAgentProperites,
-            AccessControlList accessControlList, boolean optOut, ReviewStatus reviewStatus, Date reviewDate) {
-      this.eventId = eventId;
-      this.mediaPackageId = mediaPackageId;
-      this.dublinCore = dublinCore;
-      this.captureAgentProperites = captureAgentProperites;
-      this.accessControlList = Opt.nul(accessControlList);
-      this.optOut = optOut;
-      this.reviewStatus = reviewStatus;
-      this.reviewDate = reviewDate;
-    }
-
+  private static final Fn<Boolean, String> decomposeBooleanValue = new Fn<Boolean, String>() {
     @Override
-    public int hashCode() {
-      return Equality.hash(eventId, mediaPackageId, dublinCore, captureAgentProperites, accessControlList, optOut,
-              reviewStatus, reviewDate);
+    public String apply(Boolean b) {
+      return b.toString();
     }
+  };
 
+  private static final Fn<Long, String> decomposeLongValue = new Fn<Long, String>() {
     @Override
-    public boolean equals(Object that) {
-      return (this == that) || (that instanceof Event && eqFields((Event) that));
+    public String apply(Long l) {
+      return l.toString();
     }
+  };
 
-    public boolean canEqual(Object that) {
-      return that instanceof Event;
+  private static final Fn<Date, String> decomposeDateValue = new Fn<Date, String>() {
+    @Override
+    public String apply(Date d) {
+      return DateTimeSupport.toUTC(d.getTime());
     }
+  };
 
-    private boolean eqFields(Event that) {
-      return that.canEqual(this) && eq(eventId, that.eventId) && eq(mediaPackageId, that.mediaPackageId)
-              && eq(DublinCoreUtil.calculateChecksum(dublinCore), DublinCoreUtil.calculateChecksum(that.dublinCore))
-              && eq(captureAgentProperites, that.captureAgentProperites)
-              && AccessControlUtil.equals(accessControlList.orNull(), that.accessControlList.orNull())
-              && eq(optOut, that.optOut) && eq(reviewStatus, that.reviewStatus) && eq(reviewDate, that.reviewDate);
+  private static final Fn<String, String> decomposeStringValue = new Fn<String, String>() {
+    @Override
+    public String apply(String s) {
+      return s;
     }
+  };
 
-  }
-  // CHECKSTYLE:ON
+  private static final Fn<Version, String> decomposeVersionValue = new Fn<Version, String>() {
+    @Override
+    public String apply(Version v) {
+      return v.toString();
+    }
+  };
+
+  private static final Fn<Property, String> toKey = new Fn<Property, String>() {
+    @Override
+    public String apply(Property property) {
+      return property.getId().getName();
+    }
+  };
+
+  private static final Fn<Property, String> toValue = new Fn<Property, String>() {
+    @Override
+    public String apply(Property property) {
+      return property.getValue().decompose(decomposeStringValue, decomposeDateValue, decomposeLongValue,
+          decomposeBooleanValue, decomposeVersionValue);
+    }
+  };
 
 }

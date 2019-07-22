@@ -70,8 +70,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -82,21 +80,6 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(SegmentPreviewsWorkflowOperationHandler.class);
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<>();
-    CONFIG_OPTIONS.put("source-flavor", "The \"flavor\" of the track to use as a video source input");
-    CONFIG_OPTIONS.put("source-tags",
-            "The required tags that must exist on the track for the track to be used as a video source");
-    CONFIG_OPTIONS.put("encoding-profile", "The encoding profile to use for generating the image");
-    CONFIG_OPTIONS.put("reference-flavor", "The \"flavor\" of the track to used as the reference");
-    CONFIG_OPTIONS.put("reference-tags", "The \"tags\" of the track to used as the reference");
-    CONFIG_OPTIONS.put("target-flavor", "The flavor to apply to the extracted images");
-    CONFIG_OPTIONS.put("target-tags", "The tags to apply to the extracted images");
-  }
-
   /** The composer service */
   private ComposerService composerService = null;
 
@@ -105,16 +88,6 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
   /** The local workspace */
   private Workspace workspace = null;
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
 
   /**
    * Callback for the OSGi declarative services configuration.

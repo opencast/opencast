@@ -20,6 +20,8 @@
  */
 package org.opencastproject.adminui.impl;
 
+import static org.opencastproject.mediapackage.MediaPackageElementFlavor.parseFlavor;
+
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -36,6 +38,45 @@ import java.util.Set;
 
 public class AdminUIConfiguration implements ManagedService {
 
+  /** This helper class provides all information relevant for the automatic distribution of
+      thumbnails to a specific type of publication channels */
+  public final class ThumbnailDistributionSettings {
+
+    private boolean enabled;
+    private String channelId;
+    private MediaPackageElementFlavor flavor;
+    private String[] tags;
+    private String[] profiles;
+
+    public boolean getEnabled() {
+      return enabled && !StringUtils.isEmpty(channelId);
+    }
+
+    public String getChannelId() {
+      return channelId;
+    }
+
+    public MediaPackageElementFlavor getFlavor() {
+      return flavor;
+    }
+
+    public String[] getTags() {
+      return tags;
+    }
+
+    public String[] getProfiles() {
+      return profiles;
+    }
+
+    ThumbnailDistributionSettings(boolean enabled, String channelId, String flavor, String tags, String profiles) {
+      this.enabled = enabled;
+      this.channelId = StringUtils.trimToEmpty(channelId);
+      this.flavor = parseFlavor(StringUtils.trimToEmpty(flavor));
+      this.tags = StringUtils.split(StringUtils.trimToEmpty(tags), ",");
+      this.profiles = StringUtils.split(StringUtils.trimToEmpty(profiles), ",");
+    }
+  }
+
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(AdminUIConfiguration.class);
 
@@ -44,19 +85,29 @@ public class AdminUIConfiguration implements ManagedService {
   public static final String OPT_SMIL_CATALOG_FLAVOR = "smil.catalog.flavor";
   public static final String OPT_SMIL_CATALOG_TAGS = "smil.catalog.tags";
   public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
-  public static final String OPT_THUMBNAIL_PUBLISH_FLAVOR = "thumbnail.publish.flavor";
-  public static final String OPT_THUMBNAIL_PUBLISH_TAGS = "thumbnail.publish.tags";
   public static final String OPT_THUMBNAIL_UPLOADED_FLAVOR = "thumbnail.uploaded.flavor";
   public static final String OPT_THUMBNAIL_UPLOADED_TAGS = "thumbnail.uploaded.tags";
+  public static final String OPT_THUMBNAIL_MASTER_PROFILE = "thumbnail.master.profile";
   public static final String OPT_THUMBNAIL_PREVIEW_FLAVOR = "thumbnail.preview.flavor";
+  public static final String OPT_THUMBNAIL_PREVIEW_PROFILE = "thumbnail.preview.profile";
   public static final String OPT_THUMBNAIL_PREVIEW_PROFILE_DOWNSCALE = "thumbnail.preview.profile.downscale";
   public static final String OPT_THUMBNAIL_SOURCE_FLAVOR_TYPE_PRIMARY = "thumbnail.source.flavor.type.primary";
   public static final String OPT_THUMBNAIL_SOURCE_FLAVOR_TYPE_SECONDARY = "thumbnail.source.flavor.type.secondary";
   public static final String OPT_THUMBNAIL_SOURCE_FLAVOR_SUBTYPE = "thumbnail.source.flavor.subtype";
-  public static final String OPT_THUMBNAIL_ENCODING_PROFILE = "thumbnail.encoding.profile";
   public static final String OPT_THUMBNAIL_DEFAULT_POSITION = "thumbnail.default.position";
-  public static final String OPT_THUMBNAIL_AUTO_DISTRIBUTION = "thumbnail.auto.distribution";
-  public static final String OPT_OAIPMH_CHANNEL = "oaipmh.channel";
+  public static final String OPT_THUMBNAIL_DISTRIBUTION_AUTO = "thumbnail.distribution.auto";
+  public static final String OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_CHANNEL =
+    "thumbnail.distribution.configurable.channel";
+  public static final String OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_FLAVOR =
+    "thumbnail.distribution.configurable.flavor";
+  public static final String OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_TAGS = "thumbnail.distribution.configurable.tags";
+  public static final String OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_PROFILES =
+      "thumbnail.distribution.configurable.profiles";
+  public static final String OPT_THUMBNAIL_DISTRIBUTION_OAIPMH_CHANNEL = "thumbnail.distribution.oaipmh.channel";
+  public static final String OPT_THUMBNAIL_DISTRIBUTION_OAIPMH_FLAVOR = "thumbnail.distribution.oaipmh.flavor";
+  public static final String OPT_THUMBNAIL_DISTRIBUTION_OAIPMH_TAGS = "thumbnail.distribution.oaipmh.tags";
+  public static final String OPT_THUMBNAIL_DISTRIBUTION_OAIPMH_PROFILES = "thumbnail.distribution.oaipmh.profiles";
+
   public static final String OPT_SOURCE_TRACK_LEFT_FLAVOR = "sourcetrack.left.flavor";
   public static final String OPT_SOURCE_TRACK_RIGHT_FLAVOR = "sourcetrack.right.flavor";
   public static final String OPT_PREVIEW_AUDIO_SUBTYPE = "preview.audio.subtype";
@@ -67,19 +118,26 @@ public class AdminUIConfiguration implements ManagedService {
   private static final String DEFAULT_SMIL_CATALOG_FLAVOR = "smil/cutting";
   private static final String DEFAULT_SMIL_CATALOG_TAGS = "archive";
   private static final String DEFAULT_SMIL_SILENCE_FLAVOR = "*/silence";
-  private static final String DEFAULT_THUMBNAIL_PUBLISH_FLAVOR = "*/search+preview";
-  private static final String DEFAULT_THUMBNAIL_PUBLISH_TAGS = "engage-download";
   private static final String DEFAULT_THUMBNAIL_UPLOADED_FLAVOR = "thumbnail/source";
   private static final String DEFAULT_THUMBNAIL_UPLOADED_TAGS = "archive";
+  private static final String DEFAULT_THUMBNAIL_MASTER_PROFILE = "editor.thumbnail.master";
   private static final String DEFAULT_THUMBNAIL_PREVIEW_FLAVOR = "thumbnail/preview";
+  private static final String DEFAULT_THUMBNAIL_PREVIEW_PROFILE = "editor.thumbnail.preview";
   private static final String DEFAULT_THUMBNAIL_PREVIEW_PROFILE_DOWNSCALE = "editor.thumbnail.preview.downscale";
   private static final String DEFAULT_THUMBNAIL_SOURCE_FLAVOR_TYPE_PRIMARY = "presenter";
   private static final String DEFAULT_THUMBNAIL_SOURCE_FLAVOR_TYPE_SECONDARY = "presentation";
   private static final String DEFAULT_THUMBNAIL_SOURCE_FLAVOR_SUBTYPE = "source";
-  private static final String DEFAULT_THUMBNAIL_ENCODING_PROFILE = "search-cover.http";
   private static final Double DEFAULT_THUMBNAIL_DEFAULT_POSITION = 1.0;
-  private static final Boolean DEFAULT_THUMBNAIL_AUTO_DISTRIBUTION = false;
-  private static final String DEFAULT_OAIPMH_CHANNEL = "default";
+  private static final Boolean DEFAULT_THUMBNAIL_DISTRIBUTION_AUTO = false;
+  private static final String DEFAULT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_CHANNEL = "api";
+  private static final String DEFAULT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_FLAVOR = "*/search+preview";
+  private static final String DEFAULT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_TAGS = "engage-download";
+  private static final String DEFAULT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_PROFILES = "search-cover.http.downscale";
+  private static final String DEFAULT_THUMBNAIL_DISTRIBUTION_OAIPMH_CHANNEL = "oaipmh-default";
+  private static final String DEFAULT_THUMBNAIL_DISTRIBUTION_OAIPMH_FLAVOR = "*/search+preview";
+  private static final String DEFAULT_THUMBNAIL_DISTRIBUTION_OAIPMH_TAGS = "engage-download";
+  private static final String DEFAULT_THUMBNAIL_DISTRIBUTION_OAIPMH_PROFILES = "search-cover.http.downscale";
+
   private static final String DEFAULT_PREVIEW_VIDEO_SUBTYPE = "video+preview";
   private static final String DEFAULT_PREVIEW_AUDIO_SUBTYPE = "audio+preview";
   private static final String DEFAULT_SOURCE_TRACK_LEFT_FLAVOR = "presenter/source";
@@ -90,19 +148,18 @@ public class AdminUIConfiguration implements ManagedService {
   private Set<String> smilCatalogTagSet = new HashSet<>();
   private MediaPackageElementFlavor smilCatalogFlavor = MediaPackageElementFlavor.parseFlavor(DEFAULT_SMIL_CATALOG_FLAVOR);
   private MediaPackageElementFlavor smilSilenceFlavor = MediaPackageElementFlavor.parseFlavor(DEFAULT_SMIL_SILENCE_FLAVOR);
-  private String thumbnailPublishFlavor = DEFAULT_THUMBNAIL_PUBLISH_FLAVOR;
-  private String thumbnailPublishTags = DEFAULT_THUMBNAIL_PUBLISH_TAGS;
   private String thumbnailUploadedFlavor = DEFAULT_THUMBNAIL_UPLOADED_FLAVOR;
   private String thumbnailUploadedTags = DEFAULT_THUMBNAIL_UPLOADED_TAGS;
+  private String thumbnailMasterProfile = DEFAULT_THUMBNAIL_MASTER_PROFILE;
   private String thumbnailPreviewFlavor = DEFAULT_THUMBNAIL_PREVIEW_FLAVOR;
+  private String thumbnailPreviewProfile = DEFAULT_THUMBNAIL_PREVIEW_PROFILE;
   private String thumbnailPreviewProfileDownscale = DEFAULT_THUMBNAIL_PREVIEW_PROFILE_DOWNSCALE;
   private String thumbnailSourceFlavorTypePrimary = DEFAULT_THUMBNAIL_SOURCE_FLAVOR_TYPE_PRIMARY;
   private String thumbnailSourceFlavorTypeSecondary = DEFAULT_THUMBNAIL_SOURCE_FLAVOR_TYPE_SECONDARY;
   private String thumbnailSourceFlavorSubtype = DEFAULT_THUMBNAIL_SOURCE_FLAVOR_SUBTYPE;
-  private String thumbnailEncodingProfile = DEFAULT_THUMBNAIL_ENCODING_PROFILE;
   private Double thumbnailDefaultPosition = DEFAULT_THUMBNAIL_DEFAULT_POSITION;
-  private boolean thumbnailAutoDistribution = DEFAULT_THUMBNAIL_AUTO_DISTRIBUTION;
-  private String oaipmhChannel = DEFAULT_OAIPMH_CHANNEL;
+  private ThumbnailDistributionSettings thumbnailDistributionOaiPmh;
+  private ThumbnailDistributionSettings thumbnailDistributionConfigurable;
   private String previewVideoSubtype = DEFAULT_PREVIEW_VIDEO_SUBTYPE;
   private String previewAudioSubtype = DEFAULT_PREVIEW_AUDIO_SUBTYPE;
   private MediaPackageElementFlavor sourceTrackLeftFlavor = MediaPackageElementFlavor.parseFlavor(
@@ -138,22 +195,21 @@ public class AdminUIConfiguration implements ManagedService {
     return thumbnailUploadedTags;
   }
 
-  public String getThumbnailPublishFlavor() {
-    return thumbnailPublishFlavor;
-  }
-
-  public String getThumbnailPublishTags() {
-    return thumbnailPublishTags;
-  }
-
   public String getThumbnailPreviewFlavor() {
     return thumbnailPreviewFlavor;
+  }
+
+  public String getThumbnailPreviewProfile() {
+    return thumbnailPreviewProfile;
   }
 
   public String getThumbnailPreviewProfileDownscale() {
     return thumbnailPreviewProfileDownscale;
   }
 
+  public String getThumbnailMasterProfile() {
+    return thumbnailMasterProfile;
+  }
   public String getThumbnailSourceFlavorSubtype() {
     return thumbnailSourceFlavorSubtype;
   }
@@ -166,20 +222,16 @@ public class AdminUIConfiguration implements ManagedService {
     return thumbnailSourceFlavorTypeSecondary;
   }
 
-  public String getThumbnailEncodingProfile() {
-    return thumbnailEncodingProfile;
-  }
-
   public Double getThumbnailDefaultPosition() {
     return thumbnailDefaultPosition;
   }
 
-  public boolean getThumbnailAutoDistribution() {
-    return thumbnailAutoDistribution;
+  public ThumbnailDistributionSettings getThumbnailDistributionOaiPmh() {
+    return thumbnailDistributionOaiPmh;
   }
 
-  public String getOaipmhChannel() {
-    return oaipmhChannel;
+  public ThumbnailDistributionSettings getThumbnailDistributionConfigurable() {
+    return thumbnailDistributionConfigurable;
   }
 
   public String getPreviewVideoSubtype() {
@@ -240,25 +292,25 @@ public class AdminUIConfiguration implements ManagedService {
       (String) properties.get(OPT_THUMBNAIL_UPLOADED_TAGS), DEFAULT_THUMBNAIL_UPLOADED_TAGS);
     logger.debug("Tags for uploaded thumbnail set to '{}'", thumbnailUploadedTags);
 
-    // Thumbnail publish flavor
-    thumbnailPublishFlavor = StringUtils.defaultString(
-      (String) properties.get(OPT_THUMBNAIL_PUBLISH_FLAVOR), DEFAULT_THUMBNAIL_PUBLISH_FLAVOR);
-    logger.debug("Thumbnail publish flavor set to '{}'", thumbnailPublishFlavor);
-
-    // Thumbnail publish tags
-    thumbnailPublishTags = StringUtils.defaultString(
-      (String) properties.get(OPT_THUMBNAIL_PUBLISH_TAGS), DEFAULT_THUMBNAIL_PUBLISH_TAGS);
-    logger.debug("Thumbnail publish tags set to '{}'", thumbnailPublishTags);
-
     // Thumbnail preview flavor
     thumbnailPreviewFlavor = StringUtils.defaultString(
       (String) properties.get(OPT_THUMBNAIL_PREVIEW_FLAVOR), DEFAULT_THUMBNAIL_PREVIEW_FLAVOR);
     logger.debug("Thumbnail preview flavor set to '{}'", thumbnailPreviewFlavor);
 
+    // Encoding profile used to extract the thumbnail preview image
+    thumbnailPreviewProfile = StringUtils.defaultString(
+      (String) properties.get(OPT_THUMBNAIL_PREVIEW_PROFILE), DEFAULT_THUMBNAIL_PREVIEW_PROFILE);
+    logger.debug("Thumbnail preview encoding profile set to '{}'", thumbnailPreviewProfile);
+
     // Encoding profile used to downscale the thumbnail preview image
     thumbnailPreviewProfileDownscale = StringUtils.defaultString(
       (String) properties.get(OPT_THUMBNAIL_PREVIEW_PROFILE_DOWNSCALE), DEFAULT_THUMBNAIL_PREVIEW_PROFILE_DOWNSCALE);
     logger.debug("Thumbnail preview downscale encoding profile set to '{}'", thumbnailPreviewProfileDownscale);
+
+    // Encoding profile used to extract the master thumbnail image
+    thumbnailMasterProfile = StringUtils.defaultString(
+      (String) properties.get(OPT_THUMBNAIL_MASTER_PROFILE), DEFAULT_THUMBNAIL_MASTER_PROFILE);
+    logger.debug("Thumbnail master extraction encoding profile set to '{}'", thumbnailMasterProfile);
 
     // Thumbnail source flavor primary type
     thumbnailSourceFlavorTypePrimary = StringUtils.defaultString(
@@ -276,24 +328,36 @@ public class AdminUIConfiguration implements ManagedService {
       (String) properties.get(OPT_THUMBNAIL_SOURCE_FLAVOR_SUBTYPE), DEFAULT_THUMBNAIL_SOURCE_FLAVOR_SUBTYPE);
     logger.debug("Thumbnail source flavor subtype set to '{}'", thumbnailSourceFlavorSubtype);
 
-    // Thumbnail encoding profile
-    thumbnailEncodingProfile = StringUtils.defaultString(
-      (String) properties.get(OPT_THUMBNAIL_ENCODING_PROFILE), DEFAULT_THUMBNAIL_ENCODING_PROFILE);
-    logger.debug("Thumbnail encoding profile set to '{}'", thumbnailEncodingProfile);
-
     // Thumbnail default position
     thumbnailDefaultPosition = Double.parseDouble(StringUtils.defaultString(
       (String) properties.get(OPT_THUMBNAIL_DEFAULT_POSITION), DEFAULT_THUMBNAIL_DEFAULT_POSITION.toString()));
     logger.debug("Thumbnail default position set to '{}'", thumbnailDefaultPosition);
 
-    thumbnailAutoDistribution = BooleanUtils.toBoolean(StringUtils.defaultString(
-      (String) properties.get(OPT_THUMBNAIL_AUTO_DISTRIBUTION), DEFAULT_THUMBNAIL_AUTO_DISTRIBUTION.toString()));
+    boolean thumbnailAutoDistribution = BooleanUtils.toBoolean(StringUtils.defaultString(
+      (String) properties.get(OPT_THUMBNAIL_DISTRIBUTION_AUTO), DEFAULT_THUMBNAIL_DISTRIBUTION_AUTO.toString()));
     logger.debug("Thumbnail auto distribution: {}", thumbnailAutoDistribution);
 
-    // OAI-PMH channel
-    oaipmhChannel = StringUtils.defaultString(
-      (String) properties.get(OPT_OAIPMH_CHANNEL), DEFAULT_OAIPMH_CHANNEL);
-    logger.debug("OAI-PMH channel set to '{}", oaipmhChannel);
+    thumbnailDistributionOaiPmh = new ThumbnailDistributionSettings(thumbnailAutoDistribution,
+      StringUtils.defaultString((String) properties.get(OPT_THUMBNAIL_DISTRIBUTION_OAIPMH_CHANNEL),
+        DEFAULT_THUMBNAIL_DISTRIBUTION_OAIPMH_CHANNEL),
+      StringUtils.defaultString((String) properties.get(OPT_THUMBNAIL_DISTRIBUTION_OAIPMH_FLAVOR),
+        DEFAULT_THUMBNAIL_DISTRIBUTION_OAIPMH_FLAVOR),
+      StringUtils.defaultString((String) properties.get(OPT_THUMBNAIL_DISTRIBUTION_OAIPMH_TAGS),
+        DEFAULT_THUMBNAIL_DISTRIBUTION_OAIPMH_TAGS),
+      StringUtils.defaultString((String) properties.get(OPT_THUMBNAIL_DISTRIBUTION_OAIPMH_PROFILES),
+        DEFAULT_THUMBNAIL_DISTRIBUTION_OAIPMH_PROFILES)
+    );
+
+    thumbnailDistributionConfigurable = new ThumbnailDistributionSettings(thumbnailAutoDistribution,
+      StringUtils.defaultString((String) properties.get(OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_CHANNEL),
+        DEFAULT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_CHANNEL),
+      StringUtils.defaultString((String) properties.get(OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_FLAVOR),
+        DEFAULT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_FLAVOR),
+      StringUtils.defaultString((String) properties.get(OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_TAGS),
+        DEFAULT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_TAGS),
+      StringUtils.defaultString((String) properties.get(OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_PROFILES),
+        DEFAULT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_PROFILES)
+    );
 
     // Preview Video subtype
     previewVideoSubtype = StringUtils.defaultString((String) properties.get(OPT_PREVIEW_VIDEO_SUBTYPE),

@@ -157,36 +157,6 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       and(EventIndexSchema.RIGHTS, query.getRights());
     }
 
-    // Track mime types
-    if (query.getTrackMimetypes().length > 0) {
-      and(EventIndexSchema.TRACK_MIMETYPE, query.getTrackMimetypes());
-    }
-
-    // Track stream resolutions
-    if (query.getTrackStreamResolution().length > 0) {
-      and(EventIndexSchema.TRACK_STREAM_RESOLUTION, query.getTrackStreamResolution());
-    }
-
-    // Track flavors
-    if (query.getTrackFlavor().length > 0) {
-      and(EventIndexSchema.TRACK_FLAVOR, query.getTrackFlavor());
-    }
-
-    // Metadata flavors
-    if (query.getMetadataFlavor().length > 0) {
-      and(EventIndexSchema.METADATA_FLAVOR, query.getMetadataFlavor());
-    }
-
-    // Metadata mime types
-    if (query.getMetadataMimetype().length > 0) {
-      and(EventIndexSchema.METADATA_MIMETYPE, query.getMetadataMimetype());
-    }
-
-    // Attachment flavors
-    if (query.getAttachmentFlavor().length > 0) {
-      and(EventIndexSchema.ATTACHMENT_FLAVOR, query.getAttachmentFlavor());
-    }
-
     // Access policy
     if (query.getAccessPolicy() != null) {
       and(EventIndexSchema.ACCESS_POLICY, query.getAccessPolicy());
@@ -212,24 +182,9 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       and(EventIndexSchema.WORKFLOW_DEFINITION_ID, query.getWorkflowDefinition());
     }
 
-    // Workflow scheduled date
-    if (query.getWorkflowScheduledDate() != null) {
-      and(EventIndexSchema.WORKFLOW_SCHEDULED_DATETIME, query.getWorkflowScheduledDate());
-    }
-
     // Event status
     if (query.getEventStatus() != null) {
       and(EventIndexSchema.EVENT_STATUS, query.getEventStatus());
-    }
-
-    // Review status
-    if (query.getReviewStatus() != null) {
-      and(EventIndexSchema.REVIEW_STATUS, query.getReviewStatus());
-    }
-
-    // Scheduling status
-    if (query.getSchedulingStatus() != null) {
-      and(EventIndexSchema.SCHEDULING_STATUS, query.getSchedulingStatus());
     }
 
     // Recording start date period
@@ -245,21 +200,6 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     // Recording duration
     if (query.getDuration() != null) {
       and(EventIndexSchema.DURATION, query.getDuration());
-    }
-
-    // Opt out
-    if (query.getOptedOut() != null) {
-      and(EventIndexSchema.OPTED_OUT, query.getOptedOut());
-    }
-
-    // Review date
-    if (query.getReviewDate() != null) {
-      and(EventIndexSchema.REVIEW_DATE, query.getReviewDate());
-    }
-
-    // Blacklisted
-    if (query.getBlacklisted() != null) {
-      and(EventIndexSchema.BLACKLISTED, query.getBlacklisted());
     }
 
     // Has comments
@@ -311,7 +251,7 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     // Text
     if (query.getTerms() != null) {
       for (SearchTerms<String> terms : query.getTerms()) {
-        StringBuffer queryText = new StringBuffer();
+        StringBuilder queryText = new StringBuilder();
         for (String term : terms.getTerms()) {
           if (queryText.length() > 0)
             queryText.append(" ");
@@ -323,7 +263,7 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
           this.text = queryText.toString();
         if (Quantifier.All.equals(terms.getQuantifier())) {
           if (groups == null)
-            groups = new ArrayList<ValueGroup>();
+            groups = new ArrayList<>();
           if (query.isFuzzySearch()) {
             logger.warn("All quantifier not supported in conjunction with wildcard text");
           }

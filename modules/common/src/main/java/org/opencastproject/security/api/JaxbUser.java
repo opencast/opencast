@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -75,9 +76,6 @@ public final class JaxbUser implements User {
   /** The optional password. Note that this will never be serialized to xml */
   @XmlTransient
   protected String password;
-
-  @XmlTransient
-  protected boolean canLogin = false;
 
   /** The user's home organization identifier */
   @XmlElement(name = "organization")
@@ -138,29 +136,6 @@ public final class JaxbUser implements User {
    *          the password
    * @param provider
    *          the provider
-   * @param canLogin
-   *          <code>true</code> if able to login
-   * @param organization
-   *          the organization
-   * @param roles
-   *          the set of roles for this user
-   * @throws IllegalArgumentException
-   *           if <code>userName</code> or <code>organization</code> is <code>null</code>
-   */
-  public JaxbUser(String userName, String password, String provider, boolean canLogin, JaxbOrganization organization,
-          JaxbRole... roles) throws IllegalArgumentException {
-    this(userName, password, null, null, provider, canLogin, organization, new HashSet<JaxbRole>(Arrays.asList(roles)));
-  }
-
-  /**
-   * Constructs a user which is a member of the given organization that has the specified roles.
-   *
-   * @param userName
-   *          the username
-   * @param password
-   *          the password
-   * @param provider
-   *          the provider
    * @param organization
    *          the organization
    * @param roles
@@ -170,32 +145,7 @@ public final class JaxbUser implements User {
    */
   public JaxbUser(String userName, String password, String provider, JaxbOrganization organization, Set<JaxbRole> roles)
           throws IllegalArgumentException {
-    this(userName, password, null, null, provider, true, organization, roles);
-  }
-
-  /**
-   * Constructs a user which is a member of the given organization that has the specified roles.
-   *
-   * @param userName
-   *          the username
-   * @param password
-   *          the password
-   * @param name
-   *          the name
-   * @param email
-   *          the email
-   * @param provider
-   *          the provider
-   * @param organization
-   *          the organization
-   * @param roles
-   *          the set of roles for this user
-   * @throws IllegalArgumentException
-   *           if <code>userName</code> or <code>organization</code> is <code>null</code>
-   */
-  public JaxbUser(String userName, String password, String name, String email, String provider,
-          JaxbOrganization organization, Set<JaxbRole> roles) throws IllegalArgumentException {
-    this(userName, password, name, email, provider, true, organization, roles);
+    this(userName, password, null, null, provider, organization, roles);
   }
 
   /**
@@ -230,8 +180,6 @@ public final class JaxbUser implements User {
    *          the email
    * @param provider
    *          the provider
-   * @param canLogin
-   *          <code>true</code> if able to login
    * @param organization
    *          the organization
    * @param roles
@@ -239,7 +187,7 @@ public final class JaxbUser implements User {
    * @throws IllegalArgumentException
    *           if <code>userName</code> or <code>organization</code> is <code>null</code>
    */
-  public JaxbUser(String userName, String password, String name, String email, String provider, boolean canLogin,
+  public JaxbUser(String userName, String password, String name, String email, String provider,
           JaxbOrganization organization, Set<JaxbRole> roles) throws IllegalArgumentException {
     if (StringUtils.isBlank(userName))
       throw new IllegalArgumentException("Username must be set");
@@ -249,16 +197,18 @@ public final class JaxbUser implements User {
     this.password = password;
     this.name = name;
     this.email = email;
-    this.canLogin = canLogin;
     this.provider = provider;
     this.organization = organization;
-    if (roles == null)
-      this.roles = new HashSet<JaxbRole>();
-    for (Role role : roles) {
-      if (role.getOrganization() == null || !organization.getId().equals(role.getOrganization().getId()))
-        throw new IllegalArgumentException("Role " + role + " is not from the same organization!");
+    if (roles == null) {
+      this.roles = new HashSet<>();
+    } else {
+      for (Role role : roles) {
+        if (!Objects.equals(organization.getId(), role.getOrganizationId())) {
+          throw new IllegalArgumentException("Role " + role + " is not from the same organization!");
+        }
+      }
+      this.roles = roles;
     }
-    this.roles = roles;
   }
 
   /**
@@ -291,7 +241,7 @@ public final class JaxbUser implements User {
     }
 
     JaxbUser jaxbUser = new JaxbUser(user.getUsername(), user.getPassword(), user.getName(), user.getEmail(),
-            user.getProvider(), user.canLogin(), JaxbOrganization.fromOrganization(user.getOrganization()), roles);
+            user.getProvider(), JaxbOrganization.fromOrganization(user.getOrganization()), roles);
     jaxbUser.setManageable(user.isManageable());
     return jaxbUser;
   }
@@ -313,14 +263,6 @@ public final class JaxbUser implements User {
   }
 
   /**
-   * @see org.opencastproject.security.api.User#canLogin()
-   */
-  @Override
-  public boolean canLogin() {
-    return canLogin;
-  }
-
-  /**
    * @see org.opencastproject.security.api.User#getOrganization()
    */
   @Override
@@ -333,7 +275,7 @@ public final class JaxbUser implements User {
    */
   @Override
   public Set<Role> getRoles() {
-    return new HashSet<Role>(roles);
+    return new HashSet<>(roles);
   }
 
   /**

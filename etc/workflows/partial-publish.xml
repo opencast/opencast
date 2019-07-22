@@ -31,31 +31,9 @@
       <configurations>
         <configuration key="source-flavors">*/work</configuration>
         <configuration key="smil-flavors">smil/cutting</configuration>
-        <configuration key="target-smil-flavor">smil/cutting</configuration>
+        <configuration key="target-smil-flavor">smil/publish</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
         <configuration key="interactive">false</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Tag smil/cutting for later re-use in case of re-publishing of the event
-         Note that WOH editor will re-use target-smil-flavor instead of adding a new one -->
-
-    <operation
-      id="tag"
-      description="Tagging cutting information for archival">
-      <configurations>
-        <configuration key="source-flavors">smil/cutting</configuration>
-        <configuration key="target-tags">archive</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Archive smil/cutting right now information to ensure we don't loose it in case later operations fail -->
-
-    <operation
-      id="snapshot"
-      description="Archive cutting information">
-      <configurations>
-        <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>
 
@@ -432,7 +410,7 @@
       description="Create YouTube compatible output"
       if="${publishToYouTube}"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error">
+      exception-handler-workflow="partial-error">
       <configurations>
         <configuration key="source-flavor-lower">presentation/themed</configuration>
         <configuration key="source-flavor-upper">presenter/themed</configuration>

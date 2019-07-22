@@ -25,6 +25,8 @@ import org.opencastproject.mediapackage.MediaPackage;
 
 import com.entwinemedia.fn.data.Opt;
 
+import java.util.List;
+
 /**
  * The AssetManager stores versioned {@linkplain Snapshot snapshots} of media packages.
  * <p>
@@ -48,6 +50,14 @@ import com.entwinemedia.fn.data.Opt;
  */
 public interface AssetManager {
   String DEFAULT_OWNER = "default";
+
+  /**
+   * Get the media package from the lates snapshot.
+   *
+   * @param mediaPackageId
+   * @return mediapackage
+   */
+  Opt<MediaPackage> getMediaPackage(String mediaPackageId);
 
   /**
    * Take a versioned snapshot of a media package.
@@ -95,6 +105,57 @@ public interface AssetManager {
    * @return false, if the referenced episode does not exist.
    */
   boolean setProperty(Property property);
+
+  /**
+   * Delete all properties for a given media package identifier
+   *
+   * @param mediaPackageId
+   *          Media package identifier
+   * @return Number of deleted properties
+   */
+  int deleteProperties(String mediaPackageId);
+
+  /**
+   * Delete all properties for a given media package identifier and namespace.
+   *
+   * @param mediaPackageId
+   *          Media package identifier
+   * @param namespace
+   *          A namespace prefix to use for deletion
+   * @return Number of deleted properties
+   */
+  int deleteProperties(String mediaPackageId, String namespace);
+
+  /**
+   * Check if any snapshot with the given media package identifier exists.
+   *
+   * @param mediaPackageId
+   *          The media package identifier to check for
+   * @return If a snapshot exists for the given media package
+   */
+  boolean snapshotExists(String mediaPackageId);
+
+  /**
+   * Check if any snapshot with the given media package identifier exists.
+   *
+   * @param mediaPackageId
+   *          The media package identifier to check for
+   * @param organization
+   *          The organization to limit the search to
+   * @return If a snapshot exists for the given media package
+   */
+  boolean snapshotExists(String mediaPackageId, String organization);
+
+  /**
+   * Select all properties for a specific media package.
+   *
+   * @param mediaPackageId
+   *          Media package identifier to check for
+   * @param namespace
+   *          Namespace to limit the search to
+   * @return List of properties
+   */
+  List<Property> selectProperties(String mediaPackageId, String namespace);
 
   /** Create a new query builder. */
   AQueryBuilder createQuery();

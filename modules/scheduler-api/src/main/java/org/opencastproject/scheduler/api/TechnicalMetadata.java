@@ -60,13 +60,6 @@ public interface TechnicalMetadata {
   Date getEndDate();
 
   /**
-   * Returns the opt out status
-   *
-   * @return the opt out status
-   */
-  boolean isOptOut();
-
-  /**
    * Returns the list of presenters
    *
    * @return the list of presenters

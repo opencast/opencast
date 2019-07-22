@@ -27,6 +27,7 @@ describe('Metadata Step in New Series Wizard', function () {
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json').respond(JSON.stringify(getJSONFixture('admin-ng/capture-agents/agents.json')));
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond(JSON.stringify(getJSONFixture('admin-ng/resources/ACL.json')));
         $httpBackend.whenGET('/workflow/definitions.json').respond(JSON.stringify(getJSONFixture('workflow/definitions.json')));
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.flush();
     });
 
@@ -35,10 +36,11 @@ describe('Metadata Step in New Series Wizard', function () {
         expect(NewSeriesMetadata.metadata['dublincore/series'].fields.length).toEqual(9);
     });
 
-    setParams = function (ctrl, id, value) {
+    setParams = function (ctrl, id, value, tabindex) {
         $scope.$parent.params = {
             id: id,
-            value: value
+            value: value,
+            tabindex: tabindex
         };
         ctrl.save($scope);
     };
@@ -46,14 +48,14 @@ describe('Metadata Step in New Series Wizard', function () {
     describe('#save', function () {
 
         it('saves new values', function () {
-            setParams(NewSeriesMetadata, 'testid', 'testvalue');
+            setParams(NewSeriesMetadata, 'testid', 'testvalue', 1);
             NewSeriesMetadata.save($scope);
-            expect(NewSeriesMetadata.ud['dublincore/series'].fields.testid.value).toEqual('testvalue');
+            expect(NewSeriesMetadata.ud['dublincore/series'].fields[0].value).toEqual('testvalue');
         });
 
         describe('with collection', function () {
             beforeEach(function () {
-                $scope.$parent.params = { collection: [], id: 'testid' };
+                $scope.$parent.params = { collection: [], id: 'testid', tabindex: 2 };
             });
 
             describe('with an array of values', function () {
@@ -63,7 +65,7 @@ describe('Metadata Step in New Series Wizard', function () {
 
                 it('assign the entire values array', function () {
                     NewSeriesMetadata.save($scope);
-                    expect(NewSeriesMetadata.ud['dublincore/series'].fields.testid.value).toEqual(['a', 'b']);
+                    expect(NewSeriesMetadata.ud['dublincore/series'].fields[1].value).toEqual(['a', 'b']);
                 });
             });
 
@@ -74,7 +76,7 @@ describe('Metadata Step in New Series Wizard', function () {
 
                 it('assign the entire values array', function () {
                     NewSeriesMetadata.save($scope);
-                    expect(NewSeriesMetadata.ud['dublincore/series'].fields.testid.value).toEqual('a');
+                    expect(NewSeriesMetadata.ud['dublincore/series'].fields[1].value).toEqual('a');
                 });
             });
         });

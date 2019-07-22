@@ -18,12 +18,6 @@
              cardinality="1..1" policy="static" bind="setSecurityService"/>
   <reference name="series-service" interface="org.opencastproject.series.api.SeriesService"
              cardinality="1..1" policy="static" bind="setSeriesService"/>
-  <reference name="transition-db" interface="org.opencastproject.authorization.xacml.manager.impl.AclTransitionDb"
-             cardinality="1..1" policy="static" bind="setTransitionDb"/>
-  <reference name="workflow-service" interface="org.opencastproject.workflow.api.WorkflowService"
-             cardinality="1..1" policy="static" bind="setWorkflowService"/>
-  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
-             cardinality="1..1" policy="static" bind="setWorkspace"/>
   <reference name="message-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
              cardinality="1..1" policy="static" bind="setMessageReceiver"/>
   <reference name="message-sender" interface="org.opencastproject.message.broker.api.MessageSender"

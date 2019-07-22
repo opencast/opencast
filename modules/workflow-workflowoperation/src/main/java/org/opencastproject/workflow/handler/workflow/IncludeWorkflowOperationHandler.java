@@ -63,8 +63,6 @@ public final class IncludeWorkflowOperationHandler extends AbstractWorkflowOpera
   @Override
   public void activate(ComponentContext componentContext) {
     super.activate(componentContext);
-    // Register the supported configuration options
-    addConfigurationOption(WORKFLOW_CFG, "Workflow definition identifier");
   }
 
   /**

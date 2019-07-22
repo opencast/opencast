@@ -34,6 +34,7 @@ import org.opencastproject.assetmanager.impl.storage.StoragePath;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.persistencefn.PersistenceEnvs;
+import org.opencastproject.util.persistencefn.PersistenceUtil;
 import org.opencastproject.util.persistencefn.Queries;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -77,7 +78,9 @@ public class AbstractTieredStorageAssetManagerTest<A extends TieredStorageAssetM
         return null;
       }
     });
-    final Database db = new Database(penv);
+
+    final Database db = new Database(
+            PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT));
     //
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))

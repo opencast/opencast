@@ -65,7 +65,7 @@ import javax.xml.transform.stream.StreamSource;
  */
 @XmlType(name = "series", namespace = IndexObject.INDEX_XML_NAMESPACE, propOrder = { "identifier", "title",
         "description", "subject", "organization", "language", "creator", "license", "accessPolicy", "managedAcl",
-        "createdDateTime", "organizers", "contributors", "publishers", "optOut", "rightsHolder", "theme" })
+        "createdDateTime", "organizers", "contributors", "publishers", "rightsHolder", "theme" })
 @XmlRootElement(name = "series", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class Series implements IndexObject {
@@ -135,10 +135,6 @@ public class Series implements IndexObject {
 
   @XmlElement(name = "rights_holder")
   private String rightsHolder = null;
-
-  /** The series opted out status from the participation management, whether the series is opted out or not opted out */
-  @XmlElement(name = "opt_out")
-  private Boolean optOut = false;
 
   @XmlElement(name = "theme")
   private Long theme = null;
@@ -490,25 +486,6 @@ public class Series implements IndexObject {
    */
   public String getRightsHolder() {
     return rightsHolder;
-  }
-
-  /**
-   * Sets the opt out status for this series
-   *
-   * @param optOut
-   *          the opt out status, whether the series is opted-out or not opted-out
-   */
-  public void setOptOut(boolean optOut) {
-    this.optOut = optOut;
-  }
-
-  /**
-   * Returns the opt out status from this series
-   *
-   * @return the opt out status from this series, whether the series is opted-out or not opted-out
-   */
-  public boolean isOptedOut() {
-    return optOut;
   }
 
   /**

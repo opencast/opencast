@@ -13,7 +13,8 @@ describe('Conflict check API Resource', function () {
     }));
 
     beforeEach(function () {
-        jasmine.getJSONFixtures().fixturesPath = 'base/test/unit/fixtures';
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
+        jasmine.getJSONFixtures().clearCache();
         singleTestData = getJSONFixture('conflictCheckSingle.json');
         multiTestData = getJSONFixture('conflictCheckMultiple.json');
         conflictResponse = getJSONFixture('conflictResponse.json');
@@ -21,7 +22,7 @@ describe('Conflict check API Resource', function () {
 
     describe('when schedule multiple is active', function () {
         var expectedOutput;
-        
+
         beforeEach(function () {
             var date = new Date ('2014', '7', '23', '17', '0'),
                 endFirstLecture;
@@ -40,7 +41,7 @@ describe('Conflict check API Resource', function () {
                 hour: 1,
                 minute: 0
 
-            });            
+            });
 
             endDate = JsHelper.toZuluTimeString({
                 date   : '2014-07-23',
@@ -97,7 +98,7 @@ describe('Conflict check API Resource', function () {
                 hour: 4,
                 minute: 4
             });
-            
+
             expectedOutput = {
                 'start'    : startDate,
                 'end'      : endDate,

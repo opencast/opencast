@@ -39,7 +39,8 @@ Series and Episode Rules
 Access control lists can be specified both on series and on episode level. This means that multiple rule sets can be
 attached to an episode which is part of a series. Opencast can handle this in multiple ways.
 
-The handling is specified by the merge mode configured in `etc/org.opencastproject.organization-mh_default_org.cfg`. It
+The handling is specified by the merge mode configured in 
+`etc/org.opencastproject.authorization.xacml.XACMLAuthorizationService.cfg`. It
 defines the relationship between series and episode access control lists, if both are attached to an event. If only one
 list is attached, its rules are always active. If multiple lists are attached, the following modes define Opencast's
 behavior:

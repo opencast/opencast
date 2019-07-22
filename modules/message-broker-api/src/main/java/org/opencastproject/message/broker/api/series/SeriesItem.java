@@ -48,13 +48,12 @@ public final class SeriesItem implements MessageItem, Serializable {
   private final String acl;
   private final String propertyName;
   private final String propertyValue;
-  private final String optOut;
   private final String element;
   private final String elementType;
-  private final Boolean overrideEpisodeAcl;
+  private final String overrideEpisodeAcl;
 
   public enum Type {
-    UpdateCatalog, UpdateElement, UpdateAcl, UpdateOptOut, UpdateProperty, Delete
+    UpdateCatalog, UpdateElement, UpdateAcl, UpdateProperty, Delete
   };
 
   /**
@@ -63,7 +62,7 @@ public final class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for updating a series.
    */
   public static SeriesItem updateCatalog(DublinCoreCatalog series) {
-    return new SeriesItem(Type.UpdateCatalog, null, series, null, null, null, null, null, null, null);
+    return new SeriesItem(Type.UpdateCatalog, null, series, null, null, null, null, null, null);
   }
 
   /**
@@ -76,7 +75,7 @@ public final class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for updating series element.
    */
   public static SeriesItem updateElement(String seriesId, String type, String data) {
-    return new SeriesItem(Type.UpdateElement, seriesId, null, null, null, null, null, type, data, null);
+    return new SeriesItem(Type.UpdateElement, seriesId, null, null, null, null, type, data, null);
   }
 
   /**
@@ -90,18 +89,7 @@ public final class SeriesItem implements MessageItem, Serializable {
    */
   public static SeriesItem updateAcl(String seriesId, AccessControlList acl, boolean overrideEpisodeAcl) {
     return new SeriesItem(Type.UpdateAcl, seriesId, null, AccessControlParser.toJsonSilent(acl), null, null, null,
-            null, null, overrideEpisodeAcl);
-  }
-
-  /**
-   * @param seriesId
-   *          The unique id for the series to update.
-   * @param optOut
-   *          The new opt out status.
-   * @return Builds {@link SeriesItem} for updating the opt out status.
-   */
-  public static SeriesItem updateOptOut(String seriesId, boolean optOut) {
-    return new SeriesItem(Type.UpdateOptOut, seriesId, null, null, null, null, optOut, null, null, null);
+            null, overrideEpisodeAcl);
   }
 
   /**
@@ -114,19 +102,7 @@ public final class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for updating a series property.
    */
   public static SeriesItem updateProperty(String seriesId, String propertyName, String propertyValue) {
-    return new SeriesItem(Type.UpdateProperty, seriesId, null, null, propertyName, propertyValue, null, null, null,
-            null);
-  }
-
-  /**
-   * @param seriesId
-   *          The unique id of the series to update.
-   * @param optedOut
-   *          The opt out status.
-   * @return Builds {@link SeriesItem} for updating the opt out status of a series.
-   */
-  public static SeriesItem delete(String seriesId, boolean optedOut) {
-    return new SeriesItem(Type.UpdateOptOut, seriesId, null, null, null, null, optedOut, null, null, null);
+    return new SeriesItem(Type.UpdateProperty, seriesId, null, null, propertyName, propertyValue, null, null, null);
   }
 
   /**
@@ -135,7 +111,7 @@ public final class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for deleting a series.
    */
   public static SeriesItem delete(String seriesId) {
-    return new SeriesItem(Type.Delete, seriesId, null, null, null, null, null, null, null, null);
+    return new SeriesItem(Type.Delete, seriesId, null, null, null, null, null, null, null);
   }
 
   /**
@@ -155,8 +131,6 @@ public final class SeriesItem implements MessageItem, Serializable {
    *          The name of the series property to update. Note: the series ID and property value must be also provided.
    * @param propertyValue
    *          The value of the series property to update. Note: the series ID and property name must be also provided.
-   * @param optOut
-   *          The series opt out status to update. Note: the series ID must be also provided.
    * @param elementType
    *          The type of the series element to update. Note: the series ID and element must be also provided.
    * @param element
@@ -166,9 +140,8 @@ public final class SeriesItem implements MessageItem, Serializable {
    *          If the series ID and the series are not provided or the series ID and the value of
    *          {@link DublinCore.PROPERTY_IDENTIFIER} in the series catalog does not match.
    */
-  private SeriesItem(Type type, String seriesId, DublinCoreCatalog series, String acl,
-          String propertyName, String propertyValue, Boolean optOut, String elementType, String element,
-          Boolean overrideEpisodeAcl) {
+  private SeriesItem(Type type, String seriesId, DublinCoreCatalog series, String acl, String propertyName,
+          String propertyValue, String elementType, String element, Boolean overrideEpisodeAcl) {
     if (seriesId != null && series != null && !seriesId.equals(series.getFirst(DublinCore.PROPERTY_IDENTIFIER)))
       throw new IllegalStateException("Provided series ID and dublincore series ID does not match");
 
@@ -191,10 +164,9 @@ public final class SeriesItem implements MessageItem, Serializable {
     this.acl = acl;
     this.propertyName = propertyName;
     this.propertyValue = propertyValue;
-    this.optOut = optOut == null ? null : Boolean.toString(optOut);
     this.elementType = elementType;
     this.element = element;
-    this.overrideEpisodeAcl = overrideEpisodeAcl;
+    this.overrideEpisodeAcl = overrideEpisodeAcl == null ? null : overrideEpisodeAcl.toString();
   }
 
   @Override
@@ -230,10 +202,6 @@ public final class SeriesItem implements MessageItem, Serializable {
     }
   }
 
-  public Boolean getOptOut() {
-    return optOut == null ? null : Boolean.valueOf(optOut);
-  }
-
   public String getPropertyName() {
     return propertyName;
   }
@@ -252,6 +220,6 @@ public final class SeriesItem implements MessageItem, Serializable {
   }
 
   public Boolean getOverrideEpisodeAcl() {
-    return overrideEpisodeAcl;
+    return overrideEpisodeAcl == null ? null : Boolean.parseBoolean(overrideEpisodeAcl);
   }
 }

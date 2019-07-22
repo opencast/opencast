@@ -61,7 +61,7 @@ import javax.persistence.UniqueConstraint;
                 + "avg(job.runTime) as meanRun FROM Job job "
                 + "where job.dateCreated >= :minDateCreated and job.dateCreated <= :maxDateCreated "
                 + "group by job.processorServiceRegistration.id, job.status"),
-        @NamedQuery(name = "ServiceRegistration.hostloads", query = "SELECT job.processorServiceRegistration.hostRegistration.baseUrl as host, job.status, sum(job.jobLoad) "
+        @NamedQuery(name = "ServiceRegistration.hostloads", query = "SELECT job.processorServiceRegistration.hostRegistration.baseUrl as host, job.status, sum(job.jobLoad), job.processorServiceRegistration.hostRegistration.maxLoad "
                 + "FROM Job job "
                 + "WHERE job.processorServiceRegistration.online=true and job.processorServiceRegistration.active=true and job.processorServiceRegistration.hostRegistration.maintenanceMode=false "
                 + "AND job.status in :statuses "

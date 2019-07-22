@@ -46,9 +46,9 @@ angular.module('adminNg.services')
         for (i = 0; i < mainData.fields.length; i++) {
           var field = mainData.fields[i];
           // preserve default value, if set
-          if (field.hasOwnProperty('value') && field.value) {
+          if (Object.prototype.hasOwnProperty.call(field, 'value') && field.value) {
             field.presentableValue = me.extractPresentableValue(field);
-            me.ud[mainMetadataName].fields[field.id] = field;
+            me.ud[mainMetadataName].fields[i] = field;
           }
           // just hooking the tab index up here, as this is already running through all elements
           field.tabindex = i + 1;
@@ -85,7 +85,7 @@ angular.module('adminNg.services')
           presentableValue = field.value.join(', ');
         } else if (field.collection) {
           // We need to lookup the presentable value in the collection
-          if (field.collection.hasOwnProperty(field.value)) {
+          if (Object.prototype.hasOwnProperty.call(field.collection, field.value)) {
             presentableValue = field.collection[field.value];
           } else {
             // This should work in older browsers, albeit looking clumsy
@@ -103,19 +103,15 @@ angular.module('adminNg.services')
     };
 
     this.save = function (scope) {
-      //FIXME: This should be nicer, rather propagate the id and values
-      //instead of looking for them in the parent scope.
-      var params = scope.$parent.params,
-          fieldId = params.id,
-          value = params.value;
+      //FIXME: This should be nicer, rather propagate the id and values instead of looking for them in the parent scope.
+      var field = scope.$parent.params;
+      field.presentableValue = me.extractPresentableValue(field);
 
-      params.presentableValue = me.extractPresentableValue(params);
-
-      me.ud[mainMetadataName].fields[fieldId] = params;
-
-      if (angular.isDefined(me.requiredMetadata[fieldId])) {
-        me.updateRequiredMetadata(fieldId, value);
+      if (angular.isDefined(me.requiredMetadata[field.id])) {
+        me.updateRequiredMetadata(field.id, field.value);
       }
+
+      me.ud[mainMetadataName].fields[field.tabindex - 1] = field;
     };
 
     this.reset = function () {

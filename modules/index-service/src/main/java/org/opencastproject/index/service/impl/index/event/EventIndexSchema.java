@@ -44,24 +44,6 @@ public interface EventIndexSchema extends IndexSchema {
   /** The event series name */
   String SERIES_NAME = "series_name";
 
-  /** The track mimetype */
-  String TRACK_MIMETYPE = "track_mimetype";
-
-  /** The track stream resolution */
-  String TRACK_STREAM_RESOLUTION = "track_stream_resolution";
-
-  /** The track stream resolution */
-  String TRACK_FLAVOR = "track_flavor";
-
-  /** The metadata mimetype */
-  String METADATA_MIMETYPE = "metadata_mimetype";
-
-  /** The metadata flavor */
-  String METADATA_FLAVOR = "metadata_flavor";
-
-  /** The attachment flavor */
-  String ATTACHMENT_FLAVOR = "attachment_flavor";
-
   /** The access policy */
   String ACCESS_POLICY = "access_policy";
 
@@ -151,27 +133,9 @@ public interface EventIndexSchema extends IndexSchema {
   /** The workflow definition id */
   String WORKFLOW_DEFINITION_ID = "workflow_definition_id";
 
-  /** The workflow scheduled date */
-  String WORKFLOW_SCHEDULED_DATETIME = "workflow_scheduled_datetime";
-
   /*
    * Scheduler specific fields
    */
-
-  /** The review status */
-  String REVIEW_STATUS = "review_status";
-
-  /** The review date */
-  String REVIEW_DATE = "review_date";
-
-  /** The recording status (opted-out) */
-  String OPTED_OUT = "opted_out";
-
-  /** The recording status (blacklisted) */
-  String BLACKLISTED = "blacklisted";
-
-  /** The scheduling status */
-  String SCHEDULING_STATUS = "scheduling_status";
 
   /** The recording status */
   String RECORDING_STATUS = "recording_status";

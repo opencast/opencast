@@ -11,15 +11,6 @@
   ],
   "episode_access": {
     "current_acl": 0,
-    "transitions": [
-      {
-        "id": 1,
-        "application_date": "2014-06-05T15:00:00Z",
-        "done": false,
-        "acl_id": 43,
-        "is_deleted": false
-      }
-    ],
     "acl": "{\"acl\":{\"ace\":[{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"read\"},{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"write\"}]}}",
     "privileges": {
       "ROLE_ADMIN": {

@@ -96,22 +96,24 @@
     </operation>
     -->
 
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Cleanup                                                           -->
-    <!--                                                                   -->
-    <!-- Remove work artifacts.                                            -->
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-    <!-- Clean the system from work artifacts -->
+    <!-- Clean up work artifacts -->
 
     <operation
-      id="include"
-      description="Remove temporary processing artifacts">
+        id="cleanup"
+        fail-on-error="false"
+        description="Remove temporary processing artifacts">
       <configurations>
-        <configuration key="workflow-id">partial-cleanup</configuration>
+        <configuration key="delete-external">true</configuration>
+        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 
   </operations>
+
+  <state-mappings>
+    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.REPUBLISHING_METADATA</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.REPUBLISHING_METADATA</state-mapping>
+  </state-mappings>
 
 </definition>

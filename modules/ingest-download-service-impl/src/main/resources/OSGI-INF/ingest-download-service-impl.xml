@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.ingestdownloadservice.impl.IngestDownloadServiceImpl" immediate="true">
+  <implementation class="org.opencastproject.ingestdownloadservice.impl.IngestDownloadServiceImpl"/>
+  <property name="service.description" value="Ingest download service"/>
+  <property name="service.pid" value="org.opencastproject.ingestdownloadservice.impl.IngestDownloadServiceImpl"/>
+  <service>
+    <provide interface="org.opencastproject.ingestdownloadservice.api.IngestDownloadService"/>
+  </service>
+  <reference name="serviceRegistry"
+             interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             bind="setServiceRegistry"/>
+  <reference name="workspace"
+             interface="org.opencastproject.workspace.api.Workspace"
+             bind="setWorkspace"/>
+  <reference name="security-service"
+             interface="org.opencastproject.security.api.SecurityService"
+             bind="setSecurityService"/>
+  <reference name="user-directory"
+             interface="org.opencastproject.security.api.UserDirectoryService"
+             bind="setUserDirectoryService"/>
+  <reference name="orgDirectory"
+             interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             bind="setOrganizationDirectoryService"/>
+</scr:component>

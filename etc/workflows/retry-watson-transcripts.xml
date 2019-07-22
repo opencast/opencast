@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>retry-watson-transcripts</id>
+  <title>Start automated caption/transcription job (watson)</title>
+  <tags />
+  <description>Retry transcription job in error. Called by the transcription service.</description>
+
+  <configuration_panel />
+
+  <operations>
+
+    <!-- Start transcription -->
+
+    <operation
+      id="start-watson-transcription"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Start IBM Watson transcription job">
+      <configurations>
+        <!--  Skip this operation if flavor already exists. Used for cases when mp already has captions. -->
+        <configuration key="skip-if-flavor-exists">captions/vtt+en</configuration>
+        <!-- Audio to be translated, produced and tagged in a previous workflow -->
+        <configuration key="source-tag">transcript</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Clean up work artifacts -->
+
+    <operation
+        id="cleanup"
+        fail-on-error="false"
+        description="Remove temporary processing artifacts">
+      <configurations>
+        <configuration key="delete-external">true</configuration>
+        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <configuration key="preserve-flavors">security/*</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

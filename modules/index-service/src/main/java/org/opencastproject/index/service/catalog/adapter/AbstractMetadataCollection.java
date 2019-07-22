@@ -23,9 +23,6 @@ package org.opencastproject.index.service.catalog.adapter;
 
 import static com.entwinemedia.fn.data.json.Jsons.arr;
 
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataParsingException;
@@ -221,48 +218,6 @@ public abstract class AbstractMetadataCollection implements MetadataCollection {
             current.getNamespace());
     field.setValue(value);
     addField(field);
-  }
-
-  @Override
-  public void updateIterableStringField(MetadataField<?> current, Iterable<String> value) {
-    if (!(current.getType().equals(MetadataField.Type.ITERABLE_TEXT))) {
-      throw new IllegalArgumentException("Unable to update a field to a different type than String with this method!");
-    }
-    removeField(current);
-    MetadataField<Iterable<String>> field = MetadataField.createIterableStringMetadataField(current.getInputID(),
-            Opt.some(current.getOutputID()), current.getLabel(), current.isReadOnly(), current.isRequired(),
-            current.isTranslatable(), current.getCollection(), current.getCollectionID(), current.getDelimiter(),
-            current.getOrder(), current.getNamespace());
-    field.setValue(value);
-    addField(field);
-  }
-
-  /**
-   * Get the values collection with the given name from the {@link ListProvidersService}.
-   *
-   * @param name
-   *          The target collection
-   * @param listProviderService
-   *          The list provider service
-   * @return A value collection with the given name wrapped in an {@link Opt}, or {@link Opt#none()} if no collection
-   *         has been found with this name.
-   * @throws IllegalArgumentException
-   *           if the name or the listProviderService is null or the name blank.
-   */
-  protected Opt<Map<String, String>> getCollection(String name, ListProvidersService listProviderService) {
-    if (StringUtils.isBlank(name))
-      throw new IllegalArgumentException("The listName must not be null or empty!");
-    if (listProviderService == null)
-      throw new IllegalArgumentException("The list provider must not be null!");
-
-    Opt<Map<String, String>> list;
-    try {
-      list = Opt.some(listProviderService.getList(name, new ResourceListQueryImpl(), true));
-    } catch (ListProviderException e) {
-      logger.warn("Not able to find a value list with the name {}", name);
-      list = Opt.none();
-    }
-    return list;
   }
 
   @Override

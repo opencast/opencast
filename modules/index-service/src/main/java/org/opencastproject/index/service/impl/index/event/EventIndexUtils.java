@@ -35,8 +35,6 @@ import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.TrackSupport;
-import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
@@ -154,20 +152,8 @@ public final class EventIndexUtils {
       metadata.addField(EventIndexSchema.END_DATE, event.getRecordingEndDate(), true);
     if (event.getDuration() != null)
       metadata.addField(EventIndexSchema.DURATION, event.getDuration(), true);
-    if (StringUtils.isNotBlank(event.getReviewStatus()))
-      metadata.addField(EventIndexSchema.REVIEW_STATUS, event.getReviewStatus(), true);
-    if (StringUtils.isNotBlank(event.getReviewDate()))
-      metadata.addField(EventIndexSchema.REVIEW_DATE, event.getReviewDate(), true);
-    if (StringUtils.isNotBlank(event.getWorkflowScheduledDate()))
-      metadata.addField(EventIndexSchema.WORKFLOW_SCHEDULED_DATETIME, event.getWorkflowScheduledDate(), true);
     if (event.getArchiveVersion() != null)
       metadata.addField(EventIndexSchema.ARCHIVE_VERSION, event.getArchiveVersion(), true);
-    if (event.getOptedOut() != null)
-      metadata.addField(EventIndexSchema.OPTED_OUT, event.getOptedOut(), true);
-    if (event.getBlacklisted() != null)
-      metadata.addField(EventIndexSchema.BLACKLISTED, event.getBlacklisted(), true);
-    if (event.getSchedulingStatus() != null)
-      metadata.addField(EventIndexSchema.SCHEDULING_STATUS, event.getSchedulingStatus(), true);
     if (event.getRecordingStatus() != null)
       metadata.addField(EventIndexSchema.RECORDING_STATUS, event.getRecordingStatus(), true);
 
@@ -196,41 +182,6 @@ public final class EventIndexUtils {
       metadata.addField(EventIndexSchema.CONTRIBUTOR, contributors.toArray(new String[contributors.size()]), true);
     }
 
-    if (event.getTrackMimetypes() != null) {
-      List<String> trackMimetypes = event.getTrackMimetypes();
-      metadata.addField(EventIndexSchema.TRACK_MIMETYPE, trackMimetypes.toArray(new String[trackMimetypes.size()]),
-              true);
-    }
-
-    if (event.getTrackStreamResolution() != null) {
-      List<String> trackStreamResolutions = event.getTrackStreamResolution();
-      metadata.addField(EventIndexSchema.TRACK_STREAM_RESOLUTION,
-              trackStreamResolutions.toArray(new String[trackStreamResolutions.size()]), true);
-    }
-
-    if (event.getTrackFlavors() != null) {
-      List<String> trackFlavors = event.getTrackFlavors();
-      metadata.addField(EventIndexSchema.TRACK_FLAVOR, trackFlavors.toArray(new String[trackFlavors.size()]), true);
-    }
-
-    if (event.getMetadataFlavors() != null) {
-      List<String> metadataFlavors = event.getMetadataFlavors();
-      metadata.addField(EventIndexSchema.METADATA_FLAVOR, metadataFlavors.toArray(new String[metadataFlavors.size()]),
-              true);
-    }
-
-    if (event.getMetadataMimetypes() != null) {
-      List<String> metadataMimetypes = event.getMetadataMimetypes();
-      metadata.addField(EventIndexSchema.METADATA_MIMETYPE,
-              metadataMimetypes.toArray(new String[metadataMimetypes.size()]), true);
-    }
-
-    if (event.getAttachmentFlavors() != null) {
-      List<String> attachmentFlavors = event.getAttachmentFlavors();
-      metadata.addField(EventIndexSchema.ATTACHMENT_FLAVOR,
-              attachmentFlavors.toArray(new String[attachmentFlavors.size()]), true);
-    }
-
     if (StringUtils.isNotBlank(event.getAccessPolicy())) {
       metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy(), true);
       addAuthorization(metadata, event.getAccessPolicy());
@@ -251,10 +202,6 @@ public final class EventIndexUtils {
     if (event.getTechnicalPresenters() != null) {
       metadata.addField(EventIndexSchema.TECHNICAL_PRESENTERS,
               event.getTechnicalPresenters().toArray(new String[event.getTechnicalPresenters().size()]), true);
-    }
-
-    if (event.getAgentConfiguration() != null) {
-      metadata.addField(EventIndexSchema.AGENT_CONFIGURATION, event.getAgentConfiguration(), false);
     }
 
     return metadata;
@@ -485,7 +432,7 @@ public final class EventIndexUtils {
   }
 
   public static Event updateTechnicalDate(Event event) {
-    if (event.hasRecordingStarted()) {
+    if (event.isScheduledEvent() && event.hasRecordingStarted()) {
       // Override technical dates from recording if already started
       event.setTechnicalStartTime(event.getRecordingStartDate());
       event.setTechnicalEndTime(event.getRecordingEndDate());
@@ -509,49 +456,8 @@ public final class EventIndexUtils {
    * @return the updated event
    */
   public static Event updateEvent(Event event, MediaPackage mp) {
-    // Tracks
-    List<String> trackMimeTypes = new ArrayList<>();
-    List<String> trackStreamResolutions = new ArrayList<>();
-    List<String> trackFlavors = new ArrayList<>();
-    for (Track t : mp.getTracks()) {
-      if (t.getMimeType() != null)
-        trackMimeTypes.add(t.getMimeType().toString());
-      if (t.getFlavor() != null)
-        trackFlavors.add(t.getFlavor().toString());
-      VideoStream[] streams = TrackSupport.byType(t.getStreams(), VideoStream.class);
-      for (VideoStream s : streams) {
-        trackStreamResolutions.add(s.getFrameWidth() + "x" + s.getFrameHeight());
-      }
-    }
-    event.setTrackMimetypes(trackMimeTypes);
-    event.setTrackStreamResolutions(trackStreamResolutions);
-    event.setTrackFlavors(trackFlavors);
-
-    // Metadata
-    List<String> metadataFlavors = new ArrayList<>();
-    List<String> metadataMimetypes = new ArrayList<>();
-    for (Catalog c : mp.getCatalogs()) {
-      if (c.getFlavor() != null)
-        metadataFlavors.add(c.getFlavor().toString());
-      if (c.getMimeType() != null)
-        metadataMimetypes.add(c.getMimeType().toString());
-    }
-    event.setMetadataFlavors(metadataFlavors);
-    event.setMetadataMimetypes(metadataMimetypes);
-
-    // Attachments
-    List<String> attachmentFlavors = new ArrayList<>();
-    for (Attachment a : mp.getAttachments()) {
-      if (a.getFlavor() != null)
-        attachmentFlavors.add(a.getFlavor().toString());
-    }
-    event.setAttachmentFlavors(attachmentFlavors);
-
-    // Publications
     event.setPublications(Arrays.asList(mp.getPublications()));
-
     event.setSeriesName(mp.getSeriesTitle());
-
     return event;
   }
 

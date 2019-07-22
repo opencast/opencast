@@ -56,24 +56,6 @@ angular.module('adminNg.controllers')
       $scope.$root.$broadcast('segmentTimesUpdated');
     };
 
-    $scope.clearSelectedSegment = function () {
-
-      angular.forEach($scope.video.segments, function (segment) {
-        if (segment.selected) {
-
-          var index = $scope.video.segments.indexOf(segment);
-
-          if ($scope.video.segments[index + 1]) {
-            $scope.video.segments[index + 1].start = segment.start;
-            $scope.video.segments.splice(index, 1);
-          } else if ($scope.video.segments[index - 1]) {
-            $scope.video.segments[index - 1].end = segment.end;
-            $scope.video.segments.splice(index, 1);
-          }
-        }
-      });
-    };
-
     $scope.clearSegments = function () {
       $scope.video.segments.splice(1, $scope.video.segments.length - 1);
       $scope.video.segments[0].end = $scope.video.duration;
@@ -146,6 +128,9 @@ angular.module('adminNg.controllers')
       $scope.replayEndOfSegment();
     });
 
+
+    $scope.activeTransaction = false;
+
     $scope.$on('ACTIVE_TRANSACTION', function () {
       if (!$scope.activeTransaction) {
         $scope.activeTransaction = true;
@@ -161,6 +146,10 @@ angular.module('adminNg.controllers')
           notificationId = 0;
         }
       }
+    });
+
+    $scope.$on('$destroy', function () {
+      Notifications.removeAll(NOTIFICATION_CONTEXT);
     });
 
     // This shows a confirmation dialog when the user leaves the editor while he has unsaved changes
@@ -184,6 +173,6 @@ angular.module('adminNg.controllers')
 
     $translate('VIDEO_TOOL.WARNING_UNSAVED').then(function (translation) {
       window.unloadConfirmMsg = translation;
-    });
+    }).catch(angular.noop);
   }
 ]);

@@ -130,20 +130,6 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     return writer.toString();
   }
 
-  /**
-   * Parses Dublin core stored as string.
-   *
-   * @param dcXML
-   *          string representation of Dublin core
-   * @return parsed {@link DublinCoreCatalog}
-   * @throws IOException
-   *           if parsing fails
-   */
-  private DublinCoreCatalog parseDublinCore(String dcXML) throws IOException {
-    DublinCoreCatalog dc = dcService.load(IOUtils.toInputStream(dcXML, "UTF-8"));
-    return dc;
-  }
-
   /*
    * (non-Javadoc)
    *
@@ -562,26 +548,6 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   }
 
   @Override
-  public boolean isOptOut(String seriesId) throws NotFoundException, SeriesServiceDatabaseException {
-    EntityManager em = emf.createEntityManager();
-    try {
-      SeriesEntity entity = getSeriesEntity(seriesId, em);
-      if (entity == null) {
-        throw new NotFoundException("Could not found series with ID " + seriesId);
-      }
-      return entity.isOptOut();
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      logger.error("Could not retrieve opt out status for series '{}'", seriesId, e);
-      throw new SeriesServiceDatabaseException(e);
-    } finally {
-      if (em != null)
-        em.close();
-    }
-  }
-
-  @Override
   public void updateSeriesProperty(String seriesId, String propertyName, String propertyValue)
           throws NotFoundException, SeriesServiceDatabaseException {
     EntityManager em = null;
@@ -613,44 +579,6 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       }
       logger.error("Couldn't update series {} with property: {}:{} because {}", seriesId, propertyName, propertyValue,
               ExceptionUtils.getStackTrace(e));
-      throw new SeriesServiceDatabaseException(e);
-    } finally {
-      if (em != null)
-        em.close();
-    }
-  }
-
-  /**
-   * Updates a series' opt out status.
-   *
-   * @param seriesId
-   *          The id of the series to update the opt out status of.
-   * @param optOut
-   *          Whether to opt out this series or not.
-   */
-  @Override
-  public void updateOptOutStatus(String seriesId, boolean optOut)
-          throws NotFoundException, SeriesServiceDatabaseException {
-    EntityManager em = null;
-    EntityTransaction tx = null;
-    try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      SeriesEntity entity = getSeriesEntity(seriesId, em);
-      if (entity == null)
-        throw new NotFoundException("Series with ID " + seriesId + " does not exist");
-
-      entity.setOptOut(optOut);
-      em.merge(entity);
-      tx.commit();
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      if (tx.isActive()) {
-        tx.rollback();
-      }
-      logger.error("Could not update series opted out status: {}", e.getMessage());
       throw new SeriesServiceDatabaseException(e);
     } finally {
       if (em != null)

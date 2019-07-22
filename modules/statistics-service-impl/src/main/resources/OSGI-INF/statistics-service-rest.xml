@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.statistics.endpoint.StatisticsRestService" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.statistics.endpoint.StatisticsRestService"/>
+  <property name="service.description" value="Statistics REST Endpoint"/>
+
+  <property name="opencast.service.type" value="org.opencastproject.statistics"/>
+  <property name="opencast.service.path" value="/statistics"/>
+
+  <service>
+    <provide interface="org.opencastproject.statistics.endpoint.StatisticsRestService"/>
+  </service>
+  <reference name="service-impl" interface="org.opencastproject.statistics.api.StatisticsService"
+             cardinality="1..1" policy="static" bind="setService"/>
+</scr:component>

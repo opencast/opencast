@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>7-SNAPSHOT</version>
+    <version>8-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -75,6 +75,10 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
@@ -120,14 +124,13 @@
       <artifactId>easymock</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
@@ -140,6 +143,7 @@
               org.opencastproject.workflow.handler.workflow;version=${project.version}
             </Export-Package>
             <Service-Component>
+              OSGI-INF/operations/add-catalog.xml,
               OSGI-INF/operations/analyze-tracks.xml,
               OSGI-INF/operations/cleanup.xml,
               OSGI-INF/operations/clone.xml,
@@ -157,6 +161,7 @@
               OSGI-INF/operations/start-workflow.xml,
               OSGI-INF/operations/tag.xml,
               OSGI-INF/operations/tag-by-dcterm.xml,
+              OSGI-INF/operations/transfer-metadata.xml,
               OSGI-INF/operations/zip.xml
             </Service-Component>
           </instructions>

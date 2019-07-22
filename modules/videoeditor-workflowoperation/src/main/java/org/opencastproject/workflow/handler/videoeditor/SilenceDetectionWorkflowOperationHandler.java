@@ -52,8 +52,6 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * workflowoperationhandler for silencedetection executes the silencedetection and adds a SMIL document to the
@@ -82,19 +80,6 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
   /** Name of the configuration option that provides the smil file name */
   private static final String TARGET_FILE_NAME = "smil.smil";
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_FLAVORS_PROPERTY, "The flavors for source files (tracks containing audio stream).");
-    CONFIG_OPTIONS.put(SOURCE_FLAVOR_PROPERTY, "The flavor for source files (tracks containing audio stream).");
-    CONFIG_OPTIONS.put(SMIL_FLAVOR_SUBTYPE_PROPERTY, "The flavor subtype for target smil files.");
-    CONFIG_OPTIONS.put(SMIL_TARGET_FLAVOR_PROPERTY, "The flavor for target smil files.");
-    CONFIG_OPTIONS.put(REFERENCE_TRACKS_FLAVOR_PROPERTY,
-            "The track flavors for referencing in smil as source files. If not set, fallback to "
-                    + SOURCE_FLAVORS_PROPERTY);
-  }
   /** The silence detection service. */
   private SilenceDetectionService detetionService;
 
@@ -103,16 +88,6 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
 
   /** The workspace. */
   private Workspace workspace;
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
 
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)

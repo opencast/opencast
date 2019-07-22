@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>7-SNAPSHOT</version>
+    <version>8-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -76,7 +76,7 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>net.fortuna.ical4j</groupId>
+      <groupId>org.mnode.ical4j</groupId>
       <artifactId>ical4j</artifactId>
     </dependency>
     <!-- OSGi -->
@@ -141,13 +141,6 @@
     <dependency>
       <groupId>org.codehaus.jettison</groupId>
       <artifactId>jettison</artifactId>
-      <version>1.3.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>stax</groupId>
-          <artifactId>stax-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Testing -->
     <dependency>
@@ -236,10 +229,9 @@
             <Import-Package>
               !com.mchange.v2.c3p0.*,
               !com.sun.*,
+              !javax.cache.*,
               !javax.el.*,
               !javax.servlet.jsp.*,
-              !net.fortuna.ical4j.factory,
-              !net.fortuna.ical4j.timezone,
               !org.apache.log.*,
               !org.apache.tools.*,
               !org.bouncycastle.crypto.*,
@@ -267,6 +259,7 @@
             </Private-Package>
             <_exportcontents>
               net.fortuna.ical4j,
+              net.fortuna.ical4j.agent,
               net.fortuna.ical4j.data,
               net.fortuna.ical4j.filter,
               net.fortuna.ical4j.model,
@@ -274,7 +267,10 @@
               net.fortuna.ical4j.model.parameter,
               net.fortuna.ical4j.model.property,
               net.fortuna.ical4j.transform,
-              net.fortuna.ical4j.util
+              net.fortuna.ical4j.util,
+              net.fortuna.ical4j.validate,
+              net.fortuna.ical4j.validate.component,
+              net.fortuna.ical4j.validate.property
             </_exportcontents>
             <Export-Package>
               org.opencastproject.util.*;version=${project.version};-split-package:=merge-first,

@@ -42,7 +42,7 @@ angular.module('adminNg.controllers')
       if (angular.isDefined(user.org.properties[EXTERNAL_ROLE_DISPLAY])) {
         $scope.showExternalRoles = user.org.properties[EXTERNAL_ROLE_DISPLAY] === 'true';
       }
-    });
+    }).catch(angular.noop);
 
     $scope.role = {
       available: [],
@@ -68,7 +68,9 @@ angular.module('adminNg.controllers')
       }).$promise.then(function (data) {
         $scope.role.available = $scope.role.available.concat(data);
         $scope.roleOffset = $scope.roleOffset + $scope.roleSlice;
-      }, this).finally(function () {
+      }, this).catch(
+        angular.noop
+      ).finally(function () {
         loading = false;
       });
     };
@@ -124,7 +126,7 @@ angular.module('adminNg.controllers')
       $scope.user.roles = [];
 
       angular.forEach($scope.role.selected, function (value) {
-        $scope.user.roles.push({'id': value.value, 'type': value.type});
+        $scope.user.roles.push({'name': value.value, 'type': value.type});
       });
 
       if ($scope.action === 'edit') {
@@ -181,8 +183,8 @@ angular.module('adminNg.controllers')
           // Filter the selected from the available list
           $scope.role.available = _.filter($scope.role.available,
             function(role){ return !_.findWhere($scope.role.selected, {name: role.name}); });
-        });
-      });
+        }).catch(angular.noop);
+      }).catch(angular.noop);
     }
 
     $scope.$on('change', function (event, id) {

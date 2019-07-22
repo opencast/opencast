@@ -34,23 +34,23 @@ angular.module('adminNg.services.language')
     this.translateProvider = translateProvider;
 
     /**
-        * @ngdoc function
-        * @name Language.getLanguage
-        * @description
-        * Returns the currently set language.
-        * @returns {string} The current language.
-        */
+     * @ngdoc function
+     * @name Language.getLanguage
+     * @description
+     * Returns the currently set language.
+     * @returns {string} The current language.
+     */
     this.getLanguage = function () {
       return me.currentLanguage;
     };
 
     /**
-        * @ngdoc function
-        * @name Language.getLanguageCode
-        * @description
-        * Returns the currently set language code, chopping off the country if necessary.
-        * @returns {string} The current language. ('en' if code is 'en_US')
-        */
+     * @ngdoc function
+     * @name Language.getLanguageCode
+     * @description
+     * Returns the currently set language code, chopping off the country if necessary.
+     * @returns {string} The current language. ('en' if code is 'en_US')
+     */
     this.getLanguageCode = function () {
       if (angular.isUndefined(me.currentLanguage)) {
         me.setLanguage();
@@ -350,25 +350,28 @@ angular.module('adminNg.services.language')
         method: 'GET',
         url: 'public/org/opencastproject/adminui/languages/lang-' + language + '.json',
         language: language
-      });
-      translationPromise.success(function (data, status, headers, config) {
-        me.translateProvider.translations(config.language, data);
-        data.code = config.language;
-        return deferred.resolve(data);
-      })
-                .error(function (data) {
-                  $log.error('fatal, could not load translation');
-                  return deferred.reject(data);
-                });
+      }).then(
+        function onSuccess(response) {
+          var data = response.data;
+          me.translateProvider.translations(response.config.language, data);
+          data.code = response.config.language;
+          return deferred.resolve(data);
+        }
+      ).catch(
+        function onError(response) {
+          $log.error('fatal, could not load translation');
+          return deferred.reject(response.data);
+        }
+      );
       return deferred;
     };
 
     /**
-        * @ngdoc function
-        * @name Language.updateHttpLanguageHeader
-        * @description
-        * Update the default http header 'Accept-Language' with the current language and fallback language set.
-        */
+     * @ngdoc function
+     * @name Language.updateHttpLanguageHeader
+     * @description
+     * Update the default http header 'Accept-Language' with the current language and fallback language set.
+     */
     this.updateHttpLanguageHeader = function () {
       $http.defaults.headers.common['Accept-Language'] = me.currentLanguage.code
         + ';q=1, ' + me.getFallbackLanguage().code + ';q=0.5';
@@ -394,14 +397,14 @@ angular.module('adminNg.services.language')
     };
 
     /**
-        * @ngdoc function
-        * @name Language.configure
-        *
-        * @description
-        * Configures this language service with the provided language service response
-        *
-        * @param {data} The response of the language service
-        */
+     * @ngdoc function
+     * @name Language.configure
+     *
+     * @description
+     * Configures this language service with the provided language service response
+     *
+     * @param {data} The response of the language service
+     */
     this.configure = function (data, language) {
       me.fallbackLanguage = data.fallbackLanguage;
       me.availableLanguages = data.availableLanguages;
@@ -411,49 +414,47 @@ angular.module('adminNg.services.language')
     };
 
     /**
-        * @ngdoc function
-        * @name Language.configureFromServer
-        *
-        * @description
-        * Configures this language service with the currently available languages as well as
-        * the best and fallback languages.
-        *
-        * @param {deferred} The deferred object to which the result should be passed on
-        * @param {language} The language key
-        */
+     * @ngdoc function
+     * @name Language.configureFromServer
+     *
+     * @description
+     * Configures this language service with the currently available languages as well as
+     * the best and fallback languages.
+     *
+     * @param {deferred} The deferred object to which the result should be passed on
+     * @param {language} The language key
+     */
     this.configureFromServer = function (deferred, language) {
       var me = this;
       $http({method: 'GET', url: '/i18n/languages.json'})
-                .success(function (data) {
-                  var fallbackDeferred = $q.defer();
-                  me.configure(data, language);
-                  // load the fallback language
-                  if (me.currentLanguage.code !== me.fallbackLanguage.code) {
-                    me.loadLanguageFromServer(data.fallbackLanguage.code, fallbackDeferred);
-                    fallbackDeferred.promise.then(function (data) {
-                      me.translateProvider.translations(me.fallbackLanguage.code, data);
+        .then(function onSuccess(response) {
+          var fallbackDeferred = $q.defer();
+          me.configure(response.data, language);
+          // load the fallback language
+          if (me.currentLanguage.code !== me.fallbackLanguage.code) {
+            me.loadLanguageFromServer(response.data.fallbackLanguage.code, fallbackDeferred);
+            fallbackDeferred.promise.then(function (data) {
+              me.translateProvider.translations(me.fallbackLanguage.code, data);
 
-                      // the fallback language has arrived now, lets register it
-                      me.translateProvider.fallbackLanguage(me.fallbackLanguage.code);
-                      // now we load the current translations
-                      me.loadLanguageFromServer(me.currentLanguage.code, deferred);
-                    });
-                  }
-                  else {
-                    // There is no fallback language, lets load the main language
-                    me.loadLanguageFromServer(me.currentLanguage.code, deferred);
-                  }
-                })
-            .error(function (data) {
-              // called asynchronously if an error occurs
-              // or server returns response with an error status.
-              $log.error('fatal, could not load the best language from server');
-              return deferred.reject(data);
+              // the fallback language has arrived now, lets register it
+              me.translateProvider.fallbackLanguage(me.fallbackLanguage.code);
+              // now we load the current translations
+              me.loadLanguageFromServer(me.currentLanguage.code, deferred);
             });
+          } else {
+            // There is no fallback language, lets load the main language
+            me.loadLanguageFromServer(me.currentLanguage.code, deferred);
+          }
+        }).catch(function onError(response) {
+          // called asynchronously if an error occurs
+          // or server returns response with an error status.
+          $log.error('fatal, could not load the best language from server');
+          return deferred.reject(response.data);
+        });
 
       deferred.promise.then(function () {
         $rootScope.$emit('language-changed', me.currentLanguage.code);
-      });
+      }).catch(angular.noop);
     };
   };
 

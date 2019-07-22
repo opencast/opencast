@@ -58,7 +58,6 @@ public class SeriesTest {
   private static final String IDENTIFIER_JSON_KEY = "identifier";
   private static final String LANGUAGE_JSON_KEY = "language";
   private static final String LICENSE_JSON_KEY = "license";
-  private static final String OPT_OUT_KEY = "opt_out";
   private static final String ORGANIZATION_JSON_KEY = "organization";
   private static final String ORGANIZERS_JSON_KEY = "organizers";
   private static final String ORGANIZER_JSON_KEY = "organizer";
@@ -75,7 +74,6 @@ public class SeriesTest {
   private String creator = "Creator Name";
   private String license = "Creative Commons 2.0";
   private String accessPolicy = "ROLE_ADMIN";
-  private boolean optOut = true;
   private Date createdDateTime;
   private List<String> organizers = new ArrayList<String>();
   private String organizer1 = "organizer-one";
@@ -118,7 +116,6 @@ public class SeriesTest {
     assertEquals(language, series.getLanguage());
     assertEquals(license, series.getLicense());
     assertEquals(accessPolicy, series.getAccessPolicy());
-    assertEquals(optOut, series.isOptedOut());
     assertEquals(DateTimeSupport.toUTC(createdDateTime.getTime()),
             DateTimeSupport.toUTC(series.getCreatedDateTime().getTime()));
     assertEquals(organizer1, series.getOrganizers().get(0));
@@ -157,7 +154,6 @@ public class SeriesTest {
     series.setCreatedDateTime(createdDateTime);
     series.setOrganizers(organizers);
     series.setContributors(contributors);
-    series.setOptOut(optOut);
     logger.info(series.toJSON());
 
     // Check that generated JSON has proper values
@@ -175,7 +171,6 @@ public class SeriesTest {
     assertEquals(creator, seriesJsonObject.get(CREATOR_JSON_KEY));
     assertEquals(license, seriesJsonObject.get(LICENSE_JSON_KEY));
     assertEquals(accessPolicy, seriesJsonObject.get(ACCESS_POLICY_KEY));
-    assertEquals(optOut, seriesJsonObject.get(OPT_OUT_KEY));
     assertEquals(DateTimeSupport.toUTC(createdDateTime.getTime()), seriesJsonObject.get(CREATED_DATE_TIME));
 
     JSONObject organizersJsonObject = (JSONObject) seriesJsonObject.get(ORGANIZERS_JSON_KEY);

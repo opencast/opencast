@@ -121,7 +121,9 @@ angular.module('adminNg.controllers')
           $scope.roles[role.name] = role.value;
         });
         roleOffset = Object.keys($scope.roles).length;
-      }).finally(function () {
+      }).catch(
+        angular.noop
+      ).finally(function () {
         loading = false;
       });
       return rolePromise;

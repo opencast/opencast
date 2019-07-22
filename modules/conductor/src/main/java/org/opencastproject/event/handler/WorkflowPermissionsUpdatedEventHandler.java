@@ -160,7 +160,7 @@ public class WorkflowPermissionsUpdatedEventHandler {
           if (!instance.isActive())
             continue;
 
-          Organization org = instance.getOrganization();
+          Organization org = organizationDirectoryService.getOrganization(instance.getOrganizationId());
           securityService.setOrganization(org);
 
           MediaPackage mp = instance.getMediaPackage();
@@ -227,12 +227,8 @@ public class WorkflowPermissionsUpdatedEventHandler {
         q = q.withStartPage(offset);
         result = workflowService.getWorkflowInstancesForAdministrativeRead(q);
       }
-    } catch (WorkflowException e) {
-      logger.warn(e.getMessage());
-    } catch (UnauthorizedException e) {
-      logger.warn(e.getMessage());
-    } catch (IOException e) {
-      logger.warn(e.getMessage());
+    } catch (WorkflowException | NotFoundException | IOException | UnauthorizedException e) {
+      logger.warn("Unable to handle update event for series {}: {}", seriesItem, e.getMessage());
     } finally {
       securityService.setOrganization(prevOrg);
       securityService.setUser(prevUser);

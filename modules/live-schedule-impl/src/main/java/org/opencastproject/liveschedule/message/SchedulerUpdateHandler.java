@@ -22,6 +22,7 @@ package org.opencastproject.liveschedule.message;
 
 import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
+import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -47,11 +48,14 @@ public class SchedulerUpdateHandler extends UpdateHandler {
     super(DESTINATION_SCHEDULER);
   }
 
-  @Override
   protected void execute(MessageItem messageItem) {
-    SchedulerItem schedulerItem = (SchedulerItem) messageItem;
-    String mpId = schedulerItem.getMediaPackageId();
+    SchedulerItemList schedulerItemList = (SchedulerItemList) messageItem;
+    for (SchedulerItem item : schedulerItemList.getItems()) {
+      executeSingle(schedulerItemList.getId(), item);
+    }
+  }
 
+  private void executeSingle(final String mpId, final SchedulerItem schedulerItem) {
     try {
       logger.debug("Scheduler message handler START for mp {} event type {} in thread {}", mpId,
               schedulerItem.getType(), Thread.currentThread().getId());
@@ -99,10 +103,7 @@ public class SchedulerUpdateHandler extends UpdateHandler {
             if (isLive(mpId))
               liveScheduleService.deleteLiveEvent(mpId);
           break;
-        case UpdateOptOut:
-        case UpdateBlacklist:
         case UpdatePresenters:
-        case UpdateReviewStatus:
           break;
         default:
           throw new IllegalArgumentException("Unhandled type of SchedulerItem");

@@ -110,8 +110,16 @@
           <ul>
             <li  ng-repeat="asset in wizard.sharedData.uploadAssetOptions | filter:{type:'track'}| orderBy: 'displayOrder' track by asset.id">
               <div class="file-upload">
-                <input id="{{asset.id}}" class="blue-btn file-select-btn" admin-ng-file-upload data-ng-file-select data-ng-multiple="asset.multiple"
-                                                                                                                   type="file" file="$parent.wizard.step.ud.UPLOAD.tracks.{{asset.id}}" tabindex="" />
+                <input
+                  id="{{asset.id}}"
+                  class="blue-btn file-select-btn"
+                  admin-ng-file-upload
+                  accept="{{asset.accept}}"
+                  data-ng-file-select
+                  data-ng-multiple="asset.multiple"
+                  type="file"
+                  file="$parent.wizard.step.ud.UPLOAD.tracks.{{asset.id}}"
+                  tabindex="" />
               </div>
               <span>{{asset | translateOverrideFallback: 'SHORT'}}</span>
               <span class="ui-helper-hidden"> ({{asset.type}} "{{asset.flavorType}}/{{asset.flavorSubType}}")</span>
@@ -462,7 +470,7 @@
                          >
                          <option value=""></option>
           </select>
-
+		  <div class="collapsible-box" input="wizard.step.workflowDescription" maxheight=45></div>
           <div id="new-event-workflow-configuration"
                class="checkbox-container"
                ng-click="wizard.step.save()"

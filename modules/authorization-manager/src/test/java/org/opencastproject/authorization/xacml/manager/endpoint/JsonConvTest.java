@@ -25,18 +25,9 @@ import static io.restassured.path.json.JsonPath.from;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.security.api.AccessControlUtil.acl;
 import static org.opencastproject.security.api.AccessControlUtil.entry;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
-import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
-import org.opencastproject.authorization.xacml.manager.api.TransitionResult;
-import org.opencastproject.authorization.xacml.manager.impl.TransitionResultImpl;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -71,75 +62,6 @@ public final class JsonConvTest {
 
   private static final Date now = new Date();
 
-  private static final TransitionResult tresult = new TransitionResultImpl(
-          Collections.<EpisodeACLTransition>list(new EpisodeACLTransition() {
-            @Override public String getEpisodeId() {
-              return "episode";
-            }
-
-            @Override public Option<ManagedAcl> getAccessControlList() {
-              return some(macl);
-            }
-
-            @Override public boolean isDelete() {
-              return getAccessControlList().isNone();
-            }
-
-            @Override public long getTransitionId() {
-              return 1L;
-            }
-
-            @Override public String getOrganizationId() {
-              return "org";
-            }
-
-            @Override public Date getApplicationDate() {
-              return now;
-            }
-
-            @Override public Option<ConfiguredWorkflowRef> getWorkflow() {
-              return none();
-            }
-
-            @Override public boolean isDone() {
-              return false;
-            }
-          }),
-          Collections.<SeriesACLTransition>list(new SeriesACLTransition() {
-            @Override public String getSeriesId() {
-              return "series";
-            }
-
-            @Override public ManagedAcl getAccessControlList() {
-              return macl;
-            }
-
-            @Override public boolean isOverride() {
-              return true;
-            }
-
-            @Override public long getTransitionId() {
-              return 2L;
-            }
-
-            @Override public String getOrganizationId() {
-              return "org";
-            }
-
-            @Override public Date getApplicationDate() {
-              return now;
-            }
-
-            @Override public Option<ConfiguredWorkflowRef> getWorkflow() {
-              return none();
-            }
-
-            @Override public boolean isDone() {
-              return false;
-            }
-          })
-  );
-
   @Test
   public void testManagedAclFull() {
     String json = JsonConv.full(macl).toJson();
@@ -162,10 +84,4 @@ public final class JsonConvTest {
     assertEquals("Public", jp.get("name"));
   }
 
-  @Test
-  public void testTransitionResultDigest() {
-    String json = JsonConv.digest(tresult).toJson();
-    logger.info(json);
-    JsonPath jp = from(json);
-  }
 }

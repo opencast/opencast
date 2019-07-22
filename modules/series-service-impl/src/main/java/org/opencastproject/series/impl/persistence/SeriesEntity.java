@@ -79,10 +79,6 @@ public class SeriesEntity {
   @Column(name = "access_control", length = 65535)
   protected String accessControl;
 
-  /** Opt-out status */
-  @Column(name = "opt_out")
-  protected boolean optOut = false;
-
   @ElementCollection(targetClass = String.class)
   @MapKeyColumn(name = "name")
   @Column(name = "value")
@@ -178,21 +174,6 @@ public class SeriesEntity {
    */
   public void setOrganization(String organization) {
     this.organization = organization;
-  }
-
-  /**
-   * @return the opt out status
-   */
-  public boolean isOptOut() {
-    return optOut;
-  }
-
-  /**
-   * @param optOut
-   *          the opt out status to set
-   */
-  public void setOptOut(boolean optOut) {
-    this.optOut = optOut;
   }
 
   public Map<String, String> getProperties() {

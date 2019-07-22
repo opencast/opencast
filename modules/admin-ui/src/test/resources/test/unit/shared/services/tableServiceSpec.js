@@ -1,5 +1,5 @@
 describe('Table', function () {
-    var $httpBackend, $location, Table, Storage, UsersResource;
+    var $httpBackend, $location, Table, Storage, UsersResource, angular;
 
     beforeEach(module('adminNg'));
 
@@ -23,6 +23,7 @@ describe('Table', function () {
 
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
     });
 
     it('provides a constructor', function () {
@@ -51,6 +52,7 @@ describe('Table', function () {
                         $promise: {
                             then: function (fn) {
                                 fn(data);
+                                return { catch: function() {} };
                             }
                         }
                     };
@@ -65,6 +67,7 @@ describe('Table', function () {
         });
 
         it('sets default sort parameters', function () {
+            Storage.remove('sorter');
             Table.configure(params);
             expect(Table.predicate).toEqual('name');
             expect(Table.reverse).toBe(false);
@@ -142,12 +145,13 @@ describe('Table', function () {
         });
 
         it('stores the filters', function () {
+            Storage.remove('sorter');
             spyOn(Storage, 'put');
-            $httpBackend.whenGET('/admin-ng/users/users.json?limit=10&offset=0&sort=email:DESC')
+            $httpBackend.whenGET(/^\/admin-ng\/users\/users.json/)
                 .respond(JSON.stringify(getJSONFixture('admin-ng/users/users.json')));
-            Table.sortBy({ name: 'email', sortable: true });
+            Table.sortBy({ name: 'email', sortable: true, order: 'DESC' });
             $httpBackend.flush();
-            expect(Storage.put).toHaveBeenCalledWith('sorter', 'users', 'email',  { name : 'email', priority : 0, order : 'DESC' });
+            expect(Storage.put).toHaveBeenCalledWith('sorter', 'users', 'email',  { name : 'email', priority : 0, order : 'ASC' });
         });
 
         xit('applies the datatable filter', function () {

@@ -1,6 +1,5 @@
 {
   "eventId": "9cc888e8-cdf6-4974-bf18-effecdadfa94",
-  "optOut": false,
   "agentId": "F300.1",
   "agentConfiguration": {
     "org.opencastproject.workflow.config.flagQuality1080p": "false",

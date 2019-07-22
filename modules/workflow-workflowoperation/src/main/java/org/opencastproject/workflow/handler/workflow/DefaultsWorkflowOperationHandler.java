@@ -22,7 +22,6 @@ package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.presets.api.PresetProvider;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -66,7 +65,7 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
    *          The key name for the preset to check for.
    * @return The preset if available, null if not.
    */
-  private String getPreset(final Organization organization, final String seriesID, final String key) {
+  private String getPreset(final String organizationId, final String seriesID, final String key) {
     // Check to see if the default value was set as a preset at the series or organization level
     try {
       if (presetProvider != null) {
@@ -74,7 +73,7 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
       }
     } catch (NotFoundException e) {
       logger.debug("No preset for key {} from organization {} and series {}. Using the default value if available.",
-                   key, organization, seriesID);
+                   key, organizationId, seriesID);
     }
     return null;
   }
@@ -88,16 +87,16 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
     logger.debug("Applying default values to {}", workflowInstance.getId());
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     Long id = workflowInstance.getId();
-    Organization organization = workflowInstance.getOrganization();
+    String organizationId = workflowInstance.getOrganizationId();
     String seriesID = workflowInstance.getMediaPackage().getSeries();
     // Iterate over all configuration keys
     Map<String, String> properties = new HashMap<>();
-    logger.debug("Getting properties for " + id + " " + organization + " " + seriesID);
+    logger.debug("Getting properties for {} {} {}", id, organizationId, seriesID);
     for (String key : operation.getConfigurationKeys()) {
       String value = workflowInstance.getConfiguration(key);
       if (StringUtils.isBlank(value)) {
         // Check to see if the default value was set as a preset at the series or organization level
-        String preset = getPreset(organization, seriesID, key);
+        String preset = getPreset(organizationId, seriesID, key);
         if (StringUtils.isNotBlank(preset)) {
           properties.put(key, preset);
           logger.debug("Configuration key '{}' of workflow {} is set to preset value '{}'", key, id, preset);

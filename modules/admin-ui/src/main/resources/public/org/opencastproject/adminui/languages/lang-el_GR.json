@@ -10,7 +10,8 @@
    "SAVE": "Αποθήκευση",
    "LOGOUT": "Αποσύνδεση",
    "RESET": "Επαναφορά",
-   "SELECT_NO_OPTIONS": "Καμία επιλογή",
+   "SELECT_NO_OPTION_SELECTED": "Δεν επιλέχθηκε κάποια επιλογή",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Δεν υπάρχουν διαθέσιμες επιλογές",
    "YES": "Ναί",
    "LANGUAGES": {
       "ARABIC": "Αραβικά",
@@ -55,11 +56,8 @@
             "ACL": "H παρακάτω πολιτική πρόσβασης θα διαγραφεί",
             "GROUP": "Η παρακάτω ομάδα θα διαγραφεί",
             "USER": "Ο παρακάτω χρήστης θα διαγραφεί",
-            "USER_BLACKLIST": "Η παρακάτω μαύρη λίστα χρηστών θα διαγραφεί",
             "THEME": "Το ακόλουθο θέμα θα διαγραφεί",
-            "EMAIL": "Το ακόλουθο πρότυπο ηλεκτρονικού ταχυδρομείου θα διαγραφεί",
-            "LOCATION": "Η ακόλουθη τοποθεσία θα διαγραφεί",
-            "LOCATION_BLACKLIST": "Η ακόλουθη μαύρη λίστα τοποθεσίας θα διαγραφεί"
+            "LOCATION": "Η ακόλουθη τοποθεσία θα διαγραφεί"
          },
          "NAME": "Όνομα"
       },
@@ -130,30 +128,9 @@
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Η εκδήλωση δεν μπορεί να διαγραφεί, επειδή δεν έχετε τα δικαιώματα για να το πράξετε.",
       "SERIES_DELETED": "Η σειρά έχει διαγραφεί",
       "SERIES_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της σειράς",
-      "USER_BLACKLIST_CREATED": "Δημιουργήθηκε η μαύρη λίστα",
-      "USER_BLACKLIST_NOT_CREATED": "Δεν μπορεί να δημιουργηθεί η μαύρη λίστα",
-      "USER_BLACKLIST_SAVED": "Έχει αποθηκευτεί στη μαύρη λίστα",
-      "USER_BLACKLIST_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση της μαύρης λίστας",
-      "USER_BLACKLIST_DELETED": "Η μαύρη λίστα έχει διαγραφεί",
-      "USER_BLACKLIST_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της μαύρης λίστας",
       "LOCATION_DELETED": "Η τοποθεσία έχει διαγραφεί",
       "LOCATION_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της τοποθεσίας",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Η τοποθεσία δεν μπορεί να διαγραφεί, επειδή δεν έχετε τα δικαιώματα να το πράξετε.",
-      "LOCATION_BLACKLIST_CREATED": "Δημιουργήθηκε η μαύρη λίστα",
-      "LOCATION_BLACKLIST_NOT_CREATED": "Δεν μπορεί να δημιουργηθεί η μαύρη λίστα",
-      "LOCATION_BLACKLIST_SAVED": "Η μαύρη λίστα έχει αποθηκευτεί",
-      "LOCATION_BLACKLIST_NOT_SAVED": "Η μαύρη λίστα δεν μπορεί να αποθηκευτεί",
-      "LOCATION_BLACKLIST_DELETED": "Η μαύρη λίστα έχει διαγραφεί",
-      "LOCATION_BLACKLIST_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της μαύρης λίστας",
-      "EMAIL_TEMPLATE_CREATED": "Το πρότυπο έχει δημιουργηθεί",
-      "EMAIL_TEMPLATE_NOT_CREATED": "Δεν ήταν δυνατή η δημιουργία του προτύπου",
-      "EMAIL_TEMPLATE_SAVED": "Το πρότυπο έχει αποθηκευτεί",
-      "EMAIL_TEMPLATE_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση του προτύπου",
-      "EMAIL_TEMPLATE_DELETED": "Το πρότυπο έχει διαγραφεί",
-      "EMAIL_TEMPLATE_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή του προτύπου",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "Αυτό το όνομα είναι ήδη σε χρήση",
-      "EMAIL_SENT": "Το μήνυμα έχει σταλεί",
-      "EMAIL_NOT_SENT": "Δεν μπόρεσε να σταλεί το μήνυμα",
       "CONFLICT_DETECTED": "Σύγκρουση στον προγραμματισμό: η νέα εκδήλωση συμπίμπτει με μία υπάρχουσα. Παρακαλώ αλλάξτε την αίθουσα, τις ημερηνίες ή τις ημέρες.",
       "CONFLICT_BULK_DETECTED": "Προγραμματισμός σε σύγκρουση: η αλλαγή στις εκδηλώσεις οδηγεί σε συγκρούση. Παρακαλώ να αλλάξετε την τοποθεσία, τις ημερομηνίες ή τις ώρες.",
       "CONFLICT_ALREADY_ENDED": "Σφάλμα στον προγραμματισμό. Η εκδήλωση έχει ήδη λήξει.",
@@ -166,11 +143,6 @@
       "SERIES_ACL_LOCKED": "Η επεξεργασία την πολιτικών πρόσβαησς δεν επιτρέπεται όταν εκτελούνται εργασίες σε μία εκδήλωση που αποτελεί μέρος της σειράς",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Η πολιτική πρόσβασης απαιτεί τουλάχιστον ένα ρόλο με δικαιώματα ανάγνωσης και εγγραφής.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "Η πολιτική πρόσβασης απαιτεί τουλάχιστον ένα ρόλο με δικαιώματα ανάγνωσης και εγγραφής.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Η κατάσταση εξαίρεσης εκδήλωσης έχει ενημερωθεί με επιτυχία.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Σφάλμα κατά την ενημέρωση κατάστασης της εκδήλωσης στο καθεστώς εξαίρεσης.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "Η κατάσταση συμμετοχής δεν μπορεί να ενημερωθεί καθώς η ημερομηνία έναρξης του προγραμματισμού είναι στο παρελθόν.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Η κατάσταση εξαίρεσης εκδήλωσης έχει ενημερωθεί με επιτυχία.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Σφάλμα κατά την ενημέρωση κατάστασης εξαίρεσης της σειράς.",
       "THEME_NAME_ALREADY_TAKEN": "Αυτό το όνομα είναι ήδη σε χρήση",
       "THEME_NAME_EMPTY": "Το όνομα δεν είναι δυνατό να είναι κενό",
       "BUMPER_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την μεταφόρτωση των αρχείων πολυμέσων",
@@ -187,8 +159,8 @@
       "THEME_NOT_DELETED": "Το θέμα δεν είναι δυνατόν να διαγραφεί",
       "TASK_CREATED": "Η εργασία έχει δημιουργήθει",
       "TASK_NOT_CREATED": "Η εργασία δεν θα μπορούσε να δημιουργηθεί",
-      "VIDEO_CUT_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση των πληροφοριών επεξεργασίας",
-      "VIDEO_CUT_SAVED": "Η επεξεργασία πληροφοριών έχει αποθηκευτεί",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
       "VIDEO_CUT_PROCESSING": "Επεξεργάζεται το βίντεο…",
       "THUMBNAIL_CHANGE_FAILED": "Αποτυχία αλλαγής μικρογραφίας.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Δεν έχετε επιλέξει κάποια κομμμάτια βίντεο για την επεξεργασία",
@@ -199,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Ενέργειες",
-      "SEND_MESSAGE": "Αποστολή μηνύματος",
       "WARNING": "Προειδοποίηση",
-      "EDIT_STATUS": {
-         "CAPTION": "Επεξεργαστείτε την κατάσταση",
-         "READY_FOR_RECORDING": "Έτοιμη για εγγραφή",
-         "OPTED_OUT": "Επιλογή εξόδου"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Διαγραφή",
@@ -279,9 +245,9 @@
          },
          "EDIT": {
             "CAPTION": "Επεξεργασία",
-            "EVENT": "event",
-            "EVENTS": "events",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "EVENT": "εκδήλωση",
+            "EVENTS": "εκδηλώσεις",
+            "HEADER": "Αυτή η σελίδα σας επιτρέπει να επεξεργαστείτε κάποιες προγραμματισμένες εκδηλώσεις ομαδοποιημένες κατά τις εργάσιμες ημέρες. Τα πεδία εισαγωγής είναι προ-συμπληρωμένα σε περίπτωση που όλες οι προγραμματισμένες εκδηλώσεις έχουν την ίδια τιμε σε ένα συγκεκριμένο πεδίο. Σε διαφορετική περίπτωση, όλα τα πεδιά εισαγωγής θα παραμείνουν κενά. Αφήνοντας τα πεδία εισαγωγής λευκά σημαίνει ότι οι αντίστοιχες τιμές δεν πρέπει να αλλάξουν.",
             "METADATA": "Μεταδεδομένα",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -305,6 +271,8 @@
       "BACK": "Προηγούμενη",
       "CREATE": "Δημιουργία",
       "RETRACT": "Ανάκληση",
+      "RETRACT_DELETE": "Ανάκληση/Διαγραφή",
+      "DELETE": "Διαγραφή",
       "UPDATE": "Ενημέρωση",
       "DURATION": {
          "HOURS": "Ώρες",
@@ -339,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Ρύθμιση παραμέτρων"
+      },
+      "STATISTICS": {
+         "TITLE": "Στατιστικά"
       }
    },
    "EVENTS": {
@@ -361,28 +332,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "Στείλτε μήνυμα",
-         "TABS": {
-            "RECIPIENTS": "Παραλήπτες",
-            "MESSAGE": "Μήνυμα",
-            "SUMMARY": "Περίληψη"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "Προσθέστε στη διαδρομή ελέγχου",
-            "AUDIT_TRAIL_DESCRIPTION": "Επιλέξτε για να προσθέσετε το μήνυμα στην διαδρομή ελέγχου",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "Επιλέξτε το πρότυπο ηλεκτρονικού ταχυδρομείου",
-            "SUBJECT": "Θέμα",
-            "MESSAGE": "Μήνυμα",
-            "INCLUDE_SIGNATURE": "Συμπεριλάβετε την υπογραφή μου στο email"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "Περίληψη"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -449,7 +398,7 @@
                   "REPEATS": "Επαναλήψεις",
                   "REPEAT_ON": "Επανάληψη τη",
                   "WEEKDAYS": "Ημέρες εβδομάδας",
-                  "WEEKDAY": "Weekday"
+                  "WEEKDAY": "Ημέρες εβδομάδας"
                },
                "NO_SOURCE_AVAILABLE": "Κανένας ατζέντης βιντεοσκόπησης δεν είναι διαθέσιμος για προγραμματισμό"
             },
@@ -513,7 +462,6 @@
          "ADD_EVENT": "Προσθήκη εκδήλωσης",
          "TABLE": {
             "CAPTION": "Εκδηλώσεις",
-            "CREATORS": "Δημιουργοί",
             "TITLE": "Τίτλος",
             "PRESENTERS": "Παρουσιαστής(ές)",
             "SERIES": "Σειρά",
@@ -528,9 +476,7 @@
             "LAST": "Τελευταία",
             "NEXT": "Επόμενη",
             "MANAGED_ACL": "Πολιτική πρόσβασης",
-            "SCHEDULING_STATUS": "Κατάσταση",
             "WORKFLOW_STATE": "Πρόοδος",
-            "REVIEW_STATUS": "Κατάσταση ανάλυσης",
             "PREVIOUS": "Προηγούμενη",
             "NOCONTENT": "Δεν υπάρχουν διαθέσιμα δεδομένα",
             "PUBLISHED": "Δημοσιευμένο",
@@ -545,18 +491,12 @@
                "EDITOR": "Άνοιγμα επεξεργασίας βίντεο",
                "EDITOR_NEEDS_CUTTING": "Άνοιγμα επεξεργασίας βίντεο (ένα σχόλιο δείχνει ότι έχει ζητηθεί η επεξεργασία του βίντεο)",
                "COMMENTS": "Δείτε σχόλια",
-               "PAUSED_WORKFLOW": "Δείτε σταματημένη εκδήλωση"
+               "PAUSED_WORKFLOW": "Δείτε σταματημένη εκδήλωση",
+               "PRESENTER": "Φίλτρο για αυτόν τον παρουσιαστή"
             }
-         },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "Έτοιμη για εγγραφή",
-            "BLACKLISTED": "Στη μαύρη λίστα",
-            "OPTED_OUT": "Επιλογή εξόδου"
          },
          "STATUS": {
             "SCHEDULED": "Προγραμματισμένη",
-            "OPTEDOUT": "Επιλογή εξόδου",
-            "BLACKLISTED": "Στη μαύρη λίστα",
             "RECORDING": "Εγγραφή",
             "UPLOADING": "Μεταφόρτωση",
             "INGESTING": "Εισάγεται",
@@ -568,6 +508,14 @@
             "PROCESSING_FAILURE": "Αποτυχία επεξεργασίας",
             "PROCESSING_CANCELED": "Ακύρωση επεξεργασίας"
          },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
+         },
          "DETAILS": {
             "HEADER": "Λεπτομέρειες εκδήλωσης {{resourceId}}",
             "TABS": {
@@ -578,16 +526,14 @@
                "SCHEDULING": "Προγραμματισμός",
                "WORKFLOWS": "Ροές εργασίας",
                "ACCESS": "Πολιτική πρόσβασης",
-               "COMMENTS": "Σχόλια"
+               "COMMENTS": "Σχόλια",
+               "STATISTICS": "Στατιστικά"
             },
             "PUBLICATIONS": {
                "CAPTION": "Δημοσιεύσεις",
                "NO_PUBLICATIONS_AVAILABLE": "Αυτή η εκδήλωση δεν έχει δημοσιεύσεις",
                "PUBLICATION_DESCRIPTION": "Αυτό η εκδήλωση έχει δημοσιευθεί στα παρακάτω κανάλια δημοσίευσης:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Αυτή η εκδήλωση δεν είναι σε εξέλιξη",
-               "SCHEDULING_STATUS": "Κατάσταση",
-               "READY_FOR_RECORDING": "Έτοιμη για εγγραφή",
-               "OPTED_OUT": "Επιλογή εξόδου",
                "CUSTOM": "Προσαρμοσμένη",
                "ENGAGE": "Engage",
                "ENGAGE_LIVE": "Engage live",
@@ -823,6 +769,9 @@
                   "PROCESSING_FAILURE": "Αποτυχία επεξεργασίας"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Στατιστικά"
+            },
             "METADATA": {
                "CAPTION": "Λεπτομέριες εκδήλωσης",
                "TITLE": "Τίτλος",
@@ -854,20 +803,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "Κατάσταση συμμετοχής",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Κατάσταση ανάλυσης"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Κατάσταση opt-out",
-                  "READY": "Έτοιμη για καταγραφή",
-                  "OPTEDOUT": "Opted out"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Μηνύματα",
-                  "CREATION_DATE": "Ημερομηνία δημιουργίας",
-                  "SENDER": "Αποστολέας",
-                  "SUBJECT": "Θέμα"
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Παρουσιαστής(ές)"
                }
@@ -875,25 +810,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Ενέργειες",
                "DETAILS": "Λεπτομέρειες",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Περισσότερες πληροφορίες & επιλογές",
+               "DESCRIPTION": "Περιγραφή",
+               "MORE_INFO": "Περισσότερες πληροφορίες",
                "ID": "Αναγνωριστικό",
                "TYPE": "Τύπος",
                "TITLE": "Τίτλος",
-               "STATE": "Κατάσταση",
+               "STATUS": "Κατάσταση",
                "STARTED": "Ξεκίνησε",
                "SERIES": "Σειρές",
                "SUBMITTED": "Υποβλήθηκε",
+               "SUBMITTER": "Υποβάλλων",
+               "EXECUTION_TIME": "Χρόνος Εκτέλεσης",
+               "WDID": "Ορισμός ροής εργασίας",
                "MIMETYPE": "MimeType",
                "URL": "Διεύθυνση URL",
                "CONFIGURATION": "Ρυθμίσεις παραμέτρων",
                "NO_CONFIGURATION": "Δεν υπάρχουν παράμετροι ρύθμισης για την επιλεγμένη ροή εργασίας.",
                "WORKFLOW": "Ροή εργασίας",
                "TOOLTIP": {
-                  "STOP": "Διακοπή εκτέλεσης ροής εργασίας",
+                  "STOP": "Παύση ροής εργασίας",
                   "ABORT": "Ματαίωση της εκτέλεσης της εν ενεργεία ροής εργασίας (να μην επαναληφθεί η αποτυχημένη λειτουργία ξανά)",
                   "RETRY": "Επανάληψη εκτέλεσης της εν ενεργεία ροής εργασίας",
-                  "DELETE": "Διαγραφή ροής εργασίας"
+                  "DELETE": "Διαγραφή ροής εργασίας",
+                  "DETAILS": "Άνοιγμα λεπτομερειών ροής εργασίας"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Αρχικοποιήθηκε",
@@ -901,12 +840,14 @@
                   "PAUSED": "Σε παύση",
                   "SUCCEEDED": "Ολοκληρώθηκε με επιτυχία",
                   "FAILED": "Απέτυχε",
+                  "FAILING": "Αποτυγχάνει",
                   "SKIPPED": "Παραλείφθηκε",
+                  "STOPPED": "Διακόπηκε",
                   "RETRY": "Επανάληψη"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Παρουσίες ροής εργασιών"
+               "TITLE": "Ροές εργασίας"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Λεπτομέρειες ροής εργασίας",
@@ -1035,7 +976,7 @@
             "CAPTION": "Σειρές",
             "TITLE": "Σειρές",
             "HAS_EVENTS": "Περιέχει εκδηλώσεις",
-            "CREATORS": "Οργανωτής(ες)",
+            "ORGANIZERS": "Οργανωτής(ες)",
             "CONTRIBUTORS": "Χορηγός(οι)",
             "CREATED": "Δημιουργήθηκε",
             "MANAGED_ACL": "Πολιτική πρόσβασης",
@@ -1052,10 +993,10 @@
             "TABS": {
                "METADATA": "Μεταδεδομένα",
                "EXTENDED_METADATA": "Μεταδεδομένα ΙΙ",
-               "PARTICIPATION": "Συμμετοχή",
                "EVENTS": "Εκδηλώσεις",
                "PERMISSIONS": "Πολιτική πρόσβασης",
-               "THEME": "Θέμα"
+               "THEME": "Θέμα",
+               "STATISTICS": "Στατιστικά"
             },
             "ACCESS": {
                "CAPTION": "Πολιτική πρόσβασης",
@@ -1075,8 +1016,8 @@
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
                   "DETAILS": "Λεπτομέρειες",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
+                  "REPLACE_EVENT_ACLS": "Ενημέρωση δικαιωμάτων εκδήλωσης",
+                  "REPLACE_EVENT_ACLS_HINT": "Επιβεβαίωση ότι όλες οι εκδηλώσεις σε αυτή την σειρά έχουν τα ίδια δικαιώματα σε ισχύ"
                },
                "ROLES": {
                   "LABEL": "Επιλέξτε ένα ρόλο",
@@ -1098,24 +1039,6 @@
                "LICENSE": "Άδεια χρήσης",
                "DESCRIPTION": "Περιγραφή"
             },
-            "PARTICIPATION": {
-               "CAPTION": "Κατάσταση προτύπου συμμετοχής",
-               "WARNING_TEMPLATE": "Η κατάσταση συμμετοχής της σειράς θα χρησιμοποιηθεί σαν προεπιλεγμένη τιμη για τις νέες εκδηλώσεις που αποτελούν μέρος την σειράς.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "Κατάσταση ανάλυσης"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "Κατάσταση επιλογής εξόδου",
-                  "READY": "Έτοιμη για καταγραφή",
-                  "OPTEDOUT": "Επιλογή εξόδου"
-               },
-               "MESSAGES": {
-                  "CAPTION": "Μηνύματα",
-                  "CREATION_DATE": "Ημερομηνία δημιουργίας",
-                  "SENDER": "Αποστολέας",
-                  "SUBJECT": "Θέμα"
-               }
-            },
             "EVENTS": {
                "TITLE": "Τίτλος",
                "PRESENTER": "Παρουσιαστής(ές)",
@@ -1130,12 +1053,10 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Τοποθεσίες",
-         "BLACKLISTS": "Μαύρες λίστες"
+         "LOCATIONS": "Τοποθεσίες"
       },
       "ACTIONS": {
          "EXPORT": "Εξαγωγή",
-         "ADD_BLACKLIST": "Προσθέστε στην μαύρη λίστα",
          "REMOVE": "Κατάργηση"
       },
       "RECORDINGS": {
@@ -1149,8 +1070,6 @@
             "NEXT_NAME": "Επόμενος τίτλος εκδήλωσης",
             "STATUS": "Κατάσταση",
             "VERSION": "Έκδοση",
-            "BLACKLIST_FROM": "Στη μαύρη λίστα από",
-            "BLACKLIST_TO": "Στη μαύρη λίστα μέχρι",
             "ACTION": "Ενέργειες",
             "TOOLTIP": {
                "NAME": "Φίλτρο για τις εκδηλώσεις αυτής της τοποθεσίας",
@@ -1181,60 +1100,18 @@
                "NO_CAPABILITIES": "Δεν παρέχονται δυνατότητες"
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Θέση μαύρη λίστα",
-            "NAME": "Όνομα",
-            "ACTIONS": "Ενέργειες"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Δημιουργήστε μια μαύρη λίστα",
-            "EDITCAPTION": "Επεξεργαστείτε τη μαύρη λίστα",
-            "TABS": {
-               "LOCATIONS": "Τοποθεσίες",
-               "DATES": "Ημερομηνίες",
-               "REASON": "Αιτία",
-               "SUMMARY": "Περίληψη"
-            },
-            "LOCATIONS": {
-               "REMOVE": "Κατάργηση",
-               "ADD_LOCATION": "Επιλέξτε τοποθεσία",
-               "ALL_LOCATIONS": "Όλες οι τοποθεσίες",
-               "SELECT_LOCATION": "Επιλέξτε"
-            },
-            "DATES": {
-               "START_DATE": "Ημερομηνία έναρξης",
-               "END_DATE": "Ημερομηνία λήξης"
-            },
-            "REASON": {
-               "SELECT_REASON": "Επιλέξτε",
-               "REASON": "Αιτία",
-               "COMMENTS": "Σχόλια"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Περίληψη",
-               "LOCATION": "Τοποθεσία",
-               "DATE_FROM": "Απο",
-               "DATE_TO": "Μέχρι",
-               "REASON": "Αιτία",
-               "COMMENTS": "Σχόλια"
-            }
-         }
       }
    },
    "USERS": {
       "ACTIONS": {
          "ADD_USER": "Προσθήκη χρήστη",
          "ADD_GROUP": "Προσθήκη ομάδας",
-         "ADD_ACL": "Προσθήκη πολιτικής πρόσβασης",
-         "ADD_BLACKLIST": "Προσθήκη μαύρης λίστας"
+         "ADD_ACL": "Προσθήκη πολιτικής πρόσβασης"
       },
       "NAVIGATION": {
          "USERS": "Χρήστες",
          "GROUPS": "Ομάδες",
-         "PERMISSIONS": "Πολιτικές πρόσβασης",
-         "BLACKLISTS": "Μαύρη λίστα"
+         "PERMISSIONS": "Πολιτικές πρόσβασης"
       },
       "USERS": {
          "TABLE": {
@@ -1245,8 +1122,6 @@
             "ROLES": "Ρόλοι",
             "TYPE": "Τύπος",
             "PROVIDER": "Πάροχος",
-            "BLACKLIST_FROM": "Στη μαύρη λίστα από",
-            "BLACKLIST_TO": "Στη μαύρη λίστα μέχρι",
             "ACTION": "Ενέργειες",
             "TOOLTIP": {
                "DELETE": "Διαγραφή χρήστη",
@@ -1417,49 +1292,6 @@
                }
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "Μαύρη λίστα χρηστών",
-            "NAME": "Όνομα",
-            "DATE_FROM": "Απο",
-            "DATE_TO": "Μέχρι",
-            "REASON": "Αιτία",
-            "ACTION": "Ενέργειες"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Δημιουργήστε μια μαύρη λίστα",
-            "EDITCAPTION": "Επεξεργαστείτε τη μαύρη λίστα",
-            "TABS": {
-               "USERS": "Χρήστες",
-               "DATES": "Ημερομηνίες",
-               "REASON": "Αιτία",
-               "SUMMARY": "Περίληψη"
-            },
-            "USERS": {
-               "REMOVE": "Κατάργηση",
-               "ADD_USER": "Επιλέξτε χρήστη",
-               "ALL_USERS": "Όλοι οι χρήστες",
-               "SELECT_USER": "Επιλογή"
-            },
-            "DATES": {
-               "START_DATE": "Ημερομηνία έναρξης",
-               "END_DATE": "Ημερομηνία λήξης"
-            },
-            "REASON": {
-               "SELECT_REASON": "Επιλογή",
-               "REASON": "Αιτία",
-               "COMMENTS": "Σχόλια"
-            },
-            "SUMMARY": {
-               "SUMMARY": "Περίληψη",
-               "USER": "Χρήστης",
-               "DATE_FROM": "Απο",
-               "DATE_TO": "Μέχρι",
-               "REASON": "Αιτία",
-               "COMMENTS": "Σχόλια"
-            }
-         }
       }
    },
    "THEMES": {
@@ -1517,34 +1349,7 @@
          "ADD_THEME": "Προσθέστε το θέμα"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "Πρότυπα email",
-         "MAIL_SERVERS": "Ρυθμίσεις ηλεκτρονικού ταχυδρομείου",
          "THEMES": "Θέματα"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "Πρότυπα ηλεκτρονικού ταχυδρομείου",
-            "NAME": "Όνομα",
-            "CREATOR": "Δημιουργός",
-            "CREATED": "Δημιουργήθηκε",
-            "ACTION": "Ενέργειες"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "Δημιουργία προτύπου",
-            "EDITCAPTION": "Επεξεργασία πρότυπου",
-            "TABS": {
-               "MESSAGE": "Μήνυμα",
-               "SUMMARY": "Περίληψη"
-            },
-            "MESSAGE": {
-               "NAME": "Όνομα",
-               "SUBJECT": "Θέμα",
-               "MESSAGE": "Μήνυμα"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "Σύνοψη μηνύματος"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1640,24 +1445,16 @@
       "JOBS": {
          "TABLE": {
             "ID": "Αναγνωριστικό εργασίας",
-            "ACTION": "Ενέργειες",
             "CAPTION": "Εργασίες",
             "CREATED": "Δημιουργήθηκε",
             "CREATOR": "Δημιουργός",
             "HOST_NAME": "Όνομα κεντρικού υπολογιστή",
+            "NODE_NAME": "Όνομα κόμβου",
             "OPERATION": "Λειτουργία",
             "STARTED": "Ξεκίνησε",
             "STATUS": "Κατάσταση",
             "SUBMITTED": "Υποβλήθηκε",
             "TYPE": "Τύπος"
-         },
-         "DETAILS": {
-            "HEADER": "Λεπτομέρειες εργασίας {{resourceId}}",
-            "TABS": {
-               "GENERAL": "Γενικά",
-               "OPERATIONS": "Λειτουργίες",
-               "INCIDENTS": "Περιστατικά"
-            }
          },
          "STATUS": {
             "QUEUED": "Στην ουρά",
@@ -1678,6 +1475,7 @@
             "CAPTION": "Διακομιστές",
             "STATUS": "Κατάσταση",
             "HOST_NAME": "Όνομα κεντρικού υπολογιστή",
+            "NODE_NAME": "Όνομα κόμβου",
             "CORES": "Πυρήνες",
             "COMPLETED": "Ολοκληρωμένες εργασίες",
             "RUNNING": "Εργασίες σε εκτέλεση",
@@ -1685,7 +1483,6 @@
             "MEAN_RUN_TIME": "Μέσος χρόνος εκτέλεσης",
             "MEAN_QUEUE_TIME": "Μέσος χρόνος αναμονής",
             "MAINTENANCE": "Συντήρηση",
-            "ACTION": "Ενέργειες",
             "MAINTENANCE_OFF": "Είσοδος σε λειτουργία συντήρησης",
             "MAINTENANCE_ON": "Έξοδος από λειτουργία συντήρησης"
          }
@@ -1696,6 +1493,7 @@
             "STATUS": "Κατάσταση",
             "NAME": "Όνομα υπηρεσίας",
             "HOST_NAME": "Όνομα κεντρικού υπολογιστή",
+            "NODE_NAME": "Όνομα κόμβου",
             "COMPLETED": "Ολοκληρωμένες εργασίες",
             "RUNNING": "Εργασίες σε εκτέλεση",
             "QUEUED": "Εργασίες στην ουρά",
@@ -1741,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Διαχωρισμός",
-         "CUT": "Αποκοπή",
-         "REPLAY_SEGMENT": "Επανάληψη τμήματος",
-         "REPLAY_END_OF_SEGMENT": "Τέλος του τμήματος",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Έλεγχος μετάβασης",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "Αναίρεση",
          "REDO": "Ακύρωση Αναίρεσης",
-         "CLEAR_SEGMENTS": "Καθαρισμός τμημάτων",
-         "CLEAR_SELECTED_SEGMENT": "Καθαρισμός επιλεγμένου τμήματος"
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Αφαίρεση τμήματος",
-         "USE_SEGMENT": "Χρησιμοποίηση αυτού του τμήματος",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
          "START": "Έναρξη",
          "END": "Τέλος"
       },
@@ -1915,9 +1719,6 @@
          "LOCATION": {
             "LABEL": "Τοποθεσία"
          },
-         "OPTEDOUT": {
-            "LABEL": "Επιλογή εξόδου"
-         },
          "PERIOD": {
             "LABEL": "Περίοδος"
          },
@@ -1929,12 +1730,6 @@
          },
          "PROGRESS": {
             "LABEL": "Πρόοδος"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "Κατάσταση ανάλυσης",
-            "CONFIRMED": "Επιβεβαιωμένο",
-            "UNCONFIRMED": "Ανεπιβεβαίωτη",
-            "UNSENT": "Aόριστο"
          },
          "SERIES": {
             "LABEL": "Σειρά"
@@ -1979,6 +1774,9 @@
          "HOSTNAME": {
             "LABEL": "Όνομα κεντρικού υπολογιστή"
          },
+         "NODE_NAME": {
+            "LABEL": "Όνομα κόμβου"
+         },
          "STATUS": {
             "LABEL": "Κατάσταση",
             "PAUSED": "Σε παύση",
@@ -2020,6 +1818,9 @@
          "HOSTNAME": {
             "LABEL": "Όνομα κεντρικού υπολογιστή"
          },
+         "NODE_NAME": {
+            "LABEL": "Όνομα κόμβου"
+         },
          "STATUS": {
             "LABEL": "Κατάσταση",
             "MAINTENANCE": "Συντήρηση",
@@ -2033,6 +1834,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Όνομα κεντρικού υπολογιστή"
+         },
+         "NODE_NAME": {
+            "LABEL": "Όνομα κόμβου"
          },
          "NAME": {
             "LABEL": "Όνομα"
@@ -2085,16 +1889,6 @@
    "TABLE_NO_RESULT": "Δεν βρέθηκαν αποτελέσματα",
    "TABLE_LOADING": "Φόρτωση…",
    "TABLE_EDIT": "Επεξεργασία",
-   "PM": {
-      "BLACKLIST": {
-         "REASONS": {
-            "SICK_LEAVE": "Αναρρωτική άδεια",
-            "LEAVE": "Αποχώρηση",
-            "FAMILY_EMERGENCY": "Οικογενειακή έκτακτη κατάσταση",
-            "CONSTRUCTION": "Κατασκευή"
-         }
-      }
-   },
    "DASHBOARD": {
       "RUNNING": "Εκτελείται",
       "FINISHED": "Ολοκληρώθηκε",
@@ -2183,6 +1977,34 @@
          "SHUTTING_DOWN": "Τερματισμός",
          "UNKNOWN": "Άγνωστο",
          "UPLOADING": "Μεταφόρτωση"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "Για εισαγωγή πολλαπλώ ν τιμών πατήστε Enter μεταξύ τους"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Δεν είναι δυνατή η εμφάνιση των στατιστικών αυτή τη στιγμή. Παρακαλώ δοκιμάστε αργότερα.",
+      "UNSUPPORTED_TYPE": "Λυπούμαστε, το Opencast δεν μπορεί να προβάλει αυτόν τον τύπο στατιστικών δεδομένων.",
+      "FROM": "Απο",
+      "TO": "Προς",
+      "TOTAL": "Σύνολο",
+      "GRANULARITY": "Διακριτότητα",
+      "NAVIGATION": {
+         "ORGANIZATION": "Οργανισμός"
+      },
+      "TITLE": {
+         "RANDOM": "Τυχαία δεδομένα",
+         "VIEWS_SUM": "Συνολικός αριθμός προβολών",
+         "VIEWS_AVG": "Μέσος αριθμός προβολών",
+         "PUBLISHEDHOURS": "Published Hours of Video"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "Αυτό εμφανίζει τυχαία δεδομένα ως επίδειξη. Μπορείτε να απενεργοποιήσετε αυτό το γράφημα διαγράφοντας τον ορισμό json του αντίστοιχου παροχέα στατιστικών στοιχείων από τον κατάλογο etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the running total published hours of video"
       }
    }
 }

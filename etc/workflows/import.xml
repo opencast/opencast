@@ -88,7 +88,7 @@
       </configurations>
     </operation>
 
-    <!-- Cleanup the working file repository -->
+    <!-- Clean up the working file repository -->
 
     <operation
       id="cleanup"
@@ -100,5 +100,10 @@
     </operation>
 
   </operations>
+
+  <state-mappings>
+    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.IMPORTING</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.IMPORTING</state-mapping>
+  </state-mappings>
 
 </definition>

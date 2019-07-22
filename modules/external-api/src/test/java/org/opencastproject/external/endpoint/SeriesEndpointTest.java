@@ -102,7 +102,6 @@ public class SeriesEndpointTest {
     assertEquals("opencast", json.get("organization"));
     assertEquals("Gracie Walsh", json.get("creator"));
     assertEquals("2015-04-16T09:12:36Z", json.get("created"));
-    assertEquals(true, json.get("opt_out"));
 
     JSONArray topics = (JSONArray) json.get("subjects");
     assertEquals(1, topics.size());

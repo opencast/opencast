@@ -69,7 +69,7 @@ public class TimelinePreviewsServiceRemote extends RemoteBase implements Timelin
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("track", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("imageCount", Integer.toString(imageCount)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new TimelinePreviewsException(e);
     }

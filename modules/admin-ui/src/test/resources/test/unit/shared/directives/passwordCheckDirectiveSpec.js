@@ -11,6 +11,8 @@ describe('adminNg.directives.adminNgPwCheck', function () {
         var ngModel = _ngModelDirective_[0];
         ngModel.link = function () {};
         ngModel.controller = function () {
+            this.$$initGetterSetters = function() {};
+            this.$$setUpdateOnEvents = function() {};
             this.$setValidity = jasmine.createSpy();
             this.$$setOptions = jasmine.createSpy();
             this.$formatters = [];

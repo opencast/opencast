@@ -29,20 +29,37 @@ import org.opencastproject.assetmanager.impl.RuntimeTypes;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fx;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityTransaction;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.TypedQuery;
 
 @Entity(name = "Property")
 @Table(name = "oc_assets_properties")
-
+@NamedQueries({
+    @NamedQuery(name = "Property.selectByMediaPackageAndNamespace", query = "select p from Property p where "
+            + "p.mediaPackageId = :mediaPackageId and p.namespace = :namespace"),
+    @NamedQuery(name = "Property.delete", query = "delete from Property p where p.mediaPackageId = :mediaPackageId"),
+    @NamedQuery(name = "Property.deleteByNamespace", query = "delete from Property p "
+            + "where p.mediaPackageId = :mediaPackageId and p.namespace = :namespace")})
 public class PropertyDto {
+  private static final Logger logger = LoggerFactory.getLogger(PropertyDto.class);
+
   /** Surrogate key. */
   @Id
   @GeneratedValue
@@ -141,5 +158,35 @@ public class PropertyDto {
                 dto.longValue = RuntimeTypes.convert(a).value();
               }
             }.toFn());
+  }
+
+  public static int delete(EntityManager em, final String mediaPackageId) {
+    return delete(em, mediaPackageId, null);
+  }
+
+  public static int delete(EntityManager em, final String mediaPackageId, final String namespace) {
+    TypedQuery<PropertyDto> query;
+    if (namespace == null) {
+      query = em.createNamedQuery("Property.delete", PropertyDto.class)
+              .setParameter("mediaPackageId", mediaPackageId);
+    } else {
+      query = em.createNamedQuery("Property.deleteByNamespace", PropertyDto.class)
+              .setParameter("mediaPackageId", mediaPackageId)
+              .setParameter("namespace", namespace);
+    }
+    logger.debug("Executing query {}", query);
+    EntityTransaction tx = em.getTransaction();
+    tx.begin();
+    final int num = query.executeUpdate();
+    tx.commit();
+    return num;
+  }
+
+  public static List<Property> select(EntityManager em, final String mediaPackageId, final String namespace) {
+    TypedQuery<PropertyDto> query = em.createNamedQuery("Property.selectByMediaPackageAndNamespace", PropertyDto.class)
+              .setParameter("mediaPackageId", mediaPackageId)
+              .setParameter("namespace", namespace);
+    logger.debug("Executing query {}", query);
+    return query.getResultList().parallelStream().map(PropertyDto::toProperty).collect(Collectors.toList());
   }
 }

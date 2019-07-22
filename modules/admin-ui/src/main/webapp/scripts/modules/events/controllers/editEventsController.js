@@ -58,7 +58,7 @@ angular.module('adminNg.controllers')
         series.forEach(function(element) {
           $scope.seriesResults[element.value] = element.name;
         });
-      });
+      }).catch(angular.noop);
 
       $scope.keyUp = function (event) {
         switch (event.keyCode) {
@@ -94,7 +94,7 @@ angular.module('adminNg.controllers')
       $scope.captureAgents = [];
       CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
         $scope.captureAgents = data.rows;
-      });
+      }).catch(angular.noop);
 
       // Given a capture agent id, get me the whole capture agent from the list
       var getCaById = function(agentId) {

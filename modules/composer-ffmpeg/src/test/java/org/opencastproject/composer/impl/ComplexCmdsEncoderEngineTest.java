@@ -20,6 +20,7 @@
  */
 package org.opencastproject.composer.impl;
 
+import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.capture;
 import static org.junit.Assert.assertTrue;
 
@@ -49,7 +50,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.BasicConfigurator;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
@@ -132,7 +132,6 @@ public class ComplexCmdsEncoderEngineTest {
   public void setUp() throws Exception {
     // Skip tests if FFmpeg is not installed
     Assume.assumeTrue(ffmpegInstalled);
-    BasicConfigurator.configure();
     engine = new EncoderEngine(FFMPEG_BINARY);
 
     File f = getFile("/video.mp4");
@@ -175,6 +174,24 @@ public class ComplexCmdsEncoderEngineTest {
 
     workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
+      @Override
+      public File answer() throws Throwable {
+        URI uri = (URI) EasyMock.getCurrentArguments()[0];
+        String name = uri.getPath();
+        logger.info("workspace Returns " + name);
+        if (name.contains("mux"))
+          return sourceMuxed;
+        else if (name.contains("audiovideo"))
+          return sourceAudioVideo;
+        else if (name.contains("audio"))
+          return sourceAudioOnly;
+        else if (name.contains("video"))
+          return sourceVideoOnly;
+        return sourceAudioVideo; // default
+      }
+    }).anyTimes();
+
+    EasyMock.expect(workspace.get((URI) EasyMock.anyObject(), anyBoolean())).andAnswer(new IAnswer<File>() {
       @Override
       public File answer() throws Throwable {
         URI uri = (URI) EasyMock.getCurrentArguments()[0];

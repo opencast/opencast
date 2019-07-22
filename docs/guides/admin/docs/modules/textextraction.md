@@ -112,14 +112,22 @@ unmodified. There is no additional configuration needed or even possible. Of cou
 
 #### Using a Regular Expression (dictionary-regexp)
 
-Starting with 1.6, this is the default implementation for the DictionaryService. It is quite fast and easy to configure
-but is limited in terms of filtering capabilities as it will not check if a recognized word actually makes sense.
+Starting with 1.6, this is the default implementation for the DictionaryService. It is limited in terms of filtering
+capabilities as it will not check if a recognized word actually makes sense. Here is how this service works: If
+configured with a valid pattern that compiles to a regular expression, then this pattern is used, otherwise a fall-
+back to the default expression `\w+`. The pattern is repeatedly applied to the extracted text, until the end is
+reached. Each match is returned, separated by a space character.
 
 The default expression for this module is `\w+` which will let upper- and lowercase characters as well as digits pass
 through, but will block all other characters. For the German language, for example, this would mean that all special
 characters would be blocked as well. So you want to configure Opencast to let them pass as well.
 
-You can do that by modifying the `pattern` in
+Example:
+    * pattern: `\w+`
+    * text input: "aäa bbb"
+    * text output: "a a bbb"
+
+If this is undesired, modify the `pattern` in
 `etc/org.opencastproject.dictionary.regexp.DictionaryServiceImpl.cfg`:
 
 For German, a suitable pattern could be:
@@ -128,7 +136,7 @@ For German, a suitable pattern could be:
 
 This expression will let all words pass which contain upper- and lowercase [a-z], digits and German special characters
 as well as punctuation at the end of a word. Additionally, it requires that the words are at least two characters long
-which will filter out most of the common noise.
+which will filter out most of the common noise. Note the double-escaping of `\w`.
 
 A similar pattern that could be used for Spanish would be:
 
@@ -141,8 +149,8 @@ Last, the `dictionary-hunspell` will check words based on a spell checker and a 
 the tool `hunspell` is used which is one of the most common spell checkers on Linux and should be available from the
 system repositories for most common operating systems.
 
-For the Hunspell based DictionaryService, there are two configuration options.  One is for the binary and one for the
-arguments to use for filtering.
+For the Hunspell based DictionaryService, there are two configuration options: One specifies the location of the binary
+and one is for the arguments to use for filtering.
 
 By default, Opencast will just call `hunspell` without an absolute path. This will work as long as hunspell is in the
 systems path which should be the case unless you have built and installed it manually. In that case, the binary can be

@@ -38,11 +38,6 @@ public class ADeleteQueryDecorator implements ADeleteQuery {
     return mkDecorator(delegate.name(queryName));
   }
 
-  @Override
-  public ADeleteQuery willRemoveWholeMediaPackage(boolean willRemoveWholeMediaPackage) {
-    return mkDecorator(delegate.willRemoveWholeMediaPackage(willRemoveWholeMediaPackage));
-  }
-
   @Override public long run() {
     return delegate.run();
   }

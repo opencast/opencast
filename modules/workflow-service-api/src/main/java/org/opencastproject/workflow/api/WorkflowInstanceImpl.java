@@ -84,9 +84,15 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   @XmlElement(name = "creator", namespace = "http://org.opencastproject.security")
   private User creator;
 
+  @XmlElement(name = "creator-id", namespace = "http://org.opencastproject.security")
+  private String creatorName;
+
   @XmlJavaTypeAdapter(OrganizationAdapter.class)
   @XmlElement(name = "organization", namespace = "http://org.opencastproject.security")
   private JaxbOrganization organization;
+
+  @XmlElement(name = "organization-id", namespace = "http://org.opencastproject.security")
+  private String organizationId;
 
   @XmlElement(name = "mediapackage", namespace = "http://mediapackage.opencastproject.org")
   private MediaPackage mediaPackage;
@@ -132,9 +138,9 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
     this.template = def.getId();
     this.description = def.getDescription();
     this.parentId = parentWorkflowId;
-    this.creator = creator;
+    this.creatorName = creator != null ? creator.getUsername() : null;
     if (organization != null)
-      this.organization = JaxbOrganization.fromOrganization(organization);
+      this.organizationId = organization.getId();
     this.state = WorkflowState.INSTANTIATED;
     this.mediaPackage = mediaPackage;
     this.operations = new ArrayList<WorkflowOperationInstance>();
@@ -189,42 +195,52 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowInstance#getCreator()
+   * @see org.opencastproject.workflow.api.WorkflowInstance#getCreatorName()
    */
   @Override
-  public User getCreator() {
-    return creator;
+  public String getCreatorName() {
+    if (creatorName != null) {
+      return creatorName;
+    }
+    if (creator != null) {
+      return creator.getUsername();
+    }
+    return null;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowInstance#getOrganization()
+   * @see org.opencastproject.workflow.api.WorkflowInstance#getOrganizationId()
    */
   @Override
-  public Organization getOrganization() {
-    return organization;
+  public String getOrganizationId() {
+    if (organizationId != null) {
+      return organizationId;
+    }
+    // get id from old jobs which stored the whole organization
+    if (organization != null) {
+      return organization.getId();
+    }
+    return null;
   }
 
   /**
-   * @param creator
-   *          the creator to set
+   * @param username
+   *          username of the creator to set
    */
-  public void setCreator(User creator) {
-    this.creator = creator;
+  public void setCreatorName(final String username) {
+    creatorName = username;
   }
 
   /**
    * Sets the workflow's organization.
    *
-   * @param organization
-   *          the organization
+   * @param organizationId
+   *          the organization identifier
    */
-  public void setOrganization(Organization organization) {
-    if (organization == null)
-      this.organization = null;
-    else
-      this.organization = JaxbOrganization.fromOrganization(organization);
+  public void setOrganizationId(final String organizationId) {
+    this.organizationId = organizationId;
   }
 
   /**
@@ -597,8 +613,9 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
    * Allows JAXB handling of {@link Organization} interfaces.
    */
   static class OrganizationAdapter extends XmlAdapter<JaxbOrganization, Organization> {
+
     @Override
-    public JaxbOrganization marshal(Organization org) throws Exception {
+    public JaxbOrganization marshal(Organization org) {
       if (org == null)
         return null;
       if (org instanceof JaxbOrganization)
@@ -607,9 +624,10 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
     }
 
     @Override
-    public Organization unmarshal(JaxbOrganization org) throws Exception {
+    public Organization unmarshal(JaxbOrganization org) {
       return org;
     }
+
   }
 
   /**

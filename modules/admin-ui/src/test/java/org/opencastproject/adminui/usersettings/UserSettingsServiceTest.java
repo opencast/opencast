@@ -25,7 +25,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.adminui.usersettings.persistence.UserSettingDto;
 import org.opencastproject.adminui.usersettings.persistence.UserSettingsServiceException;
-import org.opencastproject.messages.persistence.MessageSignatureDto;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -73,17 +72,6 @@ public class UserSettingsServiceTest {
     EasyMock.replay(userDirectoryService);
   }
 
-  private List<MessageSignatureDto> createSignatureList(int signatureCount) {
-    LinkedList<MessageSignatureDto> signatures = new LinkedList<MessageSignatureDto>();
-    for (int i = 0; i < signatureCount; i++) {
-//      MessageSignatureDto messageSignatureDto = new MessageSignatureDto(NAME_PREFIX + i, ORG, USER_NAME, SENDER_PREFIX
-//              + i, SENDER_NAME_PREFIX + i, REPLY_TO_PREFIX + i, REPLY_TO_PREFIX + 1, SIGNATURE_PREFIX + i,
-//              creationDate, new LinkedList<CommentDto>());
-//      signatures.add(messageSignatureDto);
-    }
-    return signatures;
-  }
-
   private List<UserSettingDto> createUserSettingsList(int settingCount) {
     LinkedList<UserSettingDto> userSettings = new LinkedList<UserSettingDto>();
     for (int i = 0; i < settingCount; i++) {
@@ -103,24 +91,6 @@ public class UserSettingsServiceTest {
 
     EntityManager findSettings = EasyMock.createMock(EntityManager.class);
     EasyMock.expect(findSettings.createNamedQuery("UserSettings.findByUserName")).andReturn(userSettingsQuery);
-    findSettings.close();
-    EasyMock.expectLastCall();
-    EasyMock.replay(findSettings);
-    return findSettings;
-  }
-
-  private EntityManager setupSignatureCountEntityManager(int total, int offset, int limit) {
-    Number totalNumber = EasyMock.createMock(Number.class);
-    EasyMock.expect(totalNumber.intValue()).andReturn(total);
-    EasyMock.replay(totalNumber);
-
-    Query userSettingsQuery = EasyMock.createMock(Query.class);
-    EasyMock.expect(userSettingsQuery.setParameter(EasyMock.anyObject(String.class), EasyMock.anyObject())).andReturn(userSettingsQuery).anyTimes();
-    EasyMock.expect(userSettingsQuery.getSingleResult()).andReturn(totalNumber);
-    EasyMock.replay(userSettingsQuery);
-
-    EntityManager findSettings = EasyMock.createMock(EntityManager.class);
-    EasyMock.expect(findSettings.createNamedQuery("MessageSignature.countByCreator")).andReturn(userSettingsQuery);
     findSettings.close();
     EasyMock.expectLastCall();
     EasyMock.replay(findSettings);

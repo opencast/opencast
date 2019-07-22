@@ -1,0 +1,8 @@
+{
+    "id": "jobId1",
+    "results": [{"error": "failed when posting audio to the STT service"}],
+    "event":"recognitions.completed_with_results",
+    "updated": "2019-02-06T05:04:32.673Z",
+    "user_token": "mpId1",
+    "created": "2019-02-06T05:04:29.283Z"
+}

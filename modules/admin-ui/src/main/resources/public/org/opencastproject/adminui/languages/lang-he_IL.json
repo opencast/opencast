@@ -10,7 +10,8 @@
    "SAVE": "שמור",
    "LOGOUT": "התנתקות",
    "RESET": "איפוס",
-   "SELECT_NO_OPTIONS": "אין אפשרות",
+   "SELECT_NO_OPTION_SELECTED": "לא נבחרה כל אופציה",
+   "SELECT_NO_OPTIONS_AVAILABLE": "אין אפשרויות זמינות",
    "YES": "כן",
    "LANGUAGES": {
       "ARABIC": "ערבית",
@@ -55,11 +56,8 @@
             "ACL": "ה-ACL הבאים יימחקו",
             "GROUP": "הקבוצה הבאה תימחק",
             "USER": "המשתמש הבא יימחקו",
-            "USER_BLACKLIST": "רשימת משתמשים חסומים הבאה תמחק",
             "THEME": "רשימת המשתמשים בחסומים הבאה תמחק",
-            "EMAIL": "רשימת המשתמשים בחסומים הבאה תמחק",
-            "LOCATION": "המיקום הבא יימחק",
-            "LOCATION_BLACKLIST": "רשימת מיקומים חסומים הבאה תמחק"
+            "LOCATION": "המיקום הבא יימחק"
          },
          "NAME": "שם"
       },
@@ -130,30 +128,9 @@
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "האירוע לא ניתן למחיקה, מכיוון שאין לך את ההרשאות לבצע פעולה זו.",
       "SERIES_DELETED": "הסדרה נמחקה",
       "SERIES_NOT_DELETED": "לא ניתן היה למחוק את הסידרה",
-      "USER_BLACKLIST_CREATED": "הרשימה השחורה נוצרה",
-      "USER_BLACKLIST_NOT_CREATED": "הרשימה השחורה לא יכולה להיווצר",
-      "USER_BLACKLIST_SAVED": "הרשימה השחורה נשמרה",
-      "USER_BLACKLIST_NOT_SAVED": "הרשימה השחורה אינה יכולה להשמר",
-      "USER_BLACKLIST_DELETED": "הרשימה השחורה נמחקה",
-      "USER_BLACKLIST_NOT_DELETED": "לא ניתן למחוק את הרשימה השחורה",
       "LOCATION_DELETED": "המיקום נמחק",
       "LOCATION_NOT_DELETED": "לא ניתן למחוק את המיקום",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "המיקום לא ניתן למחיקה, מכיוון שאין לך את ההרשאות לבצע פעולה זו.",
-      "LOCATION_BLACKLIST_CREATED": "הרשימה השחורה נוצרה",
-      "LOCATION_BLACKLIST_NOT_CREATED": "הרשימה השחורה לא יכולה להיווצר",
-      "LOCATION_BLACKLIST_SAVED": "הרשימה השחורה נשמרה",
-      "LOCATION_BLACKLIST_NOT_SAVED": "הרשימה השחורה אינה יכולה להשמר",
-      "LOCATION_BLACKLIST_DELETED": "הרשימה השחורה נמחקה",
-      "LOCATION_BLACKLIST_NOT_DELETED": "לא ניתן למחוק את הרשימה השחורה",
-      "EMAIL_TEMPLATE_CREATED": "התבנית נוצרה",
-      "EMAIL_TEMPLATE_NOT_CREATED": "לא ניתן ליצור את התבנית",
-      "EMAIL_TEMPLATE_SAVED": "התבנית נשמרה",
-      "EMAIL_TEMPLATE_NOT_SAVED": "לא ניתן לשמור את התבנית",
-      "EMAIL_TEMPLATE_DELETED": "התבנית נחקה",
-      "EMAIL_TEMPLATE_NOT_DELETED": "לא ניתן למחוק את התבנית",
-      "EMAIL_TEMPLATE_NAME_TAKEN": "שם זה נמצא כבר בשימוש",
-      "EMAIL_SENT": "ההודעה נשלחה",
-      "EMAIL_NOT_SENT": "לא ניתן היה לשלוח את ההודעה",
       "CONFLICT_DETECTED": "סתירה בתזמון: האירוע החדש מתנגש עם אירוע קיים. בבקשה שנו את המיקום, התאריך או השעה.",
       "CONFLICT_BULK_DETECTED": "התנגשות בתזמון: שינוי האירועים יוצר התנגשויות. אנא שנה את המיקום, תאריכים או שעות.",
       "CONFLICT_ALREADY_ENDED": "שגיאה בתזמון: האירוע כבר נגמר.",
@@ -166,11 +143,6 @@
       "SERIES_ACL_LOCKED": "עריכת מדיניות גישה אסורה בזמן שפעולות רצות באירועים שהם חלק מהסדרה",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "המדיניות גישה דורשת תפקיד אחד לפחות עם הרשאות קריאה וכתיבה.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "המדיניות גישה דורשת תפקיד אחד לפחות עם הרשאות קריאה וכתיבה.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "מצב הצטרפות לאירוע עודכן בהצלחה.",
-      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "שגיאה בעת עדכון מצב הצטרפות לאירוע.",
-      "EVENT_PARTICIPATION_STATUS_READONLY": "לא ניתן לעדכון את מצב ההצטרפות מכיוון שתזמון ההתחלה נמצא בעבר.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "מצב הצטרפות לאירוע עודכן בהצלחה.",
-      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "שגיאה בעת עדכון מצב הצטרפות לאירוע.",
       "THEME_NAME_ALREADY_TAKEN": "שם זה נמצא כבר בשימוש",
       "THEME_NAME_EMPTY": "השם אינו יכול להשאר ריק",
       "BUMPER_UPLOAD_ERROR": "שגיאה בזמן האלעת מדיה",
@@ -187,8 +159,8 @@
       "THEME_NOT_DELETED": "לא ניתן למחוק את ערכת הנושא",
       "TASK_CREATED": "המשימה נוצרה",
       "TASK_NOT_CREATED": "לא היתה אפשרות ליצור את המשימה",
-      "VIDEO_CUT_NOT_SAVED": "לא היתה אפשרות לשמור את המידע העריכה",
-      "VIDEO_CUT_SAVED": "מידע העריכה נשמר",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
       "VIDEO_CUT_PROCESSING": "מעבד את הוידאו…",
       "THUMBNAIL_CHANGE_FAILED": "החלפת תמונה ממוזערת נכשלה.",
       "VIDEO_SOURCE_TRACKS_INVALID": "לא נבחרו רצועות וידאו",
@@ -199,13 +171,7 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "פעולות",
-      "SEND_MESSAGE": "שלח הודעה",
       "WARNING": "אזהרה",
-      "EDIT_STATUS": {
-         "CAPTION": "ערוך מצב",
-         "READY_FOR_RECORDING": "מוכן להקלטה",
-         "OPTED_OUT": "נבחר להוצאה"
-      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "מחק",
@@ -305,6 +271,8 @@
       "BACK": "הקודם",
       "CREATE": "צור",
       "RETRACT": "ביטול",
+      "RETRACT_DELETE": "חזרה/מחיקה",
+      "DELETE": "מחק",
       "UPDATE": "עדכן",
       "DURATION": {
          "HOURS": "שעות",
@@ -339,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "הגדרות"
+      },
+      "STATISTICS": {
+         "TITLE": "סטטיסטיקות"
       }
    },
    "EVENTS": {
@@ -361,28 +332,6 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
-      },
-      "SEND_MESSAGE": {
-         "CAPTION": "שלח הודעה",
-         "TABS": {
-            "RECIPIENTS": "נמענים",
-            "MESSAGE": "הודעה",
-            "SUMMARY": "סיכום"
-         },
-         "RECIPIENTS": {
-            "AUDIT_TRAIL_CAPTION": "הוסף שובל מעקב",
-            "AUDIT_TRAIL_DESCRIPTION": "סמן כדי להוסיף את ההודעה לבדיקה/ביקורת",
-            "AUDIT_TRAIL_LABEL": ""
-         },
-         "MESSAGE": {
-            "EMAIL_TEMPLATE": "בחר תבנית דוא\"ל",
-            "SUBJECT": "נושא",
-            "MESSAGE": "הודעה",
-            "INCLUDE_SIGNATURE": "כולל את החתימה שלי בדוא\"ל"
-         },
-         "SUMMARY": {
-            "MESSAGE_SUMMARY": "סיכום"
-         }
       },
       "EVENTS": {
          "NEW": {
@@ -513,7 +462,6 @@
          "ADD_EVENT": "הוסף ארוע",
          "TABLE": {
             "CAPTION": "אירועים",
-            "CREATORS": "יוצרים",
             "TITLE": "כותרת",
             "PRESENTERS": "מציג(ים)",
             "SERIES": "סדרה",
@@ -528,9 +476,7 @@
             "LAST": "אחרון",
             "NEXT": "הבא",
             "MANAGED_ACL": "מדיניות גישה",
-            "SCHEDULING_STATUS": "מצב",
             "WORKFLOW_STATE": "התקדמות",
-            "REVIEW_STATUS": "מצב הסקירה",
             "PREVIOUS": "הקודם",
             "NOCONTENT": "אין נתונים זמינים",
             "PUBLISHED": "פורסם",
@@ -545,18 +491,12 @@
                "EDITOR": "פתח עורך וידאו",
                "EDITOR_NEEDS_CUTTING": "פתח עורך וידאו (הערה מציינת כי חיתוך הווידאו התבקש)",
                "COMMENTS": "הצגת הערות",
-               "PAUSED_WORKFLOW": "הצגת תהליכי עבודה מושהים"
+               "PAUSED_WORKFLOW": "הצגת תהליכי עבודה מושהים",
+               "PRESENTER": "מסנן עבור מציג זה"
             }
-         },
-         "SCHEDULING_STATUS": {
-            "READY_FOR_RECORDING": "מוכן להקלטה",
-            "BLACKLISTED": "ברשימה השחורה",
-            "OPTED_OUT": "בוטל/ו"
          },
          "STATUS": {
             "SCHEDULED": "מתוזמן",
-            "OPTEDOUT": "בוטל/ו",
-            "BLACKLISTED": "ברשימה השחורה",
             "RECORDING": "מקליט",
             "UPLOADING": "מעלה",
             "INGESTING": "לעבד",
@@ -568,6 +508,14 @@
             "PROCESSING_FAILURE": "עיבוד נכשל",
             "PROCESSING_CANCELED": "עיבוד בוטל"
          },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
+         },
          "DETAILS": {
             "HEADER": "פרטי אירוע - {{resourceId}}",
             "TABS": {
@@ -578,16 +526,14 @@
                "SCHEDULING": "תזמון",
                "WORKFLOWS": "תהליכים",
                "ACCESS": "מדיניות גישה",
-               "COMMENTS": "הערות"
+               "COMMENTS": "הערות",
+               "STATISTICS": "סטטיסטיקות"
             },
             "PUBLICATIONS": {
                "CAPTION": "פרסומים",
                "NO_PUBLICATIONS_AVAILABLE": "לאירוע זה אין פרסומים",
                "PUBLICATION_DESCRIPTION": "האירוע הזה פורסם לערוצים הציבוריים הבאים:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "אירוע זה אינו נמצא כעת בתהליך",
-               "SCHEDULING_STATUS": "מצב",
-               "READY_FOR_RECORDING": "מוכן להקלטה",
-               "OPTED_OUT": "נבחר להוצאה",
                "CUSTOM": "מותאם אישית",
                "ENGAGE": "צפייה",
                "ENGAGE_LIVE": "צפייה חיה",
@@ -823,6 +769,9 @@
                   "PROCESSING_FAILURE": "עיבוד נכשל"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "סטטיסטיקות"
+            },
             "METADATA": {
                "CAPTION": "פרטי אירוע",
                "TITLE": "כותרת",
@@ -854,20 +803,6 @@
             },
             "SCHEDULING": {
                "CAPTION": "תצורת תיזמון",
-               "REVIEW_STATUS": {
-                  "CAPTION": "סקור מצב"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "סטטוס נבחרו להוצאה",
-                  "READY": "מוכן להקלטה",
-                  "OPTEDOUT": "נבחר להוצאה"
-               },
-               "MESSAGES": {
-                  "CAPTION": "הודעות",
-                  "CREATION_DATE": "תאריך יצירה",
-                  "SENDER": "שולח",
-                  "SUBJECT": "נושא"
-               },
                "PLACEHOLDER": {
                   "PRESENTERS": "מציג(ים)"
                }
@@ -875,25 +810,29 @@
             "WORKFLOWS": {
                "ACTIONS": "פעולות",
                "DETAILS": "פרטים",
-               "DESCRIPTION": "",
-               "MORE_INFO": "מידע נוסף ופעולות",
+               "DESCRIPTION": "תאור",
+               "MORE_INFO": "מידע נוסף",
                "ID": "מזהה",
                "TYPE": "סוג",
                "TITLE": "כותרת",
-               "STATE": "מצב",
+               "STATUS": "מצב",
                "STARTED": "החל",
                "SERIES": "סדרות",
                "SUBMITTED": "נשלח",
+               "SUBMITTER": "מגיש",
+               "EXECUTION_TIME": "זמן ביצוע",
+               "WDID": "הגדרה של תהליך עבודה",
                "MIMETYPE": "Mimetype",
                "URL": "כתובת אינטרנט",
                "CONFIGURATION": "הגדרות",
                "NO_CONFIGURATION": "אין הגדרת פרמטרים למהלך העבודה שנבחר.",
                "WORKFLOW": "מהלך עבודה",
                "TOOLTIP": {
-                  "STOP": "הפסקת ביצוע מופע של תהליך עבודה",
-                  "ABORT": "ביטול ביצוע של מופע תהליך עבודה (אל תנסה לבצע שוב פעולות שנכשלו)",
-                  "RETRY": "נסה שנית לבצע מופע של תהליך עבודה",
-                  "DELETE": "מחק מופע של תהליך עבודה"
+                  "STOP": "עצירת התהליך",
+                  "ABORT": "ביטול ביצוע של תהליך עבודה (אל תנסה לבצע שוב פעולות שנכשלו)",
+                  "RETRY": "נסה שנית לבצע מופע תהליך עבודה",
+                  "DELETE": "מחיקת תהליך עבודה",
+                  "DETAILS": "פתח פרטי תהליך העבודה"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "מופעל",
@@ -901,12 +840,14 @@
                   "PAUSED": "מושהה",
                   "SUCCEEDED": "הצליח",
                   "FAILED": "נכשל",
+                  "FAILING": "נכשל",
                   "SKIPPED": "דולג",
+                  "STOPPED": "נעצר",
                   "RETRY": "ניסיון נוסף"
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "מופע תהליך עבודה"
+               "TITLE": "תהליכים"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "פרטי מהלך-עבודה",
@@ -1035,7 +976,7 @@
             "CAPTION": "סדרות",
             "TITLE": "סדרות",
             "HAS_EVENTS": "מכיל אירועים",
-            "CREATORS": "אירגונ(ים)",
+            "ORGANIZERS": "אירגונ(ים)",
             "CONTRIBUTORS": "תורמ(ים)",
             "CREATED": "נוצר",
             "MANAGED_ACL": "מדיניות גישה",
@@ -1052,10 +993,10 @@
             "TABS": {
                "METADATA": "מטא-נתונים",
                "EXTENDED_METADATA": "מטא-נתונים II",
-               "PARTICIPATION": "השתתפות",
                "EVENTS": "אירועים",
                "PERMISSIONS": "מדיניות גישה",
-               "THEME": "ערכת נושא"
+               "THEME": "ערכת נושא",
+               "STATISTICS": "סטטיסטיקות"
             },
             "ACCESS": {
                "CAPTION": "מדיניות גישה",
@@ -1098,24 +1039,6 @@
                "LICENSE": "רישיון",
                "DESCRIPTION": "תאור"
             },
-            "PARTICIPATION": {
-               "CAPTION": "תבנית מצב השתתפות",
-               "WARNING_TEMPLATE": "מצב השתתפות בסידרה ישמש בתור ערך ברירת המחדל עבור אירועים חדשים בסדרה.",
-               "REVIEW_STATUS": {
-                  "CAPTION": "מצב הסקירה"
-               },
-               "OPTEDOUT": {
-                  "CAPTION": "סטטוס נבחרו להוצאה",
-                  "READY": "מוכן להקלטה",
-                  "OPTEDOUT": "בוטל/ו"
-               },
-               "MESSAGES": {
-                  "CAPTION": "הודעות",
-                  "CREATION_DATE": "תאריך יצירה",
-                  "SENDER": "שולח",
-                  "SUBJECT": "נושא"
-               }
-            },
             "EVENTS": {
                "TITLE": "כותרת",
                "PRESENTER": "מציג(ים)",
@@ -1130,12 +1053,10 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "מיקומים",
-         "BLACKLISTS": "רשימה שחורה"
+         "LOCATIONS": "מיקומים"
       },
       "ACTIONS": {
          "EXPORT": "יצא",
-         "ADD_BLACKLIST": "הוסף לרשימה שחורה",
          "REMOVE": "הסר"
       },
       "RECORDINGS": {
@@ -1149,8 +1070,6 @@
             "NEXT_NAME": "כותרת האירוע הבא",
             "STATUS": "מצב",
             "VERSION": "גירסה",
-            "BLACKLIST_FROM": "ברשימה השחורה מ",
-            "BLACKLIST_TO": "ברשימה השחורה עד",
             "ACTION": "פעולות",
             "TOOLTIP": {
                "NAME": "סנן אירועים עבור מיקום זה",
@@ -1181,60 +1100,18 @@
                "NO_CAPABILITIES": "לא סופקו יכולות"
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "רשימה שחורה של מיקום",
-            "NAME": "שם",
-            "ACTIONS": "פעולות"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "צור רשימה שחורה",
-            "EDITCAPTION": "עריכת רשימה שחורה",
-            "TABS": {
-               "LOCATIONS": "מיקומים",
-               "DATES": "תאריכים",
-               "REASON": "סיבה",
-               "SUMMARY": "סיכום"
-            },
-            "LOCATIONS": {
-               "REMOVE": "הסר",
-               "ADD_LOCATION": "בחר מיקום",
-               "ALL_LOCATIONS": "כל המיקומים",
-               "SELECT_LOCATION": "בחר"
-            },
-            "DATES": {
-               "START_DATE": "תאריך התחלה",
-               "END_DATE": "תאריך סיום"
-            },
-            "REASON": {
-               "SELECT_REASON": "בחר",
-               "REASON": "סיבה",
-               "COMMENTS": "הערות"
-            },
-            "SUMMARY": {
-               "SUMMARY": "סיכום",
-               "LOCATION": "מיקום",
-               "DATE_FROM": "מאת",
-               "DATE_TO": "עד",
-               "REASON": "סיבה",
-               "COMMENTS": "הערות"
-            }
-         }
       }
    },
    "USERS": {
       "ACTIONS": {
          "ADD_USER": "הוסף משתמש",
          "ADD_GROUP": "הוסף קבוצה",
-         "ADD_ACL": "הוסף מדיניות גישה",
-         "ADD_BLACKLIST": "הוסף רשימה שחורה"
+         "ADD_ACL": "הוסף מדיניות גישה"
       },
       "NAVIGATION": {
          "USERS": "משתמשים",
          "GROUPS": "קבוצות",
-         "PERMISSIONS": "מדיניות גישה",
-         "BLACKLISTS": "רשימה שחורה"
+         "PERMISSIONS": "מדיניות גישה"
       },
       "USERS": {
          "TABLE": {
@@ -1245,8 +1122,6 @@
             "ROLES": "תפקידים",
             "TYPE": "סוג",
             "PROVIDER": "ספק",
-            "BLACKLIST_FROM": "ברשימה השחורה מ",
-            "BLACKLIST_TO": "ברשימה השחורה עד",
             "ACTION": "פעולות",
             "TOOLTIP": {
                "DELETE": "מחק משתמש",
@@ -1417,49 +1292,6 @@
                }
             }
          }
-      },
-      "BLACKLISTS": {
-         "TABLE": {
-            "CAPTION": "משתמשים חסומים",
-            "NAME": "שם",
-            "DATE_FROM": "מאת",
-            "DATE_TO": "עד",
-            "REASON": "סיבה",
-            "ACTION": "פעולות"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "צור רשימה שחורה",
-            "EDITCAPTION": "עריכת רשימה שחורה",
-            "TABS": {
-               "USERS": "משתמשים",
-               "DATES": "תאריכים",
-               "REASON": "סיבה",
-               "SUMMARY": "סיכום"
-            },
-            "USERS": {
-               "REMOVE": "הסר",
-               "ADD_USER": "בחר משתמש",
-               "ALL_USERS": "כל המשתמשים",
-               "SELECT_USER": "בחר"
-            },
-            "DATES": {
-               "START_DATE": "תאריך התחלה",
-               "END_DATE": "תאריך סיום"
-            },
-            "REASON": {
-               "SELECT_REASON": "בחר",
-               "REASON": "סיבה",
-               "COMMENTS": "הערות"
-            },
-            "SUMMARY": {
-               "SUMMARY": "סיכום",
-               "USER": "משתמש",
-               "DATE_FROM": "מאת",
-               "DATE_TO": "עד",
-               "REASON": "סיבה",
-               "COMMENTS": "הערות"
-            }
-         }
       }
    },
    "THEMES": {
@@ -1517,34 +1349,7 @@
          "ADD_THEME": "הוסף ערכת נושא"
       },
       "NAVIGATION": {
-         "MAIL_TEMPLATES": "תבנית דוא\"ל",
-         "MAIL_SERVERS": "הגדרות דוא\"ל",
          "THEMES": "ערכות נושא"
-      },
-      "EMAIL_TEMPLATES": {
-         "TABLE": {
-            "CAPTION": "תבנית דוא\"ל",
-            "NAME": "שם",
-            "CREATOR": "יוצר",
-            "CREATED": "נוצר",
-            "ACTION": "פעולות"
-         },
-         "DETAILS": {
-            "NEWCAPTION": "צור תבנית חדשה",
-            "EDITCAPTION": "ערוך תבנית",
-            "TABS": {
-               "MESSAGE": "הודעה",
-               "SUMMARY": "סיכום"
-            },
-            "MESSAGE": {
-               "NAME": "שם",
-               "SUBJECT": "נושא",
-               "MESSAGE": "הודעה"
-            },
-            "SUMMARY": {
-               "MESSAGE_SUMMARY": "סיכום הודעה"
-            }
-         }
       },
       "THEMES": {
          "TABLE": {
@@ -1640,24 +1445,16 @@
       "JOBS": {
          "TABLE": {
             "ID": "מזהה עבודה",
-            "ACTION": "פעולות",
             "CAPTION": "עבודות",
             "CREATED": "נוצר",
             "CREATOR": "יוצר",
             "HOST_NAME": "שם מחשב מארח",
+            "NODE_NAME": "שם שרת",
             "OPERATION": "פעולה",
             "STARTED": "התחילה",
             "STATUS": "מצב",
             "SUBMITTED": "נשלח",
             "TYPE": "סוג"
-         },
-         "DETAILS": {
-            "HEADER": "פרטי עבודה - {{resourceId}}",
-            "TABS": {
-               "GENERAL": "כללי",
-               "OPERATIONS": "תהליכים",
-               "INCIDENTS": "תקריות"
-            }
          },
          "STATUS": {
             "QUEUED": "בהמתנה",
@@ -1678,6 +1475,7 @@
             "CAPTION": "שרתים",
             "STATUS": "מצב",
             "HOST_NAME": "שם מחשב מארח",
+            "NODE_NAME": "שם שרת",
             "CORES": "ליבות",
             "COMPLETED": "משימות שהושלמו",
             "RUNNING": "משימות רצות",
@@ -1685,7 +1483,6 @@
             "MEAN_RUN_TIME": "זמן ריצה ממוצע",
             "MEAN_QUEUE_TIME": "זמן ממוצע בתור",
             "MAINTENANCE": "תחזוקה",
-            "ACTION": "פעולות",
             "MAINTENANCE_OFF": "הפעל מצב תחזוקה",
             "MAINTENANCE_ON": "צא ממצב תחזוקה"
          }
@@ -1696,6 +1493,7 @@
             "STATUS": "מצב",
             "NAME": "שם שירות",
             "HOST_NAME": "שם מחשב מארח",
+            "NODE_NAME": "שם שרת",
             "COMPLETED": "משימות שהושלמו",
             "RUNNING": "משימות רצות",
             "QUEUED": "משימות בתור",
@@ -1741,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "פצל",
-         "CUT": "גזור",
-         "REPLAY_SEGMENT": "הפעל מחדש מקטע",
-         "REPLAY_END_OF_SEGMENT": "סוף קטע",
-         "REPLAY_SEGMENT_WITH_PREROLL": "בדוק את המעבר",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "בטל",
          "REDO": "בצע שוב",
-         "CLEAR_SEGMENTS": "נקה מקטעים",
-         "CLEAR_SELECTED_SEGMENT": "נקטע מקטעים שנבחרו"
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "הסר מקטע",
-         "USE_SEGMENT": "השתמש במקטע זה",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
          "START": "התחל",
          "END": "סוף"
       },
@@ -1915,9 +1719,6 @@
          "LOCATION": {
             "LABEL": "מיקום"
          },
-         "OPTEDOUT": {
-            "LABEL": "בוטל/ו"
-         },
          "PERIOD": {
             "LABEL": "תקופה"
          },
@@ -1929,12 +1730,6 @@
          },
          "PROGRESS": {
             "LABEL": "התקדמות"
-         },
-         "REVIEW_STATUS": {
-            "LABEL": "מצב סקירה",
-            "CONFIRMED": "מאושר",
-            "UNCONFIRMED": "לא מאושר",
-            "UNSENT": "לא נשלח"
          },
          "SERIES": {
             "LABEL": "סדרה"
@@ -1979,6 +1774,9 @@
          "HOSTNAME": {
             "LABEL": "שם מחשב מארח"
          },
+         "NODE_NAME": {
+            "LABEL": "שם שרת"
+         },
          "STATUS": {
             "LABEL": "מצב",
             "PAUSED": "מושהה",
@@ -2020,6 +1818,9 @@
          "HOSTNAME": {
             "LABEL": "שם מחשב מארח"
          },
+         "NODE_NAME": {
+            "LABEL": "שם שרת"
+         },
          "STATUS": {
             "LABEL": "מצב",
             "MAINTENANCE": "תחזוקה",
@@ -2033,6 +1834,9 @@
          },
          "HOSTNAME": {
             "LABEL": "שם מחשב מארח"
+         },
+         "NODE_NAME": {
+            "LABEL": "שם שרת"
          },
          "NAME": {
             "LABEL": "שם"
@@ -2085,16 +1889,6 @@
    "TABLE_NO_RESULT": "לא נמצאו תוצאות",
    "TABLE_LOADING": "טוען…",
    "TABLE_EDIT": "ערוך",
-   "PM": {
-      "BLACKLIST": {
-         "REASONS": {
-            "SICK_LEAVE": "מחלה",
-            "LEAVE": "עזוב",
-            "FAMILY_EMERGENCY": "מצב חירום משפחתי",
-            "CONSTRUCTION": "בנייה"
-         }
-      }
-   },
    "DASHBOARD": {
       "RUNNING": "רץ",
       "FINISHED": "הסתיים",
@@ -2183,6 +1977,34 @@
          "SHUTTING_DOWN": "כיבוי",
          "UNKNOWN": "לא ידוע",
          "UPLOADING": "מעלה"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "על מנת להזין מספר ערכים יש ללחוץ על מקש Enter בין כל ערך"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "סטטיסטיקטות לא ניתנות להצגה ברגע זה. יש לנסות בשלב מאוחר יותר.",
+      "UNSUPPORTED_TYPE": "מצטערים, Opencast לא יכולה לחשב את הנתון הסטטיסטי הזה.",
+      "FROM": "מאת",
+      "TO": "עבור",
+      "TOTAL": "סה\"כ",
+      "GRANULARITY": "גרנולריות",
+      "NAVIGATION": {
+         "ORGANIZATION": "ארגון"
+      },
+      "TITLE": {
+         "RANDOM": "מידע אקראי",
+         "VIEWS_SUM": "מספר צפיות כללי",
+         "VIEWS_AVG": "מספר צפיות ממוצע",
+         "PUBLISHEDHOURS": "Published Hours of Video"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "מוצג מידע אקראי לצורך הצגת יכולות. ניתן לבטל תצוגת תרשים זה על ידי מחיקת קובץ json המכיל המספק מידע סטטיסטי מתקיית etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the running total published hours of video"
       }
    }
 }

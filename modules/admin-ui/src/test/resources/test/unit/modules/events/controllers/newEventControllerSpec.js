@@ -26,6 +26,7 @@ describe('New Event Controller', function () {
 
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
     });
 
     it('sports a submit function', function () {
@@ -34,6 +35,7 @@ describe('New Event Controller', function () {
 
     describe('#submit', function () {
         beforeEach(function () {
+            jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
             $httpBackend.whenGET('/admin-ng/event/new/metadata').respond('{}');
             $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true')
                 .respond(JSON.stringify(getJSONFixture('admin-ng/capture-agents/agents.json')));

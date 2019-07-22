@@ -1,7 +1,6 @@
 <definition xmlns="http://workflow.opencastproject.org">
   <id>definition-skip</id>
   <title>Workflow Definition with skipping</title>
-  <published>true</published>
   <description>Unit testing workflow</description>
   <operations>
     <operation

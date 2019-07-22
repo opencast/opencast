@@ -55,6 +55,7 @@ import org.opencastproject.transcription.ibmwatson.persistence.TranscriptionJobC
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
+import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -103,13 +104,17 @@ public class IBMWatsonTranscriptionServiceTest {
   private static final String JOB_ID = "jobId1";
   private static final long TRACK_DURATION = 60000;
   private static final String PULLED_TRANSCRIPTION_FILE = "pulled_transcription.json";
+  private static final String PULLED_TRANSCRIPTION_ERROR_FILE = "pulled_transcription_error.json";
   private static final String PUSHED_TRANSCRIPTION_FILE = "pushed_transcription.json";
+  private static final String COMPLETE_WITH_ERROR_FILE = "complete_with_error.json";
   private static final String IN_PROGRESS_JOB = "in_progress_job.json";
+  private static final String WATSON_URL = "https://test.stream.watsonplatform.net/speech-to-text/api";
+  private static final String API_KEY = "test-api-key";
+  private static final String RETRY_WORKFLOW = "retry-workflow";
 
   private CloseableHttpClient httpClient;
   private MediaPackage mediaPackage;
   private JSONParser jsonParser = new JSONParser();
-  // private InputStream resultsStream;
   private File audioFile;
 
   private IBMWatsonTranscriptionService service;
@@ -119,6 +124,8 @@ public class IBMWatsonTranscriptionServiceTest {
   private WorkflowService wfService;
   private JaxbOrganization org;
   private SmtpService smtpService;
+  private Dictionary<String, Object> props = new Hashtable<String, Object>();
+  private ComponentContext cc;
 
   @Before
   public void setUp() throws Exception {
@@ -130,15 +137,14 @@ public class IBMWatsonTranscriptionServiceTest {
     URI audioUrl = IBMWatsonTranscriptionServiceTest.class.getResource("/audio.ogg").toURI();
     audioFile = new File(audioUrl);
 
-    Dictionary<String, Object> props = new Hashtable<String, Object>();
     props.put(IBMWatsonTranscriptionService.ENABLED_CONFIG, "true");
-    props.put(IBMWatsonTranscriptionService.IBM_WATSON_USER_CONFIG, "user");
-    props.put(IBMWatsonTranscriptionService.IBM_WATSON_PSW_CONFIG, "psw");
+    props.put(IBMWatsonTranscriptionService.IBM_WATSON_API_KEY_CONFIG, API_KEY);
+    props.put(IBMWatsonTranscriptionService.IBM_WATSON_SERVICE_URL_CONFIG, WATSON_URL);
     props.put(IBMWatsonTranscriptionService.COMPLETION_CHECK_BUFFER_CONFIG, 0);
     props.put(IBMWatsonTranscriptionService.MAX_PROCESSING_TIME_CONFIG, 0);
     props.put(IBMWatsonTranscriptionService.NOTIFICATION_EMAIL_CONFIG, "anyone@opencast.org");
 
-    ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
+    cc = EasyMock.createNiceMock(ComponentContext.class);
     EasyMock.expect(cc.getProperties()).andReturn(props).anyTimes();
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bc.getProperty(OpencastConstants.SERVER_URL_PROPERTY)).andReturn("http://THIS_SERVER");
@@ -198,7 +204,6 @@ public class IBMWatsonTranscriptionServiceTest {
     service.setAssetManager(assetManager);
     service.setWorkflowService(wfService);
     service.setSmtpService(smtpService);
-    service.activate(cc);
   }
 
   @After
@@ -207,6 +212,8 @@ public class IBMWatsonTranscriptionServiceTest {
 
   @Test
   public void testRegisterCallback200() throws Exception {
+    service.activate(cc);
+
     CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
     StatusLine status = EasyMock.createNiceMock(StatusLine.class);
     EasyMock.expect(response.getStatusLine()).andReturn(status);
@@ -220,12 +227,14 @@ public class IBMWatsonTranscriptionServiceTest {
     service.registerCallback();
     Assert.assertTrue(service.isCallbackAlreadyRegistered());
     Assert.assertEquals(
-            "https://stream.watsonplatform.net/speech-to-text/api/v1/register_callback?callback_url=http://ADMIN_SERVER/transcripts/watson/results",
+            WATSON_URL + "/v1/register_callback?callback_url=http://ADMIN_SERVER/transcripts/watson/results",
             capturedPost.getValue().getURI().toString());
   }
 
   @Test
   public void testRegisterCallback201() throws Exception {
+    service.activate(cc);
+
     CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
     StatusLine status = EasyMock.createNiceMock(StatusLine.class);
     EasyMock.expect(response.getStatusLine()).andReturn(status);
@@ -239,12 +248,14 @@ public class IBMWatsonTranscriptionServiceTest {
     service.registerCallback();
     Assert.assertTrue(service.isCallbackAlreadyRegistered());
     Assert.assertEquals(
-            "https://stream.watsonplatform.net/speech-to-text/api/v1/register_callback?callback_url=http://ADMIN_SERVER/transcripts/watson/results",
+            WATSON_URL + "/v1/register_callback?callback_url=http://ADMIN_SERVER/transcripts/watson/results",
             capturedPost.getValue().getURI().toString());
   }
 
   @Test
   public void testRegisterCallbackErrors() throws Exception {
+    service.activate(cc);
+
     CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
     StatusLine status = EasyMock.createNiceMock(StatusLine.class);
     EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
@@ -260,12 +271,14 @@ public class IBMWatsonTranscriptionServiceTest {
 
   @Test
   public void testCreateRecognitionsJob() throws Exception {
+    service.activate(cc);
+
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class))).andReturn(audioFile);
     EasyMock.replay(workspace);
 
     HttpEntity httpEntity = EasyMock.createNiceMock(HttpEntity.class);
     EasyMock.expect(httpEntity.getContent()).andReturn(new ByteArrayInputStream(new String("{\"id\": \"" + JOB_ID
-            + "\", \"status\": \"waiting\", \"url\": \"http://stream.watsonplatform.net/speech-to-text/api/v1/recognitions/"
+            + "\", \"status\": \"waiting\", \"url\": \"" + WATSON_URL + "/v1/recognitions/"
             + JOB_ID + "\"}").getBytes(StandardCharsets.UTF_8)));
 
     CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
@@ -280,7 +293,7 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.replay(httpClient);
 
     service.createRecognitionsJob(MP_ID, mediaPackage.getTrack("audioTrack1"));
-    Assert.assertEquals("https://stream.watsonplatform.net/speech-to-text/api/v1/recognitions?user_token=" + MP_ID
+    Assert.assertEquals(WATSON_URL + "/v1/recognitions?user_token=" + MP_ID
             + "&inactivity_timeout=-1&timestamps=true&smart_formatting=true"
             + "&callback_url=http://ADMIN_SERVER/transcripts/watson/results&events=recognitions.completed_with_results,recognitions.failed",
             capturedPost.getValue().getURI().toString());
@@ -292,6 +305,8 @@ public class IBMWatsonTranscriptionServiceTest {
 
   @Test(expected = TranscriptionServiceException.class)
   public void testCreateRecognitionsJobErrors() throws Exception {
+    service.activate(cc);
+
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class))).andReturn(audioFile);
     EasyMock.replay(workspace);
 
@@ -311,6 +326,8 @@ public class IBMWatsonTranscriptionServiceTest {
 
   @Test
   public void testTranscriptionDone() throws Exception {
+    service.activate(cc);
+
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PUSHED_TRANSCRIPTION_FILE);
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Progress.name(), TRACK_DURATION);
@@ -338,6 +355,8 @@ public class IBMWatsonTranscriptionServiceTest {
 
   @Test
   public void testTranscriptionError() throws Exception {
+    service.activate(cc);
+
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PUSHED_TRANSCRIPTION_FILE);
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Progress.name(), TRACK_DURATION);
@@ -354,7 +373,70 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
+  public void testTranscriptionErrorWithMaxAttempts() throws Exception {
+    props.put(IBMWatsonTranscriptionService.MAX_ATTEMPTS_CONFIG, 2);
+    props.put(IBMWatsonTranscriptionService.RETRY_WORKLFOW_CONFIG, RETRY_WORKFLOW);
+    service.activate(cc);
+
+    InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PUSHED_TRANSCRIPTION_FILE);
+
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Progress.name(), TRACK_DURATION);
+    JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
+
+    service.transcriptionError(MP_ID, obj);
+    // Check if status and date in db was updated
+    TranscriptionJobControl job = database.findByJob(JOB_ID);
+    Assert.assertNotNull(job);
+    Assert.assertEquals(TranscriptionJobControl.Status.Retry.name(), job.getStatus());
+    Assert.assertNull(job.getDateCompleted());
+  }
+
+  @Test
+  public void testTranscriptionErrorMaxAttemptsExceeded() throws Exception {
+    props.put(IBMWatsonTranscriptionService.MAX_ATTEMPTS_CONFIG, 2);
+    props.put(IBMWatsonTranscriptionService.RETRY_WORKLFOW_CONFIG, RETRY_WORKFLOW);
+    service.activate(cc);
+
+    InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PUSHED_TRANSCRIPTION_FILE);
+
+    database.storeJobControl(MP_ID, TRACK_ID, "another_job", TranscriptionJobControl.Status.Error.name(),
+            TRACK_DURATION);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Progress.name(), TRACK_DURATION);
+    JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
+
+    service.transcriptionError(MP_ID, obj);
+    // Check if status and date in db was updated
+    TranscriptionJobControl job = database.findByJob(JOB_ID);
+    Assert.assertNotNull(job);
+    Assert.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
+    Assert.assertNull(job.getDateCompleted());
+
+    EasyMock.verify(smtpService);
+  }
+
+  @Test
+  public void testTranscriptionCompleteWithError() throws Exception {
+    service.activate(cc);
+
+    InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + COMPLETE_WITH_ERROR_FILE);
+
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Progress.name(), TRACK_DURATION);
+    JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
+
+    service.transcriptionDone(MP_ID, obj);
+    // Check if status and date in db was updated
+    TranscriptionJobControl job = database.findByJob(JOB_ID);
+    Assert.assertNotNull(job);
+    Assert.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
+    Assert.assertNull(job.getDateCompleted());
+
+    EasyMock.verify(smtpService);
+  }
+
+  @Test
   public void testGetAndSaveJobResults() throws Exception {
+    service.activate(cc);
+
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Progress.name(), TRACK_DURATION);
@@ -383,7 +465,7 @@ public class IBMWatsonTranscriptionServiceTest {
     service.getAndSaveJobResults(JOB_ID);
     long after = System.currentTimeMillis();
     // Check if correct url was invoked
-    Assert.assertEquals("https://stream.watsonplatform.net/speech-to-text/api/v1/recognitions/" + JOB_ID,
+    Assert.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID,
             capturedGet.getValue().getURI().toString());
     // Check if status and date in db was updated
     TranscriptionJobControl job = database.findByJob(JOB_ID);
@@ -398,6 +480,8 @@ public class IBMWatsonTranscriptionServiceTest {
 
   @Test
   public void testGetAndSaveJobResultsError404() throws Exception {
+    service.activate(cc);
+
     CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
     StatusLine status = EasyMock.createNiceMock(StatusLine.class);
     EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
@@ -419,6 +503,8 @@ public class IBMWatsonTranscriptionServiceTest {
 
   @Test(expected = TranscriptionServiceException.class)
   public void testGetAndSaveJobResultsError503() throws Exception {
+    service.activate(cc);
+
     CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
     StatusLine status = EasyMock.createNiceMock(StatusLine.class);
     EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
@@ -434,6 +520,8 @@ public class IBMWatsonTranscriptionServiceTest {
 
   @Test
   public void testGetGeneratedTranscriptionNoJobId() throws Exception {
+    service.activate(cc);
+
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Progress.name(), TRACK_DURATION);
     database.storeJobControl(MP_ID, "audioTrack2", "jobId2", TranscriptionJobControl.Status.Progress.name(),
             TRACK_DURATION);
@@ -454,6 +542,8 @@ public class IBMWatsonTranscriptionServiceTest {
 
   @Test
   public void testGetGeneratedTranscriptionNotInWorkspace() throws Exception {
+    service.activate(cc);
+
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Progress.name(), TRACK_DURATION);
@@ -486,14 +576,8 @@ public class IBMWatsonTranscriptionServiceTest {
     Assert.assertEquals(uri.toString(), mpe.getURI().toString());
   }
 
-  @Test
-  public void testWorkflowDispatcherRunTranscriptionCompletedState() throws Exception {
-
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Progress.name(), TRACK_DURATION);
-    database.storeJobControl("mpId2", "audioTrack2", "jobId2", TranscriptionJobControl.Status.Progress.name(),
-            TRACK_DURATION);
-    database.updateJobControl(JOB_ID, TranscriptionJobControl.Status.TranscriptionComplete.name());
-
+  private Capture<Set<String>> mockAssetManagerAndWorkflow(String wfDefId, boolean wfStarted)
+          throws NotFoundException, WorkflowDatabaseException {
     // Mocks for query, result, etc
     Snapshot snapshot = EasyMock.createNiceMock(Snapshot.class);
     EasyMock.expect(snapshot.getOrganizationId()).andReturn(org.getId());
@@ -522,9 +606,11 @@ public class IBMWatsonTranscriptionServiceTest {
 
     Capture<Set<String>> capturedMpIds = Capture.newInstance();
     WorkflowDefinition wfDef = new WorkflowDefinitionImpl();
-    EasyMock.expect(wfService.getWorkflowDefinitionById(IBMWatsonTranscriptionService.DEFAULT_WF_DEF)).andReturn(wfDef);
+    EasyMock.expect(wfService.getWorkflowDefinitionById(wfDefId)).andReturn(wfDef);
     List<WorkflowInstance> wfList = new ArrayList<WorkflowInstance>();
-    wfList.add(new WorkflowInstanceImpl());
+    if (wfStarted) {
+      wfList.add(new WorkflowInstanceImpl());
+    }
     Stream<WorkflowInstance> wfListStream = Stream.mk(wfList);
     Workflows wfs = EasyMock.createNiceMock(Workflows.class);
     EasyMock.expect(wfs.applyWorkflowToLatestVersion(EasyMock.capture(capturedMpIds),
@@ -532,6 +618,21 @@ public class IBMWatsonTranscriptionServiceTest {
     service.setWfUtil(wfs);
 
     EasyMock.replay(wfService, wfs);
+
+    return capturedMpIds;
+  }
+
+  @Test
+  public void testWorkflowDispatcherRunTranscriptionCompletedState() throws Exception {
+    service.activate(cc);
+
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Progress.name(), TRACK_DURATION);
+    database.storeJobControl("mpId2", "audioTrack2", "jobId2", TranscriptionJobControl.Status.Progress.name(),
+            TRACK_DURATION);
+    database.updateJobControl(JOB_ID, TranscriptionJobControl.Status.TranscriptionComplete.name());
+
+    Capture<Set<String>> capturedMpIds = mockAssetManagerAndWorkflow(IBMWatsonTranscriptionService.DEFAULT_WF_DEF,
+            true);
 
     WorkflowDispatcher dispatcher = service.new WorkflowDispatcher();
     dispatcher.run();
@@ -548,6 +649,8 @@ public class IBMWatsonTranscriptionServiceTest {
 
   @Test
   public void testWorkflowDispatcherRunProgressState() throws Exception {
+    service.activate(cc);
+
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Progress.name(), 0);
@@ -571,51 +674,15 @@ public class IBMWatsonTranscriptionServiceTest {
     Capture<HttpGet> capturedGet = Capture.newInstance();
     EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet))).andReturn(response);
     EasyMock.replay(httpClient);
-    // enrich(q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run()).getSnapshots();
-    // Mocks for query, result, etc
-    Snapshot snapshot = EasyMock.createNiceMock(Snapshot.class);
-    EasyMock.expect(snapshot.getOrganizationId()).andReturn(org.getId());
-    ARecord aRec = EasyMock.createNiceMock(ARecord.class);
-    EasyMock.expect(aRec.getSnapshot()).andReturn(Opt.some(snapshot));
-    Stream<ARecord> recStream = Stream.mk(aRec);
-    Predicate p = EasyMock.createNiceMock(Predicate.class);
-    EasyMock.expect(p.and(p)).andReturn(p);
-    AResult r = EasyMock.createNiceMock(AResult.class);
-    EasyMock.expect(r.getSize()).andReturn(1L);
-    EasyMock.expect(r.getRecords()).andReturn(recStream);
-    Target t = EasyMock.createNiceMock(Target.class);
-    ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
-    EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery);
-    EasyMock.expect(selectQuery.run()).andReturn(r);
-    AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
-    EasyMock.expect(query.snapshot()).andReturn(t);
-    EasyMock.expect(query.mediaPackageId(EasyMock.anyObject(String.class))).andReturn(p);
-    EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(selectQuery);
-    VersionField v = EasyMock.createNiceMock(VersionField.class);
-    EasyMock.expect(v.isLatest()).andReturn(p);
-    EasyMock.expect(query.version()).andReturn(v);
-    EasyMock.expect(assetManager.createQuery()).andReturn(query);
 
-    EasyMock.replay(snapshot, aRec, p, r, t, selectQuery, query, v, assetManager);
-
-    Capture<Set<String>> capturedMpIds = Capture.newInstance();
-    WorkflowDefinition wfDef = new WorkflowDefinitionImpl();
-    EasyMock.expect(wfService.getWorkflowDefinitionById(IBMWatsonTranscriptionService.DEFAULT_WF_DEF)).andReturn(wfDef);
-    List<WorkflowInstance> wfList = new ArrayList<WorkflowInstance>();
-    wfList.add(new WorkflowInstanceImpl());
-    Stream<WorkflowInstance> wfListStream = Stream.mk(wfList);
-    Workflows wfs = EasyMock.createNiceMock(Workflows.class);
-    EasyMock.expect(wfs.applyWorkflowToLatestVersion(EasyMock.capture(capturedMpIds),
-            EasyMock.anyObject(ConfiguredWorkflow.class))).andReturn(wfListStream);
-    service.setWfUtil(wfs);
-
-    EasyMock.replay(wfService, wfs);
+    Capture<Set<String>> capturedMpIds = mockAssetManagerAndWorkflow(IBMWatsonTranscriptionService.DEFAULT_WF_DEF,
+            true);
 
     WorkflowDispatcher dispatcher = service.new WorkflowDispatcher();
     dispatcher.run();
 
     // Check if it called the external service to get the results
-    Assert.assertEquals("https://stream.watsonplatform.net/speech-to-text/api/v1/recognitions/" + JOB_ID,
+    Assert.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID,
             capturedGet.getValue().getURI().toString());
     // Check if only one mp has a workflow created for it
     Assert.assertEquals(1, capturedMpIds.getValue().size());
@@ -628,7 +695,47 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
+  public void testWorkflowDispatcherFailedState() throws Exception {
+    service.activate(cc);
+
+    InputStream stream = IBMWatsonTranscriptionServiceTest.class
+            .getResourceAsStream("/" + PULLED_TRANSCRIPTION_ERROR_FILE);
+
+    HttpEntity httpEntity = EasyMock.createNiceMock(HttpEntity.class);
+    EasyMock.expect(httpEntity.getContent()).andReturn(stream);
+
+    CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
+    StatusLine status = EasyMock.createNiceMock(StatusLine.class);
+    EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
+    EasyMock.expect(response.getEntity()).andReturn(httpEntity).anyTimes();
+    EasyMock.expect(status.getStatusCode()).andReturn(HttpStatus.SC_OK).anyTimes();
+    EasyMock.replay(httpEntity, response, status);
+
+    Capture<HttpGet> capturedGet = Capture.newInstance();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet))).andReturn(response).anyTimes();
+    EasyMock.replay(httpClient);
+
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Progress.name(), 0);
+
+    EasyMock.replay(workspace);
+
+    WorkflowDispatcher dispatcher = service.new WorkflowDispatcher();
+    dispatcher.run();
+
+    // Check if it called the external service to get the results
+    Assert.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID, capturedGet.getValue().getURI().toString());
+
+    // Check if the job status was updated and email was sent
+    TranscriptionJobControl j = database.findByJob(JOB_ID);
+    Assert.assertNotNull(j);
+    Assert.assertEquals(TranscriptionJobControl.Status.Error.toString(), j.getStatus());
+    EasyMock.verify(smtpService);
+  }
+
+  @Test
   public void testWorkflowDispatcherJobNotFound() throws Exception {
+    service.activate(cc);
+
     CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
     StatusLine status = EasyMock.createNiceMock(StatusLine.class);
     EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
@@ -647,7 +754,7 @@ public class IBMWatsonTranscriptionServiceTest {
     dispatcher.run();
 
     // Check if it called the external service to get the results
-    Assert.assertEquals("https://stream.watsonplatform.net/speech-to-text/api/v1/recognitions/" + JOB_ID,
+    Assert.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID,
             capturedGet.getValue().getURI().toString());
 
     // Check if the job status was updated and email was sent
@@ -659,6 +766,8 @@ public class IBMWatsonTranscriptionServiceTest {
 
   @Test
   public void testWorkflowDispatcherJobInProgressTooLong() throws Exception {
+    service.activate(cc);
+
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + IN_PROGRESS_JOB);
 
     HttpEntity httpEntity = EasyMock.createNiceMock(HttpEntity.class);
@@ -683,14 +792,74 @@ public class IBMWatsonTranscriptionServiceTest {
     dispatcher.run();
 
     // Check if it called the external service to get the results
-    Assert.assertEquals("https://stream.watsonplatform.net/speech-to-text/api/v1/recognitions/" + JOB_ID,
+    Assert.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID,
             capturedGet.getValue().getURI().toString());
 
     // Check if the job status was updated and email was sent
     TranscriptionJobControl j = database.findByJob(JOB_ID);
     Assert.assertNotNull(j);
-    Assert.assertEquals(TranscriptionJobControl.Status.Canceled.toString(), j.getStatus());
+    Assert.assertEquals(TranscriptionJobControl.Status.Error.toString(), j.getStatus());
     EasyMock.verify(smtpService);
+  }
+
+  @Test
+  public void testWorkflowDispatcherJobInProgressTooLongWithMaxAttempts() throws Exception {
+    props.put(IBMWatsonTranscriptionService.MAX_ATTEMPTS_CONFIG, 2);
+    props.put(IBMWatsonTranscriptionService.RETRY_WORKLFOW_CONFIG, RETRY_WORKFLOW);
+    service.activate(cc);
+
+    InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + IN_PROGRESS_JOB);
+
+    HttpEntity httpEntity = EasyMock.createNiceMock(HttpEntity.class);
+    EasyMock.expect(httpEntity.getContent()).andReturn(stream);
+
+    CloseableHttpResponse response = EasyMock.createNiceMock(CloseableHttpResponse.class);
+    StatusLine status = EasyMock.createNiceMock(StatusLine.class);
+    EasyMock.expect(response.getStatusLine()).andReturn(status).anyTimes();
+    EasyMock.expect(response.getEntity()).andReturn(httpEntity).anyTimes();
+    EasyMock.expect(status.getStatusCode()).andReturn(HttpStatus.SC_OK).anyTimes();
+    EasyMock.replay(httpEntity, response, status);
+
+    Capture<HttpGet> capturedGet = Capture.newInstance();
+    EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet))).andReturn(response).anyTimes();
+    EasyMock.replay(httpClient);
+
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Progress.name(), 0);
+    Capture<Set<String>> capturedMpIds = mockAssetManagerAndWorkflow(RETRY_WORKFLOW, true);
+
+    EasyMock.replay(workspace);
+
+    WorkflowDispatcher dispatcher = service.new WorkflowDispatcher();
+    dispatcher.run();
+
+    // Check if it called the external service to get the results
+    Assert.assertEquals(WATSON_URL + "/v1/recognitions/" + JOB_ID, capturedGet.getValue().getURI().toString());
+
+    // Check if the job status was updated and email was sent
+    TranscriptionJobControl j = database.findByJob(JOB_ID);
+    Assert.assertNotNull(j);
+    Assert.assertEquals(TranscriptionJobControl.Status.Error.toString(), j.getStatus());
+  }
+
+  @Test
+  public void testWorkflowDispatcherRetry() throws Exception {
+    props.put(IBMWatsonTranscriptionService.MAX_ATTEMPTS_CONFIG, 2);
+    props.put(IBMWatsonTranscriptionService.RETRY_WORKLFOW_CONFIG, RETRY_WORKFLOW);
+    service.activate(cc);
+
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Retry.name(), TRACK_DURATION);
+    Capture<Set<String>> capturedMpIds = mockAssetManagerAndWorkflow(RETRY_WORKFLOW, true);
+
+    WorkflowDispatcher dispatcher = service.new WorkflowDispatcher();
+    dispatcher.run();
+
+    // Check if mp has a workflow created for it
+    Assert.assertEquals(1, capturedMpIds.getValue().size());
+    Assert.assertEquals(MP_ID, capturedMpIds.getValue().iterator().next());
+    // Check if status of retry job in db was updated to error
+    TranscriptionJobControl job = database.findByJob(JOB_ID);
+    Assert.assertNotNull(job);
+    Assert.assertEquals(TranscriptionJobControl.Status.Error.name(), job.getStatus());
   }
 
 }

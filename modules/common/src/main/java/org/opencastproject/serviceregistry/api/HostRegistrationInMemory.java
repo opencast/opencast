@@ -39,9 +39,12 @@ public class HostRegistrationInMemory implements HostRegistration {
 
   private String address;
 
-  public HostRegistrationInMemory(String baseUrl, String address, float maxLoad, int cores, long memory) {
+  private String nodeName;
+
+  public HostRegistrationInMemory(String baseUrl, String address, String nodeName, float maxLoad, int cores, long memory) {
     this.baseUrl = baseUrl;
     this.address = address;
+    this.nodeName = nodeName;
     this.maxLoad = maxLoad;
     this.online = true;
     this.active = true;
@@ -130,4 +133,13 @@ public class HostRegistrationInMemory implements HostRegistration {
     this.cores = cores;
   }
 
+  @Override
+  public String getNodeName() {
+    return nodeName;
+  }
+
+  @Override
+  public void setNodeName(String nodeName) {
+    this.nodeName = nodeName;
+  }
 }

@@ -220,13 +220,14 @@ public class ServiceRegistryEndpoint {
   @RestQuery(name = "registerhost", description = "Add a new server to the cluster.", returnDescription = "No content.", restParameters = {
           @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol", type = Type.STRING),
           @RestParameter(name = "address", isRequired = true, description = "The IP address", type = Type.STRING),
+          @RestParameter(name = "nodeName", isRequired = true, description = "Descriptive node name", type = Type.STRING),
           @RestParameter(name = "memory", isRequired = true, description = "The allocated memory", type = Type.STRING),
           @RestParameter(name = "cores", isRequired = true, description = "The available cores", type = Type.STRING),
           @RestParameter(name = "maxLoad", isRequired = true, description = "The maximum load this host support", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was registered successfully") })
-  public void register(@FormParam("host") String host, @FormParam("address") String address,
+  public void register(@FormParam("host") String host, @FormParam("address") String address, @FormParam("nodeName") String nodeName,
           @FormParam("memory") long memory, @FormParam("cores") int cores, @FormParam("maxLoad") float maxLoad) {
     try {
-      serviceRegistry.registerHost(host, address, memory, cores, maxLoad);
+      serviceRegistry.registerHost(host, address, nodeName, memory, cores, maxLoad);
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }

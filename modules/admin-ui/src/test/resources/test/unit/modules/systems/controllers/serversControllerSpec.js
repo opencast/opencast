@@ -15,6 +15,7 @@ describe('Servers controller', function () {
         $scope = $rootScope.$new();
         $controller('ServersCtrl', {$scope: $scope});
         $httpBackend = _$httpBackend_;
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
     }));
 
     it('instantiates', function () {
@@ -23,7 +24,8 @@ describe('Servers controller', function () {
 
     describe('#setMaintenanceMode', function () {
         beforeEach(function () {
-            $httpBackend.whenGET('/admin-ng/server/servers.json?limit=10&offset=0')
+            jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
+            $httpBackend.whenGET('/admin-ng/server/servers.json?limit=10&offset=0&sort=online:ASC')
                 .respond(JSON.stringify(getJSONFixture('admin-ng/server/servers.json')));
             $httpBackend.whenGET('/admin-ng/resources/servers/filters.json').respond('{}');
             spyOn($scope.table, 'fetch');
@@ -45,6 +47,7 @@ describe('Servers controller', function () {
         describe('on success', function () {
             beforeEach(function () {
                 $httpBackend.whenPOST('/services/maintenance').respond(204);
+                $httpBackend.whenGET('/admin-ng/server/servers.json?limit=10&offset=0&sort=online:ASC').respond('[]');
             });
 
             it('updates the table', function () {

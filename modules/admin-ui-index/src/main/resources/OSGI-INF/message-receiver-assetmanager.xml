@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+  ~ Copyright 2009, 2010 The Regents of the University of California
+  ~  Licensed under the Educational Community License, Version 2.0
+  ~  (the "License"); you may not use this file except in compliance
+  ~  with the License. You may obtain a copy of the License at
+  ~
+  ~  http://www.osedu.org/licenses/ECL-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing,
+  ~  software distributed under the License is distributed on an "AS IS"
+  ~  BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+  ~  or implied. See the License for the specific language governing
+  ~  permissions and limitations under the License.
+  -->
+
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.index.service.message.AssetManagerMessageReceiverImpl-Adminui" immediate="true"
+               activate="activate" deactivate="deactivate">
+  <implementation class="org.opencastproject.index.service.message.AssetManagerMessageReceiverImpl"/>
+  <property name="service.description" value="AssetManager Message Receiver"/>
+  <property name="destinationId" value="ASSETMANAGER.Adminui"/>
+  <service>
+    <provide interface="org.opencastproject.index.service.message.AssetManagerMessageReceiverImpl"/>
+  </service>
+  <reference name="message-broker-sender" interface="org.opencastproject.message.broker.api.MessageSender"
+             cardinality="1..1" policy="static" bind="setMessageSender"/>
+  <reference name="message-broker-receiver" cardinality="1..1"
+             interface="org.opencastproject.message.broker.api.MessageReceiver" policy="static"
+             bind="setMessageReceiver"/>
+  <reference name="message-receiver-lock-service"
+             interface="org.opencastproject.index.service.message.MessageReceiverLockService"
+             cardinality="1..1" policy="static" bind="setMessageReceiverLockService"/>
+  <reference name="search-index" cardinality="1..1"
+             interface="org.opencastproject.adminui.index.AdminUISearchIndex" policy="static"
+             bind="setSearchIndex"/>
+
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService" cardinality="1..1"
+             policy="static" bind="setSecurityService"/>
+
+  <reference name="aclServiceFactory" interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
+             cardinality="1..1" policy="static" bind="setAclServiceFactory"/>
+
+</scr:component>

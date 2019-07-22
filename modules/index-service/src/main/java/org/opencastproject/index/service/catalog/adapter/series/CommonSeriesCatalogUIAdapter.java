@@ -23,6 +23,7 @@ package org.opencastproject.index.service.catalog.adapter.series;
 
 import static java.util.Objects.requireNonNull;
 
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -41,8 +42,8 @@ public class CommonSeriesCatalogUIAdapter extends ConfigurableSeriesDCCatalogUIA
   private static final Logger logger = LoggerFactory.getLogger(CommonSeriesCatalogUIAdapter.class);
 
   @Override
-  public String getFlavor() {
-    return MediaPackageElements.SERIES.toString();
+  public MediaPackageElementFlavor getFlavor() {
+    return MediaPackageElements.SERIES;
   }
 
   @Override

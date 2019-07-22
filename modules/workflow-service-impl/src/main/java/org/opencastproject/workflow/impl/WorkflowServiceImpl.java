@@ -21,7 +21,6 @@
 
 package org.opencastproject.workflow.impl;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Collections.mkString;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.FAILED;
@@ -42,7 +41,6 @@ import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.MessageReceiver;
@@ -82,6 +80,7 @@ import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
+import org.opencastproject.workflow.api.WorkflowIdentifier;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
@@ -102,10 +101,13 @@ import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowStateException;
+import org.opencastproject.workflow.api.WorkflowStateMapping;
 import org.opencastproject.workflow.api.WorkflowStatistics;
+import org.opencastproject.workflow.conditionparser.WorkflowConditionInterpreter;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.entwinemedia.fn.data.Opt;
 import com.google.common.util.concurrent.Striped;
 
 import org.apache.commons.io.IOUtils;
@@ -113,7 +115,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.LoggerFactory;
@@ -142,8 +143,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.locks.Lock;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.management.ObjectInstance;
@@ -167,9 +167,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   enum Operation {
     START_WORKFLOW, RESUME, START_OPERATION
   }
-
-  /** The pattern used by workfow operation configuration keys * */
-  public static final Pattern PROPERTY_PATTERN = Pattern.compile("\\$\\{.+?\\}");
 
   /** The configuration key for setting {@link #workflowStatsCollect} */
   public static final String STATS_COLLECT_CONFIG_KEY = "workflowstats.collect";
@@ -362,12 +359,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public List<WorkflowDefinition> listAvailableWorkflowDefinitions() {
-    List<WorkflowDefinition> list = new ArrayList<>();
-    for (Entry<String, WorkflowDefinition> entry : workflowDefinitionScanner.getWorkflowDefinitions().entrySet()) {
-      list.add(entry.getValue());
-    }
-    Collections.sort(list); //sorts by title
-    return list;
+    return workflowDefinitionScanner
+            .getAvailableWorkflowDefinitions(securityService.getOrganization(), securityService.getUser())
+            .sorted()
+            .collect(Collectors.toList());
   }
 
   /**
@@ -375,7 +370,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   public boolean isRunnable(WorkflowDefinition workflowDefinition) {
     List<String> availableOperations = listAvailableOperationNames();
-    List<WorkflowDefinition> checkedWorkflows = new ArrayList<WorkflowDefinition>();
+    List<WorkflowDefinition> checkedWorkflows = new ArrayList<>();
     boolean runnable = isRunnable(workflowDefinition, availableOperations, checkedWorkflows);
     int wfCount = checkedWorkflows.size() - 1;
     if (runnable)
@@ -416,10 +411,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         } catch (NotFoundException e) {
           logger.info("%s is not runnable due to missing catch workflow %s on operation %s", workflowDefinition,
                   catchWorkflow, op);
-          return false;
-        } catch (WorkflowDatabaseException e) {
-          logger.info("%s is not runnable because we can not load the catch workflow %s on operation %s",
-                  workflowDefinition, catchWorkflow, op);
           return false;
         }
         if (!isRunnable(catchWorkflowDefinition, availableOperations, checkedWorkflows))
@@ -479,40 +470,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowService#registerWorkflowDefinition(org.opencastproject.workflow.api.WorkflowDefinition)
-   */
-  @Override
-  public void registerWorkflowDefinition(WorkflowDefinition workflow) {
-    if (workflow == null || workflow.getId() == null) {
-      throw new IllegalArgumentException("Workflow must not be null, and must contain an ID");
-    }
-    String id = workflow.getId();
-    if (workflowDefinitionScanner.getWorkflowDefinitions().containsKey(id)) {
-      throw new IllegalStateException("A workflow definition with ID '" + id + "' is already registered.");
-    }
-    workflowDefinitionScanner.putWorkflowDefinition(id, workflow);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowService#unregisterWorkflowDefinition(java.lang.String)
-   */
-  @Override
-  public void unregisterWorkflowDefinition(String workflowDefinitionId) throws NotFoundException,
-          WorkflowDatabaseException {
-    boolean deleted = workflowDefinitionScanner.removeWorkflowDefinition(workflowDefinitionId) != null;
-    if (deleted)
-      throw new NotFoundException("Workflow definition not found");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowById(long)
    */
   @Override
-  public WorkflowInstanceImpl getWorkflowById(long id) throws WorkflowDatabaseException, NotFoundException,
+  public WorkflowInstanceImpl getWorkflowById(long id) throws NotFoundException,
           UnauthorizedException {
     try {
       Job job = serviceRegistry.getJob(id);
@@ -530,8 +491,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       throw new IllegalStateException("The workflow job payload is malformed");
     } catch (ServiceRegistryException e) {
       throw new IllegalStateException("Error loading workflow job from the service registry");
-    } catch (MediaPackageException e) {
-      throw new IllegalStateException("Unable to read mediapackage from workflow " + id, e);
     }
   }
 
@@ -543,7 +502,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage)
-          throws WorkflowDatabaseException, WorkflowParsingException {
+          throws WorkflowDatabaseException {
     return start(workflowDefinition, mediaPackage, new HashMap<>());
   }
 
@@ -555,7 +514,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage mediaPackage,
-          Map<String, String> properties) throws WorkflowDatabaseException, WorkflowParsingException {
+          Map<String, String> properties) throws WorkflowDatabaseException {
     try {
       return start(workflowDefinition, mediaPackage, null, properties);
     } catch (NotFoundException e) {
@@ -573,16 +532,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage sourceMediaPackage,
           Long parentWorkflowId, Map<String, String> originalProperties) throws WorkflowDatabaseException,
-          WorkflowParsingException, NotFoundException {
+          NotFoundException {
     final String mediaPackageId = sourceMediaPackage.getIdentifier().compact();
+    Map<String, String> properties = null;
 
-    final Map<String, String> properties;
-    // Currently, the only place where the asset manager isn't involved is in the tests. But it might change.
-    if (assetManager != null) {
+    if (originalProperties != null) {
       WorkflowPropertiesUtil.storeProperties(assetManager, sourceMediaPackage, originalProperties);
       properties = WorkflowPropertiesUtil.getLatestWorkflowProperties(assetManager, mediaPackageId);
-    } else {
-      properties = originalProperties;
     }
 
     // We have to synchronize per media package to avoid starting multiple simultaneous workflows for one media package.
@@ -686,53 +642,22 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       for (String key : instance.getConfigurationKeys()) {
         wfProperties.put(key, instance.getConfiguration(key));
       }
-      String xml = replaceVariables(WorkflowParser.toXml(instance), wfProperties);
+      final Function<String, String> systemVariableGetter = key -> componentContext == null
+              ? null
+              : componentContext.getBundleContext().getProperty(key);
+      if (instance.getOperations().stream().anyMatch(op -> op.getExecutionCondition() != null)) {
+        instance = WorkflowParser.parseWorkflowInstance(WorkflowParser.toXml(instance));
+        instance.getOperations().stream().filter(op -> op.getExecutionCondition() != null).forEach(
+                op -> op.setExecutionCondition(WorkflowConditionInterpreter.replaceVariables(op.getExecutionCondition(),
+                        systemVariableGetter,
+                        properties, true)));
+      }
+      String xml = WorkflowConditionInterpreter.replaceVariables(WorkflowParser.toXml(instance),
+              systemVariableGetter, wfProperties, false);
       return WorkflowParser.parseWorkflowInstance(xml);
     } catch (Exception e) {
       throw new IllegalStateException("Unable to replace workflow instance variables", e);
     }
-  }
-
-  /**
-   * Replaces all occurrences of <code>${.*+}</code> with the property in the provided map, or if not available in the
-   * map, from the bundle context properties, if available.
-   *
-   * @param source
-   *          The source string
-   * @param properties
-   *          The map of properties to replace
-   * @return The resulting string
-   */
-  protected String replaceVariables(String source, Map<String, String> properties) {
-    Matcher matcher = PROPERTY_PATTERN.matcher(source);
-    StringBuilder result = new StringBuilder();
-    int cursor = 0;
-    boolean matchFound = matcher.find();
-    if (!matchFound)
-      return source;
-    while (matchFound) {
-      int matchStart = matcher.start();
-      int matchEnd = matcher.end();
-      result.append(source.substring(cursor, matchStart)); // add the content before the match
-      String key = source.substring(matchStart + 2, matchEnd - 1);
-      String systemProperty = componentContext == null ? null : componentContext.getBundleContext().getProperty(key);
-      String providedProperty = null;
-      if (properties != null) {
-        providedProperty = properties.get(key);
-      }
-      if (isNotBlank(providedProperty)) {
-        result.append(providedProperty);
-      } else if (isNotBlank(systemProperty)) {
-        result.append(systemProperty);
-      } else {
-        result.append(source, matchStart, matchEnd); // retain the original matched value
-      }
-      cursor = matchEnd;
-      matchFound = matcher.find();
-      if (!matchFound)
-        result.append(source.substring(matchEnd));
-    }
-    return result.toString();
   }
 
   /**
@@ -766,6 +691,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *          the workflow instance
    * @throws WorkflowException
    *           if there is a problem processing the workflow
+   * @throws UnauthorizedException
    */
   protected Job runWorkflow(WorkflowInstance workflow) throws WorkflowException, UnauthorizedException {
     if (!INSTANTIATED.equals(workflow.getState())) {
@@ -841,6 +767,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @return the processed workflow operation
    * @throws WorkflowException
    *           if there is a problem processing the workflow
+   * @throws UnauthorizedException
    */
   protected WorkflowOperationInstance runWorkflowOperation(WorkflowInstance workflow, Map<String, String> properties)
           throws WorkflowException, UnauthorizedException {
@@ -904,9 +831,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       WorkflowState dbWorkflowState;
       try {
         dbWorkflowState = getWorkflowById(workflow.getId()).getState();
-      } catch (WorkflowDatabaseException e) {
-        throw new IllegalStateException("The workflow with ID " + workflow.getId()
-                + " can not be accessed in the database", e);
       } catch (NotFoundException e) {
         throw new IllegalStateException("The workflow with ID " + workflow.getId()
                 + " can not be found in the database", e);
@@ -962,10 +886,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   @Override
-  public WorkflowDefinition getWorkflowDefinitionById(String id) throws NotFoundException, WorkflowDatabaseException {
-    WorkflowDefinition def = workflowDefinitionScanner.getWorkflowDefinition(id);
-    if (def == null)
-      throw new NotFoundException("Workflow definition '" + id + "' not found");
+  public WorkflowDefinition getWorkflowDefinitionById(String id) throws NotFoundException {
+    final WorkflowIdentifier workflowIdentifier = new WorkflowIdentifier(id, securityService.getOrganization().getId());
+    final WorkflowDefinition def = workflowDefinitionScanner
+            .getWorkflowDefinition(securityService.getUser(), workflowIdentifier);
+    if (def == null) {
+      throw new NotFoundException("Workflow definition '" + workflowIdentifier + "' not found or inaccessible");
+    }
     return def;
   }
 
@@ -1000,7 +927,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
   }
 
-  private void removeTempFiles(WorkflowInstance workflowInstance) throws NotFoundException {
+  private void removeTempFiles(WorkflowInstance workflowInstance) {
     logger.info("Removing temporary files for workflow {}", workflowInstance);
     if (null == workflowInstance.getMediaPackage()) {
       logger.warn("Workflow instance {} does not have an media package set", workflowInstance.getId());
@@ -1022,6 +949,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
     }
   }
+
 
   /**
    * {@inheritDoc}
@@ -1045,19 +973,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           throw new WorkflowStateException("Workflow instance with state '" + state
                                                      + "' cannot be removed. Only states SUCCEEDED, FAILED & STOPPED are allowed");
 
-        try {
-          assertPermission(instance, Permissions.Action.WRITE.toString());
-        } catch (MediaPackageException e) {
-          throw new WorkflowParsingException(e);
-        }
+        assertPermission(instance, Permissions.Action.WRITE.toString());
 
         // First, remove temporary files DO THIS BEFORE REMOVING FROM INDEX
-        try {
-          removeTempFiles(instance);
-        } catch (NotFoundException e) {
-          // If the files aren't their anymore, we don't have to cleanup up them :-)
-          logger.debug("Temporary files of workflow instance %d seem to be gone already...", workflowInstanceId);
-        }
+        removeTempFiles(instance);
 
         // Second, remove jobs related to a operation which belongs to the workflow instance
         List<WorkflowOperationInstance> operations = instance.getOperations();
@@ -1248,18 +1167,24 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *          the action to ensure is permitted
    * @throws UnauthorizedException
    *           if the action is not authorized
-   * @throws MediaPackageException
-   *           if there is an error accessing the workflow's security policy in its mediapackage
    */
-  protected void assertPermission(WorkflowInstance workflow, String action) throws UnauthorizedException,
-          MediaPackageException {
+  protected void assertPermission(WorkflowInstance workflow, String action) throws UnauthorizedException {
     User currentUser = securityService.getUser();
     Organization currentOrg = securityService.getOrganization();
     String currentOrgAdminRole = currentOrg.getAdminRole();
     String currentOrgId = currentOrg.getId();
 
     MediaPackage mediapackage = workflow.getMediaPackage();
-    User workflowCreator = workflow.getCreator();
+
+    WorkflowState state = workflow.getState();
+    if (state != INSTANTIATED && state != RUNNING && workflow.getState() != FAILING) {
+      Opt<MediaPackage> assetMediapackage = assetManager.getMediaPackage(mediapackage.getIdentifier().toString());
+      if (assetMediapackage.isSome()) {
+        mediapackage = assetMediapackage.get();
+      }
+    }
+
+    User workflowCreator = userDirectoryService.loadUser(workflow.getCreatorName());
     String workflowOrgId = workflowCreator.getOrganization().getId();
 
     boolean authorized = currentUser.hasRole(GLOBAL_ADMIN_ROLE)
@@ -1291,11 +1216,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
 
       if (originalWorkflowInstance != null) {
-        try {
-          assertPermission(originalWorkflowInstance, Permissions.Action.WRITE.toString());
-        } catch (MediaPackageException e) {
-          throw new WorkflowParsingException(e);
-        }
+        assertPermission(originalWorkflowInstance, Permissions.Action.WRITE.toString());
       }
 
       MediaPackage updatedMediaPackage = null;
@@ -1500,10 +1421,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param operation
    *          the current workflow operation
    * @return the workflow instance
-   * @throws WorkflowParsingException
    */
-  protected WorkflowInstance handleOperationException(WorkflowInstance workflow, WorkflowOperationInstance operation)
-          throws WorkflowDatabaseException, WorkflowParsingException {
+  protected WorkflowInstance handleOperationException(WorkflowInstance workflow, WorkflowOperationInstance operation) {
     WorkflowOperationInstanceImpl currentOperation = (WorkflowOperationInstanceImpl) operation;
     int failedAttempt = currentOperation.getFailedAttempts() + 1;
     currentOperation.setFailedAttempts(failedAttempt);
@@ -1555,11 +1474,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *          the workflow
    * @param currentOperation
    *          the failing workflow operation instance
-   * @throws WorkflowDatabaseException
-   *           If the exception handler workflow is not found
    */
-  private void handleFailedOperation(WorkflowInstance workflow, WorkflowOperationInstance currentOperation)
-          throws WorkflowDatabaseException {
+  private void handleFailedOperation(WorkflowInstance workflow, WorkflowOperationInstance currentOperation) {
     String errorDefId = currentOperation.getExceptionHandlingWorkflow();
 
     // Adjust the workflow state according to the setting on the operation
@@ -1720,7 +1636,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @see org.opencastproject.job.api.JobProducer#isReadyToAcceptJobs(String)
    */
   @Override
-  public boolean isReadyToAcceptJobs(String operation) throws ServiceRegistryException {
+  public boolean isReadyToAcceptJobs(String operation) {
     return true;
   }
 
@@ -1732,7 +1648,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @see org.opencastproject.job.api.AbstractJobProducer#isReadyToAccept(org.opencastproject.job.api.Job)
    */
   @Override
-  public boolean isReadyToAccept(Job job) throws ServiceRegistryException, UndispatchableJobException {
+  public boolean isReadyToAccept(Job job) throws UndispatchableJobException {
     String operation = job.getOperation();
 
     // Only restrict execution of new jobs
@@ -1899,7 +1815,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         throw new ServiceRegistryException("This argument list for operation '" + op + "' does not meet expectations",
                 e);
       } catch (NotFoundException e) {
-        logger.warn(e.getMessage());
+        logger.warn("Not found processing job {}: {}", job, e.getMessage());
         updateOperationJob(job.getId(), OperationState.FAILED);
       }
       return null;
@@ -2209,7 +2125,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   @SuppressWarnings("rawtypes")
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary properties) {
     String workflowStatsConfiguration = StringUtils.trimToNull((String) properties.get(STATS_COLLECT_CONFIG_KEY));
     if (StringUtils.isNotEmpty(workflowStatsConfiguration)) {
       try {
@@ -2364,7 +2280,16 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   }
 
   @Override
-  public void repopulate(final String indexName) throws Exception {
+  public Map<String, Map<String, String>> getWorkflowStateMappings() {
+    return workflowDefinitionScanner.workflowStateMappings.entrySet().stream().collect(Collectors.toMap(
+        Entry::getKey, e -> e.getValue().stream()
+            .collect(Collectors.toMap(m -> m.getState().name(), WorkflowStateMapping::getValue))
+    ));
+  }
+
+
+  @Override
+  public void repopulate(final String indexName) throws ServiceRegistryException {
     List<String> workflows =  serviceRegistry.getJobPayloads(Operation.START_WORKFLOW.toString());
 
     final String destinationId = WorkflowItem.WORKFLOW_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
@@ -2387,7 +2312,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           logger.warn("Skipping restoring of workflow. Error parsing: {}", workflow, e);
           continue;
         }
-        Organization organization = instance.getOrganization();
+        Organization organization = null;
+        try {
+          organization = organizationDirectoryService.getOrganization(instance.getOrganizationId());
+        } catch (NotFoundException e) {
+          logger.error("Found workflow with non-existing organization {}", instance.getOrganizationId());
+          continue;
+        }
 
         // get metadata for index update
         final String dcXml = getEpisodeDublinCoreXml(instance.getMediaPackage());

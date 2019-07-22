@@ -22,9 +22,8 @@
 
 package org.opencastproject.mediapackage;
 
-import org.opencastproject.mediapackage.identifier.Handle;
-import org.opencastproject.mediapackage.identifier.HandleBuilder;
-import org.opencastproject.mediapackage.identifier.HandleBuilderFactory;
+import org.opencastproject.mediapackage.identifier.Id;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.FileSupport;
 
 import org.junit.After;
@@ -52,11 +51,8 @@ public abstract class AbstractMediaPackageTest {
   /** The media package element builder */
   protected MediaPackageElementBuilder mediaPackageElementBuilder = null;
 
-  /** The handle builder */
-  protected HandleBuilder handleBuilder = null;
-
   /** The media package identifier */
-  protected Handle identifier = null;
+  protected Id identifier = null;
 
   /** The test media packages root directory */
   protected File packageDir = null;
@@ -114,10 +110,7 @@ public abstract class AbstractMediaPackageTest {
 
     mediaPackageElementBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
 
-    // Create a handle builder
-    handleBuilder = HandleBuilderFactory.newInstance().newHandleBuilder();
-
-    identifier = handleBuilder.createNew();
+    identifier = new IdImpl("123");
 
     // Get hold of the tmp directory
     tmpDir = testFolder.newFolder();
@@ -164,7 +157,7 @@ public abstract class AbstractMediaPackageTest {
    */
   @After
   public void tearDown() throws Exception {
-    if (packageDir.getParentFile().getName().equals(identifier.getNamingAuthority()))
+    if (packageDir.getParentFile().getName().equals(identifier.toString()))
       FileSupport.delete(packageDir.getParentFile(), true);
     else
       FileSupport.delete(packageDir, true);

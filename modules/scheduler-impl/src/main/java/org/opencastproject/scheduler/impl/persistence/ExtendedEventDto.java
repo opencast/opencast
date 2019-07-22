@@ -20,6 +20,8 @@
  */
 package org.opencastproject.scheduler.impl.persistence;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -27,6 +29,8 @@ import javax.persistence.IdClass;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
 /**
@@ -35,20 +39,12 @@ import javax.persistence.UniqueConstraint;
 @IdClass(EventIdPK.class)
 @Entity(name = "ExtendedEvent")
 @NamedQueries({
-        // Job queries
         @NamedQuery(name = "ExtendedEvent.findAll", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org"),
-        @NamedQuery(name = "ExtendedEvent.countAll", query = "SELECT COUNT(e) FROM ExtendedEvent e WHERE e.organization = :org")
-        // @NamedQuery(name = "ExtendedEvent.countRespones", query =
-        // "SELECT COUNT(e) FROM ExtendedEvent e WHERE e.reviewDate IS NOT NULL"),
-        // @NamedQuery(name = "ExtendedEvent.countConfirmed", query =
-        // "SELECT COUNT(e) FROM ExtendedEvent e WHERE e.reviewStatus =
-        // org.opencastproject.scheduler.api.SchedulerService$ReviewStatus.CONFIRMED"),
-        // @NamedQuery(name = "ExtendedEvent.countConfirmedByDateRange", query =
-        // "SELECT COUNT(e) FROM ExtendedEvent e WHERE e.reviewDate >= :start AND e.reviewDate < :end AND e.reviewStatus
-        // = org.opencastproject.scheduler.api.SchedulerService$ReviewStatus.CONFIRMED"),
-        // @NamedQuery(name = "ExtendedEvent.countUnconfirmed", query =
-        // "SELECT COUNT(e) FROM ExtendedEvent e WHERE e.reviewStatus =
-        // org.opencastproject.scheduler.api.SchedulerService$ReviewStatus.UNCONFIRMED")
+        @NamedQuery(name = "ExtendedEvent.countAll", query = "SELECT COUNT(e) FROM ExtendedEvent e"),
+        @NamedQuery(name = "ExtendedEvent.findEvents", query = "SELECT e.mediaPackageId FROM ExtendedEvent e WHERE e.organization = :org AND e.captureAgentId = :ca AND e.startDate < :end AND e.endDate > :start ORDER BY e.startDate ASC"),
+        @NamedQuery(name = "ExtendedEvent.searchEventsCA", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org AND e.captureAgentId = :ca AND e.startDate >= :startFrom AND e.startDate < :startTo AND e.endDate >= :endFrom AND e.endDate < :endTo ORDER BY e.startDate ASC"),
+        @NamedQuery(name = "ExtendedEvent.searchEvents", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org AND e.startDate >= :startFrom AND e.startDate < :startTo AND e.endDate >= :endFrom AND e.endDate < :endTo ORDER BY e.startDate ASC"),
+        @NamedQuery(name = "ExtendedEvent.knownRecordings", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org AND e.recordingState IS NOT NULL AND e.recordingLastHeard IS NOT NULL")
 })
 @Table(name = "oc_scheduled_extended_event", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "mediapackage_id", "organization" }) })
@@ -64,44 +60,159 @@ public class ExtendedEventDto {
   @Column(name = "organization", length = 128)
   private String organization;
 
+  /** Capture agent id */
+  @Column(name = "capture_agent_id", length = 128)
+  private String captureAgentId;
+
+  /** recording start date */
+  @Column(name = "start_date")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date startDate;
+
+  /** recording end date */
+  @Column(name = "end_date")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date endDate;
+
+  /** source */
+  @Column(name = "source")
+  private String source;
+
+  /** recording state */
+  @Column(name = "recording_state")
+  private String recordingState;
+
+  /** recording last heard */
+  @Column(name = "recording_last_heard")
+  private Long recordingLastHeard;
+
+  /** presenters */
+  @Column(name = "presenters")
+  private String presenters;
+
+  /** last modified date */
+  @Column(name = "last_modified_date")
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date lastModifiedDate;
+
+  /** capture agent properties */
+  @Column(name = "capture_agent_properties")
+  private String captureAgentProperties;
+
+  /** workflow properties */
+  @Column(name = "workflow_properties")
+  private String workflowProperties;
+
+  @Column(name = "checksum", length = 64)
+  private String checksum;
+
   /**
    * Default constructor without any import.
    */
   public ExtendedEventDto() {
   }
 
-  /**
-   * Returns the mediapackage ID.
-   *
-   * @return the mediapackage ID
-   */
   public String getMediaPackageId() {
     return mediaPackageId;
   }
 
-  /**
-   * Sets the mediapackage ID.
-   *
-   * @param mediaPackageId
-   *          the mediapackage ID
-   */
   public void setMediaPackageId(String mediaPackageId) {
     this.mediaPackageId = mediaPackageId;
   }
 
-  /**
-   * @return the organization
-   */
   public String getOrganization() {
     return organization;
   }
 
-  /**
-   * @param organization
-   *          the organization to set
-   */
   public void setOrganization(String organization) {
     this.organization = organization;
   }
 
+  public String getCaptureAgentId() {
+    return captureAgentId;
+  }
+
+  public void setCaptureAgentId(String captureAgentId) {
+    this.captureAgentId = captureAgentId;
+  }
+
+  public Date getStartDate() {
+    return startDate;
+  }
+
+  public void setStartDate(Date startDate) {
+    this.startDate = startDate;
+  }
+
+  public Date getEndDate() {
+    return endDate;
+  }
+
+  public void setEndDate(Date endDate) {
+    this.endDate = endDate;
+  }
+
+  public String getSource() {
+    return source;
+  }
+
+  public void setSource(String source) {
+    this.source = source;
+  }
+
+  public String getRecordingState() {
+    return recordingState;
+  }
+
+  public void setRecordingState(String recordingState) {
+    this.recordingState = recordingState;
+  }
+
+  public Long getRecordingLastHeard() {
+    return recordingLastHeard;
+  }
+
+  public void setRecordingLastHeard(Long recordingLastHeard) {
+    this.recordingLastHeard = recordingLastHeard;
+  }
+
+  public String getPresenters() {
+    return presenters;
+  }
+
+  public void setPresenters(String presenters) {
+    this.presenters = presenters;
+  }
+
+  public Date getLastModifiedDate() {
+    return lastModifiedDate;
+  }
+
+  public void setLastModifiedDate(Date lastModifiedDate) {
+    this.lastModifiedDate = lastModifiedDate;
+  }
+
+  public String getChecksum() {
+    return checksum;
+  }
+
+  public void setChecksum(String checksum) {
+    this.checksum = checksum;
+  }
+
+  public String getCaptureAgentProperties() {
+    return captureAgentProperties;
+  }
+
+  public void setCaptureAgentProperties(String captureAgentProperties) {
+    this.captureAgentProperties = captureAgentProperties;
+  }
+
+  public String getWorkflowProperties() {
+    return workflowProperties;
+  }
+
+  public void setWorkflowProperties(String workflowProperties) {
+    this.workflowProperties = workflowProperties;
+  }
 }

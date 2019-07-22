@@ -1,22 +1,24 @@
-<div ng-form="innerForm" ng-click="enterEditMode()">
-  &nbsp;<span ng-show="!editMode" ng-click="enterEditMode()" translate="{{((params.value === '' || params.value === null || angular.isUndefined(params.value)) ? 'SELECT_NO_OPTIONS' : getLabel(params.value))}}"></span>
+<div ng-form="innerForm" ng-mousedown="enterEditMode($event)" ng-click="$event.stopPropagation()">
+  &nbsp;<span ng-show="!editMode" >{{ getLabel() | translate }}</span>
 
-  <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-click="enterEditMode()" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
+  <i class="edit fa fa-pencil-square" ng-show="!editMode && collection.length != 0" ng-focus="enterEditMode()"
+     tabindex="{{ collection.length != 0 ? params.tabindex : -1 }}"></i>
   <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
 
-  <div class="editable-select" ng-show="editMode">
+  <div class="editable-select" ng-if="editMode" ng-keyup="keyUp($event)" ng-mousedown="$event.stopPropagation()"
+       ng-click="$event.stopPropagation()">
 
     <select chosen
             ng-model="params.value"
             name="{{ params.name }}"
             ng-change="submit()"
-            ng-blur="leaveEditMode()"
             ng-required="params.required"
             tabindex="{{ params.tabindex }}"
             data-width="'250px'"
             ng-options="option.value as option.label for option in collection">
-      <option value="" ng-selected="params.value === ''" ng-if="!params.required">-- {{ 'SELECT_NO_OPTIONS' | translate | limitTo : 70 }} --</option>
+      <option value="" ng-selected="params.value === ''" ng-if="!params.required">
+        -- {{ 'SELECT_NO_OPTION_SELECTED' | translate | limitTo : 70 }} --
+      </option>
     </select>
   </div>
 </div>
-

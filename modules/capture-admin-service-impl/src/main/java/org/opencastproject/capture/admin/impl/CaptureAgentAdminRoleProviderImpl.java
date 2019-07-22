@@ -21,38 +21,27 @@
 
 package org.opencastproject.capture.admin.impl;
 
-import org.opencastproject.capture.admin.api.CaptureAgentAdminRoleProvider;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.UserProvider;
-import org.opencastproject.security.impl.jpa.JpaOrganization;
-import org.opencastproject.security.impl.jpa.JpaRole;
-import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
-import org.opencastproject.util.NotFoundException;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * The capture agent admin role provider provides a role for each registered capture agent
  */
-public class CaptureAgentAdminRoleProviderImpl implements RoleProvider, CaptureAgentAdminRoleProvider {
+public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
 
   private SecurityService securityService;
-
-  private JpaUserAndRoleProvider userAndRoleProvider;
 
   /**
    * @param service
@@ -67,10 +56,6 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider, CaptureA
 
   public void setCaptureAgentStateService(final CaptureAgentStateService service) {
     this.captureAgentService = service;
-  }
-
-  public void setUserAndRoleProvider(final JpaUserAndRoleProvider userAndRoleProvider) {
-    this.userAndRoleProvider = userAndRoleProvider;
   }
 
   private Role generateCaRole(final String name) {
@@ -121,14 +106,13 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider, CaptureA
       throw new IllegalArgumentException("Query must be set");
     }
 
-    Stream<Role> skip = getRolesStream()
+    Stream<Role> roleStream = getRolesStream()
             .filter(e -> like(e.getName(), query) || like(e.getDescription(), query))
             .skip(offset);
     if (limit != 0) {
-      skip = skip.limit(limit);
+      roleStream = roleStream.limit(limit);
     }
-    return skip
-            .iterator();
+    return roleStream.iterator();
   }
 
   // This is taken liberally from ConfigurableLoginHandler. This really needs to go into a separate interface.
@@ -136,22 +120,5 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider, CaptureA
     final String regex = query.replace("_", ".").replace("%", ".*?");
     final Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     return p.matcher(string).matches();
-  }
-
-  @Override
-  public void removeRole(final String agentName) {
-    this.userAndRoleProvider.getUsers().forEachRemaining(user -> {
-      final Set<JpaRole> newRoles = user.getRoles().stream()
-              .filter(role -> !role.getName().equals(SecurityUtil.getCaptureAgentRole(agentName)))
-              .map(role -> (JpaRole)role)
-              .collect(Collectors.toSet());
-      try {
-        this.userAndRoleProvider.updateUser(new JpaUser(user.getUsername(), user.getPassword(),
-            (JpaOrganization) user.getOrganization(), user.getName(), user.getEmail(), user.getProvider(),
-            user.isManageable(), newRoles));
-      } catch (final NotFoundException | UnauthorizedException e) {
-        throw new RuntimeException(e);
-      }
-    });
   }
 }

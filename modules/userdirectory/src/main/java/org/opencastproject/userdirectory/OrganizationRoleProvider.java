@@ -32,9 +32,6 @@ import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -46,9 +43,6 @@ import java.util.regex.Pattern;
  * The organization role provider returning the admin and anonymous role from the current organization.
  */
 public class OrganizationRoleProvider implements RoleProvider {
-
-  /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(OrganizationRoleProvider.class);
 
   /** The security service */
   protected SecurityService securityService = null;

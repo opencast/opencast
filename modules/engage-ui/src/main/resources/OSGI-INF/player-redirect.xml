@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.engage.ui.PlayerRedirect" immediate="true">
+  <implementation class="org.opencastproject.engage.ui.PlayerRedirect"/>
+  <property name="service.description" value="Configurable Player Endpoint"/>
+
+  <property name="opencast.service.type" value="org.opencastproject.engage.ui.player.redirect"/>
+  <property name="opencast.service.path" value="/play"/>
+
+  <service>
+    <provide interface="org.opencastproject.engage.ui.PlayerRedirect"/>
+  </service>
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+             bind="setSecurityService"/>
+</scr:component>

@@ -37,7 +37,7 @@ job.
 
 Note: These job loads are specific for each *node* in the cluster.  This means that for any given job, each node can
 have a different load value associated.  For instance, if worker A has no job load specified for its encoding profiles,
-and worker B has job loads specified then any encoding jobs created by A will have the default load (0.8), and jobs
+and worker B has job loads specified then any encoding jobs created by A will have the default load (1.5), and jobs
 created by B will have a different, presumably higher load.  There are edge cases where this may be useful, but in
 most cases this will only cause confusion.  It is therefore highly recommended that these settings be put into your
 configuration management system, and be applied on a cluster level to ensure consistency across all nodes.
@@ -63,7 +63,7 @@ Step 3: Setting the load values for encoding profiles
 -----------------------------------------------------
 
 Each encoding profile can have a load value associated with it.  By default, we have not set any, which means that the
-default value of 0.8 is used.  To set the load associated with a profile, you simply add a .jobload key to the profile.
+default value of 1.5 is used.  To set the load associated with a profile, you simply add a .jobload key to the profile.
 For example, the composite encoding profile is prefixed with `profile.composite.http`.  If we want to set a different
 job load than the default, we would create the `profile.composite.http.jobload` key, and set it to an appropriate job value.
 

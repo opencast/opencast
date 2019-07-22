@@ -38,7 +38,7 @@ public final class PathSupport {
   private static final Logger logger = LoggerFactory.getLogger(PathSupport.class);
 
   /**
-   * This class should not be instanciated, since it only provides static utility methods.
+   * This class should not be instantiated, since it only provides static utility methods.
    */
   private PathSupport() {
   }
@@ -74,7 +74,10 @@ public final class PathSupport {
    * Concatenates the two urls with respect to leading and trailing slashes.
    *
    * @return the concatenated url of the two arguments
+   * @deprecated
+   *          Use Java's native <pre>Paths.get(String, …).toFile()</pre> instead
    */
+  @Deprecated
   public static String concat(String prefix, String suffix) {
     if (prefix == null)
       throw new IllegalArgumentException("Argument prefix is null");
@@ -101,7 +104,10 @@ public final class PathSupport {
    * @param parts
    *          the parts to concat
    * @return the concatenated path
+   * @deprecated
+   *          Use Java's native <pre>Paths.get(String, …).toFile()</pre> instead
    */
+  @Deprecated
   public static String concat(String[] parts) {
     if (parts == null)
       throw new IllegalArgumentException("Argument parts is null");
@@ -114,6 +120,7 @@ public final class PathSupport {
     return path;
   }
 
+  @Deprecated
   public static String path(String... parts) {
     return concat(parts);
   }
@@ -129,12 +136,19 @@ public final class PathSupport {
   }
 
   /**
-   * Removes any occurence of double file separators and replaces it with a single one.
+   * Removes any occurrence of double file separators and replaces it with a single one.
    *
    * @param path
    *          the path to check
    * @return the corrected path
+   * @deprecated
+   *          This implements built-in Java functionality. Use instead:
+   *            <ul>
+   *              <li><pre>Paths.get("/a/b//c")</pre></li>
+   *              <li><pre>new File("/a/b//c")</pre></li>
+   *            </ul>
    */
+  @Deprecated
   private static String removeDoubleSeparator(String path) {
     int index = 0;
     String s = File.separator + File.separatorChar;

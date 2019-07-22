@@ -73,8 +73,7 @@ public class EncoderEngine implements AutoCloseable {
   /** If true STDERR and STDOUT of the spawned process will be mixed so that both can be read via STDIN */
   private static final boolean REDIRECT_ERROR_STREAM = true;
 
-  /** the logging facility provided by log4j */
-  private static Logger logger = LoggerFactory.getLogger(EncoderEngine.class.getName());
+  private static Logger logger = LoggerFactory.getLogger(EncoderEngine.class);
   /** the encoder binary */
   private String binary = "ffmpeg";
   /** Set of processes to clean up */
@@ -341,6 +340,7 @@ public class EncoderEngine implements AutoCloseable {
           throws EncoderException {
     List<String> command = new ArrayList<>();
     command.add(binary);
+    command.add("-nostdin");
     command.add("-nostats");
 
     String commandline = profile.getExtension(CMD_SUFFIX);
@@ -965,7 +965,6 @@ public class EncoderEngine implements AutoCloseable {
         clauses.add(outmaps.getVideoFilter());
       }
       clauses.removeIf(Objects::isNull); // remove all empty filters
-      command.add("-y"); // overwrite old files
       command.add("-nostats"); // no progress report
       for (File o : inputs) {
         command.add("-i"); // Add inputfile in the order of entry

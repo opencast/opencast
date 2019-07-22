@@ -44,14 +44,16 @@
                   <tr>
                     <th class="small"><input type="checkbox" ng-model="unpublished.allSelected" ng-change="unpublished.allSelectedChanged()" class="select-all-cbox"/></th>
                     <th translate="EVENTS.EVENTS.TABLE.TITLE"><!-- Title --></th>
-                    <th translate="EVENTS.EVENTS.TABLE.CREATORS"><!-- Presenter --></th>
+                    <th translate="EVENTS.EVENTS.TABLE.PRESENTERS"><!-- Presenter --></th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr ng-repeat="row in unpublished.rows" ng-form="rowsForm" ng-class="{error: rowsForm.selection.$error.schedulingAuthorized}">
                     <td><input name="selection" type="checkbox" ng-model="row.selected" scheduling-authorized="{{row}}" ng-change="unpublished.rowSelectionChanged($index)" class="child-cbox"/></td>
                     <td>{{ row.title }}</td>
-                    <td>{{ row.presenters }}</td>
+                    <td>
+                      <span class="metadata-entry" ng-repeat="presenter in row.presenters">{{ presenter }}</span>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -104,14 +106,16 @@
                 <tr>
                   <th class="small"><input type="checkbox" ng-model="published.allSelected" ng-change="published.allSelectedChanged()" class="select-all-cbox"/></th>
                   <th translate="EVENTS.EVENTS.TABLE.TITLE"><!-- Title --></th>
-                  <th translate="EVENTS.EVENTS.TABLE.CREATORS"><!-- Presenter --></th>
+                  <th translate="EVENTS.EVENTS.TABLE.PRESENTERS"><!-- Presenter --></th>
                 </tr>
               </thead>
               <tbody>
                 <tr ng-repeat="row in published.rows">
                   <td><input type="checkbox" ng-model="row.selected" ng-change="published.rowSelectionChanged($index)" class="child-cbox"/></td>
                   <td>{{ row.title }}</td>
-                  <td>{{ row.presenters }}</td>
+                  <td>
+                    <span class="metadata-entry" ng-repeat="presenter in row.presenters">{{ presenter }}</span>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -209,9 +213,10 @@
   </div><!-- modal-content [summary] -->
   <footer ng-if="currentForm === 'summaryForm'">
     <a ng-click="submit()"
-       data-modal-tab="next" class="submit"
-                             ng-class="{active: bulkDeleteForm.summaryForm.$valid, inactive: bulkDeleteForm.summaryForm.$invalid, disabled: submitButton}">
-      {{ 'WIZARD.RETRACT' | translate }}
+       data-modal-tab="next" ng-class="{active: bulkDeleteForm.summaryForm.$valid,
+         inactive: bulkDeleteForm.summaryForm.$invalid, disabled: submitButton, submit: !events.unpublished.has,
+         danger: events.unpublished.has}">
+      {{ (events.published.has ? (events.unpublished.has ? 'WIZARD.RETRACT_DELETE' : 'WIZARD.RETRACT') : 'WIZARD.DELETE') | translate }}
     </a>
     <a ng-click="navigateTo('retractForm', currentForm, [])"
        data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">

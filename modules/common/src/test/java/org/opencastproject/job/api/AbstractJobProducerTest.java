@@ -102,7 +102,7 @@ public class AbstractJobProducerTest extends EasyMockSupport {
   @Test
   public void testIsReadyToAccept() throws Exception {
     expect(serviceRegistry.getRegistryHostname()).andReturn("test").anyTimes();
-    expect(serviceRegistry.getMaxLoadOnNode("test")).andReturn(new NodeLoad("test", 4.0f)).anyTimes();
+    expect(serviceRegistry.getMaxLoadOnNode("test")).andReturn(new NodeLoad("test", 0.0f, 4.0f)).anyTimes();
     //Initially zero load + 1.0f
     expect(serviceRegistry.getOwnLoad()).andReturn(1.0f);
     //Initially 4.0 load + 1.0f
@@ -133,7 +133,7 @@ public class AbstractJobProducerTest extends EasyMockSupport {
   @Test
   public void testIsReadyToAcceptOversize() throws Exception {
     expect(serviceRegistry.getRegistryHostname()).andReturn("test").anyTimes();
-    expect(serviceRegistry.getMaxLoadOnNode("test")).andReturn(new NodeLoad("test", 4.0f)).anyTimes();
+    expect(serviceRegistry.getMaxLoadOnNode("test")).andReturn(new NodeLoad("test", 0.0f, 4.0f)).anyTimes();
     //Initially zero load + 1.0f
     expect(serviceRegistry.getOwnLoad()).andReturn(1.0f);
     //Initially 4.0 load + 1.0f

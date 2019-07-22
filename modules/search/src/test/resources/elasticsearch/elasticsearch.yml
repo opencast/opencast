@@ -1,0 +1,3 @@
+cluster.name: opencast
+path.home: ${opencast.home}/
+path.data: ${opencast.home}/index/data
