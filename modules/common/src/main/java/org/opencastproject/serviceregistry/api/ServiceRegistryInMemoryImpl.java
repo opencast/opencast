@@ -120,7 +120,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
           UserDirectoryService userDirectoryService, OrganizationDirectoryService organizationDirectoryService,
           IncidentService incidentService) throws ServiceRegistryException {
     //Note: total memory here isn't really the correct value, but we just need something (preferably non-zero)
-    registerHost(LOCALHOST, LOCALHOST, Runtime.getRuntime().totalMemory(), Runtime.getRuntime().availableProcessors(), maxLoad);
+    registerHost(LOCALHOST, LOCALHOST, "Admin", Runtime.getRuntime().totalMemory(), Runtime.getRuntime().availableProcessors(), maxLoad);
     if (service != null)
       registerService(service, maxLoad);
     this.securityService = securityService;
@@ -176,12 +176,12 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(String, String, long, int, float)
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(String, String, String, long, int, float)
    */
   @Override
-  public void registerHost(String host, String address, long memory, int cores, float maxLoad)
+  public void registerHost(String host, String address, String nodeName, long memory, int cores, float maxLoad)
           throws ServiceRegistryException {
-    HostRegistrationInMemory hrim = new HostRegistrationInMemory(address, address, maxLoad, cores, memory);
+    HostRegistrationInMemory hrim = new HostRegistrationInMemory(address, address, nodeName, maxLoad, cores, memory);
     hosts.put(host, hrim);
   }
 
@@ -1003,7 +1003,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   @Override
   public SystemLoad getMaxLoads() throws ServiceRegistryException {
     SystemLoad systemLoad = new SystemLoad();
-    systemLoad.addNodeLoad(new NodeLoad(LOCALHOST, Runtime.getRuntime().availableProcessors()));
+    systemLoad.addNodeLoad(new NodeLoad(LOCALHOST, 0.0f, Runtime.getRuntime().availableProcessors()));
     return systemLoad;
   }
 
@@ -1015,7 +1015,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   @Override
   public NodeLoad getMaxLoadOnNode(String host) throws ServiceRegistryException {
     if (hosts.containsKey(host)) {
-      return new NodeLoad(host, hosts.get(host).getMaxLoad());
+      return new NodeLoad(host, 0.0f, hosts.get(host).getMaxLoad());
     }
     throw new ServiceRegistryException("Unable to find host " + host + " in service registry");
   }
@@ -1053,6 +1053,16 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   }
 
   @Override
+  public HostRegistration getHostRegistration(String hostname) throws ServiceRegistryException {
+    for (HostRegistration host:  this.getHostRegistrations()) {
+      if (host.getBaseUrl().equalsIgnoreCase(hostname)) {
+        return host;
+      }
+    }
+    throw new ServiceRegistryException(String.format("Host registration for %s not found", hostname));
+  }
+
+  @Override
   public SystemLoad getCurrentHostLoads() {
     SystemLoad systemLoad = new SystemLoad();
 
@@ -1072,7 +1082,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
             }
           }
         }
-        node.setLoadFactor(node.getLoadFactor() + loadSum);
+        node.setCurrentLoad(loadSum);
       }
       systemLoad.addNodeLoad(node);
     }
@@ -1099,7 +1109,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   @Override
   public float getOwnLoad() {
-    return getCurrentHostLoads().get(getRegistryHostname()).getLoadFactor();
+    return getCurrentHostLoads().get(getRegistryHostname()).getCurrentLoad();
   }
 
   @Override

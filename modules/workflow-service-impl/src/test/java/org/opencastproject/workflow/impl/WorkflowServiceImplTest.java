@@ -69,6 +69,7 @@ import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
+import org.opencastproject.workflow.api.WorkflowIdentifier;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
@@ -199,28 +200,12 @@ public class WorkflowServiceImplTest {
       // This is the asset manager the workflow service itself uses. Further below is the asset manager for the solr
       // index.
       final AssetManager assetManager = createNiceMock(AssetManager.class);
-      final AQueryBuilder query = EasyMock.createMock(AQueryBuilder.class);
-      final Target t = EasyMock.createNiceMock(Target.class);
-      final Predicate p = EasyMock.createNiceMock(Predicate.class);
-      EasyMock.expect(p.and(EasyMock.anyObject(Predicate.class))).andReturn(p).anyTimes();
-      EasyMock.expect(query.snapshot()).andReturn(t).anyTimes();
-      EasyMock.expect(query.propertiesOf(EasyMock.anyString())).andReturn(t).anyTimes();
-      final VersionField v = EasyMock.createNiceMock(VersionField.class);
-      EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
-      EasyMock.expect(query.version()).andReturn(v).anyTimes();
+      EasyMock.expect(assetManager.selectProperties(EasyMock.anyString(), EasyMock.anyString()))
+              .andReturn(Collections.emptyList())
+              .anyTimes();
       EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
-      EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(p).anyTimes();
-      final ASelectQuery selectQuery = EasyMock.createMock(ASelectQuery.class);
-      EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
-      final AResult r = EasyMock.createNiceMock(AResult.class);
-      EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
-      final Stream<ARecord> recStream = Stream.mk();
-      EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
-      EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class))).
-              andReturn(selectQuery).anyTimes();
-      EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
-      EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
-      EasyMock.replay(query, t, r, selectQuery, assetManager, p, v);
+      EasyMock.expect(assetManager.snapshotExists(EasyMock.anyString())).andReturn(true).anyTimes();
+      EasyMock.replay(assetManager);
       service.setAssetManager(assetManager);
     }
 
@@ -252,7 +237,7 @@ public class WorkflowServiceImplTest {
 
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
             organizationDirectoryService, incidentService);
-    serviceRegistry.registerHost(REMOTE_HOST, REMOTE_HOST, Runtime.getRuntime().totalMemory(), Runtime.getRuntime().
+    serviceRegistry.registerHost(REMOTE_HOST, REMOTE_HOST, "remote", Runtime.getRuntime().totalMemory(), Runtime.getRuntime().
             availableProcessors(), Runtime.getRuntime().availableProcessors());
     serviceRegistry.registerService(REMOTE_SERVICE, REMOTE_HOST, "/path", true);
     service.setWorkspace(workspace);
@@ -274,6 +259,15 @@ public class WorkflowServiceImplTest {
 
     InputStream is = null;
     try {
+      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-exception-handler.xml");
+      WorkflowDefinition exceptionHandler = WorkflowParser.parseWorkflowDefinition(is);
+      IOUtils.closeQuietly(is);
+
+      /* The exception handler workflow definition needs to be registered as the reference to it in 
+         workflow-definition-3 will be checked */
+      scanner.putWorkflowDefinition(
+              new WorkflowIdentifier("exception-handler", securityService.getOrganization().getId()), exceptionHandler);
+
       is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-1.xml");
       workingDefinition = WorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
@@ -289,11 +283,6 @@ public class WorkflowServiceImplTest {
       is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-4.xml");
       pausingWorkflowDefinition = WorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
-
-      service.registerWorkflowDefinition(workingDefinition);
-      service.registerWorkflowDefinition(failingDefinitionWithoutErrorHandler);
-      service.registerWorkflowDefinition(failingDefinitionWithErrorHandler);
-      service.registerWorkflowDefinition(pausingWorkflowDefinition);
 
       MediaPackageBuilder mediaPackageBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
       mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(new File("target/test-classes")));
@@ -690,8 +679,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    def.setPublished(true);
-    service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once", null, true);
     def.add(opDef);
@@ -711,8 +698,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    def.setPublished(true);
-    service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once", null, true);
     opDef.setRetryStrategy(RetryStrategy.RETRY);
@@ -733,8 +718,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    def.setPublished(true);
-    service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once", null, true);
     opDef.setRetryStrategy(RetryStrategy.HOLD);
@@ -764,8 +747,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    def.setPublished(true);
-    service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failTwice", "fails twice", null, true);
     opDef.setRetryStrategy(RetryStrategy.HOLD);
@@ -821,8 +802,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    def.setPublished(true);
-    service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failTwice", "fails twice", null, true);
     opDef.setRetryStrategy(RetryStrategy.HOLD);
@@ -880,8 +859,6 @@ public class WorkflowServiceImplTest {
     def.setId("workflow-definition-1");
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
-    def.setPublished(true);
-    service.registerWorkflowDefinition(def);
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOnHost", "fails on host", null,
             true);

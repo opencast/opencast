@@ -10,8 +10,8 @@
    "SAVE": "שמור",
    "LOGOUT": "התנתקות",
    "RESET": "איפוס",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "לא נבחרה כל אופציה",
+   "SELECT_NO_OPTIONS_AVAILABLE": "אין אפשרויות זמינות",
    "YES": "כן",
    "LANGUAGES": {
       "ARABIC": "ערבית",
@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "לא ניתן למחוק את ערכת הנושא",
       "TASK_CREATED": "המשימה נוצרה",
       "TASK_NOT_CREATED": "לא היתה אפשרות ליצור את המשימה",
-      "VIDEO_CUT_NOT_SAVED": "לא היתה אפשרות לשמור את המידע העריכה",
-      "VIDEO_CUT_SAVED": "מידע העריכה נשמר",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
       "VIDEO_CUT_PROCESSING": "מעבד את הוידאו…",
       "THUMBNAIL_CHANGE_FAILED": "החלפת תמונה ממוזערת נכשלה.",
       "VIDEO_SOURCE_TRACKS_INVALID": "לא נבחרו רצועות וידאו",
@@ -271,7 +271,7 @@
       "BACK": "הקודם",
       "CREATE": "צור",
       "RETRACT": "ביטול",
-      "RETRACT_DELETE": "Retract/Delete",
+      "RETRACT_DELETE": "חזרה/מחיקה",
       "DELETE": "מחק",
       "UPDATE": "עדכן",
       "DURATION": {
@@ -307,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "הגדרות"
+      },
+      "STATISTICS": {
+         "TITLE": "סטטיסטיקות"
       }
    },
    "EVENTS": {
@@ -489,7 +492,7 @@
                "EDITOR_NEEDS_CUTTING": "פתח עורך וידאו (הערה מציינת כי חיתוך הווידאו התבקש)",
                "COMMENTS": "הצגת הערות",
                "PAUSED_WORKFLOW": "הצגת תהליכי עבודה מושהים",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "מסנן עבור מציג זה"
             }
          },
          "STATUS": {
@@ -505,6 +508,14 @@
             "PROCESSING_FAILURE": "עיבוד נכשל",
             "PROCESSING_CANCELED": "עיבוד בוטל"
          },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
+         },
          "DETAILS": {
             "HEADER": "פרטי אירוע - {{resourceId}}",
             "TABS": {
@@ -515,7 +526,8 @@
                "SCHEDULING": "תזמון",
                "WORKFLOWS": "תהליכים",
                "ACCESS": "מדיניות גישה",
-               "COMMENTS": "הערות"
+               "COMMENTS": "הערות",
+               "STATISTICS": "סטטיסטיקות"
             },
             "PUBLICATIONS": {
                "CAPTION": "פרסומים",
@@ -757,6 +769,9 @@
                   "PROCESSING_FAILURE": "עיבוד נכשל"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "סטטיסטיקות"
+            },
             "METADATA": {
                "CAPTION": "פרטי אירוע",
                "TITLE": "כותרת",
@@ -796,7 +811,7 @@
                "ACTIONS": "פעולות",
                "DETAILS": "פרטים",
                "DESCRIPTION": "תאור",
-               "MORE_INFO": "More Information",
+               "MORE_INFO": "מידע נוסף",
                "ID": "מזהה",
                "TYPE": "סוג",
                "TITLE": "כותרת",
@@ -804,8 +819,8 @@
                "STARTED": "החל",
                "SERIES": "סדרות",
                "SUBMITTED": "נשלח",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
+               "SUBMITTER": "מגיש",
+               "EXECUTION_TIME": "זמן ביצוע",
                "WDID": "הגדרה של תהליך עבודה",
                "MIMETYPE": "Mimetype",
                "URL": "כתובת אינטרנט",
@@ -813,11 +828,11 @@
                "NO_CONFIGURATION": "אין הגדרת פרמטרים למהלך העבודה שנבחר.",
                "WORKFLOW": "מהלך עבודה",
                "TOOLTIP": {
-                  "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
-                  "DETAILS": "Open workflow details"
+                  "STOP": "עצירת התהליך",
+                  "ABORT": "ביטול ביצוע של תהליך עבודה (אל תנסה לבצע שוב פעולות שנכשלו)",
+                  "RETRY": "נסה שנית לבצע מופע תהליך עבודה",
+                  "DELETE": "מחיקת תהליך עבודה",
+                  "DETAILS": "פתח פרטי תהליך העבודה"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "מופעל",
@@ -825,9 +840,9 @@
                   "PAUSED": "מושהה",
                   "SUCCEEDED": "הצליח",
                   "FAILED": "נכשל",
-                  "FAILING": "Failing",
+                  "FAILING": "נכשל",
                   "SKIPPED": "דולג",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "נעצר",
                   "RETRY": "ניסיון נוסף"
                }
             },
@@ -980,7 +995,8 @@
                "EXTENDED_METADATA": "מטא-נתונים II",
                "EVENTS": "אירועים",
                "PERMISSIONS": "מדיניות גישה",
-               "THEME": "ערכת נושא"
+               "THEME": "ערכת נושא",
+               "STATISTICS": "סטטיסטיקות"
             },
             "ACCESS": {
                "CAPTION": "מדיניות גישה",
@@ -1433,6 +1449,7 @@
             "CREATED": "נוצר",
             "CREATOR": "יוצר",
             "HOST_NAME": "שם מחשב מארח",
+            "NODE_NAME": "שם שרת",
             "OPERATION": "פעולה",
             "STARTED": "התחילה",
             "STATUS": "מצב",
@@ -1458,6 +1475,7 @@
             "CAPTION": "שרתים",
             "STATUS": "מצב",
             "HOST_NAME": "שם מחשב מארח",
+            "NODE_NAME": "שם שרת",
             "CORES": "ליבות",
             "COMPLETED": "משימות שהושלמו",
             "RUNNING": "משימות רצות",
@@ -1475,6 +1493,7 @@
             "STATUS": "מצב",
             "NAME": "שם שירות",
             "HOST_NAME": "שם מחשב מארח",
+            "NODE_NAME": "שם שרת",
             "COMPLETED": "משימות שהושלמו",
             "RUNNING": "משימות רצות",
             "QUEUED": "משימות בתור",
@@ -1520,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "פצל",
-         "CUT": "גזור",
-         "REPLAY_SEGMENT": "הפעל מחדש מקטע",
-         "REPLAY_END_OF_SEGMENT": "סוף קטע",
-         "REPLAY_SEGMENT_WITH_PREROLL": "בדוק את המעבר",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "בטל",
          "REDO": "בצע שוב",
-         "CLEAR_SEGMENTS": "נקה מקטעים",
-         "CLEAR_SELECTED_SEGMENT": "נקטע מקטעים שנבחרו"
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "הסר מקטע",
-         "USE_SEGMENT": "השתמש במקטע זה",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
          "START": "התחל",
          "END": "סוף"
       },
@@ -1749,6 +1774,9 @@
          "HOSTNAME": {
             "LABEL": "שם מחשב מארח"
          },
+         "NODE_NAME": {
+            "LABEL": "שם שרת"
+         },
          "STATUS": {
             "LABEL": "מצב",
             "PAUSED": "מושהה",
@@ -1790,6 +1818,9 @@
          "HOSTNAME": {
             "LABEL": "שם מחשב מארח"
          },
+         "NODE_NAME": {
+            "LABEL": "שם שרת"
+         },
          "STATUS": {
             "LABEL": "מצב",
             "MAINTENANCE": "תחזוקה",
@@ -1803,6 +1834,9 @@
          },
          "HOSTNAME": {
             "LABEL": "שם מחשב מארח"
+         },
+         "NODE_NAME": {
+            "LABEL": "שם שרת"
          },
          "NAME": {
             "LABEL": "שם"
@@ -1947,7 +1981,30 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "על מנת להזין מספר ערכים יש ללחוץ על מקש Enter בין כל ערך"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "סטטיסטיקטות לא ניתנות להצגה ברגע זה. יש לנסות בשלב מאוחר יותר.",
+      "UNSUPPORTED_TYPE": "מצטערים, Opencast לא יכולה לחשב את הנתון הסטטיסטי הזה.",
+      "FROM": "מאת",
+      "TO": "עבור",
+      "TOTAL": "סה\"כ",
+      "GRANULARITY": "גרנולריות",
+      "NAVIGATION": {
+         "ORGANIZATION": "ארגון"
+      },
+      "TITLE": {
+         "RANDOM": "מידע אקראי",
+         "VIEWS_SUM": "מספר צפיות כללי",
+         "VIEWS_AVG": "מספר צפיות ממוצע",
+         "PUBLISHEDHOURS": "Published Hours of Video"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "מוצג מידע אקראי לצורך הצגת יכולות. ניתן לבטל תצוגת תרשים זה על ידי מחיקת קובץ json המכיל המספק מידע סטטיסטי מתקיית etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the running total published hours of video"
       }
    }
 }

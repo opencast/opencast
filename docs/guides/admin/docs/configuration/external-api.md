@@ -87,6 +87,12 @@ directly in the Opencast administrative user interface.
 |ROLE_API_SERIES_PROPERTIES_EDIT |PUT    |/api/series/\*/properties                             |
 |ROLE_API_SERIES_DELETE          |DELETE |/api/series/\*                                        |
 
+**Statistics API**
+
+|ROLE                            |METHOD | URL                                                      |
+|--------------------------------|-------|----------------------------------------------------------|
+|ROLE_API_STATISTICS_VIEW        |GET    |/api/statistics/providers<br>/api/statistics/providers/\* |
+|ROLE_API_STATISTICS_VIEW        |POST   |/api/statistics/data/query                                |
 
 **Groups API**
 

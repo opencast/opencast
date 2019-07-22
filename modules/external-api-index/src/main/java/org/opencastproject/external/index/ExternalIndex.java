@@ -30,8 +30,6 @@ import org.opencastproject.util.data.Option;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.ComponentException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,9 +38,6 @@ import java.util.List;
  * A search index implementation based on ElasticSearch.
  */
 public class ExternalIndex extends AbstractSearchIndex {
-
-  /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(ExternalIndex.class);
 
   /** The name of this index */
   private static final String INDEX_NAME = "externalapi";

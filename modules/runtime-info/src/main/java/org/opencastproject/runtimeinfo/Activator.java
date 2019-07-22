@@ -108,11 +108,11 @@ public class Activator extends HttpServlet implements BundleActivator {
       resp.sendRedirect("rest_docs.html");
     } else {
       // write the details for this service
-      writeServiceDocumentation(docPath, req, resp);
+      writeServiceDocumentation(docPath, resp);
     }
   }
 
-  private void writeServiceDocumentation(final String docPath, HttpServletRequest req, HttpServletResponse resp)
+  private void writeServiceDocumentation(final String docPath, HttpServletResponse resp)
           throws IOException {
     ServiceReference reference = null;
     for (ServiceReference ref : getRestEndpointServices()) {
@@ -134,8 +134,7 @@ public class Activator extends HttpServlet implements BundleActivator {
         @Override
         public Void some(RestService annotation) {
           globalMacro.put("SERVICE_CLASS_SIMPLE_NAME", restService.getClass().getSimpleName());
-          RestDocData data = new RestDocData(annotation.name(), annotation.title(), docPath, annotation.notes(),
-                  restService, globalMacro);
+          RestDocData data = new RestDocData(annotation.name(), annotation.title(), docPath, annotation.notes());
           data.setAbstract(annotation.abstractText());
 
           Produces producesClass = (Produces) restService.getClass().getAnnotation(Produces.class);

@@ -24,18 +24,20 @@ package org.opencastproject.message.broker.api.scheduler;
 import org.opencastproject.message.broker.api.MessageItem;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class SchedulerItemList implements MessageItem, Serializable {
   private final String id;
   private final SchedulerItem[] items;
 
-  public static SchedulerItemList singleton(final String id, final SchedulerItem item) {
-    return new SchedulerItemList(id, new SchedulerItem[] {item});
-  }
-
-  public SchedulerItemList(final String id, final SchedulerItem[] items) {
+  public SchedulerItemList(final String id, final SchedulerItem ... items) {
     this.id = id;
     this.items = items;
+  }
+
+  public SchedulerItemList(final String id, final List<SchedulerItem> items) {
+    this.id = id;
+    this.items = items.toArray(new SchedulerItem[0]);
   }
 
   public SchedulerItem[] getItems() {

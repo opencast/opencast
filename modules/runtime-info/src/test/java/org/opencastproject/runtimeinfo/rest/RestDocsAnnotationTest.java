@@ -36,7 +36,6 @@ import org.junit.Test;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -173,8 +172,7 @@ public class RestDocsAnnotationTest {
     try {
       testMethod = TestServletSample.class.getMethod("methodA");
       if (testMethod != null) {
-        RestDocData restDocData = new RestDocData("NAME", "TITLE", "URL", null, new TestServletSample(),
-                new HashMap<String, String>());
+        RestDocData restDocData = new RestDocData("NAME", "TITLE", "URL", null);
 
         RestQuery restQueryAnnotation = (RestQuery) testMethod.getAnnotation(RestQuery.class);
         Path pathAnnotation = (Path) testMethod.getAnnotation(Path.class);

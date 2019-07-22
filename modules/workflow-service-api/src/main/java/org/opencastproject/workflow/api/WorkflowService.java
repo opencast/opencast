@@ -59,27 +59,6 @@ public interface WorkflowService {
   void removeWorkflowListener(WorkflowListener listener);
 
   /**
-   * Registers a new workflow definition. If a workflow definition with the same identifier is already registered, it
-   * will be replaced.
-   *
-   * @param workflow
-   *          the new workflow definition
-   * @throws WorkflowDatabaseException
-   *           if there is a problem registering the workflow definition
-   */
-  void registerWorkflowDefinition(WorkflowDefinition workflow) throws WorkflowDatabaseException;
-
-  /**
-   * Removes the workflow definition with this identifier.
-   *
-   * @throws NotFoundException
-   *           if there is no workflow registered with this identifier
-   * @throws WorkflowDatabaseException
-   *           if there is a problem unregistering the workflow definition
-   */
-  void unregisterWorkflowDefinition(String workflowDefinitionId) throws NotFoundException, WorkflowDatabaseException;
-
-  /**
    * Returns the {@link WorkflowDefinition} identified by <code>name</code>.
    *
    * @param id
@@ -339,4 +318,9 @@ public interface WorkflowService {
    */
   void cleanupWorkflowInstances(int lifetime, WorkflowInstance.WorkflowState state) throws WorkflowDatabaseException,
           UnauthorizedException;
+
+  /**
+   * @return All configured workflow state mappings
+   */
+  Map<String, Map<String, String>> getWorkflowStateMappings();
 }

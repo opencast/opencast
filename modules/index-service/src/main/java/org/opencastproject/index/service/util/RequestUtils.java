@@ -20,20 +20,31 @@
  */
 package org.opencastproject.index.service.util;
 
+import org.opencastproject.index.service.exception.ListProviderException;
+import org.opencastproject.index.service.resources.list.api.ListProvidersService;
+import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
+
+import com.google.common.net.MediaType;
+
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public final class RequestUtils {
   public static final String ID_JSON_KEY = "id";
   public static final String VALUE_JSON_KEY = "value";
   public static final String REQUIRED_JSON_KEY = "required";
+  private static final JSONParser parser = new JSONParser();
 
   private RequestUtils() {
   }
@@ -48,7 +59,6 @@ public final class RequestUtils {
    *           Thrown if the json is malformed.
    */
   public static Map<String, String> getKeyValueMap(String json) throws ParseException {
-    JSONParser parser = new JSONParser();
     JSONArray updatedFields = (JSONArray) parser.parse(json);
     Map<String, String> fieldMap = new TreeMap<String, String>();
     JSONObject field;
@@ -70,6 +80,54 @@ public final class RequestUtils {
       }
     }
     return fieldMap;
+  }
+
+  /**
+   * Check if an uploaded asset conforms to the configured list of accepted file types.
+   *
+   * @param assetUploadId
+   *          The id of the uploaded asset
+   * @param mediaType
+   *          The media type sent by the browser
+   * @param listProvidersService
+   *          The ListProviderService to get the configured accepted types from
+   *
+   * @return true if the given mediatype is accepted, false otherwise.
+   */
+  public static boolean typeIsAccepted(String assetUploadId, MediaType mediaType, ListProvidersService listProvidersService) {
+    if (mediaType.is(MediaType.OCTET_STREAM)) {
+      // No detailed info, so we have to accept...
+      return true;
+    }
+    try {
+      final Collection<String> assetUploadJsons = listProvidersService.getList("eventUploadAssetOptions",
+          new ResourceListQueryImpl(),false).values();
+      for (String assetUploadJson: assetUploadJsons) {
+        if (!assetUploadJson.startsWith("{") || !assetUploadJson.endsWith("}")) {
+          // Ignore non-json-values
+          continue;
+        }
+        @SuppressWarnings("unchecked")
+        final Map<String, String> assetUpload = (Map<String, String>) parser.parse(assetUploadJson);
+        if (assetUploadId.equals(assetUpload.get("id"))) {
+          final List<String> accepts = Arrays.stream(assetUpload.getOrDefault("accept", "*/*").split(","))
+              .map(String::trim).collect(Collectors.toList());
+          for (String accept : accepts) {
+            if (accept.contains("/") && mediaType.is(MediaType.parse(accept))) {
+              return true;
+            } else if (mediaType.subtype().equalsIgnoreCase(accept.replace(".", ""))) {
+              return true;
+            }
+          }
+          return false;
+        }
+      }
+    } catch (ListProviderException e) {
+      throw new IllegalArgumentException("Invalid assetUploadId: " + assetUploadId);
+    } catch (org.json.simple.parser.ParseException e) {
+      throw new IllegalStateException("cannot parse json list provider for asset upload Id " + assetUploadId, e);
+    }
+    throw new IllegalArgumentException("Invalid assetUploadId: " + assetUploadId);
   }
 
 }

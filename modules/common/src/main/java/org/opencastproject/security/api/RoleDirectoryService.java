@@ -22,6 +22,10 @@
 package org.opencastproject.security.api;
 
 import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * A marker interface for the federation of all {@link RoleProvider}s.
@@ -34,6 +38,11 @@ public interface RoleDirectoryService {
    * @return the roles
    */
   Iterator<Role> getRoles();
+
+  default Stream<Role> getRolesStream() {
+    return StreamSupport
+            .stream(Spliterators.spliteratorUnknownSize(getRoles(), Spliterator.NONNULL), false);
+  }
 
   /**
    * Return the found role's as an iterator.

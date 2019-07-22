@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "Het thema kon niet verwijderd worden",
       "TASK_CREATED": "De taak werd aangemaakt",
       "TASK_NOT_CREATED": "De taak kon niet aangemaakt worden",
-      "VIDEO_CUT_NOT_SAVED": "De bewerkte informatie kon niet worden bewaard",
-      "VIDEO_CUT_SAVED": "De bewerkte informatie werd bewaard",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
       "VIDEO_CUT_PROCESSING": "De video wordt verwerkt…",
       "THUMBNAIL_CHANGE_FAILED": "Het wijzigen van de miniatuurafbeelding is mislukt.",
       "VIDEO_SOURCE_TRACKS_INVALID": "U hebt geen videotracks geselecteerd voor de verwerking",
@@ -307,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Configuratie"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistics"
       }
    },
    "EVENTS": {
@@ -505,6 +508,14 @@
             "PROCESSING_FAILURE": "Verwerking mislukt",
             "PROCESSING_CANCELED": "Verwerking geannuleerd"
          },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
+         },
          "DETAILS": {
             "HEADER": "Details van evenement {{resourceId}}",
             "TABS": {
@@ -515,7 +526,8 @@
                "SCHEDULING": "Planning",
                "WORKFLOWS": "Workflows",
                "ACCESS": "Toegangspolicy",
-               "COMMENTS": "Reacties"
+               "COMMENTS": "Reacties",
+               "STATISTICS": "Statistics"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publicaties",
@@ -757,6 +769,9 @@
                   "PROCESSING_FAILURE": "Verwerking mislukt"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Statistics"
+            },
             "METADATA": {
                "CAPTION": "Details evenement",
                "TITLE": "Titel",
@@ -825,9 +840,9 @@
                   "PAUSED": "Gepauzeerd",
                   "SUCCEEDED": "Geslaagd",
                   "FAILED": "Mislukt",
-                  "FAILING": "Failing",
+                  "FAILING": "Mislukt",
                   "SKIPPED": "Overgeslagen",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "Gestopt",
                   "RETRY": "Opnieuw"
                }
             },
@@ -980,7 +995,8 @@
                "EXTENDED_METADATA": "Metadata II",
                "EVENTS": "Evenementen",
                "PERMISSIONS": "Toegangspolicy",
-               "THEME": "Thema"
+               "THEME": "Thema",
+               "STATISTICS": "Statistics"
             },
             "ACCESS": {
                "CAPTION": "Toegangspolicy",
@@ -1433,6 +1449,7 @@
             "CREATED": "Aangemaakt",
             "CREATOR": "Auteur",
             "HOST_NAME": "Hostnaam",
+            "NODE_NAME": "Node name",
             "OPERATION": "Operatie",
             "STARTED": "Gestart",
             "STATUS": "Status",
@@ -1458,6 +1475,7 @@
             "CAPTION": "Servers",
             "STATUS": "Status",
             "HOST_NAME": "Hostnaam",
+            "NODE_NAME": "Node name",
             "CORES": "Kernen",
             "COMPLETED": "Jobs afgewerkt",
             "RUNNING": "Jobs in verwerking",
@@ -1475,6 +1493,7 @@
             "STATUS": "Status",
             "NAME": "Servicenaam",
             "HOST_NAME": "Hostnaam",
+            "NODE_NAME": "Node name",
             "COMPLETED": "Jobs afgewerkt",
             "RUNNING": "Jobs in verwerking",
             "QUEUED": "Jobs in wachtrij",
@@ -1520,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Splitsen",
-         "CUT": "Knippen",
-         "REPLAY_SEGMENT": "Segment opnieuw afspelen",
-         "REPLAY_END_OF_SEGMENT": "Einde van segment",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Bekijk overgang",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "Ongedaan maken",
          "REDO": "Opnieuw toepassen",
-         "CLEAR_SEGMENTS": "Segmenten verwijderen",
-         "CLEAR_SELECTED_SEGMENT": "Verwijder geselecteerde segmenten"
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Segment verwijderen",
-         "USE_SEGMENT": "Gebruik dit segment",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
          "START": "Start",
          "END": "Einde"
       },
@@ -1749,6 +1774,9 @@
          "HOSTNAME": {
             "LABEL": "Hostnaam"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Status",
             "PAUSED": "Gepauzeerd",
@@ -1790,6 +1818,9 @@
          "HOSTNAME": {
             "LABEL": "Hostnaam"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Status",
             "MAINTENANCE": "Onderhoud",
@@ -1803,6 +1834,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Hostnaam"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "Naam"
@@ -1948,6 +1982,29 @@
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "To insert multiple values press Enter in between"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "FROM": "Van",
+      "TO": "To",
+      "TOTAL": "Total",
+      "GRANULARITY": "Granularity",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Random Data",
+         "VIEWS_SUM": "Total Number of Views",
+         "VIEWS_AVG": "Average Number of Views",
+         "PUBLISHEDHOURS": "Published Hours of Video"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the running total published hours of video"
       }
    }
 }

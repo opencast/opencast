@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "Non se puido borrar o estilo",
       "TASK_CREATED": "Tarefa creada",
       "TASK_NOT_CREATED": "Non se puido crear a tarefa",
-      "VIDEO_CUT_NOT_SAVED": "Non se puideron gardar os datos de edición",
-      "VIDEO_CUT_SAVED": "Datos de edición gardados",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
       "VIDEO_CUT_PROCESSING": "Estase a procesar o vídeo…",
       "THUMBNAIL_CHANGE_FAILED": "Non se puido cambiar a miniatura.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Non se seleccionaron pistas de vídeo para procesar",
@@ -307,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Configuración"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistics"
       }
    },
    "EVENTS": {
@@ -505,6 +508,14 @@
             "PROCESSING_FAILURE": "Fallo no procesamento",
             "PROCESSING_CANCELED": "Procesamento cancelado"
          },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
+         },
          "DETAILS": {
             "HEADER": "Detalles do evento - {{resourceId}}",
             "TABS": {
@@ -515,7 +526,8 @@
                "SCHEDULING": "Programación",
                "WORKFLOWS": "Fluxos de Traballo",
                "ACCESS": "Política de acceso",
-               "COMMENTS": "Comentarios"
+               "COMMENTS": "Comentarios",
+               "STATISTICS": "Statistics"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publicacións",
@@ -757,6 +769,9 @@
                   "PROCESSING_FAILURE": "Fallo no procesamento"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Statistics"
+            },
             "METADATA": {
                "CAPTION": "Detalles do evento",
                "TITLE": "Título",
@@ -980,7 +995,8 @@
                "EXTENDED_METADATA": "Metadatos II",
                "EVENTS": "Eventos",
                "PERMISSIONS": "Política de acceso",
-               "THEME": "Estilo"
+               "THEME": "Estilo",
+               "STATISTICS": "Statistics"
             },
             "ACCESS": {
                "CAPTION": "Política de acceso",
@@ -1433,6 +1449,7 @@
             "CREATED": "Creado",
             "CREATOR": "Creador",
             "HOST_NAME": "Nome do servidor",
+            "NODE_NAME": "Node name",
             "OPERATION": "Operación",
             "STARTED": "Iniciado",
             "STATUS": "Estado",
@@ -1458,6 +1475,7 @@
             "CAPTION": "Servidores",
             "STATUS": "Estado",
             "HOST_NAME": "Nome do servidor",
+            "NODE_NAME": "Node name",
             "CORES": "Núcleos",
             "COMPLETED": "Traballos completados",
             "RUNNING": "Traballos en execución",
@@ -1475,6 +1493,7 @@
             "STATUS": "Estado",
             "NAME": "Nome do servizo",
             "HOST_NAME": "Nome do servidor",
+            "NODE_NAME": "Node name",
             "COMPLETED": "Traballos completados",
             "RUNNING": "Traballos en execución",
             "QUEUED": "Traballos en cola",
@@ -1520,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Dividir",
-         "CUT": "Cortar",
-         "REPLAY_SEGMENT": "Reproducir segmento",
-         "REPLAY_END_OF_SEGMENT": "Fin de segmento",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Comprobar a transición",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "Desfacer",
          "REDO": "Refacer",
-         "CLEAR_SEGMENTS": "Borrar segmentos",
-         "CLEAR_SELECTED_SEGMENT": "Borrar segmento seleccionado"
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Eliminar segmento",
-         "USE_SEGMENT": "Usar este segmento",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
          "START": "Inicio",
          "END": "Fin"
       },
@@ -1749,6 +1774,9 @@
          "HOSTNAME": {
             "LABEL": "Nome do servidor"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Estado",
             "PAUSED": "Pausado",
@@ -1790,6 +1818,9 @@
          "HOSTNAME": {
             "LABEL": "Nome do servidor"
          },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
          "STATUS": {
             "LABEL": "Estado",
             "MAINTENANCE": "Mantemento",
@@ -1803,6 +1834,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Nome do servidor"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "Nome"
@@ -1948,6 +1982,29 @@
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "Para inserir varios valores preme o Intro entre estes"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "FROM": "Dende",
+      "TO": "To",
+      "TOTAL": "Total",
+      "GRANULARITY": "Granularity",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Random Data",
+         "VIEWS_SUM": "Total Number of Views",
+         "VIEWS_AVG": "Average Number of Views",
+         "PUBLISHEDHOURS": "Published Hours of Video"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the running total published hours of video"
       }
    }
 }

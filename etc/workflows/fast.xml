@@ -315,15 +315,16 @@
       </configurations>
     </operation>
 
-    <!-- Cleanup the working file repository -->
+    <!-- Clean up the working file repository -->
 
     <operation
       id="cleanup"
       fail-on-error="false"
       description="Cleaning up">
       <configurations>
-        <configuration key="preserve-flavors">security/*</configuration>
         <configuration key="delete-external">true</configuration>
+        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 

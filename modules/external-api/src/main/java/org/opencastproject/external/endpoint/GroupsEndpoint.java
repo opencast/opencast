@@ -81,7 +81,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0 })
 @RestService(name = "externalapigroups", title = "External API Groups Service", notes = {}, abstractText = "Provides resources and operations related to the groups")
 public class GroupsEndpoint {
 
@@ -192,7 +192,7 @@ public class GroupsEndpoint {
     try {
       indexService.updateGroup(id, name, description, roles, members);
     } catch (IllegalArgumentException e) {
-      logger.warn(e.getMessage());
+      logger.warn("Unable to update group id {}: {}", id, e.getMessage());
       return Response.status(SC_BAD_REQUEST).build();
     } catch (UnauthorizedException ex) {
       return Response.status(SC_FORBIDDEN).build();
@@ -215,7 +215,7 @@ public class GroupsEndpoint {
     try {
       indexService.createGroup(name, description, roles, members);
     } catch (IllegalArgumentException e) {
-      logger.warn(e.getMessage());
+      logger.warn("Unable to create group {}: {}", name, e.getMessage());
       return Response.status(SC_BAD_REQUEST).build();
     } catch (UnauthorizedException e) {
       return Response.status(SC_FORBIDDEN).build();
@@ -246,7 +246,7 @@ public class GroupsEndpoint {
             indexService.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
                     StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
           } catch (IllegalArgumentException e) {
-            logger.warn(e.getMessage());
+            logger.warn("Unable to add member to group id '{}': {}", id, e.getMessage());
             return Response.status(SC_BAD_REQUEST).build();
           } catch (UnauthorizedException ex) {
             return Response.status(SC_FORBIDDEN).build();
@@ -289,7 +289,7 @@ public class GroupsEndpoint {
             indexService.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
                     StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
           } catch (IllegalArgumentException e) {
-            logger.warn(e.getMessage());
+            logger.warn("Unable to remove member from group id '{}': {}", id, e.getMessage());
             return Response.status(SC_BAD_REQUEST).build();
           } catch (UnauthorizedException ex) {
             return Response.status(SC_FORBIDDEN).build();

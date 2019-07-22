@@ -112,7 +112,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       Job job = searchService.add(mediaPackage);
       return Response.ok(new JaxbJob(job)).build();
     } catch (Exception e) {
-      logger.info(e.getMessage());
+      logger.warn("Unable to add mediapackage to search index: {}", e.getMessage());
       return Response.serverError().build();
     }
   }
@@ -128,7 +128,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       Job job = searchService.delete(mediaPackageId);
       return Response.ok(new JaxbJob(job)).build();
     } catch (Exception e) {
-      logger.info(e.getMessage());
+      logger.info("Unable to remove mediapackage {} from search index: {}", mediaPackageId, e.getMessage());
       return Response.serverError().build();
     }
   }

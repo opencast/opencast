@@ -90,7 +90,7 @@ public class ServiceRegistrationJpaImplTest {
 
   @Test
   public void testQueryStatistics() throws Exception {
-    HostRegistrationJpaImpl host = new HostRegistrationJpaImpl("http://localhost:8081", "http://localhost:8081", 1024L,
+    HostRegistrationJpaImpl host = new HostRegistrationJpaImpl("http://localhost:8081", "http://localhost:8081", "Admin", 1024L,
             1, 1, true, false);
     ServiceRegistrationJpaImpl serviceReg = new ServiceRegistrationJpaImpl(host, "NOP", "/nop", false);
 

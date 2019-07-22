@@ -80,12 +80,12 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
       }
 
       if (deleted == 0) {
-        logger.info(format("The asset manager does not contain episode {}", mpId));
+        logger.info(format("The asset manager does not contain episode %s", mpId));
       } else {
-        logger.info(format("Successfully deleted {} version/s episode {} from the asset manager", deleted, mpId));
+        logger.info(format("Successfully deleted %d version/s episode %s from the asset manager", deleted, mpId));
       }
     } catch (Exception e) {
-      logger.warn(format("Error deleting episode {} from the asset manager: {}", mpId, e));
+      logger.warn(format("Error deleting episode %s from the asset manager: %s", mpId, e));
       throw new WorkflowOperationException("Unable to delete episode from the asset manager", e);
     }
     return createResult(mediaPackage, Action.CONTINUE);

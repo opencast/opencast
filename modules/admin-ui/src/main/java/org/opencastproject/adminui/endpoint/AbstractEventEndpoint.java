@@ -36,6 +36,7 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.conflictJson;
@@ -76,11 +77,11 @@ import org.opencastproject.index.service.api.IndexService.Source;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
 import org.opencastproject.index.service.impl.index.event.EventUtils;
-import org.opencastproject.index.service.resources.list.provider.EventCommentsListProvider;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider.Comments;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
 import org.opencastproject.index.service.util.AccessInformationUtil;
@@ -116,6 +117,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -1107,7 +1109,18 @@ public abstract class AbstractEventEndpoint {
     MetadataList metadataList = new MetadataList();
     List<EventCatalogUIAdapter> catalogUIAdapters = getIndexService().getEventCatalogUIAdapters();
     catalogUIAdapters.remove(getIndexService().getCommonEventCatalogUIAdapter());
-    MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
+    MediaPackage mediaPackage;
+    try {
+      mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
+    } catch (IndexServiceException e) {
+      if (e.getCause() instanceof NotFoundException) {
+        return notFound("Cannot find data for event %s", eventId);
+      } else if (e.getCause() instanceof UnauthorizedException) {
+        return Response.status(Status.FORBIDDEN).entity("Not authorized to access " + eventId).build();
+      }
+      logger.error("Internal error when trying to access metadata for " + eventId, e);
+      return serverError();
+    }
     for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
       metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
     }
@@ -1331,7 +1344,18 @@ public abstract class AbstractEventEndpoint {
     Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", id);
-    MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
+    MediaPackage mp;
+    try {
+      mp = getIndexService().getEventMediapackage(optEvent.get());
+    } catch (IndexServiceException e) {
+      if (e.getCause() instanceof NotFoundException) {
+        return notFound("Cannot find data for event %s", id);
+      } else if (e.getCause() instanceof UnauthorizedException) {
+        return Response.status(Status.FORBIDDEN).entity("Not authorized to access " + id).build();
+      }
+      logger.error("Internal error when trying to access metadata for " + id, e);
+      return serverError();
+    }
     int attachments = mp.getAttachments().length;
     int catalogs = mp.getCatalogs().length;
     int media = mp.getTracks().length;
@@ -1793,7 +1817,7 @@ public abstract class AbstractEventEndpoint {
       return Response.status(Status.CREATED).entity(result).build();
     }  catch (NotFoundException e) {
       return notFound("Cannot find an event with id '%s'.", eventId);
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException | UnsupportedAssetException e) {
       return RestUtil.R.badRequest(e.getMessage());
     } catch (Exception e) {
       return RestUtil.R.serverError();
@@ -2022,8 +2046,11 @@ public abstract class AbstractEventEndpoint {
   public Response createNewEvent(@Context HttpServletRequest request) {
     try {
       String result = getIndexService().createEvent(request);
+      if (StringUtils.isEmpty(result)) {
+        return RestUtil.R.badRequest("The date range provided did not include any events");
+      }
       return Response.status(Status.CREATED).entity(result).build();
-    } catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException | UnsupportedAssetException e) {
       return RestUtil.R.badRequest(e.getMessage());
     } catch (Exception e) {
       return RestUtil.R.serverError();
@@ -2047,8 +2074,12 @@ public abstract class AbstractEventEndpoint {
     Option<Integer> optOffset = Option.option(offset);
     Option<String> optSort = Option.option(trimToNull(sort));
     ArrayList<JValue> eventsList = new ArrayList<>();
-    EventSearchQuery query = new EventSearchQuery(getSecurityService().getOrganization().getId(),
-            getSecurityService().getUser());
+    final Organization organization = getSecurityService().getOrganization();
+    final User user = getSecurityService().getUser();
+    if (organization == null || user == null) {
+      return Response.status(SC_SERVICE_UNAVAILABLE).build();
+    }
+    EventSearchQuery query = new EventSearchQuery(organization.getId(), user);
 
     // If the limit is set to 0, this is not taken into account
     if (optLimit.isSome() && limit == 0) {
@@ -2145,17 +2176,6 @@ public abstract class AbstractEventEndpoint {
       }
     }
 
-    // TODO: Add the comment resolution filter to the query
-    EventCommentsListProvider.RESOLUTION resolution = null;
-    if (StringUtils.isNotBlank(resolutionFilter)) {
-      try {
-        resolution = EventCommentsListProvider.RESOLUTION.valueOf(resolutionFilter);
-      } catch (Exception e) {
-        logger.warn("Unable to parse comment resolution filter {}", resolutionFilter);
-        return Response.status(Status.BAD_REQUEST).build();
-      }
-    }
-
     if (optLimit.isSome())
       query.withLimit(optLimit.get());
     if (optOffset.isSome())
@@ -2218,6 +2238,7 @@ public abstract class AbstractEventEndpoint {
     fields.add(f("managedAcl", v(event.getManagedAcl(), BLANK)));
     fields.add(f("workflow_state", v(event.getWorkflowState(), BLANK)));
     fields.add(f("event_status", v(event.getEventStatus())));
+    fields.add(f("displayable_status", v(event.getDisplayableStatus(getWorkflowService().getWorkflowStateMappings()))));
     fields.add(f("source", v(getIndexService().getEventSource(event).toString())));
     fields.add(f("has_comments", v(event.hasComments())));
     fields.add(f("has_open_comments", v(event.hasOpenComments())));

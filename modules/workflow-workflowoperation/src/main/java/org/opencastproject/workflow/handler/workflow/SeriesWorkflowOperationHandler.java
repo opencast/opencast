@@ -282,9 +282,9 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
           flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
         }
         for (SeriesCatalogUIAdapter a : adapters) {
-          MediaPackageElementFlavor adapterFlavor = MediaPackageElementFlavor.parseFlavor(a.getFlavor());
+          MediaPackageElementFlavor adapterFlavor = MediaPackageElementFlavor.parseFlavor(a.getFlavor().toString());
           if (flavor.matches(adapterFlavor)) {
-            if (MediaPackageElements.SERIES.eq(a.getFlavor())) {
+            if (MediaPackageElements.SERIES.eq(a.getFlavor().toString())) {
               addDublinCoreCatalog(series, MediaPackageElements.SERIES, mediaPackage);
             } else {
               try {

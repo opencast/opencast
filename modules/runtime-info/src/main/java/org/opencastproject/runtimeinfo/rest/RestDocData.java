@@ -64,16 +64,6 @@ public class RestDocData extends DocData {
   protected List<RestEndpointHolderData> holders;
 
   /**
-   * The service object which this RestDocData is about.
-   */
-  private Object serviceObject;
-
-  /**
-   * A map of macro values for REST documentation.
-   */
-  private Map<String, String> macros;
-
-  /**
    * Create the base data object for creating REST documentation.
    *
    * @param name
@@ -87,15 +77,12 @@ public class RestDocData extends DocData {
    * @throws IllegalArgumentException
    *           if the url is null or empty
    */
-  public RestDocData(String name, String title, String url, String[] notes, Object service,
-          Map<String, String> globalMacro) throws IllegalArgumentException {
+  public RestDocData(String name, String title, String url, String[] notes) throws IllegalArgumentException {
     super(name, title, notes);
     if (url == null || "".equals(url)) {
       throw new IllegalArgumentException("URL cannot be blank.");
     }
     meta.put("url", url);
-    serviceObject = service;
-    macros = globalMacro;
     // create the endpoint holders
     holders = new Vector<RestEndpointHolderData>(2);
     holders.add(new RestEndpointHolderData(READ_ENDPOINT_HOLDER_NAME, "Read"));

@@ -1,0 +1,54 @@
+<div class="statistics-graph">
+  <div class="download"><a class="download-icon" href="{{$ctrl.exportUrl}}" download="{{$ctrl.exportFileName()}}"></a></div>
+  <div class="mode">
+      <input ng-repeat-start="mode in $ctrl.timeChooseModes"
+             type="radio"
+             value="{{mode.value}}"
+             id="{{$ctrl.provider}}-mode-{{$index}}"
+             ng-change="$ctrl.changeTimeChooseMode()"
+             ng-model="$ctrl.timeChooseMode"/>
+      <label for="{{$ctrl.provider}}-mode-{{$index}}" ng-repeat-end="">{{ mode.translation | translate }}</label>
+  </div>
+  <div class="total"><span translate="STATISTICS.TOTAL"><!-- Total --></span> <span>{{ $ctrl.totalValue }}</span></div>
+  <span class="preset" ng-if="$ctrl.timeChooseMode == 'year' || $ctrl.timeChooseMode == 'month'">
+    <a class="navigation prev" ng-click="$ctrl.selectPrevious()" ></a>
+    <div>{{$ctrl.selectedName()}}</div>
+    <a class="navigation next" ng-click="$ctrl.selectNext()"></a>
+  </span>
+  <span class="custom" ng-if="$ctrl.timeChooseMode == 'custom'">
+    <div class="range">
+      <span translate="STATISTICS.FROM"><!-- From --></span>
+      <input datepicker
+             type="text"
+             tabindex="4"
+             placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}"
+             ng-model="$ctrl.from"
+             ng-change="$ctrl.change()" />
+      <span translate="STATISTICS.TO"><!-- To --></span>
+      <input datepicker
+             type="text"
+             tabindex="4"
+             placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}"
+             ng-model="$ctrl.to"
+             ng-change="$ctrl.change()" />
+    </div>
+    <div>
+      <span translate="STATISTICS.GRANULARITY"></span>
+      <select chosen
+              data-width="'100px'"
+              ng-model="$ctrl.dataResolution"
+              ng-change="$ctrl.change()">
+        <option ng-repeat="option in $ctrl.dataResolutions" value="{{option.value}}">
+          {{option.label}}
+        </option>
+      </select>
+    </div>
+  </span>
+  <canvas
+    class="chart chart-bar"
+    chart-data="$ctrl.sourceData"
+    chart-options="$ctrl.chartOptions"
+    chart-labels="$ctrl.chartLabels">
+  </canvas>
+  <p translate="{{ $ctrl.description }}"></p>
+</div>

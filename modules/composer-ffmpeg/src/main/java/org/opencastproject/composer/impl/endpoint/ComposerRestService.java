@@ -120,33 +120,6 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
           + "  </audio>\n"
           + "</track>";
 
-  private static final String MEDIA_TRACK_DEFAULT = "<track id=\"track-3\">\n"
-          + "  <mimetype>video/quicktime</mimetype>\n"
-          + "  <url>serverUrl/workflow/samples/slidechanges.mov</url>\n"
-          + "  <checksum type=\"md5\">4cbcc9223c0425a54c3f253823487d5f</checksum>\n"
-          + "  <duration>27626</duration>\n"
-          + "  <video>\n"
-          + "    <resolution>1024x768</resolution>"
-          + "  </video>\n"
-          + "</track>";
-
-  private static final String CAPTIONS_CATALOGS_DEFAULT = "<captions>\n"
-          + "  <catalog id=\"catalog-1\">\n"
-          + "    <mimetype>application/x-subrip</mimetype>\n"
-          + "    <url>serverUrl/workflow/samples/captions_test_eng.srt</url>\n"
-          + "    <checksum type=\"md5\">55d70b062896aa685e2efc4226b32980</checksum>\n" + "    <tags>\n"
-          + "      <tag>lang:en</tag>\n"
-          + "    </tags>\n"
-          + "  </catalog>\n"
-          + "  <catalog id=\"catalog-2\">\n"
-          + "    <mimetype>application/x-subrip</mimetype>\n"
-          + "    <url>serverUrl/workflow/samples/captions_test_fra.srt</url>\n"
-          + "    <checksum type=\"md5\">8f6cd99bbb6d591107f3b5c47ee51f2c</checksum>\n" + "    <tags>\n"
-          + "      <tag>lang:fr</tag>\n"
-          + "    </tags>\n"
-          + "  </catalog>\n"
-          + "</captions>\n";
-
   private static final String IMAGE_ATTACHMENT_DEFAULT = "<attachment id=\"track-3\">\n"
           + "  <mimetype>image/jpeg</mimetype>\n"
           + "  <url>serverUrl/workflow/samples/image.jpg</url>\n"

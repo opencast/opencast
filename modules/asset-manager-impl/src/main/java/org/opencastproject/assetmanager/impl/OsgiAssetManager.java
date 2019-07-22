@@ -210,13 +210,13 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   }
 
   @Override
-  public void deleteProperties(final String mediaPackageId) {
-    delegate.deleteProperties(mediaPackageId);
+  public int deleteProperties(final String mediaPackageId) {
+    return delegate.deleteProperties(mediaPackageId);
   }
 
   @Override
-  public void deleteProperties(final String mediaPackageId, final String namespace) {
-    delegate.deleteProperties(mediaPackageId, namespace);
+  public int deleteProperties(final String mediaPackageId, final String namespace) {
+    return delegate.deleteProperties(mediaPackageId, namespace);
   }
 
   @Override

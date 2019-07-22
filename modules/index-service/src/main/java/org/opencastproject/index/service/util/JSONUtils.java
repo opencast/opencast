@@ -43,7 +43,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -60,9 +59,6 @@ import java.util.Set;
 public final class JSONUtils {
 
   public static final String PATTERN_ISO_DATE = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-
-  /** Date formatter for ISO Date */
-  private static final SimpleDateFormat isoDateFormatter = new SimpleDateFormat(PATTERN_ISO_DATE);
 
   private JSONUtils() {
 

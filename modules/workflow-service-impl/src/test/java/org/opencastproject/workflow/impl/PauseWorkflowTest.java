@@ -219,7 +219,6 @@ public class PauseWorkflowTest {
     is = PauseWorkflowTest.class.getResourceAsStream("/workflow-definition-pause.xml");
     def = WorkflowParser.parseWorkflowDefinition(is);
     IOUtils.closeQuietly(is);
-    service.registerWorkflowDefinition(def);
   }
 
   @After

@@ -300,7 +300,7 @@ public class SeriesEndpoint implements ManagedService {
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
       final Opt<MetadataCollection> optSeriesMetadata = adapter.getFields(series);
       if (optSeriesMetadata.isSome()) {
-        metadataList.add(adapter.getFlavor(), adapter.getUITitle(), optSeriesMetadata.get());
+        metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), optSeriesMetadata.get());
       }
     }
     metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), getSeriesMetadata(optSeries.get()));

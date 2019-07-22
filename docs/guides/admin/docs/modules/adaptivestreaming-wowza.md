@@ -1,12 +1,5 @@
 # Wowza Adaptive Streaming Distribution Service
 
-This is an updated version of the `distribution-service-streaming` module, that is not installed by default anymore.
-
-Even though the default `distribution-service-streaming` module included in previous releases can also
-be used in combination with Wowza Media Server (or any other streaming servers) to stream videos in the RTMP format,
-this refactored version also offers access to
-[Wowza's adaptive streaming capabilities](https://www.wowza.com/forums/content.php?546-How-to-do-adaptive-bitrate-streaming).
-
 The `distribution-service-streaming-wowza` module copies the media files to the Wowza application directory
 and generates a SMIL file containing the paths to those files, grouping those with the same flavor but different
 qualities. Then, for each configured streaming protocol, it generates the adequate entries in the MediaPackage and sets
@@ -61,8 +54,8 @@ below.
 ## Configuration
 
 
-1. Edit the file etc/org.opencastproject.streaming.wowza.StreamingDistributionService.cfg with your preferred
-configuration. The contents should be self-explanatory.
+1. Edit the file `etc/org.opencastproject.distribution.streaming.wowza.WowzaAdaptiveStreamingDistributionService.cfg`
+with your preferred configuration. The contents should be self-explanatory.
 
 2. Edit `$KARAF/etc/custom.properties` and adjust these values to match those of your scenario:
 

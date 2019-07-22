@@ -2,6 +2,9 @@ site_name: Opencast - Developer Guide
 repo_url: https://github.com/opencast/opencast
 edit_uri: edit/develop/docs/guides/developer/docs/
 
+markdown_extensions:
+  - markdown_inline_graphviz
+
 # Default theme used is readthedocs
 theme: readthedocs
 
@@ -44,6 +47,7 @@ nav:
 - Proposal Log: 'proposal-log.md'
 - Asset Manager: 'asset-manager.md'
 - Scheduler: 'scheduler.md'
+- Statistics: 'statistics.md'
 - Modules:
    - Overview: 'modules/index.md'
    - Administrative user Interface:
@@ -87,6 +91,7 @@ nav:
    - Agents API: 'api/agents-api.md'
    - Events API: 'api/events-api.md'
    - Series API: 'api/series-api.md'
+   - Statistics API: 'api/statistics-api.md'
    - Groups API: 'api/groups-api.md'
    - Security API: 'api/security-api.md'
    - Workflow API: 'api/workflow-api.md'

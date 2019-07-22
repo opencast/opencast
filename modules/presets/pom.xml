@@ -17,6 +17,10 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
@@ -28,20 +32,15 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
+    <!-- Test Dependencies -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <!-- Test Dependencies -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -55,6 +54,16 @@
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <!-- provide a logger for tests -->
+            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

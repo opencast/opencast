@@ -1,5 +1,5 @@
 describe('adminNg.directives.adminNgSelectBox', function () {
-    var $compile, $rootScope, element;
+    var $compile, $rootScope, $httpBackend, element;
 
     beforeEach(module('adminNg'));
     beforeEach(module('shared/partials/selectContainer.html'));
@@ -12,12 +12,14 @@ describe('adminNg.directives.adminNgSelectBox', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function (_$rootScope_, _$compile_) {
+    beforeEach(inject(function (_$rootScope_, _$compile_, _$httpBackend_) {
         $compile = _$compile_;
+        $httpBackend = _$httpBackend_;
         $rootScope = _$rootScope_;
     }));
 
     beforeEach(function () {
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $rootScope.resource = {
             searchable: true,
             available: [{ name: 'rabbit', color: 'white' }, { name: 'crow', color: 'black' }],

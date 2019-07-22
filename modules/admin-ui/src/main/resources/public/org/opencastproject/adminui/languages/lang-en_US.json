@@ -159,8 +159,8 @@
      "THEME_NOT_DELETED":    "The theme could not be deleted",
      "TASK_CREATED": "The task has been created",
      "TASK_NOT_CREATED": "The task could not be created",
-     "VIDEO_CUT_NOT_SAVED": "The editing information could not be saved",
-     "VIDEO_CUT_SAVED": "The editing information has been saved",
+     "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+     "VIDEO_CUT_SAVED": "The changes have been saved",
      "VIDEO_CUT_PROCESSING": "The video is being processed…",
      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
      "VIDEO_SOURCE_TRACKS_INVALID": "You have selected no video tracks to process",
@@ -308,6 +308,9 @@
      },
      "CONFIGURATION": {
        "TITLE": "Configuration"
+     },
+     "STATISTICS": {
+       "TITLE": "Statistics"
      }
    },
    "EVENTS": {
@@ -506,6 +509,14 @@
          "PROCESSING_FAILURE": "Processing failure",
          "PROCESSING_CANCELED": "Processing canceled"
        },
+       "STATE_MAPPING":{
+         "RETRACTING": "Retracting",
+         "DUPLICATING": "Duplicating",
+         "PUBLISHING": "Publishing",
+         "IMPORTING": "Importing",
+         "REPUBLISHING_METADATA": "Republishing metadata",
+         "UPDATING_PREVIEWS": "Updating previews"
+       },
        "DETAILS": {
          "HEADER": "Event details - {{resourceId}}",
          "TABS": {
@@ -516,7 +527,8 @@
            "SCHEDULING": "Scheduling",
            "WORKFLOWS":   "Workflows",
            "ACCESS":      "Access policy",
-           "COMMENTS":    "Comments"
+           "COMMENTS":    "Comments",
+           "STATISTICS":    "Statistics"
          },
          "PUBLICATIONS": {
            "CAPTION":                    "Publications",
@@ -758,6 +770,9 @@
              "PROCESSING_FAILURE" : "Processing failure"
            }
          },
+         "STATISTICS": {
+           "CAPTION":     "Statistics"
+         },
          "METADATA": {
            "CAPTION": "Event details",
            "TITLE":          "Title",
@@ -981,7 +996,8 @@
            "EXTENDED_METADATA":    "Metadata II",
            "EVENTS":      "Events",
            "PERMISSIONS": "Access policy",
-           "THEME": "Theme"
+           "THEME": "Theme",
+           "STATISTICS": "Statistics"
          },
          "ACCESS": {
            "CAPTION": "Access policy",
@@ -1434,6 +1450,7 @@
          "CREATED":   "Created",
          "CREATOR":   "Creator",
          "HOST_NAME": "Host name",
+         "NODE_NAME": "Node name",
          "OPERATION": "Operation",
          "STARTED":   "Started",
          "STATUS":    "Status",
@@ -1459,6 +1476,7 @@
          "CAPTION":         "Servers",
          "STATUS":          "Status",
          "HOST_NAME":       "Host name",
+         "NODE_NAME":       "Node name",
          "CORES":           "Cores",
          "COMPLETED":       "Jobs completed",
          "RUNNING":         "Jobs running",
@@ -1476,6 +1494,7 @@
          "STATUS":          "Status",
          "NAME":            "Service name",
          "HOST_NAME":       "Host name",
+         "NODE_NAME":       "Node name",
          "COMPLETED":       "Jobs completed",
          "RUNNING":         "Jobs running",
          "QUEUED":          "Jobs queued",
@@ -1521,18 +1540,24 @@
      },
      "ACTIONS": {
        "SPLIT": "Split",
-       "CUT":   "Cut",
-       "REPLAY_SEGMENT": "Replay segment",
-       "REPLAY_END_OF_SEGMENT": "End of segment",
-       "REPLAY_SEGMENT_WITH_PREROLL": "Check transition",
+       "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+       "CUT":   "Hide/Show",
+       "CUT_TOOLTIP":   "Hide or show the selected part of the video.",
+       "REPLAY_SEGMENT": "Play Start of Segment",
+       "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+       "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+       "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+       "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+       "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
        "UNDO": "Undo",
        "REDO": "Redo",
-       "CLEAR_SEGMENTS": "Clear segments",
-       "CLEAR_SELECTED_SEGMENT": "Clear selected segment"
+       "CLEAR_SEGMENTS": "Clear All Segments",
+       "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
      },
      "SEGMENTS": {
        "REMOVE_SEGMENT":  "Remove Segment",
-       "USE_SEGMENT":     "Use this Segment",
+       "SHOW_SEGMENT":     "Show this Segment",
+       "HIDE_SEGMENT":     "Hide this Segment",
        "START":           "Start",
        "END":             "End"
      },
@@ -1750,6 +1775,9 @@
        "HOSTNAME": {
            "LABEL": "Host name"
        },
+       "NODE_NAME": {
+            "LABEL": "Node name"
+       },
        "STATUS": {
            "LABEL": "Status",
            "PAUSED": "Paused",
@@ -1791,6 +1819,9 @@
        "HOSTNAME": {
            "LABEL": "Host name"
        },
+       "NODE_NAME": {
+            "LABEL": "Node name"
+       },
        "STATUS": {
          "LABEL": "Status",
          "MAINTENANCE": "Maintenance",
@@ -1804,6 +1835,9 @@
         },
         "HOSTNAME": {
             "LABEL": "Host name"
+        },
+        "NODE_NAME": {
+            "LABEL": "Node name"
         },
         "NAME": {
             "LABEL": "Name"
@@ -1949,6 +1983,29 @@
   "EDITABLE": {
     "MULTI": {
       "PLACEHOLDER": "To insert multiple values press Enter in between"
+    }
+  },
+  "STATISTICS": {
+    "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+    "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+    "FROM": "From",
+    "TO": "To",
+    "TOTAL": "Total",
+    "GRANULARITY": "Granularity",
+    "NAVIGATION": {
+      "ORGANIZATION": "Organisation"
+    },
+    "TITLE": {
+      "RANDOM": "Random Data",
+      "VIEWS_SUM": "Total Number of Views",
+      "VIEWS_AVG": "Average Number of Views",
+      "PUBLISHEDHOURS": "Published Hours of Video"
+    },
+    "DESCRIPTION": {
+      "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+      "VIEWS_SUM": "This displays the total number of views per time unit.",
+      "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+      "PUBLISHEDHOURS": "This displays the running total published hours of video"
     }
   }
 }

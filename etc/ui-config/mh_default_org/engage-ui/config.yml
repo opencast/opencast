@@ -1,0 +1,3 @@
+# The logo that is displayed in the upper left part of the media module page. This can be eithera path or a complete url
+# with scheme and port.
+logo: /engage/ui/img/logo/opencast-icon.svg

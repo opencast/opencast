@@ -16,6 +16,21 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-common</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-common-jpa-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-security-shibboleth</artifactId>
       <version>${project.version}</version>
@@ -24,6 +39,10 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-userdirectory</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -40,6 +59,10 @@
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

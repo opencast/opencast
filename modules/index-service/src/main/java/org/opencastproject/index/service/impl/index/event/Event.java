@@ -68,9 +68,8 @@ import javax.xml.transform.stream.StreamSource;
 @XmlType(name = "event", namespace = IndexObject.INDEX_XML_NAMESPACE, propOrder = { "identifier", "organization",
         "title", "description", "subject", "location", "presenters", "contributors", "seriesId", "seriesName",
         "language", "source", "created", "creator", "publisher", "license", "rights", "accessPolicy", "managedAcl", "workflowState",
-        "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration", "trackMimetypes",
-        "trackStreamResolutions", "trackFlavors", "metadataFlavors", "metadataMimetypes", "attachmentFlavors",
-        "hasComments", "hasOpenComments", "hasPreview", "needsCutting", "publications", "workflowScheduledDate",
+        "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration",
+        "hasComments", "hasOpenComments", "hasPreview", "needsCutting", "publications",
         "archiveVersion", "recordingStatus", "eventStatus", "agentId", "agentConfigurations",
         "technicalStartTime", "technicalEndTime", "technicalPresenters" })
 @XmlRootElement(name = "event", namespace = IndexObject.INDEX_XML_NAMESPACE)
@@ -211,36 +210,6 @@ public class Event implements IndexObject {
   @XmlElement(name = "duration")
   private Long duration = null;
 
-  /** The mimetypes list of the tracks from this event */
-  @XmlElementWrapper(name = "track_mimetypes")
-  @XmlElement(name = "track_mimetype")
-  private List<String> trackMimetypes = null;
-
-  /** The resolutions list of the tracks from this event */
-  @XmlElementWrapper(name = "track_stream_resolutions")
-  @XmlElement(name = "track_stream_resolution")
-  private List<String> trackStreamResolutions = null;
-
-  /** The flavors list of the tracks from this event */
-  @XmlElementWrapper(name = "track_flavors")
-  @XmlElement(name = "track_flavor")
-  private List<String> trackFlavors = null;
-
-  /** The flavors list of the metadata from this event */
-  @XmlElementWrapper(name = "metadata_flavors")
-  @XmlElement(name = "metadata_flavor")
-  private List<String> metadataFlavors = null;
-
-  /** The mimetypes list of the metadata from this event */
-  @XmlElementWrapper(name = "metadata_mimetypes")
-  @XmlElement(name = "metadata_mimetype")
-  private List<String> metadataMimetypes = null;
-
-  /** The flavors list of the attachment from this event */
-  @XmlElementWrapper(name = "attachment_flavors")
-  @XmlElement(name = "attachment_flavor")
-  private List<String> attachmentFlavors = null;
-
   /** The status of the event */
   @XmlElement(name = "event_status")
   private String eventStatus = null;
@@ -265,10 +234,6 @@ public class Event implements IndexObject {
   @XmlElementWrapper(name = "publications")
   @XmlElement(name = "publication")
   private List<Publication> publications = new ArrayList<>();
-
-  /** The workflow scheduled date of the event */
-  @XmlElement(name = "workflow_scheduled_date")
-  private String workflowScheduledDate = null;
 
   /** The recording status of the event */
   @XmlElement(name = "recording_status")
@@ -741,120 +706,6 @@ public class Event implements IndexObject {
   }
 
   /**
-   * Sets the tracks mimetypes from this event
-   *
-   * @param trackMimetypes
-   *          the tracks mimetypes
-   */
-  public void setTrackMimetypes(List<String> trackMimetypes) {
-    this.trackMimetypes = trackMimetypes;
-  }
-
-  /**
-   * Returns the tracks mimetypes from this event
-   *
-   * @return the tracks mimetypes
-   */
-  public List<String> getTrackMimetypes() {
-    return trackMimetypes;
-  }
-
-  /**
-   * Sets the tracks stream resolutions from this event
-   *
-   * @param trackStreamResolution
-   *          the tracks stream resolutions
-   */
-  public void setTrackStreamResolutions(List<String> trackStreamResolution) {
-    this.trackStreamResolutions = trackStreamResolution;
-  }
-
-  /**
-   * Returns the tracks stream resolutions from this event
-   *
-   * @return the tracks stream resolutions
-   */
-  public List<String> getTrackStreamResolution() {
-    return trackStreamResolutions;
-  }
-
-  /**
-   * Sets the tracks flavors from this event
-   *
-   * @param trackFlavors
-   *          the tracks flavors
-   */
-  public void setTrackFlavors(List<String> trackFlavors) {
-    this.trackFlavors = trackFlavors;
-  }
-
-  /**
-   * Returns the tracks flavors from this event
-   *
-   * @return the tracks flavors
-   */
-  public List<String> getTrackFlavors() {
-    return trackFlavors;
-  }
-
-  /**
-   * Sets the metadata flavors from this event
-   *
-   * @param metadataFlavors
-   *          the tracks flavors
-   */
-  public void setMetadataFlavors(List<String> metadataFlavors) {
-    this.metadataFlavors = metadataFlavors;
-  }
-
-  /**
-   * Returns the metadata flavors from this event
-   *
-   * @return the metadata flavors
-   */
-  public List<String> getMetadataFlavors() {
-    return metadataFlavors;
-  }
-
-  /**
-   * Sets the metadata mimetypes from this event
-   *
-   * @param metadataMimetypes
-   *          the metadata mimetypes
-   */
-  public void setMetadataMimetypes(List<String> metadataMimetypes) {
-    this.metadataMimetypes = metadataMimetypes;
-  }
-
-  /**
-   * Returns the metadata mimetypes from this event
-   *
-   * @return the metadata mimetypes
-   */
-  public List<String> getMetadataMimetypes() {
-    return metadataMimetypes;
-  }
-
-  /**
-   * Sets the attachments flavors from this event
-   *
-   * @param attachmentFlavors
-   *          the attachments flavors
-   */
-  public void setAttachmentFlavors(List<String> attachmentFlavors) {
-    this.attachmentFlavors = attachmentFlavors;
-  }
-
-  /**
-   * Returns the attachments flavors from this event
-   *
-   * @return the attachments flavors
-   */
-  public List<String> getAttachmentFlavors() {
-    return attachmentFlavors;
-  }
-
-  /**
    * Sets the list of presenters.
    *
    * @param presenters
@@ -998,25 +849,6 @@ public class Event implements IndexObject {
   }
 
   /**
-   * Sets the workflow scheduled date
-   *
-   * @param workflowScheduledDate
-   *          the workflow scheduled date
-   */
-  public void setWorkflowScheduledDate(String workflowScheduledDate) {
-    this.workflowScheduledDate = workflowScheduledDate;
-  }
-
-  /**
-   * Returns the workflow scheduled date
-   *
-   * @return the workflow scheduled date
-   */
-  public String getWorkflowScheduledDate() {
-    return workflowScheduledDate;
-  }
-
-  /**
    * Sets the archive version
    *
    * @param archiveVersion
@@ -1052,6 +884,23 @@ public class Event implements IndexObject {
       /* This can be the case if all workflows of an event have been deleted */
       eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
     }
+  }
+
+  /**
+   * Return the displayable status of this event
+   *
+   * @param customWorkflowStatusMapping
+   *          The mappings used to get the displayable status for the workflow state.
+   *
+   * @return the displayable status of this event
+   */
+  public String getDisplayableStatus(Map<String, Map<String, String>> customWorkflowStatusMapping) {
+    if (getWorkflowId() != null && StringUtils.isNotBlank(getWorkflowState())
+          && customWorkflowStatusMapping.containsKey(getWorkflowDefinitionId())
+          && customWorkflowStatusMapping.get(getWorkflowDefinitionId()).containsKey(getWorkflowState())) {
+      return customWorkflowStatusMapping.get(getWorkflowDefinitionId()).get(getWorkflowState());
+    }
+    return getEventStatus();
   }
 
   public boolean isScheduledEvent() {

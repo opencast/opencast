@@ -1086,8 +1086,6 @@ public class SchedulerRestService {
     if (StringUtils.isBlank(timezone)) {
       timezone = DateTimeZone.getDefault().toString();
     }
-    Date start = new DateTime(startDate).toDateTime(DateTimeZone.forID(timezone)).toDate();
-    Date end = new DateTime(endDate).toDateTime(DateTimeZone.forID(timezone)).toDate();
 
     try {
       List<MediaPackage> events = getConflictingEvents(device, rrule, startDate, endDate, duration, timezone);

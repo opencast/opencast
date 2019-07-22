@@ -386,11 +386,11 @@ $segment-deleted-selected: saturate(darken($segment-deleted, 25%), 5%);
                                 }
 
                                 &.unused {
-                                  @include fa-icon($fa-var-square-o , before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
+                                  @include fa-icon($fa-var-eye-slash , before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
                                 }
 
                                 &.used {
-                                  @include fa-icon($fa-var-check-square-o, before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
+                                  @include fa-icon($fa-var-eye, before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
                                 }
 
                                 &.remove {
@@ -445,6 +445,14 @@ $segment-deleted-selected: saturate(darken($segment-deleted, 25%), 5%);
              background: #eee none repeat scroll 0 0;
              cursor: pointer;
              border-radius: 4px;
+        }
+
+        #hover-cursor {
+            width: 1px;
+            background-color: #777;
+            height: 60px;
+            position: absolute;
+            z-index: $z-80;
         }
 
         #cursor, #cursor_fake {
@@ -579,6 +587,14 @@ $segment-deleted-selected: saturate(darken($segment-deleted, 25%), 5%);
             width: 100%;
             z-index: 100;
 
+            #timeline-cursor {
+                width: 1px;
+                background-color: #777;
+                height: 30px;
+                position: absolute;
+                z-index: $z-80;
+            }
+
             &::before {
               content: "";
               position: absolute;
@@ -703,11 +719,11 @@ $segment-deleted-selected: saturate(darken($segment-deleted, 25%), 5%);
               }
 
               &.unused {
-                @include fa-icon($fa-var-square-o , before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
+                @include fa-icon($fa-var-eye-slash , before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
               }
 
               &.used {
-                @include fa-icon($fa-var-check-square-o, before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
+                @include fa-icon($fa-var-eye, before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
               }
 
               &.remove {

@@ -221,6 +221,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** This host's base URL */
   protected String hostName;
 
+  /** This host's descriptive node name eg admin, worker01 */
+  protected String nodeName;
+
   /** The base URL for job URLs */
   protected String jobHost;
 
@@ -316,6 +319,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     // Register this host
     try {
+      if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OpencastConstants.NODE_NAME_PROPERTY))) {
+        nodeName = hostName;
+      } else {
+        nodeName = cc.getBundleContext().getProperty(OpencastConstants.NODE_NAME_PROPERTY);
+      }
+
       float maxLoad = Runtime.getRuntime().availableProcessors();
       if (cc != null && StringUtils.isNotBlank(cc.getBundleContext().getProperty(OPT_MAXLOAD))) {
         try {
@@ -333,7 +342,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       long maxMemory = Runtime.getRuntime().maxMemory();
       int cores = Runtime.getRuntime().availableProcessors();
 
-      registerHost(hostName, address, maxMemory, cores, maxLoad);
+      registerHost(hostName, address, nodeName, maxMemory, cores, maxLoad);
     } catch (Exception e) {
       throw new IllegalStateException("Unable to register host " + hostName + " in the service registry", e);
     }
@@ -355,8 +364,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     }
 
-    localSystemLoad = getHostLoads(emf.createEntityManager()).get(hostName).getLoadFactor();
-    logger.info("Current system load: {}", format("%.1f", localSystemLoad));
+    localSystemLoad = 0;
+    logger.info("Activated");
   }
 
   @Override
@@ -947,6 +956,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               job.getId(), job.getJobType(), job.getStatus());
     }
     logger.debug("Current host load: {}, job load cache size: {}", format("%.1f", localSystemLoad), jobCache.size());
+
+    if (jobCache.isEmpty() && Math.abs(localSystemLoad) > 0.01f) {
+      logger.warn("No jobs in the job load cache, but load is {}: setting job load to 0",
+              format("%.2f", localSystemLoad));
+      localSystemLoad = 0;
+    }
   }
 
   private synchronized void removeFromLoadCache(Long jobId) {
@@ -1177,10 +1192,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(String, String, long, int, float)
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#registerHost(String, String, String, long, int, float)
    */
   @Override
-  public void registerHost(String host, String address, long memory, int cores, float maxLoad)
+  public void registerHost(String host, String address, String nodeName, long memory, int cores, float maxLoad)
           throws ServiceRegistryException {
     EntityManager em = null;
     EntityTransaction tx = null;
@@ -1191,7 +1206,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       // Find the existing registrations for this host and if it exists, update it
       HostRegistrationJpaImpl hostRegistration = fetchHostRegistration(em, host);
       if (hostRegistration == null) {
-        hostRegistration = new HostRegistrationJpaImpl(host, address, memory, cores, maxLoad, true, false);
+        hostRegistration = new HostRegistrationJpaImpl(host, address, nodeName, memory, cores, maxLoad, true, false);
         em.persist(hostRegistration);
       } else {
         hostRegistration.setIpAddress(address);
@@ -1687,6 +1702,22 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @SuppressWarnings("unchecked")
   protected List<HostRegistration> getHostRegistrations(EntityManager em) {
     return em.createNamedQuery("HostRegistration.getAll").getResultList();
+  }
+
+  @Override
+    public HostRegistration getHostRegistration(String hostname) throws ServiceRegistryException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      return getHostRegistration(em, hostname);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  protected HostRegistration getHostRegistration(EntityManager em, String hostname) {
+    return (HostRegistration) em.createNamedQuery("HostRegistration.byHostName").setParameter("host", hostname).getSingleResult();
   }
 
   /**
@@ -2229,29 +2260,23 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       String host = String.valueOf(resultArray[0]);
 
       Status status = Status.values()[(int) resultArray[1]];
-      float load = ((Number) resultArray[2]).floatValue();
+      float currentLoad = ((Number) resultArray[2]).floatValue();
+      float maxLoad = ((Number) resultArray[3]).floatValue();
 
       // Only queued, and running jobs are adding to the load, so every other status is discarded
       if (status == null || !JOB_STATUSES_INFLUENCING_LOAD_BALANCING.contains(status)) {
-        load = 0.0f;
+        currentLoad = 0.0f;
       }
 
       // Add the service registration
-      NodeLoad serviceLoad;
-      if (systemLoad.containsHost(host)) {
-        serviceLoad = systemLoad.get(host);
-        serviceLoad.setLoadFactor(serviceLoad.getLoadFactor() + load);
-      } else {
-        serviceLoad = new NodeLoad(host, load);
-      }
-
+      NodeLoad serviceLoad = new NodeLoad(host, currentLoad, maxLoad);
       systemLoad.addNodeLoad(serviceLoad);
     }
 
     // This is important, otherwise services which have no current load are not listed in the output!
     for (HostRegistration h : getHostRegistrations(em)) {
       if (!systemLoad.containsHost(h.getBaseUrl())) {
-        systemLoad.addNodeLoad(new NodeLoad(h.getBaseUrl(), 0.0f));
+        systemLoad.addNodeLoad(new NodeLoad(h.getBaseUrl(), 0.0f, h.getMaxLoad()));
       }
     }
 
@@ -2585,51 +2610,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /**
-   * Gets the services in WARNING state triggered by this job
-   *
-   * @param job
-   *          the given job to get the related services
-   * @return a list of services triggered by the job
-   * @throws IllegalArgumentException
-   *           if the given job was null
-   * @throws ServiceRegistryException
-   *           if the there was a problem with the query
-   */
-  private List<ServiceRegistrationJpaImpl> getRelatedWarningServices(JpaJob job)
-          throws IllegalArgumentException, ServiceRegistryException {
-    if (job == null)
-      throw new IllegalArgumentException("job must not be null!");
-
-    Query query = null;
-    EntityManager em = null;
-    logger.trace("Finding services put in WARNING state by job {}", job.toJob().getSignature());
-    try {
-      em = emf.createEntityManager();
-      // TODO: modify the query to avoid to go through the list here
-      query = em.createNamedQuery("ServiceRegistration.relatedservices.warning");
-      query.setParameter("serviceType", job.getJobType());
-
-      List<ServiceRegistrationJpaImpl> jpaServices = new ArrayList<ServiceRegistrationJpaImpl>();
-
-      @SuppressWarnings("unchecked")
-      List<ServiceRegistrationJpaImpl> jobResults = query.getResultList();
-      for (ServiceRegistrationJpaImpl relatedService : jobResults) {
-        if (relatedService.getWarningStateTrigger() == job.toJob().getSignature()) {
-          jpaServices.add(relatedService);
-        }
-      }
-      return jpaServices;
-    } catch (NoResultException e) {
-      return null;
-    } catch (Exception e) {
-      throw new ServiceRegistryException(e);
-    } finally {
-      if (em != null)
-        em.close();
-    }
-  }
-
-  /**
    * Gets the services in WARNING or ERROR state triggered by this job
    *
    * @param job
@@ -2840,7 +2820,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   public SystemLoad getMaxLoads() throws ServiceRegistryException {
     final SystemLoad loads = new SystemLoad();
     for (HostRegistration host : getHostRegistrations()) {
-      NodeLoad load = new NodeLoad(host.getBaseUrl(), host.getMaxLoad());
+      NodeLoad load = new NodeLoad(host.getBaseUrl(), 0.0f, host.getMaxLoad());
       loads.addNodeLoad(load);
     }
     return loads;
@@ -2859,7 +2839,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       em = emf.createEntityManager();
       query = em.createNamedQuery("HostRegistration.getMaxLoadByHostName");
       query.setParameter("host", host);
-      return new NodeLoad(host, ((Number) query.getSingleResult()).floatValue());
+      return new NodeLoad(host, 0.0f, ((Number) query.getSingleResult()).floatValue());
     } catch (NoResultException e) {
       throw new NotFoundException(e);
     } catch (Exception e) {
@@ -3378,7 +3358,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     public int compare(ServiceRegistration serviceA, ServiceRegistration serviceB) {
       String hostA = serviceA.getHost();
       String hostB = serviceB.getHost();
-      return Float.compare(loadByHost.get(hostA).getLoadFactor(), loadByHost.get(hostB).getLoadFactor());
+      NodeLoad nodeA = loadByHost.get(hostA);
+      NodeLoad nodeB = loadByHost.get(hostB);
+      //If the load factors are about the same, sort based on maximum load
+      if (Math.abs(nodeA.getLoadFactor() - nodeB.getLoadFactor()) <= 0.01) {
+        //NOTE: The sort order below is *reversed* from what you'd expect
+        //When we're comparing the load factors we want the node with the lowest factor to be first
+        //When we're comparing the maximum load value, we want the node with the highest max to be first
+        return Float.compare(nodeB.getMaxLoad(), nodeA.getMaxLoad());
+      }
+      return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
+
     }
 
   }

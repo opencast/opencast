@@ -16,6 +16,14 @@
   </properties>
   <dependencies>
     <dependency>
+      <groupId>com.entwinemedia.common</groupId>
+      <artifactId>functional</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
@@ -46,13 +54,21 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-workspace-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

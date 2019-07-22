@@ -185,7 +185,6 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
-    String orgId = securityService.getOrganization().getId();
 
     // This provider persists roles but is not authoritative for any roles, so return an empty set
     return new ArrayList<Role>().iterator();

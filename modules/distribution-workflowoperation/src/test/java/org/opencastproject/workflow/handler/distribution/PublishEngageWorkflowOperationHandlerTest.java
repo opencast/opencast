@@ -28,7 +28,6 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 
 import org.easymock.EasyMock;
@@ -51,13 +50,10 @@ public class PublishEngageWorkflowOperationHandlerTest {
     Id id = new IdImpl(mpId);
     EasyMock.expect(mp.getIdentifier()).andStubReturn(id);
     MediaPackageElement element = EasyMock.createNiceMock(MediaPackageElement.class);
-    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(securityService.getOrganization()).andReturn(getOrgWithPlayerPath()).once();
-    EasyMock.replay(element, mp, securityService);
+    EasyMock.replay(element, mp);
 
     // Test configured organization player path
     PublishEngageWorkflowOperationHandler publishEngagePublish = new PublishEngageWorkflowOperationHandler();
-    publishEngagePublish.setSecurityService(securityService);
     URI result = publishEngagePublish.createEngageUri(engageURI, mp);
     assertEquals(engageURI.toString() + "/play/" + mpId, result.toString());
   }
@@ -71,13 +67,10 @@ public class PublishEngageWorkflowOperationHandlerTest {
     Id id = new IdImpl(mpId);
     EasyMock.expect(mp.getIdentifier()).andStubReturn(id);
     MediaPackageElement element = EasyMock.createNiceMock(MediaPackageElement.class);
-    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(securityService.getOrganization()).andReturn(getOrgWithoutPlayerPath()).once();
-    EasyMock.replay(element, mp, securityService);
+    EasyMock.replay(element, mp);
 
     // Test default player path
     PublishEngageWorkflowOperationHandler publishEngagePublish = new PublishEngageWorkflowOperationHandler();
-    publishEngagePublish.setSecurityService(securityService);
     URI result = publishEngagePublish.createEngageUri(engageURI, mp);
     assertEquals(engageURI.toString() + PublishEngageWorkflowOperationHandler.PLAYER_PATH + mpId,
             result.toString());

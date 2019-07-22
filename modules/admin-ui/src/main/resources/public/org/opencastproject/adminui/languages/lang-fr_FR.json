@@ -10,8 +10,8 @@
    "SAVE": "Enregistrer",
    "LOGOUT": "Déconnexion",
    "RESET": "Remise à zéro",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "Aucune option sélectionnée",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Aucune option disponible",
    "YES": "Oui",
    "LANGUAGES": {
       "ARABIC": "Arabe",
@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "Le thème n'a pas pu être supprimé",
       "TASK_CREATED": "La tâche a été créée",
       "TASK_NOT_CREATED": "La tâche n'a pas pu être créée",
-      "VIDEO_CUT_NOT_SAVED": "Les informations n'ont pas pu être enregistrées",
-      "VIDEO_CUT_SAVED": "Les informations ont été enregistrées",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
       "VIDEO_CUT_PROCESSING": "La vidéo est en cours de traitement…",
       "THUMBNAIL_CHANGE_FAILED": "Impossible de changer la vignette.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Vous n’avez sélectionné aucune vidéo pour traiter",
@@ -245,9 +245,9 @@
          },
          "EDIT": {
             "CAPTION": "Éditer",
-            "EVENT": "event",
-            "EVENTS": "events",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "EVENT": "événement",
+            "EVENTS": "événements",
+            "HEADER": "Cette page vous permet de modifier les événements planifiés regroupés par semaine. Les champs d'entrée sont pré-remplis au cas où tous les événements planifiés ont la même valeur pour un champ spécifique. Sinon, les champs d'entrée sont laissés vides. Laisser les champs d'entrée vide signifie que les valeurs respectives ne devraient pas être modifiées.",
             "METADATA": "Métadonnées",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -271,7 +271,7 @@
       "BACK": "Précédent",
       "CREATE": "Créer",
       "RETRACT": "Retirer",
-      "RETRACT_DELETE": "Retract/Delete",
+      "RETRACT_DELETE": "Retrait/Supprimer",
       "DELETE": "Supprimer",
       "UPDATE": "Appliquer",
       "DURATION": {
@@ -307,6 +307,9 @@
       },
       "CONFIGURATION": {
          "TITLE": "Configuration"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistiques"
       }
    },
    "EVENTS": {
@@ -395,7 +398,7 @@
                   "REPEATS": "Répétitions",
                   "REPEAT_ON": "Répéter",
                   "WEEKDAYS": "Jours de la semaine",
-                  "WEEKDAY": "Weekday"
+                  "WEEKDAY": "Jour de la semaine"
                },
                "NO_SOURCE_AVAILABLE": "Aucun agent de capture disponibles pour la planification"
             },
@@ -489,7 +492,7 @@
                "EDITOR_NEEDS_CUTTING": "Ouvrir l'éditeur vidéo (un commentaire indique que la découpe de la vidéo a été demandée)",
                "COMMENTS": "Voir commentaires",
                "PAUSED_WORKFLOW": "Voir événement en pause",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "Filtrer pour ce présentateur"
             }
          },
          "STATUS": {
@@ -505,6 +508,14 @@
             "PROCESSING_FAILURE": "Erreur de traitement",
             "PROCESSING_CANCELED": "Traitement annulé"
          },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
+         },
          "DETAILS": {
             "HEADER": "Détails de l'événement {{resourceId}}",
             "TABS": {
@@ -515,7 +526,8 @@
                "SCHEDULING": "Planification",
                "WORKFLOWS": "Flux de travail",
                "ACCESS": "Droits d'accès",
-               "COMMENTS": "Commentaires"
+               "COMMENTS": "Commentaires",
+               "STATISTICS": "Statistiques"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publications",
@@ -757,6 +769,9 @@
                   "PROCESSING_FAILURE": "Erreur de traitement"
                }
             },
+            "STATISTICS": {
+               "CAPTION": "Statistiques"
+            },
             "METADATA": {
                "CAPTION": "Détails de l'événement",
                "TITLE": "Titre",
@@ -796,7 +811,7 @@
                "ACTIONS": "Actions",
                "DETAILS": "Détails",
                "DESCRIPTION": "Description",
-               "MORE_INFO": "More Information",
+               "MORE_INFO": "Plus d'informations",
                "ID": "ID",
                "TYPE": "Type",
                "TITLE": "Titre",
@@ -804,8 +819,8 @@
                "STARTED": "Démarré",
                "SERIES": "Séries",
                "SUBMITTED": "Soumis le",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
+               "SUBMITTER": "Soumettre",
+               "EXECUTION_TIME": "Temps d'exécution",
                "WDID": "Définition de workflow",
                "MIMETYPE": "Type MIME",
                "URL": "URL",
@@ -813,11 +828,11 @@
                "NO_CONFIGURATION": "Aucun paramètre de configuration existant pour la définition du flux de travail sélectionné.",
                "WORKFLOW": "Flux de travail",
                "TOOLTIP": {
-                  "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
-                  "DETAILS": "Open workflow details"
+                  "STOP": "Arrêter le flux de travail",
+                  "ABORT": "Annuler l’exécution du flux de travail (ne pas réessayer l’opération qui a échoué)",
+                  "RETRY": "Réessayer l'exécution du flux de travail",
+                  "DELETE": "Supprimer le flux de travail",
+                  "DETAILS": "Voir détails du flux de travail"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instancié",
@@ -825,9 +840,9 @@
                   "PAUSED": "Suspendu",
                   "SUCCEEDED": "Réussi",
                   "FAILED": "Echoué",
-                  "FAILING": "Failing",
+                  "FAILING": "En Echec",
                   "SKIPPED": "Ignoré",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "Arrêté",
                   "RETRY": "Réessayer"
                }
             },
@@ -980,7 +995,8 @@
                "EXTENDED_METADATA": "Métadonnées II",
                "EVENTS": "Événements",
                "PERMISSIONS": "Droits d'accès",
-               "THEME": "Thème"
+               "THEME": "Thème",
+               "STATISTICS": "Statistiques"
             },
             "ACCESS": {
                "CAPTION": "Droits d'accès",
@@ -1000,8 +1016,8 @@
                   "ACTION": "Actions",
                   "NEW": "Add row",
                   "DETAILS": "Détails",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
+                  "REPLACE_EVENT_ACLS": "Mettre à jour les permissions de l'événement",
+                  "REPLACE_EVENT_ACLS_HINT": "Assurez-vous que tous les événements de cette série ont ces permissions en vigueur"
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",
@@ -1433,6 +1449,7 @@
             "CREATED": "Créé le",
             "CREATOR": "Auteur",
             "HOST_NAME": "Nom d'hôte",
+            "NODE_NAME": "Nom du nœud",
             "OPERATION": "Opération",
             "STARTED": "Démarré",
             "STATUS": "Statut",
@@ -1458,6 +1475,7 @@
             "CAPTION": "Serveurs",
             "STATUS": "Statut",
             "HOST_NAME": "Nom d'hôte",
+            "NODE_NAME": "Nom du nœud",
             "CORES": "Coeurs",
             "COMPLETED": "Tâches achevées",
             "RUNNING": "Tâches en cours",
@@ -1475,6 +1493,7 @@
             "STATUS": "Statut",
             "NAME": "Nom du service",
             "HOST_NAME": "Nom d'hôte",
+            "NODE_NAME": "Nom du nœud",
             "COMPLETED": "Tâches achevées",
             "RUNNING": "Tâches en cours",
             "QUEUED": "Tâches en attente",
@@ -1520,18 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Segmenter",
-         "CUT": "Couper",
-         "REPLAY_SEGMENT": "Rejouer segment",
-         "REPLAY_END_OF_SEGMENT": "Fin du segment",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Vérifier la transition",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
          "UNDO": "Annuler",
          "REDO": "Répéter",
-         "CLEAR_SEGMENTS": "Effacer les segments",
-         "CLEAR_SELECTED_SEGMENT": "Nettoyer segment sélectionné"
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Enlever Segment",
-         "USE_SEGMENT": "Utiliser ce Segment",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
          "START": "Accueil",
          "END": "Fin"
       },
@@ -1749,6 +1774,9 @@
          "HOSTNAME": {
             "LABEL": "Nom d'hôte"
          },
+         "NODE_NAME": {
+            "LABEL": "Nom du nœud"
+         },
          "STATUS": {
             "LABEL": "Statut",
             "PAUSED": "Suspendu",
@@ -1790,6 +1818,9 @@
          "HOSTNAME": {
             "LABEL": "Nom d'hôte"
          },
+         "NODE_NAME": {
+            "LABEL": "Nom du nœud"
+         },
          "STATUS": {
             "LABEL": "Statut",
             "MAINTENANCE": "Maintenance",
@@ -1803,6 +1834,9 @@
          },
          "HOSTNAME": {
             "LABEL": "Nom d'hôte"
+         },
+         "NODE_NAME": {
+            "LABEL": "Nom du nœud"
          },
          "NAME": {
             "LABEL": "Nom"
@@ -1947,7 +1981,30 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "Pour insérer plusieurs valeurs appuyez sur Entrée après chaque valeur"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Les statistiques ne peuvent pas être affichées pour le moment. Veuillez réessayer plus tard.",
+      "UNSUPPORTED_TYPE": "Désolé, Opencast ne peut pas afficher ce type de données statistiques.",
+      "FROM": "Début",
+      "TO": "A",
+      "TOTAL": "Total",
+      "GRANULARITY": "Granularité",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Données aléatoires",
+         "VIEWS_SUM": "Nombre total de vues",
+         "VIEWS_AVG": "Nombre moyen de vues",
+         "PUBLISHEDHOURS": "Published Hours of Video"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "Ceci affiche des données aléatoires comme exemple. Vous pouvez désactiver ce graphique en supprimant le fichier json du fournisseur de statistiques correspondant dans etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the running total published hours of video"
       }
    }
 }

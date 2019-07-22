@@ -34,6 +34,7 @@ describe('User controller', function () {
         $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:USER&limit=100&offset=0').respond('{}');
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
         $controller('UserCtrl', {$scope: $scope});
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.flush();
     });
 

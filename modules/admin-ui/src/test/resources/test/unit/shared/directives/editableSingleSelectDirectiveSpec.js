@@ -1,5 +1,5 @@
 describe('adminNg.directives.adminNgEditableSingleSelect', function () {
-    var $compile, $rootScope, $timeout, element, $filter;
+    var $compile, $rootScope, $timeout, element, $filter, $httpBackend;
 
     beforeEach(module('adminNg'));
     beforeEach(module('adminNg.filters'));
@@ -14,14 +14,16 @@ describe('adminNg.directives.adminNgEditableSingleSelect', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function (_$filter_, _$rootScope_, _$timeout_, _$compile_) {
+    beforeEach(inject(function (_$filter_, _$httpBackend_, _$rootScope_, _$timeout_, _$compile_) {
         $filter = _$filter_;
         $rootScope = _$rootScope_;
         $compile = _$compile_;
+        $httpBackend = _$httpBackend_;
         $timeout = _$timeout_;
     }));
 
     beforeEach(function () {
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $rootScope.params = { value: 'item2' };
         $rootScope.collection = { item1: 'Value 1', item2: 'Value 2', item3: 'Value 3' };
         $rootScope.save = jasmine.createSpy();

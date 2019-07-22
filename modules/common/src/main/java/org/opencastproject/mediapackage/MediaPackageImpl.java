@@ -208,14 +208,23 @@ public final class MediaPackageImpl implements MediaPackage {
   @Override
   public Long getDuration() {
     if (duration == null && hasTracks()) {
-      for (Track t : getTracks()) {
-        if (t.getDuration() != null) {
-          if (duration == null || duration < t.getDuration())
-            duration = t.getDuration();
-        }
-      }
+      recalculateDuration();
     }
     return duration;
+  }
+
+  /**
+   * The duration of the media package is the duration of the longest track
+   */
+  private void recalculateDuration() {
+
+    duration = null;
+    for (Track t : getTracks()) {
+      if (t.getDuration() != null) {
+        if (duration == null || duration < t.getDuration())
+          duration = t.getDuration();
+      }
+    }
   }
 
   /**
@@ -324,7 +333,7 @@ public final class MediaPackageImpl implements MediaPackage {
    */
   @Override
   public MediaPackageElement[] getElementsByTag(String tag) {
-    List<MediaPackageElement> result = new ArrayList<MediaPackageElement>();
+    List<MediaPackageElement> result = new ArrayList<>();
     for (MediaPackageElement element : getElements()) {
       if (element.containsTag(tag)) {
         result.add(element);
@@ -353,7 +362,7 @@ public final class MediaPackageImpl implements MediaPackage {
         keep.add(tag);
       }
     }
-    List<MediaPackageElement> result = new ArrayList<MediaPackageElement>();
+    List<MediaPackageElement> result = new ArrayList<>();
     for (MediaPackageElement element : getElements()) {
       boolean add = false;
       for (String elementTag : element.getTags()) {
@@ -379,7 +388,7 @@ public final class MediaPackageImpl implements MediaPackage {
   @Override
   public Attachment[] getAttachmentsByTags(Collection<String> tags) {
     MediaPackageElement[] matchingElements = getElementsByTags(tags);
-    List<Attachment> attachments = new ArrayList<Attachment>();
+    List<Attachment> attachments = new ArrayList<>();
     for (MediaPackageElement element : matchingElements) {
       if (Attachment.TYPE.equals(element.getElementType())) {
         attachments.add((Attachment) element);
@@ -396,7 +405,7 @@ public final class MediaPackageImpl implements MediaPackage {
   @Override
   public Catalog[] getCatalogsByTags(Collection<String> tags) {
     MediaPackageElement[] matchingElements = getElementsByTags(tags);
-    List<Catalog> catalogs = new ArrayList<Catalog>();
+    List<Catalog> catalogs = new ArrayList<>();
     for (MediaPackageElement element : matchingElements) {
       if (Catalog.TYPE.equals(element.getElementType())) {
         catalogs.add((Catalog) element);
@@ -413,7 +422,7 @@ public final class MediaPackageImpl implements MediaPackage {
   @Override
   public Track[] getTracksByTags(Collection<String> tags) {
     MediaPackageElement[] matchingElements = getElementsByTags(tags);
-    List<Track> tracks = new ArrayList<Track>();
+    List<Track> tracks = new ArrayList<>();
     for (MediaPackageElement element : matchingElements) {
       if (Track.TYPE.equals(element.getElementType())) {
         tracks.add((Track) element);
@@ -432,7 +441,7 @@ public final class MediaPackageImpl implements MediaPackage {
     if (flavor == null)
       throw new IllegalArgumentException("Flavor cannot be null");
 
-    List<MediaPackageElement> elements = new ArrayList<MediaPackageElement>();
+    List<MediaPackageElement> elements = new ArrayList<>();
     for (MediaPackageElement element : getElements()) {
       if (flavor.matches(element.getFlavor()))
         elements.add(element);
@@ -563,7 +572,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     // Go through catalogs and remove those that don't match
     Collection<Catalog> catalogs = loadCatalogs();
-    List<Catalog> candidates = new ArrayList<Catalog>(catalogs);
+    List<Catalog> candidates = new ArrayList<>(catalogs);
     for (Catalog c : catalogs) {
       if (c.getFlavor() == null || !c.getFlavor().matches(flavor)) {
         candidates.remove(c);
@@ -593,7 +602,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     // Go through catalogs and remove those that don't match
     Collection<Catalog> catalogs = loadCatalogs();
-    List<Catalog> candidates = new ArrayList<Catalog>(catalogs);
+    List<Catalog> candidates = new ArrayList<>(catalogs);
     for (Catalog c : catalogs) {
       MediaPackageReference r = c.getReference();
       if (!reference.matches(r)) {
@@ -632,7 +641,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     // Go through catalogs and remove those that don't match
     Collection<Catalog> catalogs = loadCatalogs();
-    List<Catalog> candidates = new ArrayList<Catalog>(catalogs);
+    List<Catalog> candidates = new ArrayList<>(catalogs);
     for (Catalog c : catalogs) {
       if (!flavor.equals(c.getFlavor()) || (c.getReference() != null && !c.getReference().matches(reference))) {
         candidates.remove(c);
@@ -707,7 +716,7 @@ public final class MediaPackageImpl implements MediaPackage {
    */
   @Override
   public Track[] getTracksByTag(String tag) {
-    List<Track> result = new ArrayList<Track>();
+    List<Track> result = new ArrayList<>();
     synchronized (elements) {
       for (MediaPackageElement e : elements) {
         if (e instanceof Track && e.containsTag(tag))
@@ -729,7 +738,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     // Go through tracks and remove those that don't match
     Collection<Track> tracks = loadTracks();
-    List<Track> candidates = new ArrayList<Track>(tracks);
+    List<Track> candidates = new ArrayList<>(tracks);
     for (Track a : tracks) {
       if (a.getFlavor() == null || !a.getFlavor().matches(flavor)) {
         candidates.remove(a);
@@ -761,7 +770,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     // Go through tracks and remove those that don't match
     Collection<Track> tracks = loadTracks();
-    List<Track> candidates = new ArrayList<Track>(tracks);
+    List<Track> candidates = new ArrayList<>(tracks);
     for (Track t : tracks) {
       MediaPackageReference r = t.getReference();
       if (!reference.matches(r)) {
@@ -802,7 +811,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     // Go through tracks and remove those that don't match
     Collection<Track> tracks = loadTracks();
-    List<Track> candidates = new ArrayList<Track>(tracks);
+    List<Track> candidates = new ArrayList<>(tracks);
     for (Track a : tracks) {
       if (!flavor.equals(a.getFlavor()) || !reference.matches(a.getReference())) {
         candidates.remove(a);
@@ -844,7 +853,7 @@ public final class MediaPackageImpl implements MediaPackage {
    */
   @Override
   public MediaPackageElement[] getUnclassifiedElements(MediaPackageElementFlavor flavor) {
-    List<MediaPackageElement> unclassifieds = new ArrayList<MediaPackageElement>();
+    List<MediaPackageElement> unclassifieds = new ArrayList<>();
     synchronized (elements) {
       for (MediaPackageElement e : elements) {
         if (!(e instanceof Attachment) && !(e instanceof Catalog) && !(e instanceof Track)) {
@@ -952,7 +961,7 @@ public final class MediaPackageImpl implements MediaPackage {
    */
   @Override
   public Attachment[] getAttachmentsByTag(String tag) {
-    List<Attachment> result = new ArrayList<Attachment>();
+    List<Attachment> result = new ArrayList<>();
     synchronized (elements) {
       for (MediaPackageElement e : elements) {
         if (e instanceof Attachment && e.containsTag(tag))
@@ -974,7 +983,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     // Go through attachments and remove those that don't match
     Collection<Attachment> attachments = loadAttachments();
-    List<Attachment> candidates = new ArrayList<Attachment>(attachments);
+    List<Attachment> candidates = new ArrayList<>(attachments);
     for (Attachment a : attachments) {
       if (a.getFlavor() == null || !a.getFlavor().matches(flavor)) {
         candidates.remove(a);
@@ -1006,7 +1015,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     // Go through attachments and remove those that don't match
     Collection<Attachment> attachments = loadAttachments();
-    List<Attachment> candidates = new ArrayList<Attachment>(attachments);
+    List<Attachment> candidates = new ArrayList<>(attachments);
     for (Attachment a : attachments) {
       MediaPackageReference r = a.getReference();
       if (!reference.matches(r)) {
@@ -1046,7 +1055,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     // Go through attachments and remove those that don't match
     Collection<Attachment> attachments = loadAttachments();
-    List<Attachment> candidates = new ArrayList<Attachment>(attachments);
+    List<Attachment> candidates = new ArrayList<>(attachments);
     for (Attachment a : attachments) {
       if (!flavor.equals(a.getFlavor()) || !reference.matches(a.getReference())) {
         candidates.remove(a);
@@ -1149,8 +1158,8 @@ public final class MediaPackageImpl implements MediaPackage {
    */
   @Override
   public void remove(Track track) {
-    duration = null;
     removeElement(track);
+    recalculateDuration();
   }
 
   /**
@@ -1291,7 +1300,7 @@ public final class MediaPackageImpl implements MediaPackage {
       throw new IllegalArgumentException("Derivate flavor cannot be null");
 
     MediaPackageReference reference = new MediaPackageReferenceImpl(sourceElement);
-    List<MediaPackageElement> elements = new ArrayList<MediaPackageElement>();
+    List<MediaPackageElement> elements = new ArrayList<>();
     for (MediaPackageElement element : getElements()) {
       if (derivateFlavor.equals(element.getFlavor()) && reference.equals(element.getReference()))
         elements.add(element);
@@ -1384,7 +1393,6 @@ public final class MediaPackageImpl implements MediaPackage {
     if (id == null || contains(id)) {
       track.setIdentifier(createElementIdentifier());
     }
-    duration = null;
     integrate(track);
   }
 
@@ -1668,7 +1676,7 @@ public final class MediaPackageImpl implements MediaPackage {
   @Override
   public void addCreator(String creator) {
     if (creators == null)
-      creators = new TreeSet<String>();
+      creators = new TreeSet<>();
     creators.add(creator);
   }
 
@@ -1680,7 +1688,7 @@ public final class MediaPackageImpl implements MediaPackage {
   @Override
   public void addSubject(String subject) {
     if (subjects == null)
-      subjects = new TreeSet<String>();
+      subjects = new TreeSet<>();
     subjects.add(subject);
   }
 
@@ -1793,7 +1801,7 @@ public final class MediaPackageImpl implements MediaPackage {
    * @param element
    *          the new element
    */
-  void addInternal(MediaPackageElement element) {
+  private void addInternal(MediaPackageElement element) {
     if (element == null)
       throw new IllegalArgumentException("Media package element must not be null");
     String id = null;
@@ -1801,15 +1809,7 @@ public final class MediaPackageImpl implements MediaPackage {
       if (element instanceof Track) {
         tracks++;
         id = "track-" + tracks;
-        Long duration = ((Track) element).getDuration();
-        // Todo Do not demand equal durations for now... This is an issue that has to be discussed further
-        // if (this.duration > 0 && this.duration != duration)
-        // throw new MediaPackageException("Track " + element + " cannot be added due to varying duration (" + duration
-        // +
-        // " instead of " + this.duration +")");
-        // else
-        if (this.duration == null)
-          this.duration = duration;
+        recalculateDuration();
       } else if (element instanceof Attachment) {
         attachments++;
         id = "attachment-" + attachments;
@@ -1843,8 +1843,7 @@ public final class MediaPackageImpl implements MediaPackage {
     if (elements.remove(element)) {
       if (element instanceof Track) {
         tracks--;
-        if (tracks == 0)
-          duration = null;
+        recalculateDuration();
       } else if (element instanceof Attachment)
         attachments--;
       else if (element instanceof Catalog)
@@ -1860,7 +1859,7 @@ public final class MediaPackageImpl implements MediaPackage {
    * @return the tracks
    */
   private Collection<Track> loadTracks() {
-    List<Track> tracks = new ArrayList<Track>();
+    List<Track> tracks = new ArrayList<>();
     synchronized (elements) {
       for (MediaPackageElement e : elements) {
         if (e instanceof Track) {
@@ -1877,7 +1876,7 @@ public final class MediaPackageImpl implements MediaPackage {
    * @return the catalogs
    */
   private Collection<Catalog> loadCatalogs() {
-    List<Catalog> catalogs = new ArrayList<Catalog>();
+    List<Catalog> catalogs = new ArrayList<>();
     synchronized (elements) {
       for (MediaPackageElement e : elements) {
         if (e instanceof Catalog) {
@@ -1894,7 +1893,7 @@ public final class MediaPackageImpl implements MediaPackage {
    * @return the attachments
    */
   private Collection<Attachment> loadAttachments() {
-    List<Attachment> attachments = new ArrayList<Attachment>();
+    List<Attachment> attachments = new ArrayList<>();
     synchronized (elements) {
       for (MediaPackageElement e : elements) {
         if (e instanceof Attachment) {

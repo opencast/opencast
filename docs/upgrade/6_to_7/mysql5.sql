@@ -43,3 +43,15 @@ delete p from oc_assets_properties p where not exists (
   select * from oc_assets_snapshot s
     where p.mediapackage_id = s.mediapackage_id
 );
+
+-- MH-12047 Add series index for efficiency
+CREATE INDEX IX_oc_search_series ON oc_search (series_id);
+
+-- MH-13380 Add snapshot_id index for efficiency
+CREATE INDEX IX_oc_assets_asset_snapshot_id ON oc_assets_asset (snapshot_id);
+
+-- MH-13490 Add event index for efficiency
+CREATE INDEX IX_oc_event_comment_event ON oc_event_comment (event, organization);
+
+-- MH-13489 Add index on series_id for efficiency
+CREATE INDEX IX_oc_assets_snapshot_series ON oc_assets_snapshot (series_id, version);

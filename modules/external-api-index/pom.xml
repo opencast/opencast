@@ -37,14 +37,19 @@
       <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- logging -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <!-- Doesn't compile without that dependency-->
+            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-search</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

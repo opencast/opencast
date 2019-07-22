@@ -2,6 +2,9 @@ site_name: Opencast - Administration Guide
 repo_url: https://github.com/opencast/opencast
 edit_uri: edit/develop/docs/guides/admin/docs/
 
+markdown_extensions:
+  - markdown_inline_graphviz
+
 # Default theme used is readthedocs
 theme: readthedocs
 
@@ -62,10 +65,12 @@ nav:
    - Workflow: 'configuration/workflow.md'
    - External API: 'configuration/external-api.md'
    - OAI-PMH: 'configuration/oaipmh.md'
+   - External Monitoring: 'configuration/monitoring.md'
    - Admin UI Configuration:
       - Event Filters: 'configuration/admin-ui/event-filters.md'
       - Manual Asset Upload: 'configuration/admin-ui/asset-upload.md'
       - Languages: 'configuration/admin-ui/languages.md'
+      - Statistics: 'configuration/admin-ui/statistics.md'
       - Thumbnails: 'configuration/admin-ui/thumbnails.md'
 - Version Support: 'version-support.md'
 - Modules:
@@ -166,9 +171,11 @@ nav:
    - Silence: 'workflowoperationhandlers/silence-woh.md'
    - Start Watson Transcription: 'workflowoperationhandlers/start-watson-transcription-woh.md'
    - Start Workflow: 'workflowoperationhandlers/start-workflow-woh.md'
+   - Statistics Writer: 'workflowoperationhandlers/statistics-writer.md'
    - Tag: 'workflowoperationhandlers/tag-woh.md'
    - Tag-By-DCTerm: 'workflowoperationhandlers/tag-by-dcterm-woh.md'
    - Timelinepreviews: 'workflowoperationhandlers/timelinepreviews-woh.md'
+   - Transfer Metadata: 'workflowoperationhandlers/transfer-metadata-woh.md'
    - Theme: 'workflowoperationhandlers/theme-woh.md'
    - Waveform: 'workflowoperationhandlers/waveform-woh.md'
    - Zip: 'workflowoperationhandlers/zip-woh.md'
