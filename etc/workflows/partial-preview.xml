@@ -22,17 +22,17 @@
       exception-handler-workflow="partial-error"
       description="Analyze tracks in media package and set control variables">
       <configurations>
-        <configuration key="source-flavor">*/work</configuration>
+        <configuration key="source-flavor">*/prepared</configuration>
       </configurations>
     </operation>
 
     <operation id="compose"
       description="Create single-stream video preview"
-      if="NOT (${presenter_work_video} AND ${presentation_work_video})"
+      if="NOT (${presenter_prepared_video} AND ${presentation_prepared_video})"
       fail-on-error="true"
       exception-handler-workflow="partial-error">
       <configurations>
-        <configuration key="source-flavors">*/work</configuration>
+        <configuration key="source-flavors">*/prepared</configuration>
         <configuration key="target-flavor">*/preview</configuration>
         <configuration key="target-tags">preview</configuration>
         <configuration key="encoding-profile">mp4-preview.http</configuration>
@@ -42,12 +42,12 @@
     <operation
       id="composite"
       description="Create dual-stream video preview"
-      if="${presenter_work_video} AND ${presentation_work_video}"
+      if="${presenter_prepared_video} AND ${presentation_prepared_video}"
       fail-on-error="true"
       exception-handler-workflow="partial-error">
       <configurations>
-        <configuration key="source-flavor-lower">presentation/work</configuration>
-        <configuration key="source-flavor-upper">presenter/work</configuration>
+        <configuration key="source-flavor-lower">presentation/prepared</configuration>
+        <configuration key="source-flavor-upper">presenter/prepared</configuration>
         <configuration key="encoding-profile">mp4-preview.dual.http</configuration>
         <configuration key="target-flavor">composite/preview</configuration>
         <configuration key="target-tags">preview</configuration>
@@ -89,7 +89,7 @@
       description="Create video preview images for presenter and presentation"
       exception-handler-workflow="partial-error">
       <configurations>
-        <configuration key="source-flavor">*/work</configuration>
+        <configuration key="source-flavor">*/prepared</configuration>
         <configuration key="target-flavor">*/video+preview</configuration>
         <configuration key="target-tags">preview</configuration>
         <configuration key="encoding-profile">editor.tracks.preview</configuration>
@@ -102,7 +102,7 @@
       fail-on-error="false"
       description="Generating waveform">
       <configurations>
-        <configuration key="source-flavor">*/work</configuration>
+        <configuration key="source-flavor">*/prepared</configuration>
         <configuration key="target-flavor">*/audio+preview</configuration>
         <configuration key="target-tags">preview</configuration>
         <configuration key="min-width">688</configuration>
@@ -126,11 +126,11 @@
     <!-- If we have a presenter track, we extract the default thumbnail from the presenter track -->
 
     <operation id="image"
-               if="${thumbnailType} == 0 AND ${presenter_work_video}"
+               if="${thumbnailType} == 0 AND ${presenter_prepared_video}"
                exception-handler-workflow="partial-error"
                description="Extract default thumbnail preview image from presenter track">
       <configurations>
-        <configuration key="source-flavor">presenter/work</configuration>
+        <configuration key="source-flavor">presenter/prepared</configuration>
         <configuration key="target-flavor">thumbnail/preview</configuration>
         <configuration key="target-tags">preview</configuration>
         <configuration key="encoding-profile">editor.thumbnail.preview</configuration>
@@ -142,11 +142,11 @@
          presentation track -->
 
     <operation id="image"
-               if="${thumbnailType} == 0 AND ${presentation_work_video} AND NOT (${presenter_work_video})"
+               if="${thumbnailType} == 0 AND ${presentation_prepared_video} AND NOT (${presenter_prepared_video})"
               exception-handler-workflow="partial-error"
               description="Extract thumbnail preview image from presentation track">
       <configurations>
-        <configuration key="source-flavor">presentation/work</configuration>
+        <configuration key="source-flavor">presentation/prepared</configuration>
         <configuration key="target-flavor">thumbnail/preview</configuration>
         <configuration key="target-tags">preview</configuration>
         <configuration key="encoding-profile">editor.thumbnail.preview</configuration>
@@ -171,14 +171,14 @@
 
     <!-- Snapshot Thumbnail (2)
          The snapshot thumbnail is extracted from the flavor type as provided by the variable
-         thumbnailTrack at position thumbnailPosition relative to the uncutted media. -->
+         thumbnailTrack at position thumbnailPosition relative to the uncut media. -->
 
     <operation id="image"
                if="${thumbnailType} == 2"
                exception-handler-workflow="partial-error"
                description="Extract snapshot thumbnail preview image">
       <configurations>
-        <configuration key="source-flavor">${thumbnailTrack}/source</configuration>
+        <configuration key="source-flavor">${thumbnailTrack}/prepared</configuration>
         <configuration key="target-flavor">thumbnail/preview</configuration>
         <configuration key="target-tags">preview</configuration>
         <configuration key="encoding-profile">editor.thumbnail.preview</configuration>
@@ -201,7 +201,7 @@
       <configurations>
         <configuration key="source-flavors">*/preview</configuration>
         <configuration key="smil-flavor-subtype">silence</configuration>
-        <configuration key="reference-tracks-flavor">*/work</configuration>
+        <configuration key="reference-tracks-flavor">*/prepared</configuration>
       </configurations>
     </operation>
 

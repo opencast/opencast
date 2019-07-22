@@ -73,7 +73,7 @@
       exception-handler-workflow="error"
       description="Tagging media package elements for deletion">
       <configurations>
-        <configuration key="source-flavors">*/source,*/player+preview</configuration>
+        <configuration key="source-flavors">*/source,*/prepared,*/player+preview</configuration>
         <configuration key="target-tags">-archive</configuration>
       </configurations>
     </operation>
