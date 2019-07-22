@@ -81,8 +81,11 @@ angular.module('adminNg.directives')
         $.timepicker.setDefaults($.timepicker.regional[lc === 'en' ? '' : lc]);
 
         element.datetimepicker(optionsObj);
-        element.datetimepicker('setDate', dateValue);
-        ngModel.$setViewValue(dateValue.toISOString());
+
+        if (dateValue) {
+          element.datetimepicker('setDate', dateValue);
+          ngModel.$setViewValue(dateValue.toISOString());
+        }
       }
 
       scope.$on('$destroy', function () {
