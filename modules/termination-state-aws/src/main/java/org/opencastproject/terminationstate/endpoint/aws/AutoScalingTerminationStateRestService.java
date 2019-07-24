@@ -99,7 +99,7 @@ public class AutoScalingTerminationStateRestService implements TerminationStateR
           })
   public Response setState(@FormParam("state") String state) {
     if (service != null) {
-      if ("wait".equalsIgnoreCase(state)) {
+      if (TerminationStateService.TerminationState.WAIT.toString().equalsIgnoreCase(state)) {
         service.setState(TerminationStateService.TerminationState.WAIT);
 
         // check is state has changed (ie service is working)
