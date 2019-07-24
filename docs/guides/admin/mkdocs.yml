@@ -122,6 +122,7 @@ nav:
    - Copy: 'workflowoperationhandlers/copy-woh.md'
    - Clone: 'workflowoperationhandlers/clone-woh.md'
    - Cover Image: 'workflowoperationhandlers/coverimage-woh.md'
+   - Crop Video: 'workflowoperationhandlers/cropvideo-woh.md'
    - Defaults: 'workflowoperationhandlers/defaults-woh.md'
    - Demux: 'workflowoperationhandlers/demux-woh.md'
    - Duplicate Event: 'workflowoperationhandlers/duplicate-event-woh.md'

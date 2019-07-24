@@ -167,6 +167,9 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-conductor/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-ffmpeg/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-regexp/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
@@ -282,6 +285,9 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-remote/${project.version}</bundle>
@@ -399,6 +405,9 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3/${project.version}</bundle>
@@ -530,6 +539,8 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-animate-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
@@ -549,6 +560,10 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-ffmpeg/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-regexp/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-execute-api/${project.version}</bundle>
