@@ -22,47 +22,25 @@ package org.opencastproject.metadata.dublincore;
 
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
 /**
  * An interface class to support the creation of data providers.
  */
-public interface EventCatalogUIAdapter {
+public interface EventCatalogUIAdapter extends CatalogUIAdapter {
 
   /**
-   * @return Return the tenant organization for this catalog ui adapter.
-   */
-  String getOrganization();
-
-  /**
-   * @return Return the flavor for this catalog ui adapter.
-   */
-  MediaPackageElementFlavor getFlavor();
-
-  /**
-   * @return Get the human readable title for this catalog ui adapter for various languages.
-   */
-  String getUITitle();
-
-  /**
-   * @return All of the fields with empty values for populating a new object.
-   */
-  MetadataCollection getRawFields();
-
-  /**
-   * @return Get the field names and values for this catalog.
+   * @return Get the field names and values for the catalogs of this media package.
    */
   MetadataCollection getFields(MediaPackage mediapackage);
 
   /**
-   * Store a change in the metadata into the mediapackage as a {@link Catalog}
+   * Store a change in the metadata into the media package as a {@link Catalog}
    *
    * @param mediapackage
-   *          The mediapackage to update
+   *          The media package to update
    * @param metadataCollection
-   *          The new metadata to update the mediapackage with
+   *          The new metadata to update the media package with
    * @return the stored catalog
    */
   Catalog storeFields(MediaPackage mediapackage, MetadataCollection metadataCollection);
-
 }

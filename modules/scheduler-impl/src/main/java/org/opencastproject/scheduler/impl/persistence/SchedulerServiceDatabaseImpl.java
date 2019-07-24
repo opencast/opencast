@@ -43,6 +43,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 /**
  * Implements {@link SchedulerServiceDatabase}.
@@ -322,6 +323,23 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     } catch (Exception e) {
       if (tx.isActive())
         tx.rollback();
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  public List<ExtendedEventDto> getEvents() throws SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    final String organization = securityService.getOrganization().getId();
+    try {
+      em = emf.createEntityManager();
+      TypedQuery<ExtendedEventDto> query = em.createNamedQuery("ExtendedEvent.findAll", ExtendedEventDto.class)
+                      .setParameter("org", organization);
+      return query.getResultList();
+    } catch (Exception e) {
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       if (em != null)

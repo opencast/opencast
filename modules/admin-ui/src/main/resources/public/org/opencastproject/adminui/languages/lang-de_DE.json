@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "Das Branding konnte nicht gelöscht werden",
       "TASK_CREATED": "Der Task wurde erstellt",
       "TASK_NOT_CREATED": "Der Task konnte nicht erstellt werden",
-      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
-      "VIDEO_CUT_SAVED": "The changes have been saved",
+      "VIDEO_CUT_NOT_SAVED": "Die Änderungen konnte nicht gespeichert werden",
+      "VIDEO_CUT_SAVED": "Die Änderungen wurden gespeichert",
       "VIDEO_CUT_PROCESSING": "Das Video wird verarbeitet…",
       "THUMBNAIL_CHANGE_FAILED": "Das Vorschaubild konnte nicht aktualisiert werden.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Keine Videospuren selektiert",
@@ -509,12 +509,12 @@
             "PROCESSING_CANCELED": "Verarbeitung abgebrochen"
          },
          "STATE_MAPPING": {
-            "RETRACTING": "Retracting",
-            "DUPLICATING": "Duplicating",
-            "PUBLISHING": "Publishing",
-            "IMPORTING": "Importing",
-            "REPUBLISHING_METADATA": "Republishing metadata",
-            "UPDATING_PREVIEWS": "Updating previews"
+            "RETRACTING": "Wird zurückgezogen",
+            "DUPLICATING": "Wird dupliziert",
+            "PUBLISHING": "Wird veröffentlicht",
+            "IMPORTING": "Wird importiert",
+            "REPUBLISHING_METADATA": "Metadaten werden neu publiziert",
+            "UPDATING_PREVIEWS": "Vorschauen werden aktualisiert"
          },
          "DETAILS": {
             "HEADER": "Aufzeichnungs-Details - {{resourceId}}",
@@ -1539,24 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Auftrennen",
-         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "Hide/Show",
-         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
-         "REPLAY_SEGMENT": "Play Start of Segment",
-         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
-         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
-         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
-         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
+         "SPLIT_TOOLTIP": "Segment an der aktuellen Cursor-Position teilen.",
+         "CUT": "Aus-/Einblenden",
+         "CUT_TOOLTIP": "Verstecke oder zeige den ausgewählten Teil des Videos.",
+         "REPLAY_SEGMENT": "Anfang des Segments abspielen",
+         "REPLAY_SEGMENT_TOOLTIP": "Spiele das aktuelle Segment von Anfang an.",
+         "REPLAY_END_OF_SEGMENT": "Ende des Segments abspielen",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Spiele ein paar Sekunden am Ende des aktuellen Segments ab.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Übergang abspielen",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Spiele das Ende des vorherigen und den Beginn des nächsten Segments ab.",
          "UNDO": "Widerrufen",
          "REDO": "Wiederholen",
-         "CLEAR_SEGMENTS": "Clear All Segments",
-         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
+         "CLEAR_SEGMENTS": "Alle Segmente entfernen",
+         "CLEAR_SEGMENTS_TOOLTIP": "Alle Segmente zu einem großen Segment zusammenfassen."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Segment löschen",
-         "SHOW_SEGMENT": "Show this Segment",
-         "HIDE_SEGMENT": "Hide this Segment",
+         "SHOW_SEGMENT": "Segment anzeigen",
+         "HIDE_SEGMENT": "Segment verbergen",
          "START": "Start",
          "END": "Ende"
       },
@@ -1997,12 +1997,14 @@
       "TITLE": {
          "RANDOM": "Zufallsdaten",
          "VIEWS_SUM": "Zugriffe",
-         "VIEWS_AVG": "Durchschnittliche Anzahl Zugriffe"
+         "VIEWS_AVG": "Durchschnittliche Anzahl Zugriffe",
+         "PUBLISHEDHOURS": "Published Hours of Video"
       },
       "DESCRIPTION": {
          "RANDOM": "Diese Zufallsdaten dienen ausschließlich Test- und Demonstrationszwecken. Um diese Darstellung zu deaktivieren, können Sie die entsprechende Konfiguration in etc/providers entfernen",
-         "VIEWS_SUM": "Diese Statistik zeigt die Summe der Zugriffe pro Zeiteinheit.",
-         "VIEWS_AVG": "Diese Statistik zeigt die durchschnittliche Anzahl Zugriffe pro Zeiteinheit."
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the running total published hours of video"
       }
    }
 }

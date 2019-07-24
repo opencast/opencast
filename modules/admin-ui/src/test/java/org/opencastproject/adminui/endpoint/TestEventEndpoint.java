@@ -625,7 +625,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
       @Override
       public MetadataCollection getFields(MediaPackage mediapackage) {
-        return super.getFields(null);
+        return super.getRawFields();
       }
     };
     commonEventCatalogUIAdapter.updated(properties);

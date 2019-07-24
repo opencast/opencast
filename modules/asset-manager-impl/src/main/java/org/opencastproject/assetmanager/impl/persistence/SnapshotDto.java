@@ -27,12 +27,14 @@ import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.impl.SnapshotImpl;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageParser;
 
 import org.eclipse.persistence.annotations.CascadeOnDelete;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 
@@ -181,6 +183,14 @@ public class SnapshotDto {
   }
 
   public Snapshot toSnapshot() {
+    MediaPackage mediaPackage = Conversions.toMediaPackage(mediaPackageXml);
+    // ensure elements are tagged `archive`
+    for (MediaPackageElement element: mediaPackage.getElements()) {
+      if (!Arrays.asList(element.getTags()).contains("archive")) {
+        logger.debug("Adding additional tag `archive` to element {} retrieved from asset manager", element);
+        element.addTag("archive");
+      }
+    }
     return new SnapshotImpl(
             id,
             Conversions.toVersion(version),
@@ -189,7 +199,7 @@ public class SnapshotDto {
             Availability.valueOf(availability),
             storageId,
             owner,
-            Conversions.toMediaPackage(mediaPackageXml));
+            mediaPackage);
   }
 
   /**

@@ -50,7 +50,7 @@ public class SchedulerMessageReceiverImplTest {
   @Test
   public void testUpdateCreator() throws Exception {
     DublinCoreCatalog catalog = DublinCores.read(getClass().getResourceAsStream("/dublincore.xml"));
-    SchedulerItemList schedulerItem = SchedulerItemList.singleton("uuid", SchedulerItem.updateCatalog(catalog));
+    SchedulerItemList schedulerItem = new SchedulerItemList("uuid", SchedulerItem.updateCatalog(catalog));
 
     // Test initial set of creator
     scheduler.execute(schedulerItem);

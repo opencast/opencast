@@ -12,7 +12,6 @@
 
   <operations>
 
-
       <!-- Apply the default workflow configuration -->
 
       <operation
@@ -21,23 +20,6 @@
         <configurations>
           <configuration key="thumbnailType">0</configuration>
           <configuration key="thumbnailPosition">1</configuration>
-        </configurations>
-      </operation>
-
-      <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-      <!-- Prepare asset                                                     -->
-      <!--                                                                   -->
-      <!-- Creat previews, audio waveforms and make those artifacts availabe -->
-      <!-- for use in the preview and cutting tool.                          -->
-      <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-      <!-- Prepare work versions of the source material for further processing -->
-
-      <operation
-        id="include"
-        description="Prepare the recording for further processing">
-        <configurations>
-          <configuration key="workflow-id">partial-work</configuration>
         </configurations>
       </operation>
 
@@ -61,21 +43,18 @@
         </configurations>
       </operation>
 
-      <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-      <!-- Cleanup                                                           -->
-      <!--                                                                   -->
-      <!-- Remove work artifacts.                                            -->
-      <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Clean up work artifacts -->
 
-      <!-- Clean the system from work artifacts -->
-
-      <operation
-        id="include"
+    <operation
+        id="cleanup"
+        fail-on-error="false"
         description="Remove temporary processing artifacts">
-        <configurations>
-          <configuration key="workflow-id">partial-cleanup</configuration>
-        </configurations>
-      </operation>
+      <configurations>
+        <configuration key="delete-external">true</configuration>
+        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <configuration key="preserve-flavors">security/*</configuration>
+      </configurations>
+    </operation>
 
   </operations>
 

@@ -26,6 +26,8 @@ import org.opencastproject.util.MimeTypes;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +40,7 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.zip.CRC32;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -48,6 +51,16 @@ import javax.servlet.http.HttpServletResponse;
  * Serves static content from a configured path on the filesystem. In production systems, this should be replaced with
  * apache httpd or another web server optimized for serving static content.
  */
+@Component(
+    property = {
+            "service.description=Opencast Download Resources",
+            "alias=/static",
+            "httpContext.id=opencast.httpcontext",
+            "httpContext.shared=true"
+    },
+    immediate = true,
+    service = Servlet.class
+)
 public class StaticResourceServlet extends HttpServlet {
 
   /** The serialization UID */
@@ -59,11 +72,11 @@ public class StaticResourceServlet extends HttpServlet {
 
   /** static initializer */
   static {
-    FULL_RANGE = new ArrayList<Range>();
+    FULL_RANGE = new ArrayList<>();
   }
 
   /** The filesystem directory to serve files fro */
-  protected String distributionDirectory;
+  private String distributionDirectory;
 
   /**
    * No-arg constructor
@@ -77,20 +90,19 @@ public class StaticResourceServlet extends HttpServlet {
    * @param cc
    *          the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     if (cc != null) {
-      String ccDistributionDirectory = cc.getBundleContext().getProperty("org.opencastproject.download.directory");
-      if (StringUtils.isNotEmpty(ccDistributionDirectory)) {
-        this.distributionDirectory = ccDistributionDirectory;
-      } else {
-        String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
+      distributionDirectory = cc.getBundleContext().getProperty("org.opencastproject.download.directory");
+      if (StringUtils.isEmpty(distributionDirectory)) {
+        final String storageDir = cc.getBundleContext().getProperty("org.opencastproject.storage.dir");
         if (StringUtils.isNotEmpty(storageDir)) {
-          this.distributionDirectory = new File(storageDir, "downloads").getPath();
+          distributionDirectory = new File(storageDir, "downloads").getPath();
         }
       }
     }
 
-    if (distributionDirectory == null) {
+    if (StringUtils.isEmpty(distributionDirectory)) {
       throw new ConfigurationException("Distribution directory not set");
     }
     logger.info("Serving static files from '{}'", distributionDirectory);
@@ -106,98 +118,89 @@ public class StaticResourceServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     logger.debug("Looking for static resource '{}'", req.getRequestURI());
     String path = req.getPathInfo();
-    if (path == null) {
+    if (path == null || path.contains("..")) {
       resp.sendError(HttpServletResponse.SC_FORBIDDEN);
       return;
     }
 
-    String normalized = path.trim().replaceAll("/+", "/").replaceAll("\\.\\.", "");
-    if (normalized != null && normalized.startsWith("/") && normalized.length() > 1) {
-      normalized = normalized.substring(1);
-    }
-
-    File f = new File(distributionDirectory, normalized);
-    String eTag = null;
-    if (f.isFile() && f.canRead()) {
-      logger.debug("Serving static resource '{}'", f.getAbsolutePath());
-      eTag = computeEtag(f);
-      if (eTag.equals(req.getHeader("If-None-Match"))) {
-        resp.setStatus(304);
-        return;
-      }
-      resp.setHeader("ETag", eTag);
-      String contentType = MimeTypes.getMimeType(normalized);
-      if (!MimeTypes.DEFAULT_TYPE.equals(contentType)) {
-        resp.setContentType(contentType);
-      }
-      resp.setHeader("Content-Length", Long.toString(f.length()));
-      resp.setDateHeader("Last-Modified", f.lastModified());
-
-      resp.setHeader("Accept-Ranges", "bytes");
-      ArrayList<Range> ranges = parseRange(req, resp, eTag, f.lastModified(), f.length());
-
-      if ((((ranges == null) || (ranges.isEmpty())) && (req.getHeader("Range") == null)) || (ranges == FULL_RANGE)) {
-        IOException e = copyRange(new FileInputStream(f), resp.getOutputStream(), 0, f.length());
-        if (e != null) {
-          try {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
-          } catch (IOException e1) {
-            logger.warn("unable to send http 500 error: {}", e1);
-            return;
-          } catch (IllegalStateException e2) {
-            logger.trace("unable to send http 500 error. Client side was probably closed during file copy.", e2);
-            return;
-          }
-        }
-      } else {
-        if ((ranges == null) || (ranges.isEmpty())) {
-          return;
-        }
-        if (ranges.size() == 1) {
-          Range range = ranges.get(0);
-          resp.addHeader("Content-Range", "bytes " + range.start + "-" + range.end + "/" + range.length);
-          long length = range.end - range.start + 1;
-          if (length < Integer.MAX_VALUE) {
-            resp.setContentLength((int) length);
-          } else {
-            // Set the content-length as String to be able to use a long
-            resp.setHeader("content-length", "" + length);
-          }
-          try {
-            resp.setBufferSize(2048);
-          } catch (IllegalStateException e) {
-            logger.debug(e.getMessage(), e);
-          }
-          resp.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-          IOException e = copyRange(new FileInputStream(f), resp.getOutputStream(), range.start, range.end);
-          if (e != null) {
-            try {
-              resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-              return;
-            } catch (IOException e1) {
-              logger.warn("unable to send http 500 error: {}", e1);
-              return;
-            } catch (IllegalStateException e2) {
-              logger.trace("unable to send http 500 error. Client side was probably closed during file copy.", e2);
-              return;
-            }
-          }
-        } else {
-          resp.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-          resp.setContentType("multipart/byteranges; boundary=" + mimeSeparation);
-          try {
-            resp.setBufferSize(2048);
-          } catch (IllegalStateException e) {
-            logger.debug(e.getMessage(), e);
-          }
-          copy(f, resp.getOutputStream(), ranges.iterator(), contentType);
-        }
-      }
-    } else {
-      logger.debug("unable to find file '{}', returning HTTP 404");
+    File file = new File(distributionDirectory, path);
+    if (!file.isFile() || !file.canRead()) {
+      logger.debug("unable to find file '{}', returning HTTP 404", file);
       resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+      return;
     }
+
+    logger.debug("Serving static resource '{}'", file.getAbsolutePath());
+    String eTag = computeEtag(file);
+    if (eTag.equals(req.getHeader("If-None-Match"))) {
+      resp.setStatus(304);
+      return;
+    }
+    resp.setHeader("ETag", eTag);
+
+    String contentType = MimeTypes.getMimeType(path);
+    if (!MimeTypes.DEFAULT_TYPE.equals(contentType)) {
+      resp.setContentType(contentType);
+    }
+    resp.setHeader("Content-Length", Long.toString(file.length()));
+    resp.setDateHeader("Last-Modified", file.lastModified());
+
+    resp.setHeader("Accept-Ranges", "bytes");
+    ArrayList<Range> ranges = parseRange(req, resp, eTag, file.lastModified(), file.length());
+
+    if ((((ranges == null) || (ranges.isEmpty())) && (req.getHeader("Range") == null)) || (ranges == FULL_RANGE)) {
+      IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), 0, file.length());
+      if (e != null) {
+        try {
+          resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (IOException e1) {
+          logger.warn("unable to send http 500 error", e1);
+        } catch (IllegalStateException e2) {
+          logger.trace("unable to send http 500 error. Client side was probably closed during file copy.", e2);
+        }
+      }
+      return;
+    }
+    if ((ranges == null) || (ranges.isEmpty())) {
+      return;
+    }
+    if (ranges.size() == 1) {
+      Range range = ranges.get(0);
+      resp.addHeader("Content-Range", "bytes " + range.start + "-" + range.end + "/" + range.length);
+      long length = range.end - range.start + 1;
+      if (length < Integer.MAX_VALUE) {
+        resp.setContentLength((int) length);
+      } else {
+        // Set the content-length as String to be able to use a long
+        resp.setHeader("content-length", "" + length);
+      }
+      try {
+        resp.setBufferSize(2048);
+      } catch (IllegalStateException e) {
+        logger.debug(e.getMessage(), e);
+      }
+      resp.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+      IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), range.start, range.end);
+      if (e != null) {
+        try {
+          resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (IOException e1) {
+          logger.warn("unable to send http 500 error", e1);
+        } catch (IllegalStateException e2) {
+          logger.trace("unable to send http 500 error. Client side was probably closed during file copy.", e2);
+        }
+      }
+      return;
+    }
+
+    resp.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+    resp.setContentType("multipart/byteranges; boundary=" + mimeSeparation);
+    try {
+      resp.setBufferSize(2048);
+    } catch (IllegalStateException e) {
+      logger.debug(e.getMessage(), e);
+    }
+    copy(file, resp.getOutputStream(), ranges.iterator(), contentType);
   }
 
   /**
@@ -207,7 +210,7 @@ public class StaticResourceServlet extends HttpServlet {
    *          the file
    * @return the etag
    */
-  protected String computeEtag(File file) {
+  private String computeEtag(File file) {
     CRC32 crc = new CRC32();
     crc.update(file.getName().getBytes());
     checksum(file.lastModified(), crc);
@@ -251,7 +254,7 @@ public class StaticResourceServlet extends HttpServlet {
   /**
    * MIME multipart separation string
    */
-  protected static final String mimeSeparation = "MATTERHORN_MIME_BOUNDARY";
+  private static final String mimeSeparation = "MATTERHORN_MIME_BOUNDARY";
 
   /**
    * Parse the range header.

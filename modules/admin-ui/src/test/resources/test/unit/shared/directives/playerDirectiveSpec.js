@@ -39,6 +39,7 @@ describe('adminNg.directives.playerDirective', function () {
         $httpBackend = _$httpBackend_;
         $timeout = _$timeout_;
         repository = _PlayerAdapterRepository_;
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
     }));
 

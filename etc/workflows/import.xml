@@ -88,7 +88,7 @@
       </configurations>
     </operation>
 
-    <!-- Cleanup the working file repository -->
+    <!-- Clean up the working file repository -->
 
     <operation
       id="cleanup"

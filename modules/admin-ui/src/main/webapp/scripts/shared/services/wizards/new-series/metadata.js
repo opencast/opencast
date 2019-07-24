@@ -46,7 +46,7 @@ angular.module('adminNg.services')
         for (i = 0; i < mainData.fields.length; i++) {
           var field = mainData.fields[i];
           // preserve default value, if set
-          if (field.hasOwnProperty('value') && field.value) {
+          if (Object.prototype.hasOwnProperty.call(field, 'value') && field.value) {
             field.presentableValue = me.extractPresentableValue(field);
             me.ud[mainMetadataName].fields[i] = field;
           }
@@ -85,7 +85,7 @@ angular.module('adminNg.services')
           presentableValue = field.value.join(', ');
         } else if (field.collection) {
           // We need to lookup the presentable value in the collection
-          if (field.collection.hasOwnProperty(field.value)) {
+          if (Object.prototype.hasOwnProperty.call(field.collection, field.value)) {
             presentableValue = field.collection[field.value];
           } else {
             // This should work in older browsers, albeit looking clumsy

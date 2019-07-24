@@ -44,7 +44,6 @@ module.exports = function (config) {
 
             // fixtures
             {pattern: '../../main/resources/public/**/*.json', watched: true, served: true, included: false},
-            {pattern: 'test/unit/fixtures/**/*.json', watched: true, served: true, included: false},
             {pattern: 'app/GET/**/*', watched: true, served: true, included: false},
 
             'test/unit/setup.js',

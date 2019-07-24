@@ -35,6 +35,7 @@ describe('New Event Controller', function () {
 
     describe('#submit', function () {
         beforeEach(function () {
+            jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
             $httpBackend.whenGET('/admin-ng/event/new/metadata').respond('{}');
             $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true')
                 .respond(JSON.stringify(getJSONFixture('admin-ng/capture-agents/agents.json')));

@@ -229,11 +229,13 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
     // Similar to deleteComment but we want to avoid sending a message for each deletion
 
+    int count = 0;
     EntityManager em = emf.createEntityManager();
     EntityTransaction tx = em.getTransaction();
     try {
       tx.begin();
       List<EventComment> comments = getComments(eventId);
+      count = comments.size();
 
       for (EventComment comment : comments) {
         long commentId = comment.getId().get().intValue();
@@ -253,11 +255,13 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
       throw new EventCommentDatabaseException(e);
     } finally {
-      if (em != null)
-        em.close();
+      em.close();
     }
 
-    sendMessageUpdate(eventId);
+    // send updates only if we actually modified anything
+    if (count > 0) {
+      sendMessageUpdate(eventId);
+    }
   }
 
   @Override

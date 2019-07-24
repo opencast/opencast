@@ -1614,7 +1614,6 @@ public class IndexServiceImpl implements IndexService {
       case WORKFLOW:
         Opt<WorkflowInstance> currentWorkflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
         if (currentWorkflowInstance.isNone()) {
-          logger.error("No workflow instance for event {} found!", event.getIdentifier());
           throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
         }
         return currentWorkflowInstance.get().getMediaPackage();
@@ -1624,7 +1623,6 @@ public class IndexServiceImpl implements IndexService {
           logger.debug("Found event in archive with id {}", event.getIdentifier());
           return mpOpt.get();
         }
-        logger.error("No event with id {} found from archive!", event.getIdentifier());
         throw new IndexServiceException("No archived event found with id " + event.getIdentifier());
       case SCHEDULE:
         try {
@@ -1632,16 +1630,11 @@ public class IndexServiceImpl implements IndexService {
           logger.debug("Found event in scheduler with id {}", event.getIdentifier());
           return mediaPackage;
         } catch (NotFoundException e) {
-          logger.error("No scheduled event with id {} found!", event.getIdentifier());
-          throw new IndexServiceException(e.getMessage(), e);
+          throw new IndexServiceException("No scheduled event with id " + event.getIdentifier(), e);
         } catch (UnauthorizedException e) {
-          logger.error("Unauthorized to get event with id {} from scheduler because {}", event.getIdentifier(),
-                  getStackTrace(e));
-          throw new IndexServiceException(e.getMessage(), e);
+          throw new IndexServiceException("Unauthorized to get event " + event.getIdentifier() + " from scheduler", e);
         } catch (SchedulerException e) {
-          logger.error("Unable to get event with id {} from scheduler because {}", event.getIdentifier(),
-                  getStackTrace(e));
-          throw new IndexServiceException(e.getMessage(), e);
+          throw new IndexServiceException("Unable to get event " + event.getIdentifier() + " from scheduler", e);
         }
       default:
         throw new IllegalStateException("Unknown event type!");
@@ -2118,7 +2111,7 @@ public class IndexServiceImpl implements IndexService {
    */
   private MetadataList getMetadataListWithCommonSeriesCatalogUIAdapters() {
     MetadataList metadataList = new MetadataList();
-    metadataList.add(seriesCatalogUIAdapter.getFlavor(), seriesCatalogUIAdapter.getUITitle(),
+    metadataList.add(seriesCatalogUIAdapter.getFlavor().toString(), seriesCatalogUIAdapter.getUITitle(),
             seriesCatalogUIAdapter.getRawFields());
     return metadataList;
   }
@@ -2131,7 +2124,7 @@ public class IndexServiceImpl implements IndexService {
   public MetadataList getMetadataListWithAllSeriesCatalogUIAdapters() {
     MetadataList metadataList = new MetadataList();
     for (SeriesCatalogUIAdapter adapter : getSeriesCatalogUIAdapters()) {
-      metadataList.add(adapter.getFlavor(), adapter.getUITitle(), adapter.getRawFields());
+      metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), adapter.getRawFields());
     }
     return metadataList;
   }
@@ -2161,7 +2154,7 @@ public class IndexServiceImpl implements IndexService {
    */
   private void updateSeriesMetadata(String seriesId, MetadataList metadataList) {
     for (SeriesCatalogUIAdapter adapter : seriesCatalogUIAdapters) {
-      Opt<MetadataCollection> metadata = metadataList.getMetadataByFlavor(adapter.getFlavor());
+      Opt<MetadataCollection> metadata = metadataList.getMetadataByFlavor(adapter.getFlavor().toString());
       if (metadata.isSome() && metadata.get().isUpdated()) {
         adapter.storeFields(seriesId, metadata.get());
       }
@@ -2173,5 +2166,4 @@ public class IndexServiceImpl implements IndexService {
             || WorkflowState.RUNNING.toString().equals(workflowState)
             || WorkflowState.PAUSED.toString().equals(workflowState);
   }
-
 }

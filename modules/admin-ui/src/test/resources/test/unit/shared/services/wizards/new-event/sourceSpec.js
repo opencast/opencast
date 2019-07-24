@@ -149,7 +149,7 @@ describe('Source Step in New Event Wizard', function () {
         var conflictResponse, singleTestData;
 
         beforeEach(function () {
-            jasmine.getJSONFixtures().fixturesPath = 'base/test/unit/fixtures';
+            jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
             conflictResponse = getJSONFixture('conflictResponse.json');
             singleTestData = getJSONFixture('conflictCheckSingle.json');
             $httpBackend.expectPOST('/admin-ng/event/new/conflicts').respond(409, conflictResponse);

@@ -1704,6 +1704,22 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     return em.createNamedQuery("HostRegistration.getAll").getResultList();
   }
 
+  @Override
+    public HostRegistration getHostRegistration(String hostname) throws ServiceRegistryException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      return getHostRegistration(em, hostname);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  protected HostRegistration getHostRegistration(EntityManager em, String hostname) {
+    return (HostRegistration) em.createNamedQuery("HostRegistration.byHostName").setParameter("host", hostname).getSingleResult();
+  }
+
   /**
    * {@inheritDoc}
    *

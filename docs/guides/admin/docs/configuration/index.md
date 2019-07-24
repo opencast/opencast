@@ -31,6 +31,7 @@ General Configuration
     - [Workflow Operation Handler](../workflowoperationhandlers/index.md)
 - [External API Configuration](external-api.md)
 - [OAI-PMH Configuration](oaipmh.md)
+- [External Monitoring](monitoring.md)
 - Admin UI Configuration
     - [Event Filters](admin-ui/event-filters.md)
     - [Manual Asset Upload](admin-ui/asset-upload.md)

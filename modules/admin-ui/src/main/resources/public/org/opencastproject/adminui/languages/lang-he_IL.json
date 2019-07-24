@@ -1997,12 +1997,14 @@
       "TITLE": {
          "RANDOM": "מידע אקראי",
          "VIEWS_SUM": "מספר צפיות כללי",
-         "VIEWS_AVG": "מספר צפיות ממוצע"
+         "VIEWS_AVG": "מספר צפיות ממוצע",
+         "PUBLISHEDHOURS": "Published Hours of Video"
       },
       "DESCRIPTION": {
          "RANDOM": "מוצג מידע אקראי לצורך הצגת יכולות. ניתן לבטל תצוגת תרשים זה על ידי מחיקת קובץ json המכיל המספק מידע סטטיסטי מתקיית etc/providers",
-         "VIEWS_SUM": "מציג את סה\"כ הצפיות עבור יחידת זמן.",
-         "VIEWS_AVG": "מציג את ממוצע הצפיות היומי עבור יחידת זמן."
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the running total published hours of video"
       }
    }
 }

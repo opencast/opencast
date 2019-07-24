@@ -5,7 +5,7 @@ describe('New Event API Resource', function () {
         startDate, startDateDST, endDateDST, endDate, duration, date, dateDST, expectedSourceDSTMultiple;
 
     beforeEach(function () {
-        jasmine.getJSONFixtures().fixturesPath = 'base/test/unit/fixtures';
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         singleTestData = getJSONFixture('newEventSingleFixture.json');
         multiTestData = getJSONFixture('newEventMultipleFixture.json');
         multiTestDSTData = getJSONFixture('newEventMultipleDSTFixture.json');

@@ -213,13 +213,41 @@
       </configurations>
     </operation>
 
-    <!-- Prepare work versions of the source material for further processing -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Prepare the work media                                            -->
+    <!--                                                                   -->
+    <!-- Ensure the work media is in a format that allows Opencast to do   -->
+    <!-- its work. This includes potentially rewriting the container and   -->
+    <!-- making sure that the audio track is part of each video track.     -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Prepare presenter track -->
 
     <operation
-      id="include"
-      description="Prepare the recording for further processing">
+        id="prepare-av"
+        exception-handler-workflow="partial-error"
+        description="Preparing presenter (camera) audio and video work versions">
       <configurations>
-        <configuration key="workflow-id">partial-work</configuration>
+        <configuration key="source-flavor">presenter/source</configuration>
+        <configuration key="target-flavor">presenter/prepared</configuration>
+        <configuration key="target-tags">archive</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Prepare presentation track -->
+
+    <operation
+        id="prepare-av"
+        exception-handler-workflow="partial-error"
+        description="Preparing presentation (screen) audio and video work version">
+      <configurations>
+        <configuration key="source-flavor">presentation/source</configuration>
+        <configuration key="target-flavor">presentation/prepared</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="target-tags">archive</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
       </configurations>
     </operation>
 
@@ -312,19 +340,16 @@
       </configurations>
     </operation>
 
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Cleanup                                                           -->
-    <!--                                                                   -->
-    <!-- Remove work artifacts.                                            -->
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-    <!-- Clean the system from work artifacts -->
+    <!-- Clean up work artifacts -->
 
     <operation
-      id="include"
-      description="Remove temporary processing artifacts">
+        id="cleanup"
+        fail-on-error="false"
+        description="Remove temporary processing artifacts">
       <configurations>
-        <configuration key="workflow-id">partial-cleanup</configuration>
+        <configuration key="delete-external">true</configuration>
+        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 

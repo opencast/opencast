@@ -1,4 +1,4 @@
-Upgrading Opencast from 6.x to 7.x
+Upgrading Opencast from 7.x to 8.x
 ==================================
 
 This guide describes how to upgrade Opencast 7.x to 8.x. In case you need information about how to upgrade older

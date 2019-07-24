@@ -21,157 +21,59 @@
 
 package org.opencastproject.index.service.catalog.adapter.events;
 
-import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_FLAVOR_KEY;
-import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_ORGANIZATION_KEY;
-import static org.opencastproject.util.OsgiUtil.getCfg;
-
-import org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterConfiguration;
-import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataCollection;
+import org.opencastproject.index.service.catalog.adapter.ConfigurableDCCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
-import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
-import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Collections;
-import java.util.Dictionary;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
  * Managed service implementation of a AbstractEventsCatalogUIAdapter
  */
-public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapter {
+public class ConfigurableEventDCCatalogUIAdapter extends ConfigurableDCCatalogUIAdapter
+        implements EventCatalogUIAdapter {
 
-  /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(ConfigurableEventDCCatalogUIAdapter.class);
 
-  /** The catalog UI adapter configuration */
-  private CatalogUIAdapterConfiguration config;
-
-  private Map<String, MetadataField<?>> dublinCoreProperties = new TreeMap<>();
-  private MediaPackageElementFlavor flavor;
-  private String organization;
-  private String title;
-
-  private ListProvidersService listProvidersService;
   private Workspace workspace;
-
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
-    config = CatalogUIAdapterConfiguration.loadFromDictionary(properties);
-    organization = getCfg(properties, CONF_ORGANIZATION_KEY);
-    String flavorString = getCfg(properties, CONF_FLAVOR_KEY);
-    if (StringUtils.isBlank(flavorString) || flavorString.split("/").length != 2) {
-      throw new ConfigurationException(CONF_FLAVOR_KEY, "The flavor " + flavorString
-              + " is not a valid flavor. It should be defined as 'type/subtype'");
-    }
-    flavor = new MediaPackageElementFlavor(flavorString.split("/")[0], flavorString.split("/")[1]);
-    title = getCfg(properties, "title");
-    dublinCoreProperties = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
-    logger.info("Updated dublin core catalog UI adapter {} for flavor {}", getUITitle(), getFlavor());
-  }
-
-  @Override
-  public DublinCoreMetadataCollection getRawFields() {
-    DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
-    Set<String> emptyFields = new TreeSet<>(dublinCoreProperties.keySet());
-    populateEmptyFields(dublinCoreMetadata, emptyFields);
-    return dublinCoreMetadata;
-  }
-
-  private void populateEmptyFields(DublinCoreMetadataCollection dublinCoreMetadata, Set<String> emptyFields) {
-    // Add all of the rest of the fields that didn't have values as empty.
-    for (String field : emptyFields) {
-      try {
-        dublinCoreMetadata.addField(dublinCoreProperties.get(field), Collections.emptyList(), getListProvidersService());
-      } catch (Exception e) {
-        logger.error("Skipping metadata field '{}' because of error", field, e);
-      }
-    }
-  }
 
   @Override
   public MetadataCollection getFields(MediaPackage mediapackage) {
-    DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
-    Set<String> emptyFields = new TreeSet<>(dublinCoreProperties.keySet());
-    if (mediapackage != null) {
-      for (Catalog catalog : mediapackage.getCatalogs(getFlavor())) {
-        getFieldValuesFromCatalog(dublinCoreMetadata, emptyFields, catalog);
-      }
-    }
-    populateEmptyFields(dublinCoreMetadata, emptyFields);
-    return dublinCoreMetadata;
-  }
+    List<DublinCoreCatalog> dcCatalogs = Arrays.stream(mediapackage.getCatalogs(flavor))
+            .map(catalog -> DublinCoreUtil.loadDublinCore(getWorkspace(), catalog))
+            .collect(Collectors.toList());
 
-  private void getFieldValuesFromCatalog(DublinCoreMetadataCollection dublinCoreMetadata, Set<String> emptyFields,
-          Catalog catalog) {
-    DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(getWorkspace(), catalog);
-    getFieldValuesFromDublinCoreCatalog(dublinCoreMetadata, emptyFields, dc);
-  }
-
-  private void getFieldValuesFromDublinCoreCatalog(DublinCoreMetadataCollection dublinCoreMetadata,
-          Set<String> emptyFields, DublinCoreCatalog dc) {
-    for (EName propertyKey : dc.getValues().keySet()) {
-      for (String metdataFieldKey : dublinCoreProperties.keySet()) {
-        MetadataField<?> metadataField = dublinCoreProperties.get(metdataFieldKey);
-        String namespace = DublinCore.TERMS_NS_URI;
-        if (metadataField.getNamespace().isSome()) {
-          namespace = metadataField.getNamespace().get();
-        }
-        if (namespace.equalsIgnoreCase(propertyKey.getNamespaceURI())
-                && metadataField.getInputID().equalsIgnoreCase(propertyKey.getLocalName())) {
-          List<DublinCoreValue> values = dc.get(propertyKey);
-          if (!values.isEmpty()) {
-            emptyFields.remove(metdataFieldKey);
-            try {
-              dublinCoreMetadata.addField(metadataField, values.stream()
-                      .map(DublinCoreValue::getValue)
-                      .collect(Collectors.toList()), getListProvidersService());
-            } catch (IllegalArgumentException e) {
-              logger.error("Skipping metadata field '{}' because of error: {}", metadataField.getInputID(),
-                      ExceptionUtils.getStackTrace(e));
-            }
-
-          }
-        }
-      }
-    }
+    return getFieldsFromCatalogs(dcCatalogs);
   }
 
   @Override
   public Catalog storeFields(MediaPackage mediaPackage, MetadataCollection abstractMetadata) {
-    Catalog[] catalogs = mediaPackage.getCatalogs(getFlavor());
     final Catalog catalog;
     final DublinCoreCatalog dc;
     final String filename;
+
+    Catalog[] catalogs = mediaPackage.getCatalogs(flavor);
     if (catalogs.length == 0) {
       catalog = (Catalog) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
               .newElement(org.opencastproject.mediapackage.MediaPackageElement.Type.Catalog, getFlavor());
@@ -207,29 +109,6 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
     return catalog;
   }
 
-  @Override
-  public String getOrganization() {
-    return organization;
-  }
-
-  @Override
-  public String getUITitle() {
-    return title;
-  }
-
-  @Override
-  public MediaPackageElementFlavor getFlavor() {
-    return flavor;
-  }
-
-  public void setListProvidersService(ListProvidersService listProvidersService) {
-    this.listProvidersService = listProvidersService;
-  }
-
-  protected ListProvidersService getListProvidersService() {
-    return listProvidersService;
-  }
-
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -237,5 +116,4 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
   protected Workspace getWorkspace() {
     return workspace;
   }
-
 }

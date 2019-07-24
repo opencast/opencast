@@ -199,7 +199,7 @@ angular.module('adminNg.services')
     function filterEventProperties(workflowProperties, selectedIds) {
       var result = {};
       for (var workflowProp in workflowProperties) {
-        if (workflowProp.indexOf('$') !== 0 && workflowProperties.hasOwnProperty(workflowProp)) {
+        if (workflowProp.indexOf('$') !== 0 && Object.prototype.hasOwnProperty.call(workflowProperties, workflowProp)) {
           if (selectedIds.indexOf(workflowProp) >= 0) {
             result[workflowProp] = workflowProperties[workflowProp];
           }
