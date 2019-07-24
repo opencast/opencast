@@ -60,7 +60,7 @@ public abstract class AbstractJobTerminationStateService implements TerminationS
    * Count the current number of jobs this node is processing
    * @return number jobs
    */
-  protected long countJobs() {
+  protected long countJobs() throws ServiceRegistryException {
     String host = "";
     long nJobs = 0;
 
@@ -69,6 +69,7 @@ public abstract class AbstractJobTerminationStateService implements TerminationS
       nJobs = serviceRegistry.countByHost(null, host, Job.Status.RUNNING);
     } catch (ServiceRegistryException ex) {
       logger.error("Cannot count jobs running on {}", host, ex);
+      throw ex;
     }
 
     return nJobs;
@@ -80,7 +81,14 @@ public abstract class AbstractJobTerminationStateService implements TerminationS
    */
   protected boolean readyToTerminate() {
     if (state == TerminationState.WAIT) {
-      if (countJobs() == 0) {
+      try {
+        if (countJobs() == 0) {
+          state = TerminationState.READY;
+          return true;
+        }
+      } catch (ServiceRegistryException ex) {
+        // Ready to terminate else node state could become permanently stuck as WAITING
+        logger.warn("Can't determine number of running Jobs, setting Termination State to READ");
         state = TerminationState.READY;
         return true;
       }
