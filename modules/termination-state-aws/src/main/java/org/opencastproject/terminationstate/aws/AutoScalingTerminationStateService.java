@@ -172,9 +172,11 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
     } catch (AmazonServiceException e) {
       logger.error("EC2 Autoscaling returned an error", e);
       stop();
+      return;
     } catch (AmazonClientException e) {
       logger.error("AWS client can't communicate with EC2 Autoscaling", e);
       stop();
+      return;
     }
 
     try {
