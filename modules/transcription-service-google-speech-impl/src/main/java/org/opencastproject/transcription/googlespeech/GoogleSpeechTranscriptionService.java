@@ -392,16 +392,20 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       // Delete audio file from Google storage
       deleteStorageFile(mpId, token);
 
-      // Save results in file system if there exist
+      // Save results in file system if they exist
       if (resultsArray != null) {
         saveResults(jobId, jsonObj);
       }
     } catch (IOException e) {
-      logger.warn("Could not save transcription results file for mpId {}, jobId {}: {}",
-              new Object[]{mpId, jobId, jsonObj == null ? "null" : jsonObj.toJSONString()});
+      if (jsonObj == null) {
+        logger.warn("Could not save transcription results file for mpId {}, jobId {}: null",
+                mpId, jobId);
+      } else {
+        logger.warn("Could not save transcription results file for mpId {}, jobId {}: {}",
+                mpId, jobId, jsonObj.toJSONString());
+      }
       throw new TranscriptionServiceException("Could not save transcription results file", e);
-    }
-    catch (TranscriptionDatabaseException e) {
+    } catch (TranscriptionDatabaseException e) {
       logger.warn("Transcription results file were saved but state in db not updated for mpId {}, jobId {}", mpId,
               jobId);
       throw new TranscriptionServiceException("Could not update transcription job control db", e);

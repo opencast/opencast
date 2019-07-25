@@ -62,10 +62,10 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
     try {
       // No language to specify so define size of a transcripts line
       transcriptionLineSize = Integer.parseInt(languageLineSize.trim());
-      logger.info("Transcripts line size {} used", LINE_SIZE);
+      logger.info("Transcripts line size {} used", transcriptionLineSize);
     } catch (NumberFormatException nfe) {
       transcriptionLineSize = LINE_SIZE;
-      logger.info("Default transcripts line size {} used", LINE_SIZE);
+      logger.info("Default transcripts line size {} used", transcriptionLineSize);
     }
 
     try {
