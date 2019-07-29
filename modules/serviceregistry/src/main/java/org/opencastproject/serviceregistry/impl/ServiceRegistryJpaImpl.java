@@ -1010,7 +1010,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     try {
       tx.begin();
       fromDb = em.find(JpaJob.class, job.getId());
-      originalJob = JpaJob.from(fromDb.toJob());
+      // MH-13675 This resets the job state in the 'job' variable back to the previous value so commenting it out
+      // originalJob = JpaJob.from(fromDb.toJob());
       if (fromDb == null) {
         throw new NoResultException();
       }
@@ -1022,7 +1023,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       setJobUri(job);
       return job;
     } catch (PersistenceException e) {
-      dumpJobs(originalJob, fromDb);
       if (tx.isActive()) {
         tx.rollback();
       }
@@ -1129,6 +1129,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       ServiceRegistrationJpaImpl processingService = (ServiceRegistrationJpaImpl) getServiceRegistration(
               job.getJobType(), job.getProcessingHost());
       fromDb.setProcessorServiceRegistration(processingService);
+    } else {
+      fromDb.setProcessorServiceRegistration(null);
     }
     if (Status.RUNNING.equals(status) && !Status.WAITING.equals(fromDbStatus)) {
       if (job.getDateStarted() == null) {
