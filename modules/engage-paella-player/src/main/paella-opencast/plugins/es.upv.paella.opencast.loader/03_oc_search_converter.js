@@ -21,6 +21,35 @@
 class OpencastToPaellaConverter {
 
   constructor() {
+    this._config = paella.player.config.plugins.list['es.upv.paella.opencast.loader'] || {};
+  }
+
+  getFilterStream() {
+    var filterStream;
+
+    var streams = this._config.streams || [];
+    streams.some(function(curretStream){
+      return curretStream.filter.system.some(function(currentFilter) {
+        if ((currentFilter == '*') || base.userAgent.system[currentFilter] ) {
+          filterStream = curretStream;
+          return true;
+        }
+      });
+    });
+
+    if (!filterStream) {
+      filterStream = {
+        'filter': {
+          'system': ['*']
+        },
+        'tracks': {
+          'flavors': ['*/*'],
+          'tags': ['*']
+        }
+      };
+    }
+
+    return filterStream;
   }
 
   getVideoTypeFromTrack(track) {
@@ -172,34 +201,34 @@ class OpencastToPaellaConverter {
   }
 
   getContentToImport(episode) {
+    var filterStream = this.getFilterStream();
+
     var flavors = [];
     var tracks = episode.mediapackage.media.track;
     if (!(tracks instanceof Array)) { tracks = [tracks]; }
 
     tracks.forEach((currentTrack) => {
-      if (flavors.indexOf(currentTrack.type) < 0) {
-        flavors.push(currentTrack.type);
+      let importF = filterStream.tracks.flavors.some(function(cFlavour) {
+        let smask = cFlavour.split('/');
+        let sflavour = currentTrack.type.split('/');
+
+        return (((smask[0] == '*') || (smask[0] == sflavour[0])) && ((smask[1] == '*') || (smask[1] == sflavour[1])));
+      });
+
+      let importT = filterStream.tracks.tags.some(function(cTag) {
+        return currentTrack.tags.tag.some(function(t){
+          return ((cTag == '*') || (cTag == t));
+        });
+      });
+
+      if (importF || importT) {
+        if (flavors.indexOf(currentTrack.type) < 0) {
+          flavors.push(currentTrack.type);
+        }
       }
     });
 
     return flavors;
-  }
-
-  /**
-   * Check if a flavor passes the configured flavors for tracks.
-   * @param flavor     the tracks flavor
-   * @param subFlavor  the tracks sub-flavor
-   * @return boolean indicating if track shall pass the filter
-   */
-  matchTrackFilter(flavor, subFlavor) {
-    var filters = paella.player.config.plugins.list['es.upv.paella.opencast.loader'].flavors || [['*']];
-    for (const filter of filters) {
-      filter.push('*');
-      if ((filter[0] == '*' || filter[0] == flavor) && (filter[1] == '*' || filter[1] == subFlavor)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   getStreams(episode) {
@@ -208,10 +237,8 @@ class OpencastToPaellaConverter {
     var flavors = this.getContentToImport(episode);
     flavors.forEach((flavorStr) => {
       var [flavor, subFlavor] = flavorStr.split('/');
-      if (this.matchTrackFilter(flavor, subFlavor)) {
-        var stream = this.getStreamFromFlavor(episode, flavor, subFlavor);
-        paellaStreams.push(stream);
-      }
+      var stream = this.getStreamFromFlavor(episode, flavor, subFlavor);
+      paellaStreams.push(stream);
     });
     return paellaStreams;
   }
