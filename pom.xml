@@ -230,6 +230,7 @@
     <module>modules/userdirectory-ldap</module>
     <module>modules/userdirectory-moodle</module>
     <module>modules/userdirectory-sakai</module>
+    <module>modules/userdirectory-brightspace</module>
     <module>modules/user-interface-configuration</module>
     <module>modules/usertracking-api</module>
     <module>modules/usertracking-impl</module>
@@ -1255,6 +1256,11 @@
         <version>1.1</version>
       </dependency>
       <dependency>
+        <groupId>be.ugent.brightspace</groupId>
+        <artifactId>valence-sdk-java</artifactId>
+        <version>1.0.1</version>
+      </dependency>
+      <dependency>
         <groupId>org.codehaus.jettison</groupId>
         <artifactId>jettison</artifactId>
         <version>1.4.0</version>
@@ -1264,6 +1270,11 @@
             <artifactId>stax-api</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>be.ugent.brightspace</groupId>
+        <artifactId>valence-sdk-java</artifactId>
+        <version>1.0.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
