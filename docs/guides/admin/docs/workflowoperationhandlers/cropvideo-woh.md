@@ -1,7 +1,7 @@
 # Crop Workflow operation
 
 The plugin provides the workflow operation `crop-video`. This workflow operation excutes ffmpeg command `cropdetect`.
-`cropdetect` checks for black bars on the sides of the track of the workflow instance. If `cropdetect` is successfully,
+`cropdetect` checks for black bars on the sides of the track of the workflow instance. If `cropdetect` is successful,
 then ffmpeg command `crop` is executed. `crop` removes these black bars.
 
 ## Parameter Table
