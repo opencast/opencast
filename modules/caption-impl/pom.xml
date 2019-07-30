@@ -107,6 +107,7 @@
               OSGI-INF/converters/dfxp-caption-converter.xml,
               OSGI-INF/converters/subrip-caption-converter.xml,
               OSGI-INF/converters/mpeg7-caption-converter.xml,
+              OSGI-INF/converters/google-speech-caption-converter.xml,
               OSGI-INF/converters/ibm-watson-caption-converter.xml,
               OSGI-INF/converters/webvtt-caption-converter.xml
             </Service-Component>
