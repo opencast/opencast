@@ -40,6 +40,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -73,6 +74,9 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
 
   /** Target tags configuration property name. */
   private static final String TARGET_TAGS_PROPERTY = "target-tags";
+
+  /** Process first match only */
+  private static final String PROCCESS_FIRST_MATCH = "process-first-match-only";
 
   /** Image size configuration property name. */
   private static final String IMAGE_SIZE_PROPERTY = "image-count";
@@ -138,6 +142,9 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
       logger.info("Property {} not set, using default value: {}", IMAGE_SIZE_PROPERTY, DEFAULT_IMAGE_SIZE);
     }
 
+    boolean processOnlyOne = BooleanUtils.toBoolean(StringUtils.trimToNull(
+            workflowInstance.getCurrentOperation().getConfiguration(PROCCESS_FIRST_MATCH)));
+
     TrackSelector trackSelector = new TrackSelector();
     for (String flavor : asList(sourceFlavorProperty)) {
       trackSelector.addFlavor(flavor);
@@ -162,6 +169,10 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
 
         Job timelinepreviewsJob = timelinePreviewsService.createTimelinePreviewImages(sourceTrack, imageSize);
         timelinepreviewsJobs.add(timelinepreviewsJob);
+
+        if (processOnlyOne)
+            break;
+
       } catch (MediaPackageException | TimelinePreviewsException ex) {
         logger.error("Creating timeline previews job for track '{}' in media package '{}' failed with error {}",
                 sourceTrack.getIdentifier(), mediaPackage.getIdentifier().compact(), ex.getMessage());
