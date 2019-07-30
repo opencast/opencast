@@ -118,7 +118,6 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
     }
 
     // start cropping all candidates in parallel
-    //List<Job> jobs = new ArrayList<>();
     Map<Job, Track> jobs = new HashMap<Job, Track>();
     for (Track candidate : candidates) {
       try {
