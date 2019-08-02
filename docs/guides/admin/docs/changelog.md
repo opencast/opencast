@@ -485,6 +485,31 @@ Opencast 7
 Opencast 6
 ----------
 
+### Opencast 6.6
+
+*Released on August 2, 2019*
+
+- [[MH-13674](https://opencast.jira.com/browse/MH-13674)][[#1013](https://github.com/opencast/opencast/pull/1013)] -
+  Fix Cutting
+- [[MH-13673](https://opencast.jira.com/browse/MH-13673)][[#1012](https://github.com/opencast/opencast/pull/1012)] -
+  Workflow options not visually aligned
+- [[MH-13672](https://opencast.jira.com/browse/MH-13672)][[#1011](https://github.com/opencast/opencast/pull/1011)] -
+  Editor Maximum Height
+- [[MH-13671](https://opencast.jira.com/browse/MH-13671)][[#1010](https://github.com/opencast/opencast/pull/1010)] -
+  OAI-PMH autorepublish fails due to invalid urls
+- [[MH-13648](https://opencast.jira.com/browse/MH-13648)][[#984](https://github.com/opencast/opencast/pull/984)] -
+  Asset Manager Concurrecy Issue
+- [[MH-13644](https://opencast.jira.com/browse/MH-13644)][[#980](https://github.com/opencast/opencast/pull/980)] -
+  Sometimes paella does not play audio
+- [[MH-13643](https://opencast.jira.com/browse/MH-13643)][[#979](https://github.com/opencast/opencast/pull/979)] -
+  Update to Paella 6.1.4
+- [[MH-13637](https://opencast.jira.com/browse/MH-13637)][[#974](https://github.com/opencast/opencast/pull/974)] -
+  asset manager endpoint fix
+- [[MH-13633](https://opencast.jira.com/browse/MH-13633)][[#969](https://github.com/opencast/opencast/pull/969)] -
+  Update spring-security-oauth
+- [[MH-13611](https://opencast.jira.com/browse/MH-13611)][[#955](https://github.com/opencast/opencast/pull/955)] -
+  duplicate events fix
+
 ### Opencast 6.5
 
 *Released on June 14, 2019*
