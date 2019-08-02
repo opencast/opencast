@@ -121,6 +121,22 @@ workers.  This change means that workers with a higher maximum load will absorb 
 maximum loads will accept heavy workloads.  This change does not require any configuration changes, however you may
 notice large changes in processing load distribution depending on your cluster configuration.
 
+
+Additional Notes about 6.6
+--------------------------
+
+Opencast 6.6 fixes a bug in the video editor configuration present in Opencast 6.5 which will cause Opencast to always
+silently skip the video editor and publish the whole video. The problem was introduced by [a fix in the default
+workflows](https://github.com/opencast/opencast/pull/944) and later fixed again by a [configuration change therein
+](https://github.com/opencast/opencast/pull/1013). If you use the default workflows, please make sure to update to the
+latest state of the workflows.
+
+If you use your own workflow and did not adapt the first patch, you should not be affected by this problem at all. If
+you are, just make sure that source and target smil flavor for the editor workflow operation are identical like it is
+ensured [by the official fix](https://github.com/opencast/opencast/pull/1013). A proper solution not relying on specific
+configurations and less error prone is in work and will be added to the upcoming major Opencast release.
+
+
 Release Schedule
 ----------------
 
