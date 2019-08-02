@@ -4,6 +4,11 @@ Changelog
 Opencast 7
 ----------
 
+### Opencast 7.2
+
+- [[MH-13662](https://opencast.jira.com/browse/MH-13662)][[#1000](https://github.com/opencast/opencast/pull/1000)] -
+  Update LTI Information
+
 ### Opencast 7.1
 
 *Released on July 09, 2019*
