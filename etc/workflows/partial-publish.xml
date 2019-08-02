@@ -25,13 +25,22 @@
     <!-- Perform cutting according to the edit decision list.              -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
+    <operation
+        id="clone"
+        exception-handler-workflow="partial-error">
+      <configurations>
+        <configuration key="source-flavor">smil/cutting</configuration>
+        <configuration key="target-flavor">smil/tmp</configuration>
+      </configurations>
+    </operation>
+
     <operation id="editor"
       exception-handler-workflow="partial-error"
       description="Cut the recording according to the edit decision list">
       <configurations>
         <configuration key="source-flavors">*/work</configuration>
-        <configuration key="smil-flavors">smil/cutting</configuration>
-        <configuration key="target-smil-flavor">smil/publish</configuration>
+        <configuration key="smil-flavors">smil/tmp</configuration>
+        <configuration key="target-smil-flavor">smil/tmp</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
         <configuration key="interactive">false</configuration>
       </configurations>
