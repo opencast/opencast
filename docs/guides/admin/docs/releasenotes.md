@@ -83,11 +83,11 @@ caused minor issues for old, process events which were missing some meta-data. I
 7.0 and experience this problem, simply re-start the scheduler migration and re-build the index once more.
 
 
-Additional Notes about 6.6
+Additional Notes About 7.2
 --------------------------
 
-Opencast 6.6 fixes a bug in the video editor configuration present in Opencast 6.5 which will cause Opencast to always
-silently skip the video editor and publish the whole video. The problem was introduced by [a fix in the default
+Opencast 7.2 fixes a bug in the video editor configuration present in Opencast 7.0 to 7.1 which will cause Opencast to
+always silently skip the video editor and publish the whole video. The problem was introduced by [a fix in the default
 workflows](https://github.com/opencast/opencast/pull/944) and later fixed again by a [configuration change therein
 ](https://github.com/opencast/opencast/pull/1013). If you use the default workflows, please make sure to update to the
 latest state of the workflows.
