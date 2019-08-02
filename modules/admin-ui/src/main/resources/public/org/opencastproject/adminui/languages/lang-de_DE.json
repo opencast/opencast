@@ -1532,7 +1532,7 @@
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Segment löschen",
          "USE_SEGMENT": "Dieses Segment nutzen",
-         "START": "Zur Startseite",
+         "START": "Start",
          "END": "Ende"
       },
       "THUMBNAIL": {

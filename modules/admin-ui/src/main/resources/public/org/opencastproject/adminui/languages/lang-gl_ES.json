@@ -247,7 +247,7 @@
             "CAPTION": "Modificar",
             "EVENT": "evento",
             "EVENTS": "eventos",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "HEADER": "Esta páxina permite editar eventos programados por días da semana. Os campos xa están cumprimentados se todos os eventos programados teñen o mesmo valor para ese campo específico. En caso contrario, os campos aparecen en branco. Deixar os campos en branco significa que os valores respectivos non deben modificarse.",
             "METADATA": "Metadatos",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -271,7 +271,7 @@
       "BACK": "Anterior",
       "CREATE": "Crear",
       "RETRACT": "Retirar",
-      "RETRACT_DELETE": "Retract/Delete",
+      "RETRACT_DELETE": "Retirar/Eliminar",
       "DELETE": "Borrar",
       "UPDATE": "Actualizar",
       "DURATION": {
@@ -489,7 +489,7 @@
                "EDITOR_NEEDS_CUTTING": "Abrir editor de vídeo (un comentario indica que se solicitou cortar o vídeo)",
                "COMMENTS": "Ver comentarios",
                "PAUSED_WORKFLOW": "Ver fluxos de traballo pausados",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "Filtrar por este presentador"
             }
          },
          "STATUS": {
@@ -1000,8 +1000,8 @@
                   "ACTION": "Accións",
                   "NEW": "Nova política",
                   "DETAILS": "Detalles",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
+                  "REPLACE_EVENT_ACLS": "Actualizar permisos do evento",
+                  "REPLACE_EVENT_ACLS_HINT": "Asegura que todos os eventos desta serie teñen estes permisos en vigor"
                },
                "ROLES": {
                   "LABEL": "Seleccione un rol",
