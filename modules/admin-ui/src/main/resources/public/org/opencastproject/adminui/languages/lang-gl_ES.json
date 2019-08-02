@@ -159,8 +159,8 @@
       "THEME_NOT_DELETED": "Non se puido borrar o estilo",
       "TASK_CREATED": "Tarefa creada",
       "TASK_NOT_CREATED": "Non se puido crear a tarefa",
-      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
-      "VIDEO_CUT_SAVED": "The changes have been saved",
+      "VIDEO_CUT_NOT_SAVED": "Non se puideron gardar os cambios",
+      "VIDEO_CUT_SAVED": "Gardáronse os cambios",
       "VIDEO_CUT_PROCESSING": "Estase a procesar o vídeo…",
       "THUMBNAIL_CHANGE_FAILED": "Non se puido cambiar a miniatura.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Non se seleccionaron pistas de vídeo para procesar",
@@ -247,7 +247,7 @@
             "CAPTION": "Modificar",
             "EVENT": "evento",
             "EVENTS": "eventos",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "HEADER": "Esta páxina permite editar eventos programados por días da semana. Os campos xa están cumprimentados se todos os eventos programados teñen o mesmo valor para ese campo específico. En caso contrario, os campos aparecen en branco. Deixar os campos en branco significa que os valores respectivos non deben modificarse.",
             "METADATA": "Metadatos",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -271,7 +271,7 @@
       "BACK": "Anterior",
       "CREATE": "Crear",
       "RETRACT": "Retirar",
-      "RETRACT_DELETE": "Retract/Delete",
+      "RETRACT_DELETE": "Retirar/Eliminar",
       "DELETE": "Borrar",
       "UPDATE": "Actualizar",
       "DURATION": {
@@ -309,7 +309,7 @@
          "TITLE": "Configuración"
       },
       "STATISTICS": {
-         "TITLE": "Statistics"
+         "TITLE": "Estatísticas"
       }
    },
    "EVENTS": {
@@ -492,7 +492,7 @@
                "EDITOR_NEEDS_CUTTING": "Abrir editor de vídeo (un comentario indica que se solicitou cortar o vídeo)",
                "COMMENTS": "Ver comentarios",
                "PAUSED_WORKFLOW": "Ver fluxos de traballo pausados",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "Filtrar por este presentador"
             }
          },
          "STATUS": {
@@ -509,12 +509,12 @@
             "PROCESSING_CANCELED": "Procesamento cancelado"
          },
          "STATE_MAPPING": {
-            "RETRACTING": "Retracting",
-            "DUPLICATING": "Duplicating",
-            "PUBLISHING": "Publishing",
-            "IMPORTING": "Importing",
-            "REPUBLISHING_METADATA": "Republishing metadata",
-            "UPDATING_PREVIEWS": "Updating previews"
+            "RETRACTING": "Retirando",
+            "DUPLICATING": "Duplicando",
+            "PUBLISHING": "Publicando",
+            "IMPORTING": "Importando",
+            "REPUBLISHING_METADATA": "Republicando metadatos",
+            "UPDATING_PREVIEWS": "Actualizando vistas previas"
          },
          "DETAILS": {
             "HEADER": "Detalles do evento - {{resourceId}}",
@@ -527,7 +527,7 @@
                "WORKFLOWS": "Fluxos de Traballo",
                "ACCESS": "Política de acceso",
                "COMMENTS": "Comentarios",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "Estatísticas"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publicacións",
@@ -770,7 +770,7 @@
                }
             },
             "STATISTICS": {
-               "CAPTION": "Statistics"
+               "CAPTION": "Estatísticas"
             },
             "METADATA": {
                "CAPTION": "Detalles do evento",
@@ -996,7 +996,7 @@
                "EVENTS": "Eventos",
                "PERMISSIONS": "Política de acceso",
                "THEME": "Estilo",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "Estatísticas"
             },
             "ACCESS": {
                "CAPTION": "Política de acceso",
@@ -1016,8 +1016,8 @@
                   "ACTION": "Accións",
                   "NEW": "Nova política",
                   "DETAILS": "Detalles",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
+                  "REPLACE_EVENT_ACLS": "Actualizar permisos do evento",
+                  "REPLACE_EVENT_ACLS_HINT": "Asegura que todos os eventos desta serie teñen estes permisos en vigor"
                },
                "ROLES": {
                   "LABEL": "Seleccione un rol",
@@ -1449,7 +1449,7 @@
             "CREATED": "Creado",
             "CREATOR": "Creador",
             "HOST_NAME": "Nome do servidor",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Nome do nodo",
             "OPERATION": "Operación",
             "STARTED": "Iniciado",
             "STATUS": "Estado",
@@ -1475,7 +1475,7 @@
             "CAPTION": "Servidores",
             "STATUS": "Estado",
             "HOST_NAME": "Nome do servidor",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Nome do nodo",
             "CORES": "Núcleos",
             "COMPLETED": "Traballos completados",
             "RUNNING": "Traballos en execución",
@@ -1493,7 +1493,7 @@
             "STATUS": "Estado",
             "NAME": "Nome do servizo",
             "HOST_NAME": "Nome do servidor",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Nome do nodo",
             "COMPLETED": "Traballos completados",
             "RUNNING": "Traballos en execución",
             "QUEUED": "Traballos en cola",
@@ -1539,24 +1539,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Dividir",
-         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "Hide/Show",
-         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
-         "REPLAY_SEGMENT": "Play Start of Segment",
-         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
-         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
-         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
-         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
+         "SPLIT_TOOLTIP": "Divide o segmento na posición actuar do cursor.",
+         "CUT": "Ocultar/Amosar",
+         "CUT_TOOLTIP": "Oculta ou amosa a parte do vídeo seleccionada.",
+         "REPLAY_SEGMENT": "Reproducir Inicio do Segmento",
+         "REPLAY_SEGMENT_TOOLTIP": "Reproduce o segmento actual dende o seu inicio.",
+         "REPLAY_END_OF_SEGMENT": "Reproducir Final do Segmento",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Reproduce uns segundos ó final do segmento actual.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Reproducir Transición",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Reproduce uns segundos que conteñen o final do segmento anterior e o inicio do segmento seguinte.",
          "UNDO": "Desfacer",
          "REDO": "Refacer",
-         "CLEAR_SEGMENTS": "Clear All Segments",
-         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
+         "CLEAR_SEGMENTS": "Borrar Todos os Segmentos",
+         "CLEAR_SEGMENTS_TOOLTIP": "Borra todos os segmentos, deixando un segmento grande."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Eliminar segmento",
-         "SHOW_SEGMENT": "Show this Segment",
-         "HIDE_SEGMENT": "Hide this Segment",
+         "SHOW_SEGMENT": "Amosar este Segmento",
+         "HIDE_SEGMENT": "Ocultar este Segmento",
          "START": "Inicio",
          "END": "Fin"
       },
@@ -1775,7 +1775,7 @@
             "LABEL": "Nome do servidor"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Nome do nodo"
          },
          "STATUS": {
             "LABEL": "Estado",
@@ -1819,7 +1819,7 @@
             "LABEL": "Nome do servidor"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Nome do nodo"
          },
          "STATUS": {
             "LABEL": "Estado",
@@ -1836,7 +1836,7 @@
             "LABEL": "Nome do servidor"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Nome do nodo"
          },
          "NAME": {
             "LABEL": "Nome"
@@ -1985,25 +1985,25 @@
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
-      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "NOT_AVAILABLE": "Neste momento non se poden amosar as estatísticas. Por favor, inténteo de novo máis tarde.",
+      "UNSUPPORTED_TYPE": "Sentímolo. Opencast non pode representar este tipo de datos estatísticos.",
       "FROM": "Dende",
-      "TO": "To",
+      "TO": "Ata",
       "TOTAL": "Total",
-      "GRANULARITY": "Granularity",
+      "GRANULARITY": "Granularidade",
       "NAVIGATION": {
-         "ORGANIZATION": "Organisation"
+         "ORGANIZATION": "Organización"
       },
       "TITLE": {
-         "RANDOM": "Random Data",
-         "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views",
-         "PUBLISHEDHOURS": "Published Hours of Video"
+         "RANDOM": "Datos Aleatorios",
+         "VIEWS_SUM": "Número Total de Visualizacións",
+         "VIEWS_AVG": "Número Medio de Visualizacións",
+         "PUBLISHEDHOURS": "Horas de Vídeo Publicadas"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time unit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "RANDOM": "Esta gráfica amosa datos aleatorios como exemplo. Para que deixe de mostrarse, elimine da carpeta etc/providers o ficheiro JSON coa definición correspondente a este provedor",
+         "VIEWS_SUM": "Aquí amósase o número total de visualizacións por unidade de tempo.",
+         "VIEWS_AVG": "Aquí amósase o número total de visualizacións diarias por unidade de tempo.",
          "PUBLISHEDHOURS": "This displays the running total published hours of video"
       }
    }
