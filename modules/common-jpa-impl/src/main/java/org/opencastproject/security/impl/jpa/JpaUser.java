@@ -267,7 +267,7 @@ public class JpaUser implements User {
    */
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(username, organization, provider);
+    return Objects.hash(username, organization, provider);
   }
 
   /**

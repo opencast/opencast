@@ -23,7 +23,8 @@
 package org.opencastproject.util.data;
 
 import static org.opencastproject.util.EqualsUtil.eqClasses;
-import static org.opencastproject.util.EqualsUtil.hash;
+
+import java.util.Objects;
 
 /** A pair. */
 public final class Tuple<A, B> {
@@ -58,7 +59,7 @@ public final class Tuple<A, B> {
 
   @Override
   public int hashCode() {
-    return hash(a, b);
+    return Objects.hash(a, b);
   }
 
   /** Create a new tuple with two elements <code>a</code> and <code>b</code>. */
