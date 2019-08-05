@@ -1,0 +1,36 @@
+#!/bin/bash
+# -----------------------------------------------------------------------
+# check if http or https port is available to run opencast otherwise exit
+
+if [ -d "${KARAF_ETC}" ]; then
+  SETENV_ETC="${KARAF_ETC}"
+else
+  SETENV_ETC="etc"
+fi
+
+usehttp=$(grep "org.osgi.service.http.enabled[ =]" "${SETENV_ETC}"/org.ops4j.pax.web.cfg)
+if [ "${usehttp##*=}" = "true" ]; then 
+  httpport=$(grep "org.osgi.service.http.port[ =]" "${SETENV_ETC}"/org.ops4j.pax.web.cfg)
+  if [ -x "$(command -v netstat)" ]; then
+    used=$($(command -v netstat) -lntp 2>/dev/null | grep -c ":${httpport##*=} " 2>/dev/null)
+    if [ "$used" = "1" ]; then
+      printf "\nHttp server port \e[1m%s\e[0m already in use \n" "${httpport##*=}"
+      printf "reconfigure \e[1morg.osgi.service.http.port\e[0m in \e[1metc/org.ops4j.pax.web.cfg\e[0m \n"
+      exit 1
+    fi
+  fi 
+fi
+
+usehttps=$(grep "org.osgi.service.http.secure.enabled[ =]" ${SETENV_ETC}/org.ops4j.pax.web.cfg)
+if [ "${usehttps##*=}" = "true" ]; then 
+  httpsport=$(grep "org.osgi.service.http.port.secure[ =]" ${SETENV_ETC}/org.ops4j.pax.web.cfg)
+  if [ -x "$(command -v netstat)" ]; then
+    used=$($(command -v netstat) -lntp 2>/dev/null | grep -c ":${httpsport##*=} " 2>/dev/null)
+    if [ "$used" = "1" ]; then
+      printf "\nSecure http server port \e[1m%s\e[0m already in use \n" "${httpsport##*=}"
+      printf "reconfigure \e[1morg.osgi.service.http.port.secure\e[0m in \e[1metc/org.ops4j.pax.web.cfg\e[0m \n"
+      exit 1
+    fi
+  fi 
+fi
+

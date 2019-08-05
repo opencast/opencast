@@ -1,3 +1,4 @@
+#!/bin/bash
 # Licensed to The Apereo Foundation under one or more contributor license
 # agreements. See the NOTICE file distributed with this work for additional
 # information regarding copyright ownership.
@@ -39,32 +40,4 @@ export JAVA_MAX_MEM=1G
 export JAVA_PERM_MEM=256M
 export KARAF_NOROOT=true
 
-
-# -----------------------------------------------------------------------
-# check if http or https port is available to run opencast otherwise exit
-
-usehttp=`grep "org.osgi.service.http.enabled[ =]" etc/org.ops4j.pax.web.cfg`
-if [ ${usehttp##*=} = "true" ]; then 
-  httpport=`grep "org.osgi.service.http.port[ =]" etc/org.ops4j.pax.web.cfg`
-  if [ -x /bin/netstat ]; then
-    used=`/bin/netstat -lntp 2>/dev/null | grep -c ${httpport##*=} 2>/dev/null`
-    if [ $used = "1" ]; then
-      echo "\nHttp server port \e[1m${httpport##*=}\e[0m already in use \n"
-      echo "reconfigure \e[1morg.osgi.service.http.port\e[0m in \e[1metc/org.ops4j.pax.web.cfg\e[0m \n"
-      exit
-    fi
-  fi 
-fi
-
-usehttps=`grep "org.osgi.service.http.secure.enabled[ =]" etc/org.ops4j.pax.web.cfg`
-if [ ${usehttps##*=} = "true" ]; then 
-  httpsport=`grep "org.osgi.service.http.port.secure[ =]" etc/org.ops4j.pax.web.cfg`
-  if [ -x /bin/netstat ]; then
-    used=`/bin/netstat -lntp 2>/dev/null | grep -c ${httpsport##*=} 2>/dev/null`
-    if [ $used = "1" ]; then
-      echo "\nSecure http server port \e[1m${httpsport##*=}\e[0m already in use \n"
-      echo "reconfigure \e[1morg.osgi.service.http.port.secure\e[0m in \e[1metc/org.ops4j.pax.web.cfg\e[0m \n"
-      exit
-    fi
-  fi 
-fi
+. bin/check_ports
