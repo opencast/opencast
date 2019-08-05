@@ -65,6 +65,7 @@
     <module>modules/asset-manager-workflowoperation</module>
     <module>modules/asset-manager-storage-aws</module>
     <module>modules/asset-manager-storage-fs</module>
+    <module>modules/asset-manager-static-file-authorization</module>
     <module>modules/shared-filesystem-utils</module>
     <module>modules/authorization-manager</module>
     <module>modules/authorization-xacml</module>

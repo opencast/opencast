@@ -10,6 +10,11 @@ Important Changes
   which is dropped now
 - MariaDB JDBC driver
 - New LTI-Tools
+- A [completely new system for securing static file content](configuration/serving-static-files.md) has been integrated
+  into Opencast 9.2. While is is not active by default for compatibility to older 9.x releases, it can be easily enabled
+  and used to ensure access to static files has the same security checks you are already used to from the player and
+  from other user interfaces.
+
 
 Features
 --------
@@ -113,6 +118,14 @@ Additional Notes about 9.1
 
 This release contains an important bugfix where unprivileged users
 could not upload videos, before.
+
+Additional Notes about 9.1
+--------------------------
+
+A [completely new system for securing static file content](configuration/serving-static-files.md) has been integrated.
+While is is not active by default for compatibility to older 9.x releases, it can be easily enabled and used to ensure
+access to static files has the same security checks you are already used to from the player and from other user
+interfaces.
 
 
 Release Schedule
