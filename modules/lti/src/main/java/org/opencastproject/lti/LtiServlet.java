@@ -200,9 +200,11 @@ public class LtiServlet extends HttpServlet {
     // We must return a 200 for some OAuth client libraries to accept this as a valid response
 
     // The URL of the LTI tool. If no specific tool is passed we use the test tool
-    UriBuilder builder = null;
+    UriBuilder builder;
     try {
-      URI toolUri = new URI(StringUtils.trimToEmpty(req.getParameter(LTI_CUSTOM_TOOL)));
+      String toolUriStr = req.getParameter(LTI_CUSTOM_TOOL);
+      toolUriStr = toolUriStr.replaceAll("/?ltitools/(?<tool>[^/]*)/index.html\\??", "/ltitools/index.html?tool=${tool}&");
+      URI toolUri = new URI(StringUtils.trimToEmpty(toolUriStr));
 
       if (toolUri.getPath().isEmpty())
         throw new URISyntaxException(toolUri.toString(), "Provided 'custom_tool' has an empty path");
@@ -288,7 +290,8 @@ public class LtiServlet extends HttpServlet {
     } else {
       Map<String, String> ltiAttributes = (Map<String, String>) session.getAttribute(SESSION_ATTRIBUTE_KEY);
       if (ltiAttributes == null) {
-        ltiAttributes = new HashMap<String, String>();
+        ltiAttributes = new HashMap<>();
+        ltiAttributes.put("roles", "Instructor");
       }
       resp.setContentType("application/json");
       JSONObject.writeJSONString(ltiAttributes, resp.getWriter());

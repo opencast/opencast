@@ -1,0 +1,10 @@
+[
+  {
+    "title": "titel1",
+    "status": "EVENTS.EVENTS.STATUS.PENDING"
+  },
+  {
+    "title": "titel2",
+    "status": "EVENTS.EVENTS.STATUS.PROCESSING"
+  }
+]
