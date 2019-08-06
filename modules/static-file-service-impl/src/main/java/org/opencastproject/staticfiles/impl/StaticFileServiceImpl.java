@@ -291,7 +291,7 @@ public class StaticFileServiceImpl implements StaticFileService {
    *           if there was an error while deleting the files.
    */
   void purgeTemporaryStorageSection(final String org, final long lifetime) throws IOException {
-    logger.info("Purge temporary storage section of organization '{}'", org);
+    logger.debug("Purge temporary storage section of organization '{}'", org);
     final Path temporaryStorageDir = getTemporaryStorageDir(org);
     if (Files.exists(temporaryStorageDir)) {
       try (DirectoryStream<Path> tempFilesStream = Files.newDirectoryStream(temporaryStorageDir,
