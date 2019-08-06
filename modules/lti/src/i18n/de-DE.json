@@ -1,4 +1,22 @@
 {
   "RESULTS": "Ergebnisse {{{range.begin}}}-{{{range.end}}} von {{{total}}}",
-  "CREATOR": "von {{{creator}}}"
+  "CREATOR": "von {{{creator}}}",
+  "CURRENT_JOBS": "Heutige Uploads",
+  "NEW_UPLOAD": "Neues Video",
+  "TITLE": "Titel",
+  "STATUS": "Status",
+  "TITLE_DESCRIPTION": "Titel des Videos",
+  "PRESENTER": "Vortragende(r)",
+  "PRESENTER_DESCRIPTION": "Spur des/der Vortragenden",
+  "UPLOAD": "Upload",
+  "EVENTS.EVENTS.STATUS.PENDING": "Ausstehend",
+  "EVENTS.EVENTS.STATUS.PROCESSING": "In Verarbeitung",
+  "EVENTS.EVENTS.STATUS.PAUSED": "Pausiert",
+  "EVENTS.EVENTS.STATUS.PROCESSED": "Verarbeitet",
+  "EVENTS.EVENTS.STATUS.PROCESSING_FAILURE": "Verarbeitungs-Fehler",
+  "EVENTS.EVENTS.STATUS.PROCESSING_CANCELED": "Verarbeitung abgebrochen",
+  "DELETION_SUCCESS": "Löschen erfolgreich in Auftrag gegeben",
+  "DELETION_SUCCESS_DESCRIPTION": "Die Vorlesung wird in Kürze aus der Liste verschwinden…",
+  "DELETION_FAILURE": "Löschen ist fehlgeschlagen",
+  "DELETION_FAILURE_DESCRIPTION": "Bitte versuchen Sie es später erneut…"
 }

@@ -26,11 +26,18 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageImpl;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.series.api.SeriesException;
+import org.opencastproject.series.api.SeriesQuery;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -79,6 +86,8 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
   /** The search service */
   protected SearchServiceImpl searchService;
+
+  private SeriesService seriesService;
 
   /** The service registry */
   private ServiceRegistry serviceRegistry;
@@ -245,7 +254,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "sign", type = RestParameter.Type.BOOLEAN)
   }, reponses = { @RestResponse(description = "The request was processed successfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, formatted as xml or json.")
   public Response getEpisode(@QueryParam("id") String id, @QueryParam("q") String text,
-          @QueryParam("sid") String seriesId, @QueryParam("sort") String sort, @QueryParam("tag") String[] tags, @QueryParam("flavor") String[] flavors,
+          @QueryParam("sid") String seriesId, @QueryParam("sname") String seriesName, @QueryParam("sort") String sort, @QueryParam("tag") String[] tags, @QueryParam("flavor") String[] flavors,
           @QueryParam("limit") int limit, @QueryParam("offset") int offset, @QueryParam("admin") boolean admin,
           @QueryParam("sign") String sign, @PathParam("format") String format) throws SearchException, UnauthorizedException {
     // CHECKSTYLE:ON
@@ -259,6 +268,36 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           logger.debug("invalid flavor '{}' specified in query", f);
         }
       }
+    }
+
+    if (seriesName != null && seriesId != null) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("invalid request, both 'sid' and 'sname' specified")
+              .build();
+    }
+
+    if (seriesName != null) {
+      DublinCoreCatalogList result;
+      try {
+        result = seriesService.getSeries(new SeriesQuery().setSeriesTitle(seriesName));
+      } catch (SeriesException e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error while searching for series")
+                .build();
+      }
+      if (result.getTotalCount() == 0) {
+        return Response.status(Response.Status.BAD_REQUEST).entity("series with given name doesn't exist")
+                .build();
+      }
+      if (result.getTotalCount() > 1) {
+        return Response.status(Response.Status.BAD_REQUEST).entity("more than one series matches given series name")
+                .build();
+      }
+      DublinCoreCatalog seriesResult = result.getCatalogList().get(0);
+      final List<DublinCoreValue> identifiers = seriesResult.get(DublinCore.PROPERTY_IDENTIFIER);
+      if (identifiers.size() != 1) {
+        return Response.status(Response.Status.BAD_REQUEST).entity("more than one identifier in dublin core catalog for series")
+                .build();
+      }
+      seriesId = identifiers.get(0).getValue();
     }
 
     final boolean signURLs = BooleanUtils.toBoolean(Objects.toString(sign, "true"));
@@ -407,6 +446,16 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
    */
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
+  }
+
+  /**
+   * Callback from OSGi to set the series service implementation.
+   *
+   * @param seriesService
+   *          the series servie
+   */
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
   }
 
   /**

@@ -23,31 +23,52 @@ div.loading {
   color: #666;
 }
 
-a.episode {
-  display: block;
+div.episode {
+  display: inline-block;
   text-decoration: none;
   color: black;
   background-color: #eee;
   padding: 5px;
   margin: 15px;
+  width: 100%;
 }
 
-a.episode:hover {
+div.episode a {
+    display: inline-block;
+}
+
+div.episode:hover {
   background-color: #fafafa;
 }
 
-a.episode div {
+div.episode div {
   display: inline-block;
   padding: 20px;
 }
 
-a.episode div.preview {
+div.episode div.preview {
   width: 200px;
 }
 
-a.episode div.desc h2 {
+div.episode div.desc h2 {
   margin: 0;
   margin-bottom: 5px;
+}
+
+button.delete {
+  color: red;
+  display: inline-block;
+}
+
+button.delete img {
+  padding: 15px;
+  height: 35px;
+  width: 35px;
+}
+
+button.delete:hover {
+  color: black;
+  background-color: red;
 }
 
 footer  {

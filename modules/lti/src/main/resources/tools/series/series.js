@@ -26,6 +26,7 @@
 const player = '/play/';
 
 var currentpage,
+    deletionStatus = '',
     defaultLang = i18ndata['en-US'],
     lang = defaultLang;
 
@@ -60,19 +61,22 @@ function i18n(key) {
   return lang[key];
 }
 
-function getSeries() {
+function getParam(name) {
   const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.has('series')) {
-    return urlParams.get('series');
+  if (urlParams.has(name)) {
+    return urlParams.get(name);
   }
   return '';
 }
 
 function loadPage(page) {
-
   var limit = 15,
       offset = (page - 1) * limit,
-      series = getSeries(),
+      series = getParam('series'),
+      seriesName = getParam('series_name'),
+      isInstructor = false,
+      roles = [],
+      episodes,
       url = '/search/episode.json?limit=' + limit + '&offset=' + offset;
 
   currentpage = page;
@@ -80,29 +84,44 @@ function loadPage(page) {
   // attach series query if a series is requested
   if (series) {
     url += '&sid=' + series;
+  } else if (seriesName) {
+    url += '&sname=' + seriesName;
   }
 
   // load spinner
   $('main').html($('#template-loading').html());
 
-  $.getJSON(url, function( data ) {
-    data = data['search-results'];
+  $.when(
+    $.getJSON('/lti', function( data ) {
+      if (data.roles === undefined) {
+        isInstructor = false;
+      } else {
+        roles = data['roles'].split(',');
+        isInstructor = roles.includes('Instructor');
+      }
+    }),
+    $.getJSON(url, function( data ) {
+      episodes = data['search-results'];
+    })
+  ).then(function() {
     var rendered = '',
         results = [],
-        total = parseInt(data.total);
+        total = parseInt(episodes.total);
 
     if (total > 0) {
-      results = Array.isArray(data.result) ? data.result : [data.result];
+      results = Array.isArray(episodes.result) ? episodes.result : [episodes.result];
     }
 
     for (var i = 0; i < results.length; i++) {
       var episode = results[i],
           i18ncreator = Mustache.render(i18n('CREATOR'), {creator: episode.dcCreator}),
-          template = $('#template-episode').html(),
+          template = isInstructor ? $('#template-episode-admin').html() : $('#template-episode-user').html(),
           tpldata = {
             player: player + episode.id,
+            uid: episode.id,
             title: episode.dcTitle,
             i18ncreator: i18ncreator,
+            hasDeletion: getParam('deletion') == 'true',
             created: tryLocalDate(episode.dcCreated)};
 
       // get preview image
@@ -128,18 +147,32 @@ function loadPage(page) {
           total: total,
           range: {
             begin: Math.min(offset + 1, total),
-            end: offset + parseInt(data.limit)
+            end: offset + parseInt(episodes.limit)
           }
-        };
-    $('header').text(Mustache.render(resultTemplate, resultTplData));
+        },
+        headerStr = '',
+        deletionTemplate = $('#template-deletion').html();
+    if (deletionStatus === 'success') {
+      headerStr = Mustache.render(deletionTemplate, {
+        i18ndeletionMessage: i18n('DELETION_SUCCESS'),
+        i18ndeletionSubmessage: i18n('DELETION_SUCCESS_DESCRIPTION')
+      });
+    } else if (deletionStatus === 'failure') {
+      headerStr = Mustache.render(deletionTemplate, {
+        i18ndeletionMessage: i18n('DELETION_FAILURE'),
+        i18ndeletionSubmessage: i18n('DELETION_FAILURE_DESCRIPTION')
+      });
+    }
+    $('header').html(headerStr + Mustache.render(resultTemplate, resultTplData));
 
     // render pagination
     $('footer').pagination({
       dataSource: Array(total),
       pageSize: limit,
       pageNumber: currentpage,
-      callback: function(data, pagination) {
+      callback: function(episodes, pagination) {
         if (pagination.pageNumber != currentpage) {
+          deletionStatus = '';
           loadPage(pagination.pageNumber);
         }
       }
@@ -147,6 +180,24 @@ function loadPage(page) {
 
   });
 
+}
+
+/* function only called from index html */
+/* eslint-disable-next-line no-unused-vars */
+function deleteEpisode(uid) {
+  deletionStatus = '';
+  $.ajax({
+    url: '/lti-service-gui/' + uid,
+    type: 'DELETE'
+  })
+    .fail(function() {
+      deletionStatus = 'failure';
+      loadPage(currentpage);
+    })
+    .done(function() {
+      deletionStatus = 'success';
+      loadPage(currentpage);
+    });
 }
 
 $(document).ready(function() {

@@ -1,4 +1,22 @@
 {
   "RESULTS": "Results {{{range.begin}}}-{{{range.end}}} of {{{total}}}",
-  "CREATOR": "by {{{creator}}}"
+  "CREATOR": "by {{{creator}}}",
+  "CURRENT_JOBS": "Today's uploads",
+  "NEW_UPLOAD": "New Video",
+  "TITLE": "Title",
+  "STATUS": "Status",
+  "TITLE_DESCRIPTION": "Title for the video",
+  "PRESENTER": "Presenter",
+  "PRESENTER_DESCRIPTION": "Presenter movie track",
+  "UPLOAD": "Upload",
+  "EVENTS.EVENTS.STATUS.PENDING": "Pending",
+  "EVENTS.EVENTS.STATUS.PROCESSING": "Running",
+  "EVENTS.EVENTS.STATUS.PAUSED": "Paused",
+  "EVENTS.EVENTS.STATUS.PROCESSED": "Finished",
+  "EVENTS.EVENTS.STATUS.PROCESSING_FAILURE": "Processing failure",
+  "EVENTS.EVENTS.STATUS.PROCESSING_CANCELED": "Processing canceled",
+  "DELETION_SUCCESS": "Deletion queued successfully",
+  "DELETION_SUCCESS_DESCRIPTION": "The event will disappear from the list in a short while…",
+  "DELETION_FAILURE": "Deletion failed",
+  "DELETION_FAILURE_DESCRIPTION": "Please try again later…"
 }

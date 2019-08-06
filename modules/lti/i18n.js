@@ -5,7 +5,8 @@ const fs = require('fs');
 
 let i18n = {},
     inpath = './src/i18n/',
-    outpath = './target/classes/tools/series/',
+    toolprefix = './target/classes/tools/',
+    outpaths = [toolprefix+'series/', toolprefix+'upload/'],
     files = fs.readdirSync(inpath);
 
 files.forEach(file => {
@@ -15,4 +16,6 @@ files.forEach(file => {
     i18n[lang] = JSON.parse(data);
   }
 });
-fs.writeFileSync(outpath + 'i18n-data.js', 'var i18ndata = ' + JSON.stringify(i18n));
+outpaths.forEach(outpath => {
+  fs.writeFileSync(outpath + 'i18n-data.js', 'var i18ndata = ' + JSON.stringify(i18n));
+});

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv=content-type content="text/html; charset=utf-8" />
+<meta name=author content="Opencast" />
+<meta name=viewport content="width=device-width, initial-scale=1">
+<link rel=stylesheet type=text/css href=upload.css />
+<link rel=stylesheet href=/ltitools/lib/font-awesome/css/font-awesome.min.css />
+<link rel=stylesheet href=/ltitools/lib/paginationjs/dist/pagination.css />
+<script type=text/javascript src=/ltitools/lib/jquery/dist/jquery.min.js></script>
+<script type=text/javascript src=/ltitools/lib/mustache/mustache.min.js></script>
+<script type=text/javascript src=/ltitools/lib/paginationjs/dist/pagination.min.js></script>
+<script type=text/javascript src=i18n-data.js></script>
+<script type=text/javascript src=upload.js></script>
+
+<title>Opencast: Upload</title>
+</head>
+<body>
+
+<header></header>
+<main>
+  <div id="upload-form" class="content-element"></div>
+  <div id="processed-table"></div>
+</main>
+<footer></footer>
+
+
+<!-- Template for episodes user view -->
+<script id=template-upload-list type=x-tmpl-mustache>
+  {{#hasProcessing}}
+  <div class="content-element">
+    <h2>{{i18ncurrentJobs}}</h2>
+    <table>
+      <tr>
+        <th>{{i18ntitle}}</th>
+        <th>{{i18nstatus}}</th>
+      </tr>
+      {{#events}}
+      <tr>
+        <td>{{title}}</td>
+        <td>{{status}}</td>
+      </tr>
+      {{/events}}
+    </table>
+  </div>
+  {{/hasProcessing}}
+</script>
+
+<!-- Template for upload dialog -->
+<script id=template-upload-dialog type=x-tmpl-mustache>
+  <form action="/lti-service-gui" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="hidden_series_name" value="{{seriesName}}" />
+    <input type="hidden" name="isPartOf" value="{{series}}" />
+    <h2>{{i18nnewUpload}}</h2>
+    <table>
+      <tbody>
+        <tr class="form_field form_optional">
+          <td class="form_label">
+            <label for="createevent-2_acl">{{i18ntitle}}</label>:
+          </td>
+          <td>
+            <input id="createevent-2_acl" class="form_field form_param_submit" name="title" type="text" size="30">
+          </td>
+          <td class="form_field_description">{{i18ntitleDescription}}</td>
+        </tr>
+        <tr class="form_field form_optional">
+          <td class="form_label">
+            <label for="createevent-2_presenter">{{i18npresenter}}</label>:
+          </td>
+          <td>
+            <input id="createevent-2_presenter" name="presenter" class="form_field_file" type="file">
+          </td>
+          <td class="form_field_description">{{i18npresenterDescription}}</td>
+        </tr>
+        <tr>
+          <td>
+          </td>
+          <td>
+          </td>
+          <td>
+            <div class="form_submit">
+              <input type="submit" value="{{i18nupload}}">
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+</script>
+
+<!-- Template for spinner -->
+<script id=template-loading type=x-tmpl-mustache>
+  <div class=loading>
+    <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>
+    <span class="sr-only">Loading...</span>
+  </div>
+</script>
+
+</body>
+</html>

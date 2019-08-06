@@ -21,8 +21,8 @@
 <main></main>
 <footer></footer>
 
-<!-- Template for episodes -->
-<script id=template-episode type=x-tmpl-mustache>
+<!-- Template for episodes user view -->
+<script id=template-episode-user type=x-tmpl-mustache>
   <a class=episode href={{player}}>
     <div class=preview><img alt=Preview src={{image}} /></div>
     <div class=desc>
@@ -33,12 +33,39 @@
   </a>
 </script>
 
+<!-- Template for episodes admin view -->
+<script id=template-episode-admin type=x-tmpl-mustache>
+  <div class=episode>
+    <a href={{player}}>
+      <div class=preview><img alt=Preview src={{image}} /></div>
+      <div class=desc>
+        <h2>{{title}}</h2>
+        {{i18ncreator}}<br />
+        {{created}}
+      </div>
+    </a>
+    {{#hasDeletion}}
+    <div class=buttoncontainer>
+      <button class=delete onclick=deleteEpisode("{{uid}}")>
+        <img src="bin.svg" height="15px" width="15px" />
+      </button>
+    </div>
+    {{/hasDeletion}}
+  </div>
+</script>
+
 <!-- Template for spinner -->
 <script id=template-loading type=x-tmpl-mustache>
   <div class=loading>
     <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>
     <span class="sr-only">Loading...</span>
   </div>
+</script>
+
+<!-- Template for deletion success -->
+<script id=template-deletion type=x-tmpl-mustache>
+  <h2>{{i18ndeletionMessage}}<h2>
+  <h5>{{i18ndeletionSubmessage}}</h5>
 </script>
 
 </body>
