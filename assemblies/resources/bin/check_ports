@@ -20,50 +20,55 @@
 # -----------------------------------------------------------------------
 # check if http or https port is available to run opencast otherwise exit
 
-if [ -d "$1" ]; then
-  SETENV_ETC="$1"
-else
-  if [ -d "${KARAF_BASE}" ]; then
-    SETENV_ETC="${KARAF_BASE}/etc"
+PROGNAME=$(basename "$0")
+
+if [ "$PROGNAME" = "start-opencast" ]; then
+
+  if [ -d "$1" ]; then
+    SETENV_ETC="$1"
   else
-    SETENV_ETC="etc"
+    if [ -d "${KARAF_BASE}" ]; then
+      SETENV_ETC="${KARAF_BASE}/etc"
+    else
+      SETENV_ETC="etc"
+    fi
   fi
-fi
 
-check_port() {
-  if [ "$1" ] ; then
-    hexPort=$(echo "ibase=10; obase=16; $1" | bc)
-    for i in /proc/net/*; do 
-	if  [ -f "$i" ] && [ -r "$i" ]; then
-	   o=$(grep -c ":$hexPort " "$i")
-	   if [ "$o" = "1" ]; then
-		return 1;
-	   fi
-	fi
-    done
+  check_port() {
+    if [ "$1" ] ; then
+      hexPort=$(printf ":%04X " "$1")
+      for i in /proc/net/*; do
+        if  [ -f "$i" ] && [ -r "$i" ]; then
+          o=$(grep -c "$hexPort" "$i")
+          if [ "$o" = "1" ]; then
+            return 1;
+          fi
+        fi
+      done
+    fi
+    return 0;
+  }
+
+  usehttp=$(grep "org.osgi.service.http.enabled[ =]" "${SETENV_ETC}"/org.ops4j.pax.web.cfg)
+  if [ "${usehttp##*=}" = "true" ]; then
+    httpport=$(grep "org.osgi.service.http.port[ =]" "${SETENV_ETC}"/org.ops4j.pax.web.cfg)
+    check_port "${httpport##*=}"
+    if [ "$?" = "1" ]; then
+      printf "\nHttp server port \e[1m%s\e[0m already in use \n" "${httpport##*=}"
+      printf "reconfigure \e[1morg.osgi.service.http.port\e[0m in \e[1m%s/org.ops4j.pax.web.cfg\e[0m \n" "${SETENV_ETC}"
+      exit 1
+    fi
   fi
-  return 0;
-}
 
-
-usehttp=$(grep "org.osgi.service.http.enabled[ =]" "${SETENV_ETC}"/org.ops4j.pax.web.cfg)
-if [ "${usehttp##*=}" = "true" ]; then
-  httpport=$(grep "org.osgi.service.http.port[ =]" "${SETENV_ETC}"/org.ops4j.pax.web.cfg)
-  check_port "${httpport##*=}"
-  if [ "$?" = "1" ]; then
-    printf "\nHttp server port \e[1m%s\e[0m already in use \n" "${httpport##*=}"
-    printf "reconfigure \e[1morg.osgi.service.http.port\e[0m in \e[1m%s/org.ops4j.pax.web.cfg\e[0m \n" "${SETENV_ETC}"
-    exit 1
+  usehttps=$(grep "org.osgi.service.http.secure.enabled[ =]" ${SETENV_ETC}/org.ops4j.pax.web.cfg)
+  if [ "${usehttps##*=}" = "true" ]; then
+    httpsport=$(grep "org.osgi.service.http.port.secure[ =]" ${SETENV_ETC}/org.ops4j.pax.web.cfg)
+    check_port "${httpsport##*=}"
+    if [ "$?" = "1" ]; then
+      printf "\nSecure http server port \e[1m%s\e[0m already in use \n" "${httpsport##*=}"
+      printf "reconfigure \e[1morg.osgi.service.http.port.secure\e[0m in \e[1m%s/org.ops4j.pax.web.cfg\e[0m \n" "${SETENV_ETC}"
+      exit 1
+    fi
   fi
-fi
 
-usehttps=$(grep "org.osgi.service.http.secure.enabled[ =]" ${SETENV_ETC}/org.ops4j.pax.web.cfg)
-if [ "${usehttps##*=}" = "true" ]; then
-  httpsport=$(grep "org.osgi.service.http.port.secure[ =]" ${SETENV_ETC}/org.ops4j.pax.web.cfg)
-  check_port "${httpsport##*=}"
-  if [ "$?" = "1" ]; then
-    printf "\nSecure http server port \e[1m%s\e[0m already in use \n" "${httpsport##*=}"
-    printf "reconfigure \e[1morg.osgi.service.http.port.secure\e[0m in \e[1m%s/org.ops4j.pax.web.cfg\e[0m \n" "${SETENV_ETC}"
-    exit 1
-  fi
 fi
