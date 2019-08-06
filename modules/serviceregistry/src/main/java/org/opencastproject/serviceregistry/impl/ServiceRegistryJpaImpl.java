@@ -2003,11 +2003,16 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   public long countByHost(String serviceType, String host, Status status) throws ServiceRegistryException {
     EntityManager em = null;
+    Query query;
     try {
       em = emf.createEntityManager();
-      Query query = em.createNamedQuery("Job.countByHost");
+      if (serviceType != null && !serviceType.isEmpty()) {
+        query = em.createNamedQuery("Job.countByHost");
+        query.setParameter("serviceType", serviceType);
+      } else {
+        query = em.createNamedQuery("Job.countByHost.nullType");
+      }
       query.setParameter("status", status.ordinal());
-      query.setParameter("serviceType", serviceType);
       query.setParameter("host", host);
       Number countResult = (Number) query.getSingleResult();
       return countResult.longValue();
@@ -2025,6 +2030,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countByOperation(java.lang.String, java.lang.String,
    *      Status)
    */
+
   @Override
   public long countByOperation(String serviceType, String operation, Status status) throws ServiceRegistryException {
     EntityManager em = null;

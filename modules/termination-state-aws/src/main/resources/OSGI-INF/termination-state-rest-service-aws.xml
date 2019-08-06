@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.terminationstate.endpoint.aws.AutoScalingTerminationStateRestService"
+               immediate="true">
+  <implementation class="org.opencastproject.terminationstate.endpoint.aws.AutoScalingTerminationStateRestService" />
+  <property name="service.description" value="Termination State Rest Service: AWS Auto Scaling" />
+  <property name="opencast.service.type" value="org.opencastproject.terminationstate.aws.autoscaling" />
+  <property name="opencast.service.path" value="/termination/aws/autoscaling" />
+
+  <service>
+    <!-- MH-13571 Should be the api but the Opencast RestPublisher does not support use of endpoint api's -->
+    <provide interface="org.opencastproject.terminationstate.endpoint.aws.AutoScalingTerminationStateRestService" />
+  </service>
+  <reference name="termination-state-service" interface="org.opencastproject.terminationstate.api.TerminationStateService"
+             cardinality="1..1" policy="static" bind="setService" target="(&amp;(vendor.name=aws)(vendor.service=autoscaling))" />
+</scr:component>
