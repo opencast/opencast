@@ -66,20 +66,22 @@ public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOpe
 
     //A missing version is ok, that just means to select all of them (which is represented as null)
     String targetVersion = StringUtils.trimToNull(operation.getConfiguration("target-version"));
-    Version version = null;
+    logger.debug("Target version set to {}", targetVersion);
+
+    logger.debug("Beginning moving process");
+    Job job;
+    //Note that a null version implies *all* versions
     if (null != targetVersion) {
+      Version version;
       try {
         version = VersionImpl.mk(Long.parseLong(targetVersion));
       } catch (NumberFormatException e) {
         throw new WorkflowOperationException("Invalid version number", e);
       }
+      job = tsamjp.moveByIdAndVersion(version, mp.getIdentifier().compact(), targetStorage);
+    } else {
+      job = tsamjp.moveById(mp.getIdentifier().compact(), targetStorage);
     }
-
-    logger.debug("Target version set to {}", version);
-
-    logger.debug("Beginning moving process");
-    //Note that a null version implies *all* versions
-    Job job = tsamjp.moveByIdAndVersion(version, mp.getIdentifier().compact(), targetStorage);
     if (waitForStatus(job).isSuccess()) {
       return createResult(WorkflowOperationResult.Action.CONTINUE);
     } else {
