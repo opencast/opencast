@@ -159,7 +159,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       @PathParam("format")    String  format
       ) throws SearchException, UnauthorizedException {
 
-    SearchQuery query = new SearchQuery();
+    SearchQuery query = new SearchQuery().signURLs(true);
 
     // If id is specified, do a search based on id
     if (StringUtils.isNotBlank(id))
@@ -252,9 +252,13 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     SearchQuery search = new SearchQuery();
-    search.withId(id).withSeriesId(seriesId)
-            .withElementFlavors(flavorSet.toArray(new MediaPackageElementFlavor[flavorSet.size()]))
-            .withElementTags(tags).withLimit(limit).withOffset(offset);
+    search.withId(id)
+        .withSeriesId(seriesId)
+        .withElementFlavors(flavorSet.toArray(new MediaPackageElementFlavor[0]))
+        .withElementTags(tags)
+        .withLimit(limit)
+        .withOffset(offset)
+        .signURLs(true);
 
     if (StringUtils.isNotBlank(text)) {
       search.withText(text);
@@ -314,7 +318,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   public Response getByLuceneQuery(@QueryParam("q") String q, @QueryParam("sort") String sort, @QueryParam("limit") int limit,
           @QueryParam("offset") int offset, @QueryParam("admin") boolean admin, @PathParam("format") String format)
           throws SearchException, UnauthorizedException {
-    SearchQuery query = new SearchQuery();
+    SearchQuery query = new SearchQuery().signURLs(true);
     if (!StringUtils.isBlank(q))
       query.withQuery(q);
 
