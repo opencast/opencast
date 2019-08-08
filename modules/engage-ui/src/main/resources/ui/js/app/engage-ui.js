@@ -669,6 +669,8 @@ function($, bootbox, _, alertify, jsyaml) {
 
         if (data.dcCreated) {
           date = new Date(data.dcCreated);
+        } else {
+          date = new Date(data.mediapackage.start);
         }
         tile = tile + '<div class="date">' + date.toLocaleDateString() + '</div>';
 

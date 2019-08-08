@@ -33,9 +33,21 @@
       exception-handler-workflow="partial-error"
       description="Distribute and publish to engage server">
       <configurations>
+        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="download-source-tags">engage-download</configuration>
         <configuration key="strategy">merge</configuration>
         <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="republish-oaipmh"
+      exception-handler-workflow="partial-error"
+      description="Update recording metadata in default OAI-PMH repository">
+      <configurations>
+        <configuration key="source-flavors">dublincore/*,security/*</configuration>
+        <configuration key="download-source-tags">engage-download</configuration>
+        <configuration key="repository">default</configuration>
       </configurations>
     </operation>
 

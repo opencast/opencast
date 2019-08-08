@@ -49,7 +49,8 @@
       exception-handler-workflow="partial-error"
       description="Update recording in Opencast Media Module">
       <configurations>
-        <configuration key="download-source-flavors">${download-source-flavors}</configuration>
+        <configuration key="download-source-flavors">${download-source-flavors},dublincore/*,security/*</configuration>
+        <configuration key="download-source-tags">engage-download</configuration>
         <configuration key="strategy">merge</configuration>
         <configuration key="check-availability">false</configuration>
       </configurations>
@@ -63,7 +64,8 @@
       exception-handler-workflow="partial-error"
       description="Update recording metadata in default OAI-PMH repository">
       <configurations>
-        <configuration key="source-flavors">${download-source-flavors}</configuration>
+       <configuration key="source-flavors">${download-source-flavors},dublincore/*,security/*</configuration>
+        <configuration key="download-source-tags">engage-download</configuration>
         <configuration key="repository">default</configuration>
       </configurations>
     </operation>

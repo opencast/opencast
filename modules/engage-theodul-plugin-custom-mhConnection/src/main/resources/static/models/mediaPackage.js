@@ -86,6 +86,8 @@ define(["backbone", "engage/core"], function(Backbone, Engage) {
                             }
                             if (mediaPackage.dcCreated) {
                                 model.attributes.date = mediaPackage.dcCreated;
+                            } else {
+                                model.attributes.date = mediaPackage.mediapackage.start;
                             }
                             if (mediaPackage.dcDescription) {
                                 model.attributes.description = mediaPackage.dcDescription;
