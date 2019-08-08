@@ -29,6 +29,33 @@ signing:
 If these modules are present, the URL signing service will be available, to which the URL signing providers can then
 register themselves.
 
+
+Minimal Configuration Example
+-----------------------------
+
+This is a minimal configuration example which requires valid tokens for all static file downloads:
+
+`etc/org.opencastproject.security.urlsigning.filter.UrlSigningFilter.cfg`:
+
+```properties
+enabled=true
+url.regex.files=.*localhost:8080/static/.*
+```
+
+`etc/org.opencastproject.security.urlsigning.provider.impl.GenericUrlSigningProvider.cfg`
+
+```properties
+key.default.secret=THISISNOSECUREKEY
+key.default.url=http://localhost:8080/static/
+```
+
+`etc/org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl.cfg`:
+
+```properties
+key.default=THISISNOSECUREKEY
+```
+
+
 Configuration of Signing Providers
 ----------------------------------
 
