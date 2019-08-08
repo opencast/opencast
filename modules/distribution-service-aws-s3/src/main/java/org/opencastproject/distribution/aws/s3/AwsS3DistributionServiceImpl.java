@@ -229,9 +229,12 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
       // Create AWS client
 
-      s3 =
-              AmazonS3ClientBuilder.standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint
-                      , regionStr)).withPathStyleAccessEnabled(pathStyle).withCredentials(provider).build();
+      s3 = AmazonS3ClientBuilder.standard()
+              .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint
+                      , regionStr))
+              .withPathStyleAccessEnabled(pathStyle)
+              .withCredentials(provider)
+              .build();
 
 
       s3TransferManager = new TransferManager(s3);

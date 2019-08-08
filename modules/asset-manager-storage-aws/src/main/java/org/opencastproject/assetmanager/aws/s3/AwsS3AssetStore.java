@@ -137,8 +137,12 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
                 new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
 
       // Create AWS client.
-      s3 = AmazonS3ClientBuilder.standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint
-              , regionName)).withPathStyleAccessEnabled(pathStyle).withCredentials(provider).build();
+      s3 = AmazonS3ClientBuilder.standard()
+              .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint
+              , regionName))
+              .withPathStyleAccessEnabled(pathStyle)
+              .withCredentials(provider)
+              .build();
 
       s3TransferManager = new TransferManager(s3);
 
