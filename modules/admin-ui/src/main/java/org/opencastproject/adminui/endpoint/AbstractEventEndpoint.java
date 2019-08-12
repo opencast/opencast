@@ -1105,13 +1105,14 @@ public abstract class AbstractEventEndpoint {
     Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", eventId);
+    Event event = optEvent.get();
 
     MetadataList metadataList = new MetadataList();
     List<EventCatalogUIAdapter> catalogUIAdapters = getIndexService().getEventCatalogUIAdapters();
     catalogUIAdapters.remove(getIndexService().getCommonEventCatalogUIAdapter());
     MediaPackage mediaPackage;
     try {
-      mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
+      mediaPackage = getIndexService().getEventMediapackage(event);
     } catch (IndexServiceException e) {
       if (e.getCause() instanceof NotFoundException) {
         return notFound("Cannot find data for event %s", eventId);
@@ -1125,20 +1126,15 @@ public abstract class AbstractEventEndpoint {
       metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
     }
 
-    MetadataCollection mc = EventUtils.getEventMetadata(optEvent.get(), getIndexService().getCommonEventCatalogUIAdapter());
+    MetadataCollection metadataCollection = EventUtils.getEventMetadata(event, getIndexService().getCommonEventCatalogUIAdapter());
     if (getOnlySeriesWithWriteAccessEventModal()) {
-      MetadataField<?> series = mc.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-      mc.removeField(series);
-      Map<String, String> seriesAccessEventModal = getSeriesService().getUserSeriesByAccess(true);
-      Opt<Map<String, String>> map = Opt.some(seriesAccessEventModal);
-      MetadataField<String> newSeries = new MetadataField(series);
-      newSeries.setCollection(map);
-      newSeries.setValue(optEvent.get().getSeriesId());
-      mc.addField(newSeries);
+      MetadataField<?> seriesField = metadataCollection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
+      Map<String, String> seriesWithWriteAccess = getSeriesService().getUserSeriesByAccess(true);
+      seriesField.setCollection(Opt.some(seriesWithWriteAccess));
     }
-    metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), mc);
+    metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), metadataCollection);
 
-    final String wfState = optEvent.get().getWorkflowState();
+    final String wfState = event.getWorkflowState();
     if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState)))
       metadataList.setLocked(Locked.WORKFLOW_RUNNING);
 

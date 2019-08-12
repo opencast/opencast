@@ -55,6 +55,11 @@ public class AbstractMetadataCollectionTest {
     MetadataCollection collection = new AbstractMetadataCollection() {
 
       @Override
+      public MetadataCollection getCopy() {
+        return this;
+      }
+
+      @Override
       public JValue toJSON() {
         return null;
       }
