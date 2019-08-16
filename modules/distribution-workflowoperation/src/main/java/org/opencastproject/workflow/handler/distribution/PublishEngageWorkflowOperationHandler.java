@@ -33,6 +33,8 @@ import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.Attachment;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -382,12 +384,18 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
         // create publication URI for streaming
         if (distributeStreaming && !publishedStreamingFormats.isEmpty()) {
-          Track[] tracks = mediaPackageForSearch.getTracks();
-          for (Track track : tracks) {
+          for (Track track : mediaPackageForSearch.getTracks()) {
             String mimeType = track.getMimeType().toString();
-            if (isStreamingFormat(track) && publishedStreamingFormats.contains(mimeType)) {
+            if (isStreamingFormat(track) && (publishedStreamingFormats.contains(mimeType)
+                    || publishedStreamingFormats.contains("*"))) {
               publicationElement.addTrack(track);
             }
+          }
+          for (Attachment attachment : mediaPackageForSearch.getAttachments()) {
+            publicationElement.addAttachment(attachment);
+          }
+          for (Catalog catalog : mediaPackageForSearch.getCatalogs()) {
+            publicationElement.addCatalog(catalog);
           }
         }
 
