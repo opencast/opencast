@@ -618,7 +618,7 @@ public class EventsEndpoint implements ManagedService {
         String value;
 
         if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
-          // MH-13038 - 1.1.0 and higher support semi-colons in values
+          // MH-13038 - 1.1.0 and higher support colons in values
           value = f.substring(name.length() + 1);
         } else {
           value = filterTuple[1];

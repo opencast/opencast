@@ -204,6 +204,7 @@
     <sec:intercept-url pattern="/api/series" method="POST" access="ROLE_ADMIN, ROLE_API_SERIES_CREATE"/>
     <sec:intercept-url pattern="/api/security/sign" method="POST" access="ROLE_ADMIN, ROLE_API_SECURITY_EDIT"/>
     <sec:intercept-url pattern="/api/statistics/data/query" method="POST" access="ROLE_ADMIN, ROLE_API_STATISTICS_VIEW"/>
+    <sec:intercept-url pattern="/api/statistics/data/export.csv" method="POST" access="ROLE_ADMIN, ROLE_API_STATISTICS_VIEW"/>
     <!-- External API DELETE Endpoints -->
     <sec:intercept-url pattern="/api/events/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_DELETE"/>
     <sec:intercept-url pattern="/api/events/*/acl/*/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_DELETE"/>
