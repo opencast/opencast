@@ -3,7 +3,6 @@
 # agreements. See the NOTICE file distributed with this work for additional
 # information regarding copyright ownership.
 #
-#
 # The Apereo Foundation licenses this file to you under the Educational
 # Community License, Version 2.0 (the "License"); you may not use this file
 # except in compliance with the License. You may obtain a copy of the License
@@ -35,8 +34,20 @@ if [ "$PROGNAME" = "start-opencast" ]; then
   fi
 
   check_port() {
-    if [ "$1" ] ; then
-      hexPort=$(printf ":%04X " "$1")
+    a="$1"
+    if [ "$a" -eq "$a" ] 2>/dev/null ; then
+      port="$a"
+      hexPort=$(printf ":%04X " "$a")
+    else
+      b="${a##*:}"
+      port=$(eval echo "\$${b%%\}*}")
+      if [ "$port" -eq "$port" ] 2>/dev/null ; then
+        hexPort=$(printf ":%04X " "$port")
+      else
+        return 0;
+      fi
+    fi
+    if [ -d /proc/net ] ; then
       for i in /proc/net/*; do
         if  [ -f "$i" ] && [ -r "$i" ]; then
           o=$(grep -c "$hexPort" "$i")
@@ -45,6 +56,15 @@ if [ "$PROGNAME" = "start-opencast" ]; then
           fi
         fi
       done
+    else
+        if [ -x "$(command -v netstat)" ]; then
+          o=$(netstat -anp tcp | grep -i "listen" | grep -c ".$port ")
+          if [ "$o" -gt 0 ] ; then
+            return 1;
+          fi
+        else
+          return 0;
+        fi
     fi
     return 0;
   }
