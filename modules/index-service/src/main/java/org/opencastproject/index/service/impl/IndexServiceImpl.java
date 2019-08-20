@@ -55,6 +55,8 @@ import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventHttpServletRequest;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
 import org.opencastproject.index.service.impl.index.event.EventUtils;
+import org.opencastproject.index.service.impl.index.event.Retraction;
+import org.opencastproject.index.service.impl.index.event.RetractionListener;
 import org.opencastproject.index.service.impl.index.group.Group;
 import org.opencastproject.index.service.impl.index.group.GroupIndexSchema;
 import org.opencastproject.index.service.impl.index.group.GroupSearchQuery;
@@ -100,7 +102,6 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -124,7 +125,6 @@ import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowListener;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
@@ -486,7 +486,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   public void activate(ComponentContext cc) {
-    workflowService.addWorkflowListener(new RetractionListener());
+    workflowService.addWorkflowListener(new RetractionListener(this, securityService, retractions));
   }
 
   public void deactivate(ComponentContext cc) {
@@ -2218,48 +2218,6 @@ public class IndexServiceImpl implements IndexService {
     return WorkflowState.INSTANTIATED.toString().equals(workflowState)
             || WorkflowState.RUNNING.toString().equals(workflowState)
             || WorkflowState.PAUSED.toString().equals(workflowState);
-  }
-
-  private static final class Retraction {
-    private User user;
-    private Organization organization;
-    private Runnable doOnNotFound;
-
-    private Retraction(User user, Organization organization, Runnable doOnNotFound) {
-      this.user = user;
-      this.organization = organization;
-      this.doOnNotFound = doOnNotFound;
-    }
-  }
-
-  private final class RetractionListener implements WorkflowListener {
-    private final Logger logger = LoggerFactory.getLogger(RetractionListener.class);
-
-    @Override
-    public void stateChanged(WorkflowInstance workflow) {
-      if (workflow.getState() != WorkflowState.SUCCEEDED) {
-        return;
-      }
-      if (!retractions.containsKey(workflow.getId())) {
-        return;
-      }
-      final Retraction retraction = retractions.get(workflow.getId());
-      SecurityUtil.runAs(securityService, retraction.organization, retraction.user, () -> {
-        final String mpId = workflow.getMediaPackage().getIdentifier().compact();
-        try {
-          final boolean result = removeEvent(mpId);
-          if (!result) {
-            logger.warn("Could not delete retracted media package {}. removeEvent returned false.", mpId);
-          }
-          retractions.remove(workflow.getId());
-        } catch (UnauthorizedException e) {
-          logger.warn("Not authorized to delete retracted media package {}",  mpId);
-        } catch (NotFoundException e) {
-          logger.warn("Unable to delete retracted media package {} because it could not be found",  mpId);
-          retraction.doOnNotFound.run();
-        }
-      });
-    }
   }
 
 }
