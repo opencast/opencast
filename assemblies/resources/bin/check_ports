@@ -58,7 +58,7 @@ if [ "$PROGNAME" = "start-opencast" ]; then
       done
     else
         if [ -x "$(command -v netstat)" ]; then
-          o=$(netstat -anp tcp | grep -i "listen" | grep -c ".$port ")
+          o=$(netstat -anp tcp | grep -i "listen" | grep -c -F ".$port ")
           if [ "$o" -gt 0 ] ; then
             return 1;
           fi
