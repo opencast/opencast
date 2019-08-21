@@ -28,7 +28,7 @@ describe('Group controller', function () {
 
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
-        $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:USER&limit=0&offset=0').respond(JSON.stringify(getJSONFixture('roles/roles.json')));
+        $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:USER&limit=-1').respond(JSON.stringify(getJSONFixture('roles/roles.json')));
         $httpBackend.whenGET('/admin-ng/resources/USERS.INVERSE.WITH.USERNAME.json').respond(JSON.stringify(getJSONFixture('admin-ng/resources/USERS.INVERSE.WITH.USERNAME.json')));
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
         $httpBackend.whenGET('modules/events/partials/index.html').respond('');

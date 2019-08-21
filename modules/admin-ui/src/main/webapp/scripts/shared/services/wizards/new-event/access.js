@@ -27,11 +27,6 @@ angular.module('adminNg.services')
     Notifications, $timeout) {
     var Access = function () {
 
-      var roleSlice = 100;
-      var roleOffset = 0;
-      var loading = false;
-      var rolePromise = null;
-
       var me = this;
       var NOTIFICATION_CONTEXT = 'events-access';
       var createPolicy = function (role) {
@@ -235,37 +230,12 @@ angular.module('adminNg.services')
       });
 
       me.roles = {};
-
-      me.getMoreRoles = function (value) {
-
-        if (me.loading)
-          return rolePromise;
-
-        me.loading = true;
-        var queryParams = {limit: roleSlice, offset: roleOffset};
-
-        if ( angular.isDefined(value) && (value != '')) {
-          //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
-          //The filter format is care of ListProvidersEndpoint, which gets it from EndpointUtil
-          queryParams['filter'] = 'role_name:' + value + ',role_target:ACL';
-          queryParams['offset'] = 0;
-        } else {
-          queryParams['filter'] = 'role_target:ACL';
-        }
-        rolePromise = UserRolesResource.query(queryParams);
-        rolePromise.$promise.then(function (data) {
-          angular.forEach(data, function (role) {
-            me.roles[role.name] = role.value;
-          });
-          roleOffset = Object.keys(me.roles).length;
-        }).catch(angular.noop
-        ).finally(function () {
-          me.loading = false;
+      var queryParams = {limit: -1, filter: 'role_target:ACL'};
+      UserRolesResource.query(queryParams).$promise.then(function (data) {
+        angular.forEach(data, function (role) {
+          me.roles[role.name] = role.value;
         });
-        return rolePromise;
-      };
-
-      me.getMoreRoles();
+      });
 
       this.reset = function () {
         me.ud = {

@@ -127,7 +127,6 @@
                           <select chosen
                                   data-width="'360px'"
                                   ng-model="policy.role"
-                                  ng-get-more="wizard.step.getMoreRoles"
                                   ng-options="id as id for (id, type) in wizard.step.roles"
                                   data-placeholder=" "
                                   no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
@@ -256,7 +255,7 @@
         </div>
       </div>
 
-      <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('theme').ud.theme 
+      <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('theme').ud.theme
           && wizard.getStateControllerByName('theme').themes.hasOwnProperty(wizard.getStateControllerByName('theme').ud.theme)">
         <header class="no-expand" translate="EVENTS.SERIES.NEW.THEME.CAPTION"><!-- Caption --></header>
         <div class="obj-container">

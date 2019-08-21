@@ -28,11 +28,6 @@ angular.module('adminNg.controllers')
   function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource,
     ResourcesListResource, UserRolesResource, Notifications, AuthService, StatisticsReusable) {
 
-    var roleSlice = 100;
-    var roleOffset = 0;
-    var loading = false;
-    var rolePromise = null;
-
     var saveFns = {}, aclNotification,
         me = this,
         NOTIFICATION_CONTEXT = 'series-acl',
@@ -117,34 +112,15 @@ angular.module('adminNg.controllers')
       $scope.accessSave();
     };
 
-    $scope.getMoreRoles = function (value) {
-
-      if (loading)
-        return rolePromise;
-
-      loading = true;
-      var queryParams = {limit: roleSlice, offset: roleOffset};
-
-      if ( angular.isDefined(value) && (value != '')) {
-        //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
-        //The filter format is care of ListProvidersEndpoint, which gets it from EndpointUtil
-        queryParams['filter'] = 'role_name:' + value + ',role_target:ACL';
-        queryParams['offset'] = 0;
-      } else {
-        queryParams['filter'] = 'role_target:ACL';
-      }
-      rolePromise = UserRolesResource.query(queryParams);
-      rolePromise.$promise.then(function (data) {
+    $scope.getRoles = function() {
+      var roles = {};
+      var queryParams = {limit: -1, filter: 'role_target:ACL'};
+      UserRolesResource.query(queryParams).$promise.then(function (data) {
         angular.forEach(data, function (role) {
-          $scope.roles[role.name] = role.value;
+          roles[role.name] = role.value;
         });
-        roleOffset = Object.keys($scope.roles).length;
-      }).catch(
-        angular.noop
-      ).finally(function () {
-        loading = false;
       });
-      return rolePromise;
+      return roles;
     };
 
     fetchChildResources = function (id) {
@@ -247,7 +223,7 @@ angular.module('adminNg.controllers')
         });
       });
 
-      $scope.getMoreRoles();
+      $scope.roles = $scope.getRoles();
     };
 
     $scope.statReusable = null;
@@ -399,7 +375,7 @@ angular.module('adminNg.controllers')
       switch (value) {
       case 'permissions':
         $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
-        $scope.getMoreRoles();
+        $scope.roles = $scope.getRoles();
         break;
       }
     });

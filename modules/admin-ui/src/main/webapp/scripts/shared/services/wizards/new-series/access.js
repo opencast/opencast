@@ -26,11 +26,6 @@ angular.module('adminNg.services')
   function (ResourcesListResource, SeriesAccessResource, AuthService, UserRolesResource, Notifications, $timeout) {
     var Access = function () {
 
-      var roleSlice = 100;
-      var roleOffset;
-      var loading = false;
-      var rolePromise = null;
-
       var me = this,
           NOTIFICATION_CONTEXT = 'series-acl',
           aclNotification,
@@ -182,40 +177,17 @@ angular.module('adminNg.services')
         });
       });
 
-      me.roles = {};
-
-      me.getMoreRoles = function (value) {
-
-        if (me.loading)
-          return rolePromise;
-
-        me.loading = true;
-
-        // the offset should actually be setto roleOffset, but when used doesn't display the correct roles
-        var queryParams = {limit: roleSlice, offset: 0};
-
-        if ( angular.isDefined(value) && (value != '')) {
-          //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
-          //The filter format is care of ListProvidersEndpoint, which gets it from EndpointUtil
-          queryParams['filter'] = 'role_name:' + value + ',role_target:ACL';
-          queryParams['offset'] = 0;
-        } else {
-          queryParams['filter'] = 'role_target:ACL';
-        }
-        rolePromise = UserRolesResource.query(queryParams);
-        rolePromise.$promise.then(function (data) {
+      me.getRoles = function () {
+        var roles = {};
+        var queryParams = {limit: -1, filter: 'role_target:ACL'};
+        UserRolesResource.query(queryParams).$promise.then(function (data) {
           angular.forEach(data, function (role) {
-            me.roles[role.name] = role.value;
+            roles[role.name] = role.value;
           });
-          roleOffset = Object.keys(me.roles).length;
-        }).catch(angular.noop
-        ).finally(function () {
-          me.loading = false;
         });
-        return rolePromise;
+        return roles;
       };
-
-      me.getMoreRoles();
+      me.roles = me.getRoles();
 
       this.reset = function () {
         me.ud = {
@@ -228,9 +200,7 @@ angular.module('adminNg.services')
 
       this.reload = function () {
         me.acls  = ResourcesListResource.get({ resource: 'ACL' });
-        me.roles = {};
-        me.roleOffset = 0;
-        me.getMoreRoles();
+        me.roles = me.getRoles();
       };
 
       this.reset();
