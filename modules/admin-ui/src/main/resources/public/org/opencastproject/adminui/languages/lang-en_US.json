@@ -65,7 +65,8 @@
        "CONFIRMATION" : "Confirmation"
      },
      "WARNINGS": {
-       "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events."
+       "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
+       "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
      },
      "ERRORS": {
        "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
