@@ -352,6 +352,26 @@ class OpencastToPaellaConverter {
     return segments;
   }
 
+  getPreviewImage(episode) {
+    let presenterPreview;
+    let presentationPreview;
+    let otherPreview;
+
+    var attachments = episode.mediapackage.attachments.attachment;
+    attachments.forEach((currentAttachment) => {
+      if (currentAttachment.type == 'presenter/player+preview') {
+        presenterPreview = currentAttachment.url;
+      }
+      if (currentAttachment.type == 'presentation/player+preview') {
+        presentationPreview = currentAttachment.url;
+      }
+      if (currentAttachment.type.endsWith('/player+preview')) {
+        otherPreview = currentAttachment.url;
+      }
+    });
+
+    return presentationPreview || presenterPreview || otherPreview;
+  }
 
   convertToDataJson(episode) {
     var streams = this.getStreams(episode);
@@ -361,7 +381,8 @@ class OpencastToPaellaConverter {
     var data =  {
       metadata: {
         title: episode.mediapackage.title,
-        duration: episode.mediapackage.duration / 1000
+        duration: episode.mediapackage.duration / 1000,
+        preview: this.getPreviewImage(episode)
       },
       streams: streams,
       frameList: segments,

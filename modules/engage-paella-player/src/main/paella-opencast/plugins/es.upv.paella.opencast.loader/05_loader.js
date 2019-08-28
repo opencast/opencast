@@ -36,12 +36,14 @@ function initPaellaOpencast() {
     paella.dataDelegates.MHAnnotationServiceTrimmingDataDelegate = MHAnnotationServiceTrimmingDataDelegate;
     paella.dataDelegates.MHFootPrintsDataDelegate = MHFootPrintsDataDelegate;
     paella.dataDelegates.OpencastTrackCameraDataDelegate = OpencastTrackCameraDataDelegate;
+    paella.OpencastAccessControl = OpencastAccessControl;
+    window.OpencastAccessControl = OpencastAccessControl;
   }
 }
 
 function loadOpencastPaella(containerId) {
   initPaellaOpencast();
-  paella.load(containerId, {
+  paella.lazyLoad(containerId, {
     configUrl:'/ui/config/paella/config.json',
     loadVideo:function() {
       return new Promise((resolve, reject) => {
