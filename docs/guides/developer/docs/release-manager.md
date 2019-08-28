@@ -353,7 +353,7 @@ assume the final release should be based on `3.0-rc2`.
 11. Release the branch in JIRA, and create the next one. Talk to your JIRA administrators to have this done.
 
 12. Push the built artifacts to Maven. Bug the QA Coordinator to do this so that he remembers to set this up from the CI
-    servers.
+    servers.  If you want to do this yourself please read the [infra documentation](infrastructure/maven-repository.md#pushing-to-maven-central).
 
 13. Push the built artifacts back to GitHub. Create a new release using the
     [graphical user interface](https://github.com/opencast/opencast/releases) to upload the distribution tarballs
