@@ -141,7 +141,9 @@
               "tags": []
             }
           }
-        ]
+        ],
+        "audioTag": {         
+        }
       },
       "//**** Video profile plugins": "",
       "es.upv.paella.singleStreamProfilePlugin": {
@@ -150,7 +152,6 @@
             { "icon":"professor_icon.svg", "id":"presenter", "content":["presenter"]},
             { "icon":"slide_icon.svg", "id":"presentation", "content":["presentation"]}
           ]
-
       },
       "es.upv.paella.dualStreamProfilePlugin": { "enabled":true,
         "videoSets": [
@@ -246,7 +247,7 @@
       "es.upv.paella.ratePlugin": {
         "enabled": false
       },
-      "es.upv.paella.audioLanguage": {
+      "es.upv.paella.audioSelector": {
         "enabled": true
       },
       "es.upv.paella.videoZoomPlugin": {

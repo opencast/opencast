@@ -52,8 +52,12 @@ class OpencastToPaellaConverter {
     return filterStream;
   }
 
-  getVideoTypeFromTrack(track) {
-    var videoType = null;
+  getAudioTagConfig() {
+    return  this._config.audioTag || { '*/*': '*' };
+  }
+
+  getSourceTypeFromTrack(track) {
+    var sourceType = null;
 
     var protocol = /^(.*):\/\/.*$/.exec(track.url);
     if (protocol) {
@@ -65,7 +69,7 @@ class OpencastToPaellaConverter {
         case 'video/ogg':
         case 'video/webm':
         case 'video/x-flv':
-          videoType = 'rtmp';
+          sourceType = 'rtmp';
           break;
         default:
           paella.debug.log(`OpencastToPaellaConverter: MimeType (${track.mimetype}) not supported!`);
@@ -78,18 +82,20 @@ class OpencastToPaellaConverter {
         case 'video/mp4':
         case 'video/ogg':
         case 'video/webm':
-          videoType = track.mimetype.split('/')[1];
+          sourceType = track.mimetype.split('/')[1];
           break;
         case 'video/x-flv':
-          videoType = 'flv';
+          sourceType = 'flv';
           break;
         case 'application/x-mpegURL':
-          videoType = 'hls';
+          sourceType = 'hls';
           break;
         case 'application/dash+xml':
-          videoType = 'mpd';
+          sourceType = 'mpd';
           break;
-
+        case 'audio/m4a':
+          sourceType = 'audio';
+            break;  
         default:
           paella.debug.log(`OpencastToPaellaConverter: MimeType (${track.mimetype}) not supported!`);
           break;
@@ -101,7 +107,7 @@ class OpencastToPaellaConverter {
       }
     }
 
-    return videoType;
+    return sourceType;
   }
 
   getStreamSourceFromTrack(track) {
@@ -123,12 +129,43 @@ class OpencastToPaellaConverter {
 
     var source = {
       src:  src,
-      mimetype: track.mimetype,
-      res: {w:res[0], h:res[1]},
       isLiveStream: (track.live === true)
     };
 
+    if(track.video) {
+      source.mimetype = track.mimetype;
+      source.res = {w:res[0], h:res[1]};
+    }
+
     return source;
+  }
+
+  getAudioTagFromTrack(currentTrack) {
+    let audioTagConfig = this.getAudioTagConfig();
+    let audioTag;
+
+    if (!(currentTrack.tags.tag instanceof Array)) {
+      currentTrack.tags.tag = [currentTrack.tags.tag];
+    }
+    currentTrack.tags.tag.some(function(tag){
+      if (tag.startsWith('audioTag:')){
+        audioTag = tag.slice(9);
+        return true;
+      }
+    });
+    if (!audioTag) {
+      Object.entries(audioTagConfig).some(function(atc){
+        let sflavor = currentTrack.type.split('/');
+        let smask = atc[0].split('/');
+
+        if (((smask[0] == '*') || (smask[0] == sflavor[0])) && ((smask[1] == '*') || (smask[1] == sflavor[1]))) {
+          audioTag = (atc[1] == '*') ? base.dictionary.currentLanguage() : atc[1];
+          return true;
+        }
+      });
+    }
+    
+    return audioTag
   }
 
   /**
@@ -149,15 +186,22 @@ class OpencastToPaellaConverter {
     // Read the tracks!!
     tracks.forEach((currentTrack) => {
       if (currentTrack.type == flavor + '/' + subFlavor) {
-        var videoType = this.getVideoTypeFromTrack(currentTrack);
-        if (videoType){
-          if ( !(currentStream.sources[videoType]) || !(currentStream.sources[videoType] instanceof Array)){
-            currentStream.sources[videoType] = [];
+        var sourceType = this.getSourceTypeFromTrack(currentTrack);
+        if (sourceType){
+          if ( !(currentStream.sources[sourceType]) || !(currentStream.sources[sourceType] instanceof Array)){
+            currentStream.sources[sourceType] = [];
           }
           if (currentTrack.audio) {
-            currentStream.audioTag = base.dictionary.currentLanguage();
+            currentStream.audioTag = this.getAudioTagFromTrack(currentTrack);
           }
-          currentStream.sources[videoType].push(this.getStreamSourceFromTrack(currentTrack));
+          currentStream.sources[sourceType].push(this.getStreamSourceFromTrack(currentTrack));
+
+          if (currentTrack.video) {
+            currentStream.type="video";
+          }
+          else if (currentTrack.audio) {
+            currentStream.type="audio";
+          }
         }
       }
     });
