@@ -483,7 +483,7 @@
          "PUBLISHED": "Published",
          "WEEKDAY": "Weekday",
          "TOOLTIP": {
-           "ASSETS" : "Open asset detials",
+           "ASSETS" : "Open asset details",
            "START": "Filter for this start date",
            "SERIES": "Filter for this series",
            "STATUS": "Filter for this event status",
