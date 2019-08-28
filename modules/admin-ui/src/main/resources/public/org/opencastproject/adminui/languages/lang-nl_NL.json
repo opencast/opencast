@@ -10,8 +10,8 @@
    "SAVE": "Opslaan",
    "LOGOUT": "Afmelden",
    "RESET": "Reset",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "Geen optie geselecteerd",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Geen opties beschikbaar",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabisch",
@@ -247,7 +247,7 @@
             "CAPTION": "Bewerken",
             "EVENT": "event",
             "EVENTS": "events",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "HEADER": "Deze pagina stelt u in staat geplande gebeurtenissen te bewerken, gegroepeerd op weekdagen. De invoervelden zijn vooraf ingevuld in het geval alle geplande gebeurtenissen dezelfde waarde hebben voor een specifiek veld. Anders worden de invoervelden leeg gelaten. Door de invoervelden leeg te laten, betekent dit dat de respectieve waarden niet gewijzigd moeten worden.",
             "METADATA": "Metadata",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -271,7 +271,7 @@
       "BACK": "Vorige",
       "CREATE": "Creëer",
       "RETRACT": "Intrekken",
-      "RETRACT_DELETE": "Retract/Delete",
+      "RETRACT_DELETE": "Intrekken/Verwijderen",
       "DELETE": "Verwijderen",
       "UPDATE": "Updaten",
       "DURATION": {
@@ -395,7 +395,7 @@
                   "REPEATS": "Herhalingen",
                   "REPEAT_ON": "Herhalen op",
                   "WEEKDAYS": "Weekdagen",
-                  "WEEKDAY": "Weekday"
+                  "WEEKDAY": "Weekdag"
                },
                "NO_SOURCE_AVAILABLE": "Geen opnametoestellen beschikbaar voor het plannen"
             },
@@ -489,7 +489,7 @@
                "EDITOR_NEEDS_CUTTING": "Open video-Editor (een opmerking geeft aan dat video trimmen is aangevraagd)",
                "COMMENTS": "Commentaar bekijken",
                "PAUSED_WORKFLOW": "Onderbroken workflow weergeven",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "Filter op deze presenter"
             }
          },
          "STATUS": {
@@ -796,7 +796,7 @@
                "ACTIONS": "Acties",
                "DETAILS": "Details",
                "DESCRIPTION": "Beschrijving",
-               "MORE_INFO": "More Information",
+               "MORE_INFO": "Meer informatie",
                "ID": "ID",
                "TYPE": "Type",
                "TITLE": "Titel",
@@ -804,8 +804,8 @@
                "STARTED": "Gestart",
                "SERIES": "Series",
                "SUBMITTED": "Ingediend",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
+               "SUBMITTER": "Indiener",
+               "EXECUTION_TIME": "Uitvoeringstijd",
                "WDID": "Workflow definitie",
                "MIMETYPE": "Mimetype",
                "URL": "URL",
@@ -814,9 +814,9 @@
                "WORKFLOW": "Workflow",
                "TOOLTIP": {
                   "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
+                  "ABORT": "Uitvoering van de workflow afbreken (mislukte bewerking niet opnieuw proberen)",
+                  "RETRY": "Uitvoering van de workflow opnieuw proberen",
+                  "DELETE": "Verwijder workflow",
                   "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
@@ -1000,8 +1000,8 @@
                   "ACTION": "Acties",
                   "NEW": "Nieuwe policy",
                   "DETAILS": "Details",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
+                  "REPLACE_EVENT_ACLS": "Event permissies updaten",
+                  "REPLACE_EVENT_ACLS_HINT": "Zorg ervoor dat alle gebeurtenissen van deze serie deze machtigingen hebben"
                },
                "ROLES": {
                   "LABEL": "Selecteer een rol",
@@ -1947,7 +1947,7 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "Om meerdere waarden in te voegen, druk op Enter tussenin"
       }
    }
 }

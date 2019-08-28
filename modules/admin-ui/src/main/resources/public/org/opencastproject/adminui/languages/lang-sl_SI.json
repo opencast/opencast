@@ -827,7 +827,7 @@
                   "FAILED": "Ni uspelo",
                   "FAILING": "Failing",
                   "SKIPPED": "Izpuščen",
-                  "STOPPED": "Stopped",
+                  "STOPPED": "Ustavljeno",
                   "RETRY": "Ponovi"
                }
             },
