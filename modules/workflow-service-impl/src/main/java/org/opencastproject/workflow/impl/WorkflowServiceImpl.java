@@ -2342,51 +2342,60 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   @Override
   public void repopulate(final String indexName) throws ServiceRegistryException {
-    List<String> workflows =  serviceRegistry.getJobPayloads(Operation.START_WORKFLOW.toString());
+    final String startWorkflow = Operation.START_WORKFLOW.toString();
+    final int total = serviceRegistry.getJobCount(startWorkflow);
+    final int limit = 1000;
 
     final String destinationId = WorkflowItem.WORKFLOW_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
             + indexName.substring(1);
-    if (workflows.size() > 0) {
-      final int total = workflows.size();
+    if (total > 0) {
       logger.info("Populating index '{}' with {} workflows", indexName, total);
       final int responseInterval = (total < 100) ? 1 : (total / 100);
       int current = 0;
-      for (final String workflow : workflows) {
-        current += 1;
-        if (StringUtils.isEmpty(workflow)) {
-          logger.warn("Skipping restoring of workflow no {}: Payload is empty", current);
-          continue;
-        }
-        WorkflowInstance instance;
-        try {
-          instance = WorkflowParser.parseWorkflowInstance(workflow);
-        } catch (WorkflowParsingException e) {
-          logger.warn("Skipping restoring of workflow. Error parsing: {}", workflow, e);
-          continue;
-        }
-        Organization organization = null;
-        try {
-          organization = organizationDirectoryService.getOrganization(instance.getOrganizationId());
-        } catch (NotFoundException e) {
-          logger.error("Found workflow with non-existing organization {}", instance.getOrganizationId());
-          continue;
-        }
+      int offset = 0;
+      List<String> workflows;
+      do {
+        workflows = serviceRegistry.getJobPayloads(startWorkflow, limit, offset);
+        logger.debug("Got {} workflows for re-indexing", workflows.size());
+        offset += limit;
 
-        // get metadata for index update
-        final String dcXml = getEpisodeDublinCoreXml(instance.getMediaPackage());
-        final AccessControlList accessControlList = authorizationService.getActiveAcl(instance.getMediaPackage()).getA();
+        for (final String workflow : workflows) {
+          current += 1;
+          if (StringUtils.isEmpty(workflow)) {
+            logger.warn("Skipping restoring of workflow no {}: Payload is empty", current);
+            continue;
+          }
+          WorkflowInstance instance;
+          try {
+            instance = WorkflowParser.parseWorkflowInstance(workflow);
+          } catch (WorkflowParsingException e) {
+            logger.warn("Skipping restoring of workflow. Error parsing: {}", workflow, e);
+            continue;
+          }
+          Organization organization = null;
+          try {
+            organization = organizationDirectoryService.getOrganization(instance.getOrganizationId());
+          } catch (NotFoundException e) {
+            logger.error("Found workflow with non-existing organization {}", instance.getOrganizationId());
+            continue;
+          }
 
-        SecurityUtil.runAs(securityService, organization,
-                SecurityUtil.createSystemUser(componentContext, organization), () -> {
-                  // Send message to update index item
-                  messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                          WorkflowItem.updateInstance(instance, dcXml, accessControlList));
-                });
-        if ((current % responseInterval == 0) || (current == total)) {
-          logger.info("Updating {} workflow index {}/{}: {} percent complete.", indexName, current, total,
-                  current * 100 / total);
+          // get metadata for index update
+          final String dcXml = getEpisodeDublinCoreXml(instance.getMediaPackage());
+          final AccessControlList accessControlList = authorizationService.getActiveAcl(instance.getMediaPackage()).getA();
+
+          SecurityUtil.runAs(securityService, organization,
+                  SecurityUtil.createSystemUser(componentContext, organization), () -> {
+                    // Send message to update index item
+                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                            WorkflowItem.updateInstance(instance, dcXml, accessControlList));
+                  });
+          if ((current % responseInterval == 0) || (current == total)) {
+            logger.info("Updating {} workflow index {}/{}: {} percent complete.", indexName, current, total,
+                    current * 100 / total);
+          }
         }
-      }
+      } while (current < total);
     }
     logger.info("Finished populating {} index with workflows", indexName);
     Organization organization = new DefaultOrganization();
