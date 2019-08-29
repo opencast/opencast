@@ -90,8 +90,16 @@ nav:
       - Matomo Tracking: 'modules/player.matomo.tracking.md'
    - Paella player: 
       - Configuration: 'modules/paella.player/configuration.md'      
-      - Plugins: 'modules/paella.player/plugins.md'
       - URL Parameters: 'modules/paella.player/url.parameter.md'
+      - Paella plugins:
+        - Overview: 'modules/paella.player/plugins.md'
+        - es.upv.paella.opencast.descriptionPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.descriptionPlugin.md'
+        - es.upv.paella.opencast.downloadsPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.downloadsPlugin.md'
+        - es.upv.paella.opencast.episodesFromSeries: 'modules/paella.player/plugins/es.upv.paella.opencast.episodesFromSeries.md'
+        - es.upv.paella.opencast.logIn: 'modules/paella.player/plugins/es.upv.paella.opencast.logIn.md'
+        - es.upv.paella.opencast.searchPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.searchPlugin.md'
+        - es.upv.paella.opencast.transcriptionTabBarPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.transcriptionTabBarPlugin.md'
+        - es.upv.paella.opencast.userTrackingSaverPlugIn: 'modules/paella.player/plugins/es.upv.paella.opencast.userTrackingSaverPlugIn.md'
    - Search Index:
       - Overview: 'modules/searchindex/index.md'
       - Solr: 'modules/searchindex/solr.md'
