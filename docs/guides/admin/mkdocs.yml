@@ -88,7 +88,10 @@ nav:
       - Configuration: 'modules/player.configuration.md'
       - URL Parameters: 'modules/player.url.parameter.md'
       - Matomo Tracking: 'modules/player.matomo.tracking.md'
-   - Paella player: 'modules/paella.player.md'
+   - Paella player: 
+      - Configuration: 'modules/paella.player/configuration.md'      
+      - Plugins: 'modules/paella.player/plugins.md'
+      - URL Parameters: 'modules/paella.player/url.parameter.md'
    - Search Index:
       - Overview: 'modules/searchindex/index.md'
       - Solr: 'modules/searchindex/solr.md'
