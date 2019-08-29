@@ -31,7 +31,6 @@ import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.TrackImpl;
@@ -51,10 +50,10 @@ import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.ComponentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMException;
@@ -79,17 +78,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -108,6 +104,8 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   /** The key in the properties file that defines the streaming port. */
   protected static final String STREAMING_PORT_KEY = "org.opencastproject.streaming.port";
 
+  protected static final String STREAMING_DIRECTORY_KEY = "org.opencastproject.streaming.directory";
+
   /** The key in the properties file that defines the adaptive streaming url. */
   protected static final String ADAPTIVE_STREAMING_URL_KEY = "org.opencastproject.adaptive-streaming.url";
 
@@ -118,40 +116,40 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   protected static final String SMIL_ORDER_KEY = "org.opencastproject.adaptive-streaming.smil.order";
 
   /** One of the possible values for the order of the videos in the SMIL file */
-  protected static final String SMIL_ASCENDING_VALUE = "ascending";
+  private static final String SMIL_ASCENDING_VALUE = "ascending";
 
   /** One of the possible values for the order of the videos in the SMIL file */
-  protected static final String SMIL_DESCENDING_VALUE = "descending";
+  private static final String SMIL_DESCENDING_VALUE = "descending";
 
   /** The attribute "video-bitrate" in the SMIL files */
-  protected static final String SMIL_ATTR_VIDEO_BITRATE = "video-bitrate";
+  private static final String SMIL_ATTR_VIDEO_BITRATE = "video-bitrate";
 
   /** The attribute "video-width" in the SMIL files */
-  protected static final String SMIL_ATTR_VIDEO_WIDTH = "width";
+  private static final String SMIL_ATTR_VIDEO_WIDTH = "width";
 
   /** The attribute "video-height" in the SMIL files */
-  protected static final String SMIL_ATTR_VIDEO_HEIGHT = "height";
+  private static final String SMIL_ATTR_VIDEO_HEIGHT = "height";
 
   /** The attribute to return for Distribution Type */
-  protected static final String DISTRIBUTION_TYPE = "streaming";
+  private static final String DISTRIBUTION_TYPE = "streaming";
 
   /** Acceptable values for the streaming schemes */
-  protected static final Set<String> validStreamingSchemes;
-  protected static final Set<String> validAdaptiveStreamingSchemes;
-  protected static final Map<String, Integer> defaultProtocolPorts;
+  private static final Set<String> validStreamingSchemes;
+  private static final Set<String> validAdaptiveStreamingSchemes;
+  private static final Map<String, Integer> defaultProtocolPorts;
 
   static {
-    Set<String> temp = new HashSet<String>();
+    Set<String> temp = new HashSet<>();
     temp.add("rtmp");
     temp.add("rtmps");
     validStreamingSchemes = Collections.unmodifiableSet(temp);
 
-    temp = new HashSet<String>();
+    temp = new HashSet<>();
     temp.add("http");
     temp.add("https");
     validAdaptiveStreamingSchemes = Collections.unmodifiableSet(temp);
 
-    Map<String, Integer> tempMap = new HashMap<String, Integer>();
+    Map<String, Integer> tempMap = new HashMap<>();
     tempMap.put("rtmp", 1935);
     tempMap.put("rtmps", 443);
     tempMap.put("http", 80);
@@ -162,7 +160,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   /** Default scheme for streaming */
   protected static final String DEFAULT_STREAMING_SCHEME = "rtmp";
 
-  /** Default scheme for adaptative streaming */
+  /** Default scheme for adaptive streaming */
   protected static final String DEFAULT_ADAPTIVE_STREAMING_SCHEME = "http";
 
   /** Default streaming URL */
@@ -197,11 +195,8 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   /** The load on the system introduced by creating a retract job */
   private float retractJobLoad = DEFAULT_RETRACT_JOB_LOAD;
 
-  /** Default distribution directory */
-  public static final String DEFAULT_DISTRIBUTION_DIR = "opencast" + File.separator;
-
   /** The distribution directory */
-  protected File distributionDirectory = null;
+  private File distributionDirectory = null;
 
   /** The base URI for streaming */
   protected URI streamingUri = null;
@@ -227,23 +222,21 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
     super(JOB_TYPE);
   }
 
-  public void activate(ComponentContext cc) {
+  public void activate(BundleContext bundleContext) {
     // Get the configured streaming and server URLs
-    if (cc != null) {
+    if (bundleContext != null) {
 
-      String readStreamingUrl = StringUtils.trimToNull(cc.getBundleContext().getProperty(STREAMING_URL_KEY));
-      String readStreamingPort = StringUtils.trimToNull(cc.getBundleContext().getProperty(STREAMING_PORT_KEY));
-      String readAdaptiveStreamingUrl = StringUtils
-              .trimToNull(cc.getBundleContext().getProperty(ADAPTIVE_STREAMING_URL_KEY));
-      String readAdaptiveStreamingPort = StringUtils
-              .trimToNull(cc.getBundleContext().getProperty(ADAPTIVE_STREAMING_PORT_KEY));
+      String readStreamingUrl = StringUtils.trimToNull(bundleContext.getProperty(STREAMING_URL_KEY));
+      String readStreamingPort = StringUtils.trimToNull(bundleContext.getProperty(STREAMING_PORT_KEY));
+      String readAdaptiveStreamingUrl = StringUtils.trimToNull(bundleContext.getProperty(ADAPTIVE_STREAMING_URL_KEY));
+      String readAdaptiveStreamingPort = StringUtils.trimToNull(bundleContext.getProperty(ADAPTIVE_STREAMING_PORT_KEY));
 
       try {
         streamingUri = getStreamingUrl(readStreamingUrl, readStreamingPort, validStreamingSchemes,
                 DEFAULT_STREAMING_SCHEME, DEFAULT_STREAMING_URL);
         logger.info("Streaming URL set to \"{}\"", streamingUri);
       } catch (URISyntaxException e) {
-        logger.warn("Streaming URL {} could not be parsed", readStreamingUrl, e);
+        throw new ComponentException(String.format("Streaming URL %s could not be parsed", readStreamingUrl), e);
       }
 
       try {
@@ -251,36 +244,34 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
                 validAdaptiveStreamingSchemes, DEFAULT_ADAPTIVE_STREAMING_SCHEME, null);
         logger.info("Adaptive streaming URL set to \"{}\"", adaptiveStreamingUri);
       } catch (URISyntaxException e) {
-        logger.warn("Adaptive Streaming URL {} could not be parsed: {}", readAdaptiveStreamingUrl,
-                ExceptionUtils.getStackTrace(e));
+        throw new ComponentException(
+                String.format("Adaptive Streaming URL %s could not be parsed", readAdaptiveStreamingUrl), e);
       } catch (IllegalArgumentException e) {
         logger.info("Adaptive streaming URL was not defined in the configuration file");
       }
 
-      if ((adaptiveStreamingUri == null) && (streamingUri == null)) {
-        throw new IllegalArgumentException("Streaming URL and adaptive streaming URL are undefined.");
+      if (adaptiveStreamingUri == null && streamingUri == null) {
+        throw new ComponentException("Streaming URL and adaptive streaming URL are undefined.");
       }
 
-      String distributionDirectoryPath = StringUtils
-              .trimToNull(cc.getBundleContext().getProperty("org.opencastproject.streaming.directory"));
+      String distributionDirectoryPath = StringUtils.trimToNull(bundleContext.getProperty(STREAMING_DIRECTORY_KEY));
       if (distributionDirectoryPath == null) {
         // set default streaming directory to ${org.opencastproject.storage.dir}/streams
-        distributionDirectoryPath = StringUtils
-              .trimToNull(cc.getBundleContext().getProperty("org.opencastproject.storage.dir"));
+        distributionDirectoryPath = StringUtils.trimToNull(bundleContext.getProperty("org.opencastproject.storage.dir"));
         if (distributionDirectoryPath != null) {
           distributionDirectoryPath += "/streams";
         }
       }
-      if (distributionDirectoryPath == null)
-        logger.warn("Streaming distribution directory must be set (org.opencastproject.streaming.directory)");
-      else {
-        distributionDirectory = new File(distributionDirectoryPath);
-        if (!distributionDirectory.isDirectory()) {
-          try {
-            Files.createDirectories(distributionDirectory.toPath());
-          } catch (IOException e) {
-            throw new IllegalStateException("Distribution directory does not exist and can't be created", e);
-          }
+      if (distributionDirectoryPath == null) {
+        throw new ComponentException("Streaming distribution directory must be set");
+      }
+
+      distributionDirectory = new File(distributionDirectoryPath);
+      if (!distributionDirectory.isDirectory()) {
+        try {
+          Files.createDirectories(distributionDirectory.toPath());
+        } catch (IOException e) {
+          throw new ComponentException("Distribution directory does not exist and can't be created", e);
         }
       }
 
@@ -336,8 +327,8 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
    * @param formatString
    *          The string to parse with the supported formats.
    */
-  protected void setSupportedFormats(String formatString) {
-    supportedAdaptiveFormats = new TreeSet<StreamingProtocol>();
+  private void setSupportedFormats(String formatString) {
+    supportedAdaptiveFormats = new TreeSet<>();
 
     for (String format : formatString.toUpperCase().split("[\\s,]")) {
       if (!format.isEmpty()) {
@@ -357,13 +348,13 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   /**
    * Get the default set of supported formats to distribute to Wowza.
    */
-  protected void setDefaultSupportedFormats() {
+  private void setDefaultSupportedFormats() {
     isRTMPSupported = true;
-    supportedAdaptiveFormats = new TreeSet<StreamingProtocol>();
-    supportedAdaptiveFormats.add(TrackImpl.StreamingProtocol.HLS);
-    supportedAdaptiveFormats.add(TrackImpl.StreamingProtocol.HDS);
-    supportedAdaptiveFormats.add(TrackImpl.StreamingProtocol.SMOOTH);
-    supportedAdaptiveFormats.add(TrackImpl.StreamingProtocol.DASH);
+    supportedAdaptiveFormats = new TreeSet<>(Arrays.asList(
+            TrackImpl.StreamingProtocol.HLS,
+            TrackImpl.StreamingProtocol.HDS,
+            TrackImpl.StreamingProtocol.SMOOTH,
+            TrackImpl.StreamingProtocol.DASH));
   }
 
   /**
@@ -371,8 +362,8 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
    *
    * @throws URISyntaxException
    */
-  protected static URI getStreamingUrl(String inputUri, String inputPort, Set<String> validSchemes,
-          String defaultScheme, String defaultUri) throws URISyntaxException {
+  private static URI getStreamingUrl(String inputUri, String inputPort, Set<String> validSchemes, String defaultScheme,
+          String defaultUri) throws URISyntaxException {
 
     Integer port;
     try {
@@ -381,7 +372,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
       port = null;
     }
 
-    URI uri = null;
+    URI uri;
     if (StringUtils.isNotBlank(inputUri)) {
       uri = new URI(inputUri);
     } else if (StringUtils.isNotBlank(defaultUri)) {
@@ -406,7 +397,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
         throw new URISyntaxException(inputUri, "Provided URI has an illegal scheme");
     }
 
-    if ((port != null) && (port != defaultProtocolPorts.get(uriBuilder.build().getScheme()))) {
+    if ((port != null) && (!port.equals(defaultProtocolPorts.get(uriBuilder.build().getScheme())))) {
       uriBuilder.port(port);
     }
 
@@ -421,9 +412,9 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
    */
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
 
-    notNull(mediapackage, "mediapackage");
+    notNull(mediapackage, "mediaPackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
 
@@ -452,17 +443,16 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
    *      org.opencastproject.mediapackage.MediaPackage, String)
    */
   @Override
-  public Job distribute(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException, MediaPackageException {
-    Set<String> elmentIds = new HashSet();
-    elmentIds.add(elementId);
-    return distribute(channelId, mediapackage, elmentIds);
+  public Job distribute(final String channelId, final MediaPackage mediapackage, final String elementId)
+          throws DistributionException {
+    return distribute(channelId, mediapackage, new HashSet<>(Collections.singletonList(elementId)));
   }
 
   /**
-   * Distribute Mediapackage elements to the download distribution service.
+   * Distribute media package elements to the download distribution service.
    *
    * @param channelId The id of the publication channel to be distributed to.
-   * @param mediapackage The media package that contains the elements to be distributed.
+   * @param mediaPackage The media package that contains the elements to be distributed.
    * @param elementIds The ids of the elements that should be distributed
    * contained within the media package.
    * @return A reference to the MediaPackageElements that have been distributed.
@@ -470,84 +460,65 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
    * MediaPackageElement cannot be created, if the MediaPackageElement cannot be
    * copied or another unexpected exception occurs.
    */
-  public MediaPackageElement[] distributeElements(String channelId, MediaPackage mediapackage, Set<String> elementIds)
-    throws DistributionException {
-    notNull(mediapackage, "mediapackage");
+  private List<MediaPackageElement> distributeElements(final String channelId, final MediaPackage mediaPackage,
+          final Set<String> elementIds) throws DistributionException {
+    notNull(mediaPackage, "mediaPackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
 
-    final Set<MediaPackageElement> elements = getElements(mediapackage, elementIds);
     List<MediaPackageElement> distributedElements = new ArrayList<>();
-
-    for (MediaPackageElement element : elements) {
-      MediaPackageElement[] distributed = distributeElement(channelId, mediapackage, element.getIdentifier());
-      if (distributed != null) {
-        for (MediaPackageElement e : distributed) {
-          if (e != null) distributedElements.add(e);
-        }
-      }
+    for (MediaPackageElement element : getElements(mediaPackage, elementIds)) {
+      distributedElements.addAll(distributeElement(channelId, mediaPackage, element));
     }
-    return distributedElements.toArray(new MediaPackageElement[distributedElements.size()]);
+    return distributedElements;
   }
 
   /**
-   * Distribute a Mediapackage element to the download distribution service.
+   * Distribute a media package element to the download distribution service.
    *
-   * @param mediapackage
+   * @param mediaPackage
    *          The media package that contains the element to distribute.
-   * @param elementId
-   *          The id of the element that should be distributed contained within the media package.
-   * @return A reference to the MediaPackageElement that has been distributed.
+   * @param element
+   *          The element to be distributed
+   * @return A list of elements that have been distributed
    * @throws DistributionException
    *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
    *           cannot be copied or another unexpected exception occurs.
    */
-  public synchronized MediaPackageElement[] distributeElement(String channelId, final MediaPackage mediapackage, String elementId)
-          throws DistributionException {
-    notNull(mediapackage, "mediapackage");
-    notNull(elementId, "elementId");
-    notNull(channelId, "channelId");
+  private synchronized List<MediaPackageElement> distributeElement(final String channelId,
+          final MediaPackage mediaPackage, final MediaPackageElement element) throws DistributionException {
 
-    final MediaPackageElement element = mediapackage.getElementById(elementId);
-
-    // Make sure the element exists
-    if (element == null)
-      throw new IllegalStateException(
-              "No element " + elementId + " found in mediapackage" + mediapackage.getIdentifier());
+    if (!isRTMPSupported && supportedAdaptiveFormats.isEmpty()) {
+      logger.warn("Skipping distribution of element \"{}\" because no streaming format was specified", element);
+      return Collections.emptyList();
+    }
 
     // Streaming servers only deal with tracks
     if (!MediaPackageElement.Type.Track.equals(element.getElementType())) {
       logger.debug("Skipping {} {} for distribution to the streaming server",
-              element.getElementType().toString().toLowerCase(), element.getIdentifier());
-      return null;
+              element.getElementType(), element.getIdentifier());
+      return Collections.emptyList();
     }
 
     try {
       File source;
       try {
         source = workspace.get(element.getURI());
-      } catch (NotFoundException e) {
-        throw new DistributionException("Unable to find " + element.getURI() + " in the workspace", e);
-      } catch (IOException e) {
-        throw new DistributionException("Error loading " + element.getURI() + " from the workspace", e);
+      } catch (NotFoundException | IOException e) {
+        throw new DistributionException("Error getting element " + element.getURI() + " from the workspace", e);
       }
 
-      ArrayList<MediaPackageElement> distribution = new ArrayList<MediaPackageElement>();
-
-      if (!isRTMPSupported && supportedAdaptiveFormats.isEmpty()) {
-        logger.warn("Skipping distribution of element \"{}\" because no streaming format was specified", element);
-        return distribution.toArray(new MediaPackageElement[distribution.size()]);
-      }
+      ArrayList<MediaPackageElement> distribution = new ArrayList<>();
 
       // Put the file in place
 
-      File destination = getDistributionFile(channelId, mediapackage, element);
+      File destination = getDistributionFile(channelId, mediaPackage, element);
       try {
         Files.createDirectories(destination.toPath().getParent());
       } catch (IOException e) {
         throw new DistributionException("Unable to create " + destination.getParentFile(), e);
       }
-      logger.info("Distributing {} to {}", elementId, destination);
+      logger.info("Distributing {} to {}", element.getIdentifier(), destination);
 
       try {
         FileSupport.link(source, destination, true);
@@ -556,11 +527,11 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
       }
 
       if (isRTMPSupported) {
-        // Create a representation of the distributed file in the mediapackage
+        // Create a representation of the distributed file in the mediaPackage
         final MediaPackageElement distributedElement = (MediaPackageElement) element.clone();
 
         try {
-          distributedElement.setURI(getDistributionUri(channelId, mediapackage, element));
+          distributedElement.setURI(getDistributionUri(channelId, mediaPackage, element));
         } catch (URISyntaxException e) {
           throw new DistributionException("Distributed element produces an invalid URI", e);
         }
@@ -575,34 +546,28 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
       if ((!supportedAdaptiveFormats.isEmpty()) && isAdaptiveStreamingFormat(element)) {
         // Only if the Smil file does not exist we need to distribute adaptive streams
         // Otherwise the adaptive streams only were extended with new qualities
-        File smilFile = getSmilFile(element, mediapackage, channelId);
-        Boolean createAdaptiveStreamingEntries = !smilFile.isFile();
+        File smilFile = getSmilFile(element, mediaPackage, channelId);
         Document smilXml = getSmilDocument(smilFile);
-        addElementToSmil(smilXml, channelId, mediapackage, element);
+        addElementToSmil(smilXml, channelId, mediaPackage, element);
         URI smilUri = getSmilUri(smilFile);
 
-        if (createAdaptiveStreamingEntries) {
+        if (smilFile.isFile()) {
+          logger.debug("Skipped adding adaptive streaming manifest {} to search index, as it already exists.", element);
+        } else {
           for (StreamingProtocol protocol : supportedAdaptiveFormats) {
             distribution.add(createTrackforStreamingProtocol(element, smilUri, protocol));
             logger.info("Distributed element {} in {} format to the Wowza Server", element, protocol);
           }
-        } else {
-          logger.debug("Skipped adding adaptive streaming manifest {} to search index, as it already exists.", element);
         }
 
         saveSmilFile(smilFile, smilXml);
       }
 
       logger.info("Distributed file {} to Wowza Server", element);
-      return distribution.toArray(new MediaPackageElement[0]);
+      return distribution;
 
-    } catch (Exception e) {
-      logger.warn("Error distributing " + element, e);
-      if (e instanceof DistributionException) {
-        throw (DistributionException) e;
-      } else {
-        throw new DistributionException(e);
-      }
+    } catch (URISyntaxException e) {
+      throw new DistributionException("Error distributing " + element, e);
     }
   }
 
@@ -705,9 +670,6 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
       StreamResult stream = new StreamResult(smilFile);
       transformer.transform(source, stream);
       logger.info("SMIL file for Wowza server saved at {}", smilFile);
-    } catch (TransformerConfigurationException ex) {
-      logger.error("Could not write SMIL file {} for distribution", smilFile);
-      throw new DistributionException(format("Could not write SMIL file %s for distribution", smilFile));
     } catch (TransformerException ex) {
       logger.error("Could not write SMIL file {} for distribution", smilFile);
       throw new DistributionException(format("Could not write SMIL file %s for distribution", smilFile));
@@ -781,7 +743,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
     for (int i = 0; i < currentVideos.getLength(); i++) {
       Node current = currentVideos.item(i);
       if ("video".equals(current.getNodeName())) {
-        Float currentBitrate = Float
+        float currentBitrate = Float
                 .parseFloat(current.getAttributes().getNamedItem(SMIL_ATTR_VIDEO_BITRATE).getTextContent());
         if ((isSmilOrderDescending && (currentBitrate < bitrate))
                 || (!isSmilOrderDescending && (currentBitrate > bitrate))) {
@@ -835,9 +797,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
    */
   @Override
   public Job retract(String channelId, MediaPackage mediapackage, String elementId) throws DistributionException {
-    Set<String> elementIds = new HashSet();
-    elementIds.add(elementId);
-    return retract(channelId, mediapackage, elementIds);
+    return retract(channelId, mediapackage, new HashSet<>(Collections.singletonList(elementId)));
   }
 
   /**
@@ -862,28 +822,15 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   }
 
   @Override
-  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds)
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
       throws DistributionException {
-    MediaPackageElement[] result = distributeElements(channelId, mediapackage, elementIds);
-    if (result == null) {
-      return null;
-    }
-    return Arrays.stream(result)
-        .filter(Objects::nonNull)
-        .collect(Collectors.toList());
+    return distributeElements(channelId, mediaPackage, elementIds);
   }
 
   @Override
   public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
       throws DistributionException {
-    if (distributionDirectory == null || streamingUri == null && adaptiveStreamingUri == null) {
-      return null;
-    }
-    MediaPackageElement[] result = retractElements(channelId, mediaPackage, elementIds);
-    if (result == null) {
-      return null;
-    }
-    return Arrays.stream(result).filter(Objects::nonNull).collect(Collectors.toList());
+    return retractElements(channelId, mediaPackage, elementIds);
   }
 
   /**
@@ -893,117 +840,93 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
    *
    * @param channelId
    *          the channel id
-   * @param mediapackage
-   *          the mediapackage
+   * @param mediaPackage
+   *          the mediaPackage
    * @param elementIds
    *          the element identifiers
    * @return the retracted element or <code>null</code> if the element was not retracted
    * @throws org.opencastproject.distribution.api.DistributionException
    *           in case of an error
    */
-  protected MediaPackageElement[] retractElements(String channelId, MediaPackage mediapackage, Set<String> elementIds)
+  private List<MediaPackageElement> retractElements(String channelId, MediaPackage mediaPackage,
+          Set<String> elementIds)
           throws DistributionException {
-    notNull(mediapackage, "mediapackage");
+
+    if (distributionDirectory == null || (streamingUri == null || adaptiveStreamingUri == null)) {
+      logger.warn("Invalid configuration");
+      return Collections.emptyList();
+    }
+
+    notNull(mediaPackage, "mediaPackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
 
-    Set<MediaPackageElement> elements = getElements(mediapackage, elementIds);
     List<MediaPackageElement> retractedElements = new ArrayList<>();
-
-    for (MediaPackageElement element : elements) {
-      MediaPackageElement[] retracted = retractElement(channelId, mediapackage, element.getIdentifier());
-      if (retracted != null) {
-        for (MediaPackageElement e : retracted) {
-          if (e != null) retractedElements.add(e);
-        }
-      }
+    for (MediaPackageElement element: getElements(mediaPackage, elementIds)) {
+      retractedElements.addAll(retractElement(channelId, mediaPackage, element));
     }
-    return retractedElements.toArray(new MediaPackageElement[retractedElements.size()]);
+    return retractedElements;
   }
 
   /**
-   * Retracts the mediapackage with the given identifier from the distribution channel.
+   * Retracts the media package with the given identifier from the distribution channel.
    *
    * @param channelId
    *          the channel id
-   * @param mediapackage
-   *          the mediapackage
-   * @param elementId
-   *          the element identifier
+   * @param mediaPackage
+   *          the media package to retract the element from
+   * @param element
+   *          the element to retract
    * @return the retracted element or <code>null</code> if the element was not retracted
    */
-  protected MediaPackageElement[] retractElement(String channelId, final MediaPackage mediapackage, String elementId)
-          throws DistributionException {
+  private List<MediaPackageElement> retractElement(final String channelId, final MediaPackage mediaPackage,
+          final MediaPackageElement element) throws DistributionException {
 
-    notNull(mediapackage, "mediapackage");
-    notNull(elementId, "elementId");
-    notNull(channelId, "channelId");
-
-    // Make sure the element exists
-    final MediaPackageElement element = mediapackage.getElementById(elementId);
-    if (element == null)
-      throw new IllegalStateException(
-              "No element " + elementId + " found in mediapackage" + mediapackage.getIdentifier());
-
-    logger.debug("Start element retraction for element \"{}\" with URI {}", elementId, element.getURI());
-
-    ArrayList<MediaPackageElement> retractedElements = new ArrayList<MediaPackageElement>();
+    logger.debug("Retracting element {} with URI {}", element.getIdentifier(), element.getURI());
 
     // Has this element been distributed?
-    if (element == null || (!(element instanceof TrackImpl)))
-      return null;
-
-    try {
-      // Get the distribution path on the disk for this mediapackage element
-      File elementFile = getDistributionFile(channelId, mediapackage, element);
-      final File smilFile = getSmilFile(element, mediapackage, channelId);
-      logger.debug("delete elementFile {}", elementFile);
-
-      // Does the file exist? If not, the current element has not been distributed to this channel
-      // or has been removed otherwise
-      if (elementFile == null || !elementFile.exists()) {
-        logger.warn("Deleting element file: File does not exist. Perhaps was it already deleted?: {}", elementFile);
-        retractedElements.add(element);
-        return retractedElements.toArray(new MediaPackageElement[0]);
-      } else {
-        // If a SMIL file is referenced by this element, delete first all the elements within
-        if (elementFile.equals(smilFile)) {
-          Document smilXml = getSmilDocument(smilFile);
-          NodeList videoList = smilXml.getElementsByTagName("video");
-          for (int i = 0; i < videoList.getLength(); i++) {
-            if (videoList.item(i) instanceof Element) {
-              String smilPathStr = ((Element) videoList.item(i)).getAttribute("src");
-              // Patch the streaming tags
-              if (smilPathStr.contains("mp4:"))
-                smilPathStr = smilPathStr.replace("mp4:", "");
-              if (!smilPathStr.endsWith(".mp4"))
-                smilPathStr += ".mp4";
-
-              elementFile = smilFile.toPath().resolveSibling(smilPathStr).toFile();
-              deleteElementFile(elementFile);
-            }
-          }
-
-          if (smilFile.isFile() && !smilFile.delete()) {
-            logger.warn("The SMIL file {} could not be succesfully deleted. Forcing quite deletion...");
-          }
-        } else {
-          deleteElementFile(elementFile);
-        }
-
-      }
-
-      logger.info("Finished rectracting element {} of media package {}", elementId, mediapackage);
-      retractedElements.add(element);
-      return retractedElements.toArray(new MediaPackageElement[0]);
-    } catch (Exception e) {
-      logger.warn("Error retracting element " + elementId + " of mediapackage " + mediapackage, e);
-      if (e instanceof DistributionException) {
-        throw (DistributionException) e;
-      } else {
-        throw new DistributionException(e);
-      }
+    if (!(element instanceof TrackImpl)) {
+      return Collections.emptyList();
     }
+
+    // Get the distribution path on the disk for this mediaPackage element
+    final File elementFile = getDistributionFile(channelId, mediaPackage, element);
+    final File smilFile = getSmilFile(element, mediaPackage, channelId);
+    logger.debug("Deleting file {}", elementFile);
+
+    // Does the file exist? If not, the current element has not been distributed to this channel
+    // or has been removed otherwise
+    if (elementFile == null || !elementFile.exists()) {
+      logger.warn("{} does not exist but was to be deleted", elementFile);
+      return Collections.singletonList(element);
+    }
+
+    // If a SMIL file is referenced by this element, delete first all the elements within
+    if (elementFile.equals(smilFile)) {
+      Document smilXml = getSmilDocument(smilFile);
+      NodeList videoList = smilXml.getElementsByTagName("video");
+      for (int i = 0; i < videoList.getLength(); i++) {
+        if (videoList.item(i) instanceof Element) {
+          String smilPathStr = ((Element) videoList.item(i)).getAttribute("src");
+          // Patch the streaming tags
+          if (smilPathStr.contains("mp4:"))
+            smilPathStr = smilPathStr.replace("mp4:", "");
+          if (!smilPathStr.endsWith(".mp4"))
+            smilPathStr += ".mp4";
+
+          deleteElementFile(smilFile.toPath().resolveSibling(smilPathStr).toFile());
+        }
+      }
+
+      if (smilFile.isFile() && !smilFile.delete()) {
+        logger.warn("The SMIL file {} could not be successfully deleted.", smilFile);
+      }
+    } else {
+      deleteElementFile(elementFile);
+    }
+
+    logger.info("Finished retracting element {} of media package {}", element, mediaPackage);
+    return Collections.singletonList(element);
   }
 
   /**
@@ -1049,12 +972,11 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   }
 
   /**
-   * Gets the destination file to copy the contents of a mediapackage element.
+   * Gets the destination file to copy the contents of a media package element.
    *
    * @return The file to copy the content to
    */
-  protected File getDistributionFile(String channelId, MediaPackage mediapackage, MediaPackageElement element)
-          throws DistributionException {
+  private File getDistributionFile(String channelId, MediaPackage mediapackage, MediaPackageElement element) {
 
     final String orgId = securityService.getOrganization().getId();
     final Path distributionPath = distributionDirectory.toPath().resolve(orgId);
@@ -1066,7 +988,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
       if (relativeUri != elementUri) {
         // SMIL file
 
-        // Get the relativized URL path
+        // Get the relative URL path
         String uriPath = relativeUri.getPath();
         // Remove the last part (corresponds to the part of the "virtual" manifests)
         uriPath = uriPath.substring(0, uriPath.lastIndexOf('/'));
@@ -1118,8 +1040,8 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
    *
    * @return the filesystem directory
    */
-  protected File getMediaPackageDirectory(String channelId, MediaPackage mediaPackage) {
-    String orgId = securityService.getOrganization().getId();
+  private File getMediaPackageDirectory(String channelId, MediaPackage mediaPackage) {
+    final String orgId = securityService.getOrganization().getId();
     return distributionDirectory.toPath().resolve(Paths.get(orgId, channelId, mediaPackage.getIdentifier().compact()))
             .toFile();
   }
@@ -1129,7 +1051,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
    *
    * @return the filesystem directory
    */
-  protected File getElementDirectory(String channelId, MediaPackage mediaPackage, String elementId) {
+  private File getElementDirectory(String channelId, MediaPackage mediaPackage, String elementId) {
     return new File(getMediaPackageDirectory(channelId, mediaPackage), elementId);
   }
 
@@ -1140,7 +1062,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
    * @throws URISyntaxException
    *           if the concrete implementation tries to create a malformed uri
    */
-  protected URI getDistributionUri(String channelId, MediaPackage mp, MediaPackageElement element)
+  private URI getDistributionUri(String channelId, MediaPackage mp, MediaPackageElement element)
           throws URISyntaxException {
     String elementId = element.getIdentifier();
     String fileName = FilenameUtils.getBaseName(element.getURI().toString());
@@ -1158,11 +1080,8 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
    * Gets the URI for the element to be distributed.
    *
    * @return The resulting URI after distributionthFromSmil
-   * @throws URISyntaxException
-   *           if the concrete implementation tries to create a malformed uri
    */
-  protected String getAdaptiveDistributionName(String channelId, MediaPackage mp, MediaPackageElement element)
-          throws URISyntaxException {
+  private String getAdaptiveDistributionName(String channelId, MediaPackage mp, MediaPackageElement element) {
     String elementId = element.getIdentifier();
     String fileName = FilenameUtils.getBaseName(element.getURI().toString());
     String tag = FilenameUtils.getExtension(element.getURI().toString()) + ":";
@@ -1170,8 +1089,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
     // removes the tag for flv files, but keeps it for all others (mp4 needs it)
     if ("flv:".equals(tag))
       tag = "";
-    String result = tag + channelId + "/" + mp.getIdentifier().compact() + "/" + elementId + "/" + fileName;
-    return result;
+    return tag + channelId + "/" + mp.getIdentifier().compact() + "/" + elementId + "/" + fileName;
   }
 
   /**
@@ -1190,49 +1108,22 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
       MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(1));
       Set<String> elementIds = gson.fromJson(arguments.get(2), new TypeToken<Set<String>>() {
       }.getType());
+
+      List<MediaPackageElement> elements;
       switch (op) {
         case Distribute:
-          MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds);
-          if (logger.isDebugEnabled() && distributedElements != null) {
-            for (MediaPackageElement element : distributedElements)
-              if (element != null)
-                logger.debug("Distributed element {} with URL {}", element.getIdentifier(), element.getURI());
-          }
-          ArrayList<MediaPackageElement> distributedElementsList = new ArrayList<MediaPackageElement>();
-          if (distributedElements != null) {
-            for (int i = 0; i < distributedElements.length; i++) {
-              if (distributedElements[i] != null) distributedElementsList.add(distributedElements[i]);
-            }
-          }
-          return (! distributedElementsList.isEmpty())
-                  ? MediaPackageElementParser.getArrayAsXml(distributedElementsList) : null;
+          elements = distributeElements(channelId, mediapackage, elementIds);
+          break;
         case Retract:
-          MediaPackageElement[] retractedElements = null;
-          if (distributionDirectory != null) {
-            if (streamingUri != null || adaptiveStreamingUri != null) {
-              retractedElements = retractElements(channelId, mediapackage, elementIds);
-              if (logger.isDebugEnabled() && retractedElements != null) {
-                for (MediaPackageElement element : retractedElements)
-                  if (element != null)
-                    logger.debug("Retracted element {} with URL {}", element.getIdentifier(), element.getURI());
-              }
-            }
-          }
-          ArrayList<MediaPackageElement> retractedElementsList = new ArrayList<MediaPackageElement>();
-          if (retractedElements != null) {
-            for (MediaPackageElement element: retractedElements) {
-              if (element != null) {
-                retractedElementsList.add(element);
-              }
-            }
-          }
-          return (! retractedElementsList.isEmpty())
-                  ? MediaPackageElementParser.getArrayAsXml(retractedElementsList) : null;
+          elements = retractElements(channelId, mediapackage, elementIds);
+          break;
         default:
-          throw new IllegalStateException("Don't know how to handle operation '" + operation + "'");
+          throw new ServiceRegistryException("This service can't handle operations of type '" + op + "'");
       }
-    } catch (IllegalArgumentException e) {
-      throw new ServiceRegistryException("This service can't handle operations of type '" + op + "'", e);
+      if (!elements.isEmpty()) {
+        return MediaPackageElementParser.getArrayAsXml(elements);
+      }
+      return null;
     } catch (IndexOutOfBoundsException e) {
       throw new ServiceRegistryException("This argument list for operation '" + op + "' does not meet expectations", e);
     } catch (Exception e) {
@@ -1244,11 +1135,11 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
           throws IllegalStateException {
     final Set<MediaPackageElement> elements = new HashSet<>();
     for (String elementId : elementIds) {
-       MediaPackageElement element = mediapackage.getElementById(elementId);
+       final MediaPackageElement element = mediapackage.getElementById(elementId);
        if (element != null) {
          elements.add(element);
        } else {
-         logger.debug("No element " + elementId + " found in mediapackage " + mediapackage.getIdentifier());
+         logger.debug("No element " + elementId + " found in media package " + mediapackage.getIdentifier());
        }
     }
     return elements;
