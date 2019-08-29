@@ -2382,7 +2382,16 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
           // get metadata for index update
           final String dcXml = getEpisodeDublinCoreXml(instance.getMediaPackage());
-          final AccessControlList accessControlList = authorizationService.getActiveAcl(instance.getMediaPackage()).getA();
+
+          // get acl for active workflows.
+          // don't try this for terminated workflows since the ACLs are no longer in the working file repository and
+          // they will be overwritten later in the re-indexing process by ACLs from the asset manager anyway.
+          final AccessControlList accessControlList;
+          if (instance.getState().isTerminated()) {
+            accessControlList = new AccessControlList();
+          } else {
+            accessControlList = authorizationService.getActiveAcl(instance.getMediaPackage()).getA();
+          }
 
           SecurityUtil.runAs(securityService, organization,
                   SecurityUtil.createSystemUser(componentContext, organization), () -> {
