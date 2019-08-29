@@ -21,7 +21,8 @@
 'use strict';
 
 angular.module('adminNg.resources')
-.factory('NewEventResource', ['$resource', 'JsHelper', function ($resource, JsHelper) {
+.factory('NewEventResource', ['$resource', 'JsHelper', 'ProgressBar', function ($resource, JsHelper, ProgressBar) {
+
   return $resource('/admin-ng/event/new', {}, {
     save: {
       method: 'POST',
@@ -33,9 +34,21 @@ angular.module('adminNg.resources')
       // of the request.
       headers: { 'Content-Type': undefined },
 
+      //Track file upload progress
+      uploadEventHandlers: {
+        progress: function(event) {
+          if (event.loaded && event.loaded < event.total) {
+            ProgressBar.onUploadFileProgress(event);
+          }
+        }
+      },
+
       responseType: 'text',
 
-      transformResponse: [],
+      transformResponse: function () {
+        // Update ProgressBar service
+        ProgressBar.reset();
+      },
 
       transformRequest: function (data) {
 
@@ -175,3 +188,4 @@ angular.module('adminNg.resources')
     }
   });
 }]);
+
