@@ -308,8 +308,14 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
 
     CompositeSettings(MediaPackage mediaPackage, WorkflowOperationInstance operation)
             throws WorkflowOperationException {
-      // Check which tags have been configured
+
       sourceAudioName = StringUtils.trimToNull(operation.getConfiguration(SOURCE_AUDIO_NAME));
+      if (sourceAudioName == null) {
+        sourceAudioName = ComposerService.BOTH; // default
+      } else if (!sourceAudioOption.matcher(sourceAudioName).matches()) {
+        throw new WorkflowOperationException("sourceAudioName if used, must be either upper, lower or both!");
+      }
+
       sourceTagsUpper = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_UPPER));
       sourceFlavorUpper = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR_UPPER));
       sourceTagsLower = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_LOWER));
@@ -353,10 +359,6 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         singleSourceLayout = singleLayouts.getA();
         watermarkLayout = singleLayouts.getB();
       }
-
-      // Check that source audio is upper, lower or use a combination of both
-      if (sourceAudioName != null && !sourceAudioOption.matcher(sourceAudioName).matches())
-        throw new WorkflowOperationException("sourceAudioName if used, must be either upper, lower or both!");
 
       // Find the encoding profile
       if (encodingProfile == null)
