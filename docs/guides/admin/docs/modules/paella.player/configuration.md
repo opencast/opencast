@@ -36,3 +36,9 @@ For the default `mh_default_org` tenant file is located at `.../ui-config/mh_def
 
 For more information about the configuration format options, see the the paella [documentation page](https://paellaplayer.upv.es/docs/)
 
+
+Tracks to be played
+-------------------
+
+An event can have many tracks, but an institution can configure which of these tracks are played and which are not.
+To do it, you need to configure [es.upv.paella.opencast.loader](plugins/es.upv.paella.opencast.loader.md) plugin.

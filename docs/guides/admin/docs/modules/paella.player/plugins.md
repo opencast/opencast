@@ -38,6 +38,7 @@ Plugin                                             | Description
 [es.upv.paella.opencast.descriptionPlugin](plugins/es.upv.paella.opencast.descriptionPlugin.md)                 | Adds a panel with the video description information.
 [es.upv.paella.opencast.downloadsPlugin](plugins/es.upv.paella.opencast.downloadsPlugin.md)                     | Adds a panel to download the videos. 
 [es.upv.paella.opencast.episodesFromSeries](plugins/es.upv.paella.opencast.episodesFromSeries.md)               | Show a list of videos in the same series.
+[es.upv.paella.opencast.loader](plugins/es.upv.paella.opencast.loader.md)                                       | Configures how events are loaded into paella player.
 [es.upv.paella.opencast.logIn](plugins/es.upv.paella.opencast.logIn.md)                                         | Adds a button to be able to login.
 [es.upv.paella.opencast.searchPlugin](plugins/es.upv.paella.opencast.searchPlugin.md)                           | Enable searches using the OCR trascription.
 [es.upv.paella.opencast.transcriptionTabBarPlugin](plugins/es.upv.paella.opencast.transcriptionTabBarPlugin.md) | Adds a panel to show the OCR transcriptios.
