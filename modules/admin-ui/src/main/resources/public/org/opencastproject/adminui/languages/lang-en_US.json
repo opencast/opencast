@@ -2005,7 +2005,7 @@
       "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
       "VIEWS_SUM": "This displays the total number of views per time unit.",
       "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-      "PUBLISHEDHOURS": "This displays the running total published hours of video"
+      "PUBLISHEDHOURS": "This displays the published hours of video"
     }
   }
 }
