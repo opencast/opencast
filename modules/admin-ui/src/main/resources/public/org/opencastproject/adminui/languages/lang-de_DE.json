@@ -482,6 +482,7 @@
             "PUBLISHED": "Veröffentlicht",
             "WEEKDAY": "Wochentag",
             "TOOLTIP": {
+               "ASSETS": "Assets anzeigen",
                "START": "Nach diesem Startdatum filtern",
                "SERIES": "Nach dieser Serie filtern",
                "STATUS": "Nach diesem Verarbeitungsstatus filtern",
