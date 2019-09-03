@@ -2362,14 +2362,14 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         for (final String workflow : workflows) {
           current += 1;
           if (StringUtils.isEmpty(workflow)) {
-            logger.warn("Skipping restoring of workflow no {}: Payload is empty", current);
+            logger.warn("Skipping restore of workflow #{}: Payload is empty", current);
             continue;
           }
           WorkflowInstance instance;
           try {
             instance = WorkflowParser.parseWorkflowInstance(workflow);
           } catch (WorkflowParsingException e) {
-            logger.warn("Skipping restoring of workflow. Error parsing: {}", workflow, e);
+            logger.warn("Skipping restore of workflow. Error parsing: {}", workflow, e);
             continue;
           }
           Organization organization = null;
