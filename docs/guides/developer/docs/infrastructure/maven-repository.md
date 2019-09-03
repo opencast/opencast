@@ -93,7 +93,7 @@ transitioning to using Maven Central.  There are a few steps prior to being able
 
 - Create a GPG key, and push the public key to a key server
 - Sign up for an account on [Sonatype's JIRA instance](https://issues.sonatype.org)
-- Let the QA Coordinator know about your user, they will comment on [on our repo creation ticket](https://issues.sonatype.org/browse/OSSRH-36510) or create a new issue to give your user permissions
+- Let the QA Coordinator know about your user, they will comment on [our repo creation ticket](https://issues.sonatype.org/browse/OSSRH-36510) or create a new issue to give your user permissions
 - Put the following in your `.m2/settings.xml` file
 
 ```xml
