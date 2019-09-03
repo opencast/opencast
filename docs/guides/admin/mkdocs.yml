@@ -96,6 +96,7 @@ nav:
         - es.upv.paella.opencast.descriptionPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.descriptionPlugin.md'
         - es.upv.paella.opencast.downloadsPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.downloadsPlugin.md'
         - es.upv.paella.opencast.episodesFromSeries: 'modules/paella.player/plugins/es.upv.paella.opencast.episodesFromSeries.md'
+        - es.upv.paella.opencast.loader: 'modules/paella.player/plugins/es.upv.paella.opencast.loader.md'
         - es.upv.paella.opencast.logIn: 'modules/paella.player/plugins/es.upv.paella.opencast.logIn.md'
         - es.upv.paella.opencast.searchPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.searchPlugin.md'
         - es.upv.paella.opencast.transcriptionTabBarPlugin: 'modules/paella.player/plugins/es.upv.paella.opencast.transcriptionTabBarPlugin.md'
