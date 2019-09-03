@@ -30,9 +30,9 @@ Configuration
 -------------
 
 The configurations for the paella player are done for each tenant. The paella configuration files are located in
-`.../ui-config/<tenant_id>/paella/config.json`.
+`.../etc/ui-config/<tenant_id>/paella/config.json`.
 
-For the default `mh_default_org` tenant file is located at `.../ui-config/mh_default_org/paella/config.json`.
+For the default `mh_default_org` tenant file is located at `.../etc/ui-config/mh_default_org/paella/config.json`.
 
 For more information about the configuration format options, see the the paella [documentation page](https://paellaplayer.upv.es/docs/)
 
