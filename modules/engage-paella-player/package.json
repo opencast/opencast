@@ -10,6 +10,6 @@
     "eslint-plugin-header": "^3.0.0",
     "gulp": "^4.0.2",
     "merge-stream": "^2.0.0",
-    "paellaplayer": "github:polimediaupv/paella#6.1.5"
+    "paellaplayer": "github:polimediaupv/paella#6.2.0"
   }
 }
