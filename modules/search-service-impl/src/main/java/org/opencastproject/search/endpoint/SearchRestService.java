@@ -152,7 +152,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.BOOLEAN),
           @RestParameter(defaultValue = "true", description = "If results are to be signed", isRequired = false,
               name = "sign", type = RestParameter.Type.BOOLEAN)
-    }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json.")
+    }, reponses = { @RestResponse(description = "The request was processed successfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, formatted as XML or JSON.")
   public Response getEpisodeAndSeriesById(
       @QueryParam("id")       String  id,
       @QueryParam("q")        String  text,
@@ -243,7 +243,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.BOOLEAN),
           @RestParameter(defaultValue = "true", description = "If results are to be signed", isRequired = false,
               name = "sign", type = RestParameter.Type.BOOLEAN)
-  }, reponses = { @RestResponse(description = "The request was processed successfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json.")
+  }, reponses = { @RestResponse(description = "The request was processed successfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, formatted as xml or json.")
   public Response getEpisode(@QueryParam("id") String id, @QueryParam("q") String text,
           @QueryParam("sid") String seriesId, @QueryParam("sort") String sort, @QueryParam("tag") String[] tags, @QueryParam("flavor") String[] flavors,
           @QueryParam("limit") int limit, @QueryParam("offset") int offset, @QueryParam("admin") boolean admin,
@@ -329,7 +329,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           @RestParameter(defaultValue = "false", description = "Whether this is an administrative query", isRequired = false, name = "admin", type = RestParameter.Type.BOOLEAN),
           @RestParameter(defaultValue = "true", description = "If results are to be signed", isRequired = false,
               name = "sign", type = RestParameter.Type.BOOLEAN)
-    }, reponses = { @RestResponse(description = "The request was processed succesfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, expressed as xml or json")
+    }, reponses = { @RestResponse(description = "The request was processed successfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, formatted as xml or json")
   public Response getByLuceneQuery(@QueryParam("q") String q, @QueryParam("sort") String sort, @QueryParam("limit") int limit,
           @QueryParam("offset") int offset, @QueryParam("admin") boolean admin,
           @QueryParam("sign") String sign, @PathParam("format") String format)
