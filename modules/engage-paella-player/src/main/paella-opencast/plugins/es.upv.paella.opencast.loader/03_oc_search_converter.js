@@ -95,7 +95,7 @@ class OpencastToPaellaConverter {
           break;
         case 'audio/m4a':
           sourceType = 'audio';
-            break;  
+          break;
         default:
           paella.debug.log(`OpencastToPaellaConverter: MimeType (${track.mimetype}) not supported!`);
           break;
@@ -164,8 +164,8 @@ class OpencastToPaellaConverter {
         }
       });
     }
-    
-    return audioTag
+
+    return audioTag;
   }
 
   /**
@@ -197,10 +197,10 @@ class OpencastToPaellaConverter {
           currentStream.sources[sourceType].push(this.getStreamSourceFromTrack(currentTrack));
 
           if (currentTrack.video) {
-            currentStream.type="video";
+            currentStream.type = 'video';
           }
           else if (currentTrack.audio) {
-            currentStream.type="audio";
+            currentStream.type = 'audio';
           }
         }
       }
