@@ -6,6 +6,10 @@ This plugin configures how events are loaded into paella player.
 The configurations for this plugin are done for each tenant. So you need to modify the `plugins`
 section of the [paella config file](../configuration.md).
 
+
+Control which flavors to play
+-----------------------------
+
 An event can have many tracks, but an institution can configure which of these tracks are played and which are not.
 
 To do it, you need to configure the `streams` property. The `streams` property is an array of rules. The first that
@@ -40,10 +44,36 @@ Example:
 ```
 
 
+Multiple audio tracks
+---------------------
+
+An event can have multiple audio tracks. Paella only plays one at a time, but you can configure paella 
+to allow the user to decide which one to play. 
+
+You need to configure the `audioTag` property. It is an object where the *key* is the flavor to configure
+and the *value* is the label that will be shown in the player interface.
+
+Example:
+
+Your mediapackage has three audio tracks for english, spanish and german languages
+
+```json
+{
+    "audioTag": {
+        "audio_en/delivery" : "en",
+        "audio_es/delivery" : "es",
+        "audio_de/delivery" : "de"
+    }
+}
+```
+
+
+
 Examples
 --------
 
-An institution whant to play only `*/delivery` media tracks
+An institution whant to play only `*/delivery` media tracks and has two audio tracks for 
+english and spanish languages
 
 ```json
 {
@@ -58,7 +88,11 @@ An institution whant to play only `*/delivery` media tracks
                     "tags": []
                 }
             }
-        ]
+        ],
+        "audioTag": {
+            "audio_en/delivery" : "en",
+            "audio_es/delivery" : "es"
+        }
     }    
 }
 ```
@@ -88,7 +122,9 @@ and `presenter/delivery` and `presentation/delivery` on the other devices
                     "tags": []
                 }
             }
-        ]
+        ],
+        "audioTag": {
+        }
     }    
 }
 ```
