@@ -74,6 +74,10 @@ live.mimeType=video/x-flv
 
 # The distribution service to use: download or aws.s3
 live.distributionService=download
+
+# A list of combinations with target flavor and resolution for which streaming URIs should be published.
+# Default is an empty list
+# live.publishStreaming=presenter/delivery:1920x540
 ```
 
 ### Step 2: Configure the capture agent

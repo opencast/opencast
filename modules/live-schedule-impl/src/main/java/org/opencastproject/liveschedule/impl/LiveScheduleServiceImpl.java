@@ -83,10 +83,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -130,6 +133,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   public static final String LIVE_STREAM_RESOLUTION = "live.resolution";
   public static final String LIVE_TARGET_FLAVORS = "live.targetFlavors";
   public static final String LIVE_DISTRIBUTION_SERVICE = "live.distributionService";
+  public static final String LIVE_PUBLISH_STREAMING = "live.publishStreaming";
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LiveScheduleServiceImpl.class);
@@ -142,6 +146,8 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   private String distributionServiceType = DEFAULT_LIVE_DISTRIBUTION_SERVICE;
   private String serverUrl;
   private Cache<String, Version> snapshotVersionCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
+  /** Which streaming formats should be published automatically */
+  private List<String> publishedStreamingFormats = null;
 
   /** Services */
   private DownloadDistributionService downloadDistributionService; // to distribute episode and series catalogs
@@ -217,6 +223,8 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     if (!StringUtils.isBlank((String) properties.get(LIVE_DISTRIBUTION_SERVICE))) {
       distributionServiceType = StringUtils.trimToEmpty((String) properties.get(LIVE_DISTRIBUTION_SERVICE));
     }
+    publishedStreamingFormats = Arrays.asList(Optional.ofNullable(StringUtils.split(
+            (String)properties.get(LIVE_PUBLISH_STREAMING), ",")).orElse(new String[0]));
 
     logger.info(
             "Configured live stream name: {}, mime type: {}, resolution: {}, target flavors: {}, distribution service: {}",
@@ -292,7 +300,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       // Set duration (used by live tracks)
       setDuration(tempMp, episodeDC);
       // Add live tracks to media package
-      addLiveTracks(tempMp, episodeDC.getFirst(DublinCore.PROPERTY_SPATIAL));
+      Map<String, Track> generatedTracks = addLiveTracks(tempMp, episodeDC.getFirst(DublinCore.PROPERTY_SPATIAL));
       // Add and distribute catalogs/acl, this creates a new mp object
       MediaPackage mp = addAndDistributeElements(snapshot);
       // Add tracks from tempMp
@@ -308,7 +316,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
         logger.warn("Organization in snapshot not found: {}", snapshot.getOrganizationId());
       }
       MediaPackage archivedMp = snapshot.getMediaPackage();
-      addLivePublicationChannel(currentOrg, archivedMp);
+      addLivePublicationChannel(currentOrg, archivedMp, generatedTracks);
       // Take a snapshot with the publication added and put its version in our local cache
       // so that we ignore notifications for this snapshot version.
       snapshotVersionCache.put(mpId, assetManager.takeSnapshot(archivedMp).getVersion());
@@ -419,7 +427,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
    * @param mediaPackageId
    *          the media package id
    * @return the media package in the search index or null if not there
-   * @throws LiveException
+   * @throws LiveScheduleException
    *           if found many media packages with the same id
    */
   MediaPackage getMediaPackageFromSearch(String mediaPackageId) throws LiveScheduleException {
@@ -444,7 +452,8 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
             mp.getDuration());
   }
 
-  void addLiveTracks(MediaPackage mp, String caName) throws LiveScheduleException {
+  Map<String, Track> addLiveTracks(MediaPackage mp, String caName) throws LiveScheduleException {
+    HashMap<String, Track> generatedTracks = new HashMap<String, Track>();
     String mpId = mp.getIdentifier().compact();
     try {
       // If capture agent registered the properties:
@@ -482,13 +491,16 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
           for (int i = 0; i < streamResolution.length; i++) {
             String uri = replaceVariables(mpId, caName, UrlSupport.concat(liveStreamingUrl.toString(), streamName),
                     flavor, streamResolution[i]);
-            mp.add(buildStreamingTrack(uri, flavor, streamMimeType, streamResolution[i], mp.getDuration()));
+            Track track = buildStreamingTrack(uri, flavor, streamMimeType, streamResolution[i], mp.getDuration());
+            mp.add(track);
+            generatedTracks.put(flavor + ":" + streamResolution[i], track);
           }
         }
       }
     } catch (URISyntaxException e) {
       throw new LiveScheduleException(e);
     }
+    return generatedTracks;
   }
 
   Track buildStreamingTrack(String uriString, MediaPackageElementFlavor flavor, String mimeType, String resolution,
@@ -674,7 +686,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
   }
 
-  void addLivePublicationChannel(Organization currentOrg, MediaPackage mp) throws LiveScheduleException {
+  void addLivePublicationChannel(Organization currentOrg, MediaPackage mp, Map<String, Track> generatedTracks) throws LiveScheduleException {
     logger.debug("Adding live channel publication element to media package {}", mp);
     String engageUrlString = null;
     if (currentOrg != null) {
@@ -692,6 +704,12 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       URI engageUri = URIUtils.resolve(new URI(engageUrlString), PLAYER_PATH + mp.getIdentifier().compact());
       Publication publicationElement = PublicationImpl.publication(UUID.randomUUID().toString(), CHANNEL_ID, engageUri,
               MimeTypes.parseMimeType("text/html"));
+      for (String publishedStreamingFormat : publishedStreamingFormats) {
+        Track track = generatedTracks.get(publishedStreamingFormat);
+        if (track != null) {
+          publicationElement.addTrack(track);
+        }
+      }
       mp.add(publicationElement);
     } catch (URISyntaxException e) {
       throw new LiveScheduleException(e);
