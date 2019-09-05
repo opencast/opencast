@@ -366,12 +366,13 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   }
 
   private void createOrUpdatePublicationTracks(Publication publication, Map<String, Track> generatedTracks) {
+    if (publication.getTracks().length > 0) {
+      publication.clearTracks();
+    }
+
     for (String publishedStreamingFormat : publishedStreamingFormats) {
       Track track = generatedTracks.get(publishedStreamingFormat);
       if (track != null) {
-        if (publication.getTracks().length > 0) {
-          publication.clearTracks();
-        }
         publication.addTrack(track);
       }
     }
