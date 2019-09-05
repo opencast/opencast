@@ -20,51 +20,37 @@
 # check if http or https port is available to run opencast otherwise exit
 
 PROGNAME=$(basename "$0")
+nargs=$#
 
-if [ "$PROGNAME" = "start-opencast" ]; then
-
-  if [ -d "$1" ]; then
-    SETENV_ETC="$1"
+if [ "$PROGNAME" = "start-opencast" ] && [ "$nargs" -eq "0" ]; then
+  if [ -d "$KARAF_ETC" ]; then
+    SETENV_ETC="$KARAF_ETC"
   else
     if [ -d "${KARAF_BASE}" ]; then
       SETENV_ETC="${KARAF_BASE}/etc"
     else
-      SETENV_ETC="etc"
+      SETENV_ETC="${DIRNAME}/../etc"
     fi
   fi
 
   check_port() {
-    a="$1"
-    if [ "$a" -eq "$a" ] 2>/dev/null ; then
-      port="$a"
-      hexPort=$(printf ":%04X " "$a")
+    port="$1"
+    if [ "$port" -eq "$port" ] 2>/dev/null ; then
+      hexPort=$(printf ":%04X " "$port")
     else
-      b="${a##*:}"
-      port=$(eval echo "\$${b%%\}*}")
-      if [ "$port" -eq "$port" ] 2>/dev/null ; then
-        hexPort=$(printf ":%04X " "$port")
+      # port specified is not a number ignore and keep current behaviour
+      return 0;
+    fi
+    if [ -d /proc/net ] ; then
+      if grep -q "$hexPort" /proc/net/tcp*; then
+        return 1;
+      fi
+    else
+      if netstat -anp tcp | grep -i "listen" | grep -q -F ".$port "; then
+        return 1;
       else
         return 0;
       fi
-    fi
-    if [ -d /proc/net ] ; then
-      for i in /proc/net/*; do
-        if  [ -f "$i" ] && [ -r "$i" ]; then
-          o=$(grep -c "$hexPort" "$i")
-          if [ "$o" = "1" ]; then
-            return 1;
-          fi
-        fi
-      done
-    else
-        if [ -x "$(command -v netstat)" ]; then
-          o=$(netstat -anp tcp | grep -i "listen" | grep -c -F ".$port ")
-          if [ "$o" -gt 0 ] ; then
-            return 1;
-          fi
-        else
-          return 0;
-        fi
     fi
     return 0;
   }

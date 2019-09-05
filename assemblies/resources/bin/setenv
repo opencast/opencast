@@ -40,4 +40,4 @@ export JAVA_PERM_MEM=256M
 export KARAF_NOROOT=true
 
 
-. bin/check_ports "$KARAF_ETC"
+. "$DIRNAME/check_ports"
