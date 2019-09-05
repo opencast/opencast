@@ -1005,13 +1005,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   protected JpaJob updateInternal(EntityManager em, JpaJob job) throws PersistenceException {
     EntityTransaction tx = em.getTransaction();
-    JpaJob originalJob = null;
     JpaJob fromDb = null;
     try {
       tx.begin();
       fromDb = em.find(JpaJob.class, job.getId());
-      // MH-13675 This resets the job state in the 'job' variable back to the previous value so commenting it out
-      // originalJob = JpaJob.from(fromDb.toJob());
       if (fromDb == null) {
         throw new NoResultException();
       }
