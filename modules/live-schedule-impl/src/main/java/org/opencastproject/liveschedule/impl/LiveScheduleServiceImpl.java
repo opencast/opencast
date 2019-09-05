@@ -369,19 +369,10 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     for (String publishedStreamingFormat : publishedStreamingFormats) {
       Track track = generatedTracks.get(publishedStreamingFormat);
       if (track != null) {
-        Track[] publicationTracks = publication.getTracks();
-        boolean trackUriExisting = false;
-        if (publicationTracks != null) {
-          for (Track publicationTrack : publicationTracks) {
-            if (publicationTrack.getURI().equals(track.getURI())) {
-              trackUriExisting = true;
-              break;
-            }
-          }
+        if (publication.getTracks().length > 0) {
+          publication.clearTracks();
         }
-        if (!trackUriExisting) {
-          publication.addTrack(track);
-        }
+        publication.addTrack(track);
       }
     }
   }
