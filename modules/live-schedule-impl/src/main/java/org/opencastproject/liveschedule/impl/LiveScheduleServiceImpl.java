@@ -341,7 +341,9 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     // Set duration (used by live tracks)
     setDuration(tempMp, episodeDC);
     // Add live tracks to media package
-    addLiveTracks(tempMp, episodeDC.getFirst(DublinCore.PROPERTY_SPATIAL));
+    Map<String, Track> generatedTracks = addLiveTracks(tempMp, episodeDC.getFirst(DublinCore.PROPERTY_SPATIAL));
+    // Update tracks in the publication
+    createOrUpdatePublicationTracks(tempMp, generatedTracks);
     // If same mp, no need to do anything
     if (isSameMediaPackage(previousMp, tempMp)) {
       logger.debug("Live media package {} seems to be the same. Not updating.", previousMp);
@@ -361,6 +363,36 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     // Don't leave garbage there!
     retractPreviousElements(previousMp, mp);
     return true;
+  }
+
+  private void createOrUpdatePublicationTracks(Publication publication, Map<String, Track> generatedTracks) {
+    for (String publishedStreamingFormat : publishedStreamingFormats) {
+      Track track = generatedTracks.get(publishedStreamingFormat);
+      if (track != null) {
+        Track[] publicationTracks = publication.getTracks();
+        boolean trackUriExisting = false;
+        if (publicationTracks != null) {
+          for (Track publicationTrack : publicationTracks) {
+            if (publicationTrack.getURI().equals(track.getURI())) {
+              trackUriExisting = true;
+              break;
+            }
+          }
+        }
+        if (!trackUriExisting) {
+          publication.addTrack(track);
+        }
+      }
+    }
+  }
+
+  private void createOrUpdatePublicationTracks(MediaPackage mediaPackage, Map<String, Track> generatedTracks) {
+    Publication[] publications = mediaPackage.getPublications();
+    for (Publication publication : publications) {
+      if (publication.getChannel().equals(CHANNEL_ID)) {
+          createOrUpdatePublicationTracks(publication, generatedTracks);
+      }
+    }
   }
 
   boolean retractLiveEvent(MediaPackage mp) throws LiveScheduleException {
@@ -704,13 +736,8 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       URI engageUri = URIUtils.resolve(new URI(engageUrlString), PLAYER_PATH + mp.getIdentifier().compact());
       Publication publicationElement = PublicationImpl.publication(UUID.randomUUID().toString(), CHANNEL_ID, engageUri,
               MimeTypes.parseMimeType("text/html"));
-      for (String publishedStreamingFormat : publishedStreamingFormats) {
-        Track track = generatedTracks.get(publishedStreamingFormat);
-        if (track != null) {
-          publicationElement.addTrack(track);
-        }
-      }
       mp.add(publicationElement);
+      createOrUpdatePublicationTracks(publicationElement, generatedTracks);
     } catch (URISyntaxException e) {
       throw new LiveScheduleException(e);
     }
