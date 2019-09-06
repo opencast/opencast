@@ -54,8 +54,7 @@ if [ "$PROGNAME" = "start-opencast" ] && [ "$nargs" -eq "0" ]; then
     return 0;
   }
 
-  usehttp=$(grep "org.osgi.service.http.enabled[ =]" "${SETENV_ETC}"/org.ops4j.pax.web.cfg)
-  if [ "${usehttp##*=}" = "true" ]; then
+  if grep -qi '^org.osgi.service.http.enabled[ =]*true *$' "${SETENV_ETC}/org.ops4j.pax.web.cfg"; then
     httpport=$(grep "org.osgi.service.http.port[ =]" "${SETENV_ETC}"/org.ops4j.pax.web.cfg)
     check_port "${httpport##*=}"
     if [ "$?" = "1" ]; then
@@ -65,8 +64,7 @@ if [ "$PROGNAME" = "start-opencast" ] && [ "$nargs" -eq "0" ]; then
     fi
   fi
 
-  usehttps=$(grep "org.osgi.service.http.secure.enabled[ =]" ${SETENV_ETC}/org.ops4j.pax.web.cfg)
-  if [ "${usehttps##*=}" = "true" ]; then
+  if grep -qi '^org.osgi.service.http.secure.enabled[ =]*true *$' "${SETENV_ETC}/org.ops4j.pax.web.cfg"; then
     httpsport=$(grep "org.osgi.service.http.port.secure[ =]" ${SETENV_ETC}/org.ops4j.pax.web.cfg)
     check_port "${httpsport##*=}"
     if [ "$?" = "1" ]; then
