@@ -65,7 +65,7 @@ if [ "$PROGNAME" = "start-opencast" ] && [ "$nargs" -eq "0" ]; then
   fi
 
   if grep -qi '^org.osgi.service.http.secure.enabled[ =]*true *$' "${SETENV_ETC}/org.ops4j.pax.web.cfg"; then
-    httpsport=$(grep "org.osgi.service.http.port.secure[ =]" ${SETENV_ETC}/org.ops4j.pax.web.cfg)
+    httpsport=$(grep "org.osgi.service.http.port.secure[ =]" "${SETENV_ETC}"/org.ops4j.pax.web.cfg)
     check_port "${httpsport##*=}"
     if [ "$?" = "1" ]; then
       printf "\nSecure http server port \e[1m%s\e[0m already in use \n" "${httpsport##*=}"
