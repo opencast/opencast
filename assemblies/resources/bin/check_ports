@@ -47,8 +47,6 @@ if [ "$PROGNAME" = "start-opencast" ] && [ "$nargs" -eq "0" ]; then
     else
       if netstat -anp tcp | grep -i "listen" | grep -q -F ".$port "; then
         return 1;
-      else
-        return 0;
       fi
     fi
     return 0;
