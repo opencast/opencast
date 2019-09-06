@@ -34,7 +34,6 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -67,20 +66,6 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
     return copiedCollection;
   }
 
-  private String getCollectionDefault(MetadataField<?> metadataField,
-          ListProvidersService listProvidersService) {
-    if (listProvidersService != null && metadataField.getListprovider().isSome()) {
-      try {
-        return listProvidersService.getDefault(metadataField.getListprovider().get());
-
-      } catch (ListProviderException ex) {
-        // failed to get default property on list-provider-service
-        // as this field is optional, it is fine to pass here
-      }
-    }
-    return null;
-  }
-
   private Opt<Map<String, String>> getCollection(MetadataField<?> metadataField,
           ListProvidersService listProvidersService) {
     try {
@@ -99,13 +84,7 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
   }
 
   public void addEmptyField(MetadataField<?> metadataField, ListProvidersService listProvidersService) {
-    List<String> values = new ArrayList(1);
-    String defaultKey = getCollectionDefault(metadataField, listProvidersService); // check for default value
-
-    if (StringUtils.isNotBlank(defaultKey)) {
-      values.add(defaultKey);
-    }
-    addField(metadataField, values, listProvidersService);
+    addField(metadataField, Collections.emptyList(), listProvidersService);
   }
 
   public void addField(MetadataField<?> metadataField, String value, ListProvidersService listProvidersService) {

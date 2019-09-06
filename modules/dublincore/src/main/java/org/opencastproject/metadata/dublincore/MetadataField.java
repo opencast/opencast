@@ -290,10 +290,17 @@ public class MetadataField<A> {
   }
 
   public void setValue(A value) {
-    if (value == null)
+    setValue(value, true);
+  }
+
+  public void setValue(A value, boolean setUpdated) {
+    if (value == null) {
       this.value = Opt.none();
-    else {
+    } else {
       this.value = Opt.some(value);
+    }
+
+    if (setUpdated) {
       this.updated = true;
     }
   }
@@ -1007,37 +1014,37 @@ public class MetadataField<A> {
 
     switch (metadataField.type) {
       case BOOLEAN:
-        ((MetadataField<Boolean>)metadataField).setValue(Boolean.parseBoolean(Iterables.getLast(filteredValues)));
+        ((MetadataField<Boolean>)metadataField).setValue(Boolean.parseBoolean(Iterables.getLast(filteredValues)), false);
         break;
       case DATE:
         if (metadataField.getPattern().isNone()) {
           metadataField.setPattern(Opt.some("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
         }
-        ((MetadataField<Date>)metadataField).setValue(EncodingSchemeUtils.decodeDate(Iterables.getLast(filteredValues)));
+        ((MetadataField<Date>)metadataField).setValue(EncodingSchemeUtils.decodeDate(Iterables.getLast(filteredValues)), false);
         break;
       case DURATION:
         String value = Iterables.getLast(filteredValues);
         DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value);
         Long longValue = period.getEnd().getTime() - period.getStart().getTime();
-        ((MetadataField<String>)metadataField).setValue(longValue.toString());
+        ((MetadataField<String>)metadataField).setValue(longValue.toString(), false);
         break;
       case ITERABLE_TEXT:
       case MIXED_TEXT:
-        ((MetadataField<Iterable<String>>)metadataField).setValue(filteredValues);
+        ((MetadataField<Iterable<String>>)metadataField).setValue(filteredValues, false);
         break;
       case LONG:
-        ((MetadataField<Long>)metadataField).setValue(Long.parseLong(Iterables.getLast(filteredValues)));
+        ((MetadataField<Long>)metadataField).setValue(Long.parseLong(Iterables.getLast(filteredValues)), false);
         break;
       case START_DATE:
         if (metadataField.getPattern().isNone()) {
           metadataField.setPattern(Opt.some("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
         }
-        ((MetadataField<String>)metadataField).setValue(Iterables.getLast(filteredValues));
+        ((MetadataField<String>)metadataField).setValue(Iterables.getLast(filteredValues), false);
         break;
       case TEXT:
       case ORDERED_TEXT:
       case TEXT_LONG:
-        ((MetadataField<String>)metadataField).setValue(Iterables.getLast(filteredValues));
+        ((MetadataField<String>)metadataField).setValue(Iterables.getLast(filteredValues), false);
         break;
       default:
         throw new IllegalArgumentException("Unknown metadata type! " + metadataField.getType());
@@ -1138,6 +1145,10 @@ public class MetadataField<A> {
 
   public void setRequired(boolean required) {
     this.required = required;
+  }
+
+  public void setUpdated(boolean updated) {
+    this.updated = updated;
   }
 
   public Type getType() {
