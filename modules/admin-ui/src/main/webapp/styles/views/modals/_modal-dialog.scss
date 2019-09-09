@@ -29,7 +29,6 @@
         @extend .extra-small-modal;
 
         top: 35%;
-        height: 230px;
 
         p {
             text-align: center;
@@ -38,6 +37,10 @@
 
         .delete {
             font-weight: bold;
+        }
+
+        .warning {
+            color: $red;
         }
 
         .btn-container {

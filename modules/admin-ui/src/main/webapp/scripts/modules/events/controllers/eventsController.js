@@ -23,10 +23,9 @@
 // Controller for all event screens.
 angular.module('adminNg.controllers')
 .controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource',
-  'ResourcesListResource', 'Notifications', 'ResourceModal', 'ConfirmationModal', 'EventHasSnapshotsResource',
-  'RelativeDatesService',
+  'ResourcesListResource', 'Notifications', 'ConfirmationModal', 'RelativeDatesService',
   function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications,
-    ResourceModal, ConfirmationModal, EventHasSnapshotsResource, RelativeDatesService) {
+    ConfirmationModal, RelativeDatesService) {
 
     $scope.stats = Stats;
 
@@ -111,18 +110,7 @@ angular.module('adminNg.controllers')
           }
         });
         row.checkedDelete = function() {
-          EventHasSnapshotsResource.get({id: row.id},function(o) {
-            if ((angular.isUndefined(row.publications)
-              || row.publications.length <= 0
-              || (row.publications.length == 1 && row.publications[0].id == 'engage-live')
-              || !o.hasSnapshots)
-              && !row.has_preview )
-            // Works, opens simple modal
-              ConfirmationModal.show('confirm-modal',Table.delete,row);
-            else
-            // works, opens retract
-              ResourceModal.show('retract-published-event-modal',row.id);
-          });
+          ConfirmationModal.show('confirm-modal',Table.delete,row);
         };
       }
     });
@@ -138,9 +126,13 @@ angular.module('adminNg.controllers')
     };
 
     $scope.table.delete = function (row) {
-      EventsResource.delete({id: row.id}, function () {
+      EventsResource.delete({id: row.id}, function (response) {
         Table.fetch();
-        Notifications.add('success', 'EVENTS_DELETED');
+        if (response.status == 200) {
+          Notifications.add('success', 'EVENT_DELETED');
+        } else {
+          Notifications.add('success', 'EVENT_WILL_BE_DELETED');
+        }
       }, function (error) {
         if (error.status === 401) {
           Notifications.add('error', 'EVENTS_NOT_DELETED_NOT_AUTHORIZED');

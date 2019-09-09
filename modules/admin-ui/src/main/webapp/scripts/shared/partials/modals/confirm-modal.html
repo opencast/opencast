@@ -8,6 +8,9 @@
     <p><span translate="CONFIRMATIONS.METADATA.NOTICE.{{type}}"><!-- The following element will be deleted --></span>:</p>
     <p class="delete">{{name}}</p>
   </div>
+  <p class="warning" translate="CONFIRMATIONS.WARNINGS.EVENT_WILL_BE_GONE" ng-show="type=='EVENT'">
+    <!-- If you continue, the event will be irrevocably gone. -->
+  </p>
   <p translate="CONFIRMATIONS.CONTINUE_ACTION"><!-- Are you sure you want to continue? --></p>
 
   <div class="btn-container">

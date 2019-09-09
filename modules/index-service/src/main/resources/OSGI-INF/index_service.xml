@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.index.service.impl.IndexServiceImpl"
-               immediate="true">
+               immediate="true"
+               activate="activate"
+               deactivate="deactivate">
   <implementation class="org.opencastproject.index.service.impl.IndexServiceImpl"/>
   <property name="service.description" value="Index Services Implementation"/>
   <service>

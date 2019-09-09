@@ -15,7 +15,8 @@ Improvements
 
 Configuration changes
 ---------------------
-
+- `etc/org.opencastproject.adminui.cfg` has a new option `retract.workflow.id` which contains the id of the workflow used
+  to retract events when deleting.
 
 API changes
 -----------

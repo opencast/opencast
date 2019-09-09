@@ -43,11 +43,12 @@ import java.util.TimeZone;
 public final class EventUtils {
 
   public static final Map<String, String> PUBLICATION_CHANNELS = new HashMap<>();
+  public static final String ENGAGE_LIVE_CHANNEL_ID  = "engage-live";
 
   static {
     PUBLICATION_CHANNELS.put(EngagePublicationChannel.CHANNEL_ID, "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE");
     PUBLICATION_CHANNELS.put("youtube", "EVENTS.EVENTS.DETAILS.PUBLICATIONS.YOUTUBE");
-    PUBLICATION_CHANNELS.put("engage-live", "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE_LIVE");
+    PUBLICATION_CHANNELS.put(ENGAGE_LIVE_CHANNEL_ID, "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE_LIVE");
   }
 
   private EventUtils() {

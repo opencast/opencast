@@ -36,12 +36,14 @@ import java.io.StringWriter;
  */
 public class BulkOperationResult {
   public static final String OK_KEY = "ok";
+  public static final String ACCEPTED_KEY = "accepted";
   public static final String BAD_REQUEST_KEY = "badRequest";
   public static final String UNAUTHORIZED_KEY = "unauthorized";
   public static final String NOT_FOUND_KEY = "notFound";
   public static final String ERROR_KEY = "error";
 
   private JSONArray ok = new JSONArray();
+  private JSONArray accepted = new JSONArray();
   private JSONArray badRequest = new JSONArray();
   private JSONArray unauthorized = new JSONArray();
   private JSONArray notFound = new JSONArray();
@@ -50,6 +52,11 @@ public class BulkOperationResult {
   @SuppressWarnings("unchecked")
   public void addOk(String id) {
     ok.add(id);
+  }
+
+  @SuppressWarnings("unchecked")
+  public void addAccepted(String id) {
+    accepted.add(id);
   }
 
   @SuppressWarnings("unchecked")
@@ -91,6 +98,10 @@ public class BulkOperationResult {
     return ok;
   }
 
+  public JSONArray getAccepted() {
+    return accepted;
+  }
+
   public JSONArray getBadRequests() {
     return badRequest;
   }
@@ -111,6 +122,7 @@ public class BulkOperationResult {
   public String toJson() {
     JSONObject bulkOperationResult = new JSONObject();
     bulkOperationResult.put(OK_KEY, ok);
+    bulkOperationResult.put(ACCEPTED_KEY, accepted);
     bulkOperationResult.put(BAD_REQUEST_KEY, badRequest);
     bulkOperationResult.put(NOT_FOUND_KEY, notFound);
     bulkOperationResult.put(UNAUTHORIZED_KEY, unauthorized);
@@ -124,6 +136,7 @@ public class BulkOperationResult {
     JSONParser parser = new JSONParser();
     JSONObject result =  (JSONObject) parser.parse(writer.toString());
     this.ok = (JSONArray) result.get(OK_KEY);
+    this.accepted = (JSONArray) result.get(ACCEPTED_KEY);
     this.badRequest = (JSONArray) result.get(BAD_REQUEST_KEY);
     this.notFound = (JSONArray) result.get(NOT_FOUND_KEY);
     this.unauthorized = (JSONArray) result.get(UNAUTHORIZED_KEY);
