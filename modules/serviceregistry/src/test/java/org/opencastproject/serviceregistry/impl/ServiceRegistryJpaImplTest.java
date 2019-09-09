@@ -334,8 +334,15 @@ public class ServiceRegistryJpaImplTest {
       barrier.waitForJobs(2000);
       Assert.fail();
     } catch (Exception e) {
-      Assert.assertTrue(StringUtils.isBlank(serviceRegistryJpaImpl.getJob(testJob.getId()).getProcessingHost()));
-      Assert.assertTrue(StringUtils.isNotBlank(serviceRegistryJpaImpl.getJob(testJob2.getId()).getProcessingHost()));
+      // Mock http client always returns 503 for this path so it won't be dispatched anyway
+      testJob = serviceRegistryJpaImpl.getJob(testJob.getId());
+      Assert.assertTrue(StringUtils.isBlank(testJob.getProcessingHost()));
+      Assert.assertEquals(Job.Status.QUEUED, testJob.getStatus());
+      // Mock http client always returns 204 for this path, but it should not be dispatched
+      // because the host is in the dispatchPriorityList
+      testJob2 = serviceRegistryJpaImpl.getJob(testJob2.getId());
+      Assert.assertTrue(StringUtils.isBlank(testJob2.getProcessingHost()));
+      Assert.assertEquals(Job.Status.QUEUED, testJob2.getStatus());
       Assert.assertEquals(1, serviceRegistryJpaImpl.dispatchPriorityList.size());
       String blockingHost = serviceRegistryJpaImpl.dispatchPriorityList.get(testJob2.getId());
       Assert.assertEquals(TEST_HOST, blockingHost);
@@ -401,19 +408,20 @@ public class ServiceRegistryJpaImplTest {
     properties.put("dispatchinterval", "1000");
     serviceRegistryJpaImpl.updated(properties);
     registerTestHostAndService();
-    Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_OPERATION, null, null, true, null,
+    Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true,
+            null,
             10.0f);
     JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob);
     try {
       barrier.waitForJobs(2000);
-      //We should never successfully complete the job, so if we get here then something is wrong
+      // We should never successfully complete the job, so if we get here then something is wrong
       Assert.fail();
     } catch (Exception e) {
       testJob = serviceRegistryJpaImpl.getJob(testJob.getId());
-      //Some explanation here: If the load exceeds the global maximum node load (ie, jobLoad > all individual node max
+      // Some explanation here: If the load exceeds the global maximum node load (ie, jobLoad > all individual node max
       // loads), then we dispatch to the biggest, even if it's not going to normally accept the job.  That node may still
       // reject the job, but that's AbstractJobProducer's job, not the service registry's
-      Assert.assertEquals(TEST_HOST_OTHER, testJob.getProcessingHost());
+      Assert.assertEquals(TEST_HOST_THIRD, testJob.getProcessingHost());
     }
   }
 
