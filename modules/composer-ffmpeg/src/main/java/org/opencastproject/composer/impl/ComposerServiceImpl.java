@@ -1693,8 +1693,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       // handle audio
       boolean lowerAudio = lowerLaidOutElement.getElement().hasAudio();
       boolean upperAudio = upperLaidOutElement.get().getElement().hasAudio();
-      // if not specfied or "both", use both videos
-      if (audioSourceName != null && ! ComposerService.BOTH.equalsIgnoreCase(audioSourceName)) {
+      // if audio source name is "both" or unspecified, use audio of both videos, otherwise pick one
+      if (StringUtils.isNotBlank(audioSourceName) && ! ComposerService.BOTH.equalsIgnoreCase(audioSourceName)) {
         lowerAudio = lowerAudio & ComposerService.LOWER.equalsIgnoreCase(audioSourceName);
         upperAudio = upperAudio & ComposerService.UPPER.equalsIgnoreCase(audioSourceName);
       }
