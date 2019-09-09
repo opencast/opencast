@@ -39,10 +39,6 @@ and modify the host and if necessary port values in `jetty-opencast.xml` to matc
 
     <Set name="host">127.0.0.1</Set>
 
-If you are deploying to the cloud then your servers may not have useful hostnames. The node name is a descriptive title
-for this Opencast instance, eg Admin, worker-01, etc. and can be used as an alternative in the Admin UI.
-
-    org.opencastproject.server.nodename=AllInOne
 
 Step 2: Setting the Login Details
 ---------------------------------

@@ -183,7 +183,7 @@ public class UserAndSeriesLoader {
               seriesService.updateAccessControl(seriesId, acl);
             }
           } catch (UnauthorizedException e) {
-            logger.warn("Unauthorized: {}", e.getMessage());
+            logger.warn(e.getMessage());
           } catch (SeriesException e) {
             logger.warn("Unable to create series {}", dc);
           } catch (NotFoundException e) {

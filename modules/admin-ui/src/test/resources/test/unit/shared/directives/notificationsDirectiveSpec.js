@@ -1,5 +1,5 @@
 describe('adminNg.directives.adminNgNotifications', function () {
-    var $compile, $rootScope, element, Notifications, $httpBackend;
+    var $compile, $rootScope, element, Notifications;
 
     beforeEach(module('adminNg'));
     beforeEach(module('shared/partials/notification.html'));
@@ -16,28 +16,26 @@ describe('adminNg.directives.adminNgNotifications', function () {
     }));
 
     beforeEach(module(function ($provide) {
-    var service = {
-        getUser: function () {
-            var user = {org: { properties: {
-                "admin.notification.duration.error": -10,
-                "admin.notification.duration.success": 50,
-                "admin.notification.duration.warning": 50
-            }}};
-            return {$promise: {then: function (fn) { fn(user); return { catch: function() {} }; }}};
-        }
-    };
-    $provide.value('AuthService', service);
+	var service = {
+	    getUser: function () {
+		var user = {org: { properties: {
+		    "admin.notification.duration.error": -10,
+		    "admin.notification.duration.success": 50,
+		    "admin.notification.duration.warning": 50
+		}}};
+		return {$promise: {then: function (fn) { fn(user) }}};
+	    }
+	};
+	$provide.value('AuthService', service);
     }));
 
-    beforeEach(inject(function (_$httpBackend_, _$rootScope_, _$compile_, _Notifications_) {
-        $httpBackend = _$httpBackend_;
+    beforeEach(inject(function (_$rootScope_, _$compile_, _Notifications_) {
         $compile = _$compile_;
         $rootScope = _$rootScope_;
         Notifications = _Notifications_;
     }));
 
     beforeEach(function () {
-        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         element = $compile('<div admin-ng-notifications=""></div>')($rootScope);
         $rootScope.$digest();
     });

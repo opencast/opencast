@@ -57,6 +57,7 @@
             "GROUP": "Naslednja skupina bo izbrisana",
             "USER": "Naslednji uporabnik bo izbrisan",
             "THEME": "Naslednja tema bo izbrisana",
+            "EMAIL": "Naslednja e-poštna predloga bo izbrisana",
             "LOCATION": "Naslednja lokacija bo izbrisana"
          },
          "NAME": "Ime"
@@ -131,6 +132,15 @@
       "LOCATION_DELETED": "Lokacija je izbrisana",
       "LOCATION_NOT_DELETED": "Lokacije ni bilo mogoče izbrisati",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Lokacije ne morete izbrisati, ker nimate ustreznih pravic.",
+      "EMAIL_TEMPLATE_CREATED": "Predloga je ustvarjena",
+      "EMAIL_TEMPLATE_NOT_CREATED": "Predloge ni bilo mogoče ustvariti",
+      "EMAIL_TEMPLATE_SAVED": "Predloga je shranjena",
+      "EMAIL_TEMPLATE_NOT_SAVED": "Predloge ni bilo mogoče shraniti",
+      "EMAIL_TEMPLATE_DELETED": "Predloga je izbrisana",
+      "EMAIL_TEMPLATE_NOT_DELETED": "Predloge ni bilo mogoče izbrisati",
+      "EMAIL_TEMPLATE_NAME_TAKEN": "To ime je že v uporabi",
+      "EMAIL_SENT": "Sporočilo je poslano",
+      "EMAIL_NOT_SENT": "Sporočila ni bilo mogoče poslati",
       "CONFLICT_DETECTED": "Spor v urniku: ta novi dogodek se prekriva z obstoječim. Spremenite lokacijo, datume ali ure.",
       "CONFLICT_BULK_DETECTED": "Podvojeni podatki: spreminjanje ni mogoče. Popravite lokacije, datum ali čas.",
       "CONFLICT_ALREADY_ENDED": "Napaka urnika: dogodek se je že končal.",
@@ -143,6 +153,11 @@
       "SERIES_ACL_LOCKED": "Urejanje pravilnikov o dostopu ni dovoljeno, ko se v dogodku, ki je del serije, izvajajo postopki",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Pravilnik o dostopu zahteva vsaj eno vlogo z dovoljenji za branje in pisanje.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "Pravilnik o dostopu zahteva vsaj eno vlogo z dovoljenji za branje in pisanje.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Stanje onemogočenja dogodka je uspešno posodobljeno.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Pri posodabljanju stanja onemogočenja dogodka je prišlo do napake.",
+      "EVENT_PARTICIPATION_STATUS_READONLY": "Stanja sodelovanja ni mogoče posodobiti, ker je datum začetka načrtovanja urnika v preteklosti.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Stanje onemogočenja serije je uspešno posodobljeno.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Pri posodabljanju stanja onemogočenja serije je prišlo do napake.",
       "THEME_NAME_ALREADY_TAKEN": "To ime je že v uporabi.",
       "THEME_NAME_EMPTY": "Ime ne sme biti prazno",
       "BUMPER_UPLOAD_ERROR": "Napaka pri nalaganju predstavnosti",
@@ -171,7 +186,13 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Dejanja",
+      "SEND_MESSAGE": "Pošlji sporočilo",
       "WARNING": "Opozorilo",
+      "EDIT_STATUS": {
+         "CAPTION": "Urejanje stanja",
+         "READY_FOR_RECORDING": "Pripravljeno za snemanje",
+         "OPTED_OUT": "Onemogočeno"
+      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Izbriši",
@@ -271,8 +292,6 @@
       "BACK": "Nazaj",
       "CREATE": "Ustvari",
       "RETRACT": "Umakni",
-      "RETRACT_DELETE": "Retract/Delete",
-      "DELETE": "Izbriši",
       "UPDATE": "Posodobitev",
       "DURATION": {
          "HOURS": "Ure",
@@ -307,9 +326,6 @@
       },
       "CONFIGURATION": {
          "TITLE": "Konfiguracija"
-      },
-      "STATISTICS": {
-         "TITLE": "Statistics"
       }
    },
    "EVENTS": {
@@ -332,6 +348,28 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
+      },
+      "SEND_MESSAGE": {
+         "CAPTION": "Pošlji sporočilo",
+         "TABS": {
+            "RECIPIENTS": "Prejemniki",
+            "MESSAGE": "Sporočilo",
+            "SUMMARY": "Povzetek"
+         },
+         "RECIPIENTS": {
+            "AUDIT_TRAIL_CAPTION": "Dodaj revizijski sledi",
+            "AUDIT_TRAIL_DESCRIPTION": "Potrdite, če želite sporočilo dodati revizijski sledi",
+            "AUDIT_TRAIL_LABEL": ""
+         },
+         "MESSAGE": {
+            "EMAIL_TEMPLATE": "Izberite e-poštno predlogo",
+            "SUBJECT": "Zadeva",
+            "MESSAGE": "Sporočilo",
+            "INCLUDE_SIGNATURE": "V e-poštnem sporočilu vključi moj podpis"
+         },
+         "SUMMARY": {
+            "MESSAGE_SUMMARY": "Povzetek"
+         }
       },
       "EVENTS": {
          "NEW": {
@@ -462,6 +500,7 @@
          "ADD_EVENT": "Dodaj dogodek",
          "TABLE": {
             "CAPTION": "Dogodki",
+            "CREATORS": "Avtorji",
             "TITLE": "Naslov",
             "PRESENTERS": "Predavatelj(-i)",
             "SERIES": "Serije",
@@ -476,7 +515,9 @@
             "LAST": "Zadnje",
             "NEXT": "Naprej",
             "MANAGED_ACL": "Pravilnik o dostopu",
+            "SCHEDULING_STATUS": "Stanje",
             "WORKFLOW_STATE": "Napredek",
+            "REVIEW_STATUS": "Stanje pregleda",
             "PREVIOUS": "Nazaj",
             "NOCONTENT": "Ni podatkov",
             "PUBLISHED": "Objavljeno",
@@ -495,8 +536,13 @@
                "PRESENTER": "Filter for this presenter"
             }
          },
+         "SCHEDULING_STATUS": {
+            "READY_FOR_RECORDING": "Pripravljeno za snemanje",
+            "OPTED_OUT": "Onemogočeno"
+         },
          "STATUS": {
             "SCHEDULED": "Načrtovano",
+            "OPTEDOUT": "Onemogočeno",
             "RECORDING": "Posnetek",
             "UPLOADING": "Nalaganje",
             "INGESTING": "Uvažanje",
@@ -518,14 +564,16 @@
                "SCHEDULING": "Načrtovanje urnika",
                "WORKFLOWS": "Poteki dela",
                "ACCESS": "Pravilnik o dostopu",
-               "COMMENTS": "Komentarji",
-               "STATISTICS": "Statistics"
+               "COMMENTS": "Komentarji"
             },
             "PUBLICATIONS": {
                "CAPTION": "Objave",
                "NO_PUBLICATIONS_AVAILABLE": "Ta dogodek nima objav",
                "PUBLICATION_DESCRIPTION": "Ta posnetek je bil objavljen v naslednjih kanalih:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Ta posnetek trenutno ni v obdelavi",
+               "SCHEDULING_STATUS": "Stanje",
+               "READY_FOR_RECORDING": "Pripravljeno za snemanje",
+               "OPTED_OUT": "Onemogočeno",
                "CUSTOM": "Po meri",
                "ENGAGE": "Vključevanje",
                "ENGAGE_LIVE": "Prenos v živo",
@@ -761,9 +809,6 @@
                   "PROCESSING_FAILURE": "Napaka pri obdelavi"
                }
             },
-            "STATISTICS": {
-               "CAPTION": "Statistics"
-            },
             "METADATA": {
                "CAPTION": "Podrobnosti dogodka",
                "TITLE": "Naslov",
@@ -795,6 +840,20 @@
             },
             "SCHEDULING": {
                "CAPTION": "Stanje sodelovanja",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Stanje pregleda"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Stanje onemogočenja",
+                  "READY": "Pripravljeno za snemanje",
+                  "OPTEDOUT": "Onemogočeno"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Sporočila",
+                  "CREATION_DATE": "Datum ustvarjanja",
+                  "SENDER": "Pošiljatelj",
+                  "SUBJECT": "Zadeva"
+               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Predavatelj(-i)"
                }
@@ -968,7 +1027,7 @@
             "CAPTION": "Serije",
             "TITLE": "Serije",
             "HAS_EVENTS": "Vsebuje posnetke",
-            "ORGANIZERS": "Organizator(-ji)",
+            "CREATORS": "Organizator(-ji)",
             "CONTRIBUTORS": "Sodelavec(-ci)",
             "CREATED": "Ustvarjeno",
             "MANAGED_ACL": "Pravilnik o dostopu",
@@ -985,10 +1044,10 @@
             "TABS": {
                "METADATA": "Metapodatki",
                "EXTENDED_METADATA": "Metapodatki II",
+               "PARTICIPATION": "Sodelovanje",
                "EVENTS": "Dogodki",
                "PERMISSIONS": "Pravilnik o dostopu",
-               "THEME": "Tema",
-               "STATISTICS": "Statistics"
+               "THEME": "Tema"
             },
             "ACCESS": {
                "CAPTION": "Pravilnik o dostopu",
@@ -1030,6 +1089,24 @@
                "LANGUAGE": "Jezik",
                "LICENSE": "Licenca",
                "DESCRIPTION": "Opis"
+            },
+            "PARTICIPATION": {
+               "CAPTION": "Predloga stanja sodelovanja",
+               "WARNING_TEMPLATE": "Stanje sodelovanja serije bo uporabljeno kot privzeta vrednost za nove dogodke, ki so del serije.",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Stanje pregleda"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Stanje onemogočenja",
+                  "READY": "Pripravljeno za snemanje",
+                  "OPTEDOUT": "Onemogočeno"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Sporočila",
+                  "CREATION_DATE": "Datum ustvarjanja",
+                  "SENDER": "Pošiljatelj",
+                  "SUBJECT": "Zadeva"
+               }
             },
             "EVENTS": {
                "TITLE": "Naslov",
@@ -1341,7 +1418,34 @@
          "ADD_THEME": "Dodaj temo"
       },
       "NAVIGATION": {
+         "MAIL_TEMPLATES": "E-poštne predloge",
+         "MAIL_SERVERS": "Nastavitve e-pošte",
          "THEMES": "Teme"
+      },
+      "EMAIL_TEMPLATES": {
+         "TABLE": {
+            "CAPTION": "E-poštne predloge",
+            "NAME": "Ime",
+            "CREATOR": "Avtor",
+            "CREATED": "Ustvarjeno",
+            "ACTION": "Dejanja"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Ustvari predlogo",
+            "EDITCAPTION": "Uredi predlogo",
+            "TABS": {
+               "MESSAGE": "Sporočilo",
+               "SUMMARY": "Povzetek"
+            },
+            "MESSAGE": {
+               "NAME": "Ime",
+               "SUBJECT": "Zadeva",
+               "MESSAGE": "Sporočilo"
+            },
+            "SUMMARY": {
+               "MESSAGE_SUMMARY": "Povzetek sporočila"
+            }
+         }
       },
       "THEMES": {
          "TABLE": {
@@ -1437,16 +1541,24 @@
       "JOBS": {
          "TABLE": {
             "ID": "Identifikator posla",
+            "ACTION": "Dejanja",
             "CAPTION": "Posli",
             "CREATED": "Ustvarjeno",
             "CREATOR": "Avtor",
             "HOST_NAME": "Ime gostitelja",
-            "NODE_NAME": "Node name",
             "OPERATION": "Postopek",
             "STARTED": "Začeto",
             "STATUS": "Stanje",
             "SUBMITTED": "Poslano",
             "TYPE": "Vrsta"
+         },
+         "DETAILS": {
+            "HEADER": "Podrobnosti posla {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Splošno",
+               "OPERATIONS": "Postopki",
+               "INCIDENTS": "Dogodki"
+            }
          },
          "STATUS": {
             "QUEUED": "V čakalni vrsti",
@@ -1467,7 +1579,6 @@
             "CAPTION": "Strežniki",
             "STATUS": "Stanje",
             "HOST_NAME": "Ime gostitelja",
-            "NODE_NAME": "Node name",
             "CORES": "Jedra",
             "COMPLETED": "Dokončani posli",
             "RUNNING": "Posli, ki se izvajajo",
@@ -1475,6 +1586,7 @@
             "MEAN_RUN_TIME": "Povprečen čas izvajanja",
             "MEAN_QUEUE_TIME": "Povprečen čas v čakalni vrsti",
             "MAINTENANCE": "Vzdrževanje",
+            "ACTION": "Dejanja",
             "MAINTENANCE_OFF": "Odpri način vzdrževanja",
             "MAINTENANCE_ON": "Zapri način vzdrževanja"
          }
@@ -1485,7 +1597,6 @@
             "STATUS": "Stanje",
             "NAME": "Ime storitve",
             "HOST_NAME": "Ime gostitelja",
-            "NODE_NAME": "Node name",
             "COMPLETED": "Dokončani posli",
             "RUNNING": "Posli, ki se izvajajo",
             "QUEUED": "Posli v čakalni vrsti",
@@ -1705,6 +1816,9 @@
          "LOCATION": {
             "LABEL": "Lokacija"
          },
+         "OPTEDOUT": {
+            "LABEL": "Onemogočeno"
+         },
          "PERIOD": {
             "LABEL": "Obdobje"
          },
@@ -1716,6 +1830,12 @@
          },
          "PROGRESS": {
             "LABEL": "Napredek"
+         },
+         "REVIEW_STATUS": {
+            "LABEL": "Stanje pregleda",
+            "CONFIRMED": "Potrjeno",
+            "UNCONFIRMED": "Nepotrjeno",
+            "UNSENT": "Neposlano"
          },
          "SERIES": {
             "LABEL": "Serije"
@@ -1760,9 +1880,6 @@
          "HOSTNAME": {
             "LABEL": "Ime gostitelja"
          },
-         "NODE_NAME": {
-            "LABEL": "Node name"
-         },
          "STATUS": {
             "LABEL": "Stanje",
             "PAUSED": "Začasno ustavljeno",
@@ -1804,9 +1921,6 @@
          "HOSTNAME": {
             "LABEL": "Ime gostitelja"
          },
-         "NODE_NAME": {
-            "LABEL": "Node name"
-         },
          "STATUS": {
             "LABEL": "Stanje",
             "MAINTENANCE": "Vzdrževanje",
@@ -1820,9 +1934,6 @@
          },
          "HOSTNAME": {
             "LABEL": "Ime gostitelja"
-         },
-         "NODE_NAME": {
-            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "Ime"
@@ -1968,27 +2079,6 @@
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "To insert multiple values press Enter in between"
-      }
-   },
-   "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
-      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
-      "FROM": "Od",
-      "TO": "To",
-      "TOTAL": "Total",
-      "GRANULARITY": "Granularity",
-      "NAVIGATION": {
-         "ORGANIZATION": "Organisation"
-      },
-      "TITLE": {
-         "RANDOM": "Random Data",
-         "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views"
-      },
-      "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time uinit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time uinit."
       }
    }
 }

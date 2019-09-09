@@ -95,6 +95,7 @@ public class StartTranscriptionOperationHandlerTest {
     // Workflow set up
     WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
     def.setId("DCE-start-transcription");
+    def.setPublished(true);
     workflowInstance = new WorkflowInstanceImpl(def, mediaPackage, null, null, null, null);
     workflowInstance.setId(1);
     operation = new WorkflowOperationInstanceImpl("start-transcript", OperationState.RUNNING);

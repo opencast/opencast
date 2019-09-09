@@ -63,10 +63,9 @@
                    ng-class="getSegmentClass(segment)"
                    data-start="{{segment.start}}">
 
-                <a title="{{'VIDEO_TOOL.SEGMENTS.REMOVE_SEGMENT' | translate}}"
-                   class="remove"
-                   ng-if="video.segments.length > 1"
-                   ng-click="mergeSegment($event, segment)">
+                <a title="{{'VIDEO_TOOL.SEGMENTS.REMOVE_SEGMENT' | translate}}" class="remove"
+                                                                                ng-if="video.segments.length > 1"
+                                                                                ng-click="mergeSegment($event, segment)">
                 </a>
                 <a title="{{'VIDEO_TOOL.SEGMENTS.USE_SEGMENT' | translate}}"
                    ng-class="{ unused: segment.deleted, used: !segment.deleted }"
@@ -81,11 +80,7 @@
       <div id="cursor-track" ng-click="clickPlayTrack($event)">
         <div id="cursor" ng-mousedown="dragPlayhead($event)" ng-style="{ left: positionStyle }">
           <div class="handle"></div>
-          <div class="arrow_box">
-            <a title="{{'VIDEO_TOOL.ACTIONS.SPLIT' | translate}}"
-               class="split ng-scope">
-            </a>
-          </div>
+          <div class="arrow_box"><a class="split ng-scope"></a></div>
         </div>
         <div id="cursor_fake">
           <div class="handle"></div>

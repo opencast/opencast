@@ -1,56 +1,72 @@
 {
     "series" : {
         "_source" : { "enabled" : true },
-        "dynamic": true,
+        "dynamic": "true",
         "properties" : {
 
-            "uid": { "type" : "keyword", "store" : true },
+            "uid": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
 
-            "organization": { "type" : "keyword", "store" : true },
+            "organization": { "type" : "string", "index" : "not_analyzed", "store" : "yes" },
 
-            "object": { "type" : "text", "index": false, "store" : true },
+            "object": { "type" : "string", "index" : "no", "store" : "yes" },
 
-            "title": { "type" : "keyword" },
+            "title": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "series_json": { "type" : "keyword" },
+            "series_json": { "type" : "string", "index" : "no", "store" : "no" },
 
-            "description": { "type" : "keyword" },
+            "description": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "subject": { "type" : "keyword" },
+            "abstract": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "language": { "type" : "keyword" },
+            "subject": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "creator": { "type" : "keyword" },
+            "language": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "license": { "type" : "keyword" },
+            "creator": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "access_policy": { "type" : "keyword" },
+            "license": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "managed_acl": { "type" : "keyword" },
+            "access_policy": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "createdDateTime": { "type" : "date", "format" : "yyyy-MM-dd'T'HH:mm:ssZ" },
+            "managed_acl": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "organizers": { "copy_to" : "organizer", "type" : "keyword" },
+            "createdDateTime": { "type" : "date", "format" : "yyyy-MM-dd'T'HH:mm:ssZ", "store" : "no" },
 
-            "contributors": { "copy_to" : "contributor", "type" : "keyword" },
+            "organizers": { "copy_to" : "organizer", "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "publisher": { "type" : "keyword" },
+            "contributors": { "copy_to" : "contributor", "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "rights_holder": { "type" : "keyword" },
+            "publisher": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "theme": { "type" : "long" },
+            "rights_holder": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "text": { "type" : "text", "analyzer": "lowercasespaceanalyzer" },
-            "text_fuzzy": { "type" : "text", "analyzer": "lowercasespaceanalyzer" }
+            "theme": { "type" : "long", "store" : "no" },
+
+            "text": { "type" : "string", "index" : "analyzed", "analyzer": "lowercasespaceanalyzer", "store" : "no" },
+            "text_fuzzy": { "type" : "string", "index" : "analyzed", "analyzer": "lowercasespaceanalyzer", "store" : "no" }
 
         },
         "dynamic_templates" : [
              {
-               "permission_template" : {
+             "title_template" : {
+                 "match" : "title_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
+             },
+             {
+             "text" : {
+                 "match" : "text_*",
+                 "match_mapping_type" : "string",
+                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" }
+                 }
+             },
+             {
+             "permission_template" : {
                  "match" : "acl_permission_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "keyword" }
-                }
+                 "mapping" : { "type" : "string", "index" : "not_analyzed", "store" : "no" }
+                 }
              }
          ]
     }

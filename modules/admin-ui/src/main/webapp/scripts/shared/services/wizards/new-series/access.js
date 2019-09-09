@@ -208,8 +208,7 @@ angular.module('adminNg.services')
             me.roles[role.name] = role.value;
           });
           roleOffset = Object.keys(me.roles).length;
-        }).catch(angular.noop
-        ).finally(function () {
+        }).finally(function () {
           me.loading = false;
         });
         return rolePromise;

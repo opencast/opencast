@@ -27,8 +27,6 @@ import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
-import org.opencastproject.serviceregistry.api.HostRegistration;
-import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -87,11 +85,6 @@ public class TestJobEndpoint extends JobEndpoint {
 
     workflowSet.setTotalCount(3);
 
-    List<HostRegistration> hosts = new ArrayList<>();
-    hosts.add(new JaxbHostRegistration("host1", "1.1.1.1", "node1", 100000, 8, 8, true, false));
-    hosts.add(new JaxbHostRegistration("host2", "1.1.1.2", "node2", 400000, 4, 8, true, true));
-    hosts.add(new JaxbHostRegistration("host3", "1.1.1.2", "node3", 400000, 4, 8, true, true));
-
     List<Job> jobs = new ArrayList<>();
     jobs.add(createJob(1, Status.RUNNING, "org.opencastproject.composer", "test",
             "2014-06-05T09:10:00Z", "2014-06-05T09:10:00Z", "testuser1", "host1"));
@@ -109,7 +102,6 @@ public class TestJobEndpoint extends JobEndpoint {
     EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
             .andReturn(workflowSet).anyTimes();
     EasyMock.expect(workflowService.countWorkflowInstances()).andReturn(workflowSet.size()).anyTimes();
-    EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(hosts).anyTimes();
     EasyMock.expect(serviceRegistry.getActiveJobs()).andReturn(jobs).anyTimes();
 
     EasyMock.replay(workflowService);

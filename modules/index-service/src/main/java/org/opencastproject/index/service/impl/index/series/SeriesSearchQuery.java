@@ -58,6 +58,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
   private Date createdTo = null;
   private boolean editOnly = false;
   private String rightsHolder = null;
+  private String seriesAbstract = null;
   private Long theme = null;
 
   @SuppressWarnings("unused")
@@ -527,6 +528,20 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    */
   public Order getSeriesContributorsSortOrder() {
     return getSortOrder(SeriesIndexSchema.CONTRIBUTORS);
+  }
+
+  /**
+   * @param seriesAbstract
+   *          The text to search for in series abstracts
+   * @return enhanced search query
+   */
+  public SeriesSearchQuery withSeriesAbstract(String seriesAbstract) {
+    this.seriesAbstract = seriesAbstract;
+    return this;
+  }
+
+  public String getSeriesAbstract() {
+    return seriesAbstract;
   }
 
   /**

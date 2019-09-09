@@ -139,7 +139,7 @@ public class FileUploadServiceCleaner {
       try {
         fileUploadServiceCleaner.getFileUploadService().cleanOutdatedJobs();
       } catch (IOException e) {
-        logger.warn("Unable to clean outdated jobs: {}", e.getMessage());
+        logger.warn(e.getMessage());
       }
     }
 

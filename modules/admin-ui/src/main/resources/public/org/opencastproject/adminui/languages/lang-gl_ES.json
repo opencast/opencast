@@ -57,6 +57,7 @@
             "GROUP": "Vaise borrar o seguinte grupo",
             "USER": "Vaise borrar o seguinte usuario",
             "THEME": "Vaise borrar o seguinte estilo",
+            "EMAIL": "Vaise borrar o seguinte modelo de correo electrónico",
             "LOCATION": "Vaise borrar a seguinte localización"
          },
          "NAME": "Nome"
@@ -131,6 +132,15 @@
       "LOCATION_DELETED": "Ubicación borrada",
       "LOCATION_NOT_DELETED": "Non se puido borrar a ubicación",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Non se puido borrar a ubicación porque non se dispón do permiso para facelo.",
+      "EMAIL_TEMPLATE_CREATED": "Modelo creado",
+      "EMAIL_TEMPLATE_NOT_CREATED": "Non se puido crear o modelo",
+      "EMAIL_TEMPLATE_SAVED": "Modelo gardado",
+      "EMAIL_TEMPLATE_NOT_SAVED": "Non se puido gardar o modelo",
+      "EMAIL_TEMPLATE_DELETED": "Modelo borrado",
+      "EMAIL_TEMPLATE_NOT_DELETED": "Non se puido borrar o modelo",
+      "EMAIL_TEMPLATE_NAME_TAKEN": "Este nome xa está en uso",
+      "EMAIL_SENT": "Mensaxe enviada",
+      "EMAIL_NOT_SENT": "Non se puido enviar a mensaxe",
       "CONFLICT_DETECTED": "Conflito de programación: o novo evento coincide con outro existente. Por favor, cambie a sala, as datas ou as horas.",
       "CONFLICT_BULK_DETECTED": "Conflito de programación: o cambio dos eventos xera conflitos. Por favor mude a localización, datas ou horarios.",
       "CONFLICT_ALREADY_ENDED": "Erro de programación: O evento xa rematou.",
@@ -143,6 +153,11 @@
       "SERIES_ACL_LOCKED": "Non se permite modificar as Políticas de Acceso cando existen operacións activas nalgún evento da serie",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "A Política de Acceso require polo menos un rol con permisos de Lectura e Escritura.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "A Política de Acceso require polo menos un rol con permisos de Lectura e Escritura.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "O estado de aprobación do evento actualizouse correctamente.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Error ó actualizar o estado de aprobación do evento.",
+      "EVENT_PARTICIPATION_STATUS_READONLY": "No se pode actualizar o estado de aprobación do evento despois da data de inicio programada.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "El estado de aprobación da serie actualizouse correctamente.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Error ó actualizar o estado de aprobación da serie.",
       "THEME_NAME_ALREADY_TAKEN": "Este nome xa está en uso",
       "THEME_NAME_EMPTY": "O nome non pode estar baleiro",
       "BUMPER_UPLOAD_ERROR": "Error na subida de arquivos",
@@ -171,7 +186,13 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Accións",
+      "SEND_MESSAGE": "Enviar mensaxe",
       "WARNING": "Advertencia",
+      "EDIT_STATUS": {
+         "CAPTION": "Modificar Estado",
+         "READY_FOR_RECORDING": "Preparado para gravar",
+         "OPTED_OUT": "Non se gravará"
+      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Borrar",
@@ -271,8 +292,6 @@
       "BACK": "Anterior",
       "CREATE": "Crear",
       "RETRACT": "Retirar",
-      "RETRACT_DELETE": "Retract/Delete",
-      "DELETE": "Borrar",
       "UPDATE": "Actualizar",
       "DURATION": {
          "HOURS": "Horas",
@@ -307,9 +326,6 @@
       },
       "CONFIGURATION": {
          "TITLE": "Configuración"
-      },
-      "STATISTICS": {
-         "TITLE": "Statistics"
       }
    },
    "EVENTS": {
@@ -332,6 +348,28 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
+      },
+      "SEND_MESSAGE": {
+         "CAPTION": "Enviar mensaxe",
+         "TABS": {
+            "RECIPIENTS": "Destinatarios",
+            "MESSAGE": "Mensaxe",
+            "SUMMARY": "Resumo"
+         },
+         "RECIPIENTS": {
+            "AUDIT_TRAIL_CAPTION": "Engadir ó informe de auditoría",
+            "AUDIT_TRAIL_DESCRIPTION": "Seleccione para engadir a mensaxe ó informe de auditoría",
+            "AUDIT_TRAIL_LABEL": ""
+         },
+         "MESSAGE": {
+            "EMAIL_TEMPLATE": "Seleccione o modelo de correo electrónico",
+            "SUBJECT": "Asunto",
+            "MESSAGE": "Mensaxe",
+            "INCLUDE_SIGNATURE": "Incluír a miña sinatura no correo"
+         },
+         "SUMMARY": {
+            "MESSAGE_SUMMARY": "Resumo"
+         }
       },
       "EVENTS": {
          "NEW": {
@@ -462,6 +500,7 @@
          "ADD_EVENT": "Engadir evento",
          "TABLE": {
             "CAPTION": "Eventos",
+            "CREATORS": "Creadores",
             "TITLE": "Título",
             "PRESENTERS": "Relator(es)",
             "SERIES": "Serie",
@@ -476,7 +515,9 @@
             "LAST": "Último",
             "NEXT": "Seguinte",
             "MANAGED_ACL": "Política de acceso",
+            "SCHEDULING_STATUS": "Estado",
             "WORKFLOW_STATE": "Progreso",
+            "REVIEW_STATUS": "Estado de revisión",
             "PREVIOUS": "Anterior",
             "NOCONTENT": "Non hai información dispoñible",
             "PUBLISHED": "Publicado",
@@ -495,8 +536,13 @@
                "PRESENTER": "Filter for this presenter"
             }
          },
+         "SCHEDULING_STATUS": {
+            "READY_FOR_RECORDING": "Preparado para gravar",
+            "OPTED_OUT": "Non se gravará"
+         },
          "STATUS": {
             "SCHEDULED": "Programado",
+            "OPTEDOUT": "Non se gravará",
             "RECORDING": "Gravando",
             "UPLOADING": "Subindo",
             "INGESTING": "Importando",
@@ -518,14 +564,16 @@
                "SCHEDULING": "Programación",
                "WORKFLOWS": "Fluxos de Traballo",
                "ACCESS": "Política de acceso",
-               "COMMENTS": "Comentarios",
-               "STATISTICS": "Statistics"
+               "COMMENTS": "Comentarios"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publicacións",
                "NO_PUBLICATIONS_AVAILABLE": "Este evento non ten publicacións",
                "PUBLICATION_DESCRIPTION": "Este evento foi publicado nas seguintes canles de publicación:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Este evento non se atopa actualmente en progreso",
+               "SCHEDULING_STATUS": "Estado",
+               "READY_FOR_RECORDING": "Preparado para gravar",
+               "OPTED_OUT": "Non se gravará",
                "CUSTOM": "Personalizado",
                "ENGAGE": "Engage",
                "ENGAGE_LIVE": "Participar en Directo",
@@ -761,9 +809,6 @@
                   "PROCESSING_FAILURE": "Fallo no procesamento"
                }
             },
-            "STATISTICS": {
-               "CAPTION": "Statistics"
-            },
             "METADATA": {
                "CAPTION": "Detalles do evento",
                "TITLE": "Título",
@@ -795,6 +840,20 @@
             },
             "SCHEDULING": {
                "CAPTION": "Estado de aprobación",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Estado de revisión"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Estado de Aprobación",
+                  "READY": "Preparado para gravar",
+                  "OPTEDOUT": "Non se gravará"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Mensaxes",
+                  "CREATION_DATE": "Data de Creación",
+                  "SENDER": "Remitente",
+                  "SUBJECT": "Asunto"
+               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Relator(es)"
                }
@@ -968,7 +1027,7 @@
             "CAPTION": "Series",
             "TITLE": "Series",
             "HAS_EVENTS": "Contén eventos",
-            "ORGANIZERS": "Organizador(es)",
+            "CREATORS": "Organizador(es)",
             "CONTRIBUTORS": "Colaborador(es)",
             "CREATED": "Creado",
             "MANAGED_ACL": "Política de acceso",
@@ -985,10 +1044,10 @@
             "TABS": {
                "METADATA": "Metadatos",
                "EXTENDED_METADATA": "Metadatos II",
+               "PARTICIPATION": "Aprobación",
                "EVENTS": "Eventos",
                "PERMISSIONS": "Política de acceso",
-               "THEME": "Estilo",
-               "STATISTICS": "Statistics"
+               "THEME": "Estilo"
             },
             "ACCESS": {
                "CAPTION": "Política de acceso",
@@ -1030,6 +1089,24 @@
                "LANGUAGE": "Idioma",
                "LICENSE": "Licenza",
                "DESCRIPTION": "Descrición"
+            },
+            "PARTICIPATION": {
+               "CAPTION": "Modelo de estado de aprobación",
+               "WARNING_TEMPLATE": "O estado de aprobación da serie utilizarase como valor por defecto para os novos eventos que formen parte da serie.",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Estado de revisión"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Estado de Aprobación",
+                  "READY": "Preparado para gravar",
+                  "OPTEDOUT": "Non se gravará"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Mensaxes",
+                  "CREATION_DATE": "Data de Creación",
+                  "SENDER": "Remitente",
+                  "SUBJECT": "Tema"
+               }
             },
             "EVENTS": {
                "TITLE": "Título",
@@ -1341,7 +1418,34 @@
          "ADD_THEME": "Engadir estilo"
       },
       "NAVIGATION": {
+         "MAIL_TEMPLATES": "Modelos de correo electrónico",
+         "MAIL_SERVERS": "Configuración de correo electrónico",
          "THEMES": "Estilos"
+      },
+      "EMAIL_TEMPLATES": {
+         "TABLE": {
+            "CAPTION": "Modelos de correo electrónico",
+            "NAME": "Nome",
+            "CREATOR": "Creador",
+            "CREATED": "Creado",
+            "ACTION": "Accións"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Crear modelo",
+            "EDITCAPTION": "Modificar modelo",
+            "TABS": {
+               "MESSAGE": "Mensaxe",
+               "SUMMARY": "Resumo"
+            },
+            "MESSAGE": {
+               "NAME": "Nome",
+               "SUBJECT": "Tema",
+               "MESSAGE": "Mensaxe"
+            },
+            "SUMMARY": {
+               "MESSAGE_SUMMARY": "Resumo da mensaxe"
+            }
+         }
       },
       "THEMES": {
          "TABLE": {
@@ -1437,16 +1541,24 @@
       "JOBS": {
          "TABLE": {
             "ID": "Identificador do Traballo",
+            "ACTION": "Accións",
             "CAPTION": "Traballos",
             "CREATED": "Creado",
             "CREATOR": "Creador",
             "HOST_NAME": "Nome do servidor",
-            "NODE_NAME": "Node name",
             "OPERATION": "Operación",
             "STARTED": "Iniciado",
             "STATUS": "Estado",
             "SUBMITTED": "Enviado",
             "TYPE": "Tipo"
+         },
+         "DETAILS": {
+            "HEADER": "Detalles do traballo {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Xeral",
+               "OPERATIONS": "Operacións",
+               "INCIDENTS": "Incidentes"
+            }
          },
          "STATUS": {
             "QUEUED": "Na cola",
@@ -1467,7 +1579,6 @@
             "CAPTION": "Servidores",
             "STATUS": "Estado",
             "HOST_NAME": "Nome do servidor",
-            "NODE_NAME": "Node name",
             "CORES": "Núcleos",
             "COMPLETED": "Traballos completados",
             "RUNNING": "Traballos en execución",
@@ -1475,6 +1586,7 @@
             "MEAN_RUN_TIME": "Tempo medio de execución",
             "MEAN_QUEUE_TIME": "Tempo medio de espera na cola",
             "MAINTENANCE": "Mantemento",
+            "ACTION": "Accións",
             "MAINTENANCE_OFF": "Activar o modo de mantemento",
             "MAINTENANCE_ON": "Desactivar o modo de mantemento"
          }
@@ -1485,7 +1597,6 @@
             "STATUS": "Estado",
             "NAME": "Nome do servizo",
             "HOST_NAME": "Nome do servidor",
-            "NODE_NAME": "Node name",
             "COMPLETED": "Traballos completados",
             "RUNNING": "Traballos en execución",
             "QUEUED": "Traballos en cola",
@@ -1705,6 +1816,9 @@
          "LOCATION": {
             "LABEL": "Ubicación"
          },
+         "OPTEDOUT": {
+            "LABEL": "Non se gravará"
+         },
          "PERIOD": {
             "LABEL": "Período"
          },
@@ -1716,6 +1830,12 @@
          },
          "PROGRESS": {
             "LABEL": "Progreso"
+         },
+         "REVIEW_STATUS": {
+            "LABEL": "Estado de Revisión",
+            "CONFIRMED": "Confirmado",
+            "UNCONFIRMED": "Sen confirmar",
+            "UNSENT": "Non enviado"
          },
          "SERIES": {
             "LABEL": "Serie"
@@ -1760,9 +1880,6 @@
          "HOSTNAME": {
             "LABEL": "Nome do servidor"
          },
-         "NODE_NAME": {
-            "LABEL": "Node name"
-         },
          "STATUS": {
             "LABEL": "Estado",
             "PAUSED": "Pausado",
@@ -1804,9 +1921,6 @@
          "HOSTNAME": {
             "LABEL": "Nome do servidor"
          },
-         "NODE_NAME": {
-            "LABEL": "Node name"
-         },
          "STATUS": {
             "LABEL": "Estado",
             "MAINTENANCE": "Mantemento",
@@ -1820,9 +1934,6 @@
          },
          "HOSTNAME": {
             "LABEL": "Nome do servidor"
-         },
-         "NODE_NAME": {
-            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "Nome"
@@ -1968,27 +2079,6 @@
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "Para inserir varios valores preme o Intro entre estes"
-      }
-   },
-   "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
-      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
-      "FROM": "Dende",
-      "TO": "To",
-      "TOTAL": "Total",
-      "GRANULARITY": "Granularity",
-      "NAVIGATION": {
-         "ORGANIZATION": "Organisation"
-      },
-      "TITLE": {
-         "RANDOM": "Random Data",
-         "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views"
-      },
-      "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time uinit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time uinit."
       }
    }
 }

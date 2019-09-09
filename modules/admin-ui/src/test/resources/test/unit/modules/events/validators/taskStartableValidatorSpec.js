@@ -17,7 +17,6 @@ describe('adminNg.modules.events.validators.taskStartableValidator', function ()
     }));
 
     beforeEach(function () {
-        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $rootScope.row = {
             event_status_raw: 'PROCESSED',
             selected: true

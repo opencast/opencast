@@ -76,6 +76,9 @@ public interface SeriesIndexSchema extends IndexSchema {
   /** The publisher of the series */
   String PUBLISHERS = "publisher";
 
+  /** The abstract description for a series */
+  String ABSTRACT = "abstract";
+
   /** The rights holder for a series */
   String RIGHTS_HOLDER = "rights_holder";
 

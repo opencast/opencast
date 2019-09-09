@@ -41,7 +41,6 @@ describe('ResourceModal service', function () {
                 Modal.$scope = {};
                 spyOn(Modal, 'show').and.returnValue({ then: function (callback) {
                     callback.apply(ResourceModal);
-                    return { catch: function() {}}
                 }});
             });
 

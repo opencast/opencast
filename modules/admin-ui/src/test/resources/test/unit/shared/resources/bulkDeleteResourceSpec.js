@@ -14,10 +14,6 @@ describe('Bulk Delete API Resource', function () {
         BulkDeleteResource = _BulkDeleteResource_;
     }));
 
-    beforeEach(function () {
-        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
-    });
-
     describe('#delete', function () {
 
         it('POSTs to the API', function () {

@@ -21,6 +21,7 @@
 
 package org.opencastproject.workflow.impl;
 
+import static com.entwinemedia.fn.data.ListBuilders.LIA;
 import static java.lang.String.format;
 
 import org.opencastproject.job.api.Incident.Severity;
@@ -36,12 +37,16 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.conditionparser.WorkflowConditionInterpreter;
+
+import com.entwinemedia.fn.bool.Bool;
+import com.entwinemedia.fn.parser.Parsers;
+import com.entwinemedia.fn.parser.Result;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Handles execution of a workflow operation.
@@ -49,9 +54,15 @@ import java.util.Map;
 final class WorkflowOperationWorker {
   private static final Logger logger = LoggerFactory.getLogger(WorkflowOperationWorker.class);
 
-  private WorkflowOperationHandler handler;
-  private WorkflowInstance workflow;
-  private WorkflowServiceImpl service;
+  /**
+   * Boolean expression parser that interprets non replaced variable strings of pattern <code>${VAR}</code> as false.
+   */
+  private static final Bool booleanExpressionEvaluator = new Bool(LIA.mk(Parsers
+          .token(Parsers.regex(Pattern.compile("\\$\\{.*?\\}"))).bind(Parsers.ignorePrevious(Parsers.yield(false)))));
+
+  private WorkflowOperationHandler handler = null;
+  private WorkflowInstance workflow = null;
+  private WorkflowServiceImpl service = null;
   private Map<String, String> properties = null;
 
   /**
@@ -66,8 +77,7 @@ final class WorkflowOperationWorker {
    * @param service
    *          the workflow service.
    */
-  private WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow,
-          WorkflowServiceImpl service) {
+  WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow, WorkflowServiceImpl service) {
     this.handler = handler;
     this.workflow = workflow;
     this.service = service;
@@ -94,6 +104,35 @@ final class WorkflowOperationWorker {
   }
 
   /**
+   * Creates a worker that still needs an operation handler to be set. When the worker is finished, a callback will be
+   * made to the workflow service reporting either success or failure of the current workflow operation.
+   *
+   * @param workflow
+   *          the workflow instance
+   * @param properties
+   *          the properties used to execute the operation
+   * @param service
+   *          the workflow service.
+   */
+  WorkflowOperationWorker(WorkflowInstance workflow, Map<String, String> properties, WorkflowServiceImpl service) {
+    this(null, workflow, service);
+    this.properties = properties;
+  }
+
+  /**
+   * Creates a worker that still needs an operation handler to be set. When the worker is finished, a callback will be
+   * made to the workflow service reporting either success or failure of the current workflow operation.
+   *
+   * @param workflow
+   *          the workflow instance
+   * @param service
+   *          the workflow service.
+   */
+  WorkflowOperationWorker(WorkflowInstance workflow, WorkflowServiceImpl service) {
+    this(null, workflow, service);
+  }
+
+  /**
    * Sets the workflow operation handler to use.
    *
    * @param operationHandler
@@ -109,7 +148,7 @@ final class WorkflowOperationWorker {
   public WorkflowInstance execute() {
     WorkflowOperationInstance operation = workflow.getCurrentOperation();
     try {
-      WorkflowOperationResult result;
+      WorkflowOperationResult result = null;
       switch (operation.getState()) {
         case INSTANTIATED:
         case RETRY:
@@ -130,7 +169,7 @@ final class WorkflowOperationWorker {
       workflow = service.handleOperationResult(workflow, result);
       return workflow;
     } catch (JobCanceledException e) {
-      logger.info("Workflow {} operation {} job cancelled: {}", workflow.getId(), operation, e.getMessage());
+      logger.info(e.getMessage());
       return workflow;
     } catch (WorkflowOperationAbortedException e) {
       // Don't log it as error because it was aborted by the user
@@ -170,12 +209,13 @@ final class WorkflowOperationWorker {
     if (executionCondition == null) {
       execute = true;
     } else {
-      try {
-        execute = WorkflowConditionInterpreter.interpret(executionCondition);
-      } catch (IllegalArgumentException e) {
+      final Result<Boolean> parsed = booleanExpressionEvaluator.eval(executionCondition);
+      if (parsed.isDefined() && parsed.getRest().isEmpty()) {
+        execute = parsed.getResult();
+      } else {
         operation.setState(OperationState.FAILED);
-        throw new WorkflowOperationException(
-                format("Unable to parse execution condition '%s': %s", executionCondition, e.getMessage()));
+        throw new WorkflowOperationException(format("Unable to parse execution condition '%s'. Result is '%s'",
+                executionCondition, parsed.toString()));
       }
     }
 
@@ -237,7 +277,8 @@ final class WorkflowOperationWorker {
     service.update(workflow);
 
     try {
-      return resumableHandler.resume(workflow, null, properties);
+      WorkflowOperationResult result = resumableHandler.resume(workflow, null, properties);
+      return result;
     } catch (Exception e) {
       operation.setState(OperationState.FAILED);
       if (e instanceof WorkflowOperationException)

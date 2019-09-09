@@ -56,11 +56,6 @@ public interface FeedGenerator {
   String getDescription();
 
   /**
-   * Return the feed pattern
-   */
-  String getPattern();
-
-  /**
    * Return the feed link.
    *
    * @param organization

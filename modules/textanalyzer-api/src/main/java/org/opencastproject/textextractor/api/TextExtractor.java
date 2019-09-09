@@ -23,7 +23,6 @@ package org.opencastproject.textextractor.api;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Interface for implementations that are able to extract text from an image.
@@ -41,6 +40,6 @@ public interface TextExtractor {
    * @throws TextExtractorException
    *           if text extraction fails
    */
-  List<String> extract(File image) throws IOException, TextExtractorException;
+  TextFrame extract(File image) throws IOException, TextExtractorException;
 
 }

@@ -102,6 +102,13 @@ public interface WorkflowDefinition extends Comparable<WorkflowDefinition> {
   List<WorkflowOperationDefinition> getOperations();
 
   /**
+   * Whether this definition is published. This information is useful for user interfaces.
+   *
+   * @return Whether this is a published workflow definition
+   */
+  boolean isPublished();
+
+  /**
    * Tags the workflow definition with the given tag.
    *
    * @param tag

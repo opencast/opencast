@@ -26,7 +26,6 @@ describe('Serie controller', function () {
 
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
-        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.whenGET('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/metadata.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/metadata.json')));
         $httpBackend.whenGET('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/events.json')
@@ -42,11 +41,6 @@ describe('Serie controller', function () {
         $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=100&offset=0').respond('{"ROLE_ANONYMOUS": "ROLE_ANONYMOUS"}');
         $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=100&offset=2').respond('{}');
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
-        // Until we're actually testing the statistics endpoint, just return an empty set here
-        $httpBackend.whenGET(/\/admin-ng\/statistics.*/).respond('[]');
-        $httpBackend.whenPOST(/\/admin-ng\/statistics.*/).respond('[]');
-        $httpBackend.whenGET('/admin-ng/feeds/feeds').respond('{}');
-        $httpBackend.whenGET('/feeds/feeds').respond('{}');
 
         $controller('SerieCtrl', {$scope: $scope});
     });

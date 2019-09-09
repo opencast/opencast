@@ -492,7 +492,8 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       doc.addField(SUBJECT_KEY, buf.toString());
     }
 
-    doc.addField(WORKFLOW_CREATOR_KEY, instance.getCreatorName());
+    User workflowCreator = instance.getCreator();
+    doc.addField(WORKFLOW_CREATOR_KEY, workflowCreator.getUsername());
     doc.addField(ORG_KEY, instance.getOrganizationId());
 
     // Media package used to get the active acl

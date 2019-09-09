@@ -66,7 +66,7 @@ angular.module('adminNg.services')
           if (angular.isDefined(user.org.properties[ADMIN_NOTIFICATION_DURATION_WARNING])) {
             notificationDurationWarning = user.org.properties[ADMIN_NOTIFICATION_DURATION_WARNING];
           }
-        }).catch(angular.noop);
+        });
       }
 
       if (!context) {

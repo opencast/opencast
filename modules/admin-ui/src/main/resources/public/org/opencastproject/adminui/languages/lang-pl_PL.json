@@ -57,6 +57,7 @@
             "GROUP": "Następująca grupa zostanie usunięta",
             "USER": "Następujący użytkownik zostanie usunięty",
             "THEME": "Następujący motyw zostanie usunięty",
+            "EMAIL": "Następujący szablon wiadomości e-mail zostanie usunięty",
             "LOCATION": "Następująca lokalizacja zostanie usunięta"
          },
          "NAME": "Imię"
@@ -131,6 +132,15 @@
       "LOCATION_DELETED": "Lokalizacja została usunięta",
       "LOCATION_NOT_DELETED": "Nie udało się usunąć lokalizacji",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Nie można usunąć lokalizacji, ponieważ nie masz uprawnień, aby to zrobić.",
+      "EMAIL_TEMPLATE_CREATED": "Szablon został utworzony",
+      "EMAIL_TEMPLATE_NOT_CREATED": "Nie można utworzyć szablonu",
+      "EMAIL_TEMPLATE_SAVED": "Szablon został zapisany",
+      "EMAIL_TEMPLATE_NOT_SAVED": "Szablon nie może zostać zapisany",
+      "EMAIL_TEMPLATE_DELETED": "Szablon został usunięty",
+      "EMAIL_TEMPLATE_NOT_DELETED": "Szablon nie może być usunięty",
+      "EMAIL_TEMPLATE_NAME_TAKEN": "Ta nazwa jest już w użyciu",
+      "EMAIL_SENT": "Wiadomość została wysłana",
+      "EMAIL_NOT_SENT": "Wysłanie wiadomości nie powiodło się",
       "CONFLICT_DETECTED": "Konflikt w harmonogramie: nowe wydarzenie pokrywa się z już zaplanowanym. Proszę zmienić salę lub termin wydarzenia.",
       "CONFLICT_BULK_DETECTED": "Konflikt w harmonogramie: zmiana wydarzenia powoduje konflikty. Prosimy o zmianę lokalizacji, rozpoczęcia lub czasu trwania.",
       "CONFLICT_ALREADY_ENDED": "Błąd w harmonogramie: Wydarzenie się już zakończyło.",
@@ -143,6 +153,11 @@
       "SERIES_ACL_LOCKED": "Edytowanie zasad dostępu jest niedozwolone, jeśli wykonywane są operacje dotyczące zdarzenia, które jest częścią serii",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Zasada dostępu musi zawierać przynajmniej jedną rolę użytkownika z uprawnieniem do zapisu lub odczytu.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "Zasada dostępu musi zawierać przynajmniej jedną rolę użytkownika z uprawnieniem do zapisu lub odczytu.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Status wykluczenia został z powodzeniem zaktualizowany.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Błąd podczas aktualizacji statusu wykluczenia wydarzenia.",
+      "EVENT_PARTICIPATION_STATUS_READONLY": "Status uczestnictwa nie może być zaktualizowany w momencie w którym data rozpoczęcia już minęła.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Status wykluczenia został z powodzeniem zaktualizowany.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Błąd podczas aktualizacji statusu wykluczenia serii.",
       "THEME_NAME_ALREADY_TAKEN": "Ta nazwa jest już w użyciu",
       "THEME_NAME_EMPTY": "Nazwa nie może być pusta",
       "BUMPER_UPLOAD_ERROR": "Wystąpił błąd podczas przesyłania multimediów",
@@ -171,7 +186,13 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Działania",
+      "SEND_MESSAGE": "Wyślij wiadomość",
       "WARNING": "UWAGA",
+      "EDIT_STATUS": {
+         "CAPTION": "Edytowanie Stanu",
+         "READY_FOR_RECORDING": "Gotowy do nagrywania",
+         "OPTED_OUT": "Wykluczone"
+      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Usuń",
@@ -271,8 +292,6 @@
       "BACK": "Poprzednie",
       "CREATE": "Utwórz",
       "RETRACT": "Wycofaj",
-      "RETRACT_DELETE": "Retract/Delete",
-      "DELETE": "Usuń",
       "UPDATE": "Aktualizuj",
       "DURATION": {
          "HOURS": "Godzin",
@@ -307,9 +326,6 @@
       },
       "CONFIGURATION": {
          "TITLE": "Konfiguracja"
-      },
-      "STATISTICS": {
-         "TITLE": "Statistics"
       }
    },
    "EVENTS": {
@@ -332,6 +348,28 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
+      },
+      "SEND_MESSAGE": {
+         "CAPTION": "Wyślij wiadomość",
+         "TABS": {
+            "RECIPIENTS": "Odbiorcy",
+            "MESSAGE": "Wiadomość",
+            "SUMMARY": "Podsumowanie"
+         },
+         "RECIPIENTS": {
+            "AUDIT_TRAIL_CAPTION": "Dodaj do śladu rewizyjnego",
+            "AUDIT_TRAIL_DESCRIPTION": "Zaznacz, aby dodać wiadomość do śladu rewizyjnego",
+            "AUDIT_TRAIL_LABEL": ""
+         },
+         "MESSAGE": {
+            "EMAIL_TEMPLATE": "Wybierz szablon wiadomości e-mail",
+            "SUBJECT": "Temat",
+            "MESSAGE": "Wiadomość",
+            "INCLUDE_SIGNATURE": "Załącz mój podpis w wiadomości"
+         },
+         "SUMMARY": {
+            "MESSAGE_SUMMARY": "Podsumowanie"
+         }
       },
       "EVENTS": {
          "NEW": {
@@ -462,6 +500,7 @@
          "ADD_EVENT": "Dodaj wydarzenie",
          "TABLE": {
             "CAPTION": "Wydarzenia",
+            "CREATORS": "Twórcy",
             "TITLE": "Tytuł",
             "PRESENTERS": "Prezenter(rzy)",
             "SERIES": "Serie",
@@ -476,7 +515,9 @@
             "LAST": "Ostatnie",
             "NEXT": "Następne",
             "MANAGED_ACL": "Zasady dostępu",
+            "SCHEDULING_STATUS": "Status",
             "WORKFLOW_STATE": "Postęp",
+            "REVIEW_STATUS": "Status przeglądu",
             "PREVIOUS": "Poprzednie",
             "NOCONTENT": "Brak danych",
             "PUBLISHED": "Opublikowano",
@@ -495,8 +536,13 @@
                "PRESENTER": "Filter for this presenter"
             }
          },
+         "SCHEDULING_STATUS": {
+            "READY_FOR_RECORDING": "Gotowy do nagrywania",
+            "OPTED_OUT": "Wykluczone"
+         },
          "STATUS": {
             "SCHEDULED": "Zaplanowane",
+            "OPTEDOUT": "Wykluczone",
             "RECORDING": "Nagrywanie",
             "UPLOADING": "Przesyłanie",
             "INGESTING": "Wprowadzanie",
@@ -518,14 +564,16 @@
                "SCHEDULING": "Harmonogram",
                "WORKFLOWS": "Przepływy pracy",
                "ACCESS": "Zasady dostępu",
-               "COMMENTS": "Komentarze",
-               "STATISTICS": "Statistics"
+               "COMMENTS": "Komentarze"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publikacje",
                "NO_PUBLICATIONS_AVAILABLE": "To wydarzenie nie ma publikacji",
                "PUBLICATION_DESCRIPTION": "To wydarzenie zostało opublikowane w następujących kanałach:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "To wydarzenie nie jest obecnie w toku",
+               "SCHEDULING_STATUS": "Status",
+               "READY_FOR_RECORDING": "Gotowy do nagrywania",
+               "OPTED_OUT": "Wykluczone",
                "CUSTOM": "Niestandardowe",
                "ENGAGE": "Engage",
                "ENGAGE_LIVE": "Transmisja na żywo",
@@ -761,9 +809,6 @@
                   "PROCESSING_FAILURE": "Błąd przetwarzania"
                }
             },
-            "STATISTICS": {
-               "CAPTION": "Statistics"
-            },
             "METADATA": {
                "CAPTION": "Szczegóły wydarzenia",
                "TITLE": "Tytuł",
@@ -795,6 +840,20 @@
             },
             "SCHEDULING": {
                "CAPTION": "Stanu uczestnictwa",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Status przeglądu"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Status Wykluczonych",
+                  "READY": "Gotowy do nagrywania",
+                  "OPTEDOUT": "Wykluczone"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Wiadomości",
+                  "CREATION_DATE": "Data utworzenia",
+                  "SENDER": "Nadawca",
+                  "SUBJECT": "Temat"
+               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Prezenter(rzy)"
                }
@@ -968,7 +1027,7 @@
             "CAPTION": "Seria",
             "TITLE": "Seria",
             "HAS_EVENTS": "Zawiera wydarzenia",
-            "ORGANIZERS": "Organizator(rzy)",
+            "CREATORS": "Organizator(rzy)",
             "CONTRIBUTORS": "Współpracownik(cy)",
             "CREATED": "Utworzono",
             "MANAGED_ACL": "Zasady dostępu",
@@ -985,10 +1044,10 @@
             "TABS": {
                "METADATA": "Metadane",
                "EXTENDED_METADATA": "Metadane II",
+               "PARTICIPATION": "Uczestnictwo",
                "EVENTS": "Wydarzenia",
                "PERMISSIONS": "Zasady dostępu",
-               "THEME": "Motyw",
-               "STATISTICS": "Statistics"
+               "THEME": "Motyw"
             },
             "ACCESS": {
                "CAPTION": "Zasady dostępu",
@@ -1030,6 +1089,24 @@
                "LANGUAGE": "Język",
                "LICENSE": "Licencja",
                "DESCRIPTION": "Opis"
+            },
+            "PARTICIPATION": {
+               "CAPTION": "Wzór stanu uczestnictwa",
+               "WARNING_TEMPLATE": "Status uczestnictwa obowiązujący dla serii będzie domyślną wartością dla wydarzeń do niej przypisanych.",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Status przeglądu"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Status Wykluczonych",
+                  "READY": "Gotowy do nagrywania",
+                  "OPTEDOUT": "Wykluczone"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Wiadomości",
+                  "CREATION_DATE": "Data utworzenia",
+                  "SENDER": "Nadawca",
+                  "SUBJECT": "Temat"
+               }
             },
             "EVENTS": {
                "TITLE": "Tytuł",
@@ -1341,7 +1418,34 @@
          "ADD_THEME": "Dodaj motyw"
       },
       "NAVIGATION": {
+         "MAIL_TEMPLATES": "Szablony e-maili",
+         "MAIL_SERVERS": "Ustawienia poczty e-mail",
          "THEMES": "Motywy"
+      },
+      "EMAIL_TEMPLATES": {
+         "TABLE": {
+            "CAPTION": "Szablony e-maili",
+            "NAME": "Nazwa",
+            "CREATOR": "Twórca",
+            "CREATED": "Utworzono",
+            "ACTION": "Działania"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Utwórz szablon",
+            "EDITCAPTION": "Edytuj szablon",
+            "TABS": {
+               "MESSAGE": "Wiadomość",
+               "SUMMARY": "Podsumowanie"
+            },
+            "MESSAGE": {
+               "NAME": "Nazwa",
+               "SUBJECT": "Temat",
+               "MESSAGE": "Wiadomość"
+            },
+            "SUMMARY": {
+               "MESSAGE_SUMMARY": "Podsumowanie wiadomości"
+            }
+         }
       },
       "THEMES": {
          "TABLE": {
@@ -1437,16 +1541,24 @@
       "JOBS": {
          "TABLE": {
             "ID": "Identyfikator zadania",
+            "ACTION": "Działania",
             "CAPTION": "Zadania",
             "CREATED": "Utworzono",
             "CREATOR": "Twórca",
             "HOST_NAME": "Nazwa hosta",
-            "NODE_NAME": "Node name",
             "OPERATION": "Operacje",
             "STARTED": "Rozpoczęte",
             "STATUS": "Status",
             "SUBMITTED": "Wysłano",
             "TYPE": "Typ"
+         },
+         "DETAILS": {
+            "HEADER": "Szczegóły zadania {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Ogólne",
+               "OPERATIONS": "Operacje",
+               "INCIDENTS": "Problemy"
+            }
          },
          "STATUS": {
             "QUEUED": "W kolejce",
@@ -1467,7 +1579,6 @@
             "CAPTION": "Serwery",
             "STATUS": "Status",
             "HOST_NAME": "Nazwa hosta",
-            "NODE_NAME": "Node name",
             "CORES": "Rdzenie",
             "COMPLETED": "Zadania wykonane",
             "RUNNING": "Uruchomione zadania",
@@ -1475,6 +1586,7 @@
             "MEAN_RUN_TIME": "Średni czas trwania",
             "MEAN_QUEUE_TIME": "Średni czas w kolejce",
             "MAINTENANCE": "Obsługa",
+            "ACTION": "Działania",
             "MAINTENANCE_OFF": "Tryb konserwacji",
             "MAINTENANCE_ON": "Opuścić tryb konserwacji"
          }
@@ -1485,7 +1597,6 @@
             "STATUS": "Status",
             "NAME": "Nazwa usługi",
             "HOST_NAME": "Nazwa hosta",
-            "NODE_NAME": "Node name",
             "COMPLETED": "Zadania wykonane",
             "RUNNING": "Uruchomione zadania",
             "QUEUED": "Zadania w kolejce",
@@ -1705,6 +1816,9 @@
          "LOCATION": {
             "LABEL": "Lokalizacja"
          },
+         "OPTEDOUT": {
+            "LABEL": "Wykluczone"
+         },
          "PERIOD": {
             "LABEL": "Okres"
          },
@@ -1716,6 +1830,12 @@
          },
          "PROGRESS": {
             "LABEL": "Postęp"
+         },
+         "REVIEW_STATUS": {
+            "LABEL": "Status przeglądu",
+            "CONFIRMED": "Potwierdzone",
+            "UNCONFIRMED": "Niepotwierdzone",
+            "UNSENT": "Niewysłane"
          },
          "SERIES": {
             "LABEL": "Seria"
@@ -1760,9 +1880,6 @@
          "HOSTNAME": {
             "LABEL": "Nazwa hosta"
          },
-         "NODE_NAME": {
-            "LABEL": "Node name"
-         },
          "STATUS": {
             "LABEL": "Status",
             "PAUSED": "Zatrzymane",
@@ -1804,9 +1921,6 @@
          "HOSTNAME": {
             "LABEL": "Nazwa hosta"
          },
-         "NODE_NAME": {
-            "LABEL": "Node name"
-         },
          "STATUS": {
             "LABEL": "Status",
             "MAINTENANCE": "Obsługa",
@@ -1820,9 +1934,6 @@
          },
          "HOSTNAME": {
             "LABEL": "Nazwa hosta"
-         },
-         "NODE_NAME": {
-            "LABEL": "Node name"
          },
          "NAME": {
             "LABEL": "Imię"
@@ -1968,27 +2079,6 @@
    "EDITABLE": {
       "MULTI": {
          "PLACEHOLDER": "To insert multiple values press Enter in between"
-      }
-   },
-   "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
-      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
-      "FROM": "Od",
-      "TO": "To",
-      "TOTAL": "Total",
-      "GRANULARITY": "Granularity",
-      "NAVIGATION": {
-         "ORGANIZATION": "Organisation"
-      },
-      "TITLE": {
-         "RANDOM": "Random Data",
-         "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views"
-      },
-      "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time uinit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time uinit."
       }
    }
 }

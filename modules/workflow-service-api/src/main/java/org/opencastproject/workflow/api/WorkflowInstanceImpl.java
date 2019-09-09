@@ -89,9 +89,6 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   @XmlElement(name = "creator", namespace = "http://org.opencastproject.security")
   private User creator;
 
-  @XmlElement(name = "creator-id", namespace = "http://org.opencastproject.security")
-  private String creatorName;
-
   @XmlJavaTypeAdapter(OrganizationAdapter.class)
   @XmlElement(name = "organization", namespace = "http://org.opencastproject.security")
   private JaxbOrganization organization;
@@ -143,7 +140,7 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
     this.template = def.getId();
     this.description = def.getDescription();
     this.parentId = parentWorkflowId;
-    this.creatorName = creator != null ? creator.getUsername() : null;
+    this.creator = creator;
     if (organization != null)
       this.organizationId = organization.getId();
     this.state = WorkflowState.INSTANTIATED;
@@ -200,17 +197,11 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowInstance#getCreatorName()
+   * @see org.opencastproject.workflow.api.WorkflowInstance#getCreator()
    */
   @Override
-  public String getCreatorName() {
-    if (creatorName != null) {
-      return creatorName;
-    }
-    if (creator != null) {
-      return creator.getUsername();
-    }
-    return null;
+  public User getCreator() {
+    return creator;
   }
 
   /**
@@ -231,11 +222,11 @@ public class WorkflowInstanceImpl implements WorkflowInstance {
   }
 
   /**
-   * @param username
-   *          username of the creator to set
+   * @param creator
+   *          the creator to set
    */
-  public void setCreatorName(final String username) {
-    creatorName = username;
+  public void setCreator(User creator) {
+    this.creator = creator;
   }
 
   /**

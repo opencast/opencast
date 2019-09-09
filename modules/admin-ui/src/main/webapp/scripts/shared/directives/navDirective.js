@@ -21,8 +21,7 @@
 'use strict';
 
 angular.module('adminNg.directives')
-.directive('adminNgNav', ['HotkeysService', 'StatisticsResource', function (HotkeysService,
-  StatisticsResource) {
+.directive('adminNgNav', ['HotkeysService', function (HotkeysService) {
   return {
     restrict: 'E',
     replace: true,
@@ -32,12 +31,6 @@ angular.module('adminNg.directives')
       var menu = element.find('#roll-up-menu'),
           marginTop = element.height() + 1,
           isMenuOpen = false;
-
-      StatisticsResource.query({
-        resourceType: 'organization',
-      }).$promise.then(function (providers) {
-        scope.hasStatisticsProviders = providers.length !== 0;
-      });
 
       scope.toggleMenu = function () {
         var menuItems = element.find('#nav-container'),

@@ -1,8 +1,7 @@
 describe('adminNg.directives.preSelectFrom', function () {
-    var $httpBackend,
-        $compile,
-        $rootScope,
-        samples;
+    var $rootScope;
+    var $compile;
+    var samples;
 
     beforeEach(module('adminNg'));
     beforeEach(module('adminNg.directives'));
@@ -15,10 +14,9 @@ describe('adminNg.directives.preSelectFrom', function () {
         $provide.value('Language', service);
     }));
 
-    beforeEach(inject(function (_$httpBackend_, _$rootScope_, _$compile_) {
+    beforeEach(inject(function (_$rootScope_, _$compile_) {
         $rootScope = _$rootScope_;
         $compile = _$compile_;
-        $httpBackend = _$httpBackend_;
     }));
 
     beforeEach(inject(function () {
@@ -29,10 +27,6 @@ describe('adminNg.directives.preSelectFrom', function () {
             length3obj: {1: {name:'hans'}, 2:{name:'paul'}, 3:{name:'guenther'}}
         };
     }));
-
-    beforeEach(function () {
-        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
-    });
 
     describe('#non-nested-field', function() {
 

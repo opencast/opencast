@@ -758,10 +758,6 @@ __Response__
 
 Returns an event's list of publications.
 
-Query String Parameter     |Type                         | Description
-:--------------------------|:----------------------------|:-----------
-`sign`                     | [`boolean`](types.md#basic) | Whether public distribution urls should be signed
-
 __Response__
 
 `200 (OK)`: The list of publications is returned.<br/>
@@ -787,10 +783,6 @@ __Response__
 ### GET /api/events/{event_id}/publications/{publication_id}
 
 Returns a single publication.
-
-Query String Parameter     |Type                         | Description
-:--------------------------|:----------------------------|:-----------
-`sign`                     | [`boolean`](types.md#basic) | Whether public distribution urls should be signed
 
 __Response__
 

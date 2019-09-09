@@ -10,7 +10,6 @@
             "meanQueueTime": 3,
             "meanRunTime": 200,
             "hostname": "host1",
-            "nodeName": "node1",
             "online": true,
             "queued": 2,
             "running": 2
@@ -22,7 +21,6 @@
             "meanQueueTime": 2,
             "meanRunTime": 300,
             "hostname": "host2",
-            "nodeName": "node2",
             "online": true,
             "queued": 4,
             "running": 4
@@ -34,7 +32,6 @@
             "meanQueueTime": 4,
             "meanRunTime": 100,
             "hostname": "host3",
-            "nodeName": "node3",
             "online": false,
             "queued": 4,
             "running": 2
@@ -46,7 +43,6 @@
             "meanQueueTime": 5,
             "meanRunTime": 400,
             "hostname": "host4",
-            "nodeName": "node4",
             "online": true,
             "queued": 4,
             "running": 2

@@ -50,6 +50,9 @@ function($, bootbox, _, alertify) {
         var msg_loginFailed = "Failed to log in.";
         var msg_live_in_progress = "Live (in progress)";
         var msg_live_not_in_progress = "Live (not in progress)";
+        var infoMeURL = "/info/me.json";
+        var springSecurityLoginURL = "/j_spring_security_check";
+        var springSecurityLogoutURL = "/j_spring_security_logout";
         var springLoggedInStrCheck = "j_spring_security_check";
         var $navbarEpisodes = "#navbarEpisodes";
         var $navbarSeries = "#navbarSeries";
@@ -97,7 +100,6 @@ function($, bootbox, _, alertify) {
               case "fr": return "fr-FR";
               case "gl": return "gl-ES";
               case "he": return "he-IL";
-              case "it": return "it-IT";
               case "nl": return "nl-NL";
               case "pl": return "pl-PL";
               case "sl": return "sl-SI";
@@ -486,6 +488,8 @@ function($, bootbox, _, alertify) {
                             setAnonymousUser();
                         }
                     }
+
+                    log("Chosen player: " + player);
                 }
             })
         }

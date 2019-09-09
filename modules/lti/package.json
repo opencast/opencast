@@ -8,12 +8,12 @@
   },
   "dependencies": {
     "font-awesome": "^4.7.0",
-    "jquery": "^3.4.1",
+    "jquery": "^3.3.1",
     "mustache": "^3.0.1",
     "paginationjs": "^2.1.4"
   },
   "devDependencies": {
-    "eslint": "^5.16.0",
+    "eslint": "^5.15.3",
     "eslint-plugin-header": "^3.0.0",
     "html-linter": "^1.1.1"
   }

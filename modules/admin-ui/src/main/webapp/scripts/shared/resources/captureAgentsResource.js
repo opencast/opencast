@@ -45,10 +45,6 @@ angular.module('adminNg.resources')
           return row;
         };
 
-        if (!data) {
-          return;
-        }
-
         for (; i < data.results.length; i++) {
           result.push(parse(data.results[i]));
         }

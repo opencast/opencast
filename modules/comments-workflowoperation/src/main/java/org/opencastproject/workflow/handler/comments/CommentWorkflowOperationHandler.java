@@ -26,8 +26,6 @@ import org.opencastproject.event.comment.EventCommentException;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
-import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -60,7 +58,6 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /* service references */
   private EventCommentService eventCommentService;
   private SecurityService securityService;
-  private UserDirectoryService userDirectoryService;
 
   public enum Operation {
     create, resolve, delete
@@ -141,9 +138,8 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
     Opt<EventComment> optComment = findComment(workflowInstance.getMediaPackage().getIdentifier().toString(), reason,
             description);
     if (optComment.isNone()) {
-      final User user = userDirectoryService.loadUser(workflowInstance.getCreatorName());
-      EventComment comment = EventComment.create(Option.none(), workflowInstance.getMediaPackage().getIdentifier().toString(),
-              securityService.getOrganization().getId(), description, user, reason, false);
+      EventComment comment = EventComment.create(Option.<Long> none(), workflowInstance.getMediaPackage().getIdentifier().toString(),
+              securityService.getOrganization().getId(), description, workflowInstance.getCreator(), reason, false);
       eventCommentService.updateComment(comment);
     } else {
       logger.debug("Not creating comment with '{}' text and '{}' reason as it already exists for this event.",
@@ -261,7 +257,4 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
     this.securityService = service;
   }
 
-  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
-    this.userDirectoryService = userDirectoryService;
-  }
 }

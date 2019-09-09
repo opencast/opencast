@@ -39,8 +39,6 @@ import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.User;
-import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.IncidentL10n;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.IncidentServiceException;
@@ -85,7 +83,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -116,7 +113,7 @@ public class JobEndpoint {
   public static final Response SERVER_ERROR = Response.serverError().build();
 
   private enum JobSort {
-    CREATOR, OPERATION, PROCESSINGHOST, PROCESSINGNODE, STATUS, STARTED, SUBMITTED, TYPE, ID
+    CREATOR, OPERATION, PROCESSINGHOST, STATUS, STARTED, SUBMITTED, TYPE, ID
   }
 
   private static final String NEGATE_PREFIX = "-";
@@ -126,7 +123,6 @@ public class JobEndpoint {
   private WorkflowService workflowService;
   private ServiceRegistry serviceRegistry;
   private IncidentService incidentService;
-  private UserDirectoryService userDirectoryService;
 
   /** OSGi callback for the workflow service. */
   public void setWorkflowService(WorkflowService workflowService) {
@@ -141,10 +137,6 @@ public class JobEndpoint {
   /** OSGi callback for the incident service. */
   public void setIncidentService(IncidentService incidentService) {
     this.incidentService = incidentService;
-  }
-
-  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
-    this.userDirectoryService = userDirectoryService;
   }
 
   protected void activate(BundleContext bundleContext) {
@@ -172,9 +164,6 @@ public class JobEndpoint {
     String fHostname = null;
     if (query.getHostname().isSome())
       fHostname = StringUtils.trimToNull(query.getHostname().get());
-    String fNodeName = null;
-    if (query.getNodeName().isSome())
-      fNodeName = StringUtils.trimToNull(query.getNodeName().get());
     String fStatus = null;
     if (query.getStatus().isSome())
       fStatus = StringUtils.trimToNull(query.getStatus().get());
@@ -182,11 +171,8 @@ public class JobEndpoint {
     if (query.getFreeText().isSome())
       fFreeText = StringUtils.trimToNull(query.getFreeText().get());
 
-    List<JobExtended> jobs = new ArrayList<>();
+    List<Job> jobs = new ArrayList<>();
     try {
-      String vNodeName;
-      Optional<HostRegistration> server;
-      List<HostRegistration> servers = serviceRegistry.getHostRegistrations();
       for (Job job : serviceRegistry.getActiveJobs()) {
         // filter workflow jobs
         if (StringUtils.equals(WorkflowService.JOB_TYPE, job.getJobType())
@@ -197,13 +183,6 @@ public class JobEndpoint {
         if (fHostname != null && !StringUtils.equalsIgnoreCase(job.getProcessingHost(), fHostname))
           continue;
 
-        server = findServerByHost(job.getProcessingHost(), servers);
-        vNodeName = server.isPresent() ? server.get().getNodeName() : "";
-
-        // filter by node name
-        if (fNodeName != null && (server.isPresent()) && !StringUtils.equalsIgnoreCase(vNodeName, fNodeName))
-          continue;
-
         // filter by status
         if (fStatus != null && !StringUtils.equalsIgnoreCase(job.getStatus().toString(), fStatus))
           continue;
@@ -211,7 +190,6 @@ public class JobEndpoint {
         // fitler by user free text
         if (fFreeText != null
               && !StringUtils.equalsIgnoreCase(job.getProcessingHost(), fFreeText)
-              && !StringUtils.equalsIgnoreCase(vNodeName, fFreeText)
               && !StringUtils.equalsIgnoreCase(job.getJobType(), fFreeText)
               && !StringUtils.equalsIgnoreCase(job.getOperation(), fFreeText)
               && !StringUtils.equalsIgnoreCase(job.getCreator(), fFreeText)
@@ -219,7 +197,7 @@ public class JobEndpoint {
               && !StringUtils.equalsIgnoreCase(Long.toString(job.getId()), fFreeText)
               && (job.getRootJobId() != null && !StringUtils.equalsIgnoreCase(Long.toString(job.getRootJobId()), fFreeText)))
           continue;
-        jobs.add(new JobExtended(job, vNodeName));
+        jobs.add(job);
       }
     } catch (ServiceRegistryException ex) {
       logger.error("Failed to retrieve jobs list from service registry.", ex);
@@ -366,30 +344,9 @@ public class JobEndpoint {
     return Response.ok(stream(serializer.fn.toJson(json)), MediaType.APPLICATION_JSON_TYPE).build();
   }
 
-  /* Class to handle additional information related to a job */
-  class JobExtended {
-
-    private final Job job;
-    private final String nodeName;
-
-    JobExtended(Job job, String nodeName) {
-      this.job = job;
-      this.nodeName = nodeName;
-    }
-
-    public Job getJob() {
-      return job;
-    }
-
-    public String getNodeName() {
-      return nodeName;
-    }
-  }
-
-  public List<JValue> getJobsAsJSON(List<JobExtended> jobs) {
+  public List<JValue> getJobsAsJSON(List<Job> jobs) {
     List<JValue> jsonList = new ArrayList<>();
-    for (JobExtended jobEx : jobs) {
-      Job job = jobEx.getJob();
+    for (Job job : jobs) {
       long id = job.getId();
       String jobType = job.getJobType();
       String operation = job.getOperation();
@@ -404,7 +361,6 @@ public class JobEndpoint {
         started = DateTimeSupport.toUTC(dateStarted.getTime());
       String creator = job.getCreator();
       String processingHost = job.getProcessingHost();
-      String processingNode = jobEx.getNodeName();
 
       jsonList.add(obj(f("id", v(id)),
               f("type", v(jobType)),
@@ -413,8 +369,7 @@ public class JobEndpoint {
               f("submitted", v(created, Jsons.BLANK)),
               f("started", v(started, Jsons.BLANK)),
               f("creator", v(creator, Jsons.BLANK)),
-              f("processingHost", v(processingHost, Jsons.BLANK)),
-              f("processingNode", v(processingNode, Jsons.BLANK))));
+              f("processingHost", v(processingHost, Jsons.BLANK))));
     }
 
     return jsonList;
@@ -456,7 +411,11 @@ public class JobEndpoint {
                 instanceId, e), e.getCause());
       }
 
-      final String creatorName = instance.getCreatorName();
+      String creatorName = null;
+      User creator = instance.getCreator();
+      if (creator != null) {
+        creatorName = creator.getName();
+      }
 
       jsonList.add(obj(f("id", v(instanceId)), f("title", v(instance.getTitle(), Jsons.BLANK)),
               f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState().toString())),
@@ -464,8 +423,9 @@ public class JobEndpoint {
               f("submitter", v(creatorName, Jsons.BLANK))));
     }
 
-    return obj(f("results", arr(jsonList)), f("count", v(workflowInstances.getTotalCount())),
+    JObject json = obj(f("results", arr(jsonList)), f("count", v(workflowInstances.getTotalCount())),
             f("offset", v(query.getStartPage())), f("limit", v(jsonList.size())), f("total", v(totalWithoutFilters)));
+    return json;
   }
 
   /**
@@ -479,7 +439,7 @@ public class JobEndpoint {
   public JObject getTasksAsJSON(long id) throws JobEndpointException, NotFoundException {
     WorkflowInstance instance = getWorkflowById(id);
     // Gather user information
-    User user = userDirectoryService.loadUser(instance.getCreatorName());
+    User user = instance.getCreator();
     List<Field> userInformation = new ArrayList<>();
     if (user != null) {
       userInformation.add(f("username", v(user.getUsername())));
@@ -716,7 +676,7 @@ public class JobEndpoint {
     }
   };
 
-  private class JobComparator implements Comparator<JobExtended> {
+  private class JobComparator implements Comparator<Job> {
 
     private JobSort sortType;
     private boolean ascending;
@@ -727,12 +687,10 @@ public class JobEndpoint {
     }
 
     @Override
-    public int compare(JobExtended jobEx1, JobExtended jobEx2) {
+    public int compare(Job job1, Job job2) {
       int result = 0;
       Object value1 = null;
       Object value2 = null;
-      Job job1 = jobEx1.getJob();
-      Job job2 = jobEx2.getJob();
       switch (sortType) {
         case CREATOR:
           value1 = job1.getCreator();
@@ -746,10 +704,7 @@ public class JobEndpoint {
           value1 = job1.getProcessingHost();
           value2 = job2.getProcessingHost();
           break;
-        case PROCESSINGNODE:
-          value1 = jobEx1.getNodeName();
-          value2 = jobEx2.getNodeName();
-          break;        case STARTED:
+        case STARTED:
           value1 = job1.getDateStarted();
           value2 = job2.getDateStarted();
           break;
@@ -787,13 +742,5 @@ public class JobEndpoint {
 
       return ascending ? result : -1 * result;
     }
-  }
-
-  /**
-   * @param hostname of server to find in list
-   * @param servers list of all host registrations
-   */
-  private Optional<HostRegistration> findServerByHost(String hostname, List<HostRegistration> servers) {
-    return servers.stream().filter(o -> o.getBaseUrl().equals(hostname)).findFirst();
   }
 }

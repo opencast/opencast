@@ -520,7 +520,7 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
       }
 
       return new JaxbUser(moodleUser.getUsername(), null, moodleUser.getFullname(), moodleUser.getEmail(),
-              this.getName(), jaxbOrganization, roles);
+              this.getName(), true, jaxbOrganization, roles);
     } catch (Exception e) {
       logger.warn("Exception loading Moodle user {} at {}: {}", username, client.getURL(), e.getMessage());
     } finally {

@@ -129,7 +129,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
       Job job = service.inspect(uri, Options.fromJson(options));
       return Response.ok(new JaxbJob(job)).build();
     } catch (Exception e) {
-      logger.info("Unable to inspect track {}: {}", uri, e.getMessage());
+      logger.info(e.getMessage());
       return Response.serverError().build();
     }
   }
@@ -155,7 +155,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
               Options.fromJson(options));
       return Response.ok(new JaxbJob(job)).build();
     } catch (Exception e) {
-      logger.info("Unable to enrich track {}: {}", mediaPackageElement, e.getMessage());
+      logger.info(e.getMessage(), e);
       return Response.serverError().build();
     }
   }

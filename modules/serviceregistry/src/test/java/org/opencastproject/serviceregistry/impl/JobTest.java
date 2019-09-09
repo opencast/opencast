@@ -116,8 +116,8 @@ public class JobTest {
     serviceRegistry.setSecurityService(securityService);
 
     // register the hosts
-    serviceRegistry.registerHost(LOCALHOST, "127.0.0.1", "local", 1024, 1, 1.0f);
-    serviceRegistry.registerHost(REMOTEHOST, "127.0.0.1", "remote", 1024, 1, 1.0f);
+    serviceRegistry.registerHost(LOCALHOST, "127.0.0.1", 1024, 1, 1.0f);
+    serviceRegistry.registerHost(REMOTEHOST, "127.0.0.1", 1024, 1, 1.0f);
 
     // register some service instances
     regType1Localhost = (ServiceRegistrationJpaImpl) serviceRegistry.registerService(JOB_TYPE_1, LOCALHOST, PATH);
@@ -434,7 +434,7 @@ public class JobTest {
   @Test
   public void testHandlerRegistration() throws Exception {
     String url = "http://type1handler:8080";
-    serviceRegistry.registerHost(url, "127.0.0.1", "test", 1024, 1, 1);
+    serviceRegistry.registerHost(url, "127.0.0.1", 1024, 1, 1);
 
     String jobType = "type1";
     // we should start with no handlers
@@ -466,7 +466,7 @@ public class JobTest {
   @Test
   public void testDuplicateHandlerRegistrations() throws Exception {
     String url = "http://type1handler:8080";
-    serviceRegistry.registerHost(url, "127.0.0.1", "test", 1024, 1, 1);
+    serviceRegistry.registerHost(url, "127.0.0.1", 1024, 1, 1);
 
     String receiptType = "type1";
     // we should start with no handlers
@@ -486,7 +486,7 @@ public class JobTest {
 
     // re-register the host. this should not unset the maintenance mode and should not throw an exception
     serviceRegistry.unregisterHost(url);
-    serviceRegistry.registerHost(url, "127.0.0.1", "test", 1024, 1, 1);
+    serviceRegistry.registerHost(url, "127.0.0.1", 1024, 1, 1);
     serviceRegistry.registerService(receiptType, url, PATH);
 
     // zero because it's still in maintenance mode

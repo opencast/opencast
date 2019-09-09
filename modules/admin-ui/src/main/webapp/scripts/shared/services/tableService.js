@@ -271,6 +271,10 @@ angular.module('adminNg.services')
          */
       this.fetch = function (reset) {
 
+        if(me.lastRequest && !me.lastRequest.$resolved) {
+          me.lastRequest.$cancelRequest();
+        }
+
         if (angular.isUndefined(me.apiService)) {
           return;
         }
@@ -317,14 +321,8 @@ angular.module('adminNg.services')
 
         (function(resource){
 
-          var startTime = new Date();
-          me.apiService.query(query).$promise.then(function (data) {
-
-            if (me.lastStartTime && me.lastStartTime > startTime) {
-              return; // a more recent request got a response earlier, so we ignore this one
-            }
-            me.lastStartTime = startTime;
-
+          me.lastRequest = me.apiService.query(query);
+          me.lastRequest.$promise.then(function (data) {
             if(resource != me.resource) {
               return;
             }
@@ -356,7 +354,7 @@ angular.module('adminNg.services')
 
             me.updatePagination();
             me.updateAllSelected();
-          }).catch(angular.noop);
+          });
         })(me.resource);
 
         if (me.refreshScheduler.on) {
@@ -365,8 +363,8 @@ angular.module('adminNg.services')
       };
 
       /**
-       * Scheduler for the refresh of the fetch
-       */
+         * Scheduler for the refresh of the fetch
+         */
       this.refreshScheduler = {
         on: true,
         newSchedule: function () {

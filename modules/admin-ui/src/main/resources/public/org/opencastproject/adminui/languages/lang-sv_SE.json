@@ -10,8 +10,8 @@
    "SAVE": "Spara",
    "LOGOUT": "Logga ut",
    "RESET": "Nollställ",
-   "SELECT_NO_OPTION_SELECTED": "Inget alternativ valt",
-   "SELECT_NO_OPTIONS_AVAILABLE": "Inga tillgängliga optioner",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabiska",
@@ -57,6 +57,7 @@
             "GROUP": "Följande grupp raderas",
             "USER": "Följande användare kommer att raderas",
             "THEME": "Följande tema raderas",
+            "EMAIL": "Följande e-postmallen raderas",
             "LOCATION": "Följande plats tas bort"
          },
          "NAME": "Namn"
@@ -131,6 +132,15 @@
       "LOCATION_DELETED": "Platsen har raderats",
       "LOCATION_NOT_DELETED": "Platsen kunde inte raderas",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Platsen kunde inte tas bort eftersom att du inte har rättigheterna för att göra det.",
+      "EMAIL_TEMPLATE_CREATED": "Mallen har skapats",
+      "EMAIL_TEMPLATE_NOT_CREATED": "Mallen kunde inte skapas",
+      "EMAIL_TEMPLATE_SAVED": "Mallen har sparats",
+      "EMAIL_TEMPLATE_NOT_SAVED": "Mallen kunde inte sparas",
+      "EMAIL_TEMPLATE_DELETED": "Mallen har tagits bort",
+      "EMAIL_TEMPLATE_NOT_DELETED": "Mallen kunde inte tas bort",
+      "EMAIL_TEMPLATE_NAME_TAKEN": "Detta namn används redan",
+      "EMAIL_SENT": "Meddelandet har skickats",
+      "EMAIL_NOT_SENT": "Meddelandet kunde inte skickas",
       "CONFLICT_DETECTED": "Konflikt vid schemaläggning: Denna nya händelse överlappar med en annan. Ändra rum, datum eller tider.",
       "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Fel vid schemaläggning: Händelsen har redan avslutats.",
@@ -143,6 +153,11 @@
       "SERIES_ACL_LOCKED": "Åtkomstpolicys får inte redigeras medan en operation utförs på en händelse som är del av serien",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Åtkomstpolicy kräver minst en roll med behörigheterna att läsa och skriva.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "Åtkomstpolicy kräver minst en roll med behörigheterna att läsa och skriva.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Händelsens avhopp-status har uppdaterats.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Fel vid uppdatering händelsens avhopp-status.",
+      "EVENT_PARTICIPATION_STATUS_READONLY": "Deltagandestatus kan inte uppdateras eftersom startdatum är förflyten.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Seriens avhopp-status har uppdaterats.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Fel vid uppdatering seriens avhopp-status.",
       "THEME_NAME_ALREADY_TAKEN": "Detta namn används redan",
       "THEME_NAME_EMPTY": "Namn får inte vara tom",
       "BUMPER_UPLOAD_ERROR": "Fel vid uppladdning av media",
@@ -171,7 +186,13 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Åtgärder",
+      "SEND_MESSAGE": "Skicka meddelande",
       "WARNING": "Varning",
+      "EDIT_STATUS": {
+         "CAPTION": "Redigera status",
+         "READY_FOR_RECORDING": "Redo för inspelning",
+         "OPTED_OUT": "Avhoppad"
+      },
       "DELETE": {
          "SERIES": {
             "CAPTION": "Ta bort",
@@ -224,12 +245,12 @@
       },
       "EDIT_EVENTS": {
          "CAPTION": "Redigera schemalagda händelser",
-         "CONFLICT_CHECK_RUNNING": "Konfliktöversyn sker…",
+         "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
          "GENERAL": {
             "CAPTION": "Allmänt",
             "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
-            "NOCHANGES": "Ingen förändring i händelsen upptäckt!",
-            "CONFLICT_FIRST_EVENT": "Förändrad event",
+            "NOCHANGES": "No changes to the events detected!",
+            "CONFLICT_FIRST_EVENT": "Changed event",
             "CONFLICT_SECOND_EVENT": "Händelse i konflikt",
             "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
@@ -271,8 +292,6 @@
       "BACK": "Föregående",
       "CREATE": "Skapa",
       "RETRACT": "Dra tillbaka",
-      "RETRACT_DELETE": "Dra tillbaka/ta bort",
-      "DELETE": "Ta bort",
       "UPDATE": "Uppdatera",
       "DURATION": {
          "HOURS": "Timmar",
@@ -307,9 +326,6 @@
       },
       "CONFIGURATION": {
          "TITLE": "Konfiguration"
-      },
-      "STATISTICS": {
-         "TITLE": "Statistics"
       }
    },
    "EVENTS": {
@@ -332,6 +348,28 @@
          "BSD": "BSD",
          "CCND": "CCND",
          "GPL": "GPL"
+      },
+      "SEND_MESSAGE": {
+         "CAPTION": "Skicka meddelande",
+         "TABS": {
+            "RECIPIENTS": "Mottagare",
+            "MESSAGE": "Meddelande",
+            "SUMMARY": "Summering"
+         },
+         "RECIPIENTS": {
+            "AUDIT_TRAIL_CAPTION": "Lägg till på redovisningsspårningen",
+            "AUDIT_TRAIL_DESCRIPTION": "Markera om du vill lägga till meddelandet i redovisningsspårningen",
+            "AUDIT_TRAIL_LABEL": ""
+         },
+         "MESSAGE": {
+            "EMAIL_TEMPLATE": "Välj e-postmall",
+            "SUBJECT": "Ämne",
+            "MESSAGE": "Meddelande",
+            "INCLUDE_SIGNATURE": "Lägg till min signatur i e-post"
+         },
+         "SUMMARY": {
+            "MESSAGE_SUMMARY": "Summering"
+         }
       },
       "EVENTS": {
          "NEW": {
@@ -462,6 +500,7 @@
          "ADD_EVENT": "Lägg till händelse",
          "TABLE": {
             "CAPTION": "Händelser",
+            "CREATORS": "Skapare",
             "TITLE": "Titel",
             "PRESENTERS": "Presentatör(er)",
             "SERIES": "Serie",
@@ -476,7 +515,9 @@
             "LAST": "Sista",
             "NEXT": "Nästa",
             "MANAGED_ACL": "Åtkomstpolicy",
+            "SCHEDULING_STATUS": "Status",
             "WORKFLOW_STATE": "Förlopp",
+            "REVIEW_STATUS": "Granskningsstatus",
             "PREVIOUS": "Föregående",
             "NOCONTENT": "Inga data tillgängliga",
             "PUBLISHED": "Publicerad",
@@ -484,19 +525,24 @@
             "TOOLTIP": {
                "START": "Filter för detta startdatum",
                "SERIES": "Filter för den här serien",
-               "STATUS": "Filter för denna händelsestatus",
+               "STATUS": "Filter for this event status",
                "LOCATION": "Filtrera för den här platsen",
                "DETAILS": "Öppna eventdetaljer",
                "DELETE": "Ta bort händelse",
                "EDITOR": "Öppna videoredigeraren",
-               "EDITOR_NEEDS_CUTTING": "Öppna video editor (en kommentar anger att det har begärts att skära videon)",
+               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "Visa kommentarer",
                "PAUSED_WORKFLOW": "Visa pausat arbetsflöde",
-               "PRESENTER": "Filter för denna presentatör"
+               "PRESENTER": "Filter for this presenter"
             }
+         },
+         "SCHEDULING_STATUS": {
+            "READY_FOR_RECORDING": "Redo för inspelning",
+            "OPTED_OUT": "Avhoppad"
          },
          "STATUS": {
             "SCHEDULED": "Schemalagd",
+            "OPTEDOUT": "Avhoppad",
             "RECORDING": "Spelar in",
             "UPLOADING": "Laddar upp",
             "INGESTING": "Intag",
@@ -518,14 +564,16 @@
                "SCHEDULING": "Schemaläggning",
                "WORKFLOWS": "Workflows",
                "ACCESS": "Åtkomstpolicy",
-               "COMMENTS": "Kommentarer",
-               "STATISTICS": "Statistics"
+               "COMMENTS": "Kommentarer"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publikationer",
                "NO_PUBLICATIONS_AVAILABLE": "Denna händelse har inga publikationer",
-               "PUBLICATION_DESCRIPTION": "Den här händelsen har publicerats till följande publikationskanaler:",
-               "LIVE_EVENT_NOT_IN_PROGRESS": "Den här händelsen pågår inte för närvarandet",
+               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
+               "SCHEDULING_STATUS": "Status",
+               "READY_FOR_RECORDING": "Redo för inspelning",
+               "OPTED_OUT": "Avhoppad",
                "CUSTOM": "Anpassad",
                "ENGAGE": "Engage",
                "ENGAGE_LIVE": "Engage Live",
@@ -761,9 +809,6 @@
                   "PROCESSING_FAILURE": "Bearbetning misslyckades"
                }
             },
-            "STATISTICS": {
-               "CAPTION": "Statistics"
-            },
             "METADATA": {
                "CAPTION": "Händelseinformation",
                "TITLE": "Titel",
@@ -795,6 +840,20 @@
             },
             "SCHEDULING": {
                "CAPTION": "Deltagandestatus",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Granskningsstatus"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Opt out-status",
+                  "READY": "Redo för inspelning",
+                  "OPTEDOUT": "Avhoppad"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Meddelanden",
+                  "CREATION_DATE": "Skapandedatum",
+                  "SENDER": "Avsändare",
+                  "SUBJECT": "Ämne"
+               },
                "PLACEHOLDER": {
                   "PRESENTERS": "Presentatör(er)"
                }
@@ -803,7 +862,7 @@
                "ACTIONS": "Åtgärder",
                "DETAILS": "Detaljer",
                "DESCRIPTION": "Beskrivning",
-               "MORE_INFO": "Mer information",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "Typ",
                "TITLE": "Titel",
@@ -811,8 +870,8 @@
                "STARTED": "Startad",
                "SERIES": "Serie",
                "SUBMITTED": "Skickad",
-               "SUBMITTER": "Inlämnare",
-               "EXECUTION_TIME": "Genomförandetid",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
                "WDID": "Workflowdefinition",
                "MIMETYPE": "MimeType",
                "URL": "URI",
@@ -820,21 +879,21 @@
                "NO_CONFIGURATION": "Det finns inga konfigurationsparameter för den valda workflowdefinitionen.",
                "WORKFLOW": "Workflow",
                "TOOLTIP": {
-                  "STOP": "Stoppa workflow",
+                  "STOP": "Stop workflow",
                   "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Försök igen att utföra workflow",
-                  "DELETE": "Ta bort workflow",
-                  "DETAILS": "Workflowdetaljer"
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
-                  "INSTANTIATED": "Instansierad",
+                  "INSTANTIATED": "Instantiated",
                   "RUNNING": "Kör",
                   "PAUSED": "Pausad",
                   "SUCCEEDED": "Lyckade",
                   "FAILED": "Misslyckad",
-                  "FAILING": "Misslyckas",
+                  "FAILING": "Failing",
                   "SKIPPED": "Hoppades över",
-                  "STOPPED": "Stoppad",
+                  "STOPPED": "Stopped",
                   "RETRY": "Försök igen"
                }
             },
@@ -860,15 +919,15 @@
                   "TITLE": "Titel",
                   "STATE": "Status",
                   "DESCRIPTION": "Beskrivning",
-                  "EXECUTION_HOST": "Utförande host",
+                  "EXECUTION_HOST": "Execution Host",
                   "JOB": "Jobb",
                   "TIME_IN_QUEUE": "Tid i kön",
                   "STARTED": "Startad",
                   "FINISHED": "Färdig",
-                  "RETRY_STRATEGY": "Försök igen-strategi",
+                  "RETRY_STRATEGY": "Retry Strategy",
                   "FAILED_ATTEMPTS": "Misslyckade försök",
                   "MAX_ATTEMPTS": "Max",
-                  "EXCEPTION_HANDLER_WORKFLOW": "Exception-hanterande Workflow",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
                   "FAIL_ON_ERROR": "Misslyckas vid fel"
                }
             },
@@ -968,7 +1027,7 @@
             "CAPTION": "Serie",
             "TITLE": "Serie",
             "HAS_EVENTS": "Innehåller händelser",
-            "ORGANIZERS": "Organisatör(er)",
+            "CREATORS": "Organisatör(er)",
             "CONTRIBUTORS": "Medförfattare",
             "CREATED": "Skapad",
             "MANAGED_ACL": "Åtkomstpolicy",
@@ -976,7 +1035,7 @@
             "ACTION": "Åtgärder",
             "TOOLTIP": {
                "SERIES": "Filter events for this series",
-               "DETAILS": "Öppen seriedetaljer",
+               "DETAILS": "Open series details",
                "DELETE": "Ta bort serier"
             }
          },
@@ -985,10 +1044,10 @@
             "TABS": {
                "METADATA": "Metadata",
                "EXTENDED_METADATA": "Metadata II",
+               "PARTICIPATION": "Deltagande",
                "EVENTS": "Händelser",
                "PERMISSIONS": "Åtkomstpolicy",
-               "THEME": "Tema",
-               "STATISTICS": "Statistics"
+               "THEME": "Tema"
             },
             "ACCESS": {
                "CAPTION": "Åtkomstpolicy",
@@ -1008,7 +1067,7 @@
                   "ACTION": "Åtgärder",
                   "NEW": "Ny policy",
                   "DETAILS": "Detaljer",
-                  "REPLACE_EVENT_ACLS": "Uppdatera event rättigheter",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
                   "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
@@ -1030,6 +1089,24 @@
                "LANGUAGE": "Språk",
                "LICENSE": "Licens",
                "DESCRIPTION": "Beskrivning"
+            },
+            "PARTICIPATION": {
+               "CAPTION": "Deltagandestatus schablon",
+               "WARNING_TEMPLATE": "Deltagandestatus för serien används som standardvärde för nya händelser som ingår i serien.",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Granskningsstatus"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Opt out-status",
+                  "READY": "Redo för inspelning",
+                  "OPTEDOUT": "Avhoppad"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Meddelanden",
+                  "CREATION_DATE": "Skapandedatum",
+                  "SENDER": "Avsändare",
+                  "SUBJECT": "Ämne"
+               }
             },
             "EVENTS": {
                "TITLE": "Titel",
@@ -1341,7 +1418,34 @@
          "ADD_THEME": "Lägg till tema"
       },
       "NAVIGATION": {
+         "MAIL_TEMPLATES": "E-postmallar",
+         "MAIL_SERVERS": "E-postinställningar",
          "THEMES": "Teman"
+      },
+      "EMAIL_TEMPLATES": {
+         "TABLE": {
+            "CAPTION": "E-postmallar",
+            "NAME": "Namn",
+            "CREATOR": "Skapare",
+            "CREATED": "Skapad",
+            "ACTION": "Åtgärder"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Skapa mall",
+            "EDITCAPTION": "Redigera mall",
+            "TABS": {
+               "MESSAGE": "Meddelande",
+               "SUMMARY": "Summering"
+            },
+            "MESSAGE": {
+               "NAME": "Namn",
+               "SUBJECT": "Ämne",
+               "MESSAGE": "Meddelande"
+            },
+            "SUMMARY": {
+               "MESSAGE_SUMMARY": "Sammanfattning av meddelandet"
+            }
+         }
       },
       "THEMES": {
          "TABLE": {
@@ -1437,16 +1541,24 @@
       "JOBS": {
          "TABLE": {
             "ID": "Jobb-ID",
+            "ACTION": "Åtgärder",
             "CAPTION": "Jobb",
             "CREATED": "Skapad",
             "CREATOR": "Skapare",
             "HOST_NAME": "Hostnamn",
-            "NODE_NAME": "Node namn",
             "OPERATION": "Operation",
             "STARTED": "Startad",
             "STATUS": "Status",
             "SUBMITTED": "Skickad",
             "TYPE": "Typ"
+         },
+         "DETAILS": {
+            "HEADER": "Jobbdetaljer {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Allmänt",
+               "OPERATIONS": "Aktiviteter",
+               "INCIDENTS": "Incidenter"
+            }
          },
          "STATUS": {
             "QUEUED": "Kölagd",
@@ -1455,8 +1567,8 @@
             "FINISHED": "Färdig",
             "FAILED": "Misslyckad",
             "DELETED": "Togs bort",
-            "INSTANTIATED": "Instansierad",
-            "DISPATCHING": "Påbörjad",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
             "RESTART": "Starta om",
             "CANCELED": "Avbröts",
             "WAITING": "Väntar"
@@ -1467,7 +1579,6 @@
             "CAPTION": "Servrar",
             "STATUS": "Status",
             "HOST_NAME": "Hostnamn",
-            "NODE_NAME": "Node namn",
             "CORES": "Kärnor",
             "COMPLETED": "Avslutade jobb",
             "RUNNING": "Aktiva jobb",
@@ -1475,6 +1586,7 @@
             "MEAN_RUN_TIME": "Genomsnittlig körtid",
             "MEAN_QUEUE_TIME": "Genomsnittlig kötid",
             "MAINTENANCE": "Underhåll",
+            "ACTION": "Åtgärder",
             "MAINTENANCE_OFF": "Starta underhållsläge",
             "MAINTENANCE_ON": "Lämna underhållsläget"
          }
@@ -1485,7 +1597,6 @@
             "STATUS": "Status",
             "NAME": "Tjänstenamn",
             "HOST_NAME": "Hostnamn",
-            "NODE_NAME": "Node namn",
             "COMPLETED": "Avslutade jobb",
             "RUNNING": "Aktiva jobb",
             "QUEUED": "Köade jobb",
@@ -1505,7 +1616,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Varning: Några av dina ändringar sparades inte. Om du lämnar videoeditoren kommer dessa förändringar att gå bort. Vill du verkligen fortsätta?",
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "Tidslinje",
       "ZOOMLEVEL": "Zoomnivå",
       "PREVIEW_MODE": "Förhandsgranskningsläge",
@@ -1573,7 +1684,7 @@
             }
          },
          "PREVIEW": {
-            "NOT_AVAILABLE": "Ingen förhandsgranskning tillgänglig",
+            "NOT_AVAILABLE": "No preview available",
             "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
          },
          "CURRENT": {
@@ -1594,21 +1705,21 @@
          "VIDEO": {
             "HEADER": "Videospår",
             "NOT_AVAILABLE": "Det finns inga videospår tillgängliga",
-            "NO_PREVIEW_AVAILABLE": "Det finns inget preview-bild tillgänglig",
-            "NO_TRACK_SELECTED": "Inget videospår utvald",
+            "NO_PREVIEW_AVAILABLE": "No preview image found",
+            "NO_TRACK_SELECTED": "No video track selected",
             "TOOLTIPS": {
-               "HIDE": "Det här videospåret är utvald. Klicka för att avvälja",
-               "UNHIDE": "Det här videospåret är inte utvald. Klicka för att välja."
+               "HIDE": "This video track is currently enabled. Click to disable",
+               "UNHIDE": "This video track is currently disabled. Click to enable."
             }
          },
          "AUDIO": {
             "HEADER": "Ljudspår",
-            "NOT_AVAILABLE": "Det finns inga audiospår tillgängliga",
-            "NO_PREVIEW_AVAILABLE": "Det finns inget preview-bild tillgängliga",
-            "NO_TRACK_SELECTED": "Inget audiospår utvald",
+            "NOT_AVAILABLE": "No audio tracks available",
+            "NO_PREVIEW_AVAILABLE": "No preview image found",
+            "NO_TRACK_SELECTED": "No audio track selected",
             "TOOLTIPS": {
-               "HIDE": "Det här audiospåret är utvald. Klicka för att avvälja",
-               "UNHIDE": "Det här audiospåret är inte utvald. Klicka för att välja"
+               "HIDE": "This audio track is currently enabled. Click to disable",
+               "UNHIDE": "This audio track is currently disabled. Click to enable"
             }
          }
       },
@@ -1646,7 +1757,7 @@
       "PLACEHOLDER": "Sök…",
       "PROFILES": {
          "FILTERS_HEADER": "Sparade filter-set",
-         "EDIT": "Redigera filterset",
+         "EDIT": "Edit filter set",
          "REMOVE": "Ta bort sparat filter",
          "EMPTY": "Inga sparade filter än",
          "SAVE_FILTERS": "Spara",
@@ -1705,6 +1816,9 @@
          "LOCATION": {
             "LABEL": "Plats"
          },
+         "OPTEDOUT": {
+            "LABEL": "Avhoppad"
+         },
          "PERIOD": {
             "LABEL": "Tidsperiod"
          },
@@ -1716,6 +1830,12 @@
          },
          "PROGRESS": {
             "LABEL": "Förlopp"
+         },
+         "REVIEW_STATUS": {
+            "LABEL": "Granskningsstatus",
+            "CONFIRMED": "Bekräftad",
+            "UNCONFIRMED": "Obekräftad",
+            "UNSENT": "Ej skickad"
          },
          "SERIES": {
             "LABEL": "Serie"
@@ -1760,9 +1880,6 @@
          "HOSTNAME": {
             "LABEL": "Hostnamn"
          },
-         "NODE_NAME": {
-            "LABEL": "Node namn"
-         },
          "STATUS": {
             "LABEL": "Status",
             "PAUSED": "Pausad",
@@ -1804,9 +1921,6 @@
          "HOSTNAME": {
             "LABEL": "Hostnamn"
          },
-         "NODE_NAME": {
-            "LABEL": "Node namn"
-         },
          "STATUS": {
             "LABEL": "Status",
             "MAINTENANCE": "Underhåll",
@@ -1820,9 +1934,6 @@
          },
          "HOSTNAME": {
             "LABEL": "Hostnamn"
-         },
-         "NODE_NAME": {
-            "LABEL": "Node namn"
          },
          "NAME": {
             "LABEL": "Namn"
@@ -1967,28 +2078,7 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "För att kunna knappa in flera värder, tryck Enter imellan"
-      }
-   },
-   "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
-      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
-      "FROM": "Från",
-      "TO": "To",
-      "TOTAL": "Total",
-      "GRANULARITY": "Granularity",
-      "NAVIGATION": {
-         "ORGANIZATION": "Organisation"
-      },
-      "TITLE": {
-         "RANDOM": "Random Data",
-         "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views"
-      },
-      "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time uinit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time uinit."
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

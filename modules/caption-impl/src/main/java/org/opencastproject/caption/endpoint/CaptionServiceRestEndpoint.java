@@ -169,7 +169,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
       }
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (Exception e) {
-      logger.error("Unable to convert captions: {}", e.getMessage());
+      logger.error(e.getMessage());
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
@@ -219,7 +219,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
       return Response.status(Response.Status.OK).entity(writer.toString()).build();
     } catch (Exception e) {
-      logger.error("Unable to parse captions: {}", e.getMessage());
+      logger.error(e.getMessage());
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }

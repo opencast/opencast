@@ -128,8 +128,6 @@ public interface WorkflowOperationInstance extends Configurable {
    */
   String getExecutionCondition();
 
-  void setExecutionCondition(String condition);
-
   /**
    * Returns either <code>null</code> or <code>true</code> to have the operation skipped. Any other value is interpreted
    * as <code>false</code> and will execute the operation.

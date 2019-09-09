@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>7-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -22,11 +22,11 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-core</artifactId>
+      <artifactId>org.springframework.security.core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-web</artifactId>
+      <artifactId>org.springframework.security.web</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>

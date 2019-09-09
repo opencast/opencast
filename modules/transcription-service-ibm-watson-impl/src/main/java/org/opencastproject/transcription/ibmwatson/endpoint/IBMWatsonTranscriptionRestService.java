@@ -144,7 +144,7 @@ public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoi
               jsonObj == null ? jsonObj : jsonObj.toJSONString());
       return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
     } catch (Exception e) {
-      logger.warn("Error handling notification results: {}", e.getMessage());
+      logger.warn(e.getMessage());
       return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
     }
   }

@@ -114,14 +114,4 @@ public interface HostRegistration {
    */
   void setMaintenanceMode(boolean maintenanceMode);
 
-  /**
-   * @return the node id for this host
-   */
-  String getNodeName();
-
-  /**
-   * @param nodeName
-   *          the node name to set
-   */
-  void setNodeName(String nodeName);
 }

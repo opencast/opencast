@@ -255,7 +255,6 @@ public class WorkflowOperationInstanceImpl implements WorkflowOperationInstance 
     this.description = description;
   }
 
-  @Override
   public void setExecutionCondition(String condition) {
     this.executeCondition = condition;
   }

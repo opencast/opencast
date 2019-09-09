@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>7-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -274,6 +274,7 @@
               OSGI-INF/list-providers/boolean.xml,
               OSGI-INF/list-providers/comments.xml,
               OSGI-INF/list-providers/contributors.xml,
+              OSGI-INF/list-providers/email.xml,
               OSGI-INF/list-providers/events.xml,
               OSGI-INF/list-providers/groups.xml,
               OSGI-INF/list-providers/jobs.xml,

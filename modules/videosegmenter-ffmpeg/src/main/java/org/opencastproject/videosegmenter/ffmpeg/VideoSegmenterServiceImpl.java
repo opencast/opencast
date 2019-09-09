@@ -50,6 +50,8 @@ import org.opencastproject.videosegmenter.api.VideoSegmenterException;
 import org.opencastproject.videosegmenter.api.VideoSegmenterService;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.common.io.LineReader;
+
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -628,27 +630,32 @@ VideoSegmenterService, ManagedService {
    * @throws IOException
    * @throws VideoSegmenterException
    */
-  private LinkedList<Segment> runSegmentationFFmpeg(Track track, Video videoContent, File mediaFile,
+  protected LinkedList<Segment> runSegmentationFFmpeg(Track track, Video videoContent, File mediaFile,
           float changesThreshold) throws IOException, VideoSegmenterException {
 
-    String[] command = new String[] { binary, "-nostats", "-nostdin", "-i", mediaFile.getAbsolutePath(),
+    String[] command = new String[] { binary, "-nostats", "-i", mediaFile.getAbsolutePath(),
       "-filter:v", "select=gt(scene\\," + changesThreshold + "),showinfo", "-f", "null", "-"};
 
     logger.info("Detecting video segments using command: {}", command);
 
     ProcessBuilder pbuilder = new ProcessBuilder(command);
-    List<String> segmentsStrings = new LinkedList<>();
+    List<String> segmentsStrings = new LinkedList<String>();
     Process process = pbuilder.start();
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
-      String line = reader.readLine();
+    BufferedReader reader = new BufferedReader(
+            new InputStreamReader(process.getErrorStream()));
+    try {
+      LineReader lr = new LineReader(reader);
+      String line = lr.readLine();
       while (null != line) {
         if (line.startsWith("[Parsed_showinfo")) {
           segmentsStrings.add(line);
         }
-        line = reader.readLine();
+        line = lr.readLine();
       }
     } catch (IOException e) {
       logger.error("Error executing ffmpeg: {}", e.getMessage());
+    } finally {
+      reader.close();
     }
 
     // [Parsed_showinfo_1 @ 0x157fb40] n:0 pts:12 pts_time:12 pos:227495
@@ -656,7 +663,7 @@ VideoSegmenterService, ManagedService {
     // plane_checksum:[8DF39EA9]
 
     int segmentcount = 1;
-    LinkedList<Segment> segments = new LinkedList<>();
+    LinkedList<Segment> segments = new LinkedList<Segment>();
 
     if (segmentsStrings.size() == 0) {
       Segment s = videoContent.getTemporalDecomposition()

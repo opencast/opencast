@@ -34,7 +34,6 @@ describe('Application controller', function () {
                      ]}
                    });
         $httpBackend.whenGET('/services/health.json').respond('{}');
-        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
 
         $scope = $rootScope.$new();
 

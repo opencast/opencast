@@ -158,14 +158,6 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
     };
   }
 
-  @Override
-  public List<Property> selectProperties(final String mediaPackageId, String namespace) {
-    if (isAuthorized(mediaPackageId, READ_ACTION)) {
-      return super.selectProperties(mediaPackageId, namespace);
-    }
-    return chuck(new UnauthorizedException(format("Not allowed to read properties of event %s", mediaPackageId)));
-  }
-
   /* ------------------------------------------------------------------------------------------------------------------ */
 
   /** Create a new query builder. */
@@ -219,7 +211,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
                 .filter(roleFilter)
                 .map((role) -> mkPropertyName(role.getName(), action))
                 .collect(Collectors.toList());
-        return super.selectProperties(mediaPackageId, SECURITY_NAMESPACE).parallelStream()
+        return selectProperties(mediaPackageId, SECURITY_NAMESPACE).parallelStream()
                 .map(p -> p.getId().getName())
                 .anyMatch(p -> roles.parallelStream().anyMatch(r -> r.equals(p)));
     }
