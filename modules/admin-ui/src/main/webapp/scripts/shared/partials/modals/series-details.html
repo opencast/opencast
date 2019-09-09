@@ -49,6 +49,13 @@
        ng-if="statReusable.hasStatistics()">
       <!-- Statistics -->
     </a>
+    <a ng-if="feedContent" ng-click="openTab('feeds')"
+      data-modal-tab="feeds"
+      ng-class="{ active: tab == 'feeds' }"
+      translate="Feeds"
+      with-role="Feeds">
+      <!-- Feeds -->
+    </a>
   </nav>
 
   <!-- Left and right arrows to switch between series -->
@@ -333,6 +340,30 @@
                 <p ng-if="selectedTheme.description">{{ selectedTheme.description }}</p>
               </li>
             </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feeds view -->
+  <div ng-if="feedsLinks" class="modal-content" data-modal-tab-content="feeds">
+    <div class="modal-body">
+      <div class="full-col">
+        <div class="obj">
+          <div class="obj-container">
+            <table class="main-tbl">
+              <tr>
+                <th>Type</th>
+                <th>Version</th>
+                <th>Link</th>
+              </tr>
+              <tr ng-repeat="row in feedsLinks">
+                <td> {{ row.type }} </td>
+                <td> {{ row.version }} </td>
+                <td> <a href="{{ row.link }}"> {{ row.link }} </a> </td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>

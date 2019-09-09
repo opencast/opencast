@@ -32,6 +32,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.Gson;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedOutput;
 import com.rometools.rome.io.WireFeedOutput;
@@ -41,7 +42,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -93,6 +96,40 @@ public class FeedServiceImpl {
 
   /** The security service */
   private SecurityService securityService = null;
+
+  /** For Feedlinks */
+  private Gson gson = new Gson();
+
+  /*
+   *
+   * Feedlinks for Admin UI
+   * /feeds/feeds
+   *
+   */
+
+  @GET
+  @Path("/feeds")
+  @Produces(MediaType.APPLICATION_JSON)
+  public String listFeedServices() {
+
+    List<Map<String, String>> feedServices = new ArrayList<>();
+
+    for (FeedGenerator generator : feeds) {
+      if (generator.getName().equals("Series")
+              || generator.getName().equals("Series episodes containing audio files")) {
+        Map<String, String> details = new HashMap<>();
+        details.put("identifier", generator.getIdentifier());
+        details.put("name", generator.getName());
+        details.put("description", generator.getDescription());
+        details.put("copyright", generator.getCopyright());
+        details.put("pattern", generator.getPattern());
+        details.put("type", generator.getClass().getSimpleName());
+        feedServices.add(details);
+      }
+    }
+
+    return gson.toJson(feedServices);
+  }
 
   /*
    * Note: We're using Regex matching for the path here, instead of normal JAX-RS paths.  Previously this class was a servlet,
