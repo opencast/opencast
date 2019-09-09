@@ -1,5 +1,5 @@
 describe('Table', function () {
-    var $httpBackend, $location, Table, Storage, UsersResource;
+    var $httpBackend, $location, Table, Storage, UsersResource, angular;
 
     beforeEach(module('adminNg'));
 
@@ -23,6 +23,7 @@ describe('Table', function () {
 
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
     });
 
     it('provides a constructor', function () {
@@ -51,6 +52,7 @@ describe('Table', function () {
                         $promise: {
                             then: function (fn) {
                                 fn(data);
+                            return { catch: function() {} };
                             }
                         }
                     };

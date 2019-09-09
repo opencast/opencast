@@ -28,13 +28,13 @@ angular.module('adminNg.controllers')
   'EventWorkflowDetailsResource', 'ResourcesListResource', 'UserRolesResource', 'EventAccessResource',
   'EventPublicationsResource', 'EventSchedulingResource','NewEventProcessingResource', 'CaptureAgentsResource',
   'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService', 'UploadAssetOptions',
-  'EventUploadAssetResource', 'Table', 'SchedulingHelperService',
+  'EventUploadAssetResource', 'Table', 'SchedulingHelperService', 'StatisticsReusable',
   function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource,
     EventAssetCatalogsResource, CommentResource, EventWorkflowsResource, EventWorkflowActionResource,
     EventWorkflowDetailsResource, ResourcesListResource, UserRolesResource, EventAccessResource,
     EventPublicationsResource, EventSchedulingResource, NewEventProcessingResource, CaptureAgentsResource,
     ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
-    EventUploadAssetResource, Table, SchedulingHelperService) {
+    EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable) {
 
     var roleSlice = 100;
     var roleOffset = 0;
@@ -229,7 +229,7 @@ angular.module('adminNg.controllers')
                 }
               }, this);
               return roles;
-            });
+            }).catch(angular.noop);
           }, this);
         },
         cleanupScopeResources = function() {
@@ -241,6 +241,14 @@ angular.module('adminNg.controllers')
           me.clearConflicts();
         },
         fetchChildResources = function (id) {
+          var previousProviderData;
+          if ($scope.statReusable !== null) {
+            previousProviderData = $scope.statReusable.statProviderData;
+          }
+          $scope.statReusable = StatisticsReusable.createReusableStatistics(
+            'episode',
+            id,
+            previousProviderData);
 
           var publications = EventPublicationsResource.get({ id: id }, function () {
             angular.forEach(publications.publications, function (publication, index) {
@@ -413,7 +421,7 @@ angular.module('adminNg.controllers')
                   }
                 }
               });
-            });
+            }).catch(angular.noop);
           }, function () {
             $scope.scheduling.hasProperties = false;
           });
@@ -428,6 +436,7 @@ angular.module('adminNg.controllers')
         },
         tzOffset = (new Date()).getTimezoneOffset() / -60;
 
+    $scope.statReusable = null;
 
     $scope.getMoreRoles = function (value) {
 
@@ -451,16 +460,17 @@ angular.module('adminNg.controllers')
           $scope.roles[role.name] = role.value;
         });
         roleOffset = Object.keys($scope.roles).length;
-      }).finally(function () {
+      }).catch(angular.noop
+      ).finally(function () {
         loading = false;
       });
       return rolePromise;
     };
 
     /**
-         * <===============================
-         * START Scheduling related resources
-         */
+     * <===============================
+     * START Scheduling related resources
+     */
 
     /* Get the current client timezone */
     $scope.tz = 'UTC' + (tzOffset < 0 ? '-' : '+') + tzOffset;
@@ -533,12 +543,11 @@ angular.module('adminNg.controllers')
             resolve();
           } else {
             ConflictCheckResource.check($scope.source, me.noConflictsDetected, me.conflictsDetected)
-                            .$promise.then(function() {
-                              resolve();
-                            })
-                            .catch(function(err) {
-                              reject();
-                            });
+              .$promise.then(function() {
+                resolve();
+              }).catch(function(err) {
+                reject();
+              });
           }
         } else {
           $scope.checkingConflicts = false;

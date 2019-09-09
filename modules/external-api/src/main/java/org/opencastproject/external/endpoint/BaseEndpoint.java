@@ -79,7 +79,7 @@ import javax.ws.rs.core.Response;
  * supported API.
  */
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0 })
 @RestService(name = "externalapiservice", title = "External API Service", notes = {}, abstractText = "Provides a location for external apis to query the current server of the API.")
 public class BaseEndpoint {
 
@@ -202,6 +202,8 @@ public class BaseEndpoint {
     List<JValue> versions = new ArrayList<>();
     versions.add(v(ApiVersion.VERSION_1_0_0.toString()));
     versions.add(v(ApiVersion.VERSION_1_1_0.toString()));
+    versions.add(v(ApiVersion.VERSION_1_2_0.toString()));
+    versions.add(v(ApiVersion.VERSION_1_3_0.toString()));
     JValue json = obj(f("versions", arr(versions)), f("default", v(ApiVersion.CURRENT_VERSION.toString())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
   }

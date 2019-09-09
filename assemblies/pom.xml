@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>7-SNAPSHOT</version>
+    <version>8-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
@@ -142,6 +142,9 @@
                   <!-- Additional config lines to system.properties -->
                   <concat destfile="target/assembly/etc/system.properties" append="true">
                     <filelist dir="../resources" files="system.properties.append"/>
+                  </concat>
+                  <concat destfile="target/assembly/etc/shell.init.script" append="true">
+                    <filelist dir="resources" files="shell.init.script.append"/>
                   </concat>
                   <!-- Adding extra OSGi system packages to configuration -->
                   <replace file="target/assembly/etc/config.properties" token="org.osgi.framework.system.packages= \" value="org.osgi.framework.system.packages= com.sun.image.codec.jpeg, com.sun.jndi.ldap, \"/>

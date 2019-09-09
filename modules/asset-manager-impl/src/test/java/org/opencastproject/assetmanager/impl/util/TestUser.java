@@ -44,7 +44,6 @@ public class TestUser implements User {
   private final String email;
   private final String provider;
   private final boolean manageable;
-  private final boolean canLogin;
   private final Organization organization;
   private final Set<Role> roles;
 
@@ -55,7 +54,6 @@ public class TestUser implements User {
       String email,
       String provider,
       boolean manageable,
-      boolean canLogin,
       Organization organization,
       Set<Role> roles) {
     this.username = username;
@@ -64,26 +62,25 @@ public class TestUser implements User {
     this.email = email;
     this.provider = provider;
     this.manageable = manageable;
-    this.canLogin = canLogin;
     this.organization = organization;
     this.roles = roles;
   }
 
   public static User mk(String userName, Organization organization,
                         Set<Role> roles) {
-    return new TestUser(userName, "password", "name", "email", "provider", true, true, organization, roles);
+    return new TestUser(userName, "password", "name", "email", "provider", true, organization, roles);
   }
 
   public static User mk(Organization organization, Set<Role> roles) {
-    return new TestUser("user", "password", "name", "email", "provider", true, true, organization, roles);
+    return new TestUser("user", "password", "name", "email", "provider", true, organization, roles);
   }
 
   public static User mk(Organization organization) {
-    return new TestUser("user", "password", "name", "email", "provider", true, true, organization, Collections.<Role>emptySet());
+    return new TestUser("user", "password", "name", "email", "provider", true, organization, Collections.<Role>emptySet());
   }
 
   public static User mk(Organization organization, Role... roles) {
-    return new TestUser("user", "password", "name", "email", "provider", true, true, organization, $(roles).toSet());
+    return new TestUser("user", "password", "name", "email", "provider", true, organization, $(roles).toSet());
   }
 
   /**
@@ -92,7 +89,7 @@ public class TestUser implements User {
    */
   public static User mk(final Organization organization, String... roles) {
     return new TestUser(
-        "user", "password", "name", "email", "provider", true, true, organization,
+        "user", "password", "name", "email", "provider", true, organization,
         $(roles).map(new Fn<String, Role>() {
           @Override public Role apply(String role) {
             return TestRole.mk(role, organization);
@@ -124,10 +121,6 @@ public class TestUser implements User {
     return manageable;
   }
 
-  @Override public boolean canLogin() {
-    return canLogin;
-  }
-
   @Override public Organization getOrganization() {
     return organization;
   }
@@ -147,7 +140,7 @@ public class TestUser implements User {
   };
 
   @Override public int hashCode() {
-    return hash(username, password, name, email, provider, manageable, canLogin, organization, roles);
+    return hash(username, password, name, email, provider, manageable, organization, roles);
   }
 
   @Override public boolean equals(Object that) {
@@ -156,8 +149,8 @@ public class TestUser implements User {
 
   private boolean eqFields(TestUser that) {
     return eq(username, that.username) && eq(password, that.password) && eq(name, that.name) && eq(email, that.email)
-        && eq(provider, that.provider) && eq(manageable, that.manageable) && eq(canLogin, that.canLogin)
-        && eq(organization, that.organization) && eq(roles, that.roles);
+        && eq(provider, that.provider) && eq(manageable, that.manageable) && eq(organization, that.organization)
+        && eq(roles, that.roles);
   }
 
   @Override public String toString() {

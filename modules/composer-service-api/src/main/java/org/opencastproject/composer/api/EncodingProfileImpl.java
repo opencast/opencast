@@ -85,7 +85,7 @@ public class EncodingProfileImpl implements EncodingProfile {
   protected HashMap<String,String> suffixes = new HashMap<String, String>();
 
   @XmlElement(name = "jobLoad")
-  protected Float jobLoad = 0.8f;
+  protected Float jobLoad = 1.5f;
 
   /**
    * Private, since the profile should be created using the static factory method.

@@ -61,8 +61,8 @@ below.
 ## Configuration
 
 
-1. Edit the file etc/org.opencastproject.streaming.wowza.StreamingDistributionService.cfg with your preferred
-configuration. The contents should be self-explanatory.
+1. Edit the file `etc/org.opencastproject.distribution.streaming.wowza.WowzaAdaptiveStreamingDistributionService.cfg`
+with your preferred configuration. The contents should be self-explanatory.
 
 2. Edit `$KARAF/etc/custom.properties` and adjust these values to match those of your scenario:
 

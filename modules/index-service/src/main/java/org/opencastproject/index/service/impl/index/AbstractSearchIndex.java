@@ -474,7 +474,6 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
       event.setWorkflowId(null);
       event.setWorkflowDefinitionId(null);
       event.setWorkflowState(null);
-      event.setWorkflowScheduledDate(null);
     }
 
     if (toDelete(event)) {

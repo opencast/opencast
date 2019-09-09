@@ -26,7 +26,7 @@ Tags and flavors can be used in combination.
 |target-flavor     |"presentation/tagged"     |Apply these flavor to any media package elements|EMPTY|
 |copy              |"true" or "false"         |Indicates if matching elements will be cloned before tagging is applied or whether tagging is applied to the original element. Set to "true" to create a copy first, "false" otherwise.|FALSE|
 
-Note: see [TagWorkflowOperationHandler](tag-woh.md) for further explanation of the source/target-flavour/tags
+Note: see [TagWorkflowOperationHandler](tag-woh.md) for further explanation of the source/target-flavor/tags
 
 ### dccatalog
 The type of Dublin Core catalog in which to look for the `dcterm`. This will usually be `episode` or `series`.

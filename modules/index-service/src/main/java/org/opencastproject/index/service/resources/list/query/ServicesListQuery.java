@@ -53,6 +53,10 @@ public class ServicesListQuery extends ResourceListQueryImpl {
   public static final String FILTER_NAME_HOSTNAME = "hostname";
   /** Hostname filter label. */
   public static final String FILTER_LABEL_HOSTNAME = FILTER_PREFIX + ".HOSTNAME.LABEL";
+  /** NodeName filter name. */
+  public static final String FILTER_NAME_NODE_NAME = "nodeName";
+  /** NodeName filter label. */
+  public static final String FILTER_LABEL_NODE_NAME = FILTER_PREFIX + ".NODE_NAME.LABEL";
   /** Status filter name. */
   public static final String FILTER_NAME_STATUS = "status";
   /** Status filter label. */
@@ -67,6 +71,7 @@ public class ServicesListQuery extends ResourceListQueryImpl {
     super();
     this.availableFilters.add(createNameFilter(Option.<String> none()));
     this.availableFilters.add(createHostnameFilter(Option.<String> none()));
+    this.availableFilters.add(createNodeNameFilter(Option.<String> none()));
     this.availableFilters.add(createStatusFilter(Option.<String> none()));
     this.availableFilters.add(createActionsFilter(Option.<Boolean> none()));
   }
@@ -106,6 +111,15 @@ public class ServicesListQuery extends ResourceListQueryImpl {
    */
   public void withHostname(Option<String> hostname) {
     addFilter(createHostnameFilter(hostname));
+  }
+
+  /**
+   * Add a {@link ResourceListFilter} filter to the query with the given node name.
+   *
+   * @param nodeName the node name to filter for
+   */
+  public void withNodeName(String nodeName) {
+    addFilter(createNodeNameFilter(Option.option(nodeName)));
   }
 
   /**
@@ -153,6 +167,16 @@ public class ServicesListQuery extends ResourceListQueryImpl {
    */
   public Option<String> getHostname() {
     return getFilterValue(FILTER_NAME_HOSTNAME);
+  }
+
+  /**
+   * Returns an {@link Option} containing the node name used to filter if set.
+   * {@link Option#none()} otherwise.
+   *
+   * @return an {@link Option} containing the node name or none.
+   */
+  public Option<String> getNodeName() {
+    return getFilterValue(FILTER_NAME_NODE_NAME);
   }
 
   /**
@@ -219,6 +243,21 @@ public class ServicesListQuery extends ResourceListQueryImpl {
             FILTER_LABEL_HOSTNAME,
             ResourceListFilter.SourceType.SELECT,
             Option.some(ServersListProvider.LIST_HOSTNAME));
+  }
+
+  /**
+   * Create a new {@link ResourceListFilter} based on a nodeName.
+   *
+   * @param value the nodeName to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @return a new {@link ResourceListFilter} for a nodeName based query
+   */
+  public static ResourceListFilter<String> createNodeNameFilter(Option<String> value) {
+    return FiltersUtils.generateFilter(
+            value,
+            FILTER_NAME_NODE_NAME,
+            FILTER_LABEL_NODE_NAME,
+            ResourceListFilter.SourceType.SELECT,
+            Option.some(ServersListProvider.LIST_NODE_NAME));
   }
 
   /**

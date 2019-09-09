@@ -31,7 +31,7 @@ angular.module('adminNg.services')
                 && angular.isDefined(current_user.org)
                 && angular.isDefined(current_user.org.properties) ?
           current_user.org.properties['adminui.user.listname'] : undefined;
-      });
+      }).catch(angular.noop);
 
       this.reset = function () {
         me.users = {

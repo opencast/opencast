@@ -21,6 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static com.entwinemedia.fn.data.json.Jsons.BLANK;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
@@ -78,13 +79,14 @@ import javax.ws.rs.core.Response;
 public class ServerEndpoint {
 
   private enum Sort {
-    COMPLETED, CORES, HOSTNAME, MAINTENANCE, MEANQUEUETIME, MEANRUNTIME, ONLINE, QUEUED, RUNNING
+    COMPLETED, CORES, HOSTNAME, MAINTENANCE, MEANQUEUETIME, MEANRUNTIME, NODENAME, ONLINE, QUEUED, RUNNING
   }
 
   // List of property keys for the JSON job object
   private static final String KEY_ONLINE = "online";
   private static final String KEY_MAINTENANCE = "maintenance";
   private static final String KEY_HOSTNAME = "hostname";
+  private static final String KEY_NODE_NAME = "nodeName";
   private static final String KEY_CORES = "cores";
   private static final String KEY_RUNNING = "running";
   private static final String KEY_COMPLETED = "completed";
@@ -138,11 +140,20 @@ public class ServerEndpoint {
         case MEANRUNTIME:
           result = ((Long) host1.get(KEY_MEAN_RUN_TIME)).compareTo((Long) host2.get(KEY_MEAN_RUN_TIME));
           break;
+        case NODENAME:
+        {
+          String name1 = (String) host1.get(KEY_NODE_NAME);
+          String name2 = (String) host2.get(KEY_NODE_NAME);
+          result = name1.compareTo(name2);
+          break;
+        }
         case HOSTNAME:
         default:
+        {
           String name1 = (String) host1.get(KEY_HOSTNAME);
           String name2 = (String) host2.get(KEY_HOSTNAME);
           result = name1.compareTo(name2);
+        }
       }
 
       return ascending ? result : -1 * result;
@@ -229,10 +240,15 @@ public class ServerEndpoint {
       boolean vOnline = server.isOnline();
       boolean vMaintenance = server.isMaintenanceMode();
       String vHostname = server.getBaseUrl();
+      String vNodeName = server.getNodeName();
       int vCores = server.getCores();
 
       if (query.getHostname().isSome()
               && !StringUtils.equalsIgnoreCase(vHostname, query.getHostname().get()))
+          continue;
+
+      if (query.getNodeName().isSome()
+              && !StringUtils.equalsIgnoreCase(vNodeName, query.getNodeName().get()))
           continue;
 
       if (query.getStatus().isSome()) {
@@ -255,6 +271,7 @@ public class ServerEndpoint {
 
       if (query.getFreeText().isSome()
                 && !StringUtils.containsIgnoreCase(vHostname, query.getFreeText().get())
+                && !StringUtils.containsIgnoreCase(vNodeName, query.getFreeText().get())
                 && !StringUtils.containsIgnoreCase(server.getIpAddress(), query.getFreeText().get()))
         continue;
 
@@ -262,6 +279,7 @@ public class ServerEndpoint {
       jsonServer.put(KEY_ONLINE, vOnline && offlineJobProducerServices <= totalJobProducerServices / 2);
       jsonServer.put(KEY_MAINTENANCE, vMaintenance);
       jsonServer.put(KEY_HOSTNAME, vHostname);
+      jsonServer.put(KEY_NODE_NAME, vNodeName);
       jsonServer.put(KEY_CORES, vCores);
       jsonServer.put(KEY_RUNNING, jobsRunning);
       jsonServer.put(KEY_QUEUED, jobsQueued);
@@ -314,6 +332,7 @@ public class ServerEndpoint {
       Boolean vOnline = (Boolean) server.get(KEY_ONLINE);
       Boolean vMaintenance = (Boolean) server.get(KEY_MAINTENANCE);
       String vHostname = (String) server.get(KEY_HOSTNAME);
+      String vNodeName = (String) server.get(KEY_NODE_NAME);
       Integer vCores = (Integer) server.get(KEY_CORES);
       Integer vRunning = (Integer) server.get(KEY_RUNNING);
       Integer vQueued = (Integer) server.get(KEY_QUEUED);
@@ -323,7 +342,8 @@ public class ServerEndpoint {
 
       jsonServers.add(obj(f(KEY_ONLINE, v(vOnline)),
               f(KEY_MAINTENANCE, v(vMaintenance)),
-              f(KEY_HOSTNAME, v(vHostname)),
+              f(KEY_HOSTNAME, v(vHostname, BLANK)),
+              f(KEY_NODE_NAME, v(vNodeName, BLANK)),
               f(KEY_CORES, v(vCores)),
               f(KEY_RUNNING, v(vRunning)),
               f(KEY_QUEUED, v(vQueued)),

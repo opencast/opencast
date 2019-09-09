@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <version>7-SNAPSHOT</version>
+  <version>8-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>opencast</name>
   <description>Opencast is a media capture, processing, management and distribution system</description>
@@ -199,6 +199,11 @@
     <module>modules/static</module>
     <module>modules/static-file-service-api</module>
     <module>modules/static-file-service-impl</module>
+    <module>modules/statistics-service-api</module>
+    <module>modules/statistics-service-impl</module>
+    <module>modules/statistics-service-remote</module>
+    <module>modules/statistics-provider-influx</module>
+    <module>modules/statistics-provider-random</module>
     <module>modules/textanalyzer-api</module>
     <module>modules/textanalyzer-impl</module>
     <module>modules/textanalyzer-remote</module>
@@ -237,6 +242,7 @@
     <module>modules/waveform-ffmpeg</module>
     <module>modules/waveform-remote</module>
     <module>modules/waveform-workflowoperation</module>
+    <module>modules/workflow-condition-parser</module>
     <module>modules/workflow-service-api</module>
     <module>modules/workflow-service-impl</module>
     <module>modules/workflow-service-remote</module>
@@ -508,7 +514,7 @@
           <configuration>
             <instructions>
               <Bundle-Category>opencastproject</Bundle-Category>
-              <Bundle-DocURL>http://opencastproject.org/</Bundle-DocURL>
+              <Bundle-DocURL>https://opencast.org/</Bundle-DocURL>
               <Bundle-Vendor>The Opencast Project</Bundle-Vendor>
               <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             </instructions>
@@ -543,6 +549,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
           <version>3.5</version>
+        </plugin>
+        <plugin>
+          <groupId>org.antlr</groupId>
+          <artifactId>antlr4-maven-plugin</artifactId>
+          <version>4.7.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -681,6 +692,11 @@
   </build>
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-runtime</artifactId>
+        <version>4.7.2</version>
+      </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
@@ -918,23 +934,23 @@
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
-        <artifactId>org.springframework.security.core</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-security-core</artifactId>
+        <version>3.1.7.RELEASE</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
-        <artifactId>org.springframework.security.config</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-security-config</artifactId>
+        <version>3.1.7.RELEASE</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
-        <artifactId>org.springframework.security.web</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-security-web</artifactId>
+        <version>3.1.7.RELEASE</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
-        <artifactId>org.springframework.security.openid</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-security-openid</artifactId>
+        <version>3.1.7.RELEASE</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security.oauth</groupId>
@@ -944,12 +960,12 @@
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-cas</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <version>3.1.7.RELEASE</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-ldap</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <version>3.1.7.RELEASE</version>
       </dependency>
       <dependency>
         <groupId>org.apache.velocity</groupId>
@@ -974,7 +990,7 @@
       <dependency>
         <groupId>org.jasig.cas.client</groupId>
         <artifactId>cas-client-core</artifactId>
-        <version>3.1.12</version>
+        <version>3.3.3</version>
       </dependency>
       <dependency>
         <groupId>org.openid4java</groupId>
@@ -1113,6 +1129,12 @@
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
         <version>${joda-time.version}</version>
+      </dependency>
+      <!-- influx -->
+      <dependency>
+        <groupId>org.influxdb</groupId>
+        <artifactId>influxdb-java</artifactId>
+        <version>2.15</version>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
@@ -1514,6 +1536,38 @@
          </roles>
         <timezone>Europe/Madrid</timezone>
      </developer>
+     <developer>
+       <id>jkniephoff</id>
+       <name>Julian Kniephoff</name>
+       <email>kniephoff@elan-ev.de</email>
+       <url>https://juliankniephoff.com</url>
+       <organization>ELAN e.V.</organization>
+       <organizationUrl>https://elan-ev.de/</organizationUrl>
+       <roles>
+         <role>developer</role>
+       </roles>
+       <timezone>Europe/Berlin</timezone>
+      <properties>
+        <irc.nick>jkniephoff</irc.nick>
+        <github.nick>JulianKniephoff</github.nick>
+      </properties>
+    </developer>
+    <developer>
+      <id>mliradelc</id>
+      <name>Maximiliano Lira Del Canto</name>
+      <email>mliradel@uni-koeln.de</email>
+      <url></url>
+      <organization>Computer Center - University of Cologne</organization>
+      <organizationUrl>https://www.uni-koeln.de</organizationUrl>
+      <roles>
+         <role>developer</role>
+      </roles>
+      <timezone>Europe/Berlin</timezone>
+      <properties>
+        <irc.nick></irc.nick>
+        <github.nick>mliradelc</github.nick>
+      </properties>
+    </developer>
   </developers>
   <!-- People having significantly contributed to Opencast in the past -->
   <contributors>
@@ -1634,7 +1688,7 @@
   <licenses>
     <license>
       <name>Educational Community License, Version 2.0</name>
-      <url>http://www.osedu.org/licenses/ECL-2.0/ecl2.txt</url>
+      <url>https://opensource.org/licenses/ECL-2.0</url>
     </license>
   </licenses>
   <scm>

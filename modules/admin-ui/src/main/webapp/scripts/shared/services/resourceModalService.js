@@ -345,7 +345,7 @@ angular.module('adminNg.services.modal')
           params.resourceId = resourceId;
           params.action = action;
           $location.search(params);
-        });
+        }).catch(angular.noop);
       };
     };
 

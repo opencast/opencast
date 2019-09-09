@@ -81,6 +81,10 @@ describe('New Theme API Resource', function () {
         $httpBackend = _$httpBackend_;
     }));
 
+    beforeEach(function () {
+        $httpBackend.whenGET('modules/events/partials/index.html').respond('');
+    });
+
     describe('save requst transformation', function () {
 
         // temporarily disabled, the backend is not yet ready

@@ -86,7 +86,7 @@ angular.module('adminNg.directives')
           }
 
           scope.restoreFilters();
-        });
+        }).catch(angular.noop);
 
         scope.removeFilters = function () {
           angular.forEach(scope.filters.map, function (filter) {

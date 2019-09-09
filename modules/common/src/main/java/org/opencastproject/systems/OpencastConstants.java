@@ -29,6 +29,9 @@ public interface OpencastConstants {
   /** The property key for the current machine's hostname defined in the config.properties */
   String SERVER_URL_PROPERTY = "org.opencastproject.server.url";
 
+  /** The property key for the current machine's descriptive node name defined in the config.properties */
+  String NODE_NAME_PROPERTY = "org.opencastproject.server.nodename";
+
   /** The property key for the streaming server defined in the config.properties */
   String STREAMING_URL_PROPERTY = "org.opencastproject.streaming.url";
 

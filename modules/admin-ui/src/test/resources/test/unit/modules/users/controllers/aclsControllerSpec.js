@@ -35,6 +35,7 @@ describe('ACL controller', function () {
             $httpBackend.expectGET('/admin-ng/resources/acls/filters.json').respond('[]');
             $httpBackend.expectDELETE('/admin-ng/acl/454').respond();
             $httpBackend.expectGET('/admin-ng/acl/acls.json?limit=10&offset=0&sort=name:ASC').respond(JSON.stringify(getJSONFixture('admin-ng/acl/acls.json')));
+            $httpBackend.whenGET('modules/events/partials/index.html').respond('');
 
             $scope.table.delete({'id': 454});
 

@@ -94,6 +94,8 @@ $primary-color-green-dark-1: darken($primary-color-green, 9%);      // #2d9d68
 $primary-color-green-dark-2: darken($primary-color-green, 15%);     // #268558
 $primary-color-green-dark-3: darken($primary-color-green, 20%);     // #20724b
 
+$table-highlight: lighten($light-prim-color, 28%);
+
 // Border
 // ----------------------------------------
 
@@ -152,7 +154,7 @@ $border-box-sizing: false;
 
 // Helpers
 $side-margin:                   20px;
-$z-0:                             0;  
+$z-0:                             0;
 $z-10:                          100;
 $z-20:                          200;
 $z-30:                          300;

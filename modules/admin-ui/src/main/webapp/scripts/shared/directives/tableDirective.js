@@ -62,7 +62,8 @@ angular.module('adminNg.directives')
     templateUrl: 'shared/partials/table.html',
     replace: false,
     scope: {
-      table: '='
+      table: '=',
+      highlight: '<'
     },
     link: function (scope, element) {
       scope.table.fetch(true);
@@ -90,7 +91,7 @@ angular.module('adminNg.directives')
           } else {
             $translate(column.label).then(function (translation) {
               setWidth(translation, column, element);
-            });
+            }).catch(angular.noop);
           }
         });
       };

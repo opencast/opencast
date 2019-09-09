@@ -69,9 +69,6 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
   @XmlElement(name = "displayOrder")
   private int displayOrder = 0;
 
-  @XmlElement(name = "published")
-  private boolean published;
-
   @XmlElement(name = "configuration_panel")
   private String configurationPanel;
 
@@ -319,21 +316,6 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
     public WorkflowDefinition unmarshal(WorkflowDefinitionImpl op) throws Exception {
       return op;
     }
-  }
-
-  /**
-   * @return the published
-   */
-  public boolean isPublished() {
-    return published;
-  }
-
-  /**
-   * @param published
-   *          the published to set
-   */
-  public void setPublished(boolean published) {
-    this.published = published;
   }
 
   /**

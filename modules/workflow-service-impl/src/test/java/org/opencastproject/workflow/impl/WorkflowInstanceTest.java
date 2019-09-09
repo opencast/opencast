@@ -58,7 +58,6 @@ public class WorkflowInstanceTest {
     // Workflows should obtain information from the definition used in the constructor
     WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
     def.setId("123");
-    def.setPublished(true);
 
     Map<String, String> props = new HashMap<String, String>();
     props.put("key1", "value1");
@@ -101,7 +100,6 @@ public class WorkflowInstanceTest {
     Assert.assertEquals(2, def.getOperations().size());
     Assert.assertEquals("definition-1", def.getId());
     Assert.assertEquals("Unit testing workflow", def.getDescription());
-    Assert.assertTrue(def.isPublished());
   }
 
   @Test

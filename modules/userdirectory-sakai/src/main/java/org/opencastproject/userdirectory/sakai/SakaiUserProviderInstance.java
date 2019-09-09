@@ -215,6 +215,17 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
   @Override
   public User loadUser(String userName) {
     logger.debug("loaduser(" + userName + ")");
+
+    try {
+      if ((userPattern != null) && !userName.matches(userPattern)) {
+        logger.debug("load user {} failed regexp {}", userName, userPattern);
+        return null;
+      }
+    } catch (PatternSyntaxException e) {
+      logger.warn("Invalid regular expression for user pattern {} - disabling checks", userPattern);
+      userPattern = null;
+    }
+
     requests.incrementAndGet();
     try {
       Object user = cache.getUnchecked(userName);
@@ -310,8 +321,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
 
       logger.debug("Returning JaxbRoles: " + roles);
 
-      // JaxbUser(String userName, String password, String name, String email, String provider, boolean canLogin, JaxbOrganization organization, Set<JaxbRole> roles)
-      User user = new JaxbUser(userName, null, displayName, email, PROVIDER_NAME, true, jaxbOrganization, roles);
+      User user = new JaxbUser(userName, null, displayName, email, PROVIDER_NAME, jaxbOrganization, roles);
 
       cache.put(userName, user);
       logger.debug("Returning user {}", userName);
