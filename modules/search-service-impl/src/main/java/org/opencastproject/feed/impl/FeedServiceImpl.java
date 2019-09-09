@@ -115,13 +115,19 @@ public class FeedServiceImpl {
     List<Map<String, String>> feedServices = new ArrayList<>();
 
     for (FeedGenerator generator : feeds) {
-      Map<String, String> details = new HashMap<>();
-      details.put("identifier", generator.getIdentifier());
-      details.put("name", generator.getName());
-      details.put("description", generator.getDescription());
-      details.put("copyright", generator.getCopyright());
-      details.put("type", generator.getClass().getSimpleName());
-      feedServices.add(details);
+      // if (generator.getName().equals("Series")
+      // || generator.getName().equals("Series episodes containing audio files")) {
+      if (generator.getName().equals("Series")
+              || generator.getName().equals("Series episodes containing audio files")) {
+        Map<String, String> details = new HashMap<>();
+        details.put("identifier", generator.getIdentifier());
+        details.put("name", generator.getName());
+        details.put("description", generator.getDescription());
+        details.put("copyright", generator.getCopyright());
+        details.put("pattern", generator.getPattern());
+        details.put("type", generator.getClass().getSimpleName());
+        feedServices.add(details);
+      }
     }
 
     return gson.toJson(feedServices);
