@@ -1448,7 +1448,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           String audioSourceName = arguments.get(AUDIO_SOURCE_INDEX);
 
           Option<LaidOutElement<Attachment>> watermarkOption = Option.none();
-          if (arguments.size() == 9) {
+          //If there is a watermark defined, it needs both args 8 and 9
+          if (arguments.size() > WATERMARK_INDEX) {
             watermarkAttachment = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(WATERMARK_INDEX));
             Layout watermarkLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(WATERMARK_LAYOUT_INDEX)));
             watermarkOption = Option.some(new LaidOutElement<>(watermarkAttachment, watermarkLayout));
