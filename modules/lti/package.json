@@ -9,7 +9,7 @@
   "dependencies": {
     "font-awesome": "^4.7.0",
     "jquery": "^3.4.1",
-    "mustache": "^3.0.1",
+    "mustache": "^3.0.3",
     "paginationjs": "^2.1.4"
   },
   "devDependencies": {
