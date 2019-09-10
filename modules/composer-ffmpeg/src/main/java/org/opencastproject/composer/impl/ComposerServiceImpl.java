@@ -629,12 +629,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
     arguments.add(COMPOSITE_TRACK_SIZE_INDEX, Serializer.json(compositeTrackSize).toJson());
     arguments.add(BACKGROUND_COLOR_INDEX, background);
+    arguments.add(AUDIO_SOURCE_INDEX, sourceAudioName);
     if (watermark.isSome()) {
       LaidOutElement<Attachment> watermarkLaidOutElement = watermark.get();
       arguments.add(WATERMARK_INDEX, MediaPackageElementParser.getAsXml(watermarkLaidOutElement.getElement()));
       arguments.add(WATERMARK_LAYOUT_INDEX, Serializer.json(watermarkLaidOutElement.getLayout()).toJson());
     }
-    arguments.add(AUDIO_SOURCE_INDEX, sourceAudioName);
     try {
       final EncodingProfile profile = profileScanner.getProfile(profileId);
       return serviceRegistry.createJob(JOB_TYPE, Operation.Composite.toString(), arguments, profile.getJobLoad());
