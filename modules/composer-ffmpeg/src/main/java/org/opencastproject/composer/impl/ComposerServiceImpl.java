@@ -1449,10 +1449,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
           Option<LaidOutElement<Attachment>> watermarkOption = Option.none();
           //If there is a watermark defined, it needs both args 8 and 9
-          if (arguments.size() > WATERMARK_INDEX) {
+          if (arguments.size() > WATERMARK_INDEX && arguments.size() <= WATERMARK_LAYOUT_INDEX) {
             watermarkAttachment = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(WATERMARK_INDEX));
             Layout watermarkLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(WATERMARK_LAYOUT_INDEX)));
             watermarkOption = Option.some(new LaidOutElement<>(watermarkAttachment, watermarkLayout));
+          } else if (arguments.size() > WATERMARK_LAYOUT_INDEX) {
+            throw new IndexOutOfBoundsException("Too many composite arguments!");
           }
           serialized = composite(job, compositeTrackSize, lowerLaidOutElement, upperLaidOutElement, watermarkOption,
                   encodingProfile, backgroundColor, audioSourceName).map(MediaPackageElementParser.getAsXml()).getOrElse("");
