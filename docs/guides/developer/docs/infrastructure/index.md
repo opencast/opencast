@@ -66,7 +66,7 @@ include:
 
 - Adding new committers to the relevant group(s)
 - Removing old committers from the relevant group(s)
-- Contacting support when required for hosted projects (Crowdin, Google)
+- Contacting support when required for hosted projects (Atlassian, Crowdin, Google)
 
 ### Adding or removing Committers
 
