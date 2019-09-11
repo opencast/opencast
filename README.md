@@ -24,7 +24,7 @@ Issue Tracker
 -------------
 
 If you have found a bug, please file a ticket in our [issue tracker
-](https://opencast.jira.com).
+](https://github.com/opencast/opencast/issues).
 
 
 Community

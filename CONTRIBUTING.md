@@ -10,8 +10,9 @@ guide should suffice for most contributions.
 Issue Tracker
 -------------
 
-Opencast uses [Jira](https://opencast.jira.com) for tracking issues. Each pull request should be accompanied by a ticket
-in Jira. The issue identifier should also be used in the title of the pull request and the commit message.
+Opencast uses [GitHub](https://github.com/opencast/opencast/issues) for tracking issues. Each pull request should be
+accompanied by a ticket in GitHub. The issue identifier should also be used in the title of the pull request and the
+commit message.
 
 
 Bug Fixes and Feature
