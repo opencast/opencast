@@ -48,7 +48,7 @@ not be concerned.
 Checklist
 ---------
 
-- [ ] Jira ticket created (use ticket number in pull request and commit messages)
+- [ ] GitHub issue created (use ticket number in pull request and commit messages)
 - [ ] Pull request has a proper title and description
 - [ ] Appropriate documentation is included
 - [ ] Code passes automatic tests

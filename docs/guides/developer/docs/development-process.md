@@ -20,7 +20,7 @@ Opencast sources can be found on [GitHub](https://github.com/opencast). The easi
 project is by creating a pull request against the project's official repository. More details about the structure of
 this repository are explained later in this guide.
 
-### Jira and GitHub
+### GitHub
 
 * Opencast uses [GitHub](https://github.com/opencast/opencast/issues) for tracking issues. Each pull request should be
   accompanied by a ticket in GitHub. The issue identifier should also be used in the title of the pull request and the
@@ -38,11 +38,11 @@ Opencast distinguishes between bug fix and feature pull requests.
 
 * Features are *only* allowed to be merged into `develop`, which will let them automatically become part of the next
   major/minor release, given that the release branch for the next release has not been cut yet. If possible, please name
-  branches containing features according to the pattern `f/MH-XXXXX-short-description`, where MH-XXXXX is the relevant
-  Jira ticket.
+  branches containing features according to the pattern `f/XXXXX-short-description`, where XXXXX is the relevant
+  GitHub issue number.
 
 * Bug fixes can be merged both into `develop` and into release branches. If possible, please name branches containing
-  bug fixes according to the pattern `t/MH-XXXXX-short-description`, where MH-XXXXX is the relevant Jira ticket.
+  bug fixes according to the pattern `t/XXXXX-short-description`, where XXXXX is the relevant GitHub issue number.
 
 ### Reviews
 
