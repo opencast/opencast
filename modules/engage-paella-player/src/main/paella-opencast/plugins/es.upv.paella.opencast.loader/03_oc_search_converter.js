@@ -215,10 +215,16 @@ class OpencastToPaellaConverter {
         return (((smask[0] == '*') || (smask[0] == sflavour[0])) && ((smask[1] == '*') || (smask[1] == sflavour[1])));
       });
 
-      let importT = filterStream.tracks.tags.some(function(cTag) {
-        return currentTrack.tags.tag.some(function(t){
-          return ((cTag == '*') || (cTag == t));
-        });
+      let importT = false;
+      let tags = [];
+      if ( (currentTrack.tags) && (currentTrack.tags.tag) ) {
+        tags = [currentTrack.tags.tag];
+        if (!(currentTrack.tags.tag instanceof Array)) {
+          tags = [currentTrack.tags.tag];
+        }
+      }
+      importT = filterStream.tracks.tags.some(function(cTag) {
+        return (cTag == '*') || tags.some(function(t){ return (cTag == t); });
       });
 
       if (importF || importT) {
@@ -385,6 +391,7 @@ class OpencastToPaellaConverter {
     let otherPreview;
 
     var attachments = episode.mediapackage.attachments.attachment;
+    if (!(attachments instanceof Array)) { attachments = [attachments]; }
     attachments.forEach((currentAttachment) => {
       if (currentAttachment.type == 'presenter/player+preview') {
         presenterPreview = currentAttachment.url;
