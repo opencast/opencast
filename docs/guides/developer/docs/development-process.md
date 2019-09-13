@@ -23,9 +23,10 @@ this repository are explained later in this guide.
 ### GitHub
 
 * Opencast uses [GitHub](https://github.com/opencast/opencast/issues) for tracking issues. Each pull request should be
-  accompanied by a ticket in GitHub. The issue identifier should also be used in the title of the pull request and the
-  commits. E.g.: `#12345, Fixing Something Somewhere`. Creating a GitHub issue is usually the first step when fixing
-  something.
+  accompanied by a ticket in GitHub unless it is a very small fix. The issue identifier should also be in the
+  description of the pull request, which will automatically close the issue (if any) when the PR is merged.  See
+  [here](https://help.github.com/en/articles/closing-issues-using-keywords) for more details. Creating a GitHub issue
+  is usually the first step when fixing something.
 
 * Opencast uses [GitHub](https://github.com/opencast) for code hosting. Please
   [fork](https://help.github.com/articles/fork-a-repo/) the [official repository](https://github.com/opencast/opencast)
@@ -37,12 +38,10 @@ this repository are explained later in this guide.
 Opencast distinguishes between bug fix and feature pull requests.
 
 * Features are *only* allowed to be merged into `develop`, which will let them automatically become part of the next
-  major/minor release, given that the release branch for the next release has not been cut yet. If possible, please name
-  branches containing features according to the pattern `f/XXXXX-short-description`, where XXXXX is the relevant
-  GitHub issue number.
+  major/minor release, given that the release branch for the next release has not been cut yet.
 
-* Bug fixes can be merged both into `develop` and into release branches. If possible, please name branches containing
-  bug fixes according to the pattern `t/XXXXX-short-description`, where XXXXX is the relevant GitHub issue number.
+* Bug fixes can be merged both into `develop` and into release branches.
+
 
 ### Reviews
 
@@ -60,7 +59,6 @@ Requests](reviewing-and-merging.md).
 When reviewing a pull request, it is always easier if the reviewer knows what the ticket is about, and has a rough idea
 of what work has been done. To this end, there are a few expectations for all pull requests:
 
-* For each pull request a GitHub issue should be created
 * The GitHub issue  title should match the pull request title
 * The pull request description should contain a summary of the work done, along with reasoning for any major change
     * The GitHub issue should contain the same information
@@ -352,12 +350,9 @@ community will be requested to participate in this testing.
 
 ### Reporting Bugs
 
-If you identify any bugs, please report them! To do that, register yourself in the [Opencast issue
-tracker](https://github.com/opencast/opencast/issues) and create a new ticket. Please describe in detail how to
-reproduce the problem, and which version of Opencast you are experiencing the issue on.
-
-If in doubt of any items in the ticket, please assign it for review to either the current release manager or to the
-quality assurance manager. They will check the issue fields and adjust if necessary.
+If you identify any bugs, please [report them on Github](https://github.com/opencast/opencast/issues)!. Please make
+sure to  describe in detail how to reproduce the problem, and which version of Opencast you are experiencing the issue
+on.
 
 #### Security Issues
 
