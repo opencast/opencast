@@ -65,7 +65,8 @@
          "CONFIRMATION": "Bekräftelse"
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events."
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
@@ -123,9 +124,11 @@
       "SERIES_NOT_UPDATED": "Serien kunde inte sparas",
       "SERIES_NOT_UPDATED_ID": "Serien {{ id }} kunde inte sparas",
       "SERIES_NOT_UPDATED_ALL": "Ingen av serier kunde sparas",
-      "EVENTS_DELETED": "Händelsen har tagits bort",
-      "EVENTS_NOT_DELETED": "Händelsen kunde inte raderas",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Du kan inte radera händelsen för att du inte ha rättigheterna.",
+      "EVENT_DELETED": "The event has been deleted.",
+      "EVENT_WILL_BE_DELETED": "The event is being deleted",
+      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "Serien har tagits bort",
       "SERIES_NOT_DELETED": "Serien kunde inte raderas",
       "LOCATION_DELETED": "Platsen har raderats",
@@ -171,7 +174,6 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Åtgärder",
-      "WARNING": "Varning",
       "DELETE": {
          "SERIES": {
             "CAPTION": "Ta bort",
@@ -181,22 +183,7 @@
          "EVENTS": {
             "CAPTION": "Ta bort",
             "DELETE_EVENTS": "Radera händelser",
-            "PUBLISHED": {
-               "NONE": "Ingen av de markerade händelserna måste dras tillbaka innan de kan tas bort.",
-               "WARNING": "Händelserna nedan kan inte tas bort eftersom de redan har publicerats och att ta bort dem skulle lämna inget sätt att ta bort publicerade filer. Välj ett workflow nedan för att dra tillbaks händelserna först och sedan ta bort dem."
-            },
-            "RETRACT_EVENTS": "Dra tillbaka händelser",
-            "SELECT_RETRACT_TASK": "Välj en aktivitet för att dra tillbaka",
-            "SUMMARY": {
-               "EVENTS_DELETED": "Händelser som ska tas bort",
-               "EVENTS_RETRACTED": "Händelser som ska dras tillbaka",
-               "RETRACT_WORKFLOW": "Workflow att ta tillbaka händelser"
-            },
-            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue.",
-            "UNPUBLISHED": {
-               "NONE": "Ingen av de markerade händelserna kan tas bort utan att lämna överblivna filer."
-            },
-            "BUTTON": "Ta bort"
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Efter raderingen kan inga metadata av händelsen och inga ljud- och videofiler återställas.",
@@ -270,8 +257,6 @@
       "NEXT_STEP": "Nästa",
       "BACK": "Föregående",
       "CREATE": "Skapa",
-      "RETRACT": "Dra tillbaka",
-      "RETRACT_DELETE": "Dra tillbaka/ta bort",
       "DELETE": "Ta bort",
       "UPDATE": "Uppdatera",
       "DURATION": {
@@ -313,13 +298,6 @@
       }
    },
    "EVENTS": {
-      "RETRACT": {
-         "CAPTION": "Dra tillbaka händelsen",
-         "ID": "ID",
-         "SELECT_TASK": "Välj uppgift",
-         "SUMMARY": "Summering",
-         "WARNING": "Denna händelse har publicerats till minst en publikationskanal så den måste dras tillbaka innan den kan tas bort. Markera uppgifterna nedan för att kunna dra tillbaka publikationerna."
-      },
       "LICENSE": {
          "ALLRIGHTS": "Alla rättigheter reserverade",
          "CCBY": "CC BY",
@@ -482,6 +460,7 @@
             "PUBLISHED": "Publicerad",
             "WEEKDAY": "Veckodag",
             "TOOLTIP": {
+               "ASSETS": "Open asset details",
                "START": "Filter för detta startdatum",
                "SERIES": "Filter för den här serien",
                "STATUS": "Filter för denna händelsestatus",
@@ -510,6 +489,7 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retracting",
+            "DELETING": "Deleting",
             "DUPLICATING": "Duplicating",
             "PUBLISHING": "Publishing",
             "IMPORTING": "Importing",
@@ -2004,7 +1984,7 @@
          "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
          "VIEWS_SUM": "This displays the total number of views per time unit.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the running total published hours of video"
+         "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
 }

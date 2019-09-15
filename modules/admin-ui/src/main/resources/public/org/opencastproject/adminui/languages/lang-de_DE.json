@@ -65,7 +65,8 @@
          "CONFIRMATION": "Bestätigung"
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Diese Serie enthält noch Events. Das Löschen der Serie löscht nicht die Events."
+         "SERIES_HAS_EVENTS": "Diese Serie enthält noch Events. Das Löschen der Serie löscht nicht die Events.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Diese Serie enthält Events und kann daher nicht gelöscht werden."
@@ -123,9 +124,11 @@
       "SERIES_NOT_UPDATED": "Diese Serie konnte nicht gespeichert werden",
       "SERIES_NOT_UPDATED_ID": "Die Serie {{ id }} konnte nicht gespeichert werden",
       "SERIES_NOT_UPDATED_ALL": "Keine der Serien konnte gespeichert werden",
-      "EVENTS_DELETED": "Die Aufzeichnung wurde gelöscht",
-      "EVENTS_NOT_DELETED": "Die Aufzeichnung(en) konnten nicht gelöscht werden",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Die Aufzeichnung konnte nicht gelöscht werden, weil Sie nicht dazu berechtigt sind.",
+      "EVENT_DELETED": "The event has been deleted.",
+      "EVENT_WILL_BE_DELETED": "The event is being deleted",
+      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "Die Serie wurde gelöscht",
       "SERIES_NOT_DELETED": "Die Serie konnte nicht gelöscht werden",
       "LOCATION_DELETED": "Das Aufzeichnungsgerät wurde entfernt",
@@ -171,7 +174,6 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Aktionen",
-      "WARNING": "Achtung",
       "DELETE": {
          "SERIES": {
             "CAPTION": "Löschen",
@@ -181,22 +183,7 @@
          "EVENTS": {
             "CAPTION": "Löschen",
             "DELETE_EVENTS": "Aufzeichnungen löschen",
-            "PUBLISHED": {
-               "NONE": "Keine der ausgewählten Aufzeichnungen muss vor dem Löschen zurückgezogen werden.",
-               "WARNING": "Die folgenden Aufzeichnungen können nicht gelöscht werden, da sie veröffentlicht sind. Das Löschen würde keine Möglichkeit lassen, die veröffentlichten Dateien zu entfernen. Wählen Sie stattdessen einen Workflow aus, um die Aufzeichnungen zuerst zurückzuziehen und dann zu löschen."
-            },
-            "RETRACT_EVENTS": "Aufzeichnungen zurückziehen",
-            "SELECT_RETRACT_TASK": "Wählen Sie einen Task für das Zurückziehen aus.",
-            "SUMMARY": {
-               "EVENTS_DELETED": "Zu löschende Aufzeichnungen",
-               "EVENTS_RETRACTED": "Zurückzuziehende Aufzeichnungen",
-               "RETRACT_WORKFLOW": "Workflow zum Zurückziehen von Aufzeichnungen"
-            },
-            "UNAUTHORIZED": "Sie sind nicht dazu berechtigt, die hervorgehobenen Aufzeichnungen zu löschen. Um fortzufahren können Sie diese von der Auswahl entfernen.",
-            "UNPUBLISHED": {
-               "NONE": "Keine der ausgewählten Veranstaltungen kann gelöscht werden, ohne dass verwaiste Dateien übrig bleiben."
-            },
-            "BUTTON": "Entfernen"
+            "UNAUTHORIZED": "Sie sind nicht dazu berechtigt, die hervorgehobenen Aufzeichnungen zu löschen. Um fortzufahren können Sie diese von der Auswahl entfernen."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Sobald alle Metadaten gelöscht sind, werden die Audio- und Video-Dateien gelöscht und können nicht wiederhergestellt werden.",
@@ -270,8 +257,6 @@
       "NEXT_STEP": "Weiter",
       "BACK": "Zurück",
       "CREATE": "Anlegen",
-      "RETRACT": "Zurückziehen",
-      "RETRACT_DELETE": "Zurückziehen/Löschen",
       "DELETE": "Löschen",
       "UPDATE": "Aktualisieren",
       "DURATION": {
@@ -313,13 +298,6 @@
       }
    },
    "EVENTS": {
-      "RETRACT": {
-         "CAPTION": "Aufzeichnungen zurückziehen",
-         "ID": "ID",
-         "SELECT_TASK": "Task auswählen",
-         "SUMMARY": "Zusammenfassung",
-         "WARNING": "Diese Aufzeichnung ist mindestens einmal veröffentlicht worden. Sie muss zurückgezogen werden, bevor sie gelöscht werden kann. Wählen Sie aus den Tasks unten, um die Aufzeichnung zurückzuziehen."
-      },
       "LICENSE": {
          "ALLRIGHTS": "Alle Rechte vorbehalten",
          "CCBY": "CC BY",
@@ -482,7 +460,7 @@
             "PUBLISHED": "Veröffentlicht",
             "WEEKDAY": "Wochentag",
             "TOOLTIP": {
-               "ASSETS": "Assets anzeigen",
+               "ASSETS": "Open asset details",
                "START": "Nach diesem Startdatum filtern",
                "SERIES": "Nach dieser Serie filtern",
                "STATUS": "Nach diesem Verarbeitungsstatus filtern",
@@ -511,6 +489,7 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Wird zurückgezogen",
+            "DELETING": "Deleting",
             "DUPLICATING": "Wird dupliziert",
             "PUBLISHING": "Wird veröffentlicht",
             "IMPORTING": "Wird importiert",
@@ -2005,7 +1984,7 @@
          "RANDOM": "Diese Zufallsdaten dienen ausschließlich Test- und Demonstrationszwecken. Um diese Darstellung zu deaktivieren, können Sie die entsprechende Konfiguration in etc/providers entfernen",
          "VIEWS_SUM": "Diese Statistik zeigt die Summe der Zugriffe pro Zeiteinheit.",
          "VIEWS_AVG": "Diese Statistik zeigt die durchschnittliche Anzahl von Zugriffe pro Zeiteinheit.",
-         "PUBLISHEDHOURS": "This displays the running total published hours of video"
+         "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
 }

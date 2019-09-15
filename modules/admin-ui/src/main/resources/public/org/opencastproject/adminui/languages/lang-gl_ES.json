@@ -65,7 +65,8 @@
          "CONFIRMATION": "Confirmación"
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Estas series non conteñen eventos. Eliminar as series non eliminará os eventos."
+         "SERIES_HAS_EVENTS": "Estas series non conteñen eventos. Eliminar as series non eliminará os eventos.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Estas series non poden ser eliminadas mentres conteñan eventos."
@@ -123,9 +124,11 @@
       "SERIES_NOT_UPDATED": "Non se puido gardar a serie",
       "SERIES_NOT_UPDATED_ID": "Non se puido gardar a serie {{ id }}",
       "SERIES_NOT_UPDATED_ALL": "Non se puido gardar ningunha serie",
-      "EVENTS_DELETED": "Evento borrado",
-      "EVENTS_NOT_DELETED": "Non se puideron eliminar os eventos",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Non se puido borrar o evento porque non se dispón do permiso para facelo.",
+      "EVENT_DELETED": "The event has been deleted.",
+      "EVENT_WILL_BE_DELETED": "The event is being deleted",
+      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "Serie borrada",
       "SERIES_NOT_DELETED": "Non se puido borrar a serie",
       "LOCATION_DELETED": "Ubicación borrada",
@@ -171,7 +174,6 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Accións",
-      "WARNING": "Advertencia",
       "DELETE": {
          "SERIES": {
             "CAPTION": "Borrar",
@@ -181,22 +183,7 @@
          "EVENTS": {
             "CAPTION": "Borrar",
             "DELETE_EVENTS": "Borrar Eventos",
-            "PUBLISHED": {
-               "NONE": "Non é necesario retirar ningún dos eventos seleccionados antes de seren borrados.",
-               "WARNING": "Os eventos que aparecen a continuación non poden borrarse, porque xa foron publicados e ó borralos xa non habería ningún xeito de retirar os arquivos publicados. En vez diso, seleccione primeiro un fluxo de traballo para retirar os eventos e, unha vez retirados, bórreos."
-            },
-            "RETRACT_EVENTS": "Retirar Eventos",
-            "SELECT_RETRACT_TASK": "Seleccione unha Tarefa de Retirada",
-            "SUMMARY": {
-               "EVENTS_DELETED": "Eventos para Borrar",
-               "EVENTS_RETRACTED": "Eventos para Retirar",
-               "RETRACT_WORKFLOW": "Fluxo de Traballo para Retirar Eventos"
-            },
-            "UNAUTHORIZED": "Non está autorizado a borrar os eventos seleccionados. Por favor, desmárqueos para continuar.",
-            "UNPUBLISHED": {
-               "NONE": "Non se pode borrar ningún dos seguintes eventos sen deixar arquivos orfos."
-            },
-            "BUTTON": "Borrar"
+            "UNAUTHORIZED": "Non está autorizado a borrar os eventos seleccionados. Por favor, desmárqueos para continuar."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Ó borrar un evento, borraranse tamén todos os seus metadatos e os arquivos de audio e vídeo e serán irrecuperables.",
@@ -270,8 +257,6 @@
       "NEXT_STEP": "Seguinte",
       "BACK": "Anterior",
       "CREATE": "Crear",
-      "RETRACT": "Retirar",
-      "RETRACT_DELETE": "Retirar/Eliminar",
       "DELETE": "Borrar",
       "UPDATE": "Actualizar",
       "DURATION": {
@@ -313,13 +298,6 @@
       }
    },
    "EVENTS": {
-      "RETRACT": {
-         "CAPTION": "Retirar Evento",
-         "ID": "Id.",
-         "SELECT_TASK": "Seleccione Tarefa",
-         "SUMMARY": "Resumo",
-         "WARNING": "Este evento publicouse, como mínimo, nunha canle de publicación, polo que debe ser retirado antes de poder ser borrado. Seleccione algunha das seguintes tarefas para retirar as publicacións."
-      },
       "LICENSE": {
          "ALLRIGHTS": "Todos os dereitos reservados",
          "CCBY": "CC BY",
@@ -482,6 +460,7 @@
             "PUBLISHED": "Publicado",
             "WEEKDAY": "Día da semana",
             "TOOLTIP": {
+               "ASSETS": "Open asset details",
                "START": "Filtro para esta data de inicio",
                "SERIES": "Filtro para esta serie",
                "STATUS": "Filtro para o estado deste evento",
@@ -510,6 +489,7 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retirando",
+            "DELETING": "Deleting",
             "DUPLICATING": "Duplicando",
             "PUBLISHING": "Publicando",
             "IMPORTING": "Importando",
@@ -2004,7 +1984,7 @@
          "RANDOM": "Esta gráfica amosa datos aleatorios como exemplo. Para que deixe de mostrarse, elimine da carpeta etc/providers o ficheiro JSON coa definición correspondente a este provedor",
          "VIEWS_SUM": "Aquí amósase o número total de visualizacións por unidade de tempo.",
          "VIEWS_AVG": "Aquí amósase o número total de visualizacións diarias por unidade de tempo.",
-         "PUBLISHEDHOURS": "This displays the running total published hours of video"
+         "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
 }

@@ -65,7 +65,8 @@
          "CONFIRMATION": "Potwierdzenie"
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Ta seria zawiera wydarzenia. Usunięcie tej serii nie spowoduje ich usunięcia."
+         "SERIES_HAS_EVENTS": "Ta seria zawiera wydarzenia. Usunięcie tej serii nie spowoduje ich usunięcia.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Nie można usunąć tej serii, ponieważ nadal zawiera wydarzenia."
@@ -123,9 +124,11 @@
       "SERIES_NOT_UPDATED": "Nie udało się zapisać serii",
       "SERIES_NOT_UPDATED_ID": "Nie można zapisać serii {{ id }}",
       "SERIES_NOT_UPDATED_ALL": "Żadna seria nie została zapisana",
-      "EVENTS_DELETED": "Wydarzenie zostało usunięte",
-      "EVENTS_NOT_DELETED": "Wydarzenie/wydarzenia nie mogły być usunięte",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Wydarzenia nie można usunąć, ponieważ nie masz uprawnień, aby to zrobić.",
+      "EVENT_DELETED": "The event has been deleted.",
+      "EVENT_WILL_BE_DELETED": "The event is being deleted",
+      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "Seria została skasowana",
       "SERIES_NOT_DELETED": "Seria nie mogła zostać usunięta",
       "LOCATION_DELETED": "Lokalizacja została usunięta",
@@ -171,7 +174,6 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Działania",
-      "WARNING": "UWAGA",
       "DELETE": {
          "SERIES": {
             "CAPTION": "Usuń",
@@ -181,22 +183,7 @@
          "EVENTS": {
             "CAPTION": "Usuń",
             "DELETE_EVENTS": "Usuń wydarzenia",
-            "PUBLISHED": {
-               "NONE": "Żadne z wybranych wydarzeń nie musi być wycofywane z publikacji przed usunięciem.",
-               "WARNING": "Poniższe wydarzenia nie mogą zostać skasowane, ponieważ zostały one opublikowane i po ich usunięciu nie możnabyłoby wycofać ich z publikacji. Najpierw musisz wycofać wydarzenia z kanałów publikacji, następnie będzie można je skasować."
-            },
-            "RETRACT_EVENTS": "Wycofaj wydarzenia",
-            "SELECT_RETRACT_TASK": "Wybierz Zadanie Wycofania",
-            "SUMMARY": {
-               "EVENTS_DELETED": "Wydarzenia do usunięcia",
-               "EVENTS_RETRACTED": "Wydarzenia do wycofania",
-               "RETRACT_WORKFLOW": "Przepływ Wycofujący Zdarzenie"
-            },
-            "UNAUTHORIZED": "Nie masz uprawnień do skasowania podświetlonych zdarzeń. Proszę odznacz je, żeby kontynuować.",
-            "UNPUBLISHED": {
-               "NONE": "Żadne z wybranych zdarzeń, nie może zostać usunięte bez pozostawienia niepowiązanych plików."
-            },
-            "BUTTON": "Usuń"
+            "UNAUTHORIZED": "Nie masz uprawnień do skasowania podświetlonych zdarzeń. Proszę odznacz je, żeby kontynuować."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Po usunięciu nagrania, wszelkie związane z nim informacje, filmy i pliki zostaną bezpowrotnie utracone.",
@@ -270,8 +257,6 @@
       "NEXT_STEP": "Następne",
       "BACK": "Poprzednie",
       "CREATE": "Utwórz",
-      "RETRACT": "Wycofaj",
-      "RETRACT_DELETE": "Retract/Delete",
       "DELETE": "Usuń",
       "UPDATE": "Aktualizuj",
       "DURATION": {
@@ -313,13 +298,6 @@
       }
    },
    "EVENTS": {
-      "RETRACT": {
-         "CAPTION": "Wycofaj wydarzenie",
-         "ID": "Identyfikator",
-         "SELECT_TASK": "Wybierz Zadanie",
-         "SUMMARY": "Podsumowanie",
-         "WARNING": "Wydarzenie zostało opublikowane w przynajmniej jednym kanale. Żeby je usunąć należy wycofać je z publikacji."
-      },
       "LICENSE": {
          "ALLRIGHTS": "Wszelkie prawa zastrzeżone",
          "CCBY": "CC BY",
@@ -482,6 +460,7 @@
             "PUBLISHED": "Opublikowano",
             "WEEKDAY": "Dzień tygodnia",
             "TOOLTIP": {
+               "ASSETS": "Open asset details",
                "START": "Filtr do tej daty rozpoczęcia",
                "SERIES": "Filtr dla tej serii",
                "STATUS": "Filtr dla statusu tego wydarzenia",
@@ -510,6 +489,7 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retracting",
+            "DELETING": "Deleting",
             "DUPLICATING": "Duplicating",
             "PUBLISHING": "Publishing",
             "IMPORTING": "Importing",
@@ -2004,7 +1984,7 @@
          "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
          "VIEWS_SUM": "This displays the total number of views per time unit.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the running total published hours of video"
+         "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
 }

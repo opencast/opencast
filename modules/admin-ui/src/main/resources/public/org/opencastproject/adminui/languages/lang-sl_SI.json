@@ -65,7 +65,8 @@
          "CONFIRMATION": "Potrditev"
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Ta zbirka vsebuje posnetke. Z izbrisom zbirke, posnetki ne bodo izbrisani."
+         "SERIES_HAS_EVENTS": "Ta zbirka vsebuje posnetke. Z izbrisom zbirke, posnetki ne bodo izbrisani.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Ta zbirka ne more biti izbrisana, ker vsebuje posnetke."
@@ -123,9 +124,11 @@
       "SERIES_NOT_UPDATED": "Serije ni bilo mogoče shraniti",
       "SERIES_NOT_UPDATED_ID": "Serije {{ id }}ni bilo mogoče shraniti",
       "SERIES_NOT_UPDATED_ALL": "Nobene od serij ni bilo mogoče shraniti",
-      "EVENTS_DELETED": "Dogodek je izbrisan",
-      "EVENTS_NOT_DELETED": "Dogodkov ni bilo mogoče izbrisati",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Posnetka ni mogoče izbrisati, ker nimate ustreznih pravic.",
+      "EVENT_DELETED": "The event has been deleted.",
+      "EVENT_WILL_BE_DELETED": "The event is being deleted",
+      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "Serija je izbrisana",
       "SERIES_NOT_DELETED": "Serije ni bilo mogoče izbrisati",
       "LOCATION_DELETED": "Lokacija je izbrisana",
@@ -171,7 +174,6 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Dejanja",
-      "WARNING": "Opozorilo",
       "DELETE": {
          "SERIES": {
             "CAPTION": "Izbriši",
@@ -181,22 +183,7 @@
          "EVENTS": {
             "CAPTION": "Izbriši",
             "DELETE_EVENTS": "Izbriši dogodke",
-            "PUBLISHED": {
-               "NONE": "Nobenega od izbranih dogodkov ni treba umakniti pred izbrisom.",
-               "WARNING": "Spodnjih dogodkov ni mogoče izbrisati, ker so že objavljeni in ob njihovem izbrisu ne bi bilo mogoče izbrisati objavljenih datotek. Namesto tega spodaj izberite potek dela, da najprej umaknete dogodke, nato pa jih izbrišite."
-            },
-            "RETRACT_EVENTS": "Umakni dogodke",
-            "SELECT_RETRACT_TASK": "Izberite opravilo umika",
-            "SUMMARY": {
-               "EVENTS_DELETED": "Dogodki, ki jih je treba izbrisati",
-               "EVENTS_RETRACTED": "Dogodki, ki jih je treba umakniti",
-               "RETRACT_WORKFLOW": "Potek dela za umik dogodkov"
-            },
-            "UNAUTHORIZED": "Nimate pravic za izbris označenih posnetkov. Spremenite izbiro za nadaljevanje.",
-            "UNPUBLISHED": {
-               "NONE": "Nobenega od izbranih dogodkov ni mogoče izbrisati, ne da bi nastale osirotele datoteke."
-            },
-            "BUTTON": "Izbriši"
+            "UNAUTHORIZED": "Nimate pravic za izbris označenih posnetkov. Spremenite izbiro za nadaljevanje."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Izbrisanih metapodatkov dogodka ter zvočnih in video datotek ne bo mogoče povrniti.",
@@ -270,8 +257,6 @@
       "NEXT_STEP": "Naprej",
       "BACK": "Nazaj",
       "CREATE": "Ustvari",
-      "RETRACT": "Umakni",
-      "RETRACT_DELETE": "Retract/Delete",
       "DELETE": "Izbriši",
       "UPDATE": "Posodobitev",
       "DURATION": {
@@ -313,13 +298,6 @@
       }
    },
    "EVENTS": {
-      "RETRACT": {
-         "CAPTION": "Umakni dogodek",
-         "ID": "ID",
-         "SELECT_TASK": "Izberite opravilo",
-         "SUMMARY": "Povzetek",
-         "WARNING": "Ta dogodek je objavljen v vsaj en kanal za objavljanje, zato ga je treba pred izbrisom umakniti. Izberite med spodnjimi opravili za umik objav."
-      },
       "LICENSE": {
          "ALLRIGHTS": "Vse pravice pridržane",
          "CCBY": "CC BY",
@@ -482,6 +460,7 @@
             "PUBLISHED": "Objavljeno",
             "WEEKDAY": "Delovni dan",
             "TOOLTIP": {
+               "ASSETS": "Open asset details",
                "START": "Filter za ta začetni datum",
                "SERIES": "Filter za to zbirko",
                "STATUS": "Filter za status tega posnetka",
@@ -510,6 +489,7 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retracting",
+            "DELETING": "Deleting",
             "DUPLICATING": "Duplicating",
             "PUBLISHING": "Publishing",
             "IMPORTING": "Importing",
@@ -2004,7 +1984,7 @@
          "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
          "VIEWS_SUM": "This displays the total number of views per time unit.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the running total published hours of video"
+         "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
 }

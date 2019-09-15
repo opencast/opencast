@@ -65,7 +65,8 @@
          "CONFIRMATION": "Επιβεβαίωση"
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Αυτή η σειρά περιέχει εκδηλώσεις. Η διαγραφή της σειράς δεν θα διαγράψει τις εκδηλώσεις."
+         "SERIES_HAS_EVENTS": "Αυτή η σειρά περιέχει εκδηλώσεις. Η διαγραφή της σειράς δεν θα διαγράψει τις εκδηλώσεις.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Αυτή η σειρά δεν μπορεί να διαγραφεί, καθώς εξακολουθεί να περιέχει εκδηλώσεις."
@@ -123,9 +124,11 @@
       "SERIES_NOT_UPDATED": "Δεν ήταν δυνατή η αποθήκευση της σειράς",
       "SERIES_NOT_UPDATED_ID": "Δεν ήταν δυνατή η αποθήκευση της σειράς {{ id }}",
       "SERIES_NOT_UPDATED_ALL": "Καμμία από τις σειρές δεν μπορούσε να αποθηκευτεί",
-      "EVENTS_DELETED": "Η εκδήλωση έχει διαγραφεί",
-      "EVENTS_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της/των εκδήλωσης/εων",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Η εκδήλωση δεν μπορεί να διαγραφεί, επειδή δεν έχετε τα δικαιώματα για να το πράξετε.",
+      "EVENT_DELETED": "The event has been deleted.",
+      "EVENT_WILL_BE_DELETED": "The event is being deleted",
+      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "Η σειρά έχει διαγραφεί",
       "SERIES_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της σειράς",
       "LOCATION_DELETED": "Η τοποθεσία έχει διαγραφεί",
@@ -171,7 +174,6 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Ενέργειες",
-      "WARNING": "Προειδοποίηση",
       "DELETE": {
          "SERIES": {
             "CAPTION": "Διαγραφή",
@@ -181,22 +183,7 @@
          "EVENTS": {
             "CAPTION": "Delete",
             "DELETE_EVENTS": "Διαγραφή εκδηλώσεων",
-            "PUBLISHED": {
-               "NONE": "Καμμία από τις επιλεγμένες εκδηλώσεις χρειάζονται να αποσυρθουν πριν μπορέσουν να διαγραφούν.",
-               "WARNING": "Οι παρακάτω εκδηλώσεις δεν μπορούν να διαγραφούν καθώς έχουν ήδη δημοσιευθει και η διαγραφή τους δεν θα αφήσει κανένα τρόπο διαγραφής των αρχείων που έχουν διαγραφεί. Αντ' αυτού επιλέξτε πρώτα κάποια από τις παρακάτω ροές εργασίας για την ανάκληση των εκδηλώσεων και έπειτα την διαγραφή τους."
-            },
-            "RETRACT_EVENTS": "Ανακληθέντες εκδηλώσεις",
-            "SELECT_RETRACT_TASK": "Επιλέξτε μια εργασία ανάκλησης",
-            "SUMMARY": {
-               "EVENTS_DELETED": "Εκδηλώσεις που θα διαγραφούν",
-               "EVENTS_RETRACTED": "Εκδηλώσεις που θα ανακληθούν",
-               "RETRACT_WORKFLOW": "Ροή εργασίας για την ανάκληση εκδηλώσεων"
-            },
-            "UNAUTHORIZED": "Δεν είστε εξουσιοδοτημένοι να διαγράψετε τις επιλεγμένες εκδηλώσεις. Παρακαλώ αποεπιλέξετε τις εκδηλώσεις για να συνεχίσετε.",
-            "UNPUBLISHED": {
-               "NONE": "Καμμία από τις παρακάτω εκδηλώσεις δεν μπορεί να διαγραφεί χωρίς να αφήσει ορφανά αρχεία."
-            },
-            "BUTTON": "Delete"
+            "UNAUTHORIZED": "Δεν είστε εξουσιοδοτημένοι να διαγράψετε τις επιλεγμένες εκδηλώσεις. Παρακαλώ αποεπιλέξετε τις εκδηλώσεις για να συνεχίσετε."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Μόλις διαγραφεί, όλα τα μεταδεδομένα, τα αρχεία εικόνας και ήχου της εκδήλωσης θα διαγραφούν και δεν θα μπορούν να ανακτηθούν.",
@@ -270,8 +257,6 @@
       "NEXT_STEP": "Επόμενη",
       "BACK": "Προηγούμενη",
       "CREATE": "Δημιουργία",
-      "RETRACT": "Ανάκληση",
-      "RETRACT_DELETE": "Ανάκληση/Διαγραφή",
       "DELETE": "Διαγραφή",
       "UPDATE": "Ενημέρωση",
       "DURATION": {
@@ -313,13 +298,6 @@
       }
    },
    "EVENTS": {
-      "RETRACT": {
-         "CAPTION": "Ανάκληση εκδήλωσης",
-         "ID": "Αναγνωριστικό",
-         "SELECT_TASK": "Επιλέξτε εργασία",
-         "SUMMARY": "Σύνοψη",
-         "WARNING": "Αυτή η εκδήλωση έχει δημοσιευθεί τουλάχιστον σε ένα κανάλι δημοσίευσης, έτσι πρέπει να ανακληθεί πριν διαγραφεί. Επιλέξτε μία από τις παρακάτω εργασίες για την ανάκληση των δημοσιεύσεων."
-      },
       "LICENSE": {
          "ALLRIGHTS": "Με επιφύλαξη παντός δικαιώματος",
          "CCBY": "CC BY",
@@ -482,6 +460,7 @@
             "PUBLISHED": "Δημοσιευμένο",
             "WEEKDAY": "Ημέρες εβδομάδας",
             "TOOLTIP": {
+               "ASSETS": "Open asset details",
                "START": "Φίλτρο για αυτήν την ημερομηνία έναρξης",
                "SERIES": "Φίλτρο για αυτή τη σειρά",
                "STATUS": "Φίλτρο για την κατάσταση της εκδήλωσης",
@@ -510,6 +489,7 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retracting",
+            "DELETING": "Deleting",
             "DUPLICATING": "Duplicating",
             "PUBLISHING": "Publishing",
             "IMPORTING": "Importing",
@@ -2004,7 +1984,7 @@
          "RANDOM": "Αυτό εμφανίζει τυχαία δεδομένα ως επίδειξη. Μπορείτε να απενεργοποιήσετε αυτό το γράφημα διαγράφοντας τον ορισμό json του αντίστοιχου παροχέα στατιστικών στοιχείων από τον κατάλογο etc/providers",
          "VIEWS_SUM": "This displays the total number of views per time unit.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the running total published hours of video"
+         "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
 }

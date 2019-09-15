@@ -65,7 +65,8 @@
          "CONFIRMATION": "Confirmation"
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events."
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
@@ -123,9 +124,11 @@
       "SERIES_NOT_UPDATED": "該系列無法儲存",
       "SERIES_NOT_UPDATED_ID": "無法儲存系列 {{ id }}",
       "SERIES_NOT_UPDATED_ALL": "無可儲存的系列",
-      "EVENTS_DELETED": "事件已刪除",
-      "EVENTS_NOT_DELETED": "事件無法刪除",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event could not be deleted, because you don't have the permission to do so.",
+      "EVENT_DELETED": "The event has been deleted.",
+      "EVENT_WILL_BE_DELETED": "The event is being deleted",
+      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "該系列已被刪除",
       "SERIES_NOT_DELETED": "該系列無法刪除",
       "LOCATION_DELETED": "位置已被刪除",
@@ -171,7 +174,6 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "操作",
-      "WARNING": "警告",
       "DELETE": {
          "SERIES": {
             "CAPTION": "刪除",
@@ -181,22 +183,7 @@
          "EVENTS": {
             "CAPTION": "刪除",
             "DELETE_EVENTS": "删除事件",
-            "PUBLISHED": {
-               "NONE": "除非該事件為可刪除狀態，沒有任何已選取的事件需要回收。",
-               "WARNING": "下面的事件已經發行，無法直接刪除。必須先使用工作流程回收該事件，之後再進行刪除。"
-            },
-            "RETRACT_EVENTS": "撤銷事件",
-            "SELECT_RETRACT_TASK": "選擇一個撤銷工序",
-            "SUMMARY": {
-               "EVENTS_DELETED": "要刪除的事件",
-               "EVENTS_RETRACTED": "多個事件將被撤銷",
-               "RETRACT_WORKFLOW": "撤銷事件的工作流程"
-            },
-            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue.",
-            "UNPUBLISHED": {
-               "NONE": "欲刪除選定事件，必須先確認該事件是否為孤立的檔案。"
-            },
-            "BUTTON": "刪除"
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "一旦刪除, 所有的事件中繼資料, 音訊和視頻檔將被刪除和不可恢復。",
@@ -270,8 +257,6 @@
       "NEXT_STEP": "下一步",
       "BACK": "上一個",
       "CREATE": "新增",
-      "RETRACT": "撤銷",
-      "RETRACT_DELETE": "Retract/Delete",
       "DELETE": "刪除",
       "UPDATE": "更新",
       "DURATION": {
@@ -313,13 +298,6 @@
       }
    },
    "EVENTS": {
-      "RETRACT": {
-         "CAPTION": "撤銷事件",
-         "ID": "ID",
-         "SELECT_TASK": "選擇任務",
-         "SUMMARY": "摘要",
-         "WARNING": "此一事件已經被發佈到至少一個發行頻道，刪除前必須先撤回，請選擇下面的工序，回收該發行物件。"
-      },
       "LICENSE": {
          "ALLRIGHTS": "保留所有權利",
          "CCBY": "CC BY",
@@ -482,6 +460,7 @@
             "PUBLISHED": "已發佈",
             "WEEKDAY": "Weekday",
             "TOOLTIP": {
+               "ASSETS": "Open asset details",
                "START": "篩選此開始日期",
                "SERIES": "此系列的篩選器",
                "STATUS": "篩選此事件狀態",
@@ -510,6 +489,7 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retracting",
+            "DELETING": "Deleting",
             "DUPLICATING": "Duplicating",
             "PUBLISHING": "Publishing",
             "IMPORTING": "Importing",
@@ -2004,7 +1984,7 @@
          "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
          "VIEWS_SUM": "This displays the total number of views per time unit.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the running total published hours of video"
+         "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
 }

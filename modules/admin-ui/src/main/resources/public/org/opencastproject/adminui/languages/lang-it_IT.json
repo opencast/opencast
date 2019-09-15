@@ -65,7 +65,8 @@
          "CONFIRMATION": "Conferma"
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Questa serie contiene eventi. L'eliminazione della serie non cancellerà gli eventi."
+         "SERIES_HAS_EVENTS": "Questa serie contiene eventi. L'eliminazione della serie non cancellerà gli eventi.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Questa serie non può essere cancellata in quanto contiene ancora eventi."
@@ -123,9 +124,11 @@
       "SERIES_NOT_UPDATED": "La serie non può essere salvata",
       "SERIES_NOT_UPDATED_ID": "La serie {{ id }} non può essere salvata",
       "SERIES_NOT_UPDATED_ALL": "Nessuna delle serie può essere salvata",
-      "EVENTS_DELETED": "L'evento è stato cancellato",
-      "EVENTS_NOT_DELETED": "L'/Gli evento/i non possono essere cancellati",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "L'evento non può essere eliminato, perché non possiedi i permessi per questa operazione.",
+      "EVENT_DELETED": "The event has been deleted.",
+      "EVENT_WILL_BE_DELETED": "The event is being deleted",
+      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "La serie è stata cancellata",
       "SERIES_NOT_DELETED": "La serie non può essere cancellata",
       "LOCATION_DELETED": "La posizione è stata eliminata",
@@ -171,7 +174,6 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Azioni",
-      "WARNING": "Attenzione",
       "DELETE": {
          "SERIES": {
             "CAPTION": "Elimina",
@@ -181,22 +183,7 @@
          "EVENTS": {
             "CAPTION": "Elimina",
             "DELETE_EVENTS": "Elimina eventi",
-            "PUBLISHED": {
-               "NONE": "Nessuno degli eventi selezionati deve essere ritirato prima di poter essere eliminato.",
-               "WARNING": "Gli eventi qui sotto non possono essere eliminati perché sono già stati pubblicati e cancellarli non lascerebbero il modo di eliminare i file pubblicati. Invece, scegli un flusso di lavoro qui sotto per ritirare prima gli eventi e poi cancellarli."
-            },
-            "RETRACT_EVENTS": "Riproduci eventi",
-            "SELECT_RETRACT_TASK": "Seleziona un'attività da ritirare",
-            "SUMMARY": {
-               "EVENTS_DELETED": "Eventi da Cancellare",
-               "EVENTS_RETRACTED": "Eventi da ritirare",
-               "RETRACT_WORKFLOW": "Flusso di lavoro per ritirare eventi"
-            },
-            "UNAUTHORIZED": "Non sei autorizzato a cancellare gli eventi evidenziati. Si prega di deselezionarli per continuare.",
-            "UNPUBLISHED": {
-               "NONE": "Nessuno degli eventi selezionati può essere eliminato senza lasciare i file orfani."
-            },
-            "BUTTON": "Elimina"
+            "UNAUTHORIZED": "Non sei autorizzato a cancellare gli eventi evidenziati. Si prega di deselezionarli per continuare."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Una volta eliminati, tutti i metadati degli eventi, file audio e video verranno eliminati in modo irreversibile.",
@@ -270,8 +257,6 @@
       "NEXT_STEP": "Successivo",
       "BACK": "Precedente",
       "CREATE": "Crea",
-      "RETRACT": "Ritira",
-      "RETRACT_DELETE": "Retract/Delete",
       "DELETE": "Elimina",
       "UPDATE": "Aggiorna",
       "DURATION": {
@@ -313,13 +298,6 @@
       }
    },
    "EVENTS": {
-      "RETRACT": {
-         "CAPTION": "Ritira evento",
-         "ID": "ID",
-         "SELECT_TASK": "Selezionare attività",
-         "SUMMARY": "Riepilogo",
-         "WARNING": "Questo evento è stato pubblicato in almeno un canale di pubblicazione, quindi deve essere ritirato prima che possa essere eliminato. Seleziona dalle attività sottostanti per ritirare le pubblicazioni."
-      },
       "LICENSE": {
          "ALLRIGHTS": "Tutti i diritti riservati",
          "CCBY": "CC BY",
@@ -482,6 +460,7 @@
             "PUBLISHED": "Pubblicato",
             "WEEKDAY": "Giorno feriale",
             "TOOLTIP": {
+               "ASSETS": "Open asset details",
                "START": "Filtro per questa data di inizio",
                "SERIES": "Filtra per questa serie",
                "STATUS": "Filtra per questo stato dell'evento",
@@ -510,6 +489,7 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retracting",
+            "DELETING": "Deleting",
             "DUPLICATING": "Duplicating",
             "PUBLISHING": "Publishing",
             "IMPORTING": "Importing",
@@ -2004,7 +1984,7 @@
          "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
          "VIEWS_SUM": "This displays the total number of views per time unit.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the running total published hours of video"
+         "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
 }
