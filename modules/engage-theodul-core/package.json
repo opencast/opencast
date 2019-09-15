@@ -1,16 +1,8 @@
 {
-  "name": "opencast-engage-ui",
+  "name": "engage-theodul-core",
   "private": true,
   "scripts": {
     "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js src/main/resources/ui/js/app/ src/main/resources/ui/js/*.js"
-  },
-  "dependencies": {
-    "bootbox": "^5.3.2",
-    "jquery": "^3.4.1",
-    "js-yaml": "^3.13.1",
-    "requirejs": "^2.3.6",
-    "seedrandom": "^3.0.3",
-    "underscore": "^1.9.1"
   },
   "devDependencies": {
     "eslint": "^6.4.0",
