@@ -152,7 +152,7 @@ public class SolrRequester {
    * @throws SolrServerException
    *           if the solr server is not working as expected
    */
-  private SearchResult createSearchResult(final SolrQuery query) throws SolrServerException {
+  private SearchResult createSearchResult(final SolrQuery query, final boolean signed) throws SolrServerException {
 
     // Execute the query and try to get hold of a query response
     QueryResponse solrResponse = null;
@@ -192,8 +192,9 @@ public class SolrRequester {
         @Override
         public MediaPackage getMediaPackage() {
           MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
-          if (serializer != null)
+          if (signed && serializer != null) {
             builder.setSerializer(serializer);
+          }
           String mediaPackageFieldValue = Schema.getOcMediapackage(doc);
           if (mediaPackageFieldValue != null) {
             try {
@@ -776,7 +777,7 @@ public class SolrRequester {
    */
   public SearchResult getForAdministrativeRead(SearchQuery q) throws SolrServerException {
     SolrQuery query = getForAction(q, READ.toString(), false);
-    return createSearchResult(query);
+    return createSearchResult(query, q.isSignURLs());
   }
 
   /**
@@ -789,7 +790,7 @@ public class SolrRequester {
    */
   public SearchResult getForRead(SearchQuery q) throws SolrServerException {
     SolrQuery query = getForAction(q, READ.toString(), true);
-    return createSearchResult(query);
+    return createSearchResult(query, q.isSignURLs());
   }
 
   /**
@@ -802,7 +803,7 @@ public class SolrRequester {
    */
   public SearchResult getForWrite(SearchQuery q) throws SolrServerException {
     SolrQuery query = getForAction(q, WRITE.toString(), true);
-    return createSearchResult(query);
+    return createSearchResult(query, q.isSignURLs());
   }
 
   /**

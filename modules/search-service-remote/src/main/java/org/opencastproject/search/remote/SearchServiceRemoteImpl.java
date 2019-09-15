@@ -194,6 +194,7 @@ public class SearchServiceRemoteImpl extends RemoteBase implements SearchService
   private String getSearchUrl(SearchQuery q, boolean admin) {
     StringBuilder url = new StringBuilder();
     List<NameValuePair> queryStringParams = new ArrayList<NameValuePair>();
+    queryStringParams.add(new BasicNameValuePair("sign", "false"));
 
     // MH-10216, Choose "/expisode.xml" endpoint when querying by mediapackage id (i.e. episode id ) to recieve full mp data
     if (q.getId() != null || q.getSeriesId() != null || q.getElementFlavors() != null || q.getElementTags() != null) {
