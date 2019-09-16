@@ -131,6 +131,7 @@
     "//**** For a list of available plugins and configuration, go to": "https://github.com/polimediaupv/paella/blob/develop/doc/adopters/plugins.md",
     "list": {
       "es.upv.paella.opencast.loader": {
+        "orderTracks": ["presenter/delivery", "presenter/preview", "presentation/delivery", "presentation/preview"],
         "streams": [
           {
             "filter": {
