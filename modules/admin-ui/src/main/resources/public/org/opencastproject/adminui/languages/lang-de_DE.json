@@ -66,7 +66,7 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Diese Serie enthält noch Events. Das Löschen der Serie löscht nicht die Events.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "EVENT_WILL_BE_GONE": "Wenn Sie fortfahren, wird das Ereignis unwiderruflich gelöscht."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Diese Serie enthält Events und kann daher nicht gelöscht werden."
@@ -124,11 +124,11 @@
       "SERIES_NOT_UPDATED": "Diese Serie konnte nicht gespeichert werden",
       "SERIES_NOT_UPDATED_ID": "Die Serie {{ id }} konnte nicht gespeichert werden",
       "SERIES_NOT_UPDATED_ALL": "Keine der Serien konnte gespeichert werden",
-      "EVENT_DELETED": "The event has been deleted.",
-      "EVENT_WILL_BE_DELETED": "The event is being deleted",
-      "EVENTS_DELETED": "The events are being deleted.",
-      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
+      "EVENT_DELETED": "Die Aufzeichnung wurde gelöscht.",
+      "EVENT_WILL_BE_DELETED": "Die Aufzeichnung wird gelöscht",
+      "EVENTS_DELETED": "Die Aufzeichnungen werden gelöscht.",
+      "EVENTS_NOT_DELETED": "Die Aufzeichnung(en) konnten nicht gelöscht werden.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Die Aufzeichnungen konnten nicht gelöscht werden da Sie nicht dazu berechtigt sind.",
       "SERIES_DELETED": "Die Serie wurde gelöscht",
       "SERIES_NOT_DELETED": "Die Serie konnte nicht gelöscht werden",
       "LOCATION_DELETED": "Das Aufzeichnungsgerät wurde entfernt",
@@ -460,7 +460,7 @@
             "PUBLISHED": "Veröffentlicht",
             "WEEKDAY": "Wochentag",
             "TOOLTIP": {
-               "ASSETS": "Open asset details",
+               "ASSETS": "Anlagedetails öffnen",
                "START": "Nach diesem Startdatum filtern",
                "SERIES": "Nach dieser Serie filtern",
                "STATUS": "Nach diesem Verarbeitungsstatus filtern",
@@ -489,7 +489,7 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Wird zurückgezogen",
-            "DELETING": "Deleting",
+            "DELETING": "Löschen",
             "DUPLICATING": "Wird dupliziert",
             "PUBLISHING": "Wird veröffentlicht",
             "IMPORTING": "Wird importiert",
@@ -1984,7 +1984,7 @@
          "RANDOM": "Diese Zufallsdaten dienen ausschließlich Test- und Demonstrationszwecken. Um diese Darstellung zu deaktivieren, können Sie die entsprechende Konfiguration in etc/providers entfernen",
          "VIEWS_SUM": "Diese Statistik zeigt die Summe der Zugriffe pro Zeiteinheit.",
          "VIEWS_AVG": "Diese Statistik zeigt die durchschnittliche Anzahl von Zugriffe pro Zeiteinheit.",
-         "PUBLISHEDHOURS": "This displays the published hours of video"
+         "PUBLISHEDHOURS": "Dies zeigt die veröffentlichten Videostunden an"
       }
    }
 }
