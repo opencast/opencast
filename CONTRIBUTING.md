@@ -40,7 +40,7 @@ not be concerned.
 Checklist
 ---------
 
-- [ ] [closes an accompanying issue](https://help.github.com/en/articles/closing-issues-using-keywords) if one exists
+- [ ] [Closes an accompanying issue](https://help.github.com/en/articles/closing-issues-using-keywords) if one exists
 - [ ] Pull request has a proper title and description
 - [ ] Appropriate documentation is included
 - [ ] Code passes automatic tests
