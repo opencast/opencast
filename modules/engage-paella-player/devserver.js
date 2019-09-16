@@ -3,17 +3,23 @@ var httpProxy = require('http-proxy');
 var createError = require('http-errors');
 
 var app = express();
-var proxy = httpProxy.createProxyServer({secure:false});
+
+
+var proxy = httpProxy.createProxyServer({
+  secure:false,
+  changeOrigin: true,
+  target: 'https://develop.opencast.org'
+});
  
 function proxyFunc(req, res, next) {
-    proxy.web(req, res, { target: 'http://localhost:8080' },
+    proxy.web(req, res,
     function(err){
         next(createError(502, err));
     });
 }
 
 app.use('/paella/ui', express.static('target/gulp/paella-opencast'));
-app.use('/ui/config/paella', express.static('../../etc/ui-config/mh_default_org/paella'))
+app.use('/ui/config/paella', express.static('../../etc/ui-config/mh_default_org/paella/'));
 app.use(proxyFunc);
 
 
