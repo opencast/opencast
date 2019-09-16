@@ -31,7 +31,7 @@ Input                                                   Output
 | source-flavor-part-0 |  |    \------------------/    +---------------------------+
 +----------------------+  |
 | presenter            |--+
-| source-flavor-part-2 |
+| source-flavor-part-1 |
 +----------------------+
 **/
 
@@ -49,7 +49,7 @@ digraph G {
     color=lightgrey;
     outro [label="outro\nsource-flavor-part-2"];
     intro [label="intro\nsource-flavor-part-0"];
-    presenter [label="presenter\nsource-flavor-part-2"];
+    presenter [label="presenter\nsource-flavor-part-1"];
   }
 
   subgraph cluster_output {
