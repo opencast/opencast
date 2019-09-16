@@ -311,7 +311,7 @@
     <!-- sec:x509 subject-principal-regex="CN=(.*?)," user-service-ref="userDetailsService" / -->
 
     <!-- Enable and configure the failure URL for form-based logins -->
-    <sec:form-login authentication-failure-url="/admin-ng/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
+    <!-- <sec:form-login authentication-failure-url="/admin-ng/login.html?error" authentication-success-handler-ref="authSuccessHandler" / -->
 
     <!-- Authentication filter chain -->
     <sec:custom-filter position="BASIC_AUTH_FILTER" ref="authenticationFilters" />
