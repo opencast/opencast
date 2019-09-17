@@ -629,12 +629,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
     arguments.add(COMPOSITE_TRACK_SIZE_INDEX, Serializer.json(compositeTrackSize).toJson());
     arguments.add(BACKGROUND_COLOR_INDEX, background);
+    arguments.add(AUDIO_SOURCE_INDEX, sourceAudioName);
     if (watermark.isSome()) {
       LaidOutElement<Attachment> watermarkLaidOutElement = watermark.get();
       arguments.add(WATERMARK_INDEX, MediaPackageElementParser.getAsXml(watermarkLaidOutElement.getElement()));
       arguments.add(WATERMARK_LAYOUT_INDEX, Serializer.json(watermarkLaidOutElement.getLayout()).toJson());
     }
-    arguments.add(AUDIO_SOURCE_INDEX, sourceAudioName);
     try {
       final EncodingProfile profile = profileScanner.getProfile(profileId);
       return serviceRegistry.createJob(JOB_TYPE, Operation.Composite.toString(), arguments, profile.getJobLoad());
@@ -1448,10 +1448,13 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           String audioSourceName = arguments.get(AUDIO_SOURCE_INDEX);
 
           Option<LaidOutElement<Attachment>> watermarkOption = Option.none();
-          if (arguments.size() == 9) {
+          //If there is a watermark defined, it needs both args 8 and 9
+          if (arguments.size() > WATERMARK_INDEX && arguments.size() <= WATERMARK_LAYOUT_INDEX + 1) {
             watermarkAttachment = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(WATERMARK_INDEX));
             Layout watermarkLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(WATERMARK_LAYOUT_INDEX)));
             watermarkOption = Option.some(new LaidOutElement<>(watermarkAttachment, watermarkLayout));
+          } else if (arguments.size() > WATERMARK_LAYOUT_INDEX + 1) {
+            throw new IndexOutOfBoundsException("Too many composite arguments!");
           }
           serialized = composite(job, compositeTrackSize, lowerLaidOutElement, upperLaidOutElement, watermarkOption,
                   encodingProfile, backgroundColor, audioSourceName).map(MediaPackageElementParser.getAsXml()).getOrElse("");

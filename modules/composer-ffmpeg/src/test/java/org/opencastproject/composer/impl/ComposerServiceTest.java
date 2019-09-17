@@ -25,10 +25,12 @@ import static org.easymock.EasyMock.capture;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.LaidOutElement;
+import org.opencastproject.composer.layout.AbsolutePositionLayoutSpec;
 import org.opencastproject.composer.layout.Dimension;
 import org.opencastproject.composer.layout.HorizontalCoverageLayoutSpec;
 import org.opencastproject.composer.layout.LayoutManager;
@@ -71,12 +73,15 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 /**
  * Tests the {@link ComposerServiceImpl}.
@@ -105,6 +110,7 @@ public class ComposerServiceTest {
   private Track sourceVideoTrack;
   private Track sourceAudioTrack;
   private Track inspectedTrack;
+  private Attachment watermarkImageAttachment;
 
   /** Encoding profile scanner */
   private EncodingProfileScanner profileScanner;
@@ -193,6 +199,8 @@ public class ComposerServiceTest {
             ComposerServiceTest.class.getResourceAsStream("/composer_test_source_track_video.xml"), Charset.defaultCharset()));
     sourceAudioTrack = (Track) MediaPackageElementParser.getFromXml(IOUtils.toString(
             ComposerServiceTest.class.getResourceAsStream("/composer_test_source_track_audio.xml"), Charset.defaultCharset()));
+    watermarkImageAttachment = (Attachment) MediaPackageElementParser.getFromXml(IOUtils.toString(
+            ComposerServiceTest.class.getResourceAsStream("/composer_test_watermark_attachment.xml"), Charset.defaultCharset()));
 
     // Create and populate the composer service
     composerService = new ComposerServiceImpl() {
@@ -408,6 +416,59 @@ public class ComposerServiceTest {
     inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
     Assert.assertEquals(inspectedTrack, compositeTrack);
   }
+
+  @Test
+  public void testCompositeAudioAndWatermark() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+
+    Dimension outputDimension = new Dimension(500, 500);
+
+    List<HorizontalCoverageLayoutSpec> layouts = new ArrayList<HorizontalCoverageLayoutSpec>();
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
+            .jsonObj("{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":1.0},\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}}")));
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
+            .jsonObj("{\"horizontalCoverage\":0.2,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":0.0,\"top\":0.0}}}")));
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
+            .jsonObj("{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},\"offset\":{\"y\":20,\"x\":20},\"reference\":{\"left\":1.0,\"top\":0.0}}}")));
+
+    List<Tuple<Dimension, HorizontalCoverageLayoutSpec>> shapes = new ArrayList<>();
+    shapes.add(0, Tuple.tuple(new Dimension(300, 300), layouts.get(0)));
+    shapes.add(1, Tuple.tuple(new Dimension(200, 200), layouts.get(1)));
+
+    MultiShapeLayout multiShapeLayout = LayoutManager.multiShapeLayout(outputDimension, shapes);
+
+    //Setting this to null to bypass complaints about image possibly not being initialized...
+    BufferedImage image = null;
+    try {
+      image = ImageIO.read(sourceImage);
+    } catch (Exception e) {
+      fail("Unable to read the watermark image attachment");
+    }
+    Dimension imageDimension = Dimension.dimension(image.getWidth(), image.getHeight());
+    List<Tuple<Dimension, AbsolutePositionLayoutSpec>> watermarkShapes = new ArrayList<Tuple<Dimension, AbsolutePositionLayoutSpec>>();
+    AbsolutePositionLayoutSpec layout = Serializer.absolutePositionLayoutSpec((JsonObj
+            .jsonObj("{\"horizontalCoverage\":0.1,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},\"offset\":{\"y\":0,\"x\":0},\"reference\":{\"left\":0.010,\"top\":0.01}}}")));
+    watermarkShapes.add(0, Tuple.tuple(imageDimension, layout));
+    MultiShapeLayout watermarkLayout = LayoutManager.absoluteMultiShapeLayout(outputDimension,
+            watermarkShapes);
+    Option<LaidOutElement<Attachment>> watermarkOption = Option.some(new LaidOutElement<Attachment>(watermarkImageAttachment, watermarkLayout
+            .getShapes().get(0)));
+
+    LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>(sourceVideoTrack, multiShapeLayout.getShapes()
+            .get(0));
+    LaidOutElement<Track> upperLaidOutElement = new LaidOutElement<Track>(sourceVideoTrack, multiShapeLayout.getShapes()
+            .get(1));
+
+    Job composite = composerService.composite(outputDimension, Option.option(lowerLaidOutElement), upperLaidOutElement,
+            watermarkOption, "composite.work", "black", "upper");
+    Track compositeTrack = (Track) MediaPackageElementParser.getFromXml(composite.getPayload());
+    Assert.assertNotNull(compositeTrack);
+    inspectedTrack.setIdentifier(compositeTrack.getIdentifier());
+    inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
+    Assert.assertEquals(inspectedTrack, compositeTrack);
+  }
+
   /**
    * Test method for {@link ComposerServiceImpl#concat(String, Dimension, Track...)}
    */
