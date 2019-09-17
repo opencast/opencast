@@ -119,6 +119,7 @@ import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -274,6 +275,8 @@ public abstract class AbstractEventEndpoint {
   public abstract Boolean signWithClientIP();
 
   public abstract Boolean getOnlySeriesWithWriteAccessEventModal();
+
+  public abstract Boolean getOnlyEventsWithWriteAccessEventsTab();
 
   /** Default server URL */
   protected String serverUrl = "http://localhost:8080";
@@ -2210,6 +2213,13 @@ public abstract class AbstractEventEndpoint {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
       }
+    }
+
+    // We search for write actions
+    if (getOnlyEventsWithWriteAccessEventsTab()) {
+      query.withoutActions();
+      query.withAction(Permissions.Action.WRITE);
+      query.withAction(Permissions.Action.READ);
     }
 
     if (optLimit.isSome())

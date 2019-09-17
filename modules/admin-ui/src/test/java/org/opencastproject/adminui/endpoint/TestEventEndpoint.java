@@ -777,4 +777,9 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   public Boolean getOnlySeriesWithWriteAccessEventModal() {
     return false;
   }
+
+  @Override
+  public Boolean getOnlyEventsWithWriteAccessEventsTab() {
+    return false;
+  }
 }
