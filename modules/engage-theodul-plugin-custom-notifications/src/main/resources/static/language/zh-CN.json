@@ -1,0 +1,13 @@
+{
+    "value_locale": "zh",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "error_videoLoading": "正在加载视频。请稍等。",
+    "error_audioLoading": "正在加载音频。请稍等。",
+    "msg_videoLoadedSuccessfully": "已成功加载了视频。",
+    "msg_audioLoadedSuccessfully": "已成功加载音频。",
+    "msg_videoBuffering": "视频缓冲中，请稍等...",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "该视频已被成功地缓冲和现在是自动播放。",
+    "msg_videoBufferedSuccessfully": "视频已被成功地缓冲。",
+    "error": "错误",
+    "error_AudioCodecNotSupported": "错误: 此浏览器不支持当前用到的音频编码解码器"
+}
