@@ -1,0 +1,6 @@
+{
+  "opencast": {
+    "serverUrl": "/",
+    "loginProvided": true
+  }
+}

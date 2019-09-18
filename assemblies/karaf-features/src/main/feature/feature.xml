@@ -243,6 +243,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-random/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-studio/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-solr/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-workflowoperation/${project.version}</bundle>
@@ -347,6 +348,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-service/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-studio/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-smil-api/${project.version}</bundle>
