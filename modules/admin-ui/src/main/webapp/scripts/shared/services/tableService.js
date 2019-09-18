@@ -169,7 +169,7 @@ angular.module('adminNg.services')
           // configure them from scratch
           me.columns = options.columns;
           angular.forEach(me.columns, function (column) {
-            column.deactivated = false;
+            column.deactivated = column.name === 'technical_end';
           });
         }
 
