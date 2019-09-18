@@ -455,7 +455,11 @@ public class MetadataField<A> {
     Fn<Opt<String>, JValue> periodToJSON = new Fn<Opt<String>, JValue>() {
       @Override
       public JValue apply(Opt<String> value) {
+        if (value == null || value.isEmpty()) {
+          return v("");
+        }
         Long returnValue = 0L;
+        if (value != null || value.isSome()) {
         DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value.get());
         if (period != null && period.hasStart() && period.hasEnd()) {
           returnValue = period.getEnd().getTime() - period.getStart().getTime();
@@ -464,6 +468,7 @@ public class MetadataField<A> {
             returnValue = Long.parseLong(value.get());
           } catch (NumberFormatException e) {
             logger.debug("Unable to parse duration '{}' as either period or millisecond duration.", value.get());
+            }
           }
         }
         return v(DurationFormatUtils.formatDuration(returnValue, PATTERN_DURATION));
