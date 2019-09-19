@@ -79,8 +79,8 @@ Additional Notes About 7.1
 --------------------------
 
 Opencast 7.1 is the first maintenance release for Opencast 7. It fixes a bug with the scheduler migration which may have
-caused minor issues for old, process events which were missing some meta-data. If you have already migrated to Opencast
-7.0 and experience this problem, simply re-start the scheduler migration and re-build the index once more.
+caused minor issues for old, processed events which were missing some metadata. If you have already migrated to
+Opencast 7.0 and experience this problem, simply re-start the scheduler migration and re-build the index once more.
 
 
 Additional Notes About 7.2
@@ -96,6 +96,27 @@ If you use your own workflow and did not adapt the first patch, you should not b
 you are, just make sure that source and target smil flavor for the editor workflow operation are identical like it is
 ensured [by the official fix](https://github.com/opencast/opencast/pull/1013). A proper solution not relying on specific
 configurations and less error prone is in work and will be added to the upcoming major Opencast release.
+
+
+Additional Notes About 7.3
+--------------------------
+
+Opencast 7.3 fixes a bug where the audio-source-name parameter of the composite operation defaults to none instead of
+"dual" in distributed systems, causing the resulting video to have no audio. A workaround for this problem entails
+setting audio-source-name to "dual" explicitly. Additionally this release fixes another problem in the composite WOH
+where using the watermark tool causes the operation to fail.
+
+This release also solves a major problem during the index rebuild of the workflow service where the process will
+sometimes fail with an OutOfMemory error because it's attempting to load all workflows at once. This problem is averted
+by loading and processing the workflows in increments instead. If you encountered this problem or plan to update to 7
+and have a lot of workflows in your system, you should update to 7.3.
+
+7.3 also ensures that the start dates shown in the events table and in the event details are once more consistent by
+using the bibliographic for both instead of showing the technical date in the events table since this can't be updated
+via UI for uploaded events and leads to confusion.
+
+Last but not least this release also fixes a known security vulnerability in Apache Santuario, so it is encouraged to
+update.
 
 
 Release Schedule
