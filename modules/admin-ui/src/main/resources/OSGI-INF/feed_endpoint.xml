@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.adminui.endpoint.FeedEndpoint" immediate="true">
+  <implementation class="org.opencastproject.adminui.endpoint.FeedEndpoint"/>
+  <property name="service.description" value="Admin UI - Feed Endpoint"/>
+
+  <property name="opencast.service.type" value="org.opencastproject.adminui.endpoint.FeedEndpoint"/>
+  <property name="opencast.service.path" value="/admin-ng/feeds"/>
+  <service>
+    <provide interface="org.opencastproject.adminui.endpoint.FeedEndpoint"/>
+  </service>
+
+  <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
+             cardinality="1..1" policy="static" bind="setTrustedHttpClient"/>
+  <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             cardinality="1..1" policy="static" bind="setRemoteServiceManager"/>
+</scr:component>

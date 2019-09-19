@@ -118,6 +118,9 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   /** Property key for the feed atom media element flavor */
   public static final String PROP_ATOMTAGS = "feed.atomtags";
 
+  /** Property key for the feed atom media element flavor */
+  public static final String PROP_PATTERN = "feed.pattern";
+
   /** A default value for limit */
   protected static final int DEFAULT_LIMIT = 100;
 
@@ -171,6 +174,9 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
 
   /** The feed name */
   private String name = null;
+
+  /** The feed pattern */
+  private String pattern = null;
 
   /** Url to the cover image */
   private String cover = null;
@@ -253,6 +259,7 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     description = (String) properties.get(PROP_DESCRIPTION);
     copyright = (String) properties.get(PROP_COPYRIGHT);
     home = (String) properties.get(PROP_HOME);
+    pattern = (String) properties.get(PROP_PATTERN);
     // feed.cover can be unset if no branding is required
     if (StringUtils.isBlank((String) properties.get(PROP_COVER))) {
       cover = null;
@@ -304,6 +311,15 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
    */
   public String getIdentifier() {
     return uri;
+  }
+
+  /**
+   * Returns the pattern.
+   *
+   * @return the pattern
+   */
+  public String getPattern() {
+    return this.pattern;
   }
 
   /**
