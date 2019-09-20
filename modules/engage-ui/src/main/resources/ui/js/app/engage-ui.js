@@ -128,7 +128,7 @@ function($, bootbox, _, alertify, jsyaml) {
     case 'sl': return 'sl-SI';
     case 'sv': return 'sv-SE';
     case 'tr': return 'tr-TR';
-	  case "zh": return "zh-CN";
+    case 'zh': return 'zh-CN';
     default: return null;
     }
   }
