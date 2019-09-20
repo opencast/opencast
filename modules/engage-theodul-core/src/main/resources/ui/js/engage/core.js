@@ -181,6 +181,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
           case "sl": return "sl-SI";
           case "sv": return "sv-SE";
           case "tr": return "tr-TR";
+	  case "zh": return "zh-CN";
           default: return null;
       }
   }

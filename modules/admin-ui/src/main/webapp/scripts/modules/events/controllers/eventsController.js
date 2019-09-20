@@ -61,15 +61,15 @@ angular.module('adminNg.controllers')
         sortable: true
       }, {
         template: 'modules/events/partials/eventsTechnicalDateCell.html',
-        name:  'technical_date',
+        name:  'date',
         label: 'EVENTS.EVENTS.TABLE.DATE',
         sortable: true
       }, {
-        name:  'technical_start',
+        name:  'start_date',
         label: 'EVENTS.EVENTS.TABLE.START',
         sortable: true
       }, {
-        name:  'technical_end',
+        name:  'end_date',
         label: 'EVENTS.EVENTS.TABLE.STOP',
         sortable: true
       }, {

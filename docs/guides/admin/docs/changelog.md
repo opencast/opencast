@@ -4,6 +4,31 @@ Changelog
 Opencast 7
 ----------
 
+### Opencast 7.3
+
+*Released on September 19, 2019*
+
+- [[MH-13716](https://opencast.jira.com/browse/MH-13716)][[#1061](https://github.com/opencast/opencast/pull/1061)] -
+  Update xmlsec
+- [[MH-13715](https://opencast.jira.com/browse/MH-13715)][[#1060](https://github.com/opencast/opencast/pull/1060)] -
+  Check Markdown for newline character
+- [[#1056](https://github.com/opencast/opencast/pull/1056)] -
+  CAS security example is very out of date
+- [[MH-13707](https://opencast.jira.com/browse/MH-13707)][[#1051](https://github.com/opencast/opencast/pull/1051)] -
+  Watermark missing
+- [[MH-13706](https://opencast.jira.com/browse/MH-13706)][[#1049](https://github.com/opencast/opencast/pull/1049)] -
+  Show bibliographic event dates on the events overview page
+- [[MH-13701](https://opencast.jira.com/browse/MH-13701)][[#1040](https://github.com/opencast/opencast/pull/1040)] -
+  Interpret source-audio-name correctly for composite operation
+- [[MH-13699](https://opencast.jira.com/browse/MH-13699)][[#1038](https://github.com/opencast/opencast/pull/1038)] -
+  Fix Workflow Index Rebuild ACL Handling
+- [[MH-13697](https://opencast.jira.com/browse/MH-13697)][[#1036](https://github.com/opencast/opencast/pull/1036)] -
+  Workflow Index Rebuild Memory
+- [[MH-13684](https://opencast.jira.com/browse/MH-13684)][[#1024](https://github.com/opencast/opencast/pull/1024)] -
+  Do not include auth token in republished URLs
+- [[MH-12533](https://opencast.jira.com/browse/MH-12533)][[#714](https://github.com/opencast/opencast/pull/714)] -
+  Re-introduce ability to avoid data loss during ingest
+
 ### Opencast 7.2
 
 *Released on August 02, 2019*
@@ -43,7 +68,6 @@ Opencast 7
   Fix Italian Translation
 - [[MH-13610](https://opencast.jira.com/browse/MH-13610)][[#947](https://github.com/opencast/opencast/pull/947)] -
   LDAP User Directory Fixes
-
 
 ### Opencast 7.0
 
