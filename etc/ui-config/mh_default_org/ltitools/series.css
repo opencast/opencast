@@ -1,8 +1,14 @@
+/**
+ * This stylesheet controls the look and feel of Opencast's series LTI tool.
+ *
+ * You may want to modify this to adjust the tool to the environment (e.g. the LMS) in which it is embedded.
+ */
+
 body {
-	font-size: 14px;
-	font-family: sans-serif;
-	max-width: 800px;
-	margin: 0 auto;
+  font-size: 14px;
+  font-family: sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 header {

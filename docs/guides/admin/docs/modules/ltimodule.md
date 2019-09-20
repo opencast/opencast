@@ -91,3 +91,12 @@ custom parameters to be defined globally.
 - To show a debug page before proceeding to the tool, append the parameter `test=true`
 
 For more information about how to set custom LTI parameters, please check the documentation of your LMS.
+
+
+### Series LTI Tool
+
+Opencast's series LTI tool provides the option to provide custom style sheets for configuring the look and feel of the
+tool which may be important to match the design of the LTI consumer in which it is included. The CSS file can be found
+in the user interface configuration directory usually located at:
+
+    etc/ui-config/mh_default_org/ltitools/series.css
