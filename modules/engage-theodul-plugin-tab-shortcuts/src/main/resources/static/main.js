@@ -189,13 +189,14 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
             prepareCategories();
             var scuts = Engage.model.get("meInfo").get("shortcuts");
             if (scuts) {
-                $.each(scuts, function(i, v) {
-                    var cat = v.name.split(".")[0]
-                    if (cat !== undefined && shortcuts[cat] !== undefined) {
+                $.each(scuts, function(cat, val) {
+                    if (cat !== undefined && shortcuts[cat] != undefined && val != undefined) {
+                      $.each(val, function(name, key) {
                         shortcuts[cat].push({
-                            name: translate(v.name, v.name),
-                            val: translateKeyboardCombination(v.key, "+")
+                            name: translate(name, name),
+                            val: translateKeyboardCombination(key, "+")
                         });
+                      });
                     }
                 });
                 shortcutsParsed = true;
@@ -205,22 +206,19 @@ define(["jquery", "underscore", "backbone", "engage/core"], function($, _, Backb
 
     function prepareCategories() {
         if (!categoriesParsed) {
-            var categorySequenceString = Engage.model.get("meInfo").get("shortcut-sequence");            
-            var categorySequence = new Array();
-            if (typeof categorySequenceString !== "undefined") 
-                categorySequence = categorySequenceString.split(',');
-            if (categorySequence) {
-                $.each(categorySequence, function(i, v) {
+            var scuts = Engage.model.get("meInfo").get("shortcuts");
+            if (scuts) {
+                $.each(scuts, function(cat, val) {
                     categories.push({
-                        name: translate(v, v),
-                        val: v
+                        name: translate(cat, cat),
+                        val: cat
                     });
-                    shortcuts[v] = new Array();
+                    shortcuts[cat] = new Array();
                 });
                 categoriesParsed = true;
             }
         }
-    }    
+    }
 
     function initPlugin() {
         // only init if plugin template was inserted into the DOM
