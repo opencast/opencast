@@ -588,8 +588,7 @@ public class LiveScheduleServiceImplTest {
 
     replayServices();
 
-    service.addLivePublicationChannel(org, mp);
-
+    service.addLivePublicationChannel(org, mp, new HashMap<String, Track>());
     Publication[] publications = mp.getPublications();
     Assert.assertEquals(1, publications.length);
     Assert.assertEquals(LiveScheduleService.CHANNEL_ID, publications[0].getChannel());
