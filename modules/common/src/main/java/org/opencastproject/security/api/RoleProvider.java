@@ -25,12 +25,15 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Mix-in interface for directories that can list known roles.
+ * Mix-in interface for directories that can list roles.
  */
 public interface RoleProvider {
 
   /**
-   * Gets all known roles.
+   * Gets all roles, if the RoleProvider provides access to a fixed set of roles
+   * which are known in advance. If the RoleProvider provides access to a set of
+   * roles with undefined size (for example because roles are verified by an
+   * external system, or validated against a pattern), then return an empty iterator.
    *
    * @return the roles
    */
@@ -53,7 +56,7 @@ public interface RoleProvider {
   String getOrganization();
 
   /**
-   * Return the found role's as an iterator.
+   * Return the found roles as an iterator.
    *
    * @param query
    *          the query. Use the wildcards "_" to match any single character and "%" to match an arbitrary number of
