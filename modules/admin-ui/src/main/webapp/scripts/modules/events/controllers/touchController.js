@@ -29,5 +29,14 @@ angular.module('adminNg.controllers')
       popup.toggle('is-hidden');
     };
 
+    window.onclick = function(ev) {
+      if (ev.target.nodeName != 'SPAN') {
+        var links = document.getElementsByClassName("js-popover");
+        for (var index = 0; index < links.length; index++) {
+          links[index].style.display = "none";
+        }
+      }
+		};
+
   }
 ]);
