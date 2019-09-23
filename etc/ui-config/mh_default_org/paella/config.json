@@ -271,7 +271,10 @@
       },
       "es.upv.paella.arrowSlidesNavigatorPlugin": {
         "enabled": true,
-        "showArrowsIn": "slave"
+        "content":[
+          "presentation",
+          "presenter"
+        ]
       },
       "es.upv.paella.videoDataPlugin": {
         "enabled": false,
@@ -344,6 +347,11 @@
         "heartbeat": 30,
         "client_id": "Paella Player"
       },
+      "org.opencast.usertracking.x5gonSaverPlugIn": {
+        "enabled": false,
+        "token": "X5GON_TOKEN",
+        "testing_environment" : false
+      },
       "es.teltek.paella.usertracking.xAPISaverPlugin": {
         "enabled": false,
         "endpoint": "http://localhost:8081/data/xAPI/",
@@ -368,6 +376,9 @@
         "enabled": true
       },
       "es.upv.paella.opencast.userTrackingSaverPlugIn": {
+        "enabled": true
+      },
+      "es.upv.paella.defaultKeysPlugin": {
         "enabled": true
       }
     }
