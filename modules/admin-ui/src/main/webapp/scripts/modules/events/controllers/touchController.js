@@ -23,20 +23,17 @@
 angular.module('adminNg.controllers')
 .controller('TouchCtrl', ['$scope', '$document',
   function ($scope, $document) {
-
     $scope.openPopup = function(id) {
-      var popup = angular.element(document.getElementById(id));
-      popup.toggle('is-hidden');
+        var popup = angular.element(document.getElementById(id));
+        popup.toggle('is-hidden');
     };
-
     window.onclick = function(ev) {
-      if (ev.target.nodeName != 'SPAN') {
-        var links = document.getElementsByClassName('js-popover');
-        for (var index = 0; index < links.length; index++) {
-          links[index].style.display = 'none';
+        if (ev.target.nodeName != 'SPAN') {
+            var links = document.getElementsByClassName('js-popover');
+            for (var index = 0; index < links.length; index++) {
+                links[index].style.display = 'none';
+            }
         }
-      }
-		};
-
+    };
   }
 ]);
