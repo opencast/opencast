@@ -1815,8 +1815,8 @@
     <url>https://github.com/opencast/opencast/</url>
   </scm>
   <issueManagement>
-    <system>jira</system>
-    <url>https://opencast.jira.com</url>
+    <system>GitHub</system>
+    <url>https://github.com/opencast/opencast</url>
   </issueManagement>
   <!-- Site Report generation settings -->
   <reporting>

@@ -52,8 +52,8 @@ The exact review process heavily depends on the type, size and purpose of the pu
 Here are some things a reviewer should usually do:
 
 * Check if code looks sensible (e.g. no nonsensical files, no obvious formatting errors, no large binary files, …)
-* Locally run Opencast and verify that the issue has been fixed (as described in the pull request and/or the Jira
-  ticket) or the feature does what it is supposed
+* Locally run Opencast and verify that the issue has been fixed (as described in the pull request and/or the GitHub
+  issue) or the feature does what it is supposed
 * Check the documentation
 
 Some changes require special attention:
