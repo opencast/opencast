@@ -220,11 +220,6 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
   }
 
   @Override
-  public Iterator<Role> getRoles() {
-    return Collections.emptyIterator();
-  }
-
-  @Override
   public List<Role> getRolesForUser(String username) {
     User user = this.loadUser(username);
     if (user != null) {

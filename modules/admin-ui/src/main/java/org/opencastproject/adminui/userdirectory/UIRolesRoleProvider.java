@@ -74,15 +74,6 @@ public class UIRolesRoleProvider implements RoleProvider {
   }
 
   /**
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    JaxbOrganization organization = JaxbOrganization.fromOrganization(securityService.getOrganization());
-    return roles.stream().map((role) -> toRole(role, organization)).iterator();
-  }
-
-  /**
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
    */
   @Override

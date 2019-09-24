@@ -30,16 +30,6 @@ import java.util.List;
 public interface RoleProvider {
 
   /**
-   * Gets all roles, if the RoleProvider provides access to a fixed set of roles
-   * which are known in advance. If the RoleProvider provides access to a set of
-   * roles with undefined size (for example because roles are verified by an
-   * external system, or validated against a pattern), then return an empty iterator.
-   *
-   * @return the roles
-   */
-  Iterator<Role> getRoles();
-
-  /**
    * Returns the roles for this user or an empty array if no roles are applicable.
    *
    * @param userName

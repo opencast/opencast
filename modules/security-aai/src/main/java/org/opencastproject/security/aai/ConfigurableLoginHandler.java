@@ -493,11 +493,7 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
     }
   }
 
-  /**
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
+  private Iterator<Role> getRoles() {
     JaxbOrganization organization = JaxbOrganization.fromOrganization(securityService.getOrganization());
     HashSet<Role> roles = new HashSet<Role>();
     roles.add(new JaxbRole(roleFederationMember, organization));

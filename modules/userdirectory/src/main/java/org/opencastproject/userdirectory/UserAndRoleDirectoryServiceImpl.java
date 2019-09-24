@@ -229,21 +229,8 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    *
    * @see org.opencastproject.security.api.RoleDirectoryService#getRoles()
    */
-  @Override
   public Iterator<Role> getRoles() {
-    final Organization org = securityService.getOrganization();
-    if (org == null)
-      throw new IllegalStateException("No organization is set");
-
-    // Get all roles from the role providers
-    final List<Role> roles = new ArrayList<>();
-    for (RoleProvider roleProvider : roleProviders) {
-      final String providerOrgId = roleProvider.getOrganization();
-      if (ALL_ORGANIZATIONS.equals(providerOrgId) || org.getId().equals(providerOrgId)) {
-        roleProvider.getRoles().forEachRemaining(roles::add);
-      }
-    }
-    return roles.stream().sorted(Comparator.comparing(Role::getName)).iterator();
+    return findRoles("%", Role.Target.ALL, 0, 0);
   }
 
   /**

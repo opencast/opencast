@@ -66,14 +66,6 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
     return new JaxbRole(roleName, organization, description, system);
   }
 
-  /**
-   * @see RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    return getRolesStream().iterator();
-  }
-
   private Stream<Role> getRolesStream() {
     return this.captureAgentService.getKnownAgents()
             .keySet()

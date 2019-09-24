@@ -55,11 +55,7 @@ public class OrganizationRoleProvider implements RoleProvider {
     this.securityService = securityService;
   }
 
-  /**
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
+  private Iterator<Role> getRoles() {
     Organization organization = securityService.getOrganization();
     List<Role> roles = new ArrayList<Role>();
     // The GLOBAL_ADMIN_ROLE is provided by the InMemoryUserAndRoleProvider

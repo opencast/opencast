@@ -107,15 +107,6 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
   }
 
   /**
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    List<Role> roles = getRolesForUser(securityService.getUser().getUsername());
-    return roles.iterator();
-  }
-
-  /**
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
    */
   @Override

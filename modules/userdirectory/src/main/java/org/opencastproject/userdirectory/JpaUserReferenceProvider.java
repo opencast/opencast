@@ -237,17 +237,6 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.security.api.RoleDirectoryService#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    // The roles are returned from the JpaUserAndRoleProvider
-    return Collections.<Role> emptyList().iterator();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.security.api.UserProvider#getOrganization()
    */
   @Override
