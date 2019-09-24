@@ -11,7 +11,7 @@ These instructions outline how to install Opencast on a Linux system. Currently 
     $ cd opencast && mvn clean install -Pdev
     $ cd build/opencast-dist-develop-*/bin && ./start-opencast
 
-You can find the default Admin UI at: http://localhost:8080/admin-ng/index.html
+You can find the default Admin UI at: [localhost](http://localhost:8080/admin-ng/index.html)
 
 Default credentials are:
 
@@ -28,7 +28,7 @@ Default credentials are:
     $ ssh-keygen -t rsa -b 4096 -C "example@domain.com"
     $ cat ~/.ssh/id_rsa.pub
 
-Go to: https://github.com/settings/keys, click "New SSH Key" and paste your content of id_rsa.pub into the input field. It should look like:
+Go to: [Github](https://github.com/settings/keys), click "New SSH Key" and paste your content of id_rsa.pub into the input field. It should look like:
 
     ssh-rsa at90k0PY+z7mTyLB7UZXDnmpNHkU/MzOqpOHlEf1fCPViDYMXcFYeUMw0O/q0tR69TqQvwnFZuat90k0PY+z7mTyLB7UZXDnmpNHkU/MzOqpOHlEf1fCPViDYMXcFYeUMw0O/q0tR69TqQvwnFZuat90k0PY+z7mTyLB7UZXDnmpNHkU/MzOqpOHlEf1fCPViDYMXcFYeUMw0O/q0tR69TqQvwnFZuat90k0PY+z7mTyLB7UZXDnmpNHkU/MzOqpOHlEf1fCPViDYMXcFYeUMw0O/q0tR69TqQvwiodajsiodjaaosdiasdjsaddioasjosij== example@domain.com
 
@@ -260,7 +260,7 @@ After the successfully compilation you can start opencast with:
 
     $ cd build/opencast-dist-develop-*/bin && ./start-opencast
 
-The -Pdev argument decreases the build time and skips the creation of multiple tarballs and turning on the developer tarball.
+The `-Pdev` argument decreases the build time and skips the creation of multiple tarballs and turning on the developer tarball.
 
     $ cd opencast && mvn clean install -Pdev
     $ cd build/opencast-dist-develop-*/bin && ./start-opencast
@@ -285,7 +285,8 @@ If you want to start opencast in debug mode, you could use the debug argument:
 
 ## Modify Code and Build Changes
 --------------------
-### After you modified your code you can go back to step "Build and Start Opencast" to rebuild Opencast.
+
+After you modified your code you can go back to step "Build and Start Opencast" to rebuild Opencast.
 
 <br/>
 
@@ -294,17 +295,17 @@ If you want to start opencast in debug mode, you could use the debug argument:
 
 ### NPM Access Error
 
-If you get later on an npm access error, you can fix it by:
+To fix an npm access error ([example](https://stackoverflow.com/questions/16151018/npm-throws-error-without-sudo)), you can run
 
     $ sudo chown -R $USER:$(id -gn $USER) ~/.config && sudo chown -R $USER:$(id -gn $USER) ~/.npm
 
 ### JDK Version
 
-Make sure, that you use the 1.8.0 JDK, some IDE's could use a more up to date version, even if you set your system JDK to 1.8.0.
+Some IDEs attempt to use the most recent version of the JDK. Make sure that your IDE is configured to use JDK 1.8.0.
 
 ### Waiting for ActiveMQ
 
-Make sure, that ActiveMQ runs without errors and with the right JAVA_HOME Variable (explained under section Ubuntu). Otherwise opencast will wait forever to connect.
+Opencast requires ActiveMQ to be both running and properly configured, otherwise it will wait forever to connect. See [here](#install-and-configure-activemq) for details on how to configure ActiveMQ. Make sure, that ActiveMQ runs without errors and with the right JAVA_HOME Variable (explained [here](#set-the-javahome-variable)).
 
 ### Slow Idea Fix
 
@@ -332,9 +333,9 @@ Make sure, that the versions match, you probably have to change it depending on 
     $ sudo tar -zxvf ideaIC-*.tar.gz -C /opt
     $ cd /opt && sudo mv idea-IC-*/ idea && sh /opt/idea/bin/idea.sh
 
-Otherwise install it by downloading and following the manufacturer guide, select Community Edition
+Otherwise install it by downloading and following the manufacturer guide, select Community Edition:
 
-    https://www.jetbrains.com/idea/download/
+[IDEA Intellij Community Edition](https://www.jetbrains.com/idea/download/)
 
 Follow the next steps, if you want to import opencast correctly
 
@@ -345,7 +346,7 @@ Follow the next steps, if you want to import opencast correctly
 - Check all projects to import
 - Make sure not to select JDK 11, please select JDK 1.8.0, it should be somewhere around /usr/lib/jvm/java-1.8.0-openjdk depending on your current system
 
-Now Idea should import the projects, it could take some time, you can make it faster by reading "Slow Idea Fix" mentioned in this guide under "Common Build Errors or Fixes".
+Now Idea should import the projects, it could take some time, you can make it faster by following [this](#slow-idea-fix). 
 
 Import the opencast code style configuration by following the steps
 
@@ -366,9 +367,9 @@ If you are currently on Fedora, you can install it with
 
     $ cd && cd Downloads && sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc && sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" > /etc/yum.repos.d/vscode.repo' && dnf check-update && sudo dnf install code -y
 
-Otherwise install it by downloading and following the manufacturer guide
+Otherwise install it by downloading and following the manufacturer guide:
 
-    https://code.visualstudio.com/
+[Visual Studio Code](https://code.visualstudio.com/)
 
 After installation you can open a folder in bash with
 
