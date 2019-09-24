@@ -94,7 +94,7 @@ install them.
 
     $ sudo apt install -y git openjdk-8-jdk maven gcc g++ build-essential cmake curl sox hunspell synfig ffmpeg
 
-### Install NodeJS
+### Install NodeJS (optional)
 
     $ curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
     $ sudo apt-get install -y nodejs 
@@ -136,7 +136,7 @@ and paste following content at the end of the file:
     $ sudo dnf group install 'Development Tools' -y && $ sudo dnf install -y java-1.8.0-openjdk ffmpeg maven tesseract hunspell sox synfig unzip gcc-c++ tar bzip2
 
 
-### Install NodeJS
+### Install NodeJS (optional)
 
     $ sudo dnf install -y nodejs
     $ sudo npm install -g eslint
@@ -172,7 +172,7 @@ You can now install needed packages:
 
     $ brew install maven ffmpeg 
 
-### Install NodeJS
+### Install NodeJS (optional)
 
     $ brew install nodejs
     $ sudo npm install -g eslint
