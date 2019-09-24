@@ -135,4 +135,17 @@ angular.module('adminNg.controllers')
     });
 
     $scope.components = ResourcesListResource.get({ resource: 'components' });
-  }]);
+  }])
+  .directive('escKey', function() {
+    return function(scope, element, attrs) {
+      element.bind('keydown keypress', function(event) {
+        var keyCode = event.which || event.keyCode;
+        if (keyCode === 27) {
+          scope.$apply(function() {
+            scope.$eval(attrs.escKey);
+          });
+          event.preventDefault();
+        }
+      });
+    };
+  });
