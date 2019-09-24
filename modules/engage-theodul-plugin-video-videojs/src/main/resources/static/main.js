@@ -313,14 +313,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     if (filterTags == undefined) {
       return tracks;
     }
-    var filterTagsArray = filterTags.split(',');
     var newTracksArray = [];
 
     for (var i = 0; i < tracks.length; i++) {
       var found = false;
       for (var j = 0; j < tracks[i].tags.tag.length; j++) {
-        for (var k = 0; k < filterTagsArray.length; k++) {
-          if (tracks[i].tags.tag[j] == filterTagsArray[k].trim()) {
+        for (var k = 0; k < filterTags.length; k++) {
+          if (tracks[i].tags.tag[j] == filterTags[k].trim()) {
             found = true;
             newTracksArray.push(tracks[i]);
             break;

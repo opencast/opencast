@@ -109,30 +109,6 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   var askedForLogin = false;
   var springSecurityLoginURL = "/j_spring_security_check";
   var springLoggedInStrCheck = "<title>Opencast – Login Page</title>";
-  // shortcuts
-  var shortcut_playPause = "controls.playPause";
-  var shortcut_seekLeft = "controls.seekLeft";
-  var shortcut_seekRight = "controls.seekRight";
-  var shortcut_playbackrateIncrease = "playbackrate.increase";
-  var shortcut_playbackrateDecrease = "playbackrate.decrease";
-  var shortcut_muteToggle = "volume.muteToggle";
-  var shortcut_volDown = "volume.down";
-  var shortcut_volUp = "volume.up";
-  var shortcut_fullscreenEnable = "fullscreen.enable";
-  var shortcut_fullscreenCancel = "fullscreen.cancel";
-  var shortcut_jumpToBegin = "controls.jumpToBegin";
-  var shortcut_prevChapter = "controls.prevChapter";
-  var shortcut_nextChapter = "controls.nextChapter";
-  var shortcut_prevFocus = "layout.focusPrev";
-  var shortcut_nextFocus = "layout.focusNext";
-  var shortcut_movePiP = "layout.movePiP";
-  var shortcut_togglePiP = "layout.togglePiP";
-  var shortcut_moveLeft = "zoom.moveLeft";
-  var shortcut_moveRight = "zoom.moveRight";
-  var shortcut_moveUp = "zoom.moveUp";
-  var shortcut_moveDown = "zoom.moveDown";
-  var shortcut_zoomIn = "zoom.in";
-  var shortcut_zoomOut = "zoom.out";
 
   var basilOptions = {
     namespace: "mhStorage"
@@ -337,135 +313,130 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
       }
     });
     // process hardcoded keys
-    $.each(MeInfoModel.get("shortcuts"), function (i, val) {
-      switch (val.name) {
-        case shortcut_seekLeft:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.seekLeft.getName());
-          });
-          break;
-        case shortcut_seekRight:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.seekRight.getName());
-          });
-          break;
-        case shortcut_playbackrateIncrease:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.playbackRateIncrease.getName());
-          });
-          break;
-        case shortcut_playbackrateDecrease:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.playbackRateDecrease.getName());
-          });
-          break;
-        case shortcut_nextChapter:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.nextChapter.getName());
-          });
-          break;
-        case shortcut_fullscreenEnable:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.fullscreenEnable.getName());
-          });
-          break;
-        case shortcut_fullscreenCancel:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.fullscreenCancel.getName());
-          });
-          break;
-        case shortcut_jumpToBegin:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.seek.getName(), 0);
-          });
-          break;
-        case shortcut_prevChapter:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.previousChapter.getName());
-          });
-          break;
-        case shortcut_playPause:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.playPause.getName());
-          });
-          break;
-        case shortcut_muteToggle:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.muteToggle.getName());
-          });
-          break;
-        case shortcut_volDown:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.volumeDown.getName());
-          });
-          break;
-        case shortcut_volUp:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.volumeUp.getName());
-          });
-          break;
-        case shortcut_nextFocus:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.focusVideo.getName(), "focus.next");
-          });
-          break;
-        case shortcut_prevFocus:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.focusVideo.getName(), "focus.prev");
-          });
-          break;
-        case shortcut_movePiP:
-          Mousetrap.bind(val.key, function () {
-            if (pip) {
-                if (pipPos === "left") {
-                  pipPos = "right";
-                } else {
-                  pipPos = "left";
-                }
-                engageCore.trigger(events.movePiP.getName(), pipPos);
+    var shortcuts = MeInfoModel.get("shortcuts");
+    if (shortcuts.controls.seekLeft) {
+      Mousetrap.bind(shortcuts.controls.seekLeft, function () {
+        engageCore.trigger(events.seekLeft.getName());
+      });
+    }
+    if (shortcuts.controls.seekRight) {
+      Mousetrap.bind(shortcuts.controls.seekRight, function () {
+        engageCore.trigger(events.seekRight.getName());
+      });
+    }
+    if (shortcuts.playbackrate.increase) {
+      Mousetrap.bind(shortcuts.playbackrate.increase, function () {
+        engageCore.trigger(events.playbackRateIncrease.getName());
+      });
+    }
+    if (shortcuts.playbackrate.decrease) {
+      Mousetrap.bind(shortcuts.playbackrate.decrease, function () {
+        engageCore.trigger(events.playbackRateDecrease.getName());
+      });
+    }
+    if (shortcuts.controls.nextChapter) {
+      Mousetrap.bind(shortcuts.controls.nextChapter, function () {
+        engageCore.trigger(events.nextChapter.getName());
+      });
+    }
+    if (shortcuts.fullscreen.enable) {
+      Mousetrap.bind(shortcuts.fullscreen.enable, function () {
+        engageCore.trigger(events.fullscreenEnable.getName());
+      });
+    }
+    if (shortcuts.fullscreen.cancel) {
+      Mousetrap.bind(shortcuts.fullscreen.cancel, function () {
+        engageCore.trigger(events.fullscreenCancel.getName());
+      });
+    }
+    if (shortcuts.controls.jumpToBegin) {
+      Mousetrap.bind(shortcuts.controls.jumpToBegin, function () {
+        engageCore.trigger(events.seek.getName(), 0);
+      });
+    }
+    if (shortcuts.controls.prevChapter) {
+      Mousetrap.bind(shortcuts.controls.prevChapter, function () {
+        engageCore.trigger(events.previousChapter.getName());
+      });
+    }
+    if (shortcuts.controls.playPause) {
+      Mousetrap.bind(shortcuts.controls.playPause, function () {
+        engageCore.trigger(events.playPause.getName());
+      });
+    }
+    if (shortcuts.volume.muteToggle) {
+      Mousetrap.bind(shortcuts.volume.muteToggle, function () {
+        engageCore.trigger(events.muteToggle.getName());
+      });
+    }
+    if (shortcuts.volume.down) {
+      Mousetrap.bind(shortcuts.volume.down, function () {
+        engageCore.trigger(events.volumeDown.getName());
+      });
+    }
+    if (shortcuts.volume.up) {
+      Mousetrap.bind(shortcuts.volume.up, function () {
+        engageCore.trigger(events.volumeUp.getName());
+      });
+    }
+    if (shortcuts.layout.focusNext) {
+      Mousetrap.bind(shortcuts.layout.focusNext, function () {
+        engageCore.trigger(events.focusVideo.getName(), "focus.next");
+      });
+    }
+    if (shortcuts.layout.focusPrev) {
+      Mousetrap.bind(shortcuts.layout.focusPrev, function () {
+        engageCore.trigger(events.focusVideo.getName(), "focus.prev");
+      });
+    }
+    if (shortcuts.layout.movePiP) {
+      Mousetrap.bind(shortcuts.layout.movePiP, function () {
+        if (pip) {
+            if (pipPos === "left") {
+              pipPos = "right";
+            } else {
+              pipPos = "left";
             }
-          });
-          break;
-        case shortcut_togglePiP:
-          Mousetrap.bind(val.key, function () {
-            pip = !pip;
-            engageCore.trigger(events.togglePiP.getName(), pip);
-          });
-          break;
-        case shortcut_moveLeft:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.moveHorizontal.getName(), zoom_wasd_step_size);
-          });
-          break;
-        case shortcut_moveRight:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.moveHorizontal.getName(), -zoom_wasd_step_size);
-          });
-          break;
-        case shortcut_moveUp:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.moveVertical.getName(), zoom_wasd_step_size);
-          });
-          break;
-        case shortcut_moveDown:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.moveVertical.getName(), -zoom_wasd_step_size);
-          });
-          break;
-        case shortcut_zoomIn:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.zoomIn.getName(), true);
-          });
-          break;
-        case shortcut_zoomOut:
-          Mousetrap.bind(val.key, function () {
-            engageCore.trigger(events.zoomOut.getName(), true);
-          });
-          break;
-        default:
-          break;
-      }
-    });
+            engageCore.trigger(events.movePiP.getName(), pipPos);
+        }
+      });
+    }
+    if (shortcuts.layout.togglePiP) {
+      Mousetrap.bind(shortcuts.layout.togglePiP, function () {
+        pip = !pip;
+        engageCore.trigger(events.togglePiP.getName(), pip);
+      });
+    }
+    if (shortcuts.zoom.moveLeft) {
+      Mousetrap.bind(shortcuts.zoom.moveLeft, function () {
+        engageCore.trigger(events.moveHorizontal.getName(), zoom_wasd_step_size);
+      });
+    }
+    if (shortcuts.zoom.moveRight) {
+      Mousetrap.bind(shortcuts.zoom.moveRight, function () {
+        engageCore.trigger(events.moveHorizontal.getName(), -zoom_wasd_step_size);
+      });
+    }
+    if (shortcuts.zoom.moveUp) {
+      Mousetrap.bind(shortcuts.zoom.moveUp, function () {
+        engageCore.trigger(events.moveVertical.getName(), zoom_wasd_step_size);
+      });
+    }
+    if (shortcuts.zoom.moveDown) {
+      Mousetrap.bind(shortcuts.zoom.moveDown, function () {
+        engageCore.trigger(events.moveVertical.getName(), -zoom_wasd_step_size);
+      });
+    }
+    if (shortcuts.zoom.in) {
+      Mousetrap.bind(shortcuts.zoom.in, function () {
+        engageCore.trigger(events.zoomIn.getName(), true);
+      });
+    }
+    if (shortcuts.zoom.out) {
+      Mousetrap.bind(shortcuts.zoom.out, function () {
+        engageCore.trigger(events.zoomOut.getName(), true);
+      });
+    }
   }
 
   function checkAllPluginsloaded() {

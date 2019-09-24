@@ -50,7 +50,7 @@ import javax.ws.rs.core.Response;
                 + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated."
                 + "In other words, there is a bug! You should file an error report with your server logs from the time"
-                + "when the error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "when the error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
 public class HelloWorldRestEndpoint {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(HelloWorldRestEndpoint.class);

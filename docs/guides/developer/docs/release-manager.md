@@ -282,7 +282,8 @@ The following steps outline the necessary steps for cutting the final release:
         git merge <remote>/r/5.x
 
 2. Add the release notes, and update the changelog. The `create-changelog` [helper script
-   ](https://github.com/opencast/helper-scripts/tree/master/create-changelog) is a convenient tool for this.
+   ](https://github.com/opencast/helper-scripts/tree/master/release-management/create-changelog) is a convenient tool
+   for this.
 
         cd docs/guides/admin/docs/
         vim releasenotes.md

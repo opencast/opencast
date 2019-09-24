@@ -56,7 +56,6 @@ Administrators
 An administrator is someone within the Opencast community who has administrative access to one or more of our major
 tools.  These tools are
 
-- JIRA
 - GitHub
 - Google Groups
 - Crowdin
@@ -75,7 +74,6 @@ While the committer body manages its own membership, it does not directly have t
 from the appropriate groups across all of our hosted products.  Administrators are required to modify the various
 groups in multiple places when a change is necessary.  These changes are
 
-- Modifying the [JIRA committers group](https://opencast.jira.com/admin/groups/view?groupname=committers-matterhorn)
 - Modifying the [GitHub committers group](https://github.com/orgs/opencast/teams/committers/members) upon request
 - Modifying the [Google committers group](https://admin.google.com/opencast.org/AdminHome?hl=de&pli=1&fral=1&groupId=committers@opencast.org&chromeless=1#OGX:Group?hl=de)
 - Modifying the [Crowdin committers group](https://crowdin.com/project/opencast-community/settings#members)

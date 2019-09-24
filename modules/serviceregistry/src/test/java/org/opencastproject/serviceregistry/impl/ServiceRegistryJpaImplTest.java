@@ -58,6 +58,7 @@ import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -317,6 +318,7 @@ public class ServiceRegistryJpaImplTest {
   }
 
   @Test
+  @Ignore
   public void testIgnoreHostsInPriorityList() throws Exception {
     if (serviceRegistryJpaImpl.scheduledExecutor != null)
       serviceRegistryJpaImpl.scheduledExecutor.shutdown();

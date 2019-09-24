@@ -7,13 +7,6 @@ at [the development process documentation](https://docs.opencast.org/develop/dev
 guide should suffice for most contributions.
 
 
-Issue Tracker
--------------
-
-Opencast uses [Jira](https://opencast.jira.com) for tracking issues. Each pull request should be accompanied by a ticket
-in Jira. The issue identifier should also be used in the title of the pull request and the commit message.
-
-
 Bug Fixes and Feature
 ---------------------
 
@@ -47,7 +40,7 @@ not be concerned.
 Checklist
 ---------
 
-- [ ] Jira ticket created (use ticket number in pull request and commit messages)
+- [ ] [Closes an accompanying issue](https://help.github.com/en/articles/closing-issues-using-keywords) if one exists
 - [ ] Pull request has a proper title and description
 - [ ] Appropriate documentation is included
 - [ ] Code passes automatic tests

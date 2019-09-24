@@ -43,13 +43,10 @@ For Committers
 What to do with a security report
 ---------------------------------
 
-If no one else has, create a JIRA issue with a 'Committer' security level, and the details in the security report.
-Assign the ticket either to yourself (if you intend on working on it) or nobody, and reply on `committers@opencast.org`
-with the ticket. Thus far most of our security issues have come with patches attached, however this will not always be
-true. Issues which require work beyond application of a provided patch should be treated the same as any other JIRA
-issue, aside from the security level. Note that that security level will keep non-committers from viewing the ticket
-or comments. Depending on the issue and severity, the QA coordinator and/or release manager(s) may apply for a Common
- Vulnerability and Exposures (CVE) number as well.
+If no one else has, [draft a new security advisory on GitHub](https://github.com/opencast/opencast/security/advisories)
+and reply on `security@opencast.org` with a link to the draft.  Thus far, most of our security issues have come with
+patches attached, however this will not always be true. Depending on the issue and severity, the QA coordinator and/or
+release manager(s) may apply for a Common Vulnerability and Exposures (CVE) number as well.
 
 Where do we review security patches?
 ------------------------------------
@@ -75,10 +72,10 @@ Once a security issue has been resolved
 ---------------------------------------
 
 Once a security issue has been resolved, the QA coordinator, and/or the release manager(s) affected will work together
-to ensure that any relevant release(s) are created and available, and then release the security notice. This notice
-must contain the CVE (if applicable) and JIRA ticket number, as well as the affected version(s) of Opencast, a
-description of the issue, mitigation/upgrade instructions, as well as credit to the reporter(s) of the issue. As an
-example, this is a good notice:
+to ensure that any relevant release(s) are created and available, and then release the security notice. This notice must
+contain the CVE (if applicable) as well as the affected version(s) of Opencast, a description of the issue,
+mitigation/upgrade instructions, as well as credit to the reporter(s) of the issue. As an example, this is a good
+notice:
 
 ```no-highlight
 Hello,
@@ -124,6 +121,3 @@ Credits:
 Best regards,
 Lars Kiesow
 ```
-
-Once the issue has been fixed and the notice sent, the security level should be removed from the JIRA ticket so it
-becomes publicly viewable.
