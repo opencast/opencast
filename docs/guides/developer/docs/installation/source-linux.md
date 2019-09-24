@@ -265,7 +265,7 @@ The `-Pdev` argument decreases the build time and skips the creation of multiple
     $ cd opencast && mvn clean install -Pdev
     $ cd build/opencast-dist-develop-*/bin && ./start-opencast
 
-For further information visit [Development Environment](https://docs.opencast.org/develop/developer/development-environment/).
+For further information visit [Development Environment](../development-environment.md).
 
 ### Useful Commands for Testing Purposes
 
