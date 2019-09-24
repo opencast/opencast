@@ -27,6 +27,12 @@ angular.module('adminNg.controllers')
       var popup = angular.element(document.getElementById(id));
       popup.toggle('is-hidden');
     };
+    $scope.clearPopup = function() {
+      var links = document.getElementsByClassName('js-popover');
+      for (var index = 0; index < links.length; index++) {
+        links[index].style.display = 'none';
+      }
+    };
     window.onclick = function(ev) {
       if (ev.target.nodeName != 'SPAN') {
         var links = document.getElementsByClassName('js-popover');
@@ -36,4 +42,17 @@ angular.module('adminNg.controllers')
       }
     };
   }
-]);
+])
+.directive('escKey', function() {
+  return function(scope, element, attrs) {
+    element.bind('keydown keypress', function(event) {
+      var keyCode = event.which || event.keyCode;
+      if (keyCode === 27) {
+        scope.$apply(function() {
+          scope.$eval(attrs.escKey);
+        });
+        event.preventDefault();
+      }
+    });
+  };
+});
