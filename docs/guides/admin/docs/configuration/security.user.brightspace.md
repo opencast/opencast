@@ -1,6 +1,6 @@
 ### What it does
 
-The [Brighspace](https://www.d2l.com/) User Provider enriches Opencast users with a
+The [Brightspace](https://www.d2l.com/) User Provider enriches Opencast users with a
 set of roles made up of the user's membership in Brightspace courses, of the form
 ROLE_courseID. For example, an Opencast user who is also a Brightspace user and a
 member of the Brightspace course `myCourseID` will be granted the Opencast role `ROLE_myCourseID`.
