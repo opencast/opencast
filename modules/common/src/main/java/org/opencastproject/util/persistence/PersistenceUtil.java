@@ -26,8 +26,6 @@ import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 
-import org.eclipse.persistence.config.PersistenceUnitProperties;
-
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -35,6 +33,7 @@ import org.opencastproject.util.data.Tuple;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
+import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.osgi.service.component.ComponentContext;
 
 import java.beans.PropertyVetoException;

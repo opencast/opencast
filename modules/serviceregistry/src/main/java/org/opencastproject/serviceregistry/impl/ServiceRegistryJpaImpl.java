@@ -2946,7 +2946,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         // FIXME: the stats are not currently used and the queries are very
         // expense in database time.
         if (collectJobstats) {
-          logger.warn("About to do the stats query");
+          logger.debug("About to do the stats query");
           jobsStatistics.updateAvg(getAvgOperations(em));
           jobsStatistics.updateJobCount(getCountPerHostService(em));
         }
