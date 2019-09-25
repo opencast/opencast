@@ -92,6 +92,7 @@ public class MetadataField<A> {
   protected static final String JSON_KEY_COLLECTION = "collection";
   protected static final String JSON_KEY_TRANSLATABLE = "translatable";
   protected static final String JSON_KEY_DELIMITER = "delimiter";
+  protected static final String JSON_KEY_DIFFERENT_VALUES = "differentValues";
 
   /**
    * Possible types for the metadata field. The types are used in the frontend and backend to know how the metadata
@@ -142,6 +143,9 @@ public class MetadataField<A> {
   private Fn<Opt<A>, JValue> valueToJSON;
   private Fn<Object, A> jsonToValue;
 
+  // this can only be true if the metadata field is representing multiple events with different values
+  private Opt<Boolean> hasDifferentValues = Opt.none();
+
   /**
    * Copy constructor
    *
@@ -157,6 +161,7 @@ public class MetadataField<A> {
     this.required = other.required;
     this.value = other.value;
     this.translatable = other.translatable;
+    this.hasDifferentValues = other.hasDifferentValues;
     this.type = other.type;
     this.jsonType = other.jsonType;
     this.collection = other.collection;
@@ -257,6 +262,9 @@ public class MetadataField<A> {
     values.put(JSON_KEY_TYPE, f(JSON_KEY_TYPE, v(jsonType.toString().toLowerCase(), Jsons.BLANK)));
     values.put(JSON_KEY_READONLY, f(JSON_KEY_READONLY, v(readOnly)));
     values.put(JSON_KEY_REQUIRED, f(JSON_KEY_REQUIRED, v(required)));
+
+    if (hasDifferentValues.isSome())
+      values.put(JSON_KEY_DIFFERENT_VALUES, f(JSON_KEY_DIFFERENT_VALUES, v(hasDifferentValues.get())));
 
     if (collection.isSome())
       values.put(JSON_KEY_COLLECTION, f(JSON_KEY_COLLECTION, mapToJSON(collection.get())));
@@ -1186,5 +1194,14 @@ public class MetadataField<A> {
 
   public void setValueToJSON(Fn<Opt<A>, JValue> valueToJSON) {
     this.valueToJSON = valueToJSON;
+  }
+
+  public void setDifferentValues() {
+    value = Opt.none();
+    hasDifferentValues = Opt.some(true);
+  }
+
+  public Opt<Boolean> hasDifferentValues() {
+    return hasDifferentValues;
   }
 }

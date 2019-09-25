@@ -394,8 +394,16 @@
         }
     }
 
-    .edit-scheduled-header {
+    .header-description {
         padding: 10px;
         line-height: 20px;
     }
+}
+
+// Miscellaneous
+// --------------------------------------------------
+.loading {
+    text-align: center;
+    padding-top: 16px;
+    padding-bottom: 16px;
 }
