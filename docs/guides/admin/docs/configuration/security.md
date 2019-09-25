@@ -45,10 +45,12 @@ an administrative username and password in `custom.properties`:
 ## User and Role Providers
 
 Opencast allows user and role information to be supplied from external systems through user and role providers.
-Two user providers are available by default:
+Four user providers are available by default:
 
 * LDAP User Provider, described in [LDAP Security and Authorization](security.ldap.md)
 * [Sakai User Provider](security.user.sakai.md)
+* [Moodle User Provider](security.user.moodle.md)
+* [Brightspace D2L User Provider](security.user.brightspace.md)
 
 The set of user and role providers can be configured. If you do not want to keep users and passwords in Opencast's
 database, you can replace the JpaUserAndRoleProvider with the LdapUserProvider by replacing the
