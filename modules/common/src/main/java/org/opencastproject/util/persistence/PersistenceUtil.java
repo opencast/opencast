@@ -26,6 +26,8 @@ import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 
+import org.eclipse.persistence.config.PersistenceUnitProperties;
+
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -418,9 +420,11 @@ public final class PersistenceUtil {
    */
   public static EntityManagerFactory newTestEntityManagerFactory(String emName) {
     Map<String, String> persistenceProperties = new HashMap<>();
-    persistenceProperties.put("eclipselink.ddl-generation", "create-tables");
-    persistenceProperties.put("eclipselink.ddl-generation.output-mode", "database");
-    return newEntityManagerFactory(emName, "Auto", "org.h2.Driver", "jdbc:h2:./target/db" + System.currentTimeMillis(),
+    persistenceProperties.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.DROP_AND_CREATE);
+    persistenceProperties.put(PersistenceUnitProperties.DDL_GENERATION_MODE, PersistenceUnitProperties.DDL_DATABASE_GENERATION);
+    //persistenceProperties.put("eclipselink.ddl-generation", "drop-and-create-tables");
+    //persistenceProperties.put("eclipselink.ddl-generation.output-mode", "database");
+    return newEntityManagerFactory(emName, "Auto", "org.h2.Driver", "jdbc:h2:./target/db" + System.currentTimeMillis() + ";IGNORECASE=TRUE",
             "sa", "sa", persistenceProperties, testPersistenceProvider());
   }
 

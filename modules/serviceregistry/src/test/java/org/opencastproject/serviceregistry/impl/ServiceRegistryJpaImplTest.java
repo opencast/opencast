@@ -37,7 +37,6 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.systems.OpencastConstants;
@@ -112,9 +111,9 @@ public class ServiceRegistryJpaImplTest {
     for (ObjectInstance mbean : serviceRegistryJpaImpl.jmxBeans) {
       JmxUtil.unregisterMXBean(mbean);
     }
-    for (ServiceRegistration service : serviceRegistryJpaImpl.getServiceRegistrations()) {
-      serviceRegistryJpaImpl.unRegisterService(service.getServiceType(), service.getHost());
-    }
+    //for (ServiceRegistration service : serviceRegistryJpaImpl.getServiceRegistrations()) {
+    //  serviceRegistryJpaImpl.unRegisterService(service.getServiceType(), service.getHost());
+    //}
     serviceRegistryJpaImpl.deactivate();
   }
 
@@ -219,17 +218,24 @@ public class ServiceRegistryJpaImplTest {
 
   @Test
   public void nullContextActivatesOkay() throws ServiceRegistryException {
+    logger.warn("++++++  Starting nullContextActivatesOkay ++++++ ");
     serviceRegistryJpaImpl.activate(null);
+    logger.warn("++++++  Ending nullContextActivatesOkay ++++++ ");
+
   }
 
   @Test(expected = NotFoundException.class)
   public void testDeleteJobInvalidJobId() throws Exception {
+    logger.warn("++++++  Starting testDeleteJobInvalidJobId ++++++ ");
     serviceRegistryJpaImpl.activate(null);
     serviceRegistryJpaImpl.removeJobs(Collections.singletonList(1L));
+    logger.warn("++++++  Ending testDeleteJobInvalidJobId ++++++ ");
   }
 
   @Test
   public void testCancelUndispatchablesOrphanedByActivatingNode() throws Exception {
+    logger.warn("++++++  Starting testCancelUndispatchablesOrphanedByActivatingNode ++++++ ");
+
     serviceRegistryJpaImpl.activate(null);
     registerTestHostAndService();
     setUpUndispatchableJobs();
@@ -252,10 +258,12 @@ public class ServiceRegistryJpaImplTest {
     logger.info("Undispatachable job 1 " + undispatchableJob2.getId());
     undispatchableJob2 = serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
     assertEquals(Status.RUNNING, undispatchableJob2.getStatus());
+    logger.warn("++++++  Ending testCancelUndispatchablesOrphanedByActivatingNode ++++++ ");
   }
 
   @Test
   public void testHostAddedToPriorityList() throws Exception {
+    logger.warn("++++++  Starting testHostAddedToPriorityList ++++++ ");
     if (serviceRegistryJpaImpl.scheduledExecutor != null)
       serviceRegistryJpaImpl.scheduledExecutor.shutdown();
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
@@ -272,10 +280,12 @@ public class ServiceRegistryJpaImplTest {
     } catch (Exception e) {
       Assert.assertEquals(1, serviceRegistryJpaImpl.dispatchPriorityList.size());
     }
+    logger.warn("++++++  End testHostAddedToPriorityList ++++++ ");
   }
 
   @Test
   public void testHostAddedToPriorityListExceptWorkflowType() throws Exception {
+    logger.warn("++++++  Starting testHostAddedToPriorityListExceptWorkflowType ++++++ ");
     if (serviceRegistryJpaImpl.scheduledExecutor != null)
       serviceRegistryJpaImpl.scheduledExecutor.shutdown();
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
@@ -293,10 +303,13 @@ public class ServiceRegistryJpaImplTest {
     } catch (Exception e) {
       Assert.assertEquals(0, serviceRegistryJpaImpl.dispatchPriorityList.size());
     }
+    logger.warn("++++++  Ending testHostAddedToPriorityListExceptWorkflowType ++++++ ");
+
   }
 
   @Test
   public void testHostsBeingRemovedFromPriorityList() throws Exception {
+    logger.warn("++++++  Starting testHostsBeingRemovedFromPriorityList ++++++ ");
     if (serviceRegistryJpaImpl.scheduledExecutor != null)
       serviceRegistryJpaImpl.scheduledExecutor.shutdown();
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
@@ -314,10 +327,13 @@ public class ServiceRegistryJpaImplTest {
     } catch (Exception e) {
       Assert.assertEquals(0, serviceRegistryJpaImpl.dispatchPriorityList.size());
     }
+    logger.warn("++++++  Ending testHostsBeingRemovedFromPriorityList ++++++ ");
   }
 
   @Test
   public void testIgnoreHostsInPriorityList() throws Exception {
+    logger.warn("++++++  Starting testIgnoreHostsInPriorityList ++++++ ");
+
     if (serviceRegistryJpaImpl.scheduledExecutor != null)
       serviceRegistryJpaImpl.scheduledExecutor.shutdown();
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
@@ -347,6 +363,8 @@ public class ServiceRegistryJpaImplTest {
       String blockingHost = serviceRegistryJpaImpl.dispatchPriorityList.get(testJob2.getId());
       Assert.assertEquals(TEST_HOST, blockingHost);
     }
+    logger.warn("++++++  Ending testIgnoreHostsInPriorityList ++++++ ");
+
   }
 
   private void assertHostloads(Job j, Float a, Float b, Float c) throws Exception {
