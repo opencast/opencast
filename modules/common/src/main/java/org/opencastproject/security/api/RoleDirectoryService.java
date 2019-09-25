@@ -29,15 +29,7 @@ import java.util.Iterator;
 public interface RoleDirectoryService {
 
   /**
-   * Gets all known roles. Convenience method equivalent to:
-   *  findRoles("%", Role.Target.ALL, 0, 0)
-   *
-   * @return the roles
-   */
-  Iterator<Role> getRoles();
-
-  /**
-   * Return the found role's as an iterator.
+   * Return the found roles as an iterator.
    *
    * @param query
    *          the query. Use the wildcards "_" to match any single character and "%" to match an arbitrary number of

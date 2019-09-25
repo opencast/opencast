@@ -227,15 +227,6 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.security.api.RoleDirectoryService#getRoles()
-   */
-  public Iterator<Role> getRoles() {
-    return findRoles("%", Role.Target.ALL, 0, 0);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.security.api.UserDirectoryService#loadUser(java.lang.String)
    */
   @Override
