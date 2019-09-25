@@ -169,7 +169,7 @@ public class CropServiceTest {
 
     JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 1000, receipt);
     JobBarrier.Result result = jobBarrier.waitForJobs();
-    Assert.assertTrue(result.isSuccess());
+    Assert.assertFalse(result.isSuccess());
   }
 
 

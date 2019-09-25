@@ -269,9 +269,9 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
       exitCode = process.waitFor();
 
     } catch (IOException e) {
-      logger.error("Error executing FFmpeg", e);
+      throw new CropException("Error executing FFmpeg", e);
     } catch (InterruptedException e) {
-      logger.error("Waiting for encoder process exited was interrupted unexpected", e);
+      throw new CropException("Waiting for encoder process exited was interrupted unexpected", e);
     }
 
     if (exitCode != 0) {
