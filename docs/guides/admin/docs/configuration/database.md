@@ -104,7 +104,7 @@ To import the database structure using the MariaDB client, switch to the directo
 run the client with the user you created in the previous step (`-u opencast`) and switch to the database you want to use
 (e.g. `opencast`):
 
-    mysql -u opencast -p opencast
+    mysql -u admin -p opencast
 
 Run the ddl script:
 
@@ -112,7 +112,7 @@ Run the ddl script:
 
 Alternatively, you can import the script directly from the command line:
 
-    mysql -u opencast -p opencast < …/docs/scripts/ddl/mysql5.sql
+    mysql -u admin -p opencast < …/docs/scripts/ddl/mysql5.sql
 
 Now, ensure the MariaDB [`wait_timeout`](https://mariadb.com/kb/en/library/server-system-variables/) in `mariadb.cnf`
 or `mysql.cnf` is bigger than `org.opencastproject.db.jdbc.pool.max.idle.time` in Opencast's `custom.properties`.
