@@ -6,7 +6,7 @@
     "properties": {
       "version": {
         "type": "integer",
-        "index": "not_analyzed"
+        "index": false
       }
     }
   }
