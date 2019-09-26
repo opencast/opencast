@@ -35,14 +35,14 @@ function addTitleToCodeTag() {
     var SPAN = document.createElement("SPAN");
     SPAN.innerText = "etc";
     SPAN.classList.add("etc-span");
-    SPAN.title = '"etc" represents the configuration directory of Opencast. This directory is often located at "/etc/opencast".';
+    SPAN.title = '"etc" represents the configuration directory of Opencast.\nThis directory is often located at "/etc/opencast".';
 
     var codeElementList = document.getElementsByTagName("CODE");
     for (var i = 0; i < codeElementList.length; i++) {
         var CODE = codeElementList[i];
         if (typeof CODE.innerText !== 'undefined') {
-            if (CODE.innerText.includes("etc/")) {
-                CODE.innerHTML = CODE.innerHTML.replace("etc/", SPAN.outerHTML + "/");
+            if (CODE.innerText.startsWith('etc/')) {
+                CODE.innerHTML = CODE.innerHTML.replace(/^etc/, SPAN.outerHTML);
             }
         }
     }
