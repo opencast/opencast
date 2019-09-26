@@ -66,6 +66,7 @@ jobs:
       python: "3.6"
       install:
         - pip install mkdocs
+        - pip install mkdocs-windmill
         - (cd docs/guides && npm install)
       script:
         - (! grep -rn '	' modules assemblies pom.xml --include=pom.xml)
