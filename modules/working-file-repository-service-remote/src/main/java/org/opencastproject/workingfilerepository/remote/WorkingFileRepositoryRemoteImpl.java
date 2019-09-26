@@ -46,6 +46,7 @@ import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -289,6 +290,11 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
       throw new RuntimeException();
     }
     throw new RuntimeException("Error get from collection");
+  }
+
+  @Override
+  public File getFileFromCollection(String collectionId, String fileName) throws NotFoundException, IllegalArgumentException {
+    throw new RuntimeException("Unsupported");
   }
 
   /**
