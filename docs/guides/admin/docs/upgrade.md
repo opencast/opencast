@@ -11,5 +11,8 @@ How to Upgrade
 2. Replace Opencast with the new version
 3. Back-up Opencast files and database (optional)
 4. [Upgrade the database](#database-migration)
+5. Remove search index data folder
+6. Start Opencast
+7. Rebuild Admin UI and External API index
 
 You can find the database upgrade script in `docs/upgrade/7_to_8/`.
