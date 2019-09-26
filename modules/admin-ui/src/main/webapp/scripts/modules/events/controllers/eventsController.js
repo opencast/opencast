@@ -60,7 +60,7 @@ angular.module('adminNg.controllers')
         label: 'EVENTS.EVENTS.TABLE.SERIES',
         sortable: true
       }, {
-        template: 'modules/events/partials/eventsTechnicalDateCell.html',
+        template: 'modules/events/partials/eventsDateCell.html',
         name:  'date',
         label: 'EVENTS.EVENTS.TABLE.DATE',
         sortable: true
