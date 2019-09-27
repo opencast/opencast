@@ -30,9 +30,10 @@ define(["backbone", "engage/core"], function(Backbone, Engage) {
 
     var SEARCH_ENDPOINT = "/search/episode.json";
 
-    var mediaPackageID = Engage.model.get("urlParameters").id;
-    if (!mediaPackageID) {
-        mediaPackageID = "";
+    var mediaPackageID = '';
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('id')) {
+      mediaPackageID = urlParams.get('id');
     }
 
     var MediaPackageModel = Backbone.Model.extend({
