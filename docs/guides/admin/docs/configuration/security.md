@@ -36,7 +36,7 @@ Some examples:
 Opencast specifies an AuthenticationProvider by default, using a UserDetailService that is obtained from the OSGI
 service registry.
 
-You can use this simple provider as is, loading users into the `mh_user` and `mh_role` database tables, and specifying
+You can use this simple provider as is, loading users into the `oc_user` and `oc_role` database tables, and specifying
 an administrative username and password in `custom.properties`:
 
     org.opencastproject.security.digest.user=opencast_system_account
@@ -60,4 +60,4 @@ userdirectory-jpa jar with the userdirectory-ldap jar.
 
 * [Configure Central Authentication Service (CAS)](security.cas.md)
 * [Configure LDAP Authentication and Authorization](security.ldap.md)
-* [Configure Authentication and Authorization Infrastructure (AAI))](security.aai.md)
+* [Configure Authentication and Authorization Infrastructure (AAI)](security.aai.md)
