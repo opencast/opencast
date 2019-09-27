@@ -63,6 +63,8 @@ The following table contains the workflow operations that are available in an ou
 |inspect             |Inspect the media (check if it is valid)                       |[Documentation](inspect-woh.md)|
 |log                 |Log workflow status                                            |[Documentation](log-woh.md)|
 |multiencode         |Encode to multiple profiles in one operation                   |[Documentation](multiencode-woh.md)|
+|nibity-attach-transcription|Attaches transcripts to mediapackage                    |[Documentation](nibity-attach-transcription-woh.md)|
+|nibity-start-transcription|Starts transcription provided by Nibity                  |[Documentation](nibity-start-transcription-woh.md)|
 |normalize-audio     |Normalize first audio stream                                   |[Documentation](normalizeaudio-woh.md)|
 |partial-import      |Import partial tracks and process according to a SMIL document |[Documentation](partial-import-woh.md)|
 |post-mediapackage   |Send mediapackage to remote service                            |[Documentation](postmediapackage-woh.md)|

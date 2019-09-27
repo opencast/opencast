@@ -301,6 +301,7 @@
 
     <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/transcripts/nibity/submission/*" access="ROLE_ANONYMOUS" />
 
     <!-- Everything else is for the admin users -->
     <sec:intercept-url pattern="/admin-ng" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI, ROLE_COURSE_ADMIN" />

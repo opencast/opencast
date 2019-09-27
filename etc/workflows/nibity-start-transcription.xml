@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>nibity-start-transcription</id>
+  <title>Start Nibity Transcription</title>
+  <tags>
+    <tag>archive</tag>
+  </tags>
+  <description>Start the Nibity transcription</description>
+
+  <operations>
+
+    <!-- Start Nibity transcription job -->
+    <operation
+      id="nibity-start-transcription"
+      max-attempts="3"
+      retry-strategy="hold"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Start Nibity captions job">
+      <configurations>
+        <!--  Skip this operation if flavor already exists. Used for cases when mp already has captions. -->
+        <configuration key="skip-if-flavor-exists">captions/vtt+en</configuration>
+        <!-- Audio to be translated, produced in the previous compose operation -->
+        <configuration key="source-flavor">presenter/source</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>
+

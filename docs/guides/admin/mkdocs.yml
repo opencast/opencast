@@ -127,6 +127,7 @@ nav:
    - Timeline Previews: 'modules/timelinepreviews.md'
    - Transcripts (Google Speech): 'modules/googlespeechtranscripts.md'
    - Transcripts (IBM Watson): 'modules/watsontranscripts.md'
+   - Transcripts (Nibity): 'modules/nibitytranscripts.md'
    - Video Editor:
       - Setup: 'modules/videoeditor.setup.md'
       - Architecture: 'modules/videoeditor.architecture.md'
@@ -180,6 +181,8 @@ nav:
    - Mattermost Notification Module: 'workflowoperationhandlers/notification.md'
    - Move Storage: 'workflowoperationhandlers/move-storage-woh.md'
    - Multiencode: 'workflowoperationhandlers/multiencode-woh.md'
+   - Nibity Attach Transcription: 'workflowoperationhandlers/nibity-attach-transcription-woh.md'
+   - Nibity Start Transcription: 'workflowoperationhandlers/nibity-start-transcription-woh.md'
    - Normalize Audio: 'workflowoperationhandlers/normalizeaudio-woh.md'
    - Partial Import: 'workflowoperationhandlers/partial-import-woh.md'
    - Post Media Package: 'workflowoperationhandlers/postmediapackage-woh.md'
