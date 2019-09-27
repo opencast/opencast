@@ -89,7 +89,7 @@ job ID, follow these steps:
 * Log into your database
 * Make sure you are using the right schema. Currently the default is called `opencast`
 * Update the job's load
-    * This will look something like `UPDATE mh_job SET job\_load=0.0 WHERE id=$jobid`
+    * This will look something like `UPDATE oc_job SET job\_load=0.0 WHERE id=$jobid`
 * Log out of your database
 * Change the load specified in the configuration file to an appropriate value
     * This may need to happen across all nodes!
