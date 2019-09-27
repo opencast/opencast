@@ -69,6 +69,10 @@ public class TranscriptionJobControlDto implements Serializable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date dateCreated;
 
+  @Column(name = "date_expected", nullable = true)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date dateExpected;
+
   @Column(name = "date_completed", nullable = true)
   @Temporal(TemporalType.TIMESTAMP)
   private Date dateCompleted;
@@ -89,12 +93,13 @@ public class TranscriptionJobControlDto implements Serializable {
    * Constructor with all fields.
    */
   public TranscriptionJobControlDto(String mediaPackageId, String trackId, String transcriptionJobId, Date dateCreated,
-          Date dateCompleted, String status, long trackDuration, long providerId) {
+          Date dateExpected, Date dateCompleted, String status, long trackDuration, long providerId) {
     super();
     this.mediaPackageId = mediaPackageId;
     this.trackId = trackId;
     this.transcriptionJobId = transcriptionJobId;
     this.dateCreated = dateCreated;
+    this.dateExpected = dateExpected;
     this.dateCompleted = dateCompleted;
     this.status = status;
     this.trackDuration = trackDuration;
@@ -105,7 +110,7 @@ public class TranscriptionJobControlDto implements Serializable {
    * Convert into business object.
    */
   public TranscriptionJobControl toTranscriptionJobControl() {
-    return new TranscriptionJobControl(mediaPackageId, trackId, transcriptionJobId, dateCreated, dateCompleted, status,
+    return new TranscriptionJobControl(mediaPackageId, trackId, transcriptionJobId, dateCreated, dateExpected, dateCompleted, status,
             trackDuration, providerId);
   }
 
@@ -113,9 +118,9 @@ public class TranscriptionJobControlDto implements Serializable {
    * Store new job control
    */
   public static TranscriptionJobControlDto store(EntityManager em, String mediaPackageId, String trackId,
-          String transcriptionJobId, String jobStatus, long trackDuration, long providerId) throws TranscriptionDatabaseException {
+          String transcriptionJobId, String jobStatus, long trackDuration, Date dateExpected, long providerId) throws TranscriptionDatabaseException {
     TranscriptionJobControlDto dto = new TranscriptionJobControlDto(mediaPackageId, trackId, transcriptionJobId,
-            new Date(), null, jobStatus, trackDuration, providerId);
+            new Date(), dateExpected, null, jobStatus, trackDuration, providerId);
 
     EntityTransaction tx = em.getTransaction();
     try {

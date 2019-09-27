@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManagerFactory;
@@ -68,11 +69,11 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
   }
 
   public TranscriptionJobControl storeJobControl(String mpId, String trackId, String jobId, String jobStatus,
-          long trackDuration, String provider) throws TranscriptionDatabaseException {
+          long trackDuration, Date dateExpected, String provider) throws TranscriptionDatabaseException {
     long providerId = getProviderId(provider);
     if (providerId != noProviderId) {
       TranscriptionJobControlDto dto = TranscriptionJobControlDto.store(emf.createEntityManager(), mpId, trackId, jobId,
-              jobStatus, trackDuration, providerId);
+              jobStatus, trackDuration, dateExpected, providerId);
       if (dto != null) {
         return dto.toTranscriptionJobControl();
       }
