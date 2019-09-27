@@ -46,13 +46,13 @@ Assets are stored in the following directory structure.
 
 The asset manager uses four tables
 
-* `mh_assets_snapshot`
+* `oc_assets_snapshot`
   Manages snapshots. Each snapshot may be linked to zero or more assets.
-* `mh_assets_asset`
+* `oc_assets_asset`
   Manages the assets of a snapshot.
-* `mh_assets_properties`
+* `oc_assets_properties`
   Manages the properties. This table is indirectly linked to the snapshot table via column `mediapackage_id`.
-* `mh_assets_version_claim`
+* `oc_assets_version_claim`
   Manages the next free version number per episode.
 
 ### Security
