@@ -254,6 +254,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var isPiP = true;
   var pipPos = 'left';
   var activeCaption = undefined;
+  var overlayTimer;
 
   var foundQualities = undefined;
   var zoomTimeout = 500;
@@ -758,6 +759,18 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         if (event.deltaY < 0) {
           Engage.trigger(events.setZoomLevel.getName(), [-zoom_step_size]);
         }
+      } else {
+        // show zoom overlay
+        var overlay = document.getElementById('overlay'),
+            overlaytext = document.getElementById('overlaytext'),
+            videodisplay = document.getElementById('engage_video');
+        overlaytext.innerText = translate('scroll_overlay_text', 'Use shift + scroll to zoom');
+        overlay.style.display = 'block';
+        overlay.style.top = videodisplay.offsetTop + 'px';
+        overlay.style.height = videodisplay.offsetHeight + 'px';
+        overlayTimer = setTimeout(function() {
+          document.getElementById('overlay').style.display = 'none';
+        }, 1500);
       }
 
       wheelEvent = event;
