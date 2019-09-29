@@ -33,6 +33,7 @@ import org.opencastproject.util.data.Tuple;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
+import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.osgi.service.component.ComponentContext;
 
 import java.beans.PropertyVetoException;
@@ -418,8 +419,8 @@ public final class PersistenceUtil {
    */
   public static EntityManagerFactory newTestEntityManagerFactory(String emName) {
     Map<String, String> persistenceProperties = new HashMap<>();
-    persistenceProperties.put("eclipselink.ddl-generation", "create-tables");
-    persistenceProperties.put("eclipselink.ddl-generation.output-mode", "database");
+    persistenceProperties.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.DROP_AND_CREATE);
+    persistenceProperties.put(PersistenceUnitProperties.DDL_GENERATION_MODE, PersistenceUnitProperties.DDL_DATABASE_GENERATION);
     return newEntityManagerFactory(emName, "Auto", "org.h2.Driver", "jdbc:h2:./target/db" + System.currentTimeMillis(),
             "sa", "sa", persistenceProperties, testPersistenceProvider());
   }
