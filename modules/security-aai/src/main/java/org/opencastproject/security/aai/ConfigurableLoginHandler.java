@@ -494,18 +494,6 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
   }
 
   /**
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    JaxbOrganization organization = JaxbOrganization.fromOrganization(securityService.getOrganization());
-    HashSet<Role> roles = new HashSet<Role>();
-    roles.add(new JaxbRole(roleFederationMember, organization));
-    roles.add(new JaxbRole(organization.getAnonymousRole(), organization));
-    return roles.iterator();
-  }
-
-  /**
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
    */
   @Override
@@ -528,13 +516,15 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
-    HashSet<Role> foundRoles = new HashSet<Role>();
-    for (Iterator<Role> it = getRoles(); it.hasNext();) {
-      Role role = it.next();
-      if (like(role.getName(), query) || like(role.getDescription(), query))
-        foundRoles.add(role);
+    JaxbOrganization organization = JaxbOrganization.fromOrganization(securityService.getOrganization());
+    HashSet<Role> roles = new HashSet<>(2);
+    final String[] roleNames = new String[] {roleFederationMember, organization.getAnonymousRole()};
+    for (String name: roleNames) {
+      if (like(name, query)) {
+        roles.add(new JaxbRole(name, organization));
+      }
     }
-    return offsetLimitCollection(offset, limit, foundRoles).iterator();
+    return offsetLimitCollection(offset, limit, roles).iterator();
   }
 
   private <T> HashSet<T> offsetLimitCollection(int offset, int limit, HashSet<T> entries) {

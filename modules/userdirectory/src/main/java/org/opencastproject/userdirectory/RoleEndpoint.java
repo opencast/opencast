@@ -64,7 +64,7 @@ public class RoleEndpoint {
   @RestQuery(name = "rolesasxml", description = "Lists the roles as XML", returnDescription = "The list of roles as XML", reponses = { @RestResponse(responseCode = 200, description = "OK, roles returned") })
   public JaxbRoleList getRolesAsXml() {
     JaxbRoleList roleList = new JaxbRoleList();
-    for (Iterator<Role> i = roleDirectoryService.getRoles(); i.hasNext();) {
+    for (Iterator<Role> i = roleDirectoryService.findRoles("%", Role.Target.ALL, 0, 0); i.hasNext();) {
       roleList.add(i.next());
     }
     return roleList;

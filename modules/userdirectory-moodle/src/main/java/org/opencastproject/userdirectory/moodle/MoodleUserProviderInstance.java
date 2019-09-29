@@ -356,17 +356,6 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    // We won't ever enumerate all Moodle courses, so return an empty list here
-    return Collections.emptyIterator();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(java.lang.String)
    */
   @Override

@@ -22,7 +22,6 @@
 package org.opencastproject.userdirectory;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -48,7 +47,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -99,23 +97,6 @@ public class JpaUserProviderTest {
     assertEquals(PasswordEncoder.encode(user.getPassword(), user.getUsername()), loadUser.getPassword());
     assertEquals(user.getOrganization(), loadUser.getOrganization());
     assertEquals(user.getRoles(), loadUser.getRoles());
-  }
-
-  @Test
-  public void testAddAndGetRole() throws Exception {
-    JpaRole astroRole = new JpaRole("ROLE_ASTRO_105_SPRING_2013_STUDENT", org1, "Astro role");
-
-    provider.addRole(astroRole);
-
-    Iterator<Role> roles = provider.getRoles();
-    assertTrue("There should be one role", roles.hasNext());
-
-    Role role = roles.next();
-    assertEquals(astroRole.getName(), role.getName());
-    assertEquals(astroRole.getOrganizationId(), role.getOrganizationId());
-    assertEquals(astroRole.getDescription(), role.getDescription());
-
-    assertFalse("There should only be one role", roles.hasNext());
   }
 
   @Test
@@ -304,7 +285,8 @@ public class JpaUserProviderTest {
     JpaUser userTwo = createUserWithRoles(org1, "user2", "ROLE_ONE", "ROLE_TWO");
     provider.addUser(userTwo);
 
-    assertEquals("There should be two roles", 2, IteratorUtils.toList(provider.getRoles()).size());
+    // The provider is not authoritative for these roles
+    assertEquals("There should be no roles", 0, IteratorUtils.toList(provider.findRoles("%", Role.Target.ALL, 0, 0)).size());
   }
 
   @Test
@@ -355,7 +337,8 @@ public class JpaUserProviderTest {
       fail("User should be created");
     }
 
-    assertEquals("There should be three roles", 3, IteratorUtils.toList(provider.getRoles()).size());
+    // Provider not authoritative for these roles
+    assertEquals("There should be zero roles", 0, IteratorUtils.toList(provider.findRoles("%", Role.Target.ALL, 0, 0)).size());
 
     List<String> rolesForUser = provider.getRolesForUser("user1").stream()
             .map(Role::getName)

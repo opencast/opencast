@@ -164,17 +164,6 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    String orgId = securityService.getOrganization().getId();
-    return getGroupsRoles(UserDirectoryPersistenceUtil.findGroups(orgId, 0, 0, emf)).iterator();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
    */
   @Override

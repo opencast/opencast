@@ -83,15 +83,6 @@ public class ExternalApiRoleProvider implements RoleProvider {
   }
 
   /**
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    Organization organization = securityService.getOrganization();
-    return Stream.$(roles).map(toRole._2(organization)).iterator();
-  }
-
-  /**
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
    */
   @Override

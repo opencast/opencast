@@ -220,38 +220,6 @@ public class JpaGroupRoleProviderTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
-  public void testRoles() throws Exception {
-    Set<JpaRole> authorities = new HashSet<JpaRole>();
-    authorities.add(new JpaRole("ROLE_ASTRO_101_SPRING_2011_STUDENT", org1));
-    authorities.add(new JpaRole("ROLE_ASTRO_109_SPRING_2012_STUDENT", org1));
-    Set<String> members = new HashSet<String>();
-    members.add("admin");
-
-    JpaGroup group = new JpaGroup("test", org1, "Test", "Test group", authorities, members);
-    provider.addGroup(group);
-
-    authorities.clear();
-    authorities.add(new JpaRole("ROLE_ASTRO_122_SPRING_2011_STUDENT", org1));
-    authorities.add(new JpaRole("ROLE_ASTRO_124_SPRING_2012_STUDENT", org1));
-
-    JpaGroup group2 = new JpaGroup("test2", org1, "Test2", "Test 2 group", authorities, members);
-    provider.addGroup(group2);
-
-    authorities.clear();
-    authorities.add(new JpaRole("ROLE_ASTRO_134_SPRING_2011_STUDENT", org2));
-    authorities.add(new JpaRole("ROLE_ASTRO_144_SPRING_2012_STUDENT", org2));
-
-    JpaGroup group3 = new JpaGroup("test2", org2, "Test2", "Test 2 group", authorities, members);
-    provider.addGroup(group3);
-
-    List<Role> roles = IteratorUtils.toList(provider.getRoles());
-    Assert.assertEquals("There should be four role", 6, roles.size());
-    roles.contains(new JpaRole(group.getRole(), org1));
-    roles.contains(new JpaRole(group2.getRole(), org1));
-  }
-
-  @Test
   public void testRolesForUser() throws UnauthorizedException {
     Set<JpaRole> authorities = new HashSet<JpaRole>();
     authorities.add(new JpaRole("ROLE_ASTRO_101_SPRING_2011_STUDENT", org1));
