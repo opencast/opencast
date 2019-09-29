@@ -18,23 +18,23 @@ Enable paella player
 
 To enable paella player you need to edit the `prop.player` variable.
 This can be enabled for each tenant. So the configuration keys are located in
-`.../etc/org.opencastproject.organization-mh_default_org.cfg`.
+`etc/org.opencastproject.organization-mh_default_org.cfg`.
 
 
 To activate the paella player set:
 
-    prop.player=/paella/ui/watch.html
+    prop.player=/paella/ui/watch.html?id=#{id}
 
 
 Configuration
 -------------
 
 The configurations for the paella player are done for each tenant. The paella configuration files are located in
-`.../etc/ui-config/<tenant_id>/paella/config.json`.
+`etc/ui-config/<tenant_id>/paella/config.json`.
 
-For the default `mh_default_org` tenant file is located at `.../etc/ui-config/mh_default_org/paella/config.json`.
+For the default `mh_default_org` tenant file is located at `etc/ui-config/mh_default_org/paella/config.json`.
 
-For more information about the configuration format options, see the the paella [documentation page](https://paellaplayer.upv.es/docs/)
+For more information about the configuration format options, see the paella [documentation](https://paellaplayer.upv.es/docs/)
 
 
 Tracks to be played
