@@ -64,6 +64,7 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -90,6 +91,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Tests the functionality of the search service.
@@ -156,6 +160,8 @@ public class SearchServiceImplTest {
 
   @Before
   public void setUp() throws Exception {
+    EntityManagerFactory emf = newTestEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNIT);
+    EntityManager em = emf.createEntityManager();
     // workspace
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
@@ -180,10 +186,15 @@ public class SearchServiceImplTest {
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(anonymous).anyTimes();
     EasyMock.replay(userDirectoryService);
 
-    Organization organization = new DefaultOrganization();
+    em.getTransaction().begin();
+    Organization defaultOrg = new DefaultOrganization();
+    Organization org = new JpaOrganization(defaultOrg.getId(), defaultOrg.getName(), defaultOrg.getServers(),
+        defaultOrg.getAdminRole(), defaultOrg.getAnonymousRole(), defaultOrg.getProperties());
+    em.merge(org);
+    em.getTransaction().commit();
     OrganizationDirectoryService organizationDirectoryService = EasyMock.createMock(OrganizationDirectoryService.class);
     EasyMock.expect(organizationDirectoryService.getOrganization((String) EasyMock.anyObject()))
-    .andReturn(organization).anyTimes();
+    .andReturn(org).anyTimes();
     EasyMock.replay(organizationDirectoryService);
 
     // mpeg7 service
@@ -191,7 +202,7 @@ public class SearchServiceImplTest {
 
     // Persistence storage
     searchDatabase = new SearchServiceDatabaseImpl();
-    searchDatabase.setEntityManagerFactory(newTestEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNIT));
+    searchDatabase.setEntityManagerFactory(emf);
     searchDatabase.activate(null);
     searchDatabase.setSecurityService(securityService);
 

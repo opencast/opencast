@@ -45,6 +45,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-common-jpa-impl</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
@@ -155,6 +161,10 @@
       <groupId>com.mchange</groupId>
       <artifactId>c3p0</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>org.eclipse.persistence.core</artifactId>
     </dependency>
   </dependencies>
   <build>

@@ -21,14 +21,20 @@
 
 package org.opencastproject.search.impl.persistence;
 
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -37,13 +43,15 @@ import javax.persistence.TemporalType;
  * Entity object for storing search in persistence storage. Media package id is stored as primary key.
  */
 @Entity(name = "SearchEntity")
-@Table(name = "oc_search")
+@Table(name = "oc_search", indexes = {
+    @Index(name = "IX_oc_search_series", columnList = ("series_id")),
+    @Index(name = "IX_oc_search_organization", columnList = ("organization")) })
 @NamedQueries({
-        @NamedQuery(name = "Search.findAll", query = "SELECT s FROM SearchEntity s"),
-        @NamedQuery(name = "Search.getCount", query = "SELECT COUNT(s) FROM SearchEntity s"),
-        @NamedQuery(name = "Search.findById", query = "SELECT s FROM SearchEntity s WHERE s.mediaPackageId=:mediaPackageId"),
-        @NamedQuery(name = "Search.findBySeriesId", query = "SELECT s FROM SearchEntity s WHERE s.seriesId=:seriesId"),
-        @NamedQuery(name = "Search.getNoSeries", query = "SELECT s FROM SearchEntity s WHERE s.seriesId IS NULL")})
+    @NamedQuery(name = "Search.findAll", query = "SELECT s FROM SearchEntity s"),
+    @NamedQuery(name = "Search.getCount", query = "SELECT COUNT(s) FROM SearchEntity s"),
+    @NamedQuery(name = "Search.findById", query = "SELECT s FROM SearchEntity s WHERE s.mediaPackageId=:mediaPackageId"),
+    @NamedQuery(name = "Search.findBySeriesId", query = "SELECT s FROM SearchEntity s WHERE s.seriesId=:seriesId"),
+    @NamedQuery(name = "Search.getNoSeries", query = "SELECT s FROM SearchEntity s WHERE s.seriesId IS NULL")})
 public class SearchEntity {
 
   /** media package id, primary key */
@@ -55,8 +63,9 @@ public class SearchEntity {
   protected String seriesId;
 
   /** Organization id */
-  @Column(name = "organization", length = 128)
-  protected String organization;
+  @OneToOne(targetEntity = JpaOrganization.class)
+  @JoinColumn(name = "organization", referencedColumnName = "id")
+  protected JpaOrganization organization;
 
   /** The media package deleted */
   @Column(name = "deletion_date")
@@ -142,7 +151,7 @@ public class SearchEntity {
   /**
    * @return the organization
    */
-  public String getOrganization() {
+  public JpaOrganization getOrganization() {
     return organization;
   }
 
@@ -150,8 +159,13 @@ public class SearchEntity {
    * @param organization
    *          the organization to set
    */
-  public void setOrganization(String organization) {
-    this.organization = organization;
+  public void setOrganization(Organization organization) {
+    if (organization instanceof JpaOrganization) {
+      this.organization = (JpaOrganization) organization;
+    } else {
+      this.organization = new JpaOrganization(organization.getId(), organization.getName(), organization.getServers(),
+          organization.getAdminRole(), organization.getAnonymousRole(), organization.getProperties());
+    }
   }
 
   /**
