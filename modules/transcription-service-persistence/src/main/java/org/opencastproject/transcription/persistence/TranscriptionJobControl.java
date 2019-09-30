@@ -38,6 +38,8 @@ public class TranscriptionJobControl {
   private String status;
   // Date/time of google speech job creation
   private Date dateCreated;
+  // Date/time that the transcription job is expected to be complete
+  private Date dateExpected;
   // Date/time of google speech job completion
   private Date dateCompleted;
   // Duration of track
@@ -46,12 +48,13 @@ public class TranscriptionJobControl {
   private long providerId;
 
   public TranscriptionJobControl(String mediaPackageId, String trackId, String transcriptionJobId, Date dateCreated,
-          Date dateCompleted, String status, long trackDuration, long providerId) {
+          Date dateExpected, Date dateCompleted, String status, long trackDuration, long providerId) {
     super();
     this.mediaPackageId = mediaPackageId;
     this.trackId = trackId;
     this.transcriptionJobId = transcriptionJobId;
     this.dateCreated = dateCreated;
+    this.dateExpected = dateExpected;
     this.dateCompleted = dateCompleted;
     this.status = status;
     this.trackDuration = trackDuration;
@@ -88,6 +91,14 @@ public class TranscriptionJobControl {
 
   public void setDateCreated(Date dateCreated) {
     this.dateCreated = dateCreated;
+  }
+
+  public Date getDateExpected() {
+    return dateExpected;
+  }
+
+  public void setDateExpected(Date dateExpected) {
+    this.dateExpected = dateExpected;
   }
 
   public Date getDateCompleted() {

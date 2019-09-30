@@ -519,7 +519,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
                   jobId));
 
           database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.InProgress.name(),
-                  track.getDuration() == null ? 0 : track.getDuration().longValue(), PROVIDER);
+                  track.getDuration() == null ? 0 : track.getDuration().longValue(), null, PROVIDER);
           EntityUtils.consume(entity);
           return;
         default:

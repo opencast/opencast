@@ -622,6 +622,7 @@ CREATE TABLE oc_transcription_service_job (
   track_id VARCHAR(128) NOT NULL,
   job_id  VARCHAR(128) NOT NULL,
   date_created DATETIME NOT NULL,
+  date_expected DATETIME DEFAULT NULL,
   date_completed DATETIME DEFAULT NULL,
   status VARCHAR(128) DEFAULT NULL,
   track_duration BIGINT NOT NULL,

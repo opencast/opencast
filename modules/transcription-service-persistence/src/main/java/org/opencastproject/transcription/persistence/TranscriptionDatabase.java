@@ -20,6 +20,7 @@
  */
 package org.opencastproject.transcription.persistence;
 
+import java.util.Date;
 import java.util.List;
 
 /*
@@ -31,7 +32,7 @@ public interface TranscriptionDatabase {
    * Store transcription service job
    */
   TranscriptionJobControl storeJobControl(String mpId, String trackId, String jobId, String jobStatus,
-          long trackDuration, String provider) throws TranscriptionDatabaseException;
+          long trackDuration, Date dateExpected, String provider) throws TranscriptionDatabaseException;
 
   /*
    * Store transcription provider
