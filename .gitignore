@@ -35,8 +35,9 @@ node/
 /.m2/
 /settings.xml
 
-# Ignore mkdocs sites
+# Ignore mkdocs sites and python virtualenv (docs/guides/readme.md)
 docs/guides/*/site
+docs/guides/venv
 
 # Ignore Makefiles
 # Sometimes they help, but they should never be tracked
