@@ -475,7 +475,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @throws NotFoundException
    *         if either the collection or the file don't exist
    */
-  protected File getFileFromCollection(String collectionId, String fileName) throws NotFoundException,
+  public File getFileFromCollection(String collectionId, String fileName) throws NotFoundException,
           IllegalArgumentException {
     checkPathSafe(collectionId);
 
