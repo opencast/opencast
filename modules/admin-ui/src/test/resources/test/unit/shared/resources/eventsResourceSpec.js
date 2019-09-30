@@ -37,9 +37,9 @@ describe('Events API Resource', function () {
                 location: 'Room 2',
                 agentId: 'Room 2',
                 start_date: '2012-12-02T10:00:00Z',
-                technical_start_date: '2012-12-02T10:00:00Z',
+                technical_start: '2012-12-02T09:55:00Z',
                 end_date: '2012-12-02T11:15:00Z',
-                technical_end_date: '2012-12-02T11:15:00Z',
+                technical_end: '2012-12-02T11:20:00Z',
                 status: 'processing',
                 comments: {
                     resolved: 0,
@@ -62,9 +62,9 @@ describe('Events API Resource', function () {
                 location: 'Room 3',
                 agentId: 'Room 3',
                 start_date: '2012-12-01T08:59:00Z',
-                technical_start_date: '2012-12-01T08:59:00Z',
+                technical_start: '2012-12-01T08:59:00Z',
                 end_date: '2012-12-01T08:59:00Z',
-                technical_end_date: '2012-12-01T08:59:00Z',
+                technical_end: '2012-12-01T08:59:00Z',
                 status: 'processed',
                 comments: {
                     resolved: 1,
@@ -94,6 +94,9 @@ describe('Events API Resource', function () {
             expect(data.rows[0].date).toBe(sampleJSON.results[0].start_date);
             expect(data.rows[0].start_date).toBe('2012-12-02T10:00:00Z');
             expect(data.rows[0].end_date).toBe('2012-12-02T11:15:00Z');
+            expect(data.rows[0].technical_date).toBe(sampleJSON.results[0].technical_start);
+            expect(data.rows[0].technical_start).toBe('2012-12-02T09:55:00Z');
+            expect(data.rows[0].technical_end).toBe('2012-12-02T11:20:00Z');
         });
 
         it('handles empty payload', function () {

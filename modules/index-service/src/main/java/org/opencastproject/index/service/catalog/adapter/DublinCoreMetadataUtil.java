@@ -133,6 +133,16 @@ public final class DublinCoreMetadataUtil {
     for (DublinCoreValue periodString : periodStrings) {
       p = Opt.nul(EncodingSchemeUtils.decodePeriod(periodString.getValue()));
     }
+    if (p.isNone()) {
+      // fall back to created date with zero duration
+      // opencast keep the event start date and created date in sync
+      // if the start date isn't set, we can grab the created value
+      DublinCoreValue createdDCValue = dc.getFirstVal(DublinCore.PROPERTY_CREATED);
+      if (createdDCValue != null) {
+        Date createdDate = EncodingSchemeUtils.decodeDate(createdDCValue.getValue());
+        p = Opt.nul(new DCMIPeriod(createdDate, createdDate));
+      }
+    }
     return p;
   }
 

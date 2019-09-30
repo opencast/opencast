@@ -2126,8 +2126,8 @@ public abstract class AbstractEventEndpoint {
       if (EventListQuery.FILTER_STARTDATE_NAME.equals(name)) {
         try {
           Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(filters.get(name));
-          query.withTechnicalStartFrom(fromAndToCreationRange.getA());
-          query.withTechnicalStartTo(fromAndToCreationRange.getB());
+          query.withStartFrom(fromAndToCreationRange.getA());
+          query.withStartTo(fromAndToCreationRange.getB());
         } catch (IllegalArgumentException e) {
           return RestUtil.R.badRequest(e.getMessage());
         }
