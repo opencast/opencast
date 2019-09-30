@@ -144,10 +144,14 @@ class OpencastToPaellaConverter {
     let audioTagConfig = this.getAudioTagConfig();
     let audioTag;
 
-    if (!(currentTrack.tags.tag instanceof Array)) {
-      currentTrack.tags.tag = [currentTrack.tags.tag];
+    let tags = [];
+    if ( (currentTrack.tags) && (currentTrack.tags.tag) ) {
+      tags = [currentTrack.tags.tag];
+      if (!(currentTrack.tags.tag instanceof Array)) {
+        tags = [currentTrack.tags.tag];
+      }
     }
-    currentTrack.tags.tag.some(function(tag){
+    tags.some(function(tag){
       if (tag.startsWith('audioTag:')){
         audioTag = tag.slice(9);
         return true;
