@@ -148,9 +148,9 @@ class OpencastToPaellaConverter {
 
     let tags = [];
     if ( (currentTrack.tags) && (currentTrack.tags.tag) ) {
-      tags = [currentTrack.tags.tag];
-      if (!(currentTrack.tags.tag instanceof Array)) {
-        tags = [currentTrack.tags.tag];
+      tags = currentTrack.tags.tag;
+      if (!(tags instanceof Array)) {
+        tags = [tags];
       }
     }
     tags.some(function(tag){
