@@ -20,7 +20,7 @@
  */
 
 // eslint-disable-next-line no-undef
-define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'engage/models/meInfo'], 
+define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'engage/models/meInfo'],
   function($, Backbone, Bowser, Basil, PluginInfoModel, MeInfoModel) {
     'use strict';
 

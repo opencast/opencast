@@ -19,9 +19,7 @@
  *
  */
 
-/*jslint browser: true, nomen: true*/
-/*global define, CustomEvent*/
-// eslint-disable-next-line no-undef
+/* global define */
 define(['jquery', 'backbone', 'js-yaml.min'], function ($, Backbone, jsyaml) {
   'use strict';
 

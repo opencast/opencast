@@ -18,65 +18,64 @@
  * the License.
  *
  */
-/*jslint browser: true, nomen: true*/
-/*global define, CustomEvent*/
-define(['jquery', 'backbone', "engage/core", "engage/models/engage"], function($, Backbone, EngageCore, EngageModel) {
-    'use strict';
+/* global define */
+define(['jquery', 'backbone', 'engage/core', 'engage/models/engage'], function($, Backbone, EngageCore, EngageModel) {
+  'use strict';
 
-    var id_engage_controls = "engage_controls";
-    var id_engage_video = "engage_video";
-    var id_engage_tab = "engage_tab";
-    var id_engage_description = "engage_description";
-    var id_engage_timeline = "engage_timeline";
+  var id_engage_controls = 'engage_controls';
+  var id_engage_video = 'engage_video';
+  var id_engage_tab = 'engage_tab';
+  var id_engage_description = 'engage_description';
+  var id_engage_timeline = 'engage_timeline';
 
-    /*
+  /*
      * Init logic function
      */
-    var initMobileView = function() {
+  var initMobileView = function() {
 
-    }
+  };
 
-    /*
+  /*
      * Logic to insert a plugin with name and type to the player in mobile mode
      */
-    var insertPluginToDOM = function(plugin) {
+  var insertPluginToDOM = function(plugin) {
 
-        switch (plugin.type) {
-            case id_engage_video:
-                $("#" + id_engage_video).html(plugin.templateProcessed);
-                plugin.inserted = true;
-                plugin.container = "#" + id_engage_video;
-                break;
-            case id_engage_controls:
-                $("#" + id_engage_controls).html(plugin.templateProcessed);
-                plugin.inserted = true;
-                plugin.container = "#" + id_engage_controls;
-                break;
-            case id_engage_description:
-                $("#" + id_engage_description).html(plugin.templateProcessed);
-                plugin.inserted = true;
-                plugin.container = "#" + id_engage_description;
-                break;
-            case id_engage_tab:
-            case id_engage_timeline:
-            default:
-                plugin.inserted = false;
-                plugin.container = "";
-        }
+    switch (plugin.type) {
+    case id_engage_video:
+      $('#' + id_engage_video).html(plugin.templateProcessed);
+      plugin.inserted = true;
+      plugin.container = '#' + id_engage_video;
+      break;
+    case id_engage_controls:
+      $('#' + id_engage_controls).html(plugin.templateProcessed);
+      plugin.inserted = true;
+      plugin.container = '#' + id_engage_controls;
+      break;
+    case id_engage_description:
+      $('#' + id_engage_description).html(plugin.templateProcessed);
+      plugin.inserted = true;
+      plugin.container = '#' + id_engage_description;
+      break;
+    case id_engage_tab:
+    case id_engage_timeline:
+    default:
+      plugin.inserted = false;
+      plugin.container = '';
     }
+  };
 
-    /*
+  /*
      * This function is triggered when all plugins are loaded and inserted into the DOM
      */
-    var allPluginsLoadedEvent = function() {
+  var allPluginsLoadedEvent = function() {
 
-    }
+  };
 
-    // public functions fo the module
-    return {
-        initView: initMobileView,
-        insertPlugin: insertPluginToDOM,
-        allPluginsLoaded: allPluginsLoadedEvent
-    }
+  // public functions fo the module
+  return {
+    initView: initMobileView,
+    insertPlugin: insertPluginToDOM,
+    allPluginsLoaded: allPluginsLoadedEvent
+  };
 });
 
