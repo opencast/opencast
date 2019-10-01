@@ -3,8 +3,6 @@ var httpProxy = require('http-proxy');
 var createError = require('http-errors');
 
 var app = express();
-
-
 var proxy = httpProxy.createProxyServer({secure:false});
  
 function proxyFunc(req, res, next) {
@@ -15,6 +13,7 @@ function proxyFunc(req, res, next) {
 }
 
 app.use('/paella/ui', express.static('target/gulp/paella-opencast'));
+app.use('/ui/config/paella', express.static('../../etc/ui-config/mh_default_org/paella'))
 app.use(proxyFunc);
 
 

@@ -42,3 +42,12 @@ Tracks to be played
 
 An event can have many tracks, but an institution can configure which of these tracks are played and which are not.
 To do it, you need to configure [es.upv.paella.opencast.loader](plugins/es.upv.paella.opencast.loader.md) plugin.
+
+Multiple audio tracks
+---------------------
+
+An event can have multiple audio tracks. Paella only plays one at a time, but you can configure paella to allow the user to 
+decide which one to play. Read the [es.upv.paella.opencast.loader](plugins/es.upv.paella.opencast.loader.md) documentation
+plugin for more information.
+
+This feature is usefull when you have multiple audio languages, so the users can switch to the audio language they want.
