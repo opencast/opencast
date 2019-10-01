@@ -11,5 +11,6 @@
     "msg_startPlayingToSetTime": "Lütfen video oynatma süresini ayarlamadan önce oynatın.",
     "msg_waitToSeek": "Video yüklenene kadar inceleme mümkün değil.",
     "msg_startPlayingToSeek": "İnceleme, Oynat düğmesine en az bir kez basana dek kullanılamaz.",
-    "chromeBuffer": "Ara bellek denetleyicisi, Chrome sınırlamaları sebebiyle devre dışı bırakıldı. Video oynatmakla ilgili sorunlar yaşayabilirsiniz."
+    "chromeBuffer": "Ara bellek denetleyicisi, Chrome sınırlamaları sebebiyle devre dışı bırakıldı. Video oynatmakla ilgili sorunlar yaşayabilirsiniz.",
+    "scroll_overlay_text": "Use shift + scroll to zoom."
 }
