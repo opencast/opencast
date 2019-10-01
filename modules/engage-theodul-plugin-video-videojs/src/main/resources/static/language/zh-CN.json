@@ -11,5 +11,6 @@
     "msg_startPlayingToSetTime": "请在启动播放视频之前设置回放时间。",
     "msg_waitToSeek": "视频载入完成后，才能搜寻。",
     "msg_startPlayingToSeek": "至少要点击一次播放按钮后才能搜寻。",
-    "chromeBuffer": "由于Chrome浏览器局限性，缓冲区检查已被禁用。有可能您会遇到视频播放问题。"
+    "chromeBuffer": "由于Chrome浏览器局限性，缓冲区检查已被禁用。有可能您会遇到视频播放问题。",
+    "scroll_overlay_text": "Use shift + scroll to zoom."
 }

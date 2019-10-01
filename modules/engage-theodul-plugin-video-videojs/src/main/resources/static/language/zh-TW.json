@@ -11,5 +11,6 @@
     "msg_startPlayingToSetTime": "請啟動視頻之前先設置播放時間",
     "msg_waitToSeek": "無法尋找，直到載入視頻。",
     "msg_startPlayingToSeek": "至少一次點擊播放按鈕之前，無法啟動搜尋。",
-    "chromeBuffer": "由於Chrome的限制，緩衝區檢查已被禁用。有可能你會遇到視頻播放問題。"
+    "chromeBuffer": "由於Chrome的限制，緩衝區檢查已被禁用。有可能你會遇到視頻播放問題。",
+    "scroll_overlay_text": "Use shift + scroll to zoom."
 }
