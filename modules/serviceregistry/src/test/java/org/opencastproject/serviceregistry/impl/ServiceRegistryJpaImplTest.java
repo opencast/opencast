@@ -37,7 +37,6 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.systems.OpencastConstants;
@@ -113,9 +112,7 @@ public class ServiceRegistryJpaImplTest {
     for (ObjectInstance mbean : serviceRegistryJpaImpl.jmxBeans) {
       JmxUtil.unregisterMXBean(mbean);
     }
-    for (ServiceRegistration service : serviceRegistryJpaImpl.getServiceRegistrations()) {
-      serviceRegistryJpaImpl.unRegisterService(service.getServiceType(), service.getHost());
-    }
+    // Deactivate unregisters services
     serviceRegistryJpaImpl.deactivate();
   }
 
@@ -294,6 +291,7 @@ public class ServiceRegistryJpaImplTest {
     } catch (Exception e) {
       Assert.assertEquals(0, serviceRegistryJpaImpl.dispatchPriorityList.size());
     }
+
   }
 
   @Test
@@ -410,8 +408,7 @@ public class ServiceRegistryJpaImplTest {
     properties.put("dispatchinterval", "1000");
     serviceRegistryJpaImpl.updated(properties);
     registerTestHostAndService();
-    Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true,
-            null,
+    Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null,
             10.0f);
     JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob);
     try {
