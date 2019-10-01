@@ -22,6 +22,8 @@ class OpencastToPaellaConverter {
 
   constructor() {
     this._config = paella.player.config.plugins.list['es.upv.paella.opencast.loader'] || {};
+    this._orderTracks = this._config.orderTracks ||
+          ['presenter/delivery', 'presenter/preview', 'presentation/delivery', 'presentation/preview'];
   }
 
   getFilterStream() {
@@ -146,9 +148,9 @@ class OpencastToPaellaConverter {
 
     let tags = [];
     if ( (currentTrack.tags) && (currentTrack.tags.tag) ) {
-      tags = [currentTrack.tags.tag];
-      if (!(currentTrack.tags.tag instanceof Array)) {
-        tags = [currentTrack.tags.tag];
+      tags = currentTrack.tags.tag;
+      if (!(tags instanceof Array)) {
+        tags = [tags];
       }
     }
     tags.some(function(tag){
@@ -281,6 +283,15 @@ class OpencastToPaellaConverter {
         }
       }
     });
+
+    // Sort the streams
+    for (let i = this._orderTracks.length - 1; i >= 0; i--) {
+      let flavor = this._orderTracks[i];
+      if (flavors.indexOf(flavor) > 0) {
+        flavors.splice(flavors.indexOf(flavor), 1);
+        flavors.unshift(flavor);
+      }
+    }
 
     return flavors;
   }
