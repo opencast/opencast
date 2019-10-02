@@ -997,7 +997,9 @@
                   "NEW": "New policy",
                   "DETAILS": "Details",
                   "REPLACE_EVENT_ACLS": "Update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect",
+                  "LOAD_MORE_LIMIT": "policies shown.",
+                  "LOAD_MORE_LINK": "Load more"
                },
                "ROLES": {
                   "LABEL": "Select a role",

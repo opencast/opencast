@@ -200,15 +200,15 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr ng-repeat="policy in policies">
+                        <tr ng-repeat="policy in policies | limitTo: limit">
                           <td>
                             <select chosen
-                                    pre-select-from="roles"
+                                    pre-select-from="::roles"
                                     ng-disabled="(tab == 'permissions') && (!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked)"
                                     data-width="'360px'"
                                     ng-model="policy.role"
                                     ng-change="accessChanged(policy.role)"
-                                    ng-options="id as id for (id, type) in roles"
+                                    ng-options="id as id for (id, type) in ::roles"
                                     ng-get-more="getMoreRoles"
                                     placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
                                     no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
@@ -216,14 +216,14 @@
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
-                                   ng-disabled="aclLocked"
+                                   ng-disabled="::aclLocked"
                                    ng-model="policy.read"
                                    ng-change="accessSave()"
                                    ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/>
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
-                                   ng-disabled="aclLocked"
+                                   ng-disabled="::aclLocked"
                                    ng-model="policy.write"
                                    ng-change="accessSave()"
                                    ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/>
@@ -233,16 +233,22 @@
                                  save="accessSave"
                                  admin-ng-editable-multi-select
                                  mixed="false"
-                                 params="policy.actions"
-                                 collection="actions">
+                                 params="::policy.actions"
+                                 collection="::actions">
                             </div>
                             <div ng-if="(!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')) || aclLocked"
-                                 ng-repeat="customAction in policy.actions.value">
+                                 ng-repeat="customAction in ::policy.actions.value">
                               {{ customAction }}
                             </div>
                           </td>
                           <td class="fit" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked">
                             <a ng-click="deletePolicy(policy)" class="remove"></a>
+                          </td>
+                        </tr>
+                        <tr ng-if="limit < policies.length">
+                          <td colspan="5" >
+                            {{ limit }} / {{ policies.length }} {{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LOAD_MORE_LIMIT' | translate }}
+                            <a ng-click="loadmore()">{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LOAD_MORE_LINK' | translate }}</a>
                           </td>
                         </tr>
                         <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked">
