@@ -119,6 +119,15 @@ Last but not least this release also fixes a known security vulnerability in Apa
 update.
 
 
+Aditional Notes About 7.4
+-------------------------
+Opencast 7.4 brings a performance fix for some queries in the search API that can cause Opencast to run out of memory.
+
+This release also gives back a patch that was in version 6.x that allows to filter capture agent roles for ACLs and
+fixes the date cell of the events overview table in the admin UI.
+
+Finally, Opencast 7.4 also brings an update to the CAS security example that was out of date.
+
 Release Schedule
 ----------------
 
