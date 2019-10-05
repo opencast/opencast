@@ -169,10 +169,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the maximum load */
   protected static final String OPT_MAXLOAD = "org.opencastproject.server.maxload";
 
-  /** Configuration key for the dispatch interval in milliseconds */
-  protected static final String OPT_DISPATCHINTERVAL = "dispatchinterval";
+  /** Configuration key for the dispatch interval, in seconds */
+  protected static final String OPT_DISPATCHINTERVAL = "dispatch.interval";
 
-  /** Configuration key for the interval to check whether the hosts in the service registry are still alive [sec] * */
+  /** Configuration key for the interval to check whether the hosts in the service registry are still alive, in seconds */
   protected static final String OPT_HEARTBEATINTERVAL = "heartbeat.interval";
 
   /** Configuration key for the collection of job statistics */
@@ -184,14 +184,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
 
-  /** Minimum delay between job dispatching attempts, in milliseconds */
-  static final long MIN_DISPATCH_INTERVAL = 1000;
+  /** Minimum delay between job dispatching attempts, in seconds */
+  static final long MIN_DISPATCH_INTERVAL = 1;
 
-  /** Default delay between job dispatching attempts, in milliseconds */
-  static final long DEFAULT_DISPATCH_INTERVAL = 5000;
+  /** Default delay between job dispatching attempts, in seconds */
+  static final long DEFAULT_DISPATCH_INTERVAL = 5;
 
-  /** Default delay before starting job dispatching, in milliseconds */
-  static final long DEFAULT_DISPATCH_START_DELAY = 60000;
+  /** Default delay before starting job dispatching, in seconds */
+  static final long DEFAULT_DISPATCH_START_DELAY = 60;
 
   /** Default jobs limit during dispatching
    * (larger value will fetch more entries from the database at the same time and increase RAM usage) */
@@ -839,9 +839,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     // Schedule the job dispatching.
     if (dispatchInterval > 0) {
-      logger.debug("Starting job dispatching at a custom interval of {}s", dispatchInterval / 1000);
+      logger.debug("Starting job dispatching at a custom interval of {}s", dispatchInterval);
       scheduledExecutor.scheduleWithFixedDelay(new JobDispatcher(), dispatchDelay, dispatchInterval,
-              TimeUnit.MILLISECONDS);
+              TimeUnit.SECONDS);
     }
   }
 
