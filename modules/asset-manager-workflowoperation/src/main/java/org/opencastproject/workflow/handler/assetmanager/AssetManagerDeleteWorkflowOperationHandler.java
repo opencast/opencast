@@ -20,7 +20,6 @@
  */
 package org.opencastproject.workflow.handler.assetmanager;
 
-import static java.lang.String.format;
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 
 import org.opencastproject.assetmanager.api.AssetManager;

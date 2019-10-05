@@ -22,7 +22,6 @@
 package org.opencastproject.workflow.handler.workflow;
 
 import static com.entwinemedia.fn.Stream.$;
-import static java.lang.String.format;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;

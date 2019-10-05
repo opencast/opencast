@@ -704,8 +704,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     }
     // Publish the media package to OAI-PMH
     try {
-      logger.debug(format("Updating metadata of media package %s in %s",
-              publishedMp.getIdentifier().compact(), repository));
+      logger.debug("Updating metadata of media package {} in {}",
+              publishedMp.getIdentifier().compact(), repository);
       oaiPmhDatabase.store(publishedMp, repository);
     } catch (OaiPmhDatabaseException e) {
       throw new PublicationException(format("Media package %s could not be updated",
@@ -954,8 +954,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         for (final MediaPackageElement outdated : mergedMp.getElementsByFlavor(flavor)) {
           mergedMp.remove(outdated);
         }
-        logger.debug(format("Update %s %s of type %s", updatedElement.getElementType().toString().toLowerCase(),
-                updatedElement.getIdentifier(), updatedElement.getElementType()));
+        logger.debug("Update {} {} of type {}", updatedElement.getElementType().toString().toLowerCase(),
+                updatedElement.getIdentifier(), updatedElement.getElementType());
         mergedMp.add(updatedElement);
       }
     }
