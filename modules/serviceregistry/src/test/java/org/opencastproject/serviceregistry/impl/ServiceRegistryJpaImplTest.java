@@ -259,7 +259,7 @@ public class ServiceRegistryJpaImplTest {
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
     serviceRegistryJpaImpl.activate(null);
     Hashtable<String, String> properties = new Hashtable<>();
-    properties.put("dispatchinterval", "1000");
+    properties.put("dispatch.interval", "1");
     serviceRegistryJpaImpl.updated(properties);
     registerTestHostAndService();
     Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_OPERATION, null, null, true, null);
@@ -279,7 +279,7 @@ public class ServiceRegistryJpaImplTest {
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
     serviceRegistryJpaImpl.activate(null);
     Hashtable<String, String> properties = new Hashtable<>();
-    properties.put("dispatchinterval", "1000");
+    properties.put("dispatch.interval", "1");
     serviceRegistryJpaImpl.updated(properties);
     registerTestHostAndService();
     serviceRegistryJpaImpl.registerService(TEST_SERVICE_3, TEST_HOST, TEST_PATH_3);
@@ -301,7 +301,7 @@ public class ServiceRegistryJpaImplTest {
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
     serviceRegistryJpaImpl.activate(null);
     Hashtable<String, String> properties = new Hashtable<>();
-    properties.put("dispatchinterval", "1000");
+    properties.put("dispatch.interval", "1");
     serviceRegistryJpaImpl.updated(properties);
     registerTestHostAndService();
     serviceRegistryJpaImpl.dispatchPriorityList.put(0L, TEST_HOST);
@@ -323,7 +323,7 @@ public class ServiceRegistryJpaImplTest {
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
     serviceRegistryJpaImpl.activate(null);
     Hashtable<String, String> properties = new Hashtable<>();
-    properties.put("dispatchinterval", "1000");
+    properties.put("dispatch.interval", "1");
     serviceRegistryJpaImpl.updated(properties);
     registerTestHostAndService();
     Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_2, TEST_OPERATION, null, null, true, null);
@@ -376,7 +376,7 @@ public class ServiceRegistryJpaImplTest {
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
     serviceRegistryJpaImpl.activate(null);
     Hashtable<String, String> properties = new Hashtable<>();
-    properties.put("dispatchinterval", "1000");
+    properties.put("dispatch.interval", "1");
     serviceRegistryJpaImpl.updated(properties);
     registerTestHostAndService();
 
@@ -405,7 +405,7 @@ public class ServiceRegistryJpaImplTest {
     serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
     serviceRegistryJpaImpl.activate(null);
     Hashtable<String, String> properties = new Hashtable<>();
-    properties.put("dispatchinterval", "1000");
+    properties.put("dispatch.interval", "1");
     serviceRegistryJpaImpl.updated(properties);
     registerTestHostAndService();
     Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null,
