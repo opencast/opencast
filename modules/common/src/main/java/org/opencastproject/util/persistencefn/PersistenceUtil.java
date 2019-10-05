@@ -23,7 +23,6 @@ package org.opencastproject.util.persistencefn;
 
 import static com.entwinemedia.fn.Equality.eq;
 import static com.entwinemedia.fn.Stream.$;
-import static java.lang.String.format;
 
 import org.opencastproject.util.data.Collections;
 

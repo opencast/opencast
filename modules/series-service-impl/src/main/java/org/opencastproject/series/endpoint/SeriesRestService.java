@@ -336,10 +336,10 @@ public class SeriesRestService {
     try {
       dc = this.dcService.load(new ByteArrayInputStream(series.getBytes("UTF-8")));
     } catch (UnsupportedEncodingException e1) {
-      logger.error("Could not deserialize dublin core catalog: {}", e1.getMessage(), e1);
+      logger.error("Could not deserialize dublin core catalog: {}", e1);
       throw new WebApplicationException(INTERNAL_SERVER_ERROR);
     } catch (IOException e1) {
-      logger.warn("Could not deserialize dublin core catalog: {}", e1.getMessage(), e1);
+      logger.warn("Could not deserialize dublin core catalog: {}", e1);
       return Response.status(BAD_REQUEST).build();
     }
     try {

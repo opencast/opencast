@@ -20,7 +20,6 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static java.lang.String.format;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 
