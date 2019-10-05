@@ -642,8 +642,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         throw new PublicationException("Error filtering media package", e);
       }
     } else if (result.size() == 0) {
-      logger.info(format("Skipping update of media package %s since it is not currently published to %s",
-              mediaPackage, repository));
+      logger.info("Skipping update of media package {} since it is not currently published to {}",
+              mediaPackage, repository);
       return null;
     } else {
       final String msg = format("More than one media package with id %s found", mediaPackage.getIdentifier().compact());

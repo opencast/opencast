@@ -657,7 +657,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         }
       }
     } catch (Exception e) {
-      logger.warn("Error while retrieving elements from remote service: %s", ExceptionUtils.getStackTrace(e));
+      logger.warn("Error while retrieving elements from remote service: {}", ExceptionUtils.getStackTrace(e));
       throw new SeriesException(e);
     } finally {
       closeConnection(response);
@@ -688,7 +688,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         }
       }
     } catch (Exception e) {
-      logger.warn("Error while retrieving element from remote service: %s", ExceptionUtils.getStackTrace(e));
+      logger.warn("Error while retrieving element from remote service: {}", ExceptionUtils.getStackTrace(e));
       throw new SeriesException(e);
     } finally {
       closeConnection(response);

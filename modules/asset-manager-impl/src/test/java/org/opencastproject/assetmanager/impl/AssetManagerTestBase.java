@@ -210,7 +210,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
           final int minVersions, final int maxVersions,
           final boolean continuousVersions,
           final Opt<String> seriesId) {
-    logger.info(format("Create %s media packages with %d to %d snapshots each", amount, minVersions, maxVersions));
+    logger.info("Create {} media packages with {} to {} snapshots each", amount, minVersions, maxVersions);
     final Stream<Snapshot> inserts = Stream.cont(inc()).take(amount).bind(new FnX<Integer, Iterable<Snapshot>>() {
       @Override public Iterable<Snapshot> applyX(final Integer mpCount) throws Exception {
         final MediaPackage mp = mkMediaPackage(mkCatalog());

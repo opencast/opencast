@@ -102,10 +102,10 @@ public final class IncludeWorkflowOperationHandler extends AbstractWorkflowOpera
     try {
       final WorkflowDefinition definition = workflowService.getWorkflowDefinitionById(workflowDefinitionId);
       if (definition != null) {
-        logger.info(format("Insert workflow %s into the current workflow instance", workflowDefinitionId));
+        logger.info("Insert workflow {} into the current workflow instance", workflowDefinitionId);
         wi.insert(definition, wi.getCurrentOperation());
       } else {
-        logger.warn(format("Workflow definition %s cannot be found", workflowDefinitionId));
+        logger.warn("Workflow definition {} cannot be found", workflowDefinitionId);
       }
     } catch (Exception e) {
       throw new WorkflowOperationException("Error inserting workflow " + workflowDefinitionId, e);

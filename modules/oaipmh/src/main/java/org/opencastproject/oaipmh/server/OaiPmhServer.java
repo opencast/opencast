@@ -140,8 +140,8 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
       logger.error("Error registering OAI-PMH servlet", e);
       throw new RuntimeException("Error registering OAI-PMH servlet", e);
     }
-    logger.info(format("There are %d repositories registered yet. Watch out for later registration messages.",
-            repositories.values().size()));
+    logger.info("There are {} repositories registered yet. Watch out for later registration messages.",
+            repositories.values().size());
   }
 
   @Override
