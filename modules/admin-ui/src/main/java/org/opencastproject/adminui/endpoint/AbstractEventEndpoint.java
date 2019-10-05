@@ -1513,7 +1513,7 @@ public abstract class AbstractEventEndpoint {
       return notFound("Cannot find an event with id '%s'.", id);
 
     try {
-      if (optEvent.get().isScheduledEvent() && !optEvent.get().hasRecordingStarted()) {
+      if (optEvent.get().getEventStatus().contains("SCHEDULE")) {
         List<Field> fields = new ArrayList<Field>();
         Map<String, String> workflowConfig = getSchedulerService().getWorkflowConfig(id);
         for (Entry<String, String> entry : workflowConfig.entrySet()) {
