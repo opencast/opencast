@@ -93,7 +93,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
   @Override
   public Job distribute(String channelId, final MediaPackage mediaPackage, Set<String> elementIds)
           throws DistributionException,  MediaPackageException {
-    logger.info(format("Distributing %s elements to %s@%s", elementIds.size(), channelId, distributionChannel));
+    logger.info("Distributing {} elements to {}@{}", elementIds.size(), channelId, distributionChannel);
     final HttpPost req = post(param(PARAM_CHANNEL_ID, channelId),
                               param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
                               param(PARAM_ELEMENT_IDS, gson.toJson(elementIds)));
@@ -114,7 +114,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
 
   @Override
   public Job retract(String channelId, MediaPackage mediaPackage, Set<String> elementIds) throws DistributionException {
-    logger.info(format("Retracting %s elements from %s@%s", elementIds.size(), channelId, distributionChannel));
+    logger.info("Retracting {} elements from {}@{}", elementIds.size(), channelId, distributionChannel);
     final HttpPost req = post("/retract",
                               param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
                               param(PARAM_ELEMENT_IDS, gson.toJson(elementIds)),
@@ -130,7 +130,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
   @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds)
       throws DistributionException {
-    logger.info(format("Distributing %s elements to %s@%s", elementIds.size(), channelId, distributionChannel));
+    logger.info("Distributing {} elements to {}@{}", elementIds.size(), channelId, distributionChannel);
     final HttpPost req = post("/distributesync", param(PARAM_CHANNEL_ID, channelId),
         param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediapackage)),
         param(PARAM_ELEMENT_IDS, gson.toJson(elementIds)));
@@ -145,7 +145,7 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
   @Override
   public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
       throws DistributionException {
-    logger.info(format("Retracting %s elements from %s@%s", elementIds.size(), channelId, distributionChannel));
+    logger.info("Retracting {} elements from {}@{}", elementIds.size(), channelId, distributionChannel);
     final HttpPost req = post("/retract",
         param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
         param(PARAM_ELEMENT_IDS, gson.toJson(elementIds)),

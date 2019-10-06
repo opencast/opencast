@@ -2012,7 +2012,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       // Get the encoding profile
       EncodingProfile profile = getProfile(job, encodingProfile);
       // Create the engine/get
-      logger.info(format("Encoding video track %s using profile '%s'", videoTrack.getIdentifier(), profile));
+      logger.info("Encoding video track {} using profile '{}'", videoTrack.getIdentifier(), profile);
       final EncoderEngine encoderEngine = getEncoderEngine();
 
       // Do the work

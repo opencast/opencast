@@ -171,7 +171,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
           if (p.size() != cfg.positions.size()) {
             logger.warn("Could not apply all configured positions to track " + t);
           } else {
-            logger.info(format("Extracting images from %s at position %s", t, $(p).mkString(", ")));
+            logger.info("Extracting images from {} at position {}", t, $(p).mkString(", "));
           }
           // create one extraction per encoding profile
           return $(cfg.profiles).map(new Fn<EncodingProfile, Extraction>() {
