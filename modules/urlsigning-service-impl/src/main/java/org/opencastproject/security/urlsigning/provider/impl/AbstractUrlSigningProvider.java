@@ -29,7 +29,6 @@ import org.opencastproject.urlsigning.common.ResourceStrategy;
 import org.opencastproject.urlsigning.utils.ResourceRequestUtil;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.osgi.service.cm.ConfigurationException;
@@ -274,7 +273,7 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
       return new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), uri.getPath(),
               URLEncodedUtils.format(queryStringParameters, StandardCharsets.UTF_8), null).toString();
     } catch (Exception e) {
-      getLogger().error("Unable to create signed URL because {}", ExceptionUtils.getStackTrace(e));
+      getLogger().error("Unable to create signed URL because", e);
       throw new UrlSigningException(e);
     }
   }

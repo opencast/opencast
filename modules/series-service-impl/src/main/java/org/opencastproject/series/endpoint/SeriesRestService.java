@@ -68,7 +68,6 @@ import com.entwinemedia.fn.data.json.SimpleSerializer;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
@@ -637,8 +636,7 @@ public class SeriesRestService {
     } catch (NotFoundException e) {
       return Response.status(NOT_FOUND).build();
     } catch (SeriesException e) {
-      logger.warn("Could not update series property for series {} property {}:{} : {}", seriesId, name,
-              value, ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not update series property for series {} property {}:{} :", seriesId, name, value, e);
     }
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -669,8 +667,7 @@ public class SeriesRestService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not delete series '{}' property '{}' query: {}", seriesId, propertyName,
-              ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not delete series '{}' property '{}' query:", seriesId, propertyName, e);
     }
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -852,8 +849,7 @@ public class SeriesRestService {
         return R.notFound();
       }
     } catch (SeriesException e) {
-      logger.warn("Error while returning element '{}' of series '{}': {}", elementType, seriesId,
-              ExceptionUtils.getStackTrace(e));
+      logger.warn("Error while returning element '{}' of series '{}':", elementType, seriesId, e);
       return R.serverError();
     }
   }

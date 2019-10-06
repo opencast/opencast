@@ -26,7 +26,6 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
@@ -729,8 +728,8 @@ public class MetadataField<A> {
           return v(periodEncodedString.get(), Jsons.BLANK);
         } catch (Exception e) {
           logger.error(
-                  "Unable to parse temporal metadata '{}' as either DCIM data or a formatted date using pattern {} because: {}",
-                  periodEncodedString.get(), pattern, getStackTrace(e));
+                  "Unable to parse temporal metadata '{}' as either DCIM data or a formatted date using pattern {} because:",
+                  periodEncodedString.get(), pattern, e);
           throw new IllegalArgumentException(e);
         }
       }

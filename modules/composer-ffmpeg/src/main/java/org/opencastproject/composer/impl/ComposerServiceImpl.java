@@ -22,7 +22,6 @@
 package org.opencastproject.composer.impl;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.composer.impl.EncoderEngine.CMD_SUFFIX;
 import static org.opencastproject.serviceregistry.api.Incidents.NO_DETAILS;
 import static org.opencastproject.util.data.Option.none;
@@ -772,10 +771,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       return some(inspectedTrack);
     } catch (Exception e) {
       if (upperLaidOutElement.isSome()) {
-        logger.warn("Error composing {}  and {}: {}", lowerLaidOutElement.getElement(), upperLaidOutElement.get().getElement(),
-                getStackTrace(e));
+        logger.warn("Error composing {}  and {}:",
+                lowerLaidOutElement.getElement(), upperLaidOutElement.get().getElement(), e);
       } else {
-        logger.warn("Error composing {}: {}", lowerLaidOutElement.getElement(), getStackTrace(e));
+        logger.warn("Error composing {}:", lowerLaidOutElement.getElement(), e);
       }
       if (e instanceof EncoderException) {
         throw (EncoderException) e;

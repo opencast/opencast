@@ -145,7 +145,7 @@ public final class ResourceRequestUtil {
       String encryptedPolicy = PolicyUtils.getPolicySignature(policy, encryptionKey);
       return signature.equals(encryptedPolicy);
     } catch (Exception e) {
-      logger.warn("Unable to encrypt policy because {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to encrypt policy because", e);
       return false;
     }
   }
