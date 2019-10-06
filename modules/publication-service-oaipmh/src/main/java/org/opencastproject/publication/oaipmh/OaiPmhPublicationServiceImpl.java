@@ -565,8 +565,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
       throw new PublicationException(format("Unable to retract media package %s from OAI-PMH repository %s",
               mpId, repository), e);
     } catch (NotFoundException e) {
-      logger.debug(format("Skip retracting media package %s from OIA-PMH repository %s as it isn't published.",
-              mpId, repository), e);
+      logger.debug("Skip retracting media package {} from OIA-PMH repository {} as it isn't published.",
+              mpId, repository, e);
     }
 
     if (oaiPmhMp != null && oaiPmhMp.getElements().length > 0) {

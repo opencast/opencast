@@ -687,8 +687,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         logger.info("Merging {} '{}' into the updated mediapackage", type, element.getIdentifier());
         mergedMediaPackage.add((MediaPackageElement) element.clone());
       } else {
-        logger.info(String.format("Overwriting existing %s '%s' with '%s' in the updated mediapackage",
-                type, element.getIdentifier(), updatedMp.getElementsByFlavor(element.getFlavor())[0].getIdentifier()));
+        logger.info("Overwriting existing {} '{}' with '{}' in the updated mediapackage",
+                type, element.getIdentifier(), updatedMp.getElementsByFlavor(element.getFlavor())[0].getIdentifier());
 
       }
     }
