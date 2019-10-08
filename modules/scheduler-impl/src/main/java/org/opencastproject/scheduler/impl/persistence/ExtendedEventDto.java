@@ -26,12 +26,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.Index;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
 
 /**
  * Entity object for storing extended scheduled event information in persistence storage.
@@ -39,15 +40,18 @@ import javax.persistence.UniqueConstraint;
 @IdClass(EventIdPK.class)
 @Entity(name = "ExtendedEvent")
 @NamedQueries({
-        @NamedQuery(name = "ExtendedEvent.findAll", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org"),
-        @NamedQuery(name = "ExtendedEvent.countAll", query = "SELECT COUNT(e) FROM ExtendedEvent e"),
-        @NamedQuery(name = "ExtendedEvent.findEvents", query = "SELECT e.mediaPackageId FROM ExtendedEvent e WHERE e.organization = :org AND e.captureAgentId = :ca AND e.startDate < :end AND e.endDate > :start ORDER BY e.startDate ASC"),
-        @NamedQuery(name = "ExtendedEvent.searchEventsCA", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org AND e.captureAgentId = :ca AND e.startDate >= :startFrom AND e.startDate < :startTo AND e.endDate >= :endFrom AND e.endDate < :endTo ORDER BY e.startDate ASC"),
-        @NamedQuery(name = "ExtendedEvent.searchEvents", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org AND e.startDate >= :startFrom AND e.startDate < :startTo AND e.endDate >= :endFrom AND e.endDate < :endTo ORDER BY e.startDate ASC"),
-        @NamedQuery(name = "ExtendedEvent.knownRecordings", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org AND e.recordingState IS NOT NULL AND e.recordingLastHeard IS NOT NULL")
+    @NamedQuery(name = "ExtendedEvent.findAll", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org"),
+    @NamedQuery(name = "ExtendedEvent.countAll", query = "SELECT COUNT(e) FROM ExtendedEvent e"),
+    @NamedQuery(name = "ExtendedEvent.findEvents", query = "SELECT e.mediaPackageId FROM ExtendedEvent e WHERE e.organization = :org AND e.captureAgentId = :ca AND e.startDate < :end AND e.endDate > :start ORDER BY e.startDate ASC"),
+    @NamedQuery(name = "ExtendedEvent.searchEventsCA", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org AND e.captureAgentId = :ca AND e.startDate >= :startFrom AND e.startDate < :startTo AND e.endDate >= :endFrom AND e.endDate < :endTo ORDER BY e.startDate ASC"),
+    @NamedQuery(name = "ExtendedEvent.searchEvents", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org AND e.startDate >= :startFrom AND e.startDate < :startTo AND e.endDate >= :endFrom AND e.endDate < :endTo ORDER BY e.startDate ASC"),
+    @NamedQuery(name = "ExtendedEvent.knownRecordings", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org AND e.recordingState IS NOT NULL AND e.recordingLastHeard IS NOT NULL")
 })
-@Table(name = "oc_scheduled_extended_event", uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "mediapackage_id", "organization" }) })
+@Table(name = "oc_scheduled_extended_event", indexes = {
+    @Index(name = "IX_oc_scheduled_extended_event_organization", columnList = ("organization")),
+    @Index(name = "IX_oc_scheduled_extended_event_capture_agent_id", columnList = ("capture_agent_id")),
+    @Index(name = "IX_oc_scheduled_extended_event_dates", columnList = ("start_date, end_date"))
+})
 public class ExtendedEventDto {
 
   /** Event ID, primary key */
@@ -61,16 +65,16 @@ public class ExtendedEventDto {
   private String organization;
 
   /** Capture agent id */
-  @Column(name = "capture_agent_id", length = 128)
+  @Column(name = "capture_agent_id", nullable = false, length = 128)
   private String captureAgentId;
 
   /** recording start date */
-  @Column(name = "start_date")
+  @Column(name = "start_date", nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date startDate;
 
   /** recording end date */
-  @Column(name = "end_date")
+  @Column(name = "end_date", nullable = false)
   @Temporal(TemporalType.TIMESTAMP)
   private Date endDate;
 
@@ -87,6 +91,7 @@ public class ExtendedEventDto {
   private Long recordingLastHeard;
 
   /** presenters */
+  @Lob
   @Column(name = "presenters")
   private String presenters;
 
@@ -96,10 +101,12 @@ public class ExtendedEventDto {
   private Date lastModifiedDate;
 
   /** capture agent properties */
+  @Lob
   @Column(name = "capture_agent_properties")
   private String captureAgentProperties;
 
   /** workflow properties */
+  @Lob
   @Column(name = "workflow_properties")
   private String workflowProperties;
 
