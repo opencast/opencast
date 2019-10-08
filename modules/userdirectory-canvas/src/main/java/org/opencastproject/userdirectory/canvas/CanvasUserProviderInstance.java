@@ -2,20 +2,21 @@
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
- * <p>
- * <p>
+ *
+ *
  * The Apereo Foundation licenses this file to you under the Educational
  * Community License, Version 2.0 (the "License"); you may not use this file
  * except in compliance with the License. You may obtain a copy of the License
  * at:
- * <p>
- * http://opensource.org/licenses/ecl2.txt
- * <p>
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
+ *
  */
 
 package org.opencastproject.userdirectory.canvas;
@@ -85,7 +86,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
   private static final String PROVIDER_NAME = "canvas";
 
   private static final String OC_USERAGENT = "Opencast";
-  
+
   private static final Pattern NEXT_LINK_PATTERN = Pattern.compile("(?:.*)<(.+)>; rel=\"next\"");
 
   /** The logger */
@@ -161,9 +162,9 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
     this.userNameProperty = userNameProperty;
     this.instructorRoles = instructorRoles;
 
-    logger.info("Creating new CanvasUserProviderInstance(pid={}, url={}, courseIdentifierProperty={}, " +
-            "coursePattern={}, userPattern={}, userNameProperty={}, instructorRoles=[{}], cacheSize={}, " +
-            "cacheExpiration={})",
+    logger.info("Creating new CanvasUserProviderInstance(pid={}, url={}, courseIdentifierProperty={}, "
+                    + "coursePattern={}, userPattern={}, userNameProperty={}, instructorRoles=[{}], cacheSize={}, "
+                    + "cacheExpiration={})",
         pid, canvasUrl, courseIdentifierProperty, coursePattern, userPattern, userNameProperty,
         String.join(", ", instructorRoles), cacheSize, cacheExpiration);
 
@@ -319,7 +320,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
 
       // JaxbUser(String userId, String password, String name, String email, String provider, boolean canLogin,
       // JaxbOrganization organization, Set<JaxbRole> roles)
-      User user = new JaxbUser(userId, null, displayName, email, PROVIDER_NAME, true, jaxbOrganization, roles);
+      User user = new JaxbUser(userId, null, displayName, email, PROVIDER_NAME, jaxbOrganization, roles);
 
       cache.put(userId, user);
       logger.debug("Returning user {}", userId);
@@ -620,13 +621,6 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
   // RoleProvider methods
 
   @Override
-  public Iterator<Role> getRoles() {
-
-    // We won't ever enumerate all Canvas courses, so return an empty list here
-    return Collections.emptyIterator();
-  }
-
-  @Override
   public List<Role> getRolesForUser(String userId) {
     logger.debug("getRolesForUser({})", userId);
     List<Role> roles = new LinkedList<>();
@@ -702,8 +696,8 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
       roles.add(new JaxbRole(query, jaxbOrganization, "Canvas Course Role", Role.Type.EXTERNAL));
     } else {
       // Course ID - return both roles
-      roles.add(new JaxbRole(canvasCourse + "_" + LTI_INSTRUCTOR_ROLE, jaxbOrganization, "Canvas Course Instructor " +
-          "Role", Role.Type.EXTERNAL));
+      roles.add(new JaxbRole(canvasCourse + "_" + LTI_INSTRUCTOR_ROLE, jaxbOrganization, "Canvas Course Instructor "
+              + "Role", Role.Type.EXTERNAL));
       roles.add(new JaxbRole(canvasCourse + "_" + LTI_LEARNER_ROLE, jaxbOrganization, "Canvas Course Learner Role",
           Role.Type.EXTERNAL));
     }
