@@ -199,7 +199,7 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
    */
   private boolean executeRequest(HttpUriRequest request, int maxAttempts, int timeout, int sleepTime) {
 
-    logger.debug(format("Executing notification request on target %s, %d attemps left", request.getURI(), maxAttempts));
+    logger.debug("Executing notification request on target {}, {} attempts left", request.getURI(), maxAttempts);
 
     RequestConfig config = RequestConfig.custom()
             .setConnectTimeout(timeout)
@@ -220,11 +220,11 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
 
     Integer statusCode = response.getStatusLine().getStatusCode();
     if (statusCode == SC_OK || statusCode == SC_NO_CONTENT || statusCode == SC_ACCEPTED) {
-      logger.debug(format("Request successfully executed on target %s, status code: %d", request.getURI(), statusCode));
+      logger.debug("Request successfully executed on target {}, status code: {}", request.getURI(), statusCode);
       return true;
     } else if (maxAttempts > 1) {
-      logger.debug(format("Request failed on target %s, status code: %d, will retry in %d seconds", request.getURI(),
-              statusCode, sleepTime / 1000));
+      logger.debug("Request failed on target {}, status code: {}, will retry in {} seconds", request.getURI(),
+              statusCode, sleepTime / 1000);
       try {
         Thread.sleep(sleepTime);
         return executeRequest(request, --maxAttempts, timeout, sleepTime * SLEEP_SCALE_FACTOR);

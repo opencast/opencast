@@ -20,7 +20,6 @@
  */
 package org.opencastproject.oaipmh.server;
 
-import static java.lang.String.format;
 import static org.opencastproject.oaipmh.util.OsgiUtil.checkDictionary;
 import static org.opencastproject.oaipmh.util.OsgiUtil.getCfg;
 import static org.opencastproject.oaipmh.util.OsgiUtil.getContextProperty;
@@ -84,7 +83,7 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
     synchronized (repositories) {
       final String rId = r.getRepositoryId();
       if (repositories.containsKey(rId)) {
-        logger.error(format("A repository with id %s has already been registered", rId));
+        logger.error("A repository with id {} has already been registered", rId);
       } else {
         // lazy creation since 'baseUrl' is not available at this time
         repositories.put(rId, r);
@@ -140,8 +139,8 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
       logger.error("Error registering OAI-PMH servlet", e);
       throw new RuntimeException("Error registering OAI-PMH servlet", e);
     }
-    logger.info(format("There are %d repositories registered yet. Watch out for later registration messages.",
-            repositories.values().size()));
+    logger.info("There are {} repositories registered yet. Watch out for later registration messages.",
+            repositories.values().size());
   }
 
   @Override

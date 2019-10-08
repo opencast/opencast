@@ -782,7 +782,7 @@ public class ToolsEndpoint implements ManagedService {
     //get the first smil/cutting  catalog-ID to overwrite it with new smil info
     for (Catalog p: catalogs) {
        if (p.getFlavor().matches(mediaPackageElementFlavor)) {
-         logger.debug("Set Idendifier for Smil-Catalog to: " + p.getIdentifier());
+         logger.debug("Set Identifier for Smil-Catalog to: {}", p.getIdentifier());
          catalogId = p.getIdentifier();
        break;
        }
