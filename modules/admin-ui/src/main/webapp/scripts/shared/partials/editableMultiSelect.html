@@ -1,9 +1,9 @@
 <div ng-click="enterEditMode()" ng-form="innerForm">
   &nbsp;<ul ng-show="!editMode">
-  <li ng-repeat="value in params.value track by $index">
-    <span ng-if="value">{{ getText(value).value | translate }}</span>
-  </li>
-</ul>
+    <li ng-repeat="value in params.value track by $index">
+      <span ng-if="value">{{ getText(value).value | translate }}</span>
+    </li>
+  </ul>
 
   <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
   <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
@@ -15,12 +15,12 @@
     <datalist id="{{ data.list.id }}-data-list">
       <option ng-repeat="(item, label) in ::collection track by $index"
               value="{{ item }}">
-        {{ label | translate | limitTo : 70 }}
+      {{ label | translate | limitTo : 70 }}
       </option>
     </datalist>
   </div>
   <span ng-show="editMode" class="ng-multi-value"
-        ng-repeat="value in params.value track by $index">
+                           ng-repeat="value in params.value track by $index">
     {{ getText(value).value | translate | limitTo : 70 }}
     <a ng-mousedown="removeValue($index)">
       <i class="fa fa-times"></i>
