@@ -57,17 +57,17 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   private static final Logger logger = LoggerFactory.getLogger(ComposeWorkflowOperationHandler.class);
   private static final String QUESTION_MARK = "?";
 
-  /** Name of the 'encode to a/v work copy' encoding profile */
-  public static final String PREPARE_AV_PROFILE = "av.work";
+  /** Name of the 'encode to a/v prepared copy' encoding profile */
+  public static final String PREPARE_AV_PROFILE = "av.prepared";
 
   /** Name of the muxing encoding profile */
-  public static final String MUX_AV_PROFILE = "mux-av.work";
+  public static final String MUX_AV_PROFILE = "mux-av.prepared";
 
-  /** Name of the 'encode to audio only work copy' encoding profile */
-  public static final String PREPARE_AONLY_PROFILE = "audio-only.work";
+  /** Name of the 'encode to audio only prepared copy' encoding profile */
+  public static final String PREPARE_AONLY_PROFILE = "audio-only.prepared";
 
-  /** Name of the 'encode to video only work copy' encoding profile */
-  public static final String PREPARE_VONLY_PROFILE = "video-only.work";
+  /** Name of the 'encode to video only prepared copy' encoding profile */
+  public static final String PREPARE_VONLY_PROFILE = "video-only.prepared";
 
   /** Name of the 'rewrite' configuration key */
   public static final String OPT_REWRITE = "rewrite";
@@ -208,7 +208,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     // Make sure we have a matching combination
     if (audioTrack == null && videoTrack != null) {
       if (rewrite) {
-        logger.info("Encoding video only track {} to work version", videoTrack);
+        logger.info("Encoding video only track {} to prepared version", videoTrack);
         if (videoOnlyEncodingProfileName == null)
           videoOnlyEncodingProfileName = PREPARE_VONLY_PROFILE;
         // Find the encoding profile to make sure the given profile exists
@@ -223,7 +223,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
       }
     } else if (videoTrack == null && audioTrack != null) {
       if (rewrite) {
-        logger.info("Encoding audio only track {} to work version", audioTrack);
+        logger.info("Encoding audio only track {} to prepared version", audioTrack);
         if (audioOnlyEncodingProfileName == null)
           audioOnlyEncodingProfileName = PREPARE_AONLY_PROFILE;
         // Find the encoding profile to make sure the given profile exists
@@ -238,7 +238,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
       }
     } else if (audioTrack == videoTrack) {
       if (rewrite) {
-        logger.info("Encoding audiovisual track {} to work version", videoTrack);
+        logger.info("Encoding audiovisual track {} to prepared version", videoTrack);
         if (audioVideoEncodingProfileName == null)
           audioVideoEncodingProfileName = PREPARE_AV_PROFILE;
         // Find the encoding profile to make sure the given profile exists
@@ -252,7 +252,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
         mediaPackage.add(composedTrack);
       }
     } else {
-      logger.info("Muxing audio and video only track {} to work version", videoTrack);
+      logger.info("Muxing audio and video only track {} to prepared version", videoTrack);
 
       if (audioTrack.hasVideo()) {
         logger.info("Stripping video from track {}", audioTrack);
@@ -310,7 +310,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   private Track prepare(Track videoTrack, MediaPackage mediaPackage, String encodingProfile)
           throws WorkflowOperationException, NotFoundException, IOException, EncoderException, MediaPackageException {
     Track composedTrack = null;
-    logger.info("Encoding video only track {} to work version", videoTrack);
+    logger.info("Encoding video only track {} to prepared version", videoTrack);
     Job job = composerService.encode(videoTrack, encodingProfile);
     if (!waitForStatus(job).isSuccess()) {
       throw new WorkflowOperationException("Rewriting container for video track " + videoTrack + " failed");

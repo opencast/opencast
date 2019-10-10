@@ -500,7 +500,7 @@ public final class WorkspaceImpl implements Workspace {
       }
       // left: an exception occurred
       for (Exception e : result.left()) {
-        logger.warn(format("Could not copy %s to %s: %s", src.toString(), dst.getAbsolutePath(), e.getMessage()));
+        logger.warn("Could not copy {} to {}: {}", src.toString(), dst.getAbsolutePath(), e.getMessage());
         FileUtils.deleteQuietly(dst);
         throw new NotFoundException(e);
       }

@@ -275,12 +275,17 @@ public class JobTest {
     // create a receipt on each service instance
     serviceRegistry.createJob(regType1Localhost.getHost(), regType1Localhost.getServiceType(), OPERATION_NAME, null,
             null, false, null);
+    serviceRegistry.createJob(regType2Localhost.getHost(), regType2Localhost.getServiceType(), OPERATION_NAME, null,
+            null, false, null);
     serviceRegistry.createJob(regType1Remotehost.getHost(), regType1Remotehost.getServiceType(), OPERATION_NAME, null,
             null, false, null);
 
     // Since these jobs have not been dispatched to a host, there shouldn't be any jobs on those hosts
     assertEquals(1, serviceRegistry.countByHost(JOB_TYPE_1, LOCALHOST, Status.INSTANTIATED));
     assertEquals(1, serviceRegistry.countByHost(JOB_TYPE_1, REMOTEHOST, Status.INSTANTIATED));
+
+    // Count any job type on a host
+    assertEquals(2, serviceRegistry.countByHost(null, LOCALHOST, Status.INSTANTIATED));
 
     // Counting any job without regard to host should return both jobs
     assertEquals(2, serviceRegistry.count(JOB_TYPE_1, Status.INSTANTIATED));

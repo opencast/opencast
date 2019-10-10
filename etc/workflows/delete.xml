@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>delete</id>
+  <title>Delete</title>
+  <tags>
+    <tag>delete</tag>
+  </tags>
+  <description>This workflow is used by the Admin UI to retract all publications of an event upon deletion</description>
+  <operations>
+
+    <!-- Make sure the workflow contains at least a default configuration -->
+
+    <operation
+      id="defaults"
+      description="Applying default configuration values">
+      <configurations>
+        <configuration key="retractFromEngage">true</configuration>
+        <configuration key="retractFromAws">true</configuration>
+        <configuration key="retractFromApi">true</configuration>
+        <configuration key="retractPreview">true</configuration>
+        <configuration key="retractFromOaiPmh">true</configuration>
+        <configuration key="retractFromYouTube">false</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="include"
+      description="Retract the recording">
+      <configurations>
+        <configuration key="workflow-id">partial-retract</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+  <state-mappings>
+    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.DELETING</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.DELETING</state-mapping>
+  </state-mappings>
+
+</definition>

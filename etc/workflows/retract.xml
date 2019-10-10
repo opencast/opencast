@@ -5,7 +5,6 @@
   <title>Retract</title>
   <tags>
     <tag>archive</tag>
-    <tag>delete</tag>
   </tags>
   <description>Retract a recording</description>
   <displayOrder>100</displayOrder>
@@ -61,91 +60,11 @@
       </configurations>
     </operation>
 
-    <!-- Retract from engage player -->
-
     <operation
-      id="retract-engage"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      if="${retractFromEngage}"
-      description="Retract recording from Engage">
-    </operation>
-
-    <!-- Retract from AWS -->
-
-    <operation
-      id="retract-aws"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      if="${retractFromAws}"
-      description="Retract recording from AWS">
-    </operation>
-
-    <!-- Retract from external applications -->
-
-    <operation
-      id="retract-configure"
-      if="${retractFromApi}"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Retract recording from external application">
+      id="include"
+      description="Retract the recording">
       <configurations>
-        <configuration key="channel-id">api</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Remove the internal publication if the mediapackage is being deleted. -->
-    <operation
-      id="retract-configure"
-      if="${retractPreview}"
-      exception-handler-workflow="partial-error"
-      description="Retract from internal publication channel">
-      <configurations>
-        <configuration key="channel-id">internal</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Remove from default OAI-PMH repository -->
-
-    <operation
-      id="retract-oaipmh"
-      if="${retractFromOaiPmh}"
-      exception-handler-workflow="partial-error"
-      description="Retract recording from the default OAI-PMH repository">
-      <configurations>
-        <configuration key="repository">default</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Retract from YouTube -->
-
-    <operation
-      id="retract-youtube"
-      if="${retractFromYouTube}"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Retract recording from YouTube">
-    </operation>
-
-    <!-- Archive the current state of the mediapackage -->
-
-    <operation
-      id="snapshot"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Archiving state of retracted recording">
-    </operation>
-
-    <!-- Clean up artifacts -->
-
-    <operation
-        id="cleanup"
-        fail-on-error="false"
-        description="Remove temporary processing artifacts">
-      <configurations>
-        <configuration key="delete-external">true</configuration>
-        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
-        <configuration key="preserve-flavors">security/*</configuration>
+        <configuration key="workflow-id">partial-retract</configuration>
       </configurations>
     </operation>
 

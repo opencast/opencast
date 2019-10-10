@@ -1366,6 +1366,22 @@ themes
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 
+transcription-service-google-speech-impl
+  GroupId                                ArtifactId                                       License
+  com.googlecode.json-simple             json-simple                                      Apache License, Version 2.0
+  com.mchange                            c3p0                                             GNU LESSER GENERAL PUBLIC LICENSE
+  com.h2database                         h2                                               The H2 License, Version 1.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.jpa                      Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.asm                      Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.antlr                    Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.osgi                               org.osgi.compendium                              -
+  org.osgi                               org.osgi.core                                    -
+  org.slf4j                              slf4j-log4j12                                    MIT License
+
 
 transcription-service-ibm-watson-impl
   GroupId                                ArtifactId                                       License

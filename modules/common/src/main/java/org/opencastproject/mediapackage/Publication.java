@@ -49,6 +49,11 @@ public interface Publication extends MediaPackageElement {
   void addTrack(Track track);
 
   /**
+   * Removes all tracks from this publication.
+   */
+  void clearTracks();
+
+  /**
    * Returns the attachments that are part of this publication.
    *
    * @return the attachments

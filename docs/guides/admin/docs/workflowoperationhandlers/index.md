@@ -38,6 +38,7 @@ The following table contains the workflow operations that are available in an ou
 |configure-by-dcterm |Set workflow parameter if dublincore term matches value        |[Documentation](configure-by-dcterm-woh.md)|
 |copy                |Copy media package elements to target directory                |[Documentation](copy-woh.md)|
 |cover-image         |Generate a cover-image containing metadata                     |[Documentation](coverimage-woh.md)|
+|crop-video          |Checks for black bars on the sides of the video                |[Documentation](cropvideo-woh.md)|
 |defaults            |Applies default workflow configuration values                  |[Documentation](defaults-woh.md)|
 |demux               |Demuxes streams to multiple output files                       |[Documentation](demux-woh.md)|
 |duplicate-event     |Create an event by cloning an existing one                     |[Documentation](duplicate-event-woh.md)|
@@ -49,6 +50,8 @@ The following table contains the workflow operations that are available in an ou
 |export-wf-properties|Export workflow properties                                     |[Documentation](export-wf-properties-woh.md)|
 |extract-text        |Extracting text from presentation segments                     |[Documentation](extracttext-woh.md)|
 |failing             |Operations that always fails                                   |[Documentation](failing-woh.md)|
+|google-speech-attach-transcription|Attaches automated transcripts to mediapackage   |[Documentation](google-speech-attach-transcription-woh.md)|
+|google-speech-start-transcription|Starts automated transcription provided by Google Speech|[Documentation](google-speech-start-transcription-woh.md)|
 |http-notify         |Notifies an HTTP endpoint about the process of the workflow    |[Documentation](httpnotify-woh.md)|
 |image               |Extract images from a video using FFmpeg                       |[Documentation](image-woh.md)|
 |image-convert       |Convert images using FFmpeg                                    |[Documentation](image-convert-woh.md)|

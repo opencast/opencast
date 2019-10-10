@@ -65,7 +65,8 @@
          "CONFIRMATION": "אישור"
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "סדרה זו מכילה אירועים. מחיקת הסדרה לא תמחק אירועים אלו."
+         "SERIES_HAS_EVENTS": "סדרה זו מכילה אירועים. מחיקת הסדרה לא תמחק אירועים אלו.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "לא ניתן למחוק סדרה זו מכיוון שהיא עדיין מכילה אירועים."
@@ -123,9 +124,11 @@
       "SERIES_NOT_UPDATED": "לא היתה אפשרות לשמור את הסידרה",
       "SERIES_NOT_UPDATED_ID": "לא היתה אפשרות לשמור את הסידרה {{ id }}",
       "SERIES_NOT_UPDATED_ALL": "לא ניתן לשמור אף אחד מהסדרות",
-      "EVENTS_DELETED": "הארוע נמחק",
-      "EVENTS_NOT_DELETED": "לא ניתן למחוק את הארוע\\ים",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "האירוע לא ניתן למחיקה, מכיוון שאין לך את ההרשאות לבצע פעולה זו.",
+      "EVENT_DELETED": "The event has been deleted.",
+      "EVENT_WILL_BE_DELETED": "The event is being deleted",
+      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "הסדרה נמחקה",
       "SERIES_NOT_DELETED": "לא ניתן היה למחוק את הסידרה",
       "LOCATION_DELETED": "המיקום נמחק",
@@ -171,7 +174,6 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "פעולות",
-      "WARNING": "אזהרה",
       "DELETE": {
          "SERIES": {
             "CAPTION": "מחק",
@@ -181,22 +183,7 @@
          "EVENTS": {
             "CAPTION": "מחק",
             "DELETE_EVENTS": "מחק אירועים",
-            "PUBLISHED": {
-               "NONE": "אף אחד מהאירועים שנבחרו צריכים להמשך בחזרה לפני שהם יכולים להימחק.",
-               "WARNING": "אין אפשרות למחוק את האירועים שלהלן כיוון שהם שכבר פורסמו, מחיקתם לא יאפשר למחוק את הקבצים שפורסמו. במקום בחר מהלך עבודה למטה למשוך חזרה משכי את האירועים קודם ולאחר מכן למחוק אותם."
-            },
-            "RETRACT_EVENTS": "לבטל אירועים",
-            "SELECT_RETRACT_TASK": "בחר משימות שבוטלו",
-            "SUMMARY": {
-               "EVENTS_DELETED": "אירועים יימחקו",
-               "EVENTS_RETRACTED": "אירועים ייתבטלו/יימחקו",
-               "RETRACT_WORKFLOW": "תהליך לביטול אירועים"
-            },
-            "UNAUTHORIZED": "אין לך הרשאה למחוק את האירועים המודגשים. בבקשה הסר את הסימון שלהם על מנת להמשיך.",
-            "UNPUBLISHED": {
-               "NONE": "אף אחד מהאירועים שנבחרו ניתן למחיקה מבלי להשאיר קבצים מיותמים."
-            },
-            "BUTTON": "מחק"
+            "UNAUTHORIZED": "אין לך הרשאה למחוק את האירועים המודגשים. בבקשה הסר את הסימון שלהם על מנת להמשיך."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "לאחר מחיקתו, כל המטא נתונים של האירוע, קובצי האודיו והווידאו יימחקו ויהיו בלתי ניתנים לשחזור.",
@@ -270,8 +257,6 @@
       "NEXT_STEP": "הבא",
       "BACK": "הקודם",
       "CREATE": "צור",
-      "RETRACT": "ביטול",
-      "RETRACT_DELETE": "חזרה/מחיקה",
       "DELETE": "מחק",
       "UPDATE": "עדכן",
       "DURATION": {
@@ -313,13 +298,6 @@
       }
    },
    "EVENTS": {
-      "RETRACT": {
-         "CAPTION": "ביטול אירוע",
-         "ID": "מזהה",
-         "SELECT_TASK": "משימת בחירה",
-         "SUMMARY": "סיכום",
-         "WARNING": "האירוע פורסם ללפחות ערוץ ציבורי אחד ולכן יש צורך למשוך אותו לפני שהיה ניתן למחוק אותו. בחר מהמשימות למטה כל מנת למשוך פרסומים."
-      },
       "LICENSE": {
          "ALLRIGHTS": "כל הזכויות שמורות",
          "CCBY": "עותק על-ידי",
@@ -482,6 +460,7 @@
             "PUBLISHED": "פורסם",
             "WEEKDAY": "יום חול",
             "TOOLTIP": {
+               "ASSETS": "Open asset details",
                "START": "מסנן עבור תאריך ההתחלה הזה",
                "SERIES": "מסנן עבור סדרה זו",
                "STATUS": "מסנן עבור מצב אירוע",
@@ -510,6 +489,7 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retracting",
+            "DELETING": "Deleting",
             "DUPLICATING": "Duplicating",
             "PUBLISHING": "Publishing",
             "IMPORTING": "Importing",
@@ -2004,7 +1984,7 @@
          "RANDOM": "מוצג מידע אקראי לצורך הצגת יכולות. ניתן לבטל תצוגת תרשים זה על ידי מחיקת קובץ json המכיל המספק מידע סטטיסטי מתקיית etc/providers",
          "VIEWS_SUM": "This displays the total number of views per time unit.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the running total published hours of video"
+         "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
 }

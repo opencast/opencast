@@ -30,7 +30,7 @@ Filter Name    | Description
 `textFilter`   | Filters series where any part of the series' metadata fields match this value
 `title`        | By the title of the series
 `identifier`   | By the technical identifiers of the series. Can occur multiple times (version 1.1.0 and higher)
-`desription`   | By the description of the series (version 1.1.0 and higher)
+`description`  | By the description of the series (version 1.1.0 and higher)
 `creator`      | Series where the creator specified in the metadata field match (version 1.1.0 and higher)
 `publishers`   | Series where the publishers specified in the metadata field match. Can occur multiple times (version 1.1.0 and higher)
 `rightsholder` | By the rights holder of the series (version 1.1.0 and higher)

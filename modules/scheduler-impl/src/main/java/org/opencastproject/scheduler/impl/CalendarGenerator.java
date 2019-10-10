@@ -125,7 +125,7 @@ public class CalendarGenerator {
           Date lastModified, String captureAgentMetadata) {
     String eventId = mp.getIdentifier().compact();
 
-    logger.debug("Creating iCaleandar VEvent from scheduled event '{}'", eventId);
+    logger.debug("Creating iCalendar VEvent from scheduled event '{}'", eventId);
 
     DateTime startDate = new DateTime(start);
     DateTime endDate = new DateTime(end);

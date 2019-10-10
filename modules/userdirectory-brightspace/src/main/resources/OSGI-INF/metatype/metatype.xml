@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
+
+    <OCD description="BrightspaceUserProvider" name="org.opencastproject.userdirectory.brightspace"
+         id="org.opencastproject.userdirectory.brightspace">
+
+        <AD name="Organization ID" id="org.opencastproject.userdirectory.brightspace.org" required="true" type="String"
+            default="mh_default_org"/>
+        <AD name="Brightspace REST webservice URL" id="org.opencastproject.userdirectory.brightspace.url" required="true"
+            type="String" default=""/>
+        <AD name="Brightspace Application id" id="org.opencastproject.userdirectory.brightspace.application.id" required="true" type="String"
+            default=""/>
+        <AD name="Brightspace Application key" id="org.opencastproject.userdirectory.brightspace.application.key" required="true" type="String"
+            default=""/>
+        <AD name="Brightspace system user id" id="org.opencastproject.userdirectory.brightspace.systemuser.id" required="true" type="String"
+            default=""/>
+        <AD name="Brightspace system user key" id="org.opencastproject.userdirectory.brightspace.systemuser.key" required="true" type="String"
+            default=""/>
+        <AD name="Cache size" id="org.opencastproject.userdirectory.brightspace.cache.size" required="false" type="Integer"
+            default="1000"/>
+        <AD name="Cache expiration (minutes)" id="org.opencastproject.userdirectory.brightspace.cache.expiration"
+            required="false" type="Integer" default="60"/>
+    </OCD>
+
+    <Designate pid="org.opencastproject.userdirectory.brightspace">
+        <Object ocdref="org.opencastproject.userdirectory.brightspace"/>
+    </Designate>
+
+</metatype:MetaData>

@@ -65,7 +65,9 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   private Boolean signWithClientIP = UrlSigningServiceOsgiUtil.DEFAULT_SIGN_WITH_CLIENT_IP;
 
   public static final String EVENTMODAL_ONLYSERIESWITHWRITEACCESS_KEY = "eventModal.onlySeriesWithWriteAccess";
+  public static final String EVENTSTAB_ONLYEVENTSWITHWRITEACCESS_KEY = "eventsTab.onlyEventsWithWriteAccess";
   private Boolean onlySeriesWithWriteAccessEventModal = false;
+  private Boolean onlyEventsWithWriteAccessEventsTab = false;
 
   @Override
   public AdminUIConfiguration getAdminUIConfiguration() {
@@ -212,6 +214,11 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
     if (dictionaryValue != null) {
       onlySeriesWithWriteAccessEventModal = BooleanUtils.toBoolean(dictionaryValue.toString());
     }
+
+    dictionaryValue = properties.get(EVENTSTAB_ONLYEVENTSWITHWRITEACCESS_KEY);
+    if (dictionaryValue != null) {
+      onlyEventsWithWriteAccessEventsTab = BooleanUtils.toBoolean(dictionaryValue.toString());
+    }
   }
 
   @Override
@@ -227,6 +234,11 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   @Override
   public Boolean getOnlySeriesWithWriteAccessEventModal() {
     return onlySeriesWithWriteAccessEventModal;
+  }
+
+  @Override
+  public Boolean getOnlyEventsWithWriteAccessEventsTab() {
+    return onlyEventsWithWriteAccessEventsTab;
   }
 
 }

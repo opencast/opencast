@@ -216,22 +216,6 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.security.api.RoleDirectoryService#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    return getRolesAsList().iterator();
-  }
-
-  public List<Role> getRolesAsList() {
-    String orgId = securityService.getOrganization().getId();
-    List<JpaRole> rolesIterator = UserDirectoryPersistenceUtil.findRoles(orgId, 0, 0, emf);
-    return new ArrayList<Role>(rolesIterator);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.security.api.UserProvider#getOrganization()
    */
   @Override

@@ -28,8 +28,6 @@ angular.module('adminNg.controllers')
     var thumbnailErrorMessageId = null;
     var trackErrorMessageId = null;
 
-    var LOCAL_CONTEXT = 'video-tools';
-
     $scope.navigateTo = function (path) {
       $location.path(path).replace();
     };
@@ -79,12 +77,12 @@ angular.module('adminNg.controllers')
             $scope.$root.originalDefaultThumbnailPosition = response.thumbnail.position;
           }
           if (thumbnailErrorMessageId !== null) {
-            Notifications.remove(thumbnailErrorMessageId, LOCAL_CONTEXT);
+            Notifications.remove(thumbnailErrorMessageId);
             thumbnailErrorMessageId = null;
           }
           $scope.video.thumbnail.loading = false;
         }, function() {
-          thumbnailErrorMessageId = Notifications.add('error', 'THUMBNAIL_CHANGE_FAILED', LOCAL_CONTEXT);
+          thumbnailErrorMessageId = Notifications.add('error', 'THUMBNAIL_CHANGE_FAILED');
           $scope.video.thumbnail.loading = false;
         });
     };
@@ -202,7 +200,7 @@ angular.module('adminNg.controllers')
       }, function () {
         $scope.activeSubmission = false;
         $scope.video.thumbnail.loading = false;
-        trackErrorMessageId = Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', LOCAL_CONTEXT);
+        trackErrorMessageId = Notifications.add('error', 'VIDEO_CUT_NOT_SAVED');
       });
     };
 
@@ -210,9 +208,5 @@ angular.module('adminNg.controllers')
       Storage.put('pagination', $scope.resource, 'resume', true);
       $location.url('/events/' + $scope.resource);
     };
-
-    $scope.$on('$destroy', function () {
-      Notifications.removeAll(LOCAL_CONTEXT);
-    });
   }
 ]);

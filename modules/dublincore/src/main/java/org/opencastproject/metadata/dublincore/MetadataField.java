@@ -34,6 +34,7 @@ import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
+import com.google.common.collect.Iterables;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -289,10 +290,17 @@ public class MetadataField<A> {
   }
 
   public void setValue(A value) {
-    if (value == null)
+    setValue(value, true);
+  }
+
+  public void setValue(A value, boolean setUpdated) {
+    if (value == null) {
       this.value = Opt.none();
-    else {
+    } else {
       this.value = Opt.some(value);
+    }
+
+    if (setUpdated) {
       this.updated = true;
     }
   }
@@ -985,6 +993,65 @@ public class MetadataField<A> {
     }
   }
 
+  /**
+   * Set value to a metadata field of unknown type
+   *
+   * @param filteredValues
+   * @param metadataField
+   */
+  public static MetadataField setValueFromDCCatalog(List<String> filteredValues, MetadataField metadataField) {
+
+    if (filteredValues.isEmpty()) {
+      throw new IllegalArgumentException("Values cannot be empty");
+    }
+
+    if (filteredValues.size() > 1
+            && metadataField.getType() != MetadataField.Type.MIXED_TEXT
+            && metadataField.getType() != MetadataField.Type.ITERABLE_TEXT) {
+      logger.warn("Cannot put multiple values into a single-value field, only the last value is used. {}",
+              Arrays.toString(filteredValues.toArray()));
+    }
+
+    switch (metadataField.type) {
+      case BOOLEAN:
+        ((MetadataField<Boolean>)metadataField).setValue(Boolean.parseBoolean(Iterables.getLast(filteredValues)), false);
+        break;
+      case DATE:
+        if (metadataField.getPattern().isNone()) {
+          metadataField.setPattern(Opt.some("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+        }
+        ((MetadataField<Date>)metadataField).setValue(EncodingSchemeUtils.decodeDate(Iterables.getLast(filteredValues)), false);
+        break;
+      case DURATION:
+        String value = Iterables.getLast(filteredValues);
+        DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value);
+        Long longValue = period.getEnd().getTime() - period.getStart().getTime();
+        ((MetadataField<String>)metadataField).setValue(longValue.toString(), false);
+        break;
+      case ITERABLE_TEXT:
+      case MIXED_TEXT:
+        ((MetadataField<Iterable<String>>)metadataField).setValue(filteredValues, false);
+        break;
+      case LONG:
+        ((MetadataField<Long>)metadataField).setValue(Long.parseLong(Iterables.getLast(filteredValues)), false);
+        break;
+      case START_DATE:
+        if (metadataField.getPattern().isNone()) {
+          metadataField.setPattern(Opt.some("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+        }
+        ((MetadataField<String>)metadataField).setValue(Iterables.getLast(filteredValues), false);
+        break;
+      case TEXT:
+      case ORDERED_TEXT:
+      case TEXT_LONG:
+        ((MetadataField<String>)metadataField).setValue(Iterables.getLast(filteredValues), false);
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown metadata type! " + metadataField.getType());
+    }
+    return metadataField;
+  }
+
   public Opt<String> getCollectionID() {
     return collectionID;
   }
@@ -1078,6 +1145,10 @@ public class MetadataField<A> {
 
   public void setRequired(boolean required) {
     this.required = required;
+  }
+
+  public void setUpdated(boolean updated) {
+    this.updated = updated;
   }
 
   public Type getType() {

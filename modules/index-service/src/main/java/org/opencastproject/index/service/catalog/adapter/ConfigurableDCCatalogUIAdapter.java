@@ -25,6 +25,7 @@ import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapter
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_TITLE_KEY;
 import static org.opencastproject.util.OsgiUtil.getCfg;
 
+import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -36,6 +37,7 @@ import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;
@@ -86,12 +88,39 @@ public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter
     dublinCoreProperties = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
   }
 
+  /**
+   * Get default value for collection from list providers service
+   * @param metadataField
+   * @param listProvidersService
+   * @return default value
+   */
+  private String getCollectionDefault(MetadataField<?> metadataField,
+          ListProvidersService listProvidersService) {
+    if (listProvidersService != null && metadataField.getListprovider().isSome()) {
+      try {
+        return listProvidersService.getDefault(metadataField.getListprovider().get());
+
+      } catch (ListProviderException ex) {
+        // failed to get default property on list-provider-service
+        // as this field is optional, it is fine to pass here
+      }
+    }
+    return null;
+  }
+
   @Override
   public DublinCoreMetadataCollection getRawFields() {
+
     DublinCoreMetadataCollection rawFields = new DublinCoreMetadataCollection();
     for (MetadataField metadataField : dublinCoreProperties.values()) {
       try {
-        rawFields.addField(metadataField, listProvidersService);
+        String defaultKey = getCollectionDefault(metadataField, listProvidersService); // check for default
+
+        if (StringUtils.isNotBlank(defaultKey)) {
+          rawFields.addField(new MetadataField(metadataField), defaultKey, listProvidersService);
+        } else {
+          rawFields.addEmptyField(new MetadataField(metadataField), listProvidersService);
+        }
       } catch (IllegalArgumentException e) {
         logger.error("Skipping metadata field '{}' because of error", metadataField, e);
       }
@@ -132,7 +161,8 @@ public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter
             List<DublinCoreValue> values = dc.get(propertyKey);
             if (!values.isEmpty()) {
               try {
-                dublinCoreMetadata.addField(metadataField, values.stream().map(DublinCoreValue::getValue).collect(Collectors.toList()),
+                dublinCoreMetadata.addField(new MetadataField(metadataField),
+                        values.stream().map(DublinCoreValue::getValue).collect(Collectors.toList()),
                         getListProvidersService());
                 emptyFields.remove(metadataField);
               } catch (IllegalArgumentException e) {
@@ -148,7 +178,7 @@ public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter
     // Add all of the rest of the fields that didn't have values as empty.
     for (MetadataField metadataField: emptyFields) {
       try {
-        dublinCoreMetadata.addField(metadataField, getListProvidersService());
+        dublinCoreMetadata.addEmptyField(new MetadataField(metadataField), getListProvidersService());
       } catch (IllegalArgumentException e) {
         logger.error("Skipping metadata field '{}' because of error", metadataField, e);
       }

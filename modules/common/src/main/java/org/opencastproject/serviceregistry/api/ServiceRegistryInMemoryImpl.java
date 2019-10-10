@@ -142,7 +142,17 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * This method shuts down the service registry.
    */
   public void dispose() {
-    dispatcher.shutdownNow();
+    if (dispatcher != null) {
+      try {
+        dispatcher.shutdownNow();
+        if (!dispatcher.isShutdown()) {
+          logger.info("Waiting for Dispatcher to terminate");
+          dispatcher.awaitTermination(10, TimeUnit.SECONDS);
+        }
+      } catch (InterruptedException e) {
+        logger.error("Error shutting down the Dispatcher", e);
+      }
+    }
   }
 
   /**
@@ -723,6 +733,16 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
       }
     }
     return result;
+  }
+
+  @Override
+  public List<String> getJobPayloads(String operation, int limit, int offset) throws ServiceRegistryException {
+    return null;
+  }
+
+  @Override
+  public int getJobCount(String operation) throws ServiceRegistryException {
+    return 0;
   }
 
   /**

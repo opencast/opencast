@@ -65,7 +65,8 @@
          "CONFIRMATION": "Onaylama"
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Bu seri etkinlikler içeriyor. Serinin silinmesi, etkinlikleri silmez."
+         "SERIES_HAS_EVENTS": "Bu seri etkinlikler içeriyor. Serinin silinmesi, etkinlikleri silmez.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Bu seri, hala etkinlik içerdiğinden silinemez."
@@ -123,9 +124,11 @@
       "SERIES_NOT_UPDATED": "Seriler kaydedilemedi",
       "SERIES_NOT_UPDATED_ID": "{{ id }} serileri kaydedilemedi",
       "SERIES_NOT_UPDATED_ALL": "Serilerin hiçbiri kaydedilemedi",
-      "EVENTS_DELETED": "Etkinlik silindi",
-      "EVENTS_NOT_DELETED": "Etkinlik(ler) silinemedi",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Etkinlik silinemedi çünkü bunu yapma izniniz yok.",
+      "EVENT_DELETED": "Etkinlik silindi.",
+      "EVENT_WILL_BE_DELETED": "Etkinlik siliniyor",
+      "EVENTS_DELETED": "Etkinlikler siliniyor.",
+      "EVENTS_NOT_DELETED": "Etkinlik(ler) silinemedi.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "Seriler silindi",
       "SERIES_NOT_DELETED": "Seriler silinemedi",
       "LOCATION_DELETED": "Konum silindi",
@@ -171,7 +174,6 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Hareketler",
-      "WARNING": "Uyarı",
       "DELETE": {
          "SERIES": {
             "CAPTION": "Sil",
@@ -181,22 +183,7 @@
          "EVENTS": {
             "CAPTION": "Sil",
             "DELETE_EVENTS": "Olayları Sil",
-            "PUBLISHED": {
-               "NONE": "Seçilen hiçbir etkinliğin silinmeden önce geri alınması gerekmemektedir.",
-               "WARNING": "Aşağıdaki etkinlikler yayınlanmış olduğundan dolayı silinemez ayrıca bunları silmek yayınlanmış dosyaları silmeye olanak sağlamaz. Bunun yerine aşağıdan bir iş akışı seçip etkinlikleri geri alıp sonra silebilirsiniz."
-            },
-            "RETRACT_EVENTS": "Etkinlikleri Geri al",
-            "SELECT_RETRACT_TASK": "Geri alma görevi seçiniz",
-            "SUMMARY": {
-               "EVENTS_DELETED": "Silinecek Etkinlikler",
-               "EVENTS_RETRACTED": "Geri alınacak Etkinlikler",
-               "RETRACT_WORKFLOW": "Etkinliklerin geri alınacaği iş akışı"
-            },
-            "UNAUTHORIZED": "Vurgulanan etkinlikleri silme yetkiniz yok. Lütfen devam etmek için bu seçimleri kaldırın.",
-            "UNPUBLISHED": {
-               "NONE": "Seçilen etkinliklerin hiçbiri atık dosyalar bırakmadan silinmez."
-            },
-            "BUTTON": "Sil"
+            "UNAUTHORIZED": "Vurgulanan etkinlikleri silme yetkiniz yok. Lütfen devam etmek için bu seçimleri kaldırın."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Silindikten sonra, tüm etkinlik metaverisi, ses ve video dosyaları silinecek ve kurarılamaz olacaklar.",
@@ -270,8 +257,6 @@
       "NEXT_STEP": "İleri",
       "BACK": "Önceki",
       "CREATE": "Oluştur",
-      "RETRACT": "Geri al",
-      "RETRACT_DELETE": "Geri Çek/Sil",
       "DELETE": "Sil",
       "UPDATE": "Güncelle",
       "DURATION": {
@@ -313,13 +298,6 @@
       }
    },
    "EVENTS": {
-      "RETRACT": {
-         "CAPTION": "Etkinliği geri al",
-         "ID": "Kimlik",
-         "SELECT_TASK": "Görev Seç",
-         "SUMMARY": "Özet",
-         "WARNING": "Bu etkinlik en az bir yayın kanalında yayınlandı ve silinmeden önce geri alınmalı. Aşağıdaki görevlerden seçerek yayını geri alın."
-      },
       "LICENSE": {
          "ALLRIGHTS": "Tüm Hakları Saklıdır",
          "CCBY": "CC Tarafından",
@@ -482,6 +460,7 @@
             "PUBLISHED": "Yayınlandı",
             "WEEKDAY": "Hafta içi günü",
             "TOOLTIP": {
+               "ASSETS": "Detayları görüntüle",
                "START": "Bu başlangıç tarihi için filtre",
                "SERIES": "Bu dizi için filtre",
                "STATUS": "Bu etkinlik durumu için filtre",
@@ -510,6 +489,7 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Geri çekilmekte",
+            "DELETING": "Siliniyor",
             "DUPLICATING": "Kopyalanıyor",
             "PUBLISHING": "Yayınlanıyor",
             "IMPORTING": "İçeri aktarılıyor",
@@ -2004,7 +1984,7 @@
          "RANDOM": "Bu rastgele veriler sadece deneme ve tanıtım amaçlıdır. Bu grafiğin istatistik sağlayıcısının json tanımını 'etc/providers' klasörün içinden silerek bu grafiği devre dışı bırakabilirsiniz.",
          "VIEWS_SUM": "This displays the total number of views per time unit.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the running total published hours of video"
+         "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
 }

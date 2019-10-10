@@ -1,24 +1,15 @@
-<section class="modal wizard active modal-open" ng-form="bulkDeleteForm" id="delete-events-status-modal" style="display: block;" ng-controller="BulkDeleteCtrl">
+<section class="modal active modal-open" ng-form="bulkDeleteForm" id="delete-events-status-modal" style="display: block;" ng-controller="BulkDeleteCtrl">
   <header>
     <a ng-click="close()" class="fa fa-times close-modal"></a>
     <h2 translate="BULK_ACTIONS.DELETE.EVENTS.CAPTION"><!-- Delete Events --></h2>
   </header>
 
-  <nav id="modal-nav" class="step-by-step">
-    <a ng-click="navigateTo('deleteForm', currentForm, [])" ng-class="{ active: currentForm === 'deleteForm'}">{{ 'BULK_ACTIONS.DELETE.EVENTS.DELETE_EVENTS' | translate }}</a>
-    <a ng-click="navigateTo('retractForm', currentForm, [])" ng-class="{ active: currentForm === 'retractForm', 'not-complete': !valid()}">{{ 'BULK_ACTIONS.DELETE.EVENTS.RETRACT_EVENTS' | translate }}</a>
-    <a ng-click="navigateTo('summaryForm', currentForm, [retractForm])" ng-class="{ active: currentForm === 'summaryForm'}">{{ 'EVENTS.RETRACT.SUMMARY' | translate }}</a>
-  </nav>
-
-  <nav id="breadcrumb"></nav>
-
-  <div class="modal-content" ng-class="{active: currentForm === 'deleteForm'}" ng-if="currentForm === 'deleteForm'">
-
+  <div class="modal-content active">
     <div class="modal-body">
 
       <div class="full-col">
         <div class="list-obj" ng-form="deleteForm">
-          <div class="modal-alert danger obj" ng-if="events.unpublished.has">
+          <div class="modal-alert danger obj" ng-if="valid()">
             <p translate="BULK_ACTIONS.DELETE_EVENTS_WARNING_LINE1">
             <!-- You have chosen to delete an event. Once deleted all metadata,
               audio and video will be deleted and can not be retrieved. -->
@@ -34,7 +25,7 @@
           </div>
 
 
-          <div class="full-col" ng-if="events.unpublished.has">
+          <div class="full-col">
             <div class="obj">
               <header translate="BULK_ACTIONS.DELETE.EVENTS.DELETE_EVENTS">
                 <!-- Delete Events -->
@@ -42,14 +33,14 @@
               <table class="main-tbl">
                 <thead>
                   <tr>
-                    <th class="small"><input type="checkbox" ng-model="unpublished.allSelected" ng-change="unpublished.allSelectedChanged()" class="select-all-cbox"/></th>
+                    <th class="small"><input type="checkbox" ng-model="table.allSelected" ng-change="table.allSelectedChanged()" class="select-all-cbox"/></th>
                     <th translate="EVENTS.EVENTS.TABLE.TITLE"><!-- Title --></th>
                     <th translate="EVENTS.EVENTS.TABLE.PRESENTERS"><!-- Presenter --></th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr ng-repeat="row in unpublished.rows" ng-form="rowsForm" ng-class="{error: rowsForm.selection.$error.schedulingAuthorized}">
-                    <td><input name="selection" type="checkbox" ng-model="row.selected" scheduling-authorized="{{row}}" ng-change="unpublished.rowSelectionChanged($index)" class="child-cbox"/></td>
+                  <tr ng-repeat="row in table.rows" ng-form="rowsForm" ng-class="{error: rowsForm.selection.$error.schedulingAuthorized}">
+                    <td><input name="selection" type="checkbox" ng-model="row.selected" scheduling-authorized="{{row}}" ng-change="table.rowSelectionChanged($index)" class="child-cbox"/></td>
                     <td>{{ row.title }}</td>
                     <td>
                       <span class="metadata-entry" ng-repeat="presenter in row.presenters">{{ presenter }}</span>
@@ -60,166 +51,18 @@
             </div> <!-- obj -->
           </div><!-- full-col -->
 
-          <div class="full-col obj" ng-if="!events.unpublished.has">
-            <p translate="BULK_ACTIONS.DELETE.EVENTS.UNPUBLISHED.NONE">
-            <!-- None of the selected events can be deleted without leaving orphan files. -->
-            </p>
-          </div>
-
         </div><!-- deleteForm-->
       </div><!-- full-col-->
 
     </div><!-- modal-body -->
 
   </div><!-- modal-content [deleteForm] -->
-  <footer ng-if="currentForm === 'deleteForm'">
-    <a ng-click="navigateTo('retractForm', currentForm, [])"
-       data-modal-tab="next" class="submit"
-                             ng-class="{active: bulkDeleteForm.deleteForm.$valid, disabled: bulkDeleteForm.deleteForm.$invalid}">
-      {{ 'WIZARD.NEXT_STEP' | translate }}
+  <footer>
+    <a ng-click="submit()" data-modal-tab="next" class="danger" ng-class="{active: valid(), inactive: !valid(), disabled: submitButton}">
+      {{ 'WIZARD.DELETE' | translate }}
     </a>
-    <a ng-click="navigateTo('deleteForm', currentForm, [])"
-       data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
-    </a>
-  </footer>
-
-  <div class="modal-content" ng-class="{active: currentForm === 'retractForm'}">
-
-    <div class="modal-body">
-      <div class="full-col">
-        <div class="list-obj" ng-form="retractForm">
-
-          <div class="modal-alert danger obj" ng-if="events.published.has">
-            <p translate="BULK_ACTIONS.DELETE.EVENTS.PUBLISHED.WARNING">
-            <!-- Some events can not be deleted as they have already been published and deleting
-              them would leave the published files with no way to delete them. Instead run a start
-              task to retract the events first and then delete them. -->
-            </p>
-          </div>
-
-          <div class="obj tbl-details" ng-if="events.published.has">
-            <header translate="BULK_ACTIONS.DELETE.EVENTS.RETRACT_EVENTS">
-              <!-- Retract Events -->
-            </header>
-            <table class="main-tbl">
-              <thead>
-                <tr>
-                  <th class="small"><input type="checkbox" ng-model="published.allSelected" ng-change="published.allSelectedChanged()" class="select-all-cbox"/></th>
-                  <th translate="EVENTS.EVENTS.TABLE.TITLE"><!-- Title --></th>
-                  <th translate="EVENTS.EVENTS.TABLE.PRESENTERS"><!-- Presenter --></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr ng-repeat="row in published.rows">
-                  <td><input type="checkbox" ng-model="row.selected" ng-change="published.rowSelectionChanged($index)" class="child-cbox"/></td>
-                  <td>{{ row.title }}</td>
-                  <td>
-                    <span class="metadata-entry" ng-repeat="presenter in row.presenters">{{ presenter }}</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="obj tbl-details" ng-if="events.published.has">
-            <header translate="BULK_ACTIONS.DELETE.EVENTS.SELECT_RETRACT_TASK">
-              <!-- Select a Retract Task -->
-            </header>
-            <div class="obj-container">
-              <select chosen
-                      pre-select-from="processing.workflows"
-                      data-width="'100%'"
-                      ng-change="processing.changeWorkflow()"
-                      not-empty-selection
-                      ng-model="processing.ud.workflow"
-                      ng-model-options="{ allowInvalid: true }"
-                      ng-options="w.title for w in processing.workflows"
-                      placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW' | translate }}'"
-                      no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW_EMPTY' | translate }}'"
-                      >
-                <option value=""></option>
-              </select>
-
-              <div id="new-event-workflow-configuration"
-                   class="checkbox-container"
-                   ng-click="processing.save()"
-                   ng-bind-html="processing.workflowConfiguration"
-                   class="obj-container">
-              </div>
-            </div>
-          </div>
-
-          <div class="full-col" ng-if="!events.published.has">
-            <div class="obj">
-              <p translate="BULK_ACTIONS.DELETE.EVENTS.PUBLISHED.NONE">
-              <!-- None of the selected events need to be retracted before they can be deleted. -->
-              </p>
-            </div>
-          </div>
-
-        </div> <!-- ng-form="retractForm" -->
-      </div> <!-- full-col -->
-    </div> <!-- modal-body -->
-  </div><!-- retractForm -->
-  <footer ng-if="currentForm === 'retractForm'">
-    <a ng-click="retractForm.$valid = valid(); navigateTo('summaryForm', currentForm, [retractForm])"
-       data-modal-tab="next" class="submit"
-                             ng-class="{active: valid(), inactive: !valid()}">
-      {{ 'WIZARD.NEXT_STEP' | translate }}
-    </a>
-    <a ng-click="navigateTo('deleteForm', currentForm, [])"
-       data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
-    </a>
-  </footer>
-
-
-  <div class="modal-content" ng-class="{active: currentForm === 'summaryForm'}">
-
-    <div class="modal-body">
-      <div class="full-col">
-        <div class="obj list-obj" ng-form="summaryForm">
-          <header translate="EVENTS.RETRACT.SUMMARY">Summary</header>
-          <div class="obj-container">
-            <ul>
-              <li>
-                <span translate="BULK_ACTIONS.DELETE.EVENTS.SUMMARY.EVENTS_DELETED">
-                  <!-- Events to be Deleted -->
-                </span>
-                <p ng-repeat="row in getUnpublishedEvents()">{{ row.title }}</p>
-              </li>
-              <li>
-                <span translate="BULK_ACTIONS.DELETE.EVENTS.SUMMARY.EVENTS_RETRACTED">
-                  <!-- Events to be Retracted -->
-                </span>
-                <p ng-repeat="row in getPublishedEvents()">{{ row.title }}</p>
-              </li>
-              <li>
-                <span translate="BULK_ACTIONS.DELETE.EVENTS.SUMMARY.RETRACT_WORKFLOW">
-                  <!-- Workflow to Retract Events -->
-                </span>
-                <p>{{processing.ud.workflow.id}}</p>
-              </li>
-              <li>
-                <span translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CONFIGURATION">
-                  <!-- Configuration -->
-                </span>
-                <p ng-repeat="(key, value) in processing.ud.workflow.selection.configuration">{{key}}: {{value}}</p>
-              </li>
-            </ul>
-          </div><!-- obj-container -->
-        </div>
-      </div>
-    </div>
-  </div><!-- modal-content [summary] -->
-  <footer ng-if="currentForm === 'summaryForm'">
-    <a ng-click="submit()"
-       data-modal-tab="next" ng-class="{active: bulkDeleteForm.summaryForm.$valid,
-         inactive: bulkDeleteForm.summaryForm.$invalid, disabled: submitButton, submit: !events.unpublished.has,
-         danger: events.unpublished.has}">
-      {{ (events.published.has ? (events.unpublished.has ? 'WIZARD.RETRACT_DELETE' : 'WIZARD.RETRACT') : 'WIZARD.DELETE') | translate }}
-    </a>
-    <a ng-click="navigateTo('retractForm', currentForm, [])"
-       data-modal-tab="previous" translate="WIZARD.BACK" class="cancel">
+    <a translate="CANCEL" ng-click="close()" class="cancel">
+      <!-- Cancel -->
     </a>
   </footer>
 

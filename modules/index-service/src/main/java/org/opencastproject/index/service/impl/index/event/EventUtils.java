@@ -33,26 +33,22 @@ import org.opencastproject.workflow.handler.distribution.InternalPublicationChan
 import com.entwinemedia.fn.Fn;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
 public final class EventUtils {
-  /** The logging facility */
-  static final Logger logger = LoggerFactory.getLogger(EventUtils.class);
 
-  public static final Map<String, String> PUBLICATION_CHANNELS = new HashMap<String, String>();
+  public static final Map<String, String> PUBLICATION_CHANNELS = new HashMap<>();
+  public static final String ENGAGE_LIVE_CHANNEL_ID  = "engage-live";
 
   static {
     PUBLICATION_CHANNELS.put(EngagePublicationChannel.CHANNEL_ID, "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE");
     PUBLICATION_CHANNELS.put("youtube", "EVENTS.EVENTS.DETAILS.PUBLICATIONS.YOUTUBE");
-    PUBLICATION_CHANNELS.put("engage-live", "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE_LIVE");
+    PUBLICATION_CHANNELS.put(ENGAGE_LIVE_CHANNEL_ID, "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE_LIVE");
   }
 
   private EventUtils() {
@@ -69,147 +65,75 @@ public final class EventUtils {
   @SuppressWarnings("unchecked")
   public static MetadataCollection getEventMetadata(Event event, EventCatalogUIAdapter eventCatalogUIAdapter)
           throws Exception {
-    MetadataCollection metadata = eventCatalogUIAdapter.getRawFields();
+    //copy metadata collection to avoid side effects
+    MetadataCollection eventMetadata = eventCatalogUIAdapter.getRawFields().getCopy();
 
-    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_TITLE.getLocalName())) {
-      MetadataField<?> title = metadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
-      metadata.removeField(title);
-      MetadataField<String> newTitle = new MetadataField(title);
-      newTitle.setValue(event.getTitle());
-      metadata.addField(newTitle);
-    }
+    //match event get methods to correct output fields
+    for (MetadataField field: eventMetadata.getOutputFields().values()) {
+      if (field.getOutputID().equals(DublinCore.PROPERTY_TITLE.getLocalName())) {
+        field.setValue(event.getTitle());
+      }
+      else if (field.getOutputID().equals(DublinCore.PROPERTY_SUBJECT.getLocalName())) {
+        field.setValue(event.getSubject());
+      }
+      else if (field.getOutputID().equals(DublinCore.PROPERTY_DESCRIPTION.getLocalName())) {
+        field.setValue(event.getDescription());
+      }
+      else if (field.getOutputID().equals(DublinCore.PROPERTY_LANGUAGE.getLocalName())) {
+        field.setValue(event.getLanguage());
+      }
+      else if (field.getOutputID().equals(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName())) {
+        field.setValue(event.getRights());
+      }
+      else if (field.getOutputID().equals(DublinCore.PROPERTY_LICENSE.getLocalName())) {
+        field.setValue(event.getLicense());
+      }
+      else if (field.getOutputID().equals(DublinCore.PROPERTY_IS_PART_OF.getLocalName())) {
+        field.setValue(event.getSeriesId());
+      }
+      else if (field.getOutputID().equals(DublinCore.PROPERTY_CREATOR.getLocalName())) {
+        field.setValue(event.getPresenters());
+      }
+      else if (field.getOutputID().equals(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName())) {
+        field.setValue(event.getContributors());
+      }
+      else if (field.getOutputID().equals(DublinCore.PROPERTY_SOURCE.getLocalName())) {
+        field.setValue(event.getSource());
+      }
+      else if (field.getOutputID().equals(DublinCore.PROPERTY_CREATED.getLocalName())) {
 
-    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_SUBJECT.getLocalName())) {
-      MetadataField<?> subject = metadata.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
-      metadata.removeField(subject);
-      MetadataField<String> newSubject = new MetadataField(subject);
-      newSubject.setValue(event.getSubject());
-      metadata.addField(newSubject);
-    }
-
-    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_DESCRIPTION.getLocalName())) {
-      MetadataField<?> description = metadata.getOutputFields().get(DublinCore.PROPERTY_DESCRIPTION.getLocalName());
-      metadata.removeField(description);
-      MetadataField<String> newDescription = new MetadataField(description);
-      newDescription.setValue(event.getDescription());
-      metadata.addField(newDescription);
-    }
-
-    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_LANGUAGE.getLocalName())) {
-      MetadataField<?> language = metadata.getOutputFields().get(DublinCore.PROPERTY_LANGUAGE.getLocalName());
-      metadata.removeField(language);
-      MetadataField<String> newLanguage = new MetadataField(language);
-      newLanguage.setValue(event.getLanguage());
-      metadata.addField(newLanguage);
-    }
-
-    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName())) {
-      MetadataField<?> rightsHolder = metadata.getOutputFields().get(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName());
-      metadata.removeField(rightsHolder);
-      MetadataField<String> newRightsHolder = new MetadataField(rightsHolder);
-      newRightsHolder.setValue(event.getRights());
-      metadata.addField(newRightsHolder);
-    }
-
-    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_LICENSE.getLocalName())) {
-      MetadataField<?> license = metadata.getOutputFields().get(DublinCore.PROPERTY_LICENSE.getLocalName());
-      metadata.removeField(license);
-      MetadataField<String> newLicense = new MetadataField(license);
-      newLicense.setValue(event.getLicense());
-      metadata.addField(newLicense);
-    }
-
-    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_IS_PART_OF.getLocalName())) {
-      MetadataField<?> series = metadata.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-      metadata.removeField(series);
-      MetadataField<String> newSeries = new MetadataField(series);
-      newSeries.setValue(event.getSeriesId());
-      metadata.addField(newSeries);
-    }
-
-    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_CREATOR.getLocalName())) {
-      MetadataField<?> presenters = metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
-      metadata.removeField(presenters);
-      MetadataField<List<String>> newPresenters = new MetadataField(presenters);
-      newPresenters.setValue(event.getPresenters());
-      metadata.addField(newPresenters);
-    }
-
-    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName())) {
-      MetadataField<?> contributors = metadata.getOutputFields().get(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName());
-      metadata.removeField(contributors);
-      MetadataField<List<String>> newContributors = new MetadataField(contributors);
-      newContributors.setValue(event.getContributors());
-      metadata.addField(newContributors);
-    }
-
-    String recordingStartDate = event.getRecordingStartDate();
-    if (StringUtils.isNotBlank(recordingStartDate)) {
-      Date startDateTime = new Date(DateTimeSupport.fromUTC(recordingStartDate));
-
-      if (metadata.getOutputFields().containsKey("startDate")) {
-        MetadataField<?> startDate = metadata.getOutputFields().get("startDate");
-        metadata.removeField(startDate);
-        MetadataField<String> newStartDate = new MetadataField(startDate);
-        SimpleDateFormat sdf = new SimpleDateFormat(startDate.getPattern().get());
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        newStartDate.setValue(sdf.format(startDateTime));
-        metadata.addField(newStartDate);
+        String createdDate = event.getCreated();
+        if (StringUtils.isNotBlank(createdDate)) {
+          field.setValue(new Date(DateTimeSupport.fromUTC(createdDate)));
+        }
+      }
+      else if (field.getOutputID().equals(DublinCore.PROPERTY_IDENTIFIER.getLocalName())) {
+        field.setValue(event.getIdentifier());
+      }
+      else if (field.getOutputID().equals(DublinCore.PROPERTY_PUBLISHER.getLocalName())) {
+        field.setValue(event.getPublisher());
+      }
+      else if (field.getOutputID().equals("duration")) {
+        Long duration = event.getDuration();
+        if (duration != null) {
+          field.setValue(event.getDuration().toString());
+        }
+      }
+      else if (field.getOutputID().equals("location")) {
+        field.setValue(event.getLocation());
+      }
+      else if (field.getOutputID().equals("startDate")) {
+        String recordingStartDate = event.getRecordingStartDate();
+        if (StringUtils.isNotBlank(recordingStartDate)) {
+          Date startDateTime = new Date(DateTimeSupport.fromUTC(recordingStartDate));
+          SimpleDateFormat sdf = new SimpleDateFormat(((MetadataField<String>)field).getPattern().get());
+          sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+          field.setValue(sdf.format(startDateTime));
+        }
       }
     }
 
-    if (metadata.getOutputFields().containsKey("duration")  && event.getDuration() != null) {
-      MetadataField<?> duration = metadata.getOutputFields().get("duration");
-      metadata.removeField(duration);
-      MetadataField<String> newDuration = new MetadataField(duration);
-      newDuration.setValue(event.getDuration().toString());
-      metadata.addField(newDuration);
-    }
-
-    if (metadata.getOutputFields().containsKey("location")) {
-      MetadataField<?> agent = metadata.getOutputFields().get("location");
-      metadata.removeField(agent);
-      MetadataField<String> newAgent = new MetadataField(agent);
-      newAgent.setValue(event.getLocation());
-      metadata.addField(newAgent);
-    }
-
-    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_SOURCE.getLocalName())) {
-      MetadataField<?> source = metadata.getOutputFields().get(DublinCore.PROPERTY_SOURCE.getLocalName());
-      metadata.removeField(source);
-      MetadataField<String> newSource = new MetadataField(source);
-      newSource.setValue(event.getSource());
-      metadata.addField(newSource);
-    }
-
-    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName())) {
-      String createdDate = event.getCreated();
-      if (StringUtils.isNotBlank(createdDate)) {
-        MetadataField<?> created = metadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
-        metadata.removeField(created);
-        MetadataField<Date> newCreated = new MetadataField(created);
-        newCreated.setValue(new Date(DateTimeSupport.fromUTC(createdDate)));
-        metadata.addField(newCreated);
-      }
-    }
-
-    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_IDENTIFIER.getLocalName())) {
-      MetadataField<?> uid = metadata.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName());
-      metadata.removeField(uid);
-      MetadataField<String> newUID = new MetadataField(uid);
-      newUID.setValue(event.getIdentifier());
-      metadata.addField(newUID);
-    }
-
-    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_PUBLISHER.getLocalName())) {
-      MetadataField<?> publisher = metadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
-      metadata.removeField(publisher);
-      MetadataField<String> newPublisher = new MetadataField(publisher);
-      newPublisher.setValue(event.getPublisher());
-      metadata.addField(newPublisher);
-    }
-
-    return metadata;
+    return eventMetadata;
   }
 
   /**

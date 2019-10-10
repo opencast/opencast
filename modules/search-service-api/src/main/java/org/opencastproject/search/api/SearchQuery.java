@@ -42,9 +42,15 @@ public class SearchQuery {
   protected Date deletedDate = null;
   protected Sort sort = Sort.DATE_CREATED;
   protected boolean sortAscending = true;
+  protected boolean signURL = false;
 
   public enum Sort {
     DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER
+  }
+
+  public SearchQuery signURLs(final boolean sign) {
+    this.signURL = sign;
+    return this;
   }
 
   public SearchQuery includeEpisodes(boolean includeEpisode) {
@@ -109,6 +115,10 @@ public class SearchQuery {
 
   public String getSeriesId() {
     return seriesId;
+  }
+
+  public boolean isSignURLs() {
+    return signURL;
   }
 
   public boolean isIncludeEpisodes() {

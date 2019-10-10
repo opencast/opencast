@@ -65,6 +65,7 @@ angular.module('adminNg.resources')
         }).catch(angular.noop);
         row.workflow_state = r.workflow_state;
         row.date = Language.formatDate('short', r.start_date);
+        row.date_raw = r.start_date;
         row.technical_date = Language.formatDate('short', r.technical_start);
         row.technical_date_raw = r.technical_start;
         row.publications = r.publications;
@@ -93,6 +94,9 @@ angular.module('adminNg.resources')
         return row;
       });
 
-    }}
+    }},
+  delete: {method: 'DELETE', isArray: false, cancellable: false, transformResponse: function(_, __, status) {
+    return {status: status};
+  }}
   });
 }]);

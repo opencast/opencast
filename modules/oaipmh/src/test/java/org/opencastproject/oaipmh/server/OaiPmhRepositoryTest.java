@@ -20,7 +20,6 @@
  */
 package org.opencastproject.oaipmh.server;
 
-import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -328,7 +327,7 @@ public class OaiPmhRepositoryTest {
           if (messageObj.has("className")) {
             final String className = messageObj.val("className").as(JsonVal.asString).trim();
             final String text = messageObj.val("text").as(JsonVal.asString).trim();
-            logger.info(format("[%s] %s", className, text));
+            logger.info("[{}] {}", className, text);
             ok = ok && (eq(className, "correct")
                     // since the validator does not validate everything correctly here are some exclusions
                     || (status == IsError && eq(text, "Could not find a valid OAI-PMH command.")))

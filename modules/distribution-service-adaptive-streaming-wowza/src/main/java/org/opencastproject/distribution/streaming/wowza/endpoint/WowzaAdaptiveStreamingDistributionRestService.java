@@ -71,17 +71,17 @@ import javax.ws.rs.core.Response.Status;
         + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
         + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+        + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
 public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(WowzaAdaptiveStreamingDistributionRestService.class);
 
   /** The distribution service */
-  protected StreamingDistributionService service;
+  private StreamingDistributionService service;
 
   /** The service registry */
-  protected ServiceRegistry serviceRegistry = null;
+  private ServiceRegistry serviceRegistry = null;
 
   private static final Gson gson = new Gson();
 
@@ -124,9 +124,8 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
           @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available")})
   public Response distribute(@FormParam("mediapackage") String mediaPackageXml,
                              @FormParam("channelId") String channelId,
-                             @FormParam("elementIds") String elementIds)
-          throws Exception {
-    Job job = null;
+                             @FormParam("elementIds") String elementIds) {
+    Job job;
     try {
       Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
@@ -137,7 +136,7 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
         return Response.ok(new JaxbJob(job)).build();
       }
     } catch (IllegalArgumentException e) {
-      logger.debug("Unable to distribute element: {}", e.getMessage());
+      logger.debug("Unable to distribute element", e);
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
       logger.warn("Error distributing element", e);
@@ -156,9 +155,8 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
       @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available")})
   public Response distributeSync(@FormParam("mediapackage") String mediaPackageXml,
                              @FormParam("channelId") String channelId,
-                             @FormParam("elementIds") String elementIds)
-      throws Exception {
-    List<MediaPackageElement> result = null;
+                             @FormParam("elementIds") String elementIds) {
+    List<MediaPackageElement> result;
     try {
       Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
@@ -169,7 +167,7 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
         return Response.ok(MediaPackageElementParser.getArrayAsXml(result)).build();
       }
     } catch (IllegalArgumentException e) {
-      logger.debug("Unable to distribute element: {}", e.getMessage());
+      logger.debug("Unable to distribute element", e);
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
       logger.warn("Error distributing element", e);
@@ -188,9 +186,8 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
           @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available")})
   public Response retract(@FormParam("mediapackage") String mediaPackageXml,
                           @FormParam("channelId") String channelId,
-                          @FormParam("elementIds") String elementIds)
-          throws Exception {
-    Job job = null;
+                          @FormParam("elementIds") String elementIds) {
+    Job job;
     try {
       Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
@@ -204,7 +201,8 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
       logger.debug("Unable to retract element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
-      logger.warn("Unable to retract mediapackage '{}' from streaming channel: {}", new Object[] { mediaPackageXml, e });
+      logger.warn("Unable to retract media package '{}' from streaming channel: {}", new Object[] { mediaPackageXml,
+              e });
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
   }
@@ -220,9 +218,8 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
       @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available")})
   public Response retractSync(@FormParam("mediapackage") String mediaPackageXml,
                           @FormParam("channelId") String channelId,
-                          @FormParam("elementIds") String elementIds)
-      throws Exception {
-    List<MediaPackageElement> result = null;
+                          @FormParam("elementIds") String elementIds) {
+    List<MediaPackageElement> result;
     try {
       Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
       MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
@@ -233,7 +230,7 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
         return Response.ok(MediaPackageElementParser.getArrayAsXml(result)).build();
       }
     } catch (IllegalArgumentException e) {
-      logger.debug("Unable to retract element: {}", e.getMessage());
+      logger.debug("Unable to retract element", e);
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
       logger.warn("Unable to retract mediapackage '{}' from streaming channel: {}", new Object[] { mediaPackageXml, e });

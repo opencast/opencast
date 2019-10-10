@@ -24,6 +24,9 @@
       <provide interface="org.osgi.service.cm.ManagedService"/>
       <provide interface="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"/>
     </service>
+
+    <reference name="assetManager" interface="org.opencastproject.assetmanager.api.AssetManager"
+               cardinality="1..1" policy="static" bind="setAssetManager"/>
     <reference name="oaiPmhPersistence" interface="org.opencastproject.oaipmh.persistence.OaiPmhDatabase"
                cardinality="1..1" policy="static" bind="setOaiPmhPersistence"/>
     <reference name="oaiPmhPublicationService"

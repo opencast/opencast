@@ -42,6 +42,83 @@
 }
 
 // Alerts
+
+// New notifications
+
+.notifications-top-right {
+    top: 15px;
+    right: 15px;
+    .alert {
+         float:right;
+    }
+}
+
+.notifications-top-left {
+    top: 15px;
+    left: 15px;
+    .alert {
+         float:left;
+    }
+}
+
+.notifications-top-center {
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.notifications-bottom-right {
+    display: flex;
+    flex-direction: column-reverse;
+    bottom: 15px;
+    right: 15px;
+    .alert {
+         float:right;
+    }
+}
+
+.notifications-bottom-left {
+    display: flex;
+    flex-direction: column-reverse;
+    bottom: 15px;
+    left: 15px;
+    .alert {
+         float:left;
+    }
+}
+
+.notifications-bottom-center {
+    display: flex;
+    flex-direction: column-reverse;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.global-notifications {
+    position: fixed;
+    max-width: 300px;
+    z-index: $max-z;
+
+    .alert {
+        .close {
+            position: unset;
+            float: right;
+            font-size: unset;
+        }
+        &.sticky {
+            margin: 5px 0 10px;
+        }
+        p {
+            display: block;
+        }
+    }
+
+    .alert:hover {
+      filter: brightness(105%);
+    }
+}
+
 .alert {
     min-height: 40px;
     border-radius: $main-border-radius;

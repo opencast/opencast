@@ -36,40 +36,52 @@ function initPaellaOpencast() {
     paella.dataDelegates.MHAnnotationServiceTrimmingDataDelegate = MHAnnotationServiceTrimmingDataDelegate;
     paella.dataDelegates.MHFootPrintsDataDelegate = MHFootPrintsDataDelegate;
     paella.dataDelegates.OpencastTrackCameraDataDelegate = OpencastTrackCameraDataDelegate;
+    paella.OpencastAccessControl = OpencastAccessControl;
+    window.OpencastAccessControl = OpencastAccessControl;
   }
 }
 
 function loadOpencastPaella(containerId) {
   initPaellaOpencast();
-  paella.load(containerId, {
-    configUrl:'/ui/config/paella/config.json',
-    loadVideo:function() {
-      return new Promise((resolve, reject) => {
-        paella.opencast.getEpisode()
-        .then((episode) => {
-          var converter = new OpencastToPaellaConverter();
-          var data = converter.convertToDataJson(episode);
-          if (data.streams.length < 1) {
-            paella.messageBox.showError(paella.dictionary.translate('Error loading video! No video tracks found'));
-          }
-          else {
-            resolve(data);
-          }
-        })
-        .catch(()=>{
-          var oacl = new OpencastAccessControl();
-          oacl.userData().then((user) => {
-            if (user.isAnonymous) {
-              window.location.href = oacl.getAuthenticationUrl();
-            }
-            else {
-              var errMsg = paella.dictionary
-                .translate('Error loading video {id}')
-                .replace(/\{id\}/g, paella.utils.parameters.get('id') || '');
-              paella.messageBox.showError(errMsg);
-            }
+
+  var canRead = false;
+  var oacl = new OpencastAccessControl();
+  oacl.canRead()
+  .then(function(c) {
+    canRead = c;
+    return oacl.userData();
+  })
+  .then(function(user) {
+    if (!canRead) {
+      if (user.isAnonymous) {
+        window.location.href = oacl.getAuthenticationUrl();
+      }
+      else {
+        var errorMessage = paella.dictionary
+          .translate('Error loading video {id}')
+          .replace(/\{id\}/g, paella.utils.parameters.get('id') || '');
+        paella.messageBox.showError(errorMessage);
+        paella.events.trigger(paella.events.error, {error: errorMessage});
+      }
+    }
+    else {
+      paella.load(containerId, {
+        configUrl:'/ui/config/paella/config.json',
+        loadVideo:function() {
+          return new Promise((resolve, reject) => {
+            paella.opencast.getEpisode()
+            .then((episode) => {
+              var converter = new OpencastToPaellaConverter();
+              var data = converter.convertToDataJson(episode);
+              if (data.streams.length < 1) {
+                paella.messageBox.showError(paella.dictionary.translate('Error loading video! No video tracks found'));
+              }
+              else {
+                resolve(data);
+              }
+            });
           });
-        });
+        }
       });
     }
   });

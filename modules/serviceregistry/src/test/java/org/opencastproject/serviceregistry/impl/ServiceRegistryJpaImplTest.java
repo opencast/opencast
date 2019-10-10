@@ -37,7 +37,6 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.systems.OpencastConstants;
@@ -58,6 +57,7 @@ import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -112,9 +112,7 @@ public class ServiceRegistryJpaImplTest {
     for (ObjectInstance mbean : serviceRegistryJpaImpl.jmxBeans) {
       JmxUtil.unregisterMXBean(mbean);
     }
-    for (ServiceRegistration service : serviceRegistryJpaImpl.getServiceRegistrations()) {
-      serviceRegistryJpaImpl.unRegisterService(service.getServiceType(), service.getHost());
-    }
+    // Deactivate unregisters services
     serviceRegistryJpaImpl.deactivate();
   }
 
@@ -293,6 +291,7 @@ public class ServiceRegistryJpaImplTest {
     } catch (Exception e) {
       Assert.assertEquals(0, serviceRegistryJpaImpl.dispatchPriorityList.size());
     }
+
   }
 
   @Test
@@ -317,6 +316,7 @@ public class ServiceRegistryJpaImplTest {
   }
 
   @Test
+  @Ignore
   public void testIgnoreHostsInPriorityList() throws Exception {
     if (serviceRegistryJpaImpl.scheduledExecutor != null)
       serviceRegistryJpaImpl.scheduledExecutor.shutdown();
@@ -334,8 +334,15 @@ public class ServiceRegistryJpaImplTest {
       barrier.waitForJobs(2000);
       Assert.fail();
     } catch (Exception e) {
-      Assert.assertTrue(StringUtils.isBlank(serviceRegistryJpaImpl.getJob(testJob.getId()).getProcessingHost()));
-      Assert.assertTrue(StringUtils.isNotBlank(serviceRegistryJpaImpl.getJob(testJob2.getId()).getProcessingHost()));
+      // Mock http client always returns 503 for this path so it won't be dispatched anyway
+      testJob = serviceRegistryJpaImpl.getJob(testJob.getId());
+      Assert.assertTrue(StringUtils.isBlank(testJob.getProcessingHost()));
+      Assert.assertEquals(Job.Status.QUEUED, testJob.getStatus());
+      // Mock http client always returns 204 for this path, but it should not be dispatched
+      // because the host is in the dispatchPriorityList
+      testJob2 = serviceRegistryJpaImpl.getJob(testJob2.getId());
+      Assert.assertTrue(StringUtils.isBlank(testJob2.getProcessingHost()));
+      Assert.assertEquals(Job.Status.QUEUED, testJob2.getStatus());
       Assert.assertEquals(1, serviceRegistryJpaImpl.dispatchPriorityList.size());
       String blockingHost = serviceRegistryJpaImpl.dispatchPriorityList.get(testJob2.getId());
       Assert.assertEquals(TEST_HOST, blockingHost);
@@ -401,19 +408,19 @@ public class ServiceRegistryJpaImplTest {
     properties.put("dispatchinterval", "1000");
     serviceRegistryJpaImpl.updated(properties);
     registerTestHostAndService();
-    Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_OPERATION, null, null, true, null,
+    Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null,
             10.0f);
     JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob);
     try {
       barrier.waitForJobs(2000);
-      //We should never successfully complete the job, so if we get here then something is wrong
+      // We should never successfully complete the job, so if we get here then something is wrong
       Assert.fail();
     } catch (Exception e) {
       testJob = serviceRegistryJpaImpl.getJob(testJob.getId());
-      //Some explanation here: If the load exceeds the global maximum node load (ie, jobLoad > all individual node max
+      // Some explanation here: If the load exceeds the global maximum node load (ie, jobLoad > all individual node max
       // loads), then we dispatch to the biggest, even if it's not going to normally accept the job.  That node may still
       // reject the job, but that's AbstractJobProducer's job, not the service registry's
-      Assert.assertEquals(TEST_HOST_OTHER, testJob.getProcessingHost());
+      Assert.assertEquals(TEST_HOST_THIRD, testJob.getProcessingHost());
     }
   }
 

@@ -6,6 +6,7 @@ Features
 
 - The `adminworker` distribution is no longer available.
 
+
 Improvements
 ------------
 
@@ -15,6 +16,8 @@ Improvements
 
 Configuration changes
 ---------------------
+- `etc/org.opencastproject.adminui.cfg` has a new option `retract.workflow.id` which contains the id of the workflow used
+  to retract events when deleting.
 
 
 API changes
@@ -24,13 +27,6 @@ API changes
     - DELETE /workflow/definition/{id}
     - PUT /workflow/definition
 
-
-Additional Notes About 7.1
---------------------------
-
-Opencast 7.1 is the first maintenance release for Opencast 7. It fixes a bug with the scheduler migration which may have
-caused minor issues for old, process events which were missing some meta-data. If you have already migrated to Opencast
-7.0 and experience this problem, simply re-start the scheduler migration and re-build the index once more.
 
 Release Schedule
 ----------------

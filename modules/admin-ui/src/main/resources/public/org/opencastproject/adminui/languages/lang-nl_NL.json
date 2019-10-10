@@ -10,8 +10,8 @@
    "SAVE": "Opslaan",
    "LOGOUT": "Afmelden",
    "RESET": "Reset",
-   "SELECT_NO_OPTION_SELECTED": "No option selected",
-   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "SELECT_NO_OPTION_SELECTED": "Geen optie geselecteerd",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Geen opties beschikbaar",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabisch",
@@ -65,7 +65,8 @@
          "CONFIRMATION": "Bevestiging"
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Deze serie bevat eventementen. Door verwijderen van de serie worden de eventementen niet verwijderd."
+         "SERIES_HAS_EVENTS": "Deze serie bevat eventementen. Door verwijderen van de serie worden de eventementen niet verwijderd.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Deze serie kan niet verwijdertd worden omdat deze serie nog eventementen bevat."
@@ -123,9 +124,11 @@
       "SERIES_NOT_UPDATED": "De series konden niet bewaard worden",
       "SERIES_NOT_UPDATED_ID": "De series {{ id }} konden niet worden bewaard",
       "SERIES_NOT_UPDATED_ALL": "Geen enkele serie kon bewaard worden",
-      "EVENTS_DELETED": "Het event werd verwijderd",
-      "EVENTS_NOT_DELETED": "Het/De event(s) konden niet verwijderd worden",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "De gebeurtenis kan niet verwijderd worden, omdat u niet gemachtigd bent om dit te doen.",
+      "EVENT_DELETED": "The event has been deleted.",
+      "EVENT_WILL_BE_DELETED": "The event is being deleted",
+      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "De series werden verwijderd",
       "SERIES_NOT_DELETED": "De series konden niet verwijderd worden",
       "LOCATION_DELETED": "De locatie werd verwijderd",
@@ -159,8 +162,8 @@
       "THEME_NOT_DELETED": "Het thema kon niet verwijderd worden",
       "TASK_CREATED": "De taak werd aangemaakt",
       "TASK_NOT_CREATED": "De taak kon niet aangemaakt worden",
-      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
-      "VIDEO_CUT_SAVED": "The changes have been saved",
+      "VIDEO_CUT_NOT_SAVED": "Wijziging kan niet worden opgeslagen",
+      "VIDEO_CUT_SAVED": "De wijzigingen zijn opgeslagen",
       "VIDEO_CUT_PROCESSING": "De video wordt verwerkt…",
       "THUMBNAIL_CHANGE_FAILED": "Het wijzigen van de miniatuurafbeelding is mislukt.",
       "VIDEO_SOURCE_TRACKS_INVALID": "U hebt geen videotracks geselecteerd voor de verwerking",
@@ -171,7 +174,6 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Acties",
-      "WARNING": "Waarschuwing",
       "DELETE": {
          "SERIES": {
             "CAPTION": "Verwijderen",
@@ -181,22 +183,7 @@
          "EVENTS": {
             "CAPTION": "Verwijderen",
             "DELETE_EVENTS": "Evenementen verwijderen",
-            "PUBLISHED": {
-               "NONE": "Geen van de geselecteerde evenementen moeten worden ingetrokken voordat ze kunnen worden verwijderd.",
-               "WARNING": "De onderstaande evenementen kunnen niet verwijderd worden aangezien ze al gepubliceerd zijn en het verwijderen ervan zou het onmogelijk maken om gepubliceerde bestanden te verwijderen. Selecteer een onderstaande workflow om de evenementen eerst in te trekken en daarna te verwijderen."
-            },
-            "RETRACT_EVENTS": "Intrekken van evenement",
-            "SELECT_RETRACT_TASK": "Selecteer een in te trekken taak",
-            "SUMMARY": {
-               "EVENTS_DELETED": "Evenementen die verwijderd worden",
-               "EVENTS_RETRACTED": "Evenementen die ingetrokken worden",
-               "RETRACT_WORKFLOW": "Workflow om evenementen in te trekken"
-            },
-            "UNAUTHORIZED": "Je hebt geen machtiging om het geselecteerde evenement te verwijderen. Gelieve selectie te verwijderen om verder te gaan.",
-            "UNPUBLISHED": {
-               "NONE": "Geen van de geselecteerde evenementen kan worden verwijderd zonder het achterlaten van niet-gekoppelde bestanden."
-            },
-            "BUTTON": "Verwijder"
+            "UNAUTHORIZED": "Je hebt geen machtiging om het geselecteerde evenement te verwijderen. Gelieve selectie te verwijderen om verder te gaan."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Eens verwijderd zijn alle metadata, audio- en videobestanden van het evenement verwijderd en niet meer te recupereren.",
@@ -247,7 +234,7 @@
             "CAPTION": "Bewerken",
             "EVENT": "event",
             "EVENTS": "events",
-            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "HEADER": "Deze pagina stelt u in staat geplande gebeurtenissen te bewerken, gegroepeerd op weekdagen. De invoervelden zijn vooraf ingevuld in het geval alle geplande gebeurtenissen dezelfde waarde hebben voor een specifiek veld. Anders worden de invoervelden leeg gelaten. Door de invoervelden leeg te laten, betekent dit dat de respectieve waarden niet gewijzigd moeten worden.",
             "METADATA": "Metadata",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -270,8 +257,6 @@
       "NEXT_STEP": "Volgende",
       "BACK": "Vorige",
       "CREATE": "Creëer",
-      "RETRACT": "Intrekken",
-      "RETRACT_DELETE": "Retract/Delete",
       "DELETE": "Verwijderen",
       "UPDATE": "Updaten",
       "DURATION": {
@@ -309,17 +294,10 @@
          "TITLE": "Configuratie"
       },
       "STATISTICS": {
-         "TITLE": "Statistics"
+         "TITLE": "Statistieken"
       }
    },
    "EVENTS": {
-      "RETRACT": {
-         "CAPTION": "Intrekken van event",
-         "ID": "ID",
-         "SELECT_TASK": "Selecteer taak",
-         "SUMMARY": "Samenvatting",
-         "WARNING": "Dit evenement is gepubliceerd op minstens één publicatiekanaal, dus het moet worden ingetrokken voordat het kan worden verwijderd. Selecteer uit de onderstaande taken om de bestaande publicaties in te trekken."
-      },
       "LICENSE": {
          "ALLRIGHTS": "Alle rechten voorbehouden",
          "CCBY": "CC BY",
@@ -398,7 +376,7 @@
                   "REPEATS": "Herhalingen",
                   "REPEAT_ON": "Herhalen op",
                   "WEEKDAYS": "Weekdagen",
-                  "WEEKDAY": "Weekday"
+                  "WEEKDAY": "Weekdag"
                },
                "NO_SOURCE_AVAILABLE": "Geen opnametoestellen beschikbaar voor het plannen"
             },
@@ -482,6 +460,7 @@
             "PUBLISHED": "Gepubliceerd",
             "WEEKDAY": "Weekdag",
             "TOOLTIP": {
+               "ASSETS": "Open asset details",
                "START": "Filter voor deze begindatum",
                "SERIES": "Filter voor deze serie",
                "STATUS": "Filter voor deze gebeurtenis status",
@@ -492,7 +471,7 @@
                "EDITOR_NEEDS_CUTTING": "Open video-Editor (een opmerking geeft aan dat video trimmen is aangevraagd)",
                "COMMENTS": "Commentaar bekijken",
                "PAUSED_WORKFLOW": "Onderbroken workflow weergeven",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "Filter op deze presenter"
             }
          },
          "STATUS": {
@@ -509,12 +488,13 @@
             "PROCESSING_CANCELED": "Verwerking geannuleerd"
          },
          "STATE_MAPPING": {
-            "RETRACTING": "Retracting",
-            "DUPLICATING": "Duplicating",
-            "PUBLISHING": "Publishing",
-            "IMPORTING": "Importing",
-            "REPUBLISHING_METADATA": "Republishing metadata",
-            "UPDATING_PREVIEWS": "Updating previews"
+            "RETRACTING": "Intrekken",
+            "DELETING": "Deleting",
+            "DUPLICATING": "Dupliceren",
+            "PUBLISHING": "Bezig met publiceren",
+            "IMPORTING": "Importeren",
+            "REPUBLISHING_METADATA": "Metadata opnieuw publiceren",
+            "UPDATING_PREVIEWS": "Previews updaten"
          },
          "DETAILS": {
             "HEADER": "Details van evenement {{resourceId}}",
@@ -527,7 +507,7 @@
                "WORKFLOWS": "Workflows",
                "ACCESS": "Toegangspolicy",
                "COMMENTS": "Reacties",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "Statistieken"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publicaties",
@@ -770,7 +750,7 @@
                }
             },
             "STATISTICS": {
-               "CAPTION": "Statistics"
+               "CAPTION": "Statistieken"
             },
             "METADATA": {
                "CAPTION": "Details evenement",
@@ -811,7 +791,7 @@
                "ACTIONS": "Acties",
                "DETAILS": "Details",
                "DESCRIPTION": "Beschrijving",
-               "MORE_INFO": "More Information",
+               "MORE_INFO": "Meer informatie",
                "ID": "ID",
                "TYPE": "Type",
                "TITLE": "Titel",
@@ -819,8 +799,8 @@
                "STARTED": "Gestart",
                "SERIES": "Series",
                "SUBMITTED": "Ingediend",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
+               "SUBMITTER": "Indiener",
+               "EXECUTION_TIME": "Uitvoeringstijd",
                "WDID": "Workflow definitie",
                "MIMETYPE": "Mimetype",
                "URL": "URL",
@@ -829,9 +809,9 @@
                "WORKFLOW": "Workflow",
                "TOOLTIP": {
                   "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
+                  "ABORT": "Uitvoering van de workflow afbreken (mislukte bewerking niet opnieuw proberen)",
+                  "RETRY": "Uitvoering van de workflow opnieuw proberen",
+                  "DELETE": "Verwijder workflow",
                   "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
@@ -996,7 +976,7 @@
                "EVENTS": "Evenementen",
                "PERMISSIONS": "Toegangspolicy",
                "THEME": "Thema",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "Statistieken"
             },
             "ACCESS": {
                "CAPTION": "Toegangspolicy",
@@ -1016,8 +996,8 @@
                   "ACTION": "Acties",
                   "NEW": "Nieuwe policy",
                   "DETAILS": "Details",
-                  "REPLACE_EVENT_ACLS": "Update event permissions",
-                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
+                  "REPLACE_EVENT_ACLS": "Event permissies updaten",
+                  "REPLACE_EVENT_ACLS_HINT": "Zorg ervoor dat alle gebeurtenissen van deze serie deze machtigingen hebben"
                },
                "ROLES": {
                   "LABEL": "Selecteer een rol",
@@ -1449,7 +1429,7 @@
             "CREATED": "Aangemaakt",
             "CREATOR": "Auteur",
             "HOST_NAME": "Hostnaam",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Node naam",
             "OPERATION": "Operatie",
             "STARTED": "Gestart",
             "STATUS": "Status",
@@ -1475,7 +1455,7 @@
             "CAPTION": "Servers",
             "STATUS": "Status",
             "HOST_NAME": "Hostnaam",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Node naam",
             "CORES": "Kernen",
             "COMPLETED": "Jobs afgewerkt",
             "RUNNING": "Jobs in verwerking",
@@ -1493,7 +1473,7 @@
             "STATUS": "Status",
             "NAME": "Servicenaam",
             "HOST_NAME": "Hostnaam",
-            "NODE_NAME": "Node name",
+            "NODE_NAME": "Node naam",
             "COMPLETED": "Jobs afgewerkt",
             "RUNNING": "Jobs in verwerking",
             "QUEUED": "Jobs in wachtrij",
@@ -1539,24 +1519,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Splitsen",
-         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "Hide/Show",
-         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
-         "REPLAY_SEGMENT": "Play Start of Segment",
-         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
-         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
-         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
-         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
+         "SPLIT_TOOLTIP": "Splits segment op de huidige cursorpositie.",
+         "CUT": "Verberg/Toon",
+         "CUT_TOOLTIP": "Verberg of toon het geselecteerde deel van de video.",
+         "REPLAY_SEGMENT": "Speel Start van Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Speel het huidige segment vanaf het begin.",
+         "REPLAY_END_OF_SEGMENT": "Speel eind van Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Speel een paar seconden aan het einde van het huidige segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Speel Overgang",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Speel een paar seconden met het einde van het vorige en het begin van het volgende segment.",
          "UNDO": "Ongedaan maken",
          "REDO": "Opnieuw toepassen",
-         "CLEAR_SEGMENTS": "Clear All Segments",
-         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
+         "CLEAR_SEGMENTS": "Wis alle segmenten",
+         "CLEAR_SEGMENTS_TOOLTIP": "Wis alle segmenten, laat één groot segment achter."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Segment verwijderen",
-         "SHOW_SEGMENT": "Show this Segment",
-         "HIDE_SEGMENT": "Hide this Segment",
+         "SHOW_SEGMENT": "Toon dit segment",
+         "HIDE_SEGMENT": "Verberg dit segment",
          "START": "Start",
          "END": "Einde"
       },
@@ -1775,7 +1755,7 @@
             "LABEL": "Hostnaam"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Node naam"
          },
          "STATUS": {
             "LABEL": "Status",
@@ -1819,7 +1799,7 @@
             "LABEL": "Hostnaam"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Node naam"
          },
          "STATUS": {
             "LABEL": "Status",
@@ -1836,7 +1816,7 @@
             "LABEL": "Hostnaam"
          },
          "NODE_NAME": {
-            "LABEL": "Node name"
+            "LABEL": "Node naam"
          },
          "NAME": {
             "LABEL": "Naam"
@@ -1981,30 +1961,30 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "Om meerdere waarden in te voegen, druk op Enter tussenin"
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
-      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "NOT_AVAILABLE": "Statistieken kunnen op dit moment niet worden weergegeven. Probeer het later opnieuw.",
+      "UNSUPPORTED_TYPE": "Sorry, Opencast kan dit type statistische gegevens niet tonen.",
       "FROM": "Van",
-      "TO": "To",
-      "TOTAL": "Total",
-      "GRANULARITY": "Granularity",
+      "TO": "Aan",
+      "TOTAL": "Totaal",
+      "GRANULARITY": "Granulariteit",
       "NAVIGATION": {
-         "ORGANIZATION": "Organisation"
+         "ORGANIZATION": "Organisatie"
       },
       "TITLE": {
-         "RANDOM": "Random Data",
-         "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views",
-         "PUBLISHEDHOURS": "Published Hours of Video"
+         "RANDOM": "Willekeurige gegevens",
+         "VIEWS_SUM": "Totaal aantal weergaven",
+         "VIEWS_AVG": "Gemiddeld aantal weergaven",
+         "PUBLISHEDHOURS": "Gepubliceerde uren van video"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time unit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the running total published hours of video"
+         "RANDOM": "Dit toont willekeurige gegevens als showcase. U kunt deze grafiek uitschakelen door de bijbehorende statistieken provider definitie van etc/providers te verwijderen",
+         "VIEWS_SUM": "Dit toont het totale aantal weergaven per tijdeenheid.",
+         "VIEWS_AVG": "Dit toont het gemiddelde aantal dagelijkse weergaven per tijdeenheid.",
+         "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
 }

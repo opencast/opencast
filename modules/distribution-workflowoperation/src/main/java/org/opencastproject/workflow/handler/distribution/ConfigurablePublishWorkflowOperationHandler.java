@@ -81,6 +81,8 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
   protected static final String SERIES_ID_TEMPLATE_KEY = "series_id";
   /** The configuration property value for the player location. */
   protected static final String PLAYER_PROPERTY = "player";
+  /** The template key name prefix for organization keys */
+  protected static final String ORG_TEMPLATE_KEY_PREFIX = "org_";
   // service references
   private DownloadDistributionService distributionService;
 
@@ -145,6 +147,15 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     String playerPath = securityService.getOrganization().getProperties().get(PLAYER_PROPERTY);
     values.put(PLAYER_PATH_TEMPLATE_KEY, playerPath);
     values.put(SERIES_ID_TEMPLATE_KEY, StringUtils.trimToEmpty(mp.getSeries()));
+    Map<String, String> orgProperties = securityService.getOrganization().getProperties();
+    orgProperties.put("id", securityService.getOrganization().getId());
+    orgProperties.put("name", securityService.getOrganization().getName());
+    orgProperties.put("admin_role", securityService.getOrganization().getAdminRole());
+    orgProperties.put("anonymous_role", securityService.getOrganization().getAnonymousRole());
+    for (Map.Entry<String, String> orgProperty : orgProperties.entrySet()) {
+      values.put(ORG_TEMPLATE_KEY_PREFIX + orgProperty.getKey().replace('.', '_').toLowerCase(),
+              orgProperty.getValue());
+    }
     String uriWithVariables = DocUtil.processTextTemplate("Replacing Variables in Publish URL", urlPattern, values);
     URI publicationURI;
     try {

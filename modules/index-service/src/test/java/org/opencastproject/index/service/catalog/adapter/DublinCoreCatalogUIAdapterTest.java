@@ -80,7 +80,6 @@ public class DublinCoreCatalogUIAdapterTest {
   private static final String INPUT_PERIOD = "start=2014-11-04T19:35:19Z; end=2014-11-04T20:48:23Z; scheme=W3C-DTF;";
   private static final String CHANGED_DURATION_PERIOD = "start=2014-11-04T19:35:19Z; end=2014-11-04T20:18:23Z; scheme=W3C-DTF;";
   private static final String CHANGED_START_DATE_PERIOD = "start=2013-10-29T19:35:19Z; end=2013-10-29T20:48:23Z; scheme=W3C-DTF;";
-  private static final String CHANGED_START_TIME_PERIOD = "start=2014-11-04T18:35:19Z; end=2014-11-04T19:48:23Z; scheme=W3C-DTF;";
 
   private static final String label = "The Label";
   private static final String title = "title";
@@ -259,22 +258,25 @@ public class DublinCoreCatalogUIAdapterTest {
     DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
 
     MetadataField<String> titleField = MetadataField.createTextMetadataField(title, Opt.some(title),
-            "New Label for Title", true, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(),
-            Opt.<String> none(), Opt.<Integer> none(), Opt.<String> none());
+            "New Label for Title", true, false, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none());
     dublinCoreMetadata.addField(titleField, expectedTitle, listProvidersService);
+    titleField.setUpdated(true);
 
-    MetadataField<String> missingField = MetadataField.createTextMetadataField("missing", Opt.<String> none(),
-            "The Missing's Label", false, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(),
-            Opt.<String> none(), Opt.<Integer> none(), Opt.<String> none());
+    MetadataField<String> missingField = MetadataField.createTextMetadataField("missing", Opt.none(),
+            "The Missing's Label", false, false, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none());
     dublinCoreMetadata.addField(missingField, expectedMissing, listProvidersService);
+    missingField.setUpdated(true);
 
     MetadataField<String> durationField = MetadataField.createDurationMetadataField(temporal, Opt.some("duration"),
-            label, true, true, Opt.<Integer> none(), Opt.<String> none());
-    dublinCoreMetadata.addField(durationField, "02:15:37", listProvidersService);
+            label, true, true, Opt.none(), Opt.none());
+    dublinCoreMetadata.addField(durationField, "start=2016-03-01T09:27:35Z; end=2016-03-01T11:43:12Z; scheme=W3C-DTF;",
+            listProvidersService);
+    durationField.setUpdated(true);
 
     MetadataField<String> startDate = MetadataField.createTemporalStartDateMetadata(temporal, Opt.some("startDate"),
-            label, true, true, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Opt.<Integer> none(), Opt.<String> none());
+            label, true, true, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Opt.none(), Opt.none());
     dublinCoreMetadata.addField(startDate, "2016-03-01T09:27:35.000Z", listProvidersService);
+    startDate.setUpdated(true);
 
     configurationDublinCoreCatalogUIAdapter.storeFields(mediapackage, dublinCoreMetadata);
     assertTrue(writtenCatalog.hasCaptured());
@@ -321,7 +323,7 @@ public class DublinCoreCatalogUIAdapterTest {
 
   @Test
   public void testSetStartDateInputEmptyValueExpectsNoChange() throws IOException, URISyntaxException {
-    metadata.addField(startDateMetadataField, "2013-10-29T19:35:19.000Z", listProvidersService);
+    metadata.addField(new MetadataField<>(startDateMetadataField), "2013-10-29T19:35:19.000Z", listProvidersService);
     DublinCoreMetadataUtil.setStartDate(dc, startDateMetadataField, temporalEname);
     List<DublinCoreValue> result = dc.get(temporalEname);
     assertEquals(1, result.size());
@@ -350,7 +352,7 @@ public class DublinCoreCatalogUIAdapterTest {
 
   @Test
   public void testSetDurationInputNewValueExpectsChange() throws IOException, URISyntaxException {
-    metadata.addField(durationMetadataField, "2584000", listProvidersService);
+    metadata.addField(new MetadataField(durationMetadataField), CHANGED_DURATION_PERIOD, listProvidersService);
     DublinCoreMetadataUtil.setDuration(dc, metadata.getOutputFields().get("duration"), temporalEname);
     List<DublinCoreValue> result = dc.get(temporalEname);
     assertEquals(1, result.size());

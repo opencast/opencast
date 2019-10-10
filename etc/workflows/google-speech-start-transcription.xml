@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>google-speech-start-transcription</id>
+  <title>Start Google Speech Transcription</title>
+  <tags>
+    <tag>archive</tag>
+  </tags>
+  <description>Start the Google speech transcription service.</description>
+  <configuration_panel>
+  <![CDATA[
+    <div id="workflow-configuration">
+      <fieldset>
+        <legend>Configuration values</legend>
+        <div>
+          <label for="skipFlavor">Flavor to skip:&nbsp;&nbsp;&nbsp;</label>
+          <input id="skipFlavor" name="skipFlavor" type="text" maxlength="255" class="configField" style="width: 200px;" value="captions/timedtext"/>
+        </div>
+        <br/>
+        <div>
+          <label for="languageCode">Language code:</label>
+          <input id="languageCode" name="languageCode" type="text" maxlength="25" class="configField" style="width: 200px;" value="en-US"/>
+        </div>
+      </fieldset>
+    </div>
+  ]]>
+  </configuration_panel>
+
+  <operations>
+
+    <!-- Configuration values -->
+    <operation
+      id="defaults"
+      description="INIT: Applying default values">
+      <configurations>
+        <configuration key="skipFlavor">captions/timedtext</configuration>
+        <configuration key="languageCode">en-GB</configuration>
+      </configurations>
+    </operation>
+
+
+    <!--  Encode audio to flac -->
+    <operation
+      id="compose"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Extract audio for transcript generation">
+      <configurations>
+        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="target-flavor">audio/flac</configuration>
+        <configuration key="target-tags">transcript</configuration>
+        <configuration key="encoding-profile">audio-flac</configuration>
+        <configuration key="process-first-match-only">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Start Google Speech transcription job -->
+    <operation
+      id="google-speech-start-transcription"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Start Google Speech transcription job">
+      <configurations>
+        <!--  Skip this operation if flavor already exists. Used for cases when mp already has captions. -->
+        <configuration key="skip-if-flavor-exists">${skipFlavor}</configuration>
+        <configuration key="language-code">${languageCode}</configuration>
+        <!-- Audio to be translated, produced in the previous compose operation -->
+        <configuration key="source-tag">transcript</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>
+

@@ -26,6 +26,17 @@ import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.assetmanager.api.Version;
+import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.ARecord;
+import org.opencastproject.assetmanager.api.query.AResult;
+import org.opencastproject.assetmanager.api.query.ASelectQuery;
+import org.opencastproject.assetmanager.api.query.Field;
+import org.opencastproject.assetmanager.api.query.Predicate;
+import org.opencastproject.assetmanager.api.query.Target;
+import org.opencastproject.assetmanager.api.query.VersionField;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.CatalogImpl;
@@ -48,7 +59,11 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.entwinemedia.fn.Stream;
+import com.entwinemedia.fn.data.Opt;
+
 import org.easymock.Capture;
+import org.easymock.EasyMock;
 import org.easymock.EasyMockRule;
 import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
@@ -84,6 +99,8 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
 
   // Dependencies of class under test
   @Mock
+  private AssetManager assetManagerMock;
+  @Mock
   private SecurityService securityServiceMock;
   @Mock
   private Workspace workspace;
@@ -94,6 +111,9 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
 
   private Capture<User> adminUserCapture;
   private Capture<Query> queryCapture;
+  private Capture<String> orgIdCapture;
+  private Capture<String> mpIdCapture;
+  private Capture<String> snapshotVersionCapture;
 
   @Before
   public void setup() throws Exception {
@@ -117,6 +137,9 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
     episodeCatalog.setFlavor(MediaPackageElementFlavor.parseFlavor("dublincore/episode"));
     episodeCatalog.addTag("archive");
     MediaPackage updatedMp = createMediaPackage(episodeCatalog);
+
+    // these are the interactions we expect with the asset manager
+    mockAssetManager(updatedMp);
 
     // these are the interactions we expect with the security service
     mockSecurityService();
@@ -142,6 +165,12 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
     Assert.assertTrue(flavorsCapture.getValue().contains("dublincore/*"));
     Assert.assertTrue(flavorsCapture.getValue().contains("security/*"));
     Assert.assertTrue(tagsCapture.getValue().contains("archive"));
+    Assert.assertTrue(orgIdCapture.hasCaptured());
+    Assert.assertEquals(new DefaultOrganization().getId(), orgIdCapture.getValue());
+    Assert.assertTrue(mpIdCapture.hasCaptured());
+    Assert.assertEquals(updatedMp.getIdentifier().compact(), mpIdCapture.getValue());
+    Assert.assertTrue(snapshotVersionCapture.hasCaptured());
+    Assert.assertEquals("3", snapshotVersionCapture.getValue());
   }
 
   /**
@@ -155,6 +184,8 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
     episodeCatalog.addTag("archive");
     MediaPackage updatedMp = createMediaPackage(episodeCatalog);
 
+    // these are the interactions we expect with the asset manager
+    mockAssetManager(updatedMp);
     // these are the interactions we expect with the security service
     mockSecurityService();
 
@@ -183,6 +214,8 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
     // the episode catalog isn't tagged with archive
     MediaPackage updatedMp = createMediaPackage();
 
+    // these are the interactions we expect with the asset manager
+    mockAssetManager(updatedMp);
     // these are the interactions we expect with the security service
     mockSecurityService();
 
@@ -201,6 +234,8 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
   public void testNoElementsForPublishing() throws Exception {
     MediaPackage updatedMp = createMediaPackage();
 
+    // these are the interactions we expect with the asset manager
+    mockAssetManager(updatedMp);
     // these are the interactions we expect with the security service
     mockSecurityService();
 
@@ -214,7 +249,7 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
 
   private AssetManagerItem.TakeSnapshot createSnapshot(MediaPackage mediaPackage) throws Exception {
     AccessControlList acl = new AccessControlList();
-    AssetManagerItem.TakeSnapshot result = AssetManagerItem.add(workspace, mediaPackage, acl, 0L, new Date());
+    AssetManagerItem.TakeSnapshot result = AssetManagerItem.add(workspace, mediaPackage, acl, 3L, new Date());
     return result;
   }
 
@@ -225,6 +260,40 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
       result.add(mpe);
     }
     return result;
+  }
+
+  private void mockAssetManager(MediaPackage mediaPackage) {
+    AQueryBuilder queryBuilder = mock(AQueryBuilder.class);
+    ASelectQuery selectQuery = mock(ASelectQuery.class);
+    expect(queryBuilder.select(EasyMock.anyObject())).andReturn(selectQuery);
+    Target target = mock(Target.class);
+    expect(queryBuilder.snapshot()).andReturn(target);
+    Predicate queryPredicate1 = mock(Predicate.class);
+    Predicate queryPredicate2 = mock(Predicate.class);
+    Predicate queryPredicate3 = mock(Predicate.class);
+    expect(queryPredicate1.and(EasyMock.anyObject())).andReturn(queryPredicate2);
+    expect(queryPredicate2.and(EasyMock.anyObject())).andReturn(queryPredicate3);
+    orgIdCapture = Capture.newInstance();
+    Field<String> orgIdField = mock(Field.class);
+    expect(orgIdField.eq(capture(orgIdCapture))).andReturn(queryPredicate1);
+    expect(queryBuilder.organizationId()).andReturn(orgIdField);
+    mpIdCapture = Capture.newInstance();
+    expect(queryBuilder.mediaPackageId(capture(mpIdCapture))).andReturn(queryPredicate2);
+    VersionField versionField = mock(VersionField.class);
+    expect(versionField.eq(EasyMock.anyObject(Version.class))).andReturn(queryPredicate3);
+    expect(queryBuilder.version()).andReturn(versionField);
+    ASelectQuery selectQuery2 = mock(ASelectQuery.class);
+    expect(selectQuery.where(EasyMock.anyObject())).andReturn(selectQuery2);
+    AResult queryResult = mock(AResult.class);
+    expect(selectQuery2.run()).andReturn(queryResult);
+    expect(assetManagerMock.createQuery()).andReturn(queryBuilder);
+    snapshotVersionCapture = EasyMock.newCapture();
+    expect(assetManagerMock.toVersion(capture(snapshotVersionCapture))).andReturn(Opt.some(mock(Version.class)));
+    ARecord record = mock(ARecord.class);
+    expect(queryResult.getRecords()).andReturn(Stream.$(record));
+    Snapshot snapshot = mock(Snapshot.class);
+    expect(record.getSnapshot()).andReturn(Opt.some(snapshot));
+    expect(snapshot.getMediaPackage()).andReturn(mediaPackage);
   }
 
   private void mockSecurityService() {

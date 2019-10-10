@@ -36,7 +36,7 @@ Some examples:
 Opencast specifies an AuthenticationProvider by default, using a UserDetailService that is obtained from the OSGI
 service registry.
 
-You can use this simple provider as is, loading users into the `mh_user` and `mh_role` database tables, and specifying
+You can use this simple provider as is, loading users into the `oc_user` and `oc_role` database tables, and specifying
 an administrative username and password in `custom.properties`:
 
     org.opencastproject.security.digest.user=opencast_system_account
@@ -45,10 +45,12 @@ an administrative username and password in `custom.properties`:
 ## User and Role Providers
 
 Opencast allows user and role information to be supplied from external systems through user and role providers.
-Two user providers are available by default:
+Four user providers are available by default:
 
 * LDAP User Provider, described in [LDAP Security and Authorization](security.ldap.md)
 * [Sakai User Provider](security.user.sakai.md)
+* [Moodle User Provider](security.user.moodle.md)
+* [Brightspace D2L User Provider](security.user.brightspace.md)
 
 The set of user and role providers can be configured. If you do not want to keep users and passwords in Opencast's
 database, you can replace the JpaUserAndRoleProvider with the LdapUserProvider by replacing the
@@ -58,4 +60,4 @@ userdirectory-jpa jar with the userdirectory-ldap jar.
 
 * [Configure Central Authentication Service (CAS)](security.cas.md)
 * [Configure LDAP Authentication and Authorization](security.ldap.md)
-* [Configure Authentication and Authorization Infrastructure (AAI))](security.aai.md)
+* [Configure Authentication and Authorization Infrastructure (AAI)](security.aai.md)

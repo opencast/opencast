@@ -1,0 +1,24 @@
+# Brightspace UserDirectoryProvider configuration
+
+# The organization for this provider
+org.opencastproject.userdirectory.brightspace.org=mh_default_org
+
+# The URL for the Brightspace REST webservice
+org.opencastproject.userdirectory.brightspace.url=https://brightspace-api
+
+# properties for authentication in brightspace api
+org.opencastproject.userdirectory.brightspace.systemuser.id=system-user-id
+org.opencastproject.userdirectory.brightspace.systemuser.key=system-user-key
+org.opencastproject.userdirectory.brightspace.application.id=application-id
+org.opencastproject.userdirectory.brightspace.application.key=application-key
+
+
+# The maximum number of users to cache
+#org.opencastproject.userdirectory.brightspace.cache.size=1000
+
+# The maximum number of minutes to cache a user
+#org.opencastproject.userdirectory.brightspace.cache.expiration=60
+
+
+
+

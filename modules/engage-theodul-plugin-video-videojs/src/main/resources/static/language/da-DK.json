@@ -11,5 +11,6 @@
     "msg_startPlayingToSetTime": "Start med at afspille videoen før du indstiller en afspilningstid.",
     "msg_waitToSeek": "Søgning er ikke mulig før videoen er indlæst.",
     "msg_startPlayingToSeek": "Søgning er ikke mulig før Afspil-knappen er klikket mindst én gang.",
-    "chromeBuffer": "Buffer-tjekkeren er blevet deaktiveret grundet Chrome-begrænsninger. Det er muligt, at du oplever problemer med videoafspilningen."
+    "chromeBuffer": "Buffer-tjekkeren er blevet deaktiveret grundet Chrome-begrænsninger. Det er muligt, at du oplever problemer med videoafspilningen.",
+    "scroll_overlay_text": "Use shift + scroll to zoom."
 }

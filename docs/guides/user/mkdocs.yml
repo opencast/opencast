@@ -1,9 +1,9 @@
-site_name: Opencast - Users Guide
+site_name: Users Guide
 repo_url: https://github.com/opencast/opencast
 edit_uri: edit/develop/docs/guides/user/docs/
 
-# Default theme used is readthedocs
-theme: readthedocs
+# Default theme used is windmill
+theme: windmill
 
 # The directory that contain the source .md files
 docs_dir: 'docs'
@@ -11,9 +11,20 @@ docs_dir: 'docs'
 # The directory to which the site is built using mkdocs
 site_dir: 'site'
 
+# The css files in this list will override existing css from the default theme
+extra_css:
+  - css/extra.css
+
+# The javascript files in this list will extend the existing javascript from the default theme
+extra_javascript:
+  - javascript/extra.js
+
+# The logo in the header
+extra:
+  logo: 'opencast-white.svg'
+
 # This needs to be listed in order to populate the left navigation and the TOC
 # Items will appear in this order
-
 nav:
 - Introduction: 'index.md'
 - Log-in: 'login.md'

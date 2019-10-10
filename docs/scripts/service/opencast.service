@@ -1,5 +1,7 @@
 [Unit]
 Description=Opencast
+Documentation=https://docs.opencast.org
+
 After=local-fs.target
 After=network.target
 After=remote-fs.target
@@ -10,6 +12,10 @@ ExecStart=/opt/opencast/bin/start-opencast server
 ExecStop=/opt/opencast/bin/stop-opencast
 Restart=always
 User=opencast
+
+# Specifies the maximum file descriptor number that can be opened by this process
+# Opencast (especially larger workers) may be greedy and it makes sense to increase this number
+LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target

@@ -11,6 +11,17 @@
   <operations>
 
     <operation
+        id="select-tracks"
+        exception-handler-workflow="partial-error"
+        description="Preparing presenter (camera) audio and video work versions">
+      <configurations>
+        <configuration key="source-flavor">*/prepared</configuration>
+        <configuration key="target-flavor">*/work</configuration>
+        <configuration key="target-tags">-archive</configuration>
+      </configurations>
+    </operation>
+
+    <operation
         id="analyze-tracks"
         exception-handler-workflow="partial-error"
         description="Analyze tracks in media package a set control variables">
@@ -25,13 +36,22 @@
     <!-- Perform cutting according to the edit decision list.              -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
+    <operation
+        id="clone"
+        exception-handler-workflow="partial-error">
+      <configurations>
+        <configuration key="source-flavor">smil/cutting</configuration>
+        <configuration key="target-flavor">smil/tmp</configuration>
+      </configurations>
+    </operation>
+
     <operation id="editor"
       exception-handler-workflow="partial-error"
       description="Cut the recording according to the edit decision list">
       <configurations>
         <configuration key="source-flavors">*/work</configuration>
-        <configuration key="smil-flavors">smil/cutting</configuration>
-        <configuration key="target-smil-flavor">smil/publish</configuration>
+        <configuration key="smil-flavors">smil/tmp</configuration>
+        <configuration key="target-smil-flavor">smil/tmp</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
         <configuration key="interactive">false</configuration>
       </configurations>

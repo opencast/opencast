@@ -268,16 +268,6 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider, 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    return getOrganizationUsers().stream().flatMap(user -> user.getRoles().stream()).iterator();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.security.api.UserProvider#loadUser(java.lang.String)
    */
   @Override

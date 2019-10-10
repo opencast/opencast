@@ -65,7 +65,8 @@
          "CONFIRMATION": "Bekræftelse"
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Denne serie indeholder begivenheder. Sletning af serien sletter ikke begivenhederne."
+         "SERIES_HAS_EVENTS": "Denne serie indeholder begivenheder. Sletning af serien sletter ikke begivenhederne.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Denne serie kan ikke slettes, da den stadig indeholder begivenheder."
@@ -123,9 +124,11 @@
       "SERIES_NOT_UPDATED": "Serien kunne ikke gemmes",
       "SERIES_NOT_UPDATED_ID": "Serien {{ id }} kunne ikke gemmes",
       "SERIES_NOT_UPDATED_ALL": "Ingen af serierne kunne ikke gemmes",
-      "EVENTS_DELETED": "Begivenheden er blevet slettet",
-      "EVENTS_NOT_DELETED": "Begivenhede(-n)/(-rne) kunne ikke slettes",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Begivenheden kunne ikke slettes, da du ikke har tilladelse til at gøre det.",
+      "EVENT_DELETED": "The event has been deleted.",
+      "EVENT_WILL_BE_DELETED": "The event is being deleted",
+      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "Serien er blevet oprette",
       "SERIES_NOT_DELETED": "Serien kunne ikke slettes",
       "LOCATION_DELETED": "Placeringen er blevet slettet",
@@ -171,7 +174,6 @@
    },
    "BULK_ACTIONS": {
       "CAPTION": "Handlinger",
-      "WARNING": "Advarsel",
       "DELETE": {
          "SERIES": {
             "CAPTION": "Slet",
@@ -181,22 +183,7 @@
          "EVENTS": {
             "CAPTION": "Slet",
             "DELETE_EVENTS": "Slet begivenheder",
-            "PUBLISHED": {
-               "NONE": "Ingen af de valgte begivenheder behøver tilbagetrækning inden sletning.",
-               "WARNING": "Begivenhederne nedenfor kan ikke slettes, da de allerede er blevet offentliggjort, og sletning af dem ikke vil slette de offentliggjorte filer. Vælg i stedet en arbejdsgang nedenfor for først at tilbagetrække begivenhederne og dernæst slette dem."
-            },
-            "RETRACT_EVENTS": "Tilbagetræk begivenheder",
-            "SELECT_RETRACT_TASK": "Vælg en tilbagetrækningsopgave",
-            "SUMMARY": {
-               "EVENTS_DELETED": "Begivenheder, som skal slettes",
-               "EVENTS_RETRACTED": "Begivenheder, som skal tilbagetrækkes",
-               "RETRACT_WORKFLOW": "Arbejdsgang for begivenhedstilbagetrækning"
-            },
-            "UNAUTHORIZED": "Du har ikke tilladelse til at slette de markerede begivenheder. Afmarkér dem for at fortsætte.",
-            "UNPUBLISHED": {
-               "NONE": "Ingen af de valgte begivenheder kan slettes uden at efterlade uassocierede filer."
-            },
-            "BUTTON": "Slet"
+            "UNAUTHORIZED": "Du har ikke tilladelse til at slette de markerede begivenheder. Afmarkér dem for at fortsætte."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Efter sletning, slettes samtlige begivenhedsmetadata, lyd- og videofiler uigenkaldeligt.",
@@ -270,8 +257,6 @@
       "NEXT_STEP": "Næste",
       "BACK": "Foregående",
       "CREATE": "Oprettelse",
-      "RETRACT": "Tilbagetrækning",
-      "RETRACT_DELETE": "Tilbageræk/Slet",
       "DELETE": "Slet",
       "UPDATE": "Opdatering",
       "DURATION": {
@@ -313,13 +298,6 @@
       }
    },
    "EVENTS": {
-      "RETRACT": {
-         "CAPTION": "Tilbagetræk begivenheder",
-         "ID": "ID",
-         "SELECT_TASK": "Vælg opgave",
-         "SUMMARY": "Oversigt",
-         "WARNING": "Denne begivenhed er blevet offentliggjort via mindst én publikationskanal, så den skal tilbagetrækkes, inden den kan slettes. Vælg fra nedenstående opgaver for at tilbagetrække udgivelserne."
-      },
       "LICENSE": {
          "ALLRIGHTS": "Alle rettigheder forbeholdt",
          "CCBY": "CC BY",
@@ -482,6 +460,7 @@
             "PUBLISHED": "Offentliggjort",
             "WEEKDAY": "Ugedag",
             "TOOLTIP": {
+               "ASSETS": "Open asset details",
                "START": "Filtrer til denne startdato",
                "SERIES": "Filter til denne serie",
                "STATUS": "Filter til denne status",
@@ -510,6 +489,7 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retracting",
+            "DELETING": "Deleting",
             "DUPLICATING": "Duplicating",
             "PUBLISHING": "Publishing",
             "IMPORTING": "Importing",
@@ -2004,7 +1984,7 @@
          "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
          "VIEWS_SUM": "This displays the total number of views per time unit.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the running total published hours of video"
+         "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
 }

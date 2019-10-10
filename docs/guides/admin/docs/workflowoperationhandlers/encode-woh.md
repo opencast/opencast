@@ -63,20 +63,43 @@ profile in the example below, the first output file will be `myfile-low.mp4` and
 will contain a tag with the value `low-quality`; the second output file will be `myfile-medium.mp4` and the resulting
 media package element will contain a tag with the value `medium-quality`; and so on.
 
-    # Distribution format definition for low quality presenter download
-    profile.parallel.http.name = parallel video encoding
-    profile.parallel.http.input = visual
-    profile.parallel.http.output = visual
-    profile.parallel.http.suffix.low-quality = -low.mp4
-    profile.parallel.http.suffix.medium-quality = -medium.mp4
-    profile.parallel.http.suffix.high-quality = -high.mp4
-    profile.parallel.http.suffix.hd-quality = -hd.mp4
-    profile.parallel.http.ffmpeg.command = -i #{in.video.path} \
-      -c:v libx264 -filter:v yadif,scale=-2:288 -preset slower -crf 28 -r 25 -profile:v baseline -tune film -movflags faststart \
-      -c:a aac -ar 22050 -ac 1 -ab 32k #{out.dir}/#{out.name}#{out.suffix.low-quality} \
-      -c:v libx264 -filter:v yadif,scale=-2:360 -preset slower -crf 25 -r 25 -profile:v baseline -tune film -movflags faststart \
-      -c:a aac -ar 22050 -ac 1 -ab 48k #{out.dir}/#{out.name}#{out.suffix.medium-quality} \
-      -c:v libx264 -filter:v yadif,scale=-2:576 -preset medium -crf 23 -r 25 -pix_fmt yuv420p -tune film  -movflags faststart \
-      -c:a aac -ar 44100 -ab 96k #{out.dir}/#{out.name}#{out.suffix.high-quality} \
-      -c:v libx264 -filter:v yadif,scale=-2:720 -preset medium -crf 23 -r 25 -pix_fmt yuv420p -tune film  -movflags faststart \
-      -c:a aac -ar 44100 -ab 96k #{out.dir}/#{out.name}#{out.suffix.hd-quality}
+```properties
+# Distribution format definition for low quality presenter download
+profile.parallel.http.name = parallel video encoding
+profile.parallel.http.input = visual
+profile.parallel.http.output = visual
+profile.parallel.http.suffix.low-quality = -low.mp4
+profile.parallel.http.suffix.medium-quality = -medium.mp4
+profile.parallel.http.suffix.high-quality = -high.mp4
+profile.parallel.http.suffix.hd-quality = -hd.mp4
+profile.parallel.http.ffmpeg.command = -i #{in.video.path} \
+  -c:v libx264 -filter:v yadif,scale=-2:288 -preset slower -crf 28 -r 25 -profile:v baseline -tune film -movflags faststart \
+  -c:a aac -ar 22050 -ac 1 -ab 32k #{out.dir}/#{out.name}#{out.suffix.low-quality} \
+  -c:v libx264 -filter:v yadif,scale=-2:360 -preset slower -crf 25 -r 25 -profile:v baseline -tune film -movflags faststart \
+  -c:a aac -ar 22050 -ac 1 -ab 48k #{out.dir}/#{out.name}#{out.suffix.medium-quality} \
+  -c:v libx264 -filter:v yadif,scale=-2:576 -preset medium -crf 23 -r 25 -pix_fmt yuv420p -tune film  -movflags faststart \
+  -c:a aac -ar 44100 -ab 96k #{out.dir}/#{out.name}#{out.suffix.high-quality} \
+  -c:v libx264 -filter:v yadif,scale=-2:720 -preset medium -crf 23 -r 25 -pix_fmt yuv420p -tune film  -movflags faststart \
+  -c:a aac -ar 44100 -ab 96k #{out.dir}/#{out.name}#{out.suffix.hd-quality}
+```
+
+### Resolution Based Encoding
+
+The `encode` operation supports encoding based on the input video's resolution. For example, you can encode a certain
+output resolution only for high resolution inputs. For this you can define variables like `if-height-geq-720` which
+retain their value only if the video resolution meets the defined criteria.
+
+This modification to the encoding profile from above will encode the 720p output only if the input height is at least
+720 pixels:
+
+```properties
+…
+profile.parallel.http.ffmpeg.command.if-height-geq-720 = -c:v libx264 -filter:v yadif,scale=-2:720 \
+  -preset medium -crf 23 -r 25 -pix_fmt yuv420p -tune film  -movflags faststart \
+  -c:a aac -ar 44100 -ab 96k #{out.dir}/#{out.name}#{out.suffix.hd-quality}
+profile.parallel.http.ffmpeg.command = -i #{in.video.path} \
+  …
+  -c:v libx264 -filter:v yadif,scale=-2:576 -preset medium -crf 23 -r 25 -pix_fmt yuv420p -tune film  -movflags faststart \
+  -c:a aac -ar 44100 -ab 96k #{out.dir}/#{out.name}#{out.suffix.high-quality} \
+  #{if-height-geq-720}
+```

@@ -34,7 +34,9 @@ angular.module('adminNg.directives')
         if (angular.isUndefined(scope.context)) {
           scope.context = 'global';
         }
-
+        if (scope.context === 'global') {
+          scope.globalPosition = Notifications.notificationPositionGlobal;
+        }
         if (scope.context === context ) {
           scope.notifications = Notifications.get(scope.context);
         }

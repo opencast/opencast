@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+/* Using open sans, because its the main font of opencast */
+body {
+    font-family: 'Open Sans';
+}
+
+/* Color of top bar */
+.navbar {
+    background-color: #388ed6;
+    background-image: linear-gradient(to bottom,#388ed6,#2075b1);
+    height: 50px;
+    box-shadow: 0 1px 3px 1px rgba(0,0,0,.3);
+}
+
+/* Background color of sidebar */
+.wm-toc-pane {
+    background-color: #24425c;
+    padding-top: 75px
+}
+
+/* Sidebar - text color of entries */
+.wm-toctree a, .wm-toctree a:visited, .wm-toctree a:hover, .wm-toctree a:focus {
+    color: #fafafa;
+}
+
+/* Sidebar - color of active element */
+.wm-toc-li.wm-current, .wm-toc-li.wm-current:hover {
+    background-color: #388ed6;
+    font-weight: bold;
+}
+
+/* Sidebar - text color of folder entries */
+.wm-toc-text {
+    color: #fafafa;
+}
+
+/* Sidebar - background color of text while hover */
+.wm-toc-li:hover {
+    background-color: #388ed6;
+}
+
+/* Navigation links like "next" and "previous" */
+.wm-article-nav > a, .wm-article-nav > a:visited {
+    color: #337ab7;
+}
+
+/* Navigation links like "next" and "previous" on hover */
+.wm-article-nav > a:hover, .wm-article-nav > a:focus {
+    color: #24425c;
+}
+
+/* Color of normal links */
+.wm-page-content a {
+    color: #337ab7;
+}
+
+/* Positioning of the opencast vector logo in the top left corner */
+.wm-top-logo {
+    width: 100px;
+    height: 20px;
+    margin-left: 5px;
+}
+
+/* Restyling of the text in the title like "Administration Guide", "User Guide",... */
+.wm-top-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Repositioning of the footer "theme by bla bla" */
+footer.wm-page-content {
+    max-width: 1000px;
+}
+
+/* Color of inline code */
+code {
+    color: #E74C3C;
+}
+
+/* style of the page content */
+.wm-page-content {
+    max-width: 1000px;
+    position: relative;
+    padding-top: 15px;
+    margin-left: 25px;
+    margin-right: 50px;
+}
+
+/* repositioning of the page content depending on the current screen size */
+@media (min-width: 600px) {
+    .wm-content-pane {
+        padding-left: 350px;
+    }
+}
+
+/* repositioning of the page content depending on the current screen size */
+@media (max-width: 600px) {
+    .wm-content-pane {
+        padding-left: 0;
+    }
+}
+
+/* fix width for the table of contents */
+.wm-toc-pane {
+    min-width: 350px;
+}
+
+/* the text "etc/" in <code> blocks gets dotted lines */
+.etc-span {
+    border-bottom: 1px dotted black;
+}
+
+/* the text "etc/" in <code> blocks gets dotted lines */
+.etc-span:hover {
+    border-bottom: 1px solid black;
+}
+
+/*-------------------------------------*/
+
+/* the style for the copy and paste button in the <code> fields */
+.click-and-copy-button {
+    position: relative;
+    float: right;
+    padding: 4px;
+    margin-left: 6px;
+    border-radius: 3px;
+    border: solid 1px hsla(195, 7%, 75%, 1);
+    background-color: #f8f8f8;
+}
+
+/* workaround.. you can only use copy-to-clipboard buttons when you have */
+/* a input field or textarea.. so we copy the content of the <code> block */
+/* into a textarea and make it invisible */
+.invisible-text-area {
+    max-width: 0;
+    max-height: 0;
+    border-style: hidden;
+    background-color: white;
+    border-color: white;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    position: absolute;
+}

@@ -254,6 +254,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var isPiP = true;
   var pipPos = 'left';
   var activeCaption = undefined;
+  var overlayTimer;
 
   var foundQualities = undefined;
   var zoomTimeout = 500;
@@ -313,14 +314,14 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     if (filterTags == undefined) {
       return tracks;
     }
-    var filterTagsArray = filterTags.split(',');
     var newTracksArray = [];
 
     for (var i = 0; i < tracks.length; i++) {
-      var found = false;
-      for (var j = 0; j < tracks[i].tags.tag.length; j++) {
-        for (var k = 0; k < filterTagsArray.length; k++) {
-          if (tracks[i].tags.tag[j] == filterTagsArray[k].trim()) {
+      var found = false,
+          number_of_tags = tracks[i].tags ? tracks[i].tags.tag.length : 0;
+      for (var j = 0; j < number_of_tags; j++) {
+        for (var k = 0; k < filterTags.length; k++) {
+          if (tracks[i].tags.tag[j] == filterTags[k].trim()) {
             found = true;
             newTracksArray.push(tracks[i]);
             break;
@@ -351,7 +352,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     for (var v in videoSources) {
       for (var i = 0; i < videoSources[v].length; i++) {
-        for (var j = 0; j < videoSources[v][i].tags.tag.length; j++) {
+        var number_of_tags = videoSources[v][i].tags ? videoSources[v][i].tags.tag.length : 0;
+        for (var j = 0; j < number_of_tags; j++) {
           if (keyword !== undefined) {
             if (videoSources[v][i].tags.tag[j].indexOf(keyword) > 0) {
               tagList.push(videoSources[v][i].tags.tag[j]);
@@ -759,6 +761,18 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         if (event.deltaY < 0) {
           Engage.trigger(events.setZoomLevel.getName(), [-zoom_step_size]);
         }
+      } else {
+        // show zoom overlay
+        var overlay = document.getElementById('overlay'),
+            overlaytext = document.getElementById('overlaytext'),
+            videodisplay = document.getElementById('engage_video');
+        overlaytext.innerText = translate('scroll_overlay_text', 'Use shift + scroll to zoom');
+        overlay.style.display = 'block';
+        overlay.style.top = videodisplay.offsetTop + 'px';
+        overlay.style.height = videodisplay.offsetHeight + 'px';
+        overlayTimer = setTimeout(function() {
+          document.getElementById('overlay').style.display = 'none';
+        }, 1500);
       }
 
       wheelEvent = event;

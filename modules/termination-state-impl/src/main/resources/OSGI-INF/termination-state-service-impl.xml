@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.terminationstate.impl.TerminationStateServiceImpl"
+               immediate="true" activate="activate" deactivate="deactivate">
+  <implementation class="org.opencastproject.terminationstate.impl.TerminationStateServiceImpl" />
+  <property name="service.description" value="Termination State Service" />
+  <property name="service.pid" value="org.opencastproject.terminationstate.impl.TerminationStateService" />
+  <property name="vendor.name" value="opencast" />
+  <property name="vendor.service" value="basic" />
+
+  <service>
+    <provide interface="org.opencastproject.terminationstate.api.TerminationStateService" />
+  </service>
+  <reference name="serviceRegistry"
+             interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             cardinality="1..1" policy="static" bind="setServiceRegistry" />
+</scr:component>
+

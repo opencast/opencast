@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -93,6 +93,8 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Service-Component>
+              OSGI-INF/google-speech-attach-transcription.xml,
+              OSGI-INF/google-speech-start-transcription.xml,
               OSGI-INF/start-watson-transcription.xml,
               OSGI-INF/attach-watson-transcription.xml
             </Service-Component>

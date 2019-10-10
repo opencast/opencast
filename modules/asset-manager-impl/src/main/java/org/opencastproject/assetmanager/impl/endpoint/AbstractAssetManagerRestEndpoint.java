@@ -98,7 +98,7 @@ import javax.ws.rs.core.Response;
         "All paths are relative to the REST endpoint base (something like http://your.server/files)",
         "If you notice that this service is not working as expected, there might be a bug! "
             + "You should file an error report with your server logs from the time when the error occurred: "
-            + "<a href=\"http://opencast.jira.com\">Opencast Issue Tracker</a>"
+            + "<a href=\"http://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
     },
     abstractText = "This service indexes and queries available (distributed) episodes.")
 public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProducerEndpoint {

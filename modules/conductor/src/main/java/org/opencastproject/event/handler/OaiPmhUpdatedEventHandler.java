@@ -23,6 +23,11 @@ package org.opencastproject.event.handler;
 import static org.opencastproject.util.OsgiUtil.getOptCfg;
 import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
 
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.ARecord;
+import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -39,6 +44,8 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
+
+import com.entwinemedia.fn.data.Opt;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
@@ -81,6 +88,9 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
 
   /** The system account to use for running asynchronous events */
   protected String systemAccount = null;
+
+  /** The asset manager */
+  protected AssetManager assetManager = null;
 
   /**
    * OSGI callback for component activation.
@@ -132,38 +142,55 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
     try {
       securityService.setUser(SecurityUtil.createSystemUser(systemAccount, prevOrg));
 
-      // Check weather the media package contains elements to republish
-      MediaPackage snapshotMp = snapshotItem.getMediapackage();
-      SimpleElementSelector mpeSelector = new SimpleElementSelector();
-      for (String flavor : flavors) {
-        mpeSelector.addFlavor(flavor);
-      }
-      for (String tag : tags) {
-        mpeSelector.addTag(tag);
-      }
-      Collection<MediaPackageElement> elementsToUpdate = mpeSelector.select(snapshotMp, true);
-      if (elementsToUpdate == null || elementsToUpdate.isEmpty()) {
-        logger.debug("The media package {} does not contain any elements matching the given flavors and tags",
-                snapshotMp.getIdentifier().compact());
-        return;
-      }
+      // The mediapackage from TakeSnapshot is in some cases from an workflow instance,
+      // that has already been finished. The URLs may be become stale.
+      // For that reason we will be save, querying the mediapackage from the asset manager.
+      String versionStr = Long.toString(snapshotItem.getVersion());
+      AQueryBuilder q = assetManager.createQuery();
+      AResult snapshotQueryResult = q.select(q.snapshot())
+              .where(q.organizationId().eq(prevOrg.getId())
+                    .and(q.mediaPackageId(snapshotItem.getId())
+                    .and(q.version().eq(assetManager.toVersion(versionStr).get())))).run();
+      Opt<ARecord> snapshotRecordOpt = snapshotQueryResult.getRecords().head();
+      if (snapshotRecordOpt.isSome()) {
+        Snapshot snapshot = snapshotRecordOpt.get().getSnapshot().get();
+        MediaPackage snapshotMp = snapshot.getMediaPackage();
 
-      SearchResult result = oaiPmhPersistence.search(QueryBuilder.query().mediaPackageId(snapshotMp)
-              .isDeleted(false).build());
-      for (SearchResultItem searchResultItem : result.getItems()) {
-        try {
-          Job job = oaiPmhPublicationService
-                  .updateMetadata(snapshotMp, searchResultItem.getRepository(), flavors, tags, false);
-          // we don't want to wait for job completion here because it will block the message queue
-        } catch (Exception e) {
-          logger.error("Unable to update OAI-PMH publication for the media package {} in repository {}",
-                  snapshotItem.getId(), searchResultItem.getRepository(), e);
+        // Check weather the media package contains elements to republish
+        SimpleElementSelector mpeSelector = new SimpleElementSelector();
+        for (String flavor : flavors) {
+          mpeSelector.addFlavor(flavor);
+        }
+        for (String tag : tags) {
+          mpeSelector.addTag(tag);
+        }
+        Collection<MediaPackageElement> elementsToUpdate = mpeSelector.select(snapshotMp, true);
+        if (elementsToUpdate == null || elementsToUpdate.isEmpty()) {
+          logger.debug("The media package {} does not contain any elements matching the given flavors and tags",
+                  snapshotMp.getIdentifier().compact());
+          return;
+        }
+
+        SearchResult result = oaiPmhPersistence.search(
+                QueryBuilder.query().mediaPackageId(snapshotMp).isDeleted(false).build());
+        for (SearchResultItem searchResultItem : result.getItems()) {
+          try {
+            Job job = oaiPmhPublicationService
+                    .updateMetadata(snapshotMp, searchResultItem.getRepository(), flavors, tags, false);
+            // we don't want to wait for job completion here because it will block the message queue
+          } catch (Exception e) {
+            logger.error("Unable to update OAI-PMH publication for the media package {} in repository {}", snapshotItem.getId(), searchResultItem.getRepository(), e);
+          }
         }
       }
     } finally {
       securityService.setOrganization(prevOrg);
       securityService.setUser(prevUser);
     }
+  }
+
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 
   public void setOaiPmhPersistence(OaiPmhDatabase oaiPmhPersistence) {

@@ -23,6 +23,7 @@ package org.opencastproject.composer.impl;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.opencastproject.composer.impl.EncoderEngine.CMD_SUFFIX;
 import static org.opencastproject.serviceregistry.api.Incidents.NO_DETAILS;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
@@ -49,6 +50,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.identifier.IdBuilder;
 import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -429,13 +431,29 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     final EncodingProfile profile = getProfile(profileId);
     final EncoderEngine encoderEngine = getEncoderEngine();
 
+    // conditional settings based on frame height
+    final int height = Arrays.stream(mediaTrack.getStreams())
+            .filter((stream -> stream instanceof VideoStream))
+            .map(stream -> ((VideoStream) stream).getFrameHeight())
+            .findFirst()
+            .orElse(0);
+    Map<String, String> properties = new HashMap<>();
+    for (String key: profile.getExtensions().keySet()) {
+      if (key.startsWith(CMD_SUFFIX + ".if-height-geq-")) {
+        final int heightCondition = Integer.parseInt(key.substring((CMD_SUFFIX + ".if-height-geq-").length()));
+        if (heightCondition <= height) {
+          properties.put(key, profile.getExtension(key));
+        }
+      }
+    }
+
     // List of encoded tracks
     LinkedList<Track> encodedTracks = new LinkedList<>();
     // Do the work
     int i = 0;
     Map<String, File> source = new HashMap<>();
     source.put("video", mediaFile);
-    List<File> outputFiles = encoderEngine.process(source, profile, null);
+    List<File> outputFiles = encoderEngine.process(source, profile, properties);
     activeEncoder.remove(encoderEngine);
     for (File encodingOutput: outputFiles) {
       // Put the file in the workspace
@@ -629,12 +647,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
     arguments.add(COMPOSITE_TRACK_SIZE_INDEX, Serializer.json(compositeTrackSize).toJson());
     arguments.add(BACKGROUND_COLOR_INDEX, background);
+    arguments.add(AUDIO_SOURCE_INDEX, sourceAudioName);
     if (watermark.isSome()) {
       LaidOutElement<Attachment> watermarkLaidOutElement = watermark.get();
       arguments.add(WATERMARK_INDEX, MediaPackageElementParser.getAsXml(watermarkLaidOutElement.getElement()));
       arguments.add(WATERMARK_LAYOUT_INDEX, Serializer.json(watermarkLaidOutElement.getLayout()).toJson());
     }
-    arguments.add(AUDIO_SOURCE_INDEX, sourceAudioName);
     try {
       final EncodingProfile profile = profileScanner.getProfile(profileId);
       return serviceRegistry.createJob(JOB_TYPE, Operation.Composite.toString(), arguments, profile.getJobLoad());
@@ -708,7 +726,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
               upperLaidOutElement, upperVideoFile, watermarkOption, watermarkFile, backgroundColor, audioSourceName);
 
       Map<String, String> properties = new HashMap<>();
-      properties.put(EncoderEngine.CMD_SUFFIX + ".compositeCommand", compositeCommand);
+      properties.put(CMD_SUFFIX + ".compositeCommand", compositeCommand);
       List<File> output;
       try {
         Map<String, File> source = new HashMap<>();
@@ -871,7 +889,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
 
     Map<String, String> properties = new HashMap<>();
-    properties.put(EncoderEngine.CMD_SUFFIX + ".concatCommand", concatCommand);
+    properties.put(CMD_SUFFIX + ".concatCommand", concatCommand);
 
     File output;
     try {
@@ -1448,10 +1466,13 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           String audioSourceName = arguments.get(AUDIO_SOURCE_INDEX);
 
           Option<LaidOutElement<Attachment>> watermarkOption = Option.none();
-          if (arguments.size() == 9) {
+          //If there is a watermark defined, it needs both args 8 and 9
+          if (arguments.size() > WATERMARK_INDEX && arguments.size() <= WATERMARK_LAYOUT_INDEX + 1) {
             watermarkAttachment = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(WATERMARK_INDEX));
             Layout watermarkLayout = Serializer.layout(JsonObj.jsonObj(arguments.get(WATERMARK_LAYOUT_INDEX)));
             watermarkOption = Option.some(new LaidOutElement<>(watermarkAttachment, watermarkLayout));
+          } else if (arguments.size() > WATERMARK_LAYOUT_INDEX + 1) {
+            throw new IndexOutOfBoundsException("Too many composite arguments!");
           }
           serialized = composite(job, compositeTrackSize, lowerLaidOutElement, upperLaidOutElement, watermarkOption,
                   encodingProfile, backgroundColor, audioSourceName).map(MediaPackageElementParser.getAsXml()).getOrElse("");
@@ -1693,8 +1714,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       // handle audio
       boolean lowerAudio = lowerLaidOutElement.getElement().hasAudio();
       boolean upperAudio = upperLaidOutElement.get().getElement().hasAudio();
-      // if not specfied or "both", use both videos
-      if (audioSourceName != null && ! ComposerService.BOTH.equalsIgnoreCase(audioSourceName)) {
+      // if audio source name is "both" or unspecified, use audio of both videos, otherwise pick one
+      if (StringUtils.isNotBlank(audioSourceName) && ! ComposerService.BOTH.equalsIgnoreCase(audioSourceName)) {
         lowerAudio = lowerAudio & ComposerService.LOWER.equalsIgnoreCase(audioSourceName);
         upperAudio = upperAudio & ComposerService.UPPER.equalsIgnoreCase(audioSourceName);
       }
@@ -1991,7 +2012,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       // Get the encoding profile
       EncodingProfile profile = getProfile(job, encodingProfile);
       // Create the engine/get
-      logger.info(format("Encoding video track %s using profile '%s'", videoTrack.getIdentifier(), profile));
+      logger.info("Encoding video track {} using profile '{}'", videoTrack.getIdentifier(), profile);
       final EncoderEngine encoderEngine = getEncoderEngine();
 
       // Do the work

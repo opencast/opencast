@@ -565,8 +565,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
       throw new PublicationException(format("Unable to retract media package %s from OAI-PMH repository %s",
               mpId, repository), e);
     } catch (NotFoundException e) {
-      logger.debug(format("Skip retracting media package %s from OIA-PMH repository %s as it isn't published.",
-              mpId, repository), e);
+      logger.debug("Skip retracting media package {} from OIA-PMH repository {} as it isn't published.",
+              mpId, repository, e);
     }
 
     if (oaiPmhMp != null && oaiPmhMp.getElements().length > 0) {
@@ -642,8 +642,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         throw new PublicationException("Error filtering media package", e);
       }
     } else if (result.size() == 0) {
-      logger.info(format("Skipping update of media package %s since it is not currently published to %s",
-              mediaPackage, repository));
+      logger.info("Skipping update of media package {} since it is not currently published to {}",
+              mediaPackage, repository);
       return null;
     } else {
       final String msg = format("More than one media package with id %s found", mediaPackage.getIdentifier().compact());
@@ -704,8 +704,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     }
     // Publish the media package to OAI-PMH
     try {
-      logger.debug(format("Updating metadata of media package %s in %s",
-              publishedMp.getIdentifier().compact(), repository));
+      logger.debug("Updating metadata of media package {} in {}",
+              publishedMp.getIdentifier().compact(), repository);
       oaiPmhDatabase.store(publishedMp, repository);
     } catch (OaiPmhDatabaseException e) {
       throw new PublicationException(format("Media package %s could not be updated",
@@ -954,8 +954,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         for (final MediaPackageElement outdated : mergedMp.getElementsByFlavor(flavor)) {
           mergedMp.remove(outdated);
         }
-        logger.debug(format("Update %s %s of type %s", updatedElement.getElementType().toString().toLowerCase(),
-                updatedElement.getIdentifier(), updatedElement.getElementType()));
+        logger.debug("Update {} {} of type {}", updatedElement.getElementType().toString().toLowerCase(),
+                updatedElement.getIdentifier(), updatedElement.getElementType());
         mergedMp.add(updatedElement);
       }
     }

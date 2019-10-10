@@ -47,10 +47,14 @@ angular.module('adminNg.services')
           return notifications[context];
         };
 
+    // notification position for global notifications
+    scope.notificationPositionGlobal = 'bottom-right';
+
     scope.get = function (context) {
       var ADMIN_NOTIFICATION_DURATION_ERROR = 'admin.notification.duration.error',
           ADMIN_NOTIFICATION_DURATION_SUCCESS = 'admin.notification.duration.success',
-          ADMIN_NOTIFICATION_DURATION_WARNING = 'admin.notification.duration.warning';
+          ADMIN_NOTIFICATION_DURATION_WARNING = 'admin.notification.duration.warning',
+          ADMIN_NOTIFICATION_POSITION_GLOBAL = 'admin.notification.position.global';
 
       // We bind to AuthService here to prevent a circular dependency to $http
       if (!AuthService) { AuthService = $injector.get('AuthService'); }
@@ -65,6 +69,9 @@ angular.module('adminNg.services')
           }
           if (angular.isDefined(user.org.properties[ADMIN_NOTIFICATION_DURATION_WARNING])) {
             notificationDurationWarning = user.org.properties[ADMIN_NOTIFICATION_DURATION_WARNING];
+          }
+          if (angular.isDefined(user.org.properties[ADMIN_NOTIFICATION_POSITION_GLOBAL])) {
+            scope.notificationPositionGlobal = user.org.properties[ADMIN_NOTIFICATION_POSITION_GLOBAL];
           }
         }).catch(angular.noop);
       }

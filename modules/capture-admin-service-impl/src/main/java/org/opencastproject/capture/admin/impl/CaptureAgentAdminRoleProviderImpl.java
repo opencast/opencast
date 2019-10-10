@@ -66,14 +66,6 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
     return new JaxbRole(roleName, organization, description, system);
   }
 
-  /**
-   * @see RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    return getRolesStream().iterator();
-  }
-
   private Stream<Role> getRolesStream() {
     return this.captureAgentService.getKnownAgents()
             .keySet()
@@ -104,6 +96,11 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
   public Iterator<Role> findRoles(final String query, final Role.Target target, final int offset, final int limit) {
     if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
+
+    // These roles are not meaningful for use in ACLs
+    if (target == Role.Target.ACL) {
+      return Collections.emptyIterator();
     }
 
     Stream<Role> roleStream = getRolesStream()

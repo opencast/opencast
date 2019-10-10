@@ -84,9 +84,19 @@
       <url>metadata/mpeg-7.xml</url>
       <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
     </catalog>
+    <catalog id="catalog-4" type="foo/bar">
+      <mimetype>text/xml</mimetype>
+      <url>metadata/dublincore.xml</url>
+      <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
+    </catalog>
   </metadata>
   <attachments>
     <attachment id="cover" type="cover/source">
+      <mimetype>image/png</mimetype>
+      <url>attachments/cover.png</url>
+      <checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</checksum>
+    </attachment>
+      <attachment id="new-flavor-attachment" type="foo/bar">
       <mimetype>image/png</mimetype>
       <url>attachments/cover.png</url>
       <checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</checksum>

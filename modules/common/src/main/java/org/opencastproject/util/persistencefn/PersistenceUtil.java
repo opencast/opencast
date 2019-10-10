@@ -23,7 +23,6 @@ package org.opencastproject.util.persistencefn;
 
 import static com.entwinemedia.fn.Equality.eq;
 import static com.entwinemedia.fn.Stream.$;
-import static java.lang.String.format;
 
 import org.opencastproject.util.data.Collections;
 
@@ -211,19 +210,19 @@ public final class PersistenceUtil {
       try {
         final String dbType = new URI(new URI(url).getSchemeSpecificPart()).getScheme();
         if (eq("mysql", dbType)) {
-          logger.info(format("Use MySQL database\n"
-                                     + " test-database-url=%s\n"
-                                     + " test-database-user=%s\n"
-                                     + " test-database-password=%s\n"
-                                     + " sql-logging=%s\n"
-                                     + " keep-database=%s",
-                             url, dbUser, dbPwd, withSqlLogging, keepDatabase));
+          logger.info("Use MySQL database\n"
+                                     + " test-database-url={}\n"
+                                     + " test-database-user={}\n"
+                                     + " test-database-password={}\n"
+                                     + " sql-logging={}\n"
+                                     + " keep-database={}",
+                             url, dbUser, dbPwd, withSqlLogging, keepDatabase);
           return mkMySqlTestEntityManagerFactory(emName, url, dbUser, dbPwd, withSqlLogging, keepDatabase);
         }
       } catch (Exception ignore) {
       }
     }
-    logger.info(format("Use H2 database\n sql-logging=%s", withSqlLogging));
+    logger.info("Use H2 database\n sql-logging={}", withSqlLogging);
     return mkTestEntityManagerFactory(emName, withSqlLogging);
   }
 
