@@ -27,7 +27,6 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +61,7 @@ public class PresetProviderImpl implements PresetProvider {
       } catch (Exception e) {
         logger.warn(
                 "Unable to get the property {} from the series {} so we will try to find it in the organization. The exception was ",
-                propertyName, seriesID, ExceptionUtils.getStackTrace(e));
+                propertyName, seriesID, e);
       }
     }
     if (StringUtils.isBlank(propertyValue)) {

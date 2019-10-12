@@ -39,7 +39,6 @@ import org.opencastproject.util.RequireUtil;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,8 +101,7 @@ public class ConfigurableSeriesDCCatalogUIAdapter extends ConfigurableDCCatalogU
         return Opt.some(dc);
       }
     } catch (SeriesException e) {
-      logger.error("Error while loading DublinCore catalog of series '{}': {}", seriesId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Error while loading DublinCore catalog of series '{}': {}", seriesId, e);
       return Opt.none();
     }
   }

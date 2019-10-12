@@ -79,7 +79,6 @@ import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -288,8 +287,8 @@ public class ThemesEndpoint {
     try {
       results = searchIndex.getByQuery(query);
     } catch (SearchIndexException e) {
-      logger.error("The admin UI Search Index was not able to get the series with theme '{}': {}", themeId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("The admin UI Search Index was not able to get the series with theme '{}':", themeId,
+              e);
       return RestUtil.R.serverError();
     }
     List<JValue> seriesValues = new ArrayList<JValue>();
@@ -482,8 +481,8 @@ public class ThemesEndpoint {
       logger.warn("Unable to find a theme with id " + themeId);
       throw e;
     } catch (ThemesServiceDatabaseException e) {
-      logger.error("Error getting theme {} during delete operation because: {}", themeId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Error getting theme {} during delete operation because:", themeId,
+              e);
       return RestUtil.R.serverError();
     }
   }
@@ -501,8 +500,7 @@ public class ThemesEndpoint {
     try {
       results = searchIndex.getByQuery(query);
     } catch (SearchIndexException e) {
-      logger.error("The admin UI Search Index was not able to get the series with theme '{}': {}", themeId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("The admin UI Search Index was not able to get the series with theme '{}':", themeId, e);
       throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
     }
     for (SearchResultItem<Series> item : results.getItems()) {

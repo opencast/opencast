@@ -39,7 +39,6 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.lang3.CharUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,8 +111,7 @@ public class CommentSchedulerConflictNotifier implements ConflictNotifier {
                 false);
         eventCommentService.updateComment(comment);
       } catch (EventCommentException e) {
-        logger.error("Unable to create a comment on the event {}: {}", c.getOldEvent().getEventId(),
-                ExceptionUtils.getStackTrace(e));
+        logger.error("Unable to create a comment on the event {}:", c.getOldEvent().getEventId(), e);
       }
     }
   }

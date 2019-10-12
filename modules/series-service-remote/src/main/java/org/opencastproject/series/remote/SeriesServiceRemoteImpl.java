@@ -57,7 +57,6 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -657,7 +656,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         }
       }
     } catch (Exception e) {
-      logger.warn("Error while retrieving elements from remote service: {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Error while retrieving elements from remote service:", e);
       throw new SeriesException(e);
     } finally {
       closeConnection(response);
@@ -688,7 +687,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         }
       }
     } catch (Exception e) {
-      logger.warn("Error while retrieving element from remote service: {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Error while retrieving element from remote service:", e);
       throw new SeriesException(e);
     } finally {
       closeConnection(response);

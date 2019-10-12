@@ -165,9 +165,8 @@ public class UrlSigningFilter implements Filter, ManagedService {
 
       }
     } catch (UrlSigningException e) {
-      logger.error("Unable to verify request for '{}' with query string '{}' from host '{}' because: {}",
-              httpRequest.getRequestURL(), httpRequest.getQueryString(), httpRequest.getRemoteAddr(),
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to verify request for '{}' with query string '{}' from host '{}' because:",
+              httpRequest.getRequestURL(), httpRequest.getQueryString(), httpRequest.getRemoteAddr(), e);
       httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
               String.format("%s is unable to verify request for '%s' with query string '%s' from host '%s' because: %s",
                       getName(), httpRequest.getRequestURL(), httpRequest.getQueryString(), httpRequest.getRemoteAddr(),
