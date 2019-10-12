@@ -20,7 +20,7 @@
     <opencast.nexus-backup.url>https://nexus.opencast.org</opencast.nexus-backup.url>
     <eclipselink.version>2.6.4</eclipselink.version>
     <commons-collections.version>4.2</commons-collections.version>
-    <commons-compress.version>1.18</commons-compress.version>
+    <commons-compress.version>1.19</commons-compress.version>
     <httpcomponents-httpcore.version>4.4.10</httpcomponents-httpcore.version>
     <httpcomponents-httpclient.version>4.5.6</httpcomponents-httpclient.version>
     <aws.version>1.11.49_1</aws.version>
