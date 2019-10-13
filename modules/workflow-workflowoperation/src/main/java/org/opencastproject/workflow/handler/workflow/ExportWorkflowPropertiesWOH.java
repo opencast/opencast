@@ -44,7 +44,6 @@ import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Strings;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,8 +118,7 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
       attachment = (Attachment) builder.elementFromURI(uri, Attachment.TYPE, targetFlavor);
       attachment.setMimeType(MimeTypes.XML);
     } catch (IOException e) {
-      logger.error("Unable to store workflow properties as Attachment with flavor '{}': {}", targetFlavorString,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to store workflow properties as Attachment with flavor '{}':", targetFlavorString, e);
       throw new WorkflowOperationException("Unable to store workflow properties as Attachment", e);
     }
 

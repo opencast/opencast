@@ -30,7 +30,6 @@ import org.opencastproject.metadata.dublincore.MetadataField;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +77,7 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
       }
       return Opt.none();
     } catch (ListProviderException e) {
-      logger.warn("Unable to set collection on metadata because {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to set collection on metadata because", e);
       return Opt.none();
     }
   }

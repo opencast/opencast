@@ -22,7 +22,6 @@ package org.opencastproject.mediapackage;
 
 import static com.entwinemedia.fn.Prelude.chuck;
 import static com.entwinemedia.fn.Stream.$;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 import com.entwinemedia.fn.Fn2;
 
@@ -80,7 +79,7 @@ public class ChainingMediaPackageSerializer implements MediaPackageSerializer {
         try {
           return serializer.encodeURI(uri);
         } catch (URISyntaxException e) {
-          logger.warn("Error while encoding URI with serializer '{}': {}", serializer, getStackTrace(e));
+          logger.warn("Error while encoding URI with serializer '{}':", serializer, e);
           return chuck(e);
         }
       }
@@ -95,7 +94,7 @@ public class ChainingMediaPackageSerializer implements MediaPackageSerializer {
         try {
           return serializer.decodeURI(uri);
         } catch (URISyntaxException e) {
-          logger.warn("Error while encoding URI with serializer '{}': {}", serializer, getStackTrace(e));
+          logger.warn("Error while encoding URI with serializer '{}':", serializer, e);
           return chuck(e);
         }
       }

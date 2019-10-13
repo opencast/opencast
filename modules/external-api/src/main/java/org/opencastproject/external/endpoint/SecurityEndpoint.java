@@ -24,7 +24,6 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.DateTimeSupport.fromUTC;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -139,7 +138,7 @@ public class SecurityEndpoint implements ManagedService {
       try {
         signedUrl = urlSigningService.sign(url, validUntil, null, validSource);
       } catch (UrlSigningException e) {
-        log.warn("Error while trying to sign url '{}': {}", url, getStackTrace(e));
+        log.warn("Error while trying to sign url '{}':", url, e);
         return ApiResponses.Json.ok(acceptHeader, obj(f("error", "Error while signing url")));
       }
       return ApiResponses.Json.ok(acceptHeader, obj(f("url", signedUrl), f("valid-until", toUTC(validUntil.getMillis()))));

@@ -38,18 +38,32 @@ angular.module('adminNg.directives')
       },
       link: function (scope, element) {
 
-        if (angular.isNumber(parseInt(scope.duration)) && parseInt(scope.duration) !== -1) {
-          // we fade out the notification if it is not -1 -> therefore -1 means 'stay forever'
-          var fadeOutTimer = $timeout(function () {
-            element.fadeOut(function () {
-              Notifications.remove(scope.id, scope.$parent.context);
-            });
-          }, scope.duration);
+        var fadeOutTimer;
 
-          scope.$on('$destroy', function () {
-            $timeout.cancel(fadeOutTimer);
-          });
-        }
+        var startFadeOutTimer = function() {
+          if (angular.isNumber(parseInt(scope.duration)) && parseInt(scope.duration) !== -1) {
+            // we fade out the notification if it is not -1 -> therefore -1 means 'stay forever'
+            fadeOutTimer = $timeout(function () {
+              element.fadeOut(function () {
+                Notifications.remove(scope.id, scope.$parent.context);
+              });
+            }, scope.duration);
+
+            scope.$on('$destroy', function () {
+              $timeout.cancel(fadeOutTimer);
+            });
+          }
+        };
+
+        startFadeOutTimer();
+
+        element.on('mouseenter', function (event) {
+          $timeout.cancel(fadeOutTimer);
+        });
+
+        element.on('mouseleave', function (event) {
+          startFadeOutTimer();
+        });
       }
     };
   }]);

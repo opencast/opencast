@@ -41,7 +41,6 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -577,8 +576,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       if (tx.isActive()) {
         tx.rollback();
       }
-      logger.error("Couldn't update series {} with property: {}:{} because {}", seriesId, propertyName, propertyValue,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Couldn't update series {} with property: {}:{} because", seriesId, propertyName, propertyValue, e);
       throw new SeriesServiceDatabaseException(e);
     } finally {
       if (em != null)

@@ -3,9 +3,10 @@
 [icon_delete]:data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAABEklEQVR42q2Uuw4BURRFVYpLoSCYL2PQTTU0vsBXeY14TIyan/Ao6ChQcE6yJTs37phCsTLZ++x7cp+Te9TrNkWhL6yEi/DCdwW/aI+xG/jCUQe6QN13NRlQcCM0hRpqNegNZQZ2Ex+Fp9CF56KrOeTb6n324AQzUDMDAfJnoaRGD0ZCobUwFgx0QYiELWUSjOupiCCaFBjCWwoVIYaeUKYBL1Kxh6hSwAhz+DdqaCjjwT+ouEPkGMzgqjV8y1Y9j9pdxeHLTAqfJVCjRdpMIogGBaa0hLI2gB592ZOZ63R2aGSgDTY7dpzOf+6J0qIbG/5oENKN7aS9nQRr9nAKHnTiejtMK+MrbvO4tP9JnPV/8gansczJeXp0AgAAAABJRU5ErkJggg== "Delete icon"
 
 # Overview
-Access Policies allow to define which user / groups of users can access which Event or Series content. This is done by
-providing read and/or write permission to a Role. See the [About Roles section](groups.md#about-roles) for more
-information about Roles in the UI.
+
+Access Policies make it possible to define which user, or group(s) of users, can access specific Event or Series
+content. You can do this by providing read and/or write permission to a Role. See the [About Roles section
+](groups.md#about-roles) for more information about Roles in the UI.
 
 You can access the Access Policies page from the **Main Menu > Organization > Access Policies**
 
@@ -22,12 +23,12 @@ Access Policy templates can be edited using the edit icon ( ![icon_hamburger][] 
 Use the delete icon ( ![icon_delete][] ) in the Actions column to delete an Access Policy template.
 
 # Using Access Policy templates
-Once an Access Policy template has been created it can be applied to Series and Events. Templates are useful to
+Once an Access Policy template has been created, it can be applied to Series and Events. Templates are used to
 efficiently adjust the Access Policy of a Series or Event.
 
 
 ## Apply Access Policies to Events
-Access Policies can be applied to an Event upon its creation or using the edit mode.
+Access Policies can be applied to an Event when the Event is created or via the edit mode.
 
 In order to use a template, select the Access Policy template that should be applied to the Event. The changes are
 automatically saved when you are editing an Event. Additional Roles can be added to the Access Policy by clicking “+ New
