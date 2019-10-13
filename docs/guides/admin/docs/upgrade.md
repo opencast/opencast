@@ -4,6 +4,10 @@ Upgrading Opencast from 8.x to 9.x
 This guide describes how to upgrade Opencast 8.x to 9.x. In case you need information about how to upgrade older
 versions of Opencast, please refer to [older release notes](https://docs.opencast.org).
 
+Configuration changes
+----------------
+1. The dispatch interval property is now called _dispatch.interval_ and expects seconds instead of milliseconds (see [etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg](/etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg)).
+
 How to Upgrade
 --------------
 
