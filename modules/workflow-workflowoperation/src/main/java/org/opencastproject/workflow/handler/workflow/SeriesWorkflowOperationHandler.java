@@ -62,7 +62,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,8 +206,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
       logger.warn("Not authorized to get series with identifier '{}' found, skip operation", seriesId);
       return createResult(mediaPackage, Action.SKIP);
     } catch (SeriesException e) {
-      logger.error("Unable to get series with identifier '{}', skip operation: {}", seriesId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to get series with identifier '{}', skip operation:", seriesId, e);
       throw new WorkflowOperationException(e);
     }
 

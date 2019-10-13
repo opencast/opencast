@@ -27,7 +27,6 @@ import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.matterhorn.search.SearchQuery.Order.Descending;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
@@ -131,7 +130,7 @@ public class WorkflowDefinitionsEndpoint {
     try {
       workflowDefinitions = workflowService.listAvailableWorkflowDefinitions().stream();
     } catch (WorkflowDatabaseException e) {
-      logger.error("The workflow service was not able to get the workflow definitions: {}", getStackTrace(e));
+      logger.error("The workflow service was not able to get the workflow definitions:", e);
       return ApiResponses.serverError("Could not retrieve workflow definitions, reason: '%s'", getMessage(e));
     }
 

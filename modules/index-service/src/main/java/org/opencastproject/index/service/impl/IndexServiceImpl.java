@@ -21,7 +21,6 @@
 
 package org.opencastproject.index.service.impl;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
@@ -594,7 +593,7 @@ public class IndexServiceImpl implements IndexService {
       return createEvent(metadataJson, mp);
     } catch (FileUploadException | UnauthorizedException | ParseException | IngestException | SchedulerException
         | MediaPackageException | IOException | NotFoundException e) {
-      logger.error("Unable to create event: {}", getStackTrace(e));
+      logger.error("Unable to create event:", e);
       throw new IndexServiceException("Unable to create event", e);
     }
   }
@@ -670,7 +669,7 @@ public class IndexServiceImpl implements IndexService {
 
       return startAddAssetWorkflow(metadataJson, mp);
     } catch (MediaPackageException | FileUploadException | IOException | IngestException e) {
-      logger.error("Unable to create event: {}", getStackTrace(e));
+      logger.error("Unable to create event:", e);
       throw new IndexServiceException("Unable to create event", e);
     }
   }
@@ -753,11 +752,11 @@ public class IndexServiceImpl implements IndexService {
       logger.info("Asset update and publish workflow {} scheduled for mp {}",wfId, mpId);
 
     } catch (AssetManagerException e) {
-      logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
-              workflowDefId, mediaPackage, getStackTrace(e));
+      logger.warn("Unable to start workflow '{}' on archived media package '{}':",
+              workflowDefId, mediaPackage, e);
       throw new IndexServiceException("Unable to start workflow " + workflowDefId + " on " + mpId);
     } catch (WorkflowDatabaseException e) {
-      logger.warn("Unable to load workflow '{}' from workflow service: {}", wfId, getStackTrace(e));
+      logger.warn("Unable to load workflow '{}' from workflow service:", wfId, e);
     } catch (NotFoundException e) {
       logger.warn("Workflow '{}' not found", wfId);
     }
@@ -946,7 +945,7 @@ public class IndexServiceImpl implements IndexService {
         captureAgentId = (String) sourceMetadata.get("device");
         configuration = captureAgentStateService.getAgentConfiguration((String) sourceMetadata.get("device"));
       } catch (Exception e) {
-        logger.warn("Unable to parse device {}: because: {}", sourceMetadata.get("device"), getStackTrace(e));
+        logger.warn("Unable to parse device {}: because:", sourceMetadata.get("device"), e);
         throw new IllegalArgumentException("Unable to parse device");
       }
 
@@ -1213,7 +1212,7 @@ public class IndexServiceImpl implements IndexService {
       metadataList = getMetadataListWithCommonEventCatalogUIAdapter();
       metadataList.fromJSON(metadataJSON);
     } catch (Exception e) {
-      logger.warn("Not able to parse the event metadata {}: {}", metadataJSON, getStackTrace(e));
+      logger.warn("Not able to parse the event metadata {}:", metadataJSON, e);
       throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
     }
     return updateEventMetadata(id, metadataList, index);
@@ -1228,7 +1227,7 @@ public class IndexServiceImpl implements IndexService {
       metadataList = getMetadataListWithAllEventCatalogUIAdapters();
       metadataList.fromJSON(metadataJSON);
     } catch (Exception e) {
-      logger.warn("Not able to parse the event metadata {}: {}", metadataJSON, getStackTrace(e));
+      logger.warn("Not able to parse the event metadata {}:", metadataJSON, e);
       throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
     }
     return updateEventMetadata(id, metadataList, index);
@@ -1258,8 +1257,8 @@ public class IndexServiceImpl implements IndexService {
           instance.setMediaPackage(mediaPackage);
           updateWorkflowInstance(instance);
         } catch (WorkflowException e) {
-          logger.error("Unable to remove catalog with flavor {} by updating workflow event {} because {}",
-                  flavor, event.getIdentifier(), getStackTrace(e));
+          logger.error("Unable to remove catalog with flavor {} by updating workflow event {} because",
+                  flavor, event.getIdentifier(), e);
           throw new IndexServiceException("Unable to update workflow event " + event.getIdentifier());
         }
         break;
@@ -1272,8 +1271,8 @@ public class IndexServiceImpl implements IndexService {
                   Opt.<Set<String>> none(), Opt.some(mediaPackage), Opt.<Map<String, String>> none(),
                   Opt.<Map<String, String>> none());
         } catch (SchedulerException e) {
-          logger.error("Unable to remove catalog with flavor {} by updating scheduled event {} because {}",
-                  flavor, event.getIdentifier(), getStackTrace(e));
+          logger.error("Unable to remove catalog with flavor {} by updating scheduled event {} because",
+                  flavor, event.getIdentifier(), e);
           throw new IndexServiceException("Unable to update scheduled event " + event.getIdentifier());
         }
         break;
@@ -1333,8 +1332,8 @@ public class IndexServiceImpl implements IndexService {
           instance.setMediaPackage(mediaPackage);
           updateWorkflowInstance(instance);
         } catch (WorkflowException e) {
-          logger.error("Unable to update workflow event {} with metadata {} because {}",
-                  id, RestUtils.getJsonStringSilent(metadataList.toJSON()), getStackTrace(e));
+          logger.error("Unable to update workflow event {} with metadata {} because",
+                  id, RestUtils.getJsonStringSilent(metadataList.toJSON()), e);
           throw new IndexServiceException("Unable to update workflow event " + id);
         }
         break;
@@ -1346,8 +1345,8 @@ public class IndexServiceImpl implements IndexService {
           schedulerService.updateEvent(id, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(), presenters,
                   Opt.some(mediaPackage), Opt.<Map<String, String>> none(), Opt.<Map<String, String>> none());
         } catch (SchedulerException e) {
-          logger.error("Unable to update scheduled event {} with metadata {} because {}",
-                  id, RestUtils.getJsonStringSilent(metadataList.toJSON()), getStackTrace(e));
+          logger.error("Unable to update scheduled event {} with metadata {} because",
+                  id, RestUtils.getJsonStringSilent(metadataList.toJSON()), e);
           throw new IndexServiceException("Unable to update scheduled event " + id);
         }
         break;
@@ -1584,7 +1583,7 @@ public class IndexServiceImpl implements IndexService {
       unauthorizedScheduler = true;
     } catch (SchedulerException e) {
       removedScheduler = false;
-      logger.error("Unable to remove the event '{}' from scheduler service: {}", id, getStackTrace(e));
+      logger.error("Unable to remove the event '{}' from scheduler service:", id, e);
     }
 
     boolean unauthorizedWorkflow = false;
@@ -1605,10 +1604,10 @@ public class IndexServiceImpl implements IndexService {
       unauthorizedWorkflow = true;
     } catch (WorkflowDatabaseException e) {
       removedWorkflow = false;
-      logger.error("Unable to remove the event '{}' because removing workflow failed: {}", id, getStackTrace(e));
+      logger.error("Unable to remove the event '{}' because removing workflow failed:", id, e);
     } catch (WorkflowException e) {
       removedWorkflow = false;
-      logger.error("Unable to remove the event '{}' because removing workflow failed: {}", id, getStackTrace(e));
+      logger.error("Unable to remove the event '{}' because removing workflow failed:", id, e);
     }
 
     boolean unauthorizedArchive = false;
@@ -1627,7 +1626,7 @@ public class IndexServiceImpl implements IndexService {
         notFoundArchive = true;
       } else {
         removedArchive = false;
-        logger.error("Unable to remove the event '{}' from the archive: {}", id, getStackTrace(e));
+        logger.error("Unable to remove the event '{}' from the archive:", id, e);
       }
     }
 
@@ -1640,7 +1639,7 @@ public class IndexServiceImpl implements IndexService {
     try {
       eventCommentService.deleteComments(id);
     } catch (EventCommentException e) {
-      logger.error("Unable to remove comments for event '{}': {}", id, getStackTrace(e));
+      logger.error("Unable to remove comments for event '{}':", id, e);
     }
 
     return removedScheduler && removedWorkflow && removedArchive;
@@ -1727,7 +1726,7 @@ public class IndexServiceImpl implements IndexService {
         return Opt.none();
       }
     } catch (WorkflowDatabaseException e) {
-      logger.error("Unable to get workflows for event {} because {}", mpId, getStackTrace(e));
+      logger.error("Unable to get workflows for event {} because", mpId, e);
       throw new IndexServiceException("Unable to get current workflow for event " + mpId);
     }
     // Get the newest workflow instance
@@ -1914,7 +1913,7 @@ public class IndexServiceImpl implements IndexService {
       for (Long id : optThemeId)
         seriesService.updateSeriesProperty(seriesId, THEME_PROPERTY_NAME, Long.toString(id));
     } catch (Exception e) {
-      logger.error("Unable to create new series: {}", getStackTrace(e));
+      logger.error("Unable to create new series:", e);
       throw new IndexServiceException("Unable to create new series");
     }
 
@@ -1955,7 +1954,7 @@ public class IndexServiceImpl implements IndexService {
     try {
       optionsMap = JSONUtils.toMap(new org.codehaus.jettison.json.JSONObject(options.toJSONString()));
     } catch (JSONException e) {
-      logger.warn("Unable to parse options to map: {}", getStackTrace(e));
+      logger.warn("Unable to parse options to map:", e);
       throw new IllegalArgumentException("Unable to parse options to map");
     }
 
@@ -1971,7 +1970,7 @@ public class IndexServiceImpl implements IndexService {
       metadataList = getMetadataListWithAllSeriesCatalogUIAdapters();
       metadataList.fromJSON(seriesMetadataJson.toJSONString());
     } catch (Exception e) {
-      logger.warn("Not able to parse the series metadata {}: {}", seriesMetadataJson, getStackTrace(e));
+      logger.warn("Not able to parse the series metadata {}:", seriesMetadataJson, e);
       throw new IllegalArgumentException("Not able to parse the series metadata");
     }
 
@@ -1990,7 +1989,7 @@ public class IndexServiceImpl implements IndexService {
       for (Long id : themeId)
         seriesService.updateSeriesProperty(seriesId, THEME_PROPERTY_NAME, Long.toString(id));
     } catch (Exception e) {
-      logger.error("Unable to create new series: {}", getStackTrace(e));
+      logger.error("Unable to create new series:", e);
       throw new IndexServiceException("Unable to create new series");
     }
 
@@ -2138,7 +2137,7 @@ public class IndexServiceImpl implements IndexService {
       if (optSeries.isNone())
         throw new NotFoundException("Cannot find a series with id " + seriesID);
     } catch (SearchIndexException e) {
-      logger.error("Unable to get a series with id {} because: {}", seriesID, getStackTrace(e));
+      logger.error("Unable to get a series with id {} because:", seriesID, e);
       throw new IndexServiceException("Cannot use search service to find Series");
     }
   }
@@ -2150,7 +2149,7 @@ public class IndexServiceImpl implements IndexService {
     try {
       metadataList.fromJSON(metadataJSON);
     } catch (Exception e) {
-      logger.warn("Not able to parse the event metadata {}: {}", metadataJSON, getStackTrace(e));
+      logger.warn("Not able to parse the event metadata {}:", metadataJSON, e);
       throw new IllegalArgumentException("Not able to parse the event metadata");
     }
 

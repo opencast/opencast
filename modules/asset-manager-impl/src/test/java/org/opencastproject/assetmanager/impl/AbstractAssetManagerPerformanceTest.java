@@ -20,8 +20,6 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static java.lang.String.format;
-
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.security.api.DefaultOrganization;
 
@@ -139,6 +137,6 @@ public class AbstractAssetManagerPerformanceTest extends AbstractAssetManagerTes
     long end = System.nanoTime();
     double elapsedSeconds = (end - start) / 1000000000.0d;
     double opsPerSecond = ops / elapsedSeconds;
-    logger.info(format("Benchmark %s: ops=%d runtime=%.1fs ops/s=%.2f", name, ops, elapsedSeconds, opsPerSecond));
+    logger.info("Benchmark {}: ops={} runtime={}s ops/s={}", name, ops, elapsedSeconds, opsPerSecond);
   }
 }

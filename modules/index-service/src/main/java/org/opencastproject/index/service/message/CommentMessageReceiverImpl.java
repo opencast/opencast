@@ -28,7 +28,6 @@ import org.opencastproject.message.broker.api.comments.CommentItem;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,8 +55,7 @@ public class CommentMessageReceiverImpl extends BaseMessageReceiverImpl<CommentI
                   commentItem.hasOpenComments(), commentItem.needsCutting(), organization, user, getSearchIndex());
           logger.debug("Event {} comment status updated from search index", commentItem.getEventId());
         } catch (SearchIndexException e) {
-          logger.error("Error updating comment status of event {} from the search index: {}", commentItem.getEventId(),
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error updating comment status of event {} from the search index:", commentItem.getEventId(), e);
         } catch (NotFoundException e) {
           // This is expected if the event's comments have been removed as part of the event's removal
           logger.debug("Event {} not found for comment status updating", commentItem.getEventId());

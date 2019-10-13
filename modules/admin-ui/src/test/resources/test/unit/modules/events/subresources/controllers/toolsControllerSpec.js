@@ -100,7 +100,7 @@ describe('Tools Edit controller', function () {
                 $scope.submit();
                 $httpBackend.flush();
 
-                expect(Notifications.add).toHaveBeenCalledWith('error', jasmine.any(String), jasmine.any(String));
+                expect(Notifications.add).toHaveBeenCalledWith('error', jasmine.any(String));
             });
         });
     });

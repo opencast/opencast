@@ -40,7 +40,6 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 
 import java.io.IOException;
@@ -154,7 +153,7 @@ public class UserSettingsEndpoint {
     try {
       userSettingsService.deleteUserSetting(id);
     } catch (UserSettingsServiceException e) {
-      logger.error("Unable to remove user setting id:'%s':'%s'", id, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to remove user setting id:'%s':", id, e);
       return Response.serverError().build();
     }
     logger.debug("User setting with id %d removed.", id);

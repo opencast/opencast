@@ -32,7 +32,6 @@ import static java.util.Objects.requireNonNull;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
@@ -354,10 +353,10 @@ public class ToolsEndpoint implements ManagedService {
           }
           elementUri = new URI(urlSigningService.sign(element.getURI().toString(), expireSeconds, null, clientIP));
         } catch (URISyntaxException e) {
-          logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
+          logger.error("Error while trying to sign the preview urls because:", e);
           throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
         } catch (UrlSigningException e) {
-          logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
+          logger.error("Error while trying to sign the preview urls because:", e);
           throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
         }
       } else {
@@ -397,10 +396,10 @@ public class ToolsEndpoint implements ManagedService {
             waveformUri = new URI(
                     urlSigningService.sign(optWaveform.get().getURI().toString(), expireSeconds, null, null));
           } catch (URISyntaxException e) {
-            logger.error("Error while trying to serialize the waveform urls because: {}", getStackTrace(e));
+            logger.error("Error while trying to serialize the waveform urls because:", e);
             throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
           } catch (UrlSigningException e) {
-            logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
+            logger.error("Error while trying to sign the preview urls because:", e);
             throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
           }
         } else {
@@ -441,7 +440,7 @@ public class ToolsEndpoint implements ManagedService {
         thumbnail.getTrack().ifPresent(t -> thumbnailFields.add(f("track", t)));
       });
     } catch (UrlSigningException | URISyntaxException e) {
-      logger.error("Error while trying to serialize the thumbnail url because: {}", getStackTrace(e));
+      logger.error("Error while trying to serialize the thumbnail url because:", e);
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     }
 
@@ -585,7 +584,7 @@ public class ToolsEndpoint implements ManagedService {
         f("url", signUrl(distributedElement.getURI()))
       ))));
     } catch (IOException | FileUploadException e) {
-      logger.error("Error reading request body: {}", getStackTrace(e));
+      logger.error("Error reading request body:", e);
       return R.serverError();
     } catch (PublicationException | UnknownFileTypeException | EncoderException e) {
       logger.error("Could not generate or publish thumbnail", e);
@@ -607,7 +606,7 @@ public class ToolsEndpoint implements ManagedService {
     try (InputStream is = request.getInputStream()) {
       details = IOUtils.toString(is, request.getCharacterEncoding());
     } catch (IOException e) {
-      logger.error("Error reading request body: {}", getStackTrace(e));
+      logger.error("Error reading request body:", e);
       return R.serverError();
     }
 
@@ -634,7 +633,7 @@ public class ToolsEndpoint implements ManagedService {
       try {
         smil = createSmilCuttingCatalog(editingInfo, mediaPackage);
       } catch (Exception e) {
-        logger.warn("Unable to create a SMIL cutting catalog ({}): {}", details, getStackTrace(e));
+        logger.warn("Unable to create a SMIL cutting catalog ({}):", details, e);
         return R.badRequest("Unable to create SMIL cutting catalog");
       }
 
@@ -655,7 +654,7 @@ public class ToolsEndpoint implements ManagedService {
       try {
         addSmilToArchive(mediaPackage, smil);
       } catch (IOException e) {
-        logger.warn("Unable to add SMIL cutting catalog to archive: {}", getStackTrace(e));
+        logger.warn("Unable to add SMIL cutting catalog to archive:", e);
         return R.serverError();
       }
 
@@ -671,11 +670,11 @@ public class ToolsEndpoint implements ManagedService {
               .chooseDefaultThumbnail(mediaPackage, editingInfo.getDefaultThumbnailPosition().getAsDouble());
           }
         } catch (UrlSigningException | URISyntaxException e) {
-          logger.error("Error while trying to serialize the thumbnail url because: {}", getStackTrace(e));
+          logger.error("Error while trying to serialize the thumbnail url because:", e);
           return R.serverError();
         } catch (IOException | DistributionException | EncoderException | PublicationException
             | UnknownFileTypeException | MediaPackageException e) {
-          logger.error("Error while updating default thumbnail because: {}", getStackTrace(e));
+          logger.error("Error while updating default thumbnail because:", e);
           return R.serverError();
         }
       }
@@ -690,11 +689,11 @@ public class ToolsEndpoint implements ManagedService {
             ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId), workflowParameters))
             .run();
         } catch (AssetManagerException e) {
-          logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
-                  workflowId, mediaPackage, getStackTrace(e));
+          logger.warn("Unable to start workflow '{}' on archived media package '{}':",
+                  workflowId, mediaPackage, e);
           return R.serverError();
         } catch (WorkflowDatabaseException e) {
-          logger.warn("Unable to load workflow '{}' from workflow service: {}", workflowId, getStackTrace(e));
+          logger.warn("Unable to load workflow '{}' from workflow service:", workflowId, e);
           return R.serverError();
         } catch (NotFoundException e) {
           logger.warn("Workflow '{}' not found", workflowId);
@@ -783,7 +782,7 @@ public class ToolsEndpoint implements ManagedService {
     //get the first smil/cutting  catalog-ID to overwrite it with new smil info
     for (Catalog p: catalogs) {
        if (p.getFlavor().matches(mediaPackageElementFlavor)) {
-         logger.debug("Set Idendifier for Smil-Catalog to: " + p.getIdentifier());
+         logger.debug("Set Identifier for Smil-Catalog to: {}", p.getIdentifier());
          catalogId = p.getIdentifier();
        break;
        }
@@ -862,7 +861,7 @@ public class ToolsEndpoint implements ManagedService {
     try {
       return index.getEvent(mediaPackageId, searchIndex);
     } catch (SearchIndexException e) {
-      logger.error("Error while reading event '{}' from search index: {}", mediaPackageId, getStackTrace(e));
+      logger.error("Error while reading event '{}' from search index:", mediaPackageId, e);
       return Opt.none();
     }
   }
@@ -905,7 +904,7 @@ public class ToolsEndpoint implements ManagedService {
     try {
       workflows = workflowService.listAvailableWorkflowDefinitions();
     } catch (WorkflowDatabaseException e) {
-      logger.warn("Error while retrieving list of workflow definitions: {}", getStackTrace(e));
+      logger.warn("Error while retrieving list of workflow definitions:", e);
       return emptyList();
     }
 
@@ -931,11 +930,11 @@ public class ToolsEndpoint implements ManagedService {
         Smil smil = smilService.fromXml(workspace.get(smilCatalog.getURI())).getSmil();
         segments = mergeSegments(segments, getSegmentsFromSmil(smil));
       } catch (NotFoundException e) {
-        logger.warn("File '{}' could not be loaded by workspace service: {}", smilCatalog.getURI(), getStackTrace(e));
+        logger.warn("File '{}' could not be loaded by workspace service:", smilCatalog.getURI(), e);
       } catch (IOException e) {
-        logger.warn("Reading file '{}' from workspace service failed: {}", smilCatalog.getURI(), getStackTrace(e));
+        logger.warn("Reading file '{}' from workspace service failed:", smilCatalog.getURI(), e);
       } catch (SmilException e) {
-        logger.warn("Error while parsing SMIL catalog '{}': {}", smilCatalog.getURI(), getStackTrace(e));
+        logger.warn("Error while parsing SMIL catalog '{}':", smilCatalog.getURI(), e);
       }
     }
 
@@ -948,11 +947,11 @@ public class ToolsEndpoint implements ManagedService {
         Smil smil = smilService.fromXml(workspace.get(smilCatalog.getURI())).getSmil();
         segments = getSegmentsFromSmil(smil);
       } catch (NotFoundException e) {
-        logger.warn("File '{}' could not be loaded by workspace service: {}", smilCatalog.getURI(), getStackTrace(e));
+        logger.warn("File '{}' could not be loaded by workspace service:", smilCatalog.getURI(), e);
       } catch (IOException e) {
-        logger.warn("Reading file '{}' from workspace service failed: {}", smilCatalog.getURI(), getStackTrace(e));
+        logger.warn("Reading file '{}' from workspace service failed:", smilCatalog.getURI(), e);
       } catch (SmilException e) {
-        logger.warn("Error while parsing SMIL catalog '{}': {}", smilCatalog.getURI(), getStackTrace(e));
+        logger.warn("Error while parsing SMIL catalog '{}':", smilCatalog.getURI(), e);
       }
     }
 
@@ -1055,10 +1054,10 @@ public class ToolsEndpoint implements ManagedService {
         URI signedUrl = new URI(urlSigningService.sign(url, expireSeconds, null, null));
         return signedUrl.toString();
       } catch (URISyntaxException e) {
-        logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
+        logger.error("Error while trying to sign the preview urls because:", e);
         throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
       } catch (UrlSigningException e) {
-        logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
+        logger.error("Error while trying to sign the preview urls because:", e);
         throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
       }
     } else {

@@ -331,8 +331,8 @@ public final class FileSupport {
                 ExceptionUtils.getMessage(e));
         Files.copy(sourcePath, targetPath);
       } catch (IOException e) {
-        logger.debug("Copy file because creating a hard-link at '{}' for existing file '{}' did not work: {}",
-                targetPath, sourcePath, ExceptionUtils.getStackTrace(e));
+        logger.debug("Copy file because creating a hard-link at '{}' for existing file '{}' did not work:",
+                targetPath, sourcePath, e);
         if (overwrite) {
           Files.copy(sourcePath, targetPath, REPLACE_EXISTING);
         } else {

@@ -22,7 +22,6 @@ package org.opencastproject.assetmanager.impl;
 
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.fns.Booleans.eq;
-import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -210,7 +209,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
           final int minVersions, final int maxVersions,
           final boolean continuousVersions,
           final Opt<String> seriesId) {
-    logger.info(format("Create %s media packages with %d to %d snapshots each", amount, minVersions, maxVersions));
+    logger.info("Create {} media packages with {} to {} snapshots each", amount, minVersions, maxVersions);
     final Stream<Snapshot> inserts = Stream.cont(inc()).take(amount).bind(new FnX<Integer, Iterable<Snapshot>>() {
       @Override public Iterable<Snapshot> applyX(final Integer mpCount) throws Exception {
         final MediaPackage mp = mkMediaPackage(mkCatalog());
@@ -219,14 +218,14 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
         }
         final int versions = (int) (Math.random() * ((double) maxVersions - minVersions) + minVersions);
         final String mpId = mp.getIdentifier().toString();
-        logger.debug(format("Going to take %d snapshot/s of media package %s", versions, mpId));
+        logger.debug("Going to take {} snapshot/s of media package {}", versions, mpId);
         return Stream.cont(inc()).take(versions).map(new Fn<Integer, Snapshot>() {
           @Override public Snapshot apply(Integer versionCount) {
             if (!continuousVersions) {
               // insert a gap into the version claim
               getAbstractAssetManager().getDb().claimVersion(mp.getIdentifier().toString());
             }
-            logger.debug(format("Taking snapshot %d of media package %s", versionCount + 1, mpId));
+            logger.debug("Taking snapshot {} of media package {}", versionCount + 1, mpId);
             return am.takeSnapshot(OWNER, mp);
           }
         });
@@ -333,7 +332,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
       private Set<StoragePath> store = new HashSet<>();
 
       private void logSize() {
-        logger.debug(format("Store contains %d asset(s)", store.size()));
+        logger.debug("Store contains {} asset(s)", store.size());
       }
 
       @Override public void put(StoragePath path, Source source) throws AssetStoreException {

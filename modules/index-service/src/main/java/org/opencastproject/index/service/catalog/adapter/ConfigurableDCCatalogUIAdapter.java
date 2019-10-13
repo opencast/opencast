@@ -38,7 +38,6 @@ import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,8 +165,7 @@ public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter
                         getListProvidersService());
                 emptyFields.remove(metadataField);
               } catch (IllegalArgumentException e) {
-                logger.error("Skipping metadata field '{}' because of error: {}", metadataField.getInputID(),
-                        ExceptionUtils.getStackTrace(e));
+                logger.error("Skipping metadata field '{}' because of error:", metadataField.getInputID(), e);
               }
             }
           }

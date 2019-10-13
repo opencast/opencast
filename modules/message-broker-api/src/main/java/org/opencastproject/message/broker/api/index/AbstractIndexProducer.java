@@ -226,7 +226,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
     @Override protected void finalize() throws Throwable {
       super.finalize();
       if (updatesCurrent < updatesTotal) {
-        logger.warn(format("Only %d messages have been sent even though the batch has been initialized with %d", updatesCurrent, updatesTotal));
+        logger.warn("Only {} messages have been sent even though the batch has been initialized with {}", updatesCurrent, updatesTotal);
       }
     }
   }
