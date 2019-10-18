@@ -28,6 +28,7 @@ angular.module('adminNg.directives')
     scope: {
       resource: '=',
       groupBy:  '@',
+      display: '@',
       disabled: '=',
       loader: '=',
       ignore: '@',
@@ -35,6 +36,9 @@ angular.module('adminNg.directives')
     },
     controller: function ($scope) {
 
+      if (!$scope.display) {
+        $scope.display = 'name';
+      }
       $scope.searchField = '';
 
       $scope.customFilter = function () {
@@ -43,11 +47,11 @@ angular.module('adminNg.directives')
 
           var result = true;
           if (!angular.isUndefined($scope.ignore)) {
-            result = !(item.name.substring(0, ($scope.ignore).length) ===  $scope.ignore);
+            result = !(item[$scope.display].substring(0, ($scope.ignore).length) ===  $scope.ignore);
           }
 
           if (result && ($scope.searchField != '')) {
-            result = (item.name.toLowerCase().indexOf($scope.searchField.toLowerCase()) >= 0);
+            result = (item[$scope.display].toLowerCase().indexOf($scope.searchField.toLowerCase()) >= 0);
           }
 
           return result;

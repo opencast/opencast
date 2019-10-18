@@ -41,7 +41,7 @@ angular.module('adminNg.services')
           searchable: true
         };
         listName.then(function (listName) {
-          me.users.available = ResourcesListResource.query({ resource: listName || 'USERS.INVERSE.WITH.USERNAME'});
+          me.users.available = ResourcesListResource.query({ resource: listName || 'USERS.NAME.AND.USERNAME'});
         });
       };
 
