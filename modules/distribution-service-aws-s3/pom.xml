@@ -106,6 +106,7 @@
               com.amazonaws.auth.*,
               com.amazonaws.regions.*,
               com.amazonaws.services.s3.*,
+              com.amazonaws.client.builder.*,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
               *;resolution:=optional
