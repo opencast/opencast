@@ -127,15 +127,7 @@ configuration.
 The following changes must be made in `…/etc/custom.properties` (`/etc/opencast/custom.properties` in a package
 installation).
 
-1. Change the following configuration key (uncomment if necessary):
-
-        org.opencastproject.db.ddl.generation=false
-
-    If set to true, the database structure will be generated automatically. It works, but without all the database
-    optimizations implemented in the DDL scripts used in the step 2. While convenient for development, you should never
-    set this to `true` in a production environment.
-
-2. Configure Opencast to use MariaDB/MySQL:
+1. Configure Opencast to use MariaDB/MySQL:
 
         org.opencastproject.db.vendor=MySQL
 
