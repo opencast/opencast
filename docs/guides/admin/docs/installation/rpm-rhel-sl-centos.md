@@ -85,15 +85,18 @@ documentation](../configuration/message-broker.md).
 Install Opencast
 ------------------
 
-For this guide, `opencast3-*` is used as placeholder for the package name. It will install the latest version of the
-Opencast 3.x branch. If you want to install another version, please change the name accordingly.
+For this guide, `opencast<version>-*` is used as placeholder for the package name. It will install the latest version
+of Opencast `<version>` branch. If you want to install another version, please change the name accordingly,
+for example, to install Opencast 7 you have to use `opencast7-*` as a placeholder.
 
 
 ### Basic Installation
 
 For a basic installation (All-In-One) just run:
 
-    yum install opencast3-allinone
+    yum install opencast<version>-allinone
+
+Where `<version>` is the mayor version number for Opencast installation.
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.
 
