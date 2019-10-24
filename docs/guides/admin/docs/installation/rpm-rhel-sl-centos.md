@@ -96,7 +96,7 @@ For a basic installation (All-In-One) just run:
 
     yum install opencast<version>-allinone
 
-Where `<version>` is the mayor version number for Opencast installation.
+Where `<version>` is the major version number for Opencast installation.
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.
 
