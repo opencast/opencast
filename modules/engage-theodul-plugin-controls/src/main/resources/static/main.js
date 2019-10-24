@@ -154,11 +154,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   }
 
   /* change these variables */
-  var embedHeightOne = 280;
-  var embedHeightTwo = 315;
-  var embedHeightThree = 360;
-  var embedHeightFour = 480;
-  var embedHeightFive = 720;
+  // relative embed sizes (in percent)
+  var embedSizeOne   = 33 ;
+  var embedSizeTwo   = 50 ;
+  var embedSizeThree = 66 ;
+  var embedSizeFour  = 75 ;
+  var embedSizeFive  = 100 ;
+
   var min_segment_duration = 1000;
   var logoLink = false;
   var logo = plugin_path + 'images/logo.png';
@@ -775,7 +777,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     } else {
       str = Utils.replaceAll(str, 'mode=desktop', 'mode=embed');
     }
-    var code = '<iframe src=\'' + str + '\' style=\'border:0px #FFFFFF none;\' name=\'Opencast media player\' scrolling=\'no\' frameborder=\'0\' marginheight=\'0px\' marginwidth=\'0px\' width=\'' + ratioWidth + '\' height=\'' + ratioHeight + '\' allowfullscreen=\'true\' webkitallowfullscreen=\'true\' mozallowfullscreen=\'true\'></iframe>';
+	// create an adaptive/responsive embed code with an IFRAME inside two nested DIV elements
+	// POSSIBLE IMPROVEMENT: 'padding-bottom:56.25%' fits for 16:9 aspect ratio (=9/16) only - this should be calculated from video dimensions to fit divergent aspect ratios, e.g. 4:3 
+    var code = '<div style=\'width:'+ ratioWidth + '%\'><div style=\'position:relative;height:0;padding-bottom:56.25%\'><iframe src=\'' + str + '\' style=\'border:0px #FFFFFF none;position:absolute;width:100%;height:100%\' name=\'Opencast media player\' scrolling=\'no\' frameborder=\'0\' marginheight=\'0px\' marginwidth=\'0px\' allowfullscreen=\'true\' webkitallowfullscreen=\'true\' mozallowfullscreen=\'true\'></iframe></div></div>';
     code = Utils.escapeHtml(code);
     Engage.trigger(plugin.events.customOKMessage.getName(), 'Copy the following code and paste it to the body of your html page: <div class=\'well well-sm well-alert\'>' + code + '</div>');
   }
@@ -783,25 +787,26 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   function addEmbedRatioEvents() {
     if (!mediapackageError) {
       // setup listeners for the embed buttons
+	  // this code could be streamlined, as only a single embed size var is required here
       $('#' + id_embed0).click(function (e) {
         e.preventDefault();
-        triggerEmbedMessage(embedWidthOne, embedHeightOne);
+        triggerEmbedMessage(embedSizeOne, embedSizeOne);
       });
       $('#' + id_embed1).click(function (e) {
         e.preventDefault();
-        triggerEmbedMessage(embedWidthTwo, embedHeightTwo);
+        triggerEmbedMessage(embedSizeTwo, embedSizeTwo);
       });
       $('#' + id_embed2).click(function (e) {
         e.preventDefault();
-        triggerEmbedMessage(embedWidthThree, embedHeightThree);
+        triggerEmbedMessage(embedSizeThree, embedSizeThree);
       });
       $('#' + id_embed3).click(function (e) {
         e.preventDefault();
-        triggerEmbedMessage(embedWidthFour, embedHeightFour);
+        triggerEmbedMessage(embedSizeFour, embedSizeFour);
       });
       $('#' + id_embed4).click(function (e) {
         e.preventDefault();
-        triggerEmbedMessage(embedWidthFive, embedHeightFive);
+        triggerEmbedMessage(embedSizeFive, embedSizeFive);
       });
     }
   }
@@ -1049,22 +1054,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     }
   }
 
-  function calculateEmbedAspectRatios() {
-    if ((aspectRatioWidth <= 0) && (aspectRatioHeight <= 0)) {
-      aspectRatioWidth = 1280;
-      aspectRatioHeight = 720;
-    }
-    embedWidthOne = Utils.getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightOne);
-    embedWidthTwo = Utils.getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightTwo);
-    embedWidthThree = Utils.getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightThree);
-    embedWidthFour = Utils.getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightFour);
-    embedWidthFive = Utils.getAspectRatioWidth(aspectRatioWidth, aspectRatioHeight, embedHeightFive);
+  function calculateEmbedAspectRatios() {   // after change to relative embed sizes (in %), the name of this function does not make sense - nothing is calculated here anymore! But, preserving its name avoids additional code changes... 
 
-    $('#' + id_embed0).html('Embed ' + embedWidthOne + 'x' + embedHeightOne);
-    $('#' + id_embed1).html('Embed ' + embedWidthTwo + 'x' + embedHeightTwo);
-    $('#' + id_embed2).html('Embed ' + embedWidthThree + 'x' + embedHeightThree);
-    $('#' + id_embed3).html('Embed ' + embedWidthFour + 'x' + embedHeightFour);
-    $('#' + id_embed4).html('Embed ' + embedWidthFive + 'x' + embedHeightFive);
+    $('#' + id_embed0).html('Embed ' + embedSizeOne + '%');
+    $('#' + id_embed1).html('Embed ' + embedSizeTwo + '%');
+    $('#' + id_embed2).html('Embed ' + embedSizeThree + '%');
+    $('#' + id_embed3).html('Embed ' + embedSizeFour + '%');
+    $('#' + id_embed4).html('Embed ' + embedSizeFive + '%');
 
     $('#' + id_embed_button).removeClass('disabled');
   }
