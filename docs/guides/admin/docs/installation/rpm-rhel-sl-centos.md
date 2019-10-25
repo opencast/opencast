@@ -85,10 +85,9 @@ documentation](../configuration/message-broker.md).
 Install Opencast
 ------------------
 
-For this guide, `opencast<version>-*` is used as placeholder for the package name. It will install the latest version
-of Opencast `<version>` branch. If you want to install another version, please change the name accordingly,
-for example, to install Opencast 7 you have to use `opencast7-*` as a placeholder.
-
+For Opencast installation, you can make a basic installation, that consists in a server configured as 
+all in one (All modules in one server). The advanced installation allows you to control where and what parts 
+of Opencast you want to install.
 
 ### Basic Installation
 
@@ -99,6 +98,8 @@ For a basic installation (All-In-One) just run:
 Where `<version>` is the major version number of the Opencast release you want to install.
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.
+
+* Start Active MQ service [and copy the files described in the active MQ installation](#install-apache-activemq)
 
 Now you can start Opencast:
 
