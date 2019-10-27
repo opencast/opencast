@@ -133,6 +133,18 @@ public class TranscriptionDatabaseImpl implements TranscriptionDatabase {
   }
 
   @Override
+  public List<TranscriptionJobControl> findByMediaPackageTrackAndStatus(String mpId, String trackId, String... status)
+          throws TranscriptionDatabaseException {
+    List<TranscriptionJobControlDto> list = TranscriptionJobControlDto
+            .findByMediaPackageTrackAndStatus(emf.createEntityManager(), mpId, trackId, status);
+    List<TranscriptionJobControl> resultList = new ArrayList<TranscriptionJobControl>();
+    for (TranscriptionJobControlDto dto : list) {
+      resultList.add(dto.toTranscriptionJobControl());
+    }
+    return resultList;
+  }
+
+  @Override
   public TranscriptionProviderControl findIdByProvider(String provider) throws TranscriptionDatabaseException {
     TranscriptionProviderControlDto dtoProvider = TranscriptionProviderControlDto.findIdByProvider(emf.createEntityManager(), provider);
     if (dtoProvider != null) {

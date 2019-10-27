@@ -195,6 +195,27 @@ public class TranscriptionJobControlDto implements Serializable {
   }
 
   /**
+   * Find all job controls by media package and status.
+   */
+  @SuppressWarnings("unchecked")
+  public static List<TranscriptionJobControlDto> findByMediaPackageTrackAndStatus(EntityManager em,
+          final String mediaPackageId, String trackId, final String... status) throws TranscriptionDatabaseException {
+    Collection<String> statusCol = new HashSet<String>();
+    for (String st : status)
+      statusCol.add(st);
+    Query query = null;
+    try {
+      query = em.createNamedQuery("TranscriptionJobControl.findByMediaPackageTrackAndStatus");
+      query.setParameter("mediaPackageId", mediaPackageId);
+      query.setParameter("trackId", trackId);
+      query.setParameter("status", statusCol);
+      return query.getResultList();
+    } catch (Exception e) {
+      throw new TranscriptionDatabaseException(e);
+    }
+  }
+
+  /**
    * Update job status
    */
   public static void updateStatus(EntityManager em, String jobId, String status) throws TranscriptionDatabaseException {
