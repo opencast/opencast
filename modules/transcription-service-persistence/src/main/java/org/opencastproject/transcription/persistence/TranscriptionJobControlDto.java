@@ -46,6 +46,7 @@ import javax.xml.bind.annotation.XmlAttribute;
 @Table(name = "oc_transcription_service_job")
 @NamedQueries({
   @NamedQuery(name = "TranscriptionJobControl.findByMediaPackage", query = "SELECT jc FROM TranscriptionJobControl jc WHERE jc.mediaPackageId = :mediaPackageId ORDER BY jc.dateCreated DESC"),
+  @NamedQuery(name = "TranscriptionJobControl.findByMediaPackageTrackAndStatus", query = "SELECT jc FROM TranscriptionJobControl jc WHERE jc.mediaPackageId = :mediaPackageId AND jc.trackId = :trackId AND jc.status IN :status"),
   @NamedQuery(name = "TranscriptionJobControl.findByJob", query = "SELECT jc FROM TranscriptionJobControl jc WHERE jc.transcriptionJobId = :transcriptionJobId"),
   @NamedQuery(name = "TranscriptionJobControl.findByStatus", query = "SELECT jc FROM TranscriptionJobControl jc WHERE jc.status IN :status")})
 public class TranscriptionJobControlDto implements Serializable {

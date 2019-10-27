@@ -134,6 +134,18 @@ public class TranscriptionDatabaseTest {
   }
 
   @Test
+  public void testFindByMediaPackageTrackAndStatus() throws Exception {
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, STATUS, TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID2, STATUS, TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID2, JOB_ID3, STATUS2, TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    database.storeJobControl(MP_ID2, TRACK_ID2, JOB_ID2, STATUS2, TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    database.storeJobControl(MP_ID3, TRACK_ID3, JOB_ID3, STATUS, TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+
+    List<TranscriptionJobControl> list = database.findByMediaPackageTrackAndStatus(MP_ID, TRACK_ID, STATUS);
+    Assert.assertEquals(2, list.size());
+  }
+
+  @Test
   public void testDeleteJobControl() throws Exception {
     long dt1 = System.currentTimeMillis();
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, STATUS, TRACK_DURATION, DATE_EXPECTED, PROVIDER);
