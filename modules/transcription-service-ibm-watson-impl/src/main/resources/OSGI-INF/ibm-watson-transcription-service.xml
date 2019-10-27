@@ -27,7 +27,7 @@
              interface="org.opencastproject.security.api.OrganizationDirectoryService"
              cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
   <reference name="database"
-             interface="org.opencastproject.transcription.ibmwatson.persistence.TranscriptionDatabase"
+             interface="org.opencastproject.transcription.persistence.TranscriptionDatabase"
              policy="static" cardinality="1..1" bind="setDatabase"/>
   <reference name="assetManager" interface="org.opencastproject.assetmanager.api.AssetManager"
              cardinality="1..1" policy="static" bind="setAssetManager"/>

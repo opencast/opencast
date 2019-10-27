@@ -47,9 +47,9 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.transcription.api.TranscriptionServiceException;
-import org.opencastproject.transcription.ibmwatson.persistence.TranscriptionDatabase;
-import org.opencastproject.transcription.ibmwatson.persistence.TranscriptionDatabaseException;
-import org.opencastproject.transcription.ibmwatson.persistence.TranscriptionJobControl;
+import org.opencastproject.transcription.persistence.TranscriptionDatabase;
+import org.opencastproject.transcription.persistence.TranscriptionDatabaseException;
+import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
@@ -105,6 +105,8 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(IBMWatsonTranscriptionService.class);
+
+  private static final String PROVIDER = "IBM Watson";
 
   private static final String JOB_TYPE = "org.opencastproject.transcription.ibmwatson";
 
@@ -596,8 +598,8 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
                   "Transcription for mp %s has been submitted. Job id: %s, job status: %s, job url: %s", mpId,
                   jobId, jobStatus, jobUrl));
 
-          database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.Progress.name(),
-                  track.getDuration() == null ? 0 : track.getDuration().longValue());
+          database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.InProgress.name(),
+                  track.getDuration() == null ? 0 : track.getDuration().longValue(), null, PROVIDER);
           EntityUtils.consume(entity);
           return;
         case HttpStatus.SC_BAD_REQUEST: // 400
@@ -756,7 +758,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     // Current job is still in progress state
     int attempts = database
             .findByMediaPackageTrackAndStatus(mpId, trackId, TranscriptionJobControl.Status.Error.name(),
-                    TranscriptionJobControl.Status.Progress.name(), TranscriptionJobControl.Status.Canceled.name())
+                    TranscriptionJobControl.Status.InProgress.name(), TranscriptionJobControl.Status.Canceled.name())
             .size();
     if (attempts < maxAttempts) {
       // Update state in database to retry
@@ -872,7 +874,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
       try {
         // Find jobs that are in progress and jobs that had transcription complete i.e. got the callback
-        List<TranscriptionJobControl> jobs = database.findByStatus(TranscriptionJobControl.Status.Progress.name(),
+        List<TranscriptionJobControl> jobs = database.findByStatus(TranscriptionJobControl.Status.InProgress.name(),
                 TranscriptionJobControl.Status.TranscriptionComplete.name());
 
         for (TranscriptionJobControl j : jobs) {
@@ -881,7 +883,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
           // If the job in progress, check if it should already have finished and we didn't get the callback for some
           // reason. This can happen if the admin server was offline when the callback came.
-          if (TranscriptionJobControl.Status.Progress.name().equals(j.getStatus())) {
+          if (TranscriptionJobControl.Status.InProgress.name().equals(j.getStatus())) {
             // If job should already have been completed, try to get the results. Consider a buffer factor so that we
             // don't try it too early.
             if (j.getDateCreated().getTime() + j.getTrackDuration() + completionCheckBuffer * 1000 < System
