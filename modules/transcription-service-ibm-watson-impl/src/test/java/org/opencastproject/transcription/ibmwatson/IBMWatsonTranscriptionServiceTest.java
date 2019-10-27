@@ -92,6 +92,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -104,6 +105,7 @@ public class IBMWatsonTranscriptionServiceTest {
   private static final String TRACK_ID = "audioTrack1";
   private static final String JOB_ID = "jobId1";
   private static final long TRACK_DURATION = 60000;
+  private static final Date DATE_EXPECTED = null;
   private static final String PULLED_TRANSCRIPTION_FILE = "pulled_transcription.json";
   private static final String PULLED_TRANSCRIPTION_ERROR_FILE = "pulled_transcription_error.json";
   private static final String PUSHED_TRANSCRIPTION_FILE = "pushed_transcription.json";
@@ -338,7 +340,7 @@ public class IBMWatsonTranscriptionServiceTest {
 
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PUSHED_TRANSCRIPTION_FILE);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
 
     Capture<String> capturedCollection = Capture.newInstance();
@@ -367,7 +369,7 @@ public class IBMWatsonTranscriptionServiceTest {
 
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PUSHED_TRANSCRIPTION_FILE);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
 
     service.transcriptionError(MP_ID, obj);
@@ -388,7 +390,7 @@ public class IBMWatsonTranscriptionServiceTest {
 
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PUSHED_TRANSCRIPTION_FILE);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
 
     service.transcriptionError(MP_ID, obj);
@@ -408,8 +410,8 @@ public class IBMWatsonTranscriptionServiceTest {
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PUSHED_TRANSCRIPTION_FILE);
 
     database.storeJobControl(MP_ID, TRACK_ID, "another_job", TranscriptionJobControl.Status.Error.name(),
-            TRACK_DURATION, null, PROVIDER);
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, null, PROVIDER);
+            TRACK_DURATION, DATE_EXPECTED, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
 
     service.transcriptionError(MP_ID, obj);
@@ -428,7 +430,7 @@ public class IBMWatsonTranscriptionServiceTest {
 
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + COMPLETE_WITH_ERROR_FILE);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
 
     service.transcriptionDone(MP_ID, obj);
@@ -447,7 +449,7 @@ public class IBMWatsonTranscriptionServiceTest {
 
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
 
     Capture<String> capturedCollection = Capture.newInstance();
     Capture<String> capturedFileName = Capture.newInstance();
@@ -530,9 +532,9 @@ public class IBMWatsonTranscriptionServiceTest {
   public void testGetGeneratedTranscriptionNoJobId() throws Exception {
     service.activate(cc);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     database.storeJobControl(MP_ID, "audioTrack2", "jobId2", TranscriptionJobControl.Status.InProgress.name(),
-            TRACK_DURATION, null, PROVIDER);
+            TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     database.updateJobControl(JOB_ID, TranscriptionJobControl.Status.TranscriptionComplete.name());
 
     URI uri = new URI("http://ADMIN_SERVER/collection/" + IBMWatsonTranscriptionService.TRANSCRIPT_COLLECTION + "/"
@@ -554,7 +556,7 @@ public class IBMWatsonTranscriptionServiceTest {
 
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
 
     URI uri = new URI("http://ADMIN_SERVER/collection/" + IBMWatsonTranscriptionService.TRANSCRIPT_COLLECTION + "/"
             + JOB_ID + ".json");
@@ -634,9 +636,9 @@ public class IBMWatsonTranscriptionServiceTest {
   public void testWorkflowDispatcherRunTranscriptionCompletedState() throws Exception {
     service.activate(cc);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     database.storeJobControl("mpId2", "audioTrack2", "jobId2", TranscriptionJobControl.Status.InProgress.name(),
-            TRACK_DURATION, null, PROVIDER);
+            TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     database.updateJobControl(JOB_ID, TranscriptionJobControl.Status.TranscriptionComplete.name());
 
     Capture<Set<String>> capturedMpIds = mockAssetManagerAndWorkflow(IBMWatsonTranscriptionService.DEFAULT_WF_DEF,
@@ -661,9 +663,9 @@ public class IBMWatsonTranscriptionServiceTest {
 
     InputStream stream = IBMWatsonTranscriptionServiceTest.class.getResourceAsStream("/" + PULLED_TRANSCRIPTION_FILE);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), 0, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), 0, DATE_EXPECTED, PROVIDER);
     database.storeJobControl("mpId2", "audioTrack2", "jobId2", TranscriptionJobControl.Status.InProgress.name(),
-            TRACK_DURATION, null, PROVIDER);
+            TRACK_DURATION, DATE_EXPECTED, PROVIDER);
 
     EasyMock.expect(workspace.putInCollection(EasyMock.anyObject(String.class), EasyMock.anyObject(String.class),
             EasyMock.anyObject(InputStream.class))).andReturn(new URI("http://anything"));
@@ -723,7 +725,7 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet))).andReturn(response).anyTimes();
     EasyMock.replay(httpClient);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), 0, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), 0, DATE_EXPECTED, PROVIDER);
 
     EasyMock.replay(workspace);
 
@@ -754,7 +756,7 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet))).andReturn(response).anyTimes();
     EasyMock.replay(httpClient);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), 0, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), 0, DATE_EXPECTED, PROVIDER);
 
     EasyMock.replay(workspace);
 
@@ -792,7 +794,7 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet))).andReturn(response).anyTimes();
     EasyMock.replay(httpClient);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), 0, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), 0, DATE_EXPECTED, PROVIDER);
 
     EasyMock.replay(workspace);
 
@@ -832,7 +834,7 @@ public class IBMWatsonTranscriptionServiceTest {
     EasyMock.expect(httpClient.execute(EasyMock.capture(capturedGet))).andReturn(response).anyTimes();
     EasyMock.replay(httpClient);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), 0, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.InProgress.name(), 0, DATE_EXPECTED, PROVIDER);
     Capture<Set<String>> capturedMpIds = mockAssetManagerAndWorkflow(RETRY_WORKFLOW, true);
 
     EasyMock.replay(workspace);
@@ -855,7 +857,7 @@ public class IBMWatsonTranscriptionServiceTest {
     props.put(IBMWatsonTranscriptionService.RETRY_WORKLFOW_CONFIG, RETRY_WORKFLOW);
     service.activate(cc);
 
-    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Retry.name(), TRACK_DURATION, null, PROVIDER);
+    database.storeJobControl(MP_ID, TRACK_ID, JOB_ID, TranscriptionJobControl.Status.Retry.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     Capture<Set<String>> capturedMpIds = mockAssetManagerAndWorkflow(RETRY_WORKFLOW, true);
 
     WorkflowDispatcher dispatcher = service.new WorkflowDispatcher();
