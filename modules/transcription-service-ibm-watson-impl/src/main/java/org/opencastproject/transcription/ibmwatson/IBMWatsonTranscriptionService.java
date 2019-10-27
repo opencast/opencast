@@ -50,6 +50,7 @@ import org.opencastproject.transcription.api.TranscriptionServiceException;
 import org.opencastproject.transcription.persistence.TranscriptionDatabase;
 import org.opencastproject.transcription.persistence.TranscriptionDatabaseException;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
+import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
@@ -874,10 +875,26 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
       try {
         // Find jobs that are in progress and jobs that had transcription complete i.e. got the callback
+
+        long providerId;
+        TranscriptionProviderControl providerInfo = database.findIdByProvider(PROVIDER);
+        if (providerInfo != null) {
+          providerId = providerInfo.getId();
+        } else {
+          logger.debug("No provider entry for {}", PROVIDER);
+          return;
+        }
+
         List<TranscriptionJobControl> jobs = database.findByStatus(TranscriptionJobControl.Status.InProgress.name(),
                 TranscriptionJobControl.Status.TranscriptionComplete.name());
 
         for (TranscriptionJobControl j : jobs) {
+
+          // Don't process jobs for other services
+          if (j.getProviderId() != providerId) {
+            continue;
+          }
+
           String mpId = j.getMediaPackageId();
           String jobId = j.getTranscriptionJobId();
 
