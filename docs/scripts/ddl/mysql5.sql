@@ -585,18 +585,6 @@ CREATE TABLE oc_themes (
     CONSTRAINT FK_oc_themes_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE oc_ibm_watson_transcript_job (
-    id BIGINT(20) NOT NULL,
-    mediapackage_id VARCHAR(128) NOT NULL,
-    track_id VARCHAR(128) NOT NULL,
-    job_id  VARCHAR(128) NOT NULL,
-    date_created datetime NOT NULL,
-    date_completed datetime DEFAULT NULL,
-    status VARCHAR(128) DEFAULT NULL,
-    track_duration BIGINT NOT NULL,
-    PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE oc_aws_asset_mapping (
   id BIGINT(20) NOT NULL,
   mediapackage_element VARCHAR(128) NOT NULL,
