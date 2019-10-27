@@ -50,9 +50,11 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.transcription.api.TranscriptionServiceException;
 import org.opencastproject.transcription.ibmwatson.IBMWatsonTranscriptionService.WorkflowDispatcher;
-import org.opencastproject.transcription.persistence.TranscriptionDatabase;
+import org.opencastproject.transcription.persistence.TranscriptionDatabaseImpl;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
+import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -79,7 +81,6 @@ import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -112,6 +113,7 @@ public class IBMWatsonTranscriptionServiceTest {
   private static final String API_KEY = "test-api-key";
   private static final String RETRY_WORKFLOW = "retry-workflow";
   private static final String PROVIDER = "IBM Watson";
+  private static final long PROVIDER_ID = 1;
 
   private CloseableHttpClient httpClient;
   private MediaPackage mediaPackage;
@@ -119,7 +121,7 @@ public class IBMWatsonTranscriptionServiceTest {
   private File audioFile;
 
   private IBMWatsonTranscriptionService service;
-  private TranscriptionDatabase database;
+  private TranscriptionDatabaseImpl database;
   private Workspace workspace;
   private AssetManager assetManager;
   private WorkflowService wfService;
@@ -182,7 +184,15 @@ public class IBMWatsonTranscriptionServiceTest {
     workspace = EasyMock.createNiceMock(Workspace.class);
 
     // Database
-    database = EasyMock.createNiceMock(TranscriptionDatabase.class);
+    database = new TranscriptionDatabaseImpl() {
+      @Override
+      public TranscriptionProviderControl findIdByProvider(String provider) {
+        return new TranscriptionProviderControl(PROVIDER_ID, PROVIDER);
+      }
+    };
+    database.setEntityManagerFactory(
+            PersistenceUtil.newTestEntityManagerFactory("org.opencastproject.transcription.persistence"));
+    database.activate(null);
 
     httpClient = EasyMock.createNiceMock(CloseableHttpClient.class);
     service = new IBMWatsonTranscriptionService() {
@@ -268,7 +278,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testCreateRecognitionsJob() throws Exception {
     service.activate(cc);
 
@@ -324,7 +333,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testTranscriptionDone() throws Exception {
     service.activate(cc);
 
@@ -354,7 +362,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testTranscriptionError() throws Exception {
     service.activate(cc);
 
@@ -374,7 +381,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testTranscriptionErrorWithMaxAttempts() throws Exception {
     props.put(IBMWatsonTranscriptionService.MAX_ATTEMPTS_CONFIG, 2);
     props.put(IBMWatsonTranscriptionService.RETRY_WORKLFOW_CONFIG, RETRY_WORKFLOW);
@@ -394,7 +400,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testTranscriptionErrorMaxAttemptsExceeded() throws Exception {
     props.put(IBMWatsonTranscriptionService.MAX_ATTEMPTS_CONFIG, 2);
     props.put(IBMWatsonTranscriptionService.RETRY_WORKLFOW_CONFIG, RETRY_WORKFLOW);
@@ -418,7 +423,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testTranscriptionCompleteWithError() throws Exception {
     service.activate(cc);
 
@@ -438,7 +442,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testGetAndSaveJobResults() throws Exception {
     service.activate(cc);
 
@@ -524,7 +527,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testGetGeneratedTranscriptionNoJobId() throws Exception {
     service.activate(cc);
 
@@ -547,7 +549,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testGetGeneratedTranscriptionNotInWorkspace() throws Exception {
     service.activate(cc);
 
@@ -630,7 +631,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testWorkflowDispatcherRunTranscriptionCompletedState() throws Exception {
     service.activate(cc);
 
@@ -656,7 +656,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testWorkflowDispatcherRunProgressState() throws Exception {
     service.activate(cc);
 
@@ -704,7 +703,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testWorkflowDispatcherFailedState() throws Exception {
     service.activate(cc);
 
@@ -743,7 +741,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testWorkflowDispatcherJobNotFound() throws Exception {
     service.activate(cc);
 
@@ -776,7 +773,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testWorkflowDispatcherJobInProgressTooLong() throws Exception {
     service.activate(cc);
 
@@ -815,7 +811,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testWorkflowDispatcherJobInProgressTooLongWithMaxAttempts() throws Exception {
     props.put(IBMWatsonTranscriptionService.MAX_ATTEMPTS_CONFIG, 2);
     props.put(IBMWatsonTranscriptionService.RETRY_WORKLFOW_CONFIG, RETRY_WORKFLOW);
@@ -855,7 +850,6 @@ public class IBMWatsonTranscriptionServiceTest {
   }
 
   @Test
-  @Ignore
   public void testWorkflowDispatcherRetry() throws Exception {
     props.put(IBMWatsonTranscriptionService.MAX_ATTEMPTS_CONFIG, 2);
     props.put(IBMWatsonTranscriptionService.RETRY_WORKLFOW_CONFIG, RETRY_WORKFLOW);
