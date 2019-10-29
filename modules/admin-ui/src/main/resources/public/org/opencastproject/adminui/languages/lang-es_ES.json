@@ -66,7 +66,7 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Esta serie contiene eventos. Eliminar la serie no eliminará los acontecimientos.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "EVENT_WILL_BE_GONE": "Si continúa, el evento se eliminará permanentemente."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Esta serie no se puede eliminar ya que todavía contiene eventos."
@@ -1984,7 +1984,7 @@
          "RANDOM": "Esto muestra datos aleatorios como muestra. Puede desactivar este gráfico eliminando la definición json del proveedor de estadísticas correspondiente de etc/providers",
          "VIEWS_SUM": "Aquí se muestra el número total de vistas por unidad de tiempo.",
          "VIEWS_AVG": "Aquí se muestra el número medio de vistas diarias por unidad de tiempo.",
-         "PUBLISHEDHOURS": "This displays the published hours of video"
+         "PUBLISHEDHOURS": "Esto muestra las horas de video publicadas"
       }
    }
 }
