@@ -22,7 +22,7 @@
     <commons-beanutils.version>1.9.3</commons-beanutils.version>
     <commons-codec.version>1.12</commons-codec.version>
     <commons-collections.version>4.3</commons-collections.version>
-    <commons-compress.version>1.18</commons-compress.version>
+    <commons-compress.version>1.19</commons-compress.version>
     <commons-csv.version>1.6</commons-csv.version>
     <commons-fileupload.version>1.4</commons-fileupload.version>
     <commons-lang3.version>3.8.1</commons-lang3.version>
