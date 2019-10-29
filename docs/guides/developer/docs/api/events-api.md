@@ -281,7 +281,7 @@ scheduling a single event:
   "agent_id": "ca24",
   "start": "2018-03-27T16:00:00Z",
   "end": "2018-03-27T19:00:00Z",
-  "inputs": ["default"],
+  "inputs": ["default"]
 }
 ```
 
