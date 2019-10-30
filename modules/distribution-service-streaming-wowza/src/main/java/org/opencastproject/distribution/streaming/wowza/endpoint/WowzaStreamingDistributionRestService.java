@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -72,10 +73,10 @@ import javax.ws.rs.core.Response.Status;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
         + "other words, there is a bug! You should file an error report with your server logs from the time when the "
         + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
-public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobProducerEndpoint {
+public class WowzaStreamingDistributionRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(WowzaAdaptiveStreamingDistributionRestService.class);
+  private static final Logger logger = LoggerFactory.getLogger(WowzaStreamingDistributionRestService.class);
 
   /** The distribution service */
   private StreamingDistributionService service;
@@ -111,6 +112,20 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
    */
   public void setService(StreamingDistributionService service) {
     this.service = service;
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("/publishToStreaming")
+  @RestQuery(name = "publishToStreaming", description = "Checks whether publish to streaming is configured for the "
+                  + "current organization",
+          returnDescription = "Returns whether publish to streaming is configured for the current organization as a "
+                            + "boolean.",
+          reponses = {
+                  @RestResponse(responseCode = SC_OK, description = "Whether publish to streaming is configured for "
+                                                                  + "the current organization.")})
+  public Response publishToStreaming() {
+    return Response.ok(Boolean.toString(service.publishToStreaming())).build();
   }
 
   @POST
