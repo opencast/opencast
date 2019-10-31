@@ -458,4 +458,10 @@ angular.module('adminNg.controllers')
       }
     };
 
+    var POLICIES_LOAD_STEP = 50;
+    $scope.limit = POLICIES_LOAD_STEP;
+    $scope.loadmore = function () {
+      $scope.limit += POLICIES_LOAD_STEP;
+    };
+
   }]);

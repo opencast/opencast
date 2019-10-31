@@ -997,7 +997,9 @@
                   "NEW": "Neue Richtlinie",
                   "DETAILS": "Details",
                   "REPLACE_EVENT_ACLS": "Zugriffsrechte der Einzelaufzeichnungen aktualisieren",
-                  "REPLACE_EVENT_ACLS_HINT": "Sicherstellen, dass alle Aufzeichnungen dieser Series genau diese Zugriffsrechte haben"
+                  "REPLACE_EVENT_ACLS_HINT": "Sicherstellen, dass alle Aufzeichnungen dieser Series genau diese Zugriffsrechte haben",
+                  "LOAD_MORE_LIMIT": "Zugriffsrechten geladen.",
+                  "LOAD_MORE_LINK": "Mehr laden"
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
