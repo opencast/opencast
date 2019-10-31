@@ -53,6 +53,7 @@ import org.opencastproject.videoeditor.ffmpeg.FFmpegEdit;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -209,7 +210,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     // create working directory
     File tempDirectory = new File(new File(workspace.rootDirectory()), "editor");
     tempDirectory = new File(tempDirectory, Long.toString(job.getId()));
-    String filename = String.format("%s-%s%s", sourceTrackFlavor, sourceFile.getName(), outputFileExtension);
+    String filename = String.format("%s-%s%s", sourceTrackFlavor, FilenameUtils.removeExtension(sourceFile.getName()), outputFileExtension);
     File outputPath = new File(tempDirectory, filename);
 
     if (!outputPath.getParentFile().exists()) {
