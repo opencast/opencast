@@ -4,6 +4,21 @@ Changelog
 Opencast 7
 ----------
 
+### Opencast 7.4
+
+*Released on October 02, 2019*
+
+- [[MH-13517](https://opencast.jira.com/browse/MH-13517)][[#1092](https://github.com/opencast/opencast/pull/1092)] -
+  Set an absolute limit on solr query size
+- [[MH-13476](https://opencast.jira.com/browse/MH-13476)][[#1088](https://github.com/opencast/opencast/pull/1088)] -
+  Filter capture agent roles for ACLs
+- [[#1087](https://github.com/opencast/opencast/pull/1087)] -
+  Issue 1068, Stop job dispatcher before unregistering hosts, junit MH-13675
+- [[MH-13706](https://opencast.jira.com/browse/MH-13706)][[#1072](https://github.com/opencast/opencast/pull/1072)] -
+  fix the date cell of the events overview table in the admin UI
+- [[#1056](https://github.com/opencast/opencast/pull/1056)] -
+  NOISSUE: CAS security example is very out of date
+
 ### Opencast 7.3
 
 *Released on September 19, 2019*

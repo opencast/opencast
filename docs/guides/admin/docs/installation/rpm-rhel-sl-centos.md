@@ -41,7 +41,7 @@ Activate Repository
 
 First you have to install the necessary repositories so that your package manager can access them:
 
-* Add Opencast repository:
+1. Add Opencast repository:
 
         cd /etc/yum.repos.d
         curl -O https://pkg.opencast.org/opencast.repo \
@@ -85,25 +85,30 @@ documentation](../configuration/message-broker.md).
 Install Opencast
 ------------------
 
-For this guide, `opencast3-*` is used as placeholder for the package name. It will install the latest version of the
-Opencast 3.x branch. If you want to install another version, please change the name accordingly.
-
+This describes a simple, single-node installation. A more complex, multi-node installation guide can be found in the
+[Advanced Installation](#advanced-installation) section below and in the guide [Install Across Multiple Servers
+](multiple-servers.md).
 
 ### Basic Installation
 
 For a basic installation (All-In-One) just run:
 
-    yum install opencast3-allinone
+    yum install opencast<version>-allinone
 
-This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.
+Where `<version>` is the major version number of the Opencast release you want to install.
+
+This will install the default distribution of Opencast and all its dependencies, including 3rd-Party-Tools.
 
 Now you can start Opencast:
+
+* Don't forget to start configure and start ActiveMQ first as [described in the ActiveMQ installation section
+  ](#install-apache-activemq).
 
 * On a SysV-init based system
 
         service opencast start
 
-* On a Systemd based system
+* On a systemd based system
 
         systemctl start opencast.service
 
@@ -154,7 +159,7 @@ latest 3.x release, not the latest 4.x release. To upgrade from one version to a
 
         service opencast stop
 
-* On a Systemd based system
+* On a systemd based system
 
         systemctl stop opencast.service
 

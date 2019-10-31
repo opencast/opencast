@@ -508,6 +508,7 @@ public class IndexServiceImpl implements IndexService {
 
         for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
+
           String fieldName = item.getFieldName();
           if (item.isFormField()) {
             if ("metadata".equals(fieldName)) {
@@ -533,7 +534,8 @@ public class IndexServiceImpl implements IndexService {
             // AngularJS file upload lib appends ".0" to field name, so we cut that off
             fieldName = fieldName.substring(0, fieldName.lastIndexOf("."));
             final MediaType mediaType = MediaType.parse(item.getContentType());
-            final boolean accepted = RequestUtils.typeIsAccepted(fieldName, mediaType, listProvidersService);
+            final boolean accepted = RequestUtils.typeIsAccepted(item.getName(), fieldName, mediaType,
+                    listProvidersService);
             if (!accepted) {
               throw new UnsupportedAssetException("Provided file format " + mediaType.toString() + " not allowed.");
             }
@@ -631,7 +633,8 @@ public class IndexServiceImpl implements IndexService {
           // AngularJS file upload lib appends ".0" to field name, so we cut that off
           fieldName = fieldName.substring(0, fieldName.lastIndexOf("."));
           final MediaType mediaType = MediaType.parse(item.getContentType());
-          final boolean accepted = RequestUtils.typeIsAccepted(fieldName, mediaType, listProvidersService);
+          final boolean accepted = RequestUtils.typeIsAccepted(item.getName(), fieldName, mediaType,
+                  listProvidersService);
           if (!accepted) {
             throw new UnsupportedAssetException("Provided file format " + mediaType.toString() + " not allowed.");
           }
