@@ -151,4 +151,4 @@ jobs:
         script: bash .upload-crowdin.sh
         on:
           all_branches: true
-          condition: $TRAVIS_BRANCH =~ ^develop|r/
+          condition: $TRAVIS_BRANCH =~ ^develop|^r/
