@@ -110,8 +110,8 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
    */
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
-    logger.debug("Running a/v muxing workflow operation on workflow {}", workflowInstance.getId());
     try {
+      logger.debug("Running a/v muxing workflow operation on workflow {}", workflowInstance.getId());
       return mux(workflowInstance.getMediaPackage(), workflowInstance.getCurrentOperation());
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
