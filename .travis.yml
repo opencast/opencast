@@ -126,6 +126,30 @@ jobs:
       script:
         - mvn clean install -Pnone
 
+    # Run JS tests in Chrome
+    - stage: build
+      env: name=chrome
+      addons:
+        chrome: stable
+      install:
+        - ( cd modules/admin-ui &&
+            npm ci &&
+            ./node_modules/.bin/bower install)
+      script:
+        - (cd modules/admin-ui && npm run test-chrome)
+
+    # Run JS tests in Firefox
+    - stage: build
+      env: name=firefox
+      addons:
+        firefox: latest
+      install:
+        - ( cd modules/admin-ui &&
+            npm ci &&
+            ./node_modules/.bin/bower install)
+      script:
+        - (cd modules/admin-ui && npm run test-firefox)
+
     # Make a simple build to generate all Opencast artifacts while excluding as many checks as possible since we do a
     # proper test in parallel anyway. Then run `mvn site` to generate Javadocs. We exclude checkstyle and tests since
     # they are run separately. For now, we also exclude pmd and cpd since we are not doing anything with their report.
