@@ -24,12 +24,17 @@ Installation from Repository
 There are package repositories available for multiple operating systems. It provides packages containing pre-configured and
 pre-built Opencast installations.
 
-* [RedHat Enterprise Linux](rpm-rhel-sl-centos.md)
-* [CentOS](rpm-rhel-sl-centos.md)
-* [Scientific Linux](rpm-rhel-sl-centos.md)
+* [RedHat Enterprise Linux 7](rpm-el7.md)
+* [CentOS 7](rpm-el7.md)
+* [Scientific Linux 7](rpm-el7.md)
 * [Fedora](rpm-fedora.md)
 * [Debian](debs.md)
 * [Ubuntu](debs.md)
+
+Experimental
+
+* [RedHat Enterprise Linux 8](rpm-el8.md)
+* [CentOS 8](rpm-el8.md)
 
 
 Installation via Script
