@@ -26,22 +26,22 @@ var gulp = require('gulp');
 var spawn = require('child_process').spawn;
 var mergeStream = require('merge-stream');
 
+
 var buildPath = 'target/gulp',
     paellaSrc = 'src/main/paella-opencast';
 
 
 gulp.task('paella-opencast:prepare:source', function(){
   var s1 = gulp.src('node_modules/paellaplayer/**').pipe(gulp.dest(buildPath + '/paella'));
-  var s2 = gulp.src('paella622dependency/npm-shrinkwrap.json').pipe(gulp.dest(buildPath + '/paella'));
-  var s3 = gulp.src(paellaSrc + '/plugins/**').pipe(gulp.dest(buildPath + '/paella/plugins'));
+  var s2 = gulp.src(paellaSrc + '/plugins/**').pipe(gulp.dest(buildPath + '/paella/plugins'));
 
-  return mergeStream(s1,s2,s3);
+  return mergeStream(s1,s2);
 });
 
 
 
 gulp.task('paella-opencast:prepare', gulp.series('paella-opencast:prepare:source', function(cb){
-  var cmd_npm = spawn('npm', ['ci'], {cwd: buildPath + '/paella', stdio: 'inherit'});
+  var cmd_npm = spawn('npm', ['install'], {cwd: buildPath + '/paella', stdio: 'inherit'});
   cmd_npm.on('close', function (code) {
     cb(code);
   });
