@@ -42,7 +42,8 @@ nav:
    - Installation from Package:
       - Debian/Ubuntu: 'installation/debs.md'
       - Fedora: 'installation/rpm-fedora.md'
-      - RHEL/CentOS: 'installation/rpm-rhel-sl-centos.md'
+      - RHEL/CentOS 7: 'installation/rpm-el7.md'
+      - RHEL/CentOS 8: 'installation/rpm-el8.md'
    - Installation via script:
       - Ansible: 'installation/ansible.md'
    - Installation with Docker:
