@@ -997,7 +997,9 @@
                   "NEW": "Yeni sözleşme",
                   "DETAILS": "Ayrıntılar",
                   "REPLACE_EVENT_ACLS": "Etkinlik izinlerini güncelle",
-                  "REPLACE_EVENT_ACLS_HINT": "Bu dizinin tüm etkinliklerinin geçerli izinlere sahip olduğundan emin olun"
+                  "REPLACE_EVENT_ACLS_HINT": "Bu dizinin tüm etkinliklerinin geçerli izinlere sahip olduğundan emin olun",
+                  "LOAD_MORE_LIMIT": "policies shown.",
+                  "LOAD_MORE_LINK": "Load more"
                },
                "ROLES": {
                   "LABEL": "Bir rol seç",

@@ -997,7 +997,9 @@
                   "NEW": "מדיניות חדשה",
                   "DETAILS": "פרטים",
                   "REPLACE_EVENT_ACLS": "עדכון הרשאות אירוע",
-                  "REPLACE_EVENT_ACLS_HINT": "בדיקה שכל האירועים של סדרה זו יש הרשאות אלה בתוקף"
+                  "REPLACE_EVENT_ACLS_HINT": "בדיקה שכל האירועים של סדרה זו יש הרשאות אלה בתוקף",
+                  "LOAD_MORE_LIMIT": "policies shown.",
+                  "LOAD_MORE_LINK": "Load more"
                },
                "ROLES": {
                   "LABEL": "בחר תפקיד",

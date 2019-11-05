@@ -997,7 +997,9 @@
                   "NEW": "Add row",
                   "DETAILS": "Détails",
                   "REPLACE_EVENT_ACLS": "Mettre à jour les permissions de l'événement",
-                  "REPLACE_EVENT_ACLS_HINT": "Assurez-vous que tous les événements de cette série ont ces permissions en vigueur"
+                  "REPLACE_EVENT_ACLS_HINT": "Assurez-vous que tous les événements de cette série ont ces permissions en vigueur",
+                  "LOAD_MORE_LIMIT": "policies shown.",
+                  "LOAD_MORE_LINK": "Load more"
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",

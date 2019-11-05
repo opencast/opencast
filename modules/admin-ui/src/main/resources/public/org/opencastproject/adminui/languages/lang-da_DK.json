@@ -997,7 +997,9 @@
                   "NEW": "Ny politik",
                   "DETAILS": "Oplysninger",
                   "REPLACE_EVENT_ACLS": "Opdatér begivenhedsrettigheder",
-                  "REPLACE_EVENT_ACLS_HINT": "Sikrer, at alle begivenhederne i denne serie har disse aktive rettighedeer"
+                  "REPLACE_EVENT_ACLS_HINT": "Sikrer, at alle begivenhederne i denne serie har disse aktive rettighedeer",
+                  "LOAD_MORE_LIMIT": "policies shown.",
+                  "LOAD_MORE_LINK": "Load more"
                },
                "ROLES": {
                   "LABEL": "Vælg en rolle",
