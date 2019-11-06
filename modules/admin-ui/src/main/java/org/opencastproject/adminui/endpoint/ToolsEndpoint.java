@@ -325,6 +325,18 @@ public class ToolsEndpoint implements ManagedService {
             && adminUIConfiguration.getPreviewSubtype().equals(element.getFlavor().getSubtype());
   }
 
+  private String signIfNecessary(final URI uri) {
+    if (!urlSigningService.accepts(uri.toString())) {
+      return uri.toString();
+    }
+    String clientIP = signWithClientIP ? securityService.getUserIP() : null;
+    try {
+      return new URI(urlSigningService.sign(uri.toString(), expireSeconds, null, clientIP)).toString();
+    } catch (URISyntaxException | UrlSigningException e) {
+      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @GET
   @Path("{mediapackageid}/editor.json")
   @Produces(MediaType.APPLICATION_JSON)
@@ -345,25 +357,8 @@ public class ToolsEndpoint implements ManagedService {
     List<JValue> jPreviews = new ArrayList<>();
     List<JValue> jTracks = new ArrayList<>();
     for (MediaPackageElement element : previewPublications) {
-      final URI elementUri;
-      if (urlSigningService.accepts(element.getURI().toString())) {
-        try {
-          String clientIP = null;
-          if (signWithClientIP) {
-            clientIP = securityService.getUserIP();
-          }
-          elementUri = new URI(urlSigningService.sign(element.getURI().toString(), expireSeconds, null, clientIP));
-        } catch (URISyntaxException e) {
-          logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
-          throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-        } catch (UrlSigningException e) {
-          logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
-          throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-        }
-      } else {
-        elementUri = element.getURI();
-      }
-      JObject jPreview = obj(f("uri", v(elementUri.toString())));
+      final String elementUri = signIfNecessary(element.getURI());
+      JObject jPreview = obj(f("uri", v(elementUri)));
       // Get the elements frame rate for frame by frame skipping in the editor
       // Note that this assumes that the resulting video will have the same frame rate as the preview
       // and also that there is only one video stream for any preview element.
@@ -391,26 +386,11 @@ public class ToolsEndpoint implements ManagedService {
       // Check if there's a waveform for the current track
       Opt<Attachment> optWaveform = getWaveformForTrack(mp, element);
       if (optWaveform.isSome()) {
-        final URI waveformUri;
-        if (urlSigningService.accepts(element.getURI().toString())) {
-          try {
-            waveformUri = new URI(
-                    urlSigningService.sign(optWaveform.get().getURI().toString(), expireSeconds, null, null));
-          } catch (URISyntaxException e) {
-            logger.error("Error while trying to serialize the waveform urls because: {}", getStackTrace(e));
-            throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-          } catch (UrlSigningException e) {
-            logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
-            throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-          }
-        } else {
-          waveformUri = optWaveform.get().getURI();
-        }
-        jTracks.add(jTrack.merge(obj(f("waveform", v(waveformUri.toString())))));
+        final String waveformUri = signIfNecessary(optWaveform.get().getURI());
+        jTracks.add(jTrack.merge(obj(f("waveform", v(waveformUri)))));
       } else {
         jTracks.add(jTrack);
       }
-
     }
 
     // Get existing segments
@@ -480,7 +460,7 @@ public class ToolsEndpoint implements ManagedService {
         final String audioPreview = Arrays.stream(internalPub.getAttachments())
           .filter(a -> a.getFlavor().getType().equals(e.getFlavor().getType()))
           .filter(a -> a.getFlavor().getSubtype().equals(this.adminUIConfiguration.getPreviewAudioSubtype()))
-          .map(MediaPackageElement::getURI).map(this::signUrl)
+          .map(MediaPackageElement::getURI).map(this::signIfNecessary)
           .findAny()
           .orElse(null);
         final SourceTrackSubInfo audio = new SourceTrackSubInfo(e.hasAudio(), audioPreview,
@@ -489,7 +469,7 @@ public class ToolsEndpoint implements ManagedService {
         final String videoPreview = Arrays.stream(internalPub.getAttachments())
           .filter(a -> a.getFlavor().getType().equals(e.getFlavor().getType()))
           .filter(a -> a.getFlavor().getSubtype().equals(this.adminUIConfiguration.getPreviewVideoSubtype()))
-          .map(MediaPackageElement::getURI).map(this::signUrl)
+          .map(MediaPackageElement::getURI).map(this::signIfNecessary)
           .findAny()
           .orElse(null);
         final SourceTrackSubInfo video = new SourceTrackSubInfo(e.hasVideo(), videoPreview,
@@ -553,7 +533,7 @@ public class ToolsEndpoint implements ManagedService {
               f("position", thumbnail.getDefaultPosition()),
               f("defaultPosition", thumbnail.getDefaultPosition()),
               f("type", ThumbnailImpl.ThumbnailSource.UPLOAD.name()),
-              f("url", signUrl(distElement.getURI()))))));
+              f("url", signIfNecessary(distElement.getURI()))))));
         } else if (current.isFormField() && THUMBNAIL_TRACK.equalsIgnoreCase(current.getFieldName())) {
           final String value = Streams.asString(current.openStream());
           if (!THUMBNAIL_DEFAULT.equalsIgnoreCase(value)) {
@@ -582,7 +562,7 @@ public class ToolsEndpoint implements ManagedService {
         f("type", thumbnailSource.name()),
         f("position", position.getAsDouble()),
         f("defaultPosition", thumbnail.getDefaultPosition()),
-        f("url", signUrl(distributedElement.getURI()))
+        f("url", signIfNecessary(distributedElement.getURI()))
       ))));
     } catch (IOException | FileUploadException e) {
       logger.error("Error reading request body: {}", getStackTrace(e));
@@ -1045,26 +1025,6 @@ public class ToolsEndpoint implements ManagedService {
       }
     }
     return segments;
-  }
-
-  private String signUrl(URI baseUrl) {
-    String url = baseUrl.toString();
-    if (urlSigningService.accepts(url)) {
-      logger.trace("URL signing service has accepted '{}'", url);
-      try {
-        URI signedUrl = new URI(urlSigningService.sign(url, expireSeconds, null, null));
-        return signedUrl.toString();
-      } catch (URISyntaxException e) {
-        logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
-        throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-      } catch (UrlSigningException e) {
-        logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
-        throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-      }
-    } else {
-      logger.trace("URL signing service did not accept '{}'", url);
-      return url;
-    }
   }
 
   static final class SourceTrackSubInfo {
