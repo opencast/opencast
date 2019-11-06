@@ -999,7 +999,7 @@
                   "REPLACE_EVENT_ACLS": "Actualizar permisos de evento",
                   "REPLACE_EVENT_ACLS_HINT": "Asegúrese de que todos los eventos de esta serie tengan estos permisos en vigor",
                   "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "LOAD_MORE_LINK": "Cargar más"
                },
                "ROLES": {
                   "LABEL": "Seleccione un rol",

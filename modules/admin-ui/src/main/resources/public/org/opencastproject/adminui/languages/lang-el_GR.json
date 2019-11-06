@@ -66,7 +66,7 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Αυτή η σειρά περιέχει εκδηλώσεις. Η διαγραφή της σειράς δεν θα διαγράψει τις εκδηλώσεις.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "EVENT_WILL_BE_GONE": "Εάν συνεχίσετε, η εκδήλωση θα διαγραφεί αμετάκλητα."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Αυτή η σειρά δεν μπορεί να διαγραφεί, καθώς εξακολουθεί να περιέχει εκδηλώσεις."
@@ -124,11 +124,11 @@
       "SERIES_NOT_UPDATED": "Δεν ήταν δυνατή η αποθήκευση της σειράς",
       "SERIES_NOT_UPDATED_ID": "Δεν ήταν δυνατή η αποθήκευση της σειράς {{ id }}",
       "SERIES_NOT_UPDATED_ALL": "Καμμία από τις σειρές δεν μπορούσε να αποθηκευτεί",
-      "EVENT_DELETED": "The event has been deleted.",
-      "EVENT_WILL_BE_DELETED": "The event is being deleted",
-      "EVENTS_DELETED": "The events are being deleted.",
-      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
+      "EVENT_DELETED": "Η εκδήλωση έχει διαγραφεί.",
+      "EVENT_WILL_BE_DELETED": "Η εκδήλωση έχει διαγραφεί",
+      "EVENTS_DELETED": "Οι εκδηλώσεις έχουν διαγραφεί.",
+      "EVENTS_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της/των εκδήλωσης/εων.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Η/Οι εκδήλωση/σεις δεν μπορεί/ουν να διαγραφεί/ουν, επειδή δεν έχετε τα δικαιώματα για να το πράξετε.",
       "SERIES_DELETED": "Η σειρά έχει διαγραφεί",
       "SERIES_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της σειράς",
       "LOCATION_DELETED": "Η τοποθεσία έχει διαγραφεί",
@@ -162,8 +162,8 @@
       "THEME_NOT_DELETED": "Το θέμα δεν είναι δυνατόν να διαγραφεί",
       "TASK_CREATED": "Η εργασία έχει δημιουργήθει",
       "TASK_NOT_CREATED": "Η εργασία δεν θα μπορούσε να δημιουργηθεί",
-      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
-      "VIDEO_CUT_SAVED": "The changes have been saved",
+      "VIDEO_CUT_NOT_SAVED": "Οι αλλαγές δεν μπορούν να αποθηκευτούν",
+      "VIDEO_CUT_SAVED": "Οι αλλαγές αποθηκεύτηκαν",
       "VIDEO_CUT_PROCESSING": "Επεξεργάζεται το βίντεο…",
       "THUMBNAIL_CHANGE_FAILED": "Αποτυχία αλλαγής μικρογραφίας.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Δεν έχετε επιλέξει κάποια κομμμάτια βίντεο για την επεξεργασία",
@@ -460,7 +460,7 @@
             "PUBLISHED": "Δημοσιευμένο",
             "WEEKDAY": "Ημέρες εβδομάδας",
             "TOOLTIP": {
-               "ASSETS": "Open asset details",
+               "ASSETS": "Άνοιγμα λεπτομερειών αντικιεμένων",
                "START": "Φίλτρο για αυτήν την ημερομηνία έναρξης",
                "SERIES": "Φίλτρο για αυτή τη σειρά",
                "STATUS": "Φίλτρο για την κατάσταση της εκδήλωσης",
@@ -488,13 +488,13 @@
             "PROCESSING_CANCELED": "Ακύρωση επεξεργασίας"
          },
          "STATE_MAPPING": {
-            "RETRACTING": "Retracting",
-            "DELETING": "Deleting",
-            "DUPLICATING": "Duplicating",
-            "PUBLISHING": "Publishing",
-            "IMPORTING": "Importing",
-            "REPUBLISHING_METADATA": "Republishing metadata",
-            "UPDATING_PREVIEWS": "Updating previews"
+            "RETRACTING": "Ανάκληση",
+            "DELETING": "Διαγραφή",
+            "DUPLICATING": "Αντιγραφή",
+            "PUBLISHING": "Δημοσίευση",
+            "IMPORTING": "Εισαγωγή",
+            "REPUBLISHING_METADATA": "Επανέκδοση μεταδεδομένων",
+            "UPDATING_PREVIEWS": "Ενημέρωση προεπισκοπήσεων"
          },
          "DETAILS": {
             "HEADER": "Λεπτομέρειες εκδήλωσης {{resourceId}}",
@@ -998,8 +998,8 @@
                   "DETAILS": "Λεπτομέρειες",
                   "REPLACE_EVENT_ACLS": "Ενημέρωση δικαιωμάτων εκδήλωσης",
                   "REPLACE_EVENT_ACLS_HINT": "Επιβεβαίωση ότι όλες οι εκδηλώσεις σε αυτή την σειρά έχουν τα ίδια δικαιώματα σε ισχύ",
-                  "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "LOAD_MORE_LIMIT": "απεικόνιση πολιτικών.",
+                  "LOAD_MORE_LINK": "Φόρτωση περισσοτέρων"
                },
                "ROLES": {
                   "LABEL": "Επιλέξτε ένα ρόλο",
@@ -1521,24 +1521,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Διαχωρισμός",
-         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "Hide/Show",
-         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
-         "REPLAY_SEGMENT": "Play Start of Segment",
-         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
-         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
-         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
-         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
+         "SPLIT_TOOLTIP": "Διαχώρηση τμήματος στην τρέχουσα θέση του κέρσορα.",
+         "CUT": "Απόκρυψη/Εμφάνιση",
+         "CUT_TOOLTIP": "Απόκρυψη ή εμφάνιση του επιλεγμένου τμήματος του βίντεο.",
+         "REPLAY_SEGMENT": "Αναπαραγωγή της αρχής του τμήματος",
+         "REPLAY_SEGMENT_TOOLTIP": "Αναπαραγωγή του τρέχοντος τμήματος από την αρχή.",
+         "REPLAY_END_OF_SEGMENT": "Αναπαραγωγή του τέλους του τμήματος",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Αναπαραγωγή μερικών δευτερόλεπτα στο τέλος του τρέχοντος τμήματος.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Αναπαραγωγή μετάβασης",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Αναπαραγωγή μερικών δευτερολέπτων που περιέχουν το τέλος του προηγούμενου και την αρχή του επόμενου τμήματος.",
          "UNDO": "Αναίρεση",
          "REDO": "Ακύρωση Αναίρεσης",
-         "CLEAR_SEGMENTS": "Clear All Segments",
-         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
+         "CLEAR_SEGMENTS": "Καθαρισμός όλων των τμημάτων",
+         "CLEAR_SEGMENTS_TOOLTIP": "Διαγραφή όλων των τμημάτων, αφήνοντας ένα μεγάλο τμήμα."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Αφαίρεση τμήματος",
-         "SHOW_SEGMENT": "Show this Segment",
-         "HIDE_SEGMENT": "Hide this Segment",
+         "SHOW_SEGMENT": "Εμφάνιση αυτού του τμήματος",
+         "HIDE_SEGMENT": "Απόκρυψη αυτού του τμήματος",
          "START": "Έναρξη",
          "END": "Τέλος"
       },
@@ -1980,13 +1980,13 @@
          "RANDOM": "Τυχαία δεδομένα",
          "VIEWS_SUM": "Συνολικός αριθμός προβολών",
          "VIEWS_AVG": "Μέσος αριθμός προβολών",
-         "PUBLISHEDHOURS": "Published Hours of Video"
+         "PUBLISHEDHOURS": "Δημοσιευμένες ώρες του βίντεο"
       },
       "DESCRIPTION": {
          "RANDOM": "Αυτό εμφανίζει τυχαία δεδομένα ως επίδειξη. Μπορείτε να απενεργοποιήσετε αυτό το γράφημα διαγράφοντας τον ορισμό json του αντίστοιχου παροχέα στατιστικών στοιχείων από τον κατάλογο etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time unit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the published hours of video"
+         "VIEWS_SUM": "Η επιλογή εμφανίζει το συνολικό αριθμό προβολών ανά μονάδα χρόνου.",
+         "VIEWS_AVG": "Αυτή η επιλογή εμφανίζει τον μέσο αριθμό ημερήσιων προβολών ανά μονάδα χρόνου.",
+         "PUBLISHEDHOURS": "Αυτή η επιλογή εμφανίζει τις δημοσιευμένες ώρες του βίντεο"
       }
    }
 }
