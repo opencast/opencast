@@ -55,7 +55,7 @@
                                                             ng-click="openArea('segments')" translate>VIDEO_TOOL.AREAS.SEGMENTS</a>
                 <a ng-class="{active: area === 'metadata'}"
                    ng-click="openArea('metadata')" translate>VIDEO_TOOL.AREAS.METADATA</a>
-                <a ng-class="{active: area === 'thumbnail'}" ng-if="tab === 'editor'"
+                <a ng-class="{active: area === 'thumbnail'}" ng-if="tab === 'editor' && video.thumbnail_enabled"
                                                              ng-click="openArea('thumbnail')" translate>VIDEO_TOOL.AREAS.THUMBNAIL</a>
                 <a ng-class="{active: area === 'tracks'}" ng-if="tab === 'editor'"
                                                           ng-click="openArea('tracks')" translate>VIDEO_TOOL.AREAS.TRACKS</a>
@@ -86,7 +86,7 @@
               </div>
             </div>
 
-            <div ng-if="area === 'thumbnail'" class="editor-thumbnail">
+            <div ng-if="area === 'thumbnail' && video.thumbnail_enabled" class="editor-thumbnail">
               <div class="area-body">
                 <div class="full-col">
                   <div class="obj content-wrapper">
