@@ -22,6 +22,8 @@ package org.opencastproject.external.util.statistics;
 
 import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
+import org.opencastproject.statistics.export.api.DetailLevel;
+import org.opencastproject.util.data.Collections;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -54,13 +56,15 @@ public final class StatisticsProviderUtils {
     result.put("description", provider.getDescription());
     result.put("type", typeOf(provider));
     result.put("resourceType", ResourceTypeUtils.toString(provider.getResourceType()));
-    if (withParameters && provider instanceof TimeSeriesProvider) {
+    if (withParameters != null && withParameters && provider instanceof TimeSeriesProvider) {
       JSONArray parameters = new JSONArray();
       addParameter(parameters, "resourceId", PARAMETER_TYPE_STRING, false);
       addParameter(parameters, "from", PARAMETER_TYPE_DATETIME, false);
       addParameter(parameters, "to", PARAMETER_TYPE_DATETIME, false);
       addEnumParameter(parameters, "dataResolution",
           DataResolutionUtils.toJson(((TimeSeriesProvider) provider).getDataResolutions()), false);
+      addEnumParameter(parameters, "detailLevel",
+              DetailLevelUtils.toJson(Collections.set(DetailLevel.values())), true);
       result.put("parameters", parameters);
     }
     return result;

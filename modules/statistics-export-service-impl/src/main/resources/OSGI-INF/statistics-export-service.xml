@@ -18,4 +18,7 @@
   <reference name="SecurityService"
              interface="org.opencastproject.security.api.SecurityService"
              bind="setSecurityService"/>
+  <reference name="AssetManager"
+             interface="org.opencastproject.assetmanager.api.AssetManager"
+             bind="setAssetManager"/>
 </scr:component>

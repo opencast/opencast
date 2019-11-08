@@ -25,6 +25,7 @@ import org.opencastproject.statistics.api.StatisticsProvider;
 import org.opencastproject.statistics.api.StatisticsService;
 import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
+import org.opencastproject.statistics.export.api.DetailLevel;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
@@ -180,6 +181,27 @@ public final class QueryUtils {
     }
   }
 
+  public static class ExportParameters extends TimeSeriesParameters {
+
+    private DetailLevel detailLevel;
+
+    ExportParameters(String resourceId, JSONObject raw) {
+      super(resourceId, raw);
+    }
+
+    void setDetailLevel(String detailLevel) {
+      Optional<DetailLevel> level = DetailLevelUtils.fromString(detailLevel);
+      if (!level.isPresent()) {
+        throw new IllegalArgumentException("Illegal value for 'detailLevel'");
+      }
+      this.detailLevel = level.get();
+    }
+
+    public DetailLevel getDetailLevel() {
+      return this.detailLevel;
+    }
+  }
+
   public static List<Query> parse(String queryString, StatisticsService statisticsService) {
 
     if (StringUtils.isBlank(queryString)) {
@@ -202,6 +224,22 @@ public final class QueryUtils {
     });
 
     return queries;
+  }
+
+  public static Query parseQuery(String queryString, StatisticsService statisticsService) {
+    if (StringUtils.isBlank(queryString)) {
+      throw new IllegalArgumentException("No query data provided");
+    }
+
+    JSONParser parser = new JSONParser();
+    JSONObject queryJson;
+    try {
+      queryJson = (JSONObject) parser.parse(queryString);
+    } catch (ParseException e) {
+      throw new IllegalArgumentException("JSON malformed");
+    }
+    return parseQuery(queryJson, statisticsService);
+
   }
 
   private static Query parseQuery(JSONObject queryJson, StatisticsService statisticsService) {
@@ -230,7 +268,13 @@ public final class QueryUtils {
 
     // The other parameters are specific to statistics provider implementations
     if (provider instanceof TimeSeriesProvider) {
-      TimeSeriesParameters p = new TimeSeriesParameters(resourceId, parametersJson);
+      TimeSeriesParameters p;
+      if (parametersJson.containsKey("detailLevel")) {
+        p = new ExportParameters(resourceId, parametersJson);
+        ((ExportParameters)p).setDetailLevel(getField(parametersJson, "detailLevel", "Parameter 'detailLevel' is misisng"));
+      } else {
+        p = new TimeSeriesParameters(resourceId, parametersJson);
+      }
       p.setFrom(getField(parametersJson, "from", "Parameter 'from' is missing"));
       p.setTo(getField(parametersJson, "to", "Parameter 'to' is missing"));
       p.setDataResolution(getField(parametersJson, "dataResolution", "Parameter 'dataResolution' is missing"));
