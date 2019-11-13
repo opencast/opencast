@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Map;
 
 public final class LoadUtil {
 
@@ -40,8 +41,20 @@ public final class LoadUtil {
   /** The logging instance */
   private static final Logger logger = LoggerFactory.getLogger(LoadUtil.class);
 
-  public static float getConfiguredLoadValue(@SuppressWarnings("rawtypes") Dictionary bundleProperties, String configKey, Float defaultValue, ServiceRegistry registry) {
+  public static float getConfiguredLoadValue(Map<String, Object> properties, String configKey, Float defaultValue,
+          ServiceRegistry registry) {
+    String jobLoad = StringUtils.trimToNull((String) properties.get(configKey));
+    return getConfiguredLoadValue(jobLoad, configKey, defaultValue, registry);
+  }
+
+  public static float getConfiguredLoadValue(@SuppressWarnings("rawtypes") Dictionary bundleProperties,
+          String configKey, Float defaultValue, ServiceRegistry registry) {
     String jobLoad = StringUtils.trimToNull((String) bundleProperties.get(configKey));
+    return getConfiguredLoadValue(jobLoad, configKey, defaultValue, registry);
+  }
+
+  private static float getConfiguredLoadValue(String jobLoad, String configKey, Float defaultValue,
+          ServiceRegistry registry) {
     float loadValue = defaultValue;
     if (jobLoad != null) {
       try {

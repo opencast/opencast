@@ -39,6 +39,8 @@ import org.opencastproject.util.OsgiUtil;
 
 import com.google.gson.Gson;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -89,6 +91,23 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
     return distribute(channelId, mediaPackage, elementIds);
   }
 
+  @Override
+  public boolean publishToStreaming() {
+    HttpGet get = new HttpGet("/publishToStreaming");
+    HttpResponse response = getResponse(get);
+
+    try {
+      if (response != null) {
+        return Boolean.valueOf(response.getEntity().getContent().toString());
+      }
+      logger.error("Response to /publishToStreaming is empty.");
+    } catch (Exception e) {
+      logger.error("Exception occured: ", e);
+    } finally {
+      closeConnection(response);
+    }
+    return false;
+  }
 
   @Override
   public Job distribute(String channelId, final MediaPackage mediaPackage, Set<String> elementIds)

@@ -13,4 +13,7 @@
   <reference name="ServiceRegistry" cardinality="1..1"
              interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
              policy="static" bind="setServiceRegistry"/>
+  <reference interface="org.opencastproject.distribution.api.StreamingDistributionService"
+             name="StreamingDistributionService" target="(distribution.channel=streaming)"
+             bind="setStreamingDistributionService"/>
 </scr:component>

@@ -34,6 +34,13 @@ import java.util.Set;
  */
 public interface StreamingDistributionService extends DistributionService {
 
+  /**
+   * Checks if streaming is enabled for the current tenant.
+   *
+   * @return whether streaming is enabled for the current tenant
+   */
+  boolean publishToStreaming();
+
   Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds)
           throws DistributionException, MediaPackageException;
 

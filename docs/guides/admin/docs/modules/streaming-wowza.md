@@ -1,4 +1,4 @@
-# Wowza Adaptive Streaming Distribution Service
+# Wowza Streaming Distribution Service
 
 The `distribution-service-streaming-wowza` module copies the media files to the Wowza application directory
 and generates a SMIL file containing the paths to those files, grouping those with the same flavor but different
@@ -7,15 +7,13 @@ the necessary URLs and MIME-Types automatically.
 
 The protocols supported and the transport format they use are summarized below:
 
-* RTMP(S)-based protocols (also supported by the default `distribution-service-streaming` module)
-    * **RTMP(S):** Adobe Flash Streaming protocol. Requires the Adobe Flash Player to be installed in the client's browser.
-* HTTP(S)-based protocols, corresponding to the modern (Adaptive) Streaming Formats
+* HTTP(S)-based protocols, corresponding to the modern Streaming Formats
     * **HLS:** (Live) Streaming from Apple
     * **HDS:** Dynamic Streaming from Adobe
     * **DASH:** MPEG-DASH Dynamic Adaptive Streaming
     * **SMOOTH:** Microsoft's Smooth Streaming
 
-**Please note**: Only the protocols RTMP, HLS and DASH (with and without SSL) have been thoroughly tested.
+**Please note**: Only the protocols HLS and DASH (with and without SSL) have been thoroughly tested.
 
 
 ## Requirements
@@ -54,19 +52,19 @@ below.
 ## Configuration
 
 
-1. Edit the file `etc/org.opencastproject.distribution.streaming.wowza.WowzaAdaptiveStreamingDistributionService.cfg`
-with your preferred configuration. The contents should be self-explanatory.
+1. Edit the file `etc/org.opencastproject.distribution.streaming.wowza.WowzaStreamingDistributionService.cfg`
+and adjust the values to match those of your scenario. Most important are:
 
-2. Edit `$KARAF/etc/custom.properties` and adjust these values to match those of your scenario:
+        org.opencastproject.<tenant>.wowza.url=http(s)://<wowza-server>/<wowza-application>
+        org.opencastproject.<tenant>.wowza.port=<port_number>
 
-        org.opencastproject.streaming.url=rtmp(s)://<wowza-server>/<wowza-application>
-        org.opencastproject.streaming.port=<port_number>
-        org.opencastproject.adaptive-streaming.url=http(s)://<wowza-server>/<wowza-application>
-        org.opencastproject.adaptive-streaming.port=<port_number>
-        org.opencastproject.streaming.directory=/mnt/opencast-drive/content/streams
-
-    The port numbers are only necessary when non-standard ports are used for streaming and/or adaptive-streaming. In
+    The port numbers are only necessary when non-standard ports are used. In
     most cases, it is safe to comment them out or simply not include those properties in the file.
+    Not defining the streaming url for a tenant will result in streams not being published for this tenant.
+    
+2. Set the straming directory in `$KARAF/etc/custom.properties`:
+
+        org.opencastproject.streaming.directory=/mnt/opencast-drive/content/streams
 
 3. Restart your Opencast server.
 
@@ -85,7 +83,7 @@ Opencast must also be mounted in the Wowza server. **Please note that mount poin
 the path `/mnt/opencast-drive-content-streams` in the Opencast server might be mounted as `/media/opencast-streams` in
 the Wowza server).
 
-* Do not forget to open your firewall on ports 1935 (RTMP), 80 (HTTP, adaptive streaming) and, if you want to use SSL,
+* Do not forget to open your firewall on ports 80 (HTTP) and, if you want to use SSL,
 443.
 
 * You will have set your login credentials during the setup of Wowza. You will need these for the web UI.
@@ -159,8 +157,8 @@ All this can be configured in the "Options" section of the Wowza application:
 
 ## Players and Formats
 
-* **Theodul**: RTMP, HLS, DASH (over HTTP and HTTPS)
-* **Paella** : RTMP, RTMPS, HLS, DASH (over HTTP and HTTPS)
+* **Theodul**: HLS, DASH (over HTTP and HTTPS)
+* **Paella** : HLS, DASH (over HTTP and HTTPS)
 
 
 ## Encoding Profiles

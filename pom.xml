@@ -95,7 +95,7 @@
     <module>modules/distribution-service-aws-s3-remote</module>
     <module>modules/distribution-service-download</module>
     <module>modules/distribution-service-download-remote</module>
-    <module>modules/distribution-service-adaptive-streaming-wowza</module>
+    <module>modules/distribution-service-streaming-wowza</module>
     <module>modules/distribution-service-streaming-remote</module>
     <module>modules/distribution-workflowoperation</module>
     <module>modules/dublincore</module>
