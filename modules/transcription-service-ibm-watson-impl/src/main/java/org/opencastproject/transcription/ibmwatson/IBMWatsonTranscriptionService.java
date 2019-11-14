@@ -881,7 +881,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
         if (providerInfo != null) {
           providerId = providerInfo.getId();
         } else {
-          logger.debug("No provider entry for {}", PROVIDER);
+          logger.warn("No provider entry for {}", PROVIDER);
           return;
         }
 
