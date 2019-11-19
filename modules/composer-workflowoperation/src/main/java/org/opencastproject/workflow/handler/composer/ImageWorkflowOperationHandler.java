@@ -49,6 +49,8 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.MediaPackageSupport.Filters;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.TrackSupport;
+import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.util.JobUtil;
@@ -82,6 +84,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.UUID;
@@ -106,6 +109,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   public static final String OPT_END_MARGIN = "end-margin";
 
   private static final long END_MARGIN_DEFAULT = 100;
+  public static final double SINGLE_FRAME_POS = 0.0;
 
   /** The composer service */
   private ComposerService composerService = null;
@@ -327,8 +331,15 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /** Limit the list of media positions to those that fit into the length of the track. */
   static List<MediaPosition> limit(Track track, List<MediaPosition> positions) {
     final long duration = track.getDuration();
+    // if the video has just one frame (e.g.: MP3-Podcasts) it makes no sense to go to a certain position
+    // as the video has only one image at position 0
+    final boolean singleFrame = track.getStreams() == null ? false
+            : Arrays.stream(TrackSupport.byType(track.getStreams(), VideoStream.class)).mapToLong(
+                    fc -> fc.getFrameCount()).allMatch(fc -> fc == 1);
+
     return $(positions).filter(new Fn<MediaPosition, Boolean>() {
       @Override public Boolean apply(MediaPosition p) {
+        if (singleFrame) { p.setPosition(SINGLE_FRAME_POS); }
         return !(
                 (eq(p.type, PositionType.Seconds) && (p.position >= duration || p.position < 0.0))
                         ||
@@ -581,12 +592,16 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * A position in time in a media file.
    */
   static final class MediaPosition {
-    private final double position;
+    private double position;
     private final PositionType type;
 
     MediaPosition(PositionType type, double position) {
       this.position = position;
       this.type = type;
+    }
+
+    public void setPosition(double position) {
+      this.position = position;
     }
 
     @Override public int hashCode() {
