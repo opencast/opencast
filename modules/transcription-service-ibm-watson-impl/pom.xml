@@ -42,6 +42,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-transcription-service-persistence</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-workflow-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -58,10 +63,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -116,10 +117,6 @@
     </dependency>
     <!-- Persistence -->
     <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>javax.persistence</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>test</scope>
@@ -154,7 +151,6 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Service-Component>
-              OSGI-INF/ibm-watson-transcription-database-service.xml,
               OSGI-INF/ibm-watson-transcription-rest.xml,
               OSGI-INF/ibm-watson-transcription-service.xml
             </Service-Component>
@@ -163,9 +159,6 @@
               javax.ws.rs.core;version=2.0.1,
               *
             </Import-Package>
-            <Meta-Persistence>
-              META-INF/persistence.xml
-            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>

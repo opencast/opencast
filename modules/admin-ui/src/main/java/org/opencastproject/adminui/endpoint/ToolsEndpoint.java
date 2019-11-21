@@ -108,6 +108,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -131,6 +132,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
@@ -194,6 +196,9 @@ public class ToolsEndpoint implements ManagedService {
   private static final String THUMBNAIL_POSITION = "POSITION";
   private static final String THUMBNAIL_DEFAULT = "DEFAULT";
 
+  /** Option to enable/disable thumbnail support */
+  private static final String OPT_THUMBNAIL_ENABLED = "thumbnail.enabled";
+
   private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
   private Boolean signWithClientIP = UrlSigningServiceOsgiUtil.DEFAULT_SIGN_WITH_CLIENT_IP;
@@ -211,6 +216,7 @@ public class ToolsEndpoint implements ManagedService {
   private UrlSigningService urlSigningService;
   private WorkflowService workflowService;
   private Workspace workspace;
+  private boolean thumbnailEnabled = true;
 
   void setConfigurablePublicationService(ConfigurablePublicationService configurablePublicationService) {
     this.configurablePublicationService = configurablePublicationService;
@@ -282,6 +288,9 @@ public class ToolsEndpoint implements ManagedService {
     expireSeconds = UrlSigningServiceOsgiUtil.getUpdatedSigningExpiration(properties, this.getClass().getSimpleName());
     signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,
             this.getClass().getSimpleName());
+
+    thumbnailEnabled = BooleanUtils.toBoolean(Objects.toString(properties.get(OPT_THUMBNAIL_ENABLED), "true"));
+    logger.debug("Thumbnail feature enabled: {}", thumbnailEnabled);
   }
 
   @GET
@@ -427,22 +436,24 @@ public class ToolsEndpoint implements ManagedService {
 
     // Get thumbnail
     final List<Field> thumbnailFields = new ArrayList<>();
-    try {
-      final ThumbnailImpl thumbnailImpl = newThumbnailImpl();
-      final Optional<ThumbnailImpl.Thumbnail> optThumbnail = thumbnailImpl
-        .getThumbnail(mp, urlSigningService, expireSeconds);
+    if (thumbnailEnabled) {
+      try {
+        final ThumbnailImpl thumbnailImpl = newThumbnailImpl();
+        final Optional<ThumbnailImpl.Thumbnail> optThumbnail = thumbnailImpl
+          .getThumbnail(mp, urlSigningService, expireSeconds);
 
-      optThumbnail.ifPresent(thumbnail -> {
-        thumbnailFields.add(f("type", thumbnail.getType().name()));
-        thumbnailFields.add(f("url", thumbnail.getUrl().toString()));
-        thumbnailFields.add(f("defaultPosition",  thumbnailImpl.getDefaultPosition()));
-        thumbnail.getPosition().ifPresent(p -> thumbnailFields.add(f("position", p)));
-        thumbnail.getTrack().ifPresent(t -> thumbnailFields.add(f("track", t)));
-      });
-    } catch (UrlSigningException | URISyntaxException e) {
-      logger.error("Error while trying to serialize the thumbnail url because:", e);
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+        optThumbnail.ifPresent(thumbnail -> {
+          thumbnailFields.add(f("type", thumbnail.getType().name()));
+          thumbnailFields.add(f("url", thumbnail.getUrl().toString()));
+          thumbnailFields.add(f("defaultPosition", thumbnailImpl.getDefaultPosition()));
+          thumbnail.getPosition().ifPresent(p -> thumbnailFields.add(f("position", p)));
+          thumbnail.getTrack().ifPresent(t -> thumbnailFields.add(f("track", t)));
+        });
+      } catch (UrlSigningException | URISyntaxException e) {
+        throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+      }
     }
+
 
     final Map<String, String> latestWfProperties = WorkflowPropertiesUtil
       .getLatestWorkflowProperties(assetManager, mediaPackageId);
@@ -507,6 +518,7 @@ public class ToolsEndpoint implements ManagedService {
             f("previews", arr(jPreviews)),
             f(TRACKS_KEY, arr(jTracks)),
             f("thumbnail", obj(thumbnailFields)),
+            f("thumbnail_enabled", v(thumbnailEnabled)),
             f("duration", v(previewDuration)),
             f(SEGMENTS_KEY, arr(jSegments)),
             f("workflows", arr(jWorkflows))));
@@ -524,6 +536,10 @@ public class ToolsEndpoint implements ManagedService {
   public Response changeThumbnail(@PathParam("mediapackageid") final String mediaPackageId,
     @Context HttpServletRequest request)
     throws IndexServiceException, NotFoundException, DistributionException, MediaPackageException {
+
+    if (!thumbnailEnabled) {
+      return R.badRequest("Thumbnail creation is prohibited");
+    }
 
     final Opt<Event> optEvent = getEvent(mediaPackageId);
     if (optEvent.isNone()) {
@@ -660,7 +676,7 @@ public class ToolsEndpoint implements ManagedService {
 
       // Update default thumbnail (if used) since position may change due to cutting
       MediaPackageElement distributedThumbnail = null;
-      if (editingInfo.getDefaultThumbnailPosition().isPresent()) {
+      if (thumbnailEnabled && editingInfo.getDefaultThumbnailPosition().isPresent()) {
         try {
           final ThumbnailImpl thumbnailImpl = newThumbnailImpl();
           final Optional<ThumbnailImpl.Thumbnail> optThumbnail = thumbnailImpl
