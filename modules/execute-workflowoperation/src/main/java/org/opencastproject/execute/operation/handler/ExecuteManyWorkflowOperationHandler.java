@@ -46,12 +46,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -91,6 +96,9 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
 
   /** Property containing the tags that the resulting mediapackage elements will be assigned */
   public static final String TARGET_TAGS_PROPERTY = "target-tags";
+
+  /** Property to control whether command output will be used to set workflow properties */
+  public static final String SET_WF_PROPS_PROPERTY = "set-workflow-properties";
 
   /** The text analyzer */
   protected ExecuteService executeService;
@@ -137,6 +145,8 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
     String outputFilename = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_FILENAME_PROPERTY));
     String expectedTypeStr = StringUtils.trimToNull(operation.getConfiguration(EXPECTED_TYPE_PROPERTY));
 
+    boolean setWfProps = Boolean.valueOf(StringUtils.trimToNull(operation.getConfiguration(SET_WF_PROPS_PROPERTY)));
+
     MediaPackageElementFlavor matchingFlavor = null;
     if (sourceFlavor != null)
       matchingFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavor);
@@ -178,6 +188,8 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
 
     MediaPackageElement[] inputElements = inputSet.toArray(new MediaPackageElement[inputSet.size()]);
 
+    Map<String, String> wfProps = new HashMap<>();
+
     try {
       Job[] jobs = new Job[inputElements.length];
       MediaPackageElement[] resultElements = new MediaPackageElement[inputElements.length];
@@ -217,17 +229,34 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
 
       for (int i = 0; i < resultElements.length; i++) {
         if (resultElements[i] != inputElements[i]) {
-          // Store new element to mediaPackage
-          mediaPackage.addDerived(resultElements[i], inputElements[i]);
-          // Store new element to mediaPackage
-          URI uri = workspace.moveTo(resultElements[i].getURI(), mediaPackage.getIdentifier().toString(),
+
+          if (setWfProps) {
+            // The job payload is a file with set of properties for the workflow
+            final Properties properties = new Properties();
+            File propertiesFile = workspace.get(resultElements[i].getURI());
+            try (InputStream is = new FileInputStream(propertiesFile)) {
+              properties.load(is);
+            }
+            logger.debug("Loaded {} properties from {}", properties.size(), propertiesFile);
+            workspace.deleteFromCollection(ExecuteService.COLLECTION, propertiesFile.getName());
+
+            // Add the properties to the wfProps
+            wfProps.putAll((Map) properties);
+
+          } else {
+            // The job payload is a new element for the MediaPackage
+            // Store new element to mediaPackage
+            mediaPackage.addDerived(resultElements[i], inputElements[i]);
+            // Store new element to mediaPackage
+            URI uri = workspace.moveTo(resultElements[i].getURI(), mediaPackage.getIdentifier().toString(),
                   resultElements[i].getIdentifier(), outputFilename);
 
-          resultElements[i].setURI(uri);
+            resultElements[i].setURI(uri);
 
-          // Set new flavor
-          if (targetFlavor != null)
-            resultElements[i].setFlavor(targetFlavor);
+            // Set new flavor
+            if (targetFlavor != null)
+              resultElements[i].setFlavor(targetFlavor);
+          }
         }
 
         // Set new tags
@@ -243,7 +272,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
         }
       }
 
-      WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, totalTimeInQueue);
+      WorkflowOperationResult result = createResult(mediaPackage, wfProps, Action.CONTINUE, totalTimeInQueue);
       logger.debug("Execute operation {} completed", operation.getId());
 
       return result;
