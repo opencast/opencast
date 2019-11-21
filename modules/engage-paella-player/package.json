@@ -12,7 +12,7 @@
     "express": "^4.17.1",
     "gulp": "^4.0.2",
     "http-errors": "^1.7.3",
-    "http-proxy": "^1.17.0",
+    "http-proxy": "^1.18.0",
     "merge-stream": "^2.0.0",
     "paellaplayer": "github:polimediaupv/paella#6.2.4"
   }
