@@ -12,5 +12,5 @@
     "msg_waitToSeek": "Naviguer dans la vidéo n'est pas possible avant la fin du chargement.",
     "msg_startPlayingToSeek": "Naviguer dans la vidéo n'est pas possible avant d'avoir cliqué au moins une fois sur le bouton de lecture.",
     "chromeBuffer": "Le vérificateur de la mémoire tampon a été désactivé en raison des limitations de Chrome. Il est possible que vous rencontriez des problèmes de lecture de la vidéo.",
-    "scroll_overlay_text": "Use shift + scroll to zoom."
+    "scroll_overlay_text": "Utiliser shift + défilement pour zoomer."
 }
