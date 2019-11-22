@@ -32,6 +32,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -91,6 +92,12 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
    */
   public static final String SOURCE_TAGS_PROPERTY = "source-tags";
 
+  /** Property defining whether the track is required to contain or not contain an audio stream to be used an input */
+  public static final String SOURCE_AUDIO_PROPERTY = "source-audio";
+
+  /** Property defining whether the track is required to contain or not contain a video stream to be used an input */
+  public static final String SOURCE_VIDEO_PROPERTY = "source-video";
+
   /** Property containing the flavor that the resulting mediapackage elements will be assigned */
   public static final String TARGET_FLAVOR_PROPERTY = "target-flavor";
 
@@ -140,6 +147,8 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
     }
     String sourceFlavor = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR_PROPERTY));
     String sourceTags = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_PROPERTY));
+    String sourceAudio = StringUtils.trimToNull(operation.getConfiguration(SOURCE_AUDIO_PROPERTY));
+    String sourceVideo = StringUtils.trimToNull(operation.getConfiguration(SOURCE_VIDEO_PROPERTY));
     String targetFlavorStr = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR_PROPERTY));
     String targetTags = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS_PROPERTY));
     String outputFilename = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_FILENAME_PROPERTY));
@@ -176,13 +185,25 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
     for (MediaPackageElement element : mediaPackage.getElementsByTags(sourceTagList)) {
       MediaPackageElementFlavor elementFlavor = element.getFlavor();
       if (sourceFlavor == null || (elementFlavor != null && elementFlavor.matches(matchingFlavor))) {
+
+        // Check for audio or video streams in the track, if specified
+        if ((element instanceof Track) && (sourceAudio != null)
+            && (Boolean.parseBoolean(sourceAudio) != ((Track) element).hasAudio())) {
+          continue;
+        }
+
+        if ((element instanceof Track) && (sourceVideo != null)
+            && (Boolean.parseBoolean(sourceVideo) != ((Track) element).hasVideo())) {
+          continue;
+        }
+
         inputSet.add(element);
       }
     }
 
     if (inputSet.size() == 0) {
-      logger.warn("Mediapackage {} has no suitable elements to execute the command {} based on tags {} and flavor {}",
-              mediaPackage, exec, sourceTags, sourceFlavor);
+      logger.warn("Mediapackage {} has no suitable elements to execute the command {} based on tags {}, flavor {}, sourceAudio {}, sourceVideo {}",
+              mediaPackage, exec, sourceTags, sourceFlavor, sourceAudio, sourceVideo);
       return createResult(mediaPackage, Action.CONTINUE);
     }
 
