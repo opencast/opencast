@@ -35,6 +35,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -61,6 +62,7 @@ public class EventCommentReplyDto {
   @JoinColumn(name = "event_comment_id", referencedColumnName = "id", nullable = false)
   private EventCommentDto eventComment;
 
+  @Lob
   @Column(name = "text", nullable = false)
   private String text;
 

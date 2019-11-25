@@ -45,7 +45,7 @@ public class OaiPmhElementEntity {
   private String elementType;
 
   /** The flavor of the media package element */
-  @Column(name = "flavor", length = 255, nullable = false)
+  @Column(name = "flavor", nullable = false)
   private String flavor;
 
   /** The XML serialized media package element content */
