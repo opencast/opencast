@@ -132,7 +132,7 @@
       "LOCATION_NOT_DELETED": "Platsen kunde inte raderas",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Platsen kunde inte tas bort eftersom att du inte har rättigheterna för att göra det.",
       "CONFLICT_DETECTED": "Konflikt vid schemaläggning: Denna nya händelse överlappar med en annan. Ändra rum, datum eller tider.",
-      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "Planeringskonflikt: Förändring av eventet resulterar i konflikter. Ändra på plats eller tidspunkt.",
       "CONFLICT_ALREADY_ENDED": "Fel vid schemaläggning: Händelsen har redan avslutats.",
       "CONFLICT_END_BEFORE_START": "Fel vid schemaläggning: Slutet måste vara senare än början.",
       "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
@@ -146,7 +146,7 @@
       "THEME_NAME_ALREADY_TAKEN": "Detta namn används redan",
       "THEME_NAME_EMPTY": "Namn får inte vara tom",
       "BUMPER_UPLOAD_ERROR": "Fel vid uppladdning av media",
-      "BUMPER_REQUIRED": "You must upload a bumper",
+      "BUMPER_REQUIRED": "Du måste ladda upp en bumperfil",
       "TRAILER_UPLOAD_ERROR": "Fel vid uppladdning av media",
       "TITLE_UPLOAD_ERROR": "Fel vid uppladdning av media",
       "LICENSE_UPLOAD_ERROR": "Fel vid uppladdning av media",
@@ -1239,7 +1239,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Access policy details  - {{name}}",
+            "HEADER": "Tillgångsinformationer - {{name}}",
             "TABS": {
                "SUMMARY": "Summering",
                "METADATA": "Metadata",
@@ -1574,8 +1574,8 @@
       "TRACKS": {
          "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
-            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
+            "NO_VIDEO_TRACK_SELECTED": "Du måste välja minst ett video spår",
+            "NO_AUDIO_TRACK_SELECTED": "Du måste välja minst ett audio spår"
          },
          "TRACK": {
             "HEADER": "Spår"
@@ -1929,7 +1929,7 @@
             "CUT_SELECTED_SEGMENT": "Klipp ut",
             "PLAY_CURRENT_SEGMENT": "Spela nuvarande segment",
             "CLEAR_LIST": "Rensa segment",
-            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Spela upp segment med pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Slutet av segmentet"
          }
       }
