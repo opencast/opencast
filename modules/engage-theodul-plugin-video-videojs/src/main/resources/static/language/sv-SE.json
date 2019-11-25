@@ -12,5 +12,5 @@
     "msg_waitToSeek": "Sökning är inte tillgänglig tills videon är laddad.",
     "msg_startPlayingToSeek": "Sökning är inte möjligt innan minst ett klick på Play-knappen.",
     "chromeBuffer": "Buffer-kontrollen har inaktiverats pga begränsningar i Chrome. Det är möjligt att du kommer stöta på problem med videouppspelningen.",
-    "scroll_overlay_text": "Use shift + scroll to zoom."
+    "scroll_overlay_text": "Använd shift och scroll för att zooma."
 }

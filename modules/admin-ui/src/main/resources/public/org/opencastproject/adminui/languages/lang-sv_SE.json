@@ -66,7 +66,7 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "EVENT_WILL_BE_GONE": "Om du fortsätta, eventet ska gå förlorad."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
@@ -124,18 +124,18 @@
       "SERIES_NOT_UPDATED": "Serien kunde inte sparas",
       "SERIES_NOT_UPDATED_ID": "Serien {{ id }} kunde inte sparas",
       "SERIES_NOT_UPDATED_ALL": "Ingen av serier kunde sparas",
-      "EVENT_DELETED": "The event has been deleted.",
-      "EVENT_WILL_BE_DELETED": "The event is being deleted",
-      "EVENTS_DELETED": "The events are being deleted.",
-      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
+      "EVENT_DELETED": "Händelsen har tagits bort.",
+      "EVENT_WILL_BE_DELETED": "Händelsen tas bort",
+      "EVENTS_DELETED": "Händelserna tas bort.",
+      "EVENTS_NOT_DELETED": "Händelsen/-erna kunde inte raderas.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Händelsen/-erna kunde inte raderas för att du inte har rättigheterna.",
       "SERIES_DELETED": "Serien har tagits bort",
       "SERIES_NOT_DELETED": "Serien kunde inte raderas",
       "LOCATION_DELETED": "Platsen har raderats",
       "LOCATION_NOT_DELETED": "Platsen kunde inte raderas",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Platsen kunde inte tas bort eftersom att du inte har rättigheterna för att göra det.",
       "CONFLICT_DETECTED": "Konflikt vid schemaläggning: Denna nya händelse överlappar med en annan. Ändra rum, datum eller tider.",
-      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "Planeringskonflikt: Förändring av eventet resulterar i konflikter. Ändra på plats eller tidspunkt.",
       "CONFLICT_ALREADY_ENDED": "Fel vid schemaläggning: Händelsen har redan avslutats.",
       "CONFLICT_END_BEFORE_START": "Fel vid schemaläggning: Slutet måste vara senare än början.",
       "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
@@ -149,7 +149,7 @@
       "THEME_NAME_ALREADY_TAKEN": "Detta namn används redan",
       "THEME_NAME_EMPTY": "Namn får inte vara tom",
       "BUMPER_UPLOAD_ERROR": "Fel vid uppladdning av media",
-      "BUMPER_REQUIRED": "You must upload a bumper",
+      "BUMPER_REQUIRED": "Du måste ladda upp en bumperfil",
       "TRAILER_UPLOAD_ERROR": "Fel vid uppladdning av media",
       "TITLE_UPLOAD_ERROR": "Fel vid uppladdning av media",
       "LICENSE_UPLOAD_ERROR": "Fel vid uppladdning av media",
@@ -162,8 +162,8 @@
       "THEME_NOT_DELETED": "Temat kunde inte tas bort",
       "TASK_CREATED": "Uppgiften har skapats",
       "TASK_NOT_CREATED": "Uppgiften kunde inte skapas",
-      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
-      "VIDEO_CUT_SAVED": "The changes have been saved",
+      "VIDEO_CUT_NOT_SAVED": "Förändringarna kunde inte sparas",
+      "VIDEO_CUT_SAVED": "Förändringarna sparades",
       "VIDEO_CUT_PROCESSING": "Videon bearbetas…",
       "THUMBNAIL_CHANGE_FAILED": "Misslyckades med att byta miniatyr.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Du har inte valt att bearbeta några videospår",
@@ -294,7 +294,7 @@
          "TITLE": "Konfiguration"
       },
       "STATISTICS": {
-         "TITLE": "Statistics"
+         "TITLE": "Statistik"
       }
    },
    "EVENTS": {
@@ -488,13 +488,13 @@
             "PROCESSING_CANCELED": "Bearbetning avbruten"
          },
          "STATE_MAPPING": {
-            "RETRACTING": "Retracting",
-            "DELETING": "Deleting",
-            "DUPLICATING": "Duplicating",
-            "PUBLISHING": "Publishing",
-            "IMPORTING": "Importing",
-            "REPUBLISHING_METADATA": "Republishing metadata",
-            "UPDATING_PREVIEWS": "Updating previews"
+            "RETRACTING": "Dra tillbaka",
+            "DELETING": "Raderar",
+            "DUPLICATING": "Kopierar",
+            "PUBLISHING": "Publicerar",
+            "IMPORTING": "Importerar",
+            "REPUBLISHING_METADATA": "Republikation av metadata",
+            "UPDATING_PREVIEWS": "Uppdaterar previews"
          },
          "DETAILS": {
             "HEADER": "Händelsedetaljer - {{resourceId}}",
@@ -507,7 +507,7 @@
                "WORKFLOWS": "Workflows",
                "ACCESS": "Åtkomstpolicy",
                "COMMENTS": "Kommentarer",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "Statistik"
             },
             "PUBLICATIONS": {
                "CAPTION": "Publikationer",
@@ -750,7 +750,7 @@
                }
             },
             "STATISTICS": {
-               "CAPTION": "Statistics"
+               "CAPTION": "Statistik"
             },
             "METADATA": {
                "CAPTION": "Händelseinformation",
@@ -976,7 +976,7 @@
                "EVENTS": "Händelser",
                "PERMISSIONS": "Åtkomstpolicy",
                "THEME": "Tema",
-               "STATISTICS": "Statistics"
+               "STATISTICS": "Statistik"
             },
             "ACCESS": {
                "CAPTION": "Åtkomstpolicy",
@@ -1235,7 +1235,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Access policy details  - {{name}}",
+            "HEADER": "Tillgångsinformationer - {{name}}",
             "TABS": {
                "SUMMARY": "Summering",
                "METADATA": "Metadata",
@@ -1520,23 +1520,23 @@
       "ACTIONS": {
          "SPLIT": "Dela",
          "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "Hide/Show",
-         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
-         "REPLAY_SEGMENT": "Play Start of Segment",
-         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
-         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
-         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
-         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
+         "CUT": "Visa/Gömma",
+         "CUT_TOOLTIP": "Visa eller gömma utvalda delar av videon.",
+         "REPLAY_SEGMENT": "Spela upp segmentets början",
+         "REPLAY_SEGMENT_TOOLTIP": "Spela upp aktuella segmentet från början.",
+         "REPLAY_END_OF_SEGMENT": "Spela upp slutet av segmentet",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Spela några sekunder av det aktuella segmentets slut.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Spela upp övergången",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Spela upp några sekunder som innehåller slutet av förra och början av nästa segmentet.",
          "UNDO": "Ångra",
          "REDO": "Gör om",
-         "CLEAR_SEGMENTS": "Clear All Segments",
-         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
+         "CLEAR_SEGMENTS": "Rensa alla segment",
+         "CLEAR_SEGMENTS_TOOLTIP": "Radera alla segment men låt kvar ett stort segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Radera segment",
-         "SHOW_SEGMENT": "Show this Segment",
-         "HIDE_SEGMENT": "Hide this Segment",
+         "SHOW_SEGMENT": "Visa segmentet",
+         "HIDE_SEGMENT": "Gömma segment",
          "START": "Starta",
          "END": "Slut"
       },
@@ -1579,8 +1579,8 @@
       "TRACKS": {
          "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
-            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
+            "NO_VIDEO_TRACK_SELECTED": "Du måste välja minst ett video spår",
+            "NO_AUDIO_TRACK_SELECTED": "Du måste välja minst ett audio spår"
          },
          "TRACK": {
             "HEADER": "Spår"
@@ -1943,7 +1943,7 @@
             "CUT_SELECTED_SEGMENT": "Klipp ut",
             "PLAY_CURRENT_SEGMENT": "Spela nuvarande segment",
             "CLEAR_LIST": "Rensa segment",
-            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Spela upp segment med pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Slutet av segmentet"
          }
       }
@@ -1966,25 +1966,25 @@
    },
    "STATISTICS": {
       "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
-      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "UNSUPPORTED_TYPE": "Förlåt, Opencast kan inte visa den här typen av statistik.",
       "FROM": "Från",
-      "TO": "To",
-      "TOTAL": "Total",
-      "GRANULARITY": "Granularity",
+      "TO": "Till",
+      "TOTAL": "Totalt",
+      "GRANULARITY": "Granularitet",
       "NAVIGATION": {
          "ORGANIZATION": "Organisation"
       },
       "TITLE": {
-         "RANDOM": "Random Data",
-         "VIEWS_SUM": "Total Number of Views",
-         "VIEWS_AVG": "Average Number of Views",
-         "PUBLISHEDHOURS": "Published Hours of Video"
+         "RANDOM": "Tillfälliga uppgifter",
+         "VIEWS_SUM": "Total antal visningar",
+         "VIEWS_AVG": "Genomsnittlig antal visningar",
+         "PUBLISHEDHOURS": "Publicerad antal timmar"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time unit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the published hours of video"
+         "RANDOM": "Det här visar random uppgifter som ett exempel. Du kan deaktivera detta igenom att du ta bort JSON definitionen av statistic provider ifrån pärmen etc/providers.",
+         "VIEWS_SUM": "Det här visar totala antalet visningar per tidsenhet.",
+         "VIEWS_AVG": "Det här visar det genomsnittliga antalet visningar per tidsenhet.",
+         "PUBLISHEDHOURS": "Det här visar antalet publicerade timmar av video"
       }
    }
 }
