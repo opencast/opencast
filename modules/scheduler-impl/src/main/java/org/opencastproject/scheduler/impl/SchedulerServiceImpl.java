@@ -1081,8 +1081,21 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   public List<MediaPackage> findConflictingEvents(String captureDeviceID, Date startDate, Date endDate)
       throws SchedulerException {
     try {
-      return persistence.getEvents(captureDeviceID, startDate, endDate, Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS)
-          .parallelStream().map(this::getEventMediaPackage).collect(Collectors.toList());
+      final Organization organization = securityService.getOrganization();
+      final User user = SecurityUtil.createSystemUser(systemUserName, organization);
+      List<MediaPackage> conflictingEvents = new ArrayList();
+
+      SecurityUtil.runAs(securityService, organization, user, () -> {
+        try {
+          conflictingEvents.addAll(persistence.getEvents(captureDeviceID, startDate, endDate, Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS)
+            .parallelStream().map(this::getEventMediaPackage).collect(Collectors.toList()));
+        } catch (SchedulerServiceDatabaseException e) {
+          logger.error("Failed to get conflicting events", e);
+        }
+      });
+
+      return conflictingEvents;
+
     } catch (Exception e) {
       throw new SchedulerException(e);
     }
