@@ -152,6 +152,9 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-working-file-repository-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workspace-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workspace-impl/${project.version}</bundle>
+
+    <!-- UCT -->
+    <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-sakai/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-allinone" version="${project.version}">
