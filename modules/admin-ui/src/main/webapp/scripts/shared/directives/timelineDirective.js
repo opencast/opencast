@@ -163,7 +163,7 @@ angular.module('adminNg.directives')
         scope.displayZoomLevel = function (ms) {
 
           var date = new Date(ms),
-              st = '&#8776; ';
+              st = '\u2248 ';
 
           if (date.getUTCHours() > 0) {
             st += (date.getUTCHours() + (date.getUTCMinutes() >= 30 ? 1 : 0)) + ' h';
