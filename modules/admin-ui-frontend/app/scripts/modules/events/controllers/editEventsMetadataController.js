@@ -139,9 +139,9 @@ angular.module('adminNg.controllers')
         $scope.updateRequiredMetadata(row.id, row.value);
 
         if ((row.value || oldValue) && row.value !== oldValue) {
-          row.saved = true;
+          row.dirty = true;
         } else {
-          row.saved = false;
+          row.dirty = false;
         }
 
         row.selected = $scope.metadataFieldValid($index);

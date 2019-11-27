@@ -23,18 +23,91 @@
 // Controller for all event screens.
 angular.module('adminNg.controllers')
 .controller('EventCtrl', [
-  '$scope', 'Notifications', 'EventTransactionResource', 'EventMetadataResource', 'EventAssetsResource',
-  'EventAssetCatalogsResource', 'CommentResource', 'EventWorkflowsResource', 'EventWorkflowActionResource',
-  'EventWorkflowDetailsResource', 'ResourcesListResource', 'RolesResource', 'EventAccessResource',
-  'EventPublicationsResource', 'EventSchedulingResource','NewEventProcessingResource', 'CaptureAgentsResource',
-  'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService', 'UploadAssetOptions',
-  'EventUploadAssetResource', 'Table', 'SchedulingHelperService', 'StatisticsReusable',
-  function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource,
-    EventAssetCatalogsResource, CommentResource, EventWorkflowsResource, EventWorkflowActionResource,
-    EventWorkflowDetailsResource, ResourcesListResource, RolesResource, EventAccessResource,
-    EventPublicationsResource, EventSchedulingResource, NewEventProcessingResource, CaptureAgentsResource,
-    ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
-    EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable) {
+  '$scope',
+  'Notifications',
+  'EventTransactionResource',
+  'EventMetadataResource',
+  'EventAssetsResource',
+  'EventAssetCatalogsResource',
+  'CommentResource',
+  'EventWorkflowsResource',
+  'EventWorkflowActionResource',
+  'EventWorkflowDetailsResource',
+  'ResourcesListResource',
+  'RolesResource',
+  'EventAccessResource',
+  'EventPublicationsResource',
+  'EventSchedulingResource',
+  'NewEventProcessingResource',
+  'CaptureAgentsResource',
+  'ConflictCheckResource',
+  'Language',
+  'JsHelper',
+  '$sce',
+  '$timeout',
+  'EventHelperService',
+  'UploadAssetOptions',
+  'EventUploadAssetResource',
+  'Table',
+  'SchedulingHelperService',
+  'StatisticsReusable',
+  'Modal',
+  '$translate',
+  function (
+    $scope,
+    Notifications,
+    EventTransactionResource,
+    EventMetadataResource,
+    EventAssetsResource,
+    EventAssetCatalogsResource,
+    CommentResource,
+    EventWorkflowsResource,
+    EventWorkflowActionResource,
+    EventWorkflowDetailsResource,
+    ResourcesListResource,
+    RolesResource,
+    EventAccessResource,
+    EventPublicationsResource,
+    EventSchedulingResource,
+    NewEventProcessingResource,
+    CaptureAgentsResource,
+    ConflictCheckResource,
+    Language,
+    JsHelper,
+    $sce,
+    $timeout,
+    EventHelperService,
+    UploadAssetOptions,
+    EventUploadAssetResource,
+    Table,
+    SchedulingHelperService,
+    StatisticsReusable,
+    Modal,
+    $translate) {
+
+    $translate('EVENTS.SERIES.DETAILS.WARNING_UNSAVED').then(function (translation) {
+      window.unloadConfirmMsg = translation;
+    }).catch(angular.noop);
+
+    var dirtyFieldsPresent = function() {
+      return $scope.metadata.entries.some(
+        function(catalog) {
+          return catalog.fields.some(function(field) { return field.dirty === true; });
+        }) || $scope.episodeCatalog.fields.some(function(field) {
+        return field.dirty === true;
+      });
+    };
+
+    var confirmUnsaved = function() {
+      // eslint-disable-next-line
+      return confirm(window.unloadConfirmMsg);
+    };
+
+    $scope.close = function() {
+      if (dirtyFieldsPresent() === false || confirmUnsaved()) {
+        Modal.$scope.close();
+      }
+    };
 
     var saveFns = {},
         me = this,
@@ -192,11 +265,12 @@ angular.module('adminNg.controllers')
         },
         checkForActiveTransactions = function () {
           EventTransactionResource.hasActiveTransaction({id: $scope.resourceId }, function (data) {
-            $scope.transactions.read_only = angular.isUndefined(data.hasActiveTransaction)
+            var priorLocked = $scope.locked;
+            $scope.locked = angular.isUndefined(data.hasActiveTransaction)
               ? true
               : data.hasActiveTransaction;
 
-            if ($scope.transactions.read_only) {
+            if ($scope.locked) {
               if (!angular.isUndefined(me.transactionNotification)) {
                 Notifications.remove(me.transactionNotification, NOTIFICATION_CONTEXT);
               }
@@ -208,9 +282,40 @@ angular.module('adminNg.controllers')
               }
               $scope.$emit('NO_ACTIVE_TRANSACTION');
             }
+            if (priorLocked !== $scope.locked) {
+              EventMetadataResource.get({ id: $scope.resourceId }, reinitializeMetadata);
+            }
           });
 
           $scope.checkForActiveTransactionsTimer = $timeout(checkForActiveTransactions, 3000);
+        },
+        reinitializeMetadata = function(metadata) {
+          var episodeCatalogIndex;
+          angular.forEach(metadata.entries, function (catalog, index) {
+            if (catalog.flavor === mainCatalog) {
+              $scope.episodeCatalog = catalog;
+              episodeCatalogIndex = index;
+              var keepGoing = true;
+              var tabindex = 2;
+              angular.forEach(catalog.fields, function (entry) {
+                if (entry.id === 'title' && angular.isString(entry.value)) {
+                  $scope.titleParams = { resourceId: entry.value.substring(0,70) };
+                }
+                if (keepGoing && entry.locked) {
+                  metadata.locked = entry.locked;
+                  keepGoing = false;
+                }
+                entry.tabindex = tabindex ++;
+              });
+            }
+          });
+
+          $scope.metadata = metadata;
+          if (angular.isDefined(episodeCatalogIndex)) {
+            $scope.metadata.entries.splice(episodeCatalogIndex, 1);
+          }
+
+          checkForActiveTransactions();
         },
         cleanupScopeResources = function() {
           $timeout.cancel($scope.checkForActiveTransactionsTimer);
@@ -259,32 +364,7 @@ angular.module('adminNg.controllers')
             });
           });
 
-          $scope.metadata =  EventMetadataResource.get({ id: id }, function (metadata) {
-            var episodeCatalogIndex;
-            angular.forEach(metadata.entries, function (catalog, index) {
-              if (catalog.flavor === mainCatalog) {
-                $scope.episodeCatalog = catalog;
-                episodeCatalogIndex = index;
-                var keepGoing = true;
-                var tabindex = 2;
-                angular.forEach(catalog.fields, function (entry) {
-                  if (entry.id === 'title' && angular.isString(entry.value)) {
-                    $scope.titleParams = { resourceId: entry.value.substring(0,70) };
-                  }
-                  if (keepGoing && entry.locked) {
-                    metadata.locked = entry.locked;
-                    keepGoing = false;
-                  }
-                  entry.tabindex = tabindex ++;
-                });
-              }
-            });
-
-            if (angular.isDefined(episodeCatalogIndex)) {
-              metadata.entries.splice(episodeCatalogIndex, 1);
-            }
-          });
-
+          EventMetadataResource.get({ id: id }, reinitializeMetadata);
           //<===============================
           // Enable asset upload (catalogs and attachments) to existing events
 
@@ -317,7 +397,7 @@ angular.module('adminNg.controllers')
           $scope.saveAssets = function() {
             // The transaction becomes read-only if a workflow is running for this event.
             // Ref endpoint hasActiveTransaction(@PathParam("eventId") String eventId)
-            if ($scope.transactions.read_only) {
+            if ($scope.locked) {
               me.transactionNotification = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT,
                 3000);
               return;
@@ -669,12 +749,9 @@ angular.module('adminNg.controllers')
     $scope.$on('change', function (event, id) {
       cleanupScopeResources();
       fetchChildResources(id);
-      checkForActiveTransactions();
     });
 
-    $scope.transactions = {
-      read_only: false
-    };
+    $scope.locked = false;
 
     // Generate proxy function for the save metadata function based on the given flavor
     // Do not generate it
@@ -694,7 +771,7 @@ angular.module('adminNg.controllers')
         }
 
         fn = function (id, callback) {
-          $scope.metadataSave(id, callback, catalog);
+          $scope.markMetadataChanged(id, callback, catalog);
         };
 
         saveFns[flavor] = fn;
@@ -702,19 +779,26 @@ angular.module('adminNg.controllers')
       return fn;
     };
 
-    $scope.metadataSave = function (id, callback, catalog) {
-      catalog.attributeToSend = id;
-      EventMetadataResource.save({ id: $scope.resourceId }, catalog,  function () {
-        if (angular.isDefined(callback)) {
-          callback();
+    $scope.markMetadataChanged = function (id, callback, catalog) {
+      angular.forEach(catalog.fields, function (entry) {
+        if (entry.id === id) {
+          entry.dirty = true;
         }
-        // Mark the saved attribute as saved
-        angular.forEach(catalog.fields, function (entry) {
-          if (entry.id === id) {
-            entry.saved = true;
-          }
-        });
       });
+      if (angular.isDefined(callback)) {
+        callback();
+      }
+    };
+
+    $scope.metadataSave = function () {
+      var toSave = $scope.metadata.entries;
+      if (angular.isDefined($scope.episodeCatalog))
+        toSave.push($scope.episodeCatalog);
+      EventMetadataResource.save(
+        { id: $scope.resourceId },
+        toSave,
+        reinitializeMetadata
+      );
     };
 
     $scope.components = ResourcesListResource.get({ resource: 'components' });
@@ -913,8 +997,6 @@ angular.module('adminNg.controllers')
         }
       );
     };
-
-    checkForActiveTransactions();
 
     $scope.workflowAction = function (wfId, action) {
       if ($scope.workflowActionInProgress) return;

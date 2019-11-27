@@ -49,9 +49,12 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
+import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
 import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.QueryPreprocessor;
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
@@ -98,13 +101,18 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.workflow.api.ConfiguredWorkflow;
+import org.opencastproject.workflow.api.WorkflowDatabaseException;
+import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 import com.entwinemedia.fn.data.json.Jsons.Functions;
+import com.google.gson.Gson;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -118,12 +126,15 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -168,14 +179,37 @@ public class SeriesEndpoint implements ManagedService {
   public static final String SERIESTAB_ONLYSERIESWITHWRITEACCESS_KEY = "seriesTab.onlySeriesWithWriteAccess";
   public static final String EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY = "eventsFilter.onlySeriesWithWriteAccess";
 
+  /** Workflow to execute when somebody changes metadata via the Admin UI for a series */
+  private static final String METADATA_CHANGE_WORKFLOW = "org.opencastproject.admin.ui.series-metadata-change-workflow";
+
+  /** Workflow configuration for the series change workflow */
+  private static final String METADATA_CHANGE_WORKFLOW_CONFIG = "org.opencastproject.admin.ui.series-metadata-change-workflow-config";
+
   private SeriesService seriesService;
   private SecurityService securityService;
   private AclServiceFactory aclServiceFactory;
   private IndexService indexService;
+  private AssetManager assetManager;
+
   private AdminUISearchIndex searchIndex;
+  private String metadataChangeWorkflow;
+
+  private WorkflowService workflowService;
+
+  private Map<String, String> metadataChangeWorkflowConfig = Collections.emptyMap();
 
   /** Default server URL */
   private String serverUrl = "http://localhost:8080";
+
+  /** OSGi DI */
+  public void setWorkflowService(final WorkflowService workflowService) {
+    this.workflowService = workflowService;
+  }
+
+  /** OSGi DI */
+  public void setAssetManager(final AssetManager assetManager) {
+    this.assetManager = assetManager;
+  }
 
   /** OSGi callback for the series service. */
   public void setSeriesService(SeriesService seriesService) {
@@ -209,6 +243,11 @@ public class SeriesEndpoint implements ManagedService {
   protected void activate(ComponentContext cc) {
     if (cc != null) {
       String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
+      this.metadataChangeWorkflow = (String) cc.getProperties().get(METADATA_CHANGE_WORKFLOW);
+      final String changeWorkflowConfigJson = (String) cc.getProperties().get(METADATA_CHANGE_WORKFLOW_CONFIG);
+      if (changeWorkflowConfigJson != null) {
+        this.metadataChangeWorkflowConfig = new Gson().fromJson(changeWorkflowConfigJson, Map.class);
+      }
       logger.debug("Configured server url is {}", ccServerUrl);
       if (ccServerUrl != null)
         this.serverUrl = ccServerUrl;
@@ -398,11 +437,26 @@ public class SeriesEndpoint implements ManagedService {
           @FormParam("metadata") String metadataJSON) throws UnauthorizedException, NotFoundException,
           SearchIndexException {
     try {
-      MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, searchIndex);
+      final MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, searchIndex);
+      if (this.metadataChangeWorkflow != null) {
+        final EventSearchQuery eventInSeriesQuery = new EventSearchQuery(securityService.getOrganization().getId(),
+          securityService.getUser()).withSeriesId(seriesID);
+        final SearchResultItem<Event>[] eventsInSerie = searchIndex.getByQuery(eventInSeriesQuery).getItems();
+        final WorkflowDefinition wfd = this.workflowService.getWorkflowDefinitionById(this.metadataChangeWorkflow);
+        final Workflows workflows = new Workflows(this.assetManager, this.workflowService);
+        final ConfiguredWorkflow workflow = workflow(wfd, this.metadataChangeWorkflowConfig);
+        final Set<String> mpIds = Arrays.stream(eventsInSerie).map(e -> e.getSource().getIdentifier()).collect(
+          Collectors.toSet());
+        final List<WorkflowInstance> partialResult = workflows.applyWorkflowToLatestVersion(mpIds, workflow).toList();
+        if (!partialResult.isEmpty())
+          metadataList.setLocked(MetadataList.Locked.WORKFLOW_RUNNING);
+        if (partialResult.size() != mpIds.size())
+          logger.error("couldn't start workflow {} for all events {}", this.metadataChangeWorkflow, mpIds);
+      }
       return okJson(metadataList.toJSON());
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
-    } catch (IndexServiceException e) {
+    } catch (IndexServiceException | WorkflowDatabaseException e) {
       return RestUtil.R.serverError();
     }
   }

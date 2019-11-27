@@ -23,6 +23,7 @@ package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
@@ -60,7 +61,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   private UrlSigningService urlSigningService;
   private WorkflowService workflowService;
   private AdminUIConfiguration adminUIConfiguration;
-
+  private AssetManager assetManager;
   private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
   private Boolean signWithClientIP = UrlSigningServiceOsgiUtil.DEFAULT_SIGN_WITH_CLIENT_IP;
 
@@ -68,6 +69,17 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   public static final String EVENTSTAB_ONLYEVENTSWITHWRITEACCESS_KEY = "eventsTab.onlyEventsWithWriteAccess";
   private Boolean onlySeriesWithWriteAccessEventModal = false;
   private Boolean onlyEventsWithWriteAccessEventsTab = false;
+
+  @Override
+  public AssetManager getAssetManager() {
+    return assetManager;
+  }
+
+  /** OSGi DI. */
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
+  }
+
 
   @Override
   public AdminUIConfiguration getAdminUIConfiguration() {

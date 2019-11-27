@@ -33,7 +33,10 @@ import static org.opencastproject.external.common.ApiVersion.VERSION_1_2_0;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
+import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
@@ -43,7 +46,9 @@ import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
+import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
 import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesIndexSchema;
 import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
@@ -78,6 +83,10 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.workflow.api.ConfiguredWorkflow;
+import org.opencastproject.workflow.api.WorkflowDatabaseException;
+import org.opencastproject.workflow.api.WorkflowDefinition;
+import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
@@ -85,23 +94,28 @@ import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons.Functions;
+import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -122,12 +136,18 @@ import javax.ws.rs.core.Response.Status;
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
 @RestService(name = "externalapiseries", title = "External API Series Service", notes = {}, abstractText = "Provides resources and operations related to the series")
-public class SeriesEndpoint {
+public class SeriesEndpoint implements ManagedService {
 
   private static final int CREATED_BY_UI_ORDER = 9;
   private static final int DEFAULT_LIMIT = 100;
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesEndpoint.class);
+
+  /** Workflow to execute when somebody changes metadata for a series */
+  private static final String METADATA_CHANGE_WORKFLOW = "metadata-change-workflow";
+
+  /** Workflow configuration for the event change workflow */
+  private static final String METADATA_CHANGE_WORKFLOW_CONFIG = "metadata-change-workflow-config";
 
   /** Base URL of this endpoint */
   protected String endpointBaseUrl;
@@ -137,6 +157,34 @@ public class SeriesEndpoint {
   private IndexService indexService;
   private SecurityService securityService;
   private SeriesService seriesService;
+  private String metadataChangeWorkflow;
+  private Map<String, String> metadataChangeWorkflowConfig;
+  private AssetManager assetManager;
+  private WorkflowService workflowService;
+
+  /** OSGi DI */
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
+  }
+
+  /** OSGi DI */
+  public void setWorkflowService(WorkflowService workflowService) {
+    this.workflowService = workflowService;
+  }
+
+  /** OSGi callback if properties file is present */
+  @Override
+  public void updated(final Dictionary<String, ?> properties) {
+    if (properties == null) {
+      return;
+    }
+
+    this.metadataChangeWorkflow = (String)properties.get(METADATA_CHANGE_WORKFLOW);
+    final String changeWorkflowConfigJson = (String) properties.get(METADATA_CHANGE_WORKFLOW_CONFIG);
+    if (changeWorkflowConfigJson != null) {
+      this.metadataChangeWorkflowConfig = new Gson().fromJson(changeWorkflowConfigJson, Map.class);
+    }
+  }
 
   /** OSGi DI */
   void setExternalIndex(ExternalIndex externalIndex) {
@@ -597,6 +645,7 @@ public class SeriesEndpoint {
                   @RestParameter(name = "metadata", description = "Series metadata as Form param", isRequired = true, type = STRING) }, reponses = {
                           @RestResponse(description = "The series' metadata have been updated.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+                          @RestResponse(description = "The workflow for the event could not be triggered.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateSeriesMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id,
           @QueryParam("type") String type, @FormParam("metadata") String metadataJSON) throws Exception {
@@ -614,7 +663,7 @@ public class SeriesEndpoint {
       return RestUtil.R.badRequest(e.getMessage());
     }
 
-    if (updatedFields == null || updatedFields.size() == 0) {
+    if (updatedFields.size() == 0) {
       return RestUtil.R.badRequest(
               String.format("Unable to parse metadata fields as json from '%s' because there were no fields to update.",
                       metadataJSON));
@@ -677,6 +726,9 @@ public class SeriesEndpoint {
 
     metadataList.add(adapter, collection);
     indexService.updateAllSeriesMetadata(id, metadataList, externalIndex);
+    if (!startChangeWorkflow(id)) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+    }
     return ApiResponses.Json.ok(acceptHeader, "");
   }
 
@@ -687,6 +739,7 @@ public class SeriesEndpoint {
                   @RestParameter(name = "type", isRequired = true, description = "The type of metadata to delete", type = STRING) }, reponses = {
                           @RestResponse(description = "The metadata have been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
                           @RestResponse(description = "The main metadata catalog dublincore/series cannot be deleted as it has mandatory fields.", responseCode = HttpServletResponse.SC_FORBIDDEN),
+                          @RestResponse(description = "The workflow for the event could not be triggered.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteSeriesMetadataByType(@HeaderParam("Accept") String acceptHeader,
           @PathParam("seriesId") String id, @QueryParam("type") String type) throws Exception {
@@ -715,10 +768,29 @@ public class SeriesEndpoint {
 
     try {
       indexService.removeCatalogByFlavor(optSeries.get(), MediaPackageElementFlavor.parseFlavor(type));
+      if (!startChangeWorkflow(id)) {
+        return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+      }
     } catch (NotFoundException e) {
       return ApiResponses.notFound(e.getMessage());
     }
     return Response.noContent().build();
+  }
+
+  private boolean startChangeWorkflow(final String seriesId)
+          throws WorkflowDatabaseException, NotFoundException, SearchIndexException {
+    if (this.metadataChangeWorkflow == null) {
+      return true;
+    }
+    final EventSearchQuery eventInSeriesQuery = new EventSearchQuery(securityService.getOrganization().getId(),
+            securityService.getUser()).withSeriesId(seriesId);
+    final SearchResult<Event> eventsInSeries = externalIndex.getByQuery(eventInSeriesQuery);
+    final List<String> mpIds = Arrays.stream(eventsInSeries.getItems()).map(e -> e.getSource().getIdentifier())
+            .collect(Collectors.toList());
+    final WorkflowDefinition wfd = this.workflowService.getWorkflowDefinitionById(this.metadataChangeWorkflow);
+    final Workflows workflows = new Workflows(this.assetManager, this.workflowService);
+    final ConfiguredWorkflow workflow = workflow(wfd, this.metadataChangeWorkflowConfig);
+    return workflows.applyWorkflowToLatestVersion(mpIds, workflow).toList().size() == mpIds.size();
   }
 
   @GET
@@ -791,18 +863,25 @@ public class SeriesEndpoint {
                   @RestParameter(name = "metadata", description = "Series metadata as Form param", isRequired = true, type = STRING) }, reponses = {
                           @RestResponse(description = "The series' metadata have been updated.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+                          @RestResponse(description = "The workflow for the event could not be triggered.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateSeriesMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String seriesID,
           @FormParam("metadata") String metadataJSON)
           throws UnauthorizedException, NotFoundException, SearchIndexException {
     try {
       MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, externalIndex);
+      if (!startChangeWorkflow(seriesID)) {
+        return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+      }
       return ApiResponses.Json.ok(acceptHeader, metadataList.toJSON());
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to update series '{}' with metadata '{}'", seriesID, metadataJSON, e);
       return RestUtil.R.badRequest(e.getMessage());
     } catch (IndexServiceException e) {
       logger.error("Unable to update series '{}' with metadata '{}'", seriesID, metadataJSON, e);
+      return RestUtil.R.serverError();
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Unable to find workflow called '{}'", this.metadataChangeWorkflow);
       return RestUtil.R.serverError();
     }
   }

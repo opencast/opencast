@@ -34,7 +34,10 @@ import static org.opencastproject.external.util.SchedulingUtils.convertConflicti
 import static org.opencastproject.external.util.SchedulingUtils.getConflictingEvents;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
+import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.external.common.ApiMediaType;
@@ -106,7 +109,11 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.workflow.api.ConfiguredWorkflow;
+import org.opencastproject.workflow.api.WorkflowDatabaseException;
+import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fn2;
@@ -116,6 +123,7 @@ import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 import com.entwinemedia.fn.data.json.Jsons.Functions;
+import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -136,6 +144,8 @@ import java.text.SimpleDateFormat;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -174,6 +184,12 @@ public class EventsEndpoint implements ManagedService {
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
 
+  /** Workflow to execute when somebody changes metadata for an event */
+  private static final String METADATA_CHANGE_WORKFLOW = "metadata-change-workflow";
+
+  /** Workflow configuration for the event change workflow */
+  private static final String METADATA_CHANGE_WORKFLOW_CONFIG = "metadata-change-workflow-config";
+
   /** The default time before a piece of signed content expires. 2 Hours. */
   protected static final Long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60L;
 
@@ -194,6 +210,8 @@ public class EventsEndpoint implements ManagedService {
   private String previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
 
   private Map<String, MetadataField<?>> configuredMetadataFields = new TreeMap<>();
+  private String metadataChangeWorkflow;
+  private Map<String, String> metadataChangeWorkflowConfig;
 
   /** The resolutions */
   private enum CommentResolution {
@@ -205,11 +223,23 @@ public class EventsEndpoint implements ManagedService {
   private IndexService indexService;
   private IngestService ingestService;
   private SecurityService securityService;
+  private AssetManager assetManager;
+  private WorkflowService workflowService;
   private CommonEventCatalogUIAdapter eventCatalogUIAdapter;
   private final List<EventCatalogUIAdapter> catalogUIAdapters = new ArrayList<>();
   private UrlSigningService urlSigningService;
   private SchedulerService schedulerService;
   private CaptureAgentStateService agentStateService;
+
+  /** OSGi DI */
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
+  }
+
+  /** OSGi DI */
+  public void setWorkflowService(WorkflowService workflowService) {
+    this.workflowService = workflowService;
+  }
 
   /** OSGi DI */
   void setExternalIndex(ExternalIndex externalIndex) {
@@ -323,6 +353,12 @@ public class EventsEndpoint implements ManagedService {
     logger.debug("Preview subtype is '{}'", previewSubtype);
 
     configuredMetadataFields = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
+
+    this.metadataChangeWorkflow = (String)properties.get(METADATA_CHANGE_WORKFLOW);
+    final String changeWorkflowConfigJson = (String) properties.get(METADATA_CHANGE_WORKFLOW_CONFIG);
+    if (changeWorkflowConfigJson != null) {
+      this.metadataChangeWorkflowConfig = new Gson().fromJson(changeWorkflowConfigJson, Map.class);
+    }
   }
 
   @GET
@@ -423,6 +459,17 @@ public class EventsEndpoint implements ManagedService {
     return Response.noContent().build();
   }
 
+  private boolean startChangeWorkflow(final Collection<String> mpIds)
+          throws WorkflowDatabaseException, NotFoundException {
+    if (this.metadataChangeWorkflow == null) {
+      return true;
+    }
+    final WorkflowDefinition wfd = this.workflowService.getWorkflowDefinitionById(this.metadataChangeWorkflow);
+    final Workflows workflows = new Workflows(this.assetManager, this.workflowService);
+    final ConfiguredWorkflow workflow = workflow(wfd, this.metadataChangeWorkflowConfig);
+    return workflows.applyWorkflowToLatestVersion(mpIds, workflow).toList().size() == mpIds.size();
+  }
+
   @POST
   @Path("{eventId}")
   @RestQuery(name = "updateeventmetadata", description = "Updates an event.", returnDescription = "", pathParameters = {
@@ -435,6 +482,7 @@ public class EventsEndpoint implements ManagedService {
                   @RestParameter(name = "audio", isRequired = false, description = "Audio track", type = Type.FILE),
                   @RestParameter(name = "processing", isRequired = false, description = "Processing instructions task configuration", type = Type.STRING), }, reponses = {
                           @RestResponse(description = "The event has been updated.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+                          @RestResponse(description = "The workflow for the event could not be triggered.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
                           @RestResponse(description = "The event could not be updated due to a scheduling conflict.", responseCode = HttpServletResponse.SC_CONFLICT),
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventMetadata(@HeaderParam("Accept") String acceptHeader, @Context HttpServletRequest request,
@@ -498,6 +546,10 @@ public class EventsEndpoint implements ManagedService {
           if (clientError.isPresent()) {
             return clientError.get();
           }
+        }
+
+        if (!startChangeWorkflow(Collections.singleton(eventId))) {
+          return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         return Response.noContent().build();
@@ -1243,6 +1295,7 @@ public class EventsEndpoint implements ManagedService {
                   @RestParameter(name = "metadata", description = "Metadata catalog in JSON format", isRequired = true, type = STRING) }, reponses = {
                           @RestResponse(description = "The metadata of the given namespace has been updated.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+                          @RestResponse(description = "The workflow for the event could not be triggered.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type, @FormParam("metadata") String metadataJSON) throws Exception {
@@ -1258,7 +1311,7 @@ public class EventsEndpoint implements ManagedService {
       return RestUtil.R.badRequest(e.getMessage());
     }
 
-    if (updatedFields == null || updatedFields.size() == 0) {
+    if (updatedFields.size() == 0) {
       return RestUtil.R.badRequest(
               String.format("Unable to parse metadata fields as json from '%s' because there were no fields to update.",
                       metadataJSON));
@@ -1365,6 +1418,11 @@ public class EventsEndpoint implements ManagedService {
 
       metadataList.add(adapter, collection);
       indexService.updateEventMetadata(id, metadataList, externalIndex);
+
+      if (!startChangeWorkflow(Collections.singleton(id))) {
+        return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+      }
+
       return Response.noContent().build();
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
@@ -1407,6 +1465,9 @@ public class EventsEndpoint implements ManagedService {
       }
       try {
         indexService.removeCatalogByFlavor(event, flavor.get());
+        if (!startChangeWorkflow(Collections.singleton(id))) {
+          return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+        }
       } catch (NotFoundException e) {
         return ApiResponses.notFound(e.getMessage());
       } catch (IndexServiceException e) {
@@ -1417,6 +1478,9 @@ public class EventsEndpoint implements ManagedService {
         throw new WebApplicationException(e, Status.BAD_REQUEST);
       } catch (UnauthorizedException e) {
         return Response.status(Status.UNAUTHORIZED).build();
+      } catch (WorkflowDatabaseException e) {
+        logger.error("Couldn't find workflow called '{}'", this.metadataChangeWorkflow);
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       }
       return Response.noContent().build();
     }

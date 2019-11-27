@@ -35,6 +35,7 @@ import static org.opencastproject.util.data.Tuple.tuple;
 import org.opencastproject.adminui.endpoint.AbstractEventEndpointTest.TestEnv;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
@@ -747,6 +748,11 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   @Override
   public SchedulerService getSchedulerService() {
     return env.getSchedulerService();
+  }
+
+  @Override
+  public AssetManager getAssetManager() {
+    return null;
   }
 
   @Override

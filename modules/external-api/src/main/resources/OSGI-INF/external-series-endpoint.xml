@@ -9,6 +9,7 @@
   <service>
     <!-- expose interface for MH REST publisher! -->
     <provide interface="org.opencastproject.external.endpoint.SeriesEndpoint"/>
+    <provide interface="org.osgi.service.cm.ManagedService"/>
   </service>
   <reference name="ExternalIndex"
              interface="org.opencastproject.external.index.ExternalIndex"
@@ -30,4 +31,10 @@
              cardinality="1..1"
              policy="static"
              bind="setSeriesService"/>
+  <reference name="workflowService"
+             interface="org.opencastproject.workflow.api.WorkflowService"
+             bind="setWorkflowService"/>
+  <reference name="assetManager"
+             interface="org.opencastproject.assetmanager.api.AssetManager"
+             bind="setAssetManager"/>
 </scr:component>

@@ -57,4 +57,10 @@
              cardinality="1..1"
              policy="static"
              bind="setAgentStateService"/>
+  <reference name="workflowService"
+             interface="org.opencastproject.workflow.api.WorkflowService"
+             bind="setWorkflowService"/>
+  <reference name="assetManager"
+             interface="org.opencastproject.assetmanager.api.AssetManager"
+             bind="setAssetManager"/>
 </scr:component>
