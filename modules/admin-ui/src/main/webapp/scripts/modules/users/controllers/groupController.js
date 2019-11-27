@@ -32,13 +32,13 @@ angular.module('adminNg.controllers')
           // Now that we have the user users and the group users populate the selected and available
           $scope.user.selected = $scope.user.all.filter(function (user) {
             var foundUser = $scope.group.users.find(function (groupUser) {
-              return groupUser.username === user.value;
+              return groupUser.username === user.name;
             });
             return foundUser !== undefined;
           });
           $scope.user.available = $scope.user.all.filter(function (user) {
             var foundUser = $scope.user.selected.find(function (selectedUser) {
-              return selectedUser.value === user.value;
+              return selectedUser.name === user.name;
             });
             return foundUser === undefined;
           });
@@ -82,7 +82,7 @@ angular.module('adminNg.controllers')
       }
       $scope.user = {
         all: ResourcesListResource.query({
-          resource: $scope.orgProperties['adminui.user.listname'] || 'USERS.INVERSE.WITH.USERNAME'}),
+          resource: $scope.orgProperties['adminui.user.listname'] || 'USERS.NAME.AND.USERNAME'}),
         available: [],
         selected:  [],
         i18n: 'USERS.GROUPS.DETAILS.USERS',
@@ -103,7 +103,7 @@ angular.module('adminNg.controllers')
       $scope.group.roles = [];
 
       angular.forEach($scope.user.selected, function (item) {
-        $scope.group.users.push(item.value);
+        $scope.group.users.push(item.name);
       });
 
       angular.forEach($scope.role.selected, function (item) {

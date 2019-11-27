@@ -20,7 +20,7 @@
                 ng-disabled="disabled"
                 ng-init="markedForAddition = []"
                 ng-class="{ disabled: disabled , scrollable: 'true'}"
-                ng-options="item.name group by item[groupBy] for item in resource.available | filter: customFilter() | orderBy: 'name' : false"
+                ng-options="item[display] group by item[groupBy] for item in resource.available | filter: customFilter() | orderBy: display : false"
                 loading-scroller="loadMore()"
                 style="min-height: 11em;"
                 ng-style="getHeight()"
@@ -46,7 +46,7 @@
                 ng-model="markedForRemoval"
                 ng-init="markedForRemoval = []"
                 ng-class="{ disabled: disabled }"
-                ng-options="item.name group by item[groupBy] for item in resource.selected | filter: customSelectedFilter() | orderBy: 'name' : false"
+                ng-options="item[display] group by item[groupBy] for item in resource.selected | filter: customSelectedFilter() | orderBy: display : false"
                 style="min-height: 11em;"
                 ng-style="getHeight()"
                 ng-dblclick="remove()">

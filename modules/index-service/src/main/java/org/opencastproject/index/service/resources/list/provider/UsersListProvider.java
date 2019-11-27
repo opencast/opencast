@@ -40,20 +40,19 @@ public class UsersListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "USERS";
 
-  public static final String DEFAULT = PROVIDER_PREFIX;
-  public static final String DEFAULT_WITH_EMAIL = DEFAULT + ".WITH.EMAIL";
-  public static final String DEFAULT_WITH_USERNAME = DEFAULT + ".WITH.USERNAME";
-  public static final String INVERSE = PROVIDER_PREFIX + ".INVERSE";
-  public static final String INVERSE_WITH_EMAIL = INVERSE + ".WITH.EMAIL";
-  public static final String INVERSE_WITH_USERNAME = INVERSE + ".WITH.USERNAME";
-  public static final String USERNAME = PROVIDER_PREFIX + ".USERNAME";
-  public static final String NAME = PROVIDER_PREFIX + ".NAME";
-  public static final String EMAIL = PROVIDER_PREFIX + ".EMAIL";
-  public static final String ROLE = PROVIDER_PREFIX + ".ROLE";
-  public static final String USERDIRECTORY = PROVIDER_PREFIX + ".USERDIRECTORY";
+  public static final String NAME = PROVIDER_PREFIX + ".NAME"; // Username : Name
+  public static final String NAME_AND_EMAIL = PROVIDER_PREFIX + ".NAME.AND.EMAIL"; // Username: Name <Email>
+  public static final String NAME_AND_USERNAME = PROVIDER_PREFIX + ".NAME.AND.USERNAME"; // Username: Name (Username)
+  public static final String USERNAME = PROVIDER_PREFIX + ".USERNAME"; // UserName: UserName
+  public static final String EMAIL = PROVIDER_PREFIX + ".EMAIL"; // UserName: Email
 
-  protected static final String[] NAMES = { DEFAULT, DEFAULT_WITH_EMAIL, DEFAULT_WITH_USERNAME, INVERSE,
-          INVERSE_WITH_EMAIL, INVERSE_WITH_USERNAME, USERNAME, NAME, EMAIL, ROLE, USERDIRECTORY };
+  public static final String NAME_ONLY = PROVIDER_PREFIX + ".NAME.ONLY"; // Name : Name
+  public static final String EMAIL_ONLY = PROVIDER_PREFIX + ".EMAIL.ONLY"; // Email: Email
+  public static final String ROLE_ONLY = PROVIDER_PREFIX + ".ROLE.ONLY"; // Role: Role
+  public static final String USERDIRECTORY_ONLY = PROVIDER_PREFIX + ".USERDIRECTORY.ONLY"; // UserDirectory: UserDirectory
+
+  protected static final String[] NAMES = { NAME, NAME_AND_EMAIL, NAME_AND_USERNAME, USERNAME, EMAIL, NAME_ONLY,
+          EMAIL_ONLY, ROLE_ONLY, USERDIRECTORY_ONLY };
 
   private static final Logger logger = LoggerFactory.getLogger(UsersListProvider.class);
 
@@ -75,7 +74,7 @@ public class UsersListProvider implements ResourceListProvider {
 
   @Override
   public Map<String, String> getList(String listName, ResourceListQuery query) {
-    Map<String, String> usersList = new HashMap<String, String>();
+    Map<String, String> usersList = new HashMap<>();
     int offset = 0;
     int limit = 0;
 
@@ -92,22 +91,22 @@ public class UsersListProvider implements ResourceListProvider {
     while (users.hasNext()) {
       User u = users.next();
       if (EMAIL.equals(listName) && StringUtils.isNotBlank(u.getEmail())) {
-        usersList.put(u.getEmail(), u.getEmail());
+        usersList.put(u.getUsername(), u.getEmail());
       } else if (USERNAME.equals(listName) && StringUtils.isNotBlank(u.getUsername())) {
         usersList.put(u.getUsername(), u.getUsername());
-      } else if (USERDIRECTORY.equals(listName) && StringUtils.isNotBlank(u.getProvider())) {
-        usersList.put(u.getProvider(), u.getProvider());
       } else if (NAME.equals(listName) && StringUtils.isNotBlank(u.getName())) {
-        usersList.put(u.getName(), u.getName());
-      } else if (INVERSE.equals(listName)
-              || INVERSE_WITH_EMAIL.equals(listName)
-              || INVERSE_WITH_USERNAME.equals(listName)) {
-        usersList.put(createDisplayName(u, listName), u.getUsername());
-      } else if (DEFAULT.equals(listName)
-              || DEFAULT_WITH_EMAIL.equals(listName)
-              || DEFAULT_WITH_USERNAME.equals(listName)) {
+        usersList.put(u.getUsername(), u.getName());
+      } else if (NAME.equals(listName)
+              || NAME_AND_EMAIL.equals(listName)
+              || NAME_AND_USERNAME.equals(listName)) {
         usersList.put(u.getUsername(), createDisplayName(u, listName));
-      } else if (ROLE.equals(listName) && u.getRoles().size() > 0) {
+      } else if (NAME_ONLY.equals(listName) && StringUtils.isNotBlank(u.getName())) {
+        usersList.put(u.getName(), u.getName());
+      } else if (EMAIL_ONLY.equals(listName) && StringUtils.isNotBlank(u.getEmail())) {
+        usersList.put(u.getEmail(), u.getEmail());
+      } else if (USERDIRECTORY_ONLY.equals(listName) && StringUtils.isNotBlank(u.getProvider())) {
+        usersList.put(u.getProvider(), u.getProvider());
+      } else if (ROLE_ONLY.equals(listName) && u.getRoles().size() > 0) {
         for (Role role : u.getRoles()) {
           usersList.put(role.getName(), role.getName());
         }
@@ -129,10 +128,9 @@ public class UsersListProvider implements ResourceListProvider {
   private String createDisplayName(User user, String listName) {
     assert ((user != null) && (user.getUsername() != null));
     String name = StringUtils.isNotBlank(user.getName()) ? user.getName() : user.getUsername();
-    if (StringUtils.isNotBlank(user.getEmail())
-            && (DEFAULT_WITH_EMAIL.equals(listName) || INVERSE_WITH_EMAIL.equals(listName))) {
+    if (StringUtils.isNotBlank(user.getEmail()) && NAME_AND_EMAIL.equals(listName)) {
       name = name + " <" + user.getEmail() + ">";
-    } else if ((DEFAULT_WITH_USERNAME.equals(listName) || INVERSE_WITH_USERNAME.equals(listName))) {
+    } else if (NAME_AND_USERNAME.equals(listName)) {
       name = name + " (" + user.getUsername() + ")";
     }
     assert (name != null);
