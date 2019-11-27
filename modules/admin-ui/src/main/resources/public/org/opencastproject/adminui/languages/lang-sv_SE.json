@@ -65,11 +65,11 @@
          "CONFIRMATION": "Bekräftelse"
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
+         "SERIES_HAS_EVENTS": "Den här serien innehåller events. Raderingen av serien ska inte ta bort events.",
          "EVENT_WILL_BE_GONE": "Om du fortsätta, eventet ska gå förlorad."
       },
       "ERRORS": {
-         "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
+         "SERIES_HAS_EVENTS": "Serien kan ej tas bort då den innehåller events."
       }
    },
    "MEDIAMODULE": "Mediemodul",
@@ -138,7 +138,7 @@
       "CONFLICT_BULK_DETECTED": "Planeringskonflikt: Förändring av eventet resulterar i konflikter. Ändra på plats eller tidspunkt.",
       "CONFLICT_ALREADY_ENDED": "Fel vid schemaläggning: Händelsen har redan avslutats.",
       "CONFLICT_END_BEFORE_START": "Fel vid schemaläggning: Slutet måste vara senare än början.",
-      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
+      "CONFLICT_IN_THE_PAST": "Tidsplanen kunde inte updateras: Du kan inte planera en event som ligger i det förflutna.",
       "INVALID_ACL_RULES": "Regler måste innehålla en giltig roll och läs- eller/och skrivrätt.",
       "MISSING_ACL_RULES": "Åtminstone en roll med läs- och skrivrättigheter krävs!",
       "SAVED_ACL_RULES": "Reglerna för åtkomst har sparats.",
@@ -178,12 +178,12 @@
          "SERIES": {
             "CAPTION": "Ta bort",
             "BUTTON": "Ta bort",
-            "CANNOT_DELETE": "The highlighted series cannot be deleted as they still contain events."
+            "CANNOT_DELETE": "Valda serien kan ej tas bort då den innehåller events."
          },
          "EVENTS": {
             "CAPTION": "Ta bort",
             "DELETE_EVENTS": "Radera händelser",
-            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue."
+            "UNAUTHORIZED": "Du har inte behörighet att radera markerade events. Avmarkera dem för att kunna fortsätta."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Efter raderingen kan inga metadata av händelsen och inga ljud- och videofiler återställas.",
@@ -214,7 +214,7 @@
          "CONFLICT_CHECK_RUNNING": "Konfliktöversyn sker…",
          "GENERAL": {
             "CAPTION": "Allmänt",
-            "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
+            "CANNOTSTART": "Valda event(s) kan inte behandlas då det fungerar bara för schemalagda events.",
             "NOCHANGES": "Ingen förändring i händelsen upptäckt!",
             "CONFLICT_FIRST_EVENT": "Förändrad event",
             "CONFLICT_SECOND_EVENT": "Händelse i konflikt",
@@ -390,7 +390,7 @@
                "CAPTION": "Uppladdning av resurser",
                "SELECT_TYPE": "Välj typ av resurs",
                "ADD": "Lägg till resurs",
-               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
+               "NO_OPTIONS": "En list av resursoptioner blev inte laddad up på den här sektionen av webbsidan!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Lektionsanteckningar/Handout",
                   "CAPTIONS_DFXP": "Undertexter DFXP",
@@ -460,7 +460,7 @@
             "PUBLISHED": "Publicerad",
             "WEEKDAY": "Veckodag",
             "TOOLTIP": {
-               "ASSETS": "Open asset details",
+               "ASSETS": "Öppna resurserdetaljs",
                "START": "Filter för detta startdatum",
                "SERIES": "Filter för den här serien",
                "STATUS": "Filter för denna händelsestatus",
@@ -809,7 +809,7 @@
                "WORKFLOW": "Workflow",
                "TOOLTIP": {
                   "STOP": "Stoppa workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "ABORT": "Avbrut utförande av den aktuella workflow (försök inte att göra den felaktiga operationen igen)",
                   "RETRY": "Försök igen att utföra workflow",
                   "DELETE": "Ta bort workflow",
                   "DETAILS": "Workflowdetaljer"
@@ -1519,7 +1519,7 @@
       },
       "ACTIONS": {
          "SPLIT": "Dela",
-         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "SPLIT_TOOLTIP": "Dela upp segmentet på den aktuella positionen.",
          "CUT": "Visa/Gömma",
          "CUT_TOOLTIP": "Visa eller gömma utvalda delar av videon.",
          "REPLAY_SEGMENT": "Spela upp segmentets början",
@@ -1541,20 +1541,20 @@
          "END": "Slut"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "DESCRIPTION": "En standardminiatur som används som en visuell repräsentation av event genereras automatiskt. Om du vil hellre använda en annan miniatur så kan du extrahera en miniatur ur videon på den aktuella avspelningsposition eller ladda upp ett bild.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
                   "LABEL": "Extrahera från video",
-                  "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
+                  "TOOLTIP": "Extrahera miniaturen från videon vid den aktuella uppspelningspositionen"
                },
                "FROM_LEFT_VIDEO": {
                   "LABEL": "Extrahera från den vänstra videon",
-                  "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
+                  "TOOLTIP": "Extrahera miniaturen från videon på vänster sidan vid den aktuella uppspelningspositionen"
                },
                "FROM_RIGHT_VIDEO": {
                   "LABEL": "Extrahera från den högra videon",
-                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+                  "TOOLTIP": "Extrahera miniaturen från videon på höger sidan vid den aktuella uppspelningspositionen"
                }
             },
             "UPLOAD": {
@@ -1563,21 +1563,21 @@
             },
             "USE_DEFAULT": {
                "LABEL": "Använd standard-miniatyrbild",
-               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+               "TOOLTIP": "Använd standardminiaturen som genereras automatiskt"
             }
          },
          "PREVIEW": {
             "NOT_AVAILABLE": "Ingen förhandsgranskning tillgänglig",
-            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+            "OUTDATED": "Miniaturen är inte aktuellt för att segment blev förändrade. Den ska aktualiseras efter du har sparat dina förändringar."
          },
          "CURRENT": {
-            "DEFAULT": "You are currently using the default thumbnail.",
-            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
-            "UPLOAD": "You are currently using an uploaded thumbnail."
+            "DEFAULT": "Du använder just nu standardminiaturen.",
+            "SNAPSHOT": "Den aktuelle miniaturen har blivit extraherad från videon.",
+            "UPLOAD": "Du använder aktuellt en uppladdad miniatur."
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
+         "DESCRIPTION": "Du kan välja av spår för att inte processera vidare dem. Obs: Du måste (re-)publicera eventet för att använda förändelser.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "Du måste välja minst ett video spår",
             "NO_AUDIO_TRACK_SELECTED": "Du måste välja minst ett audio spår"
@@ -1881,7 +1881,7 @@
    "HOTKEYS": {
       "CHEAT_SHEET": {
          "TITLE": "Tangentbordsgenvägar",
-         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+         "HINT": "Den här sidan visar alla tastaturgenvägar. Obs: De kan vara olika beroende av på vilken sida du är aktuellt."
       },
       "KEYS": {
          "CTRL": "Ctrl",
@@ -1917,8 +1917,8 @@
       "DESCRIPTIONS": {
          "GENERAL": {
             "MAIN_MENU": "Huvudmeny",
-            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
-            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Välj nästa dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Välj föregående dashboard filter",
             "REMOVE_FILTERS": "Rensa alla filter",
             "EVENT_VIEW": "Händelser",
             "SERIES_VIEW": "Serie",
@@ -1965,7 +1965,7 @@
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+      "NOT_AVAILABLE": "Statistiken kan inte visas just nu. Försök igen senare.",
       "UNSUPPORTED_TYPE": "Förlåt, Opencast kan inte visa den här typen av statistik.",
       "FROM": "Från",
       "TO": "Till",
