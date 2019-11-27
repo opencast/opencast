@@ -64,34 +64,34 @@ public class MetadataField<A> {
 
   private static final Logger logger = LoggerFactory.getLogger(MetadataField.class);
 
-  public static final String PATTERN_DURATION = "HH:mm:ss";
+  private static final String PATTERN_DURATION = "HH:mm:ss";
 
   /** Keys for the different values in the configuration file */
   public static final String CONFIG_COLLECTION_ID_KEY = "collectionID";
-  public static final String CONFIG_PATTERN_KEY = "pattern";
-  public static final String CONFIG_DELIMITER_KEY = "delimiter";
+  private static final String CONFIG_PATTERN_KEY = "pattern";
+  private static final String CONFIG_DELIMITER_KEY = "delimiter";
   public static final String CONFIG_INPUT_ID_KEY = "inputID";
   public static final String CONFIG_LABEL_KEY = "label";
   public static final String CONFIG_LIST_PROVIDER_KEY = "listprovider";
-  public static final String CONFIG_NAMESPACE_KEY = "namespace";
-  public static final String CONFIG_ORDER_KEY = "order";
-  public static final String CONFIG_OUTPUT_ID_KEY = "outputID";
+  private static final String CONFIG_NAMESPACE_KEY = "namespace";
+  private static final String CONFIG_ORDER_KEY = "order";
+  private static final String CONFIG_OUTPUT_ID_KEY = "outputID";
   public static final String CONFIG_PROPERTY_PREFIX = "property";
   public static final String CONFIG_READ_ONLY_KEY = "readOnly";
   public static final String CONFIG_REQUIRED_KEY = "required";
   public static final String CONFIG_TYPE_KEY = "type";
 
   /* Keys for the different properties of the metadata JSON Object */
-  protected static final String JSON_KEY_ID = "id";
-  protected static final String JSON_KEY_LABEL = "label";
-  protected static final String JSON_KEY_READONLY = "readOnly";
-  protected static final String JSON_KEY_REQUIRED = "required";
-  protected static final String JSON_KEY_TYPE = "type";
-  protected static final String JSON_KEY_VALUE = "value";
-  protected static final String JSON_KEY_COLLECTION = "collection";
-  protected static final String JSON_KEY_TRANSLATABLE = "translatable";
-  protected static final String JSON_KEY_DELIMITER = "delimiter";
-  protected static final String JSON_KEY_DIFFERENT_VALUES = "differentValues";
+  private static final String JSON_KEY_ID = "id";
+  private static final String JSON_KEY_LABEL = "label";
+  private static final String JSON_KEY_READONLY = "readOnly";
+  private static final String JSON_KEY_REQUIRED = "required";
+  private static final String JSON_KEY_TYPE = "type";
+  private static final String JSON_KEY_VALUE = "value";
+  private static final String JSON_KEY_COLLECTION = "collection";
+  private static final String JSON_KEY_TRANSLATABLE = "translatable";
+  private static final String JSON_KEY_DELIMITER = "delimiter";
+  private static final String JSON_KEY_DIFFERENT_VALUES = "differentValues";
 
   /**
    * Possible types for the metadata field. The types are used in the frontend and backend to know how the metadata
@@ -106,7 +106,7 @@ public class MetadataField<A> {
   }
 
   /** The id of a collection to validate values against. */
-  private Opt<String> collectionID = Opt.none();
+  private Opt<String> collectionID;
   /** The format to use for temporal date properties. */
   private Opt<String> pattern = Opt.none();
   /** The delimiter used to display and parse list values. */
@@ -118,14 +118,14 @@ public class MetadataField<A> {
   /** The provider to populate the property with. */
   private Opt<String> listprovider = Opt.none();
   /** The optional namespace of the field used if a field can be found in more than one namespace */
-  private Opt<String> namespace = Opt.some(DublinCore.TERMS_NS_URI);
+  private Opt<String> namespace;
   /**
    * In the order of properties where this property should be oriented in the UI i.e. 0 means the property should come
    * first, 1 means it should come second etc.
    */
-  private Opt<Integer> order = Opt.none();
+  private Opt<Integer> order;
   /** The optional id of the field used to output for the ui, if not present will assume the same as the inputID. */
-  private Opt<String> outputID = Opt.none();
+  private final Opt<String> outputID;
   /** Whether the property should not be edited. */
   private boolean readOnly;
   /** Whether the property is required to update the metadata. */
@@ -135,12 +135,12 @@ public class MetadataField<A> {
   /** The type of the metadata for the json to use example text, date, time, number etc. */
   private JsonType jsonType;
 
-  private Opt<A> value = Opt.none();
-  private Opt<Boolean> translatable = Opt.none();
+  private Opt<A> value;
+  private Opt<Boolean> translatable;
   private boolean updated = false;
-  private Opt<Map<String, String>> collection = Opt.none();
-  private Fn<Opt<A>, JValue> valueToJSON;
-  private Fn<Object, A> jsonToValue;
+  private Opt<Map<String, String>> collection;
+  private final Fn<Opt<A>, JValue> valueToJSON;
+  private final Fn<Object, A> jsonToValue;
 
   // this can only be true if the metadata field is representing multiple events with different values
   private Opt<Boolean> hasDifferentValues = Opt.none();
@@ -151,8 +151,7 @@ public class MetadataField<A> {
    * @param other
    *          Other metadata field
    */
-  public MetadataField(MetadataField<A> other) {
-
+  public MetadataField(final MetadataField<A> other) {
     this.inputID = other.inputID;
     this.outputID = other.outputID;
     this.label = other.label;
@@ -203,11 +202,22 @@ public class MetadataField<A> {
    * @throws IllegalArgumentException
    *           if the id, label, type, valueToJSON or/and jsonToValue parameters is/are null
    */
-  private MetadataField(String inputID, Opt<String> outputID, String label, boolean readOnly, boolean required, A value,
-          Opt<Boolean> translatable, Type type, JsonType jsonType, Opt<Map<String, String>> collection,
-          Opt<String> collectionID, Fn<Opt<A>, JValue> valueToJSON, Fn<Object, A> jsonToValue, Opt<Integer> order,
-          Opt<String> namespace)
-                  throws IllegalArgumentException {
+  private MetadataField(
+          final String inputID,
+          final Opt<String> outputID,
+          final String label,
+          final boolean readOnly,
+          final boolean required,
+          final A value,
+          final Opt<Boolean> translatable,
+          final Type type,
+          final JsonType jsonType,
+          final Opt<Map<String, String>> collection,
+          final Opt<String> collectionID,
+          final Fn<Opt<A>, JValue> valueToJSON,
+          final Fn<Object, A> jsonToValue,
+          final Opt<Integer> order,
+          final Opt<String> namespace) throws IllegalArgumentException {
     if (valueToJSON == null)
       throw new IllegalArgumentException("The function 'valueToJSON' must not be null.");
     if (jsonToValue == null)
@@ -218,7 +228,6 @@ public class MetadataField<A> {
       throw new IllegalArgumentException("The metadata label must not be null.");
     if (type == null)
       throw new IllegalArgumentException("The metadata type must not be null.");
-
     this.inputID = inputID;
     this.outputID = outputID;
     this.label = label;
@@ -245,7 +254,7 @@ public class MetadataField<A> {
    * @param collection
    *          The option of a limited list of possible values
    */
-  public void setCollection(Opt<Map<String, String>> collection) {
+  public void setCollection(final Opt<Map<String, String>> collection) {
     if (collection == null)
       this.collection = Opt.none();
     else {
@@ -254,7 +263,7 @@ public class MetadataField<A> {
   }
 
   public JObject toJSON() {
-    Map<String, Field> values = new HashMap<>();
+    final Map<String, Field> values = new HashMap<>();
     values.put(JSON_KEY_ID, f(JSON_KEY_ID, v(getOutputID(), Jsons.BLANK)));
     values.put(JSON_KEY_LABEL, f(JSON_KEY_LABEL, v(label, Jsons.BLANK)));
     values.put(JSON_KEY_VALUE, f(JSON_KEY_VALUE, valueToJSON.apply(value)));
@@ -276,7 +285,7 @@ public class MetadataField<A> {
     return obj(values);
   }
 
-  public void fromJSON(Object json) {
+  public void fromJSON(final Object json) {
     this.setValue(jsonToValue.apply(json));
   }
 
@@ -296,11 +305,11 @@ public class MetadataField<A> {
     return updated;
   }
 
-  public void setValue(A value) {
+  public void setValue(final A value) {
     setValue(value, true);
   }
 
-  public void setValue(A value, boolean setUpdated) {
+  public void setValue(final A value, final boolean setUpdated) {
     if (value == null) {
       this.value = Opt.none();
     } else {
@@ -312,11 +321,11 @@ public class MetadataField<A> {
     }
   }
 
-  public void setIsTranslatable(Opt<Boolean> translatable) {
+  public void setIsTranslatable(final Opt<Boolean> translatable) {
     this.translatable = translatable;
   }
 
-  public static SimpleDateFormat getSimpleDateFormatter(String pattern) {
+  public static SimpleDateFormat getSimpleDateFormatter(final String pattern) {
     final SimpleDateFormat dateFormat;
     if (StringUtils.isNotBlank(pattern)) {
       dateFormat = new SimpleDateFormat(pattern);
@@ -343,12 +352,12 @@ public class MetadataField<A> {
    * @return The new metadata field
    *
    */
-  public static MetadataField<Boolean> createBooleanMetadata(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Integer> order, Opt<String> namespace) {
+  private static MetadataField<Boolean> createBooleanMetadata(final String inputID, final Opt<String> outputID, final String label,
+          final boolean readOnly, final boolean required, final Opt<Integer> order, final Opt<String> namespace) {
 
-    Fn<Opt<Boolean>, JValue> booleanToJson = new Fn<Opt<Boolean>, JValue>() {
+    final Fn<Opt<Boolean>, JValue> booleanToJson = new Fn<Opt<Boolean>, JValue>() {
       @Override
-      public JValue apply(Opt<Boolean> value) {
+      public JValue apply(final Opt<Boolean> value) {
         if (value.isNone())
           return Jsons.BLANK;
         else {
@@ -357,13 +366,13 @@ public class MetadataField<A> {
       }
     };
 
-    Fn<Object, Boolean> jsonToBoolean = new Fn<Object, Boolean>() {
+    final Fn<Object, Boolean> jsonToBoolean = new Fn<Object, Boolean>() {
       @Override
-      public Boolean apply(Object value) {
+      public Boolean apply(final Object value) {
         if (value instanceof Boolean) {
           return (Boolean) value;
         }
-        String stringValue = value.toString();
+        final String stringValue = value.toString();
         if (StringUtils.isBlank(stringValue)) {
           return null;
         }
@@ -372,7 +381,7 @@ public class MetadataField<A> {
     };
 
     return new MetadataField<>(inputID, outputID, label, readOnly, required, null, Opt.none(), Type.BOOLEAN, JsonType.BOOLEAN,
-            Opt.<Map<String, String>> none(), Opt.<String> none(), booleanToJson, jsonToBoolean, order, namespace);
+            Opt.none(), Opt.none(), booleanToJson, jsonToBoolean, order, namespace);
   }
 
   /**
@@ -384,8 +393,8 @@ public class MetadataField<A> {
    *          The value that will be interpreted as being from a JSON value.
    * @return A new {@link MetadataField} with the value set
    */
-  public static MetadataField<?> copyMetadataFieldWithValue(MetadataField<?> oldField, String value) {
-    MetadataField<?> newField = new MetadataField(oldField);
+  public static MetadataField<?> copyMetadataFieldWithValue(final MetadataField<?> oldField, final String value) {
+    final MetadataField<?> newField = new MetadataField(oldField);
     newField.fromJSON(value);
     return newField;
   }
@@ -408,13 +417,13 @@ public class MetadataField<A> {
    * @return The new metadata field
    *
    */
-  public static MetadataField<Date> createDateMetadata(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, final String pattern, Opt<Integer> order, Opt<String> namespace) {
+  public static MetadataField<Date> createDateMetadata(final String inputID, final Opt<String> outputID, final String label,
+          final boolean readOnly, final boolean required, final String pattern, final Opt<Integer> order, final Opt<String> namespace) {
     final SimpleDateFormat dateFormat = getSimpleDateFormatter(pattern);
 
-    Fn<Opt<Date>, JValue> dateToJSON = new Fn<Opt<Date>, JValue>() {
+    final Fn<Opt<Date>, JValue> dateToJSON = new Fn<Opt<Date>, JValue>() {
       @Override
-      public JValue apply(Opt<Date> date) {
+      public JValue apply(final Opt<Date> date) {
         if (date.isNone())
           return Jsons.BLANK;
         else {
@@ -423,25 +432,25 @@ public class MetadataField<A> {
       }
     };
 
-    Fn<Object, Date> jsonToDate = new Fn<Object, Date>() {
+    final Fn<Object, Date> jsonToDate = new Fn<Object, Date>() {
       @Override
-      public Date apply(Object value) {
+      public Date apply(final Object value) {
         try {
-          String date = (String) value;
+          final String date = (String) value;
 
           if (StringUtils.isBlank(date))
             return null;
 
           return dateFormat.parse(date);
-        } catch (java.text.ParseException e) {
+        } catch (final java.text.ParseException e) {
           logger.error("Not able to parse date {}: {}", value, e.getMessage());
           return null;
         }
       }
     };
 
-    MetadataField<Date> dateField = new MetadataField<>(inputID, outputID, label, readOnly, required, null, Opt.none(),
-            Type.DATE, JsonType.DATE, Opt.<Map<String, String>> none(), Opt.<String> none(), dateToJSON, jsonToDate,
+    final MetadataField<Date> dateField = new MetadataField<>(inputID, outputID, label, readOnly, required, null, Opt.none(),
+            Type.DATE, JsonType.DATE, Opt.none(), Opt.none(), dateToJSON, jsonToDate,
             order, namespace);
     if (StringUtils.isNotBlank(pattern)) {
       dateField.setPattern(Opt.some(pattern));
@@ -449,58 +458,56 @@ public class MetadataField<A> {
     return dateField;
   }
 
-  public static MetadataField<String> createDurationMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Integer> order, Opt<String> namespace) {
-    return createDurationMetadataField(inputID, outputID, label, readOnly, required, Opt.<Boolean> none(),
-            Opt.<Map<String, String>> none(), Opt.<String> none(), order, namespace);
+  public static MetadataField<String> createDurationMetadataField(final String inputID, final Opt<String> outputID, final String label,
+          final boolean readOnly, final boolean required, final Opt<Integer> order, final Opt<String> namespace) {
+    return createDurationMetadataField(inputID, outputID, label, readOnly, required, Opt.none(),
+            Opt.none(), Opt.none(), order, namespace);
   }
 
-  public static MetadataField<String> createDurationMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Boolean> isTranslatable, Opt<Map<String, String>> collection,
-          Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
+  private static MetadataField<String> createDurationMetadataField(final String inputID, final Opt<String> outputID, final String label,
+          final boolean readOnly, final boolean required, final Opt<Boolean> isTranslatable, final Opt<Map<String, String>> collection,
+          final Opt<String> collectionId, final Opt<Integer> order, final Opt<String> namespace) {
 
-    Fn<Opt<String>, JValue> periodToJSON = new Fn<Opt<String>, JValue>() {
+    final Fn<Opt<String>, JValue> periodToJSON = new Fn<Opt<String>, JValue>() {
       @Override
-      public JValue apply(Opt<String> value) {
+      public JValue apply(final Opt<String> value) {
         if (value == null || value.isEmpty()) {
           return v("");
         }
-        Long returnValue = 0L;
-        if (value != null || value.isSome()) {
-        DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value.get());
+        long returnValue = 0L;
+        final DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value.get());
         if (period != null && period.hasStart() && period.hasEnd()) {
           returnValue = period.getEnd().getTime() - period.getStart().getTime();
         } else {
           try {
             returnValue = Long.parseLong(value.get());
-          } catch (NumberFormatException e) {
+          } catch (final NumberFormatException e) {
             logger.debug("Unable to parse duration '{}' as either period or millisecond duration.", value.get());
-            }
           }
         }
         return v(DurationFormatUtils.formatDuration(returnValue, PATTERN_DURATION));
       }
     };
 
-    Fn<Object, String> jsonToPeriod = new Fn<Object, String>() {
+    final Fn<Object, String> jsonToPeriod = new Fn<Object, String>() {
       @Override
-      public String apply(Object value) {
+      public String apply(final Object value) {
         if (!(value instanceof String)) {
           logger.warn("The given value for duration can not be parsed.");
           return "";
         }
 
-        String duration = (String) value;
-        String[] durationParts = duration.split(":");
+        final String duration = (String) value;
+        final String[] durationParts = duration.split(":");
         if (durationParts.length < 3)
           return null;
-        Integer hours = Integer.parseInt(durationParts[0]);
-        Integer minutes = Integer.parseInt(durationParts[1]);
-        Integer seconds = Integer.parseInt(durationParts[2]);
+        final long hours = Long.parseLong(durationParts[0]);
+        final long minutes = Long.parseLong(durationParts[1]);
+        final long seconds = Long.parseLong(durationParts[2]);
 
-        Long returnValue = ((hours.longValue() * 60 + minutes.longValue()) * 60 + seconds.longValue()) * 1000;
+        final long returnValue = ((hours * 60 + minutes) * 60 + seconds) * 1000;
 
-        return returnValue.toString();
+        return Long.toString(returnValue);
       }
     };
     return new MetadataField<>(inputID, outputID, label, readOnly, required, "", isTranslatable, Type.DURATION,
@@ -527,46 +534,37 @@ public class MetadataField<A> {
    *          The ui order for the new field, 0 at the top and progressively down from there.
    * @return the new metadata field
    */
-  public static MetadataField<Iterable<String>> createMixedIterableStringMetadataField(String inputID,
-          Opt<String> outputID, String label, boolean readOnly, boolean required, Opt<Boolean> isTranslatable,
-          Opt<Map<String, String>> collection, Opt<String> collectionId, Opt<String> delimiter, Opt<Integer> order,
-          Opt<String> namespace) {
+  private static MetadataField<Iterable<String>> createMixedIterableStringMetadataField(final String inputID,
+          final Opt<String> outputID, final String label, final boolean readOnly, final boolean required, final Opt<Boolean> isTranslatable,
+          final Opt<Map<String, String>> collection, final Opt<String> collectionId, final Opt<String> delimiter, final Opt<Integer> order,
+          final Opt<String> namespace) {
 
-    Fn<Opt<Iterable<String>>, JValue> iterableToJSON = new Fn<Opt<Iterable<String>>, JValue>() {
+    final Fn<Opt<Iterable<String>>, JValue> iterableToJSON = new Fn<Opt<Iterable<String>>, JValue>() {
       @Override
-      public JValue apply(Opt<Iterable<String>> value) {
+      public JValue apply(final Opt<Iterable<String>> value) {
         if (value.isNone())
           return arr();
 
-        Object val = value.get();
-        List<JValue> list = new ArrayList<>();
+        final Object val = value.get();
+        final List<JValue> list = new ArrayList<>();
 
-        if (val instanceof String) {
-          // The value is a string so we need to split it.
-          String stringVal = (String) val;
-          for (String entry : stringVal.split(",")) {
-            if (StringUtils.isNotBlank(entry))
-              list.add(v(entry, Jsons.BLANK));
-          }
-        } else {
-          // The current value is just an iterable string.
-          for (Object v : value.get()) {
-            list.add(v(v, Jsons.BLANK));
-          }
+        // The current value is just an iterable string.
+        for (final Object v : value.get()) {
+          list.add(v(v, Jsons.BLANK));
         }
         return arr(list);
       }
     };
 
-    Fn<Object, Iterable<String>> jsonToIterable = new Fn<Object, Iterable<String>>() {
+    final Fn<Object, Iterable<String>> jsonToIterable = new Fn<Object, Iterable<String>>() {
       @Override
-      public Iterable<String> apply(Object arrayIn) {
-        JSONParser parser = new JSONParser();
-        JSONArray array;
+      public Iterable<String> apply(final Object arrayIn) {
+        final JSONParser parser = new JSONParser();
+        final JSONArray array;
         if (arrayIn instanceof String) {
           try {
             array = (JSONArray) parser.parse((String) arrayIn);
-          } catch (ParseException e) {
+          } catch (final ParseException e) {
             throw new IllegalArgumentException("Unable to parse Mixed Iterable value into a JSONArray:", e);
           }
         } else {
@@ -575,7 +573,7 @@ public class MetadataField<A> {
 
         if (array == null)
           return new ArrayList<>();
-        String[] arrayOut = new String[array.size()];
+        final String[] arrayOut = new String[array.size()];
         for (int i = 0; i < array.size(); i++) {
           arrayOut[i] = (String) array.get(i);
         }
@@ -584,8 +582,8 @@ public class MetadataField<A> {
 
     };
 
-     MetadataField<Iterable<String>> mixedField = new MetadataField<>(inputID, outputID, label, readOnly, required,
-             new ArrayList<String>(), isTranslatable, Type.MIXED_TEXT, JsonType.MIXED_TEXT, collection, collectionId,
+     final MetadataField<Iterable<String>> mixedField = new MetadataField<>(inputID, outputID, label, readOnly, required,
+             new ArrayList<>(), isTranslatable, Type.MIXED_TEXT, JsonType.MIXED_TEXT, collection, collectionId,
              iterableToJSON, jsonToIterable, order, namespace);
      mixedField.setDelimiter(delimiter);
      return mixedField;
@@ -611,43 +609,35 @@ public class MetadataField<A> {
    *          The ui order for the new field, 0 at the top and progressively down from there.
    * @return the new metadata field
    */
-  public static MetadataField<Iterable<String>> createIterableStringMetadataField(String inputID, Opt<String> outputID,
-          String label, boolean readOnly, boolean required, Opt<Boolean> isTranslatable,
-          Opt<Map<String, String>> collection, Opt<String> collectionId, Opt<String> delimiter, Opt<Integer> order,
-          Opt<String> namespace) {
+  public static MetadataField<Iterable<String>> createIterableStringMetadataField(final String inputID, final Opt<String> outputID,
+          final String label, final boolean readOnly, final boolean required, final Opt<Boolean> isTranslatable,
+          final Opt<Map<String, String>> collection, final Opt<String> collectionId, final Opt<String> delimiter, final Opt<Integer> order,
+          final Opt<String> namespace) {
 
-    Fn<Opt<Iterable<String>>, JValue> iterableToJSON = new Fn<Opt<Iterable<String>>, JValue>() {
+    final Fn<Opt<Iterable<String>>, JValue> iterableToJSON = new Fn<Opt<Iterable<String>>, JValue>() {
       @Override
-      public JValue apply(Opt<Iterable<String>> value) {
+      public JValue apply(final Opt<Iterable<String>> value) {
         if (value.isNone())
           return arr();
 
-        Object val = value.get();
-        List<JValue> list = new ArrayList<>();
+        final Object val = value.get();
+        final List<JValue> list = new ArrayList<>();
 
-        if (val instanceof String) {
-          // The value is a string so we need to split it.
-          String stringVal = (String) val;
-          for (String entry : stringVal.split(",")) {
-            list.add(v(entry, Jsons.BLANK));
-          }
-        } else {
-          // The current value is just an iterable string.
-          for (Object v : value.get()) {
-            list.add(v(v, Jsons.BLANK));
-          }
+        // The current value is just an iterable string.
+        for (final Object v : value.get()) {
+          list.add(v(v, Jsons.BLANK));
         }
         return arr(list);
       }
     };
 
-    Fn<Object, Iterable<String>> jsonToIterable = new Fn<Object, Iterable<String>>() {
+    final Fn<Object, Iterable<String>> jsonToIterable = new Fn<Object, Iterable<String>>() {
       @Override
-      public Iterable<String> apply(Object arrayIn) {
-        JSONArray array = (JSONArray) arrayIn;
+      public Iterable<String> apply(final Object arrayIn) {
+        final JSONArray array = (JSONArray) arrayIn;
         if (array == null)
           return null;
-        String[] arrayOut = new String[array.size()];
+        final String[] arrayOut = new String[array.size()];
         for (int i = 0; i < array.size(); i++) {
           arrayOut[i] = (String) array.get(i);
         }
@@ -656,20 +646,20 @@ public class MetadataField<A> {
 
     };
 
-    MetadataField<Iterable<String>> iterableField = new MetadataField<>(inputID, outputID, label, readOnly, required,
-            new ArrayList<String>(), isTranslatable, Type.ITERABLE_TEXT, JsonType.TEXT, collection, collectionId,
+    final MetadataField<Iterable<String>> iterableField = new MetadataField<>(inputID, outputID, label, readOnly, required,
+            new ArrayList<>(), isTranslatable, Type.ITERABLE_TEXT, JsonType.TEXT, collection, collectionId,
             iterableToJSON, jsonToIterable, order, namespace);
     iterableField.setDelimiter(delimiter);
     return iterableField;
   }
 
-  public static MetadataField<Long> createLongMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Boolean> isTranslatable, Opt<Map<String, String>> collection,
-          Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
+  private static MetadataField<Long> createLongMetadataField(final String inputID, final Opt<String> outputID, final String label,
+          final boolean readOnly, final boolean required, final Opt<Boolean> isTranslatable, final Opt<Map<String, String>> collection,
+          final Opt<String> collectionId, final Opt<Integer> order, final Opt<String> namespace) {
 
-    Fn<Opt<Long>, JValue> longToJSON = new Fn<Opt<Long>, JValue>() {
+    final Fn<Opt<Long>, JValue> longToJSON = new Fn<Opt<Long>, JValue>() {
       @Override
-      public JValue apply(Opt<Long> value) {
+      public JValue apply(final Opt<Long> value) {
         if (value.isNone())
           return Jsons.BLANK;
         else
@@ -677,14 +667,14 @@ public class MetadataField<A> {
       }
     };
 
-    Fn<Object, Long> jsonToLong = new Fn<Object, Long>() {
+    final Fn<Object, Long> jsonToLong = new Fn<Object, Long>() {
       @Override
-      public Long apply(Object value) {
+      public Long apply(final Object value) {
         if (!(value instanceof String)) {
           logger.warn("The given value for Long can not be parsed.");
           return 0L;
         }
-        String longString = (String) value;
+        final String longString = (String) value;
         return Long.parseLong(longString);
       }
     };
@@ -693,9 +683,9 @@ public class MetadataField<A> {
             collection, collectionId, longToJSON, jsonToLong, order, namespace);
   }
 
-  private static MetadataField<String> createTemporalMetadata(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, final String pattern, final Type type, final JsonType jsonType,
-          Opt<Integer> order, Opt<String> namespace) {
+  private static MetadataField<String> createTemporalMetadata(final String inputID, final Opt<String> outputID, final String label,
+          final boolean readOnly, final boolean required, final String pattern, final Type type, final JsonType jsonType,
+          final Opt<Integer> order, final Opt<String> namespace) {
     if (StringUtils.isBlank(pattern)) {
       throw new IllegalArgumentException(
               "For temporal metadata field " + inputID + " of type " + type + " there needs to be a pattern.");
@@ -703,17 +693,17 @@ public class MetadataField<A> {
 
     final SimpleDateFormat dateFormat = getSimpleDateFormatter(pattern);
 
-    Fn<Object, String> jsonToDateString = new Fn<Object, String>() {
+    final Fn<Object, String> jsonToDateString = new Fn<Object, String>() {
       @Override
-      public String apply(Object value) {
-        String date = (String) value;
+      public String apply(final Object value) {
+        final String date = (String) value;
 
         if (StringUtils.isBlank(date))
           return "";
 
         try {
           dateFormat.parse(date);
-        } catch (java.text.ParseException e) {
+        } catch (final java.text.ParseException e) {
           logger.error("Not able to parse date string {}: {}", value, getMessage(e));
           return null;
         }
@@ -722,15 +712,15 @@ public class MetadataField<A> {
       }
     };
 
-    Fn<Opt<String>, JValue> dateToJSON = new Fn<Opt<String>, JValue>() {
+    final Fn<Opt<String>, JValue> dateToJSON = new Fn<Opt<String>, JValue>() {
       @Override
-      public JValue apply(Opt<String> periodEncodedString) {
+      public JValue apply(final Opt<String> periodEncodedString) {
         if (periodEncodedString.isNone() || StringUtils.isBlank(periodEncodedString.get())) {
           return Jsons.BLANK;
         }
 
         // Try to parse the metadata as DCIM metadata.
-        DCMIPeriod p = EncodingSchemeUtils.decodePeriod(periodEncodedString.get());
+        final DCMIPeriod p = EncodingSchemeUtils.decodePeriod(periodEncodedString.get());
         if (p != null) {
           return v(dateFormat.format(p.getStart()), Jsons.BLANK);
         }
@@ -739,7 +729,7 @@ public class MetadataField<A> {
         try {
           dateFormat.parse(periodEncodedString.get());
           return v(periodEncodedString.get(), Jsons.BLANK);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           logger.error(
                   "Unable to parse temporal metadata '{}' as either DCIM data or a formatted date using pattern {} because:",
                   periodEncodedString.get(), pattern, e);
@@ -748,24 +738,24 @@ public class MetadataField<A> {
       }
     };
 
-    MetadataField<String> temporalStart = new MetadataField<>(inputID, outputID, label, readOnly, required, null,
-            Opt.none(), type, jsonType, Opt.<Map<String, String>> none(), Opt.<String> none(), dateToJSON,
+    final MetadataField<String> temporalStart = new MetadataField<>(inputID, outputID, label, readOnly, required, null,
+            Opt.none(), type, jsonType, Opt.none(), Opt.none(), dateToJSON,
             jsonToDateString, order, namespace);
     temporalStart.setPattern(Opt.some(pattern));
 
     return temporalStart;
   }
 
-  public static MetadataField<String> createTemporalStartDateMetadata(String inputID, Opt<String> outputID,
-          String label, boolean readOnly, boolean required, final String pattern, Opt<Integer> order,
-          Opt<String> namespace) {
+  public static MetadataField<String> createTemporalStartDateMetadata(final String inputID, final Opt<String> outputID,
+          final String label, final boolean readOnly, final boolean required, final String pattern, final Opt<Integer> order,
+          final Opt<String> namespace) {
     return createTemporalMetadata(inputID, outputID, label, readOnly, required, pattern, Type.START_DATE,
             JsonType.DATE, order, namespace);
   }
 
-  public static MetadataField<String> createTemporalStartTimeMetadata(String inputID, Opt<String> outputID,
-          String label, boolean readOnly, boolean required, final String pattern, Opt<Integer> order,
-          Opt<String> namespace) {
+  public static MetadataField<String> createTemporalStartTimeMetadata(final String inputID, final Opt<String> outputID,
+          final String label, final boolean readOnly, final boolean required, final String pattern, final Opt<Integer> order,
+          final Opt<String> namespace) {
     return createTemporalMetadata(inputID, outputID, label, readOnly, required, pattern, Type.START_TIME,
             JsonType.TIME, order, namespace);
   }
@@ -790,9 +780,9 @@ public class MetadataField<A> {
    *          The ui order for the new field, 0 at the top and progressively down from there.
    * @return the new metadata field
    */
-  public static MetadataField<String> createTextMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Boolean> isTranslatable, Opt<Map<String, String>> collection,
-          Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
+  public static MetadataField<String> createTextMetadataField(final String inputID, final Opt<String> outputID, final String label,
+          final boolean readOnly, final boolean required, final Opt<Boolean> isTranslatable, final Opt<Map<String, String>> collection,
+          final Opt<String> collectionId, final Opt<Integer> order, final Opt<String> namespace) {
     return createTextAnyMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection,
             collectionId, order, Type.TEXT, JsonType.TEXT, namespace);
   }
@@ -817,17 +807,9 @@ public class MetadataField<A> {
    *          The ui order for the new field, 0 at the top and progressively down from there.
    * @return the new metadata field
    */
-  public static MetadataField<String> createOrderedTextMetadataField(
-      String inputID,
-      Opt<String> outputID,
-      String label,
-      boolean readOnly,
-      boolean required,
-      Opt<Boolean> isTranslatable,
-      Opt<Map<String, String>> collection,
-      Opt<String> collectionId,
-      Opt<Integer> order,
-      Opt<String> namespace) {
+  private static MetadataField<String> createOrderedTextMetadataField(final String inputID, final Opt<String> outputID,
+          final String label, final boolean readOnly, final boolean required, final Opt<Boolean> isTranslatable,
+          final Opt<Map<String, String>> collection, final Opt<String> collectionId, final Opt<Integer> order, final Opt<String> namespace) {
     return createTextAnyMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection,
             collectionId, order, Type.ORDERED_TEXT, JsonType.ORDERED_TEXT, namespace);
   }
@@ -853,9 +835,9 @@ public class MetadataField<A> {
    *          The ui order for the new field, 0 at the top and progressively down from there.
    * @return the new metadata field
    */
-  public static MetadataField<String> createTextLongMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Boolean> isTranslatable, Opt<Map<String, String>> collection,
-          Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
+  public static MetadataField<String> createTextLongMetadataField(final String inputID, final Opt<String> outputID, final String label,
+          final boolean readOnly, final boolean required, final Opt<Boolean> isTranslatable, final Opt<Map<String, String>> collection,
+          final Opt<String> collectionId, final Opt<Integer> order, final Opt<String> namespace) {
     return createTextAnyMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection,
             collectionId, order, Type.TEXT_LONG, JsonType.TEXT_LONG, namespace);
   }
@@ -882,20 +864,20 @@ public class MetadataField<A> {
    *          The metadata field type as defined in {@link MetadataField.Type}
    * @return the new metadata field
    */
-  private static MetadataField<String> createTextAnyMetadataField(String inputID, Opt<String> outputID, String label,
-          boolean readOnly, boolean required, Opt<Boolean> isTranslatable, Opt<Map<String, String>> collection,
-          Opt<String> collectionId, Opt<Integer> order, Type type, JsonType jsonType, Opt<String> namespace) {
+  private static MetadataField<String> createTextAnyMetadataField(final String inputID, final Opt<String> outputID, final String label,
+          final boolean readOnly, final boolean required, final Opt<Boolean> isTranslatable, final Opt<Map<String, String>> collection,
+          final Opt<String> collectionId, final Opt<Integer> order, final Type type, final JsonType jsonType, final Opt<String> namespace) {
 
-    Fn<Opt<String>, JValue> stringToJSON = new Fn<Opt<String>, JValue>() {
+    final Fn<Opt<String>, JValue> stringToJSON = new Fn<Opt<String>, JValue>() {
       @Override
-      public JValue apply(Opt<String> value) {
+      public JValue apply(final Opt<String> value) {
         return v(value.getOr(""));
       }
     };
 
-    Fn<Object, String> jsonToString = new Fn<Object, String>() {
+    final Fn<Object, String> jsonToString = new Fn<Object, String>() {
       @Override
-      public String apply(Object jsonValue) {
+      public String apply(final Object jsonValue) {
         if (jsonValue == null)
           return "";
         if (!(jsonValue instanceof String)) {
@@ -917,58 +899,57 @@ public class MetadataField<A> {
    *          the source map
    * @return a new {@link JObject} generated with the map values
    */
-  public static JObject mapToJSON(Map<String, String> map) {
+  private static JObject mapToJSON(final Map<String, String> map) {
     if (map == null) {
       throw new IllegalArgumentException("Map must not be null!");
     }
 
-    List<Field> fields = new ArrayList<>();
-    for (Entry<String, String> item : map.entrySet()) {
+    final List<Field> fields = new ArrayList<>();
+    for (final Entry<String, String> item : map.entrySet()) {
       fields.add(f(item.getKey(), v(item.getValue(), Jsons.BLANK)));
     }
     return obj(fields);
   }
 
-  public static MetadataField createMetadataField(Map<String,String> configuration) {
+  public static MetadataField createMetadataField(final Map<String,String> configuration) {
 
-    String inputID = configuration.get(CONFIG_INPUT_ID_KEY);
-    String label = configuration.get(CONFIG_LABEL_KEY);
+    final String inputID = configuration.get(CONFIG_INPUT_ID_KEY);
+    final String label = configuration.get(CONFIG_LABEL_KEY);
 
-    Opt<String> collectionID = Opt.nul(configuration.get(CONFIG_COLLECTION_ID_KEY));
-    Opt<String> delimiter = Opt.nul(configuration.get(CONFIG_DELIMITER_KEY));
-    Opt<String> outputID = Opt.nul(configuration.get(CONFIG_OUTPUT_ID_KEY));
-    Opt<String> listprovider = Opt.nul(configuration.get(CONFIG_LIST_PROVIDER_KEY));
-    Opt<String> namespace = Opt.nul(configuration.get(CONFIG_NAMESPACE_KEY));
+    final Opt<String> collectionID = Opt.nul(configuration.get(CONFIG_COLLECTION_ID_KEY));
+    final Opt<String> delimiter = Opt.nul(configuration.get(CONFIG_DELIMITER_KEY));
+    final Opt<String> outputID = Opt.nul(configuration.get(CONFIG_OUTPUT_ID_KEY));
+    final Opt<String> listprovider = Opt.nul(configuration.get(CONFIG_LIST_PROVIDER_KEY));
+    final Opt<String> namespace = Opt.nul(configuration.get(CONFIG_NAMESPACE_KEY));
 
-    Type type = configuration.containsKey(CONFIG_TYPE_KEY)
+    final Type type = configuration.containsKey(CONFIG_TYPE_KEY)
             ? Type.valueOf(configuration.get(CONFIG_TYPE_KEY).toUpperCase()) : null;
-    Boolean required = configuration.containsKey(CONFIG_REQUIRED_KEY)
-            ? Boolean.valueOf(configuration.get(CONFIG_REQUIRED_KEY).toUpperCase()) : null;
-    Boolean readOnly = configuration.containsKey(CONFIG_READ_ONLY_KEY)
-            ? Boolean.valueOf(configuration.get(CONFIG_READ_ONLY_KEY).toUpperCase()) : null;
+    final boolean required = configuration.containsKey(CONFIG_REQUIRED_KEY) && Boolean
+            .parseBoolean(configuration.get(CONFIG_REQUIRED_KEY).toUpperCase());
+    final boolean readOnly = configuration.containsKey(CONFIG_READ_ONLY_KEY) && Boolean
+            .parseBoolean(configuration.get(CONFIG_READ_ONLY_KEY).toUpperCase());
 
-    String pattern = configuration.containsKey(CONFIG_PATTERN_KEY)
-            ? configuration.get(CONFIG_PATTERN_KEY) : "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    final String pattern = configuration.getOrDefault(CONFIG_PATTERN_KEY, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     Opt<Integer> order = Opt.none();
     if (configuration.containsKey(CONFIG_ORDER_KEY)) {
       try {
         order = Opt.some(Integer.parseInt(configuration.get(CONFIG_ORDER_KEY)));
-      } catch (NumberFormatException e) {
+      } catch (final NumberFormatException e) {
         logger.warn("Unable to parse order value {} of metadata field {}", configuration.get(CONFIG_ORDER_KEY),
                 inputID, e);
       }
     }
 
-    MetadataField metadataField = createMetadataField(inputID, outputID, label, readOnly, required, Opt.none(), type,
+    final MetadataField metadataField = createMetadataField(inputID, outputID, label, readOnly, required, Opt.none(), type,
             Opt.none(), collectionID, order, namespace, delimiter, pattern);
     metadataField.setListprovider(listprovider);
     return metadataField;
   }
 
-  public static MetadataField createMetadataField(String inputID, Opt<String> outputID, String label, boolean readOnly,
-          boolean required, Opt<Boolean> translatable, Type type, Opt<Map<String, String>> collection,
-          Opt<String> collectionID, Opt<Integer> order, Opt<String> namespace, Opt<String> delimiter, String pattern) {
+  public static MetadataField createMetadataField(final String inputID, final Opt<String> outputID, final String label, final boolean readOnly,
+          final boolean required, final Opt<Boolean> translatable, final Type type, final Opt<Map<String, String>> collection,
+          final Opt<String> collectionID, final Opt<Integer> order, final Opt<String> namespace, final Opt<String> delimiter, final String pattern) {
 
     switch (type) {
       case BOOLEAN:
@@ -1007,11 +988,8 @@ public class MetadataField<A> {
 
   /**
    * Set value to a metadata field of unknown type
-   *
-   * @param filteredValues
-   * @param metadataField
    */
-  public static MetadataField setValueFromDCCatalog(List<String> filteredValues, MetadataField metadataField) {
+  public static MetadataField setValueFromDCCatalog(final List<String> filteredValues, final MetadataField metadataField) {
 
     if (filteredValues.isEmpty()) {
       throw new IllegalArgumentException("Values cannot be empty");
@@ -1035,10 +1013,10 @@ public class MetadataField<A> {
         ((MetadataField<Date>)metadataField).setValue(EncodingSchemeUtils.decodeDate(Iterables.getLast(filteredValues)), false);
         break;
       case DURATION:
-        String value = Iterables.getLast(filteredValues);
-        DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value);
-        Long longValue = period.getEnd().getTime() - period.getStart().getTime();
-        ((MetadataField<String>)metadataField).setValue(longValue.toString(), false);
+        final String value = Iterables.getLast(filteredValues);
+        final DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value);
+        final long longValue = period.getEnd().getTime() - period.getStart().getTime();
+        ((MetadataField<String>)metadataField).setValue(Long.toString(longValue), false);
         break;
       case ITERABLE_TEXT:
       case MIXED_TEXT:
@@ -1068,7 +1046,7 @@ public class MetadataField<A> {
     return collectionID;
   }
 
-  public void setCollectionID(Opt<String> collectionID) {
+  public void setCollectionID(final Opt<String> collectionID) {
     this.collectionID = collectionID;
   }
 
@@ -1076,7 +1054,7 @@ public class MetadataField<A> {
     return inputID;
   }
 
-  public void setInputId(String inputID) {
+  public void setInputId(final String inputID) {
     this.inputID = inputID;
   }
 
@@ -1084,7 +1062,7 @@ public class MetadataField<A> {
     return label;
   }
 
-  public void setLabel(String label) {
+  public void setLabel(final String label) {
     this.label = label;
   }
 
@@ -1092,7 +1070,7 @@ public class MetadataField<A> {
     return listprovider;
   }
 
-  public void setListprovider(Opt<String> listprovider) {
+  public void setListprovider(final Opt<String> listprovider) {
     this.listprovider = listprovider;
   }
 
@@ -1100,7 +1078,7 @@ public class MetadataField<A> {
     return namespace;
   }
 
-  public void setNamespace(Opt<String> namespace) {
+  public void setNamespace(final Opt<String> namespace) {
     this.namespace = namespace;
   }
 
@@ -1108,7 +1086,7 @@ public class MetadataField<A> {
     return order;
   }
 
-  public void setOrder(Opt<Integer> order) {
+  public void setOrder(final Opt<Integer> order) {
     this.order = order;
   }
 
@@ -1123,15 +1101,11 @@ public class MetadataField<A> {
     }
   }
 
-  public void setOutputID(Opt<String> outputID) {
-    this.outputID = outputID;
-  }
-
   public Opt<String> getPattern() {
     return pattern;
   }
 
-  public void setPattern(Opt<String> pattern) {
+  public void setPattern(final Opt<String> pattern) {
     this.pattern = pattern;
   }
 
@@ -1139,11 +1113,11 @@ public class MetadataField<A> {
     return delimiter;
   }
 
-  public void setDelimiter(Opt<String> delimiter) {
+  public void setDelimiter(final Opt<String> delimiter) {
     this.delimiter = delimiter;
   }
 
-  public void setReadOnly(boolean readOnly) {
+  public void setReadOnly(final boolean readOnly) {
     this.readOnly = readOnly;
   }
 
@@ -1155,11 +1129,11 @@ public class MetadataField<A> {
     return required;
   }
 
-  public void setRequired(boolean required) {
+  public void setRequired(final boolean required) {
     this.required = required;
   }
 
-  public void setUpdated(boolean updated) {
+  public void setUpdated(final boolean updated) {
     this.updated = updated;
   }
 
@@ -1167,7 +1141,7 @@ public class MetadataField<A> {
     return type;
   }
 
-  public void setType(Type type) {
+  public void setType(final Type type) {
     this.type = type;
   }
 
@@ -1175,24 +1149,8 @@ public class MetadataField<A> {
     return jsonType;
   }
 
-  public void setJsonType(JsonType jsonType) {
+  public void setJsonType(final JsonType jsonType) {
     this.jsonType = jsonType;
-  }
-
-  public Fn<Object, A> getJsonToValue() {
-    return jsonToValue;
-  }
-
-  public void setJsonToValue(Fn<Object, A> jsonToValue) {
-    this.jsonToValue = jsonToValue;
-  }
-
-  public Fn<Opt<A>, JValue> getValueToJSON() {
-    return valueToJSON;
-  }
-
-  public void setValueToJSON(Fn<Opt<A>, JValue> valueToJSON) {
-    this.valueToJSON = valueToJSON;
   }
 
   public void setDifferentValues() {
