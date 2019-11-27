@@ -147,7 +147,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withTitle(String title) {
-    clearExpectations();
     this.title = title;
     return this;
   }
@@ -167,7 +166,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withoutActions() {
-    clearExpectations();
     this.actions.clear();
     return this;
   }
@@ -184,7 +182,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   public EventSearchQuery withAction(Action action) {
     if (action == null)
       throw new IllegalArgumentException("Action cannot be null");
-    clearExpectations();
     this.actions.add(action.toString());
     return this;
   }
@@ -210,7 +207,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   public EventSearchQuery withPresenter(String presenter) {
     if (StringUtils.isBlank(presenter))
       throw new IllegalArgumentException("Presenter cannot be null");
-    clearExpectations();
     this.presenters.add(presenter);
     return this;
   }
@@ -236,7 +232,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   public EventSearchQuery withContributor(String contributor) {
     if (StringUtils.isBlank(contributor))
       throw new IllegalArgumentException("Contributor cannot be null");
-    clearExpectations();
     this.contributors.add(contributor);
     return this;
   }
@@ -258,7 +253,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withSubject(String subject) {
-    clearExpectations();
     this.subject = subject;
     return this;
   }
@@ -280,7 +274,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withDescription(String description) {
-    clearExpectations();
     this.description = description;
     return this;
   }
@@ -302,7 +295,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withLocation(String location) {
-    clearExpectations();
     this.location = location;
     return this;
   }
@@ -324,7 +316,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withSeriesId(String seriesId) {
-    clearExpectations();
     this.seriesId = seriesId;
     return this;
   }
@@ -346,7 +337,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withSeriesName(String seriesName) {
-    clearExpectations();
     this.seriesName = seriesName;
     return this;
   }
@@ -368,7 +358,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withLanguage(String language) {
-    clearExpectations();
     this.language = language;
     return this;
   }
@@ -390,7 +379,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withSource(String source) {
-    clearExpectations();
     this.source = source;
     return this;
   }
@@ -412,7 +400,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withCreated(String created) {
-    clearExpectations();
     this.created = created;
     return this;
   }
@@ -510,7 +497,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withCreator(String creator) {
-    clearExpectations();
     this.creator = creator;
     return this;
   }
@@ -532,7 +518,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withPublisher(String publisher) {
-    clearExpectations();
     this.publisher = publisher;
     return this;
   }
@@ -554,7 +539,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withLicense(String license) {
-    clearExpectations();
     this.license = license;
     return this;
   }
@@ -576,7 +560,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withRights(String rights) {
-    clearExpectations();
     this.rights = rights;
     return this;
   }
@@ -598,7 +581,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withAccessPolicy(String accessPolicy) {
-    clearExpectations();
     this.accessPolicy = accessPolicy;
     return this;
   }
@@ -620,7 +602,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withManagedAcl(String managedAcl) {
-    clearExpectations();
     this.managedAcl = managedAcl;
     return this;
   }
@@ -642,7 +623,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withWorkflowState(String workflowState) {
-    clearExpectations();
     this.workflowState = workflowState;
     return this;
   }
@@ -664,7 +644,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withWorkflowId(long workflowId) {
-    clearExpectations();
     this.workflowId = workflowId;
     return this;
   }
@@ -686,7 +665,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withWorkflowDefinition(String workflowDefinition) {
-    clearExpectations();
     this.workflowDefinition = workflowDefinition;
     return this;
   }
@@ -708,7 +686,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withStartDate(String startDate) {
-    clearExpectations();
     this.startDate = startDate;
     return this;
   }
@@ -730,7 +707,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withDuration(long duration) {
-    clearExpectations();
     this.duration = duration;
     return this;
   }
@@ -752,7 +728,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withEventStatus(String eventStatus) {
-    clearExpectations();
     this.eventStatus = eventStatus;
     return this;
   }
@@ -774,7 +749,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withComments(boolean hasComments) {
-    clearExpectations();
     this.hasComments = hasComments;
     return this;
   }
@@ -787,7 +761,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withOpenComments(boolean hasOpenComments) {
-    clearExpectations();
     this.hasOpenComments = hasOpenComments;
     return this;
   }
@@ -800,7 +773,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withNeedsCutting(boolean needsCutting) {
-    clearExpectations();
     this.needsCutting = needsCutting;
     return this;
   }
@@ -844,7 +816,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   public EventSearchQuery withPublications(String publication) {
     if (StringUtils.isBlank(publication))
       throw new IllegalArgumentException("Publication cannot be null");
-    clearExpectations();
     this.publications.add(publication);
     return this;
   }
@@ -866,7 +837,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withArchiveVersion(long archiveVersion) {
-    clearExpectations();
     this.archiveVersion = archiveVersion;
     return this;
   }
@@ -888,7 +858,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withAgentId(String agentId) {
-    clearExpectations();
     this.agentId = agentId;
     return this;
   }
@@ -910,7 +879,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withTechnicalStartTime(Date technicalStartTime) {
-    clearExpectations();
     this.technicalStartTime = technicalStartTime;
     return this;
   }
@@ -933,7 +901,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withTechnicalEndTime(Date technicalEndTime) {
-    clearExpectations();
     this.technicalEndTime = technicalEndTime;
     return this;
   }
@@ -959,7 +926,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
   public EventSearchQuery withTechnicalPresenters(String presenter) {
     if (StringUtils.isBlank(presenter))
       throw new IllegalArgumentException("Presenter cannot be null");
-    clearExpectations();
     this.technicalPresenters.add(presenter);
     return this;
   }

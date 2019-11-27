@@ -1,13 +1,11 @@
 {
-  "version": {
-    "_source": {
-      "enabled": false
-    },
-    "properties": {
-      "version": {
-        "type": "integer",
-        "index": false
-      }
+  "_source": {
+    "enabled": false
+  },
+  "properties": {
+    "version": {
+      "type": "integer",
+      "index": false
     }
   }
 }
