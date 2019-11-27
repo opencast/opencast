@@ -84,7 +84,8 @@ But old publications still reference the players directly in the admin interface
 pose any immediate problem unless you actually want to switch players in which case you would need to republish the
 material once to update the publication links.
 
-Alternatively, you can rewrite the old links all at once without re-publication using the following method:
+Alternatively, you can rewrite the old links all at once without re-publication using the following method:  
+*Hint: replace the '...' with the actual path to your installation-storage*
 
 1. Find the archive directory and run the following command (replacing `<playerlink>`):
 
