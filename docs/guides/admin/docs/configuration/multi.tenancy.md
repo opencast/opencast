@@ -75,6 +75,16 @@ do not support multitenancy.
 Note that if you are running Apache httpd with mod\_proxy in front of the Opencast installation, the port number will be
 -1 in both files.
 
+### Tenant-specific capture agent users
+
+If you use tenant-specific capture agent users, you should use the `prop.org.opencastproject.host.<server url>` options
+to map the internal host addresses to the tenant specific ones in the endpoint services/available.
+Example:
+
+    prop.org.opencastproject.host.admin-presentation.opencast.com=tenant1.admin-presentation.opencast.com
+    prop.org.opencastproject.host.ingest.opencast.com=tenant1.ingest.opencast.com
+    prop.org.opencastproject.host.worker.opencast.com=tenant1.worker.opencast.com
+
 ### Security Configuration
 
 Create a file called tenant1.xml in /etc/security. This file specifies access rules for individual urls that specify

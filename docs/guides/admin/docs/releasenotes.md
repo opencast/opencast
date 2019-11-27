@@ -16,6 +16,13 @@ Features
 - of
 - listed
 
+Configuration changes
+---------------------
+- `etc/org.opencastproject.organization-mh_default_org` and by extension all tenant configuration files can now have
+  new options named `prop.org.opencastproject.host.<server url>` to map the internal server urls to the tenant-specific
+  ones so that tenant-specific capture agent users get the correct host address when asking the endpoint
+  services/available.
+
 
 Other Changes
 -------------
