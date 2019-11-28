@@ -45,6 +45,11 @@
               {{ 'BULK_ACTIONS.EDIT_EVENTS.CAPTION' | translate}}
             </a>
           </li>
+          <li ng-if="table.resource == 'events' && $root.userIs('ROLE_UI_EVENTS_DETAILS_METADATA_EDIT')">
+            <a data-open-modal="edit-events-metadata-modal">
+              {{ 'BULK_ACTIONS.EDIT_EVENTS_METADATA.CAPTION' | translate}}
+            </a>
+          </li>
         </ul>
       </div>
       <div data-admin-ng-table-filter="" data-filters="filters" data-namespace="table.resource"></div>

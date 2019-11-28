@@ -241,6 +241,22 @@ public class AbstractEventEndpointTest {
   }
 
   @Test
+  public void testGetEventsMetadata() throws Exception {
+    given().formParam("eventIds", "").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
+      .post(rt.host("events/metadata.json"));
+
+    given().formParam("eventIds", "[\"notExists\", \"notExists2\"]").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+      .post(rt.host("events/metadata.json"));
+
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventsMetadata.json"));
+    String result = given().formParam("eventIds", "[\"notExists\", \"exists\", \"exists2\"]").expect().statusCode(HttpStatus.SC_OK)
+      .when().post(rt.host("events/metadata.json")).asString();
+
+    assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
+  }
+
+
+  @Test
   public void testUpdateEventMetadata() throws Exception {
     String metadataJson = IOUtils.toString(getClass().getResource("/eventMetadata.json"));
 
@@ -249,6 +265,22 @@ public class AbstractEventEndpointTest {
 
     given().pathParam("eventId", "asdasd").formParam("metadata", metadataJson).expect().statusCode(HttpStatus.SC_OK)
             .when().put(rt.host("{eventId}/metadata"));
+  }
+
+  @Test
+  public void testUpdateEventsMetadata() throws Exception {
+
+    String metadataJson = IOUtils.toString(getClass().getResource("/eventMetadata.json"));
+
+    given().formParam("eventIds", "[\"exists\", \"exists2\"]").formParam("metadata", metadataJson).expect()
+      .statusCode(HttpStatus.SC_NO_CONTENT).when().put(rt.host("events/metadata"));
+
+    String updateErrors = IOUtils.toString(getClass().getResource("/eventsMetadataUpdateErrors.json"));
+    String result = given().formParam("eventIds", "[\"notExists\", \"exists\", \"updateFailure\"]").
+      formParam("metadata", "metadata").expect().statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR).when()
+      .put(rt.host("events/metadata")).asString();
+
+    assertThat(updateErrors, SameJSONAs.sameJSONAs(result));
   }
 
   @Test

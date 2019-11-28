@@ -1,0 +1,11 @@
+{
+  "updateFailures": [
+    "updateFailure"
+  ],
+  "notFound": [
+    "notExists"
+  ],
+  "updated": [
+    "exists"
+  ]
+}
