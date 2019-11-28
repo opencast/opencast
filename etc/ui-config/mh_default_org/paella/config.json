@@ -70,14 +70,6 @@
       {
         "factory": "YoutubeVideoFactory",
         "enabled": true
-      },
-      {
-        "factory": "Video360ThetaFactory",
-        "enabled": true
-      },
-      {
-        "factory": "Video360Factory",
-        "enabled": true
       }
     ],
     "audioMethods": [
