@@ -183,26 +183,6 @@ CREATE TABLE oc_job_argument (
 
 CREATE INDEX IX_oc_job_argument_id ON oc_job_argument (id);
 
-CREATE TABLE oc_job_context (
-  id BIGINT NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  value TEXT(65535),
-  CONSTRAINT UNQ_oc_job_context UNIQUE (id, name),
-  CONSTRAINT FK_oc_job_context_id FOREIGN KEY (id) REFERENCES oc_job (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_oc_job_context_id ON oc_job_context (id);
-
-CREATE TABLE oc_job_oc_service_registration (
-  Job_id BIGINT NOT NULL,
-  servicesRegistration_id BIGINT NOT NULL,
-  PRIMARY KEY (Job_id, servicesRegistration_id),
-  CONSTRAINT FK_oc_job_oc_service_registration_Job_id FOREIGN KEY (Job_id) REFERENCES oc_job (id) ON DELETE CASCADE,
-  CONSTRAINT FK_oc_job_oc_service_registration_servicesRegistration_id FOREIGN KEY (servicesRegistration_id) REFERENCES oc_service_registration (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_oc_job_oc_service_registration_servicesRegistration_id ON oc_job_oc_service_registration (servicesRegistration_id);
-
 CREATE TABLE oc_incident (
   id BIGINT NOT NULL,
   jobid BIGINT,
