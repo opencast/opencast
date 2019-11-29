@@ -5,21 +5,21 @@
  *
  *
  * The Apereo Foundation licenses this file to you under the Educational
- * Community License, Version 2.0 (the 'License'); you may not use this file
+ * Community License, Version 2.0 (the "License"); you may not use this file
  * except in compliance with the License. You may obtain a copy of the License
  * at:
  *
  *   http://opensource.org/licenses/ecl2.txt
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an 'AS IS' BASIS, WITHOUT
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
  * License for the specific language governing permissions and limitations under
  * the License.
  *
  */
-/*jslint browser: true, nomen: true*/
-/*global define*/
+/* global define, Hammer */
+// eslint-disable-next-line max-len
 define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'engage/core'], function (require, $, _, Backbone, Basil, Bootbox, Engage) {
   'use strict';
 
@@ -69,7 +69,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     sliderMousein: new Engage.Event('Slider:mouseIn', 'the mouse entered the slider', 'trigger'),
     sliderMouseout: new Engage.Event('Slider:mouseOut', 'the mouse is off the slider', 'trigger'),
     sliderMousemove: new Engage.Event('Slider:mouseMoved', 'the mouse is moving over the slider', 'trigger'),
-    sliderMousemovePreview: new Engage.Event('Slider:mouseMovedPreview', 'the mouse is moving over the slider', 'trigger'),
+    sliderMousemovePreview: new Engage.Event('Slider:mouseMovedPreview', 'the mouse is moving over the slider',
+      'trigger'),
     seek: new Engage.Event('Video:seek', 'seek video to a given position in seconds', 'trigger'),
     seekLeft: new Engage.Event('Video:seekLeft', '', 'trigger'),
     seekRight: new Engage.Event('Video:seekRight', '', 'trigger'),
@@ -91,10 +92,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     aspectRatioSet: new Engage.Event('Video:aspectRatioSet', 'the aspect ratio has been calculated', 'handler'),
     isAudioOnly: new Engage.Event('Video:isAudioOnly', 'whether it`s audio only or not', 'handler'),
     videoFormatsFound: new Engage.Event('Video:videoFormatsFound', '', 'both'),
-    numberOfVideodisplaysSet: new Engage.Event('Video:numberOfVideodisplaysSet', 'the number of videodisplays has been set', 'trigger'),
+    numberOfVideodisplaysSet: new Engage.Event('Video:numberOfVideodisplaysSet',
+      'the number of videodisplays has been set', 'trigger'),
     focusVideo: new Engage.Event('Video:focusVideo', 'increases the size of one video', 'handler'),
     resetLayout: new Engage.Event('Video:resetLayout', 'resets the layout of the videodisplays', 'handler'),
-    movePiP: new Engage.Event('Video:movePiP', 'moves the smaller picture over the larger to the different corners', 'handler'),
+    movePiP: new Engage.Event('Video:movePiP', 'moves the smaller picture over the larger to the different corners',
+      'handler'),
     togglePiP: new Engage.Event('Video:togglePiP', 'switches between PiP and next to each other layout', 'both'),
     setZoomLevel: new Engage.Event('Video:setZoomLevel', 'sets the zoom level', 'trigger'),
     zoomReset: new Engage.Event('Video:resetZoom', 'resets position and zoom level', 'trigger'),
@@ -113,44 +116,44 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
   // desktop, embed and mobile logic
   switch (Engage.model.get('mode')) {
-    case 'embed':
-      plugin = {
-        insertIntoDOM: insertIntoDOM,
-        name: PLUGIN_NAME,
-        type: PLUGIN_TYPE,
-        version: PLUGIN_VERSION,
-        styles: PLUGIN_STYLES_EMBED,
-        template: PLUGIN_TEMPLATE_EMBED,
-        events: events
-      };
-      isEmbedMode = true;
-      break;
-    case 'mobile':
-      plugin = {
-        insertIntoDOM: insertIntoDOM,
-        name: PLUGIN_NAME,
-        type: PLUGIN_TYPE,
-        version: PLUGIN_VERSION,
-        styles: PLUGIN_STYLES_MOBILE,
-        template: PLUGIN_TEMPLATE_MOBILE,
-        events: events
-      };
-      isMobileMode = true;
-      break;
-    case 'desktop':
-    default:
-      plugin = {
-        insertIntoDOM: insertIntoDOM,
-        name: PLUGIN_NAME,
-        type: PLUGIN_TYPE,
-        version: PLUGIN_VERSION,
-        styles: PLUGIN_STYLES_DESKTOP,
-        template: PLUGIN_TEMPLATE_DESKTOP,
-        template_topIfBottom: PLUGIN_TEMPLATE_DESKTOP_TOP_IFBOTTOM,
-        events: events
-      };
-      isDesktopMode = true;
-      break;
+  case 'embed':
+    plugin = {
+      insertIntoDOM: insertIntoDOM,
+      name: PLUGIN_NAME,
+      type: PLUGIN_TYPE,
+      version: PLUGIN_VERSION,
+      styles: PLUGIN_STYLES_EMBED,
+      template: PLUGIN_TEMPLATE_EMBED,
+      events: events
+    };
+    isEmbedMode = true;
+    break;
+  case 'mobile':
+    plugin = {
+      insertIntoDOM: insertIntoDOM,
+      name: PLUGIN_NAME,
+      type: PLUGIN_TYPE,
+      version: PLUGIN_VERSION,
+      styles: PLUGIN_STYLES_MOBILE,
+      template: PLUGIN_TEMPLATE_MOBILE,
+      events: events
+    };
+    isMobileMode = true;
+    break;
+  case 'desktop':
+  default:
+    plugin = {
+      insertIntoDOM: insertIntoDOM,
+      name: PLUGIN_NAME,
+      type: PLUGIN_TYPE,
+      version: PLUGIN_VERSION,
+      styles: PLUGIN_STYLES_DESKTOP,
+      template: PLUGIN_TEMPLATE_DESKTOP,
+      template_topIfBottom: PLUGIN_TEMPLATE_DESKTOP_TOP_IFBOTTOM,
+      events: events
+    };
+    isDesktopMode = true;
+    break;
   }
 
   /* change these variables */
@@ -336,11 +339,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       Bootbox.dialog({
         title: translate('loginInformation', 'Log in'),
         message: '<form class="form-signin">' +
-        '<h2 class="form-signin-heading">' + translate('enterUsernamePassword', 'Please enter your username and password') + '</h2>' +
-        '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' + translate('username', 'Username') + '" required="true" autofocus="" />' +
-        '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' + translate('password', 'Password') + '" required="true" />' +
+        '<h2 class="form-signin-heading">' +
+        translate('enterUsernamePassword', 'Please enter your username and password') + '</h2>' +
+        '<input id="username" type="text" class="form-control form-control-custom" name="username" placeholder="' +
+        translate('username', 'Username') + '" required="true" autofocus="" />' +
+        '<input id="password" type="password" class="form-control form-control-custom" name="password" placeholder="' +
+        translate('password', 'Password') + '" required="true" />' +
         '<label class="checkbox">' +
-        '<input type="checkbox" value="' + translate('rememberMe', 'Remember me') + '" id="rememberMe" name="rememberMe" checked> ' + translate('rememberMe', 'Remember me') +
+        '<input type="checkbox" value="' + translate('rememberMe', 'Remember me') +
+        '" id="rememberMe" name="rememberMe" checked> ' + translate('rememberMe', 'Remember me') +
         '</label>' +
         '</form>',
         buttons: {
@@ -369,7 +376,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
                 }).done(function (msg) {
                   password = '';
                   if (msg.indexOf(springLoggedInStrCheck) == -1) {
-                    Engage.trigger(events.customSuccess.getName(), translate('loginSuccessful', 'Successfully logged in. Please reload the page if the page does not reload automatically.'));
+                    Engage.trigger(events.customSuccess.getName(), translate('loginSuccessful',
+                      'Successfully logged in. Please reload the page if the page does not reload automatically.'));
                     location.reload();
                   } else {
                     Engage.trigger(events.customSuccess.getName(), translate('loginFailed', 'Failed to log in.'));
@@ -396,13 +404,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   }
 
   function logout() {
-    Engage.trigger(events.customSuccess.getName(), translate('loggingOut', 'You are being logged out, please wait a moment.'));
+    Engage.trigger(events.customSuccess.getName(), translate('loggingOut',
+      'You are being logged out, please wait a moment.'));
     $.ajax({
       type: 'GET',
       url: springSecurityLogoutURL,
     }).complete(function (msg) {
       location.reload();
-      Engage.trigger(events.customSuccess.getName(), translate('logoutSuccessful', 'Successfully logged out. Please reload the page if the page does not reload automatically.'));
+      Engage.trigger(events.customSuccess.getName(), translate('logoutSuccessful',
+        'Successfully logged out. Please reload the page if the page does not reload automatically.'));
     });
   }
 
@@ -450,52 +460,50 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
         segments = Utils.repairSegmentLength(segments, duration, min_segment_duration);
 
-       try {
+        try {
         // find timeline preview images in media package
-        var attachments = Engage.model.get('mediaPackage').get('attachments');
+          var attachments = Engage.model.get('mediaPackage').get('attachments');
 
-        var timelinePreviewsRegex = /(timeline)+\S*(preview)+/i;
-        timelinePreview = $(attachments).filter(function(index) {
-          return $(attachments[index]).attr('type').search(timelinePreviewsRegex) !== -1;
-        });
+          var timelinePreviewsRegex = /(timeline)+\S*(preview)+/i;
+          timelinePreview = $(attachments).filter(function(index) {
+            return $(attachments[index]).attr('type').search(timelinePreviewsRegex) !== -1;
+          });
 
-        console.log("timelinePreviews loaded: ", timelinePreview);
+          var timelinePreviewsProperties = timelinePreview.get(0).additionalProperties;
 
-        var timelinePreviewsProperties = timelinePreview.get(0).additionalProperties;
-
-        timelinePreviewsProperties.property.forEach(function(property) {
+          timelinePreviewsProperties.property.forEach(function(property) {
             switch (property.key) {
-                case "imageCount":
-                    timelinePreviewsImageCount = property.$;
-                    break;
-                case "imageSizeX":
-                    timelinePreviewsImageSize[0] = property.$;
-                    break;
-                case "imageSizeY":
-                    timelinePreviewsImageSize[1] = property.$;
-                    break;
-                case "resolutionX":
-                    timelinePreviewsTileResolution[0] = property.$;
-                    break;
-                case "resolutionY":
-                    timelinePreviewsTileResolution[1] = property.$;
-                    break;
+            case 'imageCount':
+              timelinePreviewsImageCount = property.$;
+              break;
+            case 'imageSizeX':
+              timelinePreviewsImageSize[0] = property.$;
+              break;
+            case 'imageSizeY':
+              timelinePreviewsImageSize[1] = property.$;
+              break;
+            case 'resolutionX':
+              timelinePreviewsTileResolution[0] = property.$;
+              break;
+            case 'resolutionY':
+              timelinePreviewsTileResolution[1] = property.$;
+              break;
             }
-        });
+          });
 
-        timelinePreviewsError = false;
+          timelinePreviewsError = false;
 
-    } catch (e) {
-        timelinePreviewsError = true;
-        console.error("No valid timelinepreviews image was found.", e);
-    }
+        } catch (e) {
+          timelinePreviewsError = true;
+        }
 
         if (Engage.model.get('meInfo')) {
           if (Engage.model.get('meInfo').get('logo_player')) {
             logo = Engage.model.get('meInfo').get('logo_player');
           }
           if (Engage.model.get('meInfo').get('link_mediamodule')) {
-            logoLink = window.location.protocol + '//' + window.location.host + '/engage/ui/index.html'; // link to the media module
+            // link to the media module
+            logoLink = window.location.protocol + '//' + window.location.host + '/engage/ui/index.html';
           }
           if (!Engage.model.get('meInfo').get('show_embed_links')) {
             showEmbed = false;
@@ -523,10 +531,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           str_volumeSlider: translate('volumeSlider', 'Volume slider'),
           str_muteVolume: translate('muteVolume', 'Mute volume'),
           str_unmuteVolume: translate('unmuteVolume', 'Unmute Volume'),
-          str_message_inputField: translate('message_inputField', 'Input field shows current video time. Can be edited.'),
+          str_message_inputField: translate('message_inputField',
+            'Input field shows current video time. Can be edited.'),
           str_totalVideoLength: translate('totalVideoLength', 'Total length of the video:'),
           str_openMediaModule: translate('openMediaModule', 'Go to Media Module'),
-          str_playbackRateButton: translate('playbackRateButton', 'Playback rate button. Select playback rate from dropdown.'),
+          str_playbackRateButton: translate('playbackRateButton',
+            'Playback rate button. Select playback rate from dropdown.'),
           str_playbackRate: translate('playbackRate', 'Playback rate'),
           str_remainingTime: translate('remainingTime', 'remaining time'),
           str_embedButton: translate('embedButton', 'Embed Button. Select embed size from dropdown.'),
@@ -627,7 +637,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
             logo = Engage.model.get('meInfo').get('logo_player');
           }
           if (Engage.model.get('meInfo').get('link_mediamodule')) {
-            logoLink = window.location.protocol + '//' + window.location.host + '/engage/ui/index.html'; // link to the media module
+            // link to the media module
+            logoLink = window.location.protocol + '//' + window.location.host + '/engage/ui/index.html';
           }
           if (!Engage.model.get('meInfo').get('show_embed_links')) {
             showEmbed = false;
@@ -777,17 +788,24 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     } else {
       str = Utils.replaceAll(str, 'mode=desktop', 'mode=embed');
     }
-	// create an adaptive/responsive embed code with an IFRAME inside two nested DIV elements
-	// POSSIBLE IMPROVEMENT: 'padding-bottom:56.25%' fits for 16:9 aspect ratio (=9/16) only - this should be calculated from video dimensions to fit divergent aspect ratios, e.g. 4:3 
-    var code = '<div style=\'width:'+ ratioWidth + '%\'><div style=\'position:relative;height:0;padding-bottom:56.25%\'><iframe src=\'' + str + '\' style=\'border:0px #FFFFFF none;position:absolute;width:100%;height:100%\' name=\'Opencast media player\' scrolling=\'no\' frameborder=\'0\' marginheight=\'0px\' marginwidth=\'0px\' allowfullscreen=\'true\' webkitallowfullscreen=\'true\' mozallowfullscreen=\'true\'></iframe></div></div>';
+    // create an adaptive/responsive embed code with an IFRAME inside two nested DIV elements
+    // POSSIBLE IMPROVEMENT: 'padding-bottom:56.25%' fits for 16:9 aspect ratio (=9/16) only - this should be calculated
+    // from video dimensions to fit divergent aspect ratios, e.g. 4:3
+    var code = '<div style=\'width:' + ratioWidth + '%\'>' +
+               '<div style=\'position:relative;height:0;padding-bottom:56.25%\'>' +
+               '<iframe src="' + str + '" style=\'border:0px #FFFFFF none;position:absolute;width:100%;height:100%\' ' +
+               'name=\'Opencast media player\' scrolling=\'no\' frameborder=\'0\' marginheight=\'0px\' ' +
+               'marginwidth="0px" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true">' +
+               '</iframe></div></div>';
     code = Utils.escapeHtml(code);
-    Engage.trigger(plugin.events.customOKMessage.getName(), 'Copy the following code and paste it to the body of your html page: <div class=\'well well-sm well-alert\'>' + code + '</div>');
+    Engage.trigger(plugin.events.customOKMessage.getName(), 'Copy the following code and paste it to the body of ' +
+      'your html page: <div class=\'well well-sm well-alert\'>' + code + '</div>');
   }
 
   function addEmbedRatioEvents() {
     if (!mediapackageError) {
       // setup listeners for the embed buttons
-	  // this code could be streamlined, as only a single embed size var is required here
+      // this code could be streamlined, as only a single embed size var is required here
       $('#' + id_embed0).click(function (e) {
         e.preventDefault();
         triggerEmbedMessage(embedSizeOne, embedSizeOne);
@@ -826,11 +844,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     }
 
     if (Basil.get(storage_pip_pos) !== undefined && Basil.get(storage_pip_pos) !== null) {
-      var pipPos = Basil.get(storage_pip_pos);
+      pipPos = Basil.get(storage_pip_pos);
       Engage.trigger(plugin.events.movePiP.getName(), pipPos);
     } else {
       if (Engage.model.get('meInfo').get('layout') !== 'off') {
-        var pipPos = Engage.model.get('meInfo').get('layout');
+        pipPos = Engage.model.get('meInfo').get('layout');
         Engage.trigger(plugin.events.movePiP.getName(), pipPos);
       }
     }
@@ -953,7 +971,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         $(this).toggleClass('active');
         captionsOn  = !captionsOn;
         Engage.trigger(plugin.events.toggleCaptions.getName(), captionsOn);
-      })
+      });
       // slider events
       $('#' + id_slider).on(event_slidestart, function (event, ui) {
         isSliding = true;
@@ -1054,7 +1072,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     }
   }
 
-  function calculateEmbedAspectRatios() {   // after change to relative embed sizes (in %), the name of this function does not make sense - nothing is calculated here anymore! But, preserving its name avoids additional code changes... 
+  function calculateEmbedAspectRatios() {
+    // after change to relative embed sizes (in %), the name of this function does not make sense - nothing is
+    // calculated here anymore! But, preserving its name avoids additional code changes...
 
     $('#' + id_embed0).html('Embed ' + embedSizeOne + '%');
     $('#' + id_embed1).html('Embed ' + embedSizeTwo + '%');
@@ -1089,8 +1109,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         Engage.trigger(plugin.events.focusVideo.getName(), currentFocusFlavor);
         videosInitialReadyness = false;
       }
-      if (Engage.model.get("captions")) {
-        $("#" + id_captions_button).removeClass("disabled");
+      if (Engage.model.get('captions')) {
+        $('#' + id_captions_button).removeClass('disabled');
       }
     }
   }
@@ -1251,8 +1271,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           timelinePreviewsTileResolution[1] = img.naturalHeight / timelinePreviewsImageSize[1];
         }
       } catch (ex) {
-          timelinePreviewsError = true;
-          console.log("The timeline previews image cannot be set or the resolution cannot be found", ex);
+        timelinePreviewsError = true;
       }
     }
   }
@@ -1264,7 +1283,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     // Check that the videoDataModel is available.
     if (! Engage.model.get('videoDataModel')) {
       Engage.on(videoDataModelChange, function() {
-        Engage.log("Controls: videoDataModel available.");
+        Engage.log('Controls: videoDataModel available.');
         initPlugin();
       });
       window.setTimeout(function() {
@@ -1272,7 +1291,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           initPlugin();
         }
       }, 2000);
-      Engage.log("Controls: videoDataModel not available at start.");
+      Engage.log('Controls: videoDataModel not available at start.');
       return;
     }
     // only init if plugin template was inserted into the DOM
@@ -1457,9 +1476,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       Engage.on(plugin.events.segmentMouseover.getName(), function (no) {
         if (!mediapackageError) {
           $('#' + id_segmentNo + no).addClass('segmentHover');
-            if (!timelinePreviewsError) {
-                $('#' + id_timeline_preview).addClass('timelinePreviewHover');
-            }
+          if (!timelinePreviewsError) {
+            $('#' + id_timeline_preview).addClass('timelinePreviewHover');
+          }
         }
       });
       Engage.on(plugin.events.segmentMouseout.getName(), function (no) {
@@ -1499,10 +1518,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           // index of the image that previews that part of the video
           var num = (timelinePreviewsImageCount) * posPercent;
           if (num < 0) {
-              num = 0;
+            num = 0;
           }
           if (num >= (timelinePreviewsImageCount)) {
-              num = (timelinePreviewsImageCount) - 1;
+            num = (timelinePreviewsImageCount) - 1;
           }
 
           // position of this image in the timeline previews image
@@ -1515,7 +1534,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           var canvas = document.getElementById(id_timeline_preview);
           canvas.width = width;
           canvas.height = height;
-          var ctx = canvas.getContext("2d");
+          var ctx = canvas.getContext('2d');
           var img = document.getElementById(id_timeline_preview_img);
           ctx.drawImage(img, offsetX, offsetY, width, height, 0, 0, width, height);
 
@@ -1524,15 +1543,15 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
           // clamp left: in case the preview image would exceed the page on the left, move it back to window border
           if (pos < width / 2 ) {
-              offsetLeft = -wrapperOffset;
+            offsetLeft = -wrapperOffset;
           }
 
           // clamp right: in case the preview image would exceed the page on the right, move it back to window border
           if (pos > pageWidth - (width + 6) / 2) {
-              offsetLeft = (pageWidth - (width + 3)) - wrapperOffset;
+            offsetLeft = (pageWidth - (width + 3)) - wrapperOffset;
           }
 
-          var offsetBottom = Engage.controls_top? 0 : canvas.height + wrapperHeight + 10;
+          var offsetBottom = Engage.controls_top ? 0 : canvas.height + wrapperHeight + 10;
 
           // move the image to the mouse position at a fixed height above the timeline
           $('#' + id_timeline_preview).css({'bottom': Math.round(offsetBottom) + 'px'});
@@ -1594,7 +1613,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           }
         });
         Engage.on(plugin.events.captionsFound.getName(), function () {
-            $("#" + id_captions_button).removeClass("disabled");
+          $('#' + id_captions_button).removeClass('disabled');
         });
       }
 
@@ -1642,7 +1661,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       });
 
       if (!Engage.controls_top && plugin.template_topIfBottom && (plugin.template_topIfBottom != 'none')) {
-        controlsViewTopIfBottom = new ControlsViewTop_ifBottom(Engage.model.get('videoDataModel'), plugin.template_topIfBottom, plugin.pluginPath_topIfBottom);
+        controlsViewTopIfBottom = new ControlsViewTop_ifBottom(
+          Engage.model.get('videoDataModel'),
+          plugin.template_topIfBottom,
+          plugin.pluginPath_topIfBottom);
       }
       controlsView = new ControlsView(Engage.model.get('videoDataModel'), plugin.template, plugin.pluginPath);
 
@@ -1719,22 +1741,22 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   }
 
   // load utils class
-  require([relative_plugin_path + "utils"], function(utils) {
-      Engage.log("Controls: Utils class loaded");
-      Utils = new utils();
-      initTranslate(Engage.model.get("language"), function() {
-          Engage.log("Controls: Successfully translated.");
-          initCount -= 1;
-          if (initCount <= 0) {
-              initPlugin();
-          }
-      }, function() {
-          Engage.log("Controls: Error translating...");
-          initCount -= 1;
-          if (initCount <= 0) {
-              initPlugin();
-          }
-      });
+  require([relative_plugin_path + 'utils'], function(utils) {
+    Engage.log('Controls: Utils class loaded');
+    Utils = new utils();
+    initTranslate(Engage.model.get('language'), function() {
+      Engage.log('Controls: Successfully translated.');
+      initCount -= 1;
+      if (initCount <= 0) {
+        initPlugin();
+      }
+    }, function() {
+      Engage.log('Controls: Error translating...');
+      initCount -= 1;
+      if (initCount <= 0) {
+        initPlugin();
+      }
+    });
   });
 
   return plugin;
