@@ -26,7 +26,7 @@
     <operation
       id="series"
       fail-on-error="true"
-      exception-handler-workflow="error"
+      exception-handler-workflow="partial-error"
       description="Applying access control entries from series">
       <configurations>
         <configuration key="apply-acl">true</configuration>
@@ -38,7 +38,7 @@
     <operation
       id="inspect"
       fail-on-error="true"
-      exception-handler-workflow="error"
+      exception-handler-workflow="partial-error"
       description="Inspecting audio and video streams">
       <configurations>
         <configuration key="overwrite">false</configuration>
@@ -66,7 +66,7 @@
       id="publish-engage"
       max-attempts="2"
       fail-on-error="true"
-      exception-handler-workflow="error"
+      exception-handler-workflow="partial-error"
       description="Publishing to Engage">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
@@ -81,7 +81,7 @@
     <operation
       id="snapshot"
       fail-on-error="true"
-      exception-handler-workflow="error"
+      exception-handler-workflow="partial-error"
       description="Archiving">
       <configurations>
         <configuration key="source-tags">archive</configuration>
