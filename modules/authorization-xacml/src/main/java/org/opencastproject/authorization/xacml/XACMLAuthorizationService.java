@@ -277,7 +277,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
     } catch (NotFoundException e) {
       logger.debug("URI {} not found", uri);
     } catch (Exception e) {
-      logger.warn("Unable to load or parse Acl", e);
+      logger.warn("Unable to load or parse Acl from URI {}", uri, e);
     }
     return Optional.empty();
   }
