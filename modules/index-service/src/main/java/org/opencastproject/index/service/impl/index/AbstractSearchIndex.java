@@ -250,7 +250,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    *           if the event cannot be added or updated
    */
   public void addOrUpdate(Event event) throws SearchIndexException {
-    logger.debug("Adding resource {} to search index", event);
+    logger.debug("Adding event {} to search index", event.getIdentifier());
 
     // if (!preparedIndices.contains(resource.getURI().getSite().getIdentifier())) {
     // try {
@@ -281,7 +281,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    *           Thrown if unable to add or update the group.
    */
   public void addOrUpdate(Group group) throws SearchIndexException {
-    logger.debug("Adding resource {} to search index", group);
+    logger.debug("Adding group {} to search index", group.getIdentifier());
 
     // if (!preparedIndices.contains(resource.getURI().getSite().getIdentifier())) {
     // try {
@@ -310,7 +310,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    */
   public void addOrUpdate(Series series) throws SearchIndexException {
-    logger.debug("Adding resource {} to search index", series);
+    logger.debug("Adding series {} to search index", series.getIdentifier());
 
     // if (!preparedIndices.contains(resource.getURI().getSite().getIdentifier())) {
     // try {
@@ -341,7 +341,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    *           Thrown if unable to add or update the theme.
    */
   public void addOrUpdate(Theme theme) throws SearchIndexException {
-    logger.debug("Adding resource {} to search index", theme);
+    logger.debug("Adding theme {} to search index", theme.getIdentifier());
 
     // if (!preparedIndices.contains(resource.getURI().getSite().getIdentifier())) {
     // try {
