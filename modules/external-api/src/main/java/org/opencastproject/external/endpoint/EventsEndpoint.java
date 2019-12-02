@@ -45,8 +45,6 @@ import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
-import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.IndexObject;
@@ -80,6 +78,9 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
+import org.opencastproject.metadata.dublincore.MetadataList.Locked;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -923,7 +924,7 @@ public class EventsEndpoint implements ManagedService {
       try {
         Opt<MetadataList> metadata = getEventMetadata(event);
         if (metadata.isSome()) {
-          fields.add(f("metadata", metadata.get().toJSON()));
+          fields.add(f("metadata", MetadataJson.listToJson(metadata.get(), true)));
         }
       } catch (Exception e) {
         logger.error("Unable to get metadata for event '{}'", event.getIdentifier(), e);
@@ -1098,12 +1099,12 @@ public class EventsEndpoint implements ManagedService {
 
         // API v1 should return a two separate fields for start date and start time. Since those fields were merged in index service, we have to split them up.
         Opt<MetadataCollection> collection = actualList.getMetadataByFlavor("dublincore/episode");
+        final boolean withOrderedText = collection.isNone();
         if (collection.isSome()) {
           convertStartDateTimeToApiV1(collection.get());
-          ExternalMetadataUtils.changeTypeOrderedTextToText(collection.get());
         }
 
-        return ApiResponses.Json.ok(requestedVersion, actualList.toJSON());
+        return ApiResponses.Json.ok(requestedVersion, MetadataJson.listToJson(actualList, withOrderedText));
       }
       else
         return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
@@ -1205,8 +1206,7 @@ public class EventsEndpoint implements ManagedService {
         ExternalMetadataUtils.changeSubjectToSubjects(collection);
         ExternalMetadataUtils.removeCollectionList(collection);
         convertStartDateTimeToApiV1(collection);
-        ExternalMetadataUtils.changeTypeOrderedTextToText(collection);
-        return ApiResponses.Json.ok(requestedVersion, collection.toJSON());
+        return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false));
       }
       // Try the other catalogs
       List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
@@ -1218,8 +1218,7 @@ public class EventsEndpoint implements ManagedService {
             MetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
             ExternalMetadataUtils.removeCollectionList(fields);
             convertStartDateTimeToApiV1(fields);
-            ExternalMetadataUtils.changeTypeOrderedTextToText(fields);
-            return ApiResponses.Json.ok(requestedVersion, fields.toJSON());
+            return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(fields, false));
           }
         }
       }
@@ -1304,7 +1303,7 @@ public class EventsEndpoint implements ManagedService {
           collection.removeField(field);
           JSONArray subjectArray = (JSONArray) parser.parse(updatedFields.get(key));
           collection.addField(
-                  MetadataField.copyMetadataFieldWithValue(field, StringUtils.join(subjectArray.iterator(), ",")));
+                  MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjectArray.iterator(), ",")));
         } else if ("startDate".equals(key)) {
           // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
           MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get(key);
@@ -1322,7 +1321,8 @@ public class EventsEndpoint implements ManagedService {
           DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
           DateTime updatedStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(), newStartDate.dayOfMonth().get());
           collection.removeField(field);
-          collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(updatedStartDate.toDate())));
+          collection.addField(
+                  MetadataJson.copyWithDifferentJsonValue(field, sdf.format(updatedStartDate.toDate())));
         } else if ("startTime".equals(key)) {
           // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
           MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get("startDate");
@@ -1344,7 +1344,8 @@ public class EventsEndpoint implements ManagedService {
                   newStartDate.secondOfMinute().get(),
                   newStartDate.millisOfSecond().get());
           collection.removeField(field);
-          collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(updatedStartDate.toDate())));
+          collection.addField(
+                  MetadataJson.copyWithDifferentJsonValue(field, sdf.format(updatedStartDate.toDate())));
         } else {
           MetadataField<?> field = collection.getOutputFields().get(key);
           Opt<Response> error = validateField(field, key, id, type, updatedFields);
@@ -1352,7 +1353,8 @@ public class EventsEndpoint implements ManagedService {
             return error.get();
           }
           collection.removeField(field);
-          collection.addField(MetadataField.copyMetadataFieldWithValue(field, updatedFields.get(key)));
+          collection.addField(
+                  MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
         }
       }
 

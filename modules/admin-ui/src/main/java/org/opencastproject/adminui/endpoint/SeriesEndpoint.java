@@ -57,7 +57,6 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
@@ -77,6 +76,8 @@ import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.security.api.AccessControlList;
@@ -304,7 +305,7 @@ public class SeriesEndpoint implements ManagedService {
       }
     }
     metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), getSeriesMetadata(optSeries.get()));
-    return okJson(metadataList.toJSON());
+    return okJson(MetadataJson.listToJson(metadataList, true));
   }
 
   /**
@@ -399,7 +400,7 @@ public class SeriesEndpoint implements ManagedService {
           SearchIndexException {
     try {
       MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, searchIndex);
-      return okJson(metadataList.toJSON());
+      return okJson(MetadataJson.listToJson(metadataList, true));
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
     } catch (IndexServiceException e) {
@@ -419,7 +420,7 @@ public class SeriesEndpoint implements ManagedService {
       safelyRemoveField(collection, "identifier");
       metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
     }
-    return okJson(metadataList.toJSON());
+    return okJson(MetadataJson.listToJson(metadataList, true));
   }
 
   private void safelyRemoveField(MetadataCollection collection, String fieldName) {

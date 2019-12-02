@@ -24,6 +24,7 @@ package org.opencastproject.index.service.catalog.adapter;
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
+import org.opencastproject.metadata.dublincore.AbstractMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
@@ -41,13 +42,14 @@ import java.util.stream.Collectors;
 public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
   private static final Logger logger = LoggerFactory.getLogger(DublinCoreMetadataCollection.class);
 
-  private Opt<Boolean> getCollectionIsTranslatable(MetadataField<?> metadataField,
-          ListProvidersService listProvidersService) {
+  private Opt<Boolean> getCollectionIsTranslatable(
+          final MetadataField<?> metadataField,
+          final ListProvidersService listProvidersService) {
     if (listProvidersService != null && metadataField.getListprovider().isSome()) {
       try {
-        boolean isTranslatable = listProvidersService.isTranslatable(metadataField.getListprovider().get());
+        final boolean isTranslatable = listProvidersService.isTranslatable(metadataField.getListprovider().get());
         return Opt.some(isTranslatable);
-      } catch (ListProviderException ex) {
+      } catch (final ListProviderException ex) {
         // failed to get is-translatable property on list-provider-service
         // as this field is optional, it is fine to pass here
       }
@@ -57,42 +59,43 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
 
   @Override
   public MetadataCollection getCopy() {
-    MetadataCollection copiedCollection = new DublinCoreMetadataCollection();
-    for (MetadataField field : getFields()) {
-      MetadataField copiedField = new MetadataField(field);
+    final MetadataCollection copiedCollection = new DublinCoreMetadataCollection();
+    for (final MetadataField field : getFields()) {
+      final MetadataField copiedField = new MetadataField(field);
       copiedCollection.addField(copiedField);
     }
     return copiedCollection;
   }
 
-  private Opt<Map<String, String>> getCollection(MetadataField<?> metadataField,
-          ListProvidersService listProvidersService) {
+  private Opt<Map<String, String>> getCollection(
+          final MetadataField<?> metadataField,
+          final ListProvidersService listProvidersService) {
     try {
       if (listProvidersService != null && metadataField.getListprovider().isSome()) {
-        Map<String, String> collection = listProvidersService.getList(metadataField.getListprovider().get(),
+        final Map<String, String> collection = listProvidersService.getList(metadataField.getListprovider().get(),
                 new ResourceListQueryImpl(), true);
         if (collection != null) {
           return Opt.some(collection);
         }
       }
       return Opt.none();
-    } catch (ListProviderException e) {
+    } catch (final ListProviderException e) {
       logger.warn("Unable to set collection on metadata because", e);
       return Opt.none();
     }
   }
 
-  public void addEmptyField(MetadataField<?> metadataField, ListProvidersService listProvidersService) {
+  public void addEmptyField(final MetadataField<?> metadataField, final ListProvidersService listProvidersService) {
     addField(metadataField, Collections.emptyList(), listProvidersService);
   }
 
-  public void addField(MetadataField<?> metadataField, String value, ListProvidersService listProvidersService) {
+  public void addField(final MetadataField<?> metadataField, final String value, final ListProvidersService listProvidersService) {
     addField(metadataField, Collections.singletonList(value), listProvidersService);
   }
 
-  public void addField(MetadataField<?> metadataField, List<String> values, ListProvidersService listProvidersService) {
+  public void addField(MetadataField<?> metadataField, final List<String> values, final ListProvidersService listProvidersService) {
 
-    List<String> filteredValues = values.stream()
+    final List<String> filteredValues = values.stream()
             .filter(StringUtils::isNotBlank)
             .collect(Collectors.toList());
 

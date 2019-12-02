@@ -33,6 +33,7 @@ import org.opencastproject.index.service.resources.list.api.ListProvidersService
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataJson;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -41,6 +42,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -99,8 +101,10 @@ public class MetadataFieldTest {
     assertTrue(textField.getValue().isNone());
 
     String withDifferentValuesJson = IOUtils.toString(getClass()
-            .getResource("/catalog-adapter/text/text-with-different-values.json"));
-    assertThat(withDifferentValuesJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(textField.toJSON())));
+            .getResource("/catalog-adapter/text/text-with-different-values.json"), StandardCharsets.UTF_8);
+    assertThat(
+            withDifferentValuesJson,
+            SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textField, true))));
   }
 
 
@@ -126,11 +130,11 @@ public class MetadataFieldTest {
     MetadataField<Date> dateField = MetadataField.createDateMetadata(defaultInputID, Opt.<String> none(), label,
             readOnly, required, dateTimePattern, Opt.<Integer> none(), Opt.<String> none());
     dateField.setValue(testDate);
-    assertThat(dateJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(dateField.toJSON())));
+    assertThat(dateJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField, true))));
   }
 
   @Test
-  public void testCreateDateFieldJsonInputWithBlankPatternExpectsEmptyValueInJson() throws Exception {
+  public void testCreateDateFieldJsonInputWithBlankPatternExpectsNonEmptyValueInJson() throws Exception {
     MetadataField<Date> dateField = MetadataField.createDateMetadata(defaultInputID, Opt.<String> none(), label,
             readOnly, required, null, Opt.<Integer> none(), Opt.<String> none());
     dateField.setValue(testDate);
@@ -141,7 +145,7 @@ public class MetadataFieldTest {
             f("label", v(label)), f("type", v(MetadataField.Type.DATE.toString().toLowerCase())),
             f("value", v(dateFormat.format(testDate))), f("required", v(required))));
 
-    assertThat(expectedJSON, SameJSONAs.sameJSONAs(RestUtils.getJsonString(dateField.toJSON())));
+    assertThat(expectedJSON, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField, true))));
   }
 
   @Test
@@ -149,7 +153,7 @@ public class MetadataFieldTest {
     String dateJson = IOUtils.toString(getClass().getResource("/catalog-adapter/date/date-without-value.json"));
     MetadataField<Date> dateField = MetadataField.createDateMetadata(defaultInputID, Opt.<String> none(), label,
             readOnly, required, datePattern, Opt.<Integer> none(), Opt.<String> none());
-    assertThat(dateJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(dateField.toJSON())));
+    assertThat(dateJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField, true))));
   }
 
   @Test
@@ -159,7 +163,8 @@ public class MetadataFieldTest {
     MetadataField<String> emptyValueTextField = MetadataField.createTextMetadataField(defaultInputID, optOutputID,
             label, false, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(), Opt.<String> none(),
             Opt.<Integer> none(), Opt.<String> none());
-    assertThat(emptyValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(emptyValueTextField.toJSON())));
+    assertThat(emptyValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(emptyValueTextField,
+            true))));
   }
 
   @Test
@@ -171,7 +176,7 @@ public class MetadataFieldTest {
             false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.<Integer> none(),
             Opt.<String> none());
     textField.setValue(textValue);
-    assertThat(withValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(textField.toJSON())));
+    assertThat(withValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textField, true))));
   }
 
   @Test
@@ -182,7 +187,8 @@ public class MetadataFieldTest {
     MetadataField<String> textFieldWithCollection = MetadataField.createTextMetadataField(defaultInputID, optOutputID,
             label, false, false, Opt.some(true), optCollection, Opt.<String> none(), Opt.<Integer> none(),
             Opt.<String> none());
-    assertThat(withCollectionJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(textFieldWithCollection.toJSON())));
+    assertThat(withCollectionJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textFieldWithCollection,
+            true))));
   }
 
   @Test
@@ -193,7 +199,8 @@ public class MetadataFieldTest {
     MetadataField<String> textFieldWithCollectionID = MetadataField.createTextMetadataField(defaultInputID,
             optOutputID, label, false, false, Opt.<Boolean> none(), Opt.<Map<String, String>> none(), optCollectionID,
             Opt.<Integer> none(), Opt.<String> none());
-    assertThat(withCollectionIDJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(textFieldWithCollectionID.toJSON())));
+    assertThat(withCollectionIDJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textFieldWithCollectionID,
+            true))));
   }
 
   @Test
@@ -205,6 +212,7 @@ public class MetadataFieldTest {
             false, false, Opt.<Boolean> none(),Opt.<Map<String, String>> none(), Opt.<String> none(),
             Opt.<Integer> none(), Opt.<String> none());
     textLongField.setValue("This is the text value");
-    assertThat(withCollectionIDJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(textLongField.toJSON())));
+    assertThat(withCollectionIDJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textLongField,
+            true))));
   }
 }

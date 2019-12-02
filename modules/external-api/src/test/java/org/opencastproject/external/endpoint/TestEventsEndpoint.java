@@ -30,7 +30,6 @@ import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatal
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -41,6 +40,7 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;

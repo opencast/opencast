@@ -41,7 +41,6 @@ import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
 import org.opencastproject.index.service.impl.index.series.Series;
@@ -57,6 +56,8 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -434,9 +435,8 @@ public class SeriesEndpoint {
     }
     MetadataCollection collection = getSeriesMetadata(optSeries.get());
     ExternalMetadataUtils.changeSubjectToSubjects(collection);
-    ExternalMetadataUtils.changeTypeOrderedTextToText(collection);
     metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
-    return ApiResponses.Json.ok(requestedVersion, metadataList.toJSON());
+    return ApiResponses.Json.ok(requestedVersion, MetadataJson.listToJson(metadataList, false));
   }
 
   private Response getMetadataByType(String id, String type, ApiVersion requestedVersion) throws SearchIndexException {
@@ -448,8 +448,7 @@ public class SeriesEndpoint {
     if (typeMatchesSeriesCatalogUIAdapter(type, indexService.getCommonSeriesCatalogUIAdapter())) {
       MetadataCollection collection = getSeriesMetadata(optSeries.get());
       ExternalMetadataUtils.changeSubjectToSubjects(collection);
-      ExternalMetadataUtils.changeTypeOrderedTextToText(collection);
-      return ApiResponses.Json.ok(requestedVersion, collection.toJSON());
+      return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false));
     }
 
     // Try the other catalogs
@@ -460,7 +459,7 @@ public class SeriesEndpoint {
       if (typeMatchesSeriesCatalogUIAdapter(type, adapter)) {
         final Opt<MetadataCollection> optSeriesMetadata = adapter.getFields(id);
         if (optSeriesMetadata.isSome()) {
-          return ApiResponses.Json.ok(requestedVersion, optSeriesMetadata.get().toJSON());
+          return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(optSeriesMetadata.get(), true));
         }
       }
     }
@@ -664,7 +663,7 @@ public class SeriesEndpoint {
                 key, type));
       }
       collection.removeField(field);
-      collection.addField(MetadataField.copyMetadataFieldWithValue(field, updatedFields.get(key)));
+      collection.addField(MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
     }
 
     metadataList.add(adapter, collection);
@@ -789,7 +788,7 @@ public class SeriesEndpoint {
           throws UnauthorizedException, NotFoundException, SearchIndexException {
     try {
       MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, externalIndex);
-      return ApiResponses.Json.ok(acceptHeader, metadataList.toJSON());
+      return ApiResponses.Json.ok(acceptHeader, MetadataJson.listToJson(metadataList, true));
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to update series '{}' with metadata '{}'", seriesID, metadataJSON, e);
       return RestUtil.R.badRequest(e.getMessage());
@@ -917,7 +916,7 @@ public class SeriesEndpoint {
             try {
               JSONArray subjects = (JSONArray) parser.parse(fields.get(key));
               collection.addField(
-                      MetadataField.copyMetadataFieldWithValue(field, StringUtils.join(subjects.iterator(), ",")));
+                      MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjects.iterator(), ",")));
             } catch (ParseException e) {
               throw new IllegalArgumentException(
                       String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
@@ -929,7 +928,7 @@ public class SeriesEndpoint {
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
             }
             collection.removeField(field);
-            collection.addField(MetadataField.copyMetadataFieldWithValue(field, fields.get(key)));
+            collection.addField(MetadataJson.copyWithDifferentJsonValue(field, fields.get(key)));
           }
         }
       }
