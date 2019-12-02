@@ -13,7 +13,7 @@
     "paginationjs": "^2.1.5"
   },
   "devDependencies": {
-    "eslint": "^6.7.1",
+    "eslint": "^6.7.2",
     "eslint-plugin-header": "^3.0.0",
     "html-linter": "^1.1.1"
   }
