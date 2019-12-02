@@ -24,12 +24,11 @@ package org.opencastproject.adminui.endpoint;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import org.opencastproject.index.service.catalog.adapter.AbstractMetadataCollection;
+import org.opencastproject.metadata.dublincore.AbstractMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.JValue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -59,10 +58,6 @@ public class AbstractMetadataCollectionTest {
         return this;
       }
 
-      @Override
-      public JValue toJSON() {
-        return null;
-      }
     };
     return collection;
   }

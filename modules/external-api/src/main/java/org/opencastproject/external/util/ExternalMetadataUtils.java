@@ -57,25 +57,6 @@ public final class ExternalMetadataUtils {
   }
 
   /**
-   * Change the type of metadata fields from "ordered_text" to "text". This is necessary because "ordered_text" was
-   * added later on, since it is needed by the admin UI. For the external API, backwards compatibility can be achieved
-   * by just changing it back to the more general type "text". Unfortunately, meta data handling is shared between admin
-   * UI and external api, which makes these conversions necessary.
-   *
-   * @param collection The collection to update.
-   */
-  public static void changeTypeOrderedTextToText(MetadataCollection collection) {
-    for (final MetadataField<?> field : collection.getInputFields().values())  {
-      if (MetadataField.Type.ORDERED_TEXT.equals(field.getType())) {
-        field.setType(MetadataField.Type.TEXT);
-      }
-      if (MetadataField.JsonType.ORDERED_TEXT.equals(field.getJsonType())) {
-        field.setJsonType(MetadataField.JsonType.TEXT);
-      }
-    }
-  }
-
-  /**
    * Remove the collection list from the metadata to reduce to amount of data
    *
    * @param metadata

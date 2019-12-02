@@ -20,54 +20,10 @@
  */
 package org.opencastproject.metadata.dublincore;
 
-import com.entwinemedia.fn.data.json.JValue;
-
 import java.util.List;
 import java.util.Map;
 
 public interface MetadataCollection {
-
-  /**
-   * Format the metadata as JSON array
-   *
-   * @return a JSON array representation of the metadata
-   */
-  JValue toJSON();
-
-  /**
-   * Parse the given JSON string to extract the metadata. The JSON structure must look like this:
-   *
-   * <pre>
-   * [
-   *  {
-   *     "id"        : "field id",
-   *     "value"     : "field value",
-   *
-   *     // The following properties should not be present as they are useless,
-   *     // but they do not hurt for the parsing.
-   *
-   *     "label"     : "EVENTS.SERIES.DETAILS.METADATA.LABEL",
-   *     "type"      : "",
-   *     // The collection can be a json object like below...
-   *     "collection": { "id1": "value1", "id2": "value2" },
-   *     // Or a the id of the collection available through the resource endpoint
-   *     "collection": "USERS",
-   *     "readOnly": false
-   *   },
-   *
-   *   // Additionally fields
-   *   ...
-   * ]
-   * </pre>
-   *
-   * @param json
-   *          A JSON array of metadata as String
-   * @throws MetadataParsingException
-   *           if the JSON structure is not correct
-   * @throws IllegalArgumentException
-   *           if the JSON string is null or empty
-   */
-  MetadataCollection fromJSON(String json) throws MetadataParsingException;
 
   /**
    * Copy all fields of a metadata collection into a new collection.

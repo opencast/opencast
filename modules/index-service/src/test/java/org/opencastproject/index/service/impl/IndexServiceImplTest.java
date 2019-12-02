@@ -28,7 +28,6 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataCollection;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
@@ -58,6 +57,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.Util;
@@ -789,8 +789,6 @@ public class IndexServiceImplTest {
     // mock/initialize dependencies
     String username = "user1";
     String org = "mh_default_org";
-    String testResourceLocation = "/events/update-event.json";
-    String metadataJson = IOUtils.toString(getClass().getResourceAsStream(testResourceLocation));
     MetadataCollection metadataCollection = new DublinCoreMetadataCollection();
     metadataCollection.addField(MetadataField.createTextMetadataField(
             "title", Opt.some("title"), "EVENTS.EVENTS.DETAILS.METADATA.TITLE", false, true, Opt.none(), Opt.none(),
@@ -798,10 +796,20 @@ public class IndexServiceImplTest {
     metadataCollection.addField(MetadataField.createTextLongMetadataField(
             "creator", Opt.some("creator"), "EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS", false, false, Opt.none(),
             Opt.none(), Opt.none(), Opt.none(), Opt.none()));
-    metadataCollection.addField(MetadataField.createTextMetadataField(
-            "isPartOf", Opt.some("isPartOf"), "EVENTS.EVENTS.DETAILS.METADATA.SERIES", false, false, Opt.none(),
-            Opt.none(), Opt.none(), Opt.none(), Opt.none()));
-    MetadataList metadataList = new MetadataList(metadataCollection, metadataJson);
+    final MetadataField<String> seriesMetadataField = MetadataField.createTextMetadataField("isPartOf",
+            Opt.some("isPartOf"),
+            "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
+            false,
+            false,
+            Opt.none(),
+            Opt.none(),
+            Opt.none(),
+            Opt.none(),
+            Opt.none());
+    seriesMetadataField.setValue("series-1");
+    metadataCollection.addField(seriesMetadataField);
+    MetadataList metadataList = new MetadataList();
+    metadataList.getMetadataList().put("dublincore/episode", Tuple.tuple("EVENTS.EVENTS.DETAILS.CATALOG.EPISODE", metadataCollection));
     String eventId = "event-1";
     Event event = new Event(eventId, org);
     event.setTitle("Test Event 1");

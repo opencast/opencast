@@ -20,7 +20,6 @@
  */
 package org.opencastproject.index.service.impl.index.event;
 
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.util.RequestUtils;
 import org.opencastproject.ingest.api.IngestException;
@@ -33,6 +32,8 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.NotFoundException;
@@ -441,8 +442,8 @@ public class EventHttpServletRequest {
             collection.removeField(field);
             try {
               JSONArray subjects = (JSONArray) parser.parse(fields.get(key));
-              collection.addField(
-                      MetadataField.copyMetadataFieldWithValue(field, StringUtils.join(subjects.iterator(), ",")));
+              collection.addField(MetadataJson
+                      .copyWithDifferentJsonValue(field, StringUtils.join(subjects.iterator(), ",")));
             } catch (ParseException e) {
               throw new IllegalArgumentException(
                       String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
@@ -462,7 +463,7 @@ public class EventHttpServletRequest {
               newStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(), newStartDate.dayOfMonth().get());
             }
             collection.removeField(field);
-            collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(newStartDate.toDate())));
+            collection.addField(MetadataJson.copyWithDifferentJsonValue(field, sdf.format(newStartDate.toDate())));
           } else if ("startTime".equals(key)) {
             // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
             MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get("startDate");
@@ -482,7 +483,7 @@ public class EventHttpServletRequest {
                       newStartDate.millisOfSecond().get());
             }
             collection.removeField(field);
-            collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(newStartDate.toDate())));
+            collection.addField(MetadataJson.copyWithDifferentJsonValue(field, sdf.format(newStartDate.toDate())));
           } else {
             MetadataField<?> field = collection.getOutputFields().get(key);
             if (field == null) {
@@ -490,7 +491,7 @@ public class EventHttpServletRequest {
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
             }
             collection.removeField(field);
-            collection.addField(MetadataField.copyMetadataFieldWithValue(field, fields.get(key)));
+            collection.addField(MetadataJson.copyWithDifferentJsonValue(field, fields.get(key)));
           }
         }
       }
@@ -518,7 +519,7 @@ public class EventHttpServletRequest {
         utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         String currentDate = utcDateFormat.format(new DateTime(DateTimeZone.UTC).toDate());
         commonEventCollection.removeField(startDate);
-        commonEventCollection.addField(MetadataField.copyMetadataFieldWithValue(startDate, currentDate));
+        commonEventCollection.addField(MetadataJson.copyWithDifferentJsonValue(startDate, currentDate));
       }
     }
   }

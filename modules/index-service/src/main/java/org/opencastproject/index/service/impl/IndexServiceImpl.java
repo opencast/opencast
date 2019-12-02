@@ -43,7 +43,6 @@ import org.opencastproject.event.comment.EventCommentParser;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.MetadataUtils;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
@@ -92,7 +91,8 @@ import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
-import org.opencastproject.metadata.dublincore.MetadataParsingException;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -829,12 +829,7 @@ public class IndexServiceImpl implements IndexService {
     AccessControlList acl = getAccessControlList(metadataJson);
 
     MetadataList metadataList = getMetadataListWithAllEventCatalogUIAdapters();
-    try {
-      metadataList.fromJSON(allEventMetadataJson.toJSONString());
-    } catch (MetadataParsingException e) {
-      logger.warn("Unable to parse event metadata {}", allEventMetadataJson.toJSONString());
-      throw new IllegalArgumentException("Unable to parse metadata set");
-    }
+    MetadataJson.fillListFromJson(metadataList, allEventMetadataJson);
 
     EventHttpServletRequest eventHttpServletRequest = new EventHttpServletRequest();
     eventHttpServletRequest.setAcl(acl);
@@ -1206,14 +1201,15 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public MetadataList updateAllEventMetadata(String id, String metadataJSON, AbstractSearchIndex index)
+  public MetadataList updateAllEventMetadata(
+          final String id, final String metadataJSON, final AbstractSearchIndex index)
           throws IllegalArgumentException, IndexServiceException, NotFoundException, SearchIndexException,
           UnauthorizedException {
-    MetadataList metadataList;
+    final MetadataList metadataList;
     try {
       metadataList = getMetadataListWithAllEventCatalogUIAdapters();
-      metadataList.fromJSON(metadataJSON);
-    } catch (Exception e) {
+      MetadataJson.fillListFromJson(metadataList, (JSONArray) new JSONParser().parse(metadataJSON));
+    } catch (final org.json.simple.parser.ParseException e) {
       logger.warn("Not able to parse the event metadata {}:", metadataJSON, e);
       throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
     }
@@ -1320,7 +1316,7 @@ public class IndexServiceImpl implements IndexService {
           updateWorkflowInstance(instance);
         } catch (WorkflowException e) {
           logger.error("Unable to update workflow event {} with metadata {} because",
-                  id, RestUtils.getJsonStringSilent(metadataList.toJSON()), e);
+                  id, RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
           throw new IndexServiceException("Unable to update workflow event " + id);
         }
         break;
@@ -1333,7 +1329,7 @@ public class IndexServiceImpl implements IndexService {
                   Opt.some(mediaPackage), Opt.<Map<String, String>> none(), Opt.<Map<String, String>> none());
         } catch (SchedulerException e) {
           logger.error("Unable to update scheduled event {} with metadata {} because",
-                  id, RestUtils.getJsonStringSilent(metadataList.toJSON()), e);
+                  id, RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
           throw new IndexServiceException("Unable to update scheduled event " + id);
         }
         break;
@@ -1949,14 +1945,8 @@ public class IndexServiceImpl implements IndexService {
       dc.set(new EName(DublinCores.OC_PROPERTY_NS_URI, entry.getKey()), entry.getValue());
     }
 
-    MetadataList metadataList;
-    try {
-      metadataList = getMetadataListWithAllSeriesCatalogUIAdapters();
-      metadataList.fromJSON(seriesMetadataJson.toJSONString());
-    } catch (Exception e) {
-      logger.warn("Not able to parse the series metadata {}:", seriesMetadataJson, e);
-      throw new IllegalArgumentException("Not able to parse the series metadata");
-    }
+    final MetadataList metadataList = getMetadataListWithAllSeriesCatalogUIAdapters();
+    MetadataJson.fillListFromJson(metadataList, seriesMetadataJson);
 
     Opt<MetadataCollection> seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES.toString());
     if (seriesMetadata.isSome()) {
@@ -2119,13 +2109,16 @@ public class IndexServiceImpl implements IndexService {
     }
   }
 
-  private MetadataList updateSeriesMetadata(String seriesID, String metadataJSON, AbstractSearchIndex index,
-          MetadataList metadataList)
-                  throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException {
+  private MetadataList updateSeriesMetadata(
+          final String seriesID,
+          final String metadataJSON,
+          final AbstractSearchIndex index,
+          final MetadataList metadataList)
+          throws IllegalArgumentException, IndexServiceException, NotFoundException {
     checkSeriesExists(seriesID, index);
     try {
-      metadataList.fromJSON(metadataJSON);
-    } catch (Exception e) {
+      MetadataJson.fillListFromJson(metadataList, (JSONArray) new JSONParser().parse(metadataJSON));
+    } catch (final org.json.simple.parser.ParseException e) {
       logger.warn("Not able to parse the event metadata {}:", metadataJSON, e);
       throw new IllegalArgumentException("Not able to parse the event metadata");
     }

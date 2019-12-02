@@ -22,6 +22,7 @@
 package org.opencastproject.index.service.catalog.adapter;
 
 import org.opencastproject.mediapackage.EName;
+import org.opencastproject.metadata.dublincore.AbstractMetadataCollection;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;

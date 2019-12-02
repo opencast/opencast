@@ -75,8 +75,6 @@ import org.opencastproject.event.comment.EventCommentReply;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
-import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -107,6 +105,9 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
+import org.opencastproject.metadata.dublincore.MetadataList.Locked;
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.Recording;
@@ -1151,7 +1152,7 @@ public abstract class AbstractEventEndpoint {
     if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState)))
       metadataList.setLocked(Locked.WORKFLOW_RUNNING);
 
-    return okJson(metadataList.toJSON());
+    return okJson(MetadataJson.listToJson(metadataList, true));
   }
 
   @POST  // use POST instead of GET because of a possibly long list of ids
@@ -1263,7 +1264,7 @@ public abstract class AbstractEventEndpoint {
     }
 
     return okJson(obj(
-      f("metadata", mergedMetadata.toJSON()),
+      f("metadata", MetadataJson.collectionToJson(mergedMetadata, true)),
       f("notFound", JSONUtils.setToJSON(eventsNotFound)),
       f("runningWorkflow", JSONUtils.setToJSON(eventsWithRunningWorkflow)),
       f("merged", JSONUtils.setToJSON(eventsMerged))
@@ -1453,7 +1454,7 @@ public abstract class AbstractEventEndpoint {
 
     try {
       MetadataList metadataList = getIndexService().updateAllEventMetadata(id, metadataJSON, getIndex());
-      return okJson(metadataList.toJSON());
+      return okJson(MetadataJson.listToJson(metadataList, true));
     } catch (IllegalArgumentException e) {
       return badRequest(String.format("Event %s metadata can't be updated.: %s", id, e.getMessage()));
     }
@@ -2066,7 +2067,7 @@ public abstract class AbstractEventEndpoint {
 
       metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), collection);
     }
-    return okJson(metadataList.toJSON());
+    return okJson(MetadataJson.listToJson(metadataList, true));
   }
 
   @GET
