@@ -889,9 +889,9 @@ public class IndexServiceImpl implements IndexService {
     }
 
     MetadataField<?> startDate = eventMetadata.getOutputFields().get("startDate");
-    if (startDate != null && startDate.isUpdated() && startDate.getValue().isSome()) {
-      SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(startDate.getPattern().get());
-      currentStartDate = sdf.parse((String) startDate.getValue().get());
+    if (startDate != null && startDate.isUpdated() && startDate.getValue() != null) {
+      SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(startDate.getPattern());
+      currentStartDate = sdf.parse((String) startDate.getValue());
     } else if (currentStartDate != null) {
       eventMetadata.removeField(startDate);
       MetadataField<String> newStartDate = new MetadataField(startDate);
@@ -905,7 +905,7 @@ public class IndexServiceImpl implements IndexService {
     // the startDate is used to update the DublinCore catalog PROPERTY_CREATED field,
     // event, and mediapackage start fields.
     MetadataField<?> created = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
-    if (created != null && (!created.isUpdated() || created.getValue().isNone())) {
+    if (created != null && (!created.isUpdated() || created.getValue() == null)) {
       eventMetadata.removeField(created);
       MetadataField<String> newCreated = new MetadataField(created);
       if (currentStartDate != null) {

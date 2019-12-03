@@ -152,8 +152,8 @@ public class EventHttpServletRequest {
           HttpServletRequest request,
           IngestService ingestService,
           List<EventCatalogUIAdapter> eventCatalogUIAdapters,
-          Opt<String> startDatePattern,
-          Opt<String> startTimePattern)
+          String startDatePattern,
+          String startTimePattern)
                   throws IndexServiceException {
     EventHttpServletRequest eventHttpServletRequest = new EventHttpServletRequest();
     try {
@@ -240,8 +240,8 @@ public class EventHttpServletRequest {
                                    EventHttpServletRequest eventHttpServletRequest,
                                    FileItemStream item,
                                    String fieldName,
-                                   Opt<String> startDatePattern,
-                                   Opt<String> startTimePattern)
+                                   String startDatePattern,
+                                   String startTimePattern)
                   throws IOException, NotFoundException {
     if (METADATA_JSON_KEY.equals(fieldName)) {
       String metadata = Streams.asString(item.openStream());
@@ -321,8 +321,8 @@ public class EventHttpServletRequest {
           Event event,
           HttpServletRequest request,
           List<EventCatalogUIAdapter> eventCatalogUIAdapters,
-          Opt<String> startDatePattern,
-          Opt<String> startTimePattern)
+          String startDatePattern,
+          String startTimePattern)
                   throws IllegalArgumentException, IndexServiceException, NotFoundException {
     EventHttpServletRequest eventHttpServletRequest = new EventHttpServletRequest();
     if (ServletFileUpload.isMultipartContent(request)) {
@@ -400,7 +400,11 @@ public class EventHttpServletRequest {
    * @throws NotFoundException
    *           Thrown if unable to find the catalog or field that the json refers to.
    */
-  protected static MetadataList deserializeMetadataList(String json, List<EventCatalogUIAdapter> catalogAdapters, Opt<String> startDatePattern, Opt<String> startTimePattern)
+  protected static MetadataList deserializeMetadataList(
+          String json,
+          List<EventCatalogUIAdapter> catalogAdapters,
+          String startDatePattern,
+          String startTimePattern)
           throws ParseException, NotFoundException, java.text.ParseException {
     MetadataList metadataList = new MetadataList();
     JSONParser parser = new JSONParser();
@@ -455,11 +459,11 @@ public class EventHttpServletRequest {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
             }
-            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startDatePattern.getOr(field.getPattern().get()));
-            SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
+            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startDatePattern == null ? field.getPattern() : startDatePattern);
+            SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
             DateTime newStartDate = new DateTime(apiSdf.parse(fields.get(key)), DateTimeZone.UTC);
-            if (field.getValue().isSome()) {
-              DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+            if (field.getValue() != null) {
+              DateTime oldStartDate = new DateTime(sdf.parse(field.getValue()), DateTimeZone.UTC);
               newStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(), newStartDate.dayOfMonth().get());
             }
             collection.removeField(field);
@@ -471,11 +475,11 @@ public class EventHttpServletRequest {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", "startDate", flavorString));
             }
-            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startTimePattern.getOr("HH:mm"));
-            SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
+            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startTimePattern == null ? "HH:mm" : startTimePattern);
+            SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
             DateTime newStartDate = new DateTime(apiSdf.parse(fields.get(key)), DateTimeZone.UTC);
-            if (field.getValue().isSome()) {
-              DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+            if (field.getValue() != null) {
+              DateTime oldStartDate = new DateTime(sdf.parse(field.getValue()), DateTimeZone.UTC);
               newStartDate = oldStartDate.withTime(
                       newStartDate.hourOfDay().get(),
                       newStartDate.minuteOfHour().get(),
@@ -515,7 +519,7 @@ public class EventHttpServletRequest {
 
       MetadataField<?> startDate = commonEventCollection.getOutputFields().get("startDate");
       if (!startDate.isUpdated()) {
-        SimpleDateFormat utcDateFormat = new SimpleDateFormat(startDate.getPattern().get());
+        SimpleDateFormat utcDateFormat = new SimpleDateFormat(startDate.getPattern());
         utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         String currentDate = utcDateFormat.format(new DateTime(DateTimeZone.UTC).toDate());
         commonEventCollection.removeField(startDate);

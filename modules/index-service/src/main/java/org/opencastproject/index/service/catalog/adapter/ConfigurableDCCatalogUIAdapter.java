@@ -96,9 +96,9 @@ public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter
    */
   private String getCollectionDefault(MetadataField<?> metadataField,
           ListProvidersService listProvidersService) {
-    if (listProvidersService != null && metadataField.getListprovider().isSome()) {
+    if (listProvidersService != null && metadataField.getListprovider() != null) {
       try {
-        return listProvidersService.getDefault(metadataField.getListprovider().get());
+        return listProvidersService.getDefault(metadataField.getListprovider());
 
       } catch (ListProviderException ex) {
         // failed to get default property on list-provider-service
@@ -135,8 +135,8 @@ public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter
     for (MetadataField<?> metadataField: dublinCoreProperties.values()) {
 
       String namespace = DublinCore.TERMS_NS_URI;
-      if (metadataField.getNamespace().isSome()) {
-        namespace = metadataField.getNamespace().get();
+      if (metadataField.getNamespace() != null) {
+        namespace = metadataField.getNamespace();
       }
 
       String metadataFieldKey = namespace.toLowerCase() + ":" + metadataField.getInputID().toLowerCase();

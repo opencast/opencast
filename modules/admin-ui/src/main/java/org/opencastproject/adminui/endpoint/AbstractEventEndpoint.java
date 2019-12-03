@@ -1144,7 +1144,7 @@ public abstract class AbstractEventEndpoint {
     if (getOnlySeriesWithWriteAccessEventModal()) {
       MetadataField<?> seriesField = metadataCollection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
       Map<String, String> seriesWithWriteAccess = getSeriesService().getUserSeriesByAccess(true);
-      seriesField.setCollection(Opt.some(seriesWithWriteAccess));
+      seriesField.setCollection(seriesWithWriteAccess);
     }
     metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), metadataCollection);
 
@@ -1227,7 +1227,7 @@ public abstract class AbstractEventEndpoint {
       if (getOnlySeriesWithWriteAccessEventModal()) {
         MetadataField<?> seriesField =
           metadataCollection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-        seriesField.setCollection(Opt.some(seriesWithWriteAccess));
+        seriesField.setCollection(seriesWithWriteAccess);
       }
 
       eventsMerged.add(eventId);
@@ -2051,8 +2051,8 @@ public abstract class AbstractEventEndpoint {
       if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_PUBLISHER.getLocalName())) {
         MetadataField<String> publisher = (MetadataField<String>) collection.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
         Map<String, String> users = new HashMap<String, String>();
-        if (!publisher.getCollection().isNone()) {
-          users = publisher.getCollection().get();
+        if (publisher.getCollection() != null) {
+          users = publisher.getCollection();
         }
         String loggedInUser = getSecurityService().getUser().getName();
         if (!users.containsKey(loggedInUser)) {
@@ -2061,9 +2061,8 @@ public abstract class AbstractEventEndpoint {
         publisher.setValue(loggedInUser);
       }
 
-      Map<String, String> seriesAccessEventModal = getSeriesService().getUserSeriesByAccess(getOnlySeriesWithWriteAccessEventModal());
-      Opt<Map<String, String>> map = Opt.some(seriesAccessEventModal);
-      collection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName()).setCollection(map);
+      collection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName())
+        .setCollection(getSeriesService().getUserSeriesByAccess(getOnlySeriesWithWriteAccessEventModal()));
 
       metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), collection);
     }

@@ -103,10 +103,10 @@ public final class MetadataJson {
   private MetadataJson() {
   }
 
-  private static SimpleDateFormat getSimpleDateFormatter(final Opt<String> pattern) {
+  private static SimpleDateFormat getSimpleDateFormatter(final String pattern) {
     final SimpleDateFormat dateFormat;
-    if (pattern.isSome() && StringUtils.isNotBlank(pattern.get())) {
-      dateFormat = new SimpleDateFormat(pattern.get());
+    if (StringUtils.isNotBlank(pattern)) {
+      dateFormat = new SimpleDateFormat(pattern);
     } else {
       dateFormat = new SimpleDateFormat();
     }
@@ -114,23 +114,23 @@ public final class MetadataJson {
     return dateFormat;
   }
 
-  private static <T> JValue valueToJson(final Opt<T> rawValue, final MetadataField.Type type, final Opt<String> pattern) {
+  private static <T> JValue valueToJson(final T rawValue, final MetadataField.Type type, final String pattern) {
     switch (type) {
       case BOOLEAN:
-        if (rawValue.isNone())
+        if (rawValue == null)
           return Jsons.BLANK;
-        return v(rawValue.get(), Jsons.BLANK);
+        return v(rawValue, Jsons.BLANK);
       case DATE: {
-        if (rawValue.isNone())
+        if (rawValue == null)
           return Jsons.BLANK;
         final SimpleDateFormat dateFormat = getSimpleDateFormatter(pattern);
-        return v(dateFormat.format((Date) rawValue.get()), Jsons.BLANK);
+        return v(dateFormat.format((Date) rawValue), Jsons.BLANK);
       }
       case DURATION: {
-        if (rawValue.isNone())
+        if (rawValue == null)
           return Jsons.BLANK;
         long returnValue = 0L;
-        final String value = (String) rawValue.get();
+        final String value = (String) rawValue;
         final DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value);
         if (period != null && period.hasStart() && period.hasEnd()) {
           returnValue = period.getEnd().getTime() - period.getStart().getTime();
@@ -145,20 +145,20 @@ public final class MetadataJson {
       }
       case ITERABLE_TEXT:
       case MIXED_TEXT: {
-        if (rawValue.isNone())
+        if (rawValue == null)
           return arr();
 
         final List<JValue> list = new ArrayList<>();
-        if (rawValue.get() instanceof String) {
+        if (rawValue instanceof String) {
           // The value is a string so we need to split it.
-          final String stringVal = (String) rawValue.get();
+          final String stringVal = (String) rawValue;
           for (final String entry : stringVal.split(",")) {
             if (StringUtils.isNotBlank(entry))
               list.add(v(entry, Jsons.BLANK));
           }
         } else {
           // The current value is just an iterable string.
-          for (final Object v : (Iterable<String>)rawValue.get()) {
+          for (final Object v : (Iterable<String>)rawValue) {
             list.add(v(v, Jsons.BLANK));
           }
         }
@@ -168,16 +168,16 @@ public final class MetadataJson {
       case ORDERED_TEXT:
       case TEXT_LONG:
       case TEXT:
-        return v(((Opt<String>) rawValue).getOr(""));
+        return v(rawValue == null ? "" : (String)rawValue);
       case LONG:
-        if (rawValue.isNone())
+        if (rawValue == null)
           return Jsons.BLANK;
-        return v(rawValue.get().toString());
+        return v(rawValue.toString());
       case START_DATE: {
-        if (rawValue.isNone())
+        if (rawValue == null)
           return Jsons.BLANK;
 
-        final String value = (String) rawValue.get();
+        final String value = (String) rawValue;
 
         if (StringUtils.isBlank(value))
           return Jsons.BLANK;
@@ -202,10 +202,10 @@ public final class MetadataJson {
         }
       }
       case START_TIME: {
-        if (rawValue.isNone())
+        if (rawValue == null)
           return Jsons.BLANK;
 
-        final String value = (String) rawValue.get();
+        final String value = (String) rawValue;
 
         if (StringUtils.isBlank(value))
           return Jsons.BLANK;
@@ -385,21 +385,21 @@ public final class MetadataJson {
     values.put(JSON_KEY_READONLY, f(JSON_KEY_READONLY, v(f.isReadOnly())));
     values.put(JSON_KEY_REQUIRED, f(JSON_KEY_REQUIRED, v(f.isRequired())));
 
-    if (f.getCollection().isSome())
-      values.put(JSON_KEY_COLLECTION, f(JSON_KEY_COLLECTION, mapToJson(f.getCollection().get())));
-    else if (f.getCollectionID().isSome())
-      values.put(JSON_KEY_COLLECTION, f(JSON_KEY_COLLECTION, v(f.getCollectionID().get())));
-    if (f.isTranslatable().isSome())
-      values.put(JSON_KEY_TRANSLATABLE, f(JSON_KEY_TRANSLATABLE, v(f.isTranslatable().get())));
-    if (f.getDelimiter().isSome())
-      values.put(JSON_KEY_DELIMITER, f(JSON_KEY_DELIMITER, v(f.getDelimiter().get())));
-    if (f.hasDifferentValues().isSome())
-      values.put(JSON_KEY_DIFFERENT_VALUES, f(JSON_KEY_DIFFERENT_VALUES, v(f.hasDifferentValues().get())));
+    if (f.getCollection() != null)
+      values.put(JSON_KEY_COLLECTION, f(JSON_KEY_COLLECTION, mapToJson(f.getCollection())));
+    else if (f.getCollectionID() != null)
+      values.put(JSON_KEY_COLLECTION, f(JSON_KEY_COLLECTION, v(f.getCollectionID())));
+    if (f.isTranslatable() != null)
+      values.put(JSON_KEY_TRANSLATABLE, f(JSON_KEY_TRANSLATABLE, v(f.isTranslatable())));
+    if (f.getDelimiter() != null)
+      values.put(JSON_KEY_DELIMITER, f(JSON_KEY_DELIMITER, v(f.getDelimiter())));
+    if (f.hasDifferentValues() != null)
+      values.put(JSON_KEY_DIFFERENT_VALUES, f(JSON_KEY_DIFFERENT_VALUES, v(f.hasDifferentValues())));
     return obj(values);
   }
 
   public static <T> MetadataField<T> copyWithDifferentJsonValue(final MetadataField<T> t, final String v) {
-    final MetadataField<T> copy = new MetadataField<T>(t);
+    final MetadataField<T> copy = new MetadataField<>(t);
     copy.setValue((T) valueFromJson(v, copy));
     return copy;
   }
@@ -409,7 +409,7 @@ public final class MetadataJson {
             .collect(Collectors.toList()));
   }
 
-  public static void fillCollectionFromJson(final MetadataCollection collection, final Object json) {
+  private static void fillCollectionFromJson(final MetadataCollection collection, final Object json) {
     if (!(json instanceof  JSONArray))
       throw new IllegalArgumentException("couldn't fill metadata collection, didn't get an array");
 
@@ -451,7 +451,7 @@ public final class MetadataJson {
     }
   }
 
-  public static JValue listToJson(final MetadataList metadataList, boolean withOrderedText) {
+  public static JValue listToJson(final MetadataList metadataList, final boolean withOrderedText) {
     final List<JValue> catalogs = new ArrayList<>();
     for (final Map.Entry<String, Tuple<String, MetadataCollection>> metadata : metadataList) {
       final List<Field> fields = new ArrayList<>();

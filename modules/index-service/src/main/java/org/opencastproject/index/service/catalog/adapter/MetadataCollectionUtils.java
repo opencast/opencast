@@ -29,7 +29,6 @@ import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.common.collect.Iterables;
 
 import org.apache.commons.lang3.StringUtils;
@@ -50,36 +49,32 @@ public final class MetadataCollectionUtils {
 
   }
 
-  private static Opt<Boolean> getCollectionIsTranslatable(
+  private static Boolean getCollectionIsTranslatable(
           final MetadataField<?> metadataField,
           final ListProvidersService listProvidersService) {
-    if (listProvidersService != null && metadataField.getListprovider().isSome()) {
+    if (listProvidersService != null && metadataField.getListprovider() != null) {
       try {
-        final boolean isTranslatable = listProvidersService.isTranslatable(metadataField.getListprovider().get());
-        return Opt.some(isTranslatable);
+        return listProvidersService.isTranslatable(metadataField.getListprovider());
       } catch (final ListProviderException ex) {
         // failed to get is-translatable property on list-provider-service
         // as this field is optional, it is fine to pass here
       }
     }
-    return Opt.none();
+    return null;
   }
 
-  private static Opt<Map<String, String>> getCollection(
+  private static Map<String, String> getCollection(
           final MetadataField<?> metadataField,
           final ListProvidersService listProvidersService) {
     try {
-      if (listProvidersService != null && metadataField.getListprovider().isSome()) {
-        final Map<String, String> collection = listProvidersService.getList(metadataField.getListprovider().get(),
+      if (listProvidersService != null && metadataField.getListprovider() != null) {
+        return listProvidersService.getList(metadataField.getListprovider(),
                 new ResourceListQueryImpl(), true);
-        if (collection != null) {
-          return Opt.some(collection);
-        }
       }
-      return Opt.none();
+      return null;
     } catch (final ListProviderException e) {
       logger.warn("Unable to set collection on metadata because", e);
-      return Opt.none();
+      return null;
     }
   }
 
@@ -113,14 +108,16 @@ public final class MetadataCollectionUtils {
         ((MetadataField<Boolean>)metadataField).setValue(Boolean.parseBoolean(Iterables.getLast(filteredValues)), false);
         break;
       case DATE:
-        if (metadataField.getPattern().isNone()) {
-          metadataField.setPattern(Opt.some("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+        if (metadataField.getPattern() == null) {
+          metadataField.setPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         }
         ((MetadataField<Date>)metadataField).setValue(EncodingSchemeUtils.decodeDate(Iterables.getLast(filteredValues)), false);
         break;
       case DURATION:
         final String value = Iterables.getLast(filteredValues);
         final DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value);
+        if (period == null)
+          throw new IllegalArgumentException("period couldn't be parsed: " + value);
         final long longValue = period.getEnd().getTime() - period.getStart().getTime();
         ((MetadataField<String>)metadataField).setValue(Long.toString(longValue), false);
         break;
@@ -132,8 +129,8 @@ public final class MetadataCollectionUtils {
         ((MetadataField<Long>)metadataField).setValue(Long.parseLong(Iterables.getLast(filteredValues)), false);
         break;
       case START_DATE:
-        if (metadataField.getPattern().isNone()) {
-          metadataField.setPattern(Opt.some("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+        if (metadataField.getPattern() == null) {
+          metadataField.setPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         }
         ((MetadataField<String>)metadataField).setValue(Iterables.getLast(filteredValues), false);
         break;

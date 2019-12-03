@@ -24,11 +24,8 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public final class ExternalMetadataUtils {
   private ExternalMetadataUtils() {
@@ -44,13 +41,21 @@ public final class ExternalMetadataUtils {
     // Change subject to subjects.
     MetadataField<?> subject = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     collection.removeField(subject);
-    MetadataField<Iterable<String>> newSubjects = MetadataField.createIterableStringMetadataField(subject.getInputID(),
-            Opt.some("subjects"), subject.getLabel(), subject.isReadOnly(), subject.isRequired(),
-            subject.isTranslatable(), subject.getCollection(), subject.getCollectionID(), subject.getDelimiter(),
-            subject.getOrder(), subject.getNamespace());
+    MetadataField<Iterable<String>> newSubjects = MetadataField.createIterableStringMetadataField(
+            subject.getInputID(),
+            "subjects",
+            subject.getLabel(),
+            subject.isReadOnly(),
+            subject.isRequired(),
+            subject.isTranslatable(),
+            subject.getCollection(),
+            subject.getCollectionID(),
+            subject.getDelimiter(),
+            subject.getOrder(),
+            subject.getNamespace());
     List<String> subjectNames = new ArrayList<String>();
-    if (subject.getValue().isSome()) {
-      subjectNames = com.entwinemedia.fn.Stream.$(subject.getValue().get().toString().split(",")).toList();
+    if (subject.getValue() != null) {
+      subjectNames = com.entwinemedia.fn.Stream.$(subject.getValue().toString().split(",")).toList();
     }
     newSubjects.setValue(subjectNames);
     collection.addField(newSubjects);
@@ -66,8 +71,8 @@ public final class ExternalMetadataUtils {
     // Change subject to subjects.
     List<MetadataField<?>> fields = metadata.getFields();
     for (MetadataField<?> f : fields) {
-      f.setCollection(Opt.<Map<String, String>> none());
-      f.setCollectionID(Opt.<String> none());
+      f.setCollection(null);
+      f.setCollectionID(null);
     }
   }
 }

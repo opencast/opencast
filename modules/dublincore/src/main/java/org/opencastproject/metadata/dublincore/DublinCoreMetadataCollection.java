@@ -21,8 +21,6 @@
 
 package org.opencastproject.metadata.dublincore;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -83,7 +81,7 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
     final ArrayList<MetadataField<?>> orderedFields = new ArrayList<>();
     final ArrayList<MetadataField<?>> unorderedFields = new ArrayList<>();
     for (final MetadataField<?> field : fieldsInOrder) {
-      if (field.getOrder().isSome()) {
+      if (field.getOrder() != null) {
         orderedFields.add(field);
       } else {
         unorderedFields.add(field);
@@ -91,21 +89,21 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
     }
 
     // Add the new field to either the ordered fields or the unordered fields.
-    if (metadata.getOrder().isSome()) {
+    if (metadata.getOrder() != null) {
       orderedFields.add(metadata);
     } else {
       unorderedFields.add(metadata);
     }
 
     // Sort the ordered elements so that early entries don't push later entries to the right
-    orderedFields.sort(Comparator.comparingInt(o -> o.getOrder().get()));
+    orderedFields.sort(Comparator.comparingInt(MetadataField::getOrder));
 
     // Add all the non-ordered elements to the collection
     fieldsInOrder = new ArrayList<>(unorderedFields);
 
     // Add all of the fields that have an index to their location starting at the lowest value.
     for (final MetadataField<?> orderedField : orderedFields) {
-      final Integer index = orderedField.getOrder().get() < fieldsInOrder.size() ? orderedField.getOrder().get()
+      final int index = orderedField.getOrder() < fieldsInOrder.size() ? orderedField.getOrder()
               : fieldsInOrder.size();
       fieldsInOrder.add(index, orderedField);
     }
@@ -147,13 +145,20 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
 
   @Override
   public void updateStringField(final MetadataField<?> current, final String value) {
-    if (current.getValue().isSome() && !(current.getValue().get() instanceof String)) {
+    if (current.getValue() != null && !(current.getValue() instanceof String)) {
       throw new IllegalArgumentException("Unable to update a field to a different type than String with this method!");
     }
     removeField(current);
-    final MetadataField<String> field = MetadataField.createTextMetadataField(current.getInputID(),
-            Opt.some(current.getOutputID()), current.getLabel(), current.isReadOnly(), current.isRequired(),
-            current.isTranslatable(), current.getCollection(), current.getCollectionID(), current.getOrder(),
+    final MetadataField<String> field = MetadataField.createTextMetadataField(
+            current.getInputID(),
+            current.getOutputID(),
+            current.getLabel(),
+            current.isReadOnly(),
+            current.isRequired(),
+            current.isTranslatable(),
+            current.getCollection(),
+            current.getCollectionID(),
+            current.getOrder(),
             current.getNamespace());
     field.setValue(value);
     addField(field);

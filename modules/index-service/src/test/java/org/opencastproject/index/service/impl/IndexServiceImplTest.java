@@ -791,21 +791,21 @@ public class IndexServiceImplTest {
     String org = "mh_default_org";
     MetadataCollection metadataCollection = new DublinCoreMetadataCollection();
     metadataCollection.addField(MetadataField.createTextMetadataField(
-            "title", Opt.some("title"), "EVENTS.EVENTS.DETAILS.METADATA.TITLE", false, true, Opt.none(), Opt.none(),
-            Opt.none(), Opt.none(), Opt.none()));
+            "title", "title", "EVENTS.EVENTS.DETAILS.METADATA.TITLE", false, true, null, null,
+            null, null, null));
     metadataCollection.addField(MetadataField.createTextLongMetadataField(
-            "creator", Opt.some("creator"), "EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS", false, false, Opt.none(),
-            Opt.none(), Opt.none(), Opt.none(), Opt.none()));
+            "creator", "creator", "EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS", false, false, null,
+            null, null, null, null));
     final MetadataField<String> seriesMetadataField = MetadataField.createTextMetadataField("isPartOf",
-            Opt.some("isPartOf"),
+            "isPartOf",
             "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
             false,
             false,
-            Opt.none(),
-            Opt.none(),
-            Opt.none(),
-            Opt.none(),
-            Opt.none());
+            null,
+            null,
+            null,
+            null,
+            null);
     seriesMetadataField.setValue("series-1");
     metadataCollection.addField(seriesMetadataField);
     MetadataList metadataList = new MetadataList();
@@ -987,8 +987,8 @@ public class IndexServiceImplTest {
 
   private MetadataField<Iterable<String>> createCreatorMetadataField(Iterable<String> value) {
     MetadataField<Iterable<String>> creator = MetadataField.createMetadataField(
-            DublinCore.PROPERTY_CREATOR.getLocalName(), Opt.none(), "creator", false, false, Opt.none(),
-            MetadataField.Type.TEXT, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none(), null);
+            DublinCore.PROPERTY_CREATOR.getLocalName(), null, "creator", false, false, null,
+            MetadataField.Type.TEXT, null, null, null, null, null, null);
     creator.setValue(value);
     return creator;
   }
