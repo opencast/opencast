@@ -31,8 +31,6 @@ import static org.opencastproject.util.persistence.PersistenceUtil.runUpdate;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Lazy;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.persistence.PersistenceUtil;
 
@@ -79,11 +77,7 @@ public final class ManagedAclEntity implements ManagedAcl {
   private String acl;
 
   @Transient
-  private Lazy<AccessControlList> parsedAcl = new Lazy<AccessControlList>(new Function0<AccessControlList>() {
-    @Override public AccessControlList apply() {
-      return parseAclSilent(acl);
-    }
-  });
+  private AccessControlList parsedAcl;
 
   @Column(name = "organization_id", nullable = false)
   private String organizationId;
@@ -109,7 +103,10 @@ public final class ManagedAclEntity implements ManagedAcl {
   }
 
   @Override public AccessControlList getAcl() {
-    return parsedAcl.value();
+    if (parsedAcl == null) {
+      parsedAcl = parseAclSilent(acl);
+    }
+    return parsedAcl;
   }
 
   @Override public String getOrganizationId() {

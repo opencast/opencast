@@ -154,6 +154,7 @@
               !org.HdrHistogram.*,
               !org.apache.kafka.clients.producer.*,
               !org.apache.lucene.*,
+              !javax.activation.*,
               !javax.annotation,
               !org.elasticsearch.geometry.*,
               !org.elasticsearch.secure_sm.*,

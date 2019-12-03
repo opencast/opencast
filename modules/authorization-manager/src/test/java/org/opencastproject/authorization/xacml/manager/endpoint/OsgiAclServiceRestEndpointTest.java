@@ -30,8 +30,7 @@ import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 import org.opencastproject.util.UrlSupport;
 
-import com.sun.jersey.api.core.ClassNamesResourceConfig;
-
+import org.glassfish.jersey.server.ResourceConfig;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.json.simple.JSONObject;
@@ -248,7 +247,7 @@ public class OsgiAclServiceRestEndpointTest {
   // --
 
   private static final RestServiceTestEnv env = testEnvForCustomConfig(TestRestService.BASE_URL,
-          new ClassNamesResourceConfig(TestRestService.class, NotFoundExceptionMapper.class));
+          new ResourceConfig(TestRestService.class, NotFoundExceptionMapper.class));
 
   @BeforeClass
   public static void oneTimeSetUp() throws Exception {
