@@ -441,8 +441,8 @@ public class EventsEndpoint implements ManagedService {
           @PathParam("eventId") String eventId) {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     try {
-      Opt<String> startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : Opt.none();
-      Opt<String> startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : Opt.none();
+      String startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : null;
+      String startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : null;
       for (final Event event : indexService.getEvent(eventId, externalIndex)) {
         EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.updateFromHttpServletRequest(event,
                 request, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
@@ -538,8 +538,8 @@ public class EventsEndpoint implements ManagedService {
   public Response createNewEvent(@HeaderParam("Accept") String acceptHeader, @Context HttpServletRequest request) {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     try {
-      Opt<String> startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : Opt.none();
-      Opt<String> startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : Opt.none();
+      String startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : null;
+      String startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : null;
       EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.createFromHttpServletRequest(request,
           ingestService, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
 
@@ -1118,20 +1118,20 @@ public class EventsEndpoint implements ManagedService {
     if (!collection.getOutputFields().containsKey("startDate")) return;
 
     MetadataField<String> oldStartDateField = (MetadataField<String>) collection.getOutputFields().get("startDate");
-    SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(oldStartDateField.getPattern().get());
-    Date startDate = sdf.parse(oldStartDateField.getValue().get());
+    SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(oldStartDateField.getPattern());
+    Date startDate = sdf.parse(oldStartDateField.getValue());
 
     if (configuredMetadataFields.containsKey("startDate")) {
       MetadataField<String> startDateField = (MetadataField<String>) configuredMetadataFields.get("startDate");
       startDateField = MetadataField.createTemporalStartDateMetadata(startDateField.getInputID(),
-              Opt.some(startDateField.getOutputID()),
+              startDateField.getOutputID(),
               startDateField.getLabel(),
               startDateField.isReadOnly(),
               startDateField.isRequired(),
-              startDateField.getPattern().getOr("yyyy-MM-dd"),
+              startDateField.getPattern() == null ? "yyyy-MM-dd" : startDateField.getPattern(),
               startDateField.getOrder(),
               startDateField.getNamespace());
-      sdf.applyPattern(startDateField.getPattern().get());
+      sdf.applyPattern(startDateField.getPattern());
       startDateField.setValue(sdf.format(startDate));
       collection.removeField(oldStartDateField);
       collection.addField(startDateField);
@@ -1141,14 +1141,14 @@ public class EventsEndpoint implements ManagedService {
       MetadataField<String> startTimeField = (MetadataField<String>) configuredMetadataFields.get("startTime");
       startTimeField = MetadataField.createTemporalStartTimeMetadata(
               startTimeField.getInputID(),
-              Opt.some(startTimeField.getOutputID()),
+              startTimeField.getOutputID(),
               startTimeField.getLabel(),
               startTimeField.isReadOnly(),
               startTimeField.isRequired(),
-              startTimeField.getPattern().getOr("HH:mm"),
+              startTimeField.getPattern() == null ? "HH:mm" : startTimeField.getPattern(),
               startTimeField.getOrder(),
               startTimeField.getNamespace());
-      sdf.applyPattern(startTimeField.getPattern().get());
+      sdf.applyPattern(startTimeField.getPattern());
       startTimeField.setValue(sdf.format(startDate));
       collection.addField(startTimeField);
     }
@@ -1311,13 +1311,14 @@ public class EventsEndpoint implements ManagedService {
           if (error.isSome()) {
             return error.get();
           }
-          String apiPattern = field.getPattern().get();
+          String apiPattern = field.getPattern();
           if (configuredMetadataFields.containsKey("startDate")) {
-            apiPattern = configuredMetadataFields.get("startDate").getPattern().getOr(apiPattern);
+            final String startDate = configuredMetadataFields.get("startDate").getPattern();
+            apiPattern = startDate == null ? apiPattern : startDate;
           }
           SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
-          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
-          DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
+          DateTime oldStartDate = new DateTime(sdf.parse(field.getValue()), DateTimeZone.UTC);
           DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
           DateTime updatedStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(), newStartDate.dayOfMonth().get());
           collection.removeField(field);
@@ -1332,11 +1333,12 @@ public class EventsEndpoint implements ManagedService {
           }
           String apiPattern = "HH:mm";
           if (configuredMetadataFields.containsKey("startTime")) {
-            apiPattern = configuredMetadataFields.get("startTime").getPattern().getOr(apiPattern);
+            final String startTime = configuredMetadataFields.get("startTime").getPattern();
+            apiPattern = startTime == null ? apiPattern : startTime;
           }
           SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
-          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
-          DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
+          DateTime oldStartDate = new DateTime(sdf.parse(field.getValue()), DateTimeZone.UTC);
           DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
           DateTime updatedStartDate = oldStartDate.withTime(
                   newStartDate.hourOfDay().get(),

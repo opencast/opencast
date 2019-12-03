@@ -126,7 +126,7 @@ public final class EventUtils {
         String recordingStartDate = event.getRecordingStartDate();
         if (StringUtils.isNotBlank(recordingStartDate)) {
           Date startDateTime = new Date(DateTimeSupport.fromUTC(recordingStartDate));
-          SimpleDateFormat sdf = new SimpleDateFormat(((MetadataField<String>)field).getPattern().get());
+          SimpleDateFormat sdf = new SimpleDateFormat(((MetadataField<String>)field).getPattern());
           sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
           field.setValue(sdf.format(startDateTime));
         }

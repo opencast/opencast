@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -80,11 +79,11 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
     }
 
     MetadataField<?> series = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-    if (series.getValue().isSome() && series.isUpdated()) {
-      if (isNotBlank(series.getValue().get().toString())) {
-        mediaPackage.setSeries(series.getValue().get().toString());
+    if (series.getValue() != null && series.isUpdated()) {
+      if (isNotBlank(series.getValue().toString())) {
+        mediaPackage.setSeries(series.getValue().toString());
         final Opt<String> seriesTitle = getSeriesTitle(series);
-        if (seriesTitle.isSome())
+        if (seriesTitle != null)
           mediaPackage.setSeriesTitle(seriesTitle.get());
       } else {
         mediaPackage.setSeries(null);
@@ -94,11 +93,11 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
 
     // Mediapackage start date is set by event metadata start date. The "created" metadata field is not used.
     MetadataField<?> startDate = abstractMetadata.getOutputFields().get("startDate");
-    if (startDate != null && startDate.getValue().isSome() && startDate.isUpdated()
-            && isNotBlank(startDate.getValue().get().toString())) {
+    if (startDate != null && startDate.getValue() != null && startDate.isUpdated()
+            && isNotBlank(startDate.getValue().toString())) {
       try {
-        SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(startDate.getPattern().get());
-        mediaPackage.setDate(sdf.parse((String) startDate.getValue().get()));
+        SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(startDate.getPattern());
+        mediaPackage.setDate(sdf.parse((String) startDate.getValue()));
       } catch (ParseException e) {
         logger.warn("Not able to parse start date {} to update media package {} because {}", startDate.getValue(),
                 mediaPackage.getIdentifier(), e);
@@ -108,14 +107,16 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
     // Update all the metadata related to the episode dublin core catalog
     MetadataField<?> title = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
     if (title != null && title.isUpdated()) {
-      mediaPackage.setTitle(title.getValue().get().toString());
+      mediaPackage.setTitle(title.getValue().toString());
     }
     return storeFields;
   }
 
   private Opt<String> getSeriesTitle(MetadataField<?> series) {
-    for (Map.Entry<String, String> e : series.getCollection().getOr(Collections.emptyMap()).entrySet()) {
-      if (e.getValue().equals(series.getValue().get().toString())) return Opt.some(e.getKey());
+    if (series.getCollection() == null)
+      return null;
+    for (Map.Entry<String, String> e : series.getCollection().entrySet()) {
+      if (e.getValue().equals(series.getValue().toString())) return Opt.some(e.getKey());
     }
     return Opt.none();
   }

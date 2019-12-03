@@ -444,7 +444,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     for (int i = 0; i < data.getLabels().size(); i++) {
       List<Object> values = new ArrayList<>();
       values.add(resourceId);
-      values.addAll(mdfs.stream().map(f -> f.getValue().getOr("")).collect(Collectors.toList()));
+      values.addAll(mdfs.stream().map(f -> f.getValue() == null ? "" : f.getValue()).collect(Collectors.toList()));
       values.add(formatDate(data.getLabels().get(i), dataResolution, zoneId));
       values.add(data.getValues().get(i));
       printer.printRecord(values.toArray());

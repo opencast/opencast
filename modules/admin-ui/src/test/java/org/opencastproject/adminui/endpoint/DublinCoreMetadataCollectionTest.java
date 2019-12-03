@@ -50,25 +50,25 @@ public class DublinCoreMetadataCollectionTest {
 
   @Before
   public void setUp() {
-    first = MetadataField.createTextMetadataField(FIRST_ID, Opt.none(), FIRST_ID, false, false,
-            Opt.none(), Opt.none(), Opt.none(), Opt.some(0),
-            Opt.none());
-    third = MetadataField.createTextMetadataField(THIRD_ID, Opt.none(), THIRD_ID, false, false,
-            Opt.none(), Opt.none(), Opt.none(), Opt.some(2),
-            Opt.none());
-    seventh = MetadataField.createTextMetadataField(SEVENTH_ID, Opt.none(), SEVENTH_ID, false, false,
-            Opt.none(), Opt.none(), Opt.none(), Opt.some(6),
-            Opt.none());
+    first = MetadataField.createTextMetadataField(FIRST_ID, null, FIRST_ID, false, false,
+            null, null, null, 0,
+            null);
+    third = MetadataField.createTextMetadataField(THIRD_ID, null, THIRD_ID, false, false,
+            null, null, null, 2,
+            null);
+    seventh = MetadataField.createTextMetadataField(SEVENTH_ID, null, SEVENTH_ID, false, false,
+            null, null, null, 6,
+            null);
 
-    unorderedOne = MetadataField.createTextMetadataField(UNORDERED_ONE_ID, Opt.none(), UNORDERED_ONE_ID,
-            false, false, Opt.none(), Opt.none(), Opt.none(),
-            Opt.none(), Opt.none());
-    unorderedTwo = MetadataField.createTextMetadataField(UNORDERED_TWO_ID, Opt.none(), UNORDERED_TWO_ID,
-            false, false, Opt.none(), Opt.none(), Opt.none(),
-            Opt.none(), Opt.none());
-    unorderedThree = MetadataField.createTextMetadataField(UNORDERED_THREE_ID, Opt.none(), UNORDERED_THREE_ID,
-            false, false, Opt.none(), Opt.none(), Opt.none(),
-            Opt.none(), Opt.none());
+    unorderedOne = MetadataField.createTextMetadataField(UNORDERED_ONE_ID, null, UNORDERED_ONE_ID,
+            false, false, null, null, null,
+            null, null);
+    unorderedTwo = MetadataField.createTextMetadataField(UNORDERED_TWO_ID, null, UNORDERED_TWO_ID,
+            false, false, null, null, null,
+            null, null);
+    unorderedThree = MetadataField.createTextMetadataField(UNORDERED_THREE_ID, null, UNORDERED_THREE_ID,
+            false, false, null, null, null,
+            null, null);
   }
 
   @Test
@@ -207,9 +207,9 @@ public class DublinCoreMetadataCollectionTest {
     collection.addField(third);
     collection.addField(seventh);
 
-    final MetadataField<String> newFirst = MetadataField.createTextMetadataField("New first", Opt.none(),
-            "New first", false, false, Opt.none(), Opt.none(), Opt.none(),
-            Opt.some(0), Opt.none());
+    final MetadataField<String> newFirst = MetadataField.createTextMetadataField("New first", null,
+            "New first", false, false, null, null, null,
+            0, null);
 
     collection.addField(newFirst);
 
@@ -234,9 +234,9 @@ public class DublinCoreMetadataCollectionTest {
     collection.addField(third);
     collection.addField(seventh);
 
-    final MetadataField<String> newFirst = MetadataField.createTextMetadataField("first", Opt.none(), "first",
-            false, false, Opt.none(), Opt.none(), Opt.none(), Opt.some(0),
-            Opt.none());
+    final MetadataField<String> newFirst = MetadataField.createTextMetadataField("first", null, "first",
+            false, false, null, null, null, 0,
+            null);
     final String value = "Hello";
     newFirst.setValue(value);
     collection.addField(newFirst);
@@ -246,8 +246,8 @@ public class DublinCoreMetadataCollectionTest {
     for (final MetadataField<?> field : collection.getFields()) {
       if (field.getInputID().equals(FIRST_ID)) {
         numberOfFirsts++;
-        if (field.getValue().isSome() && field.getValue().get() instanceof String) {
-          valueFound = Opt.some((String) field.getValue().get());
+        if (field.getValue() != null && field.getValue() instanceof String) {
+          valueFound = Opt.some((String) field.getValue());
         }
       }
     }
