@@ -32,11 +32,24 @@ import java.util.Map;
 /**
  * Abstract container for the metadata
  */
-public abstract class AbstractMetadataCollection implements MetadataCollection {
+public final class DublinCoreMetadataCollection implements MetadataCollection {
   /** The list containing all the metadata */
   private List<MetadataField<?>> fieldsInOrder = new ArrayList<>();
   private final Map<String, MetadataField<?>> inputFields = new HashMap<>();
   private final Map<String, MetadataField<?>> outputFields = new HashMap<>();
+
+  public DublinCoreMetadataCollection() {
+  }
+
+  @Override
+  public MetadataCollection getCopy() {
+    final MetadataCollection copiedCollection = new DublinCoreMetadataCollection();
+    for (final MetadataField field : getFields()) {
+      final MetadataField copiedField = new MetadataField(field);
+      copiedCollection.addField(copiedField);
+    }
+    return copiedCollection;
+  }
 
   @Override
   public Map<String, MetadataField<?>> getInputFields() {

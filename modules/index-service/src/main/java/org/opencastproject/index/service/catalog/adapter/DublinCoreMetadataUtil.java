@@ -22,10 +22,10 @@
 package org.opencastproject.index.service.catalog.adapter;
 
 import org.opencastproject.mediapackage.EName;
-import org.opencastproject.metadata.dublincore.AbstractMetadataCollection;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
@@ -63,12 +63,12 @@ public final class DublinCoreMetadataUtil {
   }
 
   /**
-   * Update a {@link DublinCoreCatalog} with the values contained within a {@link AbstractMetadataCollection}
+   * Update a {@link DublinCoreCatalog} with the values contained within a {@link DublinCoreMetadataCollection}
    *
    * @param dc
    *          The {@link DublinCoreCatalog} to update the values within.
    * @param metadata
-   *          The {@link AbstractMetadataCollection} data definitions and values to update the catalog with.
+   *          The {@link DublinCoreMetadataCollection} data definitions and values to update the catalog with.
    */
   public static void updateDublincoreCatalog(DublinCoreCatalog dc, MetadataCollection metadata) {
     for (MetadataField<?> field : metadata.getOutputFields().values()) {
