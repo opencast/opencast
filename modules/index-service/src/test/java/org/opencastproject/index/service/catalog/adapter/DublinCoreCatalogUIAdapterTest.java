@@ -39,6 +39,7 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.MetadataField;
@@ -259,23 +260,23 @@ public class DublinCoreCatalogUIAdapterTest {
 
     MetadataField<String> titleField = MetadataField.createTextMetadataField(title, Opt.some(title),
             "New Label for Title", true, false, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none());
-    dublinCoreMetadata.addField(titleField, expectedTitle, listProvidersService);
+    MetadataCollectionUtils.addField(dublinCoreMetadata,titleField, expectedTitle, listProvidersService);
     titleField.setUpdated(true);
 
     MetadataField<String> missingField = MetadataField.createTextMetadataField("missing", Opt.none(),
             "The Missing's Label", false, false, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none());
-    dublinCoreMetadata.addField(missingField, expectedMissing, listProvidersService);
+    MetadataCollectionUtils.addField(dublinCoreMetadata, missingField, expectedMissing, listProvidersService);
     missingField.setUpdated(true);
 
     MetadataField<String> durationField = MetadataField.createDurationMetadataField(temporal, Opt.some("duration"),
             label, true, true, Opt.none(), Opt.none());
-    dublinCoreMetadata.addField(durationField, "start=2016-03-01T09:27:35Z; end=2016-03-01T11:43:12Z; scheme=W3C-DTF;",
+    MetadataCollectionUtils.addField(dublinCoreMetadata, durationField, "start=2016-03-01T09:27:35Z; end=2016-03-01T11:43:12Z; scheme=W3C-DTF;",
             listProvidersService);
     durationField.setUpdated(true);
 
     MetadataField<String> startDate = MetadataField.createTemporalStartDateMetadata(temporal, Opt.some("startDate"),
             label, true, true, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Opt.none(), Opt.none());
-    dublinCoreMetadata.addField(startDate, "2016-03-01T09:27:35.000Z", listProvidersService);
+    MetadataCollectionUtils.addField(dublinCoreMetadata, startDate, "2016-03-01T09:27:35.000Z", listProvidersService);
     startDate.setUpdated(true);
 
     configurationDublinCoreCatalogUIAdapter.storeFields(mediapackage, dublinCoreMetadata);
@@ -323,7 +324,7 @@ public class DublinCoreCatalogUIAdapterTest {
 
   @Test
   public void testSetStartDateInputEmptyValueExpectsNoChange() throws IOException, URISyntaxException {
-    metadata.addField(new MetadataField<>(startDateMetadataField), "2013-10-29T19:35:19.000Z", listProvidersService);
+    MetadataCollectionUtils.addField(metadata, new MetadataField<>(startDateMetadataField), "2013-10-29T19:35:19.000Z", listProvidersService);
     DublinCoreMetadataUtil.setStartDate(dc, startDateMetadataField, temporalEname);
     List<DublinCoreValue> result = dc.get(temporalEname);
     assertEquals(1, result.size());
@@ -333,7 +334,7 @@ public class DublinCoreCatalogUIAdapterTest {
   @Test
   public void testSetTemporalStartDateInputNewValueExpectsChange() throws IOException, URISyntaxException {
     startDateMetadataField.setValue("2013-10-29T19:35:19.000Z");
-    metadata.addField(startDateMetadataField, "2013-10-29T19:35:19.000Z", listProvidersService);
+    MetadataCollectionUtils.addField(metadata, startDateMetadataField, "2013-10-29T19:35:19.000Z", listProvidersService);
     DublinCoreMetadataUtil.setStartDate(dc, startDateMetadataField, temporalEname);
     List<DublinCoreValue> result = dc.get(temporalEname);
     assertEquals(1, result.size());
@@ -342,7 +343,7 @@ public class DublinCoreCatalogUIAdapterTest {
 
   @Test
   public void testSetDurationInputEmptyValueExpectsNoChange() throws IOException, URISyntaxException {
-    metadata.addField(durationMetadataField, "", listProvidersService);
+    MetadataCollectionUtils.addField(metadata, durationMetadataField, "", listProvidersService);
     DublinCoreMetadataUtil.setStartDate(dc, startDateMetadataField, temporalEname);
     DublinCoreMetadataUtil.setDuration(dc, durationMetadataField, temporalEname);
     List<DublinCoreValue> result = dc.get(temporalEname);
@@ -352,7 +353,7 @@ public class DublinCoreCatalogUIAdapterTest {
 
   @Test
   public void testSetDurationInputNewValueExpectsChange() throws IOException, URISyntaxException {
-    metadata.addField(new MetadataField(durationMetadataField), CHANGED_DURATION_PERIOD, listProvidersService);
+    MetadataCollectionUtils.addField(metadata, new MetadataField(durationMetadataField), CHANGED_DURATION_PERIOD, listProvidersService);
     DublinCoreMetadataUtil.setDuration(dc, metadata.getOutputFields().get("duration"), temporalEname);
     List<DublinCoreValue> result = dc.get(temporalEname);
     assertEquals(1, result.size());
@@ -368,7 +369,7 @@ public class DublinCoreCatalogUIAdapterTest {
             Opt.some("startDate"), "START_DATE_LABEL", false, false, "yyyy-MM-dd", Opt.<Integer> none(),
             Opt.<String> none());
     DublinCoreMetadataCollection metadata = new DublinCoreMetadataCollection();
-    metadata.addField(startDate, "2014-11-01", listProvidersService);
+    MetadataCollectionUtils.addField(metadata, startDate, "2014-11-01", listProvidersService);
     DublinCoreMetadataUtil.updateDublincoreCatalog(catalog, metadata);
     logger.info("Catalog:" + catalog.toXmlString());
   }
