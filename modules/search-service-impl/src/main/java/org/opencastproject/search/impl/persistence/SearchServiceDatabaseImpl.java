@@ -176,6 +176,27 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   /**
    * {@inheritDoc}
    *
+   * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#countMediaPackages()
+   */
+  @Override
+  public int countMediaPackages() throws SearchServiceDatabaseException {
+    EntityManager em = emf.createEntityManager();
+    Query query = em.createNamedQuery("Search.getCount");
+    try {
+      Long total = (Long) query.getSingleResult();
+      return total.intValue();
+    } catch (Exception e) {
+      logger.error("Could not find number of mediapackages", e);
+      throw new SearchServiceDatabaseException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+
+  /**
+   * {@inheritDoc}
+   *
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getAllMediaPackages()
    */
   @Override

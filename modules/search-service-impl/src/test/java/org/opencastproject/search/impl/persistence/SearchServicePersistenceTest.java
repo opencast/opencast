@@ -96,8 +96,10 @@ public class SearchServicePersistenceTest {
 
   @Test
   public void testAdding() throws Exception {
-    Date modifictaionDate = new Date();
-    searchDatabase.storeMediaPackage(mediaPackage, accessControlList, modifictaionDate);
+    int mpCount = searchDatabase.countMediaPackages();
+    Date modificationDate = new Date();
+    searchDatabase.storeMediaPackage(mediaPackage, accessControlList, modificationDate);
+    Assert.assertEquals(searchDatabase.countMediaPackages(), mpCount + 1);
 
     Iterator<Tuple<MediaPackage, String>> mediaPackages = searchDatabase.getAllMediaPackages();
     while (mediaPackages.hasNext()) {
@@ -109,7 +111,7 @@ public class SearchServicePersistenceTest {
       Assert.assertEquals(accessControlList.getEntries().size(), acl.getEntries().size());
       Assert.assertEquals(accessControlList.getEntries().get(0), acl.getEntries().get(0));
       Assert.assertNull(searchDatabase.getDeletionDate(mediaPackageId));
-      Assert.assertEquals(modifictaionDate, searchDatabase.getModificationDate(mediaPackageId));
+      Assert.assertEquals(modificationDate, searchDatabase.getModificationDate(mediaPackageId));
       Assert.assertEquals(mediaPackage.getA(), searchDatabase.getMediaPackage(mediaPackageId));
       Assert.assertEquals(securityService.getOrganization().getId(), mediaPackage.getB());
       Assert.assertEquals(securityService.getOrganization().getId(), searchDatabase.getOrganizationId(mediaPackageId));
