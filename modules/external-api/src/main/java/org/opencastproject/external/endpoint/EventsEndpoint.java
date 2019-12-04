@@ -1098,10 +1098,10 @@ public class EventsEndpoint implements ManagedService {
         MetadataList actualList = metadataList.get();
 
         // API v1 should return a two separate fields for start date and start time. Since those fields were merged in index service, we have to split them up.
-        Opt<MetadataCollection> collection = actualList.getMetadataByFlavor("dublincore/episode");
-        final boolean withOrderedText = collection.isNone();
-        if (collection.isSome()) {
-          convertStartDateTimeToApiV1(collection.get());
+        final MetadataCollection collection = actualList.getMetadataByFlavor("dublincore/episode");
+        final boolean withOrderedText = collection == null;
+        if (collection != null) {
+          convertStartDateTimeToApiV1(collection);
         }
 
         return ApiResponses.Json.ok(requestedVersion, MetadataJson.listToJson(actualList, withOrderedText));
@@ -1123,14 +1123,10 @@ public class EventsEndpoint implements ManagedService {
 
     if (configuredMetadataFields.containsKey("startDate")) {
       MetadataField<String> startDateField = (MetadataField<String>) configuredMetadataFields.get("startDate");
-      startDateField = MetadataField.createTemporalStartDateMetadata(startDateField.getInputID(),
-              startDateField.getOutputID(),
-              startDateField.getLabel(),
-              startDateField.isReadOnly(),
-              startDateField.isRequired(),
-              startDateField.getPattern() == null ? "yyyy-MM-dd" : startDateField.getPattern(),
-              startDateField.getOrder(),
-              startDateField.getNamespace());
+      final String pattern = startDateField.getPattern() == null ? "yyyy-MM-dd" : startDateField.getPattern();
+      startDateField = new MetadataField<>(
+              startDateField);
+      startDateField.setPattern(pattern);
       sdf.applyPattern(startDateField.getPattern());
       startDateField.setValue(sdf.format(startDate));
       collection.removeField(oldStartDateField);
@@ -1139,15 +1135,9 @@ public class EventsEndpoint implements ManagedService {
 
     if (configuredMetadataFields.containsKey("startTime")) {
       MetadataField<String> startTimeField = (MetadataField<String>) configuredMetadataFields.get("startTime");
-      startTimeField = MetadataField.createTemporalStartTimeMetadata(
-              startTimeField.getInputID(),
-              startTimeField.getOutputID(),
-              startTimeField.getLabel(),
-              startTimeField.isReadOnly(),
-              startTimeField.isRequired(),
-              startTimeField.getPattern() == null ? "HH:mm" : startTimeField.getPattern(),
-              startTimeField.getOrder(),
-              startTimeField.getNamespace());
+      final String pattern = startTimeField.getPattern() == null ? "HH:mm" : startTimeField.getPattern();
+      startTimeField = new MetadataField<>(startTimeField);
+      startTimeField.setPattern(pattern);
       sdf.applyPattern(startTimeField.getPattern());
       startTimeField.setValue(sdf.format(startDate));
       collection.addField(startTimeField);

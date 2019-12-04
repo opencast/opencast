@@ -30,7 +30,6 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.util.data.Tuple;
 
-import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
@@ -444,10 +443,10 @@ public final class MetadataJson {
       if (value == null)
         continue;
 
-      final Opt<MetadataCollection> collection = metadataList.getMetadataByFlavor(flavor.toString());
-      if (collection.isNone())
+      final MetadataCollection collection = metadataList.getMetadataByFlavor(flavor.toString());
+      if (collection == null)
         continue;
-      MetadataJson.fillCollectionFromJson(collection.get(), value);
+      MetadataJson.fillCollectionFromJson(collection, value);
     }
   }
 

@@ -68,28 +68,28 @@ public class MetadataField<A> {
   /** The id of a collection to validate values against. */
   private String collectionID;
   /** The format to use for temporal date properties. */
-  private String pattern = null;
+  private String pattern;
   /** The delimiter used to display and parse list values. */
-  private String delimiter = null;
+  private String delimiter;
   /** The id of the field used to identify it in the dublin core. */
-  private String inputID;
+  private final String inputID;
   /** The i18n id for the label to show the property. */
-  private String label;
+  private final String label;
   /** The provider to populate the property with. */
-  private String listprovider = null;
+  private final String listprovider;
   /** The optional namespace of the field used if a field can be found in more than one namespace */
-  private String namespace;
+  private final String namespace;
   /**
    * In the order of properties where this property should be oriented in the UI i.e. 0 means the property should come
    * first, 1 means it should come second etc.
    */
-  private Integer order;
+  private final Integer order;
   /** The optional id of the field used to output for the ui, if not present will assume the same as the inputID. */
   private final String outputID;
   /** Whether the property should not be edited. */
   private boolean readOnly;
   /** Whether the property is required to update the metadata. */
-  private boolean required;
+  private final boolean required;
   /** The type of the metadata for example text, date etc. */
   private Type type;
 
@@ -148,10 +148,13 @@ public class MetadataField<A> {
    *          be none. This is also possible to use the collectionId parameter for that.
    * @param collectionID
    *          The id of the limit list of possible value that should be get through the resource endpoint.
+   * @param listprovider An optional list provider ID
+   * @param pattern Pattern for time/date fields
+   * @param delimiter Delimiter
    * @throws IllegalArgumentException
    *           if the id, label, type, valueToJSON parameters is/are null
    */
-  private MetadataField(
+  public MetadataField(
           final String inputID,
           final String outputID,
           final String label,
@@ -163,7 +166,10 @@ public class MetadataField<A> {
           final Map<String, String> collection,
           final String collectionID,
           final Integer order,
-          final String namespace) throws IllegalArgumentException {
+          final String namespace,
+          final String listprovider,
+          final String pattern,
+          final String delimiter) throws IllegalArgumentException {
     if (StringUtils.isBlank(inputID))
       throw new IllegalArgumentException("The metadata input id must not be null.");
     if (StringUtils.isBlank(label))
@@ -182,6 +188,9 @@ public class MetadataField<A> {
     this.collectionID = collectionID;
     this.order = order;
     this.namespace = namespace;
+    this.listprovider = listprovider;
+    this.pattern = pattern;
+    this.delimiter = delimiter;
   }
 
   /**
@@ -237,469 +246,7 @@ public class MetadataField<A> {
     return dateFormat;
   }
 
-  /**
-   * Create a metadata field based on a {@link Boolean}.
-   *
-   * @param inputID
-   *          The identifier of the new metadata field
-   * @param label
-   *          The label of the new metadata field
-   * @param readOnly
-   *          Define if the new metadata is or not a readonly field
-   * @param required
-   *          Define if the new metadata field is or not required
-   * @param order
-   *          The ui order for the new field, 0 at the top and progressively down from there.
-   * @return The new metadata field
-   *
-   */
-  private static MetadataField<Boolean> createBooleanMetadata(
-          final String inputID,
-          final String outputID,
-          final String label,
-          final boolean readOnly,
-          final boolean required,
-          final Integer order,
-          final String namespace) {
-
-    return new MetadataField<>(inputID,
-            outputID,
-            label,
-            readOnly,
-            required,
-            null,
-            null,
-            Type.BOOLEAN,
-            null,
-            null,
-            order,
-            namespace);
-  }
-
-  /**
-   * Create a metadata field based on a {@link Date}.
-   *
-   * @param inputID
-   *          The identifier of the new metadata field
-   * @param label
-   *          The label of the new metadata field
-   * @param readOnly
-   *          Define if the new metadata is or not a readonly field
-   * @param required
-   *          Define if the new metadata field is or not required
-   * @param pattern
-   *          The date pattern for {@link SimpleDateFormat}.
-   * @param order
-   *          The ui order for the new field, 0 at the top and progressively down from there.
-   * @return The new metadata field
-   *
-   */
-  public static MetadataField<Date> createDateMetadata(final String inputID, final String outputID, final String label,
-          final boolean readOnly, final boolean required, final String pattern, final Integer order, final String namespace) {
-
-    final MetadataField<Date> dateField = new MetadataField<>(inputID,
-            outputID,
-            label,
-            readOnly,
-            required,
-            null,
-            null,
-            Type.DATE,
-            null,
-            null,
-            order,
-            namespace);
-    if (StringUtils.isNotBlank(pattern)) {
-      dateField.setPattern(pattern);
-    }
-    return dateField;
-  }
-
-  public static MetadataField<String> createDurationMetadataField(
-          final String inputID,
-          final String outputID,
-          final String label,
-          final boolean readOnly,
-          final boolean required,
-          final Integer order,
-          final String namespace) {
-    return createDurationMetadataField(
-            inputID,
-            outputID,
-            label,
-            readOnly,
-            required,
-            null,
-            null,
-            null,
-            order,
-            namespace);
-  }
-
-  private static MetadataField<String> createDurationMetadataField(
-          final String inputID,
-          final String outputID,
-          final String label,
-          final boolean readOnly,
-          final boolean required,
-          final Boolean isTranslatable,
-          final Map<String, String> collection,
-          final String collectionId,
-          final Integer order,
-          final String namespace) {
-
-    return new MetadataField<>(inputID,
-            outputID,
-            label,
-            readOnly,
-            required,
-            "",
-            isTranslatable,
-            Type.DURATION,
-            collection,
-            collectionId,
-            order,
-            namespace);
-  }
-
-  /**
-   * Create a metadata field of type mixed iterable String
-   *
-   * @param inputID
-   *          The identifier of the new metadata field
-   * @param label
-   *          The label of the new metadata field
-   * @param readOnly
-   *          Define if the new metadata field can be or not edited
-   * @param required
-   *          Define if the new metadata field is or not required
-   * @param isTranslatable
-   *          If the field value is not human readable and should be translated before
-   * @param collection
-   *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
-   *          be none.
-   * @param order
-   *          The ui order for the new field, 0 at the top and progressively down from there.
-   * @return the new metadata field
-   */
-  private static MetadataField<Iterable<String>> createMixedIterableStringMetadataField(
-          final String inputID,
-          final String outputID,
-          final String label,
-          final boolean readOnly,
-          final boolean required,
-          final Boolean isTranslatable,
-          final Map<String, String> collection,
-          final String collectionId,
-          final String delimiter,
-          final Integer order,
-          final String namespace) {
-
-    final MetadataField<Iterable<String>> mixedField = new MetadataField<>(inputID,
-            outputID,
-            label,
-            readOnly,
-            required,
-            new ArrayList<>(),
-            isTranslatable,
-            Type.MIXED_TEXT,
-            collection,
-            collectionId,
-            order,
-            namespace);
-     mixedField.setDelimiter(delimiter);
-     return mixedField;
-  }
-
-  /**
-   * Create a metadata field of type iterable String
-   *
-   * @param inputID
-   *          The identifier of the new metadata field
-   * @param label
-   *          The label of the new metadata field
-   * @param readOnly
-   *          Define if the new metadata field can be or not edited
-   * @param required
-   *          Define if the new metadata field is or not required
-   * @param isTranslatable
-   *          If the field value is not human readable and should be translated before
-   * @param collection
-   *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
-   *          be none.
-   * @param order
-   *          The ui order for the new field, 0 at the top and progressively down from there.
-   * @return the new metadata field
-   */
-  public static MetadataField<Iterable<String>> createIterableStringMetadataField(
-          final String inputID,
-          final String outputID,
-          final String label,
-          final boolean readOnly,
-          final boolean required,
-          final Boolean isTranslatable,
-          final Map<String, String> collection,
-          final String collectionId,
-          final String delimiter,
-          final Integer order,
-          final String namespace) {
-
-    final MetadataField<Iterable<String>> iterableField = new MetadataField<>(
-            inputID,
-            outputID,
-            label,
-            readOnly,
-            required,
-            new ArrayList<>(),
-            isTranslatable,
-            Type.ITERABLE_TEXT,
-            collection,
-            collectionId,
-            order,
-            namespace);
-    iterableField.setDelimiter(delimiter);
-    return iterableField;
-  }
-
-  private static MetadataField<Long> createLongMetadataField(
-          final String inputID,
-          final String outputID,
-          final String label,
-          final boolean readOnly,
-          final boolean required,
-          final Boolean isTranslatable,
-          final Map<String, String> collection,
-          final String collectionId,
-          final Integer order,
-          final String namespace) {
-
-    return new MetadataField<>(inputID,
-            outputID,
-            label,
-            readOnly,
-            required,
-            0L,
-            isTranslatable,
-            Type.TEXT,
-            collection,
-            collectionId,
-            order,
-            namespace);
-  }
-
-  private static MetadataField<String> createTemporalMetadata(
-          final String inputID,
-          final String outputID,
-          final String label,
-          final boolean readOnly,
-          final boolean required,
-          final String pattern,
-          final Type type,
-          final Integer order,
-          final String namespace) {
-    if (StringUtils.isBlank(pattern)) {
-      throw new IllegalArgumentException(
-              "For temporal metadata field " + inputID + " of type " + type + " there needs to be a pattern.");
-    }
-
-    final MetadataField<String> temporalStart = new MetadataField<>(inputID,
-            outputID,
-            label,
-            readOnly,
-            required,
-            null,
-            null,
-            type,
-            null,
-            null,
-            order,
-            namespace);
-    temporalStart.setPattern(pattern);
-
-    return temporalStart;
-  }
-
-  public static MetadataField<String> createTemporalStartDateMetadata(final String inputID, final String outputID,
-          final String label, final boolean readOnly, final boolean required, final String pattern, final Integer order,
-          final String namespace) {
-    return createTemporalMetadata(inputID, outputID, label, readOnly, required, pattern, Type.START_DATE,
-            order, namespace);
-  }
-
-  public static MetadataField<String> createTemporalStartTimeMetadata(final String inputID, final String outputID,
-          final String label, final boolean readOnly, final boolean required, final String pattern, final Integer order,
-          final String namespace) {
-    return createTemporalMetadata(inputID, outputID, label, readOnly, required, pattern, Type.START_TIME,
-            order, namespace);
-  }
-
-  /**
-   * Create a metadata field of type String with a single line in the front end.
-   *
-   * @param inputID
-   *          The identifier of the new metadata field
-   * @param label
-   *          The label of the new metadata field
-   * @param readOnly
-   *          Define if the new metadata field can be or not edited
-   * @param required
-   *          Define if the new metadata field is or not required
-   * @param isTranslatable
-   *          If the field value is not human readable and should be translated before
-   * @param collection
-   *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
-   *          be none.
-   * @param order
-   *          The ui order for the new field, 0 at the top and progressively down from there.
-   * @return the new metadata field
-   */
-  public static MetadataField<String> createTextMetadataField(final String inputID, final String outputID, final String label,
-          final boolean readOnly, final boolean required, final Boolean isTranslatable, final Map<String, String> collection,
-          final String collectionId, final Integer order, final String namespace) {
-    return createTextAnyMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection,
-            collectionId, order, Type.TEXT, namespace);
-  }
-
-  /**
-   * Create a metadata field of type String with a single line in the front end which can be ordered and filtered.
-   *
-   * @param inputID
-   *          The identifier of the new metadata field
-   * @param label
-   *          The label of the new metadata field
-   * @param readOnly
-   *          Define if the new metadata field can be or not edited
-   * @param required
-   *          Define if the new metadata field is or not required
-   * @param isTranslatable
-   *          If the field value is not human readable and should be translated before
-   * @param collection
-   *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
-   *          be none.
-   * @param order
-   *          The ui order for the new field, 0 at the top and progressively down from there.
-   * @return the new metadata field
-   */
-  private static MetadataField<String> createOrderedTextMetadataField(
-          final String inputID,
-          final String outputID,
-          final String label,
-          final boolean readOnly,
-          final boolean required,
-          final Boolean isTranslatable,
-          final Map<String, String> collection,
-          final String collectionId,
-          final Integer order,
-          final String namespace) {
-    return createTextAnyMetadataField(inputID,
-            outputID,
-            label,
-            readOnly,
-            required,
-            isTranslatable,
-            collection,
-            collectionId,
-            order,
-            Type.ORDERED_TEXT,
-            namespace);
-  }
-
-
-  /**
-   * Create a metadata field of type String with many lines in the front end.
-   *
-   * @param inputID
-   *          The identifier of the new metadata field
-   * @param label
-   *          The label of the new metadata field
-   * @param readOnly
-   *          Define if the new metadata field can be or not edited
-   * @param required
-   *          Define if the new metadata field is or not required
-   * @param isTranslatable
-   *          If the field value is not human readable and should be translated before
-   * @param collection
-   *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
-   *          be none.
-   * @param order
-   *          The ui order for the new field, 0 at the top and progressively down from there.
-   * @return the new metadata field
-   */
-  public static MetadataField<String> createTextLongMetadataField(
-          final String inputID,
-          final String outputID,
-          final String label,
-          final boolean readOnly,
-          final boolean required,
-          final Boolean isTranslatable,
-          final Map<String, String> collection,
-          final String collectionId,
-          final Integer order,
-          final String namespace) {
-    return createTextAnyMetadataField(inputID,
-            outputID,
-            label,
-            readOnly,
-            required,
-            isTranslatable,
-            collection,
-            collectionId,
-            order,
-            Type.TEXT_LONG,
-            namespace);
-  }
-
-  /**
-   * Create a metadata field of type String specifying the type for the front end.
-   *
-   * @param inputID
-   *          The identifier of the new metadata field
-   * @param label
-   *          The label of the new metadata field
-   * @param readOnly
-   *          Define if the new metadata field can be or not edited
-   * @param required
-   *          Define if the new metadata field is or not required
-   * @param isTranslatable
-   *          If the field value is not human readable and should be translated before
-   * @param collection
-   *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
-   *          be none.
-   * @param order
-   *          The ui order for the new field, 0 at the top and progressively down from there.
-   * @param type
-   *          The metadata field type as defined in {@link MetadataField.Type}
-   * @return the new metadata field
-   */
-  private static MetadataField<String> createTextAnyMetadataField(
-          final String inputID,
-          final String outputID,
-          final String label,
-          final boolean readOnly,
-          final boolean required,
-          final Boolean isTranslatable,
-          final Map<String, String> collection,
-          final String collectionId,
-          final Integer order,
-          final Type type,
-          final String namespace) {
-
-    return new MetadataField<>(inputID,
-            outputID,
-            label,
-            readOnly,
-            required,
-            "",
-            isTranslatable,
-            type,
-            collection,
-            collectionId,
-            order,
-            namespace);
-  }
-
   public static MetadataField createMetadataField(final Map<String,String> configuration) {
-
     final String inputID = configuration.get(CONFIG_INPUT_ID_KEY);
     final String label = configuration.get(CONFIG_LABEL_KEY);
 
@@ -731,67 +278,118 @@ public class MetadataField<A> {
     if (type == null)
       throw new IllegalArgumentException("type is null");
 
-    final MetadataField metadataField = createMetadataField(inputID,
-            outputID,
-            label,
-            readOnly,
-            required,
-            null,
-            type,
-            null,
-            collectionID,
-            order,
-            namespace,
-            delimiter,
-            pattern);
-    metadataField.setListprovider(listprovider);
-    return metadataField;
-  }
-
-  public static MetadataField createMetadataField(final String inputID, final String outputID, final String label, final boolean readOnly,
-          final boolean required, final Boolean translatable, final Type type, final Map<String, String> collection,
-          final String collectionID, final Integer order, final String namespace, final String delimiter, final String pattern) {
-
     switch (type) {
       case BOOLEAN:
-        return createBooleanMetadata(inputID, outputID, label, readOnly, required, order, namespace);
-      case DATE:
-        return createDateMetadata(inputID, outputID, label, readOnly, required, pattern, order, namespace);
-      case DURATION:
-        return createDurationMetadataField(inputID, outputID, label, readOnly, required, translatable,
-                collection, collectionID, order, namespace);
-      case ITERABLE_TEXT:
-        return createIterableStringMetadataField(
+        return new MetadataField<Boolean>(
                 inputID,
                 outputID,
                 label,
                 readOnly,
                 required,
-                translatable,
-                collection,
-                collectionID,
-                delimiter,
+                null,
+                null,
+                type,
+                null,
+                null,
                 order,
-                namespace);
-      case MIXED_TEXT:
-        return createMixedIterableStringMetadataField(inputID, outputID, label, readOnly, required,
-                translatable, collection, collectionID, delimiter, order, namespace);
-      case LONG:
-        return createLongMetadataField(inputID, outputID, label, readOnly, required, translatable,
-                collection, collectionID, order, namespace);
+                namespace,
+                listprovider,
+                null,
+                null);
+      case DATE:
+        return new MetadataField<Date>(
+                inputID,
+                outputID,
+                label,
+                readOnly,
+                required,
+                null,
+                null,
+                type,
+                null,
+                null,
+                order,
+                namespace,
+                listprovider,
+                StringUtils.isNotBlank(pattern) ? pattern : null,
+                null);
+      case DURATION:
       case TEXT:
-        return createTextMetadataField(inputID, outputID, label, readOnly, required, translatable, collection,
-                collectionID, order, namespace);
-      case TEXT_LONG:
-        return createTextLongMetadataField(inputID, outputID, label, readOnly, required, translatable, collection,
-                collectionID, order, namespace);
-      case START_DATE:
-        return createTemporalStartDateMetadata(inputID, outputID, label, readOnly, required, pattern, order, namespace);
-      case START_TIME:
-        return createTemporalStartTimeMetadata(inputID, outputID, label, readOnly, required, pattern, order, namespace);
       case ORDERED_TEXT:
-        return createOrderedTextMetadataField(inputID, outputID, label, readOnly, required, translatable, collection,
-                collectionID, order, namespace);
+      case TEXT_LONG:
+        return new MetadataField<>(
+                inputID,
+                outputID,
+                label,
+                readOnly,
+                required,
+                "",
+                null,
+                type,
+                null,
+                collectionID,
+                order,
+                namespace,
+                listprovider,
+                null,
+                null);
+      case ITERABLE_TEXT:
+      case MIXED_TEXT:
+        return new MetadataField<Iterable<String>>(
+                inputID,
+                outputID,
+                label,
+                readOnly,
+                required,
+                new ArrayList<>(),
+                null,
+                type,
+                null,
+                collectionID,
+                order,
+                namespace,
+                listprovider,
+                null,
+                delimiter);
+      case LONG:
+        return new MetadataField<>(
+                inputID,
+                outputID,
+                label,
+                readOnly,
+                required,
+                0L,
+                null,
+                Type.TEXT,
+                null,
+                collectionID,
+                order,
+                namespace,
+                listprovider,
+                null, null);
+      case START_DATE:
+      case START_TIME:
+        if (StringUtils.isBlank(pattern)) {
+          throw new IllegalArgumentException(
+                  "For temporal metadata field " + inputID + " of type " + type + " there needs to be a pattern.");
+        }
+
+        return new MetadataField<String>(
+                inputID,
+                outputID,
+                label,
+                readOnly,
+                required,
+                null,
+                null,
+                type,
+                null,
+                null,
+                order,
+                namespace,
+                listprovider,
+                pattern,
+                null);
       default:
         throw new IllegalArgumentException("Unknown metadata type! " + type);
     }
@@ -809,40 +407,20 @@ public class MetadataField<A> {
     return inputID;
   }
 
-  public void setInputId(final String inputID) {
-    this.inputID = inputID;
-  }
-
   public String getLabel() {
     return label;
-  }
-
-  public void setLabel(final String label) {
-    this.label = label;
   }
 
   public String getListprovider() {
     return listprovider;
   }
 
-  public void setListprovider(final String listprovider) {
-    this.listprovider = listprovider;
-  }
-
   public String getNamespace() {
     return namespace;
   }
 
-  public void setNamespace(final String namespace) {
-    this.namespace = namespace;
-  }
-
   public Integer getOrder() {
     return order;
-  }
-
-  public void setOrder(final Integer order) {
-    this.order = order;
   }
 
   /**
@@ -851,9 +429,8 @@ public class MetadataField<A> {
   public String getOutputID() {
     if (outputID != null) {
       return outputID;
-    } else {
-      return inputID;
     }
+    return inputID;
   }
 
   public String getPattern() {
@@ -882,10 +459,6 @@ public class MetadataField<A> {
 
   public boolean isRequired() {
     return required;
-  }
-
-  public void setRequired(final boolean required) {
-    this.required = required;
   }
 
   public void setUpdated(final boolean updated) {

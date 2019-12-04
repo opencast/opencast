@@ -148,7 +148,7 @@ public class EventsEndpointTest {
     given().formParam("metadata", jsonString).pathParam("event_id", eventId).queryParam("type", "dublincore/episode")
             .expect().statusCode(SC_NO_CONTENT).when().put(env.host("{event_id}/metadata"));
     MetadataList actualMetadataList = TestEventsEndpoint.getCapturedMetadataList2().getValue();
-    assertThat(MetadataJson.collectionToJson(actualMetadataList.getMetadataByFlavor("dublincore/episode").get(), true).toString(),
+    assertThat(MetadataJson.collectionToJson(actualMetadataList.getMetadataByFlavor("dublincore/episode"), true).toString(),
             SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
   }
 
