@@ -24,8 +24,9 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public final class ExternalMetadataUtils {
   private ExternalMetadataUtils() {
@@ -37,28 +38,32 @@ public final class ExternalMetadataUtils {
    * @param collection
    *          The collection to update subject to subjects.
    */
-  public static void changeSubjectToSubjects(MetadataCollection collection) {
+  public static void changeSubjectToSubjects(final MetadataCollection collection) {
     // Change subject to subjects.
-    MetadataField<?> subject = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
+    final MetadataField<?> subject = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     collection.removeField(subject);
-    MetadataField<Iterable<String>> newSubjects = MetadataField.createIterableStringMetadataField(
+    final List<String> newValue;
+    if (subject.getValue() != null) {
+      newValue = Pattern.compile(",").splitAsStream(subject.getValue().toString()).collect(Collectors.toList());
+    } else {
+      newValue = null;
+    }
+    collection.addField(new MetadataField<Iterable<String>>(
             subject.getInputID(),
             "subjects",
             subject.getLabel(),
             subject.isReadOnly(),
             subject.isRequired(),
+            newValue,
             subject.isTranslatable(),
+            MetadataField.Type.ITERABLE_TEXT,
             subject.getCollection(),
             subject.getCollectionID(),
-            subject.getDelimiter(),
             subject.getOrder(),
-            subject.getNamespace());
-    List<String> subjectNames = new ArrayList<String>();
-    if (subject.getValue() != null) {
-      subjectNames = com.entwinemedia.fn.Stream.$(subject.getValue().toString().split(",")).toList();
-    }
-    newSubjects.setValue(subjectNames);
-    collection.addField(newSubjects);
+            subject.getNamespace(),
+            subject.getListprovider(),
+            subject.getPattern(),
+            subject.getDelimiter()));
   }
 
   /**
@@ -67,10 +72,10 @@ public final class ExternalMetadataUtils {
    * @param metadata
    *          The metadata from which the list have to be removed
    */
-  public static void removeCollectionList(MetadataCollection metadata) {
+  public static void removeCollectionList(final MetadataCollection metadata) {
     // Change subject to subjects.
-    List<MetadataField<?>> fields = metadata.getFields();
-    for (MetadataField<?> f : fields) {
+    final List<MetadataField<?>> fields = metadata.getFields();
+    for (final MetadataField<?> f : fields) {
       f.setCollection(null);
       f.setCollectionID(null);
     }

@@ -22,6 +22,7 @@
 package org.opencastproject.metadata.dublincore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,13 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
   private final Map<String, MetadataField<?>> outputFields = new HashMap<>();
 
   public DublinCoreMetadataCollection() {
+    this(Collections.emptyList());
+  }
+
+  public DublinCoreMetadataCollection(final Iterable<MetadataField<?>> fields) {
+    for (final MetadataField<?> field : fields) {
+      addField(field);
+    }
   }
 
   @Override
@@ -149,17 +157,7 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
       throw new IllegalArgumentException("Unable to update a field to a different type than String with this method!");
     }
     removeField(current);
-    final MetadataField<String> field = MetadataField.createTextMetadataField(
-            current.getInputID(),
-            current.getOutputID(),
-            current.getLabel(),
-            current.isReadOnly(),
-            current.isRequired(),
-            current.isTranslatable(),
-            current.getCollection(),
-            current.getCollectionID(),
-            current.getOrder(),
-            current.getNamespace());
+    final MetadataField<String> field = new MetadataField(current);
     field.setValue(value);
     addField(field);
   }

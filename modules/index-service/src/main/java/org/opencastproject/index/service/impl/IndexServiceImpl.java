@@ -870,7 +870,7 @@ public class IndexServiceImpl implements IndexService {
     SourceType type = getSourceType(eventHttpServletRequest.getSource().get());
 
     MetadataCollection eventMetadata = eventHttpServletRequest.getMetadataList().get()
-            .getMetadataByAdapter(eventCatalogUIAdapter).get();
+            .getMetadataByAdapter(eventCatalogUIAdapter);
 
     Date currentStartDate = null;
     JSONObject sourceMetadata = (JSONObject) eventHttpServletRequest.getSource().get().get("metadata");
@@ -1298,9 +1298,9 @@ public class IndexServiceImpl implements IndexService {
     Event event = optEvent.get();
     MediaPackage mediaPackage = getEventMediapackage(event);
     Opt<Set<String>> presenters = Opt.none();
-    Opt<MetadataCollection> eventCatalog = metadataList.getMetadataByAdapter(getCommonEventCatalogUIAdapter());
-    if (eventCatalog.isSome()) {
-      presenters = updatePresenters(eventCatalog.get());
+    MetadataCollection eventCatalog = metadataList.getMetadataByAdapter(getCommonEventCatalogUIAdapter());
+    if (eventCatalog != null) {
+      presenters = updatePresenters(eventCatalog);
     }
     updateMediaPackageMetadata(mediaPackage, metadataList);
     switch (getEventSource(event)) {
@@ -1722,9 +1722,9 @@ public class IndexServiceImpl implements IndexService {
   private void updateMediaPackageMetadata(MediaPackage mp, MetadataList metadataList) {
     String oldSeriesId = mp.getSeries();
     for (EventCatalogUIAdapter catalogUIAdapter : getEventCatalogUIAdapters()) {
-      Opt<MetadataCollection> metadata = metadataList.getMetadataByAdapter(catalogUIAdapter);
-      if (metadata.isSome() && metadata.get().isUpdated()) {
-        catalogUIAdapter.storeFields(mp, metadata.get());
+      final MetadataCollection metadata = metadataList.getMetadataByAdapter(catalogUIAdapter);
+      if (metadata != null && metadata.isUpdated()) {
+        catalogUIAdapter.storeFields(mp, metadata);
       }
     }
 
@@ -1873,9 +1873,9 @@ public class IndexServiceImpl implements IndexService {
       dc.set(new EName(DublinCores.OC_PROPERTY_NS_URI, entry.getKey()), entry.getValue());
     }
 
-    Opt<MetadataCollection> seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES.toString());
-    if (seriesMetadata.isSome()) {
-      DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata.get());
+    MetadataCollection seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES.toString());
+    if (seriesMetadata != null) {
+      DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
     }
 
     AccessControlList acl;
@@ -1948,9 +1948,9 @@ public class IndexServiceImpl implements IndexService {
     final MetadataList metadataList = getMetadataListWithAllSeriesCatalogUIAdapters();
     MetadataJson.fillListFromJson(metadataList, seriesMetadataJson);
 
-    Opt<MetadataCollection> seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES.toString());
-    if (seriesMetadata.isSome()) {
-      DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata.get());
+    MetadataCollection seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES.toString());
+    if (seriesMetadata != null) {
+      DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
     }
 
     AccessControlList acl = getAccessControlList(metadataJson);
@@ -2176,9 +2176,9 @@ public class IndexServiceImpl implements IndexService {
    */
   private void updateSeriesMetadata(String seriesId, MetadataList metadataList) {
     for (SeriesCatalogUIAdapter adapter : seriesCatalogUIAdapters) {
-      Opt<MetadataCollection> metadata = metadataList.getMetadataByFlavor(adapter.getFlavor().toString());
-      if (metadata.isSome() && metadata.get().isUpdated()) {
-        adapter.storeFields(seriesId, metadata.get());
+      final MetadataCollection metadata = metadataList.getMetadataByFlavor(adapter.getFlavor().toString());
+      if (metadata != null && metadata.isUpdated()) {
+        adapter.storeFields(seriesId, metadata);
       }
     }
   }

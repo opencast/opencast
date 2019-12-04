@@ -2029,10 +2029,9 @@ public abstract class AbstractEventEndpoint {
           @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the event metadata tab as JSON") })
   public Response getNewMetadata() {
     MetadataList metadataList = getIndexService().getMetadataListWithAllEventCatalogUIAdapters();
-    Opt<MetadataCollection> optMetadataByAdapter = metadataList
+    MetadataCollection collection = metadataList
             .getMetadataByAdapter(getIndexService().getCommonEventCatalogUIAdapter());
-    if (optMetadataByAdapter.isSome()) {
-      MetadataCollection collection = optMetadataByAdapter.get();
+    if (collection != null) {
       if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName()))
         collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
       if (collection.getOutputFields().containsKey("duration"))

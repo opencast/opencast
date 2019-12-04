@@ -38,6 +38,7 @@ import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -88,8 +89,21 @@ public class MetadataFieldTest {
   public void testSetDifferentValues()  throws Exception {
     String textValue = "This is the text value";
 
-    MetadataField<String> textField = MetadataField.createTextMetadataField(defaultInputID, optOutputID, label, false,
-            false, null, null, null, null, null);
+    MetadataField<String> textField = new MetadataField<>(defaultInputID,
+            optOutputID,
+            label,
+            false,
+            false,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
     textField.setValue(textValue);
 
     assertNull(textField.hasDifferentValues());
@@ -111,33 +125,94 @@ public class MetadataFieldTest {
   @Test
   public void testSetOutputIDInputNoOutputIDExpectsInputIDIsOutputID() {
     // If no outputID then getting the output id should return the input id.
-    final MetadataField<Date> dateField = MetadataField.createDateMetadata(defaultInputID, null, label,
-            readOnly, required, datePattern, null, null);
-    assertEquals(defaultInputID, dateField.getOutputID());
+
+    final MetadataField<Date> dateField1 = new MetadataField<>(
+            defaultInputID,
+            null,
+            label,
+            readOnly,
+            required,
+            null,
+            null,
+            MetadataField.Type.DATE,
+            null,
+            null,
+            null,
+            null,
+            null,
+            StringUtils.isNotBlank(datePattern) ? datePattern : null,
+            null);
+    assertEquals(defaultInputID, dateField1.getOutputID());
   }
 
   @Test
   public void testSetOutputIDInputOutputIDExpectsOutputIDIsSet() {
     // If outputID is set then getting the output id should return the input id.
-    final MetadataField<Date> dateField = MetadataField.createDateMetadata(defaultInputID, optOutputID, label, readOnly,
-            required, datePattern, null, null);
-    assertEquals(defaultOutputID, dateField.getOutputID());
+
+    final MetadataField<Date> dateField1 = new MetadataField<>(
+            defaultInputID,
+            optOutputID,
+            label,
+            readOnly,
+            required,
+            null,
+            null,
+            MetadataField.Type.DATE,
+            null,
+            null,
+            null,
+            null,
+            null,
+            StringUtils.isNotBlank(datePattern) ? datePattern : null,
+            null);
+    assertEquals(defaultOutputID, dateField1.getOutputID());
   }
 
   @Test
   public void testCreateDateFieldJsonInputWithValueExpectsEmptyValueInJson() throws Exception {
-    final String dateJson = IOUtils.toString(getClass().getResource("/catalog-adapter/date/date-with-value.json"));
-    final MetadataField<Date> dateField = MetadataField.createDateMetadata(defaultInputID, null, label,
-            readOnly, required, dateTimePattern, null, null);
-    dateField.setValue(testDate);
-    assertThat(dateJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField, true))));
+    final String dateJson = IOUtils.toString(getClass().getResource("/catalog-adapter/date/date-with-value.json"),
+            StandardCharsets.UTF_8);
+
+    final MetadataField<Date> dateField1 = new MetadataField<>(
+            defaultInputID,
+            null,
+            label,
+            readOnly,
+            required,
+            null,
+            null,
+            MetadataField.Type.DATE,
+            null,
+            null,
+            null,
+            null,
+            null,
+            StringUtils.isNotBlank(dateTimePattern) ? dateTimePattern : null,
+            null);
+    dateField1.setValue(testDate);
+    assertThat(dateJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField1, true))));
   }
 
   @Test
   public void testCreateDateFieldJsonInputWithBlankPatternExpectsNonEmptyValueInJson() throws Exception {
-    final MetadataField<Date> dateField = MetadataField.createDateMetadata(defaultInputID, null, label,
-            readOnly, required, null, null, null);
-    dateField.setValue(testDate);
+
+    final MetadataField<Date> dateField1 = new MetadataField<>(
+            defaultInputID,
+            null,
+            label,
+            readOnly,
+            required,
+            null,
+            null,
+            MetadataField.Type.DATE,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
+    dateField1.setValue(testDate);
 
     final SimpleDateFormat dateFormat = new SimpleDateFormat();
     dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -145,24 +220,53 @@ public class MetadataFieldTest {
             f("label", v(label)), f("type", v(MetadataField.Type.DATE.toString().toLowerCase())),
             f("value", v(dateFormat.format(testDate))), f("required", v(required))));
 
-    assertThat(expectedJSON, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField, true))));
+    assertThat(expectedJSON, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField1, true))));
   }
 
   @Test
   public void testCreateDateFieldJsonInputWithoutValueExpectsEmptyValueInJson() throws Exception {
-    final String dateJson = IOUtils.toString(getClass().getResource("/catalog-adapter/date/date-without-value.json"));
-    final MetadataField<Date> dateField = MetadataField.createDateMetadata(defaultInputID, null, label,
-            readOnly, required, datePattern, null, null);
-    assertThat(dateJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField, true))));
+    final String dateJson = IOUtils
+            .toString(getClass().getResource("/catalog-adapter/date/date-without-value.json"), StandardCharsets.UTF_8);
+
+    final MetadataField<Date> dateField1 = new MetadataField<>(
+            defaultInputID,
+            null,
+            label,
+            readOnly,
+            required,
+            null,
+            null,
+            MetadataField.Type.DATE,
+            null,
+            null,
+            null,
+            null,
+            null,
+            StringUtils.isNotBlank(datePattern) ? datePattern : null,
+            null);
+    assertThat(dateJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField1, true))));
   }
 
   @Test
   public void testCreateTextFieldJsonInputNoValueExpectsEmptyString() throws Exception {
-    final String emptyValueJson = IOUtils.toString(getClass().getResource("/catalog-adapter/text/text-empty-value.json"));
+    final String emptyValueJson = IOUtils.toString(getClass().getResource("/catalog-adapter/text/text-empty-value.json"), StandardCharsets.UTF_8);
     // Test JSON generated with no value.
-    final MetadataField<String> emptyValueTextField = MetadataField.createTextMetadataField(defaultInputID, optOutputID,
-            label, false, false, null, null, null,
-            null, null);
+    final MetadataField<String> emptyValueTextField = new MetadataField<>(
+            defaultInputID,
+            optOutputID,
+            label,
+            false,
+            false,
+            null,
+            null,
+            MetadataField.Type.TEXT,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
     assertThat(emptyValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(emptyValueTextField,
             true))));
   }
@@ -170,10 +274,24 @@ public class MetadataFieldTest {
   @Test
   public void testCreateTextFieldJsonInputWithValueExpectsValue() throws Exception {
     final String textValue = "This is the text value";
-    final String withValueJson = IOUtils.toString(getClass().getResource("/catalog-adapter/text/text-with-value.json"));
+    final String withValueJson = IOUtils
+            .toString(getClass().getResource("/catalog-adapter/text/text-with-value.json"), StandardCharsets.UTF_8);
     // Test JSON with value
-    final MetadataField<String> textField = MetadataField.createTextMetadataField(defaultInputID, optOutputID, label, false,
-            false, null, null, null, null,
+    final MetadataField<String> textField = new MetadataField<>(
+            defaultInputID,
+            optOutputID,
+            label,
+            false,
+            false,
+            null,
+            null,
+            MetadataField.Type.TEXT,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             null);
     textField.setValue(textValue);
     assertThat(withValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textField, true))));
@@ -183,36 +301,78 @@ public class MetadataFieldTest {
   public void testCreateTextFieldJsonInputWithCollectionExpectsCollectionPresentAndPopulated() throws Exception {
     // Test JSON with Collection
     final String withCollectionJson = IOUtils.toString(getClass().getResource(
-            "/catalog-adapter/text/text-with-collection.json"));
-    final MetadataField<String> textFieldWithCollection = MetadataField.createTextMetadataField(defaultInputID, optOutputID,
-            label, false, false, true, optCollection, null, null,
+            "/catalog-adapter/text/text-with-collection.json"), StandardCharsets.UTF_8);
+    final MetadataField<String> textFieldWithCollection = new MetadataField<>(
+            defaultInputID,
+            optOutputID,
+            label,
+            false,
+            false,
+            "",
+            true,
+            MetadataField.Type.TEXT,
+            optCollection,
+            null,
+            null,
+            null,
+            null,
+            null,
             null);
-    assertThat(withCollectionJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textFieldWithCollection,
-            true))));
+    assertThat(
+            withCollectionJson,
+            SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textFieldWithCollection, true))));
   }
 
   @Test
   public void testCreateTextFieldJsonInputWithCollectionIDExpectsCollectionIDInCollectionProperty() throws Exception {
     // Test JSON with Collection ID
     final String withCollectionIDJson = IOUtils.toString(getClass().getResource(
-            "/catalog-adapter/text/text-with-collection-id.json"));
-    final MetadataField<String> textFieldWithCollectionID = MetadataField.createTextMetadataField(defaultInputID,
-            optOutputID, label, false, false, null, null, optCollectionID,
-            null, null);
-    assertThat(withCollectionIDJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textFieldWithCollectionID,
-            true))));
+            "/catalog-adapter/text/text-with-collection-id.json"), StandardCharsets.UTF_8);
+    final MetadataField<String> textFieldWithCollectionID = new MetadataField<>(
+            defaultInputID,
+            optOutputID,
+            label,
+            false,
+            false,
+            null,
+            null,
+            MetadataField.Type.TEXT,
+            null,
+            optCollectionID,
+            null,
+            null,
+            null,
+            null,
+            null);
+    assertThat(
+            withCollectionIDJson,
+            SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textFieldWithCollectionID, true))));
   }
 
   @Test
   public void testCreateTextLongFieldJsonInput() throws Exception {
     // Test JSON with Collection ID
     final String withCollectionIDJson = IOUtils.toString(getClass().getResource(
-            "/catalog-adapter/text/text-long-with-value.json"));
-    final MetadataField<String> textLongField = MetadataField.createTextLongMetadataField(defaultInputID, optOutputID, label,
-            false, false, null,null, null,
-            null, null);
+            "/catalog-adapter/text/text-long-with-value.json"), StandardCharsets.UTF_8);
+    final MetadataField<String> textLongField = new MetadataField<>(
+            defaultInputID,
+            optOutputID,
+            label,
+            false,
+            false,
+            null,
+            null,
+            MetadataField.Type.TEXT_LONG,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
     textLongField.setValue("This is the text value");
-    assertThat(withCollectionIDJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textLongField,
-            true))));
+    assertThat(
+            withCollectionIDJson,
+            SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textLongField, true))));
   }
 }

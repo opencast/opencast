@@ -374,9 +374,22 @@ public class SeriesEndpoint implements ManagedService {
     metadata.addField(newPublishers);
 
     // Admin UI only field
-    MetadataField<String> createdBy = MetadataField.createTextMetadataField("createdBy", null,
-            "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY", true, false, null,
-            null, null, CREATED_BY_UI_ORDER, null);
+    MetadataField<String> createdBy = new MetadataField<>(
+      "createdBy",
+      null,
+      "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY",
+      true,
+      false,
+      null,
+      null,
+      MetadataField.Type.TEXT,
+      null,
+      null,
+      CREATED_BY_UI_ORDER,
+      null,
+      null,
+      null,
+      null);
     createdBy.setValue(series.getCreator());
     metadata.addField(createdBy);
 
@@ -413,10 +426,10 @@ public class SeriesEndpoint implements ManagedService {
   @RestQuery(name = "getNewMetadata", description = "Returns all the data related to the metadata tab in the new series modal as JSON", returnDescription = "All the data related to the series metadata tab as JSON", responses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series metadata tab as JSON") })
   public Response getNewMetadata() {
     MetadataList metadataList = indexService.getMetadataListWithAllSeriesCatalogUIAdapters();
-    Opt<MetadataCollection> metadataByAdapter = metadataList
+    final MetadataCollection metadataByAdapter = metadataList
             .getMetadataByAdapter(indexService.getCommonSeriesCatalogUIAdapter());
-    if (metadataByAdapter.isSome()) {
-      MetadataCollection collection = metadataByAdapter.get();
+    if (metadataByAdapter != null) {
+      MetadataCollection collection = metadataByAdapter;
       safelyRemoveField(collection, "identifier");
       metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
     }

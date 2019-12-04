@@ -19,19 +19,18 @@
  *
  */
 
-package org.opencastproject.adminui.endpoint;
+package org.opencastproject.metadata.dublincore;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
-import org.opencastproject.metadata.dublincore.MetadataField;
 
 import com.entwinemedia.fn.data.Opt;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 public class DublinCoreMetadataCollectionTest {
   private static final String FIRST_ID = "first";
@@ -48,65 +47,60 @@ public class DublinCoreMetadataCollectionTest {
   private MetadataField<String> unorderedTwo;
   private MetadataField<String> unorderedThree;
 
+  private static MetadataField<String> createField(final String label, final Integer order, final String value) {
+    return new MetadataField<>(
+      label,
+      null,
+      label,
+      false,
+      false,
+      value,
+      null,
+      MetadataField.Type.TEXT,
+      null,
+      null,
+      order,
+      null,
+      null,
+      null,
+      null);
+  }
+
   @Before
   public void setUp() {
-    first = MetadataField.createTextMetadataField(FIRST_ID, null, FIRST_ID, false, false,
-            null, null, null, 0,
-            null);
-    third = MetadataField.createTextMetadataField(THIRD_ID, null, THIRD_ID, false, false,
-            null, null, null, 2,
-            null);
-    seventh = MetadataField.createTextMetadataField(SEVENTH_ID, null, SEVENTH_ID, false, false,
-            null, null, null, 6,
-            null);
+    first = createField(FIRST_ID, 0, null);
+    third = createField(THIRD_ID, 2, null);
+    seventh = createField(SEVENTH_ID, 6, null);
 
-    unorderedOne = MetadataField.createTextMetadataField(UNORDERED_ONE_ID, null, UNORDERED_ONE_ID,
-            false, false, null, null, null,
-            null, null);
-    unorderedTwo = MetadataField.createTextMetadataField(UNORDERED_TWO_ID, null, UNORDERED_TWO_ID,
-            false, false, null, null, null,
-            null, null);
-    unorderedThree = MetadataField.createTextMetadataField(UNORDERED_THREE_ID, null, UNORDERED_THREE_ID,
-            false, false, null, null, null,
-            null, null);
+    unorderedOne = createField(UNORDERED_ONE_ID, null, null);
+    unorderedTwo = createField(UNORDERED_TWO_ID, null, null);
+    unorderedThree = createField(UNORDERED_THREE_ID, null, null);
   }
 
   @Test
   public void testOrderOfFields() {
-    final MetadataCollection collection = new DublinCoreMetadataCollection();
     // Add a single field that has an index greater than 0.
-    collection.addField(third);
+    final MetadataCollection collection = new DublinCoreMetadataCollection(Collections.singleton(third));
     assertEquals(1, collection.getFields().size());
     assertEquals(third, collection.getFields().get(0));
   }
 
   @Test
   public void testOrderOfFieldsInputFieldOrderZeroExpectsAtFront() {
-    MetadataCollection collection = new DublinCoreMetadataCollection();
-    collection.addField(unorderedOne);
-    collection.addField(unorderedTwo);
-    collection.addField(unorderedThree);
-    collection.addField(first);
+    MetadataCollection collection = new DublinCoreMetadataCollection(Arrays
+      .asList(unorderedOne, unorderedTwo, unorderedThree, first));
 
     assertEquals(4, collection.getFields().size());
     assertEquals("A field with an order value of 0 should be first in the list of fields", first, collection
             .getFields().get(0));
 
-    collection = new DublinCoreMetadataCollection();
-    collection.addField(first);
-    collection.addField(unorderedOne);
-    collection.addField(unorderedTwo);
-    collection.addField(unorderedThree);
+    collection = new DublinCoreMetadataCollection(Arrays.asList(first, unorderedOne, unorderedTwo, unorderedThree));
 
     assertEquals(4, collection.getFields().size());
     assertEquals("A field with an order value of 0 should be first in the list of fields", first, collection
             .getFields().get(0));
 
-    collection = new DublinCoreMetadataCollection();
-    collection.addField(unorderedOne);
-    collection.addField(first);
-    collection.addField(unorderedTwo);
-    collection.addField(unorderedThree);
+    collection = new DublinCoreMetadataCollection(Arrays.asList(unorderedOne, first, unorderedTwo, unorderedThree));
 
     assertEquals(4, collection.getFields().size());
     assertEquals("A field with an order value of 0 should be first in the list of fields", first, collection
@@ -115,31 +109,20 @@ public class DublinCoreMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputFieldOrderTwoExpectsInMiddle() {
-    MetadataCollection collection = new DublinCoreMetadataCollection();
-    collection.addField(unorderedOne);
-    collection.addField(unorderedTwo);
-    collection.addField(unorderedThree);
-    collection.addField(third);
+    MetadataCollection collection = new DublinCoreMetadataCollection(Arrays
+      .asList(unorderedOne, unorderedTwo, unorderedThree, third));
 
     assertEquals(4, collection.getFields().size());
     assertEquals("A field with an order value of 2 should be in that position in the list of fields", third, collection
             .getFields().get(2));
 
-    collection = new DublinCoreMetadataCollection();
-    collection.addField(third);
-    collection.addField(unorderedOne);
-    collection.addField(unorderedTwo);
-    collection.addField(unorderedThree);
+    collection = new DublinCoreMetadataCollection(Arrays.asList(third, unorderedOne, unorderedTwo, unorderedThree));
 
     assertEquals(4, collection.getFields().size());
     assertEquals("A field with an order value of 2 should be in that position in the list of fields", third, collection
             .getFields().get(2));
 
-    collection = new DublinCoreMetadataCollection();
-    collection.addField(unorderedOne);
-    collection.addField(third);
-    collection.addField(unorderedTwo);
-    collection.addField(unorderedThree);
+    collection = new DublinCoreMetadataCollection(Arrays.asList(unorderedOne, third, unorderedTwo, unorderedThree));
 
     assertEquals(4, collection.getFields().size());
     assertEquals("A field with an order value of 2 should be in that position in the list of fields", third, collection
@@ -148,13 +131,8 @@ public class DublinCoreMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputMultipleOrderedFieldsExpectsInCorrectPositions() {
-    MetadataCollection collection = new DublinCoreMetadataCollection();
-    collection.addField(unorderedOne);
-    collection.addField(unorderedTwo);
-    collection.addField(unorderedThree);
-    collection.addField(first);
-    collection.addField(third);
-    collection.addField(seventh);
+    MetadataCollection collection = new DublinCoreMetadataCollection(Arrays
+      .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh));
 
     assertEquals(6, collection.getFields().size());
     assertEquals("A field with an order value of 0 should be first in the list of fields", first, collection
@@ -164,13 +142,8 @@ public class DublinCoreMetadataCollectionTest {
     assertEquals("A field with an order value of 7 should be in the last position in the list of fields", seventh,
             collection.getFields().get(5));
 
-    collection = new DublinCoreMetadataCollection();
-    collection.addField(first);
-    collection.addField(third);
-    collection.addField(seventh);
-    collection.addField(unorderedOne);
-    collection.addField(unorderedTwo);
-    collection.addField(unorderedThree);
+    collection = new DublinCoreMetadataCollection(Arrays
+      .asList(first, third, seventh, unorderedOne, unorderedTwo, unorderedThree));
 
     assertEquals(6, collection.getFields().size());
     assertEquals("A field with an order value of 0 should be first in the list of fields", first, collection
@@ -180,13 +153,8 @@ public class DublinCoreMetadataCollectionTest {
     assertEquals("A field with an order value of 7 should be in the last position in the list of fields", seventh,
             collection.getFields().get(5));
 
-    collection = new DublinCoreMetadataCollection();
-    collection.addField(third);
-    collection.addField(unorderedOne);
-    collection.addField(unorderedTwo);
-    collection.addField(first);
-    collection.addField(seventh);
-    collection.addField(unorderedThree);
+    collection = new DublinCoreMetadataCollection(Arrays
+      .asList(third, unorderedOne, unorderedTwo, first, seventh, unorderedThree));
 
     assertEquals(6, collection.getFields().size());
     assertEquals("A field with an order value of 0 should be first in the list of fields", first, collection
@@ -199,19 +167,9 @@ public class DublinCoreMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputDuplicateOrderValueExpectsBothInserted() {
-    final MetadataCollection collection = new DublinCoreMetadataCollection();
-    collection.addField(unorderedOne);
-    collection.addField(unorderedTwo);
-    collection.addField(unorderedThree);
-    collection.addField(first);
-    collection.addField(third);
-    collection.addField(seventh);
-
-    final MetadataField<String> newFirst = MetadataField.createTextMetadataField("New first", null,
-            "New first", false, false, null, null, null,
-            0, null);
-
-    collection.addField(newFirst);
+    final MetadataField<String> newFirst = createField("New first", 0, null);
+    final MetadataCollection collection = new DublinCoreMetadataCollection(Arrays
+      .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh, newFirst));
 
     assertEquals(7, collection.getFields().size());
     assertTrue("A field with an order value of 0 should be first in the list of fields", first == collection
@@ -226,20 +184,12 @@ public class DublinCoreMetadataCollectionTest {
 
   @Test
   public void testAddExistingFieldInputAlreadyExistingFieldExpectsOnlyOneFieldFromGetFields() {
-    final MetadataCollection collection = new DublinCoreMetadataCollection();
-    collection.addField(unorderedOne);
-    collection.addField(unorderedTwo);
-    collection.addField(unorderedThree);
-    collection.addField(first);
-    collection.addField(third);
-    collection.addField(seventh);
-
-    final MetadataField<String> newFirst = MetadataField.createTextMetadataField("first", null, "first",
-            false, false, null, null, null, 0,
-            null);
     final String value = "Hello";
-    newFirst.setValue(value);
-    collection.addField(newFirst);
+    final MetadataField<String> newFirst = createField("first", 0, value);
+
+    final MetadataCollection collection = new DublinCoreMetadataCollection(Arrays
+      .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh, newFirst));
+
     int numberOfFirsts = 0;
     Opt<String> valueFound = Opt.none();
 

@@ -23,11 +23,6 @@ package org.opencastproject.metadata.dublincore;
 
 import org.opencastproject.util.data.Tuple;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -38,9 +33,9 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
   public enum Locked {
     NONE("NONE"), WORKFLOW_RUNNING("EVENTS.EVENTS.DETAILS.METADATA.LOCKED.RUNNING");
 
-    private String languageConstant;
+    private final String languageConstant;
 
-    Locked(String languageConstant) {
+    Locked(final String languageConstant) {
       this.languageConstant = languageConstant;
     }
 
@@ -50,7 +45,7 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
 
   }
 
-  private Map<String, Tuple<String, MetadataCollection>> metadataList = new HashMap<>();
+  private final Map<String, Tuple<String, MetadataCollection>> metadataList = new HashMap<>();
 
   private Locked locked = Locked.NONE;
 
@@ -61,8 +56,8 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
     return locked;
   }
 
-  public void makeMetadataCollectionReadOnly(MetadataCollection metadataCollection) {
-    for (MetadataField<?> field : metadataCollection.getFields())
+  public void makeMetadataCollectionReadOnly(final MetadataCollection metadataCollection) {
+    for (final MetadataField<?> field : metadataCollection.getFields())
       field.setReadOnly(true);
   }
 
@@ -70,43 +65,28 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
     return metadataList;
   }
 
-  public Opt<MetadataCollection> getMetadataByAdapter(SeriesCatalogUIAdapter catalogUIAdapter) {
-    return Stream.$(metadataList.keySet()).filter(adapterFilter._2(catalogUIAdapter.getFlavor().toString()))
-            .map(toMetadata).head();
+  public MetadataCollection getMetadataByAdapter(final SeriesCatalogUIAdapter catalogUIAdapter) {
+    return getMetadataByFlavor(catalogUIAdapter.getFlavor().toString());
   }
 
-  public Opt<MetadataCollection> getMetadataByAdapter(EventCatalogUIAdapter catalogUIAdapter) {
-    return Stream.$(metadataList.keySet()).filter(adapterFilter._2(catalogUIAdapter.getFlavor().toString()))
-            .map(toMetadata).head();
+  public MetadataCollection getMetadataByAdapter(final EventCatalogUIAdapter catalogUIAdapter) {
+    return getMetadataByFlavor(catalogUIAdapter.getFlavor().toString());
   }
 
-  public Opt<MetadataCollection> getMetadataByFlavor(String flavor) {
-    return Stream.$(metadataList.keySet()).filter(adapterFilter._2(flavor)).map(toMetadata).head();
+  public MetadataCollection getMetadataByFlavor(final String flavor) {
+    return metadataList.keySet().stream().filter(e -> e.equals(flavor)).map(metadataList::get).map(Tuple::getB)
+            .findAny().orElse(null);
   }
 
-  private static final Fn2<String, String, Boolean> adapterFilter = new Fn2<String, String, Boolean>() {
-    @Override
-    public Boolean apply(String key, String flavor) {
-      return key.equals(flavor);
-    }
-  };
-
-  private final Fn<String, MetadataCollection> toMetadata = new Fn<String, MetadataCollection>() {
-    @Override
-    public MetadataCollection apply(String key) {
-      return metadataList.get(key).getB();
-    }
-  };
-
-  public void add(EventCatalogUIAdapter adapter, MetadataCollection metadata) {
+  public void add(final EventCatalogUIAdapter adapter, final MetadataCollection metadata) {
     metadataList.put(adapter.getFlavor().toString(), Tuple.tuple(adapter.getUITitle(), metadata));
   }
 
-  public void add(SeriesCatalogUIAdapter adapter, MetadataCollection metadata) {
+  public void add(final SeriesCatalogUIAdapter adapter, final MetadataCollection metadata) {
     metadataList.put(adapter.getFlavor().toString(), Tuple.tuple(adapter.getUITitle(), metadata));
   }
 
-  public void add(String flavor, String title, MetadataCollection metadata) {
+  public void add(final String flavor, final String title, final MetadataCollection metadata) {
     metadataList.put(flavor, Tuple.tuple(title, metadata));
   }
 
@@ -115,7 +95,7 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
     return metadataList.entrySet().iterator();
   }
 
-  public void setLocked(Locked locked) {
+  public void setLocked(final Locked locked) {
     this.locked = locked;
   }
 

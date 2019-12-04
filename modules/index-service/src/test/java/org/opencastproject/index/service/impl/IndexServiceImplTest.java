@@ -790,17 +790,49 @@ public class IndexServiceImplTest {
     String username = "user1";
     String org = "mh_default_org";
     MetadataCollection metadataCollection = new DublinCoreMetadataCollection();
-    metadataCollection.addField(MetadataField.createTextMetadataField(
-            "title", "title", "EVENTS.EVENTS.DETAILS.METADATA.TITLE", false, true, null, null,
-            null, null, null));
-    metadataCollection.addField(MetadataField.createTextLongMetadataField(
-            "creator", "creator", "EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS", false, false, null,
-            null, null, null, null));
-    final MetadataField<String> seriesMetadataField = MetadataField.createTextMetadataField("isPartOf",
+    metadataCollection.addField(new MetadataField<>(
+            "title",
+            "title",
+            "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+            false,
+            true,
+            "title",
+            null,
+            MetadataField.Type.TEXT,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null));
+    metadataCollection.addField(new MetadataField<>(
+            "creator",
+            "creator",
+            "EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS",
+            false,
+            false,
+            null,
+            null,
+            MetadataField.Type.TEXT_LONG,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null));
+    final MetadataField<String> seriesMetadataField = new MetadataField<>(
+            "isPartOf",
             "isPartOf",
             "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
             false,
             false,
+            null,
+            null,
+            MetadataField.Type.TEXT,
+            null,
+            null,
             null,
             null,
             null,
@@ -986,9 +1018,10 @@ public class IndexServiceImplTest {
   }
 
   private MetadataField<Iterable<String>> createCreatorMetadataField(Iterable<String> value) {
-    MetadataField<Iterable<String>> creator = MetadataField.createMetadataField(
-            DublinCore.PROPERTY_CREATOR.getLocalName(), null, "creator", false, false, null,
-            MetadataField.Type.TEXT, null, null, null, null, null, null);
+    final MetadataField<Iterable<String>> creator = new MetadataField<>(DublinCore.PROPERTY_CREATOR.getLocalName(), null, "creator", false, false, null,
+            null, MetadataField.Type.TEXT, null, null, null, null, null,
+            null,
+            null);
     creator.setValue(value);
     return creator;
   }
