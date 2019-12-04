@@ -506,16 +506,20 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
     if (instancesInSolr == 0L) {
       logger.info("No search index found");
-      logger.info("Starting population of search index from database");
       Iterator<Tuple<MediaPackage, String>> mediaPackages;
+      int total = 0;
       try {
+        total = persistence.countMediaPackages();
+        logger.info("Starting population of search index from {} items in database", total);
         mediaPackages = persistence.getAllMediaPackages();
       } catch (SearchServiceDatabaseException e) {
         logger.error("Unable to load the search entries: {}", e.getMessage());
         throw new ServiceException(e.getMessage());
       }
       int errors = 0;
+      int current = 0;
       while (mediaPackages.hasNext()) {
+        current++;
         try {
           Tuple<MediaPackage, String> mediaPackage = mediaPackages.next();
 
@@ -540,6 +544,11 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
         } finally {
           securityService.setOrganization(null);
           securityService.setUser(null);
+        }
+
+        // log progress
+        if (current % 100 == 0) {
+          logger.info("Indexing search {}/{} ({} percent done)", current, total, current * 100 / total);
         }
       }
       if (errors > 0)
