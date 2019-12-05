@@ -71,7 +71,7 @@ public final class DublinCoreMetadataUtil {
    *          The {@link DublinCoreMetadataCollection} data definitions and values to update the catalog with.
    */
   public static void updateDublincoreCatalog(DublinCoreCatalog dc, MetadataCollection metadata) {
-    for (MetadataField<?> field : metadata.getOutputFields().values()) {
+    for (MetadataField field : metadata.getOutputFields().values()) {
       if (field.isUpdated() && field.getValue() != null) {
         final String namespace = field.getNamespace() == null ? DublinCore.TERMS_NS_URI : field.getNamespace();
         final EName ename = new EName(namespace, field.getInputID());
@@ -110,7 +110,7 @@ public final class DublinCoreMetadataUtil {
    * @param field The {@link MetadataField} with the values to update.
    * @param ename The {@link EName} of the property in the {@link DublinCoreCatalog} to update.
    */
-  private static void setIterableString(DublinCoreCatalog dc, MetadataField<?> field, final EName ename) {
+  private static void setIterableString(DublinCoreCatalog dc, MetadataField field, final EName ename) {
     if (field.getValue() != null) {
       dc.remove(ename);
       if (field.getValue() instanceof String) {
@@ -169,7 +169,7 @@ public final class DublinCoreMetadataUtil {
    * @param ename
    *          The unique id for the dublin core property.
    */
-  private static void setDate(DublinCoreCatalog dc, MetadataField<?> field, EName ename) {
+  private static void setDate(DublinCoreCatalog dc, MetadataField field, EName ename) {
     if (field.getValue() instanceof Date && field.getPattern() == null) {
       throw new IllegalArgumentException("There needs to be a pattern property set for " + field.getInputID() + ":"
               + field.getOutputID() + ":" + field.getValue() + " metadata field to store and retrieve the result.");
@@ -192,7 +192,7 @@ public final class DublinCoreMetadataUtil {
    * @param ename
    *          The EName in the catalog to identify the property that has the dublin core period.
    */
-  static void setStartDate(DublinCoreCatalog dc, MetadataField<?> field, EName ename) {
+  static void setStartDate(DublinCoreCatalog dc, MetadataField field, EName ename) {
     if (field.getValue() == null
             || (field.getValue() instanceof String && StringUtils.isBlank(field.getValue().toString()))) {
       logger.debug("No value was set for metadata field with dublin core id '{}' and json id '{}'", field.getInputID(),
@@ -259,7 +259,7 @@ public final class DublinCoreMetadataUtil {
    * @param ename
    *          The EName in the catalog to identify the property that has the dublin core period.
    */
-  static void setDuration(DublinCoreCatalog dc, MetadataField<?> field, EName ename) {
+  static void setDuration(DublinCoreCatalog dc, MetadataField field, EName ename) {
     if (field.getValue() == null) {
       logger.error("No value was set for metadata field with dublin core id '{}' and json id '{}'", field.getInputID(),
               field.getOutputID());
@@ -287,29 +287,23 @@ public final class DublinCoreMetadataUtil {
             Precision.Second));
   }
 
-  @SuppressWarnings("unchecked")
-  public static Map<String, MetadataField<?>> getDublinCoreProperties(Dictionary configProperties) {
+  public static Map<String, MetadataField> getDublinCoreProperties(Dictionary<String, ?> configProperties) {
 
-    Map<String,Map<String, String>> allProperties = new HashMap();
+    final Map<String,Map<String, String>> allProperties = new HashMap<>();
 
-    for (Object configObject : Collections.list(configProperties.keys())) {
-      String property = configObject.toString();
+    for (String configObject : Collections.list(configProperties.keys())) {
+      String propertyNameOpt = getDublinCorePropertyName(configObject);
+      String propertyKeyOpt = getDublinCorePropertyKey(configObject);
 
-      Opt<String> propertyNameOpt = getDublinCorePropertyName(property);
-      Opt<String> propertyKeyOpt = getDublinCorePropertyKey(property);
-
-      if (propertyNameOpt.isSome() && propertyKeyOpt.isSome()) {
-
-        String propertyName = propertyNameOpt.get();
-        String propertyKey = propertyKeyOpt.get();
-
-        Map<String,String> metadataFieldProperties = allProperties.computeIfAbsent(propertyName,
+      if (propertyNameOpt != null && propertyKeyOpt != null) {
+        Map<String,String> metadataFieldProperties = allProperties.computeIfAbsent(
+                propertyNameOpt,
                 key -> new HashMap<>());
-        metadataFieldProperties.put(propertyKey, configProperties.get(property).toString());
+        metadataFieldProperties.put(propertyKeyOpt, configProperties.get(configObject).toString());
       }
     }
 
-    Map<String, MetadataField<?>> metadataFieldsMap = new TreeMap<String, MetadataField<?>>();
+    final Map<String, MetadataField> metadataFieldsMap = new TreeMap<>();
     for (Map<String, String> metadataFieldPropertiesMap : allProperties.values()) {
       MetadataField metadataField = MetadataField.createMetadataField(metadataFieldPropertiesMap);
       metadataFieldsMap.put(metadataField.getOutputID(), metadataField);
@@ -318,23 +312,23 @@ public final class DublinCoreMetadataUtil {
     return metadataFieldsMap;
   }
 
-  static boolean isDublinCoreProperty(String propertyKey) {
+  private static boolean isDublinCoreProperty(String propertyKey) {
     return !StringUtils.isBlank(propertyKey) && propertyKey.split("\\.").length == 3
             && propertyKey.split("\\.")[0].equalsIgnoreCase(MetadataField.CONFIG_PROPERTY_PREFIX);
   }
 
-  static Opt<String> getDublinCorePropertyName(String propertyKey) {
+  static String getDublinCorePropertyName(String propertyKey) {
     if (isDublinCoreProperty(propertyKey)) {
-      return Opt.some(propertyKey.split("\\.")[1]);
+      return propertyKey.split("\\.")[1];
     }
-    return Opt.none();
+    return null;
   }
 
-  static Opt<String> getDublinCorePropertyKey(String propertyKey) {
+  static String getDublinCorePropertyKey(String propertyKey) {
     if (isDublinCoreProperty(propertyKey)) {
-      return Opt.some(propertyKey.split("\\.")[2]);
+      return propertyKey.split("\\.")[2];
     }
-    return Opt.none();
+    return null;
   }
 
 }

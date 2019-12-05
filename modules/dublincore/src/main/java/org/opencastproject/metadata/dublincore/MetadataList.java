@@ -57,7 +57,7 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
   }
 
   public void makeMetadataCollectionReadOnly(final MetadataCollection metadataCollection) {
-    for (final MetadataField<?> field : metadataCollection.getFields())
+    for (final MetadataField field : metadataCollection.getFields())
       field.setReadOnly(true);
   }
 

@@ -126,7 +126,7 @@ public class MetadataFieldTest {
   public void testSetOutputIDInputNoOutputIDExpectsInputIDIsOutputID() {
     // If no outputID then getting the output id should return the input id.
 
-    final MetadataField<Date> dateField1 = new MetadataField<>(
+    final MetadataField dateField1 = new MetadataField(
             defaultInputID,
             null,
             label,
@@ -149,7 +149,7 @@ public class MetadataFieldTest {
   public void testSetOutputIDInputOutputIDExpectsOutputIDIsSet() {
     // If outputID is set then getting the output id should return the input id.
 
-    final MetadataField<Date> dateField1 = new MetadataField<>(
+    final MetadataField dateField1 = new MetadataField(
             defaultInputID,
             optOutputID,
             label,
@@ -173,7 +173,7 @@ public class MetadataFieldTest {
     final String dateJson = IOUtils.toString(getClass().getResource("/catalog-adapter/date/date-with-value.json"),
             StandardCharsets.UTF_8);
 
-    final MetadataField<Date> dateField1 = new MetadataField<>(
+    final MetadataField dateField1 = new MetadataField(
             defaultInputID,
             null,
             label,
@@ -196,7 +196,7 @@ public class MetadataFieldTest {
   @Test
   public void testCreateDateFieldJsonInputWithBlankPatternExpectsNonEmptyValueInJson() throws Exception {
 
-    final MetadataField<Date> dateField1 = new MetadataField<>(
+    final MetadataField dateField1 = new MetadataField(
             defaultInputID,
             null,
             label,
@@ -228,7 +228,7 @@ public class MetadataFieldTest {
     final String dateJson = IOUtils
             .toString(getClass().getResource("/catalog-adapter/date/date-without-value.json"), StandardCharsets.UTF_8);
 
-    final MetadataField<Date> dateField1 = new MetadataField<>(
+    final MetadataField dateField1 = new MetadataField(
             defaultInputID,
             null,
             label,
@@ -251,7 +251,7 @@ public class MetadataFieldTest {
   public void testCreateTextFieldJsonInputNoValueExpectsEmptyString() throws Exception {
     final String emptyValueJson = IOUtils.toString(getClass().getResource("/catalog-adapter/text/text-empty-value.json"), StandardCharsets.UTF_8);
     // Test JSON generated with no value.
-    final MetadataField<String> emptyValueTextField = new MetadataField<>(
+    final MetadataField emptyValueTextField = new MetadataField(
             defaultInputID,
             optOutputID,
             label,
@@ -277,7 +277,7 @@ public class MetadataFieldTest {
     final String withValueJson = IOUtils
             .toString(getClass().getResource("/catalog-adapter/text/text-with-value.json"), StandardCharsets.UTF_8);
     // Test JSON with value
-    final MetadataField<String> textField = new MetadataField<>(
+    final MetadataField textField = new MetadataField(
             defaultInputID,
             optOutputID,
             label,
@@ -302,7 +302,7 @@ public class MetadataFieldTest {
     // Test JSON with Collection
     final String withCollectionJson = IOUtils.toString(getClass().getResource(
             "/catalog-adapter/text/text-with-collection.json"), StandardCharsets.UTF_8);
-    final MetadataField<String> textFieldWithCollection = new MetadataField<>(
+    final MetadataField textFieldWithCollection = new MetadataField(
             defaultInputID,
             optOutputID,
             label,
@@ -328,7 +328,7 @@ public class MetadataFieldTest {
     // Test JSON with Collection ID
     final String withCollectionIDJson = IOUtils.toString(getClass().getResource(
             "/catalog-adapter/text/text-with-collection-id.json"), StandardCharsets.UTF_8);
-    final MetadataField<String> textFieldWithCollectionID = new MetadataField<>(
+    final MetadataField textFieldWithCollectionID = new MetadataField(
             defaultInputID,
             optOutputID,
             label,
@@ -354,7 +354,7 @@ public class MetadataFieldTest {
     // Test JSON with Collection ID
     final String withCollectionIDJson = IOUtils.toString(getClass().getResource(
             "/catalog-adapter/text/text-long-with-value.json"), StandardCharsets.UTF_8);
-    final MetadataField<String> textLongField = new MetadataField<>(
+    final MetadataField textLongField = new MetadataField(
             defaultInputID,
             optOutputID,
             label,

@@ -41,7 +41,7 @@ public final class MetadataUtils {
    *          The {@link MetadataField} to get the value from.
    * @return A Iterable (empty if not available)
    */
-  public static Iterable<String> getIterableStringMetadata(final MetadataField<?> metadataField) {
+  public static Iterable<String> getIterableStringMetadata(final MetadataField metadataField) {
     final List<String> strings = new ArrayList<>();
     if (metadataField.getValue() != null) {
       if (metadataField.getValue() instanceof Iterable<?>) {

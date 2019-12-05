@@ -62,7 +62,6 @@ public final class EventUtils {
    *          the source {@link Event}
    * @return a {@link MetadataCollection} instance with all the event metadata
    */
-  @SuppressWarnings("unchecked")
   public static MetadataCollection getEventMetadata(Event event, EventCatalogUIAdapter eventCatalogUIAdapter)
           throws Exception {
     //copy metadata collection to avoid side effects
@@ -126,7 +125,7 @@ public final class EventUtils {
         String recordingStartDate = event.getRecordingStartDate();
         if (StringUtils.isNotBlank(recordingStartDate)) {
           Date startDateTime = new Date(DateTimeSupport.fromUTC(recordingStartDate));
-          SimpleDateFormat sdf = new SimpleDateFormat(((MetadataField<String>)field).getPattern());
+          SimpleDateFormat sdf = new SimpleDateFormat(field.getPattern());
           sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
           field.setValue(sdf.format(startDateTime));
         }

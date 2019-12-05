@@ -235,7 +235,7 @@ public final class MetadataJson {
     }
   }
 
-  private static <T> JsonType jsonType(final MetadataField<T> f, final boolean withOrderedText) {
+  private static JsonType jsonType(final MetadataField f, final boolean withOrderedText) {
     switch (f.getType()) {
       case BOOLEAN:
         return JsonType.BOOLEAN;
@@ -261,7 +261,7 @@ public final class MetadataJson {
     }
   }
 
-  private static <T> Object valueFromJson(final Object value, final MetadataField<T> field) {
+  private static Object valueFromJson(final Object value, final MetadataField field) {
     switch (field.getType()) {
       case BOOLEAN: {
         if (value instanceof Boolean)
@@ -374,7 +374,7 @@ public final class MetadataJson {
     }
   }
 
-  public static <T> JObject fieldToJson(final MetadataField<T> f, final boolean withOrderedText) {
+  public static JObject fieldToJson(final MetadataField f, final boolean withOrderedText) {
     Objects.requireNonNull(f);
     final Map<String, Field> values = new HashMap<>();
     values.put(JSON_KEY_ID, f(JSON_KEY_ID, v(f.getOutputID(), Jsons.BLANK)));
@@ -397,9 +397,9 @@ public final class MetadataJson {
     return obj(values);
   }
 
-  public static <T> MetadataField<T> copyWithDifferentJsonValue(final MetadataField<T> t, final String v) {
-    final MetadataField<T> copy = new MetadataField<>(t);
-    copy.setValue((T) valueFromJson(v, copy));
+  public static MetadataField copyWithDifferentJsonValue(final MetadataField t, final String v) {
+    final MetadataField copy = new MetadataField(t);
+    copy.setValue(valueFromJson(v, copy));
     return copy;
   }
 

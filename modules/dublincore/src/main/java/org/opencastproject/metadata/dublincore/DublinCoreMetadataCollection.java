@@ -33,16 +33,16 @@ import java.util.Map;
  */
 public final class DublinCoreMetadataCollection implements MetadataCollection {
   /** The list containing all the metadata */
-  private List<MetadataField<?>> fieldsInOrder = new ArrayList<>();
-  private final Map<String, MetadataField<?>> inputFields = new HashMap<>();
-  private final Map<String, MetadataField<?>> outputFields = new HashMap<>();
+  private List<MetadataField> fieldsInOrder = new ArrayList<>();
+  private final Map<String, MetadataField> inputFields = new HashMap<>();
+  private final Map<String, MetadataField> outputFields = new HashMap<>();
 
   public DublinCoreMetadataCollection() {
     this(Collections.emptyList());
   }
 
-  public DublinCoreMetadataCollection(final Iterable<MetadataField<?>> fields) {
-    for (final MetadataField<?> field : fields) {
+  public DublinCoreMetadataCollection(final Iterable<MetadataField> fields) {
+    for (final MetadataField field : fields) {
       addField(field);
     }
   }
@@ -58,17 +58,17 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
   }
 
   @Override
-  public Map<String, MetadataField<?>> getInputFields() {
+  public Map<String, MetadataField> getInputFields() {
     return inputFields;
   }
 
   @Override
-  public Map<String, MetadataField<?>> getOutputFields() {
+  public Map<String, MetadataField> getOutputFields() {
     return outputFields;
   }
 
   @Override
-  public void addField(final MetadataField<?> metadata) {
+  public void addField(final MetadataField metadata) {
     if (metadata == null)
       throw new IllegalArgumentException("The metadata must not be null.");
     addFieldInOrder(metadata);
@@ -82,13 +82,13 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
    * @param metadata
    *          The metadata to add to the collection.
    */
-  private void addFieldInOrder(final MetadataField<?> metadata) {
+  private void addFieldInOrder(final MetadataField metadata) {
     removeFieldIfExists(metadata);
 
     // Find all of the ordered or unordered elements.
-    final ArrayList<MetadataField<?>> orderedFields = new ArrayList<>();
-    final ArrayList<MetadataField<?>> unorderedFields = new ArrayList<>();
-    for (final MetadataField<?> field : fieldsInOrder) {
+    final ArrayList<MetadataField> orderedFields = new ArrayList<>();
+    final ArrayList<MetadataField> unorderedFields = new ArrayList<>();
+    for (final MetadataField field : fieldsInOrder) {
       if (field.getOrder() != null) {
         orderedFields.add(field);
       } else {
@@ -110,7 +110,7 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
     fieldsInOrder = new ArrayList<>(unorderedFields);
 
     // Add all of the fields that have an index to their location starting at the lowest value.
-    for (final MetadataField<?> orderedField : orderedFields) {
+    for (final MetadataField orderedField : orderedFields) {
       final int index = orderedField.getOrder() < fieldsInOrder.size() ? orderedField.getOrder()
               : fieldsInOrder.size();
       fieldsInOrder.add(index, orderedField);
@@ -123,9 +123,9 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
    * @param metadata
    *          The field to remove.
    */
-  private void removeFieldIfExists(final MetadataField<?> metadata) {
+  private void removeFieldIfExists(final MetadataField metadata) {
     int index = -1;
-    for (final MetadataField<?> field : fieldsInOrder) {
+    for (final MetadataField field : fieldsInOrder) {
       if (field.getInputID().equalsIgnoreCase(metadata.getInputID())
               && field.getOutputID().equalsIgnoreCase(metadata.getOutputID())) {
         index = fieldsInOrder.indexOf(field);
@@ -138,7 +138,7 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
   }
 
   @Override
-  public void removeField(final MetadataField<?> metadata) {
+  public void removeField(final MetadataField metadata) {
     if (metadata == null)
       throw new IllegalArgumentException("The metadata must not be null.");
     this.fieldsInOrder.remove(metadata);
@@ -147,24 +147,24 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
   }
 
   @Override
-  public List<MetadataField<?>> getFields() {
+  public List<MetadataField> getFields() {
     return this.fieldsInOrder;
   }
 
   @Override
-  public void updateStringField(final MetadataField<?> current, final String value) {
+  public void updateStringField(final MetadataField current, final String value) {
     if (current.getValue() != null && !(current.getValue() instanceof String)) {
       throw new IllegalArgumentException("Unable to update a field to a different type than String with this method!");
     }
     removeField(current);
-    final MetadataField<String> field = new MetadataField(current);
+    final MetadataField field = new MetadataField(current);
     field.setValue(value);
     addField(field);
   }
 
   @Override
   public boolean isUpdated() {
-    for (final MetadataField<?> field : fieldsInOrder) {
+    for (final MetadataField field : fieldsInOrder) {
       if (field.isUpdated()) {
         return true;
       }

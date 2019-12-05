@@ -481,66 +481,65 @@ public class SeriesEndpoint {
    *          the source {@link Series}
    * @return a {@link MetadataCollection} instance with all the series metadata
    */
-  @SuppressWarnings("unchecked")
   private MetadataCollection getSeriesMetadata(Series series) {
     MetadataCollection metadata = indexService.getCommonSeriesCatalogUIAdapter().getRawFields();
 
-    MetadataField<?> title = metadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
+    MetadataField title = metadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
     metadata.removeField(title);
-    MetadataField<String> newTitle = new MetadataField(title);
+    MetadataField newTitle = new MetadataField(title);
     newTitle.setValue(series.getTitle());
     metadata.addField(newTitle);
 
-    MetadataField<?> subject = metadata.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
+    MetadataField subject = metadata.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     metadata.removeField(subject);
-    MetadataField<String> newSubject = new MetadataField(subject);
+    MetadataField newSubject = new MetadataField(subject);
     newSubject.setValue(series.getSubject());
     metadata.addField(newSubject);
 
-    MetadataField<?> description = metadata.getOutputFields().get(DublinCore.PROPERTY_DESCRIPTION.getLocalName());
+    MetadataField description = metadata.getOutputFields().get(DublinCore.PROPERTY_DESCRIPTION.getLocalName());
     metadata.removeField(description);
-    MetadataField<String> newDescription = new MetadataField(description);
+    MetadataField newDescription = new MetadataField(description);
     newDescription.setValue(series.getDescription());
     metadata.addField(newDescription);
 
-    MetadataField<?> language = metadata.getOutputFields().get(DublinCore.PROPERTY_LANGUAGE.getLocalName());
+    MetadataField language = metadata.getOutputFields().get(DublinCore.PROPERTY_LANGUAGE.getLocalName());
     metadata.removeField(language);
-    MetadataField<String> newLanguage = new MetadataField(language);
+    MetadataField newLanguage = new MetadataField(language);
     newLanguage.setValue(series.getLanguage());
     metadata.addField(newLanguage);
 
-    MetadataField<?> rightsHolder = metadata.getOutputFields().get(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName());
+    MetadataField rightsHolder = metadata.getOutputFields().get(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName());
     metadata.removeField(rightsHolder);
-    MetadataField<String> newRightsHolder = new MetadataField(rightsHolder);
+    MetadataField newRightsHolder = new MetadataField(rightsHolder);
     newRightsHolder.setValue(series.getRightsHolder());
     metadata.addField(newRightsHolder);
 
-    MetadataField<?> license = metadata.getOutputFields().get(DublinCore.PROPERTY_LICENSE.getLocalName());
+    MetadataField license = metadata.getOutputFields().get(DublinCore.PROPERTY_LICENSE.getLocalName());
     metadata.removeField(license);
-    MetadataField<String> newLicense = new MetadataField(license);
+    MetadataField newLicense = new MetadataField(license);
     newLicense.setValue(series.getLicense());
     metadata.addField(newLicense);
 
-    MetadataField<?> organizers = metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
+    MetadataField organizers = metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
     metadata.removeField(organizers);
-    MetadataField<String> newOrganizers = new MetadataField(organizers);
+    MetadataField newOrganizers = new MetadataField(organizers);
     newOrganizers.setValue(StringUtils.join(series.getOrganizers(), ", "));
     metadata.addField(newOrganizers);
 
-    MetadataField<?> contributors = metadata.getOutputFields().get(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName());
+    MetadataField contributors = metadata.getOutputFields().get(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName());
     metadata.removeField(contributors);
-    MetadataField<String> newContributors = new MetadataField(contributors);
+    MetadataField newContributors = new MetadataField(contributors);
     newContributors.setValue(StringUtils.join(series.getContributors(), ", "));
     metadata.addField(newContributors);
 
-    MetadataField<?> publishers = metadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
+    MetadataField publishers = metadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
     metadata.removeField(publishers);
-    MetadataField<String> newPublishers = new MetadataField(publishers);
+    MetadataField newPublishers = new MetadataField(publishers);
     newPublishers.setValue(StringUtils.join(series.getPublishers(), ", "));
     metadata.addField(newPublishers);
 
     // Admin UI only field
-    MetadataField<String> createdBy = new MetadataField<>(
+    MetadataField createdBy = new MetadataField(
             "createdBy",
             null,
             "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY",
@@ -559,9 +558,9 @@ public class SeriesEndpoint {
     createdBy.setValue(series.getCreator());
     metadata.addField(createdBy);
 
-    MetadataField<?> uid = metadata.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName());
+    MetadataField uid = metadata.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName());
     metadata.removeField(uid);
-    MetadataField<String> newUID = new MetadataField(uid);
+    MetadataField newUID = new MetadataField(uid);
     newUID.setValue(series.getIdentifier());
     metadata.addField(newUID);
 
@@ -673,7 +672,7 @@ public class SeriesEndpoint {
     MetadataCollection collection = optCollection.get();
 
     for (String key : updatedFields.keySet()) {
-      MetadataField<?> field = collection.getOutputFields().get(key);
+      MetadataField field = collection.getOutputFields().get(key);
       if (field == null) {
         return ApiResponses.notFound(
                 "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.", key,
@@ -928,7 +927,7 @@ public class SeriesEndpoint {
         Map<String, String> fields = RequestUtils.getKeyValueMap(fieldsJson);
         for (String key : fields.keySet()) {
           if ("subjects".equals(key)) {
-            MetadataField<?> field = collection.getOutputFields().get("subject");
+            MetadataField field = collection.getOutputFields().get("subject");
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
@@ -943,7 +942,7 @@ public class SeriesEndpoint {
                       String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
             }
           } else {
-            MetadataField<?> field = collection.getOutputFields().get(key);
+            MetadataField field = collection.getOutputFields().get(key);
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
