@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,7 +49,7 @@ public final class MetadataCollectionUtils {
   }
 
   private static Boolean getCollectionIsTranslatable(
-          final MetadataField<?> metadataField,
+          final MetadataField metadataField,
           final ListProvidersService listProvidersService) {
     if (listProvidersService != null && metadataField.getListprovider() != null) {
       try {
@@ -64,7 +63,7 @@ public final class MetadataCollectionUtils {
   }
 
   private static Map<String, String> getCollection(
-          final MetadataField<?> metadataField,
+          final MetadataField metadataField,
           final ListProvidersService listProvidersService) {
     try {
       if (listProvidersService != null && metadataField.getListprovider() != null) {
@@ -78,11 +77,11 @@ public final class MetadataCollectionUtils {
     }
   }
 
-  public static void addEmptyField(final MetadataCollection collection, final MetadataField<?> metadataField, final ListProvidersService listProvidersService) {
+  public static void addEmptyField(final MetadataCollection collection, final MetadataField metadataField, final ListProvidersService listProvidersService) {
     addField(collection, metadataField, Collections.emptyList(), listProvidersService);
   }
 
-  public static void addField(final MetadataCollection collection, final MetadataField<?> metadataField, final String value, final ListProvidersService listProvidersService) {
+  public static void addField(final MetadataCollection collection, final MetadataField metadataField, final String value, final ListProvidersService listProvidersService) {
     addField(collection, metadataField, Collections.singletonList(value), listProvidersService);
   }
 
@@ -105,13 +104,13 @@ public final class MetadataCollectionUtils {
 
     switch (metadataField.getType()) {
       case BOOLEAN:
-        ((MetadataField<Boolean>)metadataField).setValue(Boolean.parseBoolean(Iterables.getLast(filteredValues)), false);
+        metadataField.setValue(Boolean.parseBoolean(Iterables.getLast(filteredValues)), false);
         break;
       case DATE:
         if (metadataField.getPattern() == null) {
           metadataField.setPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         }
-        ((MetadataField<Date>)metadataField).setValue(EncodingSchemeUtils.decodeDate(Iterables.getLast(filteredValues)), false);
+        metadataField.setValue(EncodingSchemeUtils.decodeDate(Iterables.getLast(filteredValues)), false);
         break;
       case DURATION:
         final String value = Iterables.getLast(filteredValues);
@@ -119,25 +118,25 @@ public final class MetadataCollectionUtils {
         if (period == null)
           throw new IllegalArgumentException("period couldn't be parsed: " + value);
         final long longValue = period.getEnd().getTime() - period.getStart().getTime();
-        ((MetadataField<String>)metadataField).setValue(Long.toString(longValue), false);
+        metadataField.setValue(Long.toString(longValue), false);
         break;
       case ITERABLE_TEXT:
       case MIXED_TEXT:
-        ((MetadataField<Iterable<String>>)metadataField).setValue(filteredValues, false);
+        metadataField.setValue(filteredValues, false);
         break;
       case LONG:
-        ((MetadataField<Long>)metadataField).setValue(Long.parseLong(Iterables.getLast(filteredValues)), false);
+        metadataField.setValue(Long.parseLong(Iterables.getLast(filteredValues)), false);
         break;
       case START_DATE:
         if (metadataField.getPattern() == null) {
           metadataField.setPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         }
-        ((MetadataField<String>)metadataField).setValue(Iterables.getLast(filteredValues), false);
+        metadataField.setValue(Iterables.getLast(filteredValues), false);
         break;
       case TEXT:
       case ORDERED_TEXT:
       case TEXT_LONG:
-        ((MetadataField<String>)metadataField).setValue(Iterables.getLast(filteredValues), false);
+        metadataField.setValue(Iterables.getLast(filteredValues), false);
         break;
       default:
         throw new IllegalArgumentException("Unknown metadata type! " + metadataField.getType());
@@ -145,7 +144,7 @@ public final class MetadataCollectionUtils {
   }
 
 
-  public static void addField(final MetadataCollection collection, final MetadataField<?> metadataField, final List<String> values, final ListProvidersService listProvidersService) {
+  public static void addField(final MetadataCollection collection, final MetadataField metadataField, final List<String> values, final ListProvidersService listProvidersService) {
     final List<String> filteredValues = values.stream().filter(StringUtils::isNotBlank).collect(Collectors.toList());
 
     if (!filteredValues.isEmpty()) {

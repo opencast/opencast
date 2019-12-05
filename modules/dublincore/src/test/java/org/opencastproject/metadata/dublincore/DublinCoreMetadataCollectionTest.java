@@ -40,15 +40,15 @@ public class DublinCoreMetadataCollectionTest {
   private static final String UNORDERED_TWO_ID = "unordered-2";
   private static final String UNORDERED_THREE_ID = "unordered-3";
 
-  private MetadataField<String> first;
-  private MetadataField<String> third;
-  private MetadataField<String> seventh;
-  private MetadataField<String> unorderedOne;
-  private MetadataField<String> unorderedTwo;
-  private MetadataField<String> unorderedThree;
+  private MetadataField first;
+  private MetadataField third;
+  private MetadataField seventh;
+  private MetadataField unorderedOne;
+  private MetadataField unorderedTwo;
+  private MetadataField unorderedThree;
 
-  private static MetadataField<String> createField(final String label, final Integer order, final String value) {
-    return new MetadataField<>(
+  private static MetadataField createField(final String label, final Integer order, final String value) {
+    return new MetadataField(
       label,
       null,
       label,
@@ -167,7 +167,7 @@ public class DublinCoreMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputDuplicateOrderValueExpectsBothInserted() {
-    final MetadataField<String> newFirst = createField("New first", 0, null);
+    final MetadataField newFirst = createField("New first", 0, null);
     final MetadataCollection collection = new DublinCoreMetadataCollection(Arrays
       .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh, newFirst));
 
@@ -185,7 +185,7 @@ public class DublinCoreMetadataCollectionTest {
   @Test
   public void testAddExistingFieldInputAlreadyExistingFieldExpectsOnlyOneFieldFromGetFields() {
     final String value = "Hello";
-    final MetadataField<String> newFirst = createField("first", 0, value);
+    final MetadataField newFirst = createField("first", 0, value);
 
     final MetadataCollection collection = new DublinCoreMetadataCollection(Arrays
       .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh, newFirst));
@@ -193,7 +193,7 @@ public class DublinCoreMetadataCollectionTest {
     int numberOfFirsts = 0;
     Opt<String> valueFound = Opt.none();
 
-    for (final MetadataField<?> field : collection.getFields()) {
+    for (final MetadataField field : collection.getFields()) {
       if (field.getInputID().equals(FIRST_ID)) {
         numberOfFirsts++;
         if (field.getValue() != null && field.getValue() instanceof String) {

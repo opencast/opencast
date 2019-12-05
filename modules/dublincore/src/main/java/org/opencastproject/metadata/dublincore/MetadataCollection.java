@@ -32,9 +32,9 @@ public interface MetadataCollection {
    */
   MetadataCollection getCopy();
 
-  Map<String, MetadataField<?>> getInputFields();
+  Map<String, MetadataField> getInputFields();
 
-  Map<String, MetadataField<?>> getOutputFields();
+  Map<String, MetadataField> getOutputFields();
 
   /**
    * Add the given {@link MetadataField} field to the metadata list
@@ -45,13 +45,13 @@ public interface MetadataCollection {
    *           if the {@link MetadataField} is null
    *
    */
-  void addField(MetadataField<?> metadata);
+  void addField(MetadataField metadata);
 
-  void removeField(MetadataField<?> metadata);
+  void removeField(MetadataField metadata);
 
-  List<MetadataField<?>> getFields();
+  List<MetadataField> getFields();
 
-  void updateStringField(MetadataField<?> current, String value);
+  void updateStringField(MetadataField current, String value);
 
   boolean isUpdated();
 

@@ -790,7 +790,7 @@ public class IndexServiceImplTest {
     String username = "user1";
     String org = "mh_default_org";
     MetadataCollection metadataCollection = new DublinCoreMetadataCollection();
-    metadataCollection.addField(new MetadataField<>(
+    metadataCollection.addField(new MetadataField(
             "title",
             "title",
             "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
@@ -806,7 +806,7 @@ public class IndexServiceImplTest {
             null,
             null,
             null));
-    metadataCollection.addField(new MetadataField<>(
+    metadataCollection.addField(new MetadataField(
             "creator",
             "creator",
             "EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS",
@@ -822,7 +822,7 @@ public class IndexServiceImplTest {
             null,
             null,
             null));
-    final MetadataField<String> seriesMetadataField = new MetadataField<>(
+    final MetadataField seriesMetadataField = new MetadataField(
             "isPartOf",
             "isPartOf",
             "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
@@ -1017,8 +1017,8 @@ public class IndexServiceImplTest {
 
   }
 
-  private MetadataField<Iterable<String>> createCreatorMetadataField(Iterable<String> value) {
-    final MetadataField<Iterable<String>> creator = new MetadataField<>(DublinCore.PROPERTY_CREATOR.getLocalName(), null, "creator", false, false, null,
+  private MetadataField createCreatorMetadataField(Iterable<String> value) {
+    final MetadataField creator = new MetadataField(DublinCore.PROPERTY_CREATOR.getLocalName(), null, "creator", false, false, null,
             null, MetadataField.Type.TEXT, null, null, null, null, null,
             null,
             null);
@@ -1063,27 +1063,27 @@ public class IndexServiceImplTest {
     MetadataCollection metadata = commonEventCatalogUIAdapter.getRawFields();
 
     // Possible presenter combinations
-    MetadataField<Iterable<String>> emptyUpdatedPresenter = createCreatorMetadataField(new ArrayList<String>());
+    MetadataField emptyUpdatedPresenter = createCreatorMetadataField(new ArrayList<String>());
 
     ArrayList<String> oneNonUserList = new ArrayList<>();
     oneNonUserList.add(nonUser1);
-    MetadataField<Iterable<String>> nonUserUpdatedPresenter = createCreatorMetadataField(oneNonUserList);
+    MetadataField nonUserUpdatedPresenter = createCreatorMetadataField(oneNonUserList);
 
     ArrayList<String> multiNonUserList = new ArrayList<>();
     multiNonUserList.add(nonUser1);
     multiNonUserList.add(nonUser2);
     multiNonUserList.add(nonUser3);
-    MetadataField<Iterable<String>> multiNonUserUpdatedPresenter = createCreatorMetadataField(multiNonUserList);
+    MetadataField multiNonUserUpdatedPresenter = createCreatorMetadataField(multiNonUserList);
 
     ArrayList<String> oneUserList = new ArrayList<>();
     oneUserList.add(user1.getUsername());
-    MetadataField<Iterable<String>> userUpdatedPresenter = createCreatorMetadataField(oneUserList);
+    MetadataField userUpdatedPresenter = createCreatorMetadataField(oneUserList);
 
     ArrayList<String> multiUserList = new ArrayList<>();
     multiUserList.add(user1.getUsername());
     multiUserList.add(user2.getUsername());
     multiUserList.add(user3.getUsername());
-    MetadataField<Iterable<String>> multiUserUpdatedPresenter = createCreatorMetadataField(multiUserList);
+    MetadataField multiUserUpdatedPresenter = createCreatorMetadataField(multiUserList);
 
     ArrayList<String> mixedUserList = new ArrayList<>();
     mixedUserList.add(user1.getUsername());
@@ -1092,7 +1092,7 @@ public class IndexServiceImplTest {
     mixedUserList.add(nonUser2);
     mixedUserList.add(nonUser3);
     mixedUserList.add(user3.getUsername());
-    MetadataField<Iterable<String>> mixedPresenters = createCreatorMetadataField(mixedUserList);
+    MetadataField mixedPresenters = createCreatorMetadataField(mixedUserList);
     ArrayList<String> userFullNames = new ArrayList<>();
     userFullNames.add(user1.getName());
     userFullNames.add(user2.getName());

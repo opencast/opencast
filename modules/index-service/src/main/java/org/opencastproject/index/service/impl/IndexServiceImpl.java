@@ -877,7 +877,7 @@ public class IndexServiceImpl implements IndexService {
     if (sourceMetadata != null
             && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
       try {
-        MetadataField<?> current = eventMetadata.getOutputFields().get("location");
+        MetadataField current = eventMetadata.getOutputFields().get("location");
         eventMetadata.updateStringField(current, (String) sourceMetadata.get("device"));
       } catch (Exception e) {
         logger.warn("Unable to parse device {}", sourceMetadata.get("device"));
@@ -888,13 +888,13 @@ public class IndexServiceImpl implements IndexService {
       }
     }
 
-    MetadataField<?> startDate = eventMetadata.getOutputFields().get("startDate");
+    MetadataField startDate = eventMetadata.getOutputFields().get("startDate");
     if (startDate != null && startDate.isUpdated() && startDate.getValue() != null) {
       SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(startDate.getPattern());
       currentStartDate = sdf.parse((String) startDate.getValue());
     } else if (currentStartDate != null) {
       eventMetadata.removeField(startDate);
-      MetadataField<String> newStartDate = new MetadataField(startDate);
+      MetadataField newStartDate = new MetadataField(startDate);
       newStartDate.setValue(EncodingSchemeUtils.encodeDate(currentStartDate, Precision.Fraction).getValue());
       eventMetadata.addField(newStartDate);
     }
@@ -904,10 +904,10 @@ public class IndexServiceImpl implements IndexService {
     // Note, even though this field borrows the DublinCore.PROPERTY_CREATED key,
     // the startDate is used to update the DublinCore catalog PROPERTY_CREATED field,
     // event, and mediapackage start fields.
-    MetadataField<?> created = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
+    MetadataField created = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
     if (created != null && (!created.isUpdated() || created.getValue() == null)) {
       eventMetadata.removeField(created);
-      MetadataField<String> newCreated = new MetadataField(created);
+      MetadataField newCreated = new MetadataField(created);
       if (currentStartDate != null) {
         newCreated.setValue(EncodingSchemeUtils.encodeDate(currentStartDate, Precision.Second).getValue());
       } else {
@@ -1059,14 +1059,14 @@ public class IndexServiceImpl implements IndexService {
    *         if it wasn't updated.
    */
   private Opt<Set<String>> updatePresenters(MetadataCollection eventMetadata) {
-    MetadataField<?> presentersMetadataField = eventMetadata.getOutputFields()
+    MetadataField presentersMetadataField = eventMetadata.getOutputFields()
             .get(DublinCore.PROPERTY_CREATOR.getLocalName());
     if (presentersMetadataField.isUpdated()) {
       Set<String> presenterUsernames = new HashSet<>();
       Tuple<List<String>, Set<String>> updatedPresenters = getTechnicalPresenters(eventMetadata);
       presenterUsernames = updatedPresenters.getB();
       eventMetadata.removeField(presentersMetadataField);
-      MetadataField<Iterable<String>> newPresentersMetadataField = new MetadataField(presentersMetadataField);
+      MetadataField newPresentersMetadataField = new MetadataField(presentersMetadataField);
       newPresentersMetadataField.setValue(updatedPresenters.getA());
       eventMetadata.addField(newPresentersMetadataField);
       return Opt.some(presenterUsernames);
@@ -1349,7 +1349,7 @@ public class IndexServiceImpl implements IndexService {
    *         presenters.
    */
   protected Tuple<List<String>, Set<String>> getTechnicalPresenters(MetadataCollection eventMetadata) {
-    MetadataField<?> presentersMetadataField = eventMetadata.getOutputFields()
+    MetadataField presentersMetadataField = eventMetadata.getOutputFields()
             .get(DublinCore.PROPERTY_CREATOR.getLocalName());
     List<String> presenters = new ArrayList<>();
     Set<String> technicalPresenters = new HashSet<>();

@@ -438,7 +438,7 @@ public class EventHttpServletRequest {
         for (String key : fields.keySet()) {
           if ("subjects".equals(key)) {
             // Handle the special case of allowing subjects to be an array.
-            MetadataField<?> field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
+            MetadataField field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id 'subject' from Catalog with Flavor '%s'.", flavorString));
@@ -454,7 +454,7 @@ public class EventHttpServletRequest {
             }
           } else if ("startDate".equals(key)) {
             // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
-            MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get(key);
+            MetadataField field = collection.getOutputFields().get(key);
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
@@ -463,14 +463,14 @@ public class EventHttpServletRequest {
             SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
             DateTime newStartDate = new DateTime(apiSdf.parse(fields.get(key)), DateTimeZone.UTC);
             if (field.getValue() != null) {
-              DateTime oldStartDate = new DateTime(sdf.parse(field.getValue()), DateTimeZone.UTC);
+              DateTime oldStartDate = new DateTime(sdf.parse((String) field.getValue()), DateTimeZone.UTC);
               newStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(), newStartDate.dayOfMonth().get());
             }
             collection.removeField(field);
             collection.addField(MetadataJson.copyWithDifferentJsonValue(field, sdf.format(newStartDate.toDate())));
           } else if ("startTime".equals(key)) {
             // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
-            MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get("startDate");
+            MetadataField field = collection.getOutputFields().get("startDate");
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", "startDate", flavorString));
@@ -479,7 +479,7 @@ public class EventHttpServletRequest {
             SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
             DateTime newStartDate = new DateTime(apiSdf.parse(fields.get(key)), DateTimeZone.UTC);
             if (field.getValue() != null) {
-              DateTime oldStartDate = new DateTime(sdf.parse(field.getValue()), DateTimeZone.UTC);
+              DateTime oldStartDate = new DateTime(sdf.parse((String) field.getValue()), DateTimeZone.UTC);
               newStartDate = oldStartDate.withTime(
                       newStartDate.hourOfDay().get(),
                       newStartDate.minuteOfHour().get(),
@@ -489,7 +489,7 @@ public class EventHttpServletRequest {
             collection.removeField(field);
             collection.addField(MetadataJson.copyWithDifferentJsonValue(field, sdf.format(newStartDate.toDate())));
           } else {
-            MetadataField<?> field = collection.getOutputFields().get(key);
+            MetadataField field = collection.getOutputFields().get(key);
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
@@ -515,7 +515,7 @@ public class EventHttpServletRequest {
     final MetadataCollection optCommonEventCollection = metadataList
             .getMetadataByFlavor(MediaPackageElements.EPISODE.toString());
     if (optCommonEventCollection != null) {
-      MetadataField<?> startDate = optCommonEventCollection.getOutputFields().get("startDate");
+      MetadataField startDate = optCommonEventCollection.getOutputFields().get("startDate");
       if (!startDate.isUpdated()) {
         SimpleDateFormat utcDateFormat = new SimpleDateFormat(startDate.getPattern());
         utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));

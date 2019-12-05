@@ -27,18 +27,14 @@ import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
 
 /**
  * This is a generic and very abstract view of a certain field/property in a metadata catalog. The main purpose of this
  * class is to have a generic access to the variety of information stored in metadata catalogs.
- *
- * @param <A>
- *          Defines the type of the metadata value
  */
-public class MetadataField<A> {
+public class MetadataField {
 
   private static final Logger logger = LoggerFactory.getLogger(MetadataField.class);
 
@@ -93,7 +89,7 @@ public class MetadataField<A> {
   /** The type of the metadata for example text, date etc. */
   private Type type;
 
-  private A value;
+  private Object value;
   private Boolean translatable;
   private boolean updated = false;
   private Map<String, String> collection;
@@ -107,7 +103,7 @@ public class MetadataField<A> {
    * @param other
    *          Other metadata field
    */
-  public MetadataField(final MetadataField<A> other) {
+  public MetadataField(final MetadataField other) {
     this.inputID = other.inputID;
     this.outputID = other.outputID;
     this.label = other.label;
@@ -160,7 +156,7 @@ public class MetadataField<A> {
           final String label,
           final boolean readOnly,
           final boolean required,
-          final A value,
+          final Object value,
           final Boolean translatable,
           final Type type,
           final Map<String, String> collection,
@@ -207,7 +203,7 @@ public class MetadataField<A> {
     return collection;
   }
 
-  public A getValue() {
+  public Object getValue() {
     return value;
   }
 
@@ -219,11 +215,11 @@ public class MetadataField<A> {
     return updated;
   }
 
-  public void setValue(final A value) {
+  public void setValue(final Object value) {
     setValue(value, true);
   }
 
-  public void setValue(final A value, final boolean setUpdated) {
+  public void setValue(final Object value, final boolean setUpdated) {
     this.value = value;
 
     if (setUpdated) {
@@ -280,7 +276,7 @@ public class MetadataField<A> {
 
     switch (type) {
       case BOOLEAN:
-        return new MetadataField<Boolean>(
+        return new MetadataField(
                 inputID,
                 outputID,
                 label,
@@ -297,7 +293,7 @@ public class MetadataField<A> {
                 null,
                 null);
       case DATE:
-        return new MetadataField<Date>(
+        return new MetadataField(
                 inputID,
                 outputID,
                 label,
@@ -317,7 +313,7 @@ public class MetadataField<A> {
       case TEXT:
       case ORDERED_TEXT:
       case TEXT_LONG:
-        return new MetadataField<>(
+        return new MetadataField(
                 inputID,
                 outputID,
                 label,
@@ -335,7 +331,7 @@ public class MetadataField<A> {
                 null);
       case ITERABLE_TEXT:
       case MIXED_TEXT:
-        return new MetadataField<Iterable<String>>(
+        return new MetadataField(
                 inputID,
                 outputID,
                 label,
@@ -352,7 +348,7 @@ public class MetadataField<A> {
                 null,
                 delimiter);
       case LONG:
-        return new MetadataField<>(
+        return new MetadataField(
                 inputID,
                 outputID,
                 label,
@@ -360,7 +356,7 @@ public class MetadataField<A> {
                 required,
                 0L,
                 null,
-                Type.TEXT,
+                Type.LONG,
                 null,
                 collectionID,
                 order,
@@ -374,7 +370,7 @@ public class MetadataField<A> {
                   "For temporal metadata field " + inputID + " of type " + type + " there needs to be a pattern.");
         }
 
-        return new MetadataField<String>(
+        return new MetadataField(
                 inputID,
                 outputID,
                 label,

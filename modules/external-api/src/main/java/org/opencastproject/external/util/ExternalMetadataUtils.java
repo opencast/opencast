@@ -40,7 +40,7 @@ public final class ExternalMetadataUtils {
    */
   public static void changeSubjectToSubjects(final MetadataCollection collection) {
     // Change subject to subjects.
-    final MetadataField<?> subject = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
+    final MetadataField subject = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     collection.removeField(subject);
     final List<String> newValue;
     if (subject.getValue() != null) {
@@ -48,7 +48,7 @@ public final class ExternalMetadataUtils {
     } else {
       newValue = null;
     }
-    collection.addField(new MetadataField<Iterable<String>>(
+    collection.addField(new MetadataField(
             subject.getInputID(),
             "subjects",
             subject.getLabel(),
@@ -74,8 +74,8 @@ public final class ExternalMetadataUtils {
    */
   public static void removeCollectionList(final MetadataCollection metadata) {
     // Change subject to subjects.
-    final List<MetadataField<?>> fields = metadata.getFields();
-    for (final MetadataField<?> f : fields) {
+    final List<MetadataField> fields = metadata.getFields();
+    for (final MetadataField f : fields) {
       f.setCollection(null);
       f.setCollectionID(null);
     }

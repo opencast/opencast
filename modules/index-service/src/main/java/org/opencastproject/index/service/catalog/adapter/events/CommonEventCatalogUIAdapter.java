@@ -67,7 +67,7 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
     Catalog storeFields = super.storeFields(mediaPackage, abstractMetadata);
 
     // Update the metadata stored in the mediapackage
-    MetadataField<?> presenters = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
+    MetadataField presenters = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
     if (presenters != null && presenters.isUpdated() && presenters.getValue() instanceof Iterable<?>) {
       String[] creators = mediaPackage.getCreators();
       for (String creator : creators) {
@@ -78,7 +78,7 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
       }
     }
 
-    MetadataField<?> series = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
+    MetadataField series = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
     if (series.getValue() != null && series.isUpdated()) {
       if (isNotBlank(series.getValue().toString())) {
         mediaPackage.setSeries(series.getValue().toString());
@@ -92,7 +92,7 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
     }
 
     // Mediapackage start date is set by event metadata start date. The "created" metadata field is not used.
-    MetadataField<?> startDate = abstractMetadata.getOutputFields().get("startDate");
+    MetadataField startDate = abstractMetadata.getOutputFields().get("startDate");
     if (startDate != null && startDate.getValue() != null && startDate.isUpdated()
             && isNotBlank(startDate.getValue().toString())) {
       try {
@@ -105,14 +105,14 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
     }
 
     // Update all the metadata related to the episode dublin core catalog
-    MetadataField<?> title = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
+    MetadataField title = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
     if (title != null && title.isUpdated()) {
       mediaPackage.setTitle(title.getValue().toString());
     }
     return storeFields;
   }
 
-  private Opt<String> getSeriesTitle(MetadataField<?> series) {
+  private Opt<String> getSeriesTitle(MetadataField series) {
     if (series.getCollection() == null)
       return null;
     for (Map.Entry<String, String> e : series.getCollection().entrySet()) {

@@ -1142,7 +1142,7 @@ public abstract class AbstractEventEndpoint {
 
     MetadataCollection metadataCollection = EventUtils.getEventMetadata(event, getIndexService().getCommonEventCatalogUIAdapter());
     if (getOnlySeriesWithWriteAccessEventModal()) {
-      MetadataField<?> seriesField = metadataCollection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
+      MetadataField seriesField = metadataCollection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
       Map<String, String> seriesWithWriteAccess = getSeriesService().getUserSeriesByAccess(true);
       seriesField.setCollection(seriesWithWriteAccess);
     }
@@ -2048,7 +2048,7 @@ public abstract class AbstractEventEndpoint {
         collection.removeField(collection.getOutputFields().get("location"));
 
       if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_PUBLISHER.getLocalName())) {
-        MetadataField<String> publisher = (MetadataField<String>) collection.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
+        MetadataField publisher = collection.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
         Map<String, String> users = new HashMap<String, String>();
         if (publisher.getCollection() != null) {
           users = publisher.getCollection();
