@@ -1549,7 +1549,7 @@
                },
                "FROM_RIGHT_VIDEO": {
                   "LABEL": "Sağ taraftaki videodan çıkarıp al",
-                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+                  "TOOLTIP": "Küçük resmi, sağdaki videodan mevcut oynatma yerinden çıkarıp al"
                }
             },
             "UPLOAD": {
@@ -1558,7 +1558,7 @@
             },
             "USE_DEFAULT": {
                "LABEL": "Varsayılan küçük resim kullan",
-               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+               "TOOLTIP": "Otomatik olarak oluşturulan varsayılan küçük resmi kullanın"
             }
          },
          "PREVIEW": {
@@ -1566,9 +1566,9 @@
             "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
          },
          "CURRENT": {
-            "DEFAULT": "You are currently using the default thumbnail.",
-            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
-            "UPLOAD": "You are currently using an uploaded thumbnail."
+            "DEFAULT": "Şu anda varsayılan küçük resmi kullanıyorsunuz.",
+            "SNAPSHOT": "Şu anda kullanılan küçük resim videodan alınmıştır.",
+            "UPLOAD": "Şu anda yüklenmiş bir küçük resmi kullanıyorsunuz."
          }
       },
       "TRACKS": {
@@ -1586,8 +1586,8 @@
             "NO_PREVIEW_AVAILABLE": "Önizleme görseli bulunamadı",
             "NO_TRACK_SELECTED": "Hiçbir video kaydı seçilmedi",
             "TOOLTIPS": {
-               "HIDE": "This video track is currently enabled. Click to disable",
-               "UNHIDE": "This video track is currently disabled. Click to enable."
+               "HIDE": "Bu video kaydı şu anda etkin. Devre dışı bırakmak için tıklayın",
+               "UNHIDE": "Bu video kaydı şu anda devre dışı. Etkinleştirmek için tıklayın."
             }
          },
          "AUDIO": {
@@ -1596,8 +1596,8 @@
             "NO_PREVIEW_AVAILABLE": "Önizleme görseli bulunamadı",
             "NO_TRACK_SELECTED": "Hiçbir ses kaydı seçilmedi",
             "TOOLTIPS": {
-               "HIDE": "This audio track is currently enabled. Click to disable",
-               "UNHIDE": "This audio track is currently disabled. Click to enable"
+               "HIDE": "Bu ses kaydı şu anda etkin. Devre dışı bırakmak için tıklayın",
+               "UNHIDE": "Bu ses kaydı şu anda devre dışı. Etkinleştirmek için tıklayın"
             }
          }
       },
@@ -1903,7 +1903,7 @@
       "DESCRIPTIONS": {
          "GENERAL": {
             "MAIN_MENU": "Ana menü",
-            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Bir sonraki gösterge paneli filtresini seç",
             "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
             "REMOVE_FILTERS": "Tüm filtreleri temizle",
             "EVENT_VIEW": "Etkinlikler",
