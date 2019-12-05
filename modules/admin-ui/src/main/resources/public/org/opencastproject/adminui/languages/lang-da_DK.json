@@ -8,6 +8,8 @@
    "CANCEL": "Annullér",
    "CONFIRM": "Bekræft",
    "SAVE": "Gem",
+   "CONTINUE": "Continue",
+   "CLOSE": "Luk",
    "LOGOUT": "Log ud",
    "RESET": "Nulstil",
    "SELECT_NO_OPTION_SELECTED": "Ingen mulighed valgt",
@@ -170,7 +172,13 @@
       "VIDEO_TOO_MANY_AUDIOS": "Du kan ikke have flere end én lyd-stream på en enkelt video-stream",
       "SERVER_UNRESPONSIVE": "Ups! Serveren lader ikke til at svare. Forsøg igen senere.",
       "SERVICE_UNAVAILABLE": "Ups! Serveren lader ikke til at svare. Forsøg igen senere.",
-      "ACTIVE_TRANSACTION": "Begivenheden kan ikke redigeres under en aktiv arbejdsgang eller overførsel."
+      "ACTIVE_TRANSACTION": "Begivenheden kan ikke redigeres under en aktiv arbejdsgang eller overførsel.",
+      "BULK_METADATA_UPDATE": {
+         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
+         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
+         "NO_EVENTS_UPDATED": "All updates failed.",
+         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+      }
    },
    "BULK_ACTIONS": {
       "CAPTION": "Handlinger",
@@ -237,6 +245,36 @@
             "HEADER": "Denne side muliggør redigering af planlagte begivenheder grupperet efter ugedage. Indtastningsfelterne er forudfyldte, hvis alle planlagte begivenheder har samme værdi i et bestemt felt - ellers er felterne tomme. Efterlades inputfelter tomme, betyder det, at de respektive værdier ikke skal ændres.",
             "METADATA": "Metadata",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+         }
+      },
+      "EDIT_EVENTS_METADATA": {
+         "CAPTION": "Edit the metadata of multiple events",
+         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "REQUEST_ERRORS": {
+            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
+            "NOTHING_TO_EDIT": "The events cannot be edited.",
+            "NOT_FOUND": "Not found",
+            "RUNNING_WORKFLOW": "Running workflow",
+            "TABLE": {
+               "CAPTION": "Selected events",
+               "ERRORS": "Errors"
+            }
+         },
+         "EDIT": {
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "TABLE": {
+               "CAPTION": "Metadata of selected events",
+               "FIELDS": "Metadata",
+               "VALUES": "Values"
+            }
+         },
+         "UPDATE_FAILURES": {
+            "TABLE": {
+               "CAPTION": "Update Failures"
+            },
+            "UPDATE_FAILED": "Update failed",
+            "NO_EVENTS_UPDATED": "All updates failed.",
+            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
          }
       }
    },

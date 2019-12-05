@@ -8,6 +8,8 @@
    "CANCEL": "Abbrechen",
    "CONFIRM": "Bestätigen",
    "SAVE": "Speichern",
+   "CONTINUE": "Weiter",
+   "CLOSE": "Schliessen",
    "LOGOUT": "Ausloggen",
    "RESET": "Zurücksetzen",
    "SELECT_NO_OPTION_SELECTED": "Keine Option ausgewählt",
@@ -170,7 +172,13 @@
       "VIDEO_TOO_MANY_AUDIOS": "Mehrere Audiospuren können nicht mit einer Videospur verarbeitet werden",
       "SERVER_UNRESPONSIVE": "Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut.",
       "SERVICE_UNAVAILABLE": "Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut.",
-      "ACTIVE_TRANSACTION": "Dieses Ereignis kann nicht bearbeitet werden, während ein Workflow oder eine Transaktion auf diesem aktiv sind."
+      "ACTIVE_TRANSACTION": "Dieses Ereignis kann nicht bearbeitet werden, während ein Workflow oder eine Transaktion auf diesem aktiv sind.",
+      "BULK_METADATA_UPDATE": {
+         "UNEXPECTED_ERROR": "Beim Aktualisieren ist ein unerwarteter Fehler aufgetreten. Einige Ereignisse wurden möglicherweise aktualisiert.",
+         "ALL_EVENTS_UPDATED": "Alle Aufzeichnungen wurden erfolgreich hochgeladen.",
+         "NO_EVENTS_UPDATED": "Alle Updates sind fehlgeschlagen.",
+         "SOME_EVENTS_NOT_UPDATED": "Einige Aufzeichnungen konnten nicht aktualisiert werden."
+      }
    },
    "BULK_ACTIONS": {
       "CAPTION": "Aktionen",
@@ -237,6 +245,36 @@
             "HEADER": "Hierkönnen Sie geplante Aufzeichnungen nach Wochentagen gruppiert bearbeiten. Die Eingabefelder sind vorausgefüllt, wenn alle Aufzeichnungen den gleichen Wert haben. Andernfalls sind die Felder leer. Werden Felder leer gelassen, werden diese Felder bei den Aufzeichnungen nicht geändert.",
             "METADATA": "Metadaten",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+         }
+      },
+      "EDIT_EVENTS_METADATA": {
+         "CAPTION": "Edit the metadata of multiple events",
+         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "REQUEST_ERRORS": {
+            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
+            "NOTHING_TO_EDIT": "The events cannot be edited.",
+            "NOT_FOUND": "Nicht gefunden",
+            "RUNNING_WORKFLOW": "Running workflow",
+            "TABLE": {
+               "CAPTION": "Selected events",
+               "ERRORS": "Fehler"
+            }
+         },
+         "EDIT": {
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "TABLE": {
+               "CAPTION": "Metadata of selected events",
+               "FIELDS": "Metadaten",
+               "VALUES": "Werte"
+            }
+         },
+         "UPDATE_FAILURES": {
+            "TABLE": {
+               "CAPTION": "Update Failures"
+            },
+            "UPDATE_FAILED": "Update failed",
+            "NO_EVENTS_UPDATED": "All updates failed.",
+            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
          }
       }
    },

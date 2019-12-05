@@ -8,6 +8,8 @@
    "CANCEL": "Cancelar",
    "CONFIRM": "Confirmar",
    "SAVE": "Gardar",
+   "CONTINUE": "Continue",
+   "CLOSE": "Pechar",
    "LOGOUT": "Pechar sesión",
    "RESET": "Restablecer",
    "SELECT_NO_OPTION_SELECTED": "Sen opcións seleccionadas",
@@ -170,7 +172,13 @@
       "VIDEO_TOO_MANY_AUDIOS": "Non se pode ter máis dunha pista de audio por cada pista de vídeo",
       "SERVER_UNRESPONSIVE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
       "SERVICE_UNAVAILABLE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
-      "ACTIVE_TRANSACTION": "Este evento non se pode editar mentres exista un fluxo de traballo ou unha transacción activos."
+      "ACTIVE_TRANSACTION": "Este evento non se pode editar mentres exista un fluxo de traballo ou unha transacción activos.",
+      "BULK_METADATA_UPDATE": {
+         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
+         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
+         "NO_EVENTS_UPDATED": "All updates failed.",
+         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+      }
    },
    "BULK_ACTIONS": {
       "CAPTION": "Accións",
@@ -237,6 +245,36 @@
             "HEADER": "Esta páxina permite editar eventos programados por días da semana. Os campos xa están cumprimentados se todos os eventos programados teñen o mesmo valor para ese campo específico. En caso contrario, os campos aparecen en branco. Deixar os campos en branco significa que os valores respectivos non deben modificarse.",
             "METADATA": "Metadatos",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+         }
+      },
+      "EDIT_EVENTS_METADATA": {
+         "CAPTION": "Edit the metadata of multiple events",
+         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "REQUEST_ERRORS": {
+            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
+            "NOTHING_TO_EDIT": "The events cannot be edited.",
+            "NOT_FOUND": "Not found",
+            "RUNNING_WORKFLOW": "Running workflow",
+            "TABLE": {
+               "CAPTION": "Selected events",
+               "ERRORS": "Errors"
+            }
+         },
+         "EDIT": {
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "TABLE": {
+               "CAPTION": "Metadata of selected events",
+               "FIELDS": "Metadatos",
+               "VALUES": "Values"
+            }
+         },
+         "UPDATE_FAILURES": {
+            "TABLE": {
+               "CAPTION": "Update Failures"
+            },
+            "UPDATE_FAILED": "Update failed",
+            "NO_EVENTS_UPDATED": "All updates failed.",
+            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
          }
       }
    },

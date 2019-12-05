@@ -8,6 +8,8 @@
    "CANCEL": "Annuler",
    "CONFIRM": "Confirmer",
    "SAVE": "Enregistrer",
+   "CONTINUE": "Continue",
+   "CLOSE": "Fermer",
    "LOGOUT": "Déconnexion",
    "RESET": "Remise à zéro",
    "SELECT_NO_OPTION_SELECTED": "Aucune option sélectionnée",
@@ -170,7 +172,13 @@
       "VIDEO_TOO_MANY_AUDIOS": "Vous ne pouvez pas avoir plus d'un flux audio sur un seul flux vidéo",
       "SERVER_UNRESPONSIVE": "Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
       "SERVICE_UNAVAILABLE": "Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
-      "ACTIVE_TRANSACTION": "Cet événement ne peut pas être modifié, pendant qu’il y a un flux de travail actif ou une transaction."
+      "ACTIVE_TRANSACTION": "Cet événement ne peut pas être modifié, pendant qu’il y a un flux de travail actif ou une transaction.",
+      "BULK_METADATA_UPDATE": {
+         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
+         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
+         "NO_EVENTS_UPDATED": "All updates failed.",
+         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+      }
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
@@ -237,6 +245,36 @@
             "HEADER": "Cette page vous permet de modifier les événements planifiés regroupés par semaine. Les champs d'entrée sont pré-remplis au cas où tous les événements planifiés ont la même valeur pour un champ spécifique. Sinon, les champs d'entrée sont laissés vides. Laisser les champs d'entrée vide signifie que les valeurs respectives ne devraient pas être modifiées.",
             "METADATA": "Métadonnées",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+         }
+      },
+      "EDIT_EVENTS_METADATA": {
+         "CAPTION": "Edit the metadata of multiple events",
+         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "REQUEST_ERRORS": {
+            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
+            "NOTHING_TO_EDIT": "The events cannot be edited.",
+            "NOT_FOUND": "Not found",
+            "RUNNING_WORKFLOW": "Running workflow",
+            "TABLE": {
+               "CAPTION": "Selected events",
+               "ERRORS": "Errors"
+            }
+         },
+         "EDIT": {
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "TABLE": {
+               "CAPTION": "Metadata of selected events",
+               "FIELDS": "Métadonnées",
+               "VALUES": "Values"
+            }
+         },
+         "UPDATE_FAILURES": {
+            "TABLE": {
+               "CAPTION": "Update Failures"
+            },
+            "UPDATE_FAILED": "Update failed",
+            "NO_EVENTS_UPDATED": "All updates failed.",
+            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
          }
       }
    },

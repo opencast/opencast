@@ -8,6 +8,8 @@
    "CANCEL": "בטל",
    "CONFIRM": "אשר",
    "SAVE": "שמור",
+   "CONTINUE": "Continue",
+   "CLOSE": "סגור",
    "LOGOUT": "התנתקות",
    "RESET": "איפוס",
    "SELECT_NO_OPTION_SELECTED": "לא נבחרה כל אופציה",
@@ -170,7 +172,13 @@
       "VIDEO_TOO_MANY_AUDIOS": "לא ניתן להוסיף יותר ממקור שמע אחד עבור מקור וידאו בודד",
       "SERVER_UNRESPONSIVE": ". אופס! נראה שהשרת לא מגיב. נא נסה שוב מאוחר יותר.",
       "SERVICE_UNAVAILABLE": ". אופס! נראה שהשרת לא מגיב. נא נסה שוב מאוחר יותר.",
-      "ACTIVE_TRANSACTION": "לא ניתן לערוך את האירוע הזה בזמן שהוא עובר עיבוד."
+      "ACTIVE_TRANSACTION": "לא ניתן לערוך את האירוע הזה בזמן שהוא עובר עיבוד.",
+      "BULK_METADATA_UPDATE": {
+         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
+         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
+         "NO_EVENTS_UPDATED": "All updates failed.",
+         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+      }
    },
    "BULK_ACTIONS": {
       "CAPTION": "פעולות",
@@ -237,6 +245,36 @@
             "HEADER": "דף זה מאפשר לך לערוך אירועים מתוזמנים המקובצים לפי ימי השבוע. השדות מלאים מראש במקרה שלכל האירועים המתוזמנים יש אותו ערך עבור שדה מסוים. אחרת, השדה ישאר ריק. במקרה ושדה קלט נשאר ריק הערכים המתאימים יישארו ללא שינוי.",
             "METADATA": "מטא-נתונים",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+         }
+      },
+      "EDIT_EVENTS_METADATA": {
+         "CAPTION": "Edit the metadata of multiple events",
+         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "REQUEST_ERRORS": {
+            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
+            "NOTHING_TO_EDIT": "The events cannot be edited.",
+            "NOT_FOUND": "Not found",
+            "RUNNING_WORKFLOW": "Running workflow",
+            "TABLE": {
+               "CAPTION": "Selected events",
+               "ERRORS": "Errors"
+            }
+         },
+         "EDIT": {
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "TABLE": {
+               "CAPTION": "Metadata of selected events",
+               "FIELDS": "מטא-נתונים",
+               "VALUES": "Values"
+            }
+         },
+         "UPDATE_FAILURES": {
+            "TABLE": {
+               "CAPTION": "Update Failures"
+            },
+            "UPDATE_FAILED": "Update failed",
+            "NO_EVENTS_UPDATED": "All updates failed.",
+            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
          }
       }
    },

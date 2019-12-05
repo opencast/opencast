@@ -8,6 +8,8 @@
    "CANCEL": "İptal Et",
    "CONFIRM": "Onayla",
    "SAVE": "Kaydet",
+   "CONTINUE": "Devam Et",
+   "CLOSE": "Kapat",
    "LOGOUT": "Çıkış yap",
    "RESET": "Sıfırla",
    "SELECT_NO_OPTION_SELECTED": "Seçili seçenek yok",
@@ -66,7 +68,7 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Bu seri etkinlikler içeriyor. Serinin silinmesi, etkinlikleri silmez.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "EVENT_WILL_BE_GONE": "Devam ederseniz, bu etkinlik geri alınamaz bir şekilde gider."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Bu seri, hala etkinlik içerdiğinden silinemez."
@@ -128,7 +130,7 @@
       "EVENT_WILL_BE_DELETED": "Etkinlik siliniyor",
       "EVENTS_DELETED": "Etkinlikler siliniyor.",
       "EVENTS_NOT_DELETED": "Etkinlik(ler) silinemedi.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Etkinlik(ler) silinemedi çünkü bunu yapma izniniz yok.",
       "SERIES_DELETED": "Seriler silindi",
       "SERIES_NOT_DELETED": "Seriler silinemedi",
       "LOCATION_DELETED": "Konum silindi",
@@ -170,7 +172,13 @@
       "VIDEO_TOO_MANY_AUDIOS": "Tek bir video akışında birden fazla ses akışına sahip olamazsınız",
       "SERVER_UNRESPONSIVE": "Hop! Sunucu yanıt vermiyor. Lütfen daha sonra tekrar deneyin.",
       "SERVICE_UNAVAILABLE": "Hop! Sunucu yanıt vermiyor. Lütfen daha sonra tekrar deneyin.",
-      "ACTIVE_TRANSACTION": "Bu etkinlik iş akışında aktif bir işem olduğu sürece düzenlenemez."
+      "ACTIVE_TRANSACTION": "Bu etkinlik iş akışında aktif bir işem olduğu sürece düzenlenemez.",
+      "BULK_METADATA_UPDATE": {
+         "UNEXPECTED_ERROR": "Güncelleme yapılırken beklenmeyen bir hata oluştu. Bazı etkinlikler güncellenmiş olabilir.",
+         "ALL_EVENTS_UPDATED": "Tüm etkinlikler başarıyla güncellendi.",
+         "NO_EVENTS_UPDATED": "Tüm güncellemeler başarısız oldu.",
+         "SOME_EVENTS_NOT_UPDATED": "Bazı etkinlikler güncellenemedi."
+      }
    },
    "BULK_ACTIONS": {
       "CAPTION": "Hareketler",
@@ -237,6 +245,36 @@
             "HEADER": "Bu sayfa, hafta içi gruplara göre düzenlenmiş etkinlikleri düzenlemenizi sağlar. Tüm zamanlanmış olayların belirli bir alan için aynı değere sahip olması durumunda giriş alanları önceden doldurulur. Aksi takdirde, giriş alanları boş bırakılır. Giriş alanlarını boş bırakmak, ilgili değerlerin değiştirilmemesi gerektiği anlamına gelir.",
             "METADATA": "Üstveri",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+         }
+      },
+      "EDIT_EVENTS_METADATA": {
+         "CAPTION": "Birden çok etkinliğin meta verilerini düzenle",
+         "FATAL_ERROR": "Önemli bir hata oluştu: {{ fatalError }}",
+         "REQUEST_ERRORS": {
+            "CANNOT_EDIT_SOME": "Vurgulanan etkinlikler düzenlenemez.",
+            "NOTHING_TO_EDIT": "Bu etkinlikler düzenlenemiyor.",
+            "NOT_FOUND": "Bulunamadı",
+            "RUNNING_WORKFLOW": "İş akışı çalışıyor",
+            "TABLE": {
+               "CAPTION": "Seçilen etkinlik",
+               "ERRORS": "Hatalar"
+            }
+         },
+         "EDIT": {
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "TABLE": {
+               "CAPTION": "Seçili etkinliklerin meta verileri",
+               "FIELDS": "Üstveri",
+               "VALUES": "Değerler"
+            }
+         },
+         "UPDATE_FAILURES": {
+            "TABLE": {
+               "CAPTION": "Güncelleme Hataları"
+            },
+            "UPDATE_FAILED": "Güncelleme başarısız oldu",
+            "NO_EVENTS_UPDATED": "Tüm güncellemeler başarısız oldu.",
+            "SOME_EVENTS_NOT_UPDATED": "Vurgulanan etkinlikler güncellenemedi."
          }
       }
    },
@@ -999,7 +1037,7 @@
                   "REPLACE_EVENT_ACLS": "Etkinlik izinlerini güncelle",
                   "REPLACE_EVENT_ACLS_HINT": "Bu dizinin tüm etkinliklerinin geçerli izinlere sahip olduğundan emin olun",
                   "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "LOAD_MORE_LINK": "Daha fazla yükle"
                },
                "ROLES": {
                   "LABEL": "Bir rol seç",
@@ -1523,7 +1561,7 @@
          "SPLIT": "Ayır",
          "SPLIT_TOOLTIP": "Şu andaki imleç konumunda bölütü böl.",
          "CUT": "Gizle/Göster",
-         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "CUT_TOOLTIP": "Videonun seçilen bölümünü gizleyin veya gösterin.",
          "REPLAY_SEGMENT": "Bölümün başlangıcını oynat",
          "REPLAY_SEGMENT_TOOLTIP": "Mevcut bölümü en baştan oynat.",
          "REPLAY_END_OF_SEGMENT": "Bölümün Sonunu Oynat",
@@ -1556,7 +1594,7 @@
                },
                "FROM_RIGHT_VIDEO": {
                   "LABEL": "Sağ taraftaki videodan çıkarıp al",
-                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+                  "TOOLTIP": "Küçük resmi, sağdaki videodan mevcut oynatma yerinden çıkarıp al"
                }
             },
             "UPLOAD": {
@@ -1565,7 +1603,7 @@
             },
             "USE_DEFAULT": {
                "LABEL": "Varsayılan küçük resim kullan",
-               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+               "TOOLTIP": "Otomatik olarak oluşturulan varsayılan küçük resmi kullanın"
             }
          },
          "PREVIEW": {
@@ -1573,9 +1611,9 @@
             "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
          },
          "CURRENT": {
-            "DEFAULT": "You are currently using the default thumbnail.",
-            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
-            "UPLOAD": "You are currently using an uploaded thumbnail."
+            "DEFAULT": "Şu anda varsayılan küçük resmi kullanıyorsunuz.",
+            "SNAPSHOT": "Şu anda kullanılan küçük resim videodan alınmıştır.",
+            "UPLOAD": "Şu anda yüklenmiş bir küçük resmi kullanıyorsunuz."
          }
       },
       "TRACKS": {
@@ -1593,8 +1631,8 @@
             "NO_PREVIEW_AVAILABLE": "Önizleme görseli bulunamadı",
             "NO_TRACK_SELECTED": "Hiçbir video kaydı seçilmedi",
             "TOOLTIPS": {
-               "HIDE": "This video track is currently enabled. Click to disable",
-               "UNHIDE": "This video track is currently disabled. Click to enable."
+               "HIDE": "Bu video kaydı şu anda etkin. Devre dışı bırakmak için tıklayın",
+               "UNHIDE": "Bu video kaydı şu anda devre dışı. Etkinleştirmek için tıklayın."
             }
          },
          "AUDIO": {
@@ -1603,8 +1641,8 @@
             "NO_PREVIEW_AVAILABLE": "Önizleme görseli bulunamadı",
             "NO_TRACK_SELECTED": "Hiçbir ses kaydı seçilmedi",
             "TOOLTIPS": {
-               "HIDE": "This audio track is currently enabled. Click to disable",
-               "UNHIDE": "This audio track is currently disabled. Click to enable"
+               "HIDE": "Bu ses kaydı şu anda etkin. Devre dışı bırakmak için tıklayın",
+               "UNHIDE": "Bu ses kaydı şu anda devre dışı. Etkinleştirmek için tıklayın"
             }
          }
       },
@@ -1919,7 +1957,7 @@
       "DESCRIPTIONS": {
          "GENERAL": {
             "MAIN_MENU": "Ana menü",
-            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Bir sonraki gösterge paneli filtresini seç",
             "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
             "REMOVE_FILTERS": "Tüm filtreleri temizle",
             "EVENT_VIEW": "Etkinlikler",
@@ -1984,8 +2022,8 @@
       },
       "DESCRIPTION": {
          "RANDOM": "Bu rastgele veriler sadece deneme ve tanıtım amaçlıdır. Bu grafiğin istatistik sağlayıcısının json tanımını 'etc/providers' klasörün içinden silerek bu grafiği devre dışı bırakabilirsiniz.",
-         "VIEWS_SUM": "This displays the total number of views per time unit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "VIEWS_SUM": "Zaman birimi başına toplam görüntülenme sayısını görüntüler.",
+         "VIEWS_AVG": "Zaman birimi başına ortalama günlük görüntü sayısını görüntüler.",
          "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
