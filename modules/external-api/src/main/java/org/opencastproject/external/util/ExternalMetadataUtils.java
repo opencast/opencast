@@ -21,7 +21,7 @@
 package org.opencastproject.external.util;
 
 import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public final class ExternalMetadataUtils {
    * @param collection
    *          The collection to update subject to subjects.
    */
-  public static void changeSubjectToSubjects(final MetadataCollection collection) {
+  public static void changeSubjectToSubjects(final DublinCoreMetadataCollection collection) {
     // Change subject to subjects.
     final MetadataField subject = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     collection.removeField(subject);
@@ -72,7 +72,7 @@ public final class ExternalMetadataUtils {
    * @param metadata
    *          The metadata from which the list have to be removed
    */
-  public static void removeCollectionList(final MetadataCollection metadata) {
+  public static void removeCollectionList(final DublinCoreMetadataCollection metadata) {
     // Change subject to subjects.
     final List<MetadataField> fields = metadata.getFields();
     for (final MetadataField f : fields) {

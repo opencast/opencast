@@ -34,7 +34,7 @@ import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.util.NotFoundException;
@@ -152,7 +152,7 @@ public class EventCatalogUIAdapterTest {
     configurationDublinCoreCatalogUIAdapter.setWorkspace(workspace);
     configurationDublinCoreCatalogUIAdapter.updated(eventProperties);
 
-    MetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
+    DublinCoreMetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
     assertThat(eventJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.collectionToJson(abstractMetadata,
             true)))
             .allowingAnyArrayOrdering());

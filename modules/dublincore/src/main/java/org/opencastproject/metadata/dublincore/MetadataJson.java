@@ -402,12 +402,12 @@ public final class MetadataJson {
     return copy;
   }
 
-  public static JValue collectionToJson(final MetadataCollection collection, final boolean withOrderedText) {
+  public static JValue collectionToJson(final DublinCoreMetadataCollection collection, final boolean withOrderedText) {
     return arr(collection.getFields().stream().map(field -> fieldToJson(field, withOrderedText))
             .collect(Collectors.toList()));
   }
 
-  private static void fillCollectionFromJson(final MetadataCollection collection, final Object json) {
+  private static void fillCollectionFromJson(final DublinCoreMetadataCollection collection, final Object json) {
     if (!(json instanceof  JSONArray))
       throw new IllegalArgumentException("couldn't fill metadata collection, didn't get an array");
 
@@ -442,7 +442,7 @@ public final class MetadataJson {
       if (value == null)
         continue;
 
-      final MetadataCollection collection = metadataList.getMetadataByFlavor(flavor.toString());
+      final DublinCoreMetadataCollection collection = metadataList.getMetadataByFlavor(flavor.toString());
       if (collection == null)
         continue;
       MetadataJson.fillCollectionFromJson(collection, value);
@@ -454,7 +454,7 @@ public final class MetadataJson {
     for (final Map.Entry<String, MetadataList.TitledCollection> metadata : metadataList.getMetadataList().entrySet()) {
       final List<Field> fields = new ArrayList<>();
 
-      final MetadataCollection metadataCollection = metadata.getValue().getCollection();
+      final DublinCoreMetadataCollection metadataCollection = metadata.getValue().getCollection();
 
       if (!MetadataList.Locked.NONE.equals(metadataList.getLocked())) {
         fields.add(f(KEY_METADATA_LOCKED, v(metadataList.getLocked().getValue())));

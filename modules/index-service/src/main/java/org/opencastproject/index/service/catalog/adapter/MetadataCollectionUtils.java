@@ -25,8 +25,8 @@ import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
 import com.google.common.collect.Iterables;
@@ -77,11 +77,11 @@ public final class MetadataCollectionUtils {
     }
   }
 
-  public static void addEmptyField(final MetadataCollection collection, final MetadataField metadataField, final ListProvidersService listProvidersService) {
+  public static void addEmptyField(final DublinCoreMetadataCollection collection, final MetadataField metadataField, final ListProvidersService listProvidersService) {
     addField(collection, metadataField, Collections.emptyList(), listProvidersService);
   }
 
-  public static void addField(final MetadataCollection collection, final MetadataField metadataField, final String value, final ListProvidersService listProvidersService) {
+  public static void addField(final DublinCoreMetadataCollection collection, final MetadataField metadataField, final String value, final ListProvidersService listProvidersService) {
     addField(collection, metadataField, Collections.singletonList(value), listProvidersService);
   }
 
@@ -144,7 +144,7 @@ public final class MetadataCollectionUtils {
   }
 
 
-  public static void addField(final MetadataCollection collection, final MetadataField metadataField, final List<String> values, final ListProvidersService listProvidersService) {
+  public static void addField(final DublinCoreMetadataCollection collection, final MetadataField metadataField, final List<String> values, final ListProvidersService listProvidersService) {
     final List<String> filteredValues = values.stream().filter(StringUtils::isNotBlank).collect(Collectors.toList());
 
     if (!filteredValues.isEmpty()) {

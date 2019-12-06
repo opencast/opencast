@@ -28,10 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Abstract container for the metadata
- */
-public final class DublinCoreMetadataCollection implements MetadataCollection {
+public class DublinCoreMetadataCollection {
   /** The list containing all the metadata */
   private List<MetadataField> fieldsInOrder = new ArrayList<>();
   private final Map<String, MetadataField> outputFields = new HashMap<>();
@@ -46,9 +43,12 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
     }
   }
 
-  @Override
-  public MetadataCollection getCopy() {
-    final MetadataCollection copiedCollection = new DublinCoreMetadataCollection();
+  public DublinCoreMetadataCollection(final DublinCoreMetadataCollection c) {
+    this(c.fieldsInOrder);
+  }
+
+  public DublinCoreMetadataCollection getCopy() {
+    final DublinCoreMetadataCollection copiedCollection = new DublinCoreMetadataCollection();
     for (final MetadataField field : getFields()) {
       final MetadataField copiedField = new MetadataField(field);
       copiedCollection.addField(copiedField);
@@ -56,12 +56,10 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
     return copiedCollection;
   }
 
-  @Override
   public Map<String, MetadataField> getOutputFields() {
     return outputFields;
   }
 
-  @Override
   public void addField(final MetadataField metadata) {
     if (metadata == null)
       throw new IllegalArgumentException("The metadata must not be null.");
@@ -130,7 +128,6 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
     }
   }
 
-  @Override
   public void removeField(final MetadataField metadata) {
     if (metadata == null)
       throw new IllegalArgumentException("The metadata must not be null.");
@@ -138,12 +135,10 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
     this.outputFields.remove(metadata.getOutputID());
   }
 
-  @Override
   public List<MetadataField> getFields() {
     return this.fieldsInOrder;
   }
 
-  @Override
   public void updateStringField(final MetadataField current, final String value) {
     if (current.getValue() != null && !(current.getValue() instanceof String)) {
       throw new IllegalArgumentException("Unable to update a field to a different type than String with this method!");
@@ -154,7 +149,6 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
     addField(field);
   }
 
-  @Override
   public boolean isUpdated() {
     for (final MetadataField field : fieldsInOrder) {
       if (field.isUpdated()) {

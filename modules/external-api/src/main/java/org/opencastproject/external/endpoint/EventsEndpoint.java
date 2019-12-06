@@ -75,8 +75,8 @@ import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
@@ -1105,7 +1105,7 @@ public class EventsEndpoint implements ManagedService {
         MetadataList actualList = metadataList.get();
 
         // API v1 should return a two separate fields for start date and start time. Since those fields were merged in index service, we have to split them up.
-        final MetadataCollection collection = actualList.getMetadataByFlavor("dublincore/episode");
+        final DublinCoreMetadataCollection collection = actualList.getMetadataByFlavor("dublincore/episode");
         final boolean withOrderedText = collection == null;
         if (collection != null) {
           convertStartDateTimeToApiV1(collection);
@@ -1120,7 +1120,7 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-  private void convertStartDateTimeToApiV1(MetadataCollection collection) throws java.text.ParseException {
+  private void convertStartDateTimeToApiV1(DublinCoreMetadataCollection collection) throws java.text.ParseException {
 
     if (!collection.getOutputFields().containsKey("startDate")) return;
 
@@ -1166,12 +1166,12 @@ public class EventsEndpoint implements ManagedService {
     if (catalogUIAdapters.size() > 0) {
       for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
         // TODO: This is very slow:
-        MetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
+        DublinCoreMetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
         if (fields != null) metadataList.add(catalogUIAdapter, fields);
       }
     }
     // TODO: This is slow:
-    MetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
+    DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
     ExternalMetadataUtils.changeSubjectToSubjects(collection);
     ExternalMetadataUtils.removeCollectionList(collection);
     metadataList.add(eventCatalogUIAdapter, collection);
@@ -1199,7 +1199,7 @@ public class EventsEndpoint implements ManagedService {
       }
       // Try the main catalog first as we load it from the index.
       if (flavor.get().equals(eventCatalogUIAdapter.getFlavor())) {
-        MetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
+        DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
         ExternalMetadataUtils.changeSubjectToSubjects(collection);
         ExternalMetadataUtils.removeCollectionList(collection);
         convertStartDateTimeToApiV1(collection);
@@ -1212,7 +1212,7 @@ public class EventsEndpoint implements ManagedService {
       if (catalogUIAdapters.size() > 0) {
         for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
           if (flavor.get().equals(catalogUIAdapter.getFlavor())) {
-            MetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
+            DublinCoreMetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
             ExternalMetadataUtils.removeCollectionList(fields);
             convertStartDateTimeToApiV1(fields);
             return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(fields, false));
@@ -1259,7 +1259,7 @@ public class EventsEndpoint implements ManagedService {
               String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
     }
 
-    MetadataCollection collection = null;
+    DublinCoreMetadataCollection collection = null;
     EventCatalogUIAdapter adapter = null;
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       MetadataList metadataList = new MetadataList();

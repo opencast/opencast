@@ -80,14 +80,14 @@ public class DublinCoreMetadataCollectionTest {
   @Test
   public void testOrderOfFields() {
     // Add a single field that has an index greater than 0.
-    final MetadataCollection collection = new DublinCoreMetadataCollection(Collections.singleton(third));
+    final DublinCoreMetadataCollection collection = new DublinCoreMetadataCollection(Collections.singleton(third));
     assertEquals(1, collection.getFields().size());
     assertEquals(third, collection.getFields().get(0));
   }
 
   @Test
   public void testOrderOfFieldsInputFieldOrderZeroExpectsAtFront() {
-    MetadataCollection collection = new DublinCoreMetadataCollection(Arrays
+    DublinCoreMetadataCollection collection = new DublinCoreMetadataCollection(Arrays
       .asList(unorderedOne, unorderedTwo, unorderedThree, first));
 
     assertEquals(4, collection.getFields().size());
@@ -109,7 +109,7 @@ public class DublinCoreMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputFieldOrderTwoExpectsInMiddle() {
-    MetadataCollection collection = new DublinCoreMetadataCollection(Arrays
+    DublinCoreMetadataCollection collection = new DublinCoreMetadataCollection(Arrays
       .asList(unorderedOne, unorderedTwo, unorderedThree, third));
 
     assertEquals(4, collection.getFields().size());
@@ -131,7 +131,7 @@ public class DublinCoreMetadataCollectionTest {
 
   @Test
   public void testOrderOfFieldsInputMultipleOrderedFieldsExpectsInCorrectPositions() {
-    MetadataCollection collection = new DublinCoreMetadataCollection(Arrays
+    DublinCoreMetadataCollection collection = new DublinCoreMetadataCollection(Arrays
       .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh));
 
     assertEquals(6, collection.getFields().size());
@@ -168,7 +168,7 @@ public class DublinCoreMetadataCollectionTest {
   @Test
   public void testOrderOfFieldsInputDuplicateOrderValueExpectsBothInserted() {
     final MetadataField newFirst = createField("New first", 0, null);
-    final MetadataCollection collection = new DublinCoreMetadataCollection(Arrays
+    final DublinCoreMetadataCollection collection = new DublinCoreMetadataCollection(Arrays
       .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh, newFirst));
 
     assertEquals(7, collection.getFields().size());
@@ -187,7 +187,7 @@ public class DublinCoreMetadataCollectionTest {
     final String value = "Hello";
     final MetadataField newFirst = createField("first", 0, value);
 
-    final MetadataCollection collection = new DublinCoreMetadataCollection(Arrays
+    final DublinCoreMetadataCollection collection = new DublinCoreMetadataCollection(Arrays
       .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh, newFirst));
 
     int numberOfFirsts = 0;

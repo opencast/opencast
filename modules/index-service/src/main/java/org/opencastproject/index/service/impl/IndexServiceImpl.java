@@ -84,12 +84,12 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
@@ -869,7 +869,7 @@ public class IndexServiceImpl implements IndexService {
     // Get Type of Source
     SourceType type = getSourceType(eventHttpServletRequest.getSource().get());
 
-    MetadataCollection eventMetadata = eventHttpServletRequest.getMetadataList().get()
+    DublinCoreMetadataCollection eventMetadata = eventHttpServletRequest.getMetadataList().get()
             .getMetadataByAdapter(eventCatalogUIAdapter);
 
     Date currentStartDate = null;
@@ -1050,15 +1050,15 @@ public class IndexServiceImpl implements IndexService {
   }
 
   /**
-   * Update the presenters field in the event {@link MetadataCollection} to have friendly names loaded by the
+   * Update the presenters field in the event {@link DublinCoreMetadataCollection} to have friendly names loaded by the
    * {@link UserDirectoryService} and return the usernames of the presenters.
    *
    * @param eventMetadata
-   *          The {@link MetadataCollection} to update the presenters (creator field) with full names.
+   *          The {@link DublinCoreMetadataCollection} to update the presenters (creator field) with full names.
    * @return If the presenters (creator) field has been updated, the set of user names, if any, of the presenters. None
    *         if it wasn't updated.
    */
-  private Opt<Set<String>> updatePresenters(MetadataCollection eventMetadata) {
+  private Opt<Set<String>> updatePresenters(DublinCoreMetadataCollection eventMetadata) {
     MetadataField presentersMetadataField = eventMetadata.getOutputFields()
             .get(DublinCore.PROPERTY_CREATOR.getLocalName());
     if (presentersMetadataField.isUpdated()) {
@@ -1298,7 +1298,7 @@ public class IndexServiceImpl implements IndexService {
     Event event = optEvent.get();
     MediaPackage mediaPackage = getEventMediapackage(event);
     Opt<Set<String>> presenters = Opt.none();
-    MetadataCollection eventCatalog = metadataList.getMetadataByAdapter(getCommonEventCatalogUIAdapter());
+    DublinCoreMetadataCollection eventCatalog = metadataList.getMetadataByAdapter(getCommonEventCatalogUIAdapter());
     if (eventCatalog != null) {
       presenters = updatePresenters(eventCatalog);
     }
@@ -1348,7 +1348,7 @@ public class IndexServiceImpl implements IndexService {
    * @return A {@link Tuple} with a list of friendly presenter names and a set of user names if available for the
    *         presenters.
    */
-  protected Tuple<List<String>, Set<String>> getTechnicalPresenters(MetadataCollection eventMetadata) {
+  protected Tuple<List<String>, Set<String>> getTechnicalPresenters(DublinCoreMetadataCollection eventMetadata) {
     MetadataField presentersMetadataField = eventMetadata.getOutputFields()
             .get(DublinCore.PROPERTY_CREATOR.getLocalName());
     List<String> presenters = new ArrayList<>();
@@ -1722,7 +1722,7 @@ public class IndexServiceImpl implements IndexService {
   private void updateMediaPackageMetadata(MediaPackage mp, MetadataList metadataList) {
     String oldSeriesId = mp.getSeries();
     for (EventCatalogUIAdapter catalogUIAdapter : getEventCatalogUIAdapters()) {
-      final MetadataCollection metadata = metadataList.getMetadataByAdapter(catalogUIAdapter);
+      final DublinCoreMetadataCollection metadata = metadataList.getMetadataByAdapter(catalogUIAdapter);
       if (metadata != null && metadata.isUpdated()) {
         catalogUIAdapter.storeFields(mp, metadata);
       }
@@ -1873,7 +1873,7 @@ public class IndexServiceImpl implements IndexService {
       dc.set(new EName(DublinCores.OC_PROPERTY_NS_URI, entry.getKey()), entry.getValue());
     }
 
-    MetadataCollection seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES.toString());
+    DublinCoreMetadataCollection seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES.toString());
     if (seriesMetadata != null) {
       DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
     }
@@ -1948,7 +1948,7 @@ public class IndexServiceImpl implements IndexService {
     final MetadataList metadataList = getMetadataListWithAllSeriesCatalogUIAdapters();
     MetadataJson.fillListFromJson(metadataList, seriesMetadataJson);
 
-    MetadataCollection seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES.toString());
+    DublinCoreMetadataCollection seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES.toString());
     if (seriesMetadata != null) {
       DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
     }
@@ -2128,7 +2128,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   /**
-   * @return A {@link MetadataList} with only the common SeriesCatalogUIAdapter's empty {@link MetadataCollection}
+   * @return A {@link MetadataList} with only the common SeriesCatalogUIAdapter's empty {@link DublinCoreMetadataCollection}
    *         available
    */
   private MetadataList getMetadataListWithCommonSeriesCatalogUIAdapters() {
@@ -2139,7 +2139,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   /**
-   * @return A {@link MetadataList} with all of the available CatalogUIAdapters empty {@link MetadataCollection}
+   * @return A {@link MetadataList} with all of the available CatalogUIAdapters empty {@link DublinCoreMetadataCollection}
    *         available
    */
   @Override
@@ -2176,7 +2176,7 @@ public class IndexServiceImpl implements IndexService {
    */
   private void updateSeriesMetadata(String seriesId, MetadataList metadataList) {
     for (SeriesCatalogUIAdapter adapter : seriesCatalogUIAdapters) {
-      final MetadataCollection metadata = metadataList.getMetadataByFlavor(adapter.getFlavor().toString());
+      final DublinCoreMetadataCollection metadata = metadataList.getMetadataByFlavor(adapter.getFlavor().toString());
       if (metadata != null && metadata.isUpdated()) {
         adapter.storeFields(seriesId, metadata);
       }

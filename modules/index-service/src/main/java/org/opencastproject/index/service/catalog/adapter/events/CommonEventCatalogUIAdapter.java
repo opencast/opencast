@@ -29,7 +29,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
 import com.entwinemedia.fn.data.Opt;
@@ -63,7 +63,7 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
   }
 
   @Override
-  public Catalog storeFields(MediaPackage mediaPackage, MetadataCollection abstractMetadata) {
+  public Catalog storeFields(MediaPackage mediaPackage, DublinCoreMetadataCollection abstractMetadata) {
     Catalog storeFields = super.storeFields(mediaPackage, abstractMetadata);
 
     // Update the metadata stored in the mediapackage
