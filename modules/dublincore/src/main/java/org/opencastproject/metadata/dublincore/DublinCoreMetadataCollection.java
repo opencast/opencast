@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class DublinCoreMetadataCollection {
   /** The list containing all the metadata */
@@ -47,13 +48,9 @@ public class DublinCoreMetadataCollection {
     this(c.fieldsInOrder);
   }
 
-  public DublinCoreMetadataCollection getCopy() {
-    final DublinCoreMetadataCollection copiedCollection = new DublinCoreMetadataCollection();
-    for (final MetadataField field : getFields()) {
-      final MetadataField copiedField = new MetadataField(field);
-      copiedCollection.addField(copiedField);
-    }
-    return copiedCollection;
+  public DublinCoreMetadataCollection readOnlyCopy() {
+    return new DublinCoreMetadataCollection(this.fieldsInOrder.stream().map(MetadataField::readOnlyCopy)
+            .collect(Collectors.toList()));
   }
 
   public Map<String, MetadataField> getOutputFields() {
