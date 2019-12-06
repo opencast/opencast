@@ -46,6 +46,8 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -96,15 +98,18 @@ public class StreamingDistributionServiceRemoteImpl extends RemoteBase implement
     HttpGet get = new HttpGet("/publishToStreaming");
     HttpResponse response = getResponse(get);
 
-    try {
-      if (response != null) {
-        return Boolean.valueOf(response.getEntity().getContent().toString());
+    if (response != null) {
+      String content = null;
+      try (BufferedReader r = new BufferedReader(new InputStreamReader(response.getEntity().getContent()))) {
+        content = r.readLine();
+      } catch (Exception e) {
+        logger.error("Failed to read response from remote service: ", e);
+      } finally {
+        closeConnection(response);
       }
-      logger.error("Response to /publishToStreaming is empty.");
-    } catch (Exception e) {
-      logger.error("Exception occured: ", e);
-    } finally {
-      closeConnection(response);
+      if (content != null) {
+        return Boolean.parseBoolean(content.trim());
+      }
     }
     return false;
   }
