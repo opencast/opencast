@@ -32,8 +32,6 @@ public interface MetadataCollection {
    */
   MetadataCollection getCopy();
 
-  Map<String, MetadataField> getInputFields();
-
   Map<String, MetadataField> getOutputFields();
 
   /**

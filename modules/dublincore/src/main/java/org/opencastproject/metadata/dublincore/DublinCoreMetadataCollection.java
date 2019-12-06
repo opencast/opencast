@@ -34,7 +34,6 @@ import java.util.Map;
 public final class DublinCoreMetadataCollection implements MetadataCollection {
   /** The list containing all the metadata */
   private List<MetadataField> fieldsInOrder = new ArrayList<>();
-  private final Map<String, MetadataField> inputFields = new HashMap<>();
   private final Map<String, MetadataField> outputFields = new HashMap<>();
 
   public DublinCoreMetadataCollection() {
@@ -58,11 +57,6 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
   }
 
   @Override
-  public Map<String, MetadataField> getInputFields() {
-    return inputFields;
-  }
-
-  @Override
   public Map<String, MetadataField> getOutputFields() {
     return outputFields;
   }
@@ -72,7 +66,6 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
     if (metadata == null)
       throw new IllegalArgumentException("The metadata must not be null.");
     addFieldInOrder(metadata);
-    this.inputFields.put(metadata.getInputID(), metadata);
     this.outputFields.put(metadata.getOutputID(), metadata);
   }
 
@@ -142,7 +135,6 @@ public final class DublinCoreMetadataCollection implements MetadataCollection {
     if (metadata == null)
       throw new IllegalArgumentException("The metadata must not be null.");
     this.fieldsInOrder.remove(metadata);
-    this.inputFields.remove(metadata.getInputID());
     this.outputFields.remove(metadata.getOutputID());
   }
 
