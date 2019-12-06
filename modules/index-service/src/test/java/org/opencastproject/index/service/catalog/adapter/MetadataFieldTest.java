@@ -89,14 +89,15 @@ public class MetadataFieldTest {
   public void testSetDifferentValues()  throws Exception {
     String textValue = "This is the text value";
 
-    MetadataField<String> textField = new MetadataField<>(defaultInputID,
+    MetadataField textField = new MetadataField(
+            defaultInputID,
             optOutputID,
             label,
             false,
             false,
             null,
             null,
-            null,
+            MetadataField.Type.TEXT,
             null,
             null,
             null,

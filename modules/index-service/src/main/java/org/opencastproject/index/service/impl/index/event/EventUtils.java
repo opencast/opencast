@@ -23,8 +23,8 @@ package org.opencastproject.index.service.impl.index.event;
 
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.workflow.handler.distribution.EngagePublicationChannel;
@@ -60,12 +60,12 @@ public final class EventUtils {
    *
    * @param event
    *          the source {@link Event}
-   * @return a {@link MetadataCollection} instance with all the event metadata
+   * @return a {@link DublinCoreMetadataCollection} instance with all the event metadata
    */
-  public static MetadataCollection getEventMetadata(Event event, EventCatalogUIAdapter eventCatalogUIAdapter)
+  public static DublinCoreMetadataCollection getEventMetadata(Event event, EventCatalogUIAdapter eventCatalogUIAdapter)
           throws Exception {
     //copy metadata collection to avoid side effects
-    MetadataCollection eventMetadata = eventCatalogUIAdapter.getRawFields().getCopy();
+    DublinCoreMetadataCollection eventMetadata = new DublinCoreMetadataCollection(eventCatalogUIAdapter.getRawFields());
 
     //match event get methods to correct output fields
     for (MetadataField field: eventMetadata.getOutputFields().values()) {

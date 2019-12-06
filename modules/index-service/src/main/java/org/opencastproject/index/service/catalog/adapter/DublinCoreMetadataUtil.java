@@ -28,7 +28,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataField.Type;
 import org.opencastproject.metadata.dublincore.Precision;
@@ -70,7 +69,7 @@ public final class DublinCoreMetadataUtil {
    * @param metadata
    *          The {@link DublinCoreMetadataCollection} data definitions and values to update the catalog with.
    */
-  public static void updateDublincoreCatalog(DublinCoreCatalog dc, MetadataCollection metadata) {
+  public static void updateDublincoreCatalog(DublinCoreCatalog dc, DublinCoreMetadataCollection metadata) {
     for (MetadataField field : metadata.getOutputFields().values()) {
       if (field.isUpdated() && field.getValue() != null) {
         final String namespace = field.getNamespace() == null ? DublinCore.TERMS_NS_URI : field.getNamespace();

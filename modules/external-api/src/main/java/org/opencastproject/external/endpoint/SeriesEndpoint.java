@@ -54,7 +54,7 @@ import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
@@ -428,12 +428,12 @@ public class SeriesEndpoint {
     List<SeriesCatalogUIAdapter> catalogUIAdapters = indexService.getSeriesCatalogUIAdapters();
     catalogUIAdapters.remove(indexService.getCommonSeriesCatalogUIAdapter());
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
-      final Opt<MetadataCollection> optSeriesMetadata = adapter.getFields(id);
+      final Opt<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(id);
       if (optSeriesMetadata.isSome()) {
         metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), optSeriesMetadata.get());
       }
     }
-    MetadataCollection collection = getSeriesMetadata(optSeries.get());
+    DublinCoreMetadataCollection collection = getSeriesMetadata(optSeries.get());
     ExternalMetadataUtils.changeSubjectToSubjects(collection);
     metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
     return ApiResponses.Json.ok(requestedVersion, MetadataJson.listToJson(metadataList, false));
@@ -446,7 +446,7 @@ public class SeriesEndpoint {
 
     // Try the main catalog first as we load it from the index.
     if (typeMatchesSeriesCatalogUIAdapter(type, indexService.getCommonSeriesCatalogUIAdapter())) {
-      MetadataCollection collection = getSeriesMetadata(optSeries.get());
+      DublinCoreMetadataCollection collection = getSeriesMetadata(optSeries.get());
       ExternalMetadataUtils.changeSubjectToSubjects(collection);
       return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false));
     }
@@ -457,7 +457,7 @@ public class SeriesEndpoint {
 
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
       if (typeMatchesSeriesCatalogUIAdapter(type, adapter)) {
-        final Opt<MetadataCollection> optSeriesMetadata = adapter.getFields(id);
+        final Opt<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(id);
         if (optSeriesMetadata.isSome()) {
           return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(optSeriesMetadata.get(), true));
         }
@@ -471,10 +471,10 @@ public class SeriesEndpoint {
    *
    * @param series
    *          the source {@link Series}
-   * @return a {@link MetadataCollection} instance with all the series metadata
+   * @return a {@link DublinCoreMetadataCollection} instance with all the series metadata
    */
-  private MetadataCollection getSeriesMetadata(Series series) {
-    MetadataCollection metadata = indexService.getCommonSeriesCatalogUIAdapter().getRawFields();
+  private DublinCoreMetadataCollection getSeriesMetadata(Series series) {
+    DublinCoreMetadataCollection metadata = indexService.getCommonSeriesCatalogUIAdapter().getRawFields();
 
     MetadataField title = metadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
     metadata.removeField(title);
@@ -623,7 +623,7 @@ public class SeriesEndpoint {
                       metadataJSON));
     }
 
-    Opt<MetadataCollection> optCollection = Opt.none();
+    Opt<DublinCoreMetadataCollection> optCollection = Opt.none();
     SeriesCatalogUIAdapter adapter = null;
 
     Opt<Series> optSeries = indexService.getSeries(id, externalIndex);
@@ -649,7 +649,7 @@ public class SeriesEndpoint {
           optCollection = catalogUIAdapter.getFields(id);
           adapter = catalogUIAdapter;
         } else {
-          Opt<MetadataCollection> current = catalogUIAdapter.getFields(id);
+          Opt<DublinCoreMetadataCollection> current = catalogUIAdapter.getFields(id);
           if (current.isSome()) {
             metadataList.add(catalogUIAdapter, current.get());
           }
@@ -661,7 +661,7 @@ public class SeriesEndpoint {
       return ApiResponses.notFound("Cannot find a catalog with type '%s' for series with id '%s'.", type, id);
     }
 
-    MetadataCollection collection = optCollection.get();
+    DublinCoreMetadataCollection collection = optCollection.get();
 
     for (String key : updatedFields.keySet()) {
       MetadataField field = collection.getOutputFields().get(key);
@@ -898,7 +898,7 @@ public class SeriesEndpoint {
 
       MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
 
-      MetadataCollection collection = null;
+      DublinCoreMetadataCollection collection = null;
       SeriesCatalogUIAdapter adapter = null;
       for (SeriesCatalogUIAdapter seriesCatalogUIAdapter : indexService.getSeriesCatalogUIAdapters()) {
         MediaPackageElementFlavor catalogFlavor = MediaPackageElementFlavor

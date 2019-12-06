@@ -24,7 +24,7 @@ package org.opencastproject.adminui.endpoint;
 import static org.junit.Assert.assertThat;
 
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.MetadataList.Locked;
@@ -74,7 +74,7 @@ public class MetadataListTest {
     InputStreamReader reader = new InputStreamReader(stream);
     JSONArray inputJson = (JSONArray) new JSONParser().parse(reader);
 
-    MetadataCollection abstractMetadataCollection = episodeDublinCoreCatalogUIAdapter.getRawFields();
+    DublinCoreMetadataCollection abstractMetadataCollection = episodeDublinCoreCatalogUIAdapter.getRawFields();
 
     MetadataList metadataList = new MetadataList();
     metadataList.add(episodeDublinCoreCatalogUIAdapter, abstractMetadataCollection);

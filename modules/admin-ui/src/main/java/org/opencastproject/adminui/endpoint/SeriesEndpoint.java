@@ -74,7 +74,7 @@ import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
@@ -299,7 +299,7 @@ public class SeriesEndpoint implements ManagedService {
     List<SeriesCatalogUIAdapter> catalogUIAdapters = indexService.getSeriesCatalogUIAdapters();
     catalogUIAdapters.remove(indexService.getCommonSeriesCatalogUIAdapter());
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
-      final Opt<MetadataCollection> optSeriesMetadata = adapter.getFields(series);
+      final Opt<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(series);
       if (optSeriesMetadata.isSome()) {
         metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), optSeriesMetadata.get());
       }
@@ -313,10 +313,10 @@ public class SeriesEndpoint implements ManagedService {
    *
    * @param series
    *          the source {@link Series}
-   * @return a {@link MetadataCollection} instance with all the series metadata
+   * @return a {@link DublinCoreMetadataCollection} instance with all the series metadata
    */
-  private MetadataCollection getSeriesMetadata(Series series) {
-    MetadataCollection metadata = indexService.getCommonSeriesCatalogUIAdapter().getRawFields();
+  private DublinCoreMetadataCollection getSeriesMetadata(Series series) {
+    DublinCoreMetadataCollection metadata = indexService.getCommonSeriesCatalogUIAdapter().getRawFields();
 
     MetadataField title = metadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
     metadata.removeField(title);
@@ -425,17 +425,17 @@ public class SeriesEndpoint implements ManagedService {
   @RestQuery(name = "getNewMetadata", description = "Returns all the data related to the metadata tab in the new series modal as JSON", returnDescription = "All the data related to the series metadata tab as JSON", reponses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series metadata tab as JSON") })
   public Response getNewMetadata() {
     MetadataList metadataList = indexService.getMetadataListWithAllSeriesCatalogUIAdapters();
-    final MetadataCollection metadataByAdapter = metadataList
+    final DublinCoreMetadataCollection metadataByAdapter = metadataList
             .getMetadataByAdapter(indexService.getCommonSeriesCatalogUIAdapter());
     if (metadataByAdapter != null) {
-      MetadataCollection collection = metadataByAdapter;
+      DublinCoreMetadataCollection collection = metadataByAdapter;
       safelyRemoveField(collection, "identifier");
       metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
     }
     return okJson(MetadataJson.listToJson(metadataList, true));
   }
 
-  private void safelyRemoveField(MetadataCollection collection, String fieldName) {
+  private void safelyRemoveField(DublinCoreMetadataCollection collection, String fieldName) {
     MetadataField metadataField = collection.getOutputFields().get(fieldName);
     if (metadataField != null) {
       collection.removeField(metadataField);

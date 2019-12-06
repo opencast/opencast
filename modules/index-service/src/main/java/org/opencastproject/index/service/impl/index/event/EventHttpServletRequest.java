@@ -29,8 +29,8 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
@@ -418,7 +418,7 @@ public class EventHttpServletRequest {
       String flavorString = catalog.get("flavor").toString();
       MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
 
-      MetadataCollection collection = null;
+      DublinCoreMetadataCollection collection = null;
       EventCatalogUIAdapter adapter = null;
       for (EventCatalogUIAdapter eventCatalogUIAdapter : catalogAdapters) {
         if (eventCatalogUIAdapter.getFlavor().equals(flavor)) {
@@ -512,7 +512,7 @@ public class EventHttpServletRequest {
    *          The metadata list created from the json request to create a new event
    */
   private static void setStartDateAndTimeIfUnset(MetadataList metadataList) {
-    final MetadataCollection optCommonEventCollection = metadataList
+    final DublinCoreMetadataCollection optCommonEventCollection = metadataList
             .getMetadataByFlavor(MediaPackageElements.EPISODE.toString());
     if (optCommonEventCollection != null) {
       MetadataField startDate = optCommonEventCollection.getOutputFields().get("startDate");

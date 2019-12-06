@@ -76,9 +76,9 @@ import org.opencastproject.mediapackage.track.AbstractStreamImpl;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
 import org.opencastproject.scheduler.api.Recording;
@@ -630,7 +630,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       }
 
       @Override
-      public MetadataCollection getFields(MediaPackage mediapackage) {
+      public DublinCoreMetadataCollection getFields(MediaPackage mediapackage) {
         return super.getRawFields();
       }
     };

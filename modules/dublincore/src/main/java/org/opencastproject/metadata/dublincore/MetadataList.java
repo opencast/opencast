@@ -43,9 +43,9 @@ public final class MetadataList {
 
   public static final class TitledCollection {
     private final String title;
-    private final MetadataCollection collection;
+    private final DublinCoreMetadataCollection collection;
 
-    public TitledCollection(String title, MetadataCollection collection) {
+    public TitledCollection(String title, DublinCoreMetadataCollection collection) {
       this.title = title;
       this.collection = collection;
     }
@@ -54,7 +54,7 @@ public final class MetadataList {
       return title;
     }
 
-    public MetadataCollection getCollection() {
+    public DublinCoreMetadataCollection getCollection() {
       return collection;
     }
   }
@@ -70,7 +70,7 @@ public final class MetadataList {
     return locked;
   }
 
-  public void makeMetadataCollectionReadOnly(final MetadataCollection metadataCollection) {
+  public void makeMetadataCollectionReadOnly(final DublinCoreMetadataCollection metadataCollection) {
     for (final MetadataField field : metadataCollection.getFields())
       field.setReadOnly(true);
   }
@@ -79,28 +79,28 @@ public final class MetadataList {
     return metadataList;
   }
 
-  public MetadataCollection getMetadataByAdapter(final SeriesCatalogUIAdapter catalogUIAdapter) {
+  public DublinCoreMetadataCollection getMetadataByAdapter(final SeriesCatalogUIAdapter catalogUIAdapter) {
     return getMetadataByFlavor(catalogUIAdapter.getFlavor().toString());
   }
 
-  public MetadataCollection getMetadataByAdapter(final EventCatalogUIAdapter catalogUIAdapter) {
+  public DublinCoreMetadataCollection getMetadataByAdapter(final EventCatalogUIAdapter catalogUIAdapter) {
     return getMetadataByFlavor(catalogUIAdapter.getFlavor().toString());
   }
 
-  public MetadataCollection getMetadataByFlavor(final String flavor) {
+  public DublinCoreMetadataCollection getMetadataByFlavor(final String flavor) {
     return metadataList.keySet().stream().filter(e -> e.equals(flavor)).map(metadataList::get)
             .map(TitledCollection::getCollection).findAny().orElse(null);
   }
 
-  public void add(final EventCatalogUIAdapter adapter, final MetadataCollection metadata) {
+  public void add(final EventCatalogUIAdapter adapter, final DublinCoreMetadataCollection metadata) {
     metadataList.put(adapter.getFlavor().toString(), new TitledCollection(adapter.getUITitle(), metadata));
   }
 
-  public void add(final SeriesCatalogUIAdapter adapter, final MetadataCollection metadata) {
+  public void add(final SeriesCatalogUIAdapter adapter, final DublinCoreMetadataCollection metadata) {
     metadataList.put(adapter.getFlavor().toString(), new TitledCollection(adapter.getUITitle(), metadata));
   }
 
-  public void add(final String flavor, final String title, final MetadataCollection metadata) {
+  public void add(final String flavor, final String title, final DublinCoreMetadataCollection metadata) {
     metadataList.put(flavor, new TitledCollection(title, metadata));
   }
 

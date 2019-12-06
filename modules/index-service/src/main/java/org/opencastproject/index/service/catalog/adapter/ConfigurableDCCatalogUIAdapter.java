@@ -34,7 +34,6 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 
@@ -128,7 +127,7 @@ public abstract class ConfigurableDCCatalogUIAdapter implements CatalogUIAdapter
     return rawFields;
   }
 
-  protected MetadataCollection getFieldsFromCatalogs(List<DublinCoreCatalog> dcCatalogs) {
+  protected DublinCoreMetadataCollection getFieldsFromCatalogs(List<DublinCoreCatalog> dcCatalogs) {
     Map<String,List<MetadataField>> metadataFields = new HashMap<>();
     List<MetadataField> emptyFields = new ArrayList<>(dublinCoreProperties.values());
 

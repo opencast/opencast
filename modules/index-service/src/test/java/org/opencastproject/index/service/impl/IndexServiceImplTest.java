@@ -55,7 +55,6 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -209,13 +208,13 @@ public class IndexServiceImplTest {
     return securityService;
   }
 
-  private Tuple<CommonEventCatalogUIAdapter, VCell<Option<MetadataCollection>>> setupCommonCatalogUIAdapter(
+  private Tuple<CommonEventCatalogUIAdapter, VCell<Option<DublinCoreMetadataCollection>>> setupCommonCatalogUIAdapter(
           Workspace workspace) throws org.osgi.service.cm.ConfigurationException {
     // Create Common Event Catalog UI Adapter
-    final VCell<Option<MetadataCollection>> metadataCell = VCell.ocell();
+    final VCell<Option<DublinCoreMetadataCollection>> metadataCell = VCell.ocell();
     CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = new CommonEventCatalogUIAdapter() {
       @Override
-      public Catalog storeFields(MediaPackage mediaPackage, MetadataCollection metadata) {
+      public Catalog storeFields(MediaPackage mediaPackage, DublinCoreMetadataCollection metadata) {
         metadataCell.set(Option.some(metadata));
         return super.storeFields(mediaPackage, metadata);
       }
@@ -789,7 +788,7 @@ public class IndexServiceImplTest {
     // mock/initialize dependencies
     String username = "user1";
     String org = "mh_default_org";
-    MetadataCollection metadataCollection = new DublinCoreMetadataCollection();
+    DublinCoreMetadataCollection metadataCollection = new DublinCoreMetadataCollection();
     metadataCollection.addField(new MetadataField(
             "title",
             "title",
@@ -1060,7 +1059,7 @@ public class IndexServiceImplTest {
     indexServiceImpl.setUserDirectoryService(userDirectoryService);
     indexServiceImpl.setSecurityService(securityService);
 
-    MetadataCollection metadata = commonEventCatalogUIAdapter.getRawFields();
+    DublinCoreMetadataCollection metadata = commonEventCatalogUIAdapter.getRawFields();
 
     // Possible presenter combinations
     MetadataField emptyUpdatedPresenter = createCreatorMetadataField(new ArrayList<String>());
