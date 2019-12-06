@@ -477,4 +477,10 @@ public class MetadataField {
   public Boolean hasDifferentValues() {
     return hasDifferentValues;
   }
+
+  public MetadataField readOnlyCopy() {
+    final MetadataField metadataField = new MetadataField(this);
+    metadataField.setReadOnly(true);
+    return metadataField;
+  }
 }

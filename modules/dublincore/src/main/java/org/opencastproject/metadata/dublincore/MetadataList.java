@@ -70,11 +70,6 @@ public final class MetadataList {
     return locked;
   }
 
-  public void makeMetadataCollectionReadOnly(final DublinCoreMetadataCollection metadataCollection) {
-    for (final MetadataField field : metadataCollection.getFields())
-      field.setReadOnly(true);
-  }
-
   public Map<String, TitledCollection> getMetadataList() {
     return metadataList;
   }

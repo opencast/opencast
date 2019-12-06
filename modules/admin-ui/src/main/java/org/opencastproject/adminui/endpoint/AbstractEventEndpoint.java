@@ -1247,7 +1247,7 @@ public abstract class AbstractEventEndpoint {
     }
     else {
       //use first metadata collection as base
-      mergedMetadata = collectedMetadata.get(0).getCopy();
+      mergedMetadata = collectedMetadata.get(0).readOnlyCopy();
       collectedMetadata.remove(0);
 
       for (MetadataField field : mergedMetadata.getFields()) {

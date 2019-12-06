@@ -454,11 +454,11 @@ public final class MetadataJson {
     for (final Map.Entry<String, MetadataList.TitledCollection> metadata : metadataList.getMetadataList().entrySet()) {
       final List<Field> fields = new ArrayList<>();
 
-      final DublinCoreMetadataCollection metadataCollection = metadata.getValue().getCollection();
+      DublinCoreMetadataCollection metadataCollection = metadata.getValue().getCollection();
 
       if (!MetadataList.Locked.NONE.equals(metadataList.getLocked())) {
         fields.add(f(KEY_METADATA_LOCKED, v(metadataList.getLocked().getValue())));
-        metadataList.makeMetadataCollectionReadOnly(metadataCollection);
+        metadataCollection = metadataCollection.readOnlyCopy();
       }
 
       fields.add(f(KEY_METADATA_FLAVOR, v(metadata.getKey())));
