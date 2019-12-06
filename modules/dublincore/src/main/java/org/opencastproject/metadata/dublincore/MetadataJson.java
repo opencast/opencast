@@ -28,7 +28,6 @@ import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.util.data.Tuple;
 
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JObject;
@@ -452,10 +451,10 @@ public final class MetadataJson {
 
   public static JValue listToJson(final MetadataList metadataList, final boolean withOrderedText) {
     final List<JValue> catalogs = new ArrayList<>();
-    for (final Map.Entry<String, Tuple<String, MetadataCollection>> metadata : metadataList) {
+    for (final Map.Entry<String, MetadataList.TitledCollection> metadata : metadataList.getMetadataList().entrySet()) {
       final List<Field> fields = new ArrayList<>();
 
-      final MetadataCollection metadataCollection = metadata.getValue().getB();
+      final MetadataCollection metadataCollection = metadata.getValue().getCollection();
 
       if (!MetadataList.Locked.NONE.equals(metadataList.getLocked())) {
         fields.add(f(KEY_METADATA_LOCKED, v(metadataList.getLocked().getValue())));
@@ -463,7 +462,7 @@ public final class MetadataJson {
       }
 
       fields.add(f(KEY_METADATA_FLAVOR, v(metadata.getKey())));
-      fields.add(f(KEY_METADATA_TITLE, v(metadata.getValue().getA())));
+      fields.add(f(KEY_METADATA_TITLE, v(metadata.getValue().getTitle())));
       fields.add(f(KEY_METADATA_FIELDS, MetadataJson.collectionToJson(metadataCollection, withOrderedText)));
 
       catalogs.add(obj(fields));

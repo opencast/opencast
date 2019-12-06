@@ -21,14 +21,10 @@
 
 package org.opencastproject.metadata.dublincore;
 
-import org.opencastproject.util.data.Tuple;
-
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
-public final class MetadataList implements Iterable<Entry<String, Tuple<String, MetadataCollection>>> {
+public final class MetadataList {
 
   public enum Locked {
     NONE("NONE"), WORKFLOW_RUNNING("EVENTS.EVENTS.DETAILS.METADATA.LOCKED.RUNNING");
@@ -45,7 +41,25 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
 
   }
 
-  private final Map<String, Tuple<String, MetadataCollection>> metadataList = new HashMap<>();
+  public static final class TitledCollection {
+    private final String title;
+    private final MetadataCollection collection;
+
+    public TitledCollection(String title, MetadataCollection collection) {
+      this.title = title;
+      this.collection = collection;
+    }
+
+    public String getTitle() {
+      return title;
+    }
+
+    public MetadataCollection getCollection() {
+      return collection;
+    }
+  }
+
+  private final Map<String, TitledCollection> metadataList = new HashMap<>();
 
   private Locked locked = Locked.NONE;
 
@@ -61,7 +75,7 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
       field.setReadOnly(true);
   }
 
-  public Map<String, Tuple<String, MetadataCollection>> getMetadataList() {
+  public Map<String, TitledCollection> getMetadataList() {
     return metadataList;
   }
 
@@ -74,25 +88,20 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
   }
 
   public MetadataCollection getMetadataByFlavor(final String flavor) {
-    return metadataList.keySet().stream().filter(e -> e.equals(flavor)).map(metadataList::get).map(Tuple::getB)
-            .findAny().orElse(null);
+    return metadataList.keySet().stream().filter(e -> e.equals(flavor)).map(metadataList::get)
+            .map(TitledCollection::getCollection).findAny().orElse(null);
   }
 
   public void add(final EventCatalogUIAdapter adapter, final MetadataCollection metadata) {
-    metadataList.put(adapter.getFlavor().toString(), Tuple.tuple(adapter.getUITitle(), metadata));
+    metadataList.put(adapter.getFlavor().toString(), new TitledCollection(adapter.getUITitle(), metadata));
   }
 
   public void add(final SeriesCatalogUIAdapter adapter, final MetadataCollection metadata) {
-    metadataList.put(adapter.getFlavor().toString(), Tuple.tuple(adapter.getUITitle(), metadata));
+    metadataList.put(adapter.getFlavor().toString(), new TitledCollection(adapter.getUITitle(), metadata));
   }
 
   public void add(final String flavor, final String title, final MetadataCollection metadata) {
-    metadataList.put(flavor, Tuple.tuple(title, metadata));
-  }
-
-  @Override
-  public Iterator<Entry<String, Tuple<String, MetadataCollection>>> iterator() {
-    return metadataList.entrySet().iterator();
+    metadataList.put(flavor, new TitledCollection(title, metadata));
   }
 
   public void setLocked(final Locked locked) {
