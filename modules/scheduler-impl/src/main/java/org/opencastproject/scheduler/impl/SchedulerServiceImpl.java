@@ -686,6 +686,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       if (dublinCoreOpt.isNone())
         throw new NotFoundException("No dublincore found while updating event " + mpId);
 
+
+
       final ExtendedEventDto extendedEventDto = optExtEvent.get();
       Date start = extendedEventDto.getStartDate();
       Date end = extendedEventDto.getEndDate();
@@ -740,6 +742,19 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       Opt<AccessControlList> acl = Opt.none();
       Opt<DublinCoreCatalog> dublinCore = Opt.none();
       Opt<AccessControlList> aclOld = loadEpisodeAclFromAsset(record.getSnapshot().get());
+
+      //update metadata for dublincore
+      if (startDateTime.isSome() && endDateTime.isSome()) {
+        DublinCoreValue eventTime = EncodingSchemeUtils
+                .encodePeriod(new DCMIPeriod(startDateTime.get(), endDateTime.get()), Precision.Second);
+        dublinCoreOpt.get().set(DublinCore.PROPERTY_TEMPORAL, eventTime);
+        if (captureAgentId.isSome()) {
+          dublinCoreOpt.get().set(DublinCore.PROPERTY_SPATIAL, captureAgentId.get());
+        }
+        dublinCore = dublinCoreOpt;
+        dublinCoreChanged = true;
+      }
+
       for (MediaPackage mpToUpdate : mediaPackage) {
         // Check for series change
         if (ne(record.getSnapshot().get().getMediaPackage().getSeries(), mpToUpdate.getSeries())) {

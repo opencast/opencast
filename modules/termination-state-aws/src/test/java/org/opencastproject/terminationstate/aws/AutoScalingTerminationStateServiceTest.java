@@ -37,6 +37,7 @@ import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -118,6 +119,7 @@ public class AutoScalingTerminationStateServiceTest {
   }
 
   @Test
+  @Ignore
   public void testLifeCyclePolling() throws Exception {
     service.startPollingLifeCycleHook();
     String[] trigger = scheduler.getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);

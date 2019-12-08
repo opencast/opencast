@@ -528,8 +528,30 @@ Opencast 7
 - [[MH-12782](https://opencast.jira.com/browse/MH-12782)][[#209](https://github.com/opencast/opencast/pull/209)] -
   As an unprivileged user, I only want to see series and events that I have write access to.
 
+
 Opencast 6
 ----------
+
+### Opencast 6.7
+
+*Released on December 8, 2019*
+
+- [[#1200](https://github.com/opencast/opencast/pull/1200)] -
+  Fix Crowdin Deployment
+- [[#1143](https://github.com/opencast/opencast/pull/1143)] -
+  Upgrade jackson to 2.9.10 (6.x)
+- [[#1142](https://github.com/opencast/opencast/pull/1142)] -
+  Update apache commons-compress to 1.19
+- [[#1132](https://github.com/opencast/opencast/pull/1132)] -
+  Fixed the "hide" button in the Documentation.
+- [[#1080](https://github.com/opencast/opencast/pull/1080)] -
+  Documentation reworked
+- [[#1035](https://github.com/opencast/opencast/pull/1035)] -
+  Pushing to Maven Central
+- [[#1026](https://github.com/opencast/opencast/pull/1026)] -
+  Adding Ansible script documentation
+- [[#1019](https://github.com/opencast/opencast/pull/1019)] -
+  SMIL tests fail when doctype url can't be resolved
 
 ### Opencast 6.6
 
@@ -550,11 +572,11 @@ Opencast 6
 - [[MH-13643](https://opencast.jira.com/browse/MH-13643)][[#979](https://github.com/opencast/opencast/pull/979)] -
   Update to Paella 6.1.4
 - [[MH-13637](https://opencast.jira.com/browse/MH-13637)][[#974](https://github.com/opencast/opencast/pull/974)] -
-  asset manager endpoint fix
+  Asset manager endpoint fix
 - [[MH-13633](https://opencast.jira.com/browse/MH-13633)][[#969](https://github.com/opencast/opencast/pull/969)] -
   Update spring-security-oauth
 - [[MH-13611](https://opencast.jira.com/browse/MH-13611)][[#955](https://github.com/opencast/opencast/pull/955)] -
-  duplicate events fix
+  Duplicate events fix
 
 ### Opencast 6.5
 

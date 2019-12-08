@@ -5,7 +5,7 @@
     "jquery": "3.4.1",
     "jquery-ui": "1.12.1",
     "jqueryui-timepicker-addon": "1.6.3",
-    "angular": "1.7.8",
+    "angular": "1.7.9",
     "angular-route": "1.7.8",
     "angular-resource": "1.7.8",
     "angular-animate": "1.7.8",
@@ -28,5 +28,8 @@
     }
   },
   "appPath": "src/main/webapp",
-  "moduleName": "adminNg"
+  "moduleName": "adminNg",
+  "resolutions": {
+    "angular": "1.7.9"
+  }
 }
