@@ -19,5 +19,7 @@
   <reference name="ServiceRegistry" cardinality="1..1"
              interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
              policy="static" bind="setServiceRegistry"/>
+  <reference interface="org.opencastproject.workspace.api.Workspace"
+             name="Workspace" bind="setWorkspace"/>
 
 </scr:component>

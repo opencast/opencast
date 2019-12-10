@@ -43,10 +43,17 @@ execution of the workflow operation.
 
 |Variable           |Description                               |Example                               |
 |-------------------|------------------------------------------|--------------------------------------|
+|`${element_uri}`   |URI of the last media package element     |`http://ex.com/files/mediap...xy.mp4` |
 |`${event_id}`      |The event (media package) identifier      |`18633e04-1a3f-4bbb-a72a-99c15deba1b9`|
 |`${player_path}`   |The player path for the event             |`/engage/theodul/ui/core.html?id=`    |
 |`${publication_id}`|The id of this publication.               |`54f6c12d-8e68-4ec8-badf-cd045b33d01e`|
 |`${series_id}`     |The id of the series if available         |`36f3c5d8-ad4d-4dab-beb1-1400ffab4a69`|
+
+You can also access all data from metadata catalogues here. The notation to access them is `MainFlavor.SubFlavor.fieldID`.
+For example `${dublincore.series.title}`.
+
+Opencast uses the Freemarker template engine here with several functions to manipulate the string.
+So you can create templates like this `https://my.portal/${myterms.series.courseId?ensure_ends_with("/")}${event_id}`.
 
 The organization properties are also available and can be accessed with the `org_` prefix followed by the property name,
 eg. `${org_player}` will be replaced by the value of the organization property named `player`.

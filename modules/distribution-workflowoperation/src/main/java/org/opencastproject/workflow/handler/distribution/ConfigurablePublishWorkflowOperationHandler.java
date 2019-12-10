@@ -24,6 +24,8 @@ import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -32,6 +34,9 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreUtil;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
@@ -42,6 +47,7 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -49,6 +55,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -110,6 +117,11 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
 
   private SecurityService securityService;
 
+  /**
+   * The workspace service.
+   */
+  private Workspace workspace = null;
+
   /** OSGi DI */
   void setDownloadDistributionService(DownloadDistributionService distributionService) {
     this.distributionService = distributionService;
@@ -125,6 +137,37 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     assert (distributionService != null);
     return distributionService;
   }
+
+  private Map<String, Object> addMetadataCatalogsToTemplateData(Map<String, Object> values, MediaPackage mp) {
+    if (! mp.hasCatalogs()) {
+      logger.info("No metdata catalogs found.");
+      return values;
+    }
+    if (values == null) values = new HashMap<>();
+
+    for (Catalog catalog : mp.getCatalogs()) {
+      if (catalog.getFlavor() != null) {
+        String mainflavor = catalog.getFlavor().getType();
+        String subflavor = catalog.getFlavor().getSubtype();
+        Map<String, Object> metadata = new HashMap<>();
+        try {
+          DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(workspace, catalog);
+          for (Map.Entry<EName, List<DublinCoreValue>> entry : dc.getValues().entrySet()) {
+            String value = entry.getValue().get(0).getValue();
+            metadata.put(entry.getKey().getLocalName(), value);
+          }
+          if (!values.containsKey(mainflavor)) {
+            values.put(mainflavor, new HashMap<>());
+          }
+          ((Map<String, Object>)values.get(mainflavor)).put(subflavor, metadata);
+        } catch (Exception e) {
+          logger.warn("Catalog from URL {} with flavor {}/{} could not be loaded", catalog.getURI(),
+                  mainflavor, subflavor);
+        }
+      }
+    }
+    return values;
+   }
 
   /**
    * Replace possible variables in the url-pattern configuration for this workflow operation handler.
@@ -156,6 +199,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
       values.put(ORG_TEMPLATE_KEY_PREFIX + orgProperty.getKey().replace('.', '_').toLowerCase(),
               orgProperty.getValue());
     }
+    values = addMetadataCatalogsToTemplateData(values, mp);
     String uriWithVariables = DocUtil.processTextTemplate("Replacing Variables in Publish URL", urlPattern, values);
     URI publicationURI;
     try {
@@ -272,6 +316,12 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
       publication.setMimeType(mimetype);
     }
     mp.add(publication);
+
+    try {
+      workspace.cleanup(mp.getIdentifier());
+    } catch (IOException e) {
+      throw new WorkflowOperationException(e);
+    }
     return createResult(mp, Action.CONTINUE);
   }
 
@@ -349,5 +399,9 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
   private void fail(MediaPackage mp) throws WorkflowOperationException {
     logger.error("There is already a Published Media, fail Stragy for Mediapackage {}", mp.getIdentifier());
     throw new WorkflowOperationException("There is already a Published Media, fail Stragy for Mediapackage ");
+  }
+
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
   }
 }

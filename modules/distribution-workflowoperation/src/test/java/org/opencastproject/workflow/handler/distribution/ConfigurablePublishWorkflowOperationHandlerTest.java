@@ -20,6 +20,8 @@
  */
 package org.opencastproject.workflow.handler.distribution;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.anyString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -36,6 +38,7 @@ import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.CatalogImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Publication;
@@ -53,6 +56,7 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.Stream;
@@ -62,6 +66,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -70,14 +75,43 @@ import java.util.Map;
 public class ConfigurablePublishWorkflowOperationHandlerTest {
   private Organization org;
   private String examplePlayer = "/engage/theodul/ui/core.html?id=";
+  private File file;
+  private ConfigurablePublishWorkflowOperationHandler configurePublish;
+  private Workspace workspace;
 
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
+    configurePublish = new ConfigurablePublishWorkflowOperationHandler() {
+      @Override
+      protected Result waitForStatus(long timeout, Job... jobs) {
+        HashMap<Job, Status> map = Stream.mk(jobs).foldl(new HashMap<Job, Status>(),
+                new Fn2<HashMap<Job, Status>, Job, HashMap<Job, Status>>() {
+                  @Override
+                  public HashMap<Job, Status> apply(HashMap<Job, Status> a, Job b) {
+                    a.put(b, Status.FINISHED);
+                    return a;
+                  }
+                });
+        return new Result(map);
+      }
+    };
     Map<String, String> properties = new HashMap<String, String>();
     properties.put(ConfigurablePublishWorkflowOperationHandler.PLAYER_PROPERTY, examplePlayer);
     org = EasyMock.createNiceMock(Organization.class);
     EasyMock.expect(org.getProperties()).andStubReturn(properties);
+
+    file = new File(getClass().getResource("/dc-episode.xml").toURI());
+
+    workspace = EasyMock.createMock(Workspace.class);
+    EasyMock.expect(workspace.put(anyString(), anyString(), anyString(), anyObject())).andReturn(file.toURI()).anyTimes();
+    EasyMock.expect(workspace.read(anyObject()))
+            .andAnswer(() -> getClass().getResourceAsStream("/dc-episode.xml")).anyTimes();
+    workspace.cleanup(anyObject(Id.class));
+    EasyMock.expectLastCall();
+    workspace.delete(anyObject(URI.class));
+    EasyMock.expectLastCall();
     EasyMock.replay(org);
+    configurePublish.setWorkspace(workspace);
   }
 
   @Test(expected = WorkflowOperationException.class)
@@ -89,9 +123,8 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     EasyMock.expect(workflowInstance.getCurrentOperation()).andStubReturn(workflowOperationInstance);
     JobContext jobContext = EasyMock.createNiceMock(JobContext.class);
 
-    EasyMock.replay(jobContext, mediapackage, workflowInstance, workflowOperationInstance);
+    EasyMock.replay(jobContext, mediapackage, workflowInstance, workspace, workflowOperationInstance);
 
-    ConfigurablePublishWorkflowOperationHandler configurePublish = new ConfigurablePublishWorkflowOperationHandler();
     configurePublish.start(workflowInstance, jobContext);
   }
 
@@ -112,6 +145,7 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     Catalog catalog = CatalogImpl.newInstance();
     catalog.addTag("engage-download");
     catalog.setIdentifier(catalogId);
+    catalog.setFlavor(new MediaPackageElementFlavor("dublincore", "episode"));
     catalog.setURI(new URI("http://api.com/catalog"));
 
     Track track = new TrackImpl();
@@ -201,25 +235,10 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
     EasyMock.replay(serviceRegistry);
 
-    // Override the waitForStatus method to not block the jobs
-    ConfigurablePublishWorkflowOperationHandler configurePublish = new ConfigurablePublishWorkflowOperationHandler() {
-      @Override
-      protected Result waitForStatus(long timeout, Job... jobs) {
-        HashMap<Job, Status> map = Stream.mk(jobs).foldl(new HashMap<Job, Status>(),
-                new Fn2<HashMap<Job, Status>, Job, HashMap<Job, Status>>() {
-                  @Override
-                  public HashMap<Job, Status> apply(HashMap<Job, Status> a, Job b) {
-                    a.put(b, Status.FINISHED);
-                    return a;
-                  }
-                });
-        return new Result(map);
-      }
-    };
-
     configurePublish.setDownloadDistributionService(distributionService);
     configurePublish.setSecurityService(securityService);
     configurePublish.setServiceRegistry(serviceRegistry);
+    configurePublish.setWorkspace(workspace);
 
     WorkflowOperationResult result = configurePublish.start(workflowInstance, jobContext);
     assertNotNull(result.getMediaPackage());
@@ -261,13 +280,11 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     EasyMock.replay(element, mp, securityService);
 
     // Test player path and mediapackage id
-    ConfigurablePublishWorkflowOperationHandler configurePublish = new ConfigurablePublishWorkflowOperationHandler();
     configurePublish.setSecurityService(securityService);
     URI result = configurePublish.populateUrlWithVariables("${player_path}${event_id}", mp, pubUUID);
     assertEquals(examplePlayer + "mp-id", result.toString());
 
     // Test without series
-    configurePublish = new ConfigurablePublishWorkflowOperationHandler();
     configurePublish.setSecurityService(securityService);
     result = configurePublish.populateUrlWithVariables("${series_id}/${event_id}", mp, pubUUID);
     assertEquals("/mp-id", result.toString());
@@ -278,13 +295,11 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     EasyMock.expect(mp.getSeries()).andStubReturn(seriesId);
     EasyMock.replay(mp);
 
-    configurePublish = new ConfigurablePublishWorkflowOperationHandler();
     configurePublish.setSecurityService(securityService);
     result = configurePublish.populateUrlWithVariables("${series_id}/${event_id}", mp, pubUUID);
     assertEquals("series-id/mp-id", result.toString());
 
     // Test publication uuid
-    configurePublish = new ConfigurablePublishWorkflowOperationHandler();
     configurePublish.setSecurityService(securityService);
     result = configurePublish.populateUrlWithVariables("${publication_id}", mp, pubUUID);
     assertEquals(pubUUID, result.toString());
