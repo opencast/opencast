@@ -191,13 +191,20 @@ $(document).ready(function() {
             responseBody.hide();
             responseBody.find('pre').text('');
 
-            // make the request
-            $.ajax({
+            var queryString = '';
+            if (method === 'DELETE') {
+              queryString = $.param(submitParams);
+            }
+
+            if (queryString !== '') {
+              url = url + '?' + queryString;
+            }
+
+            var request = {
               type: method,
               url: url,
               processData: true,
               dataType: 'text',
-              data: submitParams,
               success: function(data, textStatus, request) {
                 $form.parent().find('.test_form_working').hide();
                 var responseBody = $form.parent().find('.test_form_response');
@@ -213,7 +220,14 @@ $(document).ready(function() {
                 responseBody.show();
                 responseBody.find('pre').text(msg);
               }
-            });
+            };
+
+            if (method !== 'DELETE') {
+              request.data = submitParams;
+            }
+
+            // make the request
+            $.ajax(request);
           } else {
             alert('Fill out all required fields first');
           }
