@@ -570,7 +570,26 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    */
   @Override
   public void remove(long workflowInstanceId) throws WorkflowDatabaseException, NotFoundException {
-    HttpDelete delete = new HttpDelete("/remove/" + Long.toString(workflowInstanceId));
+    remove(workflowInstanceId, false);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowService#remove(long, boolean)
+   */
+  @Override
+  public void remove(long workflowInstanceId, boolean force) throws WorkflowDatabaseException, NotFoundException {
+    String deleteString = "/remove/" + Long.toString(workflowInstanceId);
+
+    if (force) {
+      List<NameValuePair> queryStringParams = new ArrayList<NameValuePair>();
+      queryStringParams.add(new BasicNameValuePair("force", "true"));
+      deleteString = deleteString + "?" + URLEncodedUtils.format(queryStringParams, "UTF_8");
+    }
+
+    HttpDelete delete = new HttpDelete(deleteString);
+
     HttpResponse response = getResponse(delete, SC_NO_CONTENT, SC_NOT_FOUND);
     try {
       if (response != null) {

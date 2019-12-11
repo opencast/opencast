@@ -69,6 +69,7 @@ import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowQuery.Sort;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
+import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
@@ -569,12 +570,19 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @DELETE
   @Path("remove/{id}")
   @Produces(MediaType.TEXT_PLAIN)
-  @RestQuery(name = "remove", description = "Danger! Permenantly removes a workflow instance including all its child jobs. In most circumstances, /stop is what you should use.", returnDescription = "HTTP 204 No Content", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, reponses = {
+  @RestQuery(name = "remove", description = "Danger! Permenantly removes a workflow instance including all its child jobs. In most circumstances, /stop is what you should use.", returnDescription = "HTTP 204 No Content", pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING)}, restParameters = {
+          @RestParameter(name = "force", isRequired = false, description = "If the workflow status should be ignored and the workflow removed anyway", type = Type.BOOLEAN, defaultValue = "false")}, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "If workflow instance could be removed successfully, no content is returned"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists.") })
-  public Response remove(@PathParam("id") long workflowInstanceId) throws WorkflowException, NotFoundException,
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists."),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "It's not allowed to remove other workflow instance statues than STOPPED, SUCCEEDED and FAILED (use force parameter to override AT YOUR OWN RISK).") })
+  public Response remove(@PathParam("id") long workflowInstanceId, @QueryParam("force") boolean force) throws WorkflowException, NotFoundException,
           UnauthorizedException {
-    service.remove(workflowInstanceId);
+    try {
+      service.remove(workflowInstanceId, force);
+    } catch (WorkflowStateException e) {
+      return Response.status(Status.FORBIDDEN).build();
+    }
     return Response.noContent().build();
   }
 
