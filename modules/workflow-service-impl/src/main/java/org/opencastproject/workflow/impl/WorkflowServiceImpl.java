@@ -976,6 +976,17 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public void remove(long workflowInstanceId) throws WorkflowDatabaseException, NotFoundException,
           UnauthorizedException, WorkflowParsingException, WorkflowStateException {
+    remove(workflowInstanceId, false);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowService#remove(long,boolean)
+   */
+  @Override
+  public void remove(long workflowInstanceId, boolean force) throws WorkflowDatabaseException, NotFoundException,
+          UnauthorizedException, WorkflowParsingException, WorkflowStateException {
     final Lock lock = this.lock.get(workflowInstanceId);
     lock.lock();
     try {
@@ -986,9 +997,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         WorkflowInstance instance = workflows.getItems()[0];
 
         WorkflowInstance.WorkflowState state = instance.getState();
-        if (state != WorkflowState.SUCCEEDED && state != WorkflowState.FAILED && state != WorkflowState.STOPPED)
-          throw new WorkflowStateException("Workflow instance with state '" + state
-                                                     + "' cannot be removed. Only states SUCCEEDED, FAILED & STOPPED are allowed");
+        if (state != WorkflowState.SUCCEEDED && state != WorkflowState.FAILED
+            && state != WorkflowState.STOPPED) {
+          if (!force) {
+            throw new WorkflowStateException("Workflow instance with state '" + state + "' cannot be removed. " + "Only states SUCCEEDED, FAILED & STOPPED are allowed");
+          }
+          logger.info("Using force, removing workflow " + workflowInstanceId + " despite being in state " + state);
+        }
 
         assertPermission(instance, Permissions.Action.WRITE.toString());
 

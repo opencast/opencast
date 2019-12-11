@@ -75,6 +75,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowSet;
+import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateListener;
 import org.opencastproject.workflow.handler.workflow.ErrorResolutionWorkflowOperationHandler;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
@@ -871,7 +872,7 @@ public class WorkflowServiceImplTest {
   }
 
   /**
-   * Test for {@link WorkflowServiceImpl#remove(long)}
+   * Test for {@link WorkflowServiceImpl#remove(long, boolean)}
    *
    * @throws Exception
    *           if anything fails
@@ -880,19 +881,34 @@ public class WorkflowServiceImplTest {
   public void testRemove() throws Exception {
     WorkflowInstance wi1 = startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
     WorkflowInstance wi2 = startAndWait(workingDefinition, mediapackage2, WorkflowState.SUCCEEDED);
+    WorkflowInstance wi3 = startAndWait(pausingWorkflowDefinition, mediapackage1, WorkflowState.PAUSED);
 
     // reload instances, because operations have no id before
     wi1 = service.getWorkflowById(wi1.getId());
     wi2 = service.getWorkflowById(wi2.getId());
 
     service.remove(wi1.getId());
-    assertEquals(1, service.getWorkflowInstances(new WorkflowQuery()).size());
+    assertEquals(2, service.getWorkflowInstances(new WorkflowQuery()).size());
     for (WorkflowOperationInstance op : wi1.getOperations()) {
       assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
     }
 
-    service.remove(wi2.getId());
-    assertEquals(0, service.getWorkflowInstances(new WorkflowQuery()).size());
+    service.remove(wi2.getId(), false);
+    assertEquals(1, service.getWorkflowInstances(new WorkflowQuery()).size());
+
+    try {
+      service.remove(wi3.getId(), false);
+      Assert.fail("A paused workflow shouldn't be removed without using force");
+    } catch (WorkflowStateException e) {
+      assertEquals(1, service.getWorkflowInstances(new WorkflowQuery()).size());
+    }
+
+    try {
+      service.remove(wi3.getId(), true);
+      assertEquals(0, service.getWorkflowInstances(new WorkflowQuery()).size());
+    } catch (WorkflowStateException e) {
+      Assert.fail(e.getMessage());
+    }
   }
 
   /**
