@@ -183,6 +183,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
@@ -1247,7 +1248,7 @@ public abstract class AbstractEventEndpoint {
     }
     else {
       //use first metadata collection as base
-      mergedMetadata = collectedMetadata.get(0).readOnlyCopy();
+      mergedMetadata = new DublinCoreMetadataCollection(collectedMetadata.get(0));
       collectedMetadata.remove(0);
 
       for (MetadataField field : mergedMetadata.getFields()) {
@@ -1255,7 +1256,7 @@ public abstract class AbstractEventEndpoint {
           MetadataField matchingField = otherMetadataCollection.getOutputFields().get(field.getOutputID());
 
           // check if fields have the same value
-          if (!field.getValue().equals(matchingField.getValue())) {
+          if (!Objects.equals(field.getValue(), matchingField.getValue())) {
             field.setDifferentValues();
             break;
           }

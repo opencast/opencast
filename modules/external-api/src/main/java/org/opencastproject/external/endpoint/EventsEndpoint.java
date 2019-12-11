@@ -1131,8 +1131,7 @@ public class EventsEndpoint implements ManagedService {
     if (configuredMetadataFields.containsKey("startDate")) {
       MetadataField startDateField = configuredMetadataFields.get("startDate");
       final String pattern = startDateField.getPattern() == null ? "yyyy-MM-dd" : startDateField.getPattern();
-      startDateField = new MetadataField(
-              startDateField);
+      startDateField = new MetadataField(startDateField);
       startDateField.setPattern(pattern);
       sdf.applyPattern(startDateField.getPattern());
       startDateField.setValue(sdf.format(startDate));
