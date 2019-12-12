@@ -127,6 +127,7 @@ nav:
       - AWS AutoScaling: 'modules/terminationstate.aws.autoscaling.md'
    - Text Extraction: 'modules/textextraction.md'
    - Timeline Previews: 'modules/timelinepreviews.md'
+   - Transcripts (AmberScript): 'modules/amberscripttranscripts.md'
    - Transcripts (Google Speech): 'modules/googlespeechtranscripts.md'
    - Transcripts (IBM Watson): 'modules/watsontranscripts.md'
    - Video Editor:
@@ -143,6 +144,8 @@ nav:
    - Analyze Tracks: 'workflowoperationhandlers/analyze-tracks-woh.md'
    - Analyze Audio: 'workflowoperationhandlers/analyzeaudio-woh.md'
    - Animate: 'workflowoperationhandlers/animate-woh.md'
+   - AmberScript Start Transcription: 'workflowoperationhandlers/amberscript-start-transcription-woh.md'
+   - AmberScript Attach Transcription: 'workflowoperationhandlers/amberscript-attach-transcription-woh.md'
    - Asset Snapshot: 'workflowoperationhandlers/snapshot-woh.md'
    - Asset Delete: 'workflowoperationhandlers/asset-delete-woh.md'
    - Attach Watson Transcription: 'workflowoperationhandlers/attach-watson-transcription-woh.md'

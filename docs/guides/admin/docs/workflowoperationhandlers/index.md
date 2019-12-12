@@ -27,6 +27,8 @@ The following table contains the workflow operations that are available in an ou
 |analyze-audio       |Analyze first audio stream                                     |[Documentation](analyzeaudio-woh.md)|
 |analyze-tracks      |Analyze tracks in media package                                |[Documentation](analyze-tracks-woh.md)|
 |animate             |Create animated video sequence                                 |[Documentation](animate-woh.md)|
+|amberscript-start-transcription|Start AmberScript Transcription                     |[Documentation](amberscript-start-transcription-woh.md)|
+|amberscript-attach-transcription|Attach AmberScript Transcription                   |[Documentation](amberscript-attach-transcription-woh.md)|
 |asset-delete        |Deletes the current mediapackage from the Archive              |[Documentation](asset-delete-woh.md)|
 |attach-watson-transcription|Attaches automated transcripts to mediapackage          |[Documentation](attach-watson-transcription-woh.md)|
 |cleanup             |Cleanup the working file repository                            |[Documentation](cleanup-woh.md)|
