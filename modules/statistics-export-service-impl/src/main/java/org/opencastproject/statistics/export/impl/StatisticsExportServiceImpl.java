@@ -151,6 +151,9 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     final LocalDateTime ldt = LocalDateTime.ofInstant(Instant.parse(dateStr), zoneId);
     DateTimeFormatter formatter = null;
     switch (dataResolution) {
+      case HOURLY:
+        formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:00");
+        return formatter.format(ldt);
       case DAILY:
         formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd");
         return formatter.format(ldt);
