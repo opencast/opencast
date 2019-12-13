@@ -24,20 +24,14 @@ package org.opencastproject.util.persistence;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.opencastproject.util.persistence.PersistenceUtil.createEntityManager;
-import static org.opencastproject.util.persistence.PersistenceUtil.newEntityManagerFactory;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
-import org.osgi.service.component.ComponentContext;
-
-import java.util.Map;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.spi.PersistenceProvider;
 
 /** Persistence environment factory. */
 public final class PersistenceEnvs {
@@ -104,30 +98,6 @@ public final class PersistenceEnvs {
         emf.close();
       }
     };
-  }
-
-  /**
-   * Shortcut for <code>persistenceEnvironment(newEntityManagerFactory(cc, emName))</code>.
-   *
-   * @see PersistenceUtil#newEntityManagerFactory(org.osgi.service.component.ComponentContext, String)
-   */
-  public static PersistenceEnv persistenceEnvironment(ComponentContext cc, String emName) {
-    return persistenceEnvironment(newEntityManagerFactory(cc, emName));
-  }
-
-  /**
-   * Shortcut for <code>newPersistenceEnvironment(newEntityManagerFactory(cc, emName, persistenceProps))</code>.
-   *
-   * @see PersistenceUtil#newEntityManagerFactory(org.osgi.service.component.ComponentContext, String, java.util.Map)
-   */
-  public static PersistenceEnv persistenceEnvironment(ComponentContext cc, String emName, Map persistenceProps) {
-    return persistenceEnvironment(newEntityManagerFactory(cc, emName, persistenceProps));
-  }
-
-  /** Create a new persistence environment. This method is the preferred way of creating a persistence environment. */
-  public static PersistenceEnv persistenceEnvironment(PersistenceProvider persistenceProvider, String emName,
-                                                      Map persistenceProps) {
-    return persistenceEnvironment(persistenceProvider.createEntityManagerFactory(emName, persistenceProps));
   }
 
   /**

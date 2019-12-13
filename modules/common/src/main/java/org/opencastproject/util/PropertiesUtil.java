@@ -21,9 +21,7 @@
 package org.opencastproject.util;
 
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
@@ -46,20 +44,6 @@ public final class PropertiesUtil {
       dictionary.put(entry.getKey().toString(), entry.getValue().toString());
     }
     return dictionary;
-  }
-
-  /**
-   * Convert the given {@link Properties} to a {@link Map} of strings
-   *
-   * @param properties
-   *          the properties
-   * @return the {@link Map} of strings
-   */
-  public static Map<String, String> toMap(Properties properties) {
-    Map<String, String> map = new HashMap<String, String>();
-    for (final String name : properties.stringPropertyNames())
-      map.put(name, properties.getProperty(name));
-    return map;
   }
 
 }

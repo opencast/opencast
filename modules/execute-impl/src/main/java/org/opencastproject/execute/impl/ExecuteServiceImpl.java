@@ -152,41 +152,6 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
    * {@inheritDoc}
    *
    * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
-   *      org.opencastproject.mediapackage.MediaPackageElement)
-   */
-  @Override
-  public Job execute(String exec, String params, MediaPackageElement inElement) throws ExecuteException {
-    return execute(exec, params, inElement, null, null, executeJobLoad);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
-   *      org.opencastproject.mediapackage.MediaPackageElement, float)
-   */
-  @Override
-  public Job execute(String exec, String params, MediaPackageElement inElement, float load) throws ExecuteException {
-    return execute(exec, params, inElement, null, null, load);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
-   *      org.opencastproject.mediapackage.MediaPackageElement, java.lang.String,
-   *      org.opencastproject.mediapackage.MediaPackageElement.Type)
-   */
-  @Override
-  public Job execute(String exec, String params, MediaPackageElement inElement, String outFileName, Type expectedType)
-          throws ExecuteException, IllegalArgumentException {
-    return execute(exec, params, inElement, null, null, executeJobLoad);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
    *      org.opencastproject.mediapackage.MediaPackageElement, java.lang.String,
    *      org.opencastproject.mediapackage.MediaPackageElement.Type, float)
    * @throws IllegalArgumentException
@@ -228,19 +193,6 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
     } catch (MediaPackageException e) {
       throw new ExecuteException("Error serializing an element", e);
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
-   *      org.opencastproject.mediapackage.MediaPackage, java.lang.String,
-   *      org.opencastproject.mediapackage.MediaPackageElement.Type)
-   */
-  @Override
-  public Job execute(String exec, String params, MediaPackage mp, String outFileName, Type expectedType)
-          throws ExecuteException {
-    return execute(exec, params, mp, outFileName, expectedType, 1.0f);
   }
 
   /**

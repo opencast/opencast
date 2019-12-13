@@ -167,9 +167,6 @@
     <module>modules/runtime-info-ui</module>
     <module>modules/runtime-info-ui-ng</module>
     <module>modules/scheduler-api</module>
-    <module>modules/scheduler-conflict-handler</module>
-    <module>modules/scheduler-conflict-notifier-comment</module>
-    <module>modules/scheduler-conflict-notifier-email</module>
     <module>modules/scheduler-impl</module>
     <module>modules/scheduler-remote</module>
     <module>modules/schema</module>

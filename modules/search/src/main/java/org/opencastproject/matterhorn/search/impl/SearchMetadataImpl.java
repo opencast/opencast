@@ -49,25 +49,6 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
   protected boolean addToText = false;
 
   /**
-   * Creates a new metadata object with the given name and values.
-   * 
-   * @param name
-   *          the metadata name
-   * @param values
-   *          the language neutral values
-   * @param localizedValues
-   *          the localized values
-   * @param addToText
-   *          <code>true</code> to add these items to the user facing fulltext index
-   */
-  public SearchMetadataImpl(String name, List<T> values, Map<Language, List<T>> localizedValues, boolean addToText) {
-    this.name = name;
-    this.values = values;
-    this.localizedValues = localizedValues;
-    this.addToText = addToText;
-  }
-
-  /**
    * Creates a new metadata item with the given name.
    * 
    * @param name

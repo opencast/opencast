@@ -52,8 +52,6 @@ import java.io.InputStream;
 import java.util.List;
 
 public abstract class AwsAbstractArchive implements AssetStore {
-  /** The default AWS region name */
-  public static final String DEFAULT_AWS_REGION = "us-east-1";
 
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(AwsAbstractArchive.class);

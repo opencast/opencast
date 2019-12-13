@@ -35,16 +35,6 @@ public class HtmlContent extends ContentImpl {
    *
    * @param value
    *          the content value
-   */
-  public HtmlContent(String value) {
-    this(value, null);
-  }
-
-  /**
-   * Creates new html content container.
-   *
-   * @param value
-   *          the content value
    * @param mode
    *          the content mode
    */

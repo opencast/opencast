@@ -37,7 +37,6 @@ import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SortCriterion;
-import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.HostRegistration;
@@ -111,9 +110,7 @@ public class JobEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(JobEndpoint.class);
   private static final SimpleSerializer serializer = new SimpleSerializer();
 
-  public static final Response UNAUTHORIZED = Response.status(Response.Status.UNAUTHORIZED).build();
   public static final Response NOT_FOUND = Response.status(Response.Status.NOT_FOUND).build();
-  public static final Response SERVER_ERROR = Response.serverError().build();
 
   private enum JobSort {
     CREATOR, OPERATION, PROCESSINGHOST, PROCESSINGNODE, STATUS, STARTED, SUBMITTED, TYPE, ID
@@ -501,8 +498,6 @@ public class JobEndpoint {
       throw new JobEndpointException(
               String.format("Error when retrieving job %s from the service registry: %s", id, e), e.getCause());
     }
-
-    MediaPackage mp = instance.getMediaPackage();
 
     List<Field> fields = new ArrayList<>();
     for (String key : instance.getConfigurationKeys()) {

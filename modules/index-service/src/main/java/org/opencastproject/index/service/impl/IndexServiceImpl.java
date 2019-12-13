@@ -809,7 +809,6 @@ public class IndexServiceImpl implements IndexService {
     return acl;
   }
 
-  @Override
   public String createEvent(JSONObject metadataJson, MediaPackage mp) throws ParseException, IOException,
           MediaPackageException, IngestException, NotFoundException, SchedulerException, UnauthorizedException {
     if (metadataJson == null)
@@ -1207,21 +1206,6 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public MetadataList updateCommonEventMetadata(String id, String metadataJSON, AbstractSearchIndex index)
-          throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
-          UnauthorizedException {
-    MetadataList metadataList;
-    try {
-      metadataList = getMetadataListWithCommonEventCatalogUIAdapter();
-      metadataList.fromJSON(metadataJSON);
-    } catch (Exception e) {
-      logger.warn("Not able to parse the event metadata {}:", metadataJSON, e);
-      throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
-    }
-    return updateEventMetadata(id, metadataList, index);
-  }
-
-  @Override
   public MetadataList updateAllEventMetadata(String id, String metadataJSON, AbstractSearchIndex index)
           throws IllegalArgumentException, IndexServiceException, NotFoundException, SearchIndexException,
           UnauthorizedException {
@@ -1424,8 +1408,7 @@ public class IndexServiceImpl implements IndexService {
     }
   }
 
-  @Override
-  public boolean hasSnapshots(String eventId) {
+  private boolean hasSnapshots(String eventId) {
     AQueryBuilder q = assetManager.createQuery();
     return !enrich(q.select(q.snapshot()).where(q.mediaPackageId(eventId).and(q.version().isLatest())).run()).getSnapshots().isEmpty();
   }
@@ -1648,8 +1631,7 @@ public class IndexServiceImpl implements IndexService {
     return removedScheduler && removedWorkflow && removedArchive;
   }
 
-  @Override
-  public void updateWorkflowInstance(WorkflowInstance workflowInstance)
+  private void updateWorkflowInstance(WorkflowInstance workflowInstance)
           throws WorkflowException, UnauthorizedException {
     // Only update the workflow if the instance is in a working state
     if (WorkflowInstance.WorkflowState.FAILED.equals(workflowInstance.getState())
@@ -1718,8 +1700,7 @@ public class IndexServiceImpl implements IndexService {
     }
   }
 
-  @Override
-  public Opt<WorkflowInstance> getCurrentWorkflowInstance(String mpId) throws IndexServiceException {
+  private Opt<WorkflowInstance> getCurrentWorkflowInstance(String mpId) throws IndexServiceException {
     WorkflowQuery query = new WorkflowQuery().withMediaPackage(mpId);
     WorkflowSet workflowInstances;
     try {
@@ -2017,13 +1998,6 @@ public class IndexServiceImpl implements IndexService {
   @Override
   public void removeSeries(String id) throws NotFoundException, SeriesException, UnauthorizedException {
     seriesService.deleteSeries(id);
-  }
-
-  @Override
-  public MetadataList updateCommonSeriesMetadata(String id, String metadataJSON, AbstractSearchIndex index)
-          throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException {
-    MetadataList metadataList = getMetadataListWithCommonSeriesCatalogUIAdapters();
-    return updateSeriesMetadata(id, metadataJSON, index, metadataList);
   }
 
   @Override

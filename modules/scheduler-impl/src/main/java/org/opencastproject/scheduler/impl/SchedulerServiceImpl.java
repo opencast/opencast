@@ -72,8 +72,6 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.Precision;
-import org.opencastproject.scheduler.api.ConflictHandler;
-import org.opencastproject.scheduler.api.ConflictNotifier;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.RecordingImpl;
 import org.opencastproject.scheduler.api.RecordingState;
@@ -222,12 +220,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The authorization service */
   private AuthorizationService authorizationService;
 
-  /** The conflict handler */
-  private ConflictHandler conflictHandler;
-
-  /** The list of registered conflict notifiers */
-  private List<ConflictNotifier> conflictNotifiers = new ArrayList<>();
-
   /** The organization directory service */
   private OrganizationDirectoryService orgDirectoryService;
 
@@ -309,25 +301,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
-  }
-
-  /**
-   * OSGi callback to set the conflict handler.
-   *
-   * @param conflictHandler
-   */
-  public void setConflictHandler(ConflictHandler conflictHandler) {
-    this.conflictHandler = conflictHandler;
-  }
-
-  /** OSGi callback to add {@link ConflictNotifier} instance. */
-  public void addConflictNotifier(ConflictNotifier conflictNotifier) {
-    conflictNotifiers.add(conflictNotifier);
-  }
-
-  /** OSGi callback to remove {@link ConflictNotifier} instance. */
-  public void removeConflictNotifier(ConflictNotifier conflictNotifier) {
-    conflictNotifiers.remove(conflictNotifier);
   }
 
   /**

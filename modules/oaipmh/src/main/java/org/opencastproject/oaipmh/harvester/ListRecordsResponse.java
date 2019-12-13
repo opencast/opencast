@@ -67,13 +67,6 @@ public class ListRecordsResponse extends OaiPmhResponse {
   }
 
   /**
-   * Get the content of all metadata elements in the current response.
-   */
-  public NodeList getMetadataElems() {
-    return xpathNodeList("/oai20:OAI-PMH/oai20:ListRecords/oai20:record/oai20:metadata/*[1]");
-  }
-
-  /**
    * Get all records in the current response.
    * <pre>
    *  &lt;record&gt;
@@ -126,28 +119,6 @@ public class ListRecordsResponse extends OaiPmhResponse {
           @Override
           protected NodeList extractNodes(ListRecordsResponse response) {
             return response.getRecords();
-          }
-        };
-      }
-    };
-  }
-
-  /**
-   * Get all metadata performing a complete request resuming any partial responses.
-   */
-  public static Iterable<Node> getAllMetadataElems(final ListRecordsResponse first, final OaiPmhRepositoryClient client) {
-    return new Iterable<Node>() {
-      @Override
-      public Iterator<Node> iterator() {
-        return new ResponseIterator(first) {
-          @Override
-          protected OaiPmhRepositoryClient getClient() {
-            return client;
-          }
-
-          @Override
-          protected NodeList extractNodes(ListRecordsResponse response) {
-            return response.getMetadataElems();
           }
         };
       }

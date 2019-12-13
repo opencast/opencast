@@ -99,17 +99,12 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.Precision;
-import org.opencastproject.scheduler.api.ConflictHandler;
-import org.opencastproject.scheduler.api.ConflictResolution;
-import org.opencastproject.scheduler.api.ConflictResolution.Strategy;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
-import org.opencastproject.scheduler.api.SchedulerEvent;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
-import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
 import org.opencastproject.scheduler.api.Util;
 import org.opencastproject.scheduler.endpoint.SchedulerRestService;
 import org.opencastproject.scheduler.impl.persistence.SchedulerServiceDatabaseImpl;
@@ -231,38 +226,6 @@ public class SchedulerServiceImplTest {
   private static Map<String, String> wfProperties = new HashMap<>();
   private static Map<String, String> wfPropertiesUpdated = new HashMap<>();
 
-  private static TestConflictHandler testConflictHandler;
-
-  private static class TestConflictHandler implements ConflictHandler {
-
-    private Strategy strategy = Strategy.OLD;
-
-    public void setStrategy(Strategy strategy) {
-      this.strategy = strategy;
-    }
-
-    @Override
-    public ConflictResolution handleConflict(SchedulerEvent newEvent, SchedulerEvent oldEvent) {
-      switch (strategy) {
-        case OLD:
-          return new ConflictResolutionImpl(Strategy.OLD, oldEvent);
-        case NEW:
-          return new ConflictResolutionImpl(Strategy.NEW, newEvent);
-        case MERGED:
-          TechnicalMetadata newTechnicalMetadata = newEvent.getTechnicalMetadata();
-          TechnicalMetadata technicalMetadata = new TechnicalMetadataImpl(newTechnicalMetadata.getEventId(),
-                  newTechnicalMetadata.getAgentId(), newTechnicalMetadata.getStartDate(),
-                  newTechnicalMetadata.getEndDate(), newTechnicalMetadata.getPresenters(),
-                  newTechnicalMetadata.getWorkflowProperties(), newTechnicalMetadata.getCaptureAgentConfiguration(),
-                  newTechnicalMetadata.getRecording());
-          SchedulerEvent mergedEvent = new SchedulerEventImpl(newEvent.getEventId(), newEvent.getVersion(),
-                  newEvent.getMediaPackage(), technicalMetadata);
-          return new ConflictResolutionImpl(Strategy.MERGED, mergedEvent);
-        default:
-          throw new IllegalStateException("No strategy found for " + strategy);
-      }
-    }
-  };
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -319,15 +282,12 @@ public class SchedulerServiceImplTest {
     EasyMock.replay(messageSender, baseMessageMock, messageReceiver, authorizationService,
             extendedAdapter, episodeAdapter, orgDirectoryService, componentContext, bundleContext);
 
-    testConflictHandler = new TestConflictHandler();
-
     schedSvc = new SchedulerServiceImpl();
 
     schedSvc.setAuthorizationService(authorizationService);
     schedSvc.setWorkspace(workspace);
     schedSvc.setMessageSender(messageSender);
     schedSvc.setMessageReceiver(messageReceiver);
-    schedSvc.setConflictHandler(testConflictHandler);
     schedSvc.addCatalogUIAdapter(episodeAdapter);
     schedSvc.addCatalogUIAdapter(extendedAdapter);
     schedSvc.setOrgDirectoryService(orgDirectoryService);
@@ -588,7 +548,6 @@ public class SchedulerServiceImplTest {
 
   @Test
   public void nonExistantRecording() throws Exception {
-    long currentTime = System.currentTimeMillis();
     String mpId = "doesNotExist";
     try {
       schedSvc.getRecordingState(mpId);
@@ -1624,16 +1583,6 @@ public class SchedulerServiceImplTest {
     assertEquals(orgList.size(), dublincoreCatalogs.size());
   }
 
-  public void testGetJsonMpSchedulerRestEndpoint() throws MediaPackageException, SchedulerException {
-    SchedulerRestService restService = new SchedulerRestService();
-    List<MediaPackage> mpList = new ArrayList();
-    mpList.add(generateEvent(Opt.some("mp1")));
-    mpList.add(generateEvent(Opt.some("mp2")));
-    String jsonStr = restService.getEventListAsJsonString(mpList);
-    Assert.assertTrue(jsonStr.contains("mp1"));
-    Assert.assertTrue(jsonStr.contains("mp2"));
-  }
-
   private String addDublinCore(Opt<String> id, MediaPackage mediaPackage, final DublinCoreCatalog initalEvent)
           throws URISyntaxException, IOException {
     String catalogId = UUID.randomUUID().toString();
@@ -1669,16 +1618,6 @@ public class SchedulerServiceImplTest {
     }
     attachment.setChecksum(null);
     return attachmentId;
-  }
-
-  private int getCountFromString(String searchTerm, String value) {
-    int count = 0;
-    int index = 0;
-    while (value.indexOf(searchTerm, index) != -1) {
-      count++;
-      index = value.indexOf(searchTerm, index) + searchTerm.length();
-    }
-    return count;
   }
 
   private List<String> createEvents(String titlePrefix, String agent, int number, SchedulerService schedulerService)
@@ -1801,10 +1740,6 @@ public class SchedulerServiceImplTest {
 
   private static long hours(int a) {
     return minutes(a * 60);
-  }
-
-  private static long days(int a) {
-    return hours(a * 24);
   }
 
   AssetManager mkAssetManager() throws Exception {

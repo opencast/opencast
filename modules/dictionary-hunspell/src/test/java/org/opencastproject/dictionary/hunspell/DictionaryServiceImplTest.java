@@ -27,7 +27,6 @@ import org.junit.Test;
 
 public class DictionaryServiceImplTest {
 
-  private static boolean hunspellInstalled = true;
   private static boolean hunspellEngDictAvailable = true;
   private static boolean hunspellDeuDictAvailable = true;
 
@@ -41,7 +40,6 @@ public class DictionaryServiceImplTest {
       service.runHunspell("");
     } catch (Throwable t) {
       /* Seems like no hunspell is available */
-      hunspellInstalled = false;
     }
 
     /* Check if the English dictionary is available */

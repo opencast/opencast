@@ -88,9 +88,6 @@ public class GroupRoleEndpoint {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(GroupRoleEndpoint.class);
 
-  /** The JPA persistence unit name */
-  public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
-
   /** the jpaGroupRoleProvider Impl service */
   private JpaGroupRoleProvider jpaGroupRoleProvider;
 

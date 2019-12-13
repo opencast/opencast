@@ -438,16 +438,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String, Float)
-   */
-  @Override
-  public Job createJob(String type, String operation, Float jobLoad) throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, null, null, true, getCurrentJob(), jobLoad);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
    *      java.util.List)
    */
@@ -466,30 +456,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   public Job createJob(String type, String operation, List<String> arguments, Float jobLoad)
           throws ServiceRegistryException {
     return createJob(this.hostName, type, operation, arguments, null, true, getCurrentJob(), jobLoad);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
-   *      java.util.List, java.lang.String)
-   */
-  @Override
-  public Job createJob(String type, String operation, List<String> arguments, String payload)
-          throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, payload, true, getCurrentJob(), DEFAULT_JOB_LOAD);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
-   *      java.util.List, java.lang.String, Float)
-   */
-  @Override
-  public Job createJob(String type, String operation, List<String> arguments, String payload, Float jobLoad)
-          throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, payload, true, getCurrentJob(), jobLoad);
   }
 
   /**
@@ -517,12 +483,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     return createJob(this.hostName, type, operation, arguments, payload, dispatchable, getCurrentJob(), jobLoad);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(String, String, List, String, boolean, Job)
-   */
-  @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean dispatchable,
           Job parentJob) throws ServiceRegistryException {
     return createJob(this.hostName, type, operation, arguments, payload, dispatchable, parentJob, DEFAULT_JOB_LOAD);
@@ -1052,37 +1012,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         tx.rollback();
       }
       throw e;
-    }
-  }
-
-  private void dumpJobs(JpaJob originalJob, JpaJob fromDb) {
-    try {
-      if (originalJob == null) {
-        logger.error("originalJob is null");
-        return;
-      }
-      if (originalJob.getStatus() == null) {
-        logger.error("originalJob.getStatus() is null");
-        return;
-      }
-      if (!originalJob.getStatus().equals(fromDb.getStatus()))
-        logger.error("JPA status mismatch: " + originalJob.getStatus() + " vs " + fromDb.getStatus());
-      if (originalJob.getProcessorServiceRegistration() == null) {
-        logger.error("originalJob.getProcessorServiceRegistration() is null");
-        return;
-      }
-      if (fromDb.getProcessorServiceRegistration() == null) {
-        logger.error("fromDb.getProcessorServiceRegistration() is null");
-        return;
-      }
-      if (!originalJob.getProcessorServiceRegistration().getId().equals(fromDb.getProcessorServiceRegistration().getId()))
-        logger.error("JPA processor service mismatch: " + originalJob.getProcessorServiceRegistration().getId() + " vs " + fromDb.getProcessorServiceRegistration().getId());
-      if (!originalJob.getDateStarted().equals(fromDb.getDateStarted()))
-        logger.error("JPA date started mismatch: " + originalJob.getDateStarted() + " vs " + fromDb.getDateStarted());
-      if (!originalJob.getChildJobsString().equals(fromDb.getChildJobsString()))
-        logger.error("JPA child job id mismatch: " + originalJob.getChildJobsString() + " vs " + fromDb.getChildJobsString());
-    } catch (Exception e) {
-      logger.error("Error logging job state information in dumpJobs()", e);
     }
   }
 

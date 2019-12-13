@@ -117,22 +117,6 @@ public class EncodingProfileScanner implements ArtifactInstaller {
   }
 
   /**
-   * Returns the list of profiles that are applicable for the given track type.
-   *
-   * @return the profile definitions
-   */
-  public Map<String, EncodingProfile> getApplicableProfiles(MediaType type) {
-    Map<String, EncodingProfile> result = new HashMap<String, EncodingProfile>();
-    for (Map.Entry<String, EncodingProfile> entry : profiles.entrySet()) {
-      EncodingProfile profile = entry.getValue();
-      if (profile.isApplicableTo(type)) {
-        result.put(entry.getKey(), profile);
-      }
-    }
-    return result;
-  }
-
-  /**
    * Reads the profiles from the given set of properties.
    *
    * @param artifact

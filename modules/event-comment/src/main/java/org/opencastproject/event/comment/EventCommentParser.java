@@ -39,10 +39,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -69,36 +67,6 @@ public final class EventCommentParser {
   private static final XPath xpath = XPathFactory.newInstance().newXPath();
 
   /**
-   * Parses the comments catalog and returns its object representation.
-   * 
-   * @param xml
-   *          the serialized comments
-   * @param userDirectoryService
-   *          the user directory service
-   * @return the comments list
-   * @throws EventCommentException
-   *           unable to parse comment from XML
-   */
-  public static List<EventComment> getCommentsFromXml(String xml, UserDirectoryService userDirectoryService)
-          throws EventCommentException {
-    try {
-      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-              .parse(IOUtils.toInputStream(xml, "UTF-8"));
-
-      List<EventComment> comments = new ArrayList<EventComment>();
-      NodeList commentNodes = (NodeList) xpath.evaluate("comments/comment", doc.getDocumentElement(),
-              XPathConstants.NODESET);
-      for (int i = 0; i < commentNodes.getLength(); i++) {
-        comments.add(commentFromManifest(commentNodes.item(i), userDirectoryService));
-      }
-
-      return comments;
-    } catch (Exception e) {
-      throw new EventCommentException(e);
-    }
-  }
-
-  /**
    * Parses the comment catalog and returns its object representation.
    * 
    * @param xml
@@ -115,28 +83,6 @@ public final class EventCommentParser {
       Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
               .parse(IOUtils.toInputStream(xml, "UTF-8"));
       return commentFromManifest(doc.getDocumentElement(), userDirectoryService);
-    } catch (Exception e) {
-      throw new EventCommentException(e);
-    }
-  }
-
-  /**
-   * Parses the comment reply catalog and returns its object representation.
-   * 
-   * @param xml
-   *          the serialized comment reply
-   * @param userDirectoryService
-   *          the user directory service
-   * @return the comment reply instance
-   * @throws EventCommentException
-   *           unable to parse comment reply from XML
-   */
-  public static EventCommentReply getCommentReplyFromXml(String xml, UserDirectoryService userDirectoryService)
-          throws EventCommentException {
-    try {
-      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-              .parse(IOUtils.toInputStream(xml, "UTF-8"));
-      return replyFromManifest(doc.getDocumentElement(), userDirectoryService);
     } catch (Exception e) {
       throw new EventCommentException(e);
     }

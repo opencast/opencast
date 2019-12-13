@@ -58,8 +58,6 @@ public class EventTest {
   private static final Logger logger = LoggerFactory.getLogger(EventTest.class);
 
   private static final String ENTRY_KEY = "entry";
-  private static final String KEY_KEY = "key";
-  private static final String VALUE_KEY = "value";
   private static final String LOCATION_JSON_KEY = "location";
   private static final String DESCRIPTION_JSON_KEY = "description";
   private static final String CONTRIBUTOR_JSON_KEY = "contributor";

@@ -134,18 +134,7 @@ public class UnitTestWorkspace implements Workspace {
   }
 
   @Override
-  public void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException {
-    throw new RuntimeException("Not yet implemented");
-  }
-
-  @Override
   public URI getURI(String mediaPackageID, String mediaPackageElementID) throws IllegalArgumentException {
-    throw new RuntimeException("Not yet implemented");
-  }
-
-  @Override
-  public URI getURI(String mediaPackageID, String mediaPackageElementID, String filename)
-          throws IllegalArgumentException {
     throw new RuntimeException("Not yet implemented");
   }
 
@@ -156,12 +145,6 @@ public class UnitTestWorkspace implements Workspace {
 
   @Override
   public URI moveTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
-          throws NotFoundException, IOException, IllegalArgumentException {
-    throw new RuntimeException("Not yet implemented");
-  }
-
-  @Override
-  public URI copyTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
           throws NotFoundException, IOException, IllegalArgumentException {
     throw new RuntimeException("Not yet implemented");
   }

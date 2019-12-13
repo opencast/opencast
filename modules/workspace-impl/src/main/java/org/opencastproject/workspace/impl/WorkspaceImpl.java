@@ -713,36 +713,8 @@ public final class WorkspaceImpl implements Workspace {
   }
 
   @Override
-  public URI getURI(String mediaPackageID, String mediaPackageElementID, String filename) {
-    return wfr.getURI(mediaPackageID, mediaPackageElementID, filename);
-  }
-
-  @Override
   public URI getCollectionURI(String collectionID, String fileName) {
     return wfr.getCollectionURI(collectionID, fileName);
-  }
-
-  @Override
-  public URI copyTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
-          throws NotFoundException, IOException {
-    String path = collectionURI.toString();
-    String filename = FilenameUtils.getName(path);
-    String collection = getCollection(collectionURI);
-
-    // Copy the local file
-    final File original = toWorkspaceFile(collectionURI);
-    if (original.isFile()) {
-      URI copyURI = wfr.getURI(toMediaPackage, toMediaPackageElement, filename);
-      File copy = toWorkspaceFile(copyURI);
-      FileUtils.forceMkdir(copy.getParentFile());
-      FileSupport.link(original, copy);
-    }
-
-    // Tell working file repository
-    final URI wfrUri = wfr.copyTo(collection, filename, toMediaPackage, toMediaPackageElement, toFileName);
-    // wait for WFR
-    waitForResource(wfrUri, SC_OK, "File %s does not appear in WFR");
-    return wfrUri;
   }
 
   @Override
@@ -775,8 +747,7 @@ public final class WorkspaceImpl implements Workspace {
     return wfr.getCollectionContents(collectionId);
   }
 
-  @Override
-  public void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException {
+  private void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException {
     // local delete
     final File f = workspaceFile(WorkingFileRepository.COLLECTION_PATH_PREFIX, collectionId,
             PathSupport.toSafeName(fileName));

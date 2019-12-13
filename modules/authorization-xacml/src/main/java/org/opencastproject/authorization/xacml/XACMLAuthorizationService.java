@@ -134,16 +134,6 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
     return getAcl(mp, AclScope.Episode);
   }
 
-  /** Returns an ACL based on a given file/inputstream. */
-  public AccessControlList getAclFromInputStream(final InputStream in) throws IOException {
-    logger.debug("Get ACL from inputstream");
-    try {
-      return XACMLUtils.parseXacml(in);
-    } catch (XACMLParsingException e) {
-      throw new IOException(e);
-    }
-  }
-
   @Override
   public Tuple<AccessControlList, AclScope> getAcl(final MediaPackage mp, final AclScope scope) {
     Optional<AccessControlList> episode = Optional.empty();

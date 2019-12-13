@@ -27,12 +27,8 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.util.data.Either;
 
-import com.entwinemedia.fn.data.ImmutableIteratorBase;
-
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import java.io.ByteArrayInputStream;
@@ -40,8 +36,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -82,16 +76,6 @@ public final class XmlUtil {
   /** Namespace aware parsing of <code>xml</code>. */
   public static Either<Exception, Document> parseNs(String xml) {
     return parseNs(fromXmlString(xml));
-  }
-
-  /** Parsing of <code>src</code> without namespaces. */
-  public static Either<Exception, Document> parse(InputSource src) {
-    try {
-      DocumentBuilder docBuilder = dbf.newDocumentBuilder();
-      return right(docBuilder.parse(src));
-    } catch (Exception e) {
-      return left(e);
-    }
   }
 
   /**
@@ -173,31 +157,4 @@ public final class XmlUtil {
     }
   }
 
-  /** Make a {@link org.w3c.dom.NodeList} iterable. */
-  public static <A extends Node> Iterable<A> iterable(final NodeList nl) {
-    return new Iterable<A>() {
-      @Override
-      public Iterator<A> iterator() {
-        return new ImmutableIteratorBase<A>() {
-          private int index = 0;
-
-          @Override
-          public boolean hasNext() {
-            return index < nl.getLength();
-          }
-
-          @Override
-          public A next() {
-            if (hasNext()) {
-              final Node next = nl.item(index);
-              index = index + 1;
-              return (A) next;
-            } else {
-              throw new NoSuchElementException();
-            }
-          }
-        };
-      }
-    };
-  }
 }

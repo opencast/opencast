@@ -71,8 +71,6 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -94,9 +92,6 @@ import javax.xml.transform.stream.StreamResult;
  * Test class for the dublin core implementation.
  */
 public class DublinCoreTest {
-
-  /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(DublinCoreTest.class);
 
   /**
    * The catalog name
@@ -157,26 +152,6 @@ public class DublinCoreTest {
   public void tearDown() throws Exception {
     FileUtils.deleteQuietly(dcTempFile1);
     FileUtils.deleteQuietly(dcTempFile2);
-  }
-
-  /**
-   * Test method for {@link org.opencastproject.metadata.dublincore.DublinCoreCatalog#fromFile(java.io.File)} .
-   */
-  @Test
-  public void testFromFile() throws Exception {
-    DublinCoreCatalog dc = null;
-    FileInputStream in = new FileInputStream(catalogFile);
-    dc = DublinCores.read(in);
-    IOUtils.closeQuietly(in);
-
-    // Check if the fields are available
-    assertEquals("ETH Zurich, Switzerland", dc.getFirst(PROPERTY_PUBLISHER, LANGUAGE_UNDEFINED));
-    assertEquals("Land and Vegetation: Key players on the Climate Scene",
-            dc.getFirst(PROPERTY_TITLE, DublinCore.LANGUAGE_UNDEFINED));
-    assertNotNull(dc.getFirst(PROPERTY_TITLE));
-    assertNull(dc.getFirst(PROPERTY_TITLE, "fr"));
-    // Test custom metadata element
-    assertEquals("true", dc.getFirst(OC_PROPERTY_PROMOTED));
   }
 
   /**

@@ -86,44 +86,16 @@ public final class ProcessRunner {
   private static final ListBuilder l = ListBuilders.looseImmutableArray;
   private static final Map<String, String> NO_ENV = new HashMap<String, String>();
 
-  public static ProcessInfo mk(String commandLine) {
-    return new ProcessInfo(mkCommandLine(commandLine), NO_ENV, false);
-  }
-
-  public static ProcessInfo mk(String commandLine, Map<String, String> environment, boolean redirectErrorStream) {
-    return new ProcessInfo(mkCommandLine(commandLine), environment, redirectErrorStream);
-  }
-
-  public static ProcessInfo mk(String command, String options) {
-    return new ProcessInfo(mkCommandLine(command, options), NO_ENV, false);
-  }
-
   public static ProcessInfo mk(String command, String[] options) {
     return new ProcessInfo($(command).append($(options)).toList(), NO_ENV, false);
-  }
-
-  public static ProcessInfo mk(String[] commandLine) {
-    return new ProcessInfo(l.mk(commandLine), NO_ENV, false);
   }
 
   public static ProcessInfo mk(String commandLine, boolean redirectErrorStream) {
     return new ProcessInfo(mkCommandLine(commandLine), NO_ENV, redirectErrorStream);
   }
 
-  public static ProcessInfo mk(String[] commandLine, boolean redirectErrorStream) {
-    return new ProcessInfo(l.mk(commandLine), NO_ENV, redirectErrorStream);
-  }
-
-  public static ProcessInfo mk(String command, String options, boolean redirectErrorStream) {
-    return new ProcessInfo(mkCommandLine(command, options), NO_ENV, redirectErrorStream);
-  }
-
   private static List<String> mkCommandLine(String command) {
     return l.mk(command.split("\\s+"));
-  }
-
-  private static List<String> mkCommandLine(String command, String options) {
-    return $(command).append(mkCommandLine(options)).toList();
   }
 
   public static final class ProcessInfo {

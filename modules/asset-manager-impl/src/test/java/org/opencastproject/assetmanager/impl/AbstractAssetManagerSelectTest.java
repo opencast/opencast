@@ -54,7 +54,6 @@ import org.opencastproject.security.api.DefaultOrganization;
 
 import com.entwinemedia.fn.FnX;
 import com.entwinemedia.fn.P2;
-import com.entwinemedia.fn.Pred;
 import com.entwinemedia.fn.Products;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
@@ -528,14 +527,6 @@ public class AbstractAssetManagerSelectTest extends AbstractAssetManagerTestBase
                  2, q.select(q.snapshot()).where(q.version().isFirst()).run().getSize());
   }
 
-  private Pred<Snapshot> findSnapshot(final String mpId, final Version version) {
-    return new Pred<Snapshot>() {
-      @Override public Boolean apply(Snapshot snapshot) {
-        return snapshot.getMediaPackage().getIdentifier().toString().equals(mpId) && snapshot.getVersion().equals(version);
-      }
-    };
-  }
-
   /**
    * CERV-1047
    */
@@ -544,7 +535,7 @@ public class AbstractAssetManagerSelectTest extends AbstractAssetManagerTestBase
     final Snapshot[] mp1 = createAndAddMediaPackages(3, 2, 2, Opt.some("series-1"));
     // fill asset manager a bit
     final Snapshot[] mp2 = createAndAddMediaPackages(3, 1, 1, Opt.some("series-2"));
-    final Snapshot[] mp3 = createAndAddMediaPackages(3, 1, 1, Opt.<String>none());
+    createAndAddMediaPackages(3, 1, 1, Opt.<String>none());
     am.setProperty(Properties.mkProperty(p.seriesId, mp1[0], "series-1"));
     {
       final RichAResult r = enrich(q.select(q.snapshot()).where(q.seriesId().eq(p.seriesId)).run());
@@ -768,9 +759,9 @@ public class AbstractAssetManagerSelectTest extends AbstractAssetManagerTestBase
 
   @Test
   public void testOrderBySnapshotField() throws Exception {
-    final String[] mp1 = createAndAddMediaPackagesSimple(1, 1, 1, Opt.some("series-1"));
-    final String[] mp2 = createAndAddMediaPackagesSimple(1, 1, 1, Opt.some("series-2"));
-    final String[] mp3 = createAndAddMediaPackagesSimple(1, 1, 1, Opt.some("series-3"));
+    createAndAddMediaPackagesSimple(1, 1, 1, Opt.some("series-1"));
+    createAndAddMediaPackagesSimple(1, 1, 1, Opt.some("series-2"));
+    createAndAddMediaPackagesSimple(1, 1, 1, Opt.some("series-3"));
     {
       final List<String> orgAsc = enrich(q.select(q.snapshot()).orderBy(q.seriesId().asc()).run())
               .getSnapshots().bind(Snapshots.getSeriesId).toList();
@@ -797,7 +788,7 @@ public class AbstractAssetManagerSelectTest extends AbstractAssetManagerTestBase
 
   @Test
   public void testPaging() throws Exception {
-    final String[] mp1 = createAndAddMediaPackagesSimple(5, 1, 1, Opt.some("series-1"));
+    createAndAddMediaPackagesSimple(5, 1, 1, Opt.some("series-1"));
     assertEquals(1, q.select().page(0, 1).where(q.seriesId().eq("series-1")).run().getSize());
     assertEquals(3, q.select().page(0, 3).where(q.seriesId().eq("series-1")).run().getSize());
     assertEquals(3, q.select().where(q.seriesId().eq("series-1")).page(0, 3).run().getSize());

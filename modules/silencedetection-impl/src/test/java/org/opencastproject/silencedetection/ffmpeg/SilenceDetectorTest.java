@@ -156,7 +156,7 @@ public class SilenceDetectorTest {
     props.setProperty(SilenceDetectionProperties.SILENCE_PRE_LENGTH, "6000");
     props.setProperty(SilenceDetectionProperties.SILENCE_MIN_LENGTH, "4000");
     try {
-      FFmpegSilenceDetector sd = init(trackUri, true, props);
+      init(trackUri, true, props);
       fail("Silence detection of media without audio should fail");
     } catch (SilenceDetectionFailedException e) {
     }
@@ -168,7 +168,7 @@ public class SilenceDetectorTest {
     if (this.skipTests) return;
     final URI trackUri = getResource("/nostreams.mp4");
     try {
-      FFmpegSilenceDetector sd = init(trackUri, false);
+      init(trackUri, false);
       fail("Silence detection of media without audio should fail");
     } catch (SilenceDetectionFailedException e) {
     }

@@ -25,21 +25,10 @@ import org.opencastproject.index.service.impl.index.IndexObject;
 import org.opencastproject.security.api.JaxbGroup;
 import org.opencastproject.util.IoSupport;
 
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-import org.codehaus.jettison.mapped.Configuration;
-import org.codehaus.jettison.mapped.MappedNamespaceConvention;
-import org.codehaus.jettison.mapped.MappedXMLStreamReader;
-import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
-
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
@@ -52,9 +41,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
 /**
@@ -273,85 +259,10 @@ public class Group implements IndexObject {
   }
 
   /**
-   * Reads the group from the input stream.
-   *
-   * @param json
-   *          the input stream
-   * @return the deserialized group
-   * @throws JSONException
-   * @throws XMLStreamException
-   * @throws JAXBException
-   */
-  public static Group valueOfJson(InputStream json) throws IOException, JSONException, XMLStreamException,
-          JAXBException {
-    // TODO Get this to work, it is currently returning null properties for all properties.
-    if (context == null) {
-      createJAXBContext();
-    }
-
-    BufferedReader streamReader = new BufferedReader(new InputStreamReader(json, "UTF-8"));
-    StringBuilder jsonStringBuilder = new StringBuilder();
-    String inputStr;
-    while ((inputStr = streamReader.readLine()) != null)
-      jsonStringBuilder.append(inputStr);
-
-    JSONObject obj = new JSONObject(jsonStringBuilder.toString());
-    Configuration config = new Configuration();
-    config.setSupressAtAttributes(true);
-    Map<String, String> xmlToJsonNamespaces = new HashMap<String, String>(1);
-    xmlToJsonNamespaces.put(INDEX_XML_NAMESPACE, "");
-    config.setXmlToJsonNamespaces(xmlToJsonNamespaces);
-    MappedNamespaceConvention con = new MappedNamespaceConvention(config);
-    XMLStreamReader xmlStreamReader = new MappedXMLStreamReader(obj, con);
-    Unmarshaller unmarshaller = context.createUnmarshaller();
-    Group event = (Group) unmarshaller.unmarshal(xmlStreamReader);
-    return event;
-  }
-
-  /**
    * Initialize the JAXBContext.
    */
   private static void createJAXBContext() throws JAXBException {
     context = JAXBContext.newInstance(Group.class);
-  }
-
-  @Override
-  public String toJSON() {
-    try {
-      if (context == null) {
-        createJAXBContext();
-      }
-      Marshaller marshaller = Group.context.createMarshaller();
-
-      Configuration config = new Configuration();
-      config.setSupressAtAttributes(true);
-      MappedNamespaceConvention con = new MappedNamespaceConvention(config);
-      StringWriter writer = new StringWriter();
-      XMLStreamWriter xmlStreamWriter = new MappedXMLStreamWriter(con, writer) {
-        @Override
-        public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
-          super.writeStartElement("", local, "");
-        }
-
-        @Override
-        public void writeStartElement(String uri, String local) throws XMLStreamException {
-          super.writeStartElement("", local, "");
-        }
-
-        @Override
-        public void setPrefix(String pfx, String uri) throws XMLStreamException {
-        }
-
-        @Override
-        public void setDefaultNamespace(String uri) throws XMLStreamException {
-        }
-      };
-
-      marshaller.marshal(this, xmlStreamWriter);
-      return writer.toString();
-    } catch (JAXBException e) {
-      throw new IllegalStateException(e.getLinkedException() != null ? e.getLinkedException() : e);
-    }
   }
 
   /**

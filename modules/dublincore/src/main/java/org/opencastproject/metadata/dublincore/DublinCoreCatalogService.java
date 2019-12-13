@@ -25,7 +25,6 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPOR
 
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.api.CatalogService;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
@@ -95,12 +94,6 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.metadata.api.CatalogService#serialize(org.opencastproject.metadata.api.MetadataCatalog)
-   */
-  @Override
   public InputStream serialize(DublinCoreCatalog catalog) throws IOException {
     try {
       Transformer tf = TransformerFactory.newInstance().newTransformer();
@@ -194,38 +187,12 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
     }
   };
 
-  /**
-   *
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.metadata.api.CatalogService#load(java.io.InputStream)
-   */
-  @Override
   public DublinCoreCatalog load(InputStream in) throws IOException {
     if (in == null)
       throw new IllegalArgumentException("Stream must not be null");
     return DublinCores.read(in);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.metadata.api.CatalogService#accepts(org.opencastproject.mediapackage.Catalog)
-   */
-  @Override
-  public boolean accepts(Catalog catalog) {
-    if (catalog == null)
-      throw new IllegalArgumentException("Catalog must not be null");
-    MediaPackageElementFlavor flavor = catalog.getFlavor();
-    return flavor != null && (flavor.equals(DublinCoreCatalog.ANY_DUBLINCORE));
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.metadata.api.CatalogService#newInstance()
-   */
-  @Override
   public DublinCoreCatalog newInstance() {
     return DublinCores.mkOpencastEpisode().getCatalog();
   }

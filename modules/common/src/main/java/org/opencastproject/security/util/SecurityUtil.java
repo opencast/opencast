@@ -27,7 +27,6 @@ import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ANONYMOU
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.security.api.JaxbOrganization;
@@ -138,30 +137,6 @@ public final class SecurityUtil {
       throw new ConfigurationException(
               "An Opencast installation always needs a system user name. Please configure one under the key "
                       + PROPERTY_KEY_SYS_USER);
-    }
-  }
-
-  /** Get the organization <code>orgId</code>. */
-  public static Option<Organization> getOrganization(OrganizationDirectoryService orgDir, String orgId) {
-    try {
-      return some(orgDir.getOrganization(orgId));
-    } catch (NotFoundException e) {
-      return none();
-    }
-  }
-
-  /** Get a user of a certain organization by its ID. */
-  public static Option<User> getUserOfOrganization(SecurityService sec, OrganizationDirectoryService orgDir,
-          String orgId, UserDirectoryService userDir, String userId) {
-    final Organization prevOrg = sec.getOrganization();
-    try {
-      final Organization org = orgDir.getOrganization(orgId);
-      sec.setOrganization(org);
-      return option(userDir.loadUser(userId));
-    } catch (NotFoundException e) {
-      return none();
-    } finally {
-      sec.setOrganization(prevOrg);
     }
   }
 

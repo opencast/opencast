@@ -38,7 +38,6 @@ import com.amazonaws.services.autoscaling.AmazonAutoScalingClientBuilder;
 import com.amazonaws.services.autoscaling.model.AutoScalingGroup;
 import com.amazonaws.services.autoscaling.model.AutoScalingInstanceDetails;
 import com.amazonaws.services.autoscaling.model.CompleteLifecycleActionRequest;
-import com.amazonaws.services.autoscaling.model.CompleteLifecycleActionResult;
 import com.amazonaws.services.autoscaling.model.DescribeAutoScalingGroupsRequest;
 import com.amazonaws.services.autoscaling.model.DescribeAutoScalingGroupsResult;
 import com.amazonaws.services.autoscaling.model.DescribeAutoScalingInstancesRequest;
@@ -48,7 +47,6 @@ import com.amazonaws.services.autoscaling.model.DescribeLifecycleHooksResult;
 import com.amazonaws.services.autoscaling.model.LifecycleHook;
 import com.amazonaws.services.autoscaling.model.LifecycleState;
 import com.amazonaws.services.autoscaling.model.RecordLifecycleActionHeartbeatRequest;
-import com.amazonaws.services.autoscaling.model.RecordLifecycleActionHeartbeatResult;
 import com.amazonaws.util.EC2MetadataUtils;
 
 import org.osgi.service.cm.ConfigurationException;
@@ -352,7 +350,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
                   .withAutoScalingGroupName(parent.autoScalingGroup.getAutoScalingGroupName())
                   .withLifecycleHookName(parent.lifeCycleHook.getLifecycleHookName())
                   .withInstanceId(parent.instanceId);
-          CompleteLifecycleActionResult result = parent.autoScaling.completeLifecycleAction(request);
+          parent.autoScaling.completeLifecycleAction(request);
           logger.info("No jobs running, sent complete Lifecycle action");
         }
 
@@ -366,7 +364,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
                   .withAutoScalingGroupName(parent.autoScalingGroup.getAutoScalingGroupName())
                   .withLifecycleHookName(parent.lifeCycleHook.getLifecycleHookName())
                   .withInstanceId(parent.instanceId);
-          RecordLifecycleActionHeartbeatResult result = parent.autoScaling.recordLifecycleActionHeartbeat(request);
+          parent.autoScaling.recordLifecycleActionHeartbeat(request);
           logger.info("Jobs still running, sent Lifecycle heartbeat");
         }
       }

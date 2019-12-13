@@ -64,19 +64,6 @@ public class BooleanListProvider implements ResourceListProvider {
   }
 
   /**
-   * Parse boolean value from the given string wrapped in an {@link Option}.
-   *
-   * @param filterValue boolean value as string
-   * @return boolean value wrapped in a {@link Option} or {@link Option#none()}
-   */
-  public static <Boolean> Option<Boolean> parseOptValue(Option<String> filterValue) {
-    if (filterValue.isSome())
-      return parseValue(filterValue.get());
-
-    return Option.none();
-  }
-
-  /**
    * Parse boolean value from the given string.
    *
    * @param filterValue boolean value as string

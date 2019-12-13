@@ -30,18 +30,8 @@ public class NamespaceBindingException extends RuntimeException {
   /** Serial version uid */
   private static final long serialVersionUID = 3520050243419468968L;
 
-  public NamespaceBindingException() {
-  }
-
   public NamespaceBindingException(String message) {
     super(message);
   }
 
-  public NamespaceBindingException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public NamespaceBindingException(Throwable cause) {
-    super(cause);
-  }
 }

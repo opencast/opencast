@@ -52,7 +52,6 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-import org.opencastproject.workflow.api.Configurable;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -87,7 +86,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import javax.servlet.http.HttpServletResponse;
@@ -744,34 +742,6 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     } catch (WorkflowDatabaseException e) {
       throw new WebApplicationException(e);
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  protected JSONArray getOperationsAsJson(List<WorkflowOperationInstance> operations) {
-    JSONArray jsonArray = new JSONArray();
-    for (WorkflowOperationInstance op : operations) {
-      JSONObject jsOp = new JSONObject();
-      jsOp.put("name", op.getTemplate());
-      jsOp.put("description", op.getDescription());
-      jsOp.put("state", op.getState().name().toLowerCase());
-      jsOp.put("configurations", getConfigsAsJson(op));
-      jsonArray.add(jsOp);
-    }
-    return jsonArray;
-  }
-
-  @SuppressWarnings("unchecked")
-  protected JSONArray getConfigsAsJson(Configurable entity) {
-    JSONArray json = new JSONArray();
-    Set<String> keys = entity.getConfigurationKeys();
-    if (keys != null) {
-      for (String key : keys) {
-        JSONObject jsConfig = new JSONObject();
-        jsConfig.put(key, entity.getConfiguration(key));
-        json.add(jsConfig);
-      }
-    }
-    return json;
   }
 
   /**

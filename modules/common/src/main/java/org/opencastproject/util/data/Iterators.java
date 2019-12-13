@@ -69,11 +69,4 @@ public final class Iterators {
     }
   }
 
-  public static <A> Iterable<A> iterable(final Iterator<A> ix) {
-    return new Iterable<A>() {
-      @Override public Iterator<A> iterator() {
-        return ix;
-      }
-    };
-  }
 }
