@@ -89,7 +89,6 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -839,28 +838,6 @@ public class WorkflowServiceImplTest {
     Assert.assertTrue(failTwiceOperation.getState() == OperationState.FAILED);
     Assert.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
     Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
-  }
-
-  @Test
-  @Ignore
-  public void testRetryStrategyFailover() throws Exception {
-    WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
-    def.setId("workflow-definition-1");
-    def.setTitle("workflow-definition-1");
-    def.setDescription("workflow-definition-1");
-
-    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOnHost", "fails on host", null,
-            true);
-    opDef.setRetryStrategy(RetryStrategy.RETRY);
-    def.add(opDef);
-
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-
-    WorkflowInstance workflow = startAndWait(def, mp, WorkflowState.SUCCEEDED);
-
-    Assert.assertTrue(service.getWorkflowById(workflow.getId()).getOperations().get(0).getState() == OperationState.SUCCEEDED);
-    Assert.assertTrue(service.getWorkflowById(workflow.getId()).getOperations().get(0).getMaxAttempts() == 2);
-    Assert.assertTrue(service.getWorkflowById(workflow.getId()).getOperations().get(0).getFailedAttempts() == 1);
   }
 
   /**

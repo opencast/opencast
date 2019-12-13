@@ -79,7 +79,6 @@ import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -297,36 +296,6 @@ public class WorkflowOperationSkippingTest {
     WorkflowInstance instance3FromDb = service.getWorkflowById(instance3.getId());
     assertNotNull(instance3FromDb);
     assertEquals(OperationState.SKIPPED, instance3FromDb.getOperations().get(0).getState());
-  }
-
-  @Test
-  @Ignore
-  // Unless attribute is currently not being evaluated
-  public void testUnless() throws Exception {
-    Map<String, String> properties1 = new HashMap<String, String>();
-    properties1.put("skipcondition", "true");
-
-    Map<String, String> properties2 = new HashMap<String, String>();
-    properties2.put("skipcondition", "false");
-
-    WorkflowInstance instance = startAndWait(workingDefinition, mediapackage1, properties1, WorkflowState.SUCCEEDED);
-    WorkflowInstance instance2 = startAndWait(workingDefinition, mediapackage1, properties2, WorkflowState.SUCCEEDED);
-    WorkflowInstance instance3 = startAndWait(workingDefinition, mediapackage1, null, WorkflowState.SUCCEEDED);
-
-    // See if the skip operation has been executed
-    WorkflowInstance instanceFromDb = service.getWorkflowById(instance.getId());
-    assertNotNull(instanceFromDb);
-    assertEquals(OperationState.SKIPPED, instanceFromDb.getOperations().get(1).getState());
-
-    // See if the skip operation has been skipped (skip value != "true")
-    WorkflowInstance instance2FromDb = service.getWorkflowById(instance2.getId());
-    assertNotNull(instance2FromDb);
-    assertEquals(OperationState.SKIPPED, instance2FromDb.getOperations().get(1).getState());
-
-    // See if the skip operation has been skipped (skip property is undefined)
-    WorkflowInstance instance3FromDb = service.getWorkflowById(instance3.getId());
-    assertNotNull(instance3FromDb);
-    assertEquals(OperationState.SUCCEEDED, instance3FromDb.getOperations().get(1).getState());
   }
 
   protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPackage mp,

@@ -56,8 +56,6 @@ import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -67,7 +65,6 @@ import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -439,18 +436,6 @@ public class DublinCoreTest {
             catalog.getFirst(DublinCore.PROPERTY_TITLE), metadata.getTitle());
   }
 
-  // todo fix http://opencast.jira.com/browse/MH-8759 then remove @Ignore
-  @Ignore
-  @Test
-  public void testPreserveEncodingScheme() {
-    DublinCoreCatalog dc = DublinCores.mkOpencastEpisode().getCatalog();
-    DublinCoreValue val = DublinCoreValue.mk("http://www.opencastproject.org/license", "en", ENC_SCHEME_URI);
-    dc.add(PROPERTY_LICENSE, val);
-    assertEquals(1, dc.get(PROPERTY_LICENSE).size());
-    assertEquals(val, dc.get(PROPERTY_LICENSE).get(0));
-    assertEquals(Opt.some(ENC_SCHEME_URI), dc.get(PROPERTY_LICENSE).get(0).getEncodingScheme());
-  }
-
   @Test
   public void testSerializeDublinCore() throws Exception {
     DublinCoreCatalog dc = null;
@@ -497,19 +482,6 @@ public class DublinCoreTest {
     } catch (Exception e) {
       Assert.assertFalse(e instanceof NullPointerException);
     }
-  }
-
-  @Test
-  @Ignore
-  // this test should verify serialization/deserialization works for a fairly minimal case
-  // waiting on https://opencast.jira.com/browse/MH-9733
-  public void testSerializationDeserializationOfCatalogs() throws Exception {
-    DublinCoreCatalog impl = DublinCores.mkOpencastEpisode().getCatalog();
-    impl.addTag("bob");
-    impl.set(impl.PROPERTY_PUBLISHER, "test");
-    DublinCoreCatalogService service = new DublinCoreCatalogService();
-    DublinCoreCatalog newImpl = service.load(service.serialize(impl));
-    Assert.assertEquals(impl, newImpl);
   }
 
   @Test

@@ -59,7 +59,6 @@ import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -508,26 +507,6 @@ public class AbstractEventEndpointTest {
   }
 
   @Test
-  @Ignore
-  public void testGetEventError() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventError.json"));
-
-    given().pathParam("eventId", "asdasd").pathParam("workflowId", "asd").pathParam("errorId", "asd").expect()
-            .statusCode(HttpStatus.SC_BAD_REQUEST).when()
-            .get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}.json"));
-
-    given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("errorId", "asd").expect()
-            .statusCode(HttpStatus.SC_BAD_REQUEST).when()
-            .get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}.json"));
-
-    String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("errorId", 1).expect()
-            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}.json"))
-            .asString();
-
-    assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
-  }
-
-  @Test
   public void testGetEventAccessInformation() throws Exception {
     String eventAccessJson = IOUtils.toString(getClass().getResource("/eventAccess.json"));
 
@@ -552,16 +531,6 @@ public class AbstractEventEndpointTest {
     JSONObject accessJson = (JSONObject) new JSONParser().parse(accessJsonString);
     JSONObject episodeAccess = (JSONObject) accessJson.get("episode_access");
     return (String) episodeAccess.get("acl");
-  }
-
-  @Test
-  @Ignore
-  public void testGetNewMetadata() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/newEventMetadata.json"));
-
-    String result = given().expect().statusCode(HttpStatus.SC_OK).when().get(rt.host("new/metadata")).asString();
-
-    assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }
 
   @Test
@@ -618,18 +587,6 @@ public class AbstractEventEndpointTest {
 
     assertThat(expected, SameJSONAs.sameJSONAs(result));
 
-  }
-
-  @Test
-  @Ignore
-  public void testCreateNewTask() throws Exception {
-    given().expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("task"));
-    given().formParam("metadata", "asdt").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("task"));
-
-    String metadataString = IOUtils.toString(getClass().getResource("/createTasksRequest.json"));
-
-    given().formParam("metadata", metadataString).expect().statusCode(HttpStatus.SC_CREATED).when()
-            .post(rt.host("task"));
   }
 
   @Test

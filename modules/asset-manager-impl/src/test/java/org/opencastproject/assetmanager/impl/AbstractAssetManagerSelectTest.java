@@ -52,16 +52,11 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.security.api.DefaultOrganization;
 
-import com.entwinemedia.fn.FnX;
-import com.entwinemedia.fn.P2;
-import com.entwinemedia.fn.Products;
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 
 import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.FixMethodOrder;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -601,42 +596,6 @@ public class AbstractAssetManagerSelectTest extends AbstractAssetManagerTestBase
                                                   .and(q.mediaPackageId(mpId).and(q.version().isLatest())))
                                    .run());
     assertEquals(1, r.getSize());
-  }
-
-  @Ignore
-  @Test
-  public void testManyMediaPackages() throws Exception {
-    final long tStart = System.nanoTime();
-    final int mpCount = 1000;
-    final Stream<P2<String, Integer>> inserts = Stream.cont(inc()).take(mpCount).map(new FnX<Integer, P2<String, Integer>>() {
-      @Override public P2<String, Integer> applyX(Integer ignore) throws Exception {
-        final MediaPackage mp = mkMediaPackage(mkCatalog());
-        final String mpId = mp.getIdentifier().toString();
-        final int versions = (int) (Math.random() * 10.0 + 1.0);
-        for (int i = 0; i < Math.random() * 10 + 1; i++) {
-          am.takeSnapshot(OWNER, mp);
-        }
-        // set the legacy ID property
-        am.setProperty(p.legacyId.mk(mpId, "legacyId=" + mpId));
-        return Products.E.p2(mp.getIdentifier().toString(), versions);
-      }
-    }).eval();
-    final long tInserted = System.nanoTime();
-    {
-      RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
-      assertEquals(mpCount, r.getSize());
-      assertEquals(mpCount, r.countSnapshots());
-    }
-    for (final P2<String, Integer> insert : inserts) {
-      final RichAResult r = enrich(q.select(p.legacyId.target()).where(q.mediaPackageId(insert.get1()).and(q.version().isLatest())).run());
-      assertEquals(1, r.getSize());
-      assertEquals(0, r.countSnapshots());
-      assertEquals(1, r.countProperties());
-      assertEquals("legacyId=" + r.getRecords().head().get().getMediaPackageId(), r.getProperties().head().get().getValue().get(Value.STRING));
-    }
-    final long tQueried = System.nanoTime();
-    logger.info("Insertion ms " + ((tInserted - tStart) / 1000000));
-    logger.info("Queries ms " + ((tQueried - tInserted) / 1000000));
   }
 
   @Test

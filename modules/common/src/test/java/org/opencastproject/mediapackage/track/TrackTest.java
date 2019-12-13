@@ -23,7 +23,6 @@ package org.opencastproject.mediapackage.track;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -37,7 +36,6 @@ import org.opencastproject.util.IoSupport;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
@@ -111,35 +109,6 @@ public class TrackTest {
   @Test
   public void testPresenterTrackAccept() throws Exception {
     assertTrue(new TrackBuilderPlugin().accept(new URI("uri"), Track.TYPE, MediaPackageElements.PRESENTER_SOURCE));
-  }
-
-  /**
-   * Test method for {@link org.opencastproject.mediapackage.track.TrackImpl#getStreams()}.
-   */
-  @Test
-  @Ignore
-  public void testGetStreams() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for
-   * {@link org.opencastproject.mediapackage.track.TrackImpl#addStream(org.opencastproject.mediapackage.track.AbstractStreamImpl)}
-   * .
-   */
-  @Test
-  @Ignore
-  public void testAddStream() {
-    fail("Not yet implemented"); // TODO
-  }
-
-  /**
-   * Test method for {@link org.opencastproject.mediapackage.track.TrackImpl#getDescription()}.
-   */
-  @Test
-  @Ignore
-  public void testGetDescription() {
-    fail("Not yet implemented"); // TODO
   }
 
   @Test
