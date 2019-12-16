@@ -4,6 +4,25 @@ Changelog
 Opencast 7
 ----------
 
+### Opencast 7.5
+
+*Released on December 10, 2019*
+
+- [[#1233](https://github.com/opencast/opencast/pull/1233)] -
+  Change bibliographicdate if technicaldate is changed.
+- [[#1220](https://github.com/opencast/opencast/pull/1220)] -
+  Make Thumbnail Optional
+- [[#1218](https://github.com/opencast/opencast/pull/1218)] -
+  [Documentation] Added path hint to upgrade.md
+- [[#1170](https://github.com/opencast/opencast/pull/1170)] -
+  MH-9753: Prepare AV WOH can throw a NPE
+- [[#1164](https://github.com/opencast/opencast/pull/1164)] -
+  CentOS basic installation guide rewording
+- [[#1148](https://github.com/opencast/opencast/pull/1148)] -
+  VideoEditorServiceImpl: Fixed the file extension duplication with removeExtention from FilenameUtils.
+- [[#1122](https://github.com/opencast/opencast/pull/1122)] -
+  fixes #1069 workflow tab shows scheduling info instead of workflows
+
 ### Opencast 7.4
 
 *Released on October 02, 2019*

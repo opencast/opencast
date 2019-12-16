@@ -37,6 +37,13 @@ fixes the date cell of the events overview table in the admin UI.
 
 Finally, Opencast 7.4 also brings an update to the CAS security example that was out of date.
 
+
+Aditional Notes About 7.5
+-------------------------
+Opencast 7.5 fixes behaviour where the bibliographic date was not changed when changing the technical date via Rest.
+Also an option was added to disable thumbnail generation in the video editor because it can lead to performance issues.
+
+
 Release Schedule
 ----------------
 
