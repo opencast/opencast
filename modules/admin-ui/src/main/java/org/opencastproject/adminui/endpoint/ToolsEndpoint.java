@@ -289,7 +289,7 @@ public class ToolsEndpoint implements ManagedService {
     signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,
             this.getClass().getSimpleName());
 
-    thumbnailEnabled = BooleanUtils.toBoolean(Objects.toString(properties.get(OPT_THUMBNAIL_ENABLED), "true"));
+    thumbnailEnabled = BooleanUtils.toBoolean(Objects.toString(properties.get(OPT_THUMBNAIL_ENABLED), "false"));
     logger.debug("Thumbnail feature enabled: {}", thumbnailEnabled);
   }
 

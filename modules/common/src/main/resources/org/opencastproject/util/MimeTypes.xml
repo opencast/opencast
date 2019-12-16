@@ -117,7 +117,7 @@
   <MimeType>
     <Type>audio/mpeg</Type>
     <Description>MPEG audio</Description>
-    <Extensions>m1a,mp2,mpa,m2a,mp3,swa</Extensions>
+    <Extensions>mp3,m1a,mp2,mpa,m2a,swa</Extensions>
   </MimeType>
   <MimeType>
     <Type>audio/mpeg3</Type>
