@@ -38,7 +38,7 @@
                 </configuration>
               </execution>
               <execution>
-                <id>npm install</id>
+                <id>npm ci</id>
                 <goals>
                   <goal>exec</goal>
                 </goals>
@@ -46,7 +46,7 @@
                 <configuration>
                   <executable>npm</executable>
                   <arguments>
-                    <argument>install</argument>
+                    <argument>ci</argument>
                   </arguments>
                 </configuration>
               </execution>
@@ -120,12 +120,12 @@
 
               <execution>
                 <phase>validate</phase>
-                <id>npm install</id>
+                <id>npm ci</id>
                 <goals>
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install</arguments>
+                  <arguments>ci</arguments>
                 </configuration>
               </execution>
               <execution>
