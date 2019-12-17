@@ -342,6 +342,7 @@ public class EncoderEngine implements AutoCloseable {
     command.add(binary);
     command.add("-nostdin");
     command.add("-nostats");
+    command.add("-hide_banner");
 
     String commandline = profile.getExtension(CMD_SUFFIX);
 
