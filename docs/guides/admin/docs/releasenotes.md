@@ -5,8 +5,8 @@ Features
 --------
 
 - Improved integration of external statistics providers (InfluxDB)
-  - Hourly scale for data exports
-  - Visualization of statistics in the Admin UI
+    - Hourly scale for data exports
+    - Visualization of statistics in the Admin UI
 - Limit accepted file types when uploading assets
 - Support for exclusion pattern for URL signing
 - Add option to configure state mappings for workflows
@@ -14,8 +14,8 @@ Features
 - Multi-tenancy support for workflows
 - Role support for workflows
 - Video-crop service
-- Paella Player 6.2.2
-- Multiple audio tracks support on paella
+- Paella Player 6.2.4
+- Multiple audio tracks support on Paella Player
 - Feeds-tab: adds a new tab in series properties for ATOM and RSS Feeds
 - Custom LTI series tool styles
 - Show only events with write access in the Admin UI
@@ -51,7 +51,7 @@ Improvements
 - Improve navigation in video editor when zoom is active
 - Switch to compatible file type filter definitions
 - Improved setting values from Dublin Core catalog
-- Don't start opencast on a used port
+- Don't start Opencast on a used port
 - ESLint used in Theodul Core
 - Theodul Player scroll/zoom overlay to use shift + scroll wheel zoom
 - Removed State Mapping "Importing"
@@ -91,5 +91,5 @@ Release Schedule
 Release managers
 ----------------
 
-- Karen Dolan (Harvard DCE)
-- Rüdiger Rolf (University of Osnabrueck)
+- Karen Dolan (Harvard University DCE)
+- Rüdiger Rolf (Osnabrück University)
