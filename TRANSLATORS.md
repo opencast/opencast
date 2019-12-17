@@ -1,8 +1,9 @@
 # Translators
 
-On this page, we want to say thanks to all the people and organizations who made contributions to the localization of the different languages that Opencast support today.
+On this page, we want to say thanks to all the people and organizations who made contributions to the localization of
+the different languages that Opencast support today.
 
-| Name                                   | Languages                                                                                                                                                                                                                                                            | Translated (Words) | Target Words | Approved (Words) | Votes |
+| Name                                   | Languages                                       | Translated (Words) | Target Words | Approved (Words) | Votes |
 | -------------------------------------- | ----------------------------------------------- | ------------------ | ------------ | ---------------- | ----- |
 | Sven Stauber (stauber)                 | English, United Kingdom; German                 | 4630               | 4575         | 0                | 0     |
 | NCAA                                   | Danish                                          | 4589               | 3907         | 0                | 0     |
