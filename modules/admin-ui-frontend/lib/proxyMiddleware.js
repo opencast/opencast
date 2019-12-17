@@ -25,39 +25,39 @@ module.exports = function (grunt, appPath) {
       ),
       connect().use(
         '/styles',
-        serveStatic('./target/grunt/.tmp/styles')
+        serveStatic('./grunt/.tmp/styles')
       ),
       connect().use(
         '/modules',
-        serveStatic('src/main/webapp/scripts/modules')
+        serveStatic('app/scripts/modules')
       ),
       connect().use(
         '/shared',
-        serveStatic('src/main/webapp/scripts/shared')
+        serveStatic('app/scripts/shared')
       ),
       connect().use(
         '/public',
-        serveStatic('src/main/resources/public/')
+        serveStatic('resources/public/')
       ),
       connect().use(
         '/img',
-        serveStatic('src/main/webapp/img/')
+        serveStatic('app/images/')
       ),
       connect().use(
         '/lib',
-        serveStatic('src/main/webapp/scripts/lib')
+        serveStatic('app/scripts/lib')
       ),
       connect().use(
         '/info',
-        serveStatic('./src/test/resources/app/GET/info')
+        serveStatic('./test/app/GET/info')
       ),
       connect().use(
         '/i18n',
-        serveStatic('./src/test/resources/app/GET/i18n')
+        serveStatic('./test/app/GET/i18n')
       ),
       connect().use(
         '/sysinfo',
-        serveStatic('./src/test/resources/app/GET/sysinfo')
+        serveStatic('./test/app/GET/sysinfo')
       )
     ];
 

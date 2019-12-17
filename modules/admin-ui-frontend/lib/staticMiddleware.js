@@ -4,10 +4,10 @@ var serveStatic = require('serve-static');
 module.exports = function (grunt, appPath) {
     return function (connect) {
             var middlewares = [
-              serveStatic('target/grunt/.tmp'),
+      serveStatic('./grunt/.tmp'),
               connect().use(
                 '/admin-ng',
-                serveStatic('./src/test/resources/app/GET/admin-ng')
+        serveStatic('./test/app/GET/admin-ng')
               ),
               connect().use(
                 '/app/styles',
@@ -15,7 +15,7 @@ module.exports = function (grunt, appPath) {
               ),
               connect().use(
                 '/blacklist',
-                serveStatic('./src/test/resources/app/GET/blacklist')
+        serveStatic('./test/app/GET/blacklist')
               ),
               connect().use(
                 '/bower_components',
@@ -23,59 +23,59 @@ module.exports = function (grunt, appPath) {
               ),
               connect().use(
                 '/capture-agents',
-                serveStatic('./src/test/resources/app/GET/capture-agents')
+        serveStatic('./test/app/GET/capture-agents')
               ),
               connect().use(
                 '/email',
-                serveStatic('./src/test/resources/app/GET/email')
+        serveStatic('./test/app/GET/email')
               ),
               connect().use(
                 '/groups',
-                serveStatic('./src/test/resources/app/GET/groups')
+        serveStatic('./test/app/GET/groups')
               ),
               connect().use(
                 '/i18n',
-                serveStatic('./src/test/resources/app/GET/i18n')
+        serveStatic('./test/app/GET/i18n')
               ),
               connect().use(
                 '/img',
-                serveStatic('src/main/webapp/img/')
+        serveStatic('app/img/')
               ),
               connect().use(
                 '/info',
-                serveStatic('./src/test/resources/app/GET/info')
+        serveStatic('./test/app/GET/info')
               ),
               connect().use(
                 '/lib',
-                serveStatic('src/main/webapp/scripts/lib')
+        serveStatic('app/scripts/lib')
               ),
               connect().use(
                 '/modules',
-                serveStatic('src/main/webapp/scripts/modules')
+        serveStatic('app/scripts/modules')
               ),
               connect().use(
                 '/public',
-                serveStatic('src/main/resources/public/')
+        serveStatic('resources/public/')
               ),
               connect().use(
                 '/roles',
-                serveStatic('./src/test/resources/app/GET/roles')
+        serveStatic('./test/app/GET/roles')
               ),
               connect().use(
                 '/services',
-                serveStatic('./src/test/resources/app/GET/services')
+        serveStatic('./test/app/GET/services')
               ),
               connect().use(
                 '/shared',
-                serveStatic('src/main/webapp/scripts/shared')
+        serveStatic('app/scripts/shared')
               ),
               connect().use(
                 '/sysinfo',
-                serveStatic('./src/test/resources/app/GET/sysinfo')
+        serveStatic('./test/app/GET/sysinfo')
               ),
               connect().use(
                 '/workflow',
-                serveStatic('./src/test/resources/app/GET/workflow')
+        serveStatic('./test/app/GET/workflow')
               ),
               serveStatic(appPath)
             ];
@@ -104,11 +104,10 @@ module.exports = function (grunt, appPath) {
 
             middlewares.unshift(
               /*
-               * This function serves POST / PUT / DELETE mock requests by getting the file content from src/test/resources/app/<method>/<url>.
+       * This function serves POST / PUT / DELETE mock requests by getting the file content from test/app/<method>/<url>.
                */
               function (req, res, next) {
-                var path = 'src/test/resources/app/' + req.method + req.url;
-
+        var path = 'test/app/' + req.method + req.url;
                 if ((req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') &&
                   grunt.file.exists(path)) {
                   setTimeout(function () {

@@ -56,7 +56,7 @@ module.exports = function (grunt) {
         tasks: ['newer:jshint:test', 'karma']
       },
       sass: {
-        files: ['<%= yeoman.app %>/styles/**/*.{scss,sass}'],
+        files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
         tasks: ['sass:server', 'postcss']
       },
       gruntfile: {
@@ -95,6 +95,7 @@ module.exports = function (grunt) {
           debug: false,
           proxyPort: '<%= proxyPort %>',
           middleware: proxyMiddleware(grunt, appConfig.app)
+        }
         },
         proxies: [{
           context: '/admin-ng',
@@ -408,7 +409,7 @@ module.exports = function (grunt) {
           ]
         }, {
           expand: true,
-          cwd: 'src/main/resources/public',
+          cwd: 'resources/public',
           dest: '<%= yeoman.dist %>/public',
           src: [
             '**'
@@ -447,7 +448,7 @@ module.exports = function (grunt) {
     // Test settings
     karma: {
       options: {
-        configFile: 'src/test/resources/karma.conf.js'
+        configFile: 'test/karma.conf.js'
       },
       unit: {
         singleRun: true

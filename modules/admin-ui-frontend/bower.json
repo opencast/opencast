@@ -27,6 +27,9 @@
       "main": "dist/angular-wizard.js"
     }
   },
-  "appPath": "src/main/webapp",
-  "moduleName": "adminNg"
+  "appPath": "app",
+  "moduleName": "adminNg",
+  "resolutions": {
+    "angular": "1.7.9"
+  }
 }

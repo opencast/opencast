@@ -54,12 +54,12 @@
     "npm": "5.6.0"
   },
   "scripts": {
-    "test": "karma start src/test/resources/karma.conf.js --single-run=true",
-    "test-chrome": "karma start src/test/resources/karma.conf.js --browsers=ChromeHeadless --single-run=true",
-    "test-firefox": "karma start src/test/resources/karma.conf.js --browsers=FirefoxHeadless --single-run=true",
+    "test": "karma start test/karma.conf.js --single-run=true",
+    "test-chrome": "karma start test/karma.conf.js --browsers=ChromeHeadless --single-run=true",
+    "test-firefox": "karma start test/karma.conf.js --browsers=FirefoxHeadless --single-run=true",
     "build": "grunt",
-    "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js --rule 'no-unused-vars: off' --rule 'no-empty: off' src/main/webapp/",
-    "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/main/webapp/**/*.html'"
+    "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js --rule 'no-unused-vars: off' --rule 'no-empty: off' app/",
+    "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'app/**/*.html'"
   },
   "dependencies": {
     "node-sass": "^4.13.1"
