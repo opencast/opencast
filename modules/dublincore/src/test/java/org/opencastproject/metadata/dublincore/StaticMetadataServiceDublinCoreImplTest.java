@@ -38,7 +38,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 
@@ -72,11 +71,11 @@ public final class StaticMetadataServiceDublinCoreImplTest {
   private Workspace newWorkspace() throws Exception {
     // mock workspace
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    final File dcFile = new File(getClass().getResource("/dublincore.xml").toURI());
-    final File dcFileDefect = new File(getClass().getResource("/dublincore-defect.xml").toURI());
+    InputStream dcFile = getClass().getResourceAsStream("/dublincore.xml");
+    InputStream dcFileDefect = getClass().getResourceAsStream("/dublincore-defect.xml");
     assertNotNull(dcFile);
     // set expectations
-    EasyMock.expect(workspace.get(EasyMock.anyObject())).andAnswer(
+    EasyMock.expect(workspace.read(EasyMock.anyObject())).andAnswer(
             () -> EasyMock.getCurrentArguments()[0].toString().contains("-defect") ? dcFileDefect : dcFile).anyTimes();
     // put into replay mode
     EasyMock.replay(workspace);
