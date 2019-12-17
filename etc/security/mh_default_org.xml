@@ -11,15 +11,7 @@
   <!-- # Open and unsecured url patterns      # -->
   <!-- ######################################## -->
 
-  <sec:http pattern="/admin/img/**" security="none" />
   <sec:http pattern="/favicon.ico" security="none" />
-  <sec:http pattern="/img/**" security="none" />
-  <sec:http pattern="/js/**" security="none" />
-  <sec:http pattern="/lib/**" security="none" />
-  <sec:http pattern="/admin-ng/fonts/**" security="none" />
-  <sec:http pattern="/admin-ng/scripts/**" security="none" />
-  <sec:http pattern="/admin-ng/styles/**" security="none" />
-  <sec:http pattern="/play/*" security="none" />
 
   <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast"
     entry-point-ref="opencastEntryPoint">
@@ -31,6 +23,15 @@
     <!-- Allow anonymous access to the login form -->
     <sec:intercept-url pattern="/admin-ng/login.html" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/sysinfo/bundles/version" method="GET" access="ROLE_ANONYMOUS" />
+
+    <!-- Allow anonymous access to resources from runtime info ui -->
+    <sec:intercept-url pattern="/img/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/js/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/docs.*" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/rest_docs.*" access="ROLE_ANONYMOUS" />
+
+    <!-- Allow anonymous access to the player redirect -->
+    <sec:intercept-url pattern="/play/*" access="ROLE_ANONYMOUS" />
 
     <!-- Protect admin UI facade -->
     <sec:intercept-url pattern="/workflow/definitions.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE" />
@@ -229,16 +230,15 @@
     <sec:intercept-url pattern="/api/series/*/metadata/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_DELETE"/>
     <sec:intercept-url pattern="/api/workflows/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_WORKFLOW_INSTANCE_DELETE"/>
 
-    <sec:intercept-url pattern="/admin-ng/css/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/lib/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/img/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/js/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/modules/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/shared/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/app.js" access="ROLE_ANONYMOUS" />
-
     <!-- Enable anonymous access to the admin ui -->
+    <sec:intercept-url pattern="/admin-ng/fonts/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/admin-ng/img/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/admin-ng/lib/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/admin-ng/modules/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/admin-ng/public/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/admin-ng/scripts/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/admin-ng/shared/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/admin-ng/styles/**" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the /info/** resource -->
     <sec:intercept-url pattern="/info/**" method="GET" access="ROLE_ANONYMOUS" />

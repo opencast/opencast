@@ -12,5 +12,5 @@
     "msg_waitToSeek": "Zoeken is niet mogelijk tot wanneer de video ingeladen is.",
     "msg_startPlayingToSeek": "Zoeken is niet mogelijk voor minstens een keer op de afspeelknop te klikken.",
     "chromeBuffer": "De buffer checker is uitgeschakeld wegens Google Chrome limitaties. Het is mogelijk dat je problemen ondervindt bij het afspelen van de video.",
-    "scroll_overlay_text": "Use shift + scroll to zoom."
+    "scroll_overlay_text": "Gebruik shift + scroll om te zoomen."
 }

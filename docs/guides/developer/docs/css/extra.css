@@ -143,3 +143,8 @@ code {
     opacity: 0;
     position: absolute;
 }
+
+.wm-toc-hidden > .wm-toc-pane {
+    margin: 0;
+    opacity: 0;
+}

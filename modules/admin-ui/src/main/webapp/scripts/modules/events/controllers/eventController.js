@@ -984,4 +984,5 @@ angular.module('adminNg.controllers')
       cleanupScopeResources();
     });
   }
+
 ]);

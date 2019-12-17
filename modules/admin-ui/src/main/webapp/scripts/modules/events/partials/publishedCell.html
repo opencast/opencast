@@ -1,6 +1,6 @@
 <div class="popover-wrapper">
   <a class="popover-wrapper__trigger" data-tab="publications" data-resource-id="{{row.id}}" ng-if="row.publications.length">
-    <span ng-controller="TouchCtrl" ng-click="openPopup(row.id)" translate="YES"><!-- Yes --></span>
+    <span ng-controller="TouchCtrl" ng-click="openPopup(row.id)" translate="YES" tabindex="0" esc-key="clearPopup()"><!-- Yes --></span>
   </a>
 
   <div id="{{row.id}}" class="js-popover popover is-hidden" ng-if="row.publications.length">

@@ -12,5 +12,5 @@
     "msg_waitToSeek": "Non é posible saltar a outros puntos do vídeo ata que este se cargue.",
     "msg_startPlayingToSeek": "Non é posible saltar a outros puntos do vídeo ata pulsar o botón \"reproducir\" por primeira vez.",
     "chromeBuffer": "Desactivouse a comprobación do búfer debido a limitacións do Chrome. É posible que isto lle afecte á calidade de reprodución.",
-    "scroll_overlay_text": "Use shift + scroll to zoom."
+    "scroll_overlay_text": "Emprega shift + desprazamento para facer zoom."
 }

@@ -66,7 +66,7 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Cette série contient des événements. Suppression de la série ne supprimera pas les événements.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "EVENT_WILL_BE_GONE": "Si vous continuez, l'événement disparaîtra irrévocablement."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Cette série ne peut être supprimée car elle contient toujours des événements."
@@ -124,11 +124,11 @@
       "SERIES_NOT_UPDATED": "La série n'a pas pu être enregistrée",
       "SERIES_NOT_UPDATED_ID": "La série {{ id }} n’a pas pu être enregistré",
       "SERIES_NOT_UPDATED_ALL": "Aucune des séries n’a pu être enregistré",
-      "EVENT_DELETED": "The event has been deleted.",
-      "EVENT_WILL_BE_DELETED": "The event is being deleted",
-      "EVENTS_DELETED": "The events are being deleted.",
-      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
+      "EVENT_DELETED": "L'événement a été supprimé.",
+      "EVENT_WILL_BE_DELETED": "L'événement est en cours de suppression",
+      "EVENTS_DELETED": "Les événements sont en cours de suppression.",
+      "EVENTS_NOT_DELETED": "Le ou les événements n'ont pas pu être supprimés.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Le ou les événements n'ont pas pu être supprimés, car vous n'avez pas la permission de le faire.",
       "SERIES_DELETED": "La série a été supprimé",
       "SERIES_NOT_DELETED": "La série n’a pu être supprimé",
       "LOCATION_DELETED": "L’emplacement a été supprimé",
@@ -162,8 +162,8 @@
       "THEME_NOT_DELETED": "Le thème n'a pas pu être supprimé",
       "TASK_CREATED": "La tâche a été créée",
       "TASK_NOT_CREATED": "La tâche n'a pas pu être créée",
-      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
-      "VIDEO_CUT_SAVED": "The changes have been saved",
+      "VIDEO_CUT_NOT_SAVED": "Les modifications n'ont pas pu être sauvegardées",
+      "VIDEO_CUT_SAVED": "Les modifications ont été sauvegardées",
       "VIDEO_CUT_PROCESSING": "La vidéo est en cours de traitement…",
       "THUMBNAIL_CHANGE_FAILED": "Impossible de changer la vignette.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Vous n’avez sélectionné aucune vidéo pour traiter",
@@ -460,7 +460,7 @@
             "PUBLISHED": "Publié",
             "WEEKDAY": "Jour de la semaine",
             "TOOLTIP": {
-               "ASSETS": "Open asset details",
+               "ASSETS": "Voir les détails de l'élément",
                "START": "Filtrer pour cette date de début",
                "SERIES": "Filtrer pour cette série",
                "STATUS": "Filtrer pour le statut de cet événement",
@@ -488,13 +488,13 @@
             "PROCESSING_CANCELED": "Traitement annulé"
          },
          "STATE_MAPPING": {
-            "RETRACTING": "Retracting",
-            "DELETING": "Deleting",
-            "DUPLICATING": "Duplicating",
-            "PUBLISHING": "Publishing",
-            "IMPORTING": "Importing",
-            "REPUBLISHING_METADATA": "Republishing metadata",
-            "UPDATING_PREVIEWS": "Updating previews"
+            "RETRACTING": "Retrait",
+            "DELETING": "Suppression",
+            "DUPLICATING": "Duplication",
+            "PUBLISHING": "Publication",
+            "IMPORTING": "Importation",
+            "REPUBLISHING_METADATA": "Republication des métadonnées",
+            "UPDATING_PREVIEWS": "Actualisation des aperçus"
          },
          "DETAILS": {
             "HEADER": "Détails de l'événement {{resourceId}}",
@@ -1519,24 +1519,24 @@
       },
       "ACTIONS": {
          "SPLIT": "Segmenter",
-         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "Hide/Show",
-         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
-         "REPLAY_SEGMENT": "Play Start of Segment",
-         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
-         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
-         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
-         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
+         "SPLIT_TOOLTIP": "Séparer le segment à la position actuelle du curseur.",
+         "CUT": "Masquer/Afficher",
+         "CUT_TOOLTIP": "Masquer ou afficher la partie sélectionnée de la vidéo.",
+         "REPLAY_SEGMENT": "Jouer le début du segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Jouer le segment courant depuis le début.",
+         "REPLAY_END_OF_SEGMENT": "Jouer la fin du segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Jouer quelques secondes à la fin du segment actuel.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Jouer la transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Jouer quelques secondes contenant la fin du segment précédent et le début du segment suivant.",
          "UNDO": "Annuler",
          "REDO": "Répéter",
-         "CLEAR_SEGMENTS": "Clear All Segments",
-         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
+         "CLEAR_SEGMENTS": "Effacer tous les segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Effacer tous les segments, laissant un grand segment."
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Enlever Segment",
-         "SHOW_SEGMENT": "Show this Segment",
-         "HIDE_SEGMENT": "Hide this Segment",
+         "SHOW_SEGMENT": "Montrer ce segment",
+         "HIDE_SEGMENT": "Masquer ce segment",
          "START": "Accueil",
          "END": "Fin"
       },
@@ -1978,13 +1978,13 @@
          "RANDOM": "Données aléatoires",
          "VIEWS_SUM": "Nombre total de vues",
          "VIEWS_AVG": "Nombre moyen de vues",
-         "PUBLISHEDHOURS": "Published Hours of Video"
+         "PUBLISHEDHOURS": "Heures de vidéo publiées"
       },
       "DESCRIPTION": {
          "RANDOM": "Ceci affiche des données aléatoires comme exemple. Vous pouvez désactiver ce graphique en supprimant le fichier json du fournisseur de statistiques correspondant dans etc/providers",
-         "VIEWS_SUM": "This displays the total number of views per time unit.",
-         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
-         "PUBLISHEDHOURS": "This displays the published hours of video"
+         "VIEWS_SUM": "Ceci affiche le nombre total de vues en fonction du temps.",
+         "VIEWS_AVG": "Ceci affiche la moyenne de vues quotidiennes en fonction du temps.",
+         "PUBLISHEDHOURS": "Ceci affiche les heures publiées de la vidéo"
       }
    }
 }

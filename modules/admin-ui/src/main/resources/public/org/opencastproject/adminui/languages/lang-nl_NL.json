@@ -66,7 +66,7 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Deze serie bevat eventementen. Door verwijderen van de serie worden de eventementen niet verwijderd.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "EVENT_WILL_BE_GONE": "Als u doorgaat, wordt deze opname onherroepelijk verwijdert."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Deze serie kan niet verwijdertd worden omdat deze serie nog eventementen bevat."
@@ -124,11 +124,11 @@
       "SERIES_NOT_UPDATED": "De series konden niet bewaard worden",
       "SERIES_NOT_UPDATED_ID": "De series {{ id }} konden niet worden bewaard",
       "SERIES_NOT_UPDATED_ALL": "Geen enkele serie kon bewaard worden",
-      "EVENT_DELETED": "The event has been deleted.",
-      "EVENT_WILL_BE_DELETED": "The event is being deleted",
-      "EVENTS_DELETED": "The events are being deleted.",
-      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
+      "EVENT_DELETED": "Het event is verwijderd.",
+      "EVENT_WILL_BE_DELETED": "Het event werd verwijderd",
+      "EVENTS_DELETED": "Deze evenementen worden verwijderd.",
+      "EVENTS_NOT_DELETED": "Het/De event(s) konden niet verwijderd worden.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Deze gebeurtenis(sen) kan/kunnen niet verwijderd worden, omdat u niet gemachtigd bent om dit te doen.",
       "SERIES_DELETED": "De series werden verwijderd",
       "SERIES_NOT_DELETED": "De series konden niet verwijderd worden",
       "LOCATION_DELETED": "De locatie werd verwijderd",
@@ -489,7 +489,7 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Intrekken",
-            "DELETING": "Deleting",
+            "DELETING": "Verwijderen",
             "DUPLICATING": "Dupliceren",
             "PUBLISHING": "Bezig met publiceren",
             "IMPORTING": "Importeren",
@@ -1984,7 +1984,7 @@
          "RANDOM": "Dit toont willekeurige gegevens als showcase. U kunt deze grafiek uitschakelen door de bijbehorende statistieken provider definitie van etc/providers te verwijderen",
          "VIEWS_SUM": "Dit toont het totale aantal weergaven per tijdeenheid.",
          "VIEWS_AVG": "Dit toont het gemiddelde aantal dagelijkse weergaven per tijdeenheid.",
-         "PUBLISHEDHOURS": "This displays the published hours of video"
+         "PUBLISHEDHOURS": "Dit toont de gepubliceerde uren van video"
       }
    }
 }

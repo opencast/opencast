@@ -171,9 +171,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -672,39 +670,6 @@ public abstract class AbstractEventEndpoint {
     if (!start.isNone() || !end.isNone() || !agentId.isNone() || !agentConfiguration.isNone()) {
       getSchedulerService()
         .updateEvent(event.getIdentifier(), start, end, agentId, Opt.none(), Opt.none(), Opt.none(), agentConfiguration);
-      // We want to keep the bibliographic meta data in sync
-      updateBibliographicMetadata(event, agentId, start, end);
-    }
-  }
-
-  private void updateBibliographicMetadata(Event event, Opt<String> agentId, Opt<Date> start, Opt<Date> end)
-    throws IndexServiceException, SearchIndexException, NotFoundException, UnauthorizedException {
-    final MetadataList metadataList = getIndexService().getMetadataListWithAllEventCatalogUIAdapters();
-    final Opt<MetadataCollection> optMetadataByAdapter = metadataList
-      .getMetadataByAdapter(getIndexService().getCommonEventCatalogUIAdapter());
-    if (optMetadataByAdapter.isSome()) {
-      final MetadataCollection collection = optMetadataByAdapter.get();
-      if (start.isSome() && collection.getOutputFields().containsKey("startDate")) {
-        final Opt<String> pattern = collection.getOutputFields().get("startDate").getPattern();
-        if (pattern.isSome()) {
-          final SimpleDateFormat sdf = new SimpleDateFormat(pattern.get());
-          sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("UTC")));
-          final MetadataField.Type type = collection.getOutputFields().get("startDate").getType();
-          collection.updateStringField(collection.getOutputFields().get("startDate"), sdf.format(start.get()));
-          collection.getOutputFields().get("startDate").setPattern(pattern);
-          collection.getOutputFields().get("startDate").setType(type);
-        }
-      }
-      if (start.isSome() && end.isSome() && collection.getOutputFields().containsKey("duration")) {
-        final MetadataField.Type type = collection.getOutputFields().get("duration").getType();
-        final long duration = end.get().getTime() - start.get().getTime();
-        collection.updateStringField(collection.getOutputFields().get("duration"), duration + "");
-        collection.getOutputFields().get("duration").setType(type);
-      }
-      if (agentId.isSome() && collection.getOutputFields().containsKey("location")) {
-        collection.updateStringField(collection.getOutputFields().get("location"), agentId.get());
-      }
-      getIndexService().updateEventMetadata(event.getIdentifier(), metadataList, getIndex());
     }
   }
 
@@ -1552,7 +1517,7 @@ public abstract class AbstractEventEndpoint {
       return notFound("Cannot find an event with id '%s'.", id);
 
     try {
-      if (optEvent.get().isScheduledEvent() && !optEvent.get().hasRecordingStarted()) {
+      if (optEvent.get().getEventStatus().equals("EVENTS.EVENTS.STATUS.SCHEDULED")) {
         List<Field> fields = new ArrayList<Field>();
         Map<String, String> workflowConfig = getSchedulerService().getWorkflowConfig(id);
         for (Entry<String, String> entry : workflowConfig.entrySet()) {

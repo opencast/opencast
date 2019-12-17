@@ -47,7 +47,6 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -159,7 +158,6 @@ public class CropServiceTest {
   }
 
   @Test
-  @Ignore
   public void testEncoderProblem() throws Exception {
     Track track = createTrack(MEDIA_RESOURCE, MEDIA_DURATION);
     cropService.setWorkspace(createWorkspace(track));
@@ -171,7 +169,7 @@ public class CropServiceTest {
 
     JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 1000, receipt);
     JobBarrier.Result result = jobBarrier.waitForJobs();
-    Assert.assertTrue(result.isSuccess());
+    Assert.assertFalse(result.isSuccess());
   }
 
 

@@ -1379,7 +1379,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     // drop catalogs sent by the capture agent in favor of Opencast's own metadata
     if (skipCatalogs) {
       for (MediaPackageElement element : mp.getCatalogs()) {
-        mp.remove(element);
+        if (!element.getFlavor().equals(MediaPackageElements.SMIL)) {
+          mp.remove(element);
+        }
       }
     }
 

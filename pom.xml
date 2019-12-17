@@ -22,7 +22,7 @@
     <commons-beanutils.version>1.9.3</commons-beanutils.version>
     <commons-codec.version>1.12</commons-codec.version>
     <commons-collections.version>4.3</commons-collections.version>
-    <commons-compress.version>1.18</commons-compress.version>
+    <commons-compress.version>1.19</commons-compress.version>
     <commons-csv.version>1.6</commons-csv.version>
     <commons-fileupload.version>1.4</commons-fileupload.version>
     <commons-lang3.version>3.8.1</commons-lang3.version>
@@ -33,7 +33,7 @@
     <guava.version>23.0</guava.version>
     <httpcomponents-httpclient.version>4.5.7</httpcomponents-httpclient.version>
     <httpcomponents-httpcore.version>4.4.11</httpcomponents-httpcore.version>
-    <jackson.version>2.9.9</jackson.version>
+    <jackson.version>2.10.0</jackson.version>
     <jdk.version>1.8</jdk.version>
     <joda-time.version>2.10.1</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
@@ -1324,9 +1324,9 @@
         <version>5.1.43</version>
       </dependency>
       <dependency>
-        <groupId>postgresql</groupId>
+        <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>9.1-901-1.jdbc4</version>
+        <version>42.2.8.jre7</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>

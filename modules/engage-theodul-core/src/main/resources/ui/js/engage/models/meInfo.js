@@ -67,7 +67,7 @@ define(['jquery', 'backbone', 'js-yaml.min'], function ($, Backbone, jsyaml) {
             me.set('mastervideotype', config.mastervideotype);
             me.set('logo_mediamodule', config.logo_mediamodule);
             me.set('logo_player', config.logo);
-            me.set('show_embed_links', config.show_embed_link);
+            me.set('show_embed_links', config.show_embed_links);
             me.set('hide_video_context_menu', config.hide_video_context_menu);
             me.set('layout', config.layout);
             me.set('focusedflavor', config.focusedflavor);

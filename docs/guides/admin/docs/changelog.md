@@ -4,6 +4,40 @@ Changelog
 Opencast 7
 ----------
 
+### Opencast 7.5
+
+*Released on December 10, 2019*
+
+- [[#1233](https://github.com/opencast/opencast/pull/1233)] -
+  Change bibliographicdate if technicaldate is changed.
+- [[#1220](https://github.com/opencast/opencast/pull/1220)] -
+  Make Thumbnail Optional
+- [[#1218](https://github.com/opencast/opencast/pull/1218)] -
+  [Documentation] Added path hint to upgrade.md
+- [[#1170](https://github.com/opencast/opencast/pull/1170)] -
+  MH-9753: Prepare AV WOH can throw a NPE
+- [[#1164](https://github.com/opencast/opencast/pull/1164)] -
+  CentOS basic installation guide rewording
+- [[#1148](https://github.com/opencast/opencast/pull/1148)] -
+  VideoEditorServiceImpl: Fixed the file extension duplication with removeExtention from FilenameUtils.
+- [[#1122](https://github.com/opencast/opencast/pull/1122)] -
+  fixes #1069 workflow tab shows scheduling info instead of workflows
+
+### Opencast 7.4
+
+*Released on October 02, 2019*
+
+- [[MH-13517](https://opencast.jira.com/browse/MH-13517)][[#1092](https://github.com/opencast/opencast/pull/1092)] -
+  Set an absolute limit on solr query size
+- [[MH-13476](https://opencast.jira.com/browse/MH-13476)][[#1088](https://github.com/opencast/opencast/pull/1088)] -
+  Filter capture agent roles for ACLs
+- [[#1087](https://github.com/opencast/opencast/pull/1087)] -
+  Issue 1068, Stop job dispatcher before unregistering hosts, junit MH-13675
+- [[MH-13706](https://opencast.jira.com/browse/MH-13706)][[#1072](https://github.com/opencast/opencast/pull/1072)] -
+  fix the date cell of the events overview table in the admin UI
+- [[#1056](https://github.com/opencast/opencast/pull/1056)] -
+  NOISSUE: CAS security example is very out of date
+
 ### Opencast 7.3
 
 *Released on September 19, 2019*
@@ -513,8 +547,30 @@ Opencast 7
 - [[MH-12782](https://opencast.jira.com/browse/MH-12782)][[#209](https://github.com/opencast/opencast/pull/209)] -
   As an unprivileged user, I only want to see series and events that I have write access to.
 
+
 Opencast 6
 ----------
+
+### Opencast 6.7
+
+*Released on December 8, 2019*
+
+- [[#1200](https://github.com/opencast/opencast/pull/1200)] -
+  Fix Crowdin Deployment
+- [[#1143](https://github.com/opencast/opencast/pull/1143)] -
+  Upgrade jackson to 2.9.10 (6.x)
+- [[#1142](https://github.com/opencast/opencast/pull/1142)] -
+  Update apache commons-compress to 1.19
+- [[#1132](https://github.com/opencast/opencast/pull/1132)] -
+  Fixed the "hide" button in the Documentation.
+- [[#1080](https://github.com/opencast/opencast/pull/1080)] -
+  Documentation reworked
+- [[#1035](https://github.com/opencast/opencast/pull/1035)] -
+  Pushing to Maven Central
+- [[#1026](https://github.com/opencast/opencast/pull/1026)] -
+  Adding Ansible script documentation
+- [[#1019](https://github.com/opencast/opencast/pull/1019)] -
+  SMIL tests fail when doctype url can't be resolved
 
 ### Opencast 6.6
 
@@ -535,11 +591,11 @@ Opencast 6
 - [[MH-13643](https://opencast.jira.com/browse/MH-13643)][[#979](https://github.com/opencast/opencast/pull/979)] -
   Update to Paella 6.1.4
 - [[MH-13637](https://opencast.jira.com/browse/MH-13637)][[#974](https://github.com/opencast/opencast/pull/974)] -
-  asset manager endpoint fix
+  Asset manager endpoint fix
 - [[MH-13633](https://opencast.jira.com/browse/MH-13633)][[#969](https://github.com/opencast/opencast/pull/969)] -
   Update spring-security-oauth
 - [[MH-13611](https://opencast.jira.com/browse/MH-13611)][[#955](https://github.com/opencast/opencast/pull/955)] -
-  duplicate events fix
+  Duplicate events fix
 
 ### Opencast 6.5
 

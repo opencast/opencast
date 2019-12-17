@@ -17,37 +17,8 @@
   <configuration_panel>
     <![CDATA[
       <div id="workflow-configuration">
-        <fieldset>
-          <legend>Add a comment that the recording needs:</legend>
-          <ul>
-            <li>
-              <input id="comment" name="comment" type="checkbox" class="configField" value="true" />
-              <label for="comment">Review / Cutting</label>
-            </li>
-          </ul>
-        </fieldset>
-        <fieldset>
-          <legend>Immediately distribute the recording to:</legend>
-          <ul>
-            <li>
-              <input id="publishToMediaModule" name="publishToMediaModule" type="checkbox" class="configField" value="true" checked=checked />
-              <label for="publishToMediaModule">Opencast Media Module</label>
-            </li>
-            <li>
-              <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" class="configField" value="true" checked=checked />
-              <label for="publishToOaiPmh">Default OAI-PMH Repository</label>
-            </li>
-          </ul>
-        </fieldset>
-        <fieldset>
-          <legend>Publish live stream:</legend>
-          <ul>
-            <li>
-              <input id="publishLive" name="publishLive" type="checkbox" class="configField" value="false" />
-              <label for="publishLive">Add live event to Opencast Media Module</label>
-            </li>
-          </ul>
-        </fieldset>
+        <input id="publish" name="publish" type="checkbox" class="configField" value="true" checked=checked />
+        <label for="publish">Publish media directly</label>
       </div>
     ]]>
   </configuration_panel>
@@ -58,11 +29,19 @@
       id="defaults"
       description="Applying default configuration values">
       <configurations>
-        <configuration key="comment">false</configuration>
+        <configuration key="publish">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Set publication variables for compatibility with the publish workflow -->
+
+    <operation
+      id="defaults"
+      if="${publish}"
+      description="Applying configuration values for publish workflow">
+      <configurations>
         <configuration key="publishToMediaModule">true</configuration>
         <configuration key="publishToOaiPmh">true</configuration>
-        <configuration key="uploadedSearchPreview">false</configuration>
-        <configuration key="publishLive">false</configuration>
       </configurations>
     </operation>
 
@@ -75,32 +54,6 @@
       description="Applying access control entries from series">
       <configurations>
         <configuration key="apply-acl">true</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Tag all assets to be archived. This is quite unnecessary for this workflow but the default publish workflow
-         expects the assets to be tagged and will fail due to no dublincore/episode catalog being archives which is a
-         requirement of the archive workflow operation. Hence, we do this extra work and get the compatibility in return. -->
-
-    <operation
-      id="tag"
-      exception-handler-workflow="partial-error"
-      description="Tagging media package elements for archival">
-      <configurations>
-        <configuration key="source-flavors">*/*</configuration>
-        <configuration key="target-tags">+archive</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Tag any optionally uploaded assets -->
-    <operation
-      id="tag"
-      if="${downloadSourceflavorsExist}"
-      exception-handler-workflow="partial-error"
-      description="Tagging uploaded assets for distribution">
-      <configurations>
-        <configuration key="source-flavors">${download-source-flavors}</configuration>
-        <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>
 
@@ -120,7 +73,7 @@
     <!-- encode video -->
 
     <operation
-      id="compose"
+      id="encode"
       fail-on-error="true"
       exception-handler-workflow="partial-error"
       description="Encoding video">
@@ -132,24 +85,11 @@
       </configurations>
     </operation>
 
-    <!-- Mark the recording for cutting -->
-
-    <operation
-      id="comment"
-      if="${comment}"
-      description="Mark the recording for review / cutting">
-      <configurations>
-        <configuration key="description">Recording has not been reviewed / cut yet.</configuration>
-        <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING</configuration>
-        <configuration key="action">create</configuration>
-      </configurations>
-    </operation>
-
     <!-- encode to engage search result thumbnails -->
     <!-- skip this when manually uploaded */search+preview -->
     <operation
       id="image"
-      if="(NOT (${uploadedSearchPreview})) AND (${publishToMediaModule} OR ${publishToOaiPmh})"
+      if="${publish}"
       fail-on-error="true"
       exception-handler-workflow="partial-error"
       description="Creating Engage search result thumbnails">
@@ -162,26 +102,11 @@
       </configurations>
     </operation>
 
-    <!-- generate default thumbnail preview for video editor -->
-
-    <operation
-        id="image"
-        fail-on-error="true"
-        exception-handler-workflow="partial-error"
-        description="Creating default thumbnail">
-      <configurations>
-        <configuration key="source-flavor">*/preview</configuration>
-        <configuration key="target-flavor">thumbnail/preview</configuration>
-        <configuration key="encoding-profile">editor.thumbnail.preview</configuration>
-        <configuration key="time">1</configuration>
-      </configurations>
-    </operation>
-
     <!-- encode to engage player preview images -->
 
     <operation
       id="image"
-      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      if="${publish}"
       fail-on-error="true"
       exception-handler-workflow="partial-error"
       description="Creating Engage player preview image">
@@ -198,7 +123,7 @@
 
     <operation
       id="segment-video"
-      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      if="${publish}"
       fail-on-error="false"
       exception-handler-workflow="partial-error"
       description="Detecting slide transitions in presentation track">
@@ -212,7 +137,7 @@
 
     <operation
       id="segmentpreviews"
-      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      if="${publish}"
       fail-on-error="false"
       exception-handler-workflow="partial-error"
       description="Creating presentation segments preview image">
@@ -230,7 +155,7 @@
 
     <operation
       id="timelinepreviews"
-      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      if="${publish}"
       fail-on-error="false"
       exception-handler-workflow="error"
       description="Creating timeline preview images">
@@ -246,7 +171,7 @@
 
     <operation
       id="extract-text"
-      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      if="${publish}"
       fail-on-error="false"
       exception-handler-workflow="partial-error"
       description="Extracting text from presentation segments">
@@ -274,7 +199,7 @@
 
     <operation
       id="publish-engage"
-      if="${publishToMediaModule}"
+      if="${publish}"
       max-attempts="2"
       fail-on-error="true"
       exception-handler-workflow="partial-error"
@@ -287,22 +212,6 @@
       </configurations>
     </operation>
 
-    <!-- Publish to OAI-PMH -->
-
-    <operation
-      id="publish-oaipmh"
-      if="${publishToOaiPmh}"
-      exception-handler-workflow="partial-error"
-      description="Publish to OAI-PMH Default Repository">
-      <configurations>
-        <configuration key="download-flavors">dublincore/*,security/*</configuration>
-        <configuration key="download-tags">engage-download</configuration>
-        <configuration key="streaming-tags">engage-streaming</configuration>
-        <configuration key="check-availability">true</configuration>
-        <configuration key="repository">default</configuration>
-      </configurations>
-    </operation>
-
     <!-- Archive the current state of the media package -->
 
     <operation
@@ -311,7 +220,7 @@
       exception-handler-workflow="partial-error"
       description="Archiving">
       <configurations>
-        <configuration key="source-tags">archive</configuration>
+        <configuration key="source-flavors">*/source,dublincore/*,security/*</configuration>
       </configurations>
     </operation>
 
@@ -323,8 +232,6 @@
       description="Cleaning up">
       <configurations>
         <configuration key="delete-external">true</configuration>
-        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
-        <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 

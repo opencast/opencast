@@ -43,6 +43,7 @@ import java.io.OutputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class GoogleSpeechCaptionConverter implements CaptionConverter {
 
@@ -114,13 +115,13 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
                   JSONObject wordTSList = (JSONObject) timestampsArray.get(indexFirst);
                   if (wordTSList.size() == 3) {
                     // Remove 's' at the end
-                    Number startNumber = NumberFormat.getInstance().parse(removeEndCharacter((wordTSList.get("startTime").toString()), "s"));
+                    Number startNumber = NumberFormat.getInstance(Locale.US).parse(removeEndCharacter((wordTSList.get("startTime").toString()), "s"));
                     start = startNumber.doubleValue();
                   }
                   // Get end time of last element
                   wordTSList = (JSONObject) timestampsArray.get(indexLast);
                   if (wordTSList.size() == 3) {
-                    Number endNumber = NumberFormat.getInstance().parse(removeEndCharacter((wordTSList.get("endTime").toString()), "s"));
+                    Number endNumber = NumberFormat.getInstance(Locale.US).parse(removeEndCharacter((wordTSList.get("endTime").toString()), "s"));
                     end = endNumber.doubleValue();
                   }
                 }

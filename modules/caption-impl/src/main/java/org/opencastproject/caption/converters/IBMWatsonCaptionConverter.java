@@ -40,8 +40,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class IBMWatsonCaptionConverter implements CaptionConverter {
 
@@ -111,11 +113,13 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
                   // Get start time of first element
                   JSONArray wordTsArray = (JSONArray) timestampsArray.get(indexFirst);
                   if (wordTsArray.size() == 3)
-                    start = ((Number) wordTsArray.get(1)).doubleValue();
+                    start = NumberFormat.getInstance(Locale.US).parse(removeEndCharacter((wordTsArray.get(1).toString()),
+                            "s")).doubleValue();
                   // Get end time of last element
                   wordTsArray = (JSONArray) timestampsArray.get(indexLast);
                   if (wordTsArray.size() == 3)
-                    end = ((Number) wordTsArray.get(2)).doubleValue();
+                    end = NumberFormat.getInstance(Locale.US).parse(removeEndCharacter((wordTsArray.get(2).toString()),
+                            "s")).doubleValue();
                 }
                 if (start == -1 || end == -1) {
                   logger.warn("Could not build caption object for job {}, result index {}: start/end times not found",
@@ -170,6 +174,13 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
     ms = (int) (ms % 1000);
 
     return new TimeImpl(h, m, s, (int) ms);
+  }
+
+  private String removeEndCharacter(String str, String end) {
+    if (str.endsWith(end)) {
+      str = str.replace(end, "");
+    }
+    return str;
   }
 
 }

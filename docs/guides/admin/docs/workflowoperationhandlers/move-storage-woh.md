@@ -20,7 +20,7 @@ Notes:
 ## Operation Example
 
     <operation
-      id="move-to-remote"
+      id="move-storage"
       description="Offloading to AWS S3">
       <configurations>
         <configuration key="target-storage">aws-s3</configuration>
