@@ -174,7 +174,7 @@
       "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
       "ACTIVE_TRANSACTION": "This event can not be edited while there is an active workflow or transaction.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
+         "UNEXPECTED_ERROR": "An unexpected error occurred while updating. Some events might have been updated.",
          "ALL_EVENTS_UPDATED": "All events were successfully updated.",
          "NO_EVENTS_UPDATED": "All updates failed.",
          "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."

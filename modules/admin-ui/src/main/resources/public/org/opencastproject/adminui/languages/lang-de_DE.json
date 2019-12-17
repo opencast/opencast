@@ -248,33 +248,33 @@
          }
       },
       "EDIT_EVENTS_METADATA": {
-         "CAPTION": "Edit the metadata of multiple events",
-         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "CAPTION": "Metadaten mehrerer Ereignisse bearbeiten",
+         "FATAL_ERROR": "Ein schwerer Fehler ist aufgetreten: {{ fatalError }}",
          "REQUEST_ERRORS": {
-            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
-            "NOTHING_TO_EDIT": "The events cannot be edited.",
+            "CANNOT_EDIT_SOME": "Markierte Ereignisse können nicht bearbeitet werden.",
+            "NOTHING_TO_EDIT": "Die Ereignisse können nicht bearbeitet werden.",
             "NOT_FOUND": "Nicht gefunden",
-            "RUNNING_WORKFLOW": "Running workflow",
+            "RUNNING_WORKFLOW": "Laufender Workflow",
             "TABLE": {
-               "CAPTION": "Selected events",
+               "CAPTION": "Ausgewählte Ereignisse",
                "ERRORS": "Fehler"
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Bearbeiten und/oder wählen Sie die Metadatenfelder, die Sie aktualisieren möchten. Ein Feld kann nicht ausgewählt werden, wenn dies nicht zu einem geänderten Wert für mindestens ein Ereignis führt, oder wenn das Feld ungültig ist (beispielsweise dürfen Pflichtfelder nicht leer sein). Markierte Metadatenfelder haben abweichende Werte für die ausgewählten Ereignisse.",
             "TABLE": {
-               "CAPTION": "Metadata of selected events",
+               "CAPTION": "Metadaten der ausgewählten Ereignisse",
                "FIELDS": "Metadaten",
                "VALUES": "Werte"
             }
          },
          "UPDATE_FAILURES": {
             "TABLE": {
-               "CAPTION": "Update Failures"
+               "CAPTION": "Aktualisierungsfehler"
             },
-            "UPDATE_FAILED": "Update failed",
-            "NO_EVENTS_UPDATED": "All updates failed.",
-            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+            "UPDATE_FAILED": "Aktualisierung fehlgeschlagen",
+            "NO_EVENTS_UPDATED": "Alle Aktualisierungen sind fehlgeschlagen.",
+            "SOME_EVENTS_NOT_UPDATED": "Markierte Ereignisse konnten nicht bearbeitet werden."
          }
       }
    },
