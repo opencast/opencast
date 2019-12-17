@@ -364,9 +364,6 @@ public final class WorkspaceImpl implements Workspace {
       return new File(inWs.getAbsolutePath());
     }
 
-    Throwable ex = new Throwable();
-    logger.warn("http download here", ex);
-
     // do HTTP transfer
     return locked(inWs, downloadIfNecessary(uri));
   }
