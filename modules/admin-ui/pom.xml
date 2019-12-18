@@ -343,6 +343,7 @@
                 <configuration>
                   <executable>node_modules/.bin/bower</executable>
                   <arguments>
+                    <argument>--allow-root</argument>
                     <argument>install</argument>
                   </arguments>
                 </configuration>
@@ -418,7 +419,7 @@
                   <goal>bower</goal>
                 </goals>
                 <configuration>
-                  <arguments>install</arguments>
+                  <arguments>--allow-root install</arguments>
                 </configuration>
               </execution>
               <execution>
