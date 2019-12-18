@@ -2,7 +2,7 @@
   "name": "docs",
   "private": true,
   "devDependencies": {
-    "markdownlint-cli": "^0.19.0"
+    "markdownlint-cli": "^0.20.0"
   },
   "scripts": {
     "test": "markdownlint *.md ./admin/**/*.md ./developer/**/*.md ./user/**/*.md ../../*.md"
