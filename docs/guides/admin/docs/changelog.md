@@ -371,7 +371,7 @@ Opencast 8
 - [[#826](https://github.com/opencast/opencast/pull/826)] -
   url query string incorrect
 - [[#825](https://github.com/opencast/opencast/pull/825)] -
-  - Remove leftover service
+  Remove leftover service
 - [[#824](https://github.com/opencast/opencast/pull/824)] -
   Use Username In Workflows
 - [[#823](https://github.com/opencast/opencast/pull/823)] -
