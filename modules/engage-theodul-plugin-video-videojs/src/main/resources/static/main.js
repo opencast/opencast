@@ -314,26 +314,27 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     if (filterTags == undefined) {
       return tracks;
     }
-    var newTracksArray = [];
-
-    for (var i = 0; i < tracks.length; i++) {
-      var found = false,
-          number_of_tags = tracks[i].tags ? tracks[i].tags.tag.length : 0;
-      for (var j = 0; j < number_of_tags; j++) {
-        for (var k = 0; k < filterTags.length; k++) {
-          if (tracks[i].tags.tag[j] == filterTags[k].trim()) {
-            found = true;
-            newTracksArray.push(tracks[i]);
-            break;
-          }
-        }
-        if (found) break;
-      }
+    var newTracksArray = [],
+        filterTagsArray = (Array.isArray(filterTags) ? filterTags : filterTags.split(','))
+                                .filter(x => x);
+    
+    if (filterTagsArray.length == 0) {
+        return tracks;
+    }
+    for (var i = 0; i < tracks.length; i++) {   
+        if (tracks[i].tags) {
+            if (tracks[i].tags.tag) {                
+                if (_.intersection(tracks[i].tags.tag, filterTagsArray).length > 0) {
+                    newTracksArray.push(tracks[i]);
+                }
+            }
+        }   
     }
 
     // avoid filtering to an empty list, better play something than nothing
     if (newTracksArray.length < 1) {
-      return tracks;
+        console.warn("No valid track tags found - returning tracks.");
+        return tracks;
     }
     return newTracksArray;
   }
@@ -419,20 +420,26 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     if (filterFormats == undefined) {
       return tracks;
     }
-    var filterFormatsArray = filterFormats.split(',');
-    var newTracksArray = [];
+    var newTracksArray = [],
+        filterFormatsArray = (Array.isArray(filterFormats) ? filterFormats : filterFormats.split(','))
+                                .map(x => Utils.preferredFormat(x.trim()))
+                                .filter(x => x);
 
-    for (var i = 0; i < tracks.length; i++) {
-      for (var j = 0; j < filterFormatsArray.length; j++) {
-        var formatMimeType = Utils.preferredFormat(filterFormatsArray[j].trim());
-        if (formatMimeType == undefined) return tracks; // if illegal mimetypes are configured ignore config
-        if (tracks[i].mimetype == formatMimeType) {
-          newTracksArray.push(tracks[i]);
-          break;
-        }
-      }
+    if (filterFormatsArray.length == 0) {
+        return tracks;
     }
 
+    for (var i = 0; i < tracks.length; i++) {
+        if (filterFormatsArray.includes(tracks[i].mimetype)) {
+            newTracksArray.push(tracks[i]);
+        }
+    }
+    
+    // avoid filtering to an empty list, better play something than nothing
+    if (newTracksArray.length < 1) {
+        console.warn("No valid track formats found - returning tracks.");
+        return tracks;
+    }    
     return newTracksArray;
   }
 
@@ -2221,11 +2228,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var hasAudio = false;
     var hasVideo = false;
     videoSources.audio = [];
-
-    for (var j = 0; j < flavorsArray.length; ++j) {
-      videoSources[Utils.extractFlavorMainType(flavorsArray[j])] = [];
-    }
-
+    
     if (mediaInfo.tracks) {
       $(mediaInfo.tracks).each(function (i, track) {
         if (track.mimetype && track.type && acceptFormat(track)) {
@@ -2246,6 +2249,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
               if (Utils.checkIfMimeTypeAvailableForFlavor(videoSources, 'application/x-mpegURL', mainFlavor)) return; //patch for broken Distribution Service that may contain Adaptive Streaming format multiple times
               track = Utils.removeQualityTag(track);
               loadHls = true;
+            }
+            if (typeof(videoSources[mainFlavor]) === "undefined") {
+                videoSources[mainFlavor] = [];
             }
             videoSources[mainFlavor].push({
               src: track.url,
