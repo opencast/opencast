@@ -24,11 +24,8 @@
       </activation>
       <modules>
         <module>karaf-features</module>
-        <module>dist-admin</module>
         <module>dist-adminpresentation</module>
-        <module>dist-allinone</module>
         <module>dist-ingest</module>
-        <module>dist-presentation</module>
         <module>dist-worker</module>
       </modules>
     </profile>
