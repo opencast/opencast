@@ -14,8 +14,6 @@
     <opencast.basedir>${basedir}</opencast.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <opencast.nexus.url>https://mvncache.opencast.org</opencast.nexus.url>
-    <opencast.nexus-backup.url>https://nexus.opencast.org</opencast.nexus-backup.url>
 
     <!-- library version specifications -->
     <aws.version>1.11.49_1</aws.version>
@@ -1796,29 +1794,21 @@
   </reporting>
   <repositories>
     <repository>
-      <id>opencast</id>
-      <name>Opencast Repo</name>
-      <url>${opencast.nexus.url}/nexus/content/groups/public</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
+      <id>central</id>
+      <name>Central Maven Repository</name>
+      <url>https://repo.maven.apache.org/maven2/</url>
     </repository>
     <repository>
-      <id>opencast-backup</id>
-      <name>Opencast Backup Repo</name>
-      <url>${opencast.nexus-backup.url}/nexus/content/groups/public</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
+      <id>spring.io</id>
+      <name>Spring Framework Maven Plugins-Release Repository</name>
+      <url>https://repo.spring.io/plugins-release/</url>
+    </repository>
+    <repository>
+      <id>mvn.opencast.org</id>
+      <name>Opencast 3rd-Party Repository</name>
+      <url>https://mvn.opencast.org/</url>
     </repository>
   </repositories>
-
   <distributionManagement>
     <snapshotRepository>
       <id>ossrh</id>
