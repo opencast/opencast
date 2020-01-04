@@ -37,17 +37,11 @@ define(['jquery', 'backbone', 'bowser', 'basil', 'engage/models/pluginInfo', 'en
     var EngageModel = Backbone.Model.extend({
       initialize: function() {
         // parse url parameters
-        var match, pl = /\+/g, // regex for replacing addition symbol
-            // with a space
-            search = /([^&=]+)=?([^&]*)/g,
-            decode = function(s) {
-              return decodeURIComponent(s.replace(pl, ' '));
-            },
-            query = window.location.search.substring(1);
-
-        var urlParams = {}; // stores url params
-        while (match == search.exec(query)) {
-          urlParams[decode(match[1])] = decode(match[2]);
+        let urlParams = {},
+            searchParams = new URLSearchParams(window.location.search),
+            entries = searchParams.entries();
+        for(var pair of entries) {
+          urlParams[pair[0]] = pair[1];
         }
 
         this.set('orientation', 'landscape');
