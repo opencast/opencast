@@ -100,7 +100,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1042,7 +1041,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
               JOB_TYPE, Operation.Image.toString(), null, null, false, profile.getJobLoad());
       job.setStatus(Job.Status.RUNNING);
       job = serviceRegistry.updateJob(job);
-      final List<Attachment> images = image(job, sourceTrack, profileId, time);
+      final List<Attachment> images = extractImages(job, sourceTrack, profileId, null, time);
       job.setStatus(Job.Status.FINISHED);
       return images;
     } catch (ServiceRegistryException | NotFoundException e) {
@@ -1081,78 +1080,19 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    *          the source track
    * @param profileId
    *          the identifier of the encoding profile to use
+   * @param properties
+   *          the properties applied to the encoding profile
    * @param times
    *          (one or more) times in seconds
    * @return the images as an attachment element list
    * @throws EncoderException
    *           if extracting the image fails
    */
-  protected List<Attachment> image(Job job, Track sourceTrack, String profileId, double... times)
-          throws EncoderException, MediaPackageException {
-    if (sourceTrack == null)
-      throw new EncoderException("SourceTrack cannot be null");
-
-    validateVideoStream(job, sourceTrack);
-
-    // The time should not be outside of the track's duration
-    for (double time : times) {
-      if (sourceTrack.getDuration() == null) {
-        Map<String, String> params = new HashMap<>();
-        params.put("track-id", sourceTrack.getIdentifier());
-        params.put("track-url", sourceTrack.getURI().toString());
-        incident().recordFailure(job, IMAGE_EXTRACTION_UNKNOWN_DURATION, params);
-        throw new EncoderException("Unable to extract an image from a track with unknown duration");
-      }
-      if (time < 0 || time * 1000 > sourceTrack.getDuration()) {
-        Duration duration = Duration.ofMillis(sourceTrack.getDuration());
-        long durationSeconds = duration.getSeconds();
-        long durationMillis = duration.minusSeconds(durationSeconds).toMillis();
-        String formattedDuration = String.valueOf(durationSeconds) + '.'
-                + StringUtils.leftPad(String.valueOf(durationMillis), 3, '0');
-
-        Map<String, String> params = new HashMap<>();
-        params.put("track-id", sourceTrack.getIdentifier());
-        params.put("track-url", sourceTrack.getURI().toString());
-        params.put("track-duration", formattedDuration);
-        params.put("time", Double.toString(time));
-        incident().recordFailure(job, IMAGE_EXTRACTION_TIME_OUTSIDE_DURATION, params);
-
-        throw new EncoderException("An image could not be extracted from the track " + sourceTrack.getURI()
-                + " with id " + sourceTrack.getIdentifier() + " because the extraction time (" + time + " second(s)) is "
-                + "outside of the track's duration (" + formattedDuration + " second(s))");
-      }
-    }
-
-    return extractImages(job, sourceTrack, profileId, null, times);
-  }
-
-  /**
-   * Extracts an image from <code>sourceTrack</code> by the given properties and the corresponding encoding profile.
-   *
-   * @param job
-   *          the associated job
-   * @param sourceTrack
-   *          the source track
-   * @param profileId
-   *          the identifier of the encoding profile to use
-   * @param properties
-   *          the properties applied to the encoding profile
-   * @return the images as an attachment element list
-   * @throws EncoderException
-   *           if extracting the image fails
-   */
-  protected List<Attachment> image(Job job, Track sourceTrack, String profileId, Map<String, String> properties)
-          throws EncoderException, MediaPackageException {
-    if (sourceTrack == null)
-      throw new EncoderException("SourceTrack cannot be null");
-
-    validateVideoStream(job, sourceTrack);
-
-    return extractImages(job, sourceTrack, profileId, properties);
-  }
-
   private List<Attachment> extractImages(Job job, Track sourceTrack, String profileId, Map<String, String> properties,
           double... times) throws EncoderException {
+    if (sourceTrack == null) {
+      throw new EncoderException("SourceTrack cannot be null");
+    }
     logger.info("creating an image using video track {}", sourceTrack.getIdentifier());
 
     // Get the encoding profile
@@ -1419,10 +1359,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
             for (int i = 3; i < arguments.size(); i++) {
               times[i - 3] = Double.parseDouble(arguments.get(i));
             }
-            resultingElements = image(job, firstTrack, encodingProfile, times);
+            resultingElements = extractImages(job, firstTrack, encodingProfile, null, times);
           } else {
             Map<String, String> properties = parseProperties(arguments.get(3));
-            resultingElements = image(job, firstTrack, encodingProfile, properties);
+            resultingElements = extractImages(job, firstTrack, encodingProfile, properties);
           }
           serialized = MediaPackageElementParser.getArrayAsXml(resultingElements);
           break;
