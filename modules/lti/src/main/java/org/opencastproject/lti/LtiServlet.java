@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -202,9 +204,10 @@ public class LtiServlet extends HttpServlet {
     // The URL of the LTI tool. If no specific tool is passed we use the test tool
     UriBuilder builder;
     try {
-      String toolUriStr = req.getParameter(LTI_CUSTOM_TOOL);
-      toolUriStr = toolUriStr.replaceAll("/?ltitools/(?<tool>[^/]*)/index.html\\??", "/ltitools/index.html?tool=${tool}&");
-      URI toolUri = new URI(StringUtils.trimToEmpty(toolUriStr));
+      String customTool = URLDecoder
+              .decode(StringUtils.trimToEmpty(req.getParameter(LTI_CUSTOM_TOOL)), StandardCharsets.UTF_8.displayName());
+      customTool = customTool.replaceAll("/?ltitools/(?<tool>[^/]*)/index.html\\??", "/ltitools/index.html?tool=${tool}&");
+      URI toolUri = new URI(customTool);
 
       if (toolUri.getPath().isEmpty())
         throw new URISyntaxException(toolUri.toString(), "Provided 'custom_tool' has an empty path");
