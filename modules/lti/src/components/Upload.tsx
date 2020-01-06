@@ -72,11 +72,11 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
         if (typeof fieldValue === "string" && fieldValue !== "")
             return fieldValue;
         // Otherwise, assume and resolve a series name instead of an ID.
-        if (typeof qs.seriesName !== "string" || seriesField.collection === undefined)
+        if (typeof qs.series_name !== "string" || seriesField.collection === undefined)
             return;
         const pairs = collectionToPairs(seriesField.collection);
         return pairs
-            .filter(([k, _]) => k === qs.seriesName)
+            .filter(([k, _]) => k === qs.series_name)
             .map(([_, v]) => v)
             .pop();
     }

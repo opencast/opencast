@@ -86,7 +86,7 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
             this.state.currentPage - 1,
             undefined,
             typeof qs.series === "string" ? qs.series : undefined,
-            typeof qs.seriesName === "string" ? qs.seriesName : undefined
+            typeof qs.series_name === "string" ? qs.series_name : undefined
         ).then((results) => this.setState({
             ...this.state,
             searchResults: results
@@ -107,7 +107,7 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
         const qs = parsedQueryString();
         let seriesSuffix = typeof qs.series === "string" ? "&series=" + qs.series : "";
         if (typeof qs.series_name === "string")
-            seriesSuffix = "&seriesName=" + qs.series_name;
+            seriesSuffix = "&series_name=" + qs.series_name;
         const debugSuffix = typeof qs.debug === "string" ? "&debug=" + qs.debug : "";
         window.location.href = "/ltitools/index.html?tool=upload&episode_id=" + id + seriesSuffix + debugSuffix;
     }
