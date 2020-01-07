@@ -90,12 +90,18 @@ custom parameters to be defined separately in each place where an LTI tool is us
 custom parameters to be defined globally.
 
 - To show the media module, use `tool=engage/ui/`
-- To show all videos for a single series, use `tool=ltitools/series/index.html?series=SERIESID`. You can also pass
-  `series_name` to select a series by name (the name has to be unique). If you want the ability to delete events
-  from the series (which will only be available for instructors), add `&deletion=true` to the URL. If you also want
-  the ability to edit events from there, add `&edit=true`.
-- To show an upload form, use `tool=ltitools/upload/index.html?series=SERIESID`. You can also pass
-  `series_name` to select a series by name (the name has to be unique).
+- To show all videos for a single series, specify the following parameters
+  - `tool=ltitools/index.html`
+  - `subtool=series`
+  - `series=SERIESID` if you have the series ID
+  - `series_name=SERIESNAME` if you just have the series name (has to be unique)
+  - `deletion=true` if you want to display a deletion button next to each episode
+  - `edit=true` if you want to display an edit button next to each episode
+- To show an upload form, specify the following parameters:
+  - `tool=ltitools/index.html`
+  - `subtool=upload`
+  - `series=SERIESID` if you have the series ID
+  - `series_name=SERIESNAME` if you just have the series name (has to be unique)
 - To show a single video, use `tool=/play/MEDIAPACKAGEID`
 - To show a debug page before proceeding to the tool, append the parameter `test=true`
 
