@@ -186,6 +186,26 @@ public class UserEndpoint {
     return Response.ok(JaxbUser.fromUser(user)).build();
   }
 
+  @GET
+  @Path("users/md5.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(
+      name = "users-with-insecure-hashing",
+      description = "Returns a list of users which passwords are stored using MD5 hashes",
+      returnDescription = "Returns a JSON representation of the list of matching user accounts",
+      reponses = {
+      @RestResponse(
+          responseCode = SC_OK,
+          description = "The user accounts.")
+  })
+  public JaxbUserList getUserWithInsecurePasswordHashingAsJson() {
+    JaxbUserList userList = new JaxbUserList();
+    for (User user: jpaUserAndRoleProvider.findInsecurePasswordHashes()) {
+      userList.add(user);
+    }
+    return userList;
+  }
+
   @POST
   @Path("/")
   @RestQuery(
