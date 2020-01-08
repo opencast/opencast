@@ -87,9 +87,6 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Service-Component>
-              OSGI-INF/asset-store.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

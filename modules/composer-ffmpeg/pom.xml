@@ -146,10 +146,6 @@
             <Private-Package>
               org.codehaus.plexus.util.cli
             </Private-Package>
-            <Service-Component>
-              OSGI-INF/composer-service.xml,
-              OSGI-INF/profile-scanner.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

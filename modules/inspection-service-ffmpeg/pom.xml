@@ -105,9 +105,6 @@
             <Export-Package>
               org.opencastproject.inspection.ffmpeg.*;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/inspection-service.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

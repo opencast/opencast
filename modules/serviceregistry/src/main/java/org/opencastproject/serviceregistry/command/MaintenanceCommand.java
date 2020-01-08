@@ -26,13 +26,27 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 /**
  * An interactive shell command for putting Maintainable services in and out of maintenance mode
  *
  */
+@Component(
+  property = {
+    "service.description=Maintenance Command (m:set id true|false, m:list)",
+    "osgi.command.scope=maintain",
+    "osgi.command.function=set",
+    "osgi.command.function=list"
+  },
+  immediate = true,
+  service = { MaintenanceCommand.class }
+)
 public class MaintenanceCommand {
   protected ServiceRegistry serviceRegistry;
 
+  @Reference(name = "remoteServiceManager")
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     this.serviceRegistry = remoteServiceManager;
   }

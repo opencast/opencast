@@ -43,6 +43,9 @@ import com.google.common.cache.LoadingCache;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +64,13 @@ import javax.persistence.EntityTransaction;
 /**
  * Manages and locates users using JPA.
  */
+@Component(
+  property = {
+    "service.description=Provides a user directory"
+  },
+  immediate = true,
+  service = { UserProvider.class, RoleProvider.class, JpaUserAndRoleProvider.class }
+)
 public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /** The logger */
@@ -96,6 +106,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   protected Object nullToken = new Object();
 
   /** OSGi DI */
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -104,6 +115,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -112,6 +124,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @param groupRoleProvider
    *          the groupRoleProvider to set
    */
+  @Reference(name = "groupRoleProvider")
   void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }
@@ -125,6 +138,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @param cc
    *          the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("activate");
 

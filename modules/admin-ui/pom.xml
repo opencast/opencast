@@ -526,7 +526,6 @@
               OSGI-INF/tasks_endpoint.xml,
               OSGI-INF/themes_endpoint.xml,
               OSGI-INF/tools_endpoint.xml,
-              OSGI-INF/ui-roles-role-provider.xml,
               OSGI-INF/user_settings_endpoint.xml,
               OSGI-INF/user_settings_service.xml,
               OSGI-INF/users_endpoint.xml,

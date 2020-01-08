@@ -67,6 +67,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +102,13 @@ import javax.ws.rs.core.UriBuilder;
  *
  * TODO Implement cache invalidation using the caching headers, if provided, from the remote server.
  */
+@Component(
+  property = {
+    "service.description=Workspace"
+  },
+  immediate = true,
+  service = { Workspace.class }
+)
 public final class WorkspaceImpl implements Workspace {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(WorkspaceImpl.class);
@@ -187,6 +198,7 @@ public final class WorkspaceImpl implements Workspace {
    * @param cc
    *          the OSGi component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     if (this.wsRoot == null) {
       if (ensureContextProp(cc, WORKSPACE_DIR_KEY)) {
@@ -300,6 +312,7 @@ public final class WorkspaceImpl implements Workspace {
   }
 
   /** Callback from OSGi on service deactivation. */
+  @Deactivate
   public void deactivate() {
     JmxUtil.unregisterMXBean(registeredMXBean);
     if (workspaceCleaner != null) {
@@ -875,6 +888,7 @@ public final class WorkspaceImpl implements Workspace {
     return wfr.getBaseUri();
   }
 
+  @Reference(name = "REPO")
   public void setRepository(WorkingFileRepository repo) {
     this.wfr = repo;
     if (repo instanceof PathMappable) {
@@ -883,10 +897,12 @@ public final class WorkspaceImpl implements Workspace {
     }
   }
 
+  @Reference(name = "trustedHttpClient")
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     this.trustedHttpClient = trustedHttpClient;
   }
 
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

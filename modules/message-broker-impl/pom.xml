@@ -47,6 +47,10 @@
       <artifactId>org.osgi.core</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
@@ -162,11 +166,6 @@
               javax.transaction,
               javax.transaction.xa
             </_exportcontents>
-            <Service-Component>
-              OSGI-INF/broker_endpoint.xml,
-              OSGI-INF/message_receiver_service.xml,
-              OSGI-INF/message_sender_service.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

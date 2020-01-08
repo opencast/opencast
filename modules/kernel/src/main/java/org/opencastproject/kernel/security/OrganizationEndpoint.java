@@ -32,6 +32,9 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -41,6 +44,16 @@ import javax.ws.rs.core.MediaType;
 /**
  * Provides access to the organizations served by this Opencast instance.
  */
+@Component(
+  property = {
+    "service.description=Organization listing REST endpoint",
+    "opencast.service.type=org.opencastproject.organization",
+    "opencast.service.path=/org",
+    "opencast.service.jobproducer=false"
+  },
+  immediate = true,
+  service = { OrganizationEndpoint.class }
+)
 @Path("/")
 @RestService(name = "organization", title = "Organizations", notes = { "" }, abstractText = "Displays the organizations served by this system")
 public class OrganizationEndpoint {
@@ -96,6 +109,7 @@ public class OrganizationEndpoint {
    * @param orgDirectoryService
    *          the orgDirectoryService to set
    */
+  @Reference(name = "orgDirectoryService")
   public void setOrgDirectoryService(OrganizationDirectoryService orgDirectoryService) {
     this.orgDirectoryService = orgDirectoryService;
   }

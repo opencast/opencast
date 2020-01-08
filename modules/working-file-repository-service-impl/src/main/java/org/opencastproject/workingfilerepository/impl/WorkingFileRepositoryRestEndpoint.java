@@ -34,6 +34,8 @@ import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.FILE;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UnknownFileTypeException;
@@ -41,6 +43,7 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.apache.commons.fileupload.FileItemIterator;
@@ -52,6 +55,10 @@ import org.apache.http.HttpStatus;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +87,16 @@ import javax.ws.rs.core.Response;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                 + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+  name = "org.opencastproject.workingfilerepository.impl.WorkingFileRepository",
+  property = {
+    "service.description=Working File Repository REST Endpoint",
+    "opencast.service.type=org.opencastproject.files",
+    "opencast.service.path=/files"
+  },
+  immediate = true,
+  service = { WorkingFileRepositoryRestEndpoint.class, WorkingFileRepository.class, PathMappable.class }
+)
 public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl {
 
   private static final Logger logger = LoggerFactory.getLogger(WorkingFileRepositoryRestEndpoint.class);
@@ -91,8 +108,35 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
    *          OSGi component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext cc) throws IOException {
     super.activate(cc);
+  }
+
+  /**
+   * Callback from OSGi that is called when this service is deactivated.
+   */
+  @Override
+  @Deactivate
+  public void deactivate() {
+    super.deactivate();
+  }
+
+  /**
+   * Sets the remote service manager.
+   *
+   * @param remoteServiceManager
+   */
+  @Override
+  @Reference(name = "remoteServiceManager")
+  public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
+    super.setRemoteServiceManager(remoteServiceManager);
+  }
+
+  @Override
+  @Reference(name = "securityService")
+  public void setSecurityService(SecurityService securityService) {
+    super.setSecurityService(securityService);
   }
 
   @POST

@@ -23,12 +23,20 @@ package org.opencastproject.helloworld.impl;
 
 import org.opencastproject.helloworld.api.HelloWorldService;
 
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * A simple tutorial class to learn about Opencast Services
  */
+@Component(
+  property = {
+    "service.description=Hello World Service"
+  },
+  immediate = true,
+  service = HelloWorldService.class
+)
 public class HelloWorldServiceImpl implements HelloWorldService {
 
   /** The module specific logger */

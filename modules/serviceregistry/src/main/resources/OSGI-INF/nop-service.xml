@@ -1,33 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
-  <scr:component name="org.opencastproject.serviceregistry.impl.NopServiceImpl" immediate="true">
-    <implementation class="org.opencastproject.serviceregistry.impl.NopServiceImpl"/>
-    <property name="service.description" value="No operation service"/>
-    <service>
-      <provide interface="org.opencastproject.serviceregistry.api.NopService"/>
-    </service>
-    <!-- Services requested by AbstractJobProducer -->
-    <reference name="serviceRegistry"
-               interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-               cardinality="1..1"
-               policy="static"
-               bind="setServiceRegistry"/>
-    <reference name="securityService"
-               interface="org.opencastproject.security.api.SecurityService"
-               cardinality="1..1"
-               policy="static"
-               bind="setSecurityService"/>
-    <reference name="userDirectoryService"
-               interface="org.opencastproject.security.api.UserDirectoryService"
-               cardinality="1..1"
-               policy="static"
-               bind="setUserDirectoryService"/>
-    <reference name="organizationDirectoryService"
-               interface="org.opencastproject.security.api.OrganizationDirectoryService"
-               cardinality="1..1"
-               policy="static"
-               bind="setOrganizationDirectoryService"/>
-  </scr:component>
   <scr:component name="org.opencastproject.serviceregistry.impl.endpoint.NopServiceEndpoint" immediate="true">
     <implementation class="org.opencastproject.serviceregistry.impl.endpoint.NopServiceEndpoint"/>
     <service>

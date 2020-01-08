@@ -87,6 +87,13 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,6 +130,13 @@ import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
 /** JPA implementation of the {@link ServiceRegistry} */
+@Component(
+  property = {
+    "service.description=Service registry"
+  },
+  immediate = true,
+  service = { ManagedService.class, ServiceRegistry.class }
+)
 public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** JPA persistence unit name */
@@ -273,10 +287,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   protected float localSystemLoad = 0.0f;
 
   /** OSGi DI */
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activate service registry");
 
@@ -378,6 +394,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     return hostName;
   }
 
+  @Deactivate
   public void deactivate() {
     logger.info("deactivate service registry");
 
@@ -850,6 +867,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * configuration admin service from calling the service deactivate and activate methods
    * for a config update. It does not have to do anything as the updates are handled by updated().
    */
+  @Modified
   public void modified(Map<String, Object> config)
      throws ConfigurationException {
     logger.debug("Modified serviceregistry");
@@ -2483,6 +2501,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param client
    *          the trusted http client
    */
+  @Reference(name = "trustedHttpClient")
   void setTrustedHttpClient(TrustedHttpClient client) {
     this.client = client;
   }
@@ -2493,6 +2512,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -2503,6 +2523,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -2513,15 +2534,21 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
 
   /** OSGi DI. */
+  @Reference(name = "incidentService", cardinality = ReferenceCardinality.OPTIONAL, policy =  ReferencePolicy.DYNAMIC, unbind = "unsetIncidentService")
   public void setIncidentService(IncidentService incidentService) {
     // Manually resolve the cyclic dependency between the incident service and the service registry
     ((OsgiIncidentService) incidentService).setServiceRegistry(this);
     this.incidents = new Incidents(this, incidentService);
+  }
+
+  public void unsetIncidentService(IncidentService incidentService) {
+    this.incidents = null;
   }
 
   /**

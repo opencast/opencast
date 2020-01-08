@@ -154,11 +154,6 @@
               org.opencastproject.serviceregistry.impl.endpoint;version=${project.version}
             </Export-Package>
             <Service-Component>
-              OSGI-INF/serviceregistry.xml,
-              OSGI-INF/maintenance_shell.xml,
-              OSGI-INF/serviceregistry-endpoint.xml,
-              OSGI-INF/incident-service.xml,
-              OSGI-INF/incident-service-endpoint.xml,
               OSGI-INF/nop-service.xml
             </Service-Component>
             <Meta-Persistence>

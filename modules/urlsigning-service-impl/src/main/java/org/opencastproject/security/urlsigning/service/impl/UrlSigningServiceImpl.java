@@ -31,12 +31,20 @@ import org.opencastproject.urlsigning.common.Policy;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeZone;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@Component(
+  immediate = true,
+  service = { UrlSigningService.class }
+)
 public class UrlSigningServiceImpl implements UrlSigningService {
 
   /** The logging facility */
@@ -46,6 +54,7 @@ public class UrlSigningServiceImpl implements UrlSigningService {
   private final List<UrlSigningProvider> signingProviders = new CopyOnWriteArrayList<>();
 
   /** OSGi callback for registering {@link UrlSigningProvider} */
+  @Reference(name = "urlSigningProviders", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC, unbind = "unregisterSigningProvider")
   void registerSigningProvider(final UrlSigningProvider provider) {
     signingProviders.add(provider);
     logger.info("{} registered", provider);

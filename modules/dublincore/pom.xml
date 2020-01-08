@@ -75,6 +75,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
@@ -121,7 +125,6 @@
               javax.annotation*
             </Private-Package>
             <Service-Component>
-              OSGI-INF/dublin-core-service.xml,
               OSGI-INF/static-metadata-service.xml
             </Service-Component>
           </instructions>

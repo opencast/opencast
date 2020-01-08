@@ -62,6 +62,12 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.auth.DigestScheme;
 import org.apache.http.params.CoreConnectionPNames;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +83,13 @@ import javax.management.ObjectName;
 /**
  * An http client that executes secure (though not necessarily encrypted) http requests.
  */
+@Component(
+  property = {
+    "service.description=Provides Trusted Http Clients (for use with digest authentication)"
+  },
+  immediate = true,
+  service = { TrustedHttpClient.class }
+)
 public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionMXBean {
   /** Header name used to request a new nonce from a server a request is sent to. */
   public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
@@ -170,6 +183,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   /** The url signing service */
   protected UrlSigningService urlSigningService = null;
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("activate");
     user = cc.getBundleContext().getProperty(DIGEST_AUTH_USER_KEY);
@@ -214,8 +228,19 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * @param serviceRegistry
    *         the serviceRegistry to set
    */
+  @Reference(name = "serviceRegistry", cardinality = ReferenceCardinality.OPTIONAL, policy =  ReferencePolicy.DYNAMIC, unbind = "unsetServiceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
+  }
+
+  /**
+   * Unsets the service registry.
+   *
+   * @param serviceRegistry
+   *         the serviceRegistry to unset (unused, but needed for OSGI)
+   */
+  public void unsetServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = null;
   }
 
   /**
@@ -224,6 +249,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * @param securityService
    *         the security service
    */
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -234,6 +260,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * @param urlSigningService
    *        The signing service to sign urls with.
    */
+  @Reference(name = "urlSigningService")
   public void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }
@@ -299,10 +326,12 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     return result;
   }
 
+  @Deactivate
   public void deactivate() {
     logger.debug("deactivate");
   }
 
+  @Reference(name = "service-impl")
   public void setHttpClientFactory(HttpClientFactory httpClientFactory) {
     this.httpClientFactory = httpClientFactory;
   }

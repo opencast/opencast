@@ -32,6 +32,8 @@ import org.opencastproject.util.ReadinessIndicator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +54,13 @@ import java.util.Set;
 /**
  * This manager class tries to read encoding profiles from the classpath.
  */
+@Component(
+  property = {
+    "service.description=Encoding Profile Scanner"
+  },
+  immediate = true,
+  service = { EncodingProfileScanner.class, ArtifactInstaller.class }
+)
 public class EncodingProfileScanner implements ArtifactInstaller {
 
   /** Prefix for encoding profile property keys **/
@@ -91,6 +100,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
    * @param ctx
    *          the bundle context
    */
+  @Activate
   void activate(BundleContext ctx) {
     this.bundleCtx = ctx;
   }
