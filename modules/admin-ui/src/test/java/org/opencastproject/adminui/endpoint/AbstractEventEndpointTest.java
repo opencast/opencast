@@ -135,7 +135,7 @@ public class AbstractEventEndpointTest {
   public void testUpdateEventComment() throws Exception {
     String eventString = IOUtils.toString(getClass().getResource("/eventComment.json"));
 
-    String result = given().pathParam("eventId", "asdasd").pathParam("commentId", 33).expect()
+    String result = given().pathParam("eventId", "asdasd").pathParam("commentId", 33).contentType(ContentType.URLENC).expect()
             .statusCode(HttpStatus.SC_OK).when().put(rt.host("{eventId}/comment/{commentId}")).asString();
 
     assertThat(eventString, SameJSONAs.sameJSONAs(result));
@@ -194,7 +194,7 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testUpdateEventCommentReply() throws Exception {
-    given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 78).expect()
+    given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 78).contentType(ContentType.URLENC).expect()
             .statusCode(HttpStatus.SC_BAD_REQUEST).when().put(rt.host("{eventId}/comment/{commentId}/{replyId}"));
 
     given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 77).formParam("text", "Text")

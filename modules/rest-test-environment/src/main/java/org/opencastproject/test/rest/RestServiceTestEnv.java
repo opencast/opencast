@@ -21,8 +21,6 @@
 
 package org.opencastproject.test.rest;
 
-import static org.opencastproject.util.data.Collections.toArray;
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
@@ -30,14 +28,12 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
-import com.sun.jersey.api.core.ClassNamesResourceConfig;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.slf4j.Logger;
@@ -116,13 +112,8 @@ public final class RestServiceTestEnv {
     return new RestServiceTestEnv(baseUrl, Option.<ResourceConfig> none());
   }
 
-  public static RestServiceTestEnv testEnvScanPackages(URL baseUrl, Package... servicePkgs) {
-    return new RestServiceTestEnv(baseUrl,
-            some(new PackagesResourceConfig(toArray(String.class, mlist(servicePkgs).map(pkgName).value()))));
-  }
-
   public static RestServiceTestEnv testEnvForClasses(URL baseUrl, Class... restServices) {
-    return new RestServiceTestEnv(baseUrl, some(new ClassNamesResourceConfig(restServices)));
+    return new RestServiceTestEnv(baseUrl, some(new ResourceConfig(restServices)));
   }
 
   public static RestServiceTestEnv testEnvForCustomConfig(String baseUrl, ResourceConfig cfg) {
