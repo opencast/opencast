@@ -109,7 +109,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery withTitle(String title) {
-    clearExpectations();
     this.title = title;
     return this;
   }
@@ -129,7 +128,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery withoutActions() {
-    clearExpectations();
     this.actions.clear();
     return this;
   }
@@ -146,7 +144,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
   public SeriesSearchQuery withAction(Action action) {
     if (action == null)
       throw new IllegalArgumentException("Action cannot be null");
-    clearExpectations();
     this.actions.add(action.toString());
     return this;
   }
@@ -168,7 +165,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery withDescription(String description) {
-    clearExpectations();
     this.description = description;
     return this;
   }
@@ -194,7 +190,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
   public SeriesSearchQuery withSubject(String subject) {
     if (StringUtils.isBlank(subject))
       throw new IllegalArgumentException("Subject cannot be null");
-    clearExpectations();
     this.subjects.add(subject);
     return this;
   }
@@ -234,7 +229,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery withLanguage(String language) {
-    clearExpectations();
     this.language = language;
     return this;
   }
@@ -256,7 +250,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery withCreator(String creator) {
-    clearExpectations();
     this.creator = creator;
     return this;
   }
@@ -278,7 +271,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery withLicense(String license) {
-    clearExpectations();
     this.license = license;
     return this;
   }
@@ -300,7 +292,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery withAccessPolicy(String accessPolicy) {
-    clearExpectations();
     this.accessPolicy = accessPolicy;
     return this;
   }
@@ -322,7 +313,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery withTheme(long theme) {
-    clearExpectations();
     this.theme = theme;
     return this;
   }
@@ -344,7 +334,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery withManagedAcl(String managedAcl) {
-    clearExpectations();
     this.managedAcl = managedAcl;
     return this;
   }
@@ -370,7 +359,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
   public SeriesSearchQuery withOrganizer(String organizer) {
     if (StringUtils.isBlank(organizer))
       throw new IllegalArgumentException("Organizer cannot be null");
-    clearExpectations();
     this.organizers.add(organizer);
     return this;
   }
@@ -397,7 +385,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
     if (StringUtils.isBlank(contributor)) {
       throw new IllegalArgumentException("Contributor can't be null");
     }
-    clearExpectations();
     this.contributors.add(contributor);
     return this;
   }
@@ -422,7 +409,6 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
     if (StringUtils.isBlank(publisher)) {
       throw new IllegalArgumentException("Publisher can't be null");
     }
-    clearExpectations();
     this.publishers.add(publisher);
     return this;
   }

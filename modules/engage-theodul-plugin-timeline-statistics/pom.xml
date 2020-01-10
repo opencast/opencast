@@ -28,8 +28,8 @@
       <version>1.6.4</version>
     </dependency>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>

@@ -191,7 +191,7 @@ public class FeedServiceImpl {
     }
 
     // Set character encoding
-    Variant v = new Variant(MediaType.valueOf(contentType), null, feed.getEncoding());
+    Variant v = new Variant(MediaType.valueOf(contentType), (String) null, feed.getEncoding());
     String outputString = null;
     try {
       if (feedInfo.getType().equals(Feed.Type.RSS)) {

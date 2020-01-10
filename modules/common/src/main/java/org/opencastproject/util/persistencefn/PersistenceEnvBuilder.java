@@ -23,9 +23,6 @@ package org.opencastproject.util.persistencefn;
 
 import static org.opencastproject.util.data.Collections.map;
 
-import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Lazy;
-
 import java.util.Map;
 
 import javax.persistence.spi.PersistenceProvider;
@@ -38,17 +35,7 @@ public final class PersistenceEnvBuilder {
   private Map<String, Object> persistenceProperties = map();
   private PersistenceProvider persistenceProvider;
   private String persistenceUnit;
-  private Lazy<org.opencastproject.util.persistencefn.PersistenceEnv> penv = Lazy.lazy(new Function0<org.opencastproject.util.persistencefn.PersistenceEnv>() {
-    @Override public org.opencastproject.util.persistencefn.PersistenceEnv apply() {
-      if (persistenceProvider == null) {
-        throw new IllegalStateException("Persistence provider has not been set yet");
-      }
-      if (persistenceUnit == null) {
-        throw new IllegalStateException("Persistence unit has not been set yet");
-      }
-      return PersistenceEnvs.mk(persistenceProvider, persistenceUnit, persistenceProperties);
-    }
-  });
+  private org.opencastproject.util.persistencefn.PersistenceEnv penv;
 
   public PersistenceEnvBuilder() {
   }
@@ -74,6 +61,15 @@ public final class PersistenceEnvBuilder {
 
   /** Builds the persistence env. Always returns the same environment so it may be safely called multiple times. */
   public PersistenceEnv get() {
-    return penv.value();
+    if (penv == null) {
+      if (persistenceProvider == null) {
+        throw new IllegalStateException("Persistence provider has not been set yet");
+      }
+      if (persistenceUnit == null) {
+        throw new IllegalStateException("Persistence unit has not been set yet");
+      }
+      penv = PersistenceEnvs.mk(persistenceProvider, persistenceUnit, persistenceProperties);
+    }
+    return penv;
   }
 }

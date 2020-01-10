@@ -24,10 +24,6 @@
       <artifactId>jsr305</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
@@ -48,6 +44,11 @@
       <groupId>pl.pragmatists</groupId>
       <artifactId>JUnitParams</artifactId>
       <version>1.0.4</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -24,8 +24,8 @@
       <artifactId>freemarker</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
     </dependency>
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
@@ -40,8 +40,8 @@
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -91,7 +91,7 @@
     <!-- Persistence -->
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
-      <artifactId>javax.persistence</artifactId>
+      <artifactId>jakarta.persistence</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
@@ -131,14 +131,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.codehaus.jettison</groupId>
       <artifactId>jettison</artifactId>
     </dependency>
@@ -149,9 +141,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>javax.activation</groupId>
-      <artifactId>activation</artifactId>
-      <version>1.1.1</version>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.activation</groupId>
+      <artifactId>jakarta.activation-api</artifactId>
       <scope>test</scope>
     </dependency>
     <!--
@@ -237,7 +233,6 @@
               !org.bouncycastle.crypto.*,
               !org.dom4j.*,
               !org.eclipse.persistence.jpa.*,
-              !org.hamcrest.*,
               !org.jaxen.*,
               !org.jdom.*,
               !org.mozilla.javascript.*,
