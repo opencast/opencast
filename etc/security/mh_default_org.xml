@@ -545,8 +545,4 @@
   <!-- Do not use a request cache -->
   <bean id="requestCache" class="org.springframework.security.web.savedrequest.NullRequestCache" />
 
-  <!-- Uncomment to enable logging interceptors -->
-  <!-- bean class="org.springframework.security.access.event.LoggerListener" / -->
-  <!-- bean class="org.springframework.security.authentication.event.LoggerListener" / -->
-
 </beans>

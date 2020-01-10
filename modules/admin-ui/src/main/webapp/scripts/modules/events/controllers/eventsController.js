@@ -51,7 +51,7 @@ angular.module('adminNg.controllers')
         sortable: true
       }, {
         template: 'modules/events/partials/eventsPresentersCell.html',
-        name:  'presenters',
+        name:  'presenter',
         label: 'EVENTS.EVENTS.TABLE.PRESENTERS',
         sortable: true
       }, {
