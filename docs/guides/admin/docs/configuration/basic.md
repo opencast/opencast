@@ -96,8 +96,14 @@ For testing, it is totally fine to keep the internal database, but you are highl
 database for productional use. For more information about database configuration, have a look at the [Database
 Configuration](database.md) section.
 
+Step 6: Elasticsearch Configuration
+-----------------------------------
 
-Step 6: Setting the Storage Directory (optional)
+Opencast requires Elasticsearch.
+For more details about the setup, have a look at the [Elasticsearch configuration
+guide](../modules/searchindex/elasticsearch.md).
+
+Step 7: Setting the Storage Directory (optional)
 ------------------------------------------------
 
 Even though it is not important for all systems – on test setups you can probably omit this – you will often want to set
