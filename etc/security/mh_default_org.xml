@@ -507,6 +507,56 @@
   </bean>
   -->
 
+  <!-- ################ -->
+  <!-- # LDAP Support # -->
+  <!-- ################ -->
+
+  <!--
+  <bean id="contextSource"
+    class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
+    < ! - - URL of the LDAP server - - >
+    <constructor-arg value="ldap://myldapserver:myport" />
+    < ! - - "Distinguished name" for the unprivileged user - - >
+    < ! - - This user is merely to perform searches in the LDAP to find the users to login - - >
+    <property name="userDn" value="uid=user-id,dc=example,dc=com" />
+    < ! - - Password of the user above - - >
+    <property name="password" value="mypassword" />
+  </bean>
+  -->
+
+  <!--
+  <bean id="ldapAuthProvider"
+    class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
+    <constructor-arg>
+      <bean
+        class="org.springframework.security.ldap.authentication.BindAuthenticator">
+        <constructor-arg ref="contextSource" />
+        <property name="userDnPatterns">
+          <list>
+            < ! - - Dn patterns to search for valid users. Multiple "<value>" tags are allowed - - >
+            <value>uid={0},dc=example,dc=com</value>
+          </list>
+        </property>
+        < ! - - If your user IDs are not part of the user Dn's, you can use a search filter to find them - - >
+        < ! - - This property can be used together with the "userDnPatterns" above - - >
+        < ! - -
+        <property name="userSearch">
+          <bean name="filterUserSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
+            < ! - - Base Dn from where the users will be searched for - - >
+            <constructor-arg index="0" value="ou=GroupName,dc=my-institution,dc=country" />
+            < ! - - Filter to located valid users. Use {0} as a placeholder for the login name - - >
+            <constructor-arg index="1" value="(uid={0})" />
+            <constructor-arg ref="contextSource" />
+          </bean>
+        </property>
+        - - >
+      </bean>
+    </constructor-arg>
+    < ! - - Defines how the user attributes are converted to authorities (roles) - - >
+    <constructor-arg ref="authoritiesPopulator" />
+  </bean>
+  -->
+
   <!-- #################### -->
   <!-- # OSGI Integration # -->
   <!-- #################### -->
@@ -525,6 +575,14 @@
   <osgi:reference id="userDirectoryService" cardinality="1..1"
                   interface="org.opencastproject.security.api.UserDirectoryService" />
 
+  <!-- Uncomment this to enable LDAP -->
+  <!-- Make sure you provide the same instanceId you used in org.opencastproject.userdirectory.ldap-….cfg -->
+  <!--
+  <osgi:reference id="authoritiesPopulator" cardinality="1..1"
+                  interface="org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator"
+                  filter="(instanceId=theId)"/>
+  -->
+
   <osgi:reference id="oAuthConsumerDetailsService" cardinality="1..1"
                   interface="org.springframework.security.oauth.provider.ConsumerDetailsService" />
 
@@ -538,7 +596,9 @@
   <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
   <sec:authentication-manager alias="authenticationManager">
     <!-- Uncomment this if using Shibboleth authentication -->
-    <!--sec:authentication-provider ref="preauthAuthProvider" /-->
+    <!-- <sec:authentication-provider ref="preauthAuthProvider" /> -->
+    <!-- Uncomment the following line if using LDAP -->
+    <!-- <sec:authentication-provider ref="ldapAuthProvider" /> -->
     <sec:authentication-provider user-service-ref="userDetailsService">
       <sec:password-encoder hash="md5"><sec:salt-source user-property="username" /></sec:password-encoder>
     </sec:authentication-provider>
