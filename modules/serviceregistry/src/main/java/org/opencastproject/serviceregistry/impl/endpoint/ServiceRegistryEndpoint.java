@@ -35,7 +35,6 @@ import org.opencastproject.job.api.JaxbJobList;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.rest.RestConstants;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
@@ -306,8 +305,7 @@ public class ServiceRegistryEndpoint {
       throw new WebApplicationException(Response.status(Status.BAD_REQUEST).entity("Service type must be specified")
               .build());
 
-    Organization currentOrg = securityService.getOrganization();
-    Map<String, String> properties = currentOrg.getProperties();
+    Map<String, String> properties = securityService.getOrganization().getProperties();
 
     JaxbServiceRegistrationList registrations = new JaxbServiceRegistrationList();
     try {
