@@ -32,6 +32,7 @@ import org.opencastproject.security.util.SecurityUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -94,15 +95,19 @@ public class SecurityServiceSpringImpl implements SecurityService {
 
     User delegatedUser = delegatedUserHolder.get();
 
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth instanceof AnonymousAuthenticationToken) {
+      return SecurityUtil.createAnonymousUser(org);
+    }
+
     if (delegatedUser != null) {
       return delegatedUser;
     }
 
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(org);
     if (auth != null) {
       Object principal = auth.getPrincipal();
-      if ((principal != null) && (principal instanceof UserDetails)) {
+      if ((principal instanceof UserDetails)) {
         UserDetails userDetails = (UserDetails) principal;
 
         User user = null;
@@ -111,16 +116,15 @@ public class SecurityServiceSpringImpl implements SecurityService {
         if (userDirectory != null) {
           user = userDirectory.loadUser(userDetails.getUsername());
           if (user == null) {
-            logger.debug(
-                    "Authenticated user '{}' could not be found in any of the current UserProviders. Continuing anyway...",
-                    userDetails.getUsername());
+            logger.debug("Authenticated user '{}' could not be found in any of the current UserProviders. "
+                + "Continuing anyway...", userDetails.getUsername());
           }
         } else {
           logger.debug("No UserDirectory was found when trying to search for user '{}'", userDetails.getUsername());
         }
 
         // Add the roles (authorities) in the security context
-        Set<JaxbRole> roles = new HashSet<JaxbRole>();
+        Set<JaxbRole> roles = new HashSet<>();
         Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
         if (authorities != null) {
           for (GrantedAuthority ga : authorities) {
