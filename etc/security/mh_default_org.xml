@@ -326,7 +326,7 @@
     -->
 
     <!-- Enables "remember me" functionality -->
-    <sec:remember-me key="opencast" user-service-ref="userDetailsService" />
+    <sec:remember-me services-ref="rememberMeServices" />
 
     <!-- Set the request cache -->
     <sec:request-cache ref="requestCache" />
@@ -343,6 +343,15 @@
     -->
 
   </sec:http>
+
+  <bean id="rememberMeServices" class="org.opencastproject.kernel.security.SystemTokenBasedRememberMeService">
+    <property name="userDetailsService" ref="userDetailsService"/>
+    <!-- All following settings are optional -->
+    <property name="tokenValiditySeconds" value="1209600"/>
+    <property name="cookieName" value="oc-remember-me"/>
+    <!-- The following key will be augmented by system properties. Thus, leaving this untouched is okay -->
+    <property name="key" value="opencast"/>
+  </bean>
 
   <!-- ############################# -->
   <!-- # Authentication Filters    # -->
