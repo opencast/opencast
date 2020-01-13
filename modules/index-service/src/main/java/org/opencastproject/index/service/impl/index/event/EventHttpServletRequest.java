@@ -246,44 +246,53 @@ public class EventHttpServletRequest {
                   throws IOException, NotFoundException {
     if (METADATA_JSON_KEY.equals(fieldName)) {
       String metadata = Streams.asString(item.openStream());
-      try {
-        MetadataList metadataList = deserializeMetadataList(metadata, eventCatalogUIAdapters, startDatePattern, startTimePattern);
-        eventHttpServletRequest.setMetadataList(metadataList);
-      } catch (IllegalArgumentException e) {
-        throw e;
-      } catch (ParseException e) {
-        throw new IllegalArgumentException(String.format("Unable to parse event metadata because: '%s'", e.toString()));
-      } catch (NotFoundException e) {
-        throw e;
-      } catch (java.text.ParseException e) {
-        throw new IllegalArgumentException(String.format("Unable to parse event metadata because: '%s'", e.toString()));
+      if (StringUtils.isNotEmpty(metadata)) {
+        try {
+          MetadataList metadataList = deserializeMetadataList(metadata, eventCatalogUIAdapters, startDatePattern,
+                  startTimePattern);
+          eventHttpServletRequest.setMetadataList(metadataList);
+        } catch (IllegalArgumentException e) {
+          throw e;
+        } catch (ParseException e) {
+          throw new IllegalArgumentException(String.format("Unable to parse event metadata because: '%s'", e.toString()));
+        } catch (NotFoundException e) {
+          throw e;
+        } catch (java.text.ParseException e) {
+          throw new IllegalArgumentException(String.format("Unable to parse event metadata because: '%s'", e.toString()));
+        }
       }
     } else if ("acl".equals(item.getFieldName())) {
       String access = Streams.asString(item.openStream());
-      try {
-        AccessControlList acl = deserializeJsonToAcl(access, true);
-        eventHttpServletRequest.setAcl(acl);
-      } catch (Exception e) {
-        logger.warn("Unable to parse acl {}", access);
-        throw new IllegalArgumentException("Unable to parse acl");
+      if (StringUtils.isNotEmpty(access)) {
+        try {
+          AccessControlList acl = deserializeJsonToAcl(access, true);
+          eventHttpServletRequest.setAcl(acl);
+        } catch (Exception e) {
+          logger.warn("Unable to parse acl {}", access);
+          throw new IllegalArgumentException("Unable to parse acl");
+        }
       }
     } else if ("processing".equals(item.getFieldName())) {
       String processing = Streams.asString(item.openStream());
-      JSONParser parser = new JSONParser();
-      try {
-        eventHttpServletRequest.setProcessing((JSONObject) parser.parse(processing));
-      } catch (Exception e) {
-        logger.warn("Unable to parse processing configuration {}", processing);
-        throw new IllegalArgumentException("Unable to parse processing configuration");
+      if (StringUtils.isNotEmpty(processing)) {
+        JSONParser parser = new JSONParser();
+        try {
+          eventHttpServletRequest.setProcessing((JSONObject) parser.parse(processing));
+        } catch (Exception e) {
+          logger.warn("Unable to parse processing configuration {}", processing);
+          throw new IllegalArgumentException("Unable to parse processing configuration");
+        }
       }
     } else if ("scheduling".equals(item.getFieldName())) {
       String scheduling = Streams.asString(item.openStream());
-      JSONParser parser = new JSONParser();
-      try {
-        eventHttpServletRequest.setScheduling((JSONObject) parser.parse(scheduling));
-      } catch (Exception e) {
-        logger.warn("Unable to parse scheduling information {}", scheduling);
-        throw new IllegalArgumentException("Unable to parse scheduling information");
+      if (StringUtils.isNotEmpty(scheduling)) {
+        JSONParser parser = new JSONParser();
+        try {
+          eventHttpServletRequest.setScheduling((JSONObject) parser.parse(scheduling));
+        } catch (Exception e) {
+          logger.warn("Unable to parse scheduling information {}", scheduling);
+          throw new IllegalArgumentException("Unable to parse scheduling information");
+        }
       }
     }
   }
