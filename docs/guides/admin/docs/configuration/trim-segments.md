@@ -11,7 +11,6 @@ and therefore video and audio could be out of sync when it gets processed by ffm
 Setting the Configuration
 -------------------------
 
-
 ####prop.admin.editor.segment.start_length
 
 * Description: How long the trim segment at the beginning of each video should be.
@@ -32,3 +31,9 @@ Setting the Configuration
 * Format: An integer.
 * Default: 0
 * Measurement: Milliseconds.
+
+####prop.admin.editor.previewmode.default=true
+
+* Description: If the preview mode in the video editor is enabled per default.
+* Format: Boolean
+* Default: true
