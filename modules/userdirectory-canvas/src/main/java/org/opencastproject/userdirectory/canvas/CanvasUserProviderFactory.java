@@ -242,7 +242,7 @@ public class CanvasUserProviderFactory implements ManagedServiceFactory {
       try {
         ManagementFactory.getPlatformMBeanServer().unregisterMBean(CanvasUserProviderFactory.getObjectName(pid));
       } catch (Exception e) {
-        logger.warn("Unable to unregister mbean for pid='{}': {}", pid, e.getMessage());
+        logger.warn("Unable to unregister mbean for pid='{}'", pid, e);
         e.printStackTrace();
 
       }

@@ -203,7 +203,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
       try {
         mbs.unregisterMBean(name);
       } catch (InstanceNotFoundException e) {
-        logger.debug(name + " was not registered");
+        logger.debug("{} was not registered", name);
       }
       mbs.registerMBean(mbean, name);
     } catch (Exception e) {
@@ -238,11 +238,11 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
         logger.debug("Returning null user from cache");
         return null;
       } else {
-        logger.debug("Returning user " + userId + " from cache");
+        logger.debug("Returning user {} from cache", userId);
         return (JaxbUser) user;
       }
     } catch (ExecutionError | UncheckedExecutionException e) {
-      logger.warn("Exception while loading user {}: {}", userId, e);
+      logger.warn("Exception while loading user {}", userId, e);
       return null;
     }
   }
@@ -261,7 +261,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
     // Don't answer for admin, anonymous or empty user
     if ("admin".equals(userId) || "".equals(userId) || "anonymous".equals(userId)) {
       cache.put(userId, nullToken);
-      logger.debug("We don't answer for: " + userId);
+      logger.debug("We don't answer for: {}", userId);
       return null;
     }
 
@@ -295,7 +295,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
         return null;
       }
 
-      logger.debug("Canvas roles for user {}: {}", userId, canvasRoles.toString());
+      logger.debug("Canvas roles for user {}: {}", userId, canvasRoles);
 
       Set<JaxbRole> roles = new HashSet<>();
 
@@ -316,7 +316,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
         roles.add(new JaxbRole(Group.ROLE_PREFIX + "CANVAS_INSTRUCTOR", jaxbOrganization, "Canvas Instructors",
             Role.Type.EXTERNAL_GROUP));
 
-      logger.debug("Returning JaxbRoles: " + roles);
+      logger.debug("Returning JaxbRoles: {}", roles);
 
       // JaxbUser(String userId, String password, String name, String email, String provider, boolean canLogin,
       // JaxbOrganization organization, Set<JaxbRole> roles)
@@ -365,7 +365,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
       connection.connect();
       code = connection.getResponseCode();
     } catch (Exception e) {
-      logger.warn("Exception verifying Canvas user {} at {}: {}", userId, urlString, e);
+      logger.warn("Exception verifying Canvas user {} at {}", userId, urlString, e);
       return false;
     }
     // HTTP OK 200 for course exists, return false for everything else (typically 404 not found)
@@ -387,7 +387,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
         return false;
       }
     } catch (PatternSyntaxException e) {
-      logger.warn("Invalid regular expression for course pattern {} - disabling checks, exception: {}", coursePattern
+      logger.warn("Invalid regular expression for course pattern {} - disabling checks", coursePattern
           , e);
       coursePattern = null;
     }
@@ -405,7 +405,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
       connection.connect();
       code = connection.getResponseCode();
     } catch (Exception e) {
-      logger.warn("Exception verifying Canvas course {} at {}: {}", courseId, urlString, e);
+      logger.warn("Exception verifying Canvas course {} at {}", courseId, urlString, e);
       return false;
     }
     // HTTP OK 200 for course exists, return false for everything else (typically 404 not found)
@@ -435,7 +435,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
     try {
       while (StringUtils.isNotBlank(nextPage)) {
         URL url = new URL(nextPage);
-        logger.debug("Requesting courses for user:{}, using API: {}", userId, url.toString());
+        logger.debug("Requesting courses for user:{}, using API: {}", userId, url);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setDoOutput(true);
@@ -445,7 +445,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
         String json = IOUtils.toString(connection.getInputStream(), Charset.defaultCharset());
         logger.debug(json);
 
-        logger.debug("Response code for API: {}, is: {}", url.toString(), connection.getResponseCode());
+        logger.debug("Response code for API: {}, is: {}", url, connection.getResponseCode());
         JsonArray courses = gson.fromJson(json, JsonElement.class).getAsJsonArray();
 
         for (JsonElement courseElement : courses) {
@@ -515,7 +515,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
 
     try {
       URL url = new URL(urlString);
-      logger.debug("Requesting user: {}, using API: {}", userId, url.toString());
+      logger.debug("Requesting user: {}, using API: {}", userId, url);
       HttpURLConnection connection = (HttpURLConnection) url.openConnection();
       connection.setRequestMethod("GET");
       connection.setDoOutput(true);
@@ -536,9 +536,9 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
       return new String[]{canvasEmail, canvasDisplayName};
 
     } catch (FileNotFoundException fnf) {
-      logger.debug("User {} does not exist in Canvas: {}", userId, fnf);
+      logger.debug("User {} does not exist in Canvas", userId, fnf);
     } catch (Exception e) {
-      logger.warn("Exception getting Canvas user information for user {} at {}: {}", userId, urlString, e);
+      logger.warn("Exception getting Canvas user information for user {} at {}", userId, urlString, e);
     }
 
     return null;
@@ -626,7 +626,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
     List<Role> roles = new LinkedList<>();
     // Don't answer for admin, anonymous or empty user
     if ("admin".equals(userId) || "".equals(userId) || "anonymous".equals(userId)) {
-      logger.debug("We don't answer for: " + userId);
+      logger.debug("We don't answer for: {}", userId);
       return roles;
     }
 
@@ -644,7 +644,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     // We search for COURSEID, COURSEID_Learner, COURSEID_Instructor
-    logger.debug("findRoles(query=" + query + " offset=" + offset + " limit=" + limit + ")");
+    logger.debug("findRoles(query={} offset={} limit={})", query, offset, limit);
 
     // Don't return roles for users or groups
     if (target == Role.Target.USER) {
