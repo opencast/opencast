@@ -8,7 +8,7 @@
    "CANCEL": "Cancelar",
    "CONFIRM": "Confirmar",
    "SAVE": "Gardar",
-   "CONTINUE": "Continue",
+   "CONTINUE": "Continuar",
    "CLOSE": "Pechar",
    "LOGOUT": "Pechar sesión",
    "RESET": "Restablecer",
@@ -68,7 +68,7 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Estas series non conteñen eventos. Eliminar as series non eliminará os eventos.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "EVENT_WILL_BE_GONE": "De continuar, o evento eliminarase de xeito permanente."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Estas series non poden ser eliminadas mentres conteñan eventos."
@@ -127,8 +127,8 @@
       "SERIES_NOT_UPDATED_ID": "Non se puido gardar a serie {{ id }}",
       "SERIES_NOT_UPDATED_ALL": "Non se puido gardar ningunha serie",
       "EVENT_DELETED": "Evento borrado.",
-      "EVENT_WILL_BE_DELETED": "The event is being deleted",
-      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENT_WILL_BE_DELETED": "O evento está a ser eliminado",
+      "EVENTS_DELETED": "Os eventos están a ser eliminados.",
       "EVENTS_NOT_DELETED": "No foi posible eliminar o(s) evento(s).",
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Non foi posible eliminar o(s) evento(s) xa que non tes permisos.",
       "SERIES_DELETED": "Serie borrada",
@@ -174,9 +174,9 @@
       "SERVICE_UNAVAILABLE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
       "ACTIVE_TRANSACTION": "Este evento non se pode editar mentres exista un fluxo de traballo ou unha transacción activos.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
-         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
-         "NO_EVENTS_UPDATED": "All updates failed.",
+         "UNEXPECTED_ERROR": "Produciuse un erro non agardado durante a actualización. Algúns eventos foron actualizados.",
+         "ALL_EVENTS_UPDATED": "Todos os eventos actualizáronse con éxito.",
+         "NO_EVENTS_UPDATED": "Fallaron tódalas actualizacións.",
          "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
       }
    },
@@ -249,32 +249,32 @@
       },
       "EDIT_EVENTS_METADATA": {
          "CAPTION": "Edit the metadata of multiple events",
-         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "FATAL_ERROR": "Produciuse un erro grave: {{ fatalError }}",
          "REQUEST_ERRORS": {
-            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
-            "NOTHING_TO_EDIT": "The events cannot be edited.",
-            "NOT_FOUND": "Not found",
+            "CANNOT_EDIT_SOME": "Non é posíbel editar os eventos resaltados.",
+            "NOTHING_TO_EDIT": "No é posíbel editar os eventos.",
+            "NOT_FOUND": "Non atopado",
             "RUNNING_WORKFLOW": "Running workflow",
             "TABLE": {
-               "CAPTION": "Selected events",
-               "ERRORS": "Errors"
+               "CAPTION": "Eventos seleccionados",
+               "ERRORS": "Erros"
             }
          },
          "EDIT": {
             "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
             "TABLE": {
-               "CAPTION": "Metadata of selected events",
+               "CAPTION": "Metadatos dos eventos seleccionados",
                "FIELDS": "Metadatos",
-               "VALUES": "Values"
+               "VALUES": "Valores"
             }
          },
          "UPDATE_FAILURES": {
             "TABLE": {
                "CAPTION": "Update Failures"
             },
-            "UPDATE_FAILED": "Update failed",
-            "NO_EVENTS_UPDATED": "All updates failed.",
-            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+            "UPDATE_FAILED": "Erro ao actualizar",
+            "NO_EVENTS_UPDATED": "Fallaron tódalas actualizacións.",
+            "SOME_EVENTS_NOT_UPDATED": "Os eventos resaltados non se puideron actualizar."
          }
       }
    },
@@ -1037,7 +1037,7 @@
                   "REPLACE_EVENT_ACLS": "Actualizar permisos do evento",
                   "REPLACE_EVENT_ACLS_HINT": "Asegura que todos os eventos desta serie teñen estes permisos en vigor",
                   "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "LOAD_MORE_LINK": "Cargar máis"
                },
                "ROLES": {
                   "LABEL": "Seleccione un rol",
