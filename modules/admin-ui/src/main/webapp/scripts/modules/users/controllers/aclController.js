@@ -24,10 +24,6 @@
 angular.module('adminNg.controllers')
 .controller('AclCtrl', ['$scope', 'AclResource', 'UserRolesResource', 'ResourcesListResource', 'Notifications', 'Modal',
   function ($scope, AclResource, UserRolesResource, ResourcesListResource, Notifications, Modal) {
-    var roleSlice = 100;
-    var roleOffset = 0;
-    var loading = false;
-    var rolePromise = null;
 
     var createPolicy = function (role) {
           return {
@@ -99,39 +95,25 @@ angular.module('adminNg.controllers')
       $scope.save();
     };
 
-    $scope.getMoreRoles = function (value) {
-
-      if (loading)
-        return rolePromise;
-
-      loading = true;
-      var queryParams = {limit: roleSlice, offset: roleOffset};
-
-      if ( angular.isDefined(value) && (value != '')) {
-        //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
-        //The filter format is care of ListProvidersEndpoint, which gets it from EndpointUtil
-        queryParams['filter'] = 'role_name:' + value + ',role_target:ACL';
-        queryParams['offset'] = 0;
-      } else {
-        queryParams['filter'] = 'role_target:ACL';
-      }
-      rolePromise = UserRolesResource.query(queryParams);
-      rolePromise.$promise.then(function (data) {
+    $scope.getMatchingRoles = function (value) {
+      var queryParams = {filter: 'role_name:' + value + ',role_target:ACL'};
+      UserRolesResource.query(queryParams).$promise.then(function (data) {
         angular.forEach(data, function (role) {
           $scope.roles[role.name] = role.value;
         });
-        roleOffset = Object.keys($scope.roles).length;
-      }).catch(
-        angular.noop
-      ).finally(function () {
-        loading = false;
       });
-      return rolePromise;
     };
 
     fetchChildResources = function (id) {
       //NB: roles is updated in both the functions for $scope.acl (MH-11716) and $scope.roles (MH-11715, MH-11717)
       $scope.roles = {};
+      var queryParams = {limit: -1, filter: 'role_target:ACL'};
+      UserRolesResource.query(queryParams).$promise.then(function (data) {
+        angular.forEach(data, function (role) {
+          $scope.roles[role.name] = role.value;
+        });
+      });
+
       $scope.acl = AclResource.get({id: id}, function (data) {
         $scope.metadata.name = data.name;
 
@@ -159,7 +141,6 @@ angular.module('adminNg.controllers')
           }
         });
       });
-      $scope.getMoreRoles();
     };
 
 

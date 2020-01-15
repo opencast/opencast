@@ -28,11 +28,6 @@ angular.module('adminNg.controllers')
   function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource,
     ResourcesListResource, UserRolesResource, Notifications, AuthService, StatisticsReusable, $http) {
 
-    var roleSlice = 100;
-    var roleOffset = 0;
-    var loading = false;
-    var rolePromise = null;
-
     var saveFns = {}, aclNotification,
         me = this,
         NOTIFICATION_CONTEXT = 'series-acl',
@@ -117,34 +112,13 @@ angular.module('adminNg.controllers')
       $scope.accessSave();
     };
 
-    $scope.getMoreRoles = function (value) {
-
-      if (loading)
-        return rolePromise;
-
-      loading = true;
-      var queryParams = {limit: roleSlice, offset: roleOffset};
-
-      if ( angular.isDefined(value) && (value != '')) {
-        //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
-        //The filter format is care of ListProvidersEndpoint, which gets it from EndpointUtil
-        queryParams['filter'] = 'role_name:' + value + ',role_target:ACL';
-        queryParams['offset'] = 0;
-      } else {
-        queryParams['filter'] = 'role_target:ACL';
-      }
-      rolePromise = UserRolesResource.query(queryParams);
-      rolePromise.$promise.then(function (data) {
+    $scope.getMatchingRoles = function (value) {
+      var queryParams = {filter: 'role_name:' + value + ',role_target:ACL'};
+      UserRolesResource.query(queryParams).$promise.then(function (data) {
         angular.forEach(data, function (role) {
           $scope.roles[role.name] = role.value;
         });
-        roleOffset = Object.keys($scope.roles).length;
-      }).catch(
-        angular.noop
-      ).finally(function () {
-        loading = false;
       });
-      return rolePromise;
     };
 
     fetchChildResources = function (id) {
@@ -221,28 +195,6 @@ angular.module('adminNg.controllers')
 
       });
 
-      $scope.roles = {};
-
-      $scope.access = SeriesAccessResource.get({ id: id }, function (data) {
-        if (angular.isDefined(data.series_access)) {
-          var json = angular.fromJson(data.series_access.acl);
-          changePolicies(json.acl.ace, true);
-
-          $scope.aclLocked = data.series_access.locked;
-
-          if ($scope.aclLocked) {
-            aclNotification = Notifications.add('warning', 'SERIES_ACL_LOCKED', 'series-acl-' + id, -1);
-          } else if (aclNotification) {
-            Notifications.remove(aclNotification, 'series-acl');
-          }
-          angular.forEach(data.series_access.privileges, function(value, key) {
-            if (angular.isUndefined($scope.roles[key])) {
-              $scope.roles[key] = key;
-            }
-          });
-        }
-      });
-
       $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
       $scope.actions = {};
       $scope.hasActions = false;
@@ -286,7 +238,36 @@ angular.module('adminNg.controllers')
         });
       });
 
-      $scope.getMoreRoles();
+      $scope.roles = {};
+      var rolesPromise = UserRolesResource.query({limit: -1, filter: 'role_target:ACL'});
+      rolesPromise.$promise.then(function (data) {
+        angular.forEach(data, function (role) {
+          $scope.roles[role.name] = role.name;
+        });
+      });
+
+      $scope.access = SeriesAccessResource.get({ id: id }, function (data) {
+        if (angular.isDefined(data.series_access)) {
+          var json = angular.fromJson(data.series_access.acl);
+          changePolicies(json.acl.ace, true);
+
+          $scope.aclLocked = data.series_access.locked;
+
+          if ($scope.aclLocked) {
+            aclNotification = Notifications.add('warning', 'SERIES_ACL_LOCKED', 'series-acl-' + id, -1);
+          } else if (aclNotification) {
+            Notifications.remove(aclNotification, 'series-acl');
+          }
+
+          rolesPromise.$promise.then(function () {
+            angular.forEach(data.series_access.privileges, function(value, key) {
+              if (angular.isUndefined($scope.roles[key])) {
+                $scope.roles[key] = key;
+              }
+            });
+          });
+        }
+      });
     };
 
     $scope.statReusable = null;
@@ -432,16 +413,6 @@ angular.module('adminNg.controllers')
         Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);
       }
     };
-
-    // Reload tab resource on tab changes
-    $scope.$parent.$watch('tab', function (value) {
-      switch (value) {
-      case 'permissions':
-        $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
-        $scope.getMoreRoles();
-        break;
-      }
-    });
 
     $scope.themeSave = function () {
       var selectedThemeID = $scope.selectedTheme.id;

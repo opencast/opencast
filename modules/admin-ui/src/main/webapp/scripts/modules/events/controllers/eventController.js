@@ -36,11 +36,6 @@ angular.module('adminNg.controllers')
     ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
     EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable) {
 
-    var roleSlice = 100;
-    var roleOffset = 0;
-    var loading = false;
-    var rolePromise = null;
-
     var saveFns = {},
         me = this,
         NOTIFICATION_CONTEXT = 'events-access',
@@ -217,21 +212,6 @@ angular.module('adminNg.controllers')
 
           $scope.checkForActiveTransactionsTimer = $timeout(checkForActiveTransactions, 3000);
         },
-        updateRoles = function() {
-          //MH-11716: We have to wait for both the access (series ACL), and the roles (list of system roles)
-          //to resolve before we can add the roles that are present in the series but not in the system
-          return ResourcesListResource.get({ resource: 'ROLES' }, function (results) {
-            var roles = results;
-            return $scope.access.$promise.then(function () {
-              angular.forEach($scope.access.episode_access.privileges, function(value, key) {
-                if (angular.isUndefined(roles[key])) {
-                  roles[key] = key;
-                }
-              }, this);
-              return roles;
-            }).catch(angular.noop);
-          }, this);
-        },
         cleanupScopeResources = function() {
           $timeout.cancel($scope.checkForActiveTransactionsTimer);
           if ($scope.lastNotificationId) {
@@ -378,7 +358,6 @@ angular.module('adminNg.controllers')
               }
             });
           });
-          $scope.roles = updateRoles();
 
           $scope.assets = EventAssetsResource.get({ id: id });
 
@@ -432,39 +411,34 @@ angular.module('adminNg.controllers')
               changePolicies(json.acl.ace, true);
             }
           });
+
+          //MH-11716: We have to wait for both the access (series ACL), and the roles (list of system roles)
+          //to resolve before we can add the roles that are present in the series but not in the system
+          ResourcesListResource.get({ resource: 'ROLES', limit: -1, filter:'role_target:ACL' },
+            function (results) {
+              $scope.roles = results;
+              return $scope.access.$promise.then(function () {
+                angular.forEach($scope.access.episode_access.privileges, function(value, key) {
+                  if (angular.isUndefined($scope.roles[key])) {
+                    $scope.roles[key] = key;
+                  }
+                }, this);
+              }).catch(angular.noop);
+            }, this);
+
           $scope.comments = CommentResource.query({ resource: 'event', resourceId: id, type: 'comments' });
         },
         tzOffset = (new Date()).getTimezoneOffset() / -60;
 
     $scope.statReusable = null;
 
-    $scope.getMoreRoles = function (value) {
-
-      if (loading)
-        return rolePromise;
-
-      loading = true;
-      var queryParams = {limit: roleSlice, offset: roleOffset};
-
-      if ( angular.isDefined(value) && (value != '')) {
-        //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
-        //The filter format is care of ListProvidersEndpoint, which gets it from EndpointUtil
-        queryParams['filter'] = 'role_name:' + value + ',role_target:ACL';
-        queryParams['offset'] = 0;
-      } else {
-        queryParams['filter'] = 'role_target:ACL';
-      }
-      rolePromise = UserRolesResource.query(queryParams);
-      rolePromise.$promise.then(function (data) {
+    $scope.getMatchingRoles = function (value) {
+      var queryParams = {filter: 'role_name:' + value + ',role_target:ACL'};
+      UserRolesResource.query(queryParams).$promise.then(function (data) {
         angular.forEach(data, function (role) {
           $scope.roles[role.name] = role.value;
         });
-        roleOffset = Object.keys($scope.roles).length;
-      }).catch(angular.noop
-      ).finally(function () {
-        loading = false;
       });
-      return rolePromise;
     };
 
     /**

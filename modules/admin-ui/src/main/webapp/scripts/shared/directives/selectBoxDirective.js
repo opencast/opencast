@@ -106,10 +106,6 @@ angular.module('adminNg.directives')
         this.markedForRemoval.splice(0);
       };
 
-      $scope.loadMore = function() {
-        $scope.loader();
-      };
-
       $scope.getHeight = function() {
         return {height: $scope.resource.searchable ? 'calc(' + $scope.height + ' + 3em)' : $scope.height};
       };

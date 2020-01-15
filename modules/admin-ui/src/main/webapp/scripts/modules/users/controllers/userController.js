@@ -26,14 +26,9 @@ angular.module('adminNg.controllers')
   function ($scope, Table, UserRolesResource, UserResource, UsersResource, JsHelper, Notifications, Modal,
     AuthService, _) {
     $scope.manageable = true;
-    $scope.roleSlice = 100;
-    // Note that the initial offset is the same size as the initial slice so that the *next* slice starts at the right
-    // place
-    $scope.roleOffset = $scope.roleSlice;
-    var loading = false;
+
     // Should the External Roles tab be visible
     var showExternalRoles = false;
-
     var EXTERNAL_ROLE_DISPLAY = 'adminui.user.external_role_display';
 
     AuthService.getUser().$promise.then(function(user) {
@@ -55,25 +50,6 @@ angular.module('adminNg.controllers')
 
     $scope.searchFieldExternal = '';
     $scope.searchFieldEffective = '';
-
-    $scope.getMoreRoles = function() {
-      if (loading)
-        return;
-
-      loading = true;
-      UserRolesResource.query({
-        limit: $scope.roleSlice,
-        offset: $scope.roleOffset,
-        filter: 'role_target:USER'
-      }).$promise.then(function (data) {
-        $scope.role.available = $scope.role.available.concat(data);
-        $scope.roleOffset = $scope.roleOffset + $scope.roleSlice;
-      }, this).catch(
-        angular.noop
-      ).finally(function () {
-        loading = false;
-      });
-    };
 
     $scope.groupSort = function(role) {
 
@@ -118,9 +94,8 @@ angular.module('adminNg.controllers')
     if ($scope.action === 'edit') {
       fetchChildResources($scope.resourceId);
     } else if ($scope.action === 'add') {
-      $scope.role.available = UserRolesResource.query({limit: $scope.roleSlice, offset: 0, filter: 'role_target:USER'});
+      $scope.role.available = UserRolesResource.query({limit: -1, filter: 'role_target:USER'});
     }
-
 
     $scope.submit = function () {
       $scope.user.roles = [];
@@ -154,7 +129,7 @@ angular.module('adminNg.controllers')
        * @param id the id of the user
        */
     function fetchChildResources(id) {
-      $scope.role.available = UserRolesResource.query({limit: $scope.roleSlice, offset: 0, filter: 'role_target:USER'});
+      $scope.role.available = UserRolesResource.query({limit: -1, filter: 'role_target:USER'});
       $scope.user = UserResource.get({ username: id });
       $scope.user.$promise.then(function () {
         $scope.manageable = $scope.user.manageable;
