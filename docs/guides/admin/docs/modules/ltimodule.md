@@ -45,7 +45,7 @@ Opencast's LTI module allows additional configuration like making a OAuth consum
 Opencast from generating a temporary username, or to block some specific usernames like the system administrator.
 
 For more details, take a look at the options in
-`etc/org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler.cfg`.
+`etc/org.opencastproject.security.lti.LtiLaunchAuthenticationHandler.cfg`.
 
 
 Configure and test an LTI tool in the LMS

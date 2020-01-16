@@ -294,7 +294,6 @@
               OSGI-INF/pingback.xml,
               OSGI-INF/rest.xml,
               OSGI-INF/security-filter.xml,
-              OSGI-INF/security-lti.xml,
               OSGI-INF/security-oauth.xml,
               OSGI-INF/security-service.xml,
               OSGI-INF/smtp-service.xml,
