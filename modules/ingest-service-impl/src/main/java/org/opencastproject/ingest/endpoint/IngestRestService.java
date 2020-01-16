@@ -837,11 +837,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           return Response.serverError().status(Status.BAD_REQUEST).build();
         }
 
-        WorkflowInstance workflow = (wdID == null) ? ingestService.ingest(mp) : ingestService.ingest(mp, wdID,
-                workflowProperties);
+        WorkflowInstance workflow = (wdID == null)
+            ? ingestService.ingest(mp)
+            : ingestService.ingest(mp, wdID, workflowProperties);
         return Response.ok(workflow).build();
       }
       return Response.serverError().status(Status.BAD_REQUEST).build();
+    } catch (IllegalArgumentException e) {
+      return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
     } catch (Exception e) {
       logger.warn("Unable to add mediapackage", e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
