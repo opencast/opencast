@@ -141,6 +141,8 @@
                   <concat destfile="target/assembly/etc/shell.init.script" append="true">
                     <filelist dir="resources" files="shell.init.script.append"/>
                   </concat>
+                  <!-- Quick-fix for invalid Maven repository. Can be removed after upgrading to Karaf >4.2.8 -->
+                  <replace file="target/assembly/etc/org.ops4j.pax.url.mvn.cfg" token="http:" value="https:"/>
                   <!-- Adding extra OSGi system packages to configuration -->
                   <replace file="target/assembly/etc/config.properties" token="org.osgi.framework.system.packages= \" value="org.osgi.framework.system.packages= com.sun.image.codec.jpeg, com.sun.jndi.ldap, \"/>
                   <!-- Disabled write permissions on karaf configuration by deactivating config saves -->
