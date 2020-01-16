@@ -6,10 +6,10 @@
     "jquery-ui": "1.12.1",
     "jqueryui-timepicker-addon": "1.6.3",
     "angular": "1.7.9",
-    "angular-route": "1.7.8",
-    "angular-resource": "1.7.8",
-    "angular-animate": "1.7.8",
-    "angular-messages": "1.7.8",
+    "angular-route": "1.7.9",
+    "angular-resource": "1.7.9",
+    "angular-animate": "1.7.9",
+    "angular-messages": "1.7.9",
     "angular-translate": "2.18.1",
     "angular-translate-loader-static-files": "2.18.1",
     "angular-local-storage": "0.7.1",
@@ -20,7 +20,7 @@
     "angular-chart.js": "^1.1.1"
   },
   "devDependencies": {
-    "angular-mocks": "1.7.8"
+    "angular-mocks": "1.7.9"
   },
   "overrides": {
     "angular-wizard": {
@@ -28,8 +28,5 @@
     }
   },
   "appPath": "src/main/webapp",
-  "moduleName": "adminNg",
-  "resolutions": {
-    "angular": "1.7.9"
-  }
+  "moduleName": "adminNg"
 }
