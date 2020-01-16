@@ -25,8 +25,7 @@ package org.opencastproject.composer.impl;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.VideoClip;
-import org.opencastproject.mediapackage.identifier.IdBuilder;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Tuple;
@@ -610,7 +609,6 @@ public class EncoderEngine implements AutoCloseable {
       pf = profiles;
       if (vInputPad == null && aInputPad == null)
         throw new EncoderException("At least one of video or audio input must be specified");
-      IdBuilder idbuilder = IdBuilderFactory.newInstance().newIdBuilder();
       int size = profiles.size();
       // Init
       vfilter = new ArrayList<>(java.util.Collections.nCopies(size, null));
@@ -629,7 +627,7 @@ public class EncoderEngine implements AutoCloseable {
         String cmd = "";
         String outSuffix;
         // generate random name as we only have one base name
-        String outFileName = params.get("out.name.base") + "_" + idbuilder.createNew().toString();
+        String outFileName = params.get("out.name.base") + "_" + IdImpl.fromUUID().toString();
         params.put("out.name", outFileName); // Output file name for this profile
         try {
           outSuffix = processParameters(profile.getSuffix(), params);

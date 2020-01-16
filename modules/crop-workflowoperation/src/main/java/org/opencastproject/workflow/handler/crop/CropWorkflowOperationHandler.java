@@ -29,8 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.identifier.IdBuilder;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -66,9 +65,6 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
   /** Name of the configuration key that specifies the flavor of the track to analyze */
   private static final String PROP_TARGET_TAGS = "target-tags";
 
-  /** Id builder used to create ids for cropped tracks */
-  private final IdBuilder idBuilder = IdBuilderFactory.newInstance().newIdBuilder();
-
   /** The composer service */
   private CropService cropService = null;
 
@@ -87,7 +83,7 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
-    logger.info("Start cropping workflow operation for mediapackage {}", mediaPackage.getIdentifier().compact());
+    logger.info("Start cropping workflow operation for mediapackage {}", mediaPackage.getIdentifier().toString());
 
     List<String> targetTags = asList(operation.getConfiguration(PROP_TARGET_TAGS));
 
@@ -147,7 +143,7 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
       }
 
       // update identifier
-      croppedTrack.setIdentifier(idBuilder.createNew().toString());
+      croppedTrack.setIdentifier(IdImpl.fromUUID().toString());
 
       // move into space for media package in ws/wfr
       try {

@@ -159,7 +159,7 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
 
     cut.handleEvent(createSnapshot(updatedMp));
 
-    assertEquals(updatedMp.getIdentifier().compact(), mpCapture.getValue().getIdentifier().compact());
+    assertEquals(updatedMp.getIdentifier().toString(), mpCapture.getValue().getIdentifier().toString());
     assertEquals(OAIPMH_REPOSITORY, repositoryCapture.getValue());
     Assert.assertNotNull(flavorsCapture.getValue());
     Assert.assertTrue(flavorsCapture.getValue().contains("dublincore/*"));
@@ -168,7 +168,7 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
     Assert.assertTrue(orgIdCapture.hasCaptured());
     Assert.assertEquals(new DefaultOrganization().getId(), orgIdCapture.getValue());
     Assert.assertTrue(mpIdCapture.hasCaptured());
-    Assert.assertEquals(updatedMp.getIdentifier().compact(), mpIdCapture.getValue());
+    Assert.assertEquals(updatedMp.getIdentifier().toString(), mpIdCapture.getValue());
     Assert.assertTrue(snapshotVersionCapture.hasCaptured());
     Assert.assertEquals("3", snapshotVersionCapture.getValue());
   }

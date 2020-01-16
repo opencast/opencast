@@ -290,7 +290,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
   public MediaPackageElement distributeElement(String channelId, MediaPackage mediapackage, MediaPackageElement element,
           boolean checkAvailability, boolean preserveReference) throws DistributionException {
 
-    final String mediapackageId = mediapackage.getIdentifier().compact();
+    final String mediapackageId = mediapackage.getIdentifier().toString();
     final String elementId = element.getIdentifier();
 
     try {
@@ -483,7 +483,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     notNull(element, "element");
     notNull(channelId, "channelId");
 
-    String mediapackageId = mediapackage.getIdentifier().compact();
+    String mediapackageId = mediapackage.getIdentifier().toString();
     String elementId = element.getIdentifier();
 
     try {
@@ -664,7 +664,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
         return new File(path(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3], splitUrl[4]));
       }
     }
-    return new File(path(directoryName, orgId, channelId, mp.getIdentifier().compact(), element.getIdentifier(),
+    return new File(path(directoryName, orgId, channelId, mp.getIdentifier().toString(), element.getIdentifier(),
             FilenameUtils.getName(uriString)));
   }
 
@@ -675,7 +675,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    */
   protected File getMediaPackageDirectory(String channelId, MediaPackage mp) {
     final String orgId = securityService.getOrganization().getId();
-    return new File(distributionDirectory, path(orgId, channelId, mp.getIdentifier().compact()));
+    return new File(distributionDirectory, path(orgId, channelId, mp.getIdentifier().toString()));
   }
 
   /**

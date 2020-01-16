@@ -517,7 +517,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     if (instance.getState().isTerminated()) {
       AQueryBuilder query = assetManager.createQuery();
       AResult result = query.select(query.snapshot())
-              .where(query.mediaPackageId(mp.getIdentifier().compact()).and(query.version().isLatest())).run();
+              .where(query.mediaPackageId(mp.getIdentifier().toString()).and(query.version().isLatest())).run();
       if (result.getRecords().head().isSome()) {
         aclMp = result.getRecords().head().get().getSnapshot().get().getMediaPackage();
       }

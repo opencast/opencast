@@ -56,7 +56,7 @@ public final class RetractionListener implements WorkflowListener {
     }
     final Retraction retraction = retractions.get(workflow.getId());
     SecurityUtil.runAs(securityService, retraction.getOrganization(), retraction.getUser(), () -> {
-      final String mpId = workflow.getMediaPackage().getIdentifier().compact();
+      final String mpId = workflow.getMediaPackage().getIdentifier().toString();
       try {
         final boolean result = indexService.removeEvent(mpId);
         if (!result) {

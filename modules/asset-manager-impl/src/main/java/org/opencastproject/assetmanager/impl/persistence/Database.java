@@ -229,7 +229,7 @@ public class Database implements EntityPaths {
   }
 
   public void setStorageLocation(Snapshot snapshot, final String storageId) {
-    setStorageLocation(VersionImpl.mk(snapshot.getVersion()), snapshot.getMediaPackage().getIdentifier().compact(), storageId);
+    setStorageLocation(VersionImpl.mk(snapshot.getVersion()), snapshot.getMediaPackage().getIdentifier().toString(), storageId);
   }
 
   public void setStorageLocation(final VersionImpl version, final String mpId, final String storageId) {

@@ -550,7 +550,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage sourceMediaPackage,
           Long parentWorkflowId, Map<String, String> originalProperties) throws WorkflowDatabaseException,
           NotFoundException {
-    final String mediaPackageId = sourceMediaPackage.getIdentifier().compact();
+    final String mediaPackageId = sourceMediaPackage.getIdentifier().toString();
     Map<String, String> properties = null;
 
     if (originalProperties != null) {
@@ -576,7 +576,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           throw new IllegalArgumentException("Parent workflow " + parentWorkflowId + " not visible to this user");
         }
       } else {
-        WorkflowQuery wfq = new WorkflowQuery().withMediaPackage(sourceMediaPackage.getIdentifier().compact());
+        WorkflowQuery wfq = new WorkflowQuery().withMediaPackage(sourceMediaPackage.getIdentifier().toString());
         WorkflowSet mpWorkflowInstances = getWorkflowInstances(wfq);
         if (mpWorkflowInstances.size() > 0) {
           for (WorkflowInstance wfInstance : mpWorkflowInstances.getItems()) {
@@ -584,7 +584,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               throw new IllegalStateException(String.format(
                       "Can't start workflow '%s' for media package '%s' because another workflow is currently active.",
                       workflowDefinition.getTitle(),
-                      sourceMediaPackage.getIdentifier().compact()));
+                      sourceMediaPackage.getIdentifier().toString()));
           }
         }
       }
@@ -953,7 +953,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     for (MediaPackageElement elem : workflowInstance.getMediaPackage().getElements()) {
       if (null == elem.getURI()) {
         logger.warn("Mediapackage element {} from the media package {} does not have an URI set",
-                elem.getIdentifier(), workflowInstance.getMediaPackage().getIdentifier().compact());
+                elem.getIdentifier(), workflowInstance.getMediaPackage().getIdentifier().toString());
         continue;
       }
       try {

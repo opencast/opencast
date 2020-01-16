@@ -94,7 +94,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
           throws WorkflowOperationException {
 
     MediaPackage mp = workflowInstance.getMediaPackage();
-    logger.debug("Start silence detection workflow operation for mediapackage {}", mp.getIdentifier().compact());
+    logger.debug("Start silence detection workflow operation for mediapackage {}", mp.getIdentifier().toString());
 
     String sourceFlavors = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(
             SOURCE_FLAVORS_PROPERTY));
@@ -173,7 +173,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
         InputStream is = null;
         try {
           is = IOUtils.toInputStream(smil.toXML(), "UTF-8");
-          URI smilURI = workspace.put(mp.getIdentifier().compact(), smil.getId(), TARGET_FILE_NAME, is);
+          URI smilURI = workspace.put(mp.getIdentifier().toString(), smil.getId(), TARGET_FILE_NAME, is);
           MediaPackageElementFlavor smilFlavor = smilTargetFlavor;
           if (smilFlavor == null)
             smilFlavor = new MediaPackageElementFlavor(sourceTrack.getFlavor().getType(), smilFlavorSubType);
@@ -197,7 +197,7 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
                 "Failed to get smil from silence detection job for track %s", sourceTrack.getIdentifier()));
       }
     }
-    logger.debug("Finished silence detection workflow operation for mediapackage {}", mp.getIdentifier().compact());
+    logger.debug("Finished silence detection workflow operation for mediapackage {}", mp.getIdentifier().toString());
     return createResult(mp, Action.CONTINUE);
   }
 

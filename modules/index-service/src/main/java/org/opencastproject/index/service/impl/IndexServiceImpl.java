@@ -1006,7 +1006,7 @@ public class IndexServiceImpl implements IndexService {
         configuration.put("workflowDefinitionId", workflowTemplate);
         WorkflowInstance ingest = ingestService.ingest(eventHttpServletRequest.getMediaPackage().get(),
                 workflowTemplate, configuration);
-        return eventHttpServletRequest.getMediaPackage().get().getIdentifier().compact();
+        return eventHttpServletRequest.getMediaPackage().get().getIdentifier().toString();
       case SCHEDULE_SINGLE:
         mediaPackage = updateDublincCoreCatalog(eventHttpServletRequest.getMediaPackage().get(), dc);
         eventHttpServletRequest.setMediaPackage(mediaPackage);
@@ -1022,7 +1022,7 @@ public class IndexServiceImpl implements IndexService {
             }
           }
         }
-        return mediaPackage.getIdentifier().compact();
+        return mediaPackage.getIdentifier().toString();
       case SCHEDULE_MULTIPLE:
         final Map<String, Period> scheduled = schedulerService.addMultipleEvents(rRule, start.toDate(), end.toDate(), duration, tz, captureAgentId,
                 presenterUsernames, eventHttpServletRequest.getMediaPackage().get(), configuration, (Map) caProperties, Opt.none());
@@ -1806,7 +1806,7 @@ public class IndexServiceImpl implements IndexService {
             mp.setSeriesTitle(seriesDC.getFirst(DublinCore.PROPERTY_TITLE));
             try (InputStream in = IOUtils.toInputStream(seriesDC.toXmlString(), "UTF-8")) {
               String elementId = UUID.randomUUID().toString();
-              URI catalogUrl = workspace.put(mp.getIdentifier().compact(), elementId, "dublincore.xml", in);
+              URI catalogUrl = workspace.put(mp.getIdentifier().toString(), elementId, "dublincore.xml", in);
               MediaPackageElement mpe = mp.add(catalogUrl, MediaPackageElement.Type.Catalog, MediaPackageElements.SERIES);
               mpe.setIdentifier(elementId);
               mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, workspace.read(catalogUrl)));
@@ -1855,7 +1855,7 @@ public class IndexServiceImpl implements IndexService {
             for (String seriesElementType : seriesElements.keySet()) {
               try (InputStream in = new ByteArrayInputStream(seriesElements.get(seriesElementType))) {
                 String elementId = UUID.randomUUID().toString();
-                URI catalogUrl = workspace.put(mp.getIdentifier().compact(), elementId, "dublincore.xml", in);
+                URI catalogUrl = workspace.put(mp.getIdentifier().toString(), elementId, "dublincore.xml", in);
                 MediaPackageElement mpe = mp.add(catalogUrl, MediaPackageElement.Type.Catalog,
                         MediaPackageElementFlavor.flavor(seriesElementType, "series"));
                 mpe.setIdentifier(elementId);

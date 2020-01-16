@@ -142,7 +142,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
   public URI populateUrlWithVariables(String urlPattern, MediaPackage mp, String pubUUID)
           throws WorkflowOperationException {
     Map<String, Object> values = new HashMap<>();
-    values.put(EVENT_ID_TEMPLATE_KEY, mp.getIdentifier().compact());
+    values.put(EVENT_ID_TEMPLATE_KEY, mp.getIdentifier().toString());
     values.put(PUBLICATION_ID_TEMPLATE_KEY, pubUUID);
     String playerPath = securityService.getOrganization().getProperties().get(PLAYER_PROPERTY);
     values.put(PLAYER_PATH_TEMPLATE_KEY, playerPath);

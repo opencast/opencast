@@ -426,7 +426,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     if (endDateTime.before(startDateTime))
       throw new IllegalArgumentException("The end date is before the start date");
 
-    final String mediaPackageId = mediaPackage.getIdentifier().compact();
+    final String mediaPackageId = mediaPackage.getIdentifier().toString();
 
     try {
       AQueryBuilder query = assetManager.createQuery();
@@ -519,7 +519,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         while (ids.size() <= periods.size()) {
           Id id = new IdImpl(UUID.randomUUID().toString());
           ids.add(id);
-          Predicate np = qb.mediaPackageId(id.compact());
+          Predicate np = qb.mediaPackageId(id.toString());
           //Haha, p = np jokes with the AM query language. Ha. Haha. Ha.  (Sob...)
           if (null == p) {
             p = np;
@@ -583,7 +583,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         }
         mediaPackage.setTitle(newTitle);
 
-        String mediaPackageId = mediaPackage.getIdentifier().compact();
+        String mediaPackageId = mediaPackage.getIdentifier().toString();
         //Converting from iCal4j DateTime objects to plain Date objects to prevent AMQ issues below
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         cal.setTime(event.getStart());
@@ -708,7 +708,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                 startDateTime.getOr(start), endDateTime.getOr(end))).filter(new Fn<MediaPackage, Boolean>() {
                     @Override
                     public Boolean apply(MediaPackage mp) {
-                    return !mpId.equals(mp.getIdentifier().compact());
+                    return !mpId.equals(mp.getIdentifier().toString());
                   }
                   }).toList();
         if (conflictingEvents.size() > 0) {
@@ -830,7 +830,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       return Opt.none();
 
     Opt<Asset> asset = assetManager.getAsset(snapshot.getVersion(),
-            snapshot.getMediaPackage().getIdentifier().compact(), acl.get().getIdentifier());
+            snapshot.getMediaPackage().getIdentifier().toString(), acl.get().getIdentifier());
     if (asset.isNone())
       return Opt.none();
 
@@ -856,7 +856,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       return Opt.none();
 
     Opt<Asset> asset = assetManager.getAsset(snapshot.getVersion(),
-            snapshot.getMediaPackage().getIdentifier().compact(), dcCatalog.get().getIdentifier());
+            snapshot.getMediaPackage().getIdentifier().toString(), dcCatalog.get().getIdentifier());
     if (asset.isNone())
       return Opt.none();
 

@@ -197,14 +197,14 @@ public class OaiPmhPublicationServiceRemoteImpl extends RemoteBase implements Oa
       Job receipt = null;
       if (response != null) {
         logger.info("Retracting {} from OAI-PMH channel {} using a remote publication service",
-                mediaPackage.getIdentifier().compact(), repository);
+                mediaPackage.getIdentifier().toString(), repository);
         try {
           receipt = JobParser.parseJob(response.getEntity().getContent());
           return receipt;
         } catch (Exception e) {
           throw new PublicationException(format(
                   "Unable to retract media package %s from OAI-PMH channel %s using a remote publication service",
-                  mediaPackage.getIdentifier().compact(), repository), e);
+                  mediaPackage.getIdentifier().toString(), repository), e);
         }
       }
     } finally {
@@ -212,7 +212,7 @@ public class OaiPmhPublicationServiceRemoteImpl extends RemoteBase implements Oa
     }
     throw new PublicationException(format(
                     "Unable to retract media package %s from OAI-PMH channel %s using a remote publication service",
-                    mediaPackage.getIdentifier().compact(), repository));
+                    mediaPackage.getIdentifier().toString(), repository));
   }
 
   @Override
@@ -232,18 +232,18 @@ public class OaiPmhPublicationServiceRemoteImpl extends RemoteBase implements Oa
       response = getResponse(post);
       if (response != null) {
         logger.info("Update media package {} metadata in OAI-PMH channel {} using a remote publication service",
-                mediaPackage.getIdentifier().compact(), repository);
+                mediaPackage.getIdentifier().toString(), repository);
         return JobParser.parseJob(response.getEntity().getContent());
       }
     } catch (Exception e) {
       throw new PublicationException(format(
               "Unable to update media package %s metadata in OAI-PMH repository %s using a remote publication service.",
-              mediaPackage.getIdentifier().compact(), repository), e);
+              mediaPackage.getIdentifier().toString(), repository), e);
     } finally {
       closeConnection(response);
     }
     throw new PublicationException(format(
               "Unable to update media package %s metadata in OAI-PMH repository %s using a remote publication service.",
-              mediaPackage.getIdentifier().compact(), repository));
+              mediaPackage.getIdentifier().toString(), repository));
   }
 }

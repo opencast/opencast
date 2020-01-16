@@ -50,8 +50,7 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
-import org.opencastproject.mediapackage.identifier.IdBuilder;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -228,9 +227,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /** The organization directory service */
   private OrganizationDirectoryService organizationDirectoryService = null;
 
-  /** Id builder used to create ids for encoded tracks */
-  private final IdBuilder idBuilder = IdBuilderFactory.newInstance().newIdBuilder();
-
   /** The security service */
   private SecurityService securityService = null;
 
@@ -362,7 +358,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   private Option<Track> encode(final Job job, Map<String, Track> tracks, String profileId)
           throws EncoderException, MediaPackageException {
 
-    final String targetTrackId = idBuilder.createNew().toString();
+    final String targetTrackId = IdImpl.fromUUID().toString();
 
     Map<String, File> files = new HashMap<>();
     // Get the tracks and make sure they exist
@@ -472,7 +468,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     for (File encodingOutput: outputFiles) {
       // Put the file in the workspace
       URI returnURL;
-      final String targetTrackId = idBuilder.createNew().toString();
+      final String targetTrackId = IdImpl.fromUUID().toString();
 
       try (InputStream in = new FileInputStream(encodingOutput)) {
         returnURL = workspace.putInCollection(COLLECTION,
@@ -562,7 +558,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    */
   private Option<Track> trim(Job job, Track sourceTrack, String profileId, long start, long duration)
           throws EncoderException {
-    String targetTrackId = idBuilder.createNew().toString();
+    String targetTrackId = IdImpl.fromUUID().toString();
 
     // Get the track and make sure it exists
     final File trackFile = loadTrackIntoWorkspace(job, "source", sourceTrack, false);
@@ -685,7 +681,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // Create the engine
     final EncoderEngine encoderEngine = getEncoderEngine();
 
-    final String targetTrackId = idBuilder.createNew().toString();
+    final String targetTrackId = IdImpl.fromUUID().toString();
     Option<File> upperVideoFile = Option.none();
     try {
       // Get the tracks and make sure they exist
@@ -855,7 +851,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       throw new EncoderException("The output dimension id parameter must not be null when concatenating video");
     }
 
-    final String targetTrackId = idBuilder.createNew().toString();
+    final String targetTrackId = IdImpl.fromUUID().toString();
     // Get the tracks and make sure they exist
     List<File> trackFiles = new ArrayList<>();
     int i = 0;
@@ -959,7 +955,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // Get the encoding profile
     final EncodingProfile profile = getProfile(job, profileId);
 
-    final String targetTrackId = idBuilder.createNew().toString();
+    final String targetTrackId = IdImpl.fromUUID().toString();
     // Get the attachment and make sure it exist
     File imageFile;
     try {
@@ -1314,7 +1310,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
         MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         Attachment convertedImage = (Attachment) builder.elementFromURI(workspaceURI, Attachment.TYPE, null);
-        convertedImage.setIdentifier(idBuilder.createNew().toString());
+        convertedImage.setIdentifier(IdImpl.fromUUID().toString());
         try {
           convertedImage.setMimeType(MimeTypes.fromURI(convertedImage.getURI()));
         } catch (UnknownFileTypeException e) {
@@ -2006,7 +2002,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
       List<URI> workspaceURIs = putToCollection(job, outputs, "demuxed file");
       List<Track> tracks = inspect(job, workspaceURIs);
-      tracks.forEach(track -> track.setIdentifier(idBuilder.createNew().toString()));
+      tracks.forEach(track -> track.setIdentifier(IdImpl.fromUUID().toString()));
       return tracks;
     } catch (Exception e) {
       logger.warn("Demux/MultiOutputEncode operation failed to encode " + videoTrack, e);
@@ -2279,7 +2275,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       logger.info("ProcessSmil/MultiTrimConcat returns {} media files {}", outputs.size(), outputs);
       List<URI> workspaceURIs = putToCollection(job, outputs, "processSmil files");
       List<Track> tracks = inspect(job, workspaceURIs);
-      tracks.forEach(track -> track.setIdentifier(idBuilder.createNew().toString()));
+      tracks.forEach(track -> track.setIdentifier(IdImpl.fromUUID().toString()));
       return tracks;
     } catch (Exception e) { // clean up all the stored files
       throw new EncoderException("ProcessSmil operation failed to run ", e);
@@ -2352,7 +2348,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       logger.info("MultiEncode returns {} media files {} ", outputs.size(), outputs);
       List<URI> workspaceURIs = putToCollection(job, outputs, "multiencode files");
       List<Track> tracks = inspect(job, workspaceURIs);
-      tracks.forEach(eachtrack -> eachtrack.setIdentifier(idBuilder.createNew().toString()));
+      tracks.forEach(eachtrack -> eachtrack.setIdentifier(IdImpl.fromUUID().toString()));
       return tracks;
     } catch (Exception e) {
       throw new EncoderException("MultiEncode operation failed to run ", e);

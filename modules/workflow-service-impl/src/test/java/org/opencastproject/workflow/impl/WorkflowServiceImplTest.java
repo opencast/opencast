@@ -46,7 +46,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
@@ -890,7 +890,7 @@ public class WorkflowServiceImplTest {
 
     for (int i = 0; i < count; i++) {
       MediaPackage mp = i % 2 == 0 ? mediapackage1 : mediapackage2;
-      mp.setIdentifier(new UUIDIdBuilderImpl().createNew());
+      mp.setIdentifier(IdImpl.fromUUID());
       instances.add(service.start(workingDefinition, mp, Collections.emptyMap()));
     }
 

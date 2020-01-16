@@ -303,7 +303,7 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
                 mp.getIdentifier()), e);
       }
     }
-    return new TakeSnapshot(mp.getIdentifier().compact(), MediaPackageParser.getAsXml(mp), dcXml,
+    return new TakeSnapshot(mp.getIdentifier().toString(), MediaPackageParser.getAsXml(mp), dcXml,
             AccessControlParser.toJsonSilent(acl), version, date);
   }
 

@@ -443,7 +443,7 @@ public class LiveScheduleServiceImplTest {
     Assert.assertNotNull(s);
     MediaPackage mp1 = s.getMediaPackage();
     Assert.assertNotNull(mp1);
-    Assert.assertEquals(MP_ID, mp1.getIdentifier().compact());
+    Assert.assertEquals(MP_ID, mp1.getIdentifier().toString());
     Assert.assertEquals("Live Test", mp1.getTitle());
     Assert.assertEquals("2017-10-12T18:10:59Z", DateTimeSupport.toUTC(mp1.getDate().getTime()));
     Assert.assertEquals("20170119999", mp1.getSeries());
@@ -459,7 +459,7 @@ public class LiveScheduleServiceImplTest {
 
     MediaPackage mp = service.getMediaPackageFromSearch(MP_ID);
     Assert.assertNotNull(mp);
-    Assert.assertEquals(MP_ID, mp.getIdentifier().compact());
+    Assert.assertEquals(MP_ID, mp.getIdentifier().toString());
   }
 
   @Test
@@ -577,7 +577,7 @@ public class LiveScheduleServiceImplTest {
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     mp.setIdentifier(new IdImpl(MP_ID));
     service.publish(mp);
-    Assert.assertEquals(MP_ID, capturedMp.getValue().getIdentifier().compact());
+    Assert.assertEquals(MP_ID, capturedMp.getValue().getIdentifier().toString());
   }
 
   @Test
@@ -712,14 +712,14 @@ public class LiveScheduleServiceImplTest {
 
     // Check published live media package
     MediaPackage searchMp = capturedMp.getValue();
-    Assert.assertEquals(MP_ID, searchMp.getIdentifier().compact());
+    Assert.assertEquals(MP_ID, searchMp.getIdentifier().toString());
     Assert.assertEquals(DURATION, searchMp.getDuration().longValue());
     Assert.assertEquals(2, searchMp.getCatalogs().length);
     assertExpectedLiveTracks(searchMp.getTracks(), DURATION, CAPTURE_AGENT_NAME, "_suffix", false);
 
     // Check archived media package
     MediaPackage archivedMp = capturedSnapshotMp.getValue();
-    Assert.assertEquals(MP_ID, archivedMp.getIdentifier().compact());
+    Assert.assertEquals(MP_ID, archivedMp.getIdentifier().toString());
     Assert.assertEquals(1, archivedMp.getPublications().length);
     Assert.assertEquals(LiveScheduleService.CHANNEL_ID, archivedMp.getPublications()[0].getChannel());
     Assert.assertEquals(v, service.getSnapshotVersionCache().getIfPresent(MP_ID)); // Check that version got into local cache
@@ -828,7 +828,7 @@ public class LiveScheduleServiceImplTest {
 
     // Check published live media package
     MediaPackage searchMp = capturedMp.getValue();
-    Assert.assertEquals(MP_ID, searchMp.getIdentifier().compact());
+    Assert.assertEquals(MP_ID, searchMp.getIdentifier().toString());
     Assert.assertEquals(120000L, searchMp.getDuration().longValue());
     Assert.assertEquals(2, searchMp.getCatalogs().length);
     assertExpectedLiveTracks(searchMp.getTracks(), 120000L, "another_ca", "_suffix", false);
@@ -868,7 +868,7 @@ public class LiveScheduleServiceImplTest {
 
     // Check archived media package
     MediaPackage archivedMp = capturedSnapshotMp.getValue();
-    Assert.assertEquals(MP_ID, archivedMp.getIdentifier().compact());
+    Assert.assertEquals(MP_ID, archivedMp.getIdentifier().toString());
     Assert.assertEquals(0, archivedMp.getPublications().length);
 
     EasyMock.verify(searchService, downloadDistributionService);

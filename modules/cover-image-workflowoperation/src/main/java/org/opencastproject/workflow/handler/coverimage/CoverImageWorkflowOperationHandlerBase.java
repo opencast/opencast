@@ -157,7 +157,7 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
       generate = serviceRegistry.getJob(generate.getId());
       Attachment coverImage = (Attachment) MediaPackageElementParser.getFromXml(generate.getPayload());
 
-      URI attachmentUri = getWorkspace().moveTo(coverImage.getURI(), mediaPackage.getIdentifier().compact(),
+      URI attachmentUri = getWorkspace().moveTo(coverImage.getURI(), mediaPackage.getIdentifier().toString(),
               UUID.randomUUID().toString(), COVERIMAGE_FILENAME);
       coverImage.setURI(attachmentUri);
 

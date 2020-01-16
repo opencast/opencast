@@ -27,8 +27,7 @@ import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.identifier.Id;
-import org.opencastproject.mediapackage.identifier.IdBuilder;
-import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.IoSupport;
 
@@ -126,9 +125,6 @@ public final class MediaPackageImpl implements MediaPackage {
   @XmlElement(name = "subject")
   private Set<String> subjects = null;
 
-  /** id builder, for internal use only */
-  private static final IdBuilder idBuilder = new UUIDIdBuilderImpl();
-
   /** The media package's identifier */
   private Id identifier = null;
 
@@ -165,7 +161,7 @@ public final class MediaPackageImpl implements MediaPackage {
    * Creates a media package object.
    */
   MediaPackageImpl() {
-    this(idBuilder.createNew());
+    this(IdImpl.fromUUID());
   }
 
   /**

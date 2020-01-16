@@ -1007,7 +1007,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
    */
   private File getMediaPackageDirectory(String channelId, MediaPackage mediaPackage) {
     final String orgId = securityService.getOrganization().getId();
-    return distributionDirectory.toPath().resolve(Paths.get(orgId, channelId, mediaPackage.getIdentifier().compact()))
+    return distributionDirectory.toPath().resolve(Paths.get(orgId, channelId, mediaPackage.getIdentifier().toString()))
             .toFile();
   }
 
@@ -1033,7 +1033,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     // removes the tag for flv files, but keeps it for all others (mp4 needs it)
     if ("flv:".equals(tag))
       tag = "";
-    return tag + channelId + "/" + mp.getIdentifier().compact() + "/" + elementId + "/" + fileName;
+    return tag + channelId + "/" + mp.getIdentifier().toString() + "/" + elementId + "/" + fileName;
   }
 
   /**

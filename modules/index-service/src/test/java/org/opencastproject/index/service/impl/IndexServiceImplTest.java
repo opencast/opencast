@@ -571,7 +571,7 @@ public class IndexServiceImplTest {
     indexServiceImpl.setCaptureAgentStateService(captureAgentStateService);
     indexServiceImpl.setSchedulerService(schedulerService);
     String scheduledEvent = indexServiceImpl.createEvent(metadataJson, mediapackage);
-    Assert.assertEquals(mediapackage.getIdentifier().compact(), scheduledEvent);
+    Assert.assertEquals(mediapackage.getIdentifier().toString(), scheduledEvent);
 
     assertTrue("The catalog must be added to the mediapackage", result.hasCaptured());
     assertEquals("The catalog should have been added to the correct mediapackage", mpId.toString(),
@@ -710,7 +710,7 @@ public class IndexServiceImplTest {
                 Map<String, Period> mapping = new LinkedHashMap<>();
                 int counter = 0;
                 for (Period p : periods) {
-                  mapping.put(new IdImpl(UUID.randomUUID().toString()).compact(), p);
+                  mapping.put(new IdImpl(UUID.randomUUID().toString()).toString(), p);
                 }
                 return mapping;
               }

@@ -236,7 +236,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
       mediaPackage.add(newElement);
 
       if (externalChannel.isSome() && externalMimetype.isSome() && externalTempalte.isSome()) {
-        String template = externalTempalte.get().replace("{event}", mediaPackage.getIdentifier().compact());
+        String template = externalTempalte.get().replace("{event}", mediaPackage.getIdentifier().toString());
         if (StringUtils.isNotBlank(mediaPackage.getSeries()))
           template = template.replace("{series}", mediaPackage.getSeries());
 

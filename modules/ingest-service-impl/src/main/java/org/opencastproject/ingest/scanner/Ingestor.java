@@ -138,13 +138,13 @@ public class Ingestor implements Runnable {
               logger.info("Start ingest inbox file {} as a zipped mediapackage", artifact.getName());
               WorkflowInstance workflowInstance = ingestService.addZippedMediaPackage(in, workflowDefinition, workflowConfig);
               logger.info("Ingested {} as a zipped mediapackage from inbox as {}. Started workflow {}.",
-                      artifact.getName(), workflowInstance.getMediaPackage().getIdentifier().compact(),
+                      artifact.getName(), workflowInstance.getMediaPackage().getIdentifier().toString(),
                       workflowInstance.getId());
             } else {
               /* Create MediaPackage and add Track */
               MediaPackage mp = ingestService.createMediaPackage();
               logger.info("Start ingest track from file {} to mediapackage {}",
-                      artifact.getName(), mp.getIdentifier().compact());
+                      artifact.getName(), mp.getIdentifier().toString());
 
               DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
               dcc.add(DublinCore.PROPERTY_TITLE, artifact.getName());
@@ -175,7 +175,7 @@ public class Ingestor implements Runnable {
               /* Ingest media*/
               mp = ingestService.addTrack(in, artifact.getName(), mediaFlavor, mp);
               logger.info("Ingested track from file {} to mediapackage {}",
-                      artifact.getName(), mp.getIdentifier().compact());
+                      artifact.getName(), mp.getIdentifier().toString());
               /* Ingest mediapackage */
               WorkflowInstance workflowInstance = ingestService.ingest(mp, workflowDefinition, workflowConfig);
               logger.info("Ingested {} from inbox, workflow {} started", artifact.getName(), workflowInstance.getId());

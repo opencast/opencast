@@ -679,7 +679,7 @@ public class ToolsEndpoint implements ManagedService {
         final String workflowId = editingInfo.getPostProcessingWorkflow().get();
         try {
           final Map<String, String> workflowParameters = WorkflowPropertiesUtil
-            .getLatestWorkflowProperties(assetManager, mediaPackage.getIdentifier().compact());
+            .getLatestWorkflowProperties(assetManager, mediaPackage.getIdentifier().toString());
           final Workflows workflows = new Workflows(assetManager, workflowService);
           workflows.applyWorkflowToLatestVersion($(mediaPackage.getIdentifier().toString()),
             ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId), workflowParameters))
@@ -787,7 +787,7 @@ public class ToolsEndpoint implements ManagedService {
 
     URI smilURI;
     try (InputStream is = IOUtils.toInputStream(smil.toXML(), "UTF-8")) {
-      smilURI = workspace.put(mediaPackage.getIdentifier().compact(), catalogId, TARGET_FILE_NAME, is);
+      smilURI = workspace.put(mediaPackage.getIdentifier().toString(), catalogId, TARGET_FILE_NAME, is);
     } catch (SAXException e) {
       logger.error("Error while serializing the SMIL catalog to XML: {}", e.getMessage());
       throw new IOException(e);

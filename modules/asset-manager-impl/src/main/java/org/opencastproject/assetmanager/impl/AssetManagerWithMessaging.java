@@ -151,7 +151,7 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
                           MessageSender.DestinationType.Queue, takeSnapshot);
                 } catch (Throwable t) {
                   logger.error("Unable to recreate event {} from organization {}",
-                          snapshot.getMediaPackage().getIdentifier().compact(), orgId, t);
+                          snapshot.getMediaPackage().getIdentifier().toString(), orgId, t);
                 }
                 if (((current % responseInterval) == 0) || (current == total)) {
                   getMessageSender().sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
