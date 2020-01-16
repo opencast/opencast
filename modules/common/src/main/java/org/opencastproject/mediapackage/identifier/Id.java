@@ -41,6 +41,7 @@ public interface Id {
    *
    * @return a path separator-free representation of the identifier
    */
+  @Deprecated
   String compact();
 
   class Adapter extends XmlAdapter<IdImpl, Id> {
