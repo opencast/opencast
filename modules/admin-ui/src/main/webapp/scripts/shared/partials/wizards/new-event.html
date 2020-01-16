@@ -464,7 +464,7 @@
                          ng-options="w.title for (obj, w) in wizard.step.workflows |
                                      filter: wizard.getStateControllerByName('source').ud.type === 'UPLOAD'
                                        ? 'upload' : 'schedule' |
-                                     orderBy: 'displayOrder':true"
+                                     orderBy: 'displayOrder':true track by w.id"
                          placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}'"
                          no-results-text="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY' | translate }}'"
                          >

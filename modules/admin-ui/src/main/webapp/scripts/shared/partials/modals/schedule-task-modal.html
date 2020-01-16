@@ -83,7 +83,7 @@
                       not-empty-selection
                       ng-model="processing.ud.workflow"
                       ng-model-options="{ allowInvalid: true }"
-                      ng-options="w.title for w in processing.workflows | orderBy: 'displayOrder':true"
+                      ng-options="w.title for w in processing.workflows | orderBy: 'displayOrder':true track by w.id"
                       placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW' | translate }}'"
                       no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW_EMPTY' | translate }}'"
                       >
