@@ -60,7 +60,8 @@ public final class RetractionListener implements WorkflowListener {
       logger.warn("The retract workflow \"{}\" (id: {}, created by: {}) does not have a media package.",
               workflow.getTitle(), workflow.getId(), workflow.getCreatorName());
     } else if (mediaPackage.getPublications() != null && mediaPackage.getPublications().length > 0) {
-      logger.warn("The retract workflow \"{}\" (id: {}, created by: {}, media package {}) has leave some publications.",
+      logger.warn("The retract workflow \"{}\" (id: {}, created by: {}, media package {}) "
+                      + "has some non-retracted publications, refusing to orphan them.",
               workflow.getTitle(), workflow.getId(), workflow.getCreatorName(), mediaPackage.getIdentifier().compact());
     } else {
       final Retraction retraction = retractions.get(workflow.getId());
