@@ -42,7 +42,7 @@
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <querydsl.version>3.7.4</querydsl.version>
-    <spring.version>3.1.4.RELEASE</spring.version>
+    <spring.version>5.2.3.RELEASE</spring.version>
     <spring-security.version>3.1.7.RELEASE</spring-security.version>
   </properties>
   <modules>
