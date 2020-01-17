@@ -112,8 +112,8 @@ public class AutoScalingTerminationStateServiceTest {
 
     Dictionary config = new Hashtable();
     config.put(AutoScalingTerminationStateService.CONFIG_ENABLE, "true");
-    config.put(AutoScalingTerminationStateService.CONFIG_LIFECYCLE_POLLING_PERIOD, "2");
-    config.put(AutoScalingTerminationStateService.CONFIG_LIFECYCLE_HEARTBEAT_PERIOD, "2");
+    config.put(AutoScalingTerminationStateService.CONFIG_LIFECYCLE_POLLING_PERIOD, "1");
+    config.put(AutoScalingTerminationStateService.CONFIG_LIFECYCLE_HEARTBEAT_PERIOD, "1");
     service.configure(config);
   }
 
