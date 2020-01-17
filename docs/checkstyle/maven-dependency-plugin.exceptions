@@ -25,5 +25,4 @@ modules/solr/pom.xml
 modules/themes/pom.xml
 modules/transcription-service-google-speech-impl/pom.xml
 modules/transcription-service-persistence/pom.xml
-modules/userdirectory-ldap/pom.xml
 modules/userdirectory/pom.xml
