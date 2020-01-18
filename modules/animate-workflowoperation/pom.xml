@@ -106,9 +106,6 @@
             <Export-Package>
               org.opencastproject.workflow.handler.animate;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/operations/animate.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

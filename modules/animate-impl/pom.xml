@@ -112,10 +112,6 @@
             <Export-Package>
               org.opencastproject.animate.impl.*;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/animate.xml,
-              OSGI-INF/animate-rest.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

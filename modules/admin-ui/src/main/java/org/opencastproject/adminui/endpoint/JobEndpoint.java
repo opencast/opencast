@@ -74,6 +74,9 @@ import com.entwinemedia.fn.data.json.SimpleSerializer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,6 +108,15 @@ import javax.ws.rs.core.Response;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+  immediate = true,
+  service = JobEndpoint.class,
+  property = {
+    "service.description=Admin UI - Job facade Endpoint",
+    "opencast.service.type=org.opencastproject.adminui.endpoint.JobEndpoint",
+    "opencast.service.path=/admin-ng/job"
+  }
+)
 public class JobEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(JobEndpoint.class);
@@ -126,24 +138,29 @@ public class JobEndpoint {
   private UserDirectoryService userDirectoryService;
 
   /** OSGi callback for the workflow service. */
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
   /** OSGi callback for the service registry. */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
   /** OSGi callback for the incident service. */
+  @Reference
   public void setIncidentService(IncidentService incidentService) {
     this.incidentService = incidentService;
   }
 
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Activate job endpoint");
   }

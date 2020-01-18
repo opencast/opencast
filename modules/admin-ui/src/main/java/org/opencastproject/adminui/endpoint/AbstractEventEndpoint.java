@@ -166,6 +166,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -290,6 +291,7 @@ public abstract class AbstractEventEndpoint {
    * @param cc
    *          ComponentContext
    */
+  @Activate
   public void activate(ComponentContext cc) {
     if (cc != null) {
       String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);

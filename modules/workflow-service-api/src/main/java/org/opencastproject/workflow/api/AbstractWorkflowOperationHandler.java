@@ -43,6 +43,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Constants;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Reference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +74,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * @param cc
    *          The component's context, containing the properties used for configuration
    */
+  @Activate
   protected void activate(ComponentContext cc) {
     this.id = (String) cc.getProperties().get(WorkflowService.WORKFLOW_OPERATION_PROPERTY);
     this.description = (String) cc.getProperties().get(Constants.SERVICE_DESCRIPTION);
@@ -240,6 +243,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

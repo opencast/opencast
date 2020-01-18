@@ -27,6 +27,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,15 @@ import javax.ws.rs.core.MediaType;
 @RestService(name = "FeedService", title = "Admin UI Feed Service",
   abstractText = "Provides Feed Information",
   notes = {"This service offers Feed information for the admin UI."})
+@Component(
+  immediate = true,
+  service = FeedEndpoint.class,
+  property = {
+    "service.description=Admin UI - Feed Endpoint",
+    "opencast.service.type=org.opencastproject.adminui.endpoint.FeedEndpoint",
+    "opencast.service.path=/admin-ng/feeds"
+  }
+)
 public class FeedEndpoint extends RemoteBase {
 
   public FeedEndpoint() {

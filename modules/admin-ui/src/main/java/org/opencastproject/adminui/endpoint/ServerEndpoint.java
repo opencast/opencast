@@ -48,6 +48,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +79,15 @@ import javax.ws.rs.core.Response;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+  immediate = true,
+  service = ServerEndpoint.class,
+  property = {
+    "service.description=Admin UI - Server facade Endpoint",
+    "opencast.service.type=org.opencastproject.adminui.endpoint.ServerEndpoint",
+    "opencast.service.path=/admin-ng/server"
+  }
+)
 public class ServerEndpoint {
 
   private enum Sort {
@@ -169,10 +181,12 @@ public class ServerEndpoint {
   private ServiceRegistry serviceRegistry;
 
   /** OSGi callback for the service registry. */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Activate job endpoint");
   }
