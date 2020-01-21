@@ -293,7 +293,7 @@
         range or prefix queries that expanded to big boolean queries - built in Solr 
         query parsers no longer create queries with this limitation. 
         An exception is thrown if exceeded.  -->
-    <maxBooleanClauses>1024</maxBooleanClauses>
+    <maxBooleanClauses>2048</maxBooleanClauses>
 
 
     <!-- There are two implementations of cache available for Solr,
