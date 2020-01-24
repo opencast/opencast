@@ -13,6 +13,7 @@ versions of Opencast, please refer to [older release notes](https://docs.opencas
 7. Remove search index data folder
 8. Start Opencast
 9. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
+10. [Check passwords](#check-passwords)
 
 Install and configure a standalone Elasticsearch node
 -----------------------------------------------------
@@ -63,3 +64,14 @@ You can also just open the REST documentation, which can be found under the “H
 `/recreateIndex`.
 
 In both cases you should again get a 200 HTTP status.
+
+
+Check Passwords
+---------------
+
+Since Opencast 8.1 [passwords are stored in a much safer way than before
+](https://github.com/opencast/opencast/security/advisories/GHSA-h362-m8f2-5x7c)
+but to benefit from this mechanism, users have to reset their password.
+
+You can use the endpoint `/user-utils/users/md5.json` to find out which users are still using MD5-hashed passwords and
+suggest to them that they update their passwords.
