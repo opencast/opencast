@@ -1,25 +1,9 @@
-
 Upgrading Opencast from 8.x to 9.x
 ==================================
 
 This guide describes how to upgrade Opencast 8.x to 9.x. In case you need information about how to upgrade older
 versions of Opencast, please refer to [older release notes](https://docs.opencast.org).
 
-Configuration Changes
----------------------
-
-1. The dispatch interval property is now called `dispatch.interval` and expects seconds instead of milliseconds
-   `etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg`.
-2. The file `etc/elasticsearch.yml` was removed as it is no longer required due to the removal of the embedded
-   Elasticsearch node.
-3. The file `etc/custom.properties` was changed:
-   - The property `org.opencastproject.elasticsearch.server.address` was renamed
-   to `org.opencastproject.elasticsearch.server.hostname` and now defaults to `localhost` (was: `127.0.0.1`).
-   - The property `org.opencastproject.elasticsearch.server.port` now defaults to `9200` (was: `9300`).
-   - A new property `org.opencastproject.elasticsearch.server.scheme` was added and defaults to `http`.
-
-How to Upgrade
---------------
 1. Stop your current Opencast instance
 2. Replace Opencast with the new version
 3. Back-up Opencast files and database (optional)
