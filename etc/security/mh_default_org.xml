@@ -265,8 +265,8 @@
     <!-- The OAI-PMH specification demands boths GET and POST requests  -->
     <!-- Please make sure that the path configured here matches         -->
     <!-- the path configured for the repository servlet.                -->
-    <sec:intercept-url pattern="/oaipmh/**" method="GET" access="ROLE_ANONYMOUS"/>
-    <sec:intercept-url pattern="/oaipmh/**" method="POST" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="/oaipmh/**" method="GET" access="ROLE_ADMIN"/>
+    <sec:intercept-url pattern="/oaipmh/**" method="POST" access="ROLE_ADMIN"/>
 
     <!-- Enable anonymous access to the rss and atom feeds -->
     <sec:intercept-url pattern="/feeds/**" method="GET" access="ROLE_ANONYMOUS" />
