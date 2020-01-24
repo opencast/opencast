@@ -87,6 +87,8 @@ nav:
       - Languages: 'configuration/admin-ui/languages.md'
       - Statistics: 'configuration/admin-ui/statistics.md'
       - Thumbnails: 'configuration/admin-ui/thumbnails.md'
+      - Role-based Visibility: 'configuration/admin-ui/role-based-visibility.md'
+      - Capture-Agent Access: configuration/admin-ui/capture-agent-access.md
 - Version Support: 'version-support.md'
 - Modules:
    - Overview: 'modules/index.md'

@@ -2,6 +2,8 @@
 
 Opencast allows restrictions considering what a user or group of users can do with capture agents to be configured.
 
+> This is __no__ security feature and does not guarantee that users cannot access any of the functionality.
+
 There are three kinds of access restriction levels:
 
 - Unrestricted Access: Full access to all capture agents
