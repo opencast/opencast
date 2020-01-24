@@ -38,18 +38,6 @@
       </configurations>
     </operation>
 
-    <!-- Publish to oaipmh -->
-
-    <operation
-      id="republish-oaipmh"
-      exception-handler-workflow="partial-error"
-      description="Update recording metadata in default OAI-PMH repository">
-      <configurations>
-        <configuration key="source-flavors">dublincore/*,security/*,captions/*</configuration>
-        <configuration key="repository">default</configuration>
-      </configurations>
-    </operation>
-
     <!-- Archive media package -->
 
     <operation id="snapshot"

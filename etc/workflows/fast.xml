@@ -41,7 +41,6 @@
       description="Applying configuration values for publish workflow">
       <configurations>
         <configuration key="publishToMediaModule">true</configuration>
-        <configuration key="publishToOaiPmh">true</configuration>
       </configurations>
     </operation>
 

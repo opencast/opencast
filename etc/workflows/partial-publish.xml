@@ -547,22 +547,6 @@
       </configurations>
     </operation>
 
-    <!-- Publish to OAI-PMH -->
-
-    <operation
-      id="publish-oaipmh"
-      if="${publishToOaiPmh}"
-      exception-handler-workflow="partial-error"
-      description="Publish to OAI-PMH Default Repository">
-      <configurations>
-        <configuration key="download-flavors">dublincore/*,security/*</configuration>
-        <configuration key="download-tags">engage-download,atom,rss</configuration>
-        <configuration key="streaming-tags">engage-streaming</configuration>
-        <configuration key="check-availability">true</configuration>
-        <configuration key="repository">default</configuration>
-      </configurations>
-    </operation>
-
     <!-- Publish to YouTube -->
 
     <operation
