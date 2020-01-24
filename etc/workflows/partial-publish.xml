@@ -223,7 +223,7 @@
     <operation
       id="timelinepreviews"
       fail-on-error="false"
-      exception-handler-workflow="error"
+      exception-handler-workflow="partial-error"
       description="Creating timeline preview images">
       <configurations>
         <configuration key="source-flavor">*/trimmed</configuration>

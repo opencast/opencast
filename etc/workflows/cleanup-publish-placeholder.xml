@@ -70,7 +70,7 @@
       id="tag"
       max-attempts="2"
       fail-on-error="true"
-      exception-handler-workflow="error"
+      exception-handler-workflow="partial-error"
       description="Tagging media package elements for deletion">
       <configurations>
         <configuration key="source-flavors">*/source,*/prepared,*/player+preview</configuration>
@@ -82,7 +82,7 @@
     <operation
       id="compose"
       fail-on-error="true"
-      exception-handler-workflow="error"
+      exception-handler-workflow="partial-error"
       description="create placeholder Video">
       <configurations>
         <configuration key="source-flavor">presenter/source</configuration>
@@ -191,7 +191,7 @@
     <operation
       id="asset-delete"
       fail-on-error="true"
-      exception-handler-workflow="error"
+      exception-handler-workflow="partial-error"
       description="Delete every older Snapshot from AssetManager">
       <configurations>
         <configuration key="keep-last-snapshot">true</configuration>
