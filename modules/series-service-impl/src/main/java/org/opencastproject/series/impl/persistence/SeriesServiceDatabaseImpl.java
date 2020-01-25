@@ -30,6 +30,7 @@ import org.opencastproject.security.api.AccessControlParsingException;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Permissions;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -462,6 +463,10 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
       User currentUser = securityService.getUser();
       Organization currentOrg = securityService.getOrganization();
+
+      if (currentUser.hasRole(SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE)) {
+        return true;
+      }
       // There are several reasons a user may need to load a series: to read content, to edit it, or add content
       if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString())
               && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.CONTRIBUTE.toString())
