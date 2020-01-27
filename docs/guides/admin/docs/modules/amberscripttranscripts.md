@@ -18,7 +18,7 @@ Configuration
 
 ### Step 1: Get AmberScript API key
 
-* Contact AmberScript via https://amberscript.com
+* Contact AmberScript via https://www.amberscript.com/en/opencast-integration
 
 ### Step 2: Configure AmberscriptTranscriptionService
 
