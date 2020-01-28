@@ -161,15 +161,6 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <!-- Earlier drivers yield an error:
-        - com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException:
-        - You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OPTION SQL_SELECT_LIMIT=DEFAULT' at line 1
-        -->
-      <scope>test</scope>
-    </dependency>
     <!-- contains javax.inject.Provider -->
     <dependency>
       <groupId>com.mysema.querydsl</groupId>

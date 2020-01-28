@@ -5,7 +5,7 @@ Opencast ships with embedded JDBC drivers for the H2, MySQL and MariaDB database
 default and needs no configuration, but it is strongly recommended to use MariaDB for production.
 performance gain.
 
-> **Notice:** H2 is neither supported for updates, nor for distributed systems. Use it for testing only!
+> __Notice:__ H2 is neither supported for updates, nor for distributed systems. Use it for testing only!
 
 
 ### Other databases
@@ -71,7 +71,7 @@ Then create a user `opencast` with a password and grant it all necessary rights:
     GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON opencast.*
       TO 'opencast'@'localhost' IDENTIFIED BY 'opencast_password';
 
-The rights granted here are all that is needed to *run* Opencast. To execute the migration scripts
+The rights granted here are all that is needed to run Opencast. To execute the migration scripts
 used to initialize (see next section) and upgrade the database schema upon releases of new versions
 of Opencast, you need more. If you don't want to do this using the `root` user (which normally
 can do anything), but with a dedicated user called `admin` for the sake of the example,
@@ -80,7 +80,7 @@ you should grant that user the following rights:
     GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,ALTER,DROP,INDEX,TRIGGER,CREATE TEMPORARY TABLES,REFERENCES ON opencast.*
       TO 'admin'@'localhost' IDENTIFIED BY 'opencast_admin_password';
 
-You can choose other names for the users and the database, and you **should** use a different password.
+You can choose other names for the users and the database, and you should use a different password.
 
 In a distributed system, apart from `'username'@'localhost'` (which would allow access from the local machine only),
 you should grant a external user access to the database by running the same command for a user like
@@ -127,18 +127,14 @@ configuration.
 The following changes must be made in `…/etc/custom.properties` (`/etc/opencast/custom.properties` in a package
 installation).
 
-1. Configure Opencast to use MariaDB/MySQL:
+1. Configure Opencast to use the JDBC driver for MariaDB:
 
-        org.opencastproject.db.vendor=MySQL
+        org.opencastproject.db.jdbc.driver=org.mariadb.jdbc.Driver
 
-3. Configure Opencast to use the JDBC driver for MariaDB/MySQL:
+2. Configure the host where Opencast should find the database (`localhost`) and the database name (`opencast`). Adjust
+   the names in this example to match your configuration:
 
-        org.opencastproject.db.jdbc.driver=com.mysql.jdbc.Driver
-
-4. Configure the host where Opencast should find the database (`localhost`) and the database name (`opencast`). Adjust
-the names in this example to match your configuration:
-
-        org.opencastproject.db.jdbc.url=jdbc:mysql://localhost/opencast
+        org.opencastproject.db.jdbc.url=jdbc:mysql://localhost/opencast?useMysqlMetadata=true
 
 5. Configure the username and password which Opencast should use to access the database:
 

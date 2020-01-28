@@ -56,10 +56,6 @@
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.mchange</groupId>
       <artifactId>c3p0</artifactId>
     </dependency>
