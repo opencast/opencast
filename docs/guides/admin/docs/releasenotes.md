@@ -1,6 +1,13 @@
 Opencast 9: Release Notes
 =========================
 
+Important Changes
+-----------------
+
+- External Elasticsearch
+- MariaDB JDBC driver
+
+
 Features
 --------
 
