@@ -29,6 +29,7 @@ import static org.junit.Assert.fail;
 import static org.opencastproject.util.data.Collections.set;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
+import org.opencastproject.kernel.security.CustomPasswordEncoder;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
@@ -38,7 +39,6 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PasswordEncoder;
 import org.opencastproject.util.data.Collections;
 
 import org.apache.commons.collections4.IteratorUtils;
@@ -56,6 +56,7 @@ public class JpaUserProviderTest {
   private JpaUserAndRoleProvider provider = null;
   private JpaOrganization org1 = null;
   private JpaOrganization org2 = null;
+  private CustomPasswordEncoder passwordEncoder = new CustomPasswordEncoder();
 
   @Before
   public void setUp() throws Exception {
@@ -83,7 +84,7 @@ public class JpaUserProviderTest {
     assertNotNull(loadUser);
 
     assertEquals(user.getUsername(), loadUser.getUsername());
-    assertEquals(PasswordEncoder.encode(user.getPassword(), user.getUsername()), loadUser.getPassword());
+    assertTrue(passwordEncoder.isPasswordValid(loadUser.getPassword(), user.getPassword(), null));
     assertEquals(user.getOrganization(), loadUser.getOrganization());
     assertEquals(user.getRoles(), loadUser.getRoles());
 
@@ -94,7 +95,7 @@ public class JpaUserProviderTest {
     assertNotNull(loadUser);
 
     assertEquals(user.getUsername(), loadUser.getUsername());
-    assertEquals(PasswordEncoder.encode(user.getPassword(), user.getUsername()), loadUser.getPassword());
+    assertTrue(passwordEncoder.isPasswordValid(loadUser.getPassword(), user.getPassword(), null));
     assertEquals(user.getOrganization(), loadUser.getOrganization());
     assertEquals(user.getRoles(), loadUser.getRoles());
   }
@@ -227,7 +228,7 @@ public class JpaUserProviderTest {
 
     assertNotNull(loadUpdatedUser);
     assertEquals(user.getUsername(), loadUpdatedUser.getUsername());
-    assertEquals(PasswordEncoder.encode(newPassword, user.getUsername()), loadUpdatedUser.getPassword());
+    assertTrue(passwordEncoder.isPasswordValid(loadUpdatedUser.getPassword(), newPassword, null));
     assertEquals(authorities.size(), loadUpdatedUser.getRoles().size());
 
     updateUser = new JpaUser("unknown", newPassword, org1, provider.getName(), true, authorities);

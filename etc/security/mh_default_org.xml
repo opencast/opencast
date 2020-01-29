@@ -582,9 +582,12 @@
   <osgi:reference id="ltiLaunchAuthenticationHandler" cardinality="1..1"
                   interface="org.springframework.security.oauth.provider.OAuthAuthenticationHandler" />
 
+
   <!-- ############################# -->
   <!-- # Spring Security Internals # -->
   <!-- ############################# -->
+
+  <bean id="passwordEncoder" class="org.opencastproject.kernel.security.CustomPasswordEncoder" />
 
   <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
   <sec:authentication-manager alias="authenticationManager">
@@ -593,7 +596,10 @@
     <!-- Uncomment the following line if using LDAP -->
     <!-- <sec:authentication-provider ref="ldapAuthProvider" /> -->
     <sec:authentication-provider user-service-ref="userDetailsService">
-      <sec:password-encoder hash="md5"><sec:salt-source user-property="username" /></sec:password-encoder>
+      <sec:password-encoder ref="passwordEncoder">
+        <!-- This salt is used only for decoding legacy MD5 hased passwords -->
+        <sec:salt-source user-property="username" />
+      </sec:password-encoder>
     </sec:authentication-provider>
   </sec:authentication-manager>
 
