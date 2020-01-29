@@ -77,9 +77,10 @@ API changes
     - DELETE /workflow/definition/{id}
     - PUT /workflow/definition
 
-Aditional Notes About 7.6
+Aditional Notes About 8.1
 -------------------------
-Opencast 7.6 fixes a number of security issues. Upgrading is strongly recommended.
+
+Opencast 8.1 fixes a number of security issues. Upgrading is strongly recommended.
 Take a look at the [security advisories](https://github.com/opencast/opencast/security/advisories) for more details.
 
 One change is that the OAI-PMH endpoint is no longer publically accessible by default.
@@ -95,6 +96,8 @@ If you need it to be, you can easily change that in the security configuration a
   ](https://github.com/opencast/opencast/security/advisories/GHSA-mh8g-hprg-8363)
 - CVE-2020-5230 – [Unsafe Identifiers
   ](https://github.com/opencast/opencast/security/advisories/GHSA-w29m-fjp4-qhmq)
+- CVE-2020-5229 – [Replace MD5 with bcrypt for password hashing
+  ](https://github.com/opencast/opencast/security/advisories/GHSA-h362-m8f2-5x7c)
 - CVE-2020-5228 – [Public Access Via OAI-PMH
   ](https://github.com/opencast/opencast/security/advisories/GHSA-6f54-3qr9-pjgj)
 
