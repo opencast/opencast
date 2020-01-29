@@ -426,6 +426,20 @@ Opencast 8
 
 Opencast 7
 ----------
+### Opencast 7.6
+
+*Released on January 29, 2020*
+
+- [CVE-2020-5231](https://github.com/opencast/opencast/security/advisories/GHSA-94qw-r73x-j7hg) - 
+   Users with ROLE\_COURSE\_ADMIN can create new users
+- [CVE-2020-5206](https://github.com/opencast/opencast/security/advisories/GHSA-vmm6-w4cf-7f3x) - 
+   Authentication Bypass For Endpoints With Anonymous Access
+- [CVE-2020-5222](https://github.com/opencast/opencast/security/advisories/GHSA-mh8g-hprg-8363) - 
+   Hard-Coded Key Used For Remember-me Token
+- [CVE-2020-5230](https://github.com/opencast/opencast/security/advisories/GHSA-w29m-fjp4-qhmq) - 
+   Unsafe Identifiers
+- [CVE-2020-5228](https://github.com/opencast/opencast/security/advisories/GHSA-6f54-3qr9-pjgj) - 
+   Public Access Via OAI-PMH
 
 ### Opencast 7.5
 
