@@ -131,7 +131,7 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     Job job = null;
     for (Track track : elements) {
       try {
-        job = ((AmberscriptTranscriptionService)service).startTranscription(mediaPackage.getIdentifier().compact(), track, language, jobtype);
+        job = ((AmberscriptTranscriptionService)service).startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobtype);
         // Only one job per media package
         break;
       } catch (TranscriptionServiceException e) {

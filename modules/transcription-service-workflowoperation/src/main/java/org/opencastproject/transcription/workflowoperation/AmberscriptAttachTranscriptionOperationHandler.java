@@ -116,7 +116,7 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
       flavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
 
     try {
-      MediaPackageElement transcription = service.getGeneratedTranscription(mediaPackage.getIdentifier().compact(), jobId);
+      MediaPackageElement transcription = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId);
 
       if (captionFormatOption != null) {
         Job job = captionService.convert(transcription, "subrip", captionFormatOption, service.getLanguage());
