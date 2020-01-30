@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.security.lti.LtiLaunchAuthenticationHandler"
+               immediate="true" activate="activate">
+  <implementation class="org.opencastproject.security.lti.LtiLaunchAuthenticationHandler"/>
+  <property name="service.description" value="LTI authentication helper"/>
+  <service>
+    <provide interface="org.springframework.security.oauth.provider.OAuthAuthenticationHandler"/>
+  </service>
+  <reference name="userDetailsService" interface="org.springframework.security.core.userdetails.UserDetailsService"
+             cardinality="1..1" policy="static" bind="setUserDetailsService"/>
+  <reference name="ReferenceProvider" interface="org.opencastproject.userdirectory.api.UserReferenceProvider"
+             cardinality="1..1" policy="static" bind="setUserReferenceProvider"/>
+  <reference name="SecurityService" interface="org.opencastproject.security.api.SecurityService"
+             cardinality="1..1" policy="static" bind="setSecurityService"/>
+</scr:component>
