@@ -21,10 +21,7 @@
 
 package org.opencastproject.userdirectory.canvas;
 
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.RoleProvider;
-import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.security.api.*;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -220,9 +217,12 @@ public class CanvasUserProviderFactory implements ManagedServiceFactory {
       throw new ConfigurationException(ORGANIZATION_KEY, "not found");
     }
 
+    //Get Admin Username from OSGi contextBundle
+    String adminUserName = StringUtils.trimToNull(bundleContext.getProperty(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY));
+
     logger.debug("Creating new CanvasUserProviderInstance for pid={}", pid);
     CanvasUserProviderInstance provider = new CanvasUserProviderInstance(pid, org, url, token, courseIdentifierProperty,
-        coursePattern, userPattern, userNameProperty, instructorRoles, cacheSize, cacheExpiration);
+        coursePattern, userPattern, userNameProperty, instructorRoles, cacheSize, cacheExpiration, adminUserName);
 
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
     providerRegistrations.put(pid, bundleContext.registerService(RoleProvider.class.getName(), provider, null));

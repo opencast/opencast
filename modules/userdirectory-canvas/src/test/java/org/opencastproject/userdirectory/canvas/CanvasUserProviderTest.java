@@ -48,7 +48,7 @@ public class CanvasUserProviderTest {
     instructorRoles.add("TeacherEnrollment");
 
     canvasProvider = new CanvasUserProviderInstance("sample_pid", new DefaultOrganization(), "https://example.com",
-      "id", "12345", "^[a-zA-Z0-9-]+$", "^[0-9a-zA-Z]{6,}$", "short_name", instructorRoles, 100, 10);
+      "id", "12345", "^[a-zA-Z0-9-]+$", "^[0-9a-zA-Z]{6,}$", "short_name", instructorRoles, 100, 10, "admin");
   }
 
   private boolean hasRole(Set<Role> roles, String roleName) {

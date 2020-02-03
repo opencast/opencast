@@ -21,16 +21,7 @@
 
 package org.opencastproject.userdirectory.canvas;
 
-import org.opencastproject.security.api.CachingUserProviderMXBean;
-import org.opencastproject.security.api.Group;
-import org.opencastproject.security.api.JaxbOrganization;
-import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.JaxbUser;
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.RoleProvider;
-import org.opencastproject.security.api.User;
-import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.security.api.*;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -134,6 +125,9 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
   /** A set of strings representing instructor roles */
   private Set<String> instructorRoles;
 
+  /** List of ignored usernames when loading users from Canvas */
+  private List<String> ignoredUsernames;
+
   /**
    * Constructs an Canvas user provider with the needed settings.
    *
@@ -147,11 +141,12 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
    * @param instructorRoles  A set of strings representing instructor roles
    * @param cacheSize        The number of users to cache
    * @param cacheExpiration  The number of minutes to cache users
+   * @param adminUserName    The name for the global admin property
    */
   public CanvasUserProviderInstance(String pid, Organization organization, String canvasUrl, String canvasToken,
                                     String courseIdentifierProperty, String coursePattern, String userPattern,
                                     String userNameProperty,
-                                    Set<String> instructorRoles, int cacheSize, int cacheExpiration) {
+                                    Set<String> instructorRoles, int cacheSize, int cacheExpiration, String adminUserName) {
 
     this.organization = organization;
     this.canvasUrl = canvasUrl;
@@ -161,6 +156,14 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
     this.userPattern = userPattern;
     this.userNameProperty = userNameProperty;
     this.instructorRoles = instructorRoles;
+
+    // Initialize user filter
+    this.ignoredUsernames = new ArrayList<>();
+    this.ignoredUsernames.add("");
+    this.ignoredUsernames.add(SecurityConstants.GLOBAL_ANONYMOUS_USERNAME);
+    if (StringUtils.isNoneEmpty(adminUserName)) {
+      ignoredUsernames.add(adminUserName);
+    }
 
     logger.info("Creating new CanvasUserProviderInstance(pid={}, url={}, courseIdentifierProperty={}, "
                     + "coursePattern={}, userPattern={}, userNameProperty={}, instructorRoles=[{}], cacheSize={}, "
@@ -259,7 +262,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
     }
 
     // Don't answer for admin, anonymous or empty user
-    if ("admin".equals(userId) || "".equals(userId) || "anonymous".equals(userId)) {
+    if (ignoredUsernames.contains(userId)) {
       cache.put(userId, nullToken);
       logger.debug("We don't answer for: {}", userId);
       return null;
@@ -625,7 +628,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
     logger.debug("getRolesForUser({})", userId);
     List<Role> roles = new LinkedList<>();
     // Don't answer for admin, anonymous or empty user
-    if ("admin".equals(userId) || "".equals(userId) || "anonymous".equals(userId)) {
+    if (ignoredUsernames.contains(userId)) {
       logger.debug("We don't answer for: {}", userId);
       return roles;
     }
