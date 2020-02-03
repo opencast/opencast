@@ -22,4 +22,6 @@
              bind="setSeriesService"/>
   <reference name="ingest-service" interface="org.opencastproject.ingest.api.IngestService"
              bind="setIngestService"/>
+  <reference name="authorization-service" interface="org.opencastproject.security.api.AuthorizationService"
+             bind="setAuthorizationService"/>
 </scr:component>

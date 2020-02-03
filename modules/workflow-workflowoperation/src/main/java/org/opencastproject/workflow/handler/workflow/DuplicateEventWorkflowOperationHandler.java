@@ -47,6 +47,9 @@ import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AclScope;
+import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
@@ -63,6 +66,7 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,8 +151,19 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
   /** The series service */
   private SeriesService seriesService;
 
+  /** The authorization service */
+  private AuthorizationService authorizationService;
+
   /** The ingest service */
   private IngestService ingestService;
+
+  /**
+   * OSGi setter
+   * @param authorizationService
+   */
+  public void setAuthorizationService(AuthorizationService authorizationService) {
+    this.authorizationService = authorizationService;
+  }
 
   /**
    * OSGi setter
@@ -221,10 +236,12 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     }
 
     SeriesInformation series = null;
+    AccessControlList seriesAccessControl = null;
     if (!seriesId.isEmpty()) {
       try {
         final DublinCoreCatalog dc = seriesService.getSeries(seriesId);
         series = new SeriesInformation(seriesId, dc, dc.get(DublinCore.PROPERTY_TITLE).get(0).getValue());
+        seriesAccessControl = seriesService.getSeriesAccessControl(seriesId);
       } catch (SeriesException e) {
         throw new WorkflowOperationException(e);
       } catch (NotFoundException e) {
@@ -270,6 +287,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     final Collection<MediaPackageElement> elements = elementSelector.select(mediaPackage, false);
     final Collection<Publication> internalPublications = new HashSet<>();
 
+    final List<String> seriesAclTags = new ArrayList<>();
     for (MediaPackageElement e : mediaPackage.getElements()) {
       if (e instanceof Publication) {
         if (InternalPublicationChannel.CHANNEL_ID.equals(((Publication) e).getChannel())) {
@@ -284,6 +302,10 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
       // The series DC changes
       if (series != null && MediaPackageElements.SERIES.equals(e.getFlavor())) {
         // Remove episode DC since we will add a new one
+        elements.remove(e);
+      }
+      if (series != null && MediaPackageElements.XACML_POLICY_SERIES.equals(e.getFlavor())) {
+        seriesAclTags.addAll(Arrays.asList(e.getTags()));
         elements.remove(e);
       }
     }
@@ -312,6 +334,14 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
           newMp = ingestService
                   .addCatalog(new ByteArrayInputStream(series.dc.toXmlString().getBytes(StandardCharsets.UTF_8)),
                           UUID.randomUUID().toString() + ".xml", MediaPackageElements.SERIES, newMp);
+          if (seriesAccessControl != null) {
+            newMp = authorizationService.setAcl(newMp, AclScope.Series, seriesAccessControl).getA();
+            for (MediaPackageElement seriesAclMpe : newMp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_SERIES)) {
+              for (final String tag : seriesAclTags) {
+                seriesAclMpe.addTag(tag);
+              }
+            }
+          }
         }
 
         // Create and add new episode dublin core with changed title
