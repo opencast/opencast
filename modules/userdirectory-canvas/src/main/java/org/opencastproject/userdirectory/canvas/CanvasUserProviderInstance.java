@@ -347,8 +347,8 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
         return false;
       }
     } catch (PatternSyntaxException e) {
-      logger.warn("Invalid regular expression for user pattern {} - disabling checks, exception: {}", userPattern, e);
-      userPattern = null;
+      logger.error("Invalid regular expression for user pattern {}", userPattern, e);
+      throw e;
     }
 
     int code;
@@ -523,7 +523,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
       connection.setRequestProperty("User-Agent", OC_USERAGENT);
 
       String json = IOUtils.toString(connection.getInputStream(), Charset.defaultCharset());
-      logger.debug(json);
+      logger.debug("User JSON that was returned: {}",json);
 
       if (StringUtils.isBlank(json)) {
         return null;
