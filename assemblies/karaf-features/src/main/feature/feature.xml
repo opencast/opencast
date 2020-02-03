@@ -134,7 +134,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-termination-state-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-termination-state-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-canvas/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-ldap/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-user-interface-configuration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-urlsigning-common/${project.version}</bundle>
@@ -685,4 +684,8 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-brightspace/${project.version}</bundle>
   </feature>
 
+  <feature name="opencast-canvas" version="${project.version}">
+    <feature start-level="80">opencast-core</feature>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-canvas/${project.version}</bundle>
+  </feature>
 </features>
