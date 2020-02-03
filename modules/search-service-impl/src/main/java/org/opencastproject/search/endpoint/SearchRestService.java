@@ -241,6 +241,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "The ID of the single episode to be returned, if it exists.", isRequired = false, name = "id", type = RestParameter.Type.STRING),
           @RestParameter(description = "Any episode that matches this free-text query.", isRequired = false, name = "q", type = RestParameter.Type.STRING),
           @RestParameter(description = "Any episode that belongs to specified series id.", isRequired = false, name = "sid", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Any episode that belongs to specified series name (note that the specified series name must be unique).", isRequired = false, name = "sname", type = RestParameter.Type.STRING),
           // @RestParameter(defaultValue = "false", description =
           // "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".",
           // isRequired = false, name = "episodes", type = RestParameter.Type.STRING),
