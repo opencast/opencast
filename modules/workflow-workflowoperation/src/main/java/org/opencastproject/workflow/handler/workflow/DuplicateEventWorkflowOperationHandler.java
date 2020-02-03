@@ -206,8 +206,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     final String configuredSourceTags = trimToEmpty(operation.getConfiguration(SOURCE_TAGS_PROPERTY));
     final String configuredTargetTags = trimToEmpty(operation.getConfiguration(TARGET_TAGS_PROPERTY));
     final boolean noSuffix = Boolean.parseBoolean(trimToEmpty(operation.getConfiguration(NO_SUFFIX)));
-    final String seriesIdStr = operation.getConfiguration(SET_SERIES_ID);
-    final String seriesId = seriesIdStr == null || seriesIdStr.startsWith("$") ? "" : seriesIdStr;
+    final String seriesId = trimToEmpty(operation.getConfiguration(SET_SERIES_ID));
     final int numberOfEvents = Integer.parseInt(operation.getConfiguration(NUMBER_PROPERTY));
     final String configuredPropertyNamespaces = trimToEmpty(operation.getConfiguration(PROPERTY_NAMESPACES_PROPERTY));
     int maxNumberOfEvents = MAX_NUMBER_DEFAULT;
