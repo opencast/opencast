@@ -28,6 +28,7 @@ import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
+import static org.opencastproject.external.common.ApiVersion.VERSION_1_4_0;
 import static org.opencastproject.external.util.SchedulingUtils.SchedulingInfo;
 import static org.opencastproject.external.util.SchedulingUtils.convertConflictingEvents;
 import static org.opencastproject.external.util.SchedulingUtils.getConflictingEvents;
@@ -862,12 +863,19 @@ public class EventsEndpoint implements ManagedService {
     }
     fields.add(f("publication_status", arr(publicationIds)));
     fields.add(f("processing_state", v(event.getWorkflowState(), BLANK)));
-    fields.add(f("start", v(event.getTechnicalStartTime(), BLANK)));
-    if (event.getTechnicalEndTime() != null) {
-      long duration = new DateTime(event.getTechnicalEndTime()).getMillis()
-                    - new DateTime(event.getTechnicalStartTime()).getMillis();
-      fields.add(f("duration", v(duration)));
+
+    if (requestedVersion.isSmallerThan(VERSION_1_4_0)) {
+      fields.add(f("start", v(event.getTechnicalStartTime(), BLANK)));
+      if (event.getTechnicalEndTime() != null) {
+        long duration = new DateTime(event.getTechnicalEndTime()).getMillis()
+                - new DateTime(event.getTechnicalStartTime()).getMillis();
+        fields.add(f("duration", v(duration)));
+      }
+    } else {
+      fields.add(f("start", v(event.getRecordingStartDate(), BLANK)));
+      fields.add(f("duration", v(event.getDuration(), BLANK)));
     }
+
     if (StringUtils.trimToNull(event.getSubject()) != null) {
       fields.add(f("subjects", arr(splitSubjectIntoArray(event.getSubject()))));
     } else {
