@@ -122,8 +122,7 @@ module.exports = function (grunt) {
           host: 'localhost',
           port: '<%= proxyPort %>',
           https: false
-        }]
-      },
+        }],
       test: {
         options: {
           port: 9001,
@@ -178,7 +177,7 @@ module.exports = function (grunt) {
     postcss: {
       options: {
         processors: [
-          require('autoprefixer')({browsers: ['last 1 version']})
+          require('autoprefixer')
         ]
       },
       server: {

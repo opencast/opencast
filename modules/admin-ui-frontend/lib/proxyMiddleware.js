@@ -25,7 +25,7 @@ module.exports = function (grunt, appPath) {
       ),
       connect().use(
         '/styles',
-        serveStatic('./grunt/.tmp/styles')
+        serveStatic('./target/grunt/.tmp/styles')
       ),
       connect().use(
         '/modules',

@@ -4,25 +4,25 @@ module.exports = function (config) {
 
         files : [
             // bower:js
-      '../bower_components/jquery/dist/jquery.js',
-      '../bower_components/jquery-ui/jquery-ui.js',
-      '../bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.js',
-      '../bower_components/angular/angular.js',
-      '../bower_components/angular-animate/angular-animate.js',
-      '../bower_components/angular-resource/angular-resource.js',
-      '../bower_components/angular-route/angular-route.js',
-      '../bower_components/angular-messages/angular-messages.js',
-      '../bower_components/angular-translate/angular-translate.js',
-      '../bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js',
-      '../bower_components/angular-local-storage/dist/angular-local-storage.js',
-      '../bower_components/angular-wizard/dist/angular-wizard.js',
-      '../bower_components/angular-hotkeys/build/hotkeys.js',
-      '../bower_components/angular-ui-sortable/sortable.js',
-      '../bower_components/ng-file-upload/angular-file-upload.js',
-      '../bower_components/chart.js/dist/Chart.js',
-      '../bower_components/angular-chart.js/dist/angular-chart.js',
-      '../bower_components/angular-mocks/angular-mocks.js',
-      // endbower
+            '../bower_components/jquery/dist/jquery.js',
+            '../bower_components/jquery-ui/jquery-ui.js',
+            '../bower_components/jqueryui-timepicker-addon/dist/jquery-ui-timepicker-addon.js',
+            '../bower_components/angular/angular.js',
+            '../bower_components/angular-route/angular-route.js',
+            '../bower_components/angular-resource/angular-resource.js',
+            '../bower_components/angular-animate/angular-animate.js',
+            '../bower_components/angular-messages/angular-messages.js',
+            '../bower_components/angular-translate/angular-translate.js',
+            '../bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js',
+            '../bower_components/angular-local-storage/dist/angular-local-storage.js',
+            '../bower_components/angular-wizard/dist/angular-wizard.js',
+            '../bower_components/angular-hotkeys/build/hotkeys.js',
+            '../bower_components/angular-ui-sortable/sortable.js',
+            '../bower_components/ng-file-upload/angular-file-upload.js',
+            '../bower_components/chart.js/dist/Chart.js',
+            '../bower_components/angular-chart.js/dist/angular-chart.js',
+            '../bower_components/angular-mocks/angular-mocks.js',
+            // endbower
       '../app/scripts/lib/chosen.jquery.js',
       '../app/scripts/lib/angular-chosen.js',
       '../app/scripts/lib/underscore-1.5.2.js',
@@ -88,7 +88,7 @@ module.exports = function (config) {
 
         coverageReporter: {
             type : 'html',
-      dir : 'grunt/coverage/'
+      dir : '../target/grunt/coverage/'
         },
 
         ngHtml2JsPreprocessor: {
