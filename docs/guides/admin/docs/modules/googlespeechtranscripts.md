@@ -1,6 +1,9 @@
 Transcripts (Automated by Google Speech)
 ========================================
 
+> Using this requires you to turn on an Opencast plugin.
+> Take a look [at the plugin management documentation](plugin-management.md) to find out how you can do that.
+
 Overview
 --------
 

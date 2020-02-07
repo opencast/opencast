@@ -107,6 +107,7 @@ nav:
 - Version Support: 'version-support.md'
 - Modules:
    - Overview: 'modules/index.md'
+   - Plugin Management: modules/plugin-management.md
    - Atom/RSS Feed: 'modules/atomrss.md'
    - Amazon Services:
       - Amazon S3 Archive Storage: 'modules/awss3archive.md'

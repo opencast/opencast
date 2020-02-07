@@ -109,6 +109,7 @@
             <feature>wrap</feature>
             <!-- Opencast features -->
             <feature>opencast-allinone</feature>
+            <feature>opencast-pluginmanager</feature>
           </bootFeatures>
         </configuration>
       </plugin>

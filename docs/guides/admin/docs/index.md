@@ -30,6 +30,7 @@ The Opencast Release Documentation is the official Opencast documentation for ea
     * [Encoding Configuration](configuration/encoding.md)
     * [more...](configuration/index.md)
 * [Module Documentation](modules/index.md)
+    * [Plugin Management](modules/plugin-management.md)
     * [Atom and RSS Feed](modules/atomrss.md)
     * [AWS S3 Distribution](modules/awss3distribution.md)
     * [Media Module](modules/mediamodule.configuration.md)
