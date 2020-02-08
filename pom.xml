@@ -871,7 +871,7 @@
             <artifactId>wstx-asl</artifactId>
           </exclusion>
         </exclusions>
-        <version>1.4.1</version>
+        <version>8.3.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.solr</groupId>
