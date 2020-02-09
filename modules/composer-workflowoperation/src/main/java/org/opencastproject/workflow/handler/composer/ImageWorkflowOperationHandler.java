@@ -47,8 +47,8 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSupport;
-import org.opencastproject.mediapackage.MediaPackageSupport.Filters;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.util.JobUtil;
@@ -82,9 +82,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * The workflow definition for handling "image" operations
@@ -326,15 +328,20 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /** Limit the list of media positions to those that fit into the length of the track. */
   static List<MediaPosition> limit(Track track, List<MediaPosition> positions) {
-    final long duration = track.getDuration();
-    return $(positions).filter(new Fn<MediaPosition, Boolean>() {
-      @Override public Boolean apply(MediaPosition p) {
-        return !(
-                (eq(p.type, PositionType.Seconds) && (p.position >= duration || p.position < 0.0))
-                        ||
-                        (eq(p.type, PositionType.Percentage) && (p.position < 0.0 || p.position > 100.0)));
-      }
-    }).toList();
+    final Long duration = track.getDuration();
+    // if the video has just one frame (e.g.: MP3-Podcasts) it makes no sense to go to a certain position
+    // as the video has only one image at position 0
+    if (duration == null || (track.getStreams() != null && Arrays.stream(track.getStreams())
+            .filter(stream -> stream instanceof VideoStream)
+            .map(org.opencastproject.mediapackage.Stream::getFrameCount)
+            .allMatch(frameCount -> frameCount == null || frameCount == 1))) {
+      return java.util.Collections.singletonList(new MediaPosition(PositionType.Seconds, 0));
+    }
+
+    return positions.stream()
+        .filter(p -> (PositionType.Seconds.equals(p.type) && p.position >= 0 && p.position < duration)
+                || (PositionType.Percentage.equals(p.type) && p.position >= 0 && p.position <= 100))
+        .collect(Collectors.toList());
   }
 
   /**
@@ -343,7 +350,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * the bounds of the tracks length.
    */
   static double toSeconds(Track track, MediaPosition position, double endMarginMs) {
-    final long durationMs = track.getDuration();
+    final long durationMs = track.getDuration() == null ? 0 : track.getDuration();
     final double posMs;
     switch (position.type) {
       case Percentage:
@@ -476,15 +483,9 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
       // fold both into a selector
       final TrackSelector trackSelector = sourceTags.apply(tagFold(sourceFlavors.apply(flavorFold(new TrackSelector()))));
       // select the tracks based on source flavors and tags and skip those that don't have video
-      sourceTracks = $(trackSelector.select(mp, true))
-              .filter(Filters.hasVideo.toFn())
-              .each(new Fx<Track>() {
-                @Override public void apply(Track track) {
-                  if (track.getDuration() == null) {
-                    chuck(new WorkflowOperationException(format("Track %s cannot tell its duration", track)));
-                  }
-                }
-              }).toList();
+      sourceTracks = trackSelector.select(mp, true).stream()
+          .filter(Track::hasVideo)
+          .collect(Collectors.toList());
     }
     final List<MediaPosition> positions = parsePositions(getConfig(woi, OPT_POSITIONS));
     final long endMargin = getOptConfig(woi, OPT_END_MARGIN).bind(Strings.toLong).getOr(END_MARGIN_DEFAULT);
