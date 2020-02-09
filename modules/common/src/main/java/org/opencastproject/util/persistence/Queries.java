@@ -21,13 +21,9 @@
 
 package org.opencastproject.util.persistence;
 
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 
@@ -37,8 +33,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
@@ -64,25 +58,6 @@ public final class Queries {
       @Override public A apply(EntityManager em) {
         em.persist(a);
         return a;
-      }
-    };
-  }
-
-  /** {@link javax.persistence.EntityManager#merge(Object)} as a function. */
-  public static <A> Function<EntityManager, A> merge(final A a) {
-    return new Function<EntityManager, A>() {
-      @Override public A apply(EntityManager em) {
-        return em.merge(a);
-      }
-    };
-  }
-
-  /** {@link javax.persistence.EntityManager#remove(Object)} as a function. */
-  public static <A> Function<EntityManager, A> remove(final A a) {
-    return new Function<EntityManager, A>() {
-      @Override public A apply(EntityManager em) {
-        em.remove(a);
-        return null;
       }
     };
   }
@@ -168,25 +143,6 @@ public final class Queries {
     }
   };
 
-  /** JPQL queries with support for named parameters. */
-  public static final TypedQueriesBase<Tuple<String, ?>> jpql = new TypedQueriesBase<Tuple<String, ?>>() {
-    @Override public Query query(EntityManager em, String q, Tuple<String, ?>... params) {
-      return setParams(em.createQuery(q), params);
-    }
-
-    @Override
-    public <A> TypedQuery<A> query(EntityManager em, String q, Class<A> type, Tuple<String, ?>... params) {
-      return setParams(em.createQuery(q, type), params);
-    }
-  };
-
-  /** Native SQL queries. Only support positional parameters. */
-  public static final QueriesBase<Object> sql = new QueriesBase<Object>() {
-    @Override public Query query(EntityManager em, String q, Object... params) {
-      return setParams(em.createNativeQuery(q), params);
-    }
-  };
-
   // -------------------------------------------------------------------------------------------------------------------
 
   public static abstract class TypedQueriesBase<P> extends QueriesBase<P> {
@@ -250,56 +206,6 @@ public final class Queries {
       };
     }
 
-    /**
-     * Run a SELECT query that should return a single result.
-     *
-     * @return some value if the query yields exactly one result, none otherwise
-     */
-    public <A> Option<A> findSingle(final EntityManager em,
-                                    final String q,
-                                    final P... params) {
-      try {
-        return some((A) query(em, q, params).getSingleResult());
-      } catch (NoResultException e) {
-        return none();
-      } catch (NonUniqueResultException e) {
-        return none();
-      }
-    }
-
-    /** {@link #findSingle(EntityManager, String, Object[])} as a function. */
-    public <A> Function<EntityManager, Option<A>> findSingle(final String q,
-                                                             final P... params) {
-      return new Function<EntityManager, Option<A>>() {
-        @Override public Option<A> apply(EntityManager em) {
-          return findSingle(em, q, params);
-        }
-      };
-    }
-
-    /** Run a SELECT query and return only the first result item. */
-    public <A> Option<A> findFirst(final EntityManager em,
-                                   final String q,
-                                   final P... params) {
-      try {
-        return some((A) query(em, q, params).setMaxResults(1).getSingleResult());
-      } catch (NoResultException e) {
-        return none();
-      } catch (NonUniqueResultException e) {
-        return none();
-      }
-    }
-
-    /** {@link #findSingle(EntityManager, String, Object[])} as a function. */
-    public <A> Function<EntityManager, Option<A>> findFirst(final String q,
-                                                            final P... params) {
-      return new Function<EntityManager, Option<A>>() {
-        @Override public Option<A> apply(EntityManager em) {
-          return findFirst(em, q, params);
-        }
-      };
-    }
-
     /** Run a COUNT(x) query. */
     public long count(final EntityManager em, final String q, final P... params) {
       return (Long) query(em, q, params).getSingleResult();
@@ -329,108 +235,5 @@ public final class Queries {
       };
     }
 
-    /** Find multiple entities and wrap the in the list monad. */
-    public <A> Monadics.ListMonadic<A> findAllM(EntityManager em, final String q, final P... params) {
-      return mlist(this.<A>findAll(em, q, params));
-    }
-
-    /** {@link #findAllM(EntityManager, String, Object[])} as a function. */
-    public <A> Function<EntityManager, Monadics.ListMonadic<A>> findAllM(final String q,
-                                                                         final P... params) {
-      return new Function<EntityManager, Monadics.ListMonadic<A>>() {
-        @Override public Monadics.ListMonadic<A> apply(EntityManager em) {
-          return findAllM(em, q, params);
-        }
-      };
-    }
-
-    /** Find multiple objects with optional pagination. */
-    public <A> List<A> findAll(final EntityManager em,
-                               final String q,
-                               final Option<Integer> offset,
-                               final Option<Integer> limit,
-                               final P... params) {
-      final Query query = query(em, q, params);
-      for (Integer x : offset) query.setFirstResult(x);
-      for (Integer x : limit) query.setMaxResults(x);
-      return (List<A>) query.getResultList();
-    }
-
-    /** {@link #findAll(EntityManager, String, Option, Option, Object[])} as a function. */
-    public <A> Function<EntityManager, List<A>> findAll(final String q,
-                                                        final Option<Integer> offset,
-                                                        final Option<Integer> limit,
-                                                        final P... params) {
-      return new Function<EntityManager, List<A>>() {
-        @Override public List<A> apply(EntityManager em) {
-          return findAll(em, q, offset, limit, params);
-        }
-      };
-    }
-
-    /** Find multiple objects with optional pagination wrapped in the list monad. */
-    public <A> Monadics.ListMonadic<A> findAllM(final EntityManager em,
-                                                final String q,
-                                                final Option<Integer> offset,
-                                                final Option<Integer> limit,
-                                                final P... params) {
-      return mlist(this.<A>findAll(em, q, offset, limit, params));
-    }
-
-    /** {@link #findAllM(EntityManager, String, Option, Option, Object[])} as a function. */
-    public <A> Function<EntityManager, Monadics.ListMonadic<A>> findAllM(final String q,
-                                                                         final Option<Integer> offset,
-                                                                         final Option<Integer> limit,
-                                                                         final P... params) {
-      return new Function<EntityManager, Monadics.ListMonadic<A>>() {
-        @Override public Monadics.ListMonadic<A> apply(EntityManager em) {
-          return findAllM(em, q, offset, limit, params);
-        }
-      };
-    }
-
-    /** Find multiple objects with pagination. */
-    public <A> List<A> findAll(final EntityManager em,
-                               final String q,
-                               final int offset,
-                               final int limit,
-                               final P... params) {
-      final Query query = query(em, q, params);
-      query.setFirstResult(offset);
-      query.setMaxResults(limit);
-      return (List<A>) query.getResultList();
-    }
-
-    public <A> Function<EntityManager, List<A>> findAll(final String q,
-                                                        final int offset,
-                                                        final int limit,
-                                                        final P... params) {
-      return new Function<EntityManager, List<A>>() {
-        @Override public List<A> apply(EntityManager em) {
-          return findAll(em, q, offset, limit, params);
-        }
-      };
-    }
-
-    /** Find multiple objects with pagination wrapped in the list monad. */
-    public <A> Monadics.ListMonadic<A> findAllM(final EntityManager em,
-                                                final String q,
-                                                final int offset,
-                                                final int limit,
-                                                final P... params) {
-      return mlist(this.<A>findAll(em, q, offset, limit, params));
-    }
-
-    /** {@link #findAllM(javax.persistence.EntityManager, String, int, int, Object[])} as a function. */
-    public <A> Function<EntityManager, Monadics.ListMonadic<A>> findAllM(final String q,
-                                                                         final int offset,
-                                                                         final int limit,
-                                                                         final P... params) {
-      return new Function<EntityManager, Monadics.ListMonadic<A>>() {
-        @Override public Monadics.ListMonadic<A> apply(EntityManager em) {
-          return findAllM(em, q, offset, limit, params);
-        }
-      };
-    }
   }
 }

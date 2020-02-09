@@ -234,8 +234,6 @@ public abstract class AbstractEventEndpoint {
   /** The logging facility */
   static final Logger logger = LoggerFactory.getLogger(AbstractEventEndpoint.class);
 
-  protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
-
   /** The configuration key that defines the default workflow definition */
   //TODO Move to a constants file instead of declaring it at the top of multiple files?
   protected static final String WORKFLOW_DEFINITION_DEFAULT = "org.opencastproject.workflow.default.definition";

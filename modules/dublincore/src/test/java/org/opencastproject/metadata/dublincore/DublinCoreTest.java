@@ -56,8 +56,6 @@ import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -67,12 +65,9 @@ import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -94,9 +89,6 @@ import javax.xml.transform.stream.StreamResult;
  * Test class for the dublin core implementation.
  */
 public class DublinCoreTest {
-
-  /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(DublinCoreTest.class);
 
   /**
    * The catalog name
@@ -157,26 +149,6 @@ public class DublinCoreTest {
   public void tearDown() throws Exception {
     FileUtils.deleteQuietly(dcTempFile1);
     FileUtils.deleteQuietly(dcTempFile2);
-  }
-
-  /**
-   * Test method for {@link org.opencastproject.metadata.dublincore.DublinCoreCatalog#fromFile(java.io.File)} .
-   */
-  @Test
-  public void testFromFile() throws Exception {
-    DublinCoreCatalog dc = null;
-    FileInputStream in = new FileInputStream(catalogFile);
-    dc = DublinCores.read(in);
-    IOUtils.closeQuietly(in);
-
-    // Check if the fields are available
-    assertEquals("ETH Zurich, Switzerland", dc.getFirst(PROPERTY_PUBLISHER, LANGUAGE_UNDEFINED));
-    assertEquals("Land and Vegetation: Key players on the Climate Scene",
-            dc.getFirst(PROPERTY_TITLE, DublinCore.LANGUAGE_UNDEFINED));
-    assertNotNull(dc.getFirst(PROPERTY_TITLE));
-    assertNull(dc.getFirst(PROPERTY_TITLE, "fr"));
-    // Test custom metadata element
-    assertEquals("true", dc.getFirst(OC_PROPERTY_PROMOTED));
   }
 
   /**
@@ -464,18 +436,6 @@ public class DublinCoreTest {
             catalog.getFirst(DublinCore.PROPERTY_TITLE), metadata.getTitle());
   }
 
-  // todo fix http://opencast.jira.com/browse/MH-8759 then remove @Ignore
-  @Ignore
-  @Test
-  public void testPreserveEncodingScheme() {
-    DublinCoreCatalog dc = DublinCores.mkOpencastEpisode().getCatalog();
-    DublinCoreValue val = DublinCoreValue.mk("http://www.opencastproject.org/license", "en", ENC_SCHEME_URI);
-    dc.add(PROPERTY_LICENSE, val);
-    assertEquals(1, dc.get(PROPERTY_LICENSE).size());
-    assertEquals(val, dc.get(PROPERTY_LICENSE).get(0));
-    assertEquals(Opt.some(ENC_SCHEME_URI), dc.get(PROPERTY_LICENSE).get(0).getEncodingScheme());
-  }
-
   @Test
   public void testSerializeDublinCore() throws Exception {
     DublinCoreCatalog dc = null;
@@ -522,19 +482,6 @@ public class DublinCoreTest {
     } catch (Exception e) {
       Assert.assertFalse(e instanceof NullPointerException);
     }
-  }
-
-  @Test
-  @Ignore
-  // this test should verify serialization/deserialization works for a fairly minimal case
-  // waiting on https://opencast.jira.com/browse/MH-9733
-  public void testSerializationDeserializationOfCatalogs() throws Exception {
-    DublinCoreCatalog impl = DublinCores.mkOpencastEpisode().getCatalog();
-    impl.addTag("bob");
-    impl.set(impl.PROPERTY_PUBLISHER, "test");
-    DublinCoreCatalogService service = new DublinCoreCatalogService();
-    DublinCoreCatalog newImpl = service.load(service.serialize(impl));
-    Assert.assertEquals(impl, newImpl);
   }
 
   @Test

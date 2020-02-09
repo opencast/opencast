@@ -50,7 +50,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -94,39 +93,6 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
   @Reference(name = "remoteServiceManager")
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     super.setRemoteServiceManager(remoteServiceManager);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#copyTo(java.lang.String, java.lang.String,
-   *      java.lang.String, java.lang.String, java.lang.String)
-   */
-  @Override
-  public URI copyTo(String fromCollection, String fromFileName, String toMediaPackage, String toMediaPackageElement,
-          String toFileName) throws IOException, NotFoundException {
-    String urlSuffix = UrlSupport.concat(
-            new String[] { "copy", fromCollection, fromFileName, toMediaPackage, toMediaPackageElement, toFileName });
-    HttpPost post = new HttpPost(urlSuffix);
-    HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND);
-    try {
-      if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          throw new NotFoundException("File from collection to copy not found: " + fromCollection + "/" + fromFileName);
-        } else {
-          URI uri = new URI(EntityUtils.toString(response.getEntity(), "UTF-8"));
-          logger.info("Copied collection file {}/{} to {}", fromCollection, fromFileName, uri);
-          return uri;
-        }
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new IOException("Unable to copy file", e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new RuntimeException("Unable to copy file from collection");
   }
 
   /**
@@ -246,16 +212,6 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getCollectionSize(java.lang.String)
-   */
-  @Override
-  public long getCollectionSize(String id) throws NotFoundException {
-    return getCollectionContents(id).length;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getDiskSpace()
    */
   @Override
@@ -297,37 +253,6 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
       closeConnection(response);
     }
     throw new RuntimeException("Error getting storage report");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getFromCollection(java.lang.String,
-   *      java.lang.String)
-   */
-  @Override
-  public InputStream getFromCollection(String collectionId, String fileName) throws NotFoundException {
-    String url = UrlSupport.concat(new String[] { COLLECTION_PATH_PREFIX, collectionId, fileName });
-    HttpGet get = new HttpGet(url);
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
-    try {
-      if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode())
-          throw new NotFoundException();
-        // Do not close this response. It will be closed when the caller closes the input stream
-        return new HttpClientClosingInputStream(response);
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new RuntimeException();
-    }
-    throw new RuntimeException("Error get from collection");
-  }
-
-  @Override
-  public File getFileFromCollection(String collectionId, String fileName) throws NotFoundException, IllegalArgumentException {
-    throw new RuntimeException("Unsupported");
   }
 
   /**

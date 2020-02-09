@@ -22,8 +22,6 @@
 
 package org.opencastproject.util;
 
-import org.joda.time.DateTime;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,7 +35,6 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 public final class DateTimeSupport {
 
   private static final String HOUR_MINUTE_SECOND_TIME_FORMAT = "HH:mm:ss";
-  private static final String HOUR_MINUTE_TIME_FORMAT = "HH:mm";
   private static final String STANDARD_DATE_FORMAT = "yyyy-MM-dd";
 
   /** Disable construction of this utility class */
@@ -56,21 +53,6 @@ public final class DateTimeSupport {
    */
   public static long fromUTC(String s) throws IllegalStateException, ParseException {
    return fromUTC(s, STANDARD_DATE_FORMAT, HOUR_MINUTE_SECOND_TIME_FORMAT);
-  }
-
-  /**
-   * This methods reads a utc date string without seconds and returns it's unix time equivalent in milliseconds.
-   * i.e. yyyy-MM-ddTHH:mmZ e.g. 2014-09-27T16:25Z
-   *
-   * @param s
-   *          the utc string
-   * @return the date/time in milliseconds
-   * @throws IllegalStateException
-   * @throws ParseException
-   *           if the date string is malformed
-   */
-  public static long fromUTCNoSeconds(String s) throws IllegalStateException, ParseException {
-    return fromUTC(s, STANDARD_DATE_FORMAT, HOUR_MINUTE_TIME_FORMAT);
   }
 
   /**
@@ -135,19 +117,6 @@ public final class DateTimeSupport {
     utc.append("Z");
 
     return utc.toString();
-  }
-
-  /**
-   * Forward to the next week day.
-   * <p>
-   * If it's Monday forwarding to Tuesday will add 1 day. If it's Friday forwarding to Thursday will go to next week's
-   * Thursday which is adding 6 days. Forward to Monday if on Monday simply returns <code>time</code>.
-   *
-   * @param weekDay
-   *          like described in {@link org.joda.time.DateTimeConstants}
-   */
-  public static DateTime toNextWeekDay(DateTime time, int weekDay) {
-    return time.getDayOfWeek() <= weekDay ? time.withDayOfWeek(weekDay) : time.plusWeeks(1).withDayOfWeek(weekDay);
   }
 
   /**

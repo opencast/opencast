@@ -59,18 +59,6 @@ public class PersonImpl implements Person {
    *
    * @param name
    *          the person's name
-   * @param email
-   *          the person's e-mail address
-   */
-  public PersonImpl(String name, String email) {
-    this(name, email, null);
-  }
-
-  /**
-   * Creates a new person.
-   *
-   * @param name
-   *          the person's name
    */
   public PersonImpl(String name) {
     this(name, null, null);

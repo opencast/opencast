@@ -174,27 +174,10 @@ public interface Workspace extends StorageUsage {
   void deleteFromCollection(String collectionId, String fileName) throws NotFoundException, IOException;
 
   /**
-   * Removes a file from a collection, removing the parent collection folder if empty
-   *
-   * @param collectionId
-   *          the collection identifier
-   * @param fileName
-   *          the filename to remove
-   * @param removeCollection
-   *          remove the parent collection folder if empty
-   * @throws NotFoundException
-   *           if there was no file with the provided name stored under this collection.
-   * @throws IOException
-   *           if deleting the data from the workspace fails
-   */
-  void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException;
-
-  /**
    * Get the URL for a file stored under the given media package and element IDs. MediaPackages may reference elements
    * that are not yet stored in the working file repository, so this method will return a URI even if the file is not
    * yet stored.
    *
-   * @deprecated Please use {@link #getURI(String, String, String)} instead
    * @param mediaPackageID
    *          the mediapackage identifier
    * @param mediaPackageElementID
@@ -204,23 +187,6 @@ public interface Workspace extends StorageUsage {
    *           if a URI cannot be created using the arguments provided
    */
   URI getURI(String mediaPackageID, String mediaPackageElementID) throws IllegalArgumentException;
-
-  /**
-   * Get the URL for a file stored under the given media package and element IDs. MediaPackages may reference elements
-   * that are not yet stored in the working file repository, so this method will return a URI even if the file is not
-   * yet stored.
-   *
-   * @param mediaPackageID
-   *          the mediapackage identifier
-   * @param mediaPackageElementID
-   *          the element identifier
-   * @param filename
-   *          the filename
-   * @return the URI to the file
-   * @throws IllegalArgumentException
-   *           if a URI cannot be created using the arguments provided
-   */
-  URI getURI(String mediaPackageID, String mediaPackageElementID, String filename) throws IllegalArgumentException;
 
   /**
    * Get the URL for a file stored under the given collection.
@@ -255,28 +221,6 @@ public interface Workspace extends StorageUsage {
    *           if a URI cannot be created using the arguments provided
    */
   URI moveTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
-          throws NotFoundException, IOException, IllegalArgumentException;
-
-  /**
-   * Copies a file from a collection into a mediapackage
-   *
-   * @param collectionURI
-   *          The uri pointing to a workspace collection
-   * @param toMediaPackage
-   *          The media package ID to copy the file into
-   * @param toMediaPackageElement
-   *          the media package element ID of the file
-   * @param toFileName
-   *          the name of the resulting file
-   * @return the URI pointing to the file's new location
-   * @throws NotFoundException
-   *           if the element identified by <code>collectionURI</code> cannot be found
-   * @throws IOException
-   *           if either the original element cannot be read or the copy cannot be written to the new location
-   * @throws IllegalArgumentException
-   *           if a URI cannot be created using the arguments provided
-   */
-  URI copyTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
           throws NotFoundException, IOException, IllegalArgumentException;
 
   /**

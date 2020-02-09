@@ -42,8 +42,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -59,9 +57,6 @@ import de.schlichtherle.io.FileOutputStream;
  * Tests XACML features of the security service
  */
 public class XACMLSecurityTest {
-
-  /** The logger */
-  protected static final Logger logger = LoggerFactory.getLogger(XACMLSecurityTest.class);
 
   /** The username to use with the security service */
   protected final String currentUser = "me";

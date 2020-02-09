@@ -25,7 +25,6 @@ package org.opencastproject.util.data;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.data.Cells.fcell;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 /**
@@ -55,15 +54,6 @@ public final class VCell<A> extends Cell<A> {
   /** Constructor function. */
   public static <A> VCell<A> cell(A a) {
     return new VCell<A>(a, true);
-  }
-
-  public static <A> VCell<A> iocell(A a) {
-    return new VCell<A>(a, false);
-  }
-
-  /** Create a cell containing some a. */
-  public static <A> VCell<Option<A>> ocell(A a) {
-    return cell(some(a));
   }
 
   /** Create a cell containing none. */
@@ -96,7 +86,6 @@ public final class VCell<A> extends Cell<A> {
     }
   }
 
-  @Override
   public <B> Cell<B> lift(Function<A, B> f) {
     return fcell(this, f);
   }

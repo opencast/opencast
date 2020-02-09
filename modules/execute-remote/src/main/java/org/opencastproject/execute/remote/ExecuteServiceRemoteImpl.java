@@ -62,29 +62,6 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
   }
 
   /**
-   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement)
-   */
-  public Job execute(String exec, String params, MediaPackageElement inElement) throws ExecuteException {
-    return execute(exec, params, inElement, null, null, 1.0f);
-  }
-
-  /**
-   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement, float)
-   */
-  public Job execute(String exec, String params, MediaPackageElement inElement, float load) throws ExecuteException {
-    return execute(exec, params, inElement, null, null, load);
-  }
-
-
-  /**
-   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement.Type)
-   */
-  public Job execute(String exec, String params, MediaPackageElement inElement, String outFileName, Type type)
-          throws ExecuteException {
-    return execute(exec, params, inElement, outFileName, type, 1.0f);
-  }
-
-  /**
    * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement.Type, float)
    */
   public Job execute(String exec, String params, MediaPackageElement inElement, String outFileName, Type type, float load)
@@ -126,15 +103,6 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
     } finally {
       closeConnection(response);
     }
-  }
-
-  /**
-   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackage, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement.Type)
-   */
-  @Override
-  public Job execute(String exec, String params, MediaPackage mp, String outFileName, Type type)
-          throws ExecuteException {
-    return execute(exec, params, mp, outFileName, type, 1.0f);
   }
 
   /**

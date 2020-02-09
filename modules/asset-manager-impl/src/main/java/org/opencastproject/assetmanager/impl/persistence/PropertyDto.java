@@ -26,7 +26,6 @@ import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
 
-import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fx;
 
 import org.slf4j.Logger;
@@ -124,12 +123,6 @@ public class PropertyDto {
     setValue(dto, value);
     return dto;
   }
-
-  public static final Fn<PropertyDto, Property> toProperty = new Fn<PropertyDto, Property>() {
-    @Override public Property apply(PropertyDto a) {
-      return a.toProperty();
-    }
-  };
 
   private static void setValue(final PropertyDto dto, final Value value) {
     value.decompose(

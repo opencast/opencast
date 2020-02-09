@@ -30,9 +30,6 @@ import org.opencastproject.smil.entity.api.SmilObject;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.StringWriter;
 
@@ -187,28 +184,11 @@ public class SmilResponseImpl implements SmilResponse {
   /**
    * Deserialize {@link SmilResponse} from XML.
    *
-   * @param smilResponseXmlFile {@link SmilResponse} as XML {@link File}
-   * @return {@link SmilResponse} object
-   * @throws JAXBException if deserialization fail
-   */
-  public static SmilResponse fromXml(File smilResponseXmlFile) throws JAXBException, FileNotFoundException {
-    FileInputStream smilStream = new FileInputStream(smilResponseXmlFile);
-    try {
-      return fromXml(smilStream);
-    } finally {
-      IOUtils.closeQuietly(smilStream);
-    }
-  }
-
-  /**
-   * Deserialize {@link SmilResponse} from XML.
-   *
    * @param smilResponseXml {@link SmilResponse} as XML {@link InputStream}
    * @return {@link SmilResponse} object
    * @throws JAXBException if deserialization fail
    */
   protected static SmilResponse fromXml(InputStream smilResponseXml) throws JAXBException {
-    StringWriter writer = new StringWriter();
     JAXBContext ctx = JAXBContext.newInstance(SmilResponseImpl.class);
     Unmarshaller unmarshaller = ctx.createUnmarshaller();
     return (SmilResponse) unmarshaller.unmarshal(smilResponseXml);

@@ -169,7 +169,6 @@ import javax.ws.rs.core.Response.Status;
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {}, abstractText = "Provides resources and operations related to the events")
 public class EventsEndpoint implements ManagedService {
-  private static final String METADATA_JSON_KEY = "metadata";
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
 
@@ -738,10 +737,9 @@ public class EventsEndpoint implements ManagedService {
     }
 
     // TODO: Add the comment resolution filter to the query
-    CommentResolution resolution = null;
     if (StringUtils.isNotBlank(resolutionFilter)) {
       try {
-        resolution = CommentResolution.valueOf(resolutionFilter);
+        CommentResolution.valueOf(resolutionFilter);
       } catch (Exception e) {
         logger.debug("Unable to parse comment resolution filter {}", resolutionFilter);
         return Response.status(Status.BAD_REQUEST).build();
@@ -1543,63 +1541,6 @@ public class EventsEndpoint implements ManagedService {
               String.format("Unable to find publication with id '%s' in event with id '%s'", publicationId, eventId));
     }
     throw new NotFoundException(String.format("Unable to find event with id '%s'", eventId));
-  }
-
-  /**
-   * Change the simplified fields of key values provided to the external api into a {@link MetadataList}.
-   *
-   * @param json
-   *          The json string that contains an array of metadata field lists for the different catalogs.
-   * @return A {@link MetadataList} with the fields populated with the values provided.
-   * @throws ParseException
-   *           Thrown if unable to parse the json string.
-   * @throws NotFoundException
-   *           Thrown if unable to find the catalog or field that the json refers to.
-   */
-  protected MetadataList deserializeMetadataList(String json) throws ParseException, NotFoundException {
-    MetadataList metadataList = new MetadataList();
-    JSONParser parser = new JSONParser();
-    JSONArray jsonCatalogs = (JSONArray) parser.parse(json);
-    for (int i = 0; i < jsonCatalogs.size(); i++) {
-      JSONObject catalog = (JSONObject) jsonCatalogs.get(i);
-      String flavorString = catalog.get("flavor").toString();
-      if (StringUtils.trimToNull(flavorString) == null) {
-        throw new IllegalArgumentException(
-                "Unable to create new event as no flavor was given for one of the metadata collections");
-      }
-
-      MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
-
-      MetadataCollection collection = null;
-      EventCatalogUIAdapter adapter = null;
-      for (EventCatalogUIAdapter eventCatalogUIAdapter : getEventCatalogUIAdapters()) {
-        if (eventCatalogUIAdapter.getFlavor().equals(flavor)) {
-          adapter = eventCatalogUIAdapter;
-          collection = eventCatalogUIAdapter.getRawFields();
-        }
-      }
-
-      if (collection == null) {
-        throw new IllegalArgumentException(
-                String.format("Unable to find an EventCatalogUIAdapter with Flavor '%s'", flavorString));
-      }
-
-      String fieldsJson = catalog.get("fields").toString();
-      if (StringUtils.trimToNull(fieldsJson) != null) {
-        Map<String, String> fields = RequestUtils.getKeyValueMap(fieldsJson);
-        for (String key : fields.keySet()) {
-          MetadataField<?> field = collection.getOutputFields().get(key);
-          if (field == null) {
-            throw new NotFoundException(String.format(
-                    "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
-          }
-          collection.removeField(field);
-          collection.addField(MetadataField.copyMetadataFieldWithValue(field, fields.get(key)));
-        }
-      }
-      metadataList.add(adapter, collection);
-    }
-    return metadataList;
   }
 
   /**

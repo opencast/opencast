@@ -26,7 +26,6 @@ import org.opencastproject.mediapackage.XMLCatalogImpl;
 import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
 import org.opencastproject.util.XmlNamespaceContext;
 
-import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
@@ -155,44 +154,10 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
     }
   }
 
-  /** {@link #read(String)} as a function, returning none on error. */
-  public static final Fn<String, Opt<DublinCoreCatalog>> readOptFromString = new Fn<String, Opt<DublinCoreCatalog>>() {
-    @Override public Opt<DublinCoreCatalog> apply(String xml) {
-      return readOpt(xml);
-    }
-  };
-
   @Nonnull
   public static DublinCoreCatalog read(Node xml)
       throws TransformerException {
     return new DublinCoreXmlFormat().readImpl(xml);
-  }
-
-  @Nonnull
-  public static DublinCoreCatalog read(InputSource xml)
-      throws IOException, SAXException, ParserConfigurationException {
-    return new DublinCoreXmlFormat().readImpl(xml);
-  }
-
-  // Optional read to optionally instantiate catalog with intentionally empty elements
-  // used to remove existing DublinCore catalog values during a merge update.
-  @Nonnull
-  public static DublinCoreCatalog read(String xml, boolean includeEmptiedElements)
-          throws IOException, SAXException, ParserConfigurationException {
-    return new DublinCoreXmlFormat(includeEmptiedElements).readImpl(
-        new InputSource(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))));
-  }
-
-  @Nonnull
-  public static DublinCoreCatalog read(Node xml, boolean includeEmptiedElements)
-      throws TransformerException {
-    return new DublinCoreXmlFormat(includeEmptiedElements).readImpl(xml);
-  }
-
-  @Nonnull
-  public static DublinCoreCatalog read(InputSource xml, boolean includeEmptiedElements)
-      throws IOException, SAXException, ParserConfigurationException {
-    return new DublinCoreXmlFormat(includeEmptiedElements).readImpl(xml);
   }
 
   @Nonnull
@@ -258,14 +223,6 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
       return doc;
     } else {
       throw new RuntimeException("DublinCore catalog does not have a root tag.");
-    }
-  }
-
-  public static String writeString(DublinCoreCatalog dc) {
-    try {
-      return dc.toXmlString();
-    } catch (IOException e) {
-      throw new IllegalStateException(String.format("Error serializing the episode dublincore catalog %s.", dc), e);
     }
   }
 

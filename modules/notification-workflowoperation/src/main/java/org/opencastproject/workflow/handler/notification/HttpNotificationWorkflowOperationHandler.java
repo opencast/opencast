@@ -37,7 +37,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -107,9 +106,6 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
 
   /** The scale factor to the sleep time between two notification attempts */
   public static final int SLEEP_SCALE_FACTOR = 2;
-
-  /** The http client to use when connecting to remote servers */
-  protected HttpClient client = null;
 
   /**
    * {@inheritDoc}

@@ -35,8 +35,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,9 +48,6 @@ import java.util.Map;
  * Abstract container for the metadata
  */
 public abstract class AbstractMetadataCollection implements MetadataCollection {
-
-  /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(AbstractMetadataCollection.class);
 
   /* Keys for the different properties of the metadata JSON Object */
   protected static final String KEY_METADATA_ID = "id";

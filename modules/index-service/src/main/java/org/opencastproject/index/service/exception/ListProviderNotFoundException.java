@@ -35,13 +35,4 @@ public class ListProviderNotFoundException extends ListProviderException {
     super(message);
   }
 
-  /**
-   * Constructs an exception with its cause and a simple message.
-   *
-   * @param message the simple message
-   * @param cause the cause
-   */
-  public ListProviderNotFoundException(String message, Throwable cause) {
-    super(message, cause);
-  }
 }

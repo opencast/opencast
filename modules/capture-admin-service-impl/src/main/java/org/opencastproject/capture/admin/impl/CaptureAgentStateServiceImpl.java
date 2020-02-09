@@ -172,16 +172,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   }
 
   /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#updateAgent(Agent)
-   */
-  @Override
-  public void updateAgent(Agent agent) {
-    updateAgentInDatabase((AgentImpl) agent);
-  }
-
-  /**
    * Gets an agent by name and organization.
    *
    * @param name

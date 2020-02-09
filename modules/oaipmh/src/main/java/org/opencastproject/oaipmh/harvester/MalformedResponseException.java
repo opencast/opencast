@@ -26,9 +26,6 @@ package org.opencastproject.oaipmh.harvester;
  * Indicates if some information cannot be retrieved from the OAI response.
  */
 public class MalformedResponseException extends HarvesterException {
-  public MalformedResponseException(String s) {
-    super(s);
-  }
 
   public MalformedResponseException(String s, Throwable throwable) {
     super(s, throwable);

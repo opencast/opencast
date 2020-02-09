@@ -1113,7 +1113,6 @@ public class Event implements IndexObject {
    *
    * @return the serialized recording event
    */
-  @Override
   public String toJSON() {
     try {
       if (context == null) {

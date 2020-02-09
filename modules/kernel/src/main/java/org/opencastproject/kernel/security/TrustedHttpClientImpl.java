@@ -53,7 +53,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
@@ -587,16 +586,6 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     }
   }
 
-  @Override
-  public <T> T execute(HttpUriRequest httpUriRequest, ResponseHandler<T> responseHandler, int connectionTimeout,
-                       int socketTimeout) throws TrustedHttpClientException {
-    try {
-      return responseHandler.handleResponse(execute(httpUriRequest, connectionTimeout, socketTimeout));
-    } catch (IOException e) {
-      throw new TrustedHttpClientException(e);
-    }
-  }
-
   /**
    * {@inheritDoc}
    *
@@ -612,18 +601,6 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     } else {
       logger.debug("Can not close a null response");
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.security.api.TrustedHttpClient#execute(org.apache.http.client.methods.HttpUriRequest,
-   * org.apache.http.client.ResponseHandler)
-   */
-  @Override
-  public <T> T execute(HttpUriRequest httpUriRequest, ResponseHandler<T> responseHandler)
-          throws TrustedHttpClientException {
-    return execute(httpUriRequest, responseHandler, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT);
   }
 
   /**

@@ -65,8 +65,6 @@ public class Ingestor implements Runnable {
    */
   private static final Logger logger = LoggerFactory.getLogger(Ingestor.class);
 
-  public static final String WFR_COLLECTION = "inbox";
-
   private final IngestService ingestService;
 
   private final SecurityContext secCtx;

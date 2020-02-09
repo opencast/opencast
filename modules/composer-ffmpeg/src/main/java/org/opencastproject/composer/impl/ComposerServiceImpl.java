@@ -1799,9 +1799,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   private static List<Tuple<String, String>> detailsFor(EncoderException ex, EncoderEngine engine) {
     final List<Tuple<String, String>> d = new ArrayList<>();
     d.add(tuple("encoder-engine-class", engine.getClass().getName()));
-    if (ex instanceof CmdlineEncoderException) {
-      d.add(tuple("encoder-commandline", ((CmdlineEncoderException) ex).getCommandLine()));
-    }
     return d;
   }
 

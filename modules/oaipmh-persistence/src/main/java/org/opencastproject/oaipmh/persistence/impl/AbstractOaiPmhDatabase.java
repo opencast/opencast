@@ -70,11 +70,6 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
 
   public abstract Workspace getWorkspace();
 
-  /** Return the current date. Used in implementation instead of new Date(); to facilitate unit testing. */
-  public Date currentDate() {
-    return new Date();
-  }
-
   @Override
   public void store(MediaPackage mediaPackage, String repository) throws OaiPmhDatabaseException {
     try {

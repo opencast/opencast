@@ -27,9 +27,6 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.authorization.xacml.manager.impl.Util.getManagedAcl;
-import static org.opencastproject.security.api.AccessControlUtil.acl;
-import static org.opencastproject.util.Jsons.obj;
-import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.RestUtil.R.conflict;
 import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
@@ -58,7 +55,6 @@ import org.opencastproject.util.Jsons;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Predicate;
 import org.opencastproject.util.data.functions.Functions;
 import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -85,8 +81,6 @@ import javax.ws.rs.core.Response;
 public abstract class AbstractAclServiceRestEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(AbstractAclServiceRestEndpoint.class);
 
-  private static final AccessControlList EMPTY_ACL = acl();
-
   protected abstract AclServiceFactory getAclServiceFactory();
 
   protected abstract String getEndpointBaseUrl();
@@ -98,20 +92,6 @@ public abstract class AbstractAclServiceRestEndpoint {
   protected abstract AssetManager getAssetManager();
 
   protected abstract SeriesService getSeriesService();
-
-  private static final Jsons.Obj fromSeries = obj(p("isFromSeries", true));
-
-  private static final Jsons.Obj fromEpisode = obj(p("isFromSeries", false));
-
-  /** Matches the given ACL against all managed ACLs returning the first match. */
-  private static Option<ManagedAcl> matchAcls(final AclService aclService, final AccessControlList acl) {
-    return mlist(aclService.getAcls()).find(new Predicate<ManagedAcl>() {
-      @Override
-      public Boolean apply(ManagedAcl macl) {
-        return AccessControlUtil.equals(acl, macl.getAcl());
-      }
-    });
-  }
 
   @GET
   @Path("/acl/{aclId}")

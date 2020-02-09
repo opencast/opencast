@@ -98,20 +98,6 @@ public final class OaiPmhRepositoryClient {
   }
 
   /**
-   * Run a "GetRecord" request.
-   */
-  public GetRecordResponse getRecord(String metadataPrefix, String identifier, Option<Date> from, Option<Date> until, Option<String> set) {
-    String queryParams = join(
-        "verb=" + OaiPmhConstants.VERB_GET_RECORD,
-        "metadataPrefix=" + metadataPrefix,
-        "identifier=" + identifier,
-        from.map(mkQueryParamDate("from")).getOrElse(""),
-        until.map(mkQueryParamDate("until")).getOrElse(""),
-        set.map(mkQueryParam("set")).getOrElse(""));
-    return new GetRecordResponse(doRequest(baseUrl + "?" + queryParams));
-  }
-
-  /**
    * Resume a "ListRecords" request.
    */
   public ListRecordsResponse resumeListRecords(String resumptionToken) {

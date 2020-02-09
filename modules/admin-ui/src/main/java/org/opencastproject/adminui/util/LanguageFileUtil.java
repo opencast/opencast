@@ -26,8 +26,6 @@ import org.opencastproject.adminui.exception.IllegalLanguageFilenameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -50,28 +48,6 @@ public final class LanguageFileUtil {
 
   private static final Logger logger = LoggerFactory
     .getLogger(LanguageFileUtil.class);
-
-  /**
-   * Executes {@link #stripLanguageFromFilename(String)} on each of the
-   * provided <code>filenames</code>.
-   *
-   * @param filenames
-   * @return
-   */
-  public static List<String> extractLanguagenamesFromFilenames(
-      List<String> filenames) {
-    List<String> result = new ArrayList<String>();
-    for (String filename : filenames) {
-      try {
-        result.add(stripLanguageFromFilename(filename));
-      } catch (IllegalLanguageFilenameException e) {
-        logger.warn(
-            "There is an illegal language filename lurking around. Excluding it from the available languages list.",
-            e);
-      }
-    }
-    return result;
-  }
 
   /**
    * Finds the language substring in a translation file (e.g. lang-de_DE.json
@@ -109,26 +85,6 @@ public final class LanguageFileUtil {
       logger.warn("Could not strip the language name from the filename {}. This indicates that the filename on the "
           + "server is not compliant with the naming convention.", filename, e);
       return filename;
-    }
-  }
-
-  /**
-   * Finds the part before the - or _ of a composited language code like de_DE
-   * (as it is returned by {@link #stripLanguageFromFilename(String)} or
-   * {@link #safelyStripLanguageFromFilename(String)}. If the languageCode is
-   * not composited, it will be returned as is.
-   *
-   * @param languageCode
-   * @return The ISO part of a composited language code, if not composited,
-   *         the languageCode.
-   */
-  public static String getIsoLanguagePart(String languageCode) {
-    CompositeLanguageCodeParser parser = new CompositeLanguageCodeParser(
-        languageCode);
-    if (parser.isComposite()) {
-      return parser.getSimpleLanguage();
-    } else {
-      return languageCode;
     }
   }
 

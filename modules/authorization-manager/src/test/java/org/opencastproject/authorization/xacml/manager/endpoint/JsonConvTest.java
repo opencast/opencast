@@ -33,7 +33,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -59,8 +58,6 @@ public final class JsonConvTest {
       return acl(entry("anonymous", "read", true));
     }
   };
-
-  private static final Date now = new Date();
 
   @Test
   public void testManagedAclFull() {

@@ -391,12 +391,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     this.mediaInspectionService = mediaInspectionService;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream)
-   */
-  @Override
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream)
           throws IngestException, IOException, MediaPackageException {
     try {
@@ -406,22 +400,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream, java.lang.String)
-   */
-  @Override
-  public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String wd)
-          throws MediaPackageException, IOException, IngestException, NotFoundException {
-    return addZippedMediaPackage(zipStream, wd, null);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.ingest.api.IngestService#addZippedMediaPackage(java.io.InputStream, java.lang.String)
-   */
   @Override
   public WorkflowInstance addZippedMediaPackage(InputStream zipStream, String wd, Map<String, String> workflowConfig)
           throws MediaPackageException, IOException, IngestException, NotFoundException {
@@ -1087,21 +1065,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       return ingest(mp, null, null, null);
     } catch (NotFoundException e) {
       throw new IngestException(e);
-    } catch (UnauthorizedException e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.ingest.api.IngestService#ingest(org.opencastproject.mediapackage.MediaPackage,
-   *      java.lang.String)
-   */
-  @Override
-  public WorkflowInstance ingest(MediaPackage mp, String wd) throws IngestException, NotFoundException {
-    try {
-      return ingest(mp, wd, null, null);
     } catch (UnauthorizedException e) {
       throw new IllegalStateException(e);
     }

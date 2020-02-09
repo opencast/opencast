@@ -68,72 +68,6 @@ public interface ExecuteService {
   String COLLECTION = "executor";
 
   /**
-   * Execute the operation specified by {@code exec} with the argument string indicated by {@code args}.
-   * 
-   * @param exec
-   *          The command to be executed by this method
-   * @param args
-   *          A string containing the argument list for this command. The special argument {@value #INPUT_FILE_PATTERN}
-   *          will be substituted by the location of the resource represented by the {@code inElement} parameter
-   * @param inElement
-   *          An {@link org.opencastproject.mediapackage.MediaPackageElement} object to be used as an input to the
-   *          command
-   * @return A {@link org.opencastproject.job.api.Job} representing the execution of the command. After a successful
-   *         execution, the {link @Job} payload will contain a serialized mediapackage element.
-   * @throws ExecuteException
-   *           if this method fails to create the {@code Job} correctly
-   */
-  Job execute(String exec, String args, MediaPackageElement inElement) throws ExecuteException;
-
-  /**
-   * Execute the operation specified by {@code exec} with the argument string indicated by {@code args}.
-   * 
-   * @param exec
-   *          The command to be executed by this method
-   * @param args
-   *          A string containing the argument list for this command. The special argument {@value #INPUT_FILE_PATTERN}
-   *          will be substituted by the location of the resource represented by the {@code inElement} parameter
-   * @param inElement
-   *          An {@link org.opencastproject.mediapackage.MediaPackageElement} object to be used as an input to the
-   *          command
-   * @param load
-   *          A floating point estimate of the load imposed on the node by executing the command
-   * @return A {@link org.opencastproject.job.api.Job} representing the execution of the command. After a successful
-   *         execution, the {link @Job} payload will contain a serialized mediapackage element.
-   * @throws ExecuteException
-   *           if this method fails to create the {@code Job} correctly
-   */
-  Job execute(String exec, String args, MediaPackageElement inElement, float load) throws ExecuteException;
-
-  /**
-   * Execute the operation specified by {@code exec} with the argument string indicated by {@code args}. This method may
-   * create an output file with the name {@code outFileName} and a
-   * {@link org.opencastproject.mediapackage.MediaPackageElement} will be created with the
-   * {@link org.opencastproject.mediapackage.MediaPackageElement.Type} indicated by the argument {@code type}.
-   * 
-   * @param exec
-   *          The command to be executed by this method
-   * @param args
-   *          A string containing the argument list for this command. The special argument {@value #INPUT_FILE_PATTERN}
-   *          will be substituted by the location of the resource represented by the {@code inElement} parameter, and
-   *          {@value #OUTPUT_FILE_PATTERN} by the file name indicated in {@code outFileName}.
-   * @param inElement
-   *          An {@link org.opencastproject.mediapackage.MediaPackageElement} object to be used as an input to the
-   *          command
-   * @param outFileName
-   *          The name of the file the command may possibly create.
-   * @param type
-   *          The {@link org.opencastproject.mediapackage.MediaPackageElement.Type} of the {@code MediaPackageElement}
-   *          created by this command.
-   * @return A {@link org.opencastproject.job.api.Job} representing the execution of the command. After a successful
-   *         execution, the {link @Job} payload will contain a serialized mediapackage element.
-   * @throws ExecuteException
-   *           if this method fails to create the {@code Job} correctly
-   */
-  Job execute(String exec, String args, MediaPackageElement inElement, String outFileName, MediaPackageElement.Type type)
-          throws ExecuteException;
-
-  /**
    * Execute the operation specified by {@code exec} with the argument string indicated by {@code args}. This method may
    * create an output file with the name {@code outFileName} and a
    * {@link org.opencastproject.mediapackage.MediaPackageElement} will be created with the
@@ -162,32 +96,6 @@ public interface ExecuteService {
    */
   Job execute(String exec, String args, MediaPackageElement inElement, String outFileName,
           MediaPackageElement.Type type, float load) throws ExecuteException;
-
-  /**
-   * Execute the operation specified by {@code exec} with the argument string indicated by {@code args}. This method
-   * accepts a {@link org.opencastproject.mediapackage.MediaPackage} as an argument, and elements within that
-   * MediaPackage may be referenced in the argument list by using certain placeholders.
-   *
-   * @param exec
-   *          The command to be executed by this method
-   * @param args
-   *          A string containing the argument list for this command. Some special placeholders are allowed, that will
-   *          be converted into the actual locations of elements in the supplied MediaPackage
-   * @param mp
-   *          The {@link org.opencastproject.mediapackage.MediaPackage} containing {@code MediaPackageElements} that
-   *          will be used as inputs of the command
-   * @param outFileName
-   *          The name of the file the command may possibly create.
-   * @param type
-   *          The {@link org.opencastproject.mediapackage.MediaPackageElement.Type} of the {@code MediaPackageElement}
-   *          created by this command.
-   * @return A {@link org.opencastproject.job.api.Job} representing the execution of the command. After a successful
-   *         execution, the {link @Job} payload will contain a serialized mediapackage element.
-   * @throws ExecuteException
-   *           if this method fails to create the {@code Job} correctly
-   */
-  Job execute(String exec, String args, MediaPackage mp, String outFileName, MediaPackageElement.Type type)
-          throws ExecuteException;
 
   /**
    * Execute the operation specified by {@code exec} with the argument string indicated by {@code args}. This method

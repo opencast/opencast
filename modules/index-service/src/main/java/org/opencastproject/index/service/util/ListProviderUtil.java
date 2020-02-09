@@ -24,11 +24,8 @@ package org.opencastproject.index.service.util;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.util.SmartIterator;
 
-import org.json.simple.JSONAware;
-
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -105,16 +102,6 @@ public final class ListProviderUtil {
 
   private static boolean noActionRequired(ResourceListQuery query) {
     return query == null || (query.getFilters().isEmpty() && query.getOffset().isNone() && query.getLimit().isNone());
-  }
-
-  public static List<JSONAware> filterMap(List<JSONAware> unfilteredList, ResourceListQuery query) {
-    if (noActionRequired(query)) {
-      return unfilteredList;
-    }
-    int limit = query.getLimit().getOrElse(0);
-    int offset = query.getOffset().getOrElse(0);
-    SmartIterator<JSONAware> si = new SmartIterator<JSONAware>(limit, offset);
-    return si.applyLimitAndOffset(unfilteredList);
   }
 
   /**

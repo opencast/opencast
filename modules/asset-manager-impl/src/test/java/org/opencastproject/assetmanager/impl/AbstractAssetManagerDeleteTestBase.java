@@ -22,7 +22,6 @@ package org.opencastproject.assetmanager.impl;
 
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
-import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
@@ -58,15 +57,6 @@ public class AbstractAssetManagerDeleteTestBase extends AbstractAssetManagerTest
     assertEquals(format("[SQL] There should be %d snapshots total", count),
                  count,
                  runCount(new JPAQuery().from(Q_SNAPSHOT)));
-  }
-
-  void assertPropertiesOfMediaPackage(long count, String mpId) {
-    assertEquals(format("[AssetManager] There should be %d properties for episode %s", count, mpId),
-                 count,
-                 enrich(q.select(q.properties()).where(q.mediaPackageId(mpId)).run()).countProperties());
-    assertEquals(format("[SQL] There should be %d properties for episode %s", count, mpId),
-                 count,
-                 runCount(new JPAQuery().from(Q_PROPERTY).where(Q_PROPERTY.mediaPackageId.eq(mpId))));
   }
 
   void assertTotals(long snapshots, long assets, long properties) {
