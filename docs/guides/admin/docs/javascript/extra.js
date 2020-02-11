@@ -10,6 +10,7 @@ $(document).ready(function () {
     if (window.location !== window.parent.location) {
         addTitleToCodeTag();
         addCopyToClipboardButton();
+        linkHeaders();
     } else {
         (function (i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r;
@@ -43,6 +44,26 @@ function addTitleToCodeTag() {
         if (typeof CODE.innerText !== 'undefined') {
             if (CODE.innerText.startsWith('etc/')) {
                 CODE.innerHTML = CODE.innerHTML.replace(/^etc/, SPAN.outerHTML);
+            }
+        }
+    }
+}
+
+/**
+ * Adds a section links to headers
+ */
+function linkHeaders() {
+    for (var i = 1; i < 4; i++) {
+        var headers = document.getElementsByTagName('h' + i);
+        for (var j = 0; j < headers.length; j++) {
+            var header = headers[j],
+                id = header.getAttribute('id')
+            if (id) {
+                var a = document.createElement('a');
+                a.innerText = '🔗';
+                a.classList.add('header-link');
+                a.setAttribute('href', '#' + id);
+                header.appendChild(a);
             }
         }
     }
