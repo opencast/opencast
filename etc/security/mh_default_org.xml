@@ -311,6 +311,7 @@
     <!-- sec:x509 subject-principal-regex="CN=(.*?)," user-service-ref="userDetailsService" / -->
 
     <!-- Enable and configure the failure URL for form-based logins -->
+    <!-- CAS Auth: Comment this if using CAS authentication -->
     <sec:form-login authentication-failure-url="/admin-ng/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
 
     <!-- Authentication filter chain -->
@@ -325,6 +326,10 @@
     <sec:custom-filter ref="shibbolethHeaderFilter" position="PRE_AUTH_FILTER"/>
     -->
 
+    <!-- CAS Auth:  Uncomment this if using CAS authentication
+    <sec:custom-filter position="FORM_LOGIN_FILTER" ref="casFilter" />
+    -->
+
     <!-- Enables "remember me" functionality -->
     <sec:remember-me services-ref="rememberMeServices" />
 
@@ -333,6 +338,13 @@
 
     <!-- If any URLs are to be exposed to anonymous users, the "sec:anonymous" filter must be present -->
     <sec:anonymous enabled="false" />
+
+    <!-- CAS Auth:  Uncomment this if using CAS authentication  -->
+    <!-- Enables CAS Single Sign Out
+    <sec:logout logout-success-url="/cas-logout.jsp"/>
+    <sec:custom-filter ref="requestSingleLogoutFilter" before="LOGOUT_FILTER"/>
+    <sec:custom-filter ref="singleLogoutFilter" before="FORM_LOGIN_FILTER"/>
+    -->
 
     <!-- Enables log out -->
     <sec:logout success-handler-ref="logoutSuccessHandler" />
@@ -400,7 +412,10 @@
 
   <!-- Differentiates between "normal" user requests and those requesting digest auth -->
   <bean id="opencastEntryPoint" class="org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint">
+    <!-- CAS Auth:  Comment this if using CAS authentication -->
     <property name="userEntryPoint" ref="userEntryPoint" />
+    <!-- CAS Auth:  Uncomment this if using CAS authentication -->
+    <!-- <property name="userEntryPoint" ref="casEntryPoint" /> -->
     <property name="digestAuthenticationEntryPoint" ref="digestEntryPoint" />
   </bean>
 
@@ -474,6 +489,59 @@
     </property>
     <property name="authHandler" ref="ltiLaunchAuthenticationHandler" />
   </bean>
+
+  <!-- ############### -->
+  <!-- # CAS Support # -->
+  <!-- ############### -->
+  <!--
+  <bean id="casFilter"
+    class="org.springframework.security.cas.web.CasAuthenticationFilter">
+    <property name="authenticationManager" ref="authenticationManager"/>
+    <property name="authenticationSuccessHandler" ref="authSuccessHandler" />
+    <property name="serviceProperties" ref="serviceProperties" />
+    <property name="authenticationDetailsSource">
+      <bean class="org.springframework.security.cas.web.authentication.ServiceAuthenticationDetailsSource"/>
+    </property>
+  </bean>
+
+  <bean id="casEntryPoint"
+    class="org.springframework.security.cas.web.CasAuthenticationEntryPoint">
+    <property name="loginUrl" value="https://auth-test.berkeley.edu/cas/login"/>
+    <property name="serviceProperties" ref="serviceProperties"/>
+  </bean>
+
+  <bean id="serviceProperties"
+    class="org.springframework.security.cas.ServiceProperties">
+    <property name="service" value="https://localhost/j_spring_cas_security_check"/>
+    <property name="sendRenew" value="false"/>
+  </bean>
+
+  <bean id="casAuthenticationProvider"
+    class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+    <property name="serviceProperties" ref="serviceProperties" />
+    <property name="authenticationUserDetailsService">
+      <bean class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+          <constructor-arg ref="userDetailsService" />
+      </bean>
+    </property>
+    <property name="ticketValidator">
+      <bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+        <constructor-arg index="0" value="https://auth-test.berkeley.edu/cas" />
+      </bean>
+    </property>
+    <property name="key" value="cas"/>
+  </bean>
+
+  <bean id="singleLogoutFilter" class="org.jasig.cas.client.session.SingleSignOutFilter"/>
+
+  <bean id="requestSingleLogoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+    <constructor-arg value="https://auth-test.berkeley.edu/cas/logout"/>
+    <constructor-arg>
+      <bean class= "org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+    </constructor-arg>
+    <property name="filterProcessesUrl" value="https://localhost/j_spring_security_logout"/>
+  </bean>
+  -->
 
   <!-- ###################### -->
   <!-- # Shibboleth Support # -->
@@ -600,6 +668,8 @@
 
   <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
   <sec:authentication-manager alias="authenticationManager">
+    <!-- CAS Auth: Uncomment this if using CAS authentication -->
+    <!-- <sec:authentication-provider ref="casAuthenticationProvider" /> -->
     <!-- Uncomment this if using Shibboleth authentication -->
     <!-- <sec:authentication-provider ref="preauthAuthProvider" /> -->
     <!-- Uncomment the following line if using LDAP -->
