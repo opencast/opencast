@@ -130,7 +130,7 @@
                                       data-width="'360px'"
                                       ng-model="policy.role"
                                       ng-options="id as id for (id, type) in roles"
-                                      ng-get-more="getMoreRoles"
+                                      call-on-search="getMatchingRoles"
                                       placeholder-text-single="'{{ 'USERS.ACLS.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
                                       no-results-text="'{{ 'USERS.ACLS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
                                       />

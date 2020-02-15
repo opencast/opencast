@@ -64,7 +64,7 @@ angular.module('adminNg.controllers')
 
     var reloadRoles = function () {
       $scope.role = {
-        available: UserRolesResource.query({limit: 0, offset: 0, filter: 'role_target:USER'}),
+        available: UserRolesResource.query({limit: -1, filter: 'role_target:USER'}),
         selected:  [],
         i18n: 'USERS.GROUPS.DETAILS.ROLES',
         searchable: true

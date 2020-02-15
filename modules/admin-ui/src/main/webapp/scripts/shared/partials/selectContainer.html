@@ -21,7 +21,6 @@
                 ng-init="markedForAddition = []"
                 ng-class="{ disabled: disabled , scrollable: 'true'}"
                 ng-options="item[display] group by item[groupBy] for item in resource.available | filter: customFilter() | orderBy: display : false"
-                loading-scroller="loadMore()"
                 style="min-height: 11em;"
                 ng-style="getHeight()"
                 ng-dblclick="add()">
