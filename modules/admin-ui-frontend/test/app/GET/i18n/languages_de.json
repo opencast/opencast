@@ -1,25 +1,4 @@
 {
-   "bestLanguage":{
-      "dateFormats":{
-         "time":{
-            "short":"HH:mm",
-            "full":"HH:mm' Uhr 'z",
-            "medium":"HH:mm:ss"
-         },
-         "dateTime":{
-            "short":"dd.MM.yy HH:mm",
-            "full":"EEEE, d. MMMM yyyy HH:mm' Uhr 'z",
-            "medium":"dd.MM.yyyy HH:mm:ss"
-         },
-         "date":{
-            "short":"dd.MM.yy",
-            "full":"EEEE, d. MMMM yyyy",
-            "medium":"dd.MM.yyyy"
-         }
-      },
-      "displayLanguage":"German",
-      "code":"de_DE"
-   },
    "fallbackLanguage":{
       "dateFormats":{
          "time":{

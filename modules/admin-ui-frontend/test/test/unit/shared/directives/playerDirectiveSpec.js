@@ -54,7 +54,7 @@ describe('adminNg.directives.playerDirective', function () {
         spyOn(repository, 'createNewAdapter').and.returnValue(adapter);
 
         $httpBackend.whenGET('modules/events/partials/index.html').respond('');
-        $httpBackend.whenGET('/i18n/languages.json')
+        $httpBackend.whenGET('public/languages.json')
             .respond('{"fallbackLanguage":{"code":"en_US"},"bestLanguage":{"code":"en_US"}}');
         $rootScope.player = {};
         element = $compile('<div video-player data-player="player" data-video="video" data-player-ref="player" data-x="{{playing}}" data-adapter="html5"/>')($rootScope);

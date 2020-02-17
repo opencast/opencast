@@ -223,7 +223,6 @@ angular.module('adminNg.services.language')
           });
         }
       }
-
       return $filter('date')(string, me.currentLanguage.dateFormats[format][style]);
     };
 
@@ -389,13 +388,6 @@ angular.module('adminNg.services.language')
       });
     };
 
-    this.setLanguages = function (data) {
-      me.currentLanguage = data.bestLanguage;
-      me.fallbackLanguage = data.fallbackLanguage;
-      me.availableLanguages = data.availableLanguages;
-      me.dateFormats = data.dateFormats;
-    };
-
     /**
      * @ngdoc function
      * @name Language.configure
@@ -408,8 +400,23 @@ angular.module('adminNg.services.language')
     this.configure = function (data, language) {
       me.fallbackLanguage = data.fallbackLanguage;
       me.availableLanguages = data.availableLanguages;
-      me.dateFormats = data.dateFormats;
-      me.currentLanguage = this.getAvailableLanguage(language) || data.bestLanguage;
+      me.currentLanguage = this.getAvailableLanguage(language);
+      var currentLanguageCode = navigator.language.replace('-','_');
+
+      if(angular.isUndefined(me.currentLanguage)) {
+        me.currentLanguage = data.availableLanguages.filter(function(lang){
+          return lang.code === currentLanguageCode;
+        })[0];
+      }
+      if(angular.isUndefined(me.currentLanguage)) {
+        me.currentLanguage = data.availableLanguages.filter(function(lang){
+          return lang.code.substr(0,2) === currentLanguageCode.substr(0,2);
+        })[0];
+      }
+      if(angular.isUndefined(me.currentLanguage)) {
+        me.currentLanguage = me.fallbackLanguage;
+      }
+
       me.updateHttpLanguageHeader();
     };
 
@@ -426,7 +433,7 @@ angular.module('adminNg.services.language')
      */
     this.configureFromServer = function (deferred, language) {
       var me = this;
-      $http({method: 'GET', url: '/i18n/languages.json'})
+      $http({method: 'GET', url: 'public/languages.json'})
         .then(function onSuccess(response) {
           var fallbackDeferred = $q.defer();
           me.configure(response.data, language);

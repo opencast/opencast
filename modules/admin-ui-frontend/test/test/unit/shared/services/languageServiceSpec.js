@@ -38,7 +38,7 @@ describe('adminNg.services.language', function () {
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
 
-        $httpBackend.expectGET('/i18n/languages.json').respond(JSON.stringify(getJSONFixture('i18n/languages.json')));
+        $httpBackend.expectGET('public/languages.json').respond(JSON.stringify(getJSONFixture('i18n/languages.json')));
         $httpBackend.whenGET('public/org/opencastproject/adminui/languages/lang-en_US.json').respond('');
         $httpBackend.whenGET('modules/events/partials/index.html').respond('');
         $httpBackend.flush();
@@ -301,22 +301,6 @@ describe('adminNg.services.language', function () {
         });
     });
 
-    describe('#setLanguages', function () {
-
-        it('applies JSON data', function () {
-            Language.setLanguages({
-                bestLanguage: 'best',
-                fallbackLanguage: 'fallback',
-                availableLanguages: 'available',
-                dateFormats: 'formats'
-            });
-            expect(Language.currentLanguage).toEqual('best');
-            expect(Language.fallbackLanguage).toEqual('fallback');
-            expect(Language.availableLanguages).toEqual('available');
-            expect(Language.dateFormats).toEqual('formats');
-        });
-    });
-
     describe('#loadLanguageFromServer', function () {
 
         it('rejects on errors', function () {
@@ -331,7 +315,7 @@ describe('adminNg.services.language', function () {
 
     describe('#changeLanguage', function () {
         beforeEach(function () {
-            $httpBackend.expectGET('/i18n/languages.json').respond(JSON.stringify(getJSONFixture('i18n/languages.json')));
+            $httpBackend.expectGET('public/languages.json').respond(JSON.stringify(getJSONFixture('i18n/languages.json')));
         });
 
         afterEach(function () {
@@ -351,7 +335,7 @@ describe('adminNg.services.language', function () {
 
         describe('on success', function () {
             beforeEach(function () {
-                $httpBackend.expectGET('/i18n/languages.json')
+                $httpBackend.expectGET('public/languages.json')
                     .respond(JSON.stringify(getJSONFixture('i18n/languages.json')));
                 $httpBackend.expectGET('public/org/opencastproject/adminui/languages/lang-en_US.json');
             });
@@ -364,7 +348,7 @@ describe('adminNg.services.language', function () {
 
         describe('on error', function () {
             beforeEach(function () {
-                $httpBackend.whenGET('/i18n/languages.json').respond(500);
+                $httpBackend.whenGET('public/languages.json').respond(500);
             });
 
             it('rejects the promise', function () {

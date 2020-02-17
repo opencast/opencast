@@ -1,0 +1,361 @@
+{
+   "availableLanguages" : [
+      {
+         "code" : "da_DK",
+         "dateFormats" : {
+            "date" : {
+               "full" : "d. MMMM yyyy",
+               "medium" : "dd-MM-yyyy",
+               "short" : "dd-MM-yy"
+            },
+            "dateTime" : {
+               "full" : "d. MMMM yyyy HH:mm:ss z",
+               "medium" : "dd-MM-yyyy HH:mm:ss",
+               "short" : "dd-MM-yy HH:mm"
+            },
+            "time" : {
+               "full" : "HH:mm:ss z",
+               "medium" : "HH:mm:ss",
+               "short" : "HH:mm"
+            }
+         },
+         "displayLanguage" : "Dansk"
+      },
+      {
+         "code" : "de_DE",
+         "dateFormats" : {
+            "date" : {
+               "full" : "EEEE, d. MMMM yyyy",
+               "medium" : "dd.MM.yyyy",
+               "short" : "dd.MM.yy"
+            },
+            "dateTime" : {
+               "full" : "EEEE, d. MMMM yyyy HH:mm' Uhr 'z",
+               "medium" : "dd.MM.yyyy HH:mm:ss",
+               "short" : "dd.MM.yy HH:mm"
+            },
+            "time" : {
+               "full" : "HH:mm' Uhr 'z",
+               "medium" : "HH:mm:ss",
+               "short" : "HH:mm"
+            }
+         },
+         "displayLanguage" : "Deutsch"
+      },
+      {
+         "code" : "el_GR",
+         "dateFormats" : {
+            "date" : {
+               "full" : "EEEE, d MMMM yyyy",
+               "medium" : "d MMM yyyy",
+               "short" : "d/M/yyyy"
+            },
+            "dateTime" : {
+               "full" : "EEEE, d MMMM yyyy h:mm:ss a z",
+               "medium" : "d MMM yyyy h:mm:ss a",
+               "short" : "d/M/yyyy h:mm a"
+            },
+            "time" : {
+               "full" : "h:mm:ss a z",
+               "medium" : "h:mm:ss a",
+               "short" : "h:mm a"
+            }
+         },
+         "displayLanguage" : "ÎÎ»Î»Î·Î½Î¹ÎºÎ¬"
+      },
+      {
+         "code" : "en_GB",
+         "dateFormats" : {
+            "date" : {
+               "full" : "EEEE, d MMMM yyyy",
+               "medium" : "dd-MMM-yyyy",
+               "short" : "dd/MM/yy"
+            },
+            "dateTime" : {
+               "full" : "EEEE, d MMMM yyyy HH:mm:ss 'o''clock' z",
+               "medium" : "dd-MMM-yyyy HH:mm:ss",
+               "short" : "dd/MM/yy HH:mm"
+            },
+            "time" : {
+               "full" : "HH:mm:ss 'o''clock' z",
+               "medium" : "HH:mm:ss",
+               "short" : "HH:mm"
+            }
+         },
+         "displayLanguage" : "English"
+      },
+      {
+         "code" : "en_US",
+         "dateFormats" : {
+            "date" : {
+               "full" : "EEEE, MMMM d, yyyy",
+               "medium" : "MMM d, yyyy",
+               "short" : "M/d/yy"
+            },
+            "dateTime" : {
+               "full" : "EEEE, MMMM d, yyyy h:mm:ss a z",
+               "medium" : "MMM d, yyyy h:mm:ss a",
+               "short" : "M/d/yy h:mm a"
+            },
+            "time" : {
+               "full" : "h:mm:ss a z",
+               "medium" : "h:mm:ss a",
+               "short" : "h:mm a"
+            }
+         },
+         "displayLanguage" : "English"
+      },
+      {
+         "code" : "es_ES",
+         "dateFormats" : {
+            "date" : {
+               "full" : "EEEE d' de 'MMMM' de 'yyyy",
+               "medium" : "dd-MMM-yyyy",
+               "short" : "d/MM/yy"
+            },
+            "dateTime" : {
+               "full" : "EEEE d' de 'MMMM' de 'yyyy HH'H'mm'' z",
+               "medium" : "dd-MMM-yyyy H:mm:ss",
+               "short" : "d/MM/yy H:mm"
+            },
+            "time" : {
+               "full" : "HH'H'mm'' z",
+               "medium" : "H:mm:ss",
+               "short" : "H:mm"
+            }
+         },
+         "displayLanguage" : "EspaÃ±ol"
+      },
+      {
+         "code" : "fr_FR",
+         "dateFormats" : {
+            "date" : {
+               "full" : "EEEE d MMMM yyyy",
+               "medium" : "d MMM yyyy",
+               "short" : "dd/MM/yy"
+            },
+            "dateTime" : {
+               "full" : "EEEE d MMMM yyyy HH' h 'mm z",
+               "medium" : "d MMM yyyy HH:mm:ss",
+               "short" : "dd/MM/yy HH:mm"
+            },
+            "time" : {
+               "full" : "HH' h 'mm z",
+               "medium" : "HH:mm:ss",
+               "short" : "HH:mm"
+            }
+         },
+         "displayLanguage" : "FranÃ§ais"
+      },
+      {
+         "code" : "gl_ES",
+         "dateFormats" : {
+            "date" : {
+               "full" : "EEEE, MMMM d, yyyy",
+               "medium" : "MMM d, yyyy",
+               "short" : "M/d/yy"
+            },
+            "dateTime" : {
+               "full" : "EEEE, MMMM d, yyyy h:mm:ss a z",
+               "medium" : "MMM d, yyyy h:mm:ss a",
+               "short" : "M/d/yy h:mm a"
+            },
+            "time" : {
+               "full" : "h:mm:ss a z",
+               "medium" : "h:mm:ss a",
+               "short" : "h:mm a"
+            }
+         },
+         "displayLanguage" : "Gallegan"
+      },
+      {
+         "code" : "he_IL",
+         "dateFormats" : {
+            "date" : {
+               "full" : "EEEE d MMMM yyyy",
+               "medium" : "dd/MM/yyyy",
+               "short" : "dd/MM/yy"
+            },
+            "dateTime" : {
+               "full" : "HH:mm:ss z EEEE d MMMM yyyy",
+               "medium" : "HH:mm:ss dd/MM/yyyy",
+               "short" : "HH:mm dd/MM/yy"
+            },
+            "time" : {
+               "full" : "HH:mm:ss z",
+               "medium" : "HH:mm:ss",
+               "short" : "HH:mm"
+            }
+         },
+         "displayLanguage" : "×¢××¨××ª"
+      },
+      {
+         "code" : "it_IT",
+         "dateFormats" : {
+            "date" : {
+               "full" : "EEEE d MMMM yyyy",
+               "medium" : "d-MMM-yyyy",
+               "short" : "dd/MM/yy"
+            },
+            "dateTime" : {
+               "full" : "EEEE d MMMM yyyy H.mm.ss z",
+               "medium" : "d-MMM-yyyy H.mm.ss",
+               "short" : "dd/MM/yy H.mm"
+            },
+            "time" : {
+               "full" : "H.mm.ss z",
+               "medium" : "H.mm.ss",
+               "short" : "H.mm"
+            }
+         },
+         "displayLanguage" : "Italiano"
+      },
+      {
+         "code" : "nl_NL",
+         "dateFormats" : {
+            "date" : {
+               "full" : "EEEE d MMMM yyyy",
+               "medium" : "d-MMM-yyyy",
+               "short" : "d-M-yy"
+            },
+            "dateTime" : {
+               "full" : "EEEE d MMMM yyyy H:mm:ss' uur' z",
+               "medium" : "d-MMM-yyyy H:mm:ss",
+               "short" : "d-M-yy H:mm"
+            },
+            "time" : {
+               "full" : "H:mm:ss' uur' z",
+               "medium" : "H:mm:ss",
+               "short" : "H:mm"
+            }
+         },
+         "displayLanguage" : "Nederlands"
+      },
+      {
+         "code" : "pl_PL",
+         "dateFormats" : {
+            "date" : {
+               "full" : "EEEE, d MMMM yyyy",
+               "medium" : "yyyy-MM-dd",
+               "short" : "dd.MM.yy"
+            },
+            "dateTime" : {
+               "full" : "EEEE, d MMMM yyyy HH:mm:ss z",
+               "medium" : "yyyy-MM-dd HH:mm:ss",
+               "short" : "dd.MM.yy HH:mm"
+            },
+            "time" : {
+               "full" : "HH:mm:ss z",
+               "medium" : "HH:mm:ss",
+               "short" : "HH:mm"
+            }
+         },
+         "displayLanguage" : "Polski"
+      },
+      {
+         "code" : "sl_SI",
+         "dateFormats" : {
+            "date" : {
+               "full" : "EEEE, dd. MMMM y",
+               "medium" : "d.M.yyyy",
+               "short" : "d.M.y"
+            },
+            "dateTime" : {
+               "full" : "EEEE, dd. MMMM y H:mm:ss z",
+               "medium" : "d.M.yyyy H:mm:ss",
+               "short" : "d.M.y H:mm"
+            },
+            "time" : {
+               "full" : "H:mm:ss z",
+               "medium" : "H:mm:ss",
+               "short" : "H:mm"
+            }
+         },
+         "displayLanguage" : "SlovenÅ¡Äina"
+      },
+      {
+         "code" : "sv_SE",
+         "dateFormats" : {
+            "date" : {
+               "full" : "'den 'd MMMM yyyy",
+               "medium" : "yyyy-MMM-dd",
+               "short" : "yyyy-MM-dd"
+            },
+            "dateTime" : {
+               "full" : "'den 'd MMMM yyyy 'kl 'H:mm z",
+               "medium" : "yyyy-MMM-dd HH:mm:ss",
+               "short" : "yyyy-MM-dd HH:mm"
+            },
+            "time" : {
+               "full" : "'kl 'H:mm z",
+               "medium" : "HH:mm:ss",
+               "short" : "HH:mm"
+            }
+         },
+         "displayLanguage" : "Svenska"
+      },
+      {
+         "code" : "tr_TR",
+         "dateFormats" : {
+            "date" : {
+               "full" : "dd MMMM yyyy EEEE",
+               "medium" : "dd.MMM.yyyy",
+               "short" : "dd.MM.yyyy"
+            },
+            "dateTime" : {
+               "full" : "dd MMMM yyyy EEEE HH:mm:ss z",
+               "medium" : "dd.MMM.yyyy HH:mm:ss",
+               "short" : "dd.MM.yyyy HH:mm"
+            },
+            "time" : {
+               "full" : "HH:mm:ss z",
+               "medium" : "HH:mm:ss",
+               "short" : "HH:mm"
+            }
+         },
+         "displayLanguage" : "TÃ¼rkÃ§e"
+      },
+      {
+         "code" : "zh_TW",
+         "dateFormats" : {
+            "date" : {
+               "full" : "yyyy'å¹´'M'æ'd'æ¥' EEEE",
+               "medium" : "yyyy/M/d",
+               "short" : "yyyy/M/d"
+            },
+            "dateTime" : {
+               "full" : "yyyy'å¹´'M'æ'd'æ¥' EEEE ahh'æ'mm'å'ss'ç§' z",
+               "medium" : "yyyy/M/d a hh:mm:ss",
+               "short" : "yyyy/M/d a h:mm"
+            },
+            "time" : {
+               "full" : "ahh'æ'mm'å'ss'ç§' z",
+               "medium" : "a hh:mm:ss",
+               "short" : "a h:mm"
+            }
+         },
+         "displayLanguage" : "ä¸­æ"
+      }
+   ],
+   "fallbackLanguage" : {
+      "code" : "en_US",
+      "dateFormats" : {
+         "date" : {
+            "full" : "EEEE, MMMM d, yyyy",
+            "medium" : "MMM d, yyyy",
+            "short" : "M/d/yy"
+         },
+         "dateTime" : {
+            "full" : "EEEE, MMMM d, yyyy h:mm:ss a z",
+            "medium" : "MMM d, yyyy h:mm:ss a",
+            "short" : "M/d/yy h:mm a"
+         },
+         "time" : {
+            "full" : "h:mm:ss a z",
+            "medium" : "h:mm:ss a",
+            "short" : "h:mm a"
+         }
+      },
+      "displayLanguage" : "English"
+   }
+}

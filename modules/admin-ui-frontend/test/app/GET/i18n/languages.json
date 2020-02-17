@@ -1,26 +1,4 @@
 {
-  "bestLanguage":
-  {
-  "code":"en_US",
-  "dateFormats":{
-    "dateTime":{
-      "short":"M\/d\/yy h:mm a",
-      "medium":"MMM d, yyyy h:mm:ss a",
-      "full":"EEEE, MMMM d, yyyy h:mm:ss a z"
-    },
-    "date":{
-      "short":"M\/d\/yy",
-      "medium":"MMM d, yyyy",
-      "full":"EEEE, MMMM d, yyyy"
-    },
-    "time":{
-      "short":"h:mm a",
-      "medium":"h:mm:ss a",
-      "full":"h:mm:ss a z"
-    }
-  },
-    "displayLanguage":"English"
-  },
   "availableLanguages":[
     {
       "code":"de_DE",

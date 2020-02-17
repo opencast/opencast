@@ -29,7 +29,7 @@ describe('Edit events controller', function () {
           $controller('EditEventsMetadataCtrl', {$scope: $scope});
           jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
           $httpBackend.whenGET('modules/events/partials/index.html').respond('');
-          $httpBackend.whenGET('/i18n/languages.json').respond(JSON.stringify(getJSONFixture('i18n/languages.json')));
+          $httpBackend.whenGET('public/languages.json').respond(JSON.stringify(getJSONFixture('i18n/languages.json')));
           $httpBackend.whenGET('public/org/opencastproject/adminui/languages/lang-en_US.json').respond('');
       });
 
