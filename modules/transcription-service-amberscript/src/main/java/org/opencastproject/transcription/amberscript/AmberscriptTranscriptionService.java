@@ -154,7 +154,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
   private String clientKey;
   private String workflowDefinitionId = "amberscript-attach-transcripts";
   private long workflowDispatchIntervalSeconds = 60;
-  private long maxProcessingSeconds = 48 * 60 * 60;
+  private long maxProcessingSeconds = 8 * 24 * 60 * 60; // maximum runtime for jobType perfect is 8 days
   private int cleanupResultDays = 7;
 
   private String systemAccount;
