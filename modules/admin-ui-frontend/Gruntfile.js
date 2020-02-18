@@ -1,6 +1,9 @@
 // Generated on 2016-03-07 using generator-angular 0.15.1
 'use strict';
 
+// Set a fixed locale required for running tests
+process.env.LANG='en_US.UTF-8';
+
 // # Globbing
 // for performance reasons we're only matching one level down:
 // 'test/spec/{,*/}*.js'
