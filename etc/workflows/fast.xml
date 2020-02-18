@@ -232,6 +232,8 @@
       description="Cleaning up">
       <configurations>
         <configuration key="delete-external">true</configuration>
+        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <configuration key="preserve-flavors">security/*</configuration>
       </configurations>
     </operation>
 

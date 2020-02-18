@@ -46,7 +46,6 @@ import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.index.IndexProducer;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -742,7 +741,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       Opt<AccessControlList> acl = Opt.none();
       Opt<DublinCoreCatalog> dublinCore = Opt.none();
-      Opt<AccessControlList> aclOld = loadEpisodeAclFromAsset(record.getSnapshot().get());
+      Opt<AccessControlList> aclOld =
+              some(authorizationService.getActiveAcl(record.getSnapshot().get().getMediaPackage()).getA());
 
       //update metadata for dublincore
       if (startDateTime.isSome() && endDateTime.isSome()) {
@@ -822,32 +822,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private boolean isAdmin() {
     return (securityService.getUser().hasRole(GLOBAL_ADMIN_ROLE)
             || securityService.getUser().hasRole(securityService.getOrganization().getAdminRole()));
-  }
-
-  private Opt<AccessControlList> loadEpisodeAclFromAsset(Snapshot snapshot) {
-    Option<MediaPackageElement> acl = mlist(snapshot.getMediaPackage().getElements())
-            .filter(MediaPackageSupport.Filters.isEpisodeAcl).headOpt();
-    if (acl.isNone())
-      return Opt.none();
-
-    Opt<Asset> asset = assetManager.getAsset(snapshot.getVersion(),
-            snapshot.getMediaPackage().getIdentifier().compact(), acl.get().getIdentifier());
-    if (asset.isNone())
-      return Opt.none();
-
-    if (Availability.OFFLINE.equals(asset.get().getAvailability()))
-      return Opt.none();
-
-    InputStream inputStream = null;
-    try {
-      inputStream = asset.get().getInputStream();
-      return Opt.some(XACMLUtils.parseXacml(inputStream));
-    } catch (Exception e) {
-      logger.warn("Unable to parse access control list: {}", getStackTrace(e));
-      return Opt.none();
-    } finally {
-      IOUtils.closeQuietly(inputStream);
-    }
   }
 
   private Opt<DublinCoreCatalog> loadEpisodeDublinCoreFromAsset(Snapshot snapshot) {
@@ -995,11 +969,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       if (record.isNone())
         throw new NotFoundException();
 
-      Opt<AccessControlList> acl = loadEpisodeAclFromAsset(record.get().getSnapshot().get());
-      if (acl.isNone())
-        return null;
-
-      return acl.get();
+      return authorizationService.getActiveAcl(record.get().getSnapshot().get().getMediaPackage()).getA();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1642,7 +1612,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             final AResult result = query.select(query.snapshot())
                     .where(query.mediaPackageId(event.getMediaPackageId()).and(query.version().isLatest())).run();
             final Snapshot snapshot = result.getRecords().head().get().getSnapshot().get();
-            final Opt<AccessControlList> acl = loadEpisodeAclFromAsset(snapshot);
+            final Opt<AccessControlList> acl = Opt.some(authorizationService.getActiveAcl(snapshot.getMediaPackage()).getA());
+
             final Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
 
             final List<SchedulerItem> schedulerItems = new ArrayList<>(
