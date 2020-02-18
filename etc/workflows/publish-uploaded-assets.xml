@@ -18,20 +18,6 @@
       description="Applying default configuration values">
       <configurations>
         <configuration key="publishToEngage">true</configuration>
-        <configuration key="publishToOaiPmh">true</configuration>
-        <configuration key="publishToYouTube">false</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Tag for publish -->
-
-    <operation
-      id="tag"
-      exception-handler-workflow="partial-error"
-      description="Tagging media package elements for archival">
-      <configurations>
-        <configuration key="source-flavors">*/*</configuration>
-        <configuration key="target-tags">+archive</configuration>
       </configurations>
     </operation>
 
@@ -74,7 +60,7 @@
       id="snapshot"
       description="Archiving new assets">
       <configurations>
-        <configuration key="source-tags">archive</configuration>
+        <configuration key="source-flavors">*/*</configuration>
       </configurations>
     </operation>
 
