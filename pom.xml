@@ -47,6 +47,7 @@
   </properties>
   <modules>
     <module>modules/admin-ui</module>
+    <module>modules/admin-ui-frontend</module>
     <module>modules/admin-ui-index</module>
     <module>modules/animate-api</module>
     <module>modules/animate-impl</module>
