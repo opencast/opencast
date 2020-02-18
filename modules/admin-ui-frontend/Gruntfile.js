@@ -20,7 +20,8 @@ module.exports = function (grunt) {
   // Automatically load required Grunt tasks
   require('jit-grunt')(grunt, {
     useminPrepare: 'grunt-usemin',
-    setupProxies: 'grunt-middleware-proxy'
+    setupProxies: 'grunt-middleware-proxy',
+    run: 'grunt-run'
   });
 
   // Configurable paths for the application
@@ -198,6 +199,18 @@ module.exports = function (grunt) {
           src: '{,*/}*.css',
           dest: '<%= yeoman.staging %>/styles/'
         }]
+      }
+    },
+    // Run external scripts
+    run: {
+      options: {
+        // Task-specific options go here.
+      },
+      checklanguagejson: {
+        cmd: 'node',
+        args: [
+          'lib/checklanguagejson.js'
+        ]
       }
     },
 
@@ -469,6 +482,7 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'clean:server',
+      'run:checklanguagejson',
       'wiredep',
       'concurrent:server',
       'postcss:server',
@@ -484,6 +498,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('test', [
     'clean:server',
+    'run:checklanguagejson',
     'wiredep',
     'concurrent:test',
     'postcss',
@@ -499,6 +514,7 @@ module.exports = function (grunt) {
     }
     grunt.task.run([
       'clean:dist',
+      'run:checklanguagejson',
       'wiredep',
       'useminPrepare',
       'concurrent:dist',
@@ -523,6 +539,7 @@ module.exports = function (grunt) {
   // Base task for the development with proxy to a real backend
   grunt.registerTask('proxy', [
     'clean:server',
+    'run:checklanguagejson',
     'wiredep',
     'concurrent:server',
     'postcss:server',
