@@ -354,8 +354,6 @@
               OSGI-INF/groups_endpoint.xml,
               OSGI-INF/index_endpoint.xml,
               OSGI-INF/job_endpoint.xml,
-              OSGI-INF/language-service.xml,
-              OSGI-INF/languages_endpoint.xml,
               OSGI-INF/presets_endpoint.xml,
               OSGI-INF/server_endpoint.xml,
               OSGI-INF/series_endpoint.xml,
