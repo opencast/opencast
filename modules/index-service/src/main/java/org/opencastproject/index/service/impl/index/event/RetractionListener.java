@@ -22,6 +22,7 @@
 package org.opencastproject.index.service.impl.index.event;
 
 import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.util.SecurityUtil;
@@ -54,22 +55,33 @@ public final class RetractionListener implements WorkflowListener {
     if (!retractions.containsKey(workflow.getId())) {
       return;
     }
-    final Retraction retraction = retractions.get(workflow.getId());
-    SecurityUtil.runAs(securityService, retraction.getOrganization(), retraction.getUser(), () -> {
-      final String mpId = workflow.getMediaPackage().getIdentifier().compact();
-      try {
-        final boolean result = indexService.removeEvent(mpId);
-        if (!result) {
-          logger.warn("Could not delete retracted media package {}. removeEvent returned false.", mpId);
+    MediaPackage mediaPackage = workflow.getMediaPackage();
+    if (mediaPackage == null) {
+      logger.warn("The retract workflow \"{}\" (id: {}, created by: {}) does not have a media package.",
+              workflow.getTitle(), workflow.getId(), workflow.getCreatorName());
+    } else if (mediaPackage.getPublications() != null && mediaPackage.getPublications().length > 0) {
+      logger.warn("The retract workflow \"{}\" (id: {}, created by: {}, media package {}) "
+                      + "has some non-retracted publications, refusing to orphan them.",
+              workflow.getTitle(), workflow.getId(), workflow.getCreatorName(), mediaPackage.getIdentifier().compact());
+    } else {
+      final Retraction retraction = retractions.get(workflow.getId());
+      SecurityUtil.runAs(securityService, retraction.getOrganization(), retraction.getUser(), () -> {
+        final String mpId = mediaPackage.getIdentifier().compact();
+        try {
+          if (!indexService.removeEvent(mpId)) {
+            logger.warn("Could not delete retracted media package {}. removeEvent returned false.", mpId);
+          }
+        } catch (UnauthorizedException e) {
+          logger.warn("Not authorized to delete retracted media package {}", mpId);
+        } catch (NotFoundException e) {
+          logger.warn("Unable to delete retracted media package {} because it could not be found", mpId);
+          retraction.getDoOnNotFound().run();
+        } catch (Exception e) {
+          logger.warn("Unable to delete retracted media package {}:", mpId, e);
         }
-        retractions.remove(workflow.getId());
-      } catch (UnauthorizedException e) {
-        logger.warn("Not authorized to delete retracted media package {}",  mpId);
-      } catch (NotFoundException e) {
-        logger.warn("Unable to delete retracted media package {} because it could not be found",  mpId);
-        retraction.getDoOnNotFound().run();
-      }
-    });
+      });
+    }
+    retractions.remove(workflow.getId());
   }
 }
 
