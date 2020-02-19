@@ -207,11 +207,6 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
       orgProperties.put(key.substring(ORG_PROPERTY_PREFIX.length()), (String) properties.get(key));
     }
 
-    if (serverUrls.isEmpty()) {
-      logger.debug("No server configured for organization " + name + ", setting default");
-      serverUrls.add(DEFAULT_SERVER);
-    }
-
     // Load the existing organization or create a new one
     try {
       JpaOrganization org;
