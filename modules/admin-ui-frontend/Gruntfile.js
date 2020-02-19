@@ -3,6 +3,7 @@
 
 // Set a fixed locale required for running tests
 process.env.LANG='en_US.UTF-8';
+process.env.LC_ALL='en_US.UTF-8';
 
 // # Globbing
 // for performance reasons we're only matching one level down:
