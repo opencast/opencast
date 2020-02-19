@@ -22,8 +22,8 @@
 
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
-.controller('AclCtrl', ['$scope', 'AclResource', 'UserRolesResource', 'ResourcesListResource', 'Notifications', 'Modal',
-  function ($scope, AclResource, UserRolesResource, ResourcesListResource, Notifications, Modal) {
+.controller('AclCtrl', ['$scope', 'AclResource', 'RolesResource', 'ResourcesListResource', 'Notifications', 'Modal',
+  function ($scope, AclResource, RolesResource, ResourcesListResource, Notifications, Modal) {
 
     var createPolicy = function (role) {
           return {
@@ -96,23 +96,18 @@ angular.module('adminNg.controllers')
     };
 
     $scope.getMatchingRoles = function (value) {
-      var queryParams = {filter: 'role_name:' + value + ',role_target:ACL'};
-      UserRolesResource.query(queryParams).$promise.then(function (data) {
-        angular.forEach(data, function (role) {
-          $scope.roles[role.name] = role.value;
+      RolesResource.queryNameOnly({query: value, target:'ACL'}).$promise.then(function (data) {
+        angular.forEach(data, function(newRole) {
+          if ($scope.roles.indexOf(newRole) == -1) {
+            $scope.roles.unshift(newRole);
+          }
         });
       });
     };
 
     fetchChildResources = function (id) {
       //NB: roles is updated in both the functions for $scope.acl (MH-11716) and $scope.roles (MH-11715, MH-11717)
-      $scope.roles = {};
-      var queryParams = {limit: -1, filter: 'role_target:ACL'};
-      UserRolesResource.query(queryParams).$promise.then(function (data) {
-        angular.forEach(data, function (role) {
-          $scope.roles[role.name] = role.value;
-        });
-      });
+      $scope.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
 
       $scope.acl = AclResource.get({id: id}, function (data) {
         $scope.metadata.name = data.name;
@@ -123,9 +118,9 @@ angular.module('adminNg.controllers')
         }
 
         angular.forEach(angular.fromJson(data.acl.ace), function(value, key) {
-          var rolename = value['role'];
-          if (angular.isUndefined($scope.roles[rolename])) {
-            $scope.roles[rolename] = rolename;
+          var roleName = value['role'];
+          if ($scope.roles.indexOf(roleName) == -1) {
+            $scope.roles.push(roleName);
           }
         }, this);
       });
@@ -142,7 +137,6 @@ angular.module('adminNg.controllers')
         });
       });
     };
-
 
     fetchChildResources($scope.resourceId);
 

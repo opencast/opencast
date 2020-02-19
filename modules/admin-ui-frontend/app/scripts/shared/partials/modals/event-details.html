@@ -604,7 +604,7 @@
                                       data-width="'360px'"
                                       ng-model="policy.role"
                                       ng-change="accessChanged(policy.role)"
-                                      ng-options="id as id for (id, type) in roles"
+                                      ng-options="role as role for role in roles"
                                       call-on-search="getMatchingRoles"
                                       placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
                                       no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"

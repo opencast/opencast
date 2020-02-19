@@ -40,7 +40,7 @@ describe('Serie controller', function () {
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/feeds/feeds').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
-        $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=-1').respond('{"ROLE_ANONYMOUS": "ROLE_ANONYMOUS"}');
+        $httpBackend.whenGET('/admin-ng/acl/roles.json?target=ACL&limit=-1').respond('[{"name": "ROLE_ANONYMOUS"}]');
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
         // Until we're actually testing the statistics endpoint, just return an empty set here
         $httpBackend.whenGET(/\/admin-ng\/statistics.*/).respond('[]');

@@ -21,9 +21,9 @@
 'use strict';
 
 angular.module('adminNg.services')
-.factory('NewSeriesAccess', ['ResourcesListResource', 'SeriesAccessResource', 'AuthService', 'UserRolesResource',
+.factory('NewSeriesAccess', ['ResourcesListResource', 'SeriesAccessResource', 'AuthService', 'RolesResource',
   'Notifications', '$timeout',
-  function (ResourcesListResource, SeriesAccessResource, AuthService, UserRolesResource, Notifications, $timeout) {
+  function (ResourcesListResource, SeriesAccessResource, AuthService, RolesResource, Notifications, $timeout) {
     var Access = function () {
 
       var me = this,
@@ -177,19 +177,14 @@ angular.module('adminNg.services')
         });
       });
 
-      me.roles = {};
-      var queryParams = {limit: -1, filter: 'role_target:ACL'};
-      UserRolesResource.query(queryParams).$promise.then(function (data) {
-        angular.forEach(data, function (role) {
-          me.roles[role.name] = role.value;
-        });
-      });
+      me.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
 
       this.getMatchingRoles = function (value) {
-        var queryParams = {filter: 'role_name:' + value + ',role_target:ACL'};
-        UserRolesResource.query(queryParams).$promise.then(function (data) {
-          angular.forEach(data, function (role) {
-            me.roles[role.name] = role.value;
+        RolesResource.queryNameOnly({query: value, target: 'ACL'}).$promise.then(function (data) {
+          angular.forEach(data, function(newRole) {
+            if (me.roles.indexOf(newRole) == -1) {
+              me.roles.unshift(newRole);
+            }
           });
         });
       };

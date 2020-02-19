@@ -23,10 +23,10 @@
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
 .controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource',
-  'SeriesThemeResource', 'ResourcesListResource', 'UserRolesResource', 'Notifications', 'AuthService',
+  'SeriesThemeResource', 'ResourcesListResource', 'RolesResource', 'Notifications', 'AuthService',
   'StatisticsReusable', '$http',
   function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource,
-    ResourcesListResource, UserRolesResource, Notifications, AuthService, StatisticsReusable, $http) {
+    ResourcesListResource, RolesResource, Notifications, AuthService, StatisticsReusable, $http) {
 
     var saveFns = {}, aclNotification,
         me = this,
@@ -113,10 +113,11 @@ angular.module('adminNg.controllers')
     };
 
     $scope.getMatchingRoles = function (value) {
-      var queryParams = {filter: 'role_name:' + value + ',role_target:ACL'};
-      UserRolesResource.query(queryParams).$promise.then(function (data) {
-        angular.forEach(data, function (role) {
-          $scope.roles[role.name] = role.value;
+      RolesResource.queryNameOnly({query: value, target: 'ACL'}).$promise.then(function (data) {
+        angular.forEach(data, function(newRole) {
+          if ($scope.roles.indexOf(newRole) == -1) {
+            $scope.roles.unshift(newRole);
+          }
         });
       });
     };
@@ -238,13 +239,7 @@ angular.module('adminNg.controllers')
         });
       });
 
-      $scope.roles = {};
-      var rolesPromise = UserRolesResource.query({limit: -1, filter: 'role_target:ACL'});
-      rolesPromise.$promise.then(function (data) {
-        angular.forEach(data, function (role) {
-          $scope.roles[role.name] = role.name;
-        });
-      });
+      $scope.roles = RolesResource.queryNameOnly({limit: -1, target: 'ACL'});
 
       $scope.access = SeriesAccessResource.get({ id: id }, function (data) {
         if (angular.isDefined(data.series_access)) {
@@ -259,10 +254,10 @@ angular.module('adminNg.controllers')
             Notifications.remove(aclNotification, 'series-acl');
           }
 
-          rolesPromise.$promise.then(function () {
+          $scope.roles.$promise.then(function () {
             angular.forEach(data.series_access.privileges, function(value, key) {
-              if (angular.isUndefined($scope.roles[key])) {
-                $scope.roles[key] = key;
+              if ($scope.roles.indexOf(key) == -1) {
+                $scope.roles.push(key);
               }
             });
           });

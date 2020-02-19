@@ -21,27 +21,28 @@
 'use strict';
 
 angular.module('adminNg.resources')
-.factory('UserRolesResource', ['$resource', function ($resource) {
-  return $resource('/admin-ng/resources/ROLES.json', {}, {
+.factory('RolesResource', ['$resource', function ($resource) {
+  return $resource('/admin-ng/acl/roles.json', {}, {
     query: {
       method: 'GET',
       isArray: true,
       transformResponse: function (data) {
-        var result = [];
-
+        data = JSON.parse(data);
+        return data;
+      }
+    },
+    queryNameOnly: {
+      method: 'GET',
+      isArray: true,
+      transformResponse: function (data) {
         data = JSON.parse(data);
 
-        if (angular.isDefined(data)) {
-          angular.forEach(data, function(value, key) {
-            result.push({
-              name: key,
-              value: key,
-              type: value
-            });
-          });
-        }
+        var roleNames = [];
+        angular.forEach(data, function (role) {
+          roleNames.push(role.name);
+        });
 
-        return result;
+        return roleNames;
       }
     }
   });

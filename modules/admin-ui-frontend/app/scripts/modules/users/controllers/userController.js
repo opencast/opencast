@@ -21,9 +21,9 @@
 'use strict';
 
 angular.module('adminNg.controllers')
-.controller('UserCtrl', ['$scope', 'Table', 'UserRolesResource', 'UserResource', 'UsersResource', 'JsHelper',
+.controller('UserCtrl', ['$scope', 'Table', 'RolesResource', 'UserResource', 'UsersResource', 'JsHelper',
   'Notifications', 'Modal', 'AuthService', 'underscore',
-  function ($scope, Table, UserRolesResource, UserResource, UsersResource, JsHelper, Notifications, Modal,
+  function ($scope, Table, RolesResource, UserResource, UsersResource, JsHelper, Notifications, Modal,
     AuthService, _) {
     $scope.manageable = true;
 
@@ -94,15 +94,11 @@ angular.module('adminNg.controllers')
     if ($scope.action === 'edit') {
       fetchChildResources($scope.resourceId);
     } else if ($scope.action === 'add') {
-      $scope.role.available = UserRolesResource.query({limit: -1, filter: 'role_target:USER'});
+      $scope.role.available = RolesResource.query({limit: -1, target: 'USER'});
     }
 
     $scope.submit = function () {
-      $scope.user.roles = [];
-
-      angular.forEach($scope.role.selected, function (value) {
-        $scope.user.roles.push({'name': value.value, 'type': value.type});
-      });
+      $scope.user.roles = $scope.role.selected;
 
       if ($scope.action === 'edit') {
         $scope.user.$update({ username: $scope.user.username }, function () {
@@ -129,7 +125,7 @@ angular.module('adminNg.controllers')
        * @param id the id of the user
        */
     function fetchChildResources(id) {
-      $scope.role.available = UserRolesResource.query({limit: -1, filter: 'role_target:USER'});
+      $scope.role.available = RolesResource.query({limit: -1, target: 'USER'});
       $scope.user = UserResource.get({ username: id });
       $scope.user.$promise.then(function () {
         $scope.manageable = $scope.user.manageable;
@@ -143,15 +139,15 @@ angular.module('adminNg.controllers')
           angular.forEach($scope.user.roles, function (role) {
 
             if (role.type == 'INTERNAL' || role.type == 'GROUP') {
-              $scope.role.selected.push({name: role.name, value: role.name, type: role.type});
+              $scope.role.selected.push(role);
             }
 
             if (role.type == 'EXTERNAL' || role.type == 'EXTERNAL_GROUP') {
-              $scope.role.external.push({name: role.name, value: role.name, type: role.type});
+              $scope.role.external.push(role);
             }
 
             if (role.type == 'SYSTEM' || role.type == 'DERIVED') {
-              $scope.role.derived.push({name: role.name, value: role.name, type: role.type});
+              $scope.role.derived.push(role);
             }
           });
 

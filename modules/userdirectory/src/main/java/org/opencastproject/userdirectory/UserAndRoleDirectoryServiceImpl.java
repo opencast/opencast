@@ -462,7 +462,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   }
 
   @Override
-  public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
+  public List<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
     Organization org = securityService.getOrganization();
@@ -479,9 +479,9 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     }
     Stream<Role> stream = roles.stream().sorted(Comparator.comparing(Role::getName)).skip(offset);
     if (limit > 0) {
-      return stream.limit(limit).iterator();
+      return stream.limit(limit).collect(Collectors.toList());
     }
-    return stream.iterator();
+    return stream.collect(Collectors.toList());
   }
 
   @Override

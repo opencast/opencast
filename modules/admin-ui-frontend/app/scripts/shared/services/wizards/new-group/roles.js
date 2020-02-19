@@ -21,14 +21,14 @@
 'use strict';
 
 angular.module('adminNg.services')
-.factory('NewGroupRoles', ['UsersResource', 'UserRolesResource', 'ResourcesListResource',
-  function (UsersResource, UserRolesResource, ResourcesListResource) {
+.factory('NewGroupRoles', ['UsersResource', 'RolesResource', 'ResourcesListResource',
+  function (UsersResource, RolesResource, ResourcesListResource) {
     var Roles = function () {
       var me = this;
 
       this.reset = function () {
         me.roles = {
-          available: UserRolesResource.query({limit: -1, filter: 'role_target:USER'}),
+          available: RolesResource.query({limit: -1, target: 'USER'}),
           selected:  [],
           i18n: 'USERS.GROUPS.DETAILS.ROLES',
           searchable: true

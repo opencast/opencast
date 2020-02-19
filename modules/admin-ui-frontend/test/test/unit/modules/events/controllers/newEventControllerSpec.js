@@ -17,7 +17,7 @@ describe('New Event Controller', function () {
         Table = _Table_;
         Notifications = _Notifications_;
 
-        $httpBackend.expectGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=-1').respond('{"ROLE_ANONYMOUS": "ROLE_ANONYMOUS"}');
+        $httpBackend.expectGET('/admin-ng/acl/roles.json?target=ACL&limit=-1').respond('[{"name": "ROLE_ANONYMOUS"}]');
 
         $parentScope = $rootScope.$new();
         $scope = $parentScope.$new();
@@ -41,7 +41,7 @@ describe('New Event Controller', function () {
                 .respond(JSON.stringify(getJSONFixture('admin-ng/capture-agents/agents.json')));
             $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
-            $httpBackend.whenGET('/admin-ng/resources/ROLES.json').respond('{}');
+            $httpBackend.whenGET('/admin-ng/acl/roles.json').respond('[]');
             $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
             $httpBackend.whenGET('/workflow/definitions.json').respond('{}');
 

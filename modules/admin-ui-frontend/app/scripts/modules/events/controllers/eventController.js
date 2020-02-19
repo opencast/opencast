@@ -25,13 +25,13 @@ angular.module('adminNg.controllers')
 .controller('EventCtrl', [
   '$scope', 'Notifications', 'EventTransactionResource', 'EventMetadataResource', 'EventAssetsResource',
   'EventAssetCatalogsResource', 'CommentResource', 'EventWorkflowsResource', 'EventWorkflowActionResource',
-  'EventWorkflowDetailsResource', 'ResourcesListResource', 'UserRolesResource', 'EventAccessResource',
+  'EventWorkflowDetailsResource', 'ResourcesListResource', 'RolesResource', 'EventAccessResource',
   'EventPublicationsResource', 'EventSchedulingResource','NewEventProcessingResource', 'CaptureAgentsResource',
   'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService', 'UploadAssetOptions',
   'EventUploadAssetResource', 'Table', 'SchedulingHelperService', 'StatisticsReusable',
   function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource,
     EventAssetCatalogsResource, CommentResource, EventWorkflowsResource, EventWorkflowActionResource,
-    EventWorkflowDetailsResource, ResourcesListResource, UserRolesResource, EventAccessResource,
+    EventWorkflowDetailsResource, ResourcesListResource, RolesResource, EventAccessResource,
     EventPublicationsResource, EventSchedulingResource, NewEventProcessingResource, CaptureAgentsResource,
     ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
     EventUploadAssetResource, Table, SchedulingHelperService, StatisticsReusable) {
@@ -412,19 +412,19 @@ angular.module('adminNg.controllers')
             }
           });
 
+          $scope.roles = RolesResource.queryNameOnly({limit: -1, target:'ACL' });
+
           //MH-11716: We have to wait for both the access (series ACL), and the roles (list of system roles)
           //to resolve before we can add the roles that are present in the series but not in the system
-          ResourcesListResource.get({ resource: 'ROLES', limit: -1, filter:'role_target:ACL' },
-            function (results) {
-              $scope.roles = results;
-              return $scope.access.$promise.then(function () {
-                angular.forEach($scope.access.episode_access.privileges, function(value, key) {
-                  if (angular.isUndefined($scope.roles[key])) {
-                    $scope.roles[key] = key;
-                  }
-                }, this);
-              }).catch(angular.noop);
-            }, this);
+          $scope.access.$promise.then(function () {
+            $scope.roles.$promise.then(function() {
+              angular.forEach($scope.access.episode_access.privileges, function(newRole) {
+                if ($scope.roles.indexOf(newRole) == -1) {
+                  $scope.roles.push(newRole);
+                }
+              });
+            });
+          });
 
           $scope.comments = CommentResource.query({ resource: 'event', resourceId: id, type: 'comments' });
         },
@@ -433,10 +433,11 @@ angular.module('adminNg.controllers')
     $scope.statReusable = null;
 
     $scope.getMatchingRoles = function (value) {
-      var queryParams = {filter: 'role_name:' + value + ',role_target:ACL'};
-      UserRolesResource.query(queryParams).$promise.then(function (data) {
-        angular.forEach(data, function (role) {
-          $scope.roles[role.name] = role.value;
+      RolesResource.queryNameOnly({query: value, target: 'ACL'}).$promise.then(function (data) {
+        angular.forEach(data, function(newRole) {
+          if ($scope.roles.indexOf(newRole) == -1) {
+            $scope.roles.unshift(newRole);
+          }
         });
       });
     };

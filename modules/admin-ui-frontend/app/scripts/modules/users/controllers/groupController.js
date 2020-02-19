@@ -21,9 +21,9 @@
 'use strict';
 
 angular.module('adminNg.controllers')
-.controller('GroupCtrl', ['$scope', 'AuthService', 'UserRolesResource', 'ResourcesListResource', 'GroupResource',
+.controller('GroupCtrl', ['$scope', 'AuthService', 'RolesResource', 'ResourcesListResource', 'GroupResource',
   'GroupsResource', 'Notifications', 'Modal',
-  function ($scope, AuthService, UserRolesResource, ResourcesListResource, GroupResource, GroupsResources,
+  function ($scope, AuthService, RolesResource, ResourcesListResource, GroupResource, GroupsResources,
     Notifications, Modal) {
 
     var reloadSelectedUsers = function () {
@@ -64,7 +64,7 @@ angular.module('adminNg.controllers')
 
     var reloadRoles = function () {
       $scope.role = {
-        available: UserRolesResource.query({limit: -1, filter: 'role_target:USER'}),
+        available: RolesResource.query({limit: -1, target: 'USER'}),
         selected:  [],
         i18n: 'USERS.GROUPS.DETAILS.ROLES',
         searchable: true
