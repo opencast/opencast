@@ -148,7 +148,6 @@ nav:
    - Attach Watson Transcription: 'workflowoperationhandlers/attach-watson-transcription-woh.md'
    - Cleanup: 'workflowoperationhandlers/cleanup-woh.md'
    - Comment: 'workflowoperationhandlers/comment-woh.md'
-   - Compose: 'workflowoperationhandlers/compose-woh.md'
    - Composite: 'workflowoperationhandlers/composite-woh.md'
    - Concat: 'workflowoperationhandlers/concat-woh.md'
    - Configure-By-DCTerm: 'workflowoperationhandlers/configure-by-dcterm-woh.md'

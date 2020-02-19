@@ -70,7 +70,7 @@
 
     <!-- Copy placeholder Video for publication -->
     <operation
-      id="compose"
+      id="encode"
       fail-on-error="true"
       exception-handler-workflow="partial-error"
       description="create placeholder Video">

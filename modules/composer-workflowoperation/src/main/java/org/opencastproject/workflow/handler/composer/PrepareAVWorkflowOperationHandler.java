@@ -54,7 +54,7 @@ import java.io.IOException;
 public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(ComposeWorkflowOperationHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(PrepareAVWorkflowOperationHandler.class);
   private static final String QUESTION_MARK = "?";
 
   /** Name of the 'encode to a/v prepared copy' encoding profile */

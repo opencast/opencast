@@ -8,12 +8,13 @@ Description
 
 The encode workflow operation can be used to encode media files to different formats using [FFmpeg](https://ffmpeg.org).
 
-Its functionality is similar to the [compose workflow operation](compose-woh.md) but can utilize the parallel encoding
-capabilities of FFmpeg. This has the advantage that the source file needs to be read only once for several encodings,
-reducing the encoding time quite a lot. Additionally, this will let FFmpeg make better use of multiple CPU cores.
+It can utilize the parallel encoding capabilities of FFmpeg. This has the advantage that the source file needs to be
+read only once for several encodings, reducing the encoding time quite a lot. Additionally, this will let FFmpeg make
+better use of multiple CPU cores.
 
 
-## Parameter Table
+Parameter Table
+---------------
 
 |configuration keys|example           |description                           |
 |------------------|------------------|--------------------------------------|
@@ -36,18 +37,19 @@ run of the operation, the media package will contain four new tracks: the first 
 Operation Example
 -----------------
 
-    <operation
-      id="encode"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="encoding media files">
-        <configurations>
-        <configuration key="source-flavor">*/trimmed</configuration>
-        <configuration key="target-flavor">*/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">parallel.http</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+  id="encode"
+  exception-handler-workflow="partial-error"
+  description="encoding media files">
+    <configurations>
+    <configuration key="source-flavor">*/trimmed</configuration>
+    <configuration key="target-flavor">*/delivery</configuration>
+    <configuration key="target-tags">engage-download,engage-streaming</configuration>
+    <configuration key="encoding-profile">parallel.http</configuration>
+  </configurations>
+</operation>
+```
 
 
 Encoding Profile Example
