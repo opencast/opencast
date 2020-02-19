@@ -53,7 +53,9 @@ angular.module('adminNg.services').service('UploadAssetOptions',[ 'ResourcesList
               if ((assetKey.indexOf(_OptionPrefixAsset) >= 0) || (assetKey.indexOf(_OptionPrefixSource) >= 0)) {
                 // parse upload asset options
                 var options = JSON.parse(assetOption);
-                options[ 'title'] = assetKey;
+                if (!options['title']) {
+                  options['title'] = assetKey;
+                }
                 _uploadOptions.push(options);
               } else if (assetKey.indexOf(_WorkflowPrefix) >= 0) {
                 // parse upload workflow definition id

@@ -23,13 +23,21 @@ listprovider properties file:
 
 Two source types are enabled by default for use in the Admin UI.
 
-    EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE={
-       "id":"track_presenter", "type":"track", "flavorType":"presenter",
-       "flavorSubType":"source", "multiple":false, "displayOrder": 1}
+    EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE={\
+      "id":"track_presenter",\
+      "type":"track",\
+      "flavorType":"presenter",\
+      "flavorSubType":"source",\
+      "multiple":false,\
+      "displayOrder": 1}
 
-    EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE={
-       "id":"track_presentation", "type":"track", "flavorType":"presentation",
-       "flavorSubType":"source", "multiple":false, "displayOrder": 2}
+    EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE={\
+      "id":"track_presentation",\
+      "type":"track",\
+      "flavorType":"presentation",\
+      "flavorSubType":"source",\
+      "multiple":false,\
+      "displayOrder": 2}
 
 Source upload options as displayed in the Admin UI Create event:
     ![assetUploadSource](images/assetUploadSource.png)
@@ -48,17 +56,17 @@ download-source-flavors    | comma separated list | A convenience variable that 
 Example of variables in a workflow:
 
 ```xml
-    <!-- Tag any optionally uploaded assets -->
-    <operation
-      id="tag"
-      if="${downloadSourceflavorsExist}"
-      exception-handler-workflow="partial-error"
-      description="Tagging uploaded assets for distribution">
-      <configurations>
-        <configuration key="source-flavors">${download-source-flavors}</configuration>
-        <configuration key="target-tags">+engage-download</configuration>
-      </configurations>
-    </operation>
+<!-- Tag any optionally uploaded assets -->
+<operation
+  id="tag"
+  if="${downloadSourceflavorsExist}"
+  exception-handler-workflow="partial-error"
+  description="Tagging uploaded assets for distribution">
+  <configurations>
+    <configuration key="source-flavors">${download-source-flavors}</configuration>
+    <configuration key="target-tags">+engage-download</configuration>
+  </configurations>
+</operation>
 ```
 
 How to Enable Preconfigured Asset Options
@@ -123,11 +131,13 @@ attachments can be added to existing events. New source types can be added to ne
 
 Tasks:
 
-* Modify `etc/listproviders/event.upload.asset.options.properties`
-* Add Admin UI translation for the new asset name
-  `modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/...`
-* Modify your workflow from `etc/workflows/...`
-* Test your changes
+- Modify `etc/listproviders/event.upload.asset.options.properties`
+- For the title of the options displayed in the admin interface, either:
+    - add a translation for the new asset name to
+      `modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/...`
+    - or add a `title` field to the upload specification
+- Modify your workflow from `etc/workflows/...`
+- Test your changes
 
 The following steps describe how to change the properties configuration.
 

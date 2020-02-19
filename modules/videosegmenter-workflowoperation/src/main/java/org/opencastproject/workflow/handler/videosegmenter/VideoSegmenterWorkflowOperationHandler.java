@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -61,6 +60,9 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
 
   /** Name of the configuration key that specifies the flavor of the track to analyze */
   private static final String PROP_TARGET_TAGS = "target-tags";
+
+  /** Minimum video length in seconds for video segmentation to run */
+  private static final int MIN_VIDEO_LENGTH = 30000;
 
   /** The composer service */
   private VideoSegmenterService videosegmenter = null;
@@ -91,12 +93,7 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
       candidates.addAll(Arrays.asList(mediaPackage.getTracks(MediaPackageElements.PRESENTATION_SOURCE)));
 
     // Remove unsupported tracks (only those containing video can be segmented)
-    Iterator<Track> ti = candidates.iterator();
-    while (ti.hasNext()) {
-      Track t = ti.next();
-      if (!t.hasVideo())
-        ti.remove();
-    }
+    candidates.removeIf(t -> !t.hasVideo());
 
     // Found one?
     if (candidates.size() == 0) {
@@ -109,6 +106,12 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
       logger.info("Found more than one track to segment, choosing the first one ({})", candidates.get(0));
     }
     Track track = candidates.get(0);
+
+    // Skip operation if media is shorter than the minimum defined video length (30s) since we won't generate a
+    // sensible segmentation on such a short video anyway.
+    if (track.getDuration() != null && track.getDuration() < MIN_VIDEO_LENGTH) {
+      return createResult(mediaPackage, Action.SKIP);
+    }
 
     // Segment the media package
     Catalog mpeg7Catalog = null;
