@@ -380,7 +380,6 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     final HttpClient httpClient = makeHttpClient(connectionTimeout, socketTimeout);
     // Add the request header to elicit a digest auth response
     httpUriRequest.setHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
-    httpUriRequest.setHeader(SecurityConstants.AUTHORIZATION_HEADER, "true");
 
     if (serviceRegistry != null && serviceRegistry.getCurrentJob() != null) {
       httpUriRequest.setHeader(CURRENT_JOB_HEADER, Long.toString(serviceRegistry.getCurrentJob().getId()));
