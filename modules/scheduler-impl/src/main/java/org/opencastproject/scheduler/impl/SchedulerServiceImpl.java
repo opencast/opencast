@@ -1088,7 +1088,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       SecurityUtil.runAs(securityService, organization, user, () -> {
         try {
           conflictingEvents.addAll(persistence.getEvents(captureDeviceID, startDate, endDate, Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS)
-            .parallelStream().map(this::getEventMediaPackage).collect(Collectors.toList()));
+            .stream().map(this::getEventMediaPackage).collect(Collectors.toList()));
         } catch (SchedulerServiceDatabaseException e) {
           logger.error("Failed to get conflicting events", e);
         }
