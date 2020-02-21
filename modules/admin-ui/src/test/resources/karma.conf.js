@@ -52,14 +52,41 @@ module.exports = function (config) {
 
         autoWatch : true,
 
-        frameworks: ['jasmine'],
+        frameworks: ['detectBrowsers', 'jasmine'],
 
-        browsers : ['PhantomJS'],
+        detectBrowsers: {
+            enabled: true,
+            usePhantomJS: true,
+            preferHeadless: true,
+            // post processing of browsers list
+            // here you can edit the list of browsers used by karma
+            postDetection: function(availableBrowsers) {
+                /* Karma configuration with custom launchers
+                customLaunchers: {
+                    IE9: {
+                        base: 'IE',
+                        'x-ua-compatible': 'IE=EmulateIE9'
+                    }
+                }
+                */
+ 
+                var result = availableBrowsers;
+                //Remove PhantomJS if another browser has been detected
+                if (availableBrowsers.length > 1 && availableBrowsers.indexOf('PhantomJS')>-1) {
+                    var i = result.indexOf('PhantomJS');
+                    if (i !== -1) {
+                        result.splice(i, 1);
+                    }
+                }
+                return result;
+            }
+        },
 
         plugins : [
             'karma-chrome-launcher',
             'karma-phantomjs-launcher',
             'karma-coverage',
+            'karma-detect-browsers',
             'karma-firefox-launcher',
             'karma-jasmine',
             'karma-ng-html2js-preprocessor'

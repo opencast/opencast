@@ -1,6 +1,10 @@
 // Generated on 2016-03-07 using generator-angular 0.15.1
 'use strict';
 
+// Prevents Debian 10 (at least) from erroring out if PhantomJS is being used
+// Appears to be related to something in the config file, but we can't exactly ship our own config
+process.env.OPENSSL_CONF='';
+
 // # Globbing
 // for performance reasons we're only matching one level down:
 // 'test/spec/{,*/}*.js'
@@ -454,8 +458,7 @@ module.exports = function (grunt) {
       },
       coverage: {
         singleRun : true,
-        reporters : ['dots', 'coverage'],
-        browsers  : ['PhantomJS']
+        reporters : ['dots', 'coverage']
       }
     }
   });
