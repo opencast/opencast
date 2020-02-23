@@ -66,7 +66,7 @@
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "סדרה זו מכילה אירועים. מחיקת הסדרה לא תמחק אירועים אלו.",
-         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+         "EVENT_WILL_BE_GONE": "אם תתקדמו, האירוע יעלם לצמיתות."
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "לא ניתן למחוק סדרה זו מכיוון שהיא עדיין מכילה אירועים."
@@ -124,11 +124,11 @@
       "SERIES_NOT_UPDATED": "לא היתה אפשרות לשמור את הסידרה",
       "SERIES_NOT_UPDATED_ID": "לא היתה אפשרות לשמור את הסידרה {{ id }}",
       "SERIES_NOT_UPDATED_ALL": "לא ניתן לשמור אף אחד מהסדרות",
-      "EVENT_DELETED": "The event has been deleted.",
-      "EVENT_WILL_BE_DELETED": "The event is being deleted",
-      "EVENTS_DELETED": "The events are being deleted.",
-      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
+      "EVENT_DELETED": "הארוע נמחק.",
+      "EVENT_WILL_BE_DELETED": "הארוע נמחק",
+      "EVENTS_DELETED": "הארועים נמחקו.",
+      "EVENTS_NOT_DELETED": "לא ניתן למחוק את הארוע(ים).",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "האירוע(ים) לא ניתנ(ים) למחיקה, מכיוון שאין לך את ההרשאות לבצע פעולה זו.",
       "SERIES_DELETED": "הסדרה נמחקה",
       "SERIES_NOT_DELETED": "לא ניתן היה למחוק את הסידרה",
       "LOCATION_DELETED": "המיקום נמחק",
@@ -162,8 +162,8 @@
       "THEME_NOT_DELETED": "לא ניתן למחוק את ערכת הנושא",
       "TASK_CREATED": "המשימה נוצרה",
       "TASK_NOT_CREATED": "לא היתה אפשרות ליצור את המשימה",
-      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
-      "VIDEO_CUT_SAVED": "The changes have been saved",
+      "VIDEO_CUT_NOT_SAVED": "לא ניתן לשמור את השינויים",
+      "VIDEO_CUT_SAVED": "השינויים נשמרו",
       "VIDEO_CUT_PROCESSING": "מעבד את הוידאו…",
       "THUMBNAIL_CHANGE_FAILED": "החלפת תמונה ממוזערת נכשלה.",
       "VIDEO_SOURCE_TRACKS_INVALID": "לא נבחרו רצועות וידאו",
@@ -489,10 +489,10 @@
          },
          "STATE_MAPPING": {
             "RETRACTING": "Retracting",
-            "DELETING": "Deleting",
-            "DUPLICATING": "Duplicating",
-            "PUBLISHING": "Publishing",
-            "IMPORTING": "Importing",
+            "DELETING": "מוחק",
+            "DUPLICATING": "משכפל",
+            "PUBLISHING": "מפרסם",
+            "IMPORTING": "מייבא",
             "REPUBLISHING_METADATA": "Republishing metadata",
             "UPDATING_PREVIEWS": "Updating previews"
          },
@@ -1520,7 +1520,7 @@
       "ACTIONS": {
          "SPLIT": "פצל",
          "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "Hide/Show",
+         "CUT": "הסתר/הצג",
          "CUT_TOOLTIP": "Hide or show the selected part of the video.",
          "REPLAY_SEGMENT": "Play Start of Segment",
          "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
