@@ -56,20 +56,13 @@ module.exports = function (config) {
 
         detectBrowsers: {
             enabled: true,
-            usePhantomJS: true,
+            usePhantomJS: false,
             preferHeadless: true,
+            /* Leaving this commented out as an example.
+               If we ever want to disable an installed browser (c.f: IE) we can exclude it like this
             // post processing of browsers list
             // here you can edit the list of browsers used by karma
             postDetection: function(availableBrowsers) {
-                /* Karma configuration with custom launchers
-                customLaunchers: {
-                    IE9: {
-                        base: 'IE',
-                        'x-ua-compatible': 'IE=EmulateIE9'
-                    }
-                }
-                */
- 
                 var result = availableBrowsers;
                 //Remove PhantomJS if another browser has been detected
                 if (availableBrowsers.length > 1 && availableBrowsers.indexOf('PhantomJS')>-1) {
@@ -80,11 +73,11 @@ module.exports = function (config) {
                 }
                 return result;
             }
+            */
         },
 
         plugins : [
             'karma-chrome-launcher',
-            'karma-phantomjs-launcher',
             'karma-coverage',
             'karma-detect-browsers',
             'karma-firefox-launcher',
