@@ -244,9 +244,6 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "Any episode that matches this free-text query.", isRequired = false, name = "q", type = RestParameter.Type.STRING),
           @RestParameter(description = "Any episode that belongs to specified series id.", isRequired = false, name = "sid", type = RestParameter.Type.STRING),
           @RestParameter(description = "Any episode that belongs to specified series name (note that the specified series name must be unique).", isRequired = false, name = "sname", type = RestParameter.Type.STRING),
-          // @RestParameter(defaultValue = "false", description =
-          // "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".",
-          // isRequired = false, name = "episodes", type = RestParameter.Type.STRING),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
                   + "of the following: DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = RestParameter.Type.STRING),          
@@ -287,7 +284,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       try {
         result = seriesService.getSeries(new SeriesQuery().setSeriesTitle(seriesName));
       } catch (SeriesException e) {
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("error while searching for series")
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error while searching for series")
                 .build();
       }
       // Specifying a nonexistent series ID is not an error, so a nonexistent series name shouldn't be, either.
