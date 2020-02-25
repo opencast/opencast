@@ -276,7 +276,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     if (accessControl == null) {
       throw new IllegalArgumentException("ACL parameter must not be null");
     }
-    if (needsUpdate(seriesId, accessControl)) {
+    if (needsUpdate(seriesId, accessControl) || overrideEpisodeAcl) {
       logger.debug("Updating ACL of series {}", seriesId);
       boolean updated;
       // not found is thrown if it doesn't exist
