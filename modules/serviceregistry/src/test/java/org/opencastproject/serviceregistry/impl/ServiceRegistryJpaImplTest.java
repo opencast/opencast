@@ -93,6 +93,7 @@ public class ServiceRegistryJpaImplTest {
   private static final String TEST_HOST = "http://localhost:8080";
   private static final String TEST_HOST_OTHER = "http://otherhost:8080";
   private static final String TEST_HOST_THIRD = "http://thirdhost:8080";
+  // #1249 companion pull 1 of 2 to identify Travis CI concurrent build collision hotspots
 
   @Before
   public void setUp() throws Exception {
