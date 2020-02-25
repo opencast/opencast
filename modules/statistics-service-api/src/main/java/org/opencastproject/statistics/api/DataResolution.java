@@ -21,8 +21,6 @@
 
 package org.opencastproject.statistics.api;
 
-import java.util.Arrays;
-
 /**
  * Resolution to get data with (e.g. daily. weekly, ...)
  */
@@ -37,7 +35,4 @@ public enum DataResolution {
     return DataResolution.valueOf(value.toUpperCase());
   }
 
-  public static boolean isValid(final String value) {
-    return Arrays.stream(DataResolution.values()).map(Enum::toString).anyMatch(v -> v.equals(value.toUpperCase()));
-  }
 }

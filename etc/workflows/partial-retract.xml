@@ -55,7 +55,6 @@
 
     <operation
       id="retract-oaipmh"
-      if="${retractFromOaiPmh}"
       exception-handler-workflow="partial-error"
       description="Retract recording from the default OAI-PMH repository">
       <configurations>

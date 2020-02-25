@@ -20,14 +20,9 @@
  */
 package org.opencastproject.assetmanager.api;
 
-import org.opencastproject.assetmanager.api.Value.TypedValue;
-
 public final class Values {
   private Values() {
   }
-
-  public static final TypedValue<Boolean> TRUE = Value.mk(true);
-  public static final TypedValue<Boolean> FALSE = Value.mk(false);
 
   public static Object getValueUntyped(Value v) {
     return v.get();

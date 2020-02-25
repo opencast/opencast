@@ -4,6 +4,47 @@ Changelog
 Opencast 8
 ----------
 
+### Opencast 8.1
+
+*Released on January 29, 2020*
+
+- [[#1341](https://github.com/opencast/opencast/pull/1341)] -
+  Spring Framework Dependency Specification
+- [[#1340](https://github.com/opencast/opencast/pull/1340)] -
+  LDAP User Directory Dependencies
+- [[#1339](https://github.com/opencast/opencast/pull/1339)] -
+  Add Missing Karaf Features
+- [[#1338](https://github.com/opencast/opencast/pull/1338)] -
+  Sakai User Directory Dependencies
+- [[#1328](https://github.com/opencast/opencast/pull/1328)] -
+  AngularJS Components 1.7.9
+- [[#1326](https://github.com/opencast/opencast/pull/1326)] -
+  Fix Image Extraction From Short Videos
+- [[#1321](https://github.com/opencast/opencast/pull/1321)] -
+  Fix URL Parameters in Theodul Player
+- [[#1300](https://github.com/opencast/opencast/pull/1300)] -
+  Allow Root In Bower
+- [[#1299](https://github.com/opencast/opencast/pull/1299)] -
+  Fix AWS WOH OSGI dependencies
+- [[#1266](https://github.com/opencast/opencast/pull/1266)] -
+  Allow capture agent users to read properties of series
+
+#### Fixed Security Issues
+
+- CVE-2020-5231 – [Users with ROLE\_COURSE\_ADMIN can create new users
+  ](https://github.com/opencast/opencast/security/advisories/GHSA-94qw-r73x-j7hg)
+- CVE-2020-5206 – [Authentication Bypass For Endpoints With Anonymous Access
+  ](https://github.com/opencast/opencast/security/advisories/GHSA-vmm6-w4cf-7f3x)
+- CVE-2020-5222 – [Hard-Coded Key Used For Remember-me Token
+  ](https://github.com/opencast/opencast/security/advisories/GHSA-mh8g-hprg-8363)
+- CVE-2020-5230 – [Unsafe Identifiers
+  ](https://github.com/opencast/opencast/security/advisories/GHSA-w29m-fjp4-qhmq)
+- CVE-2020-5229 – [Replace MD5 with bcrypt for password hashing
+  ](https://github.com/opencast/opencast/security/advisories/GHSA-h362-m8f2-5x7c)
+- CVE-2020-5228 – [Public Access Via OAI-PMH
+  ](https://github.com/opencast/opencast/security/advisories/GHSA-6f54-3qr9-pjgj)
+
+
 ### Opencast 8.0
 
 *Released on December 17, 2019*
@@ -385,6 +426,49 @@ Opencast 8
 
 Opencast 7
 ----------
+
+### Opencast 7.6
+
+*Released on January 29, 2020*
+
+- [CVE-2020-5231](https://github.com/opencast/opencast/security/advisories/GHSA-94qw-r73x-j7hg) -
+   Users with ROLE\_COURSE\_ADMIN can create new users
+- [CVE-2020-5206](https://github.com/opencast/opencast/security/advisories/GHSA-vmm6-w4cf-7f3x) -
+   Authentication Bypass For Endpoints With Anonymous Access
+- [CVE-2020-5222](https://github.com/opencast/opencast/security/advisories/GHSA-mh8g-hprg-8363) -
+   Hard-Coded Key Used For Remember-me Token
+- [CVE-2020-5230](https://github.com/opencast/opencast/security/advisories/GHSA-w29m-fjp4-qhmq) -
+   Unsafe Identifiers
+- [CVE-2020-5228](https://github.com/opencast/opencast/security/advisories/GHSA-6f54-3qr9-pjgj) -
+   Public Access Via OAI-PMH
+- [[#1358](https://github.com/opencast/opencast/pull/1358)] -
+  Switch To HTTPS Maven Repository
+- [[#1353](https://github.com/opencast/opencast/pull/1353)] -
+  Handle empty fields from REST docs in EventHttpServletRequest
+- [[#1352](https://github.com/opencast/opencast/pull/1352)] -
+  Remove unsafe option in ffmpeg command for SMIL processing
+- [[#1343](https://github.com/opencast/opencast/pull/1343)] -
+  ] Fixes Admin-UI Presenter's column
+- [[#1333](https://github.com/opencast/opencast/pull/1333)] -
+  Switch to mvn.opencast.org
+- [[#1329](https://github.com/opencast/opencast/pull/1329)] -
+  Remove Spring Request Logger Configuration
+- [[#1325](https://github.com/opencast/opencast/pull/1325)] -
+  Secure FPS For Smil Processing
+- [[#1318](https://github.com/opencast/opencast/pull/1318)] -
+  Remove Custom Plugin Repositories
+- [[#1315](https://github.com/opencast/opencast/pull/1315)] -
+  Bump spring-security-oauth from 2.3.6.RELEASE to 2.3.7.RELEASE
+- [[#1276](https://github.com/opencast/opencast/pull/1276)] -
+  Don't add the internal publication of the original event twice
+- [[#1271](https://github.com/opencast/opencast/pull/1271)] -
+  Wrong encoding in video editor zoom box
+- [[#1270](https://github.com/opencast/opencast/pull/1270)] -
+  S3 Distribution Fails
+- [[#1265](https://github.com/opencast/opencast/pull/1265)] -
+  Some error operations referencing the wrong error-handler.
+- [[#1246](https://github.com/opencast/opencast/pull/1246)] -
+  Remove default storage_id setting from asset Manager
 
 ### Opencast 7.5
 

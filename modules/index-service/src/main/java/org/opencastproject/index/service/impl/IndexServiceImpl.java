@@ -809,7 +809,6 @@ public class IndexServiceImpl implements IndexService {
     return acl;
   }
 
-  @Override
   public String createEvent(JSONObject metadataJson, MediaPackage mp) throws ParseException, IOException,
           MediaPackageException, IngestException, NotFoundException, SchedulerException, UnauthorizedException {
     if (metadataJson == null)
@@ -1006,7 +1005,7 @@ public class IndexServiceImpl implements IndexService {
         configuration.put("workflowDefinitionId", workflowTemplate);
         WorkflowInstance ingest = ingestService.ingest(eventHttpServletRequest.getMediaPackage().get(),
                 workflowTemplate, configuration);
-        return eventHttpServletRequest.getMediaPackage().get().getIdentifier().compact();
+        return eventHttpServletRequest.getMediaPackage().get().getIdentifier().toString();
       case SCHEDULE_SINGLE:
         mediaPackage = updateDublincCoreCatalog(eventHttpServletRequest.getMediaPackage().get(), dc);
         eventHttpServletRequest.setMediaPackage(mediaPackage);
@@ -1022,7 +1021,7 @@ public class IndexServiceImpl implements IndexService {
             }
           }
         }
-        return mediaPackage.getIdentifier().compact();
+        return mediaPackage.getIdentifier().toString();
       case SCHEDULE_MULTIPLE:
         final Map<String, Period> scheduled = schedulerService.addMultipleEvents(rRule, start.toDate(), end.toDate(), duration, tz, captureAgentId,
                 presenterUsernames, eventHttpServletRequest.getMediaPackage().get(), configuration, (Map) caProperties, Opt.none());
@@ -1204,21 +1203,6 @@ public class IndexServiceImpl implements IndexService {
       }
     }
     return mp;
-  }
-
-  @Override
-  public MetadataList updateCommonEventMetadata(String id, String metadataJSON, AbstractSearchIndex index)
-          throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
-          UnauthorizedException {
-    MetadataList metadataList;
-    try {
-      metadataList = getMetadataListWithCommonEventCatalogUIAdapter();
-      metadataList.fromJSON(metadataJSON);
-    } catch (Exception e) {
-      logger.warn("Not able to parse the event metadata {}:", metadataJSON, e);
-      throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
-    }
-    return updateEventMetadata(id, metadataList, index);
   }
 
   @Override
@@ -1424,8 +1408,7 @@ public class IndexServiceImpl implements IndexService {
     }
   }
 
-  @Override
-  public boolean hasSnapshots(String eventId) {
+  private boolean hasSnapshots(String eventId) {
     AQueryBuilder q = assetManager.createQuery();
     return !enrich(q.select(q.snapshot()).where(q.mediaPackageId(eventId).and(q.version().isLatest())).run()).getSnapshots().isEmpty();
   }
@@ -1648,8 +1631,7 @@ public class IndexServiceImpl implements IndexService {
     return removedScheduler && removedWorkflow && removedArchive;
   }
 
-  @Override
-  public void updateWorkflowInstance(WorkflowInstance workflowInstance)
+  private void updateWorkflowInstance(WorkflowInstance workflowInstance)
           throws WorkflowException, UnauthorizedException {
     // Only update the workflow if the instance is in a working state
     if (WorkflowInstance.WorkflowState.FAILED.equals(workflowInstance.getState())
@@ -1718,8 +1700,7 @@ public class IndexServiceImpl implements IndexService {
     }
   }
 
-  @Override
-  public Opt<WorkflowInstance> getCurrentWorkflowInstance(String mpId) throws IndexServiceException {
+  private Opt<WorkflowInstance> getCurrentWorkflowInstance(String mpId) throws IndexServiceException {
     WorkflowQuery query = new WorkflowQuery().withMediaPackage(mpId);
     WorkflowSet workflowInstances;
     try {
@@ -1806,7 +1787,7 @@ public class IndexServiceImpl implements IndexService {
             mp.setSeriesTitle(seriesDC.getFirst(DublinCore.PROPERTY_TITLE));
             try (InputStream in = IOUtils.toInputStream(seriesDC.toXmlString(), "UTF-8")) {
               String elementId = UUID.randomUUID().toString();
-              URI catalogUrl = workspace.put(mp.getIdentifier().compact(), elementId, "dublincore.xml", in);
+              URI catalogUrl = workspace.put(mp.getIdentifier().toString(), elementId, "dublincore.xml", in);
               MediaPackageElement mpe = mp.add(catalogUrl, MediaPackageElement.Type.Catalog, MediaPackageElements.SERIES);
               mpe.setIdentifier(elementId);
               mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, workspace.read(catalogUrl)));
@@ -1855,7 +1836,7 @@ public class IndexServiceImpl implements IndexService {
             for (String seriesElementType : seriesElements.keySet()) {
               try (InputStream in = new ByteArrayInputStream(seriesElements.get(seriesElementType))) {
                 String elementId = UUID.randomUUID().toString();
-                URI catalogUrl = workspace.put(mp.getIdentifier().compact(), elementId, "dublincore.xml", in);
+                URI catalogUrl = workspace.put(mp.getIdentifier().toString(), elementId, "dublincore.xml", in);
                 MediaPackageElement mpe = mp.add(catalogUrl, MediaPackageElement.Type.Catalog,
                         MediaPackageElementFlavor.flavor(seriesElementType, "series"));
                 mpe.setIdentifier(elementId);
@@ -2017,13 +1998,6 @@ public class IndexServiceImpl implements IndexService {
   @Override
   public void removeSeries(String id) throws NotFoundException, SeriesException, UnauthorizedException {
     seriesService.deleteSeries(id);
-  }
-
-  @Override
-  public MetadataList updateCommonSeriesMetadata(String id, String metadataJSON, AbstractSearchIndex index)
-          throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException {
-    MetadataList metadataList = getMetadataListWithCommonSeriesCatalogUIAdapters();
-    return updateSeriesMetadata(id, metadataJSON, index, metadataList);
   }
 
   @Override

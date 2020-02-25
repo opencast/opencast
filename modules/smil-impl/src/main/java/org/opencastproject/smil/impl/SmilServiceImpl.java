@@ -80,7 +80,7 @@ public class SmilServiceImpl implements SmilService {
     SmilImpl smil = new SmilImpl();
     ((SmilHeadImpl) smil.getHead()).addMeta(
             SmilMeta.SMIL_META_NAME_MEDIA_PACKAGE_ID,
-            mediaPackage.getIdentifier().compact());
+            mediaPackage.getIdentifier().toString());
     return new SmilResponseImpl(smil);
   }
 

@@ -30,10 +30,6 @@ public class MediaInspectionException extends Exception {
   /** Serial version uid */
   private static final long serialVersionUID = 1336936343567817393L;
 
-  public MediaInspectionException() {
-    super();
-  }
-
   /**
    * Creates a new inspection exception with the specified error message.
    *

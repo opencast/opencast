@@ -43,7 +43,6 @@ import com.entwinemedia.fn.Products;
 import com.entwinemedia.fn.data.Opt;
 import com.mysema.query.jpa.JPASubQuery;
 import com.mysema.query.jpa.impl.JPAQueryFactory;
-import com.mysema.query.support.Expressions;
 import com.mysema.query.types.ConstantImpl;
 import com.mysema.query.types.Operator;
 import com.mysema.query.types.Ops;
@@ -243,16 +242,6 @@ public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
 //      }
 //    };
 //  }
-
-  public BooleanExpression mkPropertyPredicate(
-          final Opt<String> namespace,
-          final Opt<String> propertyName,
-          final Opt<BooleanExpression> valuePredicate) {
-    return Expressions.allOf(
-            namespace.isSome() ? Q_PROPERTY.namespace.eq(namespace.get()) : null,
-            propertyName.isSome() ? Q_PROPERTY.propertyName.eq(propertyName.get()) : null,
-            valuePredicate.isSome() ? valuePredicate.get() : null);
-  }
 
 
   /* ------------------------------------------------------------------------------------------------------------------ */

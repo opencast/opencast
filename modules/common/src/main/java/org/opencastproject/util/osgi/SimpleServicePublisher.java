@@ -41,7 +41,6 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Closeable;
 import java.util.Dictionary;
 import java.util.List;
 
@@ -74,19 +73,7 @@ public abstract class SimpleServicePublisher implements ManagedService {
       this.onShutdown = onShutdown;
     }
 
-    public static ServiceReg reg(List<ServiceRegistration> serviceRegistrations, List<Effect0> onShutdown) {
-      return new ServiceReg(serviceRegistrations, onShutdown);
-    }
-
     public static ServiceReg reg(ServiceRegistration serviceRegistration, Effect0 onShutdown) {
-      return new ServiceReg(list(serviceRegistration), list(onShutdown));
-    }
-
-    public static ServiceReg reg(ServiceRegistration serviceRegistration, Effect0... onShutdown) {
-      return new ServiceReg(list(serviceRegistration), list(onShutdown));
-    }
-
-    public static ServiceReg reg(Effect0 onShutdown, ServiceRegistration... serviceRegistration) {
       return new ServiceReg(list(serviceRegistration), list(onShutdown));
     }
 
@@ -164,32 +151,6 @@ public abstract class SimpleServicePublisher implements ManagedService {
     final Dictionary props = dict(tuple(SERVICE_PID, o.getClass().getName()),
             tuple(SERVICE_DESCRIPTION, serviceDescription));
     return cc.getBundleContext().registerService(serviceClass.getName(), o, props);
-  }
-
-  /**
-   * Create an effect to unregister a service suitable to return by
-   * {@link #registerService(java.util.Dictionary, org.osgi.service.component.ComponentContext)}.
-   */
-  public static Effect0 unregisterService(final ServiceRegistration sr) {
-    return new Effect0() {
-      @Override
-      protected void run() {
-        sr.unregister();
-      }
-    };
-  }
-
-  /**
-   * Create an effect to close a closeable suitable to return by
-   * {@link #registerService(java.util.Dictionary, org.osgi.service.component.ComponentContext)}.
-   */
-  public static Effect0 close(final Closeable c) {
-    return new Effect0.X() {
-      @Override
-      protected void xrun() throws Exception {
-        c.close();
-      }
-    };
   }
 
   /**

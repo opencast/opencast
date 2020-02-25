@@ -21,10 +21,7 @@
 
 package org.opencastproject.util.persistencefn;
 
-import static com.entwinemedia.fn.Stream.$;
-
 import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Monoid;
 import com.entwinemedia.fn.P2;
 import com.entwinemedia.fn.Unit;
 import com.entwinemedia.fn.data.Opt;
@@ -39,7 +36,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
-import javax.persistence.TypedQuery;
 
 /**
  * JPA query constructors.
@@ -63,15 +59,6 @@ public final class Queries {
       @Override public A apply(EntityManager em) {
         em.persist(a);
         return a;
-      }
-    };
-  }
-
-  /** {@link javax.persistence.EntityManager#merge(Object)} as a function. */
-  public static <A> Fn<EntityManager, A> merge(final A a) {
-    return new Fn<EntityManager, A>() {
-      @Override public A apply(EntityManager em) {
-        return em.merge(a);
       }
     };
   }
@@ -204,49 +191,12 @@ public final class Queries {
     return q;
   }
 
-  /**
-   * Compose multiple queries <code>qs</code> and sum up their results.
-   *
-   * @param m monoid to sum up results
-   * @param qs list of queries
-   * @return the sum of the results
-   */
-  @SafeVarargs
-  public static <A> Fn<EntityManager, A> sum(final Monoid<A> m, final Fn<EntityManager, A>... qs) {
-    return new Fn<EntityManager, A>() {
-      @Override public A apply(final EntityManager em) {
-        return $(qs).map(new Fn<Fn<EntityManager,A>, A>() {
-          @Override public A apply(Fn<EntityManager, A> q) {
-            return q.apply(em);
-          }
-        }).sum(m);
-      }
-    };
-  }
-
   // -------------------------------------------------------------------------------------------------------------------
 
   /** Named queries with support for named parameters. */
   public static final TypedQueriesBase<P2<String, ?>> named = new TypedQueriesBase<P2<String, ?>>() {
     @Override public Query query(EntityManager em, String q, P2<String, ?>... params) {
       return setParams(em.createNamedQuery(q), params);
-    }
-
-    @Override
-    public <A> TypedQuery<A> query(EntityManager em, String q, Class<A> type, P2<String, ?>... params) {
-      return setParams(em.createNamedQuery(q, type), params);
-    }
-  };
-
-  /** JPQL queries with support for named parameters. */
-  public static final TypedQueriesBase<P2<String, ?>> jpql = new TypedQueriesBase<P2<String, ?>>() {
-    @Override public Query query(EntityManager em, String q, P2<String, ?>... params) {
-      return setParams(em.createQuery(q), params);
-    }
-
-    @Override
-    public <A> TypedQuery<A> query(EntityManager em, String q, Class<A> type, P2<String, ?>... params) {
-      return setParams(em.createQuery(q, type), params);
     }
   };
 
@@ -263,34 +213,6 @@ public final class Queries {
     protected TypedQueriesBase() {
     }
 
-    /**
-     * Create a typed query from <code>q</code> with a list of parameters.
-     * Values of type {@link java.util.Date} are recognized
-     * and set as a timestamp ({@link javax.persistence.TemporalType#TIMESTAMP}.
-     */
-    public abstract <A> TypedQuery<A> query(EntityManager em,
-                                            String queryName,
-                                            Class<A> type,
-                                            P2<String, ?>... params);
-
-    /** Find multiple entities. */
-    public <A> List<A> findAll(EntityManager em,
-                               final String q,
-                               final Class<A> type,
-                               final P2<String, ?>... params) {
-      return query(em, q, type, params).getResultList();
-    }
-
-    /** {@link #findAll(javax.persistence.EntityManager, String, Class, com.entwinemedia.fn.P2[])} as a function. */
-    public <A> Fn<EntityManager, List<A>> findAll(final String q,
-                                                  final Class<A> type,
-                                                  final P2<String, ?>... params) {
-      return new Fn<EntityManager, List<A>>() {
-        @Override public List<A> apply(EntityManager em) {
-          return findAll(em, q, type, params);
-        }
-      };
-    }
   }
 
   // -------------------------------------------------------------------------------------------------------------------
@@ -309,15 +231,6 @@ public final class Queries {
     /** Run an update (UPDATE or DELETE) query and ensure that at least one row got affected. */
     public boolean update(EntityManager em, String q, P... params) {
       return query(em, q, params).executeUpdate() > 0;
-    }
-
-    /** {@link #update(javax.persistence.EntityManager, String, Object[])} as a function. */
-    public Fn<EntityManager, Boolean> update(final String q, final P... params) {
-      return new Fn<EntityManager, Boolean>() {
-        @Override public Boolean apply(EntityManager em) {
-          return update(em, q, params);
-        }
-      };
     }
 
     /**
@@ -347,43 +260,6 @@ public final class Queries {
       };
     }
 
-    /** Run a SELECT query and return only the first result item. */
-    public <A> Opt<A> findFirst(final EntityManager em,
-                                final String q,
-                                final P... params) {
-      try {
-        return Opt.some((A) query(em, q, params).setMaxResults(1).getSingleResult());
-      } catch (NoResultException e) {
-        return Opt.none();
-      } catch (NonUniqueResultException e) {
-        return Opt.none();
-      }
-    }
-
-    /** {@link #findSingle(javax.persistence.EntityManager, String, Object[])} as a function. */
-    public <A> Fn<EntityManager, Opt<A>> findFirst(final String q,
-                                                   final P... params) {
-      return new Fn<EntityManager, Opt<A>>() {
-        @Override public Opt<A> apply(EntityManager em) {
-          return findFirst(em, q, params);
-        }
-      };
-    }
-
-    /** Run a COUNT(x) query. */
-    public long count(final EntityManager em, final String q, final P... params) {
-      return (Long) query(em, q, params).getSingleResult();
-    }
-
-    /** {@link #count(javax.persistence.EntityManager, String, Object[])} as a function. */
-    public Fn<EntityManager, Long> count(final String q, final P... params) {
-      return new Fn<EntityManager, Long>() {
-        @Override public Long apply(EntityManager em) {
-          return count(em, q, params);
-        }
-      };
-    }
-
     /** Find multiple entities. */
     public <A> List<A> findAll(EntityManager em, final String q, final P... params) {
       return (List<A>) query(em, q, params).getResultList();
@@ -399,50 +275,5 @@ public final class Queries {
       };
     }
 
-    /** Find multiple objects with optional pagination. */
-    public <A> List<A> findAll(final EntityManager em,
-                               final String q,
-                               final Opt<Integer> offset,
-                               final Opt<Integer> limit,
-                               final P... params) {
-      final Query query = query(em, q, params);
-      for (Integer x : offset) query.setFirstResult(x);
-      for (Integer x : limit) query.setMaxResults(x);
-      return (List<A>) query.getResultList();
-    }
-
-    public <A> Fn<EntityManager, List<A>> findAll(final String q,
-                                                  final Opt<Integer> offset,
-                                                  final Opt<Integer> limit,
-                                                  final P... params) {
-      return new Fn<EntityManager, List<A>>() {
-        @Override public List<A> apply(EntityManager em) {
-          return findAll(em, q, offset, limit, params);
-        }
-      };
-    }
-
-    /** Find multiple objects with pagination. */
-    public <A> List<A> findAll(final EntityManager em,
-                               final String q,
-                               final int offset,
-                               final int limit,
-                               final P... params) {
-      final Query query = query(em, q, params);
-      query.setFirstResult(offset);
-      query.setMaxResults(limit);
-      return (List<A>) query.getResultList();
-    }
-
-    public <A> Fn<EntityManager, List<A>> findAll(final String q,
-                                                  final int offset,
-                                                  final int limit,
-                                                  final P... params) {
-      return new Fn<EntityManager, List<A>>() {
-        @Override public List<A> apply(EntityManager em) {
-          return findAll(em, q, offset, limit, params);
-        }
-      };
-    }
   }
 }

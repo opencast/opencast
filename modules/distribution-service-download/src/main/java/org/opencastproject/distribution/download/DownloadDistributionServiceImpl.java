@@ -258,27 +258,6 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    *          The the element that should be distributed contained within the media package.
    * @param checkAvailability
    *          Check the availability of the distributed element via http.
-   * @return A reference to the MediaPackageElement that has been distributed.
-   * @throws DistributionException
-   *           Thrown if the parent directory of the MediaPackageElement cannot be created, if the MediaPackageElement
-   *           cannot be copied or another unexpected exception occurs.
-   */
-  public MediaPackageElement distributeElement(String channelId, MediaPackage mediapackage, MediaPackageElement element,
-          boolean checkAvailability) throws DistributionException {
-    return distributeElement(channelId, mediapackage, element, checkAvailability, false);
-  }
-
-  /**
-   * Distribute a Mediapackage element to the download distribution service.
-   *
-   * @param channelId
-   #          The id of the publication channel to be distributed to.
-   * @param mediapackage
-   *          The media package that contains the element to be distributed.
-   * @param element
-   *          The the element that should be distributed contained within the media package.
-   * @param checkAvailability
-   *          Check the availability of the distributed element via http.
    * @param preserveReference
    *           Copy existing Track-Reference to the new distributed Track
    * @return A reference to the MediaPackageElement that has been distributed.
@@ -290,7 +269,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
   public MediaPackageElement distributeElement(String channelId, MediaPackage mediapackage, MediaPackageElement element,
           boolean checkAvailability, boolean preserveReference) throws DistributionException {
 
-    final String mediapackageId = mediapackage.getIdentifier().compact();
+    final String mediapackageId = mediapackage.getIdentifier().toString();
     final String elementId = element.getIdentifier();
 
     try {
@@ -483,7 +462,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     notNull(element, "element");
     notNull(channelId, "channelId");
 
-    String mediapackageId = mediapackage.getIdentifier().compact();
+    String mediapackageId = mediapackage.getIdentifier().toString();
     String elementId = element.getIdentifier();
 
     try {
@@ -664,7 +643,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
         return new File(path(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3], splitUrl[4]));
       }
     }
-    return new File(path(directoryName, orgId, channelId, mp.getIdentifier().compact(), element.getIdentifier(),
+    return new File(path(directoryName, orgId, channelId, mp.getIdentifier().toString(), element.getIdentifier(),
             FilenameUtils.getName(uriString)));
   }
 
@@ -675,7 +654,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    */
   protected File getMediaPackageDirectory(String channelId, MediaPackage mp) {
     final String orgId = securityService.getOrganization().getId();
-    return new File(distributionDirectory, path(orgId, channelId, mp.getIdentifier().compact()));
+    return new File(distributionDirectory, path(orgId, channelId, mp.getIdentifier().toString()));
   }
 
   /**

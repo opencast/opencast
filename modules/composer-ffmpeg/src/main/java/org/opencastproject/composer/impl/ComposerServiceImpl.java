@@ -50,8 +50,7 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
-import org.opencastproject.mediapackage.identifier.IdBuilder;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -105,7 +104,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -228,9 +226,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /** The organization directory service */
   private OrganizationDirectoryService organizationDirectoryService = null;
-
-  /** Id builder used to create ids for encoded tracks */
-  private final IdBuilder idBuilder = IdBuilderFactory.newInstance().newIdBuilder();
 
   /** The security service */
   private SecurityService securityService = null;
@@ -363,7 +358,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   private Option<Track> encode(final Job job, Map<String, Track> tracks, String profileId)
           throws EncoderException, MediaPackageException {
 
-    final String targetTrackId = idBuilder.createNew().toString();
+    final String targetTrackId = IdImpl.fromUUID().toString();
 
     Map<String, File> files = new HashMap<>();
     // Get the tracks and make sure they exist
@@ -473,7 +468,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     for (File encodingOutput: outputFiles) {
       // Put the file in the workspace
       URI returnURL;
-      final String targetTrackId = idBuilder.createNew().toString();
+      final String targetTrackId = IdImpl.fromUUID().toString();
 
       try (InputStream in = new FileInputStream(encodingOutput)) {
         returnURL = workspace.putInCollection(COLLECTION,
@@ -563,7 +558,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    */
   private Option<Track> trim(Job job, Track sourceTrack, String profileId, long start, long duration)
           throws EncoderException {
-    String targetTrackId = idBuilder.createNew().toString();
+    String targetTrackId = IdImpl.fromUUID().toString();
 
     // Get the track and make sure it exists
     final File trackFile = loadTrackIntoWorkspace(job, "source", sourceTrack, false);
@@ -686,7 +681,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // Create the engine
     final EncoderEngine encoderEngine = getEncoderEngine();
 
-    final String targetTrackId = idBuilder.createNew().toString();
+    final String targetTrackId = IdImpl.fromUUID().toString();
     Option<File> upperVideoFile = Option.none();
     try {
       // Get the tracks and make sure they exist
@@ -856,7 +851,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       throw new EncoderException("The output dimension id parameter must not be null when concatenating video");
     }
 
-    final String targetTrackId = idBuilder.createNew().toString();
+    final String targetTrackId = IdImpl.fromUUID().toString();
     // Get the tracks and make sure they exist
     List<File> trackFiles = new ArrayList<>();
     int i = 0;
@@ -960,7 +955,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // Get the encoding profile
     final EncodingProfile profile = getProfile(job, profileId);
 
-    final String targetTrackId = idBuilder.createNew().toString();
+    final String targetTrackId = IdImpl.fromUUID().toString();
     // Get the attachment and make sure it exist
     File imageFile;
     try {
@@ -1057,7 +1052,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
               JOB_TYPE, Operation.Image.toString(), null, null, false, profile.getJobLoad());
       job.setStatus(Job.Status.RUNNING);
       job = serviceRegistry.updateJob(job);
-      final List<Attachment> images = image(job, sourceTrack, profileId, time);
+      final List<Attachment> images = extractImages(job, sourceTrack, profileId, null, time);
       job.setStatus(Job.Status.FINISHED);
       return images;
     } catch (ServiceRegistryException | NotFoundException e) {
@@ -1096,78 +1091,19 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    *          the source track
    * @param profileId
    *          the identifier of the encoding profile to use
+   * @param properties
+   *          the properties applied to the encoding profile
    * @param times
    *          (one or more) times in seconds
    * @return the images as an attachment element list
    * @throws EncoderException
    *           if extracting the image fails
    */
-  protected List<Attachment> image(Job job, Track sourceTrack, String profileId, double... times)
-          throws EncoderException, MediaPackageException {
-    if (sourceTrack == null)
-      throw new EncoderException("SourceTrack cannot be null");
-
-    validateVideoStream(job, sourceTrack);
-
-    // The time should not be outside of the track's duration
-    for (double time : times) {
-      if (sourceTrack.getDuration() == null) {
-        Map<String, String> params = new HashMap<>();
-        params.put("track-id", sourceTrack.getIdentifier());
-        params.put("track-url", sourceTrack.getURI().toString());
-        incident().recordFailure(job, IMAGE_EXTRACTION_UNKNOWN_DURATION, params);
-        throw new EncoderException("Unable to extract an image from a track with unknown duration");
-      }
-      if (time < 0 || time * 1000 > sourceTrack.getDuration()) {
-        Duration duration = Duration.ofMillis(sourceTrack.getDuration());
-        long durationSeconds = duration.getSeconds();
-        long durationMillis = duration.minusSeconds(durationSeconds).toMillis();
-        String formattedDuration = String.valueOf(durationSeconds) + '.'
-                + StringUtils.leftPad(String.valueOf(durationMillis), 3, '0');
-
-        Map<String, String> params = new HashMap<>();
-        params.put("track-id", sourceTrack.getIdentifier());
-        params.put("track-url", sourceTrack.getURI().toString());
-        params.put("track-duration", formattedDuration);
-        params.put("time", Double.toString(time));
-        incident().recordFailure(job, IMAGE_EXTRACTION_TIME_OUTSIDE_DURATION, params);
-
-        throw new EncoderException("An image could not be extracted from the track " + sourceTrack.getURI()
-                + " with id " + sourceTrack.getIdentifier() + " because the extraction time (" + time + " second(s)) is "
-                + "outside of the track's duration (" + formattedDuration + " second(s))");
-      }
-    }
-
-    return extractImages(job, sourceTrack, profileId, null, times);
-  }
-
-  /**
-   * Extracts an image from <code>sourceTrack</code> by the given properties and the corresponding encoding profile.
-   *
-   * @param job
-   *          the associated job
-   * @param sourceTrack
-   *          the source track
-   * @param profileId
-   *          the identifier of the encoding profile to use
-   * @param properties
-   *          the properties applied to the encoding profile
-   * @return the images as an attachment element list
-   * @throws EncoderException
-   *           if extracting the image fails
-   */
-  protected List<Attachment> image(Job job, Track sourceTrack, String profileId, Map<String, String> properties)
-          throws EncoderException, MediaPackageException {
-    if (sourceTrack == null)
-      throw new EncoderException("SourceTrack cannot be null");
-
-    validateVideoStream(job, sourceTrack);
-
-    return extractImages(job, sourceTrack, profileId, properties);
-  }
-
   private List<Attachment> extractImages(Job job, Track sourceTrack, String profileId, Map<String, String> properties,
           double... times) throws EncoderException {
+    if (sourceTrack == null) {
+      throw new EncoderException("SourceTrack cannot be null");
+    }
     logger.info("creating an image using video track {}", sourceTrack.getIdentifier());
 
     // Get the encoding profile
@@ -1374,7 +1310,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
         MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         Attachment convertedImage = (Attachment) builder.elementFromURI(workspaceURI, Attachment.TYPE, null);
-        convertedImage.setIdentifier(idBuilder.createNew().toString());
+        convertedImage.setIdentifier(IdImpl.fromUUID().toString());
         try {
           convertedImage.setMimeType(MimeTypes.fromURI(convertedImage.getURI()));
         } catch (UnknownFileTypeException e) {
@@ -1434,10 +1370,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
             for (int i = 3; i < arguments.size(); i++) {
               times[i - 3] = Double.parseDouble(arguments.get(i));
             }
-            resultingElements = image(job, firstTrack, encodingProfile, times);
+            resultingElements = extractImages(job, firstTrack, encodingProfile, null, times);
           } else {
             Map<String, String> properties = parseProperties(arguments.get(3));
-            resultingElements = image(job, firstTrack, encodingProfile, properties);
+            resultingElements = extractImages(job, firstTrack, encodingProfile, properties);
           }
           serialized = MediaPackageElementParser.getArrayAsXml(resultingElements);
           break;
@@ -1863,9 +1799,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   private static List<Tuple<String, String>> detailsFor(EncoderException ex, EncoderEngine engine) {
     final List<Tuple<String, String>> d = new ArrayList<>();
     d.add(tuple("encoder-engine-class", engine.getClass().getName()));
-    if (ex instanceof CmdlineEncoderException) {
-      d.add(tuple("encoder-commandline", ((CmdlineEncoderException) ex).getCommandLine()));
-    }
     return d;
   }
 
@@ -2066,7 +1999,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
       List<URI> workspaceURIs = putToCollection(job, outputs, "demuxed file");
       List<Track> tracks = inspect(job, workspaceURIs);
-      tracks.forEach(track -> track.setIdentifier(idBuilder.createNew().toString()));
+      tracks.forEach(track -> track.setIdentifier(IdImpl.fromUUID().toString()));
       return tracks;
     } catch (Exception e) {
       logger.warn("Demux/MultiOutputEncode operation failed to encode " + videoTrack, e);
@@ -2339,7 +2272,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       logger.info("ProcessSmil/MultiTrimConcat returns {} media files {}", outputs.size(), outputs);
       List<URI> workspaceURIs = putToCollection(job, outputs, "processSmil files");
       List<Track> tracks = inspect(job, workspaceURIs);
-      tracks.forEach(track -> track.setIdentifier(idBuilder.createNew().toString()));
+      tracks.forEach(track -> track.setIdentifier(IdImpl.fromUUID().toString()));
       return tracks;
     } catch (Exception e) { // clean up all the stored files
       throw new EncoderException("ProcessSmil operation failed to run ", e);
@@ -2412,7 +2345,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       logger.info("MultiEncode returns {} media files {} ", outputs.size(), outputs);
       List<URI> workspaceURIs = putToCollection(job, outputs, "multiencode files");
       List<Track> tracks = inspect(job, workspaceURIs);
-      tracks.forEach(eachtrack -> eachtrack.setIdentifier(idBuilder.createNew().toString()));
+      tracks.forEach(eachtrack -> eachtrack.setIdentifier(IdImpl.fromUUID().toString()));
       return tracks;
     } catch (Exception e) {
       throw new EncoderException("MultiEncode operation failed to run ", e);

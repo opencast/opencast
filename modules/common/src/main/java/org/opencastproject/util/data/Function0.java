@@ -45,11 +45,6 @@ public abstract class Function0<A> {
     return Functions.then(Function0.this, f);
   }
 
-  /** Turn this function into an effect by discarding its result. */
-  public Effect0 toEffect() {
-    return Functions.toEffect(this);
-  }
-
   /** Version of {@link Function0} that allows for throwing a checked exception. */
   public abstract static class X<A> extends Function0<A> {
     @Override

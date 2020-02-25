@@ -30,15 +30,12 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
-import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.SmartIterator;
 
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -86,10 +83,6 @@ public class TestUsersEndpoint extends UsersEndpoint {
     this.setUserDirectoryService(userDirectoryService);
     this.setSecurityService(null);
     this.setJpaUserAndRoleProvider(null);
-  }
-
-  private static Date fromUTC(String utcDate) throws IllegalStateException, ParseException {
-    return new Date(DateTimeSupport.fromUTC(utcDate));
   }
 
   public class TestUsers implements UserDirectoryService {

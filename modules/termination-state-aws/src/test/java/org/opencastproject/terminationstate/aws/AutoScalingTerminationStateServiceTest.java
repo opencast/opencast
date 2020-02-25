@@ -35,10 +35,7 @@ import com.amazonaws.services.autoscaling.model.RecordLifecycleActionHeartbeatRe
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
@@ -116,30 +113,6 @@ public class AutoScalingTerminationStateServiceTest {
     config.put(AutoScalingTerminationStateService.CONFIG_LIFECYCLE_POLLING_PERIOD, "2");
     config.put(AutoScalingTerminationStateService.CONFIG_LIFECYCLE_HEARTBEAT_PERIOD, "2");
     service.configure(config);
-  }
-
-  @Test
-  @Ignore
-  public void testLifeCyclePolling() throws Exception {
-    service.startPollingLifeCycleHook();
-    String[] trigger = scheduler.getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);
-    Assert.assertEquals(1, trigger.length);
-    Assert.assertEquals(AutoScalingTerminationStateService.SCHEDULE_LIFECYCLE_POLLING_TRIGGER, trigger[0]);
-    service.stopPollingLifeCycleHook();
-
-    // change Lifecycle state
-    instance.setLifecycleState("Terminating:Wait");
-    Thread.sleep(3000);
-    trigger = scheduler.getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);
-    Assert.assertEquals(1, trigger.length);
-    Assert.assertEquals(AutoScalingTerminationStateService.SCHEDULE_LIFECYCLE_HEARTBEAT_TRIGGER, trigger[0]);
-
-    // complete running jobs
-    nRunningJobs = 0L;
-    Thread.sleep(3000);
-    trigger = scheduler.getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);
-    Assert.assertEquals(0, trigger.length);
-    Assert.assertEquals(AutoScalingTerminationStateService.TerminationState.READY, service.getState());
   }
 
   @After

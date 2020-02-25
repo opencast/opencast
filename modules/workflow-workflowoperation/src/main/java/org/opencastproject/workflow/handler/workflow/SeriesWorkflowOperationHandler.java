@@ -331,7 +331,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
           MediaPackage mediaPackage) throws WorkflowOperationException {
     try (InputStream in = IOUtils.toInputStream(catalog.toXmlString(), "UTF-8")) {
       String elementId = UUID.randomUUID().toString();
-      URI catalogUrl = workspace.put(mediaPackage.getIdentifier().compact(), elementId, "dublincore.xml", in);
+      URI catalogUrl = workspace.put(mediaPackage.getIdentifier().toString(), elementId, "dublincore.xml", in);
       logger.info("Adding catalog with flavor {} to mediapackage {}", flavor, mediaPackage);
       MediaPackageElement mpe = mediaPackage.add(catalogUrl, MediaPackageElement.Type.Catalog, flavor);
       mpe.setIdentifier(elementId);

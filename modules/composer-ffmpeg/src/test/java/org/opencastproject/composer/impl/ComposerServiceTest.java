@@ -89,7 +89,6 @@ import javax.imageio.ImageIO;
 public class ComposerServiceTest {
   /** The sources file to test with */
   private File sourceVideoOnly = null;
-  private File[] sourceVideosUnique = new File[10];
   private File sourceAudioOnly = null;
   private File sourceImage = null;
 

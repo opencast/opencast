@@ -44,7 +44,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.util.persistence.PersistenceUtil;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
@@ -57,7 +56,6 @@ import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -312,40 +310,6 @@ public class ServiceRegistryJpaImplTest {
       Assert.fail();
     } catch (Exception e) {
       Assert.assertEquals(0, serviceRegistryJpaImpl.dispatchPriorityList.size());
-    }
-  }
-
-  @Test
-  @Ignore
-  public void testIgnoreHostsInPriorityList() throws Exception {
-    if (serviceRegistryJpaImpl.scheduledExecutor != null)
-      serviceRegistryJpaImpl.scheduledExecutor.shutdown();
-    serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
-    serviceRegistryJpaImpl.activate(null);
-    Hashtable<String, String> properties = new Hashtable<>();
-    properties.put("dispatch.interval", "1");
-    serviceRegistryJpaImpl.updated(properties);
-    registerTestHostAndService();
-    Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_2, TEST_OPERATION, null, null, true, null);
-    Job testJob2 = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_OPERATION, null, null, true, null);
-    serviceRegistryJpaImpl.dispatchPriorityList.put(testJob2.getId(), TEST_HOST);
-    JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob, testJob2);
-    try {
-      barrier.waitForJobs(2000);
-      Assert.fail();
-    } catch (Exception e) {
-      // Mock http client always returns 503 for this path so it won't be dispatched anyway
-      testJob = serviceRegistryJpaImpl.getJob(testJob.getId());
-      Assert.assertTrue(StringUtils.isBlank(testJob.getProcessingHost()));
-      Assert.assertEquals(Job.Status.QUEUED, testJob.getStatus());
-      // Mock http client always returns 204 for this path, but it should not be dispatched
-      // because the host is in the dispatchPriorityList
-      testJob2 = serviceRegistryJpaImpl.getJob(testJob2.getId());
-      Assert.assertTrue(StringUtils.isBlank(testJob2.getProcessingHost()));
-      Assert.assertEquals(Job.Status.QUEUED, testJob2.getStatus());
-      Assert.assertEquals(1, serviceRegistryJpaImpl.dispatchPriorityList.size());
-      String blockingHost = serviceRegistryJpaImpl.dispatchPriorityList.get(testJob2.getId());
-      Assert.assertEquals(TEST_HOST, blockingHost);
     }
   }
 

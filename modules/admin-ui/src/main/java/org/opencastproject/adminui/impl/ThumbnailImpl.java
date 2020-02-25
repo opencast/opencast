@@ -225,7 +225,7 @@ public final class ThumbnailImpl {
     }
 
     final Map<String, String> ps = WorkflowPropertiesUtil
-      .getLatestWorkflowProperties(assetManager, mp.getIdentifier().compact());
+      .getLatestWorkflowProperties(assetManager, mp.getIdentifier().toString());
     final ThumbnailSource source = ps.entrySet().stream()
       .filter(p -> ThumbnailImpl.THUMBNAIL_PROPERTY_TYPE.equals(p.getKey()))
       .map(Map.Entry::getValue)
@@ -344,7 +344,7 @@ public final class ThumbnailImpl {
     final String publishThumbnailId = UUID.randomUUID().toString();
     final InputStream inputStream = tempInputStream();
     final URI publishThumbnailUri = workspace
-      .put(mp.getIdentifier().compact(), publishThumbnailId, this.tempThumbnailFileName, inputStream);
+      .put(mp.getIdentifier().toString(), publishThumbnailId, this.tempThumbnailFileName, inputStream);
     inputStream.close();
 
     final Attachment publishAttachment = AttachmentImpl.fromURI(publishThumbnailUri);
@@ -387,7 +387,7 @@ public final class ThumbnailImpl {
 
     final String aid = UUID.randomUUID().toString();
     final InputStream inputStream = tempInputStream();
-    final URI aUri = workspace.put(mp.getIdentifier().compact(), aid, tempThumbnailFileName, inputStream);
+    final URI aUri = workspace.put(mp.getIdentifier().toString(), aid, tempThumbnailFileName, inputStream);
     inputStream.close();
     final Attachment attachment = AttachmentImpl.fromURI(aUri);
     attachment.setIdentifier(aid);
@@ -448,7 +448,7 @@ public final class ThumbnailImpl {
     tempThumbnailMimeType = MimeTypes.parseMimeType(contentType);
     final String filename = "uploaded_thumbnail." + tempThumbnailMimeType.getSuffix().getOrElse("unknown");
     final String originalThumbnailId = UUID.randomUUID().toString();
-    tempThumbnail = workspace.put(mp.getIdentifier().compact(), originalThumbnailId, filename, inputStream);
+    tempThumbnail = workspace.put(mp.getIdentifier().toString(), originalThumbnailId, filename, inputStream);
     tempThumbnailFileName = "uploaded_thumbnail." + tempThumbnailMimeType.getSuffix().getOrElse("unknown");
   }
 

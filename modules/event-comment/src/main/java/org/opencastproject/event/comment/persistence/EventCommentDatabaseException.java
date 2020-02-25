@@ -32,37 +32,12 @@ public class EventCommentDatabaseException extends Exception {
   private static final long serialVersionUID = 5364839635104824076L;
 
   /**
-   * Create exception.
-   */
-  public EventCommentDatabaseException() {
-  }
-
-  /**
-   * Create exception with a message.
-   * 
-   * @param message
-   */
-  public EventCommentDatabaseException(String message) {
-    super(message);
-  }
-
-  /**
    * Create exception with a cause.
    * 
    * @param cause
    */
   public EventCommentDatabaseException(Throwable cause) {
     super(cause);
-  }
-
-  /**
-   * Create exception with a message and a cause.
-   * 
-   * @param message
-   * @param cause
-   */
-  public EventCommentDatabaseException(String message, Throwable cause) {
-    super(message, cause);
   }
 
 }

@@ -68,16 +68,4 @@ public class DefaultOrganization extends JaxbOrganization {
             DEFAULT_PROPERTIES);
   }
 
-  /**
-   * Creates a default organization for the given servers.
-   *
-   * @param servers
-   *          the server names and ports
-   */
-  public DefaultOrganization(Map<String, Integer> servers) {
-    super(DefaultOrganization.DEFAULT_ORGANIZATION_ID, DefaultOrganization.DEFAULT_ORGANIZATION_NAME, servers,
-            DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS,
-            DEFAULT_PROPERTIES);
-  }
-
 }

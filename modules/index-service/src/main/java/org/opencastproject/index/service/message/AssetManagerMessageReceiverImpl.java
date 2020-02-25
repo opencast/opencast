@@ -114,7 +114,8 @@ public class AssetManagerMessageReceiverImpl extends BaseMessageReceiverImpl<Ass
     // Persist the scheduling event
     try {
       getSearchIndex().addOrUpdate(event);
-      logger.debug("Asset manager entry {} updated in the admin ui search index", event.getIdentifier());
+      logger.debug("Asset manager entry {} updated in the {} search index", event.getIdentifier(),
+              getSearchIndex().getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error retrieving the recording event from the search index: {}", e.getMessage());
     }

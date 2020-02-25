@@ -21,20 +21,11 @@
 
 package org.opencastproject.userdirectory.brightspace;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.User;
 import org.opencastproject.userdirectory.brightspace.client.BrightspaceClientException;
 import org.opencastproject.userdirectory.brightspace.client.BrightspaceClientImpl;
 
 import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.util.Set;
 
 public class BrightspaceUserProviderInstanceTest {
 
@@ -55,22 +46,4 @@ public class BrightspaceUserProviderInstanceTest {
         CACHE_EXPIRATION, "admin");
   }
 
-  @Test
-  @Ignore
-  public void testLoadUser() throws BrightspaceClientException {
-    //When using a superadmin user in brightspace, only return a single admin role to prevert returning
-    //all course-ids in a brightspace installation.
-    User user = brightspaceUserProviderInstance.loadUser("admin");
-    assertNotNull(user);
-
-    assertTrue(hasRole(user.getRoles(), "ROLE_BRIGHTSPACE_ADMIN"));
-  }
-
-  private boolean hasRole(Set<Role> roles, String roleName) {
-    for (Role role : roles)
-      if (roleName.equals(role.getName()))
-        return true;
-
-    return false;
-  }
 }

@@ -19,7 +19,6 @@
         <configuration key="retractFromAws">true</configuration>
         <configuration key="retractFromApi">true</configuration>
         <configuration key="retractPreview">true</configuration>
-        <configuration key="retractFromOaiPmh">true</configuration>
         <configuration key="retractFromYouTube">false</configuration>
       </configurations>
     </operation>

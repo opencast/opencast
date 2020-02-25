@@ -105,7 +105,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           Opt<String> schedulingSource) throws UnauthorizedException, SchedulerConflictException,
           SchedulerException {
     HttpPost post = new HttpPost("/");
-    String eventId = mediaPackage.getIdentifier().compact();
+    String eventId = mediaPackage.getIdentifier().toString();
     logger.debug("Start adding a new event {} through remote Schedule Service", eventId);
 
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -174,7 +174,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       params.add(new BasicNameValuePair("source", schedulingSource.get()));
     post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
-    String eventId = templateMp.getIdentifier().compact();
+    String eventId = templateMp.getIdentifier().toString();
 
     HttpResponse response = getResponse(post, SC_CREATED, SC_UNAUTHORIZED, SC_CONFLICT);
     try {

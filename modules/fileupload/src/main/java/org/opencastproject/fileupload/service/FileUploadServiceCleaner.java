@@ -103,15 +103,6 @@ public class FileUploadServiceCleaner {
     }
   }
 
-  /** Trigger the scheduler once independent of it's actual schedule. */
-  public void trigger() {
-    try {
-      quartz.triggerJobWithVolatileTrigger(JOB_NAME, JOB_GROUP);
-    } catch (Exception e) {
-      logger.error("Error triggering Quartz job", e);
-    }
-  }
-
   // just to make sure Quartz is being shut down...
   @Override
   protected void finalize() throws Throwable {

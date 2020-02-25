@@ -93,7 +93,7 @@ public class WorkflowItem implements MessageItem, Serializable {
    *          The workflow instance to update.
    */
   public WorkflowItem(WorkflowInstance workflowInstance, String dublincoreXml, AccessControlList accessControlList) {
-    this.id = workflowInstance.getMediaPackage().getIdentifier().compact();
+    this.id = workflowInstance.getMediaPackage().getIdentifier().toString();
     this.workflowDefinitionId = workflowInstance.getTemplate();
     this.workflowInstanceId = workflowInstance.getId();
     this.episodeDublincoreCatalog = dublincoreXml;
@@ -113,7 +113,7 @@ public class WorkflowItem implements MessageItem, Serializable {
    */
   public WorkflowItem(long workflowInstanceId, WorkflowInstance workflowInstance) {
     // We just need the media package id and workflow id
-    this.id = workflowInstance.getMediaPackage().getIdentifier().compact();
+    this.id = workflowInstance.getMediaPackage().getIdentifier().toString();
     this.workflowInstanceId = workflowInstanceId;
     this.workflowDefinitionId = null;
     this.episodeDublincoreCatalog = null;

@@ -100,11 +100,13 @@
             <feature>http</feature>
             <feature>http-whiteboard</feature>
             <feature>scr</feature>
+            <feature>cxf-commands</feature>
             <feature>cxf-jaxrs</feature>
             <feature>cxf-http-jetty</feature>
             <feature>transaction</feature>
             <feature>jndi</feature>
             <feature>eclipselink</feature>
+            <feature>wrap</feature>
             <!-- Opencast features -->
             <feature>opencast-allinone</feature>
           </bootFeatures>

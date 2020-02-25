@@ -436,7 +436,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @return the assembled player URI for this mediapackage
    */
   URI createEngageUri(URI engageUri, MediaPackage mp) {
-    return URIUtils.resolve(engageUri, PLAYER_PATH + mp.getIdentifier().compact());
+    return URIUtils.resolve(engageUri, PLAYER_PATH + mp.getIdentifier().toString());
   }
 
   /**

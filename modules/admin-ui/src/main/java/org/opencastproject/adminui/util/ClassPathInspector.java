@@ -22,7 +22,6 @@
 package org.opencastproject.adminui.util;
 
 import org.opencastproject.adminui.exception.IllegalPathException;
-import org.opencastproject.adminui.impl.LanguageServiceImpl;
 
 import org.osgi.framework.Bundle;
 
@@ -57,7 +56,6 @@ public class ClassPathInspector implements PathInspector {
     List<String> result = new ArrayList<String>();
     while (entries.hasMoreElements()) {
       URL file = (URL) entries.nextElement();
-      result.add(file.getPath().replaceAll(LanguageServiceImpl.TRANSLATION_FILES_PATH, "").replaceAll("/", ""));
     }
     return result;
   }

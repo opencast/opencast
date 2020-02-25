@@ -1,16 +1,16 @@
-# Security Policy
+Security Policy
+===============
 
-## Supported Versions
+Supported Versions
+------------------
 
-Security updates are supported for the current and previous major [Opencast release](https://opencast.org/releases.html):
+Only the current and previous major [Opencast release](https://github.com/opencast/opencast/releases) are supported.
+This means that if `N.x` is the latest release, `N.x` and `(N-1).x` are supported. Older versions will not receive any
+additional updates.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 7.x     | :white_check_mark: |
-| 6.x     | :white_check_mark: |
-| < 6.0   | :x:                |
 
-## Reporting a Vulnerability
+Reporting a Vulnerability
+-------------------------
 
 Please report security-related bugs by sending an email to security@opencast.org.
 Everything else should be filed as a ticket in our [issue tracker](https://github.com/opencast/opencast/issues)

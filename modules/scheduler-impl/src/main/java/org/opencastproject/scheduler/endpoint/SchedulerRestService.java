@@ -657,7 +657,7 @@ public class SchedulerRestService {
       return RestUtil.R.badRequest("Could not parse media package");
     }
 
-    String eventId = mediaPackage.getIdentifier().compact();
+    String eventId = mediaPackage.getIdentifier().toString();
 
     Map<String, String> caProperties = new HashMap<>();
     if (StringUtils.isNotBlank(agentParameters)) {
@@ -1344,7 +1344,7 @@ public class SchedulerRestService {
         service.addEvent(now, temporaryEndDate, agentId, Collections.<String> emptySet(), mediaPackage, wfProperties,
                 caProperties, Opt.<String> none());
         return Response.status(Status.CREATED)
-                .header("Location", serverUrl + serviceUrl + '/' + mediaPackage.getIdentifier().compact() + ".xml")
+                .header("Location", serverUrl + serviceUrl + '/' + mediaPackage.getIdentifier().toString() + ".xml")
                 .build();
       } catch (Exception e) {
         prolongingService.stop(agentId);
@@ -1413,7 +1413,7 @@ public class SchedulerRestService {
         } else {
           mp = current.get();
           eventCatalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp).get();
-          eventId = mp.getIdentifier().compact();
+          eventId = mp.getIdentifier().toString();
         }
       } catch (Exception e) {
         logger.error("Unable to get the immediate recording for agent '{}': {}", agentId, e);
@@ -1540,7 +1540,7 @@ public class SchedulerRestService {
 
     // Update comments catalog
     try {
-      URI catalogUrl = workspace.put(mediaPackage.getIdentifier().compact(), c.getIdentifier(), fileName, in);
+      URI catalogUrl = workspace.put(mediaPackage.getIdentifier().toString(), c.getIdentifier(), fileName, in);
       c.setURI(catalogUrl);
       // setting the URI to a new source so the checksum will most like be invalid
       c.setChecksum(null);
@@ -1591,7 +1591,7 @@ public class SchedulerRestService {
         mpJson = (JSONObject) mpJson.get("mediapackage");
         jsonArray.add(mpJson);
       } catch (org.json.simple.parser.ParseException e) {
-        logger.warn("Unexpected JSON parse exception for getAsJSON on mp {}", mp.getIdentifier().compact(), e);
+        logger.warn("Unexpected JSON parse exception for getAsJSON on mp {}", mp.getIdentifier().toString(), e);
         throw new SchedulerException(e);
       }
     }

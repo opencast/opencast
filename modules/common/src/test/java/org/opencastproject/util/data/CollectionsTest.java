@@ -169,7 +169,7 @@ public class CollectionsTest {
   @Test
   public void testList() {
     // compile test
-    List<Object> x = list(1, new Object(), "hallo");
+    list(1, new Object(), "hallo");
     // does not compile
     // List<String> y = list(1, new Object(), "hallo");
   }
@@ -220,7 +220,7 @@ public class CollectionsTest {
 
   @Test
   public void testAppendArray() {
-    Object[] as = append(Object.class, new String[]{"a", "b"}, new Exception());
+    append(Object.class, new String[]{"a", "b"}, new Exception());
   }
 
   @Test
@@ -234,14 +234,14 @@ public class CollectionsTest {
   public void testAppendTo() {
     final List<Object> a = new ArrayList<Object>();
     // compile check
-    final Collection<Object> b = appendTo(a, list(1));
+    appendTo(a, list(1));
     appendTo(a, list("a"));
   }
 
   @Test
   public void testCons() {
     // compile check
-    List<Object> x = Collections.<Object>cons("1", list(1, 3));
+    Collections.<Object>cons("1", list(1, 3));
   }
 
   @Test

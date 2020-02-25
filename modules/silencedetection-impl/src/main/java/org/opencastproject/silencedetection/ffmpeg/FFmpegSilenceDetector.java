@@ -152,7 +152,7 @@ public class FFmpegSilenceDetector {
     DecimalFormat decimalFmt = new DecimalFormat("0.000", new DecimalFormatSymbols(Locale.US));
     String minSilenceLengthInSeconds = decimalFmt.format((double) minSilenceLength / 1000.0);
     String filter = "silencedetect=noise=" + thresholdDB + ":duration=" + minSilenceLengthInSeconds;
-    String[] command = new String[] {binary, "-nostats", "-i", mediaPath, "-filter:a", filter, "-f", "null", "-"};
+    String[] command = new String[] {binary, "-nostats", "-i", mediaPath, "-vn", "-filter:a", filter, "-f", "null", "-"};
     String commandline = StringUtils.join(command, " ");
 
     logger.info("Running {}", commandline);

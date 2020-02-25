@@ -283,55 +283,6 @@ public final class ZipUtil {
   /***************************************************************************************/
 
   /**
-   * Compresses source files into a zip archive (no recursive, default compression)
-   *
-   * @param sourceFiles
-   *          A {@link String} array with the file names to be included in the root of the archive
-   * @param destination
-   *          A {@link String} with the path name of the resulting zip file
-   * @return A {@link java.io.File} descriptor of the zip archive file
-   * @throws IOException
-   *           If the zip file can not be created, or the input files names can not be correctly parsed
-   */
-  public static java.io.File zip(String[] sourceFiles, String destination) throws IOException {
-    return zip(sourceFiles, destination, false, DEFAULT_COMPRESSION);
-  }
-
-  /**
-   * Compresses source files into a zip archive (no recursive)
-   *
-   * @param sourceFiles
-   *          A {@link String} array with the file names to be included in the root of the archive
-   * @param destination
-   *          A {@link String} with the path name of the resulting zip file
-   * @param level
-   *          The zip algorithm compression level. Ranges between 0 (no compression) and 9 (max. compression)
-   * @return A {@link java.io.File} descriptor of the zip archive file
-   * @throws IOException
-   *           If the zip file can not be created, or the input files names can not be correctly parsed
-   */
-  public static java.io.File zip(String[] sourceFiles, String destination, int level) throws IOException {
-    return zip(sourceFiles, destination, false, level);
-  }
-
-  /**
-   * Compresses source files into a zip archive (default compression)
-   *
-   * @param sourceFiles
-   *          A {@link String} array with the file names to be included in the root of the archive
-   * @param destination
-   *          A {@link String} with the path name of the resulting zip file
-   * @param recursive
-   *          A {@link boolean} indicating whether or not recursively zipping nested directories
-   * @return A {@link java.io.File} descriptor of the zip archive file
-   * @throws IOException
-   *           If the zip file can not be created, or the input files names can not be correctly parsed
-   */
-  public static java.io.File zip(String[] sourceFiles, String destination, boolean recursive) throws IOException {
-    return zip(sourceFiles, destination, recursive, DEFAULT_COMPRESSION);
-  }
-
-  /**
    * Compresses source files into a zip archive
    *
    * @param sourceFiles
@@ -381,55 +332,6 @@ public final class ZipUtil {
   }
 
   /**
-   * Compresses source files into a zip archive (no recursive, default compression)
-   *
-   * @param sourceFiles
-   *          A {@link String} array with the file names to be included in the root of the archive
-   * @param destination
-   *          A {@link java.io.File} with the path name of the resulting zip file
-   * @return A {@link java.io.File} descriptor of the zip archive file
-   * @throws IOException
-   *           If the zip file can not be created, or the input files names can not be correctly parsed
-   */
-  public static java.io.File zip(String[] sourceFiles, java.io.File destination) throws IOException {
-    return zip(sourceFiles, destination, false, DEFAULT_COMPRESSION);
-  }
-
-  /**
-   * Compresses source files into a zip archive (no recursive)
-   *
-   * @param sourceFiles
-   *          A {@link String} array with the file names to be included in the root of the archive
-   * @param destination
-   *          A {@link java.io.File} with the path name of the resulting zip file
-   * @param level
-   *          The zip algorithm compression level. Ranges between 0 (no compression) and 9 (max. compression)
-   * @return A {@link java.io.File} descriptor of the zip archive file
-   * @throws IOException
-   *           If the zip file can not be created, or the input files names can not be correctly parsed
-   */
-  public static java.io.File zip(String[] sourceFiles, java.io.File destination, int level) throws IOException {
-    return zip(sourceFiles, destination, false, level);
-  }
-
-  /**
-   * Compresses source files into a zip archive (default compression)
-   *
-   * @param sourceFiles
-   *          A {@link String} array with the file names to be included in the root of the archive
-   * @param destination
-   *          A {@link java.io.File} with the path name of the resulting zip file
-   * @param recursive
-   *          Indicate whether or not recursively zipping nested directories
-   * @return A {@link java.io.File} descriptor of the zip archive file
-   * @throws IOException
-   *           If the zip file can not be created, or the input files names can not be correctly parsed
-   */
-  public static java.io.File zip(String[] sourceFiles, java.io.File destination, boolean recursive) throws IOException {
-    return zip(sourceFiles, destination, recursive, DEFAULT_COMPRESSION);
-  }
-
-  /**
    * Compresses source files into a zip archive
    *
    * @param sourceFiles
@@ -469,56 +371,6 @@ public final class ZipUtil {
   }
 
   /**
-   * Compresses source files into a zip archive (no recursive, default compression)
-   *
-   * @param sourceFiles
-   *          A {@link java.io.File} array with the file names to be included in the root of the archive
-   * @param destination
-   *          A {@link String} with the path name of the resulting zip file
-   * @return A {@link java.io.File} descriptor of the zip archive file
-   * @throws IOException
-   *           If the zip file can not be created, or the input files names can not be correctly parsed
-   */
-  public static java.io.File zip(java.io.File[] sourceFiles, String destination) throws IOException {
-    return zip(sourceFiles, destination, false, DEFAULT_COMPRESSION);
-  }
-
-  /**
-   * Compresses source files into a zip archive (no recursive)
-   *
-   * @param sourceFiles
-   *          A {@link java.io.File} array with the file names to be included in the root of the archive
-   * @param destination
-   *          A {@link String} with the path name of the resulting zip file
-   * @param level
-   *          The zip algorithm compression level. Ranges between 0 (no compression) and 9 (max. compression)
-   * @return A {@link java.io.File} descriptor of the zip archive file
-   * @throws IOException
-   *           If the zip file can not be created, or the input files names can not be correctly parsed
-   */
-  public static java.io.File zip(java.io.File[] sourceFiles, String destination, int level) throws IOException {
-    return zip(sourceFiles, destination, false, level);
-  }
-
-  /**
-   * Compresses source files into a zip archive (default compression)
-   *
-   * @param sourceFiles
-   *          A {@link java.io.File} array with the file names to be included in the root of the archive
-   * @param destination
-   *          A {@link String} with the path name of the resulting zip file
-   * @param recursive
-   *          Indicate whether or not recursively zipping nested directories
-   * @return A {@link java.io.File} descriptor of the zip archive file
-   * @throws IOException
-   *           If the zip file can not be created, or the input files names can not be correctly parsed
-   */
-  public static java.io.File zip(java.io.File[] sourceFiles, String destination, boolean recursive) throws IOException {
-    return zip(sourceFiles, destination, recursive, DEFAULT_COMPRESSION);
-
-  }
-
-  /**
    * Compresses source files into a zip archive
    *
    * @param sourceFiles
@@ -548,39 +400,6 @@ public final class ZipUtil {
 
     return zip(sourceFiles, new java.io.File(destination), recursive, level);
 
-  }
-
-  /**
-   * Compresses source files into a zip archive (no recursive, default compression)
-   *
-   * @param sourceFiles
-   *          A {@link java.io.File} array with the file names to be included in the root of the archive
-   * @param destination
-   *          A {@link java.io.File} with the path name of the resulting zip file
-   * @return A {@link java.io.File} descriptor of the zip archive file
-   * @throws IOException
-   *           If the zip file can not be created, or the input files names can not be correctly parsed
-   */
-  public static java.io.File zip(java.io.File[] sourceFiles, java.io.File destination) throws IOException {
-    return zip(sourceFiles, destination, false, DEFAULT_COMPRESSION);
-  }
-
-  /**
-   * Compresses source files into a zip archive (default compression)
-   *
-   * @param sourceFiles
-   *          A {@link java.io.File} array with the file names to be included in the root of the archive
-   * @param destination
-   *          A {@link java.io.File} with the path name of the resulting zip file
-   * @param recursive
-   *          Indicate whether or not recursively zipping nested directories
-   * @return A {@link java.io.File} descriptor of the zip archive file
-   * @throws IOException
-   *           If the zip file can not be created, or the input files names can not be correctly parsed
-   */
-  public static java.io.File zip(java.io.File[] sourceFiles, java.io.File destination, boolean recursive)
-          throws IOException {
-    return zip(sourceFiles, destination, recursive, DEFAULT_COMPRESSION);
   }
 
   /**

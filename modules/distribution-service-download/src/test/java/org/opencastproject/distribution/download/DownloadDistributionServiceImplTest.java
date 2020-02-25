@@ -172,7 +172,7 @@ public class DownloadDistributionServiceImplTest {
     jobBarrier.waitForJobs();
 
     File mpDir = new File(distributionRoot,
-            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().compact()));
+            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()));
     Assert.assertTrue(mpDir.exists());
     File mediaDir = new File(mpDir, "track-1");
     File metadataDir = new File(mpDir, "catalog-1");
@@ -205,7 +205,7 @@ public class DownloadDistributionServiceImplTest {
     mp.add(MediaPackageElementParser.getFromXml(job5.getPayload()));
 
     File mpDir = new File(distributionRoot,
-            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().compact()));
+            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()));
     File mediaDir = new File(mpDir, "track-1");
     File metadata1Dir = new File(mpDir, "catalog-1");
     File metadata2Dir = new File(mpDir, "catalog-2");
@@ -260,7 +260,7 @@ public class DownloadDistributionServiceImplTest {
     mp.add(job5Element);
 
     File mpDir = new File(distributionRoot,
-            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().compact()));
+            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()));
     File mediaDir = new File(mpDir, "track-1");
     File metadata1Dir = new File(mpDir, "catalog-1");
     File metadata2Dir = new File(mpDir, "catalog-2");

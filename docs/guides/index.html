@@ -17,18 +17,14 @@
     <script type=application/javascript>
       function init() {
         var admin = '',
-            user = '',
             developer = '';
         for (var i=0; i<versions.length; i++) {
           admin += '<li role="presentation"><a role="menuitem" tabindex="-1" '
             + 'href="' + versions[i] + '/admin">' + versions[i] + '</a></li>';
-          user += '<li role="presentation"><a role="menuitem" tabindex="-1" '
-            + 'href="' + versions[i] + '/user">' + versions[i] + '</a></li>';
           developer += '<li role="presentation"><a role="menuitem" tabindex="-1" '
             + 'href="' + versions[i] + '/developer">' + versions[i] + '</a></li>';
         }
         document.getElementById('adminGuides').innerHTML = admin;
-        document.getElementById('userGuides').innerHTML = user;
         document.getElementById('developerGuides').innerHTML = developer;
       }
     </script>
@@ -48,9 +44,9 @@
     <div class="container">
       <!-- Example row of columns -->
       <div class="row">
-        <div class="col-md-4">
-          <h2><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Administration Guide</h2>
-          <p>The Opencast administration guide contains official release documentation and installation and configuration details.</p>
+        <div class="col-md-6">
+          <h2><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Adopters Guide</h2>
+          <p>The Opencast adopters guide contains official release documentation and installation and configuration details.</p>
           <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" id="adminGuideVersions" data-toggle="dropdown" aria-expanded="true">
               Select a version
@@ -61,20 +57,7 @@
             </ul>
           </div>
         </div>
-        <div class="col-md-4">
-          <h2><span class="glyphicon glyphicon-user" aria-hidden="true"></span> User Guide</h2>
-          <p>This set of documentation is written for users who will primarily access and use Opencast through the administrative user interfaces.</p>
-          <div class="dropdown">
-            <button class="btn btn-default dropdown-toggle" type="button" id="adminGuideVersions" data-toggle="dropdown" aria-expanded="true">
-              Select a version
-              <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="userGuides">
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="http://docs.opencast.org/develop/user">Develop</a></li>
-            </ul>
-          </div>
-       </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
           <h2><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Developer Guide</h2>
           <p>The Opencast developer guide contains information for active developers and those who want to become involved in Opencast development.</p>
           <div class="dropdown">

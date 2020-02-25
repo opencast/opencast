@@ -397,7 +397,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     destinationDublinCore.set(DublinCore.PROPERTY_TITLE, destination.getTitle());
     try (InputStream inputStream = IOUtils.toInputStream(destinationDublinCore.toXmlString(), "UTF-8")) {
       final String elementId = UUID.randomUUID().toString();
-      final URI newUrl = workspace.put(destination.getIdentifier().compact(), elementId, "dublincore.xml",
+      final URI newUrl = workspace.put(destination.getIdentifier().toString(), elementId, "dublincore.xml",
           inputStream);
       temporaryFiles.add(newUrl);
       final MediaPackageElement mpe = destination.add(newUrl, MediaPackageElement.Type.Catalog,

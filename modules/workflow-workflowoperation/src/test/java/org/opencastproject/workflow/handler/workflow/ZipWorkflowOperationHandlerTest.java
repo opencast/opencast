@@ -94,7 +94,7 @@ public class ZipWorkflowOperationHandlerTest {
     operation.setConfiguration(ZipWorkflowOperationHandler.COMPRESS_PROPERTY, "false");
 
     try {
-      WorkflowOperationResult result = operationHandler.start(null, null);
+      operationHandler.start(null, null);
       Assert.fail("A null workflow is passed so an exception should be thrown");
     } catch (WorkflowOperationException e) {
       // expecting exception
@@ -120,7 +120,7 @@ public class ZipWorkflowOperationHandlerTest {
     operation.setConfiguration(ZipWorkflowOperationHandler.COMPRESS_PROPERTY, "false");
 
     try {
-      WorkflowOperationResult result = operationHandler.start(instance, null);
+      operationHandler.start(instance, null);
       Assert.fail("A null mediapackage is passed so an exception should be thrown");
     } catch (WorkflowOperationException e) {
       // expecting exception

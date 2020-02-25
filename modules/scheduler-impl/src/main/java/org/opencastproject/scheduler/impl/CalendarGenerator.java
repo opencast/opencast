@@ -123,7 +123,7 @@ public class CalendarGenerator {
    */
   public boolean addEvent(MediaPackage mp, DublinCoreCatalog catalog, String agentId, Date start, Date end,
           Date lastModified, String captureAgentMetadata) {
-    String eventId = mp.getIdentifier().compact();
+    String eventId = mp.getIdentifier().toString();
 
     logger.debug("Creating iCalendar VEvent from scheduled event '{}'", eventId);
 

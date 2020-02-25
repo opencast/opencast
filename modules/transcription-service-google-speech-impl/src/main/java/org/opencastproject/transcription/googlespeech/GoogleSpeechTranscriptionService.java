@@ -135,13 +135,6 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   // Cluster name
   private String clusterName = "";
 
-  // The events we are interested in receiving notifications
-  public interface JobEvent {
-
-    String COMPLETED_WITH_RESULTS = "recognitions.completed_with_results";
-    String FAILED = "recognitions.failed";
-  }
-
   /**
    * Service dependencies
    */

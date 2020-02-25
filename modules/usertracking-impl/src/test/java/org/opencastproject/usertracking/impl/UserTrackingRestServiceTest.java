@@ -34,10 +34,7 @@ import org.opencastproject.usertracking.api.UserTrackingService;
 import org.opencastproject.usertracking.endpoint.UserTrackingRestService;
 
 import org.easymock.EasyMock;
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
@@ -45,7 +42,6 @@ import java.util.Dictionary;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.core.Response;
 
 public class UserTrackingRestServiceTest {
 
@@ -101,42 +97,4 @@ public class UserTrackingRestServiceTest {
     return request;
   }
 
-  private HttpServletRequest getMockHttpSessionWithProxy() {
-    HttpServletRequest request = getMockHttpSession();
-    EasyMock.expect(request.getHeader("X-FORWARDED-FOR")).andReturn(PROXY_IP).anyTimes();
-    EasyMock.replay(request);
-    return request;
-  }
-
-  @Test
-  @Ignore
-  public void testNullContext() {
-    service.activate(null);
-    // This is broken, the Response object generated in the REST service can't find the appropriate class :(
-    HttpServletRequest request = getMockHttpSession();
-    Response r = service.addFootprint("test", "0", "10", "FOOTPRINT", "true", request);
-    UserAction a = (UserAction) r.getEntity();
-    Assert.assertEquals(0, a.getInpoint());
-    Assert.assertEquals(10, a.getOutpoint());
-    Assert.assertEquals(10, a.getLength());
-    Assert.assertEquals("FOOTPRINT", a.getType());
-    Assert.assertTrue(a.getIsPlaying());
-    Assert.assertEquals("test", a.getMediapackageId());
-    Assert.assertEquals(MOCK_SESSION_ID, a.getSession().getSessionId());
-    Assert.assertEquals(REMOTE_IP, a.getSession().getUserIp());
-    Assert.assertEquals(MOCK_USER, a.getSession().getUserId());
-
-    request = getMockHttpSessionWithProxy();
-    r = service.addFootprint("test", "20", "30", "FOOTPRINT", "true", request);
-    a = (UserAction) r.getEntity();
-    Assert.assertEquals(20, a.getInpoint());
-    Assert.assertEquals(30, a.getOutpoint());
-    Assert.assertEquals(10, a.getLength());
-    Assert.assertEquals("FOOTPRINT", a.getType());
-    Assert.assertTrue(a.getIsPlaying());
-    Assert.assertEquals("test", a.getMediapackageId());
-    Assert.assertEquals(MOCK_SESSION_ID, a.getSession().getSessionId());
-    Assert.assertEquals(REMOTE_IP, a.getSession().getUserIp());
-    Assert.assertEquals(MOCK_USER, a.getSession().getUserId());
-  }
 }

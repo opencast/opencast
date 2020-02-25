@@ -146,18 +146,6 @@ public class OptimizationStep implements Comparable<OptimizationStep> {
   }
 
   /**
-   * calculates error from given number of segments and preferred number of
-   * segments
-   *
-   * @param segmentNum number of segments
-   * @param prefNum preferred number of segments
-   * @return
-   */
-  public static float calculateError(int segmentNum, int prefNum) {
-    return (float)(segmentNum - prefNum) / (float)prefNum;
-  }
-
-  /**
    * calculates absolute error from given number of segments and preferred
    * number of segments
    *

@@ -45,7 +45,6 @@ import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.index.IndexProducer;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -72,8 +71,6 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.Precision;
-import org.opencastproject.scheduler.api.ConflictHandler;
-import org.opencastproject.scheduler.api.ConflictNotifier;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.RecordingImpl;
 import org.opencastproject.scheduler.api.RecordingState;
@@ -222,12 +219,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The authorization service */
   private AuthorizationService authorizationService;
 
-  /** The conflict handler */
-  private ConflictHandler conflictHandler;
-
-  /** The list of registered conflict notifiers */
-  private List<ConflictNotifier> conflictNotifiers = new ArrayList<>();
-
   /** The organization directory service */
   private OrganizationDirectoryService orgDirectoryService;
 
@@ -309,25 +300,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
-  }
-
-  /**
-   * OSGi callback to set the conflict handler.
-   *
-   * @param conflictHandler
-   */
-  public void setConflictHandler(ConflictHandler conflictHandler) {
-    this.conflictHandler = conflictHandler;
-  }
-
-  /** OSGi callback to add {@link ConflictNotifier} instance. */
-  public void addConflictNotifier(ConflictNotifier conflictNotifier) {
-    conflictNotifiers.add(conflictNotifier);
-  }
-
-  /** OSGi callback to remove {@link ConflictNotifier} instance. */
-  public void removeConflictNotifier(ConflictNotifier conflictNotifier) {
-    conflictNotifiers.remove(conflictNotifier);
   }
 
   /**
@@ -426,7 +398,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     if (endDateTime.before(startDateTime))
       throw new IllegalArgumentException("The end date is before the start date");
 
-    final String mediaPackageId = mediaPackage.getIdentifier().compact();
+    final String mediaPackageId = mediaPackage.getIdentifier().toString();
 
     try {
       AQueryBuilder query = assetManager.createQuery();
@@ -519,7 +491,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         while (ids.size() <= periods.size()) {
           Id id = new IdImpl(UUID.randomUUID().toString());
           ids.add(id);
-          Predicate np = qb.mediaPackageId(id.compact());
+          Predicate np = qb.mediaPackageId(id.toString());
           //Haha, p = np jokes with the AM query language. Ha. Haha. Ha.  (Sob...)
           if (null == p) {
             p = np;
@@ -583,7 +555,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         }
         mediaPackage.setTitle(newTitle);
 
-        String mediaPackageId = mediaPackage.getIdentifier().compact();
+        String mediaPackageId = mediaPackage.getIdentifier().toString();
         //Converting from iCal4j DateTime objects to plain Date objects to prevent AMQ issues below
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         cal.setTime(event.getStart());
@@ -708,7 +680,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                 startDateTime.getOr(start), endDateTime.getOr(end))).filter(new Fn<MediaPackage, Boolean>() {
                     @Override
                     public Boolean apply(MediaPackage mp) {
-                    return !mpId.equals(mp.getIdentifier().compact());
+                    return !mpId.equals(mp.getIdentifier().toString());
                   }
                   }).toList();
         if (conflictingEvents.size() > 0) {
@@ -741,7 +713,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       Opt<AccessControlList> acl = Opt.none();
       Opt<DublinCoreCatalog> dublinCore = Opt.none();
-      Opt<AccessControlList> aclOld = loadEpisodeAclFromAsset(record.getSnapshot().get());
+      Opt<AccessControlList> aclOld =
+              some(authorizationService.getActiveAcl(record.getSnapshot().get().getMediaPackage()).getA());
 
       //update metadata for dublincore
       if (startDateTime.isSome() && endDateTime.isSome()) {
@@ -823,32 +796,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             || securityService.getUser().hasRole(securityService.getOrganization().getAdminRole()));
   }
 
-  private Opt<AccessControlList> loadEpisodeAclFromAsset(Snapshot snapshot) {
-    Option<MediaPackageElement> acl = mlist(snapshot.getMediaPackage().getElements())
-            .filter(MediaPackageSupport.Filters.isEpisodeAcl).headOpt();
-    if (acl.isNone())
-      return Opt.none();
-
-    Opt<Asset> asset = assetManager.getAsset(snapshot.getVersion(),
-            snapshot.getMediaPackage().getIdentifier().compact(), acl.get().getIdentifier());
-    if (asset.isNone())
-      return Opt.none();
-
-    if (Availability.OFFLINE.equals(asset.get().getAvailability()))
-      return Opt.none();
-
-    InputStream inputStream = null;
-    try {
-      inputStream = asset.get().getInputStream();
-      return Opt.some(XACMLUtils.parseXacml(inputStream));
-    } catch (Exception e) {
-      logger.warn("Unable to parse access control list:", e);
-      return Opt.none();
-    } finally {
-      IOUtils.closeQuietly(inputStream);
-    }
-  }
-
   private Opt<DublinCoreCatalog> loadEpisodeDublinCoreFromAsset(Snapshot snapshot) {
     Option<MediaPackageElement> dcCatalog = mlist(snapshot.getMediaPackage().getElements())
             .filter(MediaPackageSupport.Filters.isEpisodeDublinCore).headOpt();
@@ -856,7 +803,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       return Opt.none();
 
     Opt<Asset> asset = assetManager.getAsset(snapshot.getVersion(),
-            snapshot.getMediaPackage().getIdentifier().compact(), dcCatalog.get().getIdentifier());
+            snapshot.getMediaPackage().getIdentifier().toString(), dcCatalog.get().getIdentifier());
     if (asset.isNone())
       return Opt.none();
 
@@ -994,11 +941,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       if (record.isNone())
         throw new NotFoundException();
 
-      Opt<AccessControlList> acl = loadEpisodeAclFromAsset(record.get().getSnapshot().get());
-      if (acl.isNone())
-        return null;
-
-      return acl.get();
+      return authorizationService.getActiveAcl(record.get().getSnapshot().get().getMediaPackage()).getA();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1641,7 +1584,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             final AResult result = query.select(query.snapshot())
                     .where(query.mediaPackageId(event.getMediaPackageId()).and(query.version().isLatest())).run();
             final Snapshot snapshot = result.getRecords().head().get().getSnapshot().get();
-            final Opt<AccessControlList> acl = loadEpisodeAclFromAsset(snapshot);
+            final Opt<AccessControlList> acl = Opt.some(authorizationService.getActiveAcl(snapshot.getMediaPackage()).getA());
+
             final Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
 
             final List<SchedulerItem> schedulerItems = new ArrayList<>(

@@ -183,22 +183,6 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Creates a result for the execution of this workflow operation handler.
-   * <p>
-   * Since there is no way for the workflow service to determine the queuing time (e. g. waiting on services), it needs
-   * to be provided by the handler.
-   *
-   * @param action
-   *          the action to take
-   * @param timeInQueue
-   *          the amount of time this handle spent waiting for services
-   * @return the result
-   */
-  protected WorkflowOperationResult createResult(Action action, long timeInQueue) {
-    return createResult(null, null, action, timeInQueue);
-  }
-
-  /**
-   * Creates a result for the execution of this workflow operation handler.
    *
    * @param mediaPackage
    *          the modified mediapackage

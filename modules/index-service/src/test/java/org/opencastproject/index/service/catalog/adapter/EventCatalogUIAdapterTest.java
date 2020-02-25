@@ -43,7 +43,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 
@@ -157,9 +156,4 @@ public class EventCatalogUIAdapterTest {
             .allowingAnyArrayOrdering());
   }
 
-  @Ignore
-  @Test
-  public void testStoreFields() {
-
-  }
 }

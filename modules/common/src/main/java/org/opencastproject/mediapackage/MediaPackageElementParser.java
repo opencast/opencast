@@ -101,13 +101,6 @@ public final class MediaPackageElementParser {
     }
   }
 
-  /** {@link #getFromXml(String)} as function. */
-  public static final Function<String, MediaPackageElement> getFromXml = new Function.X<String, MediaPackageElement>() {
-    @Override public MediaPackageElement xapply(String s) throws Exception {
-      return getFromXml(s);
-    }
-  };
-
   /**
    * Serializes media package element list to a string.
    *
@@ -137,12 +130,6 @@ public final class MediaPackageElementParser {
       }
     }
   }
-
-  public static final Function<String, List<MediaPackageElement>> getArrayFromXmlFn = new Function.X<String, List<MediaPackageElement>>() {
-    @Override public List<MediaPackageElement> xapply(String xml) throws Exception {
-      return (List<MediaPackageElement>) getArrayFromXml(xml);
-    }
-  };
 
   /**
    * Parses the serialized media package element list.

@@ -59,10 +59,6 @@
       <artifactId>jetty-servlet</artifactId>
       <version>9.4.20.v20190813</version>
     </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest</artifactId>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

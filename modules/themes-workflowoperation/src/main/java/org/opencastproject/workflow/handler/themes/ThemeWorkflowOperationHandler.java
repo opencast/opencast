@@ -317,7 +317,7 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
     for (String tag : tags) {
       element.addTag(tag);
     }
-    URI uri = workspace.put(mediaPackage.getIdentifier().compact(), element.getIdentifier(), filename, file);
+    URI uri = workspace.put(mediaPackage.getIdentifier().toString(), element.getIdentifier(), filename, file);
     element.setURI(uri);
     try {
       MimeType mimeType = MimeTypes.fromString(filename);

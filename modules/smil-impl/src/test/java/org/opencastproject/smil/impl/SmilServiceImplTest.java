@@ -48,8 +48,6 @@ import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.List;
@@ -59,10 +57,6 @@ import java.util.List;
  */
 public class SmilServiceImplTest {
 
-  /**
-   * Logger
-   */
-  private static final Logger logger = LoggerFactory.getLogger(SmilServiceImplTest.class);
   /**
    * Test SMIL document
    */

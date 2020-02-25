@@ -79,6 +79,6 @@ public class ApiMediaTypeTest {
 
   @Test(expected = ApiMediaTypeException.class)
   public void testParseJsonWithInvalidVersion() throws Exception {
-    final ApiMediaType type = ApiMediaType.parse("application/v0.0.0+json");
+    ApiMediaType.parse("application/v0.0.0+json");
   }
 }

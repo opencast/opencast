@@ -38,8 +38,4 @@ public class JsonCreationException extends Exception {
     super(message);
   }
 
-  public JsonCreationException(String message, Throwable t) {
-    super(message, t);
-  }
-
 }

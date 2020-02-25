@@ -234,8 +234,6 @@ public abstract class AbstractEventEndpoint {
   /** The logging facility */
   static final Logger logger = LoggerFactory.getLogger(AbstractEventEndpoint.class);
 
-  protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
-
   /** The configuration key that defines the default workflow definition */
   //TODO Move to a constants file instead of declaring it at the top of multiple files?
   protected static final String WORKFLOW_DEFINITION_DEFAULT = "org.opencastproject.workflow.default.definition";
@@ -2207,7 +2205,7 @@ public abstract class AbstractEventEndpoint {
   private List<JValue> convertToConflictObjects(final String eventId, final List<MediaPackage> events) throws SearchIndexException {
     final List<JValue> eventsJSON = new ArrayList<>();
     for (final MediaPackage event : events) {
-      final Opt<Event> eventOpt = getIndexService().getEvent(event.getIdentifier().compact(), getIndex());
+      final Opt<Event> eventOpt = getIndexService().getEvent(event.getIdentifier().toString(), getIndex());
       if (eventOpt.isSome()) {
         final Event e = eventOpt.get();
         if (StringUtils.isNotEmpty(eventId) && eventId.equals(e.getIdentifier())) {
@@ -2216,7 +2214,7 @@ public abstract class AbstractEventEndpoint {
         eventsJSON.add(convertEventToConflictingObject(e.getTechnicalStartTime(), e.getTechnicalEndTime(), e.getTitle()));
       } else {
         logger.warn("Index out of sync! Conflicting event catalog {} not found on event index!",
-          event.getIdentifier().compact());
+          event.getIdentifier().toString());
       }
     }
     return eventsJSON;

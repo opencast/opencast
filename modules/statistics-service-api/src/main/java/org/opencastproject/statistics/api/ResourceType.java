@@ -27,9 +27,5 @@ package org.opencastproject.statistics.api;
 public enum ResourceType {
   EPISODE,
   SERIES,
-  ORGANIZATION;
-
-  public static ResourceType fromString(final String value) {
-    return ResourceType.valueOf(value.toUpperCase());
-  }
+  ORGANIZATION
 }

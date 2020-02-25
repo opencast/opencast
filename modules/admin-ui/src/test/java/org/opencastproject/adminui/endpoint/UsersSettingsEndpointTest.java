@@ -38,7 +38,6 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashMap;
 import java.util.Set;
 
 import io.restassured.http.ContentType;
@@ -110,46 +108,6 @@ public class UsersSettingsEndpointTest {
     compareIds("results", expected, actual);
   }
 
-  @Ignore
-  @Test
-  public void testGetSignatureExpectsOK() throws ParseException, IOException {
-    JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).when().get(rt.host("/signature")).asString());
-    logger.info(actual.toJSONString());
-  }
-
-  // FIXME
-  @Ignore
-  @SuppressWarnings("unchecked")
-  @Test
-  public void testPostSignatureExpectsOK() throws ParseException, IOException {
-    String nameKey = "name";
-    String nameValue = "newsignature";
-    String fromNameKey = "from_name";
-    String fromNameValue = "FakeName";
-    String fromAddressKey = "from_address";
-    String fromAddressValue = "from@fake.com";
-    String textKey = "text";
-    String textValue = "ThisIstheSignatureText";
-    HashMap<String, String> parameters = new HashMap<String, String>();
-    parameters.put(nameKey, nameValue);
-    parameters.put(fromNameKey, fromNameValue);
-    parameters.put(fromAddressKey, fromAddressValue);
-    parameters.put(textKey, textValue);
-
-    JSONObject creator = new JSONObject();
-    creator.put("username", TestUserSettingsEndpoint.EXAMPLE_USERNAME);
-    creator.put("email", TestUserSettingsEndpoint.EXAMPLE_EMAIL);
-    creator.put("name", TestUserSettingsEndpoint.EXAMPLE_NAME);
-
-    JSONObject actual = (JSONObject) parser.parse(given().formParam(nameKey, nameValue)
-            .formParam(fromNameKey, fromNameValue).formParam(fromAddressKey, fromAddressValue)
-            .formParam(textKey, textValue).expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).body(nameKey, equalTo(nameValue)).body("creator", equalTo(creator))
-            .body("signature", equalTo(textValue)).when().post(rt.host("/signature")).asString());
-    logger.info(actual.toJSONString());
-  }
-
   @Test
   public void testPostSettingExpectsOK() throws ParseException, IOException {
     String key = "example_key";
@@ -161,39 +119,9 @@ public class UsersSettingsEndpointTest {
     logger.info(actual.toJSONString());
   }
 
-  @Ignore
-  @Test
-  public void testDeleteSignatureExpectsOK() throws ParseException, IOException {
-    given().expect().statusCode(HttpStatus.SC_OK).when().delete(rt.host("/signature/19"));
-  }
-
   @Test
   public void testDeleteUserSettingExpectsOK() throws ParseException, IOException {
     given().expect().statusCode(HttpStatus.SC_OK).when().delete(rt.host("/setting/18"));
-  }
-
-  // FIXME
-  @Ignore
-  @SuppressWarnings("unchecked")
-  @Test
-  public void testPutSignatureExpectsOK() throws ParseException, IOException {
-    String nameKey = "name";
-    String nameValue = "newsignature";
-    String fromNameKey = "from_name";
-    String fromAddressKey = "from_address";
-    String textKey = "text";
-    String textValue = "ThisIstheSignatureText";
-
-    JSONObject creator = new JSONObject();
-    creator.put("username", TestUserSettingsEndpoint.EXAMPLE_USERNAME);
-    creator.put("email", TestUserSettingsEndpoint.EXAMPLE_EMAIL);
-    creator.put("name", TestUserSettingsEndpoint.EXAMPLE_NAME);
-
-    given().formParam(nameKey, nameValue).formParam(fromNameKey, TestUserSettingsEndpoint.EXAMPLE_NAME)
-            .formParam(fromAddressKey, TestUserSettingsEndpoint.EXAMPLE_EMAIL).formParam(textKey, textValue).log()
-            .all().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .body(nameKey, equalTo(nameValue)).body("creator", equalTo(creator)).body("signature", equalTo(textValue))
-            .when().put(rt.host("/signature/19")).asString();
   }
 
   @Test

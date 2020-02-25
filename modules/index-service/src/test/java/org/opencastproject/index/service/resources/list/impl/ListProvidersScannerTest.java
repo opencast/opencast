@@ -34,14 +34,11 @@ import org.opencastproject.security.api.SecurityService;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Map;
 
 public class ListProvidersScannerTest {
-  private static final Logger logger = LoggerFactory.getLogger(ListProvidersScannerTest.class);
   private String listName;
   private Organization defaultOrg;
   private Organization specificOrg;
@@ -179,7 +176,7 @@ public class ListProvidersScannerTest {
     File file = getResourceFile("/ListProvidersScannerTest-WithOrg.properties");
     listProvidersScanner.install(file);
     try {
-      String defaultValue = listProvidersService.getDefault(listName);
+      listProvidersService.getDefault(listName);
     } catch (ListProviderException e) {
       assertEquals("No provider found for organisation <*> with the name " + listName, e.getMessage());
     }

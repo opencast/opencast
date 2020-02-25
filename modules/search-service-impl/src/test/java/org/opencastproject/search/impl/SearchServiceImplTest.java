@@ -38,7 +38,7 @@ import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
@@ -669,7 +669,7 @@ public class SearchServiceImplTest {
     List<Job> jobs = new ArrayList<Job>();
     for (long i = 0; i < 10; i++) {
       MediaPackage mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-      mediaPackage.setIdentifier(IdBuilderFactory.newInstance().newIdBuilder().createNew());
+      mediaPackage.setIdentifier(IdImpl.fromUUID());
       searchDatabase.storeMediaPackage(mediaPackage, acl, new Date());
       String payload = MediaPackageParser.getAsXml(mediaPackage);
       Job job = new JobImpl(i);

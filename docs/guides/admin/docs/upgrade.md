@@ -1,25 +1,9 @@
-
 Upgrading Opencast from 8.x to 9.x
 ==================================
 
 This guide describes how to upgrade Opencast 8.x to 9.x. In case you need information about how to upgrade older
 versions of Opencast, please refer to [older release notes](https://docs.opencast.org).
 
-Configuration Changes
----------------------
-
-1. The dispatch interval property is now called `dispatch.interval` and expects seconds instead of milliseconds
-   `etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg`.
-2. The file `etc/elasticsearch.yml` was removed as it is no longer required due to the removal of the embedded
-   Elasticsearch node.
-3. The file `etc/custom.properties` was changed:
-   - The property `org.opencastproject.elasticsearch.server.address` was renamed
-   to `org.opencastproject.elasticsearch.server.hostname` and now defaults to `localhost` (was: `127.0.0.1`).
-   - The property `org.opencastproject.elasticsearch.server.port` now defaults to `9200` (was: `9300`).
-   - A new property `org.opencastproject.elasticsearch.server.scheme` was added and defaults to `http`.
-
-How to Upgrade
---------------
 1. Stop your current Opencast instance
 2. Replace Opencast with the new version
 3. Back-up Opencast files and database (optional)
@@ -29,6 +13,7 @@ How to Upgrade
 7. Remove search index data folder
 8. Start Opencast
 9. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
+10. [Check passwords](#check-passwords)
 
 Install and configure a standalone Elasticsearch node
 -----------------------------------------------------
@@ -38,8 +23,7 @@ support to be embedded in applications. Since the Elasticsearch client was updat
 external Elasticsearch node of the same version to be present. This means, that all Opencast adopters now have to run
 Elasticsearch.
 
-Please check [the documentation](https://docs.opencast.org/develop/admin/#modules/searchindex/elasticsearch/)
-for information about how to setup an external node.
+Please check [the documentation](modules/searchindex/elasticsearch.md) for information about how to setup an external node.
 
 If you already used an external Elasticsearch node in the past, please update your node to version 7. Since the index
 schema has changed, you will need to drop you indices and [rebuild them](#rebuild-the-elasticsearch-indexes).
@@ -80,3 +64,14 @@ You can also just open the REST documentation, which can be found under the “H
 `/recreateIndex`.
 
 In both cases you should again get a 200 HTTP status.
+
+
+Check Passwords
+---------------
+
+Since Opencast 8.1 [passwords are stored in a much safer way than before
+](https://github.com/opencast/opencast/security/advisories/GHSA-h362-m8f2-5x7c)
+but to benefit from this mechanism, users have to reset their password.
+
+You can use the endpoint `/user-utils/users/md5.json` to find out which users are still using MD5-hashed passwords and
+suggest to them that they update their passwords.

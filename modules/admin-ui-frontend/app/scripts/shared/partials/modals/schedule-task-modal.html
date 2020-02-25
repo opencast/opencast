@@ -1,0 +1,164 @@
+<section ng-form="scheduleTaskForm" ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal wizard modal-animation ng-hide" ng-controller="ScheduleTaskCtrl">
+  <header>
+    <a class="fa fa-times close-modal" ng-click="close()" ng-class="{disabled: submitButton}"></a>
+    <h2 translate="BULK_ACTIONS.SCHEDULE_TASK.CAPTION"><!-- Template --></h2>
+  </header>
+  <wizard edit-mode="false" name="scheduleTaskWz" on-finish="submit()" template="shared/partials/wizardNav.html">
+  <wz-step wz-title="General" canexit="scheduleTaskForm.generalForm.$valid" wz-disabled="!scheduleTaskForm.generalForm.$valid" ng-form="generalForm" novalidate>
+    <!-- First Step: General -->
+    <div class="modal-content active">
+      <div class="modal-body">
+        <div class="row">
+          <div ng-show="scheduleTaskForm.generalForm.$error.taskStartable" class="alert sticky warning">
+            <p translate="BULK_ACTIONS.SCHEDULE_TASK.GENERAL.CANNOTSTART">
+            <!-- Cannot start -->
+            </p>
+          </div>
+          <div data-notifications="schedule-task"/>
+          </div>
+          <div class="full-col">
+            <div class="obj tbl-list">
+              <header translate="BULK_ACTIONS.SCHEDULE_TASK.GENERAL.CAPTION">
+                <span class="header-value" translate="BULK_ACTIONS.SCHEDULE_TASK.GENERAL.SUMMARY" translate-values='{ count: rows.length}'>
+                </span>
+              </header>
+              <div class="obj-container">
+                <table class="main-tbl">
+                  <thead>
+                    <tr>
+                      <th class="small"><input type="checkbox" ng-model="allSelected" ng-change="allSelectedChanged(allSelected)" class="select-all-cbox"></th>
+                      <th class="full-width" translate="EVENTS.EVENTS.TABLE.TITLE">
+                        <!-- Title -->
+                      </th>
+                      <th class="nowrap" translate="EVENTS.EVENTS.TABLE.SERIES">
+                        <!-- Series -->
+                      </th>
+                      <th class="nowrap" translate="EVENTS.EVENTS.TABLE.STATUS">
+                        <!-- Progress -->
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody >
+                    <tr ng-repeat="row in rows" ng-form="rowsForm" ng-class="{error: rowsForm.selection.$error.taskStartable}">
+                      <td><input name="selection" ng-required="!hasAnySelected()" type="checkbox" task-startable="{{row.event_status_raw}}" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox"></td>
+                      <td>{{ row.title }}</td>
+                      <td class="nowrap">{{ row.series_name}}</td>
+                      <td class="nowrap">{{ row.event_status }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+              </div><!-- obj-container -->
+
+            </div><!-- obj -->
+
+          </div>
+
+        </div>
+
+      </div><!-- modal-content [general] -->
+
+      <footer>
+        <a class="submit"
+           ng-click="clearWorkflowFormAndContinue()"
+           ng-class="{active: scheduleTaskForm.generalForm.$valid, disabled: scheduleTaskForm.generalForm.$invalid}">
+          {{ 'WIZARD.NEXT_STEP' | translate }}
+        </a>
+      </footer>
+  </wz-step>
+
+  <!-- Second Step: Task selection -->
+  <wz-step wz-title="{{ 'BULK_ACTIONS.SCHEDULE_TASK.TASKS.CAPTION' | translate }}" ng-form="taskForm" novalidate canexit="taskForm.$valid">
+    <div class="modal-content active">
+
+      <div class="modal-body">
+        <div class="full-col">
+
+          <div class="obj list-obj">
+            <header translate="BULK_ACTIONS.SCHEDULE_TASK.TASKS.SELECT"><!-- Select Task --></header>
+            <div class="obj-container">
+              <select chosen
+                      data-width="'100%'"
+                      ng-change="processing.changeWorkflow(workflowProperties, getSelectedIds())"
+                      not-empty-selection
+                      ng-model="processing.ud.workflow"
+                      ng-model-options="{ allowInvalid: true }"
+                      ng-options="w.title for w in processing.workflows | orderBy: 'displayOrder':true track by w.id"
+                      placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW' | translate }}'"
+                      no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW_EMPTY' | translate }}'"
+                      >
+                      <option value=""></option>
+              </select>
+              <div class="collapsible-box" input="processing.workflowDescription" maxheight=45></div>
+              <div id="new-event-workflow-configuration"
+                   class="checkbox-container"
+                   ng-click="processing.save()"
+                   ng-bind-html="processing.workflowConfiguration"
+                   class="obj-container">
+              </div>
+
+            </div><!-- obj-container -->
+
+          </div><!--list-obj -->
+        </div><!-- full-col-->
+      </div><!-- modal-body -->
+    </div><!-- modal-content [task] -->
+    <footer>
+      <a wz-next class="submit"
+                 ng-class="{active: taskForm.$valid, inactive: taskForm.$invalid}">
+        {{ 'WIZARD.NEXT_STEP' | translate }}
+      </a>
+      <a wz-previous translate="WIZARD.BACK" class="cancel">
+      </a>
+    </footer>
+  </wz-step>
+
+  <!-- Third step: Summary -->
+  <wz-step wz-title="{{ 'BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CAPTION' | translate }}" novalidate canexit="submitButton">
+    <div class="modal-content active">
+      <div class="modal-body">
+        <div class="full-col">
+          <div class="obj list-obj">
+            <header translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CAPTION"><!-- Summary --></header>
+            <div class="obj-container">
+              <ul>
+                <li>
+                  <span translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.EVENTS">
+                    <!-- Events -->
+                  </span>
+                  <p translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.EVENTS_SUMMARY" translate-values="{numberOfEvents: numSelected()}">
+                  <!-- You have selected 44 events -->
+                  </p>
+                </li>
+                <li>
+                  <span translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.WORKFLOW">
+                    <!-- Summary -->
+                  </span>
+                  <p>{{ processing.ud.workflow.selection.id }}</p>
+                </li>
+                <li>
+                  <span translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CONFIGURATION"></span>
+                  <p ng-repeat="(key, value) in processing.getWorkflowConfig()">{{key}}: {{value}}</p>
+                </li>
+              </ul>
+            </div><!-- obj-container -->
+          </div>
+        </div>
+
+      </div>
+    </div><!-- modal-content [summary] -->
+    <footer>
+      <a wz-next class="submit"
+                 ng-class="{active: scheduleTaskForm.$valid, inactive: scheduleTaskForm.$invalid, disabled: submitButton}">
+        {{ 'WIZARD.CREATE' | translate }}
+      </a>
+      <a wz-previous translate="WIZARD.BACK" class="cancel" ng-class="{disabled: submitButton}">
+      </a>
+    </footer>
+  </wz-step>
+
+  </wizard>
+
+
+  <div class="btm-spacer"></div>
+</section>

@@ -25,8 +25,7 @@ package org.opencastproject.composer.impl;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.VideoClip;
-import org.opencastproject.mediapackage.identifier.IdBuilder;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Tuple;
@@ -610,7 +609,6 @@ public class EncoderEngine implements AutoCloseable {
       pf = profiles;
       if (vInputPad == null && aInputPad == null)
         throw new EncoderException("At least one of video or audio input must be specified");
-      IdBuilder idbuilder = IdBuilderFactory.newInstance().newIdBuilder();
       int size = profiles.size();
       // Init
       vfilter = new ArrayList<>(java.util.Collections.nCopies(size, null));
@@ -629,7 +627,7 @@ public class EncoderEngine implements AutoCloseable {
         String cmd = "";
         String outSuffix;
         // generate random name as we only have one base name
-        String outFileName = params.get("out.name.base") + "_" + idbuilder.createNew().toString();
+        String outFileName = params.get("out.name.base") + "_" + IdImpl.fromUUID().toString();
         params.put("out.name", outFileName); // Output file name for this profile
         try {
           outSuffix = processParameters(profile.getSuffix(), params);
@@ -818,7 +816,6 @@ public class EncoderEngine implements AutoCloseable {
                   + ",setpts=PTS-STARTPTS"
                   + ((fade > 0) ? ",fade=t=in:st=0:d=" + fade + ",fade=t=out:st=" + f.format(vend) + ":d=" + fade
                           : "")
-                  + ",fps=25"
                   + "[" + outmap + "v" + i + "]";
           clauses.add(vvclip);
         }
@@ -835,7 +832,7 @@ public class EncoderEngine implements AutoCloseable {
       }
       // use unsafe because different files may have different SAR/framerate
       if (hasVideo)
-        clauses.add(StringUtils.join(vpads, "") + "concat=n=" + n + ":unsafe=1[ov]"); // concat video clips
+        clauses.add(StringUtils.join(vpads, "") + "concat=n=" + n + "[ov]"); // concat video clips
       if (hasAudio)
         clauses.add(StringUtils.join(apads, "") + "concat=n=" + n + ":v=0:a=1[oa]"); // concat audio clips in stream 0,
     } else if (n == 1) { // single segment

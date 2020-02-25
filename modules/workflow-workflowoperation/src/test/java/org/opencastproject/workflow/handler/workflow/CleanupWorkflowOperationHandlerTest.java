@@ -155,27 +155,27 @@ public class CleanupWorkflowOperationHandlerTest {
     MediaPackageElement track1 = addElementToMediaPackage(mp, MediaPackageElement.Type.Track,
             "presenter", "source", null);
     track1.setURI(UrlSupport.uri(HOSTNAME_NODE1, WFR_URL_PREFIX, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
-            mp.getIdentifier().compact(), track1.getIdentifier(), "track.mp4"));
+            mp.getIdentifier().toString(), track1.getIdentifier(), "track.mp4"));
     MediaPackageElement track2 = addElementToMediaPackage(mp, MediaPackageElement.Type.Track,
             "presentation", "work", null);
     track2.setURI(UrlSupport.uri(HOSTNAME_NODE2, WFR_URL_PREFIX, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
-            mp.getIdentifier().compact(), track2.getIdentifier(), "track.mp4"));
+            mp.getIdentifier().toString(), track2.getIdentifier(), "track.mp4"));
     MediaPackageElement att1 = addElementToMediaPackage(mp, MediaPackageElement.Type.Attachment,
             "presentation", "preview", null);
     att1.setURI(UrlSupport.uri(HOSTNAME_NODE2, WFR_URL_PREFIX, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
-            mp.getIdentifier().compact(), att1.getIdentifier(), "preview.png"));
+            mp.getIdentifier().toString(), att1.getIdentifier(), "preview.png"));
     MediaPackageElement att2 = addElementToMediaPackage(mp, MediaPackageElement.Type.Attachment,
             "smil", "trimmed", null);
     att2.setURI(UrlSupport.uri(HOSTNAME_NODE1, WFR_URL_PREFIX, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
-            mp.getIdentifier().compact(), att2.getIdentifier(), "trimmed.smil"));
+            mp.getIdentifier().toString(), att2.getIdentifier(), "trimmed.smil"));
     MediaPackageElement cat1 = addElementToMediaPackage(mp, MediaPackageElement.Type.Catalog,
             "dublincore", "episode", null);
     cat1.setURI(UrlSupport.uri(HOSTNAME_NODE1, WFR_URL_PREFIX, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
-            mp.getIdentifier().compact(), cat1.getIdentifier(), "dublincore.xml"));
+            mp.getIdentifier().toString(), cat1.getIdentifier(), "dublincore.xml"));
     MediaPackageElement cat2 = addElementToMediaPackage(mp, MediaPackageElement.Type.Catalog,
             "security", "xaml", null);
     cat2.setURI(UrlSupport.uri(HOSTNAME_NODE1, WFR_URL_PREFIX, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
-            mp.getIdentifier().compact(), cat2.getIdentifier(), "security.xml"));
+            mp.getIdentifier().toString(), cat2.getIdentifier(), "security.xml"));
 
     cleanupWOH.start(createWorkflowInstance(wfInstConfig, mp), null);
     Assert.assertEquals("Media package should contain at least tree elements", 3, mp.getElements().length);
@@ -207,27 +207,27 @@ public class CleanupWorkflowOperationHandlerTest {
     MediaPackageElement track1 = addElementToMediaPackage(mp, MediaPackageElement.Type.Track,
             "presenter", "source", null);
     track1.setURI(UrlSupport.uri(HOSTNAME_NODE1, WFR_URL_PREFIX, WorkingFileRepository.COLLECTION_PATH_PREFIX,
-            "asset", mp.getIdentifier().compact(), track1.getIdentifier(), "track.mp4"));
+            "asset", mp.getIdentifier().toString(), track1.getIdentifier(), "track.mp4"));
     MediaPackageElement track2 = addElementToMediaPackage(mp, MediaPackageElement.Type.Track,
             "presentation", "work", null);
     track2.setURI(UrlSupport.uri(HOSTNAME_NODE2, WFR_URL_PREFIX, WorkingFileRepository.COLLECTION_PATH_PREFIX,
-            "compose", mp.getIdentifier().compact(), track2.getIdentifier(), "track.mp4"));
+            "compose", mp.getIdentifier().toString(), track2.getIdentifier(), "track.mp4"));
     MediaPackageElement att1 = addElementToMediaPackage(mp, MediaPackageElement.Type.Attachment,
             "presentation", "preview", null);
     att1.setURI(UrlSupport.uri(HOSTNAME_NODE2, WFR_URL_PREFIX, WorkingFileRepository.COLLECTION_PATH_PREFIX,
-            "compose", mp.getIdentifier().compact(), att1.getIdentifier(), "preview.png"));
+            "compose", mp.getIdentifier().toString(), att1.getIdentifier(), "preview.png"));
     MediaPackageElement att2 = addElementToMediaPackage(mp, MediaPackageElement.Type.Attachment,
             "smil", "trimmed", null);
     att2.setURI(UrlSupport.uri(HOSTNAME_NODE1, WFR_URL_PREFIX, WorkingFileRepository.COLLECTION_PATH_PREFIX,
-            "silence", mp.getIdentifier().compact(), att2.getIdentifier(), "trimmed.smil"));
+            "silence", mp.getIdentifier().toString(), att2.getIdentifier(), "trimmed.smil"));
     MediaPackageElement cat1 = addElementToMediaPackage(mp, MediaPackageElement.Type.Catalog,
             "dublincore", "episode", null);
     cat1.setURI(UrlSupport.uri(HOSTNAME_NODE1, WFR_URL_PREFIX, WorkingFileRepository.COLLECTION_PATH_PREFIX,
-            "asset", mp.getIdentifier().compact(), cat1.getIdentifier(), "dublincore.xml"));
+            "asset", mp.getIdentifier().toString(), cat1.getIdentifier(), "dublincore.xml"));
     MediaPackageElement cat2 = addElementToMediaPackage(mp, MediaPackageElement.Type.Catalog,
             "security", "xaml", null);
     cat2.setURI(UrlSupport.uri(HOSTNAME_NODE1, WFR_URL_PREFIX, WorkingFileRepository.COLLECTION_PATH_PREFIX,
-            "security", mp.getIdentifier().compact(), cat2.getIdentifier(), "security.xml"));
+            "security", mp.getIdentifier().toString(), cat2.getIdentifier(), "security.xml"));
 
     cleanupWOH.start(createWorkflowInstance(wfInstConfig, mp), null);
     Assert.assertEquals("Media package should contain at least tree elements", 3, mp.getElements().length);
@@ -257,7 +257,7 @@ public class CleanupWorkflowOperationHandlerTest {
     MediaPackageElement track1 = addElementToMediaPackage(mp, MediaPackageElement.Type.Track,
             "presenter", "source", null);
     track1.setURI(UrlSupport.uri(HOSTNAME_NODE1, WFR_URL_PREFIX, WorkingFileRepository.COLLECTION_PATH_PREFIX,
-            "asset", mp.getIdentifier().compact(), track1.getIdentifier(), "track.mp4"));
+            "asset", mp.getIdentifier().toString(), track1.getIdentifier(), "track.mp4"));
 
     cleanupWOH.start(createWorkflowInstance(wfInstConfig, mp), null);
     Assert.assertEquals("Media package shouldn't contain any elements", 0, mp.getElements().length);
@@ -274,7 +274,7 @@ public class CleanupWorkflowOperationHandlerTest {
     MediaPackageElement track1 = addElementToMediaPackage(mp, MediaPackageElement.Type.Track,
             "presenter", "source", null);
     track1.setURI(UrlSupport.uri(HOSTNAME_NODE1, WFR_URL_PREFIX, WorkingFileRepository.COLLECTION_PATH_PREFIX,
-            "asset", mp.getIdentifier().compact(), track1.getIdentifier(), "track.mp4"));
+            "asset", mp.getIdentifier().toString(), track1.getIdentifier(), "track.mp4"));
 
     cleanupWOH.start(createWorkflowInstance(wfInstConfig, mp), null);
     Assert.assertEquals("Media package shouldn't contain any elements", 0, mp.getElements().length);
@@ -291,7 +291,7 @@ public class CleanupWorkflowOperationHandlerTest {
     MediaPackageElement track1 = addElementToMediaPackage(mp, MediaPackageElement.Type.Track,
             "presenter", "source", null);
     track1.setURI(UrlSupport.uri(HOSTNAME_NODE1, "asset", "asset",
-            mp.getIdentifier().compact(), track1.getIdentifier(), 0, "track.mp4"));
+            mp.getIdentifier().toString(), track1.getIdentifier(), 0, "track.mp4"));
 
     cleanupWOH.start(createWorkflowInstance(wfInstConfig, mp), null);
     Assert.assertEquals("Media package shouldn't contain any elements", 0, mp.getElements().length);

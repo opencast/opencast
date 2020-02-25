@@ -115,18 +115,6 @@ public final class RestUtils {
   }
 
   /**
-   * Create a INTERNAL SERVER ERROR (500) response with the given messages and arguments
-   *
-   * @param msg
-   * @param args
-   * @return an INTERNAL SERVER ERROR response
-   */
-  public static Response serverError(String msg, Object... args) {
-    return Response.status(Status.INTERNAL_SERVER_ERROR).entity(format(msg, args)).type(MediaType.TEXT_PLAIN_TYPE)
-            .build();
-  }
-
-  /**
    * Create an INTERNAL SERVER ERROR (500) response with the given JSON as body
    *
    * @param json

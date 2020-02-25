@@ -30,10 +30,6 @@ public class AnimateServiceException extends Exception {
   /** Serial version uid */
   private static final long serialVersionUID = 1236236323567217393L;
 
-  public AnimateServiceException() {
-    super();
-  }
-
   /**
    * Creates a new animate exception with the specified error message.
    *

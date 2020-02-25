@@ -47,10 +47,6 @@ public final class AnchorOffset {
     this.offset = offset;
   }
 
-  public static AnchorOffset anchorOffset(Anchor referenceAnchor, Anchor referringAnchor, Offset offset) {
-    return new AnchorOffset(referenceAnchor, referringAnchor, offset);
-  }
-
   public static AnchorOffset anchorOffset(Anchor referenceAnchor, Anchor referringAnchor, int xOffset, int yOffset) {
     return new AnchorOffset(referenceAnchor, referringAnchor, new Offset(xOffset, yOffset));
   }

@@ -91,19 +91,19 @@
     <bundle>mvn:org.springframework.osgi/spring-osgi-core/1.2.1</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-extender/1.2.1</bundle>
     <bundle>mvn:org.springframework.osgi/spring-osgi-io/1.2.1</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-config/3.1.7.RELEASE</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-core/3.1.7.RELEASE</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-ldap/3.1.7.RELEASE</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-web/3.1.7.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-aop/3.1.4.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-asm/3.1.4.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-beans/3.1.4.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-context-support/3.1.4.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-context/3.1.4.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-core/3.1.4.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-expression/3.1.4.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-tx/3.1.4.RELEASE</bundle>
-    <bundle>mvn:org.springframework/spring-web/3.1.4.RELEASE</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-config/${spring-security.version}</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-core/${spring-security.version}</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-ldap/${spring-security.version}</bundle>
+    <bundle>mvn:org.springframework.security/spring-security-web/${spring-security.version}</bundle>
+    <bundle>mvn:org.springframework/spring-aop/${spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-asm/${spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-beans/${spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-context-support/${spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-context/${spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-core/${spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-expression/${spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-tx/${spring.version}</bundle>
+    <bundle>mvn:org.springframework/spring-web/${spring.version}</bundle>
   </feature>
 
   <feature name="opencast-core" version="${project.version}">
@@ -154,6 +154,7 @@
     <feature start-level="80">opencast-services-processing-light-load</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-frontend/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-index/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-animate-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-api/${project.version}</bundle>
@@ -226,9 +227,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-oaipmh/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-youtube-v3/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-runtime-info-ui-ng/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-handler/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-notifier-comment/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-notifier-email/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-schema/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search/${project.version}</bundle>
@@ -269,6 +267,7 @@
     <feature start-level="80">opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-frontend/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-index/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-animate-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-animate-remote/${project.version}</bundle>
@@ -334,9 +333,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-oaipmh-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-youtube-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-runtime-info-ui-ng/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-handler/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-notifier-comment/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-notifier-email/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-schema/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search/${project.version}</bundle>
@@ -390,6 +386,7 @@
     <feature start-level="80">opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-frontend/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-index/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-animate-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-animate-remote/${project.version}</bundle>
@@ -474,9 +471,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-oaipmh/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-youtube-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-runtime-info-ui-ng/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-handler/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-notifier-comment/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-conflict-notifier-email/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-schema/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-api/${project.version}</bundle>

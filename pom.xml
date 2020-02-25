@@ -28,8 +28,8 @@
     <eclipselink.version>2.7.5</eclipselink.version>
     <functional.version>1.4.2</functional.version>
     <guava.version>23.0</guava.version>
-    <httpcomponents-httpclient.version>4.5.7</httpcomponents-httpclient.version>
-    <httpcomponents-httpcore.version>4.4.11</httpcomponents-httpcore.version>
+    <httpcomponents-httpclient.version>4.5.10</httpcomponents-httpclient.version>
+    <httpcomponents-httpcore.version>4.4.12</httpcomponents-httpcore.version>
     <jackson.version>2.10.0</jackson.version>
     <jersey.version>2.29.1</jersey.version>
     <jdk.version>1.8</jdk.version>
@@ -42,9 +42,12 @@
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <querydsl.version>3.7.4</querydsl.version>
+    <spring.version>3.1.4.RELEASE</spring.version>
+    <spring-security.version>3.1.7.RELEASE</spring-security.version>
   </properties>
   <modules>
     <module>modules/admin-ui</module>
+    <module>modules/admin-ui-frontend</module>
     <module>modules/admin-ui-index</module>
     <module>modules/animate-api</module>
     <module>modules/animate-impl</module>
@@ -167,9 +170,6 @@
     <module>modules/runtime-info-ui</module>
     <module>modules/runtime-info-ui-ng</module>
     <module>modules/scheduler-api</module>
-    <module>modules/scheduler-conflict-handler</module>
-    <module>modules/scheduler-conflict-notifier-comment</module>
-    <module>modules/scheduler-conflict-notifier-email</module>
     <module>modules/scheduler-impl</module>
     <module>modules/scheduler-remote</module>
     <module>modules/schema</module>
@@ -365,7 +365,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>8.21</version>
+            <version>8.29</version>
           </dependency>
         </dependencies>
         <configuration>
@@ -997,53 +997,43 @@
       <!-- Spring -->
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.aop</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-aop</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.asm</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-core</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.core</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-beans</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.beans</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-jdbc</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.jdbc</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-expression</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.expression</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-context</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.transaction</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-context-support</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.context</artifactId>
-        <version>3.1.4.RELEASE</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.context.support</artifactId>
-        <version>3.1.4.RELEASE</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.web</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-web</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.osgi</groupId>
@@ -1063,22 +1053,22 @@
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-core</artifactId>
-        <version>3.1.7.RELEASE</version>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-config</artifactId>
-        <version>3.1.7.RELEASE</version>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-web</artifactId>
-        <version>3.1.7.RELEASE</version>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-openid</artifactId>
-        <version>3.1.7.RELEASE</version>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security.oauth</groupId>
@@ -1088,12 +1078,12 @@
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-cas</artifactId>
-        <version>3.1.7.RELEASE</version>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-ldap</artifactId>
-        <version>3.1.7.RELEASE</version>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.velocity</groupId>
