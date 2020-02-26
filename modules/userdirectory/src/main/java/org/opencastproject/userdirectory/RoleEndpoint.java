@@ -32,8 +32,6 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.util.Iterator;
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -78,8 +76,8 @@ public class RoleEndpoint {
   @RestQuery(name = "rolesasxml", description = "Lists the roles as XML", returnDescription = "The list of roles as XML", reponses = { @RestResponse(responseCode = 200, description = "OK, roles returned") })
   public JaxbRoleList getRolesAsXml() {
     JaxbRoleList roleList = new JaxbRoleList();
-    for (Iterator<Role> i = roleDirectoryService.findRoles("%", Role.Target.ALL, 0, 0); i.hasNext();) {
-      roleList.add(i.next());
+    for (Role role: roleDirectoryService.findRoles("%", Role.Target.ALL, 0, 0)) {
+      roleList.add(role);
     }
     return roleList;
   }

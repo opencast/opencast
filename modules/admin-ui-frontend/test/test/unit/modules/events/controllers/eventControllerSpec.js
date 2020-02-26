@@ -48,7 +48,7 @@ describe('Event controller', function () {
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNELS.json').respond('{}');
-        $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=-1').respond('{}');
+        $httpBackend.whenGET('/admin-ng/acl/roles.json?target=ACL&limit=-1').respond('[]');
         $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNELS.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/event/new/processing?tags=schedule')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/new/processing')));

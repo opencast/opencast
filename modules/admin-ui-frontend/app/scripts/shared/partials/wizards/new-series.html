@@ -127,7 +127,7 @@
                           <select chosen
                                   data-width="'360px'"
                                   ng-model="policy.role"
-                                  ng-options="id as id for (id, type) in wizard.step.roles"
+                                  ng-options="role as role for role in wizard.step.roles"
                                   call-on-search="wizard.step.getMatchingRoles"
                                   data-placeholder=" "
                                   no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY' | translate }}'"

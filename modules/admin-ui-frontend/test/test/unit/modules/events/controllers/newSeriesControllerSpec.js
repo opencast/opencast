@@ -15,7 +15,7 @@ describe('New Series Controller', function () {
         $httpBackend = _$httpBackend_;
 
         $httpBackend.whenGET('modules/events/partials/index.html').respond('');
-        $httpBackend.expectGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=-1').respond('{"ROLE_ANONYMOUS": "ROLE_ANONYMOUS"}');
+        $httpBackend.expectGET('/admin-ng/acl/roles.json?target=ACL&limit=-1').respond('[{"name": "ROLE_ANONYMOUS"}]');
 
         $parentScope = $rootScope.$new();
         $scope = $parentScope.$new();
@@ -33,7 +33,7 @@ describe('New Series Controller', function () {
             $httpBackend.whenGET('/admin-ng/series/new/metadata').respond('{}');
             $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
-            $httpBackend.whenGET('/admin-ng/resources/ROLES.json').respond('{}');
+            $httpBackend.whenGET('/admin-ng/acl/roles.json').respond('[]');
             $httpBackend.whenGET('/admin-ng/resources/components.json').respond('{}');
             $httpBackend.whenGET('/admin-ng/series/new/themes').respond('{}');
             $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));

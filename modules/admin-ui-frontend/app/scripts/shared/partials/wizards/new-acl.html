@@ -103,7 +103,7 @@
                                          call-on-search="wizard.step.getMatchingRoles"
                                          data-width="'360px'"
                                          ng-model="policy.role"
-                                         ng-options="id as id for (id, type) in wizard.step.roles"
+                                         ng-options="role as role for role in wizard.step.roles"
                                          placeholder-text-single="'{{ 'USERS.ACLS.NEW.ACCESS.ROLES.LABEL' | translate }}'"
                                          no-results-text="'{{ 'USERS.ACLS.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
                                          />

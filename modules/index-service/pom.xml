@@ -270,7 +270,6 @@
               OSGI-INF/list-providers/events.xml,
               OSGI-INF/list-providers/groups.xml,
               OSGI-INF/list-providers/jobs.xml,
-              OSGI-INF/list-providers/roles.xml,
               OSGI-INF/list-providers/series.xml,
               OSGI-INF/list-providers/servers.xml,
               OSGI-INF/list-providers/services.xml,
