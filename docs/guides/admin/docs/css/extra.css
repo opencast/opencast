@@ -148,3 +148,13 @@ code {
     margin: 0;
     opacity: 0;
 }
+
+a.header-link {
+    margin-left: 10px;
+    font-size: 80%;
+    opacity: 0.3;
+}
+
+a.header-link:hover {
+    opacity: 1;
+}
