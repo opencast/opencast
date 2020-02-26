@@ -347,25 +347,15 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/acl_endpoint.xml,
-              OSGI-INF/adminui_configuration.xml,
-              OSGI-INF/captureagents_endpoint.xml,
               OSGI-INF/event_endpoint.xml,
-              OSGI-INF/feed_endpoint.xml,
               OSGI-INF/groups_endpoint.xml,
               OSGI-INF/index_endpoint.xml,
-              OSGI-INF/job_endpoint.xml,
+              OSGI-INF/list_providers_endpoint.xml,
               OSGI-INF/presets_endpoint.xml,
-              OSGI-INF/server_endpoint.xml,
               OSGI-INF/series_endpoint.xml,
-              OSGI-INF/services_endpoint.xml,
               OSGI-INF/statistics_endpoint.xml,
-              OSGI-INF/tasks_endpoint.xml,
               OSGI-INF/themes_endpoint.xml,
-              OSGI-INF/tools_endpoint.xml,
-              OSGI-INF/user_settings_endpoint.xml,
-              OSGI-INF/user_settings_service.xml,
-              OSGI-INF/users_endpoint.xml,
-              OSGI-INF/list_providers_endpoint.xml
+              OSGI-INF/tools_endpoint.xml
             </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml

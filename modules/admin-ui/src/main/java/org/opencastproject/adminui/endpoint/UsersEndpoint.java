@@ -65,6 +65,9 @@ import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,6 +103,15 @@ import javax.ws.rs.core.Response;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+  immediate = true,
+  service = UsersEndpoint.class,
+  property = {
+    "service.description=Admin UI - Users facade Endpoint",
+    "opencast.service.type=org.opencastproject.adminui.endpoint.UsersEndpoint",
+    "opencast.service.path=/admin-ng/users"
+  }
+)
 public class UsersEndpoint {
 
   /** The logging facility */
@@ -127,6 +139,7 @@ public class UsersEndpoint {
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -135,6 +148,7 @@ public class UsersEndpoint {
    * @param securityService
    *          the securityService to set
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -143,11 +157,13 @@ public class UsersEndpoint {
    * @param jpaUserAndRoleProvider
    *          the user provider to set
    */
+  @Reference
   public void setJpaUserAndRoleProvider(JpaUserAndRoleProvider jpaUserAndRoleProvider) {
     this.jpaUserAndRoleProvider = jpaUserAndRoleProvider;
   }
 
   /** OSGi callback. */
+  @Activate
   protected void activate(ComponentContext cc) {
     logger.info("Activate the Admin ui - Users facade endpoint");
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc);

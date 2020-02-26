@@ -47,6 +47,9 @@ import com.entwinemedia.fn.data.json.Jsons;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONAware;
 import org.json.simple.JSONObject;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +79,15 @@ import javax.ws.rs.core.Response;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+  immediate = true,
+  service = ServicesEndpoint.class,
+  property = {
+    "service.description=Admin UI - Services facade Endpoint",
+    "opencast.service.type=org.opencastproject.adminui.endpoint.ServicesEndpoint",
+    "opencast.service.path=/admin-ng/services"
+  }
+)
 public class ServicesEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(ServicesEndpoint.class);
   private ServiceRegistry serviceRegistry;
@@ -401,6 +413,7 @@ public class ServicesEndpoint {
   }
 
   /** OSGI activate method. */
+  @Activate
   public void activate() {
     logger.info("ServicesEndpoint is activated!");
   }
@@ -409,6 +422,7 @@ public class ServicesEndpoint {
    * @param serviceRegistry
    *          the serviceRegistry to set
    */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
