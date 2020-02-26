@@ -416,7 +416,7 @@ public class ServiceRegistryJpaImplTest {
   private void assertHostloads(Job j, Float a, Float b, Float c) throws Exception {
     // launch the  dispatcher and wait a little longer for dispatch to complete before getting job
     launchDispatcherOnce(false);
-    Thread.sleep(3 * DISPATCH_START_DELAY);
+    Thread.sleep(JOB_BARRIER_TIMEOUT);
     Job k = serviceRegistryJpaImpl.getJob(j.getId());
     k.setStatus(Status.RUNNING);
     serviceRegistryJpaImpl.updateJob(k);
