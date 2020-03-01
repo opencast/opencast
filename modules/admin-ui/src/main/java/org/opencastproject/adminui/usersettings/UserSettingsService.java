@@ -26,12 +26,13 @@ import org.opencastproject.adminui.usersettings.persistence.UserSettingsServiceE
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.util.Log;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class UserSettingsService {
   public static final String PERSISTENCE_UNIT = "org.opencastproject.adminui";
 
   /** Logging utilities */
-  private static final Log logger = Log.mk(UserSettingsService.class);
+  private static final Logger logger = LoggerFactory.getLogger(UserSettingsService.class);
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;

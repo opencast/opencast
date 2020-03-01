@@ -31,7 +31,6 @@ import org.opencastproject.adminui.usersettings.UserSetting;
 import org.opencastproject.adminui.usersettings.UserSettings;
 import org.opencastproject.adminui.usersettings.UserSettingsService;
 import org.opencastproject.adminui.usersettings.persistence.UserSettingsServiceException;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Tuple;
@@ -44,6 +43,8 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -80,7 +81,7 @@ import javax.ws.rs.core.Response;
 public class UserSettingsEndpoint {
 
   /** The logging facility */
-  private static final Log logger = Log.mk(ServerEndpoint.class);
+  private static final Logger logger = LoggerFactory.getLogger(ServerEndpoint.class);
 
   /** Base url of this endpoint */
   private String endpointBaseUrl;
