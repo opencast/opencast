@@ -28,4 +28,15 @@ Other Changes
 Release Schedule
 ----------------
 
-*To be determined*
+|Date                         |Phase
+|-----------------------------|------------------------------------------
+|March 31st 2020              |Feature freeze
+|May 4th - May 10th 2020      |Translation week
+|May 11th - May 24th 2019     |Public QA phase
+|June 15th 2020               |Release of Opencast 9.0
+
+Release Managers
+----------------
+
+- Julian Kniephoff (ELAN e.V.)
+- Carlos Turro Ribalta (Universitat Politècnica de València)
