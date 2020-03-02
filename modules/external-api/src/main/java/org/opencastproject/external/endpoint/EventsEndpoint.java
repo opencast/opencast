@@ -454,6 +454,41 @@ public class EventsEndpoint implements ManagedService {
           indexService.updateEventAcl(eventId, eventHttpServletRequest.getAcl().get(), externalIndex);
         }
 
+        if (eventHttpServletRequest.getProcessing().isSome()) {
+
+          if (!event.isScheduledEvent() || event.hasRecordingStarted()) {
+            return RestUtil.R.badRequest("Processing can't be updated for events that are already uploaded.");
+          }
+          JSONObject processing = eventHttpServletRequest.getProcessing().get();
+
+          String workflowId = (String) processing.get("workflow");
+          if (workflowId == null)
+            throw new IllegalArgumentException("No workflow template in metadata");
+
+          Map<String, String> configuration = new HashMap<>();
+          if (eventHttpServletRequest.getProcessing().get().get("configuration") != null) {
+            configuration = new HashMap<>((JSONObject) eventHttpServletRequest.getProcessing().get().get("configuration"));
+          }
+
+          Opt<Map<String, String>> caMetadataOpt = Opt.none();
+          Opt<Map<String, String>> workflowConfigOpt = Opt.none();
+
+          Map<String, String> caMetadata = new HashMap<>(getSchedulerService().getCaptureAgentConfiguration(eventId));
+          if (!workflowId.equals(caMetadata.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION))) {
+            caMetadata.put(CaptureParameters.INGEST_WORKFLOW_DEFINITION, workflowId);
+            caMetadataOpt = Opt.some(caMetadata);
+          }
+
+          Map<String, String> oldWorkflowConfig = new HashMap<>(getSchedulerService().getWorkflowConfig(eventId));
+          if (!oldWorkflowConfig.equals(configuration))
+            workflowConfigOpt = Opt.some(configuration);
+
+          if (!caMetadataOpt.isNone() || !workflowConfigOpt.isNone()) {
+            getSchedulerService().updateEvent(eventId, Opt.none(), Opt.none(), Opt.none(),
+                    Opt.none(), Opt.none(), workflowConfigOpt, caMetadataOpt);
+          }
+        }
+
         if (eventHttpServletRequest.getScheduling().isSome() && !requestedVersion.isSmallerThan(VERSION_1_1_0)) {
           // Scheduling is only available for version 1.1.0 and above
           Optional<Response> clientError = updateSchedulingInformation(
