@@ -285,6 +285,9 @@ public abstract class AbstractEventEndpoint {
   /** The default workflow identifier, if one is configured */
   protected String defaultWorkflowDefinionId = null;
 
+  /** The system user name (default set here for unit tests) */
+  private String systemUserName = "opencast_system_account";
+
   /**
    * Activates REST service.
    *
@@ -303,8 +306,9 @@ public abstract class AbstractEventEndpoint {
 
       if (StringUtils.isNotBlank(ccDefaultWorkflowDefinionId))
         this.defaultWorkflowDefinionId = ccDefaultWorkflowDefinionId;
-    }
 
+      systemUserName = SecurityUtil.getSystemUserName(cc);
+    }
   }
 
   /* As the list of event ids can grow large, we use a POST request to avoid problems with too large query strings */
@@ -2016,19 +2020,29 @@ public abstract class AbstractEventEndpoint {
 
   private List<JValue> convertToConflictObjects(final String eventId, final List<MediaPackage> events) throws SearchIndexException {
     final List<JValue> eventsJSON = new ArrayList<>();
-    for (final MediaPackage event : events) {
-      final Opt<Event> eventOpt = getIndexService().getEvent(event.getIdentifier().compact(), getIndex());
-      if (eventOpt.isSome()) {
-        final Event e = eventOpt.get();
-        if (StringUtils.isNotEmpty(eventId) && eventId.equals(e.getIdentifier())) {
-          continue;
+    final Organization organization = getSecurityService().getOrganization();
+    final User user = SecurityUtil.createSystemUser(systemUserName, organization);
+
+    SecurityUtil.runAs(getSecurityService(), organization, user, () -> {
+      try {
+        for (final MediaPackage event : events) {
+          final Opt<Event> eventOpt = getIndexService().getEvent(event.getIdentifier().compact(), getIndex());
+          if (eventOpt.isSome()) {
+            final Event e = eventOpt.get();
+            if (StringUtils.isNotEmpty(eventId) && eventId.equals(e.getIdentifier())) {
+              continue;
+            }
+            eventsJSON.add(convertEventToConflictingObject(e.getTechnicalStartTime(), e.getTechnicalEndTime(), e.getTitle()));
+          } else {
+            logger.warn("Index out of sync! Conflicting event catalog {} not found on event index!",
+              event.getIdentifier().compact());
+          }
         }
-        eventsJSON.add(convertEventToConflictingObject(e.getTechnicalStartTime(), e.getTechnicalEndTime(), e.getTitle()));
-      } else {
-        logger.warn("Index out of sync! Conflicting event catalog {} not found on event index!",
-          event.getIdentifier().compact());
+      } catch (Exception e) {
+         logger.error("Failed to get conflicting events", e);
       }
-    }
+    });
+
     return eventsJSON;
   }
 
