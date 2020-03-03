@@ -71,6 +71,12 @@
       <artifactId>easymock</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-transcription-service-amberscript</artifactId>
+      <version>9-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -95,6 +101,8 @@
             <Service-Component>
               OSGI-INF/google-speech-attach-transcription.xml,
               OSGI-INF/google-speech-start-transcription.xml,
+              OSGI-INF/amberscript-attach-transcription.xml,
+              OSGI-INF/amberscript-start-transcription.xml,
               OSGI-INF/start-watson-transcription.xml,
               OSGI-INF/attach-watson-transcription.xml
             </Service-Component>

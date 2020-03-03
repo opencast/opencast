@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>amberscript-start-transcription</id>
+  <title>Start AmberScript Transcription</title>
+  <tags>
+    <tag>archive</tag>
+  </tags>
+  <description>Start the AmberScript transcription</description>
+
+  <operations>
+
+    <operation
+        id="defaults"
+        description="Applying default values for AmberScript Transcriptions">
+      <configurations>
+        <configuration key="skipFlavor">captions/vtt</configuration>
+        <configuration key="language">en</configuration>
+        <configuration key="jobtype">direct</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="encode"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Encoding audio for transcription">
+      <configurations>
+        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="target-flavor">audio/mp3</configuration>
+        <configuration key="target-tags">transcript</configuration>
+        <configuration key="encoding-profile">audio-mp3</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="amberscript-start-transcription"
+        max-attempts="3"
+        retry-strategy="hold"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Start AmberScript transcription job">
+      <configurations>
+          <configuration key="source-tag">transcript</configuration>
+          <configuration key="language">${language}</configuration>
+        <configuration key="jobtype">${jobtype}</configuration>
+        <configuration key="skip-if-flavor-exists">${skipFlavor}</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>
+
