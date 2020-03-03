@@ -367,7 +367,7 @@
     <!-- Encode presenter (camera) to Engage player format -->
     <operation
       if="${flagQuality360p}"
-      id="compose"
+      id="encode"
       exception-handler-workflow="partial-error"
       description="Encoding 360p video to MP4 download">
       <configurations>
@@ -379,7 +379,7 @@
     </operation>
     <operation
       if="${flagQuality480p}"
-      id="compose"
+      id="encode"
       exception-handler-workflow="partial-error"
       description="Encoding 480p video to MP4 download">
       <configurations>
@@ -391,7 +391,7 @@
     </operation>
     <operation
       if="${flagQuality720p}"
-      id="compose"
+      id="encode"
       exception-handler-workflow="partial-error"
       description="Encoding 720p video to MP4 download">
       <configurations>
@@ -403,7 +403,7 @@
     </operation>
     <operation
       if="${flagQuality1080p}"
-      id="compose"
+      id="encode"
       exception-handler-workflow="partial-error"
       description="Encoding 1080p video to MP4 download">
       <configurations>
@@ -415,7 +415,7 @@
     </operation>
     <operation
       if="${flagQuality2160p}"
-      id="compose"
+      id="encode"
       exception-handler-workflow="partial-error"
       description="Encoding 2160p video to MP4 download">
       <configurations>

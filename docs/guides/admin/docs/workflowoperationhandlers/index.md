@@ -32,7 +32,6 @@ The following table contains the workflow operations that are available in an ou
 |cleanup             |Cleanup the working file repository                            |[Documentation](cleanup-woh.md)|
 |clone               |Clone media package elements to another flavor                 |[Documentation](clone-woh.md)|
 |comment             |Add, resolve or delete a comment                               |[Documentation](comment-woh.md)|
-|compose             |Encode media files using FFmpeg                                |[Documentation](compose-woh.md)|
 |composite           |Compose two videos on one canvas.                              |[Documentation](composite-woh.md)|
 |concat              |Concatenate multiple video tracks into one video track         |[Documentation](concat-woh.md)|
 |configure-by-dcterm |Set workflow parameter if dublincore term matches value        |[Documentation](configure-by-dcterm-woh.md)|

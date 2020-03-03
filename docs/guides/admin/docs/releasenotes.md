@@ -6,6 +6,7 @@ Important Changes
 
 - External Elasticsearch
 - MariaDB JDBC driver
+- Dropping compose operation in favor of encode
 
 
 Features
