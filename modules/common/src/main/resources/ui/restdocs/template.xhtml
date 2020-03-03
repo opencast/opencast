@@ -212,7 +212,8 @@
                          name="${item.name}"
                          class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>"
                          type="checkbox"
-                         value="true" <#if item.defaultValue == "true">checked</#if> />
+                         value="true"
+                         <#if item.defaultValue?? && item.defaultValue == "true">checked</#if> />
                 </td>
                 <td class="form_field_description">${item.description!}</td>
                 <#elseif item.type == "file">
