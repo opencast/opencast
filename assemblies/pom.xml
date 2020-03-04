@@ -129,9 +129,8 @@
               <phase>prepare-package</phase>
               <configuration>
                 <target>
-                  <!-- Make sure to deactivate JMX by default, comment out these three lines to enable JMX from the build -->
+                  <!-- Make sure to deactivate JMX by default -->
                   <replaceregexp file="target/assembly/bin/karaf" match="-Dcom.sun.management.jmxremote" replace="" byline="true"/>
-                  <replaceregexp file="target/assembly/bin/karaf.bat" match="-Dcom.sun.management.jmxremote" replace="" byline="true"/>
                   <replaceregexp file="target/assembly/bin/inc" match="-Dcom.sun.management.jmxremote" replace="" byline="true"/>
                   <!-- Correct the start script name -->
                   <replaceregexp file="target/assembly/bin/karaf" match="^KARAF_SCRIPT=.*$" replace="KARAF_SCRIPT='start-opencast'" byline="true"/>
