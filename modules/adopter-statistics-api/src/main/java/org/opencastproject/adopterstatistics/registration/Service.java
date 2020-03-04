@@ -19,11 +19,29 @@
  *
  */
 
+package org.opencastproject.adopterstatistics.registration;
 
-// Components
-@import "components/tables";
-@import "components/drag-and-drop";
+/**
+ * API for the Adopter Statistics Registrations.
+ */
+public interface Service {
 
-// Views
-@import "views/modals/edit-table-view";
-@import "views/modals/registration";
+  /**
+   * Saves the the submitted form.
+   *
+   * @param form The adopter registration form.
+   */
+  void saveFormData(IForm form);
+
+  /**
+   * Retrieves the adopter registration form from db.
+   *
+   * @return The form from db.
+   */
+  IForm retrieveFormData();
+
+  /**
+   * Deletes the adopter registration form from db.
+   */
+  void deleteFormData();
+}

@@ -1,0 +1,326 @@
+<section ng-show="open" id="registration-modal" ng-keyup="keyUp($event)"
+  tabindex="1" class="modal active modal-open modal-animation"
+  ng-controller="RegistrationCtrl">
+  <header>
+    <a ng-show="states[state]['buttons']['close']" ng-click="nextState(0)"
+      class="fa fa-times close-modal"></a>
+    <h2 translate="ADOPTER_REGISTRATION.MODAL.CAPTION">
+      <!--Registration-->
+    </h2>
+  </header>
+
+  <div ng-show="state == 'information'" class="modal-content"
+    style="display: block;">
+    <div class="modal-body">
+      <div class="registration-header" style="padding: 5px 0 15px 0">
+        <h2 translate="ADOPTER_REGISTRATION.MODAL.INFORMATION_STATE.HEADER"></h2>
+      </div>
+      <div>
+        <div class="row">
+          <p translate="ADOPTER_REGISTRATION.MODAL.INFORMATION_STATE.INFORMATION_PARAGRAPH_1"></p>
+          <br/>
+          <p translate="ADOPTER_REGISTRATION.MODAL.INFORMATION_STATE.INFORMATION_PARAGRAPH_2"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div ng-show="state == 'legal_info'" class="modal-content"
+    style="display: block;">
+    <div class="modal-body">
+      <div>
+        <div class="row">
+          <div class="scrollbox">
+            <ng-include
+              src="'modules/registration/partials/terms-of-use.html'">
+              </ng-include>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div ng-show="state == 'skip'" class="modal-content"
+    style="display: block;">
+    <div class="modal-body">
+      <div class="registration-header">
+        <h2 translate="ADOPTER_REGISTRATION.MODAL.SKIP_STATE.HEADER"></h2>
+      </div>
+      <div>
+        <div class="row">
+          <p>
+            <span translate="ADOPTER_REGISTRATION.MODAL.SKIP_STATE.TEXT"></span>
+            <br />
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div ng-show="state == 'delete_submit'" class="modal-content"
+    style="display: block;">
+    <div class="modal-body">
+      <div>
+        <p>
+          <span translate="ADOPTER_REGISTRATION.MODAL.DELETE_SUBMIT_STATE.TEXT"></span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div ng-show="state == 'save' || state == 'delete' || state == 'update'" class="modal-content"
+    style="display: block;">
+    <div class="modal-body">
+      <div>
+        <div class="row spinner-container">
+          <i class="fa fa-spinner fa-spin fa-4x fa-fw"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div ng-show="state == 'thank_you'" class="modal-content"
+    style="display: block;">
+    <div class="modal-body">
+      <div class="registration-header">
+        <h2 translate="ADOPTER_REGISTRATION.MODAL.THANK_YOU_STATE.HEADER"></h2>
+      </div>
+      <div>
+        <div class="row">
+          <p>
+            <span translate="ADOPTER_REGISTRATION.MODAL.THANK_YOU_STATE.TEXT_LEADING_TO_PATH">
+              <!-- You can change your data at   -->
+            </span>
+            <b>
+              (<span translate="HELP.HELP"></span>)
+              <span class="fa fa-question-circle"></span>
+              >
+              <span translate="HELP.ADOPTER_REGISTRATION"></span>
+            </b>
+            <span translate="ADOPTER_REGISTRATION.MODAL.THANK_YOU_STATE.TEXT_LEADING_AFTER_PATH">
+              <!-- at any time. -->
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div ng-show="state == 'error'" class="modal-content"
+       style="display: block;">
+    <div class="modal-body">
+      <div class="registration-header">
+        <h2 translate="ADOPTER_REGISTRATION.MODAL.ERROR.HEADER"></h2>
+      </div>
+      <div>
+        <div class="row">
+          <p>
+            <span translate="ADOPTER_REGISTRATION.MODAL.ERROR.TEXT">
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form name="adopterRegistrationForm">
+    <div ng-show="state == 'form'" class="modal-content" style="display: block;">
+      <div class="modal-body">
+        <div>
+          <fieldset>
+            <legend translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.ORGANISATION"></legend>
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <input type="text" id="adopter_organisation" ng-model="adopter.organisationName" class="form-control">
+                  <label
+                    class="form-control-placeholder"
+                    for="adopter_organisation"
+                    translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.ORGANISATION"></label>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <input type="text" id="adopter_department" ng-model="adopter.departmentName" class="form-control">
+                  <label
+                    class="form-control-placeholder"
+                    for="adopter_department"
+                    translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.DEPARTMENT"></label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <select style="color: #666; font-weight: 600"
+                          id="adopter_country"
+                          class="form-control"
+                          ng-model="adopter.country">
+
+                    <option value=""></option>
+                    <option ng-repeat="country in countries | orderBy:'name'" value="{{country.code}}">
+                      {{country.name}}
+                    </option>
+                  </select>
+                  <label
+                    class="form-control-placeholder"
+                    for="adopter_country"
+                    translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.COUNTRY"></label>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group-pair">
+                  <div class="form-group">
+                    <input type="text" id="adopter_postalcode" ng-model="adopter.postalCode" class="form-control">
+                    <label
+                      class="form-control-placeholder"
+                      for="adopter_postalcode"
+                      translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.POSTAL_CODE"></label>
+                  </div>
+                  <div class="form-group">
+                    <input type="text" id="adopter_city" ng-model="adopter.city" class="form-control">
+                    <label
+                      class="form-control-placeholder"
+                      for="adopter_city"
+                      translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.CITY"></label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.CONTACT_INFO"></legend>
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <input type="text" id="adopter_firstname" ng-model="adopter.firstName" class="form-control">
+                  <label
+                    class="form-control-placeholder"
+                    for="adopter_firstname"
+                    translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.FIRST_NAME"></label>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <input type="text" id="adopter_lastname" ng-model="adopter.lastName" class="form-control">
+                  <label
+                    class="form-control-placeholder"
+                    for="adopter_lastname"
+                    translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.LAST_NAME"></label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <input type="text" id="adopter_street" ng-model="adopter.street" class="form-control">
+                  <label
+                    class="form-control-placeholder"
+                    for="adopter_street"
+                    translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.STREET"></label>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <input type="text" id="adopter_streetnumber" ng-model="adopter.streetNo" class="form-control">
+                  <label
+                    class="form-control-placeholder"
+                    for="adopter_streetnumber"
+                    translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.NUMBER"></label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <input id="adopter_emailadr" type="email" ng-model-options="{ debounce: 300 }"
+                         ng-model="adopter.email" class="form-control">
+                  <label
+                    class="form-control-placeholder"
+                    for="adopter_emailadr"
+                    translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.MAIL"></label>
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group form-group-checkbox">
+                  <input type="checkbox"
+                         id="adopter_contactme"
+                         ng-model="adopter.contactMe"
+                         ng-model-options="{ allowInvalid: true }"
+                         class="form-control">
+                  <label
+                    for="adopter_contactme"
+                    translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.CONTACT_ME"></label>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.WHICH_DATA_TO_SHARE"></legend>
+            <div class="form-group form-group-checkbox">
+              <input type="checkbox"
+                     id="adopter_allows_statistics"
+                     ng-model="adopter.allowsStatistics"
+                     ng-model-options="{ allowInvalid: true }"
+                     class="form-control">
+              <label
+                for="adopter_allows_statistics"
+                translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.USAGE_STATISTICS"></label>
+            </div>
+            <div class="form-group form-group-checkbox">
+              <input type="checkbox"
+                     id="adopter_allows_err_reports"
+                     ng-model="adopter.allowsErrorReports"
+                     ng-model-options="{ allowInvalid: true }"
+                     class="form-control">
+              <label
+                for="adopter_allows_err_reports"
+                translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.ERROR_REPORTS"></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.POLICY_HEADLINE"></legend>
+            <div class="form-group form-group-checkbox">
+              <input type="checkbox" id="agreedToPolicy" class="form-control" ng-model="adopter.agreedToPolicy">
+              <label
+                for="agreedToPolicy">
+                <span translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.READ_TERMS_OF_USE_BEFORE"></span>
+                <span
+                  translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.READ_TERMS_OF_USE_LINK"
+                  class="link"
+                  ng-click="nextState(2)"></span>
+                <span translate="ADOPTER_REGISTRATION.MODAL.FORM_STATE.READ_TERMS_OF_USE_AFTER"></span>
+              </label>
+            </div>
+          </fieldset>
+        </div>
+      </div>
+    </div>
+
+  <footer>
+    <div class="pull-right" ng-show="states[state]['buttons']['submit']">
+      <a ng-hide="state == 'form'"
+         class="continue-registration"
+         ng-click="nextState(1)"
+         translate="{{states[state]['buttons']['submitButtonText']}}"></a>
+      <a ng-show="state == 'form'"
+         class="submit inactive"
+         ng-form="adopterRegistrationForm"
+         ng-class="{inactive: !adopter.agreedToPolicy}"
+         ng-click="nextState(1)"
+         translate="{{states[state]['buttons']['submitButtonText']}}"></a>
+    </div>
+
+    <div class="pull-left">
+      <a ng-show="states[state]['buttons']['back']" class="cancel"
+         ng-click="nextState(5)" translate="ADOPTER_REGISTRATION.MODAL.BACK"></a>
+      <a ng-show="state == 'form' && registered"
+         class="danger"
+         ng-click="nextState(4)"
+         translate="WIZARD.DELETE"></a>
+      <a ng-show="states[state]['buttons']['skip']" class="cancel"
+         ng-click="nextState(2)" translate="ADOPTER_REGISTRATION.MODAL.SKIP"></a>
+    </div>
+  </footer>
+  </form>
+</section>
