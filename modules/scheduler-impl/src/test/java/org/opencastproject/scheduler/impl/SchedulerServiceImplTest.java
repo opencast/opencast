@@ -109,7 +109,6 @@ import org.opencastproject.scheduler.endpoint.SchedulerRestService;
 import org.opencastproject.scheduler.impl.persistence.SchedulerServiceDatabaseImpl;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -530,22 +529,6 @@ public class SchedulerServiceImplTest {
   }
 
   @Test
-  public void testAclPersistence() throws Exception {
-    Date start = new Date();
-    Date end = new Date(System.currentTimeMillis() + 60000);
-    String captureDeviceID = "demo";
-    MediaPackage mp = generateEvent(Opt.<String> none());
-    addAcl(Opt.<String> none(), mp, acl);
-    Map<String, String> caProperties = generateCaptureAgentMetadata("demo");
-
-    // Store event
-    schedSvc.addEvent(start, end, captureDeviceID, Collections.<String> emptySet(), mp, wfProperties, caProperties,
-            Opt.<String> none());
-
-    assertTrue(AccessControlUtil.equals(acl, schedSvc.getAccessControlList(mp.getIdentifier().toString())));
-  }
-
-  @Test
   public void nonExistantRecording() throws Exception {
     String mpId = "doesNotExist";
     try {
@@ -917,13 +900,6 @@ public class SchedulerServiceImplTest {
 
     try {
       schedSvc.getDublinCore(mediaPackageId);
-      fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    try {
-      schedSvc.getAccessControlList(mediaPackageId);
       fail();
     } catch (NotFoundException e) {
       Assert.assertNotNull(e);

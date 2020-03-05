@@ -928,29 +928,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public AccessControlList getAccessControlList(String mediaPackageId) throws NotFoundException, SchedulerException {
-    notEmpty(mediaPackageId, "mediaPackageId");
-
-    try {
-      AQueryBuilder query = assetManager.createQuery();
-      AResult result = query.select(query.snapshot())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withOwner(query))
-                  .and(query.version().isLatest()))
-              .run();
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isNone())
-        throw new NotFoundException();
-
-      return authorizationService.getActiveAcl(record.get().getSnapshot().get().getMediaPackage()).getA();
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      logger.error("Failed to get access control list of event '{}':", mediaPackageId, e);
-      throw new SchedulerException(e);
-    }
-  }
-
-  @Override
   public Map<String, String> getWorkflowConfig(String mediaPackageId) throws NotFoundException, SchedulerException {
     notEmpty(mediaPackageId, "mediaPackageId");
 

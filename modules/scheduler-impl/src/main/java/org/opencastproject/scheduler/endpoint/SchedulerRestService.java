@@ -67,8 +67,6 @@ import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.impl.CaptureNowProlongingService;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
@@ -388,34 +386,6 @@ public class SchedulerRestService {
       return Response.status(Status.NOT_FOUND).build();
     } catch (SchedulerException e) {
       logger.error("Unable to retrieve event with id '{}': {}", eventId, getMessage(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("{id}/acl")
-  @RestQuery(name = "getaccesscontrollist", description = "Retrieves the access control list for specified event", returnDescription = "The access control list", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "ID of event for which the access control list will be retrieved", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The access control list as JSON "),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "The event has no access control list"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to remove the event. Maybe you need to authenticate.") })
-  public Response getAccessControlList(@PathParam("id") String eventId) throws UnauthorizedException {
-    try {
-      AccessControlList accessControlList = service.getAccessControlList(eventId);
-      if (accessControlList != null) {
-        return Response.ok(AccessControlParser.toJson(accessControlList)).type(MediaType.APPLICATION_JSON_TYPE).build();
-      } else {
-        return Response.noContent().build();
-      }
-    } catch (NotFoundException e) {
-      logger.info("Event with id '{}' does not exist.", eventId);
-      return Response.status(Status.NOT_FOUND).build();
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      logger.error("Unable to retrieve access control list of event with id '{}': {}", eventId, getMessage(e));
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
