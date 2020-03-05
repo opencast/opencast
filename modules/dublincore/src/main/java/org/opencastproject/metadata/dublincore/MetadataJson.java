@@ -451,7 +451,7 @@ public final class MetadataJson {
 
   public static JValue listToJson(final MetadataList metadataList, final boolean withOrderedText) {
     final List<JValue> catalogs = new ArrayList<>();
-    for (final Map.Entry<String, MetadataList.TitledCollection> metadata : metadataList.getMetadataList().entrySet()) {
+    for (final Map.Entry<String, MetadataList.TitledMetadataCollection> metadata : metadataList.getMetadataList().entrySet()) {
       final List<Field> fields = new ArrayList<>();
 
       DublinCoreMetadataCollection metadataCollection = metadata.getValue().getCollection();

@@ -840,7 +840,7 @@ public class IndexServiceImplTest {
     seriesMetadataField.setValue("series-1");
     metadataCollection.addField(seriesMetadataField);
     MetadataList metadataList = new MetadataList();
-    metadataList.getMetadataList().put("dublincore/episode", new MetadataList.TitledCollection("EVENTS.EVENTS.DETAILS.CATALOG.EPISODE", metadataCollection));
+    metadataList.getMetadataList().put("dublincore/episode", new MetadataList.TitledMetadataCollection("EVENTS.EVENTS.DETAILS.CATALOG.EPISODE", metadataCollection));
     String eventId = "event-1";
     Event event = new Event(eventId, org);
     event.setTitle("Test Event 1");

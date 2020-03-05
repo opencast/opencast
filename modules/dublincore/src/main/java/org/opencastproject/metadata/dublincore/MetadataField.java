@@ -148,7 +148,7 @@ public class MetadataField {
    * @param pattern Pattern for time/date fields
    * @param delimiter Delimiter
    * @throws IllegalArgumentException
-   *           if the id, label, type, valueToJSON parameters is/are null
+   *           if the id, label, type parameters is/are null
    */
   public MetadataField(
           final String inputID,
