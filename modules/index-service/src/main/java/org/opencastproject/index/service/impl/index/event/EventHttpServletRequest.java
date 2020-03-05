@@ -512,16 +512,16 @@ public class EventHttpServletRequest {
    *          The metadata list created from the json request to create a new event
    */
   private static void setStartDateAndTimeIfUnset(MetadataList metadataList) {
-    final DublinCoreMetadataCollection optCommonEventCollection = metadataList
+    final DublinCoreMetadataCollection commonEventCollection = metadataList
             .getMetadataByFlavor(MediaPackageElements.EPISODE.toString());
-    if (optCommonEventCollection != null) {
-      MetadataField startDate = optCommonEventCollection.getOutputFields().get("startDate");
+    if (commonEventCollection != null) {
+      MetadataField startDate = commonEventCollection.getOutputFields().get("startDate");
       if (!startDate.isUpdated()) {
         SimpleDateFormat utcDateFormat = new SimpleDateFormat(startDate.getPattern());
         utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         String currentDate = utcDateFormat.format(new DateTime(DateTimeZone.UTC).toDate());
-        optCommonEventCollection.removeField(startDate);
-        optCommonEventCollection.addField(MetadataJson.copyWithDifferentJsonValue(startDate, currentDate));
+        commonEventCollection.removeField(startDate);
+        commonEventCollection.addField(MetadataJson.copyWithDifferentJsonValue(startDate, currentDate));
       }
     }
   }

@@ -291,14 +291,14 @@ public final class DublinCoreMetadataUtil {
     final Map<String,Map<String, String>> allProperties = new HashMap<>();
 
     for (String configObject : Collections.list(configProperties.keys())) {
-      String propertyNameOpt = getDublinCorePropertyName(configObject);
-      String propertyKeyOpt = getDublinCorePropertyKey(configObject);
+      String propertyName = getDublinCorePropertyName(configObject);
+      String propertyKey = getDublinCorePropertyKey(configObject);
 
-      if (propertyNameOpt != null && propertyKeyOpt != null) {
+      if (propertyName != null && propertyKey != null) {
         Map<String,String> metadataFieldProperties = allProperties.computeIfAbsent(
-                propertyNameOpt,
+                propertyName,
                 key -> new HashMap<>());
-        metadataFieldProperties.put(propertyKeyOpt, configProperties.get(configObject).toString());
+        metadataFieldProperties.put(propertyKey, configProperties.get(configObject).toString());
       }
     }
 

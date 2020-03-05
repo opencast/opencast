@@ -41,11 +41,11 @@ public final class MetadataList {
 
   }
 
-  public static final class TitledCollection {
+  public static final class TitledMetadataCollection {
     private final String title;
     private final DublinCoreMetadataCollection collection;
 
-    public TitledCollection(String title, DublinCoreMetadataCollection collection) {
+    public TitledMetadataCollection(String title, DublinCoreMetadataCollection collection) {
       this.title = title;
       this.collection = collection;
     }
@@ -59,7 +59,7 @@ public final class MetadataList {
     }
   }
 
-  private final Map<String, TitledCollection> metadataList = new HashMap<>();
+  private final Map<String, TitledMetadataCollection> metadataList = new HashMap<>();
 
   private Locked locked = Locked.NONE;
 
@@ -70,7 +70,7 @@ public final class MetadataList {
     return locked;
   }
 
-  public Map<String, TitledCollection> getMetadataList() {
+  public Map<String, TitledMetadataCollection> getMetadataList() {
     return metadataList;
   }
 
@@ -84,19 +84,19 @@ public final class MetadataList {
 
   public DublinCoreMetadataCollection getMetadataByFlavor(final String flavor) {
     return metadataList.keySet().stream().filter(e -> e.equals(flavor)).map(metadataList::get)
-            .map(TitledCollection::getCollection).findAny().orElse(null);
+                       .map(TitledMetadataCollection::getCollection).findAny().orElse(null);
   }
 
   public void add(final EventCatalogUIAdapter adapter, final DublinCoreMetadataCollection metadata) {
-    metadataList.put(adapter.getFlavor().toString(), new TitledCollection(adapter.getUITitle(), metadata));
+    metadataList.put(adapter.getFlavor().toString(), new TitledMetadataCollection(adapter.getUITitle(), metadata));
   }
 
   public void add(final SeriesCatalogUIAdapter adapter, final DublinCoreMetadataCollection metadata) {
-    metadataList.put(adapter.getFlavor().toString(), new TitledCollection(adapter.getUITitle(), metadata));
+    metadataList.put(adapter.getFlavor().toString(), new TitledMetadataCollection(adapter.getUITitle(), metadata));
   }
 
   public void add(final String flavor, final String title, final DublinCoreMetadataCollection metadata) {
-    metadataList.put(flavor, new TitledCollection(title, metadata));
+    metadataList.put(flavor, new TitledMetadataCollection(title, metadata));
   }
 
   public void setLocked(final Locked locked) {
