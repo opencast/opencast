@@ -58,12 +58,12 @@ module.exports = function (config) {
             enabled: true,
             usePhantomJS: false,
             preferHeadless: true,
-            /* Leaving this commented out as an example.
-               If we ever want to disable an installed browser (c.f: IE) we can exclude it like this
             // post processing of browsers list
             // here you can edit the list of browsers used by karma
             postDetection: function(availableBrowsers) {
                 var result = availableBrowsers;
+                /* Leaving this commented out as an example.
+                   If we ever want to disable an installed browser (c.f: IE) we can exclude it like this
                 //Remove PhantomJS if another browser has been detected
                 if (availableBrowsers.length > 1 && availableBrowsers.indexOf('PhantomJS')>-1) {
                     var i = result.indexOf('PhantomJS');
@@ -71,9 +71,14 @@ module.exports = function (config) {
                         result.splice(i, 1);
                     }
                 }
+		*/
+		if (availableBrowsers.length < 1) {
+                    console.error("No browsers detected");
+                    console.error("Suggest installing Firefox or other FOSS browser");
+                    throw "No browsers detected";
+	        }
                 return result;
             }
-            */
         },
 
         plugins : [
