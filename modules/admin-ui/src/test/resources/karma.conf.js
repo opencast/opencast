@@ -87,7 +87,8 @@ module.exports = function (config) {
             'karma-detect-browsers',
             'karma-firefox-launcher',
             'karma-jasmine',
-            'karma-ng-html2js-preprocessor'
+            'karma-ng-html2js-preprocessor',
+            'karma-safari-launcher'
         ],
 
         captureTimeout: 60000,
