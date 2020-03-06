@@ -1,6 +1,13 @@
 Create a Custom Workflow
 ========================
 
+Creating custom workflows can be complex.  Some members of the community have contributed their production workflows to
+a public repo.
+
+> [Community Workflow Repository](https://github.com/opencast/community-workflows)
+
+Please feel free to contribute your workflows when you have Opencast in production!
+
 This document will help you get started with creating your own Opencast workflows. For a list of available workflow
 operations, see:
 
