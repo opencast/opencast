@@ -84,7 +84,10 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   public static final String ORG_NAME_KEY = "name";
 
   /** The managed property that specifies the organization server name */
-  public static final String ORG_SERVER_KEY = "server";
+  public static final String ORG_SERVER_PREFIX = "prop.org.opencastproject.host.";
+
+  /** The default in case no server is configured */
+  public static final String DEFAULT_SERVER = "localhost";
 
   /** The managed property that specifies the server port */
   public static final String ORG_PORT_KEY = "port";
@@ -175,15 +178,10 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     // Gather the properties
     final String id = (String) properties.get(ORG_ID_KEY);
     final String name = (String) properties.get(ORG_NAME_KEY);
-    final String server = (String) properties.get(ORG_SERVER_KEY);
 
     // Make sure the configuration meets the minimum requirements
     if (StringUtils.isBlank(id))
       throw new ConfigurationException(ORG_ID_KEY, ORG_ID_KEY + " must be set");
-    if (StringUtils.isBlank(server))
-      throw new ConfigurationException(ORG_SERVER_KEY, ORG_SERVER_KEY + " must be set");
-
-    String[] serverUrls = StringUtils.split(server, ",");
 
     final String portAsString = StringUtils.trimToNull((String) properties.get(ORG_PORT_KEY));
     final int port = portAsString != null ? Integer.parseInt(portAsString) : 80;
@@ -192,11 +190,20 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
     // Build the properties map
     final Map<String, String> orgProperties = new HashMap<String, String>();
+    ArrayList<String> serverUrls = new ArrayList();
+
     for (Enumeration<?> e = properties.keys(); e.hasMoreElements();) {
       final String key = (String) e.nextElement();
+
       if (!key.startsWith(ORG_PROPERTY_PREFIX)) {
         continue;
       }
+
+      if (key.startsWith(ORG_SERVER_PREFIX)) {
+        String tenantSpecificHost = StringUtils.trimToNull((String) properties.get(key));
+        serverUrls.add(tenantSpecificHost);
+      }
+
       orgProperties.put(key.substring(ORG_PROPERTY_PREFIX.length()), (String) properties.get(key));
     }
 
