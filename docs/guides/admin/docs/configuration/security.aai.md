@@ -158,3 +158,26 @@ To protect HTML pages, you will need to adapt the configuration of your web serv
         require valid-user
     </LocationMatch>
 
+Dynamic login handler configuration
+-----------------------------------
+
+To configure the dynamic login for the use of attributes via SpEL in the `mh_default_org.xml` file, it is necessary to follow the same steps above. Just change the bean class to `aaiLoginHandler`,
+
+    <bean id="aaiLoginHandler" class="org.opencastproject.security.aai.DynamicLoginHandler">
+      <property name="securityService" ref="securityService" />
+      <property name="userReferenceProvider" ref="userReferenceProvider" />
+      <property name="attributeMapper" ref="attributeMapper" />
+    </bean>
+
+activate the bean attributeMapper,
+
+    <bean id="attributeMapper" class="org.opencastproject.security.aai.api.AttributeMapper">
+      <property name="useHeader" value="true" />
+      <property name="multiValueDelimiter" value=";" />
+      <property name="attributeMap" ref="attributeMap" />
+      <property name="aaiAttributes" ref="aaiAttributes" />
+    </bean>
+
+and configure the values `<util:...>`.
+
+Everything is in the commented section Dynamic AAI Loginhandler.
