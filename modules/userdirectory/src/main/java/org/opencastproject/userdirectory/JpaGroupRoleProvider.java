@@ -47,6 +47,7 @@ import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.userdirectory.api.GroupRoleProvider;
 import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
 import org.opencastproject.util.NotFoundException;
 
@@ -81,7 +82,7 @@ import javax.persistence.EntityTransaction;
   immediate = true,
   service = { RoleProvider.class, JpaGroupRoleProvider.class }
 )
-public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleProvider, GroupProvider {
+public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleProvider, GroupProvider, GroupRoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaGroupRoleProvider.class);
@@ -181,6 +182,17 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   /**
    * {@inheritDoc}
    *
+   * @see org.opencastproject.security.api.GroupRoleProvider#getRoles()
+   */
+  @Override
+  public Iterator<Role> getRoles() {
+    String orgId = securityService.getOrganization().getId();
+    return getGroupsRoles(UserDirectoryPersistenceUtil.findGroups(orgId, 0, 0, emf)).iterator();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see org.opencastproject.security.api.RoleProvider#getRolesForUser(String)
    */
   @Override
@@ -263,6 +275,22 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    *          the list of group role names
    */
   public void updateGroupMembershipFromRoles(String userName, String orgId, List<String> roleList) {
+      updateGroupMembershipFromRoles(userName, orgId, roleList, "");
+  }
+
+  /**
+   * Updates a user's group membership
+   *
+   * @param userName
+   *          the username
+   * @param orgId
+              the user's organization
+   * @param roleList
+   *          the list of group role names
+   * @param prefix
+   *          handle only roles with given prefix
+   */
+  public void updateGroupMembershipFromRoles(String userName, String orgId, List<String> roleList, String prefix) {
 
     logger.debug("updateGroupMembershipFromRoles({}, size={})", userName, roleList.size());
 
@@ -275,6 +303,10 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
     // List of the user's groups
     List<JpaGroup> membership = UserDirectoryPersistenceUtil.findGroupsByUser(userName, orgId, emf);
     for (JpaGroup group : membership) {
+      if (prefix != null && !"".equals(prefix) && !group.getRole().startsWith(prefix)) {
+        //ignore groups of other providers
+        continue;
+      }
       try {
         if (roleList.contains(group.getRole())) {
           // record this membership
@@ -303,7 +335,8 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
             logger.warn("Cannot add user {} to group {} - no group found with that role", userName, rolename);
           }
         } catch (UnauthorizedException e) {
-          logger.warn("Unable to add user {} to group {} - unauthorized", userName, group.getRole());
+            logger.warn("Unable to add user {} to group {} - unauthorized: {}", userName, group.getRole(),e.getMessage(),e);
+            e.printStackTrace();
         }
       }
     }
