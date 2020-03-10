@@ -81,16 +81,6 @@ module.exports = function (config) {
             }
         },
 
-        plugins : [
-            'karma-chrome-launcher',
-            'karma-coverage',
-            'karma-detect-browsers',
-            'karma-firefox-launcher',
-            'karma-jasmine',
-            'karma-ng-html2js-preprocessor',
-            'karma-safari-launcher'
-        ],
-
         captureTimeout: 60000,
         browserDisconnectTimeout : 10000,
         browserDisconnectTolerance : 1,
