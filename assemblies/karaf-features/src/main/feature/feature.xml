@@ -77,7 +77,7 @@
     <bundle>mvn:org.jdom/com.springsource.org.jdom/1.1.0</bundle>
     <!-- At least search-service-impl need JDOM in version 2.x -->
     <bundle>mvn:org.jdom/com.springsource.org.jdom/2.0.1</bundle>
-    <bundle>mvn:org.opencastproject/android-mms/1.1</bundle>
+    <bundle>mvn:org.opencastproject/android-mms/1.2</bundle>
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
 
     <!-- AWS Bits -->
