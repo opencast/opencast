@@ -86,11 +86,11 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
   private static final int DEFAULT_LIFECYCLE_HEARTBEAT_PERIOD = 300; // secs
 
   protected static final String SCHEDULE_GROUP = AbstractJobTerminationStateService.class.getSimpleName();
-  private static final String SCHEDULE_LIFECYCLE_POLLING_JOB = "PollLifeCycle";
-  private static final String SCHEDULE_LIFECYCLE_HEARTBEAT_JOB = "PollTerminationState";
+  protected static final String SCHEDULE_LIFECYCLE_POLLING_JOB = "PollLifeCycle";
+  protected static final String SCHEDULE_LIFECYCLE_HEARTBEAT_JOB = "PollTerminationState";
   protected static final String SCHEDULE_LIFECYCLE_POLLING_TRIGGER = "TriggerPollLifeCycle";
   protected static final String SCHEDULE_LIFECYCLE_HEARTBEAT_TRIGGER = "TriggerHeartbeat";
-  private static final String SCHEDULE_JOB_PARAM_PARENT = "parent";
+  protected static final String SCHEDULE_JOB_PARAM_PARENT = "parent";
 
   private String instanceId;
   private AWSCredentialsProvider credentials;
