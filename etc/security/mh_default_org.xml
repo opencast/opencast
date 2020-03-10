@@ -353,6 +353,11 @@
     <property name="key" value="opencast"/>
   </bean>
 
+  <bean id="rememberMeAuthenticationProvider"
+        class="org.opencastproject.kernel.security.SystemTokenBasedRememberMeAuthenticationProvider">
+    <property name="key" value="opencast"/>
+  </bean>
+
   <!-- ############################# -->
   <!-- # Authentication Filters    # -->
   <!-- ############################# -->
@@ -539,6 +544,7 @@
 
   <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
   <sec:authentication-manager alias="authenticationManager">
+    <sec:authentication-provider ref="rememberMeAuthenticationProvider"/>
     <!-- Uncomment this if using Shibboleth authentication -->
     <!--sec:authentication-provider ref="preauthAuthProvider" /-->
     <sec:authentication-provider user-service-ref="userDetailsService">
