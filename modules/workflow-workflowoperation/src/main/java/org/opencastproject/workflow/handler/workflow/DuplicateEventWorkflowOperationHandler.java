@@ -205,10 +205,11 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     final Collection<Publication> internalPublications = new HashSet<>();
 
     for (MediaPackageElement e : mediaPackage.getElements()) {
-      if (e instanceof Publication && InternalPublicationChannel.CHANNEL_ID.equals(((Publication) e).getChannel())) {
-        internalPublications.add((Publication) e);
-        // Remove publications since they are cloned in another way than the other elements
-        elements.remove(e);
+      if (e instanceof Publication) {
+        if (InternalPublicationChannel.CHANNEL_ID.equals(((Publication) e).getChannel())) {
+          internalPublications.add((Publication) e);
+        }
+        elements.remove(e); // don't duplicate publications
       }
       if (MediaPackageElements.EPISODE.equals(e.getFlavor())) {
         // Remove episode DC since we will add a new one (with changed title)

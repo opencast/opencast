@@ -22,6 +22,7 @@ package org.opencastproject.terminationstate.aws;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.terminationstate.aws.AutoScalingTerminationStateService.CheckTerminationState;
 
 import com.amazonaws.services.autoscaling.AmazonAutoScaling;
 import com.amazonaws.services.autoscaling.model.AutoScalingGroup;
@@ -35,7 +36,11 @@ import com.amazonaws.services.autoscaling.model.RecordLifecycleActionHeartbeatRe
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
+import org.quartz.JobDetail;
+import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
@@ -52,6 +57,7 @@ public class AutoScalingTerminationStateServiceTest {
   private AutoScalingGroup autoScalingGroup;
   private LifecycleHook lifecycleHook;
   private AutoScalingInstanceDetails instance;
+  private JobExecutionContext jobExecutionContext;
   private Long nRunningJobs;
 
   private Scheduler scheduler;
@@ -66,6 +72,7 @@ public class AutoScalingTerminationStateServiceTest {
     lifecycleHook.setLifecycleHookName("test-terminate");
     instance = new AutoScalingInstanceDetails();
     instance.setLifecycleState("InService");
+    jobExecutionContext = EasyMock.createMock(JobExecutionContext.class);
 
     try {
       scheduler = new StdSchedulerFactory().getScheduler();
@@ -108,11 +115,43 @@ public class AutoScalingTerminationStateServiceTest {
     service.setLifecycleHook(lifecycleHook);
     service.setScheduler(scheduler);
 
+    JobDetail jobDetail = new JobDetail();
+    jobDetail.getJobDataMap().put(AutoScalingTerminationStateService.SCHEDULE_JOB_PARAM_PARENT, service);
+    EasyMock.expect(jobExecutionContext.getJobDetail()).andReturn(jobDetail).anyTimes();
+    EasyMock.replay(jobExecutionContext);
+
     Dictionary config = new Hashtable();
     config.put(AutoScalingTerminationStateService.CONFIG_ENABLE, "true");
-    config.put(AutoScalingTerminationStateService.CONFIG_LIFECYCLE_POLLING_PERIOD, "2");
-    config.put(AutoScalingTerminationStateService.CONFIG_LIFECYCLE_HEARTBEAT_PERIOD, "2");
+    config.put(AutoScalingTerminationStateService.CONFIG_LIFECYCLE_POLLING_PERIOD, "1");
+    config.put(AutoScalingTerminationStateService.CONFIG_LIFECYCLE_HEARTBEAT_PERIOD, "1");
     service.configure(config);
+  }
+
+  @Test
+  public void testLifeCyclePolling() throws Exception {
+    service.startPollingLifeCycleHook();
+    String[] trigger = scheduler.getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);
+    Assert.assertEquals(1, trigger.length);
+    Assert.assertEquals(AutoScalingTerminationStateService.SCHEDULE_LIFECYCLE_POLLING_TRIGGER, trigger[0]);
+    service.stopPollingLifeCycleHook();
+
+    // change Lifecycle state
+    service.setState(AutoScalingTerminationStateService.TerminationState.WAIT);
+    Assert.assertEquals(AutoScalingTerminationStateService.TerminationState.WAIT, service.getState());
+    trigger = scheduler.getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);
+    // Run job explicitly rather than waiting for scheduler
+    CheckTerminationState checkTermState = new CheckTerminationState();
+    checkTermState.execute(jobExecutionContext);
+    Assert.assertEquals(1, trigger.length);
+    Assert.assertEquals(AutoScalingTerminationStateService.SCHEDULE_LIFECYCLE_HEARTBEAT_TRIGGER, trigger[0]);
+
+    // complete running jobs
+    nRunningJobs = 0L;
+    // Run job explicitly rather than waiting for scheduler
+    checkTermState.execute(jobExecutionContext);
+    trigger = scheduler.getTriggerNames(AutoScalingTerminationStateService.SCHEDULE_GROUP);
+    Assert.assertEquals(0, trigger.length);
+    Assert.assertEquals(AutoScalingTerminationStateService.TerminationState.READY, service.getState());
   }
 
   @After

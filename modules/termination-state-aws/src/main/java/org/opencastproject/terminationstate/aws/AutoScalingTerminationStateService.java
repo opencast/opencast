@@ -22,7 +22,6 @@ package org.opencastproject.terminationstate.aws;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.terminationstate.api.AbstractJobTerminationStateService;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
@@ -60,13 +59,14 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.List;
 
 public final class AutoScalingTerminationStateService extends AbstractJobTerminationStateService {
-  private static final Log logger = new Log(LoggerFactory.getLogger(AutoScalingTerminationStateService.class));
+  private static final Logger logger = LoggerFactory.getLogger(AutoScalingTerminationStateService.class);
 
   // AWS String Constants
   private static final String AUTOSCALING_INSTANCE_TERMINATING = "autoscaling:EC2_INSTANCE_TERMINATING";
@@ -84,11 +84,11 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
   private static final int DEFAULT_LIFECYCLE_HEARTBEAT_PERIOD = 300; // secs
 
   protected static final String SCHEDULE_GROUP = AbstractJobTerminationStateService.class.getSimpleName();
-  private static final String SCHEDULE_LIFECYCLE_POLLING_JOB = "PollLifeCycle";
-  private static final String SCHEDULE_LIFECYCLE_HEARTBEAT_JOB = "PollTerminationState";
+  protected static final String SCHEDULE_LIFECYCLE_POLLING_JOB = "PollLifeCycle";
+  protected static final String SCHEDULE_LIFECYCLE_HEARTBEAT_JOB = "PollTerminationState";
   protected static final String SCHEDULE_LIFECYCLE_POLLING_TRIGGER = "TriggerPollLifeCycle";
   protected static final String SCHEDULE_LIFECYCLE_HEARTBEAT_TRIGGER = "TriggerHeartbeat";
-  private static final String SCHEDULE_JOB_PARAM_PARENT = "parent";
+  protected static final String SCHEDULE_JOB_PARAM_PARENT = "parent";
 
   private String instanceId;
   private AWSCredentialsProvider credentials;
