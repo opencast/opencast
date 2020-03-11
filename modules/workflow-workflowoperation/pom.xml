@@ -23,6 +23,12 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-list-providers-service</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-dublincore</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
@@ -130,6 +136,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-list-providers-service</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.felix</groupId>

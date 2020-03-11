@@ -21,7 +21,18 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
+
+import com.google.common.collect.Iterables;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -30,6 +41,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DublinCoreMetadataCollection {
+  private static final Logger logger = LoggerFactory.getLogger(DublinCoreMetadataCollection.class);
+
   /** The list containing all the metadata */
   private List<MetadataField> fieldsInOrder = new ArrayList<>();
   private final Map<String, MetadataField> outputFields = new HashMap<>();
@@ -102,6 +115,115 @@ public class DublinCoreMetadataCollection {
       final int index = orderedField.getOrder() < fieldsInOrder.size() ? orderedField.getOrder()
               : fieldsInOrder.size();
       fieldsInOrder.add(index, orderedField);
+    }
+  }
+
+  public void addEmptyField(final MetadataField metadataField, final ListProvidersService listProvidersService) {
+    addField(metadataField, Collections.emptyList(), listProvidersService);
+  }
+
+  public void addField(final MetadataField metadataField, final String value, final ListProvidersService listProvidersService) {
+    addField(metadataField, Collections.singletonList(value), listProvidersService);
+  }
+
+  /**
+   * Set value to a metadata field of unknown type
+   */
+  private static void setValueFromDCCatalog(
+          final List<String> filteredValues,
+          final MetadataField metadataField) {
+    if (filteredValues.isEmpty()) {
+      throw new IllegalArgumentException("Values cannot be empty");
+    }
+
+    if (filteredValues.size() > 1
+            && metadataField.getType() != MetadataField.Type.MIXED_TEXT
+            && metadataField.getType() != MetadataField.Type.ITERABLE_TEXT) {
+      logger.warn("Cannot put multiple values into a single-value field, only the last value is used. {}",
+              Arrays.toString(filteredValues.toArray()));
+    }
+
+    switch (metadataField.getType()) {
+      case BOOLEAN:
+        metadataField.setValue(Boolean.parseBoolean(Iterables.getLast(filteredValues)), false);
+        break;
+      case DATE:
+        if (metadataField.getPattern() == null) {
+          metadataField.setPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        }
+        metadataField.setValue(EncodingSchemeUtils.decodeDate(Iterables.getLast(filteredValues)), false);
+        break;
+      case DURATION:
+        final String value = Iterables.getLast(filteredValues);
+        final DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value);
+        if (period == null)
+          throw new IllegalArgumentException("period couldn't be parsed: " + value);
+        final long longValue = period.getEnd().getTime() - period.getStart().getTime();
+        metadataField.setValue(Long.toString(longValue), false);
+        break;
+      case ITERABLE_TEXT:
+      case MIXED_TEXT:
+        metadataField.setValue(filteredValues, false);
+        break;
+      case LONG:
+        metadataField.setValue(Long.parseLong(Iterables.getLast(filteredValues)), false);
+        break;
+      case START_DATE:
+        if (metadataField.getPattern() == null) {
+          metadataField.setPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        }
+        metadataField.setValue(Iterables.getLast(filteredValues), false);
+        break;
+      case TEXT:
+      case ORDERED_TEXT:
+      case TEXT_LONG:
+        metadataField.setValue(Iterables.getLast(filteredValues), false);
+        break;
+      default:
+        throw new IllegalArgumentException("Unknown metadata type! " + metadataField.getType());
+    }
+  }
+
+
+  public void addField(final MetadataField metadataField, final List<String> values, final ListProvidersService listProvidersService) {
+    final List<String> filteredValues = values.stream().filter(StringUtils::isNotBlank).collect(Collectors.toList());
+
+    if (!filteredValues.isEmpty()) {
+      setValueFromDCCatalog(filteredValues, metadataField);
+    }
+
+    metadataField.setIsTranslatable(getCollectionIsTranslatable(metadataField, listProvidersService));
+    metadataField.setCollection(getCollection(metadataField, listProvidersService));
+
+    addField(metadataField);
+  }
+
+  private static Boolean getCollectionIsTranslatable(
+          final MetadataField metadataField,
+          final ListProvidersService listProvidersService) {
+    if (listProvidersService != null && metadataField.getListprovider() != null) {
+      try {
+        return listProvidersService.isTranslatable(metadataField.getListprovider());
+      } catch (final ListProviderException ex) {
+        // failed to get is-translatable property on list-provider-service
+        // as this field is optional, it is fine to pass here
+      }
+    }
+    return null;
+  }
+
+  private static Map<String, String> getCollection(
+          final MetadataField metadataField,
+          final ListProvidersService listProvidersService) {
+    try {
+      if (listProvidersService != null && metadataField.getListprovider() != null) {
+        return listProvidersService.getList(metadataField.getListprovider(),
+                new ResourceListQueryImpl(), true);
+      }
+      return null;
+    } catch (final ListProviderException e) {
+      logger.warn("Unable to set collection on metadata because", e);
+      return null;
     }
   }
 
