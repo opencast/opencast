@@ -19,28 +19,22 @@
  *
  */
 
-package org.opencastproject.index.service.resources.list.query;
+package org.opencastproject.list.impl;
 
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
-import org.opencastproject.util.data.Option;
+import org.opencastproject.list.api.ListProviderException;
 
 /**
- * Abstract base class for the filter. Only implement the {@code getValue} method
- *
- * @param <A>
- *          The filter value type
+ * This exception indicates that the queried list provider resource could not be found.
  */
-public abstract class AbstractListFilter<A> implements ResourceListFilter<A> {
+public class ListProviderNotFoundException extends ListProviderException {
 
-  private final Option<A> value;
-
-  public AbstractListFilter(Option<A> value) {
-    this.value = value;
-  }
-
-  @Override
-  public Option<A> getValue() {
-    return value;
+  /**
+   * Constructs an exception with a simple message.
+   *
+   * @param message the simple message
+   */
+  public ListProviderNotFoundException(String message) {
+    super(message);
   }
 
 }

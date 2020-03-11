@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.index.service.resources.list.api;
+package org.opencastproject.list.api;
 
 import org.opencastproject.util.data.Option;
 

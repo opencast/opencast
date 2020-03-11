@@ -19,20 +19,31 @@
  *
  */
 
-package org.opencastproject.index.service.exception;
+package org.opencastproject.list.api;
 
 /**
- * This exception indicates that the queried list provider resource could not be found.
+ * An exception which indicates an error from the list provider
  */
-public class ListProviderNotFoundException extends ListProviderException {
+public class ListProviderException extends Exception {
+
+  private static final long serialVersionUID = 7020240266255081300L;
 
   /**
-   * Constructs an exception with a simple message.
-   *
-   * @param message the simple message
+   * Constructor without cause.
+   * 
+   * @param message
    */
-  public ListProviderNotFoundException(String message) {
+  public ListProviderException(String message) {
     super(message);
   }
 
+  /**
+   * Full fledged constructor.
+   * 
+   * @param message
+   * @param cause
+   */
+  public ListProviderException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

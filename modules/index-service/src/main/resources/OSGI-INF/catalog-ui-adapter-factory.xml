@@ -12,7 +12,7 @@
   </service>
 
   <reference name="listProvidersService"
-             interface="org.opencastproject.index.service.resources.list.api.ListProvidersService"
+             interface="org.opencastproject.list.api.ListProvidersService"
              cardinality="1..1" policy="static" bind="setListProvidersService"/>
   <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
              cardinality="1..1" policy="static" bind="setWorkspace"/>

@@ -19,10 +19,10 @@
  *
  */
 
-package org.opencastproject.index.service.resources.list.query;
+package org.opencastproject.list.impl;
 
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
+import org.opencastproject.list.api.ResourceListFilter;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.util.data.Option;
 
 import java.util.ArrayList;
@@ -32,8 +32,8 @@ import java.util.Map;
 
 public class ResourceListQueryImpl implements ResourceListQuery {
 
-  protected final List<ResourceListFilter<?>> availableFilters = new ArrayList<ResourceListFilter<?>>();
-  private final Map<String, ResourceListFilter<?>> filters = new HashMap<String, ResourceListFilter<?>>();
+  protected final List<ResourceListFilter<?>> availableFilters = new ArrayList<>();
+  private final Map<String, ResourceListFilter<?>> filters = new HashMap<>();
   private Option<Integer> limit;
   private Option<Integer> offset;
   protected Option<String> sortBy;
@@ -53,16 +53,16 @@ public class ResourceListQueryImpl implements ResourceListQuery {
   }
 
   public void setLimit(Integer limit) {
-    this.limit = Option.<Integer> option(limit);
+    this.limit = Option.option(limit);
   }
 
   public void setOffset(Integer offset) {
-    this.offset = Option.<Integer> option(offset);
+    this.offset = Option.option(offset);
   }
 
   @Override
   public List<ResourceListFilter<?>> getFilters() {
-    return new ArrayList<ResourceListFilter<?>>(filters.values());
+    return new ArrayList<>(filters.values());
   }
 
   @Override
@@ -107,7 +107,7 @@ public class ResourceListQueryImpl implements ResourceListQuery {
       return (Option<A>) this.getFilter(name).getValue();
     }
 
-    return Option.<A> none();
+    return Option.none();
   }
 
 }

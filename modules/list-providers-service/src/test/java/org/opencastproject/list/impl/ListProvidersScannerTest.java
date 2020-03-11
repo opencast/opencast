@@ -19,15 +19,14 @@
  *
  */
 
-package org.opencastproject.index.service.resources.list.impl;
+package org.opencastproject.list.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 
@@ -115,7 +114,7 @@ public class ListProvidersScannerTest {
   public void testDefaultUninstall() throws Exception {
     File file = getResourceFile("/ListProvidersScannerTest-GoodProperties.properties");
     listProvidersScanner.uninstall(file);
-    assertTrue("Provider was not removed", !listProvidersService.hasProvider(listName));
+    assertFalse("Provider was not removed", listProvidersService.hasProvider(listName));
   }
 
   @Test
@@ -142,7 +141,7 @@ public class ListProvidersScannerTest {
 
     EasyMock.replay();
 
-    assertTrue("Provider was not removed", !listProvidersService.hasProvider(listName, "org1"));
+    assertFalse("Provider was not removed", listProvidersService.hasProvider(listName, "org1"));
   }
 
   @Test

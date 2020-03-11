@@ -19,20 +19,18 @@
  *
  */
 
-package org.opencastproject.index.service.resources.list.impl;
+package org.opencastproject.list.impl;
 
-import static org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl.ALL_ORGANIZATIONS;
-import static org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl.ResourceTuple;
+import static org.opencastproject.list.impl.ListProvidersServiceImpl.ALL_ORGANIZATIONS;
+import static org.opencastproject.list.impl.ListProvidersServiceImpl.ResourceTuple;
 
-import org.opencastproject.index.service.exception.ListProviderNotFoundException;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListProvider;
+import org.opencastproject.list.api.ResourceListQuery;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
-import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +38,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -66,14 +65,6 @@ public class ListProvidersScanner implements ArtifactInstaller {
   /** The list providers service to add the list provider to. **/
   private ListProvidersService listProvidersService;
 
-  void activate(BundleContext ctx) {
-    logger.info("Activated");
-  }
-
-  void deactivate(BundleContext ctx) {
-    logger.info("Deactivated");
-  }
-
   public void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }
@@ -92,7 +83,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
   /**
    * Inner class used to represent a new list.
    */
-  private class SingleResourceListProviderImpl implements ResourceListProvider {
+  private static class SingleResourceListProviderImpl implements ResourceListProvider {
     private String listName;
     private String orgId;
     private Map<String, String> list;
@@ -172,7 +163,11 @@ public class ListProvidersScanner implements ArtifactInstaller {
       }
     }
 
-    SingleResourceListProviderImpl listProvider = new SingleResourceListProviderImpl(listName, list, orgId, translatable);
+    SingleResourceListProviderImpl listProvider = new SingleResourceListProviderImpl(
+            listName,
+            list,
+            orgId,
+            translatable);
     if (StringUtils.isNotBlank(defaultKey)) {
       listProvider.setDefault(defaultKey);
     }
@@ -182,7 +177,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
 
   private static Properties readProperties(File file) throws IOException {
     Properties properties = new Properties();
-    InputStreamReader reader = new InputStreamReader(new FileInputStream(file), "UTF-8");
+    InputStreamReader reader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8);
     properties.load(reader);
     return properties;
   }
