@@ -51,3 +51,10 @@ decide which one to play. Read the [es.upv.paella.opencast.loader](plugins/es.up
 plugin for more information.
 
 This feature is usefull when you have multiple audio languages, so the users can switch to the audio language they want.
+
+Selecting video canvas to use
+-----------------------------
+
+You can configure which canvas to use in order to render video files. This is usefull to enable 360 videos for example.
+Read the [es.upv.paella.opencast.loader](plugins/es.upv.paella.opencast.loader.md) documentation
+plugin for more information.
