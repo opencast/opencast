@@ -19,31 +19,28 @@
  *
  */
 
-package org.opencastproject.index.service.exception;
+package org.opencastproject.list.query;
+
+import org.opencastproject.list.api.ResourceListFilter;
+import org.opencastproject.util.data.Option;
 
 /**
- * An exception which indicates an error from the list provider
+ * Abstract base class for the filter. Only implement the {@code getValue} method
+ *
+ * @param <A>
+ *          The filter value type
  */
-public class ListProviderException extends Exception {
+public abstract class AbstractListFilter<A> implements ResourceListFilter<A> {
 
-  private static final long serialVersionUID = 7020240266255081300L;
+  private final Option<A> value;
 
-  /**
-   * Constructor without cause.
-   * 
-   * @param message
-   */
-  public ListProviderException(String message) {
-    super(message);
+  public AbstractListFilter(Option<A> value) {
+    this.value = value;
   }
 
-  /**
-   * Full fledged constructor.
-   * 
-   * @param message
-   * @param cause
-   */
-  public ListProviderException(String message, Throwable cause) {
-    super(message, cause);
+  @Override
+  public Option<A> getValue() {
+    return value;
   }
+
 }

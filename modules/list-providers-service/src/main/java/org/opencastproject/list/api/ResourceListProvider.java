@@ -19,9 +19,7 @@
  *
  */
 
-package org.opencastproject.index.service.resources.list.api;
-
-import org.opencastproject.index.service.exception.ListProviderException;
+package org.opencastproject.list.api;
 
 import java.util.Map;
 

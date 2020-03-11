@@ -19,14 +19,13 @@
  *
  */
 
-package org.opencastproject.index.service.resources.list.impl;
+package org.opencastproject.list.impl;
 
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
-import org.opencastproject.index.service.resources.list.query.StringListFilter;
-import org.opencastproject.index.service.util.ListProviderUtil;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ResourceListProvider;
+import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.query.StringListFilter;
+import org.opencastproject.list.util.ListProviderUtil;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 
@@ -62,7 +61,7 @@ public class ListProvidersServiceTest {
       @Override
       public Map<String, String> getList(String listName, ResourceListQuery query) {
 
-        Map<String, String> filteredList = new HashMap<String, String>();
+        Map<String, String> filteredList = new HashMap<>();
 
         int i = 0;
 
@@ -112,13 +111,13 @@ public class ListProvidersServiceTest {
   @Test
   public void testAddandRemove() throws ListProviderException {
     final String providerName1 = "test1";
-    final Map<String, String> list1 = new HashMap<String, String>();
+    final Map<String, String> list1 = new HashMap<>();
     list1.put("1", "test");
     list1.put("2", "test");
     list1.put("3", "test");
     list1.put("4", "test");
     final String providerName2 = "test2";
-    final Map<String, String> list2 = new HashMap<String, String>();
+    final Map<String, String> list2 = new HashMap<>();
     list2.put("1", "test");
     list2.put("2", "test");
     list2.put("3", "test");
@@ -145,7 +144,7 @@ public class ListProvidersServiceTest {
   public void testQuery() throws ListProviderException {
     ResourceListQueryImpl query = new ResourceListQueryImpl();
     final String providerName1 = "test1";
-    final Map<String, String> list1 = new HashMap<String, String>();
+    final Map<String, String> list1 = new HashMap<>();
     list1.put("1", "x test34");
     list1.put("2", "a test12");
     list1.put("3", "c ok");

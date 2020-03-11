@@ -19,9 +19,9 @@
  *
  */
 
-package org.opencastproject.index.service.resources.list.query;
+package org.opencastproject.list.query;
 
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
+import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.util.data.Option;
 
 /**

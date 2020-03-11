@@ -25,16 +25,11 @@ import static org.opencastproject.adminui.endpoint.EndpointUtil.addRequestFilter
 import static org.opencastproject.adminui.endpoint.EndpointUtil.generateJSONObject;
 
 import org.opencastproject.adminui.exception.JsonCreationException;
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.exception.ListProviderNotFoundException;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.query.AclsListQuery;
 import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.resources.list.query.JobsListQuery;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.resources.list.query.ServersListQuery;
 import org.opencastproject.index.service.resources.list.query.ServicesListQuery;
@@ -42,6 +37,11 @@ import org.opencastproject.index.service.resources.list.query.ThemesListQuery;
 import org.opencastproject.index.service.resources.list.query.UsersListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.impl.ListProviderNotFoundException;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;

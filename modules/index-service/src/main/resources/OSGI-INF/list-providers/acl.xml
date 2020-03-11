@@ -15,7 +15,7 @@
              cardinality="1..1" policy="static" bind="setSecurityService"/>
 
   <service>
-    <provide interface="org.opencastproject.index.service.resources.list.api.ResourceListProvider"/>
+    <provide interface="org.opencastproject.list.api.ResourceListProvider"/>
   </service>
 
 </scr:component>

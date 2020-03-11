@@ -19,15 +19,13 @@
  *
  */
 
-package org.opencastproject.index.service.resources.list.impl;
+package org.opencastproject.list.impl;
 
-import static org.opencastproject.index.service.util.ListProviderUtil.invertMap;
-
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.exception.ListProviderNotFoundException;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListProvider;
+import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.util.ListProviderUtil;
 import org.opencastproject.security.api.SecurityService;
 
 import java.util.ArrayList;
@@ -129,7 +127,7 @@ public class ListProvidersServiceImpl implements ListProvidersService {
           throws ListProviderException {
     ResourceListProvider provider = getProvider(listName);
     Map<String, String> list = provider.getList(listName, query);
-    return inverseValueKey ? invertMap(list) : list;
+    return inverseValueKey ? ListProviderUtil.invertMap(list) : list;
   }
 
   @Override

@@ -19,9 +19,9 @@
  *
  */
 
-package org.opencastproject.index.service.util;
+package org.opencastproject.list.util;
 
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.util.SmartIterator;
 
 import java.util.Comparator;
@@ -45,15 +45,15 @@ public final class ListProviderUtil {
    * @return a sorted map
    */
   public static Map<String, String> sortMapByValue(Map<String, String> map, boolean asc) {
-    TreeMap<String, String> treeMap = new TreeMap<String, String>(new ValueComparer(map, asc));
+    TreeMap<String, String> treeMap = new TreeMap<>(new ValueComparer(map, asc));
     treeMap.putAll(map);
     return treeMap;
   }
 
   /** inner class to sort the map **/
   private static class ValueComparer implements Comparator<String> {
-    private Map<String, String> baseMap = null;
-    private boolean ascending = true;
+    private Map<String, String> baseMap;
+    private boolean ascending;
 
     /**
      * Comparator for a map of strings key/value
@@ -71,13 +71,13 @@ public final class ListProviderUtil {
 
     @Override
     public int compare(String o1, String o2) {
-      String e1 = (String) baseMap.get(o1);
-      String e2 = (String) baseMap.get(o2);
+      String e1 = baseMap.get(o1);
+      String e2 = baseMap.get(o2);
 
       if (ascending)
         return e1.compareTo(e2);
       else
-        return 0 - e1.compareTo(e2);
+        return -e1.compareTo(e2);
     }
   }
 
@@ -96,7 +96,7 @@ public final class ListProviderUtil {
 
     int limit = query.getLimit().getOrElse(0);
     int offset = query.getOffset().getOrElse(0);
-    SmartIterator<String> si = new SmartIterator<String>(limit, offset);
+    SmartIterator<String> si = new SmartIterator<>(limit, offset);
     return si.applyLimitAndOffset(map);
   }
 
@@ -112,7 +112,7 @@ public final class ListProviderUtil {
    * @return an inverted map
    */
   public static Map<String, String> invertMap(Map<String, String> map) {
-    Map<String, String> inv = new HashMap<String, String>();
+    Map<String, String> inv = new HashMap<>();
 
     for (Entry<String, String> entry : map.entrySet())
       inv.put(entry.getValue(), entry.getKey());

@@ -19,17 +19,16 @@
  *
  */
 
-package org.opencastproject.index.service.util;
+package org.opencastproject.list.util;
 
 import static org.junit.Assert.assertEquals;
-import static org.opencastproject.index.service.util.ListProviderUtil.filterMap;
-import static org.opencastproject.index.service.util.ListProviderUtil.sortMapByValue;
+import static org.opencastproject.list.util.ListProviderUtil.filterMap;
+import static org.opencastproject.list.util.ListProviderUtil.sortMapByValue;
 
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
 
 import org.junit.Test;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,7 +38,7 @@ import java.util.TreeSet;
 public class ListProviderUtilTest {
 
   private Map<String, String> getTestMap() {
-    Map<String, String> map = new HashMap<String, String>();
+    Map<String, String> map = new HashMap<>();
     map.put("21", "b: a test value");
     map.put("2", "c: second test value");
     map.put("34", "x: another test value");
@@ -79,13 +78,11 @@ public class ListProviderUtilTest {
     Map<String, String> sortedMap = sortMapByValue(testMap, true);
 
     assertEquals(testMap.size(), sortedMap.size());
-    TreeSet<Object> sortedValues = new TreeSet<Object>(new Comparator<Object>() {
-      public int compare(Object s1, Object s2) {
-        if (s1 instanceof Comparable && s2 instanceof Comparable) {
-          return ((Comparable) s1).compareTo((Comparable) s2);
-        } else
-          return -1;
-      }
+    TreeSet<Object> sortedValues = new TreeSet<>((s1, s2) -> {
+      if (s1 instanceof Comparable && s2 instanceof Comparable) {
+        return ((Comparable) s1).compareTo(s2);
+      } else
+        return -1;
     });
     sortedValues.addAll(testMap.values());
 
@@ -102,11 +99,7 @@ public class ListProviderUtilTest {
     sortedMap = sortMapByValue(testMap, false);
 
     assertEquals(testMap.size(), sortedMap.size());
-    sortedValues = new TreeSet<Object>(new Comparator<Object>() {
-      public int compare(Object s1, Object s2) {
-        return 0 - ((Comparable) s1).compareTo((Comparable) s2);
-      }
-    });
+    sortedValues = new TreeSet<>((s1, s2) -> -((Comparable) s1).compareTo(s2));
     sortedValues.addAll(testMap.values());
 
     iteratorSortedMap = sortedMap.entrySet().iterator();

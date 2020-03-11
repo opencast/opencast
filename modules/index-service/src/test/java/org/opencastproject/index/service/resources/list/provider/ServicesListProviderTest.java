@@ -23,8 +23,8 @@ package org.opencastproject.index.service.resources.list.provider;
 
 import static org.junit.Assert.assertEquals;
 
-import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.query.ServicesListQuery;
+import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistrationInMemoryImpl;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;

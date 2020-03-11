@@ -22,8 +22,8 @@
 package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.exception.JsonCreationException;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
-import org.opencastproject.index.service.resources.list.query.StringListFilter;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
+import org.opencastproject.list.query.StringListFilter;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
