@@ -134,7 +134,7 @@ class OpencastToPaellaConverter {
       isLiveStream: (track.live === true)
     };
 
-    if(track.video) {
+    if(track.mimetype != 'audio/m4a') {
       source.mimetype = track.mimetype;
       source.res = {w:res[0], h:res[1]};
     }
