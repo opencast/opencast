@@ -14,6 +14,6 @@
     "http-errors": "^1.7.3",
     "http-proxy": "^1.18.0",
     "merge-stream": "^2.0.0",
-    "paellaplayer": "github:polimediaupv/paella#6.3.2"
+    "paellaplayer": "github:polimediaupv/paella#6.3.3"
   }
 }
