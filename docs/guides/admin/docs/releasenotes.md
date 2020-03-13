@@ -69,7 +69,6 @@ Configuration changes
 - `etc/org.opencastproject.adminui.cfg` has a new option `retract.workflow.id` which contains the id of the workflow used
   to retract events when deleting.
 
-
 API changes
 -----------
 
@@ -85,6 +84,17 @@ Take a look at the [security advisories](https://github.com/opencast/opencast/se
 
 One change is that the OAI-PMH endpoint is no longer publicly accessible by default.
 If you need it to be, you can easily change that in the security configuration at `etc/security/mh_default_org.xml`.
+
+### Configuration Changes in 8.1
+
+- `etc/security/mh_default_org.xml`
+    - `/oaipmh` URL is now restricted to `ROLE_ADMIN`
+    - Removed `ROLE_COURSE_ADMIN` that was used for `/` and `/admin-ng` URLs
+    - replaced `<sec:remember-me key="opencast" user-service-ref="userDetailsService" />`
+with `<sec:remember-me services-ref="rememberMeServices" />`
+    - Added configuration for rememberMeServices
+    - Added CustomPasswordEncoder configuration instead of MD5
+- changed `exception-handler-workflow="error"` to `exception-handler-workflow="partial-error"` in several workflow definitions
 
 ### Fixed Security Issues
 
