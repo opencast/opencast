@@ -216,7 +216,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-mattermost-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
-    <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-api/${project.version}</bundle>
@@ -242,6 +241,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-random/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-studio/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-solr/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-workflowoperation/${project.version}</bundle>
@@ -325,7 +325,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-mattermost-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
-    <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-persistence/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-presets/${project.version}</bundle>
@@ -346,6 +345,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-studio/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-smil-api/${project.version}</bundle>
@@ -462,7 +462,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-mattermost-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
-    <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-api/${project.version}</bundle>

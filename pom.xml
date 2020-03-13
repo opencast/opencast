@@ -150,7 +150,6 @@
     <module>modules/message-broker-impl</module>
     <module>modules/metadata</module>
     <module>modules/metadata-api</module>
-    <module>modules/migration</module>
     <module>modules/mpeg7</module>
     <module>modules/notification-workflowoperation</module>
     <module>modules/oaipmh</module>
@@ -209,6 +208,7 @@
     <module>modules/statistics-service-remote</module>
     <module>modules/statistics-provider-influx</module>
     <module>modules/statistics-provider-random</module>
+    <module>modules/studio</module>
     <module>modules/termination-state-api</module>
     <module>modules/termination-state-aws</module>
     <module>modules/termination-state-impl</module>
@@ -589,6 +589,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
           <version>3.1.0</version>
+        </plugin>
+        <plugin>
+          <groupId>com.googlecode.maven-download-plugin</groupId>
+          <artifactId>download-maven-plugin</artifactId>
+          <version>1.5.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
