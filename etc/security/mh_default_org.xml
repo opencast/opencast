@@ -261,6 +261,9 @@
     <sec:intercept-url pattern="/static/**" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/export/**" method="GET" access="ROLE_ANONYMOUS" />
 
+    <!-- Enable admin access to Opencast Studio -->
+    <sec:intercept-url pattern="/studio/**" access="ROLE_ADMIN, ROLE_STUDIO" />
+
     <!-- Enable anonymous access to the annotation and the series endpoints -->
     <sec:intercept-url pattern="/series/**" method="GET" access="ROLE_ANONYMOUS, ROLE_CAPTURE_AGENT" />
     <sec:intercept-url pattern="/annotation/**" method="GET" access="ROLE_ANONYMOUS" />
@@ -286,7 +289,7 @@
     <!-- Enable capture agent updates and ingest -->
     <sec:intercept-url pattern="/capture-admin/**" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
     <sec:intercept-url pattern="/recordings/**" method="GET" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
-    <sec:intercept-url pattern="/ingest/**" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
+    <sec:intercept-url pattern="/ingest/**" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT, ROLE_STUDIO" />
 
     <!-- Secure the user management URLs for admins only -->
     <sec:intercept-url pattern="/users/**" access="ROLE_ADMIN" />
