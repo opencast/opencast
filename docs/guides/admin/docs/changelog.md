@@ -4,6 +4,46 @@ Changelog
 Opencast 8
 ----------
 
+### Opencast 8.2
+
+*Released on March 14th, 2020*
+
+- [[#1458](https://github.com/opencast/opencast/pull/1458)] -
+  Fix Image Extraction At Position Zero
+- [[#1457](https://github.com/opencast/opencast/pull/1457)] -
+  Image Extraction Without Stream Duration
+- [[#1454](https://github.com/opencast/opencast/pull/1454)] -
+  Fix HLS on iOS
+- [[#1448](https://github.com/opencast/opencast/pull/1448)] -
+  Adding link to community workflow repository to the markdown docs
+- [[#1446](https://github.com/opencast/opencast/pull/1446)] -
+  Disable 2 more instances of jmxremote param, #1445
+- [[#1441](https://github.com/opencast/opencast/pull/1441)] -
+  Remove databasemigration for Opencast 7
+- [[#1436](https://github.com/opencast/opencast/pull/1436)] -
+  integrate opencast studio
+- [[#1433](https://github.com/opencast/opencast/pull/1433)] -
+  Series ACLs not propagating to individual events
+- [[#1414](https://github.com/opencast/opencast/pull/1414)] -
+  Gracefully crash if there is no password stored
+- [[#1409](https://github.com/opencast/opencast/pull/1409)] -
+  Asset Upload Title
+- [[#1408](https://github.com/opencast/opencast/pull/1408)] -
+  Simplify Asset Upload Workflow
+- [[#1399](https://github.com/opencast/opencast/pull/1399)] -
+  Gracefully Fail Hash Verification
+- [[#1364](https://github.com/opencast/opencast/pull/1364)] -
+  Temination state service test
+- [[#1359](https://github.com/opencast/opencast/pull/1359)] -
+  Fix workflow dropdown in start task
+- [[#1327](https://github.com/opencast/opencast/pull/1327)] -
+  Video Segemntation On Short Videos
+- [[#1301](https://github.com/opencast/opencast/pull/1301)] -
+  Fix event delete with existing publications
+- [[#1248](https://github.com/opencast/opencast/pull/1248)] -
+  Fix conflict detection for non-admin users and for multiple events
+
+
 ### Opencast 8.1
 
 *Released on January 29, 2020*
