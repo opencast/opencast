@@ -9,7 +9,6 @@ modules/distribution-service-aws-s3/pom.xml
 modules/external-api/pom.xml
 modules/index-service/pom.xml
 modules/ingest-service-impl/pom.xml
-modules/migration/pom.xml
 modules/oaipmh-persistence/pom.xml
 modules/publication-service-youtube-v3/pom.xml
 modules/scheduler-impl/pom.xml
