@@ -1,6 +1,23 @@
 Install Opencast
 ================
 
+
+Installation from Repository
+----------------------------
+
+There are package repositories available for multiple operating systems. It provides packages containing pre-configured and
+pre-built Opencast installations.
+
+* [RedHat Enterprise Linux 7](rpm-el7.md)
+* [CentOS 7](rpm-el7.md)
+* [Scientific Linux 7](rpm-el7.md)
+* [RedHat Enterprise Linux 8](rpm-el8.md)
+* [CentOS 8](rpm-el8.md)
+* [Fedora](rpm-fedora.md)
+* [Debian](debs.md)
+* [Ubuntu](debs.md)
+
+
 Installation from Source
 ------------------------
 
@@ -16,25 +33,6 @@ work on all Unix-like systems.
 * [Mac OS X](source-macosx.md)
 
 Building on most other Unix-like operating systems should be very much alike.
-
-
-Installation from Repository
-----------------------------
-
-There are package repositories available for multiple operating systems. It provides packages containing pre-configured and
-pre-built Opencast installations.
-
-* [RedHat Enterprise Linux 7](rpm-el7.md)
-* [CentOS 7](rpm-el7.md)
-* [Scientific Linux 7](rpm-el7.md)
-* [Fedora](rpm-fedora.md)
-* [Debian](debs.md)
-* [Ubuntu](debs.md)
-
-Experimental
-
-* [RedHat Enterprise Linux 8](rpm-el8.md)
-* [CentOS 8](rpm-el8.md)
 
 
 Installation via Script

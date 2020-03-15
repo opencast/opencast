@@ -40,27 +40,19 @@ Activate Repository
 
 First you have to install the necessary repositories so that your package manager can access them:
 
-1. Add Opencast repository:
+    yum install -y https://pkg.opencast.org/rpms/release/el/7/noarch/opencast-repository-8-0-1.el8.noarch.rpm
 
-        cd /etc/yum.repos.d
-        curl -O https://pkg.opencast.org/opencast.repo \
-           -d os=el -d version=7 -u [YOUR_USERNAME]
+It might take some time after the release of a new Opencast version before the RPMs are moved to the stable repository.
+Until then, you can use `/etc/yum.repos.d/opencast-testing.repo` instead to get the latest version.
+Note that the testing repository is an additional repository and still requires the stable repository to be active.
 
-    You will be asked for your password.
+If you get an error saying that the package `epel-release` is not available, please enable this repository manually.
+To do that, follow the
+[instructions in the EPEL documentation](https://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F).
 
-    It might take some time after the release of a new Opencast version before the RPMs are moved to the stable
-    repository. Until then, you can use `…/opencast-testing.repo` instead to get the latest version. Note that the
-    testing repository is an additional repository and still requires the stable repository to be active.
+You can check if the repositories were sucessfully enabled using:
 
-2. Add the Extra Packages for Enterprise Linux (EPEL) repository:
-
-        yum install epel-release
-
-    If this package is not available, please enable this repository manually. For that, follow the [instructions in the
-    EPEL documentation](https://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F). You can check if the
-    repository was sucessfully enabled using:
-
-       yum repolist enabled
+    yum repolist enabled
 
 
 Install Apache ActiveMQ
