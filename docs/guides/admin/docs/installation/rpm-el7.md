@@ -26,21 +26,14 @@ Currently Supported
 > *Other architectures like i386, i686, arm, … are not supported!*
 
 
-Registration
-------------
-
-Before you can start you need to get an account for the repository. You will need the credentials that you got via
-e-mail after the registration to successfully complete this guide.
-
-Get your account on [pkg.opencast.org](https://pkg.opencast.org).
-
-
 Activate Repository
 -------------------
 
 First you have to install the necessary repositories so that your package manager can access them:
 
-    yum install -y https://pkg.opencast.org/rpms/release/el/7/noarch/opencast-repository-8-0-1.el8.noarch.rpm
+```sh
+yum install -y https://pkg.opencast.org/rpms/release/el/7/noarch/opencast-repository-8-0-1.el8.noarch.rpm
+```
 
 It might take some time after the release of a new Opencast version before the RPMs are moved to the stable repository.
 Until then, you can use `/etc/yum.repos.d/opencast-testing.repo` instead to get the latest version.
@@ -52,7 +45,9 @@ To do that, follow the
 
 You can check if the repositories were sucessfully enabled using:
 
-    yum repolist enabled
+```
+yum repolist enabled
+```
 
 
 Install Apache ActiveMQ
