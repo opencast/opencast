@@ -487,8 +487,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         changeQuality(q);
       });
       Engage.trigger(plugin.events.videoFormatsFound.getName(), qualities);
-      if (isMobileMode) {
-        Engage.model.set('quality', 'low');
+      if (!Engage.model.get('quality')) {
+        if (isMobileMode) {
+          Engage.model.set('quality', qualities[qualities.length - 1]);
+        } else {
+          Engage.model.set('quality', qualities[Math.floor(qualities.length / 2)]);
+        }
       }
       changeQuality(Engage.model.get('quality'));
     }
