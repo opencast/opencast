@@ -1336,11 +1336,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
           }
 
           // init video.js
-          videojs(id, videoOptions, function () {
-            var videodisplay = this;
-            // set sources
-            videodisplay.src(videoSource);
-          });
+          videojs(id, videoOptions);
           // URL to the flash swf
           if (videojs_swf) {
             Engage.log('Video: Loaded flash component');
