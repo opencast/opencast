@@ -393,7 +393,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     }
     var sortedResolutionsList = [];
     sortedResolutionsList = _.map(qualitiesList, function(quality) {
-      var currentTrack = filterTracksByTag(tracks, quality + '-quality')[0];
+      var currentTrack = filterTracksByTag(tracks, [quality + '-quality'])[0];
       if (currentTrack !== undefined && currentTrack.resolution !== undefined)
         return [quality, currentTrack.resolution.substring(0, currentTrack.resolution.indexOf('x'))];
     });
@@ -505,7 +505,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       for (var i = 0; i < tuples.length; ++i) {
         var value = tuples[i][1];
         if (value[1][0]) {
-          var track = filterTracksByTag(value[1], quality);
+          var track = filterTracksByTag(value[1], [quality]);
           if (track && track.length > 0) {
             videojs(value[0]).src(track[0].src);
           }
