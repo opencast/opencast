@@ -222,7 +222,6 @@
         description="Creating player preview image">
       <configurations>
         <configuration key="source-flavor">*/prepared</configuration>
-        <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">*/player+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
@@ -440,7 +439,7 @@
         description="Remove temporary processing artifacts">
       <configurations>
         <configuration key="preserve-flavors">security/*</configuration>
-        <configuration key="delete-external">false</configuration>
+        <configuration key="delete-external">true</configuration>
       </configurations>
     </operation>
 
