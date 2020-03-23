@@ -4,6 +4,6 @@
     "loginProvided": true
   },
   "upload": {
-    "workflowId": "fast"
+    "workflowId": "studio-upload"
   }
 }
