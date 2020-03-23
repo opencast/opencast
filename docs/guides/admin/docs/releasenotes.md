@@ -76,6 +76,14 @@ API changes
     - DELETE /workflow/definition/{id}
     - PUT /workflow/definition
 
+Additional Notes About 8.3
+--------------------------
+
+### Configuration Changes in 8.3
+
+- The configuration file `etc/org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler.cfg` was moved
+   to `etc/org.opencastproject.security.lti.LtiLaunchAuthenticationHandler.cfg`.
+
 Additional Notes About 8.2
 --------------------------
 
