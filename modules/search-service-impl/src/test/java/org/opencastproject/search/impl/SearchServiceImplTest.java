@@ -81,6 +81,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -158,10 +159,10 @@ public class SearchServiceImplTest {
   public void setUp() throws Exception {
     // workspace
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
+    EasyMock.expect(workspace.read((URI) EasyMock.anyObject())).andAnswer(new IAnswer<InputStream>() {
       @Override
-      public File answer() throws Throwable {
-        return new File(new URI(EasyMock.getCurrentArguments()[0].toString()));
+      public InputStream answer() throws Throwable {
+        return new FileInputStream(new File(new URI(EasyMock.getCurrentArguments()[0].toString())));
       }
     }).anyTimes();
     EasyMock.replay(workspace);

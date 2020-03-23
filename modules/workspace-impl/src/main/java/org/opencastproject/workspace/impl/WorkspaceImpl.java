@@ -37,6 +37,7 @@ import static org.opencastproject.util.data.Prelude.sleep;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.util.AssetPathUtils;
+import org.opencastproject.assetmanager.util.DistributionPathUtils;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
@@ -147,6 +148,10 @@ public final class WorkspaceImpl implements Workspace {
 
   /** the asset manager directory if locally available */
   private String assetManagerPath = null;
+
+  /** the download url and directory if locally available */
+  private String downloadUrl = null;
+  private String downloadPath = null;
 
   /** The workspce cleaner */
   private WorkspaceCleaner workspaceCleaner = null;
@@ -297,6 +302,10 @@ public final class WorkspaceImpl implements Workspace {
 
     // Check if we can read from the asset manager locally to avoid downloading files via HTTP
     assetManagerPath = AssetPathUtils.getAssetManagerPath(cc);
+
+    // Check if we can read published files locally to avoid downloading files via HTTP
+    downloadUrl = DistributionPathUtils.getDownloadUrl(cc);
+    downloadPath = DistributionPathUtils.getDownloadPath(cc);
   }
 
   /** Callback from OSGi on service deactivation. */
@@ -381,6 +390,12 @@ public final class WorkspaceImpl implements Workspace {
     final File asset = AssetPathUtils.getLocalFile(assetManagerPath, securityService.getOrganization().getId(), uri);
     if (asset != null) {
       return new FileInputStream(asset);
+    }
+
+    // Check if we can get the files directly from the distribution download directory
+    final File publishedFile = DistributionPathUtils.getLocalFile(downloadPath, downloadUrl, securityService.getOrganization().getId(), uri);
+    if (publishedFile != null) {
+      return new FileInputStream(publishedFile);
     }
 
     // fall back to get() which should download the file into local workspace if necessary
