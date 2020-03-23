@@ -19,15 +19,19 @@
  *
  */
 
-package org.opencastproject.kernel.security;
+package org.opencastproject.security.lti;
 
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityConstants;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+import org.opencastproject.security.impl.jpa.JpaRole;
+import org.opencastproject.security.impl.jpa.JpaUserReference;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.userdirectory.api.UserReferenceProvider;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +49,7 @@ import org.springframework.security.oauth.provider.token.OAuthAccessProviderToke
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Set;
@@ -55,7 +60,7 @@ import javax.servlet.http.HttpServletRequest;
  * Callback interface for handing authentication details that are used when an authenticated request for a protected
  * resource is received.
  */
-public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandler, ManagedService {
+public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandler {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LtiLaunchAuthenticationHandler.class);
@@ -99,6 +104,15 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   /** The key to look up whether the digest user should be able to authenticate via LTI **/
   private static final String ALLOW_DIGEST_USER_KEY = "lti.allow_digest_user";
 
+  /** The key to look up whether a JpaUserReferences should be created on login **/
+  private static final String CREATE_JPA_USER_REFERENCE_KEY = "lti.create_jpa_user_reference";
+
+  /** The security service */
+  private SecurityService securityService = null;
+
+  /** The user reference provider */
+  private UserReferenceProvider userReferenceProvider = null;
+
   /** The user details service */
   private UserDetailsService userDetailsService;
 
@@ -111,20 +125,38 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   /** Set of usernames that should not authenticated as themselves even if the OAuth consumer keys is trusted */
   private Set<String> usernameBlacklist = new HashSet<>();
 
-  /**
-   * OSGi DI
-   */
+  /** Determines whether a JpaUserReference should be created on lti login */
+  private boolean createJpaUserReference = false;
+
   public void setUserDetailsService(UserDetailsService userDetailsService) {
     this.userDetailsService = userDetailsService;
   }
 
-  public void activate(ComponentContext cc) {
-    logger.info("Activating LtiLaunchAuthenticationHandler");
-    componentContext = cc;
+  /**
+   * Sets the user reference provider.
+   *
+   * @param userReferenceProvider
+   *          the user reference provider
+   */
+  public void setUserReferenceProvider(UserReferenceProvider userReferenceProvider) {
+    this.userReferenceProvider = userReferenceProvider;
   }
 
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  /**
+   * Sets the security service.
+   *
+   * @param securityService
+   *          the security service
+   */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
+  protected void activate(ComponentContext cc) {
+    logger.info("Activating LtiLaunchAuthenticationHandler");
+    componentContext = cc;
+    Dictionary properties = cc.getProperties();
+
     logger.debug("Updating LtiLaunchAuthenticationHandler");
 
     highlyTrustedConsumerKeys.clear();
@@ -147,8 +179,8 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
     // User blacklist
     if (!BooleanUtils.toBoolean(StringUtils.trimToNull((String) properties.get(ALLOW_SYSTEM_ADMINISTRATOR_KEY)))) {
-      String adminUsername = StringUtils.trimToNull(
-              componentContext.getBundleContext().getProperty(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY));
+      String adminUsername = StringUtils.trimToNull((String)
+              properties.get(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY));
       if (adminUsername != null) {
         usernameBlacklist.add(adminUsername);
       }
@@ -165,6 +197,10 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       }
       usernameBlacklist.add(username);
     }
+
+    createJpaUserReference = BooleanUtils.toBooleanDefaultIfNull(
+      BooleanUtils.toBooleanObject(StringUtils.trimToNull((String) properties.get(CREATE_JPA_USER_REFERENCE_KEY))),
+      false);
   }
 
   /**
@@ -259,6 +295,36 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     userAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
     userAuthorities.add(new SimpleGrantedAuthority("ROLE_ANONYMOUS"));
 
+
+    // Create/Update the user reference
+    if (createJpaUserReference) {
+      JpaOrganization organization = fromOrganization(securityService.getOrganization());
+
+      JpaUserReference jpaUserReference = userReferenceProvider.findUserReference(username, organization.getId());
+
+      Set<JpaRole> jpaRoles = new HashSet<JpaRole>();
+      for (GrantedAuthority authority : userAuthorities) {
+        jpaRoles.add(new JpaRole(authority.getAuthority(), organization));
+      }
+
+      Date loginDate = new Date();
+
+      // Create new JpaUserReference if none exists or update existing
+      if (jpaUserReference == null) {
+        String jpaContext = request.getParameter(CONTEXT_ID);
+        jpaContext = StringUtils.isBlank(jpaContext) ? DEFAULT_CONTEXT : jpaContext;
+
+        JpaUserReference userReference = new JpaUserReference(username, username, null, jpaContext, loginDate, organization, jpaRoles);
+        userReferenceProvider.addUserReference(userReference, jpaContext);
+      }
+      else {
+        jpaUserReference.setLastLogin(loginDate);
+        jpaUserReference.setRoles(jpaRoles);
+        userReferenceProvider.updateUserReference(jpaUserReference);
+      }
+    }
+    //Create/Update UserReference End
+
     Authentication ltiAuth = new PreAuthenticatedAuthenticationToken(userDetails, authentication.getCredentials(),
             userAuthorities);
     SecurityContextHolder.getContext().setAuthentication(ltiAuth);
@@ -304,4 +370,23 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       }
     }
   }
+
+  /**
+   * Creates a JpaOrganization from an organization
+   *
+   * @param org
+   *          the organization
+   */
+  private JpaOrganization fromOrganization(Organization org) {
+    if (org instanceof JpaOrganization) {
+      return (JpaOrganization) org;
+    } else {
+      return new JpaOrganization(org.getId(), org.getName(), org.getServers(), org.getAdminRole(),
+              org.getAnonymousRole(), org.getProperties());
+    }
+  }
+
+
+
 }
+
