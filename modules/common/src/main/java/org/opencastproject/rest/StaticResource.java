@@ -124,6 +124,8 @@ public class StaticResource extends HttpServlet {
       } else {
         redirectPath = alias + "/" + welcomeFile;
       }
+      String queryString = req.getQueryString();
+      redirectPath += queryString != null ? "?" + queryString : "";
       logger.debug("redirecting {} to {}", path, redirectPath);
       resp.sendRedirect(redirectPath);
       return;
