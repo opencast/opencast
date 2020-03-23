@@ -185,6 +185,7 @@
     <module>modules/security-cas-client-wrapper</module>
     <module>modules/security-cas</module>
     <module>modules/security-ldap</module>
+    <module>modules/security-lti</module>
     <module>modules/security-openid</module>
     <module>modules/security-shibboleth</module>
     <module>modules/series-service-api</module>

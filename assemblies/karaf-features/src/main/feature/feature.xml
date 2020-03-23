@@ -125,6 +125,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-runtime-info/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-aai/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-security-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-shibboleth/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-serviceregistry/${project.version}</bundle>
