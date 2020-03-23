@@ -358,11 +358,13 @@
     <property name="tokenValiditySeconds" value="1209600"/>
     <property name="cookieName" value="oc-remember-me"/>
     <!-- The following key will be augmented by system properties. Thus, leaving this untouched is okay -->
+    <!-- This key must be equal to the key passed to rememberMeAuthenticationProvider (s. below) -->
     <property name="key" value="opencast"/>
   </bean>
 
   <bean id="rememberMeAuthenticationProvider"
         class="org.opencastproject.kernel.security.SystemTokenBasedRememberMeAuthenticationProvider">
+    <!-- This key must be equal to the key passed to rememberMeServices (s. above) -->
     <property name="key" value="opencast"/>
   </bean>
 
