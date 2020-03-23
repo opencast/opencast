@@ -69,6 +69,13 @@ public interface MetadataCollection {
    */
   MetadataCollection fromJSON(String json) throws MetadataParsingException;
 
+  /**
+   * Copy all fields of a metadata collection into a new collection.
+   *
+   * @return a copy of the current MetadataCollection
+   */
+  MetadataCollection getCopy();
+
   Map<String, MetadataField<?>> getInputFields();
 
   Map<String, MetadataField<?>> getOutputFields();

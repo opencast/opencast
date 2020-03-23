@@ -47,13 +47,4 @@ public class XACMLParsingException extends Exception {
     super(message, cause);
   }
 
-  /**
-   * Creates a new xacml parsing exception, caused by the given exception.
-   *
-   * @param cause
-   *          the error cause
-   */
-  public XACMLParsingException(Throwable cause) {
-    super(cause);
-  }
 }

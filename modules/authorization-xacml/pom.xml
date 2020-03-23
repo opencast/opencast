@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -53,8 +53,8 @@
       <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <!-- Logging -->
@@ -144,9 +144,6 @@
             <Export-Package>
               org.opencastproject.authorization.xacml;version=${project.version},
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/authorization-service.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

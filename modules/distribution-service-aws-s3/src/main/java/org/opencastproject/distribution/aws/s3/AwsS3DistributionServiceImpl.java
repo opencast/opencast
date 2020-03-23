@@ -49,9 +49,9 @@ import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.auth.policy.Policy;
 import com.amazonaws.auth.policy.Principal;
 import com.amazonaws.auth.policy.Statement;
-import com.amazonaws.auth.policy.Statement.Effect;
 import com.amazonaws.auth.policy.actions.S3Actions;
 import com.amazonaws.auth.policy.resources.S3ObjectResource;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.DeleteVersionRequest;
@@ -106,6 +106,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   public static final String AWS_S3_SECRET_ACCESS_KEY_CONFIG = "org.opencastproject.distribution.aws.s3.secret.key";
   public static final String AWS_S3_REGION_CONFIG = "org.opencastproject.distribution.aws.s3.region";
   public static final String AWS_S3_BUCKET_CONFIG = "org.opencastproject.distribution.aws.s3.bucket";
+  public static final String AWS_S3_ENDPOINT_CONFIG = "org.opencastproject.distribution.aws.s3.endpoint";
+  public static final String AWS_S3_PATH_STYLE_CONFIG = "org.opencastproject.distribution.aws.s3.path.style";
   // config.properties
   public static final String OPENCAST_DOWNLOAD_URL = "org.opencastproject.download.url";
 
@@ -144,6 +146,12 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   /** The AWS S3 bucket name */
   private String bucketName = null;
+
+  /** The AWS S3 endpoint */
+  private String endpoint = null;
+
+  /** path style enabled */
+  private boolean pathStyle = false;
 
   /** The opencast download distribution url */
   private String opencastDistributionUrl = null;
@@ -184,6 +192,14 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       String regionStr = getAWSConfigKey(cc, AWS_S3_REGION_CONFIG);
       logger.info("AWS region is {}", regionStr);
 
+      // AWS endpoint
+      endpoint = getAWSConfigKey(cc, AWS_S3_ENDPOINT_CONFIG);
+      logger.info("AWS S3 endpoint is {}", endpoint);
+
+      // AWS path style
+      pathStyle = Boolean.valueOf(getAWSConfigKey(cc, AWS_S3_PATH_STYLE_CONFIG));
+      logger.info("AWS path style is {}", pathStyle);
+
       opencastDistributionUrl = getAWSConfigKey(cc, AWS_S3_DISTRIBUTION_BASE_CONFIG);
       if (!opencastDistributionUrl.endsWith("/")) {
         opencastDistributionUrl = opencastDistributionUrl + "/";
@@ -211,8 +227,15 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
         provider = new AWSStaticCredentialsProvider(
                 new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
 
-      // Create AWS client.
-      s3 = AmazonS3ClientBuilder.standard().withRegion(regionStr).withCredentials(provider).build();
+      // Create AWS client
+
+      s3 = AmazonS3ClientBuilder.standard()
+              .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint
+                      , regionStr))
+              .withPathStyleAccessEnabled(pathStyle)
+              .withCredentials(provider)
+              .build();
+
 
       s3TransferManager = new TransferManager(s3);
 
@@ -752,7 +775,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
         try {
           s3.createBucket(bucketName);
           // Allow public read
-          Statement allowPublicReadStatement = new Statement(Effect.Allow).withPrincipals(Principal.AllUsers)
+          Statement allowPublicReadStatement = new Statement(Statement.Effect.Allow).withPrincipals(Principal.AllUsers)
                   .withActions(S3Actions.GetObject).withResources(new S3ObjectResource(bucketName, "*"));
           Policy policy = new Policy().withStatements(allowPublicReadStatement);
           s3.setBucketPolicy(bucketName, policy.toJson());

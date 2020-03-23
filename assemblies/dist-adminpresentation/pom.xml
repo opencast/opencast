@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opencastproject.assemblies</groupId>
     <artifactId>opencast-assemblies</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
@@ -100,11 +100,13 @@
             <feature>http</feature>
             <feature>http-whiteboard</feature>
             <feature>scr</feature>
+            <feature>cxf-commands</feature>
             <feature>cxf-jaxrs</feature>
             <feature>cxf-http-jetty</feature>
             <feature>transaction</feature>
             <feature>jndi</feature>
             <feature>eclipselink</feature>
+            <feature>wrap</feature>
             <!-- Opencast features -->
             <feature>opencast-adminpresentation</feature>
           </bootFeatures>

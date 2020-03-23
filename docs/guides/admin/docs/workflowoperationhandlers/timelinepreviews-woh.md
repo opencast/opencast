@@ -19,6 +19,7 @@ Parameter Table
 |target-flavor|\*/timeline+preview|Specifies the flavor the new files will get. This should use the \*-operator if it was used in the source-flavor too. This flavor has to contain the words "timeline" and "preview" for the file to be found by the player.|EMPTY|
 |target-tags|engage-download|Specifies the tags the new files will get.|EMPTY|
 |image-count|100|Specifies the number of generated timeline preview images. In the example 100 timeline preview images will be generated and stored in a 10x10 grid in the output image|100|
+|process-first-match-only|true|Only use the first resource that matches the source-flavor and/or target-tag|false|
 
 Operation Example
 -----------------
@@ -32,6 +33,8 @@ Operation Example
     <configuration key="target-flavor">*/timeline+preview</configuration>
     <configuration key="target-tags">engage-download</configuration>
     <configuration key="image-count">100</configuration>
+    <!-- If there is more than one file that match the source-tags, use only the first one -->
+    <configuration key="process-first-match-only">true</configuration>
   </configurations>
 </operation>
 ```

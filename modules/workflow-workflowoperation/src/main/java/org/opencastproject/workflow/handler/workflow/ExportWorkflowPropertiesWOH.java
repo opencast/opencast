@@ -44,7 +44,6 @@ import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Strings;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,14 +112,13 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
     try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
       workflowProps.storeToXML(out, null, "UTF-8");
       String elementId = UUID.randomUUID().toString();
-      URI uri = workspace.put(mediaPackage.getIdentifier().compact(), elementId, EXPORTED_PROPERTIES_FILENAME,
+      URI uri = workspace.put(mediaPackage.getIdentifier().toString(), elementId, EXPORTED_PROPERTIES_FILENAME,
               new ByteArrayInputStream(out.toByteArray()));
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
       attachment = (Attachment) builder.elementFromURI(uri, Attachment.TYPE, targetFlavor);
       attachment.setMimeType(MimeTypes.XML);
     } catch (IOException e) {
-      logger.error("Unable to store workflow properties as Attachment with flavor '{}': {}", targetFlavorString,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to store workflow properties as Attachment with flavor '{}':", targetFlavorString, e);
       throw new WorkflowOperationException("Unable to store workflow properties as Attachment", e);
     }
 

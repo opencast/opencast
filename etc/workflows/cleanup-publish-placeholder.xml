@@ -44,16 +44,6 @@
       </configurations>
     </operation>
 
-    <!-- Remove from default OAI-PMH repository -->
-    <operation
-      id="retract-oaipmh"
-      exception-handler-workflow="partial-error"
-      description="Retract recording from the default OAI-PMH repository">
-      <configurations>
-        <configuration key="repository">default</configuration>
-      </configurations>
-    </operation>
-
     <!-- Resolve the comment for cutting -->
     <operation
       id="comment"
@@ -70,19 +60,19 @@
       id="tag"
       max-attempts="2"
       fail-on-error="true"
-      exception-handler-workflow="error"
+      exception-handler-workflow="partial-error"
       description="Tagging media package elements for deletion">
       <configurations>
-        <configuration key="source-flavors">*/source,*/player+preview</configuration>
+        <configuration key="source-flavors">*/source,*/prepared,*/player+preview</configuration>
         <configuration key="target-tags">-archive</configuration>
       </configurations>
     </operation>
 
     <!-- Copy placeholder Video for publication -->
     <operation
-      id="compose"
+      id="encode"
       fail-on-error="true"
-      exception-handler-workflow="error"
+      exception-handler-workflow="partial-error"
       description="create placeholder Video">
       <configurations>
         <configuration key="source-flavor">presenter/source</configuration>
@@ -162,21 +152,6 @@
       </configurations>
     </operation>
 
-    <!-- Publish to OAI-PMH -->
-    <operation
-      id="publish-oaipmh"
-      if="${publishToOaiPmh}"
-      exception-handler-workflow="partial-error"
-      description="Publish to OAI-PMH Default Repository">
-      <configurations>
-        <configuration key="download-flavors">dublincore/*,security/*</configuration>
-        <configuration key="download-tags">engage-download,atom,rss</configuration>
-        <configuration key="streaming-tags">engage-streaming</configuration>
-        <configuration key="check-availability">true</configuration>
-        <configuration key="repository">default</configuration>
-      </configurations>
-    </operation>
-
     <!-- Copy last mediapackage version to workspace -->
     <operation
       id="ingest-download"
@@ -191,7 +166,7 @@
     <operation
       id="asset-delete"
       fail-on-error="true"
-      exception-handler-workflow="error"
+      exception-handler-workflow="partial-error"
       description="Delete every older Snapshot from AssetManager">
       <configurations>
         <configuration key="keep-last-snapshot">true</configuration>

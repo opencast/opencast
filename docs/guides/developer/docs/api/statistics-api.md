@@ -258,3 +258,65 @@ Field name       |Type                                  | Description
 `values`         | [`array[integer]`](#extended)        | The values of the measurement points
 `total`          | [`integer`](#basic)                  | The sum of all values 
 
+### POST /api/statistics/data/export.csv
+
+Retrieves statistical data in csv format.
+
+Form Parameters | Required |Type                                  | Description
+:---------------|:---------|:-------------------------------------|:-----------
+`data`          | yes      | [`array[object]`](types.md#extended) | A JSON object describing the statistics query to request (see below)
+`filter`        | no       | [`string`](types.md#basic)           | A comma-separated list of filters to limit the results with (see [Filtering](usage.md#filtering)). All standard dublin core meta data fields are filterable.
+`limit`         | no       | [`integer`](types.md#basic)          | The maximum number of resources to return (see [Pagination](usage.md#pagination))
+`offset`        | no       | [`integer`](types.md#basic)          | The index of the first resource to return (see [Pagination](usage.md#pagination))
+
+Note that limit and offset relate to the resource here, not CSV lines. There can be multiple lines in a CSV for a resource,
+e.g. an event. However, you cannot limit by lines, but only by e.g. events.
+
+A query JSON object contains information about a statistics query to be executed:
+
+Field        | Required | Type                     | Description
+:------------|:---------|:-------------------------|:-----------
+`provider`   | yes      | [`property`](#extended)  | A JSON object with information about the statistics provider to be queried
+`parameters` | yes      | [`property`](#extended)  | A JSON object containing the parameters
+
+Here, a statistics provider JSON object has the following fields:
+
+Field          | Type                                      | Description
+:--------------|:------------------------------------------|:-----------
+`identifier`   | [`string`](types.md#basic)                | The unique identifier of the provider
+`resourceType` | [`string`](types.md#basic)                | The resource type of the provider
+
+There parameters are the same as described [above](#time-series-statistics-provider), but with one additional field:
+
+Field name       |Type                                  | Description
+:----------------|:-------------------------------------|:-----------
+`detailLevel`    | [`string`](#basic)                   | `EPISODE`, `SERIES`, or `ORGANIZATION` (only available for CSV exports)
+
+__Example__
+
+data:
+```
+    {
+      "parameters": {
+        "resourceId": "mh_default_org",
+        "detailLevel": "EPISODE",
+        "from": "2018-12-31T23:00:00.000Z",
+        "to": "2019-12-31T22:59:59.999Z",
+        "dataResolution": "YEARLY"
+      },
+      "provider": {
+        "identifier": "organization.views.sum.influx",
+        "resourceType": "organization"
+      }
+    }
+```
+filter:
+```
+    presenters:Hans Dampf
+```
+
+__Response__
+
+`200 (OK)`: A (potentially empty) CSV file containing the resource statistics with all available meta data
+`400 (BAD REQUEST)`: The request was not valid
+

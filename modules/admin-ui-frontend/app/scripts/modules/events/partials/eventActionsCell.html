@@ -1,0 +1,64 @@
+<a data-open-modal="event-details"
+   data-resource-id="{{ row.id }}"
+   class="more"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.DETAILS' | translate }}"
+   with-role="ROLE_UI_EVENTS_DETAILS_VIEW">
+</a>
+
+
+<a ng-if="row.series_id"
+   data-open-modal="series-details"
+   data-resource-id="{{ row.series_id }}"
+   class="more-series"
+   title="{{ 'EVENTS.SERIES.TABLE.TOOLTIP.DETAILS' | translate }}"
+   with-role="ROLE_UI_SERIES_DETAILS_VIEW">
+</a>
+
+<!-- Remove button for published events. -->
+<a class="remove"
+   ng-click="row.checkedDelete()"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.DELETE' | translate }}"
+   with-role="ROLE_UI_EVENTS_DELETE">
+</a>
+
+<a ng-if="row.has_preview"
+   href="#!/events/events/{{row.id}}/tools/editor"
+   class="cut"
+   title="{{ row.needs_cutting ? 'EVENTS.EVENTS.TABLE.TOOLTIP.EDITOR_NEEDS_CUTTING' : 'EVENTS.EVENTS.TABLE.TOOLTIP.EDITOR' | translate }}"
+   with-role="ROLE_UI_EVENTS_EDITOR_VIEW">
+  <span id="badge" class="badge" ng-show="row.needs_cutting"></span>
+</a>
+
+<a ng-if="row.has_comments && !row.has_open_comments"
+   data-open-modal="event-details"
+   data-resource-id="{{ row.id }}"
+   data-tab="comments"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS' | translate }}"
+   class="comments">
+</a>
+
+<a ng-if="row.has_comments && row.has_open_comments"
+   data-open-modal="event-details"
+   data-resource-id="{{ row.id }}"
+   data-tab="comments"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS' | translate }}"
+   class="comments-open">
+</a>
+
+<a ng-if="row.workflow_state == 'PAUSED'"
+   data-open-modal="event-details"
+   data-resource-id="{{ row.id }}"
+   data-tab="workflows"
+   with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.PAUSED_WORKFLOW' | translate }}"
+   class="fa fa-warning">
+</a>
+
+<a data-open-modal="event-details"
+   data-resource-id="{{ row.id }}"
+   class="fa fa-folder-open"
+   data-tab="assets"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.ASSETS' | translate }}"
+   with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW">
+</a>
+

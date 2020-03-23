@@ -132,6 +132,11 @@ public class PublicationImpl extends AbstractMediaPackageElement implements Publ
   }
 
   @Override
+  public void clearTracks() {
+    tracks.clear();
+  }
+
+  @Override
   public void setFlavor(MediaPackageElementFlavor flavor) {
     throw new UnsupportedOperationException("Unable to set the flavor of publications.");
   }

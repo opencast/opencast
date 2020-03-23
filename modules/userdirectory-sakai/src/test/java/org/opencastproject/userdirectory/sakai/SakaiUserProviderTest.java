@@ -21,18 +21,9 @@
 
 package org.opencastproject.userdirectory.sakai;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.User;
 
-import org.apache.commons.collections4.IteratorUtils;
 import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -53,60 +44,4 @@ public class SakaiUserProviderTest {
       "admin", "admin", "^[a-zA-Z0-9-]+$", "^[0-9a-zA-Z]{6,}$", instructorRoles, 100, 10);
   }
 
-  private boolean hasRole(Set<Role> roles, String roleName) {
-    for (Role role : roles) {
-      if (roleName.equals(role.getName()))
-        return true;
-    }
-
-    return false;
-  }
-
-  @Test
-  @Ignore
-  public void testLoadUser() throws Exception {
-    User user = sakaiProvider.loadUser("datest");
-    assertNotNull(user);
-
-    // Generic group role added for all Sakai users
-    assertTrue(hasRole(user.getRoles(), "ROLE_GROUP_SAKAI"));
-
-    // Test role specific to user datest on test Sakai instances
-    assertTrue(hasRole(user.getRoles(), "DAC-EDUCATION-DEPT1-SUBJ3-426_Instructor"));
-  }
-
-  @Test
-  @Ignore
-  public void testFindUser() throws Exception {
-
-    // User exists
-    assertEquals(1, IteratorUtils.toList(sakaiProvider.findUsers("datest", 0, 1)).size());
-
-    // User exists but fails regexp pattern (minimum 6 characters)
-    assertEquals(0, IteratorUtils.toList(sakaiProvider.findUsers("admin", 0, 1)).size());
-
-    // User doesn't exist
-    assertEquals(0, IteratorUtils.toList(sakaiProvider.findUsers("nobody", 0, 1)).size());
-  }
-
-  @Test
-  @Ignore
-  public void testFindRoles() throws Exception {
-
-    // Site exists
-    assertEquals(2, IteratorUtils.toList(sakaiProvider.findRoles("DAC-EDUCATION-DEPT1-SUBJ3-426%", Role.Target.ACL, 0, 2)).size());
-    assertEquals(1, IteratorUtils.toList(sakaiProvider.findRoles("DAC-EDUCATION-DEPT1-SUBJ3-426_Learner", Role.Target.ACL, 0, 1)).size());
-    assertEquals(1, IteratorUtils.toList(sakaiProvider.findRoles("DAC-EDUCATION-DEPT1-SUBJ3-426_Instructor", Role.Target.ACL, 0, 1)).size());
-    assertEquals(1, IteratorUtils.toList(sakaiProvider.findRoles("DAC-EDUCATION-DEPT1-SUBJ3-426_Instructor%", Role.Target.ACL, 0, 1)).size());
-
-    // Site fails pattern
-    assertEquals(0, IteratorUtils.toList(sakaiProvider.findRoles("!gateway%", Role.Target.ACL, 0, 2)).size());
-
-    // Site or role does not exist
-    assertEquals(0, IteratorUtils.toList(sakaiProvider.findRoles("unknown%", Role.Target.ACL, 0, 1)).size());
-    assertEquals(0, IteratorUtils.toList(sakaiProvider.findRoles("unknown", Role.Target.ACL, 0, 1)).size());
-    assertEquals(0, IteratorUtils.toList(sakaiProvider.findRoles("DAC-EDUCATION-DEPT1-SUBJ3-426__Learner", Role.Target.ACL, 0, 1)).size());
-    assertEquals(0, IteratorUtils.toList(sakaiProvider.findRoles("DAC-EDUCATION-DEPT1-SUBJ3-426_", Role.Target.ACL, 0, 1)).size());
-
-  }
 }

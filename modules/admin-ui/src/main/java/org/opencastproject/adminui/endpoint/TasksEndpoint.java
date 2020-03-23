@@ -47,7 +47,6 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.json.JValue;
@@ -55,6 +54,9 @@ import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,11 +84,20 @@ import javax.ws.rs.core.Response.Status;
               + "not working and is either restarting or has failed",
             "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
               + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-              + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>",
+              + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>",
             "<strong>Important:</strong> "
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+  immediate = true,
+  service = TasksEndpoint.class,
+  property = {
+    "service.description=Admin UI - Tasks facade Endpoint",
+    "opencast.service.type=org.opencastproject.adminui.endpoint.TasksEndpoint",
+    "opencast.service.path=/admin-ng/tasks"
+  }
+)
 public class TasksEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(TasksEndpoint.class);
@@ -95,23 +106,19 @@ public class TasksEndpoint {
 
   private AssetManager assetManager;
 
-  private Workspace workspace;
-
   /** OSGi callback for the workflow service. */
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
   /** OSGi callback to set the asset manager. */
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
-  /** OSGi callback to set the workspace. */
-  public void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
-  }
-
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Activate tasks endpoint");
   }

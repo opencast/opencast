@@ -205,8 +205,11 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     final Collection<Publication> internalPublications = new HashSet<>();
 
     for (MediaPackageElement e : mediaPackage.getElements()) {
-      if (e instanceof Publication && InternalPublicationChannel.CHANNEL_ID.equals(((Publication) e).getChannel())) {
-        internalPublications.add((Publication) e);
+      if (e instanceof Publication) {
+        if (InternalPublicationChannel.CHANNEL_ID.equals(((Publication) e).getChannel())) {
+          internalPublications.add((Publication) e);
+        }
+        elements.remove(e); // don't duplicate publications
       }
       if (MediaPackageElements.EPISODE.equals(e.getFlavor())) {
         // Remove episode DC since we will add a new one (with changed title)
@@ -395,7 +398,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     destinationDublinCore.set(DublinCore.PROPERTY_TITLE, destination.getTitle());
     try (InputStream inputStream = IOUtils.toInputStream(destinationDublinCore.toXmlString(), "UTF-8")) {
       final String elementId = UUID.randomUUID().toString();
-      final URI newUrl = workspace.put(destination.getIdentifier().compact(), elementId, "dublincore.xml",
+      final URI newUrl = workspace.put(destination.getIdentifier().toString(), elementId, "dublincore.xml",
           inputStream);
       temporaryFiles.add(newUrl);
       final MediaPackageElement mpe = destination.add(newUrl, MediaPackageElement.Type.Catalog,

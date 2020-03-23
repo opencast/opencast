@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
@@ -36,6 +37,7 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +49,14 @@ import java.nio.charset.Charset;
  * The <code>LoggingWorkflowOperationHandlerTest</code> will log the current state of a workflow instance and its media
  * package at a given point of a workflow.
  */
+@Component(
+  property = {
+    "service.description=Logging Workflow Operation Handler",
+    "workflow.operation=log"
+  },
+  immediate = true,
+  service = WorkflowOperationHandler.class
+)
 public class LoggingWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */

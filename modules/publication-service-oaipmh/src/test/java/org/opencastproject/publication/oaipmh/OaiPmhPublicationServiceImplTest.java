@@ -23,23 +23,13 @@ package org.opencastproject.publication.oaipmh;
 import static org.easymock.EasyMock.anyString;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.eq;
-import static org.opencastproject.mediapackage.MediaPackageElementFlavor.parseFlavor;
 import static org.opencastproject.oaipmh.server.OaiPmhServerInfoUtil.ORG_CFG_OAIPMH_SERVER_HOSTURL;
 
-import org.opencastproject.distribution.api.DistributionException;
-import org.opencastproject.distribution.api.DownloadDistributionService;
-import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSupport;
-import org.opencastproject.mediapackage.Publication;
-import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
-import org.opencastproject.oaipmh.persistence.OaiPmhDatabaseException;
-import org.opencastproject.oaipmh.persistence.Query;
-import org.opencastproject.oaipmh.persistence.impl.SearchResultImpl;
 import org.opencastproject.oaipmh.server.OaiPmhServerInfo;
 import org.opencastproject.publication.api.OaiPmhPublicationService;
 import org.opencastproject.publication.api.PublicationException;
@@ -64,11 +54,8 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -246,89 +233,5 @@ public class OaiPmhPublicationServiceImplTest {
     Assert.assertEquals(StringUtils.join(flavorsSet, OaiPmhPublicationServiceImpl.SEPARATOR), jobArgs.get(2));
     Assert.assertEquals(StringUtils.join(tagsSet, OaiPmhPublicationServiceImpl.SEPARATOR), jobArgs.get(3));
     Assert.assertTrue(Boolean.valueOf(jobArgs.get(4)));
-  }
-
-  @Ignore
-  @Test
-  public void testPublishInternal()
-          throws PublicationException, OaiPmhDatabaseException, MediaPackageException, DistributionException {
-    OaiPmhDatabase oaiDb = EasyMock.createNiceMock(OaiPmhDatabase.class);
-    // mock empty DB
-    EasyMock.expect(oaiDb.search(EasyMock.anyObject(Query.class)))
-            .andReturn(new SearchResultImpl(0, 0, new ArrayList<>())).once();
-    Capture<MediaPackage> storedMpCap = EasyMock.newCapture();
-    // capture stored media package
-    oaiDb.store(capture(storedMpCap), eq("default"));
-    EasyMock.replay(oaiDb);
-    service.setOaiPmhDatabase(oaiDb);
-
-    // mock download distribution service
-    DownloadDistributionService downloadDistributionService = EasyMock.createNiceMock(DownloadDistributionService.class);
-    Capture<MediaPackage> downloadDistributedMpCap = EasyMock.newCapture();
-    Capture<Set<String>> downloadDistributedElemIdsCap = EasyMock.newCapture();
-    EasyMock.expect(downloadDistributionService.distribute(EasyMock.contains("default"),
-            capture(downloadDistributedMpCap), capture(downloadDistributedElemIdsCap),
-            eq(true))).andAnswer(() -> serviceRegistry.createJob("distribute", "download", null,
-            serializeMediaPackageElements((MediaPackage) EasyMock.getCurrentArguments()[1]))).anyTimes();
-    EasyMock.replay(downloadDistributionService);
-    service.setDownloadDistributionService(downloadDistributionService);
-
-    // mock streaming distribution service
-    StreamingDistributionService streamingDistributionService = EasyMock.createNiceMock(StreamingDistributionService.class);
-    Capture<MediaPackage> streamingDistributedMpCap = EasyMock.newCapture();
-    Capture<Set<String>> streamingDistributedElemIdsCap = EasyMock.newCapture();
-    EasyMock.expect(streamingDistributionService.distribute(EasyMock.contains("default"),
-            capture(streamingDistributedMpCap), capture(streamingDistributedElemIdsCap)))
-            .andAnswer(() -> serviceRegistry.createJob("distribute", "streaming", null,
-                    serializeMediaPackageElements((MediaPackage) EasyMock.getCurrentArguments()[1]))).anyTimes();
-    EasyMock.replay(streamingDistributionService);
-    service.setStreamingDistributionService(streamingDistributionService);
-
-    Publication publication = service.publish(null, mp, "default", Collections.set("catalog-1", "track-1"),
-            Collections.set("track-1"), true);
-
-    Assert.assertNotNull(publication);
-    Assert.assertNotNull(publication.getChannel());
-    Assert.assertTrue(publication.getChannel().contains("default"));
-    Assert.assertNotNull(publication.getURI());
-    Assert.assertEquals(URI.create(OAI_PMH_SERVER_URL).getHost(), publication.getURI().getHost());
-    Assert.assertTrue(publication.getURI().getPath().startsWith(OAI_PMH_SERVER_MOUNT_POINT));
-    Assert.assertTrue(downloadDistributedMpCap.hasCaptured());
-    // check distributed elements
-    // download distribution elements
-    MediaPackage mp = downloadDistributedMpCap.getValue();
-    Assert.assertEquals(2, mp.getElements().length);
-    Assert.assertEquals(1, mp.getElementsByFlavor(parseFlavor("dublincore/episode")).length);
-    Assert.assertNotEquals("catalog-1", mp.getElementsByFlavor(parseFlavor("dublincore/episode"))[0].getIdentifier());
-    Assert.assertEquals(1, mp.getElementsByFlavor(parseFlavor("presentation/source")).length);
-    Assert.assertNotEquals("track-1", mp.getElementsByFlavor(parseFlavor("presentation/source"))[0].getIdentifier());
-    // streaming distribution elements
-    Assert.assertTrue(streamingDistributedMpCap.hasCaptured());
-    mp = streamingDistributedMpCap.getValue();
-    Assert.assertEquals(1, mp.getElements().length);
-    Assert.assertEquals(1, mp.getElementsByFlavor(parseFlavor("presentation/source")).length);
-    Assert.assertNotEquals("track-1", mp.getElementsByFlavor(parseFlavor("presentation/source"))[0].getIdentifier());
-    // check stored media package
-    Assert.assertTrue(storedMpCap.hasCaptured());
-    mp = storedMpCap.getValue();
-    Assert.assertEquals(4, mp.getElements().length);
-    Assert.assertEquals(1, mp.getElementsByFlavor(parseFlavor("dublincore/episode")).length);
-    Assert.assertEquals(2, mp.getElementsByFlavor(parseFlavor("presentation/source")).length);
-    Assert.assertEquals(1, mp.getPublications().length);
-  }
-
-  @Test
-  public void testRetractInternal() {
-    // todo
-  }
-
-  @Test
-  public void testUpdateMetadataInternal() {
-    // todo
-  }
-
-  private static String serializeMediaPackageElements(MediaPackage mp) throws MediaPackageException {
-    Assert.assertNotNull(mp);
-    return MediaPackageElementParser.getArrayAsXml(Collections.list(mp.getElements()));
   }
 }

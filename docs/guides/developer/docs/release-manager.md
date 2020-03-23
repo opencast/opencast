@@ -282,7 +282,8 @@ The following steps outline the necessary steps for cutting the final release:
         git merge <remote>/r/5.x
 
 2. Add the release notes, and update the changelog. The `create-changelog` [helper script
-   ](https://github.com/opencast/helper-scripts/tree/master/create-changelog) is a convenient tool for this.
+   ](https://github.com/opencast/helper-scripts/tree/master/release-management/create-changelog) is a convenient tool
+   for this.
 
         cd docs/guides/admin/docs/
         vim releasenotes.md
@@ -313,7 +314,10 @@ The following steps outline the necessary steps for cutting the final release:
 
         git push <remote> 6.0:6.0
 
-8. Create a new release on GitHub using the [graphical user interface](https://github.com/opencast/opencast/releases)
+8. Push the built artifacts to Maven. Bug the QA Coordinator to do this so that he remembers to set this up from the CI
+    servers. If you want to do this yourself please read the [infra documentation](infrastructure/maven-repository.md#pushing-to-maven-central).
+
+9. Create a new release on GitHub using the [graphical user interface](https://github.com/opencast/opencast/releases)
     to upload the distribution tarballs.
 
 Finally, send a release notice to Opencast's announcement list. Note that posting to this list is restricted to those

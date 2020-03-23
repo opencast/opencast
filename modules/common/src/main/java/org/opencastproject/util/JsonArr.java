@@ -23,12 +23,9 @@ package org.opencastproject.util;
 
 import static org.opencastproject.util.data.Monadics.mlist;
 
-import org.opencastproject.util.data.Function;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public final class JsonArr implements Iterable<JsonVal> {
   private final List<Object> val;
@@ -39,22 +36,6 @@ public final class JsonArr implements Iterable<JsonVal> {
 
   public JsonVal val(int index) {
     return new JsonVal(val.get(index));
-  }
-
-  public JsonObj obj(int index) {
-    return new JsonObj((Map) val.get(index));
-  }
-
-  public JsonArr arr(int index) {
-    return new JsonArr((List) val.get(index));
-  }
-
-  public <A> List<A> as(Function<Object, A> converter) {
-    return mlist(val).map(converter).value();
-  }
-
-  public List<JsonVal> get() {
-    return mlist(val).map(JsonVal.asJsonVal).value();
   }
 
   @Override

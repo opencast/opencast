@@ -25,15 +25,29 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.OsgiAbstractJobProducer;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.NopService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.Log;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * No operation service.
  * <p>
  * This dummy service just exists for creating jobs for testing purposes.
  */
+@Component(
+  property = {
+    "service.description=No operation service"
+  },
+  immediate = true,
+  service = { NopService.class }
+)
 public final class NopServiceImpl extends OsgiAbstractJobProducer implements NopService {
   private static final Log log = Log.mk(NopServiceImpl.class);
 
@@ -41,6 +55,30 @@ public final class NopServiceImpl extends OsgiAbstractJobProducer implements Nop
 
   public NopServiceImpl() {
     super("org.opencastproject.nop");
+  }
+
+  @Override
+  @Reference(name = "serviceRegistry")
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    super.setServiceRegistry(serviceRegistry);
+  }
+
+  @Override
+  @Reference(name = "securityService")
+  public void setSecurityService(SecurityService securityService) {
+    super.setSecurityService(securityService);
+  }
+
+  @Override
+  @Reference(name = "userDirectoryService")
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    super.setUserDirectoryService(userDirectoryService);
+  }
+
+  @Override
+  @Reference(name = "organizationDirectoryService")
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    super.setOrganizationDirectoryService(organizationDirectoryService);
   }
 
   @Override protected String process(Job job) throws Exception {

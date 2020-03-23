@@ -47,6 +47,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +67,12 @@ import javax.xml.bind.JAXBException;
 /**
  * A XACML implementation of the {@link AuthorizationService}.
  */
+@Component(
+  property = {
+    "service.description=Provides translation between access control entries and xacml documents"
+  },
+  service = { AuthorizationService.class, ManagedService.class }
+)
 public class XACMLAuthorizationService implements AuthorizationService, ManagedService {
 
   /** The logger */
@@ -89,10 +99,12 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
     OVERRIDE, ROLES, ACTIONS
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     updated(cc.getProperties());
   }
 
+  @Modified
   public void modified(Map<String, Object> config) {
     // this prevents the service from restarting on configuration updated.
     // updated() will handle the configuration update.
@@ -120,16 +132,6 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
   public Tuple<AccessControlList, AclScope> getActiveAcl(final MediaPackage mp) {
     logger.debug("getActiveACl for media package {}", mp.getIdentifier());
     return getAcl(mp, AclScope.Episode);
-  }
-
-  /** Returns an ACL based on a given file/inputstream. */
-  public AccessControlList getAclFromInputStream(final InputStream in) throws IOException {
-    logger.debug("Get ACL from inputstream");
-    try {
-      return XACMLUtils.parseXacml(in);
-    } catch (XACMLParsingException e) {
-      throw new IOException(e);
-    }
   }
 
   @Override
@@ -277,7 +279,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
     } catch (NotFoundException e) {
       logger.debug("URI {} not found", uri);
     } catch (Exception e) {
-      logger.warn("Unable to load or parse Acl", e);
+      logger.warn("Unable to load or parse Acl from URI {}", uri, e);
     }
     return Optional.empty();
   }
@@ -314,6 +316,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
    * @param workspace
    *          the workspace to set
    */
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -324,6 +327,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
    * @param securityService
    *          the security service
    */
+  @Reference(name = "security")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -334,6 +338,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
    * @param seriesService
    *          the series service
    */
+  @Reference(name = "series")
   protected void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }

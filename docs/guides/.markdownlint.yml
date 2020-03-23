@@ -43,3 +43,6 @@ MD042: true
 
 # accessibility
 MD045: true
+
+# files should end with a single newline character
+MD047: true

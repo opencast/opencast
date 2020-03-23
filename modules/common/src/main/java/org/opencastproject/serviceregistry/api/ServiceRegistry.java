@@ -186,9 +186,7 @@ public interface ServiceRegistry {
    * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
    * {@link #createJob(String, String, List, String, boolean)} with an empty argument list.
    * <p>
-   * Note that this job will be linked to the current job as its parent. Use
-   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
-   * need the link.
+   * Note that this job will be linked to the current job as its parent.
    * </p>
    *
    * @param type
@@ -203,32 +201,9 @@ public interface ServiceRegistry {
 
   /**
    * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
-   * {@link #createJob(String, String, List, String, boolean)} with an empty argument list.
-   * <p>
-   * Note that this job will be linked to the current job as its parent. Use
-   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
-   * need the link.
-   * </p>
-   *
-   * @param type
-   *          the type of service responsible for this job
-   * @param operation
-   *          the operation for this service to run
-   * @param jobLoad
-   *          the load caused by this job, roughly equivalent to the number of cores used this job
-   * @return the job
-   * @throws ServiceRegistryException
-   *           if there is a problem creating the job
-   */
-  Job createJob(String type, String operation, Float jobLoad) throws ServiceRegistryException;
-
-  /**
-   * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
    * {@link #createJob(String, String, List, String, boolean)}.
    * <p>
-   * Note that this job will be linked to the current job as its parent. Use
-   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
-   * need the link.
+   * Note that this job will be linked to the current job as its parent.
    * </p>
    *
    * @param type
@@ -247,9 +222,7 @@ public interface ServiceRegistry {
    * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
    * {@link #createJob(String, String, List, String, boolean)}.
    * <p>
-   * Note that this job will be linked to the current job as its parent. Use
-   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
-   * need the link.
+   * Note that this job will be linked to the current job as its parent.
    * </p>
    *
    * @param type
@@ -267,62 +240,11 @@ public interface ServiceRegistry {
   Job createJob(String type, String operation, List<String> arguments, Float jobLoad) throws ServiceRegistryException;
 
   /**
-   * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
-   * {@link #createJob(String, String, List, String, boolean)}. The job will carry the given payload from the beginning.
-   * <p>
-   * Note that this job will be linked to the current job as its parent. Use
-   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
-   * need the link.
-   * </p>
-   *
-   * @param type
-   *          the type of service responsible for this job
-   * @param operation
-   *          the operation for this service to run
-   * @param arguments
-   *          the arguments to the operation
-   * @param payload
-   *          an optional initial payload
-   * @return the job
-   * @throws ServiceRegistryException
-   *           if there is a problem creating the job
-   */
-  Job createJob(String type, String operation, List<String> arguments, String payload) throws ServiceRegistryException;
-
-  /**
-   * Create and store a new job that will be dispatched as soon as possible. This is equivalent to calling
-   * {@link #createJob(String, String, List, String, boolean)}. The job will carry the given payload from the beginning.
-   * <p>
-   * Note that this job will be linked to the current job as its parent. Use
-   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
-   * need the link.
-   * </p>
-   *
-   * @param type
-   *          the type of service responsible for this job
-   * @param operation
-   *          the operation for this service to run
-   * @param arguments
-   *          the arguments to the operation
-   * @param payload
-   *          an optional initial payload
-   * @param jobLoad
-   *          the load caused by this job, roughly equivalent to the number of cores used this job
-   * @return the job
-   * @throws ServiceRegistryException
-   *           if there is a problem creating the job
-   */
-  Job createJob(String type, String operation, List<String> arguments, String payload, Float jobLoad)
-          throws ServiceRegistryException;
-
-  /**
    * Create and store a new job. If <code>enqueueImmediately</code> is true, the job will be in the
    * {@link Status#QUEUED} state and will be dispatched as soon as possible. Otherwise, it will be
    * {@link Status#INSTANTIATED}.
    * <p>
-   * Note that this job will be linked to the current job as its parent. Use
-   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
-   * need the link.
+   * Note that this job will be linked to the current job as its parent.
    * </p>
    *
    * @param type
@@ -348,9 +270,7 @@ public interface ServiceRegistry {
    * {@link Status#QUEUED} state and will be dispatched as soon as possible. Otherwise, it will be
    * {@link Status#INSTANTIATED}.
    * <p>
-   * Note that this job will be linked to the current job as its parent. Use
-   * {@link #createJob(String, String, List, String, boolean, Job)} and pass <code>null</code> as the job if you don't
-   * need the link.
+   * Note that this job will be linked to the current job as its parent.
    * </p>
    *
    * @param type
@@ -371,31 +291,6 @@ public interface ServiceRegistry {
    *           if there is a problem creating the job
    */
   Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable, Float jobLoad)
-          throws ServiceRegistryException;
-
-  /**
-   * Create and store a new job. If <code>enqueueImmediately</code> is true, the job will be in the
-   * {@link Status#QUEUED} state and will be dispatched as soon as possible. Otherwise, it will be
-   * {@link Status#INSTANTIATED}.
-   *
-   * @param type
-   *          the type of service responsible for this job
-   * @param operation
-   *          the operation for this service to run
-   * @param arguments
-   *          the arguments to the operation
-   * @param payload
-   *          an optional initial payload
-   * @param queueable
-   *          whether the job can be enqueued for dispatch. If false, the job's initial state will be
-   *          {@link Status#INSTANTIATED} and will not be dispatched.
-   * @param parentJob
-   *          the parent job
-   * @return the job
-   * @throws ServiceRegistryException
-   *           if there is a problem creating the job
-   */
-  Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable, Job parentJob)
           throws ServiceRegistryException;
 
   /**
@@ -504,6 +399,31 @@ public interface ServiceRegistry {
    *          if there is a problem accessing the service registry
    */
   List<String> getJobPayloads(String operation) throws ServiceRegistryException;
+
+  /**
+   * Return the payload of a specified number of jobs for a specified operation type.
+   *
+   * @param operation
+   *          Operation type to get payload for
+   * @param limit
+   *          How many results to return
+   * @param offset
+   *          Offset for the set of returned results
+   * @return Serialized workflows
+   * @throws ServiceRegistryException
+   *          if there is a problem accessing the service registry
+   */
+  List<String> getJobPayloads(String operation, int limit, int offset) throws ServiceRegistryException;
+
+  /**
+   * Return the number of jobs for a specified operation type.
+   *
+   * @param operation
+   *          Operation type to check for
+   * @return Number of jobs for the specified operation type.
+   * @throws ServiceRegistryException
+   */
+  int getJobCount(String operation) throws ServiceRegistryException;
 
   /**
    * Get the list of active jobs.

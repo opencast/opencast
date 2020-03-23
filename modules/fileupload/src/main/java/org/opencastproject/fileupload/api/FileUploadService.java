@@ -77,15 +77,6 @@ public interface FileUploadService {
   void cleanOutdatedJobs() throws IOException;
 
   /**
-   * Persists the given job object.
-   *
-   * @param job
-   *          job object to persist
-   * @throws FileUploadException
-   */
-  void storeJob(FileUploadJob job) throws FileUploadException;
-
-  /**
    * Deletes the job permanently, thus deleting persistent data.
    *
    * @param id

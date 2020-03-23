@@ -32,11 +32,11 @@ public interface OpencastConstants {
   /** The property key for the current machine's descriptive node name defined in the config.properties */
   String NODE_NAME_PROPERTY = "org.opencastproject.server.nodename";
 
-  /** The property key for the streaming server defined in the config.properties */
-  String STREAMING_URL_PROPERTY = "org.opencastproject.streaming.url";
-
   /** The property key for the Admin UI URL defined in the organization properties */
   String ADMIN_URL_ORG_PROPERTY = "org.opencastproject.admin.ui.url";
+
+  /** The property key for the Admin email defined in the custom properties */
+  String ADMIN_EMAIL_PROPERTY = "org.opencastproject.admin.email";
 
   /** The property key for the external API URL defined in the organization properties */
   String EXTERNAL_API_URL_ORG_PROPERTY = "org.opencastproject.external.api.url";
@@ -54,4 +54,10 @@ public interface OpencastConstants {
   String WFR_URL_ORG_PROPERTY = "org.opencastproject.file.repo.url";
 
   String WORKFLOW_PROPERTIES_NAMESPACE = "org.opencastproject.workflow.configuration";
+
+  /** The property key for the digest user defined in the custom.properties */
+  String DIGEST_USER_PROPERTY = "org.opencastproject.security.digest.user";
+
+  /** The property key for the environment defined in the custom.properties */
+  String ENVIRONMENT_NAME_PROPERTY = "org.opencastproject.environment.name";
 }

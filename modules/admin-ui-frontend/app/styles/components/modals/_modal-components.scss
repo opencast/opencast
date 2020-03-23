@@ -1,0 +1,737 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+// Common Modal Components
+// ----------------------------------------
+
+.modal .obj {
+
+    // Comments
+    // ----------------------------------------
+
+    &.comments {
+
+        .comment-container {
+            padding: $modal-container-padding;
+            height: 400px;
+            overflow-y: auto;
+
+            .comment {
+                margin-bottom: 20px;
+
+                &:first-child h4 {
+                    margin-top: 0;
+                }
+
+                .is-reply {
+
+                    > h4 {
+                        padding-left: 30px;
+                    }
+
+                    .category {
+                        padding-left: 30px;
+                    }
+
+                    > p {
+                        padding-left: 30px;
+                    }
+                }
+
+                // Hide first HR
+                &:first-child > hr {
+                    display: none;
+                }
+
+                > hr {
+                    background: lighten($main-border-color, 10%);
+                    height: 1px;
+                    border: none;
+                    margin: 30px 0 20px;
+                }
+
+                > h4 {
+                    font-weight: 600;
+                }
+
+                .category {
+                    font-size: 10px;
+                    color: $medium-prim-color;
+
+                    > strong {
+                        color: $medium-prim-color;
+                    }
+                }
+
+                .date {
+                    float: right;
+                    font-size: 10px;
+                    color: $light-prim-color;
+                    @include fa-icon($fa-var-clock-o, before, inline-block, 0 5px 0 0, 0, inherit, 10px);
+                }
+
+                > p {
+                   margin: 7px 15px 0 0;
+                   font-size: 11px;
+                   line-height: 15px;
+
+                    > span {
+                        color: $l-blue;
+                    }
+                }
+
+                .reply,
+                .delete,
+                .resolve {
+                    float: right;
+                    font-size: 11px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    color: $l-blue;
+                    display: inline-block;
+                }
+
+                .delete {
+                    color: $red;
+                    margin-left: 10px;
+
+                }
+
+                .resolve {
+                    color: $light-prim-color;
+                    margin-right: 10px;
+
+                    &.resolved {
+                        color: $green;
+                    }
+                }
+            }
+        }
+
+        .add-comment {
+            background: $off-white;
+            border-top: $thin-border-stroke #e9e9e9;
+            @include border-bottom-radius($main-border-radius);
+            height: 191px;
+            padding: 3%;
+
+            .drop-down-container {
+                width: 100%;
+            }
+
+            textarea {
+                width: 100%;
+                height: 80px;
+                resize: none;
+                margin-bottom: 20px;
+            }
+
+            .btn {
+                @include btn(green);
+                padding: 10px 15px;
+                float: right;
+            }
+
+            .drop-down-container {
+                width: 250px;
+                display: inline-block;
+            }
+
+        }
+    }
+
+
+
+    // Tags
+    // ----------------------------------------
+    // Currently not used in this build
+
+    &.tags {
+
+        .add-tag-container {
+            background: red;
+            margin: -15px auto 0;
+            text-align: center;
+            padding: 10px 0 0;
+            height: 42px;
+            background: darken($body-background, 3%);
+            border-bottom: 1px solid $main-border-color;
+
+            > a {
+                @include btn(green);
+                margin-left: 10px;
+            }
+
+        }
+
+        .tag-container {
+            padding: 15px;
+
+            > span {
+                display: inline-block;
+                padding: 5px 7px;
+                margin: 5px 5px 0 0;
+                font-size: 12px;
+                background: $l-blue;
+                color: #fff;
+                border-radius: $main-border-radius;
+
+                > a {
+                    margin-left: 5px;
+                    color: #fff;
+                }
+            }
+        }
+    }
+
+
+
+    // Quick Actions
+    // ----------------------------------------
+
+    &.quick-actions {
+
+        .drop-down-container {
+            width: 200px;
+            text-align: left;
+        }
+    }
+
+
+
+    // Headerless Table Lists
+    // ----------------------------------------
+
+    &.tbl-list table td {
+
+        &:first-child {
+            width: 150px;
+        }
+
+        &:last-child {
+            color: $dark-prim-color;
+        }
+    }
+
+
+
+    // Checkbox Container
+    // ----------------------------------------
+
+    .checkbox-container {
+        margin-top: 5px;
+
+        label {
+            font-size: 12px;
+            line-height: 30px;
+        }
+
+        input {
+            margin-right: 10px;
+        }
+
+        .fa-arrow-right {
+            margin-top: -25px;
+        }
+    }
+
+
+    // Button Properties
+    // ----------------------------------------
+
+    .btn-container {
+        margin: 20px 0;
+    }
+
+    .cancel-btn {
+        margin: 10px 10px 0 0;
+    }
+
+
+
+    // Sub modal tab link
+    // ----------------------------------------
+
+    .details-link {
+        color: $l-blue;
+        position: relative;
+        white-space: nowrap;
+        @include fa-icon($fa-var-chevron-right, after, inline-block, 0, 0, inherit, 8px);
+
+        &:hover {
+            color: darken($l-blue, 20%);
+        }
+
+        &:after {
+            position: relative;
+            right: -5px;
+            top: -1px;
+        }
+    }
+
+
+    // Remove Button Row within Tables
+    // ----------------------------------------
+
+    .remove-btn-container {
+        height: 50px;
+        border-top: 1px solid $main-border-color;
+    }
+
+    .red-btn {
+        margin: 10px 10px 0 0;
+        display: inline-block;
+        float: right;
+        padding: 7px 10px;
+    }
+
+
+    // Dropdown Container
+    // ----------------------------------------
+
+    .drop-down-container {
+        margin: 0 0;
+
+        &.full-width {
+            width: 100%;
+        }
+    }
+
+
+    // Manage Files
+    // ----------------------------------------
+
+    .file-upload {
+        @include clearfix();
+    }
+
+    .upload-file-info {
+        @include clearfix();
+        color: $medium-prim-color;
+        font-size: 10px;
+        font-weight: $weight-semibold;
+        background: #fff;
+        border: 1px solid $main-border-color;
+        border-radius: 10px;
+        height: 19px;
+        display: inline-block;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+        // Filename label
+        p {
+            color: $dark-prim-color;
+            display: inline-block;
+            padding: 4px 10px;
+            float: left;
+            max-width: 175px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        .button-container {
+            float: right;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .remove-file-button {
+
+            // Reset
+            @include appearance(none);
+            background: none;
+            outline: none;
+            border: none;
+            margin: auto;;
+            height: 100%;
+            min-width: 0;
+            color: $medium-prim-color;
+            border-radius: 0;
+
+            // Styles
+            border-left: 1px solid $main-border-color;
+            padding: 0 6px;
+            padding-right: 8px;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+
+            @include fa-icon($fa-var-close, after, inline-block, 0, 0, $main-border-color, 10px);
+
+            &::after {
+                position: relative;
+                top: -1px;
+            }
+
+            &:hover {
+                @include fa-icon-color(after, $medium-prim-color);
+            }
+        }
+    }
+
+    .progress {
+        border: 1px solid darken($bright-blue, 5%);
+    }
+
+    .progress-bar {
+        @include linear-gradient(top, lighten($bright-blue, 5%), $bright-blue);
+    }
+
+    button {
+        margin: 0 3px;
+        height: 32px;
+        min-width: 80px;
+
+        &:first-child {
+           margin-left: 0;
+        }
+
+        &:last-child {
+            margin-right: 0;
+        }
+    }
+
+    .upload-button {
+        @include btn(brightblue);
+    }
+
+
+    // Summary & Content List
+    // ----------------------------------------
+
+    .content-list,
+    .summary-list {
+
+        li {
+            padding: 20px 0 !important; // ## Todo: Fix this override
+
+            &:first-child {
+                padding-top: 0 !important;
+            }
+
+            &:last-child {
+                padding-bottom: 0 !important;
+            }
+        }
+
+        .video-container {
+            margin: 15px 0;
+        }
+
+        h4 {
+            font-size: 18px;
+            font-weight: $weight-regular;
+            line-height: 24px;
+            color: $dark-prim-color;
+            margin-bottom: 5px;
+        }
+    }
+
+    .list-row {
+        @include clearfix();
+        padding: 15px 0;
+        border-bottom: 1px solid $main-border-color;
+
+        &:first-child {
+            padding-top: 0;
+        }
+
+        &:last-child {
+            padding-bottom: 0;
+            border-bottom: 0;
+        }
+
+        label.large {
+            font-size: 16px;
+        }
+    }
+
+    .list-sub-row {
+        @include clearfix();
+        padding: 5px 0;
+
+        &:last-child {
+            padding-bottom: 0;
+        }
+    }
+
+    .header-column,
+    .content-column {
+        float: left;
+    }
+
+    .header-column {
+        width: 24.25%;
+        margin-right: 1.5%;
+    }
+
+    .content-column {
+        width: 74.25%;
+    }
+
+    .content-container {
+        float: right;
+    }
+
+
+    // Video Preview
+    // ----------------------------------------
+
+    .video-container {
+        @include clearfix();
+        position: relative;
+
+        .video-wrapper {
+            position: relative;
+            width: 500px;
+            height: auto;
+            padding: 5px;
+            border: 1px solid $main-border-color;
+            border-radius: $main-border-radius;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-overlay {
+            position: absolute;
+            z-index: $z-60;
+            width: 500px;
+            height: 100%;
+            @include calc(max-width, "100% - 10px");
+            @include calc(max-height, "100% - 12px");
+            @include linear-gradient(top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
+            overflow: hidden;
+        }
+
+        iframe {
+            max-width: 100%;
+            margin: 0;
+        }
+
+        // Watermark Layout
+
+        .watermark-preview,
+        .watermark-config {
+            @include span-columns(6);
+        }
+
+        .watermark-preview {
+
+            video,
+            iframe,
+            img,
+            picture {
+                max-width: 100%;
+                height: auto;
+            }
+        }
+
+        .watermark-image {
+            position: absolute;
+            z-index: $z-60;
+
+            img {
+                max-width: 50px;
+                height: auto;
+            }
+
+            $watermark-margin: 15px;
+
+            // default attributes
+            bottom: $watermark-margin;
+            right: $watermark-margin;
+
+            &.position-top-left {
+                top: $watermark-margin;
+                left: $watermark-margin;
+            }
+
+            &.position-top-right {
+                top: $watermark-margin;
+                right: $watermark-margin;
+            }
+
+            &.position-bottom-left {
+                bottom: $watermark-margin;
+                left: $watermark-margin;
+            }
+
+            &.position-bottom-right {
+                bottom: $watermark-margin;
+                right: $watermark-margin;
+            }
+        }
+
+        .position-selection {
+            position: relative;
+            padding: 5px;
+            border: 1px solid $main-border-color;
+            border-radius: $main-border-radius;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.1);
+            background: #fff;
+            min-height: 202px;
+        }
+
+        .position-button {
+            @include btn(white);
+            position: absolute;
+            min-width: 100px;
+
+            &.active {
+                @include btn(brightblue);
+                text-shadow: none !important;
+                position: absolute;
+            }
+        }
+
+        .position-top-left {
+            top: 5px;
+            left: 5px;
+        }
+
+        .position-top-right {
+            top: 5px;
+            right: 5px;
+        }
+
+        .position-bottom-left {
+            bottom: 5px;
+            left: 5px;
+        }
+
+        .position-bottom-right {
+            bottom: 5px;
+            right: 5px;
+        }
+
+        .overlay-meta {
+            padding: 40px 20px;
+            color: rgba($white, 0.98);
+            text-shadow: 0 1px 2px rgba($black, 0.2);
+            font-size: 18px;
+            line-height: 22px;
+            font-weight: $weight-semibold;
+            text-align: center;
+            @include calc(max-height, "100% - 0px");
+
+            &.left-aligned {
+                text-align: left;
+            }
+
+            &.right-aligned {
+                text-align: right;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4,
+            h5,
+            h6 {
+                margin-bottom: 8px;
+            }
+
+            h1 {
+                font-size: 30px;
+                line-height: 36px;
+                font-weight: $weight-semibold;
+            }
+
+            h2 {
+                font-size: 28px;
+                line-height: 34px;
+                font-weight: $weight-semibold;
+            }
+
+            h3 {
+                font-size: 26px;
+                line-height: 32px;
+                font-weight: $weight-semibold;
+            }
+
+            h4 {
+                font-size: 24px;
+                line-height: 30px;
+                font-weight: $weight-semibold;
+            }
+
+            h5 {
+                font-size: 22px;
+                line-height: 28px;
+                font-weight: $weight-regular;
+            }
+
+            h6 {
+                font-size: 20px;
+                line-height: 26px;
+                font-weight: $weight-regular;
+            }
+
+            // for legal or other small print
+            &.paragraph-meta {
+                @include linear-gradient(top, rgba($black, 0.8), rgba($black, 0.2));
+                height: 100%;
+                font-size: 12px;
+                line-height: 18px;
+                padding: 10px;
+                text-align: left;
+                overflow: auto;
+
+                p {
+                    margin-bottom: 6px;
+                }
+            }
+        }
+    }
+
+    .preview-duration {
+        margin-top: 10px;
+        font-size: 14px;
+
+        .field-title {
+            font-weight: $weight-semibold;
+            color: $dark-prim-color;
+        }
+    }
+
+    // Workflow Definition Configuration Panel
+    #workflow-configuration {
+        legend {
+          padding-top: 20px;
+          padding-bottom: 5px
+        }
+        li {
+          padding: 2px 20px;
+        }
+        input {
+          vertical-align: sub;
+        }
+        input[type=checkbox] {
+          padding: 0px 5px;
+        }
+        label {
+          display: inline-block;
+          padding: 0px
+        }
+        input:disabled+label {
+          opacity: 0.5;
+        }
+    }
+}

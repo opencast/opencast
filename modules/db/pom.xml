@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -62,12 +62,17 @@
       <artifactId>h2</artifactId>
     </dependency>
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
+      <groupId>org.mariadb.jdbc</groupId>
+      <artifactId>mariadb-java-client</artifactId>
     </dependency>
     <dependency>
-      <groupId>postgresql</groupId>
+      <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>4.1.0</version>
     </dependency>
   </dependencies>
   <build>
@@ -86,6 +91,7 @@
               !org.apache.lucene.*,
               !org.jboss.resource.adapter.jdbc.*,
               !org.hibernate.*,
+              !com.sun.jna.platform.win32,
               org.w3c.dom;version=0,
               *
             </Import-Package>
@@ -94,7 +100,8 @@
               config;inline=true,
               h2;inline=true,
               mchange-commons-java;inline=true,
-              mysql-connector-java;inline=true,
+              mariadb-java-client;inline=true,
+              jna,
               postgresql;inline=true
             </Embed-Dependency>
             <Export-Package>

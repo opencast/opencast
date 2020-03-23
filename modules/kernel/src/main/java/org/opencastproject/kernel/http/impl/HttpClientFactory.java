@@ -28,12 +28,22 @@ import org.opencastproject.kernel.http.api.HttpClient;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 
 /** Creates HttpClients that can be used for making requests such as GET, POST etc.*/
+@Component(
+  property = {
+    "service.description=Provides a service that builds http clients."
+  },
+  immediate = true,
+  service = { HttpClientFactory.class }
+)
 public class HttpClientFactory implements ManagedService {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(HttpClientFactory.class);
@@ -45,6 +55,7 @@ public class HttpClientFactory implements ManagedService {
    * @param componentContext
    *          the component context
    */
+  @Activate
   public void activate(ComponentContext componentContext) {
     logger.debug("Starting up");
   }
@@ -52,6 +63,7 @@ public class HttpClientFactory implements ManagedService {
   /**
    * Deactivates the service
    */
+  @Deactivate
   public void deactivate() {
     logger.debug("Shutting down");
   }

@@ -21,6 +21,7 @@
 
 package org.opencastproject.userdirectory;
 
+import org.opencastproject.kernel.security.CustomPasswordEncoder;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
@@ -33,7 +34,6 @@ import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PasswordEncoder;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 
@@ -43,6 +43,9 @@ import com.google.common.cache.LoadingCache;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,10 +60,18 @@ import java.util.concurrent.TimeUnit;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.TypedQuery;
 
 /**
  * Manages and locates users using JPA.
  */
+@Component(
+  property = {
+    "service.description=Provides a user directory"
+  },
+  immediate = true,
+  service = { UserProvider.class, RoleProvider.class, JpaUserAndRoleProvider.class }
+)
 public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
 
   /** The logger */
@@ -95,7 +106,11 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   /** A token to store in the miss cache */
   protected Object nullToken = new Object();
 
+  /** Password encoder for storing user passwords */
+  private CustomPasswordEncoder passwordEncoder = new CustomPasswordEncoder();
+
   /** OSGi DI */
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -104,6 +119,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -112,6 +128,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @param groupRoleProvider
    *          the groupRoleProvider to set
    */
+  @Reference(name = "groupRoleProvider")
   void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
     this.groupRoleProvider = groupRoleProvider;
   }
@@ -125,6 +142,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    * @param cc
    *          the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("activate");
 
@@ -177,6 +195,23 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   }
 
   /**
+   * List all users with insecure password hashes
+   */
+  public List<User> findInsecurePasswordHashes() {
+    final String orgId = securityService.getOrganization().getId();
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      TypedQuery<User> q = em.createNamedQuery("User.findInsecureHash", User.class);
+      q.setParameter("org", orgId);
+      return q.getResultList();
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.security.api.RoleProvider#findRoles(String, Role.Target, int, int)
@@ -211,22 +246,6 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     String orgId = securityService.getOrganization().getId();
     List<JpaUser> users = UserDirectoryPersistenceUtil.findUsers(orgId, 0, 0, emf);
     return Monadics.mlist(users).map(addProviderName).iterator();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.security.api.RoleDirectoryService#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    return getRolesAsList().iterator();
-  }
-
-  public List<Role> getRolesAsList() {
-    String orgId = securityService.getOrganization().getId();
-    List<JpaRole> rolesIterator = UserDirectoryPersistenceUtil.findRoles(orgId, 0, 0, emf);
-    return new ArrayList<Role>(rolesIterator);
   }
 
   /**
@@ -287,11 +306,26 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    *          if the user is not allowed to create other user with the given roles
    */
   public void addUser(JpaUser user) throws UnauthorizedException {
+    addUser(user, false);
+  }
+
+  /**
+   * Adds a user to the persistence
+   *
+   * @param user
+   *          the user to add
+   * @param passwordEncoded
+   *          if the password is already encoded or should be encoded
+   *
+   * @throws org.opencastproject.security.api.UnauthorizedException
+   *          if the user is not allowed to create other user with the given roles
+   */
+  public void addUser(JpaUser user, final boolean passwordEncoded) throws UnauthorizedException {
     if (!UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, user.getRoles()))
       throw new UnauthorizedException("The user is not allowed to set the admin role on other users");
 
     // Create a JPA user with an encoded password.
-    String encodedPassword = PasswordEncoder.encode(user.getPassword(), user.getUsername());
+    String encodedPassword = passwordEncoded ? user.getPassword() : passwordEncoder.encodePassword(user.getPassword());
 
     // Only save internal roles
     Set<JpaRole> roles = UserDirectoryPersistenceUtil.saveRoles(filterRoles(user.getRoles()), emf);
@@ -333,6 +367,21 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
    *          if the current user is not allowed to update user with the given roles
    */
   public User updateUser(JpaUser user) throws NotFoundException, UnauthorizedException {
+    return updateUser(user, false);
+  }
+
+  /**
+   * Updates a user to the persistence
+   *
+   * @param user
+   *          the user to save
+   * @param passwordEncoded
+   *          if the password is already encoded or should be encoded
+   * @throws NotFoundException
+   * @throws org.opencastproject.security.api.UnauthorizedException
+   *          if the current user is not allowed to update user with the given roles
+   */
+  public User updateUser(JpaUser user, final boolean passwordEncoded) throws NotFoundException, UnauthorizedException {
     if (!UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, user.getRoles()))
       throw new UnauthorizedException("The user is not allowed to set the admin role on other users");
 
@@ -352,7 +401,11 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       encodedPassword = updateUser.getPassword();
     } else  {
       // Update an JPA user with an encoded password.
-      encodedPassword = PasswordEncoder.encode(user.getPassword(), user.getUsername());
+      if (passwordEncoded) {
+        encodedPassword = user.getPassword();
+      } else {
+        encodedPassword = passwordEncoder.encodePassword(user.getPassword());
+      }
     }
 
     // Only save internal roles

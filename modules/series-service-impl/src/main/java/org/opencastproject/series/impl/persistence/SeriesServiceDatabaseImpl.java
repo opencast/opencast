@@ -30,6 +30,7 @@ import org.opencastproject.security.api.AccessControlParsingException;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Permissions;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -41,8 +42,10 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +64,13 @@ import javax.persistence.Query;
 /**
  * Implements {@link SeriesServiceDatabase}. Defines permanent storage for series.
  */
+@Component(
+  property = {
+    "service.description=Series Service"
+  },
+  immediate = true,
+  service = { SeriesServiceDatabase.class }
+)
 public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   /** Logging utilities */
@@ -79,6 +89,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   protected SecurityService securityService;
 
   /** OSGi DI */
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.series.impl.persistence)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -88,6 +99,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    *
    * @param cc
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for series");
   }
@@ -98,6 +110,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -108,6 +121,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    * @param dcService
    *          {@link DublinCoreCatalogService} object
    */
+  @Reference(name = "dc")
   public void setDublinCoreService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }
@@ -462,6 +476,10 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
       User currentUser = securityService.getUser();
       Organization currentOrg = securityService.getOrganization();
+
+      if (currentUser.hasRole(SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE)) {
+        return true;
+      }
       // There are several reasons a user may need to load a series: to read content, to edit it, or add content
       if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString())
               && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.CONTRIBUTE.toString())
@@ -577,8 +595,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       if (tx.isActive()) {
         tx.rollback();
       }
-      logger.error("Couldn't update series {} with property: {}:{} because {}", seriesId, propertyName, propertyValue,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Couldn't update series {} with property: {}:{} because", seriesId, propertyName, propertyValue, e);
       throw new SeriesServiceDatabaseException(e);
     } finally {
       if (em != null)

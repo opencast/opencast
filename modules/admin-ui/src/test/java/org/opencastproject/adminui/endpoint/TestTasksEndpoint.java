@@ -138,7 +138,6 @@ public class TestTasksEndpoint extends TasksEndpoint {
 
     this.setWorkflowService(workflowService);
     this.setAssetManager(assetManager);
-    this.setWorkspace(workspace);
     this.activate(null);
   }
 

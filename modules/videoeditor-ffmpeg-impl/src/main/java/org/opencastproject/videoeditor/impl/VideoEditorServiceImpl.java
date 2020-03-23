@@ -30,8 +30,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.identifier.IdBuilder;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -53,6 +52,7 @@ import org.opencastproject.videoeditor.ffmpeg.FFmpegEdit;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -108,10 +108,6 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
    * Reference to the workspace service
    */
   private Workspace workspace = null;
-  /**
-   * Id builder used to create ids for encoded tracks
-   */
-  private final IdBuilder idBuilder = IdBuilderFactory.newInstance().newIdBuilder();
   /**
    * Reference to the receipt service
    */
@@ -209,7 +205,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     // create working directory
     File tempDirectory = new File(new File(workspace.rootDirectory()), "editor");
     tempDirectory = new File(tempDirectory, Long.toString(job.getId()));
-    String filename = String.format("%s-%s%s", sourceTrackFlavor, sourceFile.getName(), outputFileExtension);
+    String filename = String.format("%s-%s%s", sourceTrackFlavor, FilenameUtils.removeExtension(sourceFile.getName()), outputFileExtension);
     File outputPath = new File(tempDirectory, filename);
 
     if (!outputPath.getParentFile().exists()) {
@@ -287,7 +283,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       }
 
       // create Track for edited file
-      String newTrackId = idBuilder.createNew().toString();
+      String newTrackId = IdImpl.fromUUID().toString();
       InputStream in = new FileInputStream(outputPath);
       try {
         newTrackURI = workspace.putInCollection(COLLECTION_ID,

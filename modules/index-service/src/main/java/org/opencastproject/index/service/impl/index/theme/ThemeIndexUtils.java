@@ -28,6 +28,7 @@ import org.opencastproject.matterhorn.search.SearchMetadata;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.impl.SearchMetadataCollection;
 import org.opencastproject.security.api.User;
+import org.opencastproject.util.DateTimeSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -88,7 +89,8 @@ public final class ThemeIndexUtils {
     metadata.addField(ThemeIndexSchema.DEFAULT, theme.isDefault(), false);
 
     if (theme.getCreationDate() != null) {
-      metadata.addField(ThemeIndexSchema.CREATION_DATE, theme.getCreationDate(), true);
+      metadata.addField(ThemeIndexSchema.CREATION_DATE,
+              DateTimeSupport.toUTC(theme.getCreationDate().getTime()), true);
     }
 
     if (StringUtils.isNotBlank(theme.getCreator())) {

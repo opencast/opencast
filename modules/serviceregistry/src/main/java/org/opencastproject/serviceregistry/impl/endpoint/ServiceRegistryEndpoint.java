@@ -35,6 +35,7 @@ import org.opencastproject.job.api.JaxbJobList;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.rest.RestConstants;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistrationList;
@@ -61,11 +62,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -89,10 +94,21 @@ import javax.ws.rs.core.Response.Status;
  */
 @Path("/")
 @RestService(name = "serviceregistry", title = "Service Registry", notes = { "All paths above are relative to the REST endpoint base" }, abstractText = "Provides registration and management functions for servers and services in this Opencast instance or cluster.")
+@Component(
+  property = {
+    "service.description=Service Registry REST Endpoint",
+    "opencast.service.type=org.opencastproject.serviceregistry",
+    "opencast.service.path=/services"
+  },
+  immediate = true,
+  service = { ServiceRegistryEndpoint.class }
+)
 public class ServiceRegistryEndpoint {
 
   /** The remote service maanger */
   protected ServiceRegistry serviceRegistry = null;
+
+  private SecurityService securityService = null;
 
   /** This server's URL */
   protected String serverUrl = UrlSupport.DEFAULT_BASE_URL;
@@ -101,8 +117,14 @@ public class ServiceRegistryEndpoint {
   protected String servicePath = "/";
 
   /** Sets the service registry instance for delegation */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
+  }
+
+  @Reference
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /**
@@ -111,6 +133,7 @@ public class ServiceRegistryEndpoint {
    * @param cc
    *          OSGi component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     serverUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
     servicePath = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
@@ -277,13 +300,30 @@ public class ServiceRegistryEndpoint {
           @RestResponse(responseCode = SC_OK, description = "Returned the available services."),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "No service type specified, bad request.") })
   public Response getAvailableServicesAsXml(@QueryParam("serviceType") String serviceType) {
+
     if (isBlank(serviceType))
       throw new WebApplicationException(Response.status(Status.BAD_REQUEST).entity("Service type must be specified")
               .build());
+
+    Map<String, String> properties = securityService.getOrganization().getProperties();
+
     JaxbServiceRegistrationList registrations = new JaxbServiceRegistrationList();
     try {
       for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByLoad(serviceType)) {
-        registrations.add(new JaxbServiceRegistration(reg));
+        JaxbServiceRegistration jaxbReg = new JaxbServiceRegistration(reg);
+
+        String internalHost = jaxbReg.getHost();
+        String schemePrefix = null;
+        // extract scheme
+        if (internalHost.contains("://")) {
+          schemePrefix = StringUtils.substringBefore(internalHost, "://") + "://";
+          internalHost = StringUtils.substringAfter(internalHost, "://");
+        }
+        String tenantSpecificHost = StringUtils.trimToNull(properties.get("org.opencastproject.host." + internalHost));
+        if (StringUtils.isNotBlank(tenantSpecificHost)) {
+          jaxbReg.setHost(schemePrefix + tenantSpecificHost);
+        }
+        registrations.add(jaxbReg);
       }
       return Response.ok(registrations).build();
     } catch (ServiceRegistryException e) {

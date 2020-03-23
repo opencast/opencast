@@ -374,26 +374,6 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   }
 
   /**
-   * Creates a file containing the md5 hash for the contents of a source file.
-   *
-   * @param is
-   *         the input stream containing the data to hash
-   * @throws IOException
-   *         if the hash cannot be created
-   */
-  protected String createMd5(InputStream is) throws IOException {
-    File md5File = null;
-    try {
-      return DigestUtils.md5Hex(is);
-    } catch (IOException e) {
-      FileUtils.deleteQuietly(md5File);
-      throw e;
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
-  }
-
-  /**
    * Gets the file handle for an md5 associated with a content file. Calling this method and obtaining a File handle is
    * not a guarantee that the md5 file exists.
    *
@@ -475,7 +455,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @throws NotFoundException
    *         if either the collection or the file don't exist
    */
-  protected File getFileFromCollection(String collectionId, String fileName) throws NotFoundException,
+  public File getFileFromCollection(String collectionId, String fileName) throws NotFoundException,
           IllegalArgumentException {
     checkPathSafe(collectionId);
 
@@ -542,12 +522,6 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       FileUtils.forceMkdir(f);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getCollectionSize(java.lang.String)
-   */
-  @Override
   public long getCollectionSize(String id) throws NotFoundException {
     File collectionDir = null;
     try {
@@ -563,13 +537,6 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     return files.length;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getFromCollection(java.lang.String,
-   * java.lang.String)
-   */
-  @Override
   public InputStream getFromCollection(String collectionId, String fileName) throws NotFoundException, IOException {
     File f = getFileFromCollection(collectionId, fileName);
     if (f == null || !f.isFile()) {
@@ -643,13 +610,6 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     return getCollectionURI(collectionId, fileName);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#copyTo(java.lang.String, java.lang.String,
-   * java.lang.String, java.lang.String, java.lang.String)
-   */
-  @Override
   public URI copyTo(String fromCollection, String fromFileName, String toMediaPackage, String toMediaPackageElement,
                     String toFileName) throws NotFoundException, IOException {
     File source = getFileFromCollection(fromCollection, fromFileName);
@@ -814,16 +774,6 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     if (f == null)
       throw new NotFoundException(mediaPackageID + "/" + mediaPackageElementID);
     return getFileDigest(f);
-  }
-
-  /**
-   * Returns the md5 hash value for the given collection element.
-   *
-   * @throws NotFoundException
-   *         if the collection element does not exist
-   */
-  String getCollectionElementDigest(String collectionId, String fileName) throws IOException, NotFoundException {
-    return getFileDigest(getFileFromCollection(collectionId, fileName));
   }
 
   /**

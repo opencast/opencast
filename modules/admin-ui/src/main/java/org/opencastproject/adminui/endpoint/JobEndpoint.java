@@ -37,7 +37,6 @@ import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SortCriterion;
-import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.HostRegistration;
@@ -75,6 +74,9 @@ import com.entwinemedia.fn.data.json.SimpleSerializer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,14 +108,21 @@ import javax.ws.rs.core.Response;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+  immediate = true,
+  service = JobEndpoint.class,
+  property = {
+    "service.description=Admin UI - Job facade Endpoint",
+    "opencast.service.type=org.opencastproject.adminui.endpoint.JobEndpoint",
+    "opencast.service.path=/admin-ng/job"
+  }
+)
 public class JobEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(JobEndpoint.class);
   private static final SimpleSerializer serializer = new SimpleSerializer();
 
-  public static final Response UNAUTHORIZED = Response.status(Response.Status.UNAUTHORIZED).build();
   public static final Response NOT_FOUND = Response.status(Response.Status.NOT_FOUND).build();
-  public static final Response SERVER_ERROR = Response.serverError().build();
 
   private enum JobSort {
     CREATOR, OPERATION, PROCESSINGHOST, PROCESSINGNODE, STATUS, STARTED, SUBMITTED, TYPE, ID
@@ -129,24 +138,29 @@ public class JobEndpoint {
   private UserDirectoryService userDirectoryService;
 
   /** OSGi callback for the workflow service. */
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
   /** OSGi callback for the service registry. */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
   /** OSGi callback for the incident service. */
+  @Reference
   public void setIncidentService(IncidentService incidentService) {
     this.incidentService = incidentService;
   }
 
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Activate job endpoint");
   }
@@ -501,8 +515,6 @@ public class JobEndpoint {
       throw new JobEndpointException(
               String.format("Error when retrieving job %s from the service registry: %s", id, e), e.getCause());
     }
-
-    MediaPackage mp = instance.getMediaPackage();
 
     List<Field> fields = new ArrayList<>();
     for (String key : instance.getConfigurationKeys()) {

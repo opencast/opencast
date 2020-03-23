@@ -70,14 +70,6 @@
       {
         "factory": "YoutubeVideoFactory",
         "enabled": true
-      },
-      {
-        "factory": "Video360ThetaFactory",
-        "enabled": true
-      },
-      {
-        "factory": "Video360Factory",
-        "enabled": true
       }
     ],
     "audioMethods": [
@@ -131,9 +123,20 @@
     "//**** For a list of available plugins and configuration, go to": "https://github.com/polimediaupv/paella/blob/develop/doc/adopters/plugins.md",
     "list": {
       "es.upv.paella.opencast.loader": {
-        "flavors": [
-          ["*", "*"]
-        ]
+        "orderTracks": ["presenter/delivery", "presenter/preview", "presentation/delivery", "presentation/preview"],
+        "streams": [
+          {
+            "filter": {
+              "system": ["*"]
+            },
+            "tracks": {
+              "flavors": ["*/*"],
+              "tags": []
+            }
+          }
+        ],
+        "audioTag": {
+        }
       },
       "//**** Video profile plugins": "",
       "es.upv.paella.singleStreamProfilePlugin": {
@@ -142,7 +145,6 @@
             { "icon":"professor_icon.svg", "id":"presenter", "content":["presenter"]},
             { "icon":"slide_icon.svg", "id":"presentation", "content":["presentation"]}
           ]
-
       },
       "es.upv.paella.dualStreamProfilePlugin": { "enabled":true,
         "videoSets": [
@@ -238,7 +240,7 @@
       "es.upv.paella.ratePlugin": {
         "enabled": false
       },
-      "es.upv.paella.audioLanguage": {
+      "es.upv.paella.audioSelector": {
         "enabled": true
       },
       "es.upv.paella.videoZoomPlugin": {
@@ -261,7 +263,10 @@
       },
       "es.upv.paella.arrowSlidesNavigatorPlugin": {
         "enabled": true,
-        "showArrowsIn": "slave"
+        "content":[
+          "presentation",
+          "presenter"
+        ]
       },
       "es.upv.paella.videoDataPlugin": {
         "enabled": false,
@@ -334,6 +339,11 @@
         "heartbeat": 30,
         "client_id": "Paella Player"
       },
+      "org.opencast.usertracking.x5gonSaverPlugIn": {
+        "enabled": false,
+        "token": "X5GON_TOKEN",
+        "testing_environment" : false
+      },
       "es.teltek.paella.usertracking.xAPISaverPlugin": {
         "enabled": false,
         "endpoint": "http://localhost:8081/data/xAPI/",
@@ -358,6 +368,9 @@
         "enabled": true
       },
       "es.upv.paella.opencast.userTrackingSaverPlugIn": {
+        "enabled": true
+      },
+      "es.upv.paella.defaultKeysPlugin": {
         "enabled": true
       }
     }

@@ -21,18 +21,13 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.option;
 
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.rest.SharedHttpContext;
-import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Strings;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -152,40 +147,6 @@ public final class OsgiUtil {
     } catch (NumberFormatException e) {
       throw new ConfigurationException(key, "not an integer");
     }
-  }
-
-  /**
-   * Get a mandatory boolean from a dictionary.
-   *
-   * @throws ConfigurationException
-   *           key does not exist
-   */
-  public static boolean getCfgAsBoolean(Dictionary d, String key) throws ConfigurationException {
-    Object p = d.get(key);
-    if (p == null)
-      throw new ConfigurationException(key, "does not exist");
-    return BooleanUtils.toBoolean(p.toString());
-  }
-
-  /**
-   * Check the existence of the given dictionary. Throw an exception if null.
-   */
-  public static void checkDictionary(Dictionary properties, ComponentContext componentContext)
-          throws ConfigurationException {
-    if (properties == null) {
-      String dicName = componentContext.getProperties().get("service.pid").toString();
-      throw new ConfigurationException("*", "Dictionary for " + dicName + " does not exist");
-    }
-  }
-
-  /** Create a config info string suitable for logging purposes. */
-  public static String showConfig(Tuple<String, ?>... cfg) {
-    return "Config\n" + Collections.mkString(mlist(cfg).map(new Function<Tuple<String, ?>, String>() {
-      @Override
-      public String apply(Tuple<String, ?> t) {
-        return t.getA() + "=" + t.getB().toString();
-      }
-    }).value(), "\n");
   }
 
   public static ServiceRegistration<?> registerServlet(BundleContext bundleContext, Object service, String alias) {

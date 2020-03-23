@@ -94,11 +94,20 @@ public final class RequestUtils {
    *
    * @return true if the given mediatype is accepted, false otherwise.
    */
-  public static boolean typeIsAccepted(String assetUploadId, MediaType mediaType, ListProvidersService listProvidersService) {
+  public static boolean typeIsAccepted(String fileName, String assetUploadId, MediaType mediaType,
+          ListProvidersService listProvidersService) {
     if (mediaType.is(MediaType.OCTET_STREAM)) {
       // No detailed info, so we have to accept...
       return true;
     }
+
+    // get file extension with .
+    String fileExtension = null;
+    int dot = fileName.lastIndexOf('.');
+    if (dot != -1) {
+      fileExtension = fileName.substring(dot);
+    }
+
     try {
       final Collection<String> assetUploadJsons = listProvidersService.getList("eventUploadAssetOptions",
           new ResourceListQueryImpl(),false).values();
@@ -115,7 +124,7 @@ public final class RequestUtils {
           for (String accept : accepts) {
             if (accept.contains("/") && mediaType.is(MediaType.parse(accept))) {
               return true;
-            } else if (mediaType.subtype().equalsIgnoreCase(accept.replace(".", ""))) {
+            } else if (fileExtension != null && accept.contains(".") && fileExtension.equalsIgnoreCase(accept)) {
               return true;
             }
           }

@@ -52,8 +52,6 @@ import java.io.InputStream;
 import java.util.List;
 
 public abstract class AwsAbstractArchive implements AssetStore {
-  /** The default AWS region name */
-  public static final String DEFAULT_AWS_REGION = "us-east-1";
 
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(AwsAbstractArchive.class);
@@ -118,8 +116,8 @@ public abstract class AwsAbstractArchive implements AssetStore {
         return false;
       }
       // New mapping will point to the SAME AWS object, nothing will be uploaded
-      logger.debug(String.format("Adding AWS %s link mapping to database: %s points to %s, version %s", getStoreType(),
-              to, map.getObjectKey(), map.getObjectVersion()));
+      logger.debug("Adding AWS {} link mapping to database: {} points to {}, version {}", getStoreType(),
+              to, map.getObjectKey(), map.getObjectVersion());
       database.storeMapping(to, map.getObjectKey(), map.getObjectVersion());
       return true;
     } catch (AwsAssetDatabaseException e) {
@@ -188,8 +186,8 @@ public abstract class AwsAbstractArchive implements AssetStore {
 
     try {
       // Upload was successful. Store mapping in the database
-      logger.debug(String.format("Adding AWS %s mapping to database: %s points to %s, object version %s", getStoreType(),
-              storagePath, objectName, objectVersion));
+      logger.debug("Adding AWS {} mapping to database: {} points to {}, object version {}", getStoreType(),
+              storagePath, objectName, objectVersion);
       database.storeMapping(storagePath, objectName, objectVersion);
     } catch (AwsAssetDatabaseException e) {
       throw new AssetStoreException(e);

@@ -18,43 +18,42 @@
  * the License.
  *
  */
-/*jslint browser: true, nomen: true*/
-/*global define, CustomEvent*/
+/* global define */
 define(function() {
-    "use strict";
+  'use strict';
 
-    function generateRandomID(length) {
-        var id = "";
-        var pool = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  function generateRandomID(length) {
+    var id = '';
+    var pool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-        for (var i = 0; i < length; ++i) {
-            id += pool.charAt(Math.floor(Math.random() * pool.length));
-        }
-
-        return id;
+    for (var i = 0; i < length; ++i) {
+      id += pool.charAt(Math.floor(Math.random() * pool.length));
     }
 
-    function EngageEvent(_name, _description, _type) {
-        this.name = (!_name || _name.length <= 0) ? ("RandomEvent:" + generateRandomID(8)) : _name;
-        this.description = (!_description || _description.length <= 0) ? "" : _description;
-        this.type = (!_type || _type.length <= 0) ? "unknown" : _type;
-    }
+    return id;
+  }
 
-    EngageEvent.prototype.getName = function() {
-        return this.name;
-    };
+  function EngageEvent(_name, _description, _type) {
+    this.name = (!_name || _name.length <= 0) ? ('RandomEvent:' + generateRandomID(8)) : _name;
+    this.description = (!_description || _description.length <= 0) ? '' : _description;
+    this.type = (!_type || _type.length <= 0) ? 'unknown' : _type;
+  }
 
-    EngageEvent.prototype.getDescription = function() {
-        return this.description;
-    };
+  EngageEvent.prototype.getName = function() {
+    return this.name;
+  };
 
-    EngageEvent.prototype.getType = function() {
-        return this.type;
-    };
+  EngageEvent.prototype.getDescription = function() {
+    return this.description;
+  };
 
-    EngageEvent.prototype.toString = function() {
-        return this.name;
-    };
+  EngageEvent.prototype.getType = function() {
+    return this.type;
+  };
 
-    return EngageEvent;
+  EngageEvent.prototype.toString = function() {
+    return this.name;
+  };
+
+  return EngageEvent;
 });

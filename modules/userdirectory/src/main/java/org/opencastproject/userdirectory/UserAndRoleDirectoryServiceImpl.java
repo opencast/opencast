@@ -45,6 +45,10 @@ import com.google.common.cache.LoadingCache;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
@@ -71,6 +75,13 @@ import java.util.stream.Stream;
  * Federates user and role providers, and exposes a spring UserDetailsService so user lookups can be used by spring
  * security.
  */
+@Component(
+  property = {
+    "service.description=Provides a user directory"
+  },
+  immediate = true,
+  service = { UserDirectoryService.class, RoleDirectoryService.class, UserDetailsService.class }
+)
 public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, UserDetailsService, RoleDirectoryService {
 
   /** The logger */
@@ -160,6 +171,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    * @param userProvider
    *          the user provider to add
    */
+  @Reference(name = "userProviders", cardinality = ReferenceCardinality.AT_LEAST_ONE, policy = ReferencePolicy.DYNAMIC, unbind = "removeUserProvider")
   protected synchronized void addUserProvider(UserProvider userProvider) {
     logger.debug("Adding {} to the list of user providers", userProvider);
     if (InMemoryUserAndRoleProvider.PROVIDER_NAME.equals(userProvider.getName())) {
@@ -186,6 +198,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    * @param roleProvider
    *          the role provider to add
    */
+  @Reference(name = "roleProviders", cardinality = ReferenceCardinality.AT_LEAST_ONE, policy = ReferencePolicy.DYNAMIC, unbind = "removeRoleProvider")
   protected synchronized void addRoleProvider(RoleProvider roleProvider) {
     logger.debug("Adding {} to the list of role providers", roleProvider);
     roleProviders.add(roleProvider);
@@ -222,28 +235,6 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       }
     }
     return users.stream().sorted(Comparator.comparing(User::getUsername)).iterator();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.security.api.RoleDirectoryService#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    final Organization org = securityService.getOrganization();
-    if (org == null)
-      throw new IllegalStateException("No organization is set");
-
-    // Get all roles from the role providers
-    final List<Role> roles = new ArrayList<>();
-    for (RoleProvider roleProvider : roleProviders) {
-      final String providerOrgId = roleProvider.getOrganization();
-      if (ALL_ORGANIZATIONS.equals(providerOrgId) || org.getId().equals(providerOrgId)) {
-        roleProvider.getRoles().forEachRemaining(roles::add);
-      }
-    }
-    return roles.stream().sorted(Comparator.comparing(Role::getName)).iterator();
   }
 
   /**
@@ -442,6 +433,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -470,7 +462,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   }
 
   @Override
-  public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
+  public List<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
     Organization org = securityService.getOrganization();
@@ -487,9 +479,9 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     }
     Stream<Role> stream = roles.stream().sorted(Comparator.comparing(Role::getName)).skip(offset);
     if (limit > 0) {
-      return stream.limit(limit).iterator();
+      return stream.limit(limit).collect(Collectors.toList());
     }
-    return stream.iterator();
+    return stream.collect(Collectors.toList());
   }
 
   @Override

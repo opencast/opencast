@@ -28,6 +28,7 @@ import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
+import static org.opencastproject.external.common.ApiVersion.VERSION_1_4_0;
 import static org.opencastproject.external.util.SchedulingUtils.SchedulingInfo;
 import static org.opencastproject.external.util.SchedulingUtils.convertConflictingEvents;
 import static org.opencastproject.external.util.SchedulingUtils.getConflictingEvents;
@@ -166,10 +167,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {}, abstractText = "Provides resources and operations related to the events")
 public class EventsEndpoint implements ManagedService {
-  private static final String METADATA_JSON_KEY = "metadata";
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
 
@@ -455,6 +455,41 @@ public class EventsEndpoint implements ManagedService {
           indexService.updateEventAcl(eventId, eventHttpServletRequest.getAcl().get(), externalIndex);
         }
 
+        if (eventHttpServletRequest.getProcessing().isSome()) {
+
+          if (!event.isScheduledEvent() || event.hasRecordingStarted()) {
+            return RestUtil.R.badRequest("Processing can't be updated for events that are already uploaded.");
+          }
+          JSONObject processing = eventHttpServletRequest.getProcessing().get();
+
+          String workflowId = (String) processing.get("workflow");
+          if (workflowId == null)
+            throw new IllegalArgumentException("No workflow template in metadata");
+
+          Map<String, String> configuration = new HashMap<>();
+          if (eventHttpServletRequest.getProcessing().get().get("configuration") != null) {
+            configuration = new HashMap<>((JSONObject) eventHttpServletRequest.getProcessing().get().get("configuration"));
+          }
+
+          Opt<Map<String, String>> caMetadataOpt = Opt.none();
+          Opt<Map<String, String>> workflowConfigOpt = Opt.none();
+
+          Map<String, String> caMetadata = new HashMap<>(getSchedulerService().getCaptureAgentConfiguration(eventId));
+          if (!workflowId.equals(caMetadata.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION))) {
+            caMetadata.put(CaptureParameters.INGEST_WORKFLOW_DEFINITION, workflowId);
+            caMetadataOpt = Opt.some(caMetadata);
+          }
+
+          Map<String, String> oldWorkflowConfig = new HashMap<>(getSchedulerService().getWorkflowConfig(eventId));
+          if (!oldWorkflowConfig.equals(configuration))
+            workflowConfigOpt = Opt.some(configuration);
+
+          if (!caMetadataOpt.isNone() || !workflowConfigOpt.isNone()) {
+            getSchedulerService().updateEvent(eventId, Opt.none(), Opt.none(), Opt.none(),
+                    Opt.none(), Opt.none(), workflowConfigOpt, caMetadataOpt);
+          }
+        }
+
         if (eventHttpServletRequest.getScheduling().isSome() && !requestedVersion.isSmallerThan(VERSION_1_1_0)) {
           // Scheduling is only available for version 1.1.0 and above
           Optional<Response> clientError = updateSchedulingInformation(
@@ -618,7 +653,7 @@ public class EventsEndpoint implements ManagedService {
         String value;
 
         if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
-          // MH-13038 - 1.1.0 and higher support semi-colons in values
+          // MH-13038 - 1.1.0 and higher support colons in values
           value = f.substring(name.length() + 1);
         } else {
           value = filterTuple[1];
@@ -738,10 +773,9 @@ public class EventsEndpoint implements ManagedService {
     }
 
     // TODO: Add the comment resolution filter to the query
-    CommentResolution resolution = null;
     if (StringUtils.isNotBlank(resolutionFilter)) {
       try {
-        resolution = CommentResolution.valueOf(resolutionFilter);
+        CommentResolution.valueOf(resolutionFilter);
       } catch (Exception e) {
         logger.debug("Unable to parse comment resolution filter {}", resolutionFilter);
         return Response.status(Status.BAD_REQUEST).build();
@@ -862,12 +896,19 @@ public class EventsEndpoint implements ManagedService {
     }
     fields.add(f("publication_status", arr(publicationIds)));
     fields.add(f("processing_state", v(event.getWorkflowState(), BLANK)));
-    fields.add(f("start", v(event.getTechnicalStartTime(), BLANK)));
-    if (event.getTechnicalEndTime() != null) {
-      long duration = new DateTime(event.getTechnicalEndTime()).getMillis()
-                    - new DateTime(event.getTechnicalStartTime()).getMillis();
-      fields.add(f("duration", v(duration)));
+
+    if (requestedVersion.isSmallerThan(VERSION_1_4_0)) {
+      fields.add(f("start", v(event.getTechnicalStartTime(), BLANK)));
+      if (event.getTechnicalEndTime() != null) {
+        long duration = new DateTime(event.getTechnicalEndTime()).getMillis()
+                - new DateTime(event.getTechnicalStartTime()).getMillis();
+        fields.add(f("duration", v(duration)));
+      }
+    } else {
+      fields.add(f("start", v(event.getRecordingStartDate(), BLANK)));
+      fields.add(f("duration", v(event.getDuration(), BLANK)));
     }
+
     if (StringUtils.trimToNull(event.getSubject()) != null) {
       fields.add(f("subjects", arr(splitSubjectIntoArray(event.getSubject()))));
     } else {
@@ -1546,63 +1587,6 @@ public class EventsEndpoint implements ManagedService {
   }
 
   /**
-   * Change the simplified fields of key values provided to the external api into a {@link MetadataList}.
-   *
-   * @param json
-   *          The json string that contains an array of metadata field lists for the different catalogs.
-   * @return A {@link MetadataList} with the fields populated with the values provided.
-   * @throws ParseException
-   *           Thrown if unable to parse the json string.
-   * @throws NotFoundException
-   *           Thrown if unable to find the catalog or field that the json refers to.
-   */
-  protected MetadataList deserializeMetadataList(String json) throws ParseException, NotFoundException {
-    MetadataList metadataList = new MetadataList();
-    JSONParser parser = new JSONParser();
-    JSONArray jsonCatalogs = (JSONArray) parser.parse(json);
-    for (int i = 0; i < jsonCatalogs.size(); i++) {
-      JSONObject catalog = (JSONObject) jsonCatalogs.get(i);
-      String flavorString = catalog.get("flavor").toString();
-      if (StringUtils.trimToNull(flavorString) == null) {
-        throw new IllegalArgumentException(
-                "Unable to create new event as no flavor was given for one of the metadata collections");
-      }
-
-      MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
-
-      MetadataCollection collection = null;
-      EventCatalogUIAdapter adapter = null;
-      for (EventCatalogUIAdapter eventCatalogUIAdapter : getEventCatalogUIAdapters()) {
-        if (eventCatalogUIAdapter.getFlavor().equals(flavor)) {
-          adapter = eventCatalogUIAdapter;
-          collection = eventCatalogUIAdapter.getRawFields();
-        }
-      }
-
-      if (collection == null) {
-        throw new IllegalArgumentException(
-                String.format("Unable to find an EventCatalogUIAdapter with Flavor '%s'", flavorString));
-      }
-
-      String fieldsJson = catalog.get("fields").toString();
-      if (StringUtils.trimToNull(fieldsJson) != null) {
-        Map<String, String> fields = RequestUtils.getKeyValueMap(fieldsJson);
-        for (String key : fields.keySet()) {
-          MetadataField<?> field = collection.getOutputFields().get(key);
-          if (field == null) {
-            throw new NotFoundException(String.format(
-                    "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
-          }
-          collection.removeField(field);
-          collection.addField(MetadataField.copyMetadataFieldWithValue(field, fields.get(key)));
-        }
-      }
-      metadataList.add(adapter, collection);
-    }
-    return metadataList;
-  }
-
-  /**
    * Get an {@link AccessControlList} from an {@link Event}.
    *
    * @param event
@@ -1694,7 +1678,7 @@ public class EventsEndpoint implements ManagedService {
 
   @GET
   @Path("{eventId}/scheduling")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0 })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
   @RestQuery(name = "geteventscheduling", description = "Returns an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
       @RestResponse(description = "The scheduling information for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
@@ -1722,7 +1706,7 @@ public class EventsEndpoint implements ManagedService {
 
   @PUT
   @Path("{eventId}/scheduling")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0 })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
   @RestQuery(name = "updateeventscheduling", description = "Update an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = Type.STRING) }, restParameters = {
       @RestParameter(name = "scheduling", isRequired = true, description = "Scheduling Information", type = Type.STRING),

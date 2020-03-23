@@ -28,6 +28,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,17 @@ import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Set;
 
+@Component(
+  immediate = true,
+  service = {
+    ManagedService.class,
+    AdminUIConfiguration.class
+  },
+  property = {
+    "service.description=Admin UI - Configuration",
+    "service.pid=org.opencastproject.adminui"
+  }
+)
 public class AdminUIConfiguration implements ManagedService {
 
   /** This helper class provides all information relevant for the automatic distribution of
@@ -112,6 +124,7 @@ public class AdminUIConfiguration implements ManagedService {
   public static final String OPT_SOURCE_TRACK_RIGHT_FLAVOR = "sourcetrack.right.flavor";
   public static final String OPT_PREVIEW_AUDIO_SUBTYPE = "preview.audio.subtype";
   public static final String OPT_PREVIEW_VIDEO_SUBTYPE = "preview.video.subtype";
+  private static final String OPT_RETRACT_WORKFLOW_ID = "retract.workflow.id";
 
   private static final String DEFAULT_PREVIEW_SUBTYPE = "preview";
   private static final String DEFAULT_WAVEFORM_SUBTYPE = "waveform";
@@ -143,6 +156,8 @@ public class AdminUIConfiguration implements ManagedService {
   private static final String DEFAULT_SOURCE_TRACK_LEFT_FLAVOR = "presenter/source";
   private static final String DEFAULT_SOURCE_TRACK_RIGHT_FLAVOR = "presentation/source";
 
+  private static final String DEFAULT_RETRACT_WORKFLOW_ID = "delete";
+
   private String previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
   private String waveformSubtype = DEFAULT_WAVEFORM_SUBTYPE;
   private Set<String> smilCatalogTagSet = new HashSet<>();
@@ -166,6 +181,7 @@ public class AdminUIConfiguration implements ManagedService {
     DEFAULT_SOURCE_TRACK_LEFT_FLAVOR);
   private MediaPackageElementFlavor sourceTrackRightFlavor = MediaPackageElementFlavor.parseFlavor(
     DEFAULT_SOURCE_TRACK_RIGHT_FLAVOR);
+  private String retractWorkflowId = DEFAULT_RETRACT_WORKFLOW_ID;
 
   public String getPreviewSubtype() {
     return previewSubtype;
@@ -248,6 +264,10 @@ public class AdminUIConfiguration implements ManagedService {
 
   public MediaPackageElementFlavor getSourceTrackRightFlavor() {
     return sourceTrackRightFlavor;
+  }
+
+  public String getRetractWorkflowId() {
+    return retractWorkflowId;
   }
 
   @Override
@@ -379,5 +399,9 @@ public class AdminUIConfiguration implements ManagedService {
       (String) properties.get(OPT_SOURCE_TRACK_RIGHT_FLAVOR), DEFAULT_SOURCE_TRACK_RIGHT_FLAVOR));
     logger.debug("Source track right flavor set to '{}'", sourceTrackRightFlavor);
 
+    // Retract workflow ID
+    retractWorkflowId = StringUtils.defaultString((String) properties.get(OPT_RETRACT_WORKFLOW_ID),
+      DEFAULT_RETRACT_WORKFLOW_ID);
+    logger.debug("Retract workflow ID set to {}", retractWorkflowId);
   }
 }

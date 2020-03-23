@@ -110,9 +110,14 @@ import javax.persistence.Version;
                 + "where j.status = :status and j.processorServiceRegistration is not null and "
                 + "j.processorServiceRegistration.serviceType = :serviceType and "
                 + "j.creatorServiceRegistration.hostRegistration.baseUrl = :host"),
+        @NamedQuery(name = "Job.countByHost.nullType", query = "SELECT COUNT(j) FROM Job j "
+                + "where j.status = :status and j.processorServiceRegistration is not null and "
+                + "j.creatorServiceRegistration.hostRegistration.baseUrl = :host"),
         @NamedQuery(name = "Job.countByOperation", query = "SELECT COUNT(j) FROM Job j "
                 + "where j.status = :status and j.operation = :operation and "
                 + "j.creatorServiceRegistration.serviceType = :serviceType"),
+        @NamedQuery(name = "Job.countByOperationOnly", query = "SELECT COUNT(j) FROM Job j "
+                + "where j.operation = :operation"),
         @NamedQuery(name = "Job.fullMonty", query = "SELECT COUNT(j) FROM Job j "
                 + "where j.status = :status and j.operation = :operation "
                 + "and j.processorServiceRegistration is not null and "

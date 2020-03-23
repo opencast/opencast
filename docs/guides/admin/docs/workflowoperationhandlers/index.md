@@ -27,17 +27,19 @@ The following table contains the workflow operations that are available in an ou
 |analyze-audio       |Analyze first audio stream                                     |[Documentation](analyzeaudio-woh.md)|
 |analyze-tracks      |Analyze tracks in media package                                |[Documentation](analyze-tracks-woh.md)|
 |animate             |Create animated video sequence                                 |[Documentation](animate-woh.md)|
+|amberscript-start-transcription|Start AmberScript Transcription                     |[Documentation](amberscript-start-transcription-woh.md)|
+|amberscript-attach-transcription|Attach AmberScript Transcription                   |[Documentation](amberscript-attach-transcription-woh.md)|
 |asset-delete        |Deletes the current mediapackage from the Archive              |[Documentation](asset-delete-woh.md)|
 |attach-watson-transcription|Attaches automated transcripts to mediapackage          |[Documentation](attach-watson-transcription-woh.md)|
 |cleanup             |Cleanup the working file repository                            |[Documentation](cleanup-woh.md)|
 |clone               |Clone media package elements to another flavor                 |[Documentation](clone-woh.md)|
 |comment             |Add, resolve or delete a comment                               |[Documentation](comment-woh.md)|
-|compose             |Encode media files using FFmpeg                                |[Documentation](compose-woh.md)|
 |composite           |Compose two videos on one canvas.                              |[Documentation](composite-woh.md)|
 |concat              |Concatenate multiple video tracks into one video track         |[Documentation](concat-woh.md)|
 |configure-by-dcterm |Set workflow parameter if dublincore term matches value        |[Documentation](configure-by-dcterm-woh.md)|
 |copy                |Copy media package elements to target directory                |[Documentation](copy-woh.md)|
 |cover-image         |Generate a cover-image containing metadata                     |[Documentation](coverimage-woh.md)|
+|crop-video          |Checks for black bars on the sides of the video                |[Documentation](cropvideo-woh.md)|
 |defaults            |Applies default workflow configuration values                  |[Documentation](defaults-woh.md)|
 |demux               |Demuxes streams to multiple output files                       |[Documentation](demux-woh.md)|
 |duplicate-event     |Create an event by cloning an existing one                     |[Documentation](duplicate-event-woh.md)|
@@ -49,6 +51,8 @@ The following table contains the workflow operations that are available in an ou
 |export-wf-properties|Export workflow properties                                     |[Documentation](export-wf-properties-woh.md)|
 |extract-text        |Extracting text from presentation segments                     |[Documentation](extracttext-woh.md)|
 |failing             |Operations that always fails                                   |[Documentation](failing-woh.md)|
+|google-speech-attach-transcription|Attaches automated transcripts to mediapackage   |[Documentation](google-speech-attach-transcription-woh.md)|
+|google-speech-start-transcription|Starts automated transcription provided by Google Speech|[Documentation](google-speech-start-transcription-woh.md)|
 |http-notify         |Notifies an HTTP endpoint about the process of the workflow    |[Documentation](httpnotify-woh.md)|
 |image               |Extract images from a video using FFmpeg                       |[Documentation](image-woh.md)|
 |image-convert       |Convert images using FFmpeg                                    |[Documentation](image-convert-woh.md)|

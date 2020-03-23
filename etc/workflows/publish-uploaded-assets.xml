@@ -18,20 +18,6 @@
       description="Applying default configuration values">
       <configurations>
         <configuration key="publishToEngage">true</configuration>
-        <configuration key="publishToOaiPmh">true</configuration>
-        <configuration key="publishToYouTube">false</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Tag for publish -->
-
-    <operation
-      id="tag"
-      exception-handler-workflow="partial-error"
-      description="Tagging media package elements for archival">
-      <configurations>
-        <configuration key="source-flavors">*/*</configuration>
-        <configuration key="target-tags">+archive</configuration>
       </configurations>
     </operation>
 
@@ -55,26 +41,13 @@
       </configurations>
     </operation>
 
-    <!-- Publish to engage player -->
-
-    <operation
-      id="republish-oaipmh"
-      if="${publishToOaiPmh}"
-      exception-handler-workflow="partial-error"
-      description="Update recording metadata in default OAI-PMH repository">
-      <configurations>
-        <configuration key="source-flavors">${download-source-flavors}</configuration>
-        <configuration key="repository">default</configuration>
-      </configurations>
-    </operation>
-
     <!-- Archive the current state of the mediapackage -->
 
     <operation
       id="snapshot"
       description="Archiving new assets">
       <configurations>
-        <configuration key="source-tags">archive</configuration>
+        <configuration key="source-flavors">*/*</configuration>
       </configurations>
     </operation>
 

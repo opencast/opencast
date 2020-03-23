@@ -94,40 +94,6 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
   /**
    * Creates an attachment.
    *
-   * @param flavor
-   *          the attachment type
-   * @param uri
-   *          the attachment location
-   * @param size
-   *          the attachment size
-   * @param checksum
-   *          the attachment checksum
-   * @param mimeType
-   *          the attachment mime type
-   */
-  protected AttachmentImpl(MediaPackageElementFlavor flavor, URI uri, long size, Checksum checksum, MimeType mimeType) {
-    super(Type.Attachment, flavor, uri, size, checksum, mimeType);
-    if (uri != null)
-      try {
-        this.setMimeType(MimeTypes.fromURI(uri));
-      } catch (UnknownFileTypeException e) { }
-  }
-
-  /**
-   * Creates an attachment.
-   *
-   * @param identifier
-   *          the attachment identifier
-   * @param uri
-   *          the attachments location
-   */
-  protected AttachmentImpl(String identifier, URI uri) {
-    this(identifier, null, uri, 0, null, null);
-  }
-
-  /**
-   * Creates an attachment.
-   *
    * @param uri
    *          the attachments location
    */

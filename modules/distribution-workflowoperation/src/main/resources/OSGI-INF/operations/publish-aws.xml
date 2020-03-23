@@ -16,4 +16,7 @@
   <reference name="ServiceRegistry" cardinality="1..1"
              interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
              policy="static" bind="setServiceRegistry"/>
+  <reference name="organizationDirectoryService"
+             interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             bind="setOrganizationDirectoryService"/>
 </scr:component>

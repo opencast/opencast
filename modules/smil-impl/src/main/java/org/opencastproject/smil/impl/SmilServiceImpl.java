@@ -44,6 +44,8 @@ import org.opencastproject.smil.entity.media.param.SmilMediaParamGroupImpl;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 
+import org.osgi.service.component.annotations.Component;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +55,13 @@ import javax.xml.bind.JAXBException;
 /**
  * Implement {@link SmilService} interface.
  */
+@Component(
+  property = {
+    "service.description=SMIL Service"
+  },
+  immediate = true,
+  service = { SmilService.class }
+)
 public class SmilServiceImpl implements SmilService {
 
   /**
@@ -71,7 +80,7 @@ public class SmilServiceImpl implements SmilService {
     SmilImpl smil = new SmilImpl();
     ((SmilHeadImpl) smil.getHead()).addMeta(
             SmilMeta.SMIL_META_NAME_MEDIA_PACKAGE_ID,
-            mediaPackage.getIdentifier().compact());
+            mediaPackage.getIdentifier().toString());
     return new SmilResponseImpl(smil);
   }
 

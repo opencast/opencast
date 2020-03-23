@@ -29,7 +29,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageParser;
-import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 
 import org.apache.commons.fileupload.MockHttpServletRequest;
@@ -84,7 +84,7 @@ public class IngestRestServiceTest {
             .andReturn(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
     EasyMock.expect(ingestService.createMediaPackage("1a6f70ab-4262-4523-9f8e-babce22a1ea8"))
             .andReturn(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-                    .createNew(new UUIDIdBuilderImpl().fromString("1a6f70ab-4262-4523-9f8e-babce22a1ea8")));
+                    .createNew(new IdImpl("1a6f70ab-4262-4523-9f8e-babce22a1ea8")));
     EasyMock.expect(ingestService.addAttachment((URI) EasyMock.anyObject(),
             (MediaPackageElementFlavor) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject()))
             .andReturn(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());

@@ -247,7 +247,7 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
       return Response.status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
       logger.warn("Unable to retract media package '{}' from the OAI-PMH channel {}",
-              mediaPackage != null ? mediaPackage.getIdentifier().compact() : "<parsing error>", channel, e);
+              mediaPackage != null ? mediaPackage.getIdentifier().toString() : "<parsing error>", channel, e);
       return Response.serverError().build();
     }
     return Response.ok(new JaxbJob(job)).build();

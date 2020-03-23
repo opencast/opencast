@@ -30,7 +30,6 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -69,7 +68,7 @@ import javax.xml.transform.stream.StreamResult;
                 + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
 public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -77,12 +76,6 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The caption service */
   protected CaptionService service;
-
-  /** The default server URL */
-  protected String serverUrl = UrlSupport.DEFAULT_BASE_URL;
-
-  /** The default sample location URL */
-  protected String sampleLocation = serverUrl + "/workflow";
 
   /** The service registry */
   protected ServiceRegistry serviceRegistry = null;
@@ -222,12 +215,6 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
       logger.error("Unable to parse captions: {}", e.getMessage());
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
-  }
-
-  protected String generateCatalog() {
-    return "<catalog id=\"catalog-1\" type=\"captions/dfxp\">" + "  <mimetype>text/xml</mimetype>" + "  <url>"
-            + sampleLocation + "/samples/captions.dfxp.xml</url>"
-            + "  <checksum type=\"md5\">08b58d152be05a85f877cf160ee6608c</checksum>" + "</catalog>";
   }
 
   /**

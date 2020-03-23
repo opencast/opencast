@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.transcription.workflowoperation.AmberscriptAttachTranscriptionOperationHandler"
+               immediate="true" activate="activate">
+  <implementation
+      class="org.opencastproject.transcription.workflowoperation.AmberscriptAttachTranscriptionOperationHandler"/>
+  <property name="service.description"
+            value="Attach Transcription Workflow Operation Handler (Amberscript)"/>
+  <property name="workflow.operation"
+            value="amberscript-attach-transcription"/>
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
+  </service>
+  <reference name="ServiceRegistry"
+             interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             cardinality="1..1"
+             policy="static"
+             bind="setServiceRegistry"/>
+  <reference name="TranscriptionService"
+             interface="org.opencastproject.transcription.api.TranscriptionService"
+             cardinality="1..1"
+             policy="static"
+             target="(provider=amberscript)"
+             bind="setTranscriptionService"/>
+  <reference name="workspace"
+             interface="org.opencastproject.workspace.api.Workspace"
+             cardinality="1..1"
+             policy="static"
+             bind="setWorkspace"/>
+  <reference name="captionService"
+             interface="org.opencastproject.caption.api.CaptionService"
+             policy="static"
+             cardinality="1..1"
+             bind="setCaptionService"/>
+</scr:component>

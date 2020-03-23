@@ -828,13 +828,13 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     URI uri;
     if (FilenameUtils.getExtension(encodedTrack.getURI().toString()).equalsIgnoreCase(
             FilenameUtils.getExtension(track.getURI().toString()))) {
-      uri = workspace.moveTo(encodedTrack.getURI(), mp.getIdentifier().compact(), encodedTrack.getIdentifier(),
+      uri = workspace.moveTo(encodedTrack.getURI(), mp.getIdentifier().toString(), encodedTrack.getIdentifier(),
               FilenameUtils.getName(track.getURI().toString()));
     } else {
       // The new encoded file has a different extension.
       uri = workspace.moveTo(
               encodedTrack.getURI(),
-              mp.getIdentifier().compact(),
+              mp.getIdentifier().toString(),
               encodedTrack.getIdentifier(),
               FilenameUtils.getBaseName(track.getURI().toString()) + "."
                       + FilenameUtils.getExtension(encodedTrack.getURI().toString()));
@@ -858,7 +858,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     if (trimmedTrack == null)
       throw new WorkflowOperationException("Trimming track " + track + " failed to produce a track");
 
-    URI uri = workspace.moveTo(trimmedTrack.getURI(), mediaPackage.getIdentifier().compact(),
+    URI uri = workspace.moveTo(trimmedTrack.getURI(), mediaPackage.getIdentifier().toString(),
             trimmedTrack.getIdentifier(), FilenameUtils.getName(track.getURI().toString()));
     trimmedTrack.setURI(uri);
     trimmedTrack.setFlavor(track.getFlavor());

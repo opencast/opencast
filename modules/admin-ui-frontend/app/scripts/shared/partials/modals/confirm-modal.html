@@ -1,0 +1,20 @@
+<section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="confirm-modal">
+  <header>
+    <a class="fa fa-times close-modal" ng-click="close()"></a>
+    <h2 translate="CONFIRMATIONS.ACTIONS.CONFIRMATION"><!-- Confirm --></h2>
+  </header>
+
+  <div>
+    <p><span translate="CONFIRMATIONS.METADATA.NOTICE.{{type}}"><!-- The following element will be deleted --></span>:</p>
+    <p class="delete">{{name}}</p>
+  </div>
+  <p class="warning" translate="CONFIRMATIONS.WARNINGS.EVENT_WILL_BE_GONE" ng-show="type=='EVENT'">
+    <!-- If you continue, the event will be irrevocably gone. -->
+  </p>
+  <p translate="CONFIRMATIONS.CONTINUE_ACTION"><!-- Are you sure you want to continue? --></p>
+
+  <div class="btn-container">
+    <a translate="CANCEL" class="cancel-btn close-modal" ng-click="close()"><i><!--- Cancel --></i></a>
+    <a translate="CONFIRM" class="danger-btn" ng-click="confirm()"><i><!-- Confirm --></i></a>
+  </div>
+</section>

@@ -24,6 +24,7 @@ General Configuration
     - [LDAP Authentication and Authorization (without CAS)](security.ldap.md)
     - [Moodle User Provider](security.user.moodle.md)
     - [Sakai User Provider](security.user.sakai.md)
+    - [Brightspace User Provider](security.user.brightspace.md)
     - [Authentication and Authorization Infrastructure (AAI)](security.aai.md)
     - [Access Control Lists](acl.md)
     - [Stream Security](stream-security.md)

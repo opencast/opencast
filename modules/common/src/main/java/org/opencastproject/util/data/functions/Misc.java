@@ -24,7 +24,6 @@ package org.opencastproject.util.data.functions;
 import static org.opencastproject.util.EqualsUtil.eq;
 
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 
 import java.util.List;
@@ -101,36 +100,8 @@ public final class Misc {
   }
 
   /** Widening cast. */
-  public static <A> List<A> widen(Class<A> type, List<? extends A> xs) {
-    return (List<A>) xs;
-  }
-
-  /** Widening cast. */
   public static <A> Option<A> widen(Option<? extends A> xs) {
     return (Option<A>) xs;
-  }
-
-  /** Widening cast. */
-  public static <A> Option<A> widen(Class<A> type, Option<? extends A> xs) {
-    return (Option<A>) xs;
-  }
-
-  public static <A extends Exception> Function0<A> error(final Class<A> cls, final String msg, final Throwable cause) {
-    return new Function0.X<A>() {
-      @Override
-      public A xapply() throws Exception {
-        return cls.getConstructor(String.class, Throwable.class).newInstance(msg, cause);
-      }
-    };
-  }
-
-  public static <A extends Exception> Function0<A> error(final Class<A> cls, final String msg) {
-    return new Function0.X<A>() {
-      @Override
-      public A xapply() throws Exception {
-        return cls.getConstructor(String.class).newInstance(msg);
-      }
-    };
   }
 
   public static <A> Function<A, A> ifThen(final A predicate, final A b) {

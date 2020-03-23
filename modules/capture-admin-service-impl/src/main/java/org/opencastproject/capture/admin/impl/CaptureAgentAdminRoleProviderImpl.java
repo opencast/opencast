@@ -30,6 +30,9 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.util.SecurityUtil;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +42,13 @@ import java.util.stream.Stream;
 /**
  * The capture agent admin role provider provides a role for each registered capture agent
  */
+@Component(
+  property = {
+    "service.description=Manages Roles for each capture agent"
+  },
+  immediate = true,
+  service = { RoleProvider.class }
+)
 public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
 
   private SecurityService securityService;
@@ -47,6 +57,7 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
    * @param service
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(final SecurityService service) {
     this.securityService = service;
   }
@@ -54,6 +65,7 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
 
   private CaptureAgentStateService captureAgentService;
 
+  @Reference(name = "CaptureAgentStateService")
   public void setCaptureAgentStateService(final CaptureAgentStateService service) {
     this.captureAgentService = service;
   }
@@ -64,14 +76,6 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
     final String description = "Role for capture agent \"" + name + "\"";
     final Role.Type system = Role.Type.INTERNAL;
     return new JaxbRole(roleName, organization, description, system);
-  }
-
-  /**
-   * @see RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    return getRolesStream().iterator();
   }
 
   private Stream<Role> getRolesStream() {
@@ -104,6 +108,11 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
   public Iterator<Role> findRoles(final String query, final Role.Target target, final int offset, final int limit) {
     if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
+
+    // These roles are not meaningful for use in ACLs
+    if (target == Role.Target.ACL) {
+      return Collections.emptyIterator();
     }
 
     Stream<Role> roleStream = getRolesStream()

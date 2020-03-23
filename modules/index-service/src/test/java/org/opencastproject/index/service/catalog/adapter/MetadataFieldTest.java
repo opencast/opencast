@@ -24,6 +24,7 @@ package org.opencastproject.index.service.catalog.adapter;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
@@ -51,10 +52,6 @@ import uk.co.datumedge.hamcrest.json.SameJSONAs;
 public class MetadataFieldTest {
   private String defaultInputID = "TestInputID";
   private String defaultOutputID = "TestOutputID";
-  private String startDate = "startDate";
-  private String startTime = "startTime";
-  private String endDate = "endDate";
-  private String endTime = "endTime";
   private Opt<String> optOutputID = Opt.some(defaultOutputID);
   private String label = "A_LABEL_FOR_THIS_PROPERTY";
   private Map<String, String> collection = new TreeMap<>();
@@ -67,7 +64,6 @@ public class MetadataFieldTest {
   private String datePattern = "yyyy-MM-dd";
   private String timePattern = "hh-mm-ss";
   private String dateTimePattern = datePattern + " " + timePattern;
-  private String temporal = "start=2014-11-04T19:00:00Z; end=2014-11-05T20:00:00Z; scheme=W3C-DTF;";
   private ListProvidersService listProvidersService;
   private Date testDate = new Date(1415396970000L);
 
@@ -85,6 +81,28 @@ public class MetadataFieldTest {
             listProvidersService.isTranslatable(EasyMock.anyString())).andReturn(isTranslatable).anyTimes();
     EasyMock.replay(listProvidersService);
   }
+
+  @Test
+  public void testSetDifferentValues()  throws Exception {
+    String textValue = "This is the text value";
+
+    MetadataField<String> textField = MetadataField.createTextMetadataField(defaultInputID, optOutputID, label, false,
+            false, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none());
+    textField.setValue(textValue);
+
+    assertTrue(textField.hasDifferentValues().isNone());
+
+    textField.setDifferentValues();
+
+    assertTrue(textField.hasDifferentValues().isSome());
+    assertTrue(textField.hasDifferentValues().get());
+    assertTrue(textField.getValue().isNone());
+
+    String withDifferentValuesJson = IOUtils.toString(getClass()
+            .getResource("/catalog-adapter/text/text-with-different-values.json"));
+    assertThat(withDifferentValuesJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(textField.toJSON())));
+  }
+
 
   @Test
   public void testSetOutputIDInputNoOutputIDExpectsInputIDIsOutputID() {

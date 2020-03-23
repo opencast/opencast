@@ -51,6 +51,8 @@ import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Role;
+import org.opencastproject.security.api.RoleDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
@@ -69,6 +71,8 @@ import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,12 +117,20 @@ public class AclEndpoint {
   /** The security service */
   private SecurityService securityService;
 
+  // The role directory service
+  private RoleDirectoryService roleDirectoryService;
+
   /**
    * @param aclServiceFactory
    *          the aclServiceFactory to set
    */
   public void setAclServiceFactory(AclServiceFactory aclServiceFactory) {
     this.aclServiceFactory = aclServiceFactory;
+  }
+
+  /** OSGi callback for role directory service. */
+  public void setRoleDirectoryService(RoleDirectoryService roleDirectoryService) {
+    this.roleDirectoryService = roleDirectoryService;
   }
 
   /**
@@ -204,6 +216,55 @@ public class AclEndpoint {
             .apply(limit > 0 ? StreamOp.<ManagedAcl> id().take(limit) : StreamOp.<ManagedAcl> id()).map(fullManagedAcl)
             .toList();
     return okJsonList(aclJSON, offset, limit, total);
+  }
+
+  @GET
+  @Path("roles.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getRoles", description = "Returns a list of roles",
+             returnDescription = "Returns a JSON representation of the roles with the given parameters under the "
+                               + "current user's organization.",
+             restParameters = {
+               @RestParameter(name = "query", isRequired = false, description = "The query.", type = STRING),
+               @RestParameter(name = "target", isRequired = false, description = "The target of the roles.",
+                              type = STRING),
+               @RestParameter(name = "limit", defaultValue = "100",
+                              description = "The maximum number of items to return per page.", isRequired = false,
+                              type = RestParameter.Type.STRING),
+               @RestParameter(name = "offset", defaultValue = "0", description = "The page number.", isRequired = false,
+                              type = RestParameter.Type.STRING) },
+             reponses = { @RestResponse(responseCode = SC_OK, description = "The list of roles.") })
+  public Response getRoles(@QueryParam("query") String query, @QueryParam("target") String target,
+                           @QueryParam("offset") int offset, @QueryParam("limit") int limit) {
+
+    String roleQuery = "%";
+    if (StringUtils.isNotBlank(query)) {
+      roleQuery = query.trim() + "%";
+    }
+
+    Role.Target roleTarget = Role.Target.ALL;
+
+    if (StringUtils.isNotBlank(target)) {
+      try {
+        roleTarget = Role.Target.valueOf(target.trim());
+      } catch (Exception e) {
+        logger.warn("Invalid target filter value {}", target);
+      }
+    }
+
+    List<Role> roles = roleDirectoryService.findRoles(roleQuery, roleTarget, offset, limit);
+
+    JSONArray jsonRoles = new JSONArray();
+    for (Role role: roles) {
+      JSONObject jsonRole = new JSONObject();
+      jsonRole.put("name", role.getName());
+      jsonRole.put("type", role.getType().toString());
+      jsonRole.put("description", role.getDescription());
+      jsonRole.put("organization", role.getOrganizationId());
+      jsonRoles.add(jsonRole);
+    }
+
+    return Response.ok(jsonRoles.toJSONString()).build();
   }
 
   @DELETE

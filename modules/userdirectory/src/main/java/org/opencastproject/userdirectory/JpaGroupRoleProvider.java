@@ -53,6 +53,9 @@ import org.opencastproject.util.NotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +74,13 @@ import javax.persistence.EntityTransaction;
 /**
  * Manages and locates users using JPA.
  */
+@Component(
+  property = {
+    "service.description=Provides a group role directory"
+  },
+  immediate = true,
+  service = { RoleProvider.class, JpaGroupRoleProvider.class }
+)
 public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleProvider, GroupProvider {
 
   /** The logger */
@@ -101,6 +111,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   private ComponentContext cc;
 
   /** OSGi DI */
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -111,6 +122,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference(name = "userDirectoryService")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -119,6 +131,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    * @param messageSender
    *          The messageSender to set
    */
+  @Reference(name = "message-broker-sender")
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
   }
@@ -127,6 +140,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    * @param messageReceiver
    *          The messageReceiver to set
    */
+  @Reference(name = "message-broker-receiver")
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
   }
@@ -135,6 +149,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -143,6 +158,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    * @param organizationDirectoryService
    *          the organizationDirectoryService to set
    */
+  @Reference(name = "organization-directory-service")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
@@ -153,23 +169,13 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    * @param cc
    *          the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("Activate group role provider");
     this.cc = cc;
 
     // Set up persistence
     super.activate();
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    String orgId = securityService.getOrganization().getId();
-    return getGroupsRoles(UserDirectoryPersistenceUtil.findGroups(orgId, 0, 0, emf)).iterator();
   }
 
   /**

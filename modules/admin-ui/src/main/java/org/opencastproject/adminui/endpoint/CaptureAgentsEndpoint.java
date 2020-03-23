@@ -57,6 +57,8 @@ import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +90,15 @@ import javax.ws.rs.core.Response.Status;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+  immediate = true,
+  service = CaptureAgentsEndpoint.class,
+  property = {
+    "service.description=Admin UI - Capture agents facade Endpoint",
+    "opencast.service.type=org.opencastproject.adminui.endpoint.UsersEndpoint",
+    "opencast.service.path=/admin-ng/capture-agents"
+  }
+)
 public class CaptureAgentsEndpoint {
 
   private static final String TRANSLATION_KEY_PREFIX = "CAPTURE_AGENT.DEVICE.";
@@ -106,10 +117,12 @@ public class CaptureAgentsEndpoint {
    * @param service
    *          the capture agent service to set
    */
+  @Reference
   public void setCaptureAgentService(CaptureAgentStateService service) {
     this.service = service;
   }
 
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

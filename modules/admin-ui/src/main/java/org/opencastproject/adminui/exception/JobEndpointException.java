@@ -29,17 +29,8 @@ public class JobEndpointException extends Exception {
   private static final long serialVersionUID = 7020240266255081300L;
 
   /**
-   * Constructor without cause.
-   * 
-   * @param message
-   */
-  public JobEndpointException(String message) {
-    super(message);
-  }
-
-  /**
    * Full fledged constructor.
-   * 
+   *
    * @param message
    * @param cause
    */

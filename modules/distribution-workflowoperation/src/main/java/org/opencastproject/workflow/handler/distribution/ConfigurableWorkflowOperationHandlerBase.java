@@ -20,8 +20,6 @@
  */
 package org.opencastproject.workflow.handler.distribution;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
@@ -119,8 +117,8 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
       try {
         job = getDistributionService().retract(channelId, mediapackageWithPublicationElements, elementIds);
       } catch (DistributionException e) {
-        logger.error("Error while retracting '{}' elements from channel '{}' of distribution '{}': {}",
-                elementIds.size(), channelId, getDistributionService(), getStackTrace(e));
+        logger.error("Error while retracting '{}' elements from channel '{}' of distribution '{}':",
+                elementIds.size(), channelId, getDistributionService(), e);
         throw new WorkflowOperationException("The retraction job did not complete successfully");
       }
       if (!waitForStatus(job).isSuccess()) {

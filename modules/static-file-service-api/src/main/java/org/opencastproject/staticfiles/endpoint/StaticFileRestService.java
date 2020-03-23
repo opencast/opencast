@@ -23,7 +23,6 @@ package org.opencastproject.staticfiles.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.security.api.SecurityService;
@@ -47,7 +46,6 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -84,7 +82,7 @@ import javax.ws.rs.core.Response.Status;
                 + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
 public class StaticFileRestService {
 
   /** The logging facility */
@@ -232,8 +230,7 @@ public class StaticFileRestService {
       try {
         return Response.created(getStaticFileURL(uuid)).entity(uuid).build();
       } catch (NotFoundException e) {
-        logger.error("Previous stored file with uuid {} couldn't beren found: {}", uuid,
-                ExceptionUtils.getStackTrace(e));
+        logger.error("Previous stored file with uuid {} couldn't beren found:", uuid, e);
         return Response.serverError().build();
       }
     } catch (WebApplicationException e) {
@@ -256,7 +253,7 @@ public class StaticFileRestService {
       staticFileService.persistFile(uuid);
       return R.ok();
     } catch (IOException e) {
-      logger.error("Unable to persist file '{}': {}", uuid, getStackTrace(e));
+      logger.error("Unable to persist file '{}':", uuid, e);
       return R.serverError();
     }
   }

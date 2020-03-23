@@ -65,23 +65,22 @@ jobs:
       language: python
       python: "3.6"
       install:
-        - pip install mkdocs markdown_inline_graphviz_extension
+        - pip install mkdocs markdown_inline_graphviz_extension mkdocs-windmill
         - (cd docs/guides && npm install)
       script:
+        # Check for tests or trailing spaces in pom.xml files or configuration
         - (! grep -rn '	' modules assemblies pom.xml --include=pom.xml)
         - (! grep -rn ' $' modules assemblies pom.xml --include=pom.xml)
         - (! grep -rn '	' etc)
         - (! grep -rn ' $' etc)
         # build number must be present in all modules
         - grep -L '<Build-Number>${buildNumber}</Build-Number>' modules/*/pom.xml | wc -l | grep -q '^0$'
+        # maven-dependency-plugin should be active for all now modules
+        - grep -L maven-dependency-plugin modules/*/pom.xml > maven-dependency-plugin.list
+        - diff -q maven-dependency-plugin.list docs/checkstyle/maven-dependency-plugin.exceptions
+        # check that documentation builds without warnings
         - >
           ( cd docs/guides/admin &&
-            mkdocs build > mkdocs.log 2>&1 &&
-            ! grep 'WARNING.*Documentation file' mkdocs.log &&
-            ! grep 'pages exist in the docs directory' mkdocs.log &&
-            cat mkdocs.log )
-        - >
-          ( cd docs/guides/user &&
             mkdocs build > mkdocs.log 2>&1 &&
             ! grep 'WARNING.*Documentation file' mkdocs.log &&
             ! grep 'pages exist in the docs directory' mkdocs.log &&
@@ -126,6 +125,30 @@ jobs:
       script:
         - mvn clean install -Pnone
 
+    # Run JS tests in Chrome
+    - stage: build
+      env: name=chrome
+      addons:
+        chrome: stable
+      install:
+        - ( cd modules/admin-ui-frontend &&
+            npm ci &&
+            ./node_modules/.bin/bower install)
+      script:
+        - (cd modules/admin-ui-frontend && npm run test-chrome)
+
+    # Run JS tests in Firefox
+    - stage: build
+      env: name=firefox
+      addons:
+        firefox: latest
+      install:
+        - ( cd modules/admin-ui-frontend &&
+            npm ci &&
+            ./node_modules/.bin/bower install)
+      script:
+        - (cd modules/admin-ui-frontend && npm run test-firefox)
+
     # Make a simple build to generate all Opencast artifacts while excluding as many checks as possible since we do a
     # proper test in parallel anyway. Then run `mvn site` to generate Javadocs. We exclude checkstyle and tests since
     # they are run separately. For now, we also exclude pmd and cpd since we are not doing anything with their report.
@@ -152,4 +175,4 @@ jobs:
         script: bash .upload-crowdin.sh
         on:
           all_branches: true
-          condition: $TRAVIS_BRANCH =~ ^develop|r/
+          condition: $TRAVIS_BRANCH =~ ^develop|^r/

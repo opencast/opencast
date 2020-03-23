@@ -41,6 +41,9 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,14 +72,21 @@ import javax.ws.rs.core.Response;
                 + "not working and is either restarting or has failed",
                 "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                         + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                        + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+  property = {
+    "service.description=Group Role REST EndPoint",
+    "opencast.service.type=org.opencastproject.userdirectory.endpoint.GroupRoleEndpoint",
+    "opencast.service.jobproducer=false",
+    "opencast.service.path=/groups"
+  },
+  immediate = false,
+  service = { GroupRoleEndpoint.class }
+)
 public class GroupRoleEndpoint {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(GroupRoleEndpoint.class);
-
-  /** The JPA persistence unit name */
-  public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
 
   /** the jpaGroupRoleProvider Impl service */
   private JpaGroupRoleProvider jpaGroupRoleProvider;
@@ -85,6 +95,7 @@ public class GroupRoleEndpoint {
    * @param jpaGroupRoleProvider
    *          the jpaGroupRoleProvider to set
    */
+  @Reference(name = "JpaGroupRoleProvider")
   public void setJpaGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
     this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
@@ -92,6 +103,7 @@ public class GroupRoleEndpoint {
   /**
    * Callback for activation of this component.
    */
+  @Activate
   public void activate() {
     logger.info("Activating  {}", getClass().getName());
   }

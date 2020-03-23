@@ -86,6 +86,7 @@ used.  Of further note, if you retract after publication to AWS then your workfl
 To summarize, this table presents a subset of the various situations that are possible
 
 |Workflow Operations|Files present in the Media Module|Files present in AWS|Files served from|
+|--|--|--|--|
 |publish-engage | Yes | No | Opencast Media Module |
 |publish-aws| No | Yes | AWS |
 |publish-engage, publish-aws| Yes | Yes | AWS |

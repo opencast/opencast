@@ -142,7 +142,17 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * This method shuts down the service registry.
    */
   public void dispose() {
-    dispatcher.shutdownNow();
+    if (dispatcher != null) {
+      try {
+        dispatcher.shutdownNow();
+        if (!dispatcher.isShutdown()) {
+          logger.info("Waiting for Dispatcher to terminate");
+          dispatcher.awaitTermination(10, TimeUnit.SECONDS);
+        }
+      } catch (InterruptedException e) {
+        logger.error("Error shutting down the Dispatcher", e);
+      }
+    }
   }
 
   /**
@@ -339,17 +349,6 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    * {@inheritDoc}
    *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
-          Float)
-   */
-  @Override
-  public Job createJob(String type, String operation, Float jobLoad) throws ServiceRegistryException {
-    return createJob(type, operation, null, null, true, 1.0f);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
    *      java.util.List)
    */
   @Override
@@ -369,28 +368,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     return createJob(type, operation, arguments, null, true, jobLoad);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
-          java.util.List, java.lang.String)
-   */
-  @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload)
           throws ServiceRegistryException {
     return createJob(type, operation, arguments, payload, true);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
-          java.util.List, java.lang.String, Float)
-   */
-  @Override
-  public Job createJob(String type, String operation, List<String> arguments, String payload, Float jobLoad)
-          throws ServiceRegistryException {
-    return createJob(type, operation, arguments, payload, true, jobLoad);
   }
 
   /**
@@ -415,18 +395,6 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable,
           Float jobLoad) throws ServiceRegistryException {
     return createJob(type, operation, arguments, payload, queueable, null, jobLoad);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
-          java.util.List, java.lang.String, boolean, org.opencastproject.job.api.Job)
-   */
-  @Override
-  public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable,
-          Job parentJob) throws ServiceRegistryException {
-    return createJob(type, operation, arguments, payload, queueable, parentJob, 1.0f);
   }
 
   /**
@@ -723,6 +691,16 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
       }
     }
     return result;
+  }
+
+  @Override
+  public List<String> getJobPayloads(String operation, int limit, int offset) throws ServiceRegistryException {
+    return null;
+  }
+
+  @Override
+  public int getJobCount(String operation) throws ServiceRegistryException {
+    return 0;
   }
 
   /**

@@ -26,10 +26,13 @@ import org.opencastproject.adminui.usersettings.persistence.UserSettingsServiceE
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.util.Log;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -41,11 +44,19 @@ import javax.persistence.Query;
 /**
  * Finds the user settings and message signatures from the current user.
  */
+@Component(
+  immediate = true,
+  service = UserSettingsService.class,
+  property = {
+    "service.description=Admin UI - Users Settings Service",
+    "opencast.service.type=org.opencastproject.adminui.usersettings.UserSettingsService"
+  }
+)
 public class UserSettingsService {
   public static final String PERSISTENCE_UNIT = "org.opencastproject.adminui";
 
   /** Logging utilities */
-  private static final Log logger = Log.mk(UserSettingsService.class);
+  private static final Logger logger = LoggerFactory.getLogger(UserSettingsService.class);
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
@@ -64,11 +75,13 @@ public class UserSettingsService {
    *
    * @param cc
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for user settings");
   }
 
   /** OSGi DI */
+  @Reference(target = "(osgi.unit.name=org.opencastproject.adminui)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -79,6 +92,7 @@ public class UserSettingsService {
    * @param userDirectoryService
    *          user directory service
    */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -89,6 +103,7 @@ public class UserSettingsService {
    * @param securityService
    *          the security service
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -138,7 +153,7 @@ public class UserSettingsService {
       Number countResult = (Number) q.getSingleResult();
       return countResult.intValue();
     }  catch (Exception e) {
-      logger.error("Could not count message signatures: %s", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not count message signatures:", e);
       throw new UserSettingsServiceException(e);
     } finally {
       if (em != null) {
@@ -178,7 +193,7 @@ public class UserSettingsService {
       }
       return userSettings;
     } catch (Exception e) {
-      logger.error("Could not get user settings: %s", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not get user settings:", e);
       throw new UserSettingsServiceException(e);
     } finally {
       if (em != null) {
@@ -217,7 +232,8 @@ public class UserSettingsService {
       tx.commit();
       return userSettingDto.toUserSetting();
     } catch (Exception e) {
-      logger.error("Could not update user setting username '%s' org:'%s' key:'%s' value:'%s':%s", username, orgId, key, value, ExceptionUtils.getStackTrace(e));
+      logger.error("Could not update user setting username '%s' org:'%s' key:'%s' value:'%s':",
+        username, orgId, key, value, e);
       if (tx.isActive()) {
         tx.rollback();
       }
@@ -307,7 +323,8 @@ public class UserSettingsService {
       tx.commit();
       return userSettingDto.toUserSetting();
     } catch (Exception e) {
-      logger.error("Could not update user setting username '%s' org:'%s' id:'%d' key:'%s' value:'%s':\n%s", username, orgId, id, key, value, ExceptionUtils.getStackTrace(e));
+      logger.error("Could not update user setting username '%s' org:'%s' id:'%d' key:'%s' value:'%s':",
+        username, orgId, id, key, value, e);
       if (tx.isActive()) {
         tx.rollback();
       }
@@ -337,7 +354,7 @@ public class UserSettingsService {
       em.remove(userSettingsDto);
       tx.commit();
     } catch (Exception e) {
-      logger.error("Could not delete user setting '%d': %s", id, ExceptionUtils.getStackTrace(e));
+      logger.error("Could not delete user setting '%d':", id, e);
       if (tx.isActive())
         tx.rollback();
       throw new UserSettingsServiceException(e);

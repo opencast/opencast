@@ -55,9 +55,6 @@ public abstract class AbstractAttachmentBuilderPlugin extends AbstractElementBui
   /** the logging facility provided by log4j */
   private static final Logger logger = LoggerFactory.getLogger(AbstractAttachmentBuilderPlugin.class);
 
-  /** The candidate type */
-  protected MediaPackageElement.Type type = MediaPackageElement.Type.Attachment;
-
   /** The flavor to look for */
   protected MediaPackageElementFlavor flavor = null;
 

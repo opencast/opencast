@@ -75,7 +75,7 @@ public class ThemesListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createCreatorFilter(Option<String> creator) {
     return FiltersUtils.generateFilter(creator, FILTER_CREATOR_NAME, FILTER_CREATOR_LABEL, SourceType.SELECT,
-            Option.some(UsersListProvider.NAME));
+            Option.some(UsersListProvider.NAME_ONLY));
   }
 
 }

@@ -29,14 +29,11 @@ import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 
 import com.entwinemedia.fn.Fn;
@@ -218,17 +215,6 @@ public final class AccessControlUtil {
     }
     return newAcl;
   }
-
-  public static final Function<String, Option<AclScope>> toAclScope = new Function<String, Option<AclScope>>() {
-    @Override
-    public Option<AclScope> apply(String s) {
-      try {
-        return some(AclScope.valueOf(s));
-      } catch (IllegalArgumentException e) {
-        return none();
-      }
-    }
-  };
 
   /**
    * Constructor function for ACLs.

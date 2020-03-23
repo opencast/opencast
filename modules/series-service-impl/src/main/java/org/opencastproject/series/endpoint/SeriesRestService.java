@@ -68,7 +68,6 @@ import com.entwinemedia.fn.data.json.SimpleSerializer;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
@@ -110,7 +109,7 @@ import javax.ws.rs.core.Response;
                 + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
 public class SeriesRestService {
 
   private static final String SERIES_ELEMENT_CONTENT_TYPE_PREFIX = "series/";
@@ -637,8 +636,7 @@ public class SeriesRestService {
     } catch (NotFoundException e) {
       return Response.status(NOT_FOUND).build();
     } catch (SeriesException e) {
-      logger.warn("Could not update series property for series {} property {}:{} : {}", seriesId, name,
-              value, ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not update series property for series {} property {}:{} :", seriesId, name, value, e);
     }
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -669,8 +667,7 @@ public class SeriesRestService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not delete series '{}' property '{}' query: {}", seriesId, propertyName,
-              ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not delete series '{}' property '{}' query:", seriesId, propertyName, e);
     }
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -852,8 +849,7 @@ public class SeriesRestService {
         return R.notFound();
       }
     } catch (SeriesException e) {
-      logger.warn("Error while returning element '{}' of series '{}': {}", elementType, seriesId,
-              ExceptionUtils.getStackTrace(e));
+      logger.warn("Error while returning element '{}' of series '{}':", elementType, seriesId, e);
       return R.serverError();
     }
   }

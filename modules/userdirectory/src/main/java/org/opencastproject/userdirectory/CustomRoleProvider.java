@@ -37,6 +37,8 @@ import com.entwinemedia.fn.StreamOp;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +57,13 @@ import java.util.regex.PatternSyntaxException;
 /**
  * An in-memory role provider containing administratively-defined custom roles
  */
+@Component(
+  property = {
+    "service.description=Provides custom roles"
+  },
+  immediate = true,
+  service = { RoleProvider.class }
+)
 public class CustomRoleProvider implements RoleProvider {
 
   /** The logging facility */
@@ -79,6 +88,7 @@ public class CustomRoleProvider implements RoleProvider {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -126,15 +136,6 @@ public class CustomRoleProvider implements RoleProvider {
   @Override
   public String getOrganization() {
     return ALL_ORGANIZATIONS;
-  }
-
-  /**
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    Organization organization = securityService.getOrganization();
-    return Stream.$(roles).map(toRole._2(organization)).iterator();
   }
 
   /**

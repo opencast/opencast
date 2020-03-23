@@ -25,7 +25,9 @@ import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
 
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
@@ -43,6 +45,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +57,13 @@ import java.net.URI;
 /**
  * A remote service proxy for a working file repository
  */
+@Component(
+  property = {
+    "service.description=Working File Repository Remote Service Proxy"
+  },
+  immediate = true,
+  service = { WorkingFileRepository.class }
+)
 public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements WorkingFileRepository {
 
   /** the logger */
@@ -63,36 +74,25 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
   }
 
   /**
-   * {@inheritDoc}
+   * Sets the trusted http client
    *
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#copyTo(java.lang.String, java.lang.String,
-   *      java.lang.String, java.lang.String, java.lang.String)
+   * @param client
    */
   @Override
-  public URI copyTo(String fromCollection, String fromFileName, String toMediaPackage, String toMediaPackageElement,
-          String toFileName) throws IOException, NotFoundException {
-    String urlSuffix = UrlSupport.concat(
-            new String[] { "copy", fromCollection, fromFileName, toMediaPackage, toMediaPackageElement, toFileName });
-    HttpPost post = new HttpPost(urlSuffix);
-    HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND);
-    try {
-      if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
-          throw new NotFoundException("File from collection to copy not found: " + fromCollection + "/" + fromFileName);
-        } else {
-          URI uri = new URI(EntityUtils.toString(response.getEntity(), "UTF-8"));
-          logger.info("Copied collection file {}/{} to {}", fromCollection, fromFileName, uri);
-          return uri;
-        }
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new IOException("Unable to copy file", e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new RuntimeException("Unable to copy file from collection");
+  @Reference(name = "trustedHttpClient")
+  public void setTrustedHttpClient(TrustedHttpClient client) {
+    super.setTrustedHttpClient(client);
+  }
+
+  /**
+   * Sets the remote service manager.
+   *
+   * @param remoteServiceManager
+   */
+  @Override
+  @Reference(name = "remoteServiceManager")
+  public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
+    super.setRemoteServiceManager(remoteServiceManager);
   }
 
   /**
@@ -212,16 +212,6 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getCollectionSize(java.lang.String)
-   */
-  @Override
-  public long getCollectionSize(String id) throws NotFoundException {
-    return getCollectionContents(id).length;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getDiskSpace()
    */
   @Override
@@ -263,32 +253,6 @@ public class WorkingFileRepositoryRemoteImpl extends RemoteBase implements Worki
       closeConnection(response);
     }
     throw new RuntimeException("Error getting storage report");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getFromCollection(java.lang.String,
-   *      java.lang.String)
-   */
-  @Override
-  public InputStream getFromCollection(String collectionId, String fileName) throws NotFoundException {
-    String url = UrlSupport.concat(new String[] { COLLECTION_PATH_PREFIX, collectionId, fileName });
-    HttpGet get = new HttpGet(url);
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND);
-    try {
-      if (response != null) {
-        if (SC_NOT_FOUND == response.getStatusLine().getStatusCode())
-          throw new NotFoundException();
-        // Do not close this response. It will be closed when the caller closes the input stream
-        return new HttpClientClosingInputStream(response);
-      }
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new RuntimeException();
-    }
-    throw new RuntimeException("Error get from collection");
   }
 
   /**

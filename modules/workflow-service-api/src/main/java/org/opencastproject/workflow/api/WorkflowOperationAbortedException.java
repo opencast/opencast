@@ -29,18 +29,6 @@ public class WorkflowOperationAbortedException extends WorkflowOperationExceptio
   private static final long serialVersionUID = -4991597618099939629L;
 
   /**
-   * Constructs a new {@link WorkflowOperationAbortedException} with a message and a root cause.
-   *
-   * @param message
-   *          The message describing what went wrong
-   * @param cause
-   *          The exception that triggered this problem
-   */
-  public WorkflowOperationAbortedException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  /**
    * Constructs a new {@link WorkflowOperationAbortedException} with a message, but no root cause.
    *
    * @param message
@@ -48,16 +36,6 @@ public class WorkflowOperationAbortedException extends WorkflowOperationExceptio
    */
   public WorkflowOperationAbortedException(String message) {
     super(message);
-  }
-
-  /**
-   * Constructs a new {@link WorkflowOperationAbortedException} with a root cause.
-   *
-   * @param cause
-   *          The exception that caused this problem
-   */
-  public WorkflowOperationAbortedException(Throwable cause) {
-    super(cause);
   }
 
 }

@@ -61,10 +61,6 @@
                 <label for="publishToApi">External Applications</label>
               </li>
               <li>
-                <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" checked="checked" class="configField" value="true" />
-                <label for="publishToOaiPmh">OAI-PMH Default Repository</label>
-              </li>
-              <li>
                 <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
                 <label for="publishToYouTube">YouTube</label>
               </li>
@@ -118,7 +114,7 @@
     <operation
       id="import-wf-properties"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Import workflow settings from Java properties file">
       <configurations>
         <configuration key="source-flavor">processing/defaults</configuration>
@@ -140,41 +136,11 @@
         <configuration key="flagQuality2160p">false</configuration>
         <configuration key="publishToEngage">true</configuration>
         <configuration key="publishToApi">true</configuration>
-        <configuration key="publishToOaiPmh">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
         <configuration key="publishToAws">false</configuration>
         <configuration key="uploadedSearchPreview">false</configuration>
         <configuration key="thumbnailType">0</configuration>
         <configuration key="thumbnailPosition">1</configuration>
-      </configurations>
-    </operation>
-
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Prepare asset                                                     -->
-    <!--                                                                   -->
-    <!-- Prepare the recording for asset management, including creation of -->
-    <!-- previews, audio waveforms and storing of the recording data in    -->
-    <!-- the asset area for further processing.                            -->
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-    <!-- Prepare work versions of the source material for further processing -->
-
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Prepare the work media                                            -->
-    <!--                                                                   -->
-    <!-- Ensure the work media is in a format that allows Opencast to do   -->
-    <!-- its work. This includes potentially rewriting the container and   -->
-    <!-- making sure that the audio track is part of each video track.     -->
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-    <operation
-        id="select-tracks"
-        exception-handler-workflow="partial-error"
-        description="Preparing presenter (camera) audio and video work versions">
-      <configurations>
-        <configuration key="source-flavor">*/source</configuration>
-        <configuration key="target-flavor">*/work</configuration>
-        <configuration key="target-tags">-archive</configuration>
       </configurations>
     </operation>
 

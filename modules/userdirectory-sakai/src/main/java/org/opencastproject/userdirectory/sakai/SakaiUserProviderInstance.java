@@ -601,13 +601,6 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
   // RoleProvider methods
 
    @Override
-   public Iterator<Role> getRoles() {
-
-     // We won't ever enumerate all Sakai sites, so return an empty list here
-     return Collections.emptyIterator();
-   }
-
-   @Override
    public List<Role> getRolesForUser(String userName) {
 
       List<Role> roles = new LinkedList<Role>();

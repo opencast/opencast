@@ -1,0 +1,11 @@
+{
+  "name": "engage-theodul-plugin-controls",
+  "private": true,
+  "scripts": {
+    "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js --rule '{\"no-unused-vars\": \"off\"}' src/main/resources/static/*.js"
+  },
+  "devDependencies": {
+    "eslint": "^6.6.0",
+    "eslint-plugin-header": "^3.0.0"
+  }
+}

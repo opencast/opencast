@@ -38,17 +38,6 @@ public class StringListFilter implements ResourceListFilter<String> {
   private String label = FREETEXT_LABEL;
 
   /**
-   * Standard constructor, accepting a key and an {@link Option} value.
-   *
-   * @param name
-   * @param value
-   */
-  public StringListFilter(String name, Option<String> value) {
-    this.value = value;
-    this.name = name;
-  }
-
-  /**
    * Standard constructor, accepting a key and a value.
    *
    * @param name

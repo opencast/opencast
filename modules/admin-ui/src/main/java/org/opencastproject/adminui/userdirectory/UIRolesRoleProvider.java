@@ -31,6 +31,9 @@ import org.opencastproject.security.api.UserProvider;
 
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +49,13 @@ import java.util.regex.Pattern;
 /**
  * The admin UI roles role provider.
  */
+@Component(
+  property = {
+    "service.description=Provides the Admin UI roles"
+  },
+  immediate = true,
+  service = { RoleProvider.class }
+)
 public class UIRolesRoleProvider implements RoleProvider {
 
   /** The logger */
@@ -60,10 +70,12 @@ public class UIRolesRoleProvider implements RoleProvider {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Activate
   protected void activate(ComponentContext cc) {
     try (InputStream in = getClass().getResourceAsStream("/roles.txt")) {
       roles = new TreeSet<>(IOUtils.readLines(in, "UTF-8"));
@@ -71,15 +83,6 @@ public class UIRolesRoleProvider implements RoleProvider {
       logger.error("Unable to read available roles", e);
     }
     logger.info("Activated Admin UI roles role provider");
-  }
-
-  /**
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    JaxbOrganization organization = JaxbOrganization.fromOrganization(securityService.getOrganization());
-    return roles.stream().map((role) -> toRole(role, organization)).iterator();
   }
 
   /**

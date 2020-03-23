@@ -49,9 +49,4 @@ final class Join {
     }
   };
 
-  static final Fn<Join, BooleanExpression> getOn = new Fn<Join, BooleanExpression>() {
-    @Override public BooleanExpression apply(Join a) {
-      return a.on;
-    }
-  };
 }

@@ -23,20 +23,10 @@ package org.opencastproject.util.data.functions;
 
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 /** {@link Either} related functions. */
 public final class Eithers {
   private Eithers() {
-  }
-
-  /** Like <code>Either#right()#toOption()</code>. */
-  public static <A, B> Function<Either<A, B>, Option<B>> toOption() {
-    return new Function<Either<A, B>, Option<B>>() {
-      @Override public Option<B> apply(Either<A, B> either) {
-        return either.right().toOption();
-      }
-    };
   }
 
   /** Flatten nested Eithers. */

@@ -21,7 +21,6 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
@@ -33,8 +32,6 @@ import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 
-import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,9 +79,4 @@ public class TestServerEndpoint extends ServerEndpoint {
     this.activate(null);
   }
 
-  private MediaPackage loadMpFromResource(String name) throws Exception {
-    URL test = ServerEndpointTest.class.getResource("/" + name + ".xml");
-    URI publishedMediaPackageURI = test.toURI();
-    return mpBuilder.loadFromXml(publishedMediaPackageURI.toURL().openStream());
-  }
 }

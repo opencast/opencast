@@ -38,6 +38,8 @@ import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +54,13 @@ import java.util.regex.Pattern;
 /**
  * The user id role provider assigns the user id role.
  */
+@Component(
+  property = {
+    "service.description=Provides the user id role"
+  },
+  immediate = true,
+  service = { RoleProvider.class, UserIdRoleProvider.class, ManagedService.class }
+)
 public class UserIdRoleProvider implements RoleProvider, ManagedService {
 
 
@@ -82,6 +91,7 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -92,6 +102,7 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference(name = "userDirectoryService")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -104,15 +115,6 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
       safeUserName = userName;
     }
     return userRolePrefix.concat(safeUserName);
-  }
-
-  /**
-   * @see org.opencastproject.security.api.RoleProvider#getRoles()
-   */
-  @Override
-  public Iterator<Role> getRoles() {
-    List<Role> roles = getRolesForUser(securityService.getUser().getUsername());
-    return roles.iterator();
   }
 
   /**

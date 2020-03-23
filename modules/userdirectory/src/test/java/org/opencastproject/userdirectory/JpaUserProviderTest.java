@@ -22,7 +22,6 @@
 package org.opencastproject.userdirectory;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -30,6 +29,7 @@ import static org.junit.Assert.fail;
 import static org.opencastproject.util.data.Collections.set;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
+import org.opencastproject.kernel.security.CustomPasswordEncoder;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
@@ -39,7 +39,6 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PasswordEncoder;
 import org.opencastproject.util.data.Collections;
 
 import org.apache.commons.collections4.IteratorUtils;
@@ -48,7 +47,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -58,6 +56,7 @@ public class JpaUserProviderTest {
   private JpaUserAndRoleProvider provider = null;
   private JpaOrganization org1 = null;
   private JpaOrganization org2 = null;
+  private CustomPasswordEncoder passwordEncoder = new CustomPasswordEncoder();
 
   @Before
   public void setUp() throws Exception {
@@ -85,7 +84,7 @@ public class JpaUserProviderTest {
     assertNotNull(loadUser);
 
     assertEquals(user.getUsername(), loadUser.getUsername());
-    assertEquals(PasswordEncoder.encode(user.getPassword(), user.getUsername()), loadUser.getPassword());
+    assertTrue(passwordEncoder.isPasswordValid(loadUser.getPassword(), user.getPassword(), null));
     assertEquals(user.getOrganization(), loadUser.getOrganization());
     assertEquals(user.getRoles(), loadUser.getRoles());
 
@@ -96,26 +95,9 @@ public class JpaUserProviderTest {
     assertNotNull(loadUser);
 
     assertEquals(user.getUsername(), loadUser.getUsername());
-    assertEquals(PasswordEncoder.encode(user.getPassword(), user.getUsername()), loadUser.getPassword());
+    assertTrue(passwordEncoder.isPasswordValid(loadUser.getPassword(), user.getPassword(), null));
     assertEquals(user.getOrganization(), loadUser.getOrganization());
     assertEquals(user.getRoles(), loadUser.getRoles());
-  }
-
-  @Test
-  public void testAddAndGetRole() throws Exception {
-    JpaRole astroRole = new JpaRole("ROLE_ASTRO_105_SPRING_2013_STUDENT", org1, "Astro role");
-
-    provider.addRole(astroRole);
-
-    Iterator<Role> roles = provider.getRoles();
-    assertTrue("There should be one role", roles.hasNext());
-
-    Role role = roles.next();
-    assertEquals(astroRole.getName(), role.getName());
-    assertEquals(astroRole.getOrganizationId(), role.getOrganizationId());
-    assertEquals(astroRole.getDescription(), role.getDescription());
-
-    assertFalse("There should only be one role", roles.hasNext());
   }
 
   @Test
@@ -246,7 +228,7 @@ public class JpaUserProviderTest {
 
     assertNotNull(loadUpdatedUser);
     assertEquals(user.getUsername(), loadUpdatedUser.getUsername());
-    assertEquals(PasswordEncoder.encode(newPassword, user.getUsername()), loadUpdatedUser.getPassword());
+    assertTrue(passwordEncoder.isPasswordValid(loadUpdatedUser.getPassword(), newPassword, null));
     assertEquals(authorities.size(), loadUpdatedUser.getRoles().size());
 
     updateUser = new JpaUser("unknown", newPassword, org1, provider.getName(), true, authorities);
@@ -304,7 +286,8 @@ public class JpaUserProviderTest {
     JpaUser userTwo = createUserWithRoles(org1, "user2", "ROLE_ONE", "ROLE_TWO");
     provider.addUser(userTwo);
 
-    assertEquals("There should be two roles", 2, IteratorUtils.toList(provider.getRoles()).size());
+    // The provider is not authoritative for these roles
+    assertEquals("There should be no roles", 0, IteratorUtils.toList(provider.findRoles("%", Role.Target.ALL, 0, 0)).size());
   }
 
   @Test
@@ -326,8 +309,8 @@ public class JpaUserProviderTest {
 
   @Test
   public void testDuplicateUser() {
-    Set<JpaRole> authorities1 = set(new JpaRole("ROLE_COOL_ONE", org1));
-    Set<JpaRole> authorities2 = set(new JpaRole("ROLE_COOL_ONE", org2));
+    set(new JpaRole("ROLE_COOL_ONE", org1));
+    set(new JpaRole("ROLE_COOL_ONE", org2));
     try {
       provider.addUser(createUserWithRoles(org1, "user1", "ROLE_COOL_ONE"));
       provider.addUser(createUserWithRoles(org1, "user2", "ROLE_COOL_ONE"));
@@ -355,7 +338,8 @@ public class JpaUserProviderTest {
       fail("User should be created");
     }
 
-    assertEquals("There should be three roles", 3, IteratorUtils.toList(provider.getRoles()).size());
+    // Provider not authoritative for these roles
+    assertEquals("There should be zero roles", 0, IteratorUtils.toList(provider.findRoles("%", Role.Target.ALL, 0, 0)).size());
 
     List<String> rolesForUser = provider.getRolesForUser("user1").stream()
             .map(Role::getName)

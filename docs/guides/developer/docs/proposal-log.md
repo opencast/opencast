@@ -9,6 +9,127 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### JPA, PostgreSQL and DDL-Scripts
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Wed, 30 Oct 2019
+
+```no-highlight
+Hi everyone,
+
+  tl;dr – we want to replace the manually maintained database set-up
+  scripts with JPA's auto-generation capabilities, properly including
+  optimizations like indices, constraints, … while re-introducing
+  proper support for PostgreSQL.
+
+
+We recently looked into re-introducing proper PostgreSQL support for
+Opencast, updating the driver [1], … – thanks to Beuth University – One
+task left now is to properly initialize the database.
+
+While we could now write our own initialization script for PostgreSQL,
+much like `docs/scripts/ddl/mysql5.sql `, we would like to spare us as
+community the double-effort and instead tackle an alternative route we
+have been discussing in the community for a long time now: Making
+Opencast generate a proper database schema on its own.
+
+To give you a few more details, if you do not use the DDL scripts, but
+just configure a database and start Opencast, you will already see a
+database schema being auto-generated and everything (kind of) magically
+works.
+
+However, due to a mix of historical reasons and some deliberate
+negligence on our side as developers – why do the JPA stuff properly if
+we have to write the DDL script anyway – the auto-generated schema is
+problematic for production since a lot of optimization is missing.
+
+We did already take a look at this, evaluating the amount of work [2]
+and fixing a few of the problems [3] but there is much more work to do.
+The first pull request [2] also outlines in much more detail the
+current state, what the problems are and what we have to do …if you are
+interested.
+
+Now, finally, we would like to continue this work. First, we are
+seeking help from others, fixing the issues, but more importantly,
+testing the work with your database set-ups.
+
+Additionally, for us, this work only makes sense if we get a proper
+PostgreSQL support out of it. Overall, I hope this will make supporting
+all databases easier since we do not need to write set-up SQL anymore,
+but for now, we do still need to write upgrade SQL statements and
+officially re-adding support for PostreSQL, this means that we need to
+write upgrade scripts for that as well – we are looking into fixing
+that problem as well, but that's a separate project ;-)
+
+Does anyone have objections to this plan?
+Does anyone want to help (with development or testing)?
+
+Best regards,
+Lars
+
+[1] https://github.com/opencast/opencast/pull/1103
+[2] https://github.com/opencast/opencast/pull/1105
+[3] https://github.com/opencast/opencast/pull/1133
+```
+
+
+### Pull request reviews
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 7 Feb 2019
+
+```no-highlight
+Hi everyone,
+right now, we have 43 open pull requests. 23 of these are open for over
+a month. 12 are open for over two month. I find this a bit problematic.
+
+That is why I #propose to relax the requirement of reviewers as follows:
+
+  Pull requests with no major modification and no review for over a
+  month may be reviewed by developers from the same or related
+  organizations.
+
+
+Reasoning:
+
+I find our review process to be very valuable since it prevents a lot
+of bugs from getting into the code base in the first place. The state
+of develop is proof that it works great: Most of the time, you can spin
+up develop and use it without major issues. This state is completely
+different from Opencast develop back in 1.4 days.
+
+Nevertheless, it also puts a burden on the community since it sometimes
+makes it very hard to fix problems. Not only do you need to write the
+patch, but you also need to find someone completely unrelated to review
+this. This can be quite hard in some scenarios. Example: SWITCH tasks
+me with fixing a bug. This means that SWITCH is out of the loop for
+reviews and ELAN e.V. is out as well. But not only that. We are related
+to Osnabrück University so e.g. Rüdiger cannot review my patch and also
+e.g. Michael is working for plapadoo and ELAN so he is out as well. In
+short: ~80% of the regular reviewers are forbidden from taking the
+review.
+
+This example shows that our current rules can be problematic. This is
+not generally the case, but this can be the case.
+
+Going back to the original reasoning for this rule, it was an
+intentional decision to prevent a specific institution from just
+forcing code into Opencast without community involvement by creating a
+pull request and having a colleague simply merge it.
+
+Lifting the embargo after a month should have more or less the same
+effect. The community has a month to notice and complain about any
+given patch. Hence, no institution should be able to just push any code
+into Opencast. If no one complained or commented for a month to raise
+their concerns, it's unlikely that anyone really objects to the change
+and it just becomes a matter of a technical review (does the code
+have any problems). For that, any second developer should hopefully
+suffice.
+
+Please let me know if you have any objections to this change.
+As usual, this proposal will pass in 72h if no one objects.
+
+Best regards,
+Lars
+```
+
+
 ### Automate translation merges
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Wed, 29 Sept 2018
 

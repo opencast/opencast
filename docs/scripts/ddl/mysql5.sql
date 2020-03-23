@@ -183,26 +183,6 @@ CREATE TABLE oc_job_argument (
 
 CREATE INDEX IX_oc_job_argument_id ON oc_job_argument (id);
 
-CREATE TABLE oc_job_context (
-  id BIGINT NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  value TEXT(65535),
-  CONSTRAINT UNQ_oc_job_context UNIQUE (id, name),
-  CONSTRAINT FK_oc_job_context_id FOREIGN KEY (id) REFERENCES oc_job (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_oc_job_context_id ON oc_job_context (id);
-
-CREATE TABLE oc_job_oc_service_registration (
-  Job_id BIGINT NOT NULL,
-  servicesRegistration_id BIGINT NOT NULL,
-  PRIMARY KEY (Job_id, servicesRegistration_id),
-  CONSTRAINT FK_oc_job_oc_service_registration_Job_id FOREIGN KEY (Job_id) REFERENCES oc_job (id) ON DELETE CASCADE,
-  CONSTRAINT FK_oc_job_oc_service_registration_servicesRegistration_id FOREIGN KEY (servicesRegistration_id) REFERENCES oc_service_registration (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_oc_job_oc_service_registration_servicesRegistration_id ON oc_job_oc_service_registration (servicesRegistration_id);
-
 CREATE TABLE oc_incident (
   id BIGINT NOT NULL,
   jobid BIGINT,
@@ -361,7 +341,7 @@ CREATE TABLE oc_assets_snapshot (
   organization_id VARCHAR(128) NOT NULL,
   owner VARCHAR(256) NOT NULL,
   version BIGINT NOT NULL,
-  storage_id VARCHAR(256) NOT NULL DEFAULT 'local-filesystem',
+  storage_id VARCHAR(256) NOT NULL,
   --
   CONSTRAINT UNQ_oc_assets_snapshot UNIQUE (mediapackage_id, version),
   CONSTRAINT FK_oc_assets_snapshot_organization FOREIGN KEY (organization_id) REFERENCES oc_organization (id),
@@ -379,7 +359,7 @@ CREATE TABLE oc_assets_asset (
   mediapackage_element_id VARCHAR(128) NOT NULL,
   mime_type VARCHAR(64),
   size BIGINT NOT NULL,
-  storage_id VARCHAR(256) NOT NULL DEFAULT 'local-filesystem',
+  storage_id VARCHAR(256) NOT NULL,
   --
   CONSTRAINT FK_oc_assets_asset_snapshot_id FOREIGN KEY (snapshot_id) REFERENCES oc_assets_snapshot (id) ON DELETE CASCADE,
   INDEX IX_oc_assets_asset_checksum (checksum),
@@ -585,18 +565,6 @@ CREATE TABLE oc_themes (
     CONSTRAINT FK_oc_themes_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE oc_ibm_watson_transcript_job (
-    id BIGINT(20) NOT NULL,
-    mediapackage_id VARCHAR(128) NOT NULL,
-    track_id VARCHAR(128) NOT NULL,
-    job_id  VARCHAR(128) NOT NULL,
-    date_created datetime NOT NULL,
-    date_completed datetime DEFAULT NULL,
-    status VARCHAR(128) DEFAULT NULL,
-    track_duration BIGINT NOT NULL,
-    PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE oc_aws_asset_mapping (
   id BIGINT(20) NOT NULL,
   mediapackage_element VARCHAR(128) NOT NULL,
@@ -610,3 +578,23 @@ CREATE TABLE oc_aws_asset_mapping (
   CONSTRAINT UNQ_aws_archive_mapping_0 UNIQUE (organization, mediapackage, mediapackage_element, version)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
+CREATE TABLE oc_transcription_service_provider (
+  id BIGINT(20) NOT NULL,
+  provider VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE oc_transcription_service_job (
+  id BIGINT(20) NOT NULL,
+  mediapackage_id VARCHAR(128) NOT NULL,
+  track_id VARCHAR(128) NOT NULL,
+  job_id  VARCHAR(128) NOT NULL,
+  date_created DATETIME NOT NULL,
+  date_expected DATETIME DEFAULT NULL,
+  date_completed DATETIME DEFAULT NULL,
+  status VARCHAR(128) DEFAULT NULL,
+  track_duration BIGINT NOT NULL,
+  provider_id BIGINT(20) NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT FK_oc_transcription_service_job_provider_id FOREIGN KEY (provider_id) REFERENCES oc_transcription_service_provider (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

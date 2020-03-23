@@ -1,0 +1,63 @@
+<div class="row">
+  <div class="multi-select-container offset-col-2">
+    <div class="multi-select-col">
+      <div class="row">
+        <label translate="{{ resource.i18n }}.LEFT"><i class="required"><!-- * --></i></label>
+
+        <a ng-click="searchField=''" class="clear" ng-show="resource.searchable"></a>
+        <input type="text"
+               id="search"
+               class="search"
+               placeholder="{{ 'TABLE_FILTERS.PLACEHOLDER' | translate  }}"
+               ng-show="resource.searchable"
+               ng-disabled="disabled"
+               ng-class="{ disabled: disabled }"
+               ng-model="searchField">
+
+        <select multiple
+                class="available"
+                ng-model="markedForAddition"
+                ng-disabled="disabled"
+                ng-init="markedForAddition = []"
+                ng-class="{ disabled: disabled , scrollable: 'true'}"
+                ng-options="item[display] group by item[groupBy] for item in resource.available | filter: customFilter() | orderBy: display : false"
+                style="min-height: 11em;"
+                ng-style="getHeight()"
+                ng-dblclick="add()">
+        </select>
+      </div>
+      <div class="row">
+        <div class="button-container">
+          <a ng-click="add()" ng-class="{ disabled: !markedForAddition.length }" class="submit" translate="{{ resource.i18n }}.ADD">
+            <!-- Add -->
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="exchange-icon"></div>
+
+    <div class="multi-select-col">
+      <div class="row">
+        <label translate="{{ resource.i18n }}.RIGHT"></label>
+        <select multiple
+                class="selected"
+                ng-model="markedForRemoval"
+                ng-init="markedForRemoval = []"
+                ng-class="{ disabled: disabled }"
+                ng-options="item[display] group by item[groupBy] for item in resource.selected | filter: customSelectedFilter() | orderBy: display : false"
+                style="min-height: 11em;"
+                ng-style="getHeight()"
+                ng-dblclick="remove()">
+        </select>
+      </div>
+      <div class="row">
+        <div class="button-container">
+          <a ng-click="remove()" ng-class="{ disabled: !markedForRemoval.length }" class="remove" translate="{{ resource.i18n }}.REMOVE">
+            <!-- Remove -->
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

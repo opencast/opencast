@@ -147,17 +147,6 @@ public interface WorkingFileRepository extends StorageUsage {
   boolean delete(String mediaPackageID, String mediaPackageElementID) throws IOException;
 
   /**
-   * Gets the number of files in a collection.
-   *
-   * @param collectionId
-   *          the collection identifier
-   * @return the number of files in a collection
-   * @throws NotFoundException
-   *           if the collection does not exist
-   */
-  long getCollectionSize(String collectionId) throws NotFoundException;
-
-  /**
    * Puts a file into a collection, overwriting the existing file if present.
    *
    * @param collectionId
@@ -182,17 +171,6 @@ public interface WorkingFileRepository extends StorageUsage {
    *           if the collectionId does not exist
    */
   URI[] getCollectionContents(String collectionId) throws NotFoundException;
-
-  /**
-   * Gets data from a collection
-   *
-   * @param collectionId
-   *          the collection identifier
-   * @param fileName
-   *          The filename to retrieve
-   * @return the data as a stream, or null if not found
-   */
-  InputStream getFromCollection(String collectionId, String fileName) throws NotFoundException, IOException;
 
   /**
    * Removes a file from a collection
@@ -234,24 +212,6 @@ public interface WorkingFileRepository extends StorageUsage {
    * @return the URI pointing to the file's new location
    */
   URI moveTo(String fromCollection, String fromFileName, String toMediaPackage, String toMediaPackageElement,
-          String toFileName) throws NotFoundException, IOException;
-
-  /**
-   * Copies a file from a collection into a mediapackage
-   *
-   * @param fromCollection
-   *          The collection holding the file
-   * @param fromFileName
-   *          The filename
-   * @param toMediaPackage
-   *          The media package ID to copy the file into
-   * @param toMediaPackageElement
-   *          the media package element ID of the file
-   * @param toFileName
-   *          the name of the resulting file
-   * @return the URI pointing to the file's new location
-   */
-  URI copyTo(String fromCollection, String fromFileName, String toMediaPackage, String toMediaPackageElement,
           String toFileName) throws NotFoundException, IOException;
 
   /**

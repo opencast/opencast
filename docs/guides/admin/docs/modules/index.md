@@ -22,5 +22,9 @@ Documentation for modules included in Opencast.
     * [Setup](videoeditor.setup.md)
     * [Architecture](videoeditor.architecture.md)
 * [Video Segmentation](videosegmentation.md)
+* Termination State
+    * [Basic](terminationstate.md)
+    * [AWS AutoScaling](terminationstate.aws.autoscaling.md)
+* [Transcripts (Google Speech)](googlespeechtranscripts.md)
 * [Transcripts (IBM Watson)](watsontranscripts.md)
 * [YouTube Publication](youtubepublication.md)

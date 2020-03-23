@@ -116,7 +116,7 @@ public class StartTranscriptionOperationHandler extends AbstractWorkflowOperatio
         continue;
       }
       try {
-        job = service.startTranscription(mediaPackage.getIdentifier().compact(), track);
+        job = service.startTranscription(mediaPackage.getIdentifier().toString(), track);
         // Only one job per media package
         break;
       } catch (TranscriptionServiceException e) {

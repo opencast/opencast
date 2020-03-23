@@ -45,26 +45,4 @@ public class WorkflowStateException extends WorkflowException {
     super(message);
   }
 
-  /**
-   * Constructs a new workflow state exception with the throwable causing this exception to be thrown.
-   * 
-   * @param cause
-   *          the cause of this exception
-   */
-  public WorkflowStateException(Throwable cause) {
-    super(cause);
-  }
-
-  /**
-   * Constructs a new workflow state exception with a message and the throwable that caused this exception to be thrown.
-   * 
-   * @param message
-   *          the message describing the exception
-   * @param cause
-   *          the cause of this exception
-   */
-  public WorkflowStateException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
 }

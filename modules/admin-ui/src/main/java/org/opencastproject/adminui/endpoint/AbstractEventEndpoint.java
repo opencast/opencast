@@ -31,6 +31,7 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static java.lang.String.format;
+import static javax.servlet.http.HttpServletResponse.SC_ACCEPTED;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -118,6 +119,7 @@ import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -164,19 +166,19 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -233,8 +235,6 @@ public abstract class AbstractEventEndpoint {
   /** The logging facility */
   static final Logger logger = LoggerFactory.getLogger(AbstractEventEndpoint.class);
 
-  protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
-
   /** The configuration key that defines the default workflow definition */
   //TODO Move to a constants file instead of declaring it at the top of multiple files?
   protected static final String WORKFLOW_DEFINITION_DEFAULT = "org.opencastproject.workflow.default.definition";
@@ -274,6 +274,8 @@ public abstract class AbstractEventEndpoint {
 
   public abstract Boolean getOnlySeriesWithWriteAccessEventModal();
 
+  public abstract Boolean getOnlyEventsWithWriteAccessEventsTab();
+
   /** Default server URL */
   protected String serverUrl = "http://localhost:8080";
 
@@ -283,12 +285,16 @@ public abstract class AbstractEventEndpoint {
   /** The default workflow identifier, if one is configured */
   protected String defaultWorkflowDefinionId = null;
 
+  /** The system user name (default set here for unit tests) */
+  private String systemUserName = "opencast_system_account";
+
   /**
    * Activates REST service.
    *
    * @param cc
    *          ComponentContext
    */
+  @Activate
   public void activate(ComponentContext cc) {
     if (cc != null) {
       String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
@@ -301,8 +307,9 @@ public abstract class AbstractEventEndpoint {
 
       if (StringUtils.isNotBlank(ccDefaultWorkflowDefinionId))
         this.defaultWorkflowDefinionId = ccDefaultWorkflowDefinionId;
-    }
 
+      systemUserName = SecurityUtil.getSystemUserName(cc);
+    }
   }
 
   /* As the list of event ids can grow large, we use a POST request to avoid problems with too large query strings */
@@ -383,24 +390,43 @@ public abstract class AbstractEventEndpoint {
   @RestQuery(name = "deleteevent", description = "Delete a single event.", returnDescription = "Ok if the event has been deleted.", pathParameters = {
           @RestParameter(name = "eventId", isRequired = true, description = "The id of the event to delete.", type = STRING), }, reponses = {
                   @RestResponse(responseCode = SC_OK, description = "The event has been deleted."),
+                  @RestResponse(responseCode = SC_ACCEPTED, description = "The event will be retracted and deleted afterwards."),
                   @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response deleteEvent(@PathParam("eventId") String id) throws UnauthorizedException, SearchIndexException {
-    try {
-      checkAgentAccessForEvent(id);
-      if (!getIndexService().removeEvent(id))
-        return Response.serverError().build();
-    } catch (NotFoundException e) {
-      // If we couldn't find any trace of the event in the underlying database(s), we can get rid of it
-      // entirely in the index.
+    final Opt<Event> event = checkAgentAccessForEvent(id);
+    if (event.isNone()) {
+      return RestUtil.R.notFound(id);
+    }
+    final Runnable doOnNotFound = () -> {
       try {
         getIndex().delete(Event.DOCUMENT_TYPE,id.concat(getSecurityService().getOrganization().getId()));
-      } catch (SearchIndexException e1) {
-        logger.error("error removing event {}: {}",id,e1);
-        return Response.serverError().build();
+      } catch (SearchIndexException e) {
+        logger.error("error removing event {}: {}", id, e);
       }
+    };
+    final IndexService.EventRemovalResult result;
+    try {
+      result = getIndexService().removeEvent(event.get(), doOnNotFound, getAdminUIConfiguration().getRetractWorkflowId());
+    } catch (WorkflowDatabaseException e) {
+      logger.error("Workflow database is not reachable. This may be a temporary problem.");
+      return RestUtil.R.serverError();
+    } catch (NotFoundException e) {
+      logger.error("Configured retract workflow not found. Check your configuration.");
+      return RestUtil.R.serverError();
     }
-
-    return Response.ok().build();
+    switch (result) {
+      case SUCCESS:
+        return Response.ok().build();
+      case RETRACTING:
+        return Response.accepted().build();
+      case GENERAL_FAILURE:
+        return Response.serverError().build();
+      case NOT_FOUND:
+        doOnNotFound.run();
+        return RestUtil.R.notFound(id);
+      default:
+        throw new RuntimeException("Unknown EventRemovalResult type: " + result.name());
+    }
   }
 
   @POST
@@ -430,31 +456,51 @@ public abstract class AbstractEventEndpoint {
     BulkOperationResult result = new BulkOperationResult();
 
     for (Object eventIdObject : eventIdsJsonArray) {
-      String eventId = eventIdObject.toString();
-      try {
-        checkAgentAccessForEvent(eventId);
-        if (!getIndexService().removeEvent(eventId)) {
-          result.addServerError(eventId);
-        } else {
-          result.addOk(eventId);
+      final String eventId = eventIdObject.toString();
+      final Runnable doOnNotFound = () -> {
+        try {
+          getIndex().delete(Event.DOCUMENT_TYPE,eventId.concat(getSecurityService().getOrganization().getId()));
+        } catch (SearchIndexException e) {
+          logger.error("error removing event {}: {}", eventId, e);
         }
-      } catch (NotFoundException e) {
-        result.addNotFound(eventId);
+      };
+      try {
+        final Opt<Event> event = checkAgentAccessForEvent(eventId);
+        if (event.isSome()) {
+          final IndexService.EventRemovalResult  currentResult = getIndexService().removeEvent(event.get(), doOnNotFound,
+            getAdminUIConfiguration().getRetractWorkflowId()
+          );
+          switch (currentResult) {
+            case SUCCESS:
+              result.addOk(eventId);
+              break;
+            case RETRACTING:
+              result.addAccepted(eventId);
+              break;
+            case GENERAL_FAILURE:
+              result.addServerError(eventId);
+              break;
+            case NOT_FOUND:
+              doOnNotFound.run();
+              result.addNotFound(eventId);
+              break;
+            default:
+              throw new RuntimeException("Unknown EventRemovalResult type: " + currentResult.name());
+          }
+        } else {
+          result.addNotFound(eventId);
+        }
       } catch (UnauthorizedException e) {
         result.addUnauthorized(eventId);
+      } catch (WorkflowDatabaseException e) {
+        logger.error("Workflow database is not reachable. This may be a temporary problem.");
+        return RestUtil.R.serverError();
+      } catch (NotFoundException e) {
+        logger.error("Configured retract workflow not found. Check your configuration.");
+        return RestUtil.R.serverError();
       }
     }
     return Response.ok(result.toJson()).build();
-  }
-
-  @GET
-  @Path("{eventId}/hasSnapshots.json")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "hassnapshots", description = "Returns a JSON object containing a boolean indicating if snapshots exist for this event", returnDescription = "A JSON object", pathParameters = {
-    @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
-    @RestResponse(description = "A JSON object containing a property \"hasSnapshots\"", responseCode = HttpServletResponse.SC_OK) })
-  public Response hasEventSnapshots(@PathParam("eventId") String id) throws Exception {
-    return okJson(obj(f("hasSnapshots",this.getIndexService().hasSnapshots(id))));
   }
 
   @GET
@@ -629,39 +675,6 @@ public abstract class AbstractEventEndpoint {
     if (!start.isNone() || !end.isNone() || !agentId.isNone() || !agentConfiguration.isNone()) {
       getSchedulerService()
         .updateEvent(event.getIdentifier(), start, end, agentId, Opt.none(), Opt.none(), Opt.none(), agentConfiguration);
-      // We want to keep the bibliographic meta data in sync
-      updateBibliographicMetadata(event, agentId, start, end);
-    }
-  }
-
-  private void updateBibliographicMetadata(Event event, Opt<String> agentId, Opt<Date> start, Opt<Date> end)
-    throws IndexServiceException, SearchIndexException, NotFoundException, UnauthorizedException {
-    final MetadataList metadataList = getIndexService().getMetadataListWithAllEventCatalogUIAdapters();
-    final Opt<MetadataCollection> optMetadataByAdapter = metadataList
-      .getMetadataByAdapter(getIndexService().getCommonEventCatalogUIAdapter());
-    if (optMetadataByAdapter.isSome()) {
-      final MetadataCollection collection = optMetadataByAdapter.get();
-      if (start.isSome() && collection.getOutputFields().containsKey("startDate")) {
-        final Opt<String> pattern = collection.getOutputFields().get("startDate").getPattern();
-        if (pattern.isSome()) {
-          final SimpleDateFormat sdf = new SimpleDateFormat(pattern.get());
-          sdf.setTimeZone(TimeZone.getTimeZone(ZoneId.of("UTC")));
-          final MetadataField.Type type = collection.getOutputFields().get("startDate").getType();
-          collection.updateStringField(collection.getOutputFields().get("startDate"), sdf.format(start.get()));
-          collection.getOutputFields().get("startDate").setPattern(pattern);
-          collection.getOutputFields().get("startDate").setType(type);
-        }
-      }
-      if (start.isSome() && end.isSome() && collection.getOutputFields().containsKey("duration")) {
-        final MetadataField.Type type = collection.getOutputFields().get("duration").getType();
-        final long duration = end.get().getTime() - start.get().getTime();
-        collection.updateStringField(collection.getOutputFields().get("duration"), duration + "");
-        collection.getOutputFields().get("duration").setType(type);
-      }
-      if (agentId.isSome() && collection.getOutputFields().containsKey("location")) {
-        collection.updateStringField(collection.getOutputFields().get("location"), agentId.get());
-      }
-      getIndexService().updateEventMetadata(event.getIdentifier(), metadataList, getIndex());
     }
   }
 
@@ -1105,13 +1118,14 @@ public abstract class AbstractEventEndpoint {
     Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", eventId);
+    Event event = optEvent.get();
 
     MetadataList metadataList = new MetadataList();
     List<EventCatalogUIAdapter> catalogUIAdapters = getIndexService().getEventCatalogUIAdapters();
     catalogUIAdapters.remove(getIndexService().getCommonEventCatalogUIAdapter());
     MediaPackage mediaPackage;
     try {
-      mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
+      mediaPackage = getIndexService().getEventMediapackage(event);
     } catch (IndexServiceException e) {
       if (e.getCause() instanceof NotFoundException) {
         return notFound("Cannot find data for event %s", eventId);
@@ -1125,24 +1139,135 @@ public abstract class AbstractEventEndpoint {
       metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
     }
 
-    MetadataCollection mc = EventUtils.getEventMetadata(optEvent.get(), getIndexService().getCommonEventCatalogUIAdapter());
+    MetadataCollection metadataCollection = EventUtils.getEventMetadata(event, getIndexService().getCommonEventCatalogUIAdapter());
     if (getOnlySeriesWithWriteAccessEventModal()) {
-      MetadataField<?> series = mc.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-      mc.removeField(series);
-      Map<String, String> seriesAccessEventModal = getSeriesService().getUserSeriesByAccess(true);
-      Opt<Map<String, String>> map = Opt.some(seriesAccessEventModal);
-      MetadataField<String> newSeries = new MetadataField(series);
-      newSeries.setCollection(map);
-      newSeries.setValue(optEvent.get().getSeriesId());
-      mc.addField(newSeries);
+      MetadataField<?> seriesField = metadataCollection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
+      Map<String, String> seriesWithWriteAccess = getSeriesService().getUserSeriesByAccess(true);
+      seriesField.setCollection(Opt.some(seriesWithWriteAccess));
     }
-    metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), mc);
+    metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), metadataCollection);
 
-    final String wfState = optEvent.get().getWorkflowState();
+    final String wfState = event.getWorkflowState();
     if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState)))
       metadataList.setLocked(Locked.WORKFLOW_RUNNING);
 
     return okJson(metadataList.toJSON());
+  }
+
+  @POST  // use POST instead of GET because of a possibly long list of ids
+  @Path("events/metadata.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "geteventsmetadata",
+             description = "Returns all the data related to the edit events metadata modal as JSON",
+             returnDescription = "All the data related to the edit events metadata modal as JSON",
+             restParameters = {
+               @RestParameter(name = "eventIds", description = "The event ids", isRequired = true,
+                              type = RestParameter.Type.STRING)
+             }, reponses = {
+               @RestResponse(description = "Returns all the data related to the edit events metadata modal as JSON",
+                             responseCode = HttpServletResponse.SC_OK),
+               @RestResponse(description = "No events to update, either not found or with running workflow, "
+                                         + "details in response body.",
+                             responseCode = HttpServletResponse.SC_NOT_FOUND)
+             })
+  public Response getEventsMetadata(@FormParam("eventIds") String eventIds) throws Exception {
+
+    if (StringUtils.isBlank(eventIds)) {
+      return badRequest("Event ids can't be empty");
+    }
+
+    JSONParser parser = new JSONParser();
+    List<String> ids;
+    try {
+      ids = (List<String>) parser.parse(eventIds);
+    } catch (org.json.simple.parser.ParseException e) {
+      logger.error("Unable to parse '{}'", eventIds, e);
+      return badRequest("Unable to parse event ids");
+    } catch (ClassCastException e) {
+      logger.error("Unable to cast '{}'", eventIds, e);
+      return badRequest("Unable to parse event ids");
+    }
+
+    Set<String> eventsNotFound = new HashSet();
+    Set<String> eventsWithRunningWorkflow = new HashSet();
+    Set<String> eventsMerged = new HashSet();
+
+    //get once instead of for each event
+    Map<String, String> seriesWithWriteAccess = null;
+    if (getOnlySeriesWithWriteAccessEventModal()) {
+      seriesWithWriteAccess = getSeriesService().getUserSeriesByAccess(true);
+    }
+
+    // collect the metadata of all events
+    List<MetadataCollection> collectedMetadata = new ArrayList();
+    for (String eventId: ids) {
+      Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+      // not found?
+      if (optEvent.isNone()) {
+        eventsNotFound.add(eventId);
+        continue;
+      }
+
+      Event event = optEvent.get();
+
+      // check if there's a running workflow
+      final String wfState = event.getWorkflowState();
+      if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState))) {
+        eventsWithRunningWorkflow.add(eventId);
+        continue;
+      }
+
+      // collect metadata
+      MetadataCollection metadataCollection =
+        EventUtils.getEventMetadata(event, getIndexService().getCommonEventCatalogUIAdapter());
+      collectedMetadata.add(metadataCollection);
+
+      // in case we want only series with write access
+      if (getOnlySeriesWithWriteAccessEventModal()) {
+        MetadataField<?> seriesField =
+          metadataCollection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
+        seriesField.setCollection(Opt.some(seriesWithWriteAccess));
+      }
+
+      eventsMerged.add(eventId);
+    }
+
+    // no events found?
+    if (collectedMetadata.isEmpty()) {
+      return notFoundJson(obj(
+        f("notFound", JSONUtils.setToJSON(eventsNotFound)),
+        f("runningWorkflow", JSONUtils.setToJSON(eventsWithRunningWorkflow))));
+    }
+
+    // merge metadata of events
+    MetadataCollection mergedMetadata;
+    if (collectedMetadata.size() == 1) {
+      mergedMetadata = collectedMetadata.get(0);
+    }
+    else {
+      //use first metadata collection as base
+      mergedMetadata = collectedMetadata.get(0).getCopy();
+      collectedMetadata.remove(0);
+
+      for (MetadataField field : mergedMetadata.getFields()) {
+        for (MetadataCollection otherMetadataCollection : collectedMetadata) {
+          MetadataField matchingField = otherMetadataCollection.getOutputFields().get(field.getOutputID());
+
+          // check if fields have the same value
+          if (!field.getValue().equals(matchingField.getValue())) {
+            field.setDifferentValues();
+            break;
+          }
+        }
+      }
+    }
+
+    return okJson(obj(
+      f("metadata", mergedMetadata.toJSON()),
+      f("notFound", JSONUtils.setToJSON(eventsNotFound)),
+      f("runningWorkflow", JSONUtils.setToJSON(eventsWithRunningWorkflow)),
+      f("merged", JSONUtils.setToJSON(eventsMerged))
+    ));
   }
 
   @PUT
@@ -1334,6 +1459,79 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
+  @PUT
+  @Path("events/metadata")
+  @RestQuery(name = "updateeventsmetadata",
+    description = "Update the passed metadata for the events with the given ids",
+    restParameters = {
+      @RestParameter(name = "eventIds", isRequired = true, type = RestParameter.Type.STRING,
+        description = "The ids of the events to update"),
+      @RestParameter(name = "metadata", isRequired = true, type = RestParameter.Type.TEXT,
+        description = "The metadata fields to update"),
+    }, reponses = {
+    @RestResponse(description = "All events have been updated successfully.",
+      responseCode = HttpServletResponse.SC_NO_CONTENT),
+    @RestResponse(description = "One or multiple errors occured while updating event metadata. "
+      + "Some events may have been updated successfully. "
+      + "Details are available in the response body.",
+      responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)},
+    returnDescription = "In case of complete success, no content is returned. Otherwise, the response content "
+      + "contains the ids of events that couldn't be found and the ids and errors of events where the update failed "
+      + "as well as the ids of the events that were updated successfully.")
+  public Response updateEventsMetadata(@FormParam("eventIds") String eventIds, @FormParam("metadata") String metadata)
+    throws Exception {
+
+    if (StringUtils.isBlank(eventIds)) {
+      return badRequest("Event ids can't be empty");
+    }
+
+    JSONParser parser = new JSONParser();
+    List<String> ids;
+    try {
+      ids = (List<String>) parser.parse(eventIds);
+    } catch (org.json.simple.parser.ParseException e) {
+      logger.error("Unable to parse '{}'", eventIds, e);
+      return badRequest("Unable to parse event ids");
+    } catch (ClassCastException e) {
+      logger.error("Unable to cast '{}'", eventIds, e);
+      return badRequest("Unable to parse event ids");
+    }
+
+    // try to update each event
+    Set<String> eventsNotFound = new HashSet<>();
+    Set<String> eventsUpdated = new HashSet<>();
+    Set<String> eventsUpdateFailure = new HashSet();
+
+    for (String eventId : ids) {
+      Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+      // not found?
+
+      if (optEvent.isNone()) {
+        eventsNotFound.add(eventId);
+        continue;
+      }
+
+      // update
+      try {
+        getIndexService().updateAllEventMetadata(eventId, metadata, getIndex());
+        eventsUpdated.add(eventId);
+      } catch (IllegalArgumentException e) {
+        eventsUpdateFailure.add(eventId);
+      }
+    }
+
+    // errors occurred?
+    if (!eventsNotFound.isEmpty() || !eventsUpdateFailure.isEmpty()) {
+      return serverErrorJson(obj(
+        f("updateFailures", JSONUtils.setToJSON(eventsUpdateFailure)),
+        f("notFound", JSONUtils.setToJSON(eventsNotFound)),
+        f("updated", JSONUtils.setToJSON(eventsUpdated))
+      ));
+    }
+
+    return noContent();
+  }
+
   @GET
   @Path("{eventId}/asset/assets.json")
   @Produces(MediaType.APPLICATION_JSON)
@@ -1513,7 +1711,7 @@ public abstract class AbstractEventEndpoint {
       return notFound("Cannot find an event with id '%s'.", id);
 
     try {
-      if (optEvent.get().isScheduledEvent() && !optEvent.get().hasRecordingStarted()) {
+      if (optEvent.get().getEventStatus().equals("EVENTS.EVENTS.STATUS.SCHEDULED")) {
         List<Field> fields = new ArrayList<Field>();
         Map<String, String> workflowConfig = getSchedulerService().getWorkflowConfig(id);
         for (Entry<String, String> entry : workflowConfig.entrySet()) {
@@ -2012,19 +2210,29 @@ public abstract class AbstractEventEndpoint {
 
   private List<JValue> convertToConflictObjects(final String eventId, final List<MediaPackage> events) throws SearchIndexException {
     final List<JValue> eventsJSON = new ArrayList<>();
-    for (final MediaPackage event : events) {
-      final Opt<Event> eventOpt = getIndexService().getEvent(event.getIdentifier().compact(), getIndex());
-      if (eventOpt.isSome()) {
-        final Event e = eventOpt.get();
-        if (StringUtils.isNotEmpty(eventId) && eventId.equals(e.getIdentifier())) {
-          continue;
+    final Organization organization = getSecurityService().getOrganization();
+    final User user = SecurityUtil.createSystemUser(systemUserName, organization);
+
+    SecurityUtil.runAs(getSecurityService(), organization, user, () -> {
+      try {
+        for (final MediaPackage event : events) {
+          final Opt<Event> eventOpt = getIndexService().getEvent(event.getIdentifier().toString(), getIndex());
+          if (eventOpt.isSome()) {
+            final Event e = eventOpt.get();
+            if (StringUtils.isNotEmpty(eventId) && eventId.equals(e.getIdentifier())) {
+              continue;
+            }
+            eventsJSON.add(convertEventToConflictingObject(e.getTechnicalStartTime(), e.getTechnicalEndTime(), e.getTitle()));
+          } else {
+            logger.warn("Index out of sync! Conflicting event catalog {} not found on event index!",
+              event.getIdentifier().toString());
+          }
         }
-        eventsJSON.add(convertEventToConflictingObject(e.getTechnicalStartTime(), e.getTechnicalEndTime(), e.getTitle()));
-      } else {
-        logger.warn("Index out of sync! Conflicting event catalog {} not found on event index!",
-          event.getIdentifier().compact());
+      } catch (Exception e) {
+         logger.error("Failed to get conflicting events", e);
       }
-    }
+    });
+
     return eventsJSON;
   }
 
@@ -2126,8 +2334,8 @@ public abstract class AbstractEventEndpoint {
       if (EventListQuery.FILTER_STARTDATE_NAME.equals(name)) {
         try {
           Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(filters.get(name));
-          query.withTechnicalStartFrom(fromAndToCreationRange.getA());
-          query.withTechnicalStartTo(fromAndToCreationRange.getB());
+          query.withStartFrom(fromAndToCreationRange.getA());
+          query.withStartTo(fromAndToCreationRange.getB());
         } catch (IllegalArgumentException e) {
           return RestUtil.R.badRequest(e.getMessage());
         }
@@ -2174,6 +2382,13 @@ public abstract class AbstractEventEndpoint {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
       }
+    }
+
+    // We search for write actions
+    if (getOnlyEventsWithWriteAccessEventsTab()) {
+      query.withoutActions();
+      query.withAction(Permissions.Action.WRITE);
+      query.withAction(Permissions.Action.READ);
     }
 
     if (optLimit.isSome())
@@ -2533,12 +2748,13 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
-  private void checkAgentAccessForEvent(final String eventId) throws UnauthorizedException, SearchIndexException {
+  private Opt<Event> checkAgentAccessForEvent(final String eventId) throws UnauthorizedException, SearchIndexException {
     final Opt<Event> event = getIndexService().getEvent(eventId, getIndex());
     if (event.isNone() || !event.get().getEventStatus().contains("SCHEDULE")) {
-      return;
+      return event;
     }
     SecurityUtil.checkAgentAccess(getSecurityService(), event.get().getAgentId());
+    return event;
   }
 
   private void checkAgentAccessForAgent(final String agentId) throws UnauthorizedException {

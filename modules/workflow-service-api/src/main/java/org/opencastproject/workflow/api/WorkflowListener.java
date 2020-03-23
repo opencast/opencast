@@ -31,13 +31,15 @@ public interface WorkflowListener {
    *
    * @param workflow the workflow instance
    */
-  void operationChanged(WorkflowInstance workflow);
+  default void operationChanged(WorkflowInstance workflow) {
+  }
 
   /**
    * Called when the state of a workflow instance has changed.
    *
    * @param workflow
    */
-  void stateChanged(WorkflowInstance workflow);
+  default void stateChanged(WorkflowInstance workflow) {
+  }
 
 }

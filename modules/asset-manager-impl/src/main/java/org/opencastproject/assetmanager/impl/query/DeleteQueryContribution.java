@@ -132,18 +132,6 @@ public final class DeleteQueryContribution {
     };
   }
 
-  static final Fn<DeleteQueryContribution, Stream<EntityPath<?>>> getFrom = new Fn<DeleteQueryContribution, Stream<EntityPath<?>>>() {
-    @Override public Stream<EntityPath<?>> apply(DeleteQueryContribution c) {
-      return c.from;
-    }
-  };
-
-  static final Fn<DeleteQueryContribution, Fn<EntityPath<?>, BooleanExpression>> getWhere = new Fn<DeleteQueryContribution, Fn<EntityPath<?>, BooleanExpression>>() {
-    @Override public Fn<EntityPath<?>, BooleanExpression> apply(DeleteQueryContribution c) {
-      return c.where;
-    }
-  };
-
   /* -- */
 
   @ParametersAreNonnullByDefault

@@ -63,7 +63,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,7 +167,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     try {
       compositeSettings = new CompositeSettings(operation);
     } catch (IllegalArgumentException e) {
-      logger.warn("Unable to parse composite settings because {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to parse composite settings because", e);
       return createResult(mediaPackage, Action.SKIP);
     }
     Option<Attachment> watermarkAttachment = Option.<Attachment> none();
@@ -309,6 +308,12 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     CompositeSettings(WorkflowOperationInstance operation) throws WorkflowOperationException {
       // Check which tags have been configured
       sourceAudioName = StringUtils.trimToNull(operation.getConfiguration(SOURCE_AUDIO_NAME));
+      if (sourceAudioName == null) {
+        sourceAudioName = ComposerService.BOTH; // default
+      } else if (!sourceAudioOption.matcher(sourceAudioName).matches()) {
+        throw new WorkflowOperationException("sourceAudioName if used, must be either upper, lower or both!");
+      }
+
       sourceTagsUpper = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_UPPER));
       sourceFlavorUpper = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR_UPPER));
       sourceTagsLower = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS_LOWER));
@@ -352,10 +357,6 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         singleSourceLayout = singleLayouts.getA();
         watermarkLayout = singleLayouts.getB();
       }
-
-      // Check that source audio is upper, lower or use a combination of both
-      if (sourceAudioName != null && !sourceAudioOption.matcher(sourceAudioName).matches())
-        throw new WorkflowOperationException("sourceAudioName if used, must be either upper, lower or both!");
 
       // Find the encoding profile
       if (encodingProfile == null)

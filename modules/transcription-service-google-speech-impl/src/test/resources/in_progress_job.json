@@ -1,0 +1,9 @@
+{  "name": "jobId1",
+  "metadata": {
+   "@type": "type.googleapis.com/google.cloud.speech.v1.LongRunningRecognizeMetadata",
+   "progressPercent": 40,
+   "startTime": "2018-07-18T19:30:14.680Z",
+   "lastUpdateTime": "2018-09-18T19:31:26.491Z"
+  },
+  "done": false
+}

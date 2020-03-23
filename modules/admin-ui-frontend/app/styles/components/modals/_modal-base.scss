@@ -1,0 +1,409 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+// Modal sizes
+// ----------------------------------------
+
+.extra-small-modal {
+    width: 400px;
+    margin-left: -200px;
+}
+
+.small-modal {
+    width: 600px;
+    margin-left: -300px;
+}
+
+.medium-modal {
+    width: $modal-width;
+    margin-left: -($modal-width / 2);
+}
+
+.large-modal {
+    width: 1000px;
+    margin-left: -500px;
+}
+
+
+// Main Modal Properties
+// ----------------------------------------
+
+.modal {
+
+    // Hide modal
+    visibility: hidden;
+    opacity: 0;
+    display: none;
+    @include transition(all .2s);
+    z-index: ($max-z + 2);
+    width: $modal-width;
+    height: auto;
+
+    // Center box
+    position: absolute;
+    top: 100px;
+    left: 50%;
+    margin-left: -($modal-width / 2);
+    background: $body-background;
+    border-radius: $main-border-radius;
+    box-shadow: 0 0 20px 2px rgba($black, 0.3);
+
+    &.active {
+        opacity: 1;
+        top: 30px;
+        visibility: visible;
+    }
+
+    // Directional Arrows Outside of Modal
+    .arrow {
+        $spacing: -75px;
+        position: absolute;
+        top: 48%;
+        font-size: 50px;
+        color: rgba($white, 0.7);
+        text-shadow: 0 0 10px rgba($black, 0.4);
+        @include transition(all 0.2s);
+
+        &.fa-chevron-left  {
+            left: $spacing;
+        }
+
+        &.fa-chevron-right {
+            right: $spacing;
+        }
+
+        &:hover {
+            color: #fff;
+        }
+    }
+}
+
+
+// Modal Overlay
+// ----------------------------------------
+
+.modal-overlay {
+
+    // Hide overlay
+    visibility: hidden;
+    opacity: 0;
+    @include transition(all .15s);
+
+    &.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: $max-z + 1;
+    @include radial-gradient(rgba($black, 0.2), rgba($black, 0.4));
+
+}
+
+
+// Modal Layout
+// ----------------------------------------
+
+.modal-body {
+    padding: 3%;
+
+    input.search {
+        border-radius: $main-border-radius 0 0 $main-border-radius;
+        border-right-width: 0;
+        float: left;
+        width: 100% !important;
+    }
+
+    a.clear {
+        width: 46px;
+        margin-top: 5px;
+        float: right;
+        @include btn(white);
+        @include fa-icon($fa-var-times, before, block, 0, 0.45em 0.45em 0.55em 0.45em, inherit, 14px);
+
+        border-radius: 0 $main-border-radius $main-border-radius 0;
+
+        &+input.search {
+            width: calc(100% - 46px) !important;
+        }
+    }
+}
+
+.modal {
+    .modal-content {
+        display: none;
+        margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+
+        &.active {
+            display: block;
+        }
+
+        .tab-description {
+            color: $medium-prim-color;
+            font-size: 12px;
+            line-height: 20px;
+            margin-bottom: 10px;
+            width: 97%;
+        }
+
+        // Modal obj header
+        header {
+            $height: 35px;
+            @include accordion-header($height);
+            @include user-select(none);
+            position: static;
+
+            &.expand {
+                @include accordion-header($height, true);
+            }
+
+            // This is used when there is data displayed in header
+            span.header-value {
+                float: right;
+            }
+        }
+
+        p {
+            color: $color-gray;
+            margin-bottom: 0.3em;
+        }
+    }
+
+    // Modal Columns
+    .col {
+        width: 48.78%;
+        display: inline-block;
+        vertical-align: top;
+
+        &:not(:first-child) {
+            margin-left: 1%;
+        }
+
+        &:not(:last-child) {
+            margin-right: 1%;
+        }
+
+        // Remove bottom margin on last object
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    // Full col
+
+    .full-col {
+        width: 100%;
+
+        .obj {
+            width: $modal-full-col-width;
+
+            > header {
+                width: ($modal-full-col-width);
+            }
+        }
+
+        .tbl-container {
+            width: $modal-full-col-width;
+
+            .obj-container .table-series .wrapper {
+
+                padding: 1% 2%;
+
+                &:first-child {
+                    padding-top: 2%;
+                }
+
+                &:last-child {
+                    padding-bottom: 2%;
+                }
+
+                header {
+                    border: $thin-border-stroke $main-border-color;
+                }
+
+                .main-tbl {
+                    border: $thin-border-stroke $main-border-color;
+                    border-top: none;
+                    border-top-left-radius: 0;
+                    border-top-right-radius: 0;
+                }
+            }
+        }
+    }
+}
+
+
+// Object Styles
+// --------------------------------------------------
+
+.modal {
+
+    // Just some text to loosen up the strict "tables-within-boxes" layout
+    .hint {
+        &:not(:last-child) {
+            margin-bottom: 20px;
+        }
+        font-size: 11px;
+        line-height: 18px;
+    }
+
+    // Object within columns
+    .obj {
+        box-sizing: border-box;
+        background: #fff;
+        border-radius: $main-border-radius;
+        border: $thin-border-stroke $main-border-color;
+        color: $medium-prim-color;
+
+        &:not(:last-child) {
+            margin-bottom: 20px;
+        }
+
+        table {
+            border: none;
+            padding-left: 0;
+
+            &.main-tbl.top-tbl {
+                border-bottom: 1px solid $main-border-color;
+                border-radius: 0;
+            }
+
+            td {
+                line-height: 25px !important;
+                padding-top: 4px;
+                padding-bottom: 4px;
+
+                > a {
+                    float: none;
+                    margin: 0;
+                }
+
+                a.external-link {
+                    @include fa-icon($fa-var-external-link-square, before, inline-block, 4px, 0, inherit, 14px);
+                    float: right;
+
+                    &:hover {
+                        @include fa-icon-color(before, $l-blue);
+                    }
+                }
+
+                .circle {
+                    margin-top: 7px;
+                }
+            }
+        }
+
+        .fa-calendar-o {
+            margin-left: 5px;
+        }
+
+        // Main container
+        .obj-container {
+            height: auto;
+            opacity: 1;
+
+            > p,
+            pre {
+                font-size: 11px;
+                color: $medium-prim-color;
+                line-height: 18px;
+                margin-bottom: 15px;
+
+                &:last-child {
+                    margin-bottom: 8px;
+                }
+            }
+
+            .desc {
+                margin: 0 auto;
+                padding: 20px 15px;
+
+                &.no-border {
+                    border-bottom: none;
+                }
+            }
+
+            h3.section-heading {
+                color: $dark-prim-color;
+                padding: 10px 20px 5px;
+                border-bottom: 1px solid $main-border-color;
+            }
+
+            h4 {
+                color: $dark-prim-color;
+                font-size: 14px;
+                margin-bottom: 8px;
+
+                &:not(:first-child) {
+                    margin-top: 15px;
+                }
+            }
+
+            > ul {
+
+                span {
+                    font-weight: 600;
+                    font-size: 13px;
+                }
+
+                > li {
+                    line-height: 23px;
+                    border-bottom: 1px solid lighten($main-border-color, 10%);
+                    padding: 10px 0;
+
+                    &:first-child {
+                        padding-top: 0;
+                    }
+
+                    &:last-child {
+                        border-bottom: none;
+                        margin-bottom: 0;
+                        padding-bottom: 0;
+                    }
+                }
+
+            }
+
+            &.padded {
+                padding: 20px;
+            }
+        }
+    }
+
+    .header-description {
+        padding: 10px;
+        line-height: 20px;
+    }
+}
+
+// Miscellaneous
+// --------------------------------------------------
+.loading {
+    text-align: center;
+    padding-top: 16px;
+    padding-bottom: 16px;
+}

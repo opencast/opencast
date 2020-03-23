@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -42,6 +42,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-transcription-service-persistence</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-workflow-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -58,10 +63,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -96,8 +97,8 @@
       <artifactId>json-simple</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -116,10 +117,6 @@
     </dependency>
     <!-- Persistence -->
     <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>javax.persistence</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>test</scope>
@@ -137,12 +134,7 @@
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
             <!-- test database -->
             <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
-            <!-- REST declarations -->
-            <ignoredUnusedDeclaredDependency>javax.ws.rs:jsr311-api</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
-          <ignoredUsedUndeclaredDependencies>
-            <ignoredUsedUndeclaredDependency>javax.ws.rs:javax.ws.rs-api</ignoredUsedUndeclaredDependency>
-          </ignoredUsedUndeclaredDependencies>
         </configuration>
       </plugin>
       <plugin>
@@ -154,7 +146,6 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Service-Component>
-              OSGI-INF/ibm-watson-transcription-database-service.xml,
               OSGI-INF/ibm-watson-transcription-rest.xml,
               OSGI-INF/ibm-watson-transcription-service.xml
             </Service-Component>
@@ -163,9 +154,6 @@
               javax.ws.rs.core;version=2.0.1,
               *
             </Import-Package>
-            <Meta-Persistence>
-              META-INF/persistence.xml
-            </Meta-Persistence>
           </instructions>
         </configuration>
       </plugin>

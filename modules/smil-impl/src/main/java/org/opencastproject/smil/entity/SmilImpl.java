@@ -189,17 +189,6 @@ public class SmilImpl extends SmilObjectImpl implements Smil {
   }
 
   /**
-   * JAXB helper method, references to {
-   *
-   * @param smil {@link Smil} document as xml
-   * @return parsed {@link SmilImpl}
-   * @throws JAXBException if unmarshalling fail
-   */
-  public static SmilImpl fromString(String smil) throws JAXBException {
-    return (SmilImpl) fromXML(smil);
-  }
-
-  /**
    * Unmarshall a SMIL document from string.
    *
    * @param xml {@link Smil} document as xml

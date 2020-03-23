@@ -33,12 +33,6 @@ public class SeriesServiceDatabaseException extends Exception {
   private static final long serialVersionUID = 3686276964199249490L;
 
   /**
-   * Create exception.
-   */
-  public SeriesServiceDatabaseException() {
-  }
-
-  /**
    * Create exception with a message.
    *
    * @param message

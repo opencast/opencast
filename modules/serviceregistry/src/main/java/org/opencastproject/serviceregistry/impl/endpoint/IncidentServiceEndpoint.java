@@ -66,6 +66,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,7 +101,16 @@ import javax.ws.rs.core.Response.Status;
                 + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>"})
+                + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"})
+@Component(
+  property = {
+    "service.description=Incident Service REST Endpoint",
+    "opencast.service.type=org.opencastproject.incident",
+    "opencast.service.path=/incidents"
+  },
+  immediate = true,
+  service = { IncidentServiceEndpoint.class }
+)
 public class IncidentServiceEndpoint {
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(IncidentServiceEndpoint.class);
@@ -122,6 +133,7 @@ public class IncidentServiceEndpoint {
   protected String serviceUrl = "/incidents";
 
   /** OSGi callback for setting the incident service. */
+  @Reference(name = "incidentService")
   public void setIncidentService(IncidentService incidentService) {
     this.svc = incidentService;
   }

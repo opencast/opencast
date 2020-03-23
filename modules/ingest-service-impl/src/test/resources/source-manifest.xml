@@ -35,4 +35,15 @@
       <checksum type="md5">6d535f61a1b31a3edeb01be0951a2b4e</checksum>
     </attachment>    
   </attachments>
+  <!-- test with live pub in asset manager -->
+  <publications>
+    <publication id="1004b8ad-a794-4a6c-93e2-073b80a2eb7f" channel="engage-live">
+      <mimetype>text/html</mimetype>
+        <tags/>
+        <url>http://opencast.acme.edu/engage/player/watch.html?id=537fec50-690a-4dee-a4ce-528ae90c1f9c</url>
+        <media/>
+        <attachments/>
+        <metadata/>
+      </publication>
+   </publications>
 </mediapackage>

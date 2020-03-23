@@ -27,7 +27,6 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.capture.CaptureParameters.AGENT_REGISTRATION_TYPE;
 import static org.opencastproject.capture.CaptureParameters.AGENT_REGISTRATION_TYPE_ADHOC;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATED;
@@ -68,8 +67,6 @@ import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.impl.CaptureNowProlongingService;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
@@ -150,7 +147,7 @@ import javax.ws.rs.core.Response.Status;
                 + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
 public class SchedulerRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(SchedulerRestService.class);
@@ -393,34 +390,6 @@ public class SchedulerRestService {
     }
   }
 
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("{id}/acl")
-  @RestQuery(name = "getaccesscontrollist", description = "Retrieves the access control list for specified event", returnDescription = "The access control list", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "ID of event for which the access control list will be retrieved", type = Type.STRING) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The access control list as JSON "),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "The event has no access control list"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to remove the event. Maybe you need to authenticate.") })
-  public Response getAccessControlList(@PathParam("id") String eventId) throws UnauthorizedException {
-    try {
-      AccessControlList accessControlList = service.getAccessControlList(eventId);
-      if (accessControlList != null) {
-        return Response.ok(AccessControlParser.toJson(accessControlList)).type(MediaType.APPLICATION_JSON_TYPE).build();
-      } else {
-        return Response.noContent().build();
-      }
-    } catch (NotFoundException e) {
-      logger.info("Event with id '{}' does not exist.", eventId);
-      return Response.status(Status.NOT_FOUND).build();
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      logger.error("Unable to retrieve access control list of event with id '{}': {}", eventId, getMessage(e));
-      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-  }
-
   /**
    * Gets the workflow configuration for the specified event.
    *
@@ -561,7 +530,7 @@ public class SchedulerRestService {
         response.header(HttpHeaders.ETAG, lastModified);
       return response.build();
     } catch (Exception e) {
-      logger.error("Unable to get calendar for capture agent '{}': {}", captureAgentId, getStackTrace(e));
+      logger.error("Unable to get calendar for capture agent '{}':", captureAgentId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -658,7 +627,7 @@ public class SchedulerRestService {
       return RestUtil.R.badRequest("Could not parse media package");
     }
 
-    String eventId = mediaPackage.getIdentifier().compact();
+    String eventId = mediaPackage.getIdentifier().toString();
 
     Map<String, String> caProperties = new HashMap<>();
     if (StringUtils.isNotBlank(agentParameters)) {
@@ -1054,8 +1023,8 @@ public class SchedulerRestService {
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to find conflicting events for {}, {}, {}, {}, {}: {}",
-              device, rrule, startDate, endDate, duration, getStackTrace(e));
+      logger.error("Unable to find conflicting events for {}, {}, {}, {}, {}:",
+              device, rrule, startDate, endDate, duration, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1103,8 +1072,8 @@ public class SchedulerRestService {
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to find conflicting events for {}, {}, {}, {}, {}: {}",
-              device, rrule, startDate, endDate, duration, getStackTrace(e));
+      logger.error("Unable to find conflicting events for {}, {}, {}, {}, {}",
+              device, rrule, startDate, endDate, duration, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1129,7 +1098,7 @@ public class SchedulerRestService {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
     } catch (SchedulerException e) {
-      logger.debug("Unable to set recording state of {}: {}", id, getStackTrace(e));
+      logger.debug("Unable to set recording state of {}:", id, e);
       return Response.serverError().build();
     }
   }
@@ -1147,7 +1116,7 @@ public class SchedulerRestService {
       return RestUtil.R
               .ok(obj(p("id", rec.getID()), p("state", rec.getState()), p("lastHeardFrom", rec.getLastCheckinTime())));
     } catch (SchedulerException e) {
-      logger.debug("Unable to get recording state of {}: {}", id, getStackTrace(e));
+      logger.debug("Unable to get recording state of {}:", id, e);
       return Response.serverError().build();
     }
   }
@@ -1167,7 +1136,7 @@ public class SchedulerRestService {
       service.removeRecording(id);
       return Response.ok(id + " removed").build();
     } catch (SchedulerException e) {
-      logger.debug("Unable to remove recording with id '{}': {}", id, getStackTrace(e));
+      logger.debug("Unable to remove recording with id '{}':", id, e);
       return Response.serverError().build();
     }
   }
@@ -1186,7 +1155,7 @@ public class SchedulerRestService {
       }
       return RestUtil.R.ok(arr(update).toJson());
     } catch (SchedulerException e) {
-      logger.debug("Unable to get all recordings: {}", getStackTrace(e));
+      logger.debug("Unable to get all recordings:", e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1345,7 +1314,7 @@ public class SchedulerRestService {
         service.addEvent(now, temporaryEndDate, agentId, Collections.<String> emptySet(), mediaPackage, wfProperties,
                 caProperties, Opt.<String> none());
         return Response.status(Status.CREATED)
-                .header("Location", serverUrl + serviceUrl + '/' + mediaPackage.getIdentifier().compact() + ".xml")
+                .header("Location", serverUrl + serviceUrl + '/' + mediaPackage.getIdentifier().toString() + ".xml")
                 .build();
       } catch (Exception e) {
         prolongingService.stop(agentId);
@@ -1414,7 +1383,7 @@ public class SchedulerRestService {
         } else {
           mp = current.get();
           eventCatalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp).get();
-          eventId = mp.getIdentifier().compact();
+          eventId = mp.getIdentifier().toString();
         }
       } catch (Exception e) {
         logger.error("Unable to get the immediate recording for agent '{}': {}", agentId, e);
@@ -1541,7 +1510,7 @@ public class SchedulerRestService {
 
     // Update comments catalog
     try {
-      URI catalogUrl = workspace.put(mediaPackage.getIdentifier().compact(), c.getIdentifier(), fileName, in);
+      URI catalogUrl = workspace.put(mediaPackage.getIdentifier().toString(), c.getIdentifier(), fileName, in);
       c.setURI(catalogUrl);
       // setting the URI to a new source so the checksum will most like be invalid
       c.setChecksum(null);
@@ -1592,7 +1561,7 @@ public class SchedulerRestService {
         mpJson = (JSONObject) mpJson.get("mediapackage");
         jsonArray.add(mpJson);
       } catch (org.json.simple.parser.ParseException e) {
-        logger.warn("Unexpected JSON parse exception for getAsJSON on mp {}", mp.getIdentifier().compact(), e);
+        logger.warn("Unexpected JSON parse exception for getAsJSON on mp {}", mp.getIdentifier().toString(), e);
         throw new SchedulerException(e);
       }
     }

@@ -36,7 +36,9 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.util.data.Option;
 
@@ -49,6 +51,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +69,13 @@ import java.util.stream.Collectors;
 /**
  * Proxies a set of remote composer services for use as a JVM-local service. Remote services are selected at random.
  */
+@Component(
+  property = {
+    "service.description=Composer (Encoder) Remote Service Proxy"
+  },
+  immediate = true,
+  service = { ComposerService.class }
+)
 public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerService {
 
   /** The logger */
@@ -72,6 +83,28 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
 
   public ComposerServiceRemoteImpl() {
     super(JOB_TYPE);
+  }
+
+  /**
+   * Sets the trusted http client
+   *
+   * @param client
+   */
+  @Override
+  @Reference(name = "trustedHttpClient")
+  public void setTrustedHttpClient(TrustedHttpClient client) {
+    this.client = client;
+  }
+
+  /**
+   * Sets the remote service manager.
+   *
+   * @param remoteServiceManager
+   */
+  @Override
+  @Reference(name = "remoteServiceManager")
+  public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
+    this.remoteServiceManager = remoteServiceManager;
   }
 
   /**

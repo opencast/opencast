@@ -27,6 +27,11 @@ import java.util.Locale;
 
 public class LocaleFormattingStringProvider {
 
+  static {
+    // Date formats changed with java 9
+    System.setProperty("java.locale.providers", "COMPAT");
+  }
+
   private Locale locale;
 
   public LocaleFormattingStringProvider(Locale locale) {

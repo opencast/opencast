@@ -1,0 +1,70 @@
+<section class="modal active modal-open" ng-form="bulkDeleteForm" id="delete-events-status-modal" style="display: block;" ng-controller="BulkDeleteCtrl">
+  <header>
+    <a ng-click="close()" class="fa fa-times close-modal"></a>
+    <h2 translate="BULK_ACTIONS.DELETE.EVENTS.CAPTION"><!-- Delete Events --></h2>
+  </header>
+
+  <div class="modal-content active">
+    <div class="modal-body">
+
+      <div class="full-col">
+        <div class="list-obj" ng-form="deleteForm">
+          <div class="modal-alert danger obj" ng-if="valid()">
+            <p translate="BULK_ACTIONS.DELETE_EVENTS_WARNING_LINE1">
+            <!-- You have chosen to delete an event. Once deleted all metadata,
+              audio and video will be deleted and can not be retrieved. -->
+            </p>
+            <p translate="BULK_ACTIONS.DELETE_EVENTS_WARNING_LINE2">
+            <!-- By pressing delete you understand that these files are unrecoverable. -->
+            </p>
+          </div>
+          <div ng-show="bulkDeleteForm.deleteForm.$error.schedulingAuthorized" class="alert sticky warning">
+            <p translate="BULK_ACTIONS.DELETE.EVENTS.UNAUTHORIZED">
+            <!-- Unauthorized -->
+            </p>
+          </div>
+
+
+          <div class="full-col">
+            <div class="obj">
+              <header translate="BULK_ACTIONS.DELETE.EVENTS.DELETE_EVENTS">
+                <!-- Delete Events -->
+              </header>
+              <table class="main-tbl">
+                <thead>
+                  <tr>
+                    <th class="small"><input type="checkbox" ng-model="table.allSelected" ng-change="table.allSelectedChanged()" class="select-all-cbox"/></th>
+                    <th translate="EVENTS.EVENTS.TABLE.TITLE"><!-- Title --></th>
+                    <th translate="EVENTS.EVENTS.TABLE.PRESENTERS"><!-- Presenter --></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="row in table.rows" ng-form="rowsForm" ng-class="{error: rowsForm.selection.$error.schedulingAuthorized}">
+                    <td><input name="selection" type="checkbox" ng-model="row.selected" scheduling-authorized="{{row}}" ng-change="table.rowSelectionChanged($index)" class="child-cbox"/></td>
+                    <td>{{ row.title }}</td>
+                    <td>
+                      <span class="metadata-entry" ng-repeat="presenter in row.presenters">{{ presenter }}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div> <!-- obj -->
+          </div><!-- full-col -->
+
+        </div><!-- deleteForm-->
+      </div><!-- full-col-->
+
+    </div><!-- modal-body -->
+
+  </div><!-- modal-content [deleteForm] -->
+  <footer>
+    <a ng-click="submit()" data-modal-tab="next" class="danger" ng-class="{active: valid(), inactive: !valid(), disabled: submitButton}">
+      {{ 'WIZARD.DELETE' | translate }}
+    </a>
+    <a translate="CANCEL" ng-click="close()" class="cancel">
+      <!-- Cancel -->
+    </a>
+  </footer>
+
+  <div class="btm-spacer"></div>
+</section>

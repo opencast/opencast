@@ -250,8 +250,10 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
         String[] mimetype = FileTypeMap.getDefaultFileTypeMap().getContentType(exported.getPath()).split("/");
         mpe.setMimeType(mimeType(mimetype[0], mimetype[1]));
       }
-      if (language != null)
+     // Don't need to add language tag if it doesn't exist or used for different purpose
+      if (language != null && !isNumeric(language)) {
         mpe.addTag("lang:" + language);
+      }
 
       return mpe;
 
@@ -436,6 +438,14 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
     return workspace.putInCollection(COLLECTION, outputName + "." + converter.getExtension(), in);
   }
 
+  private boolean isNumeric(String str) {
+    try {
+      Integer.parseInt(str);
+    } catch (NumberFormatException e) {
+      return false;
+    }
+    return true;
+  }
   /**
    * {@inheritDoc}
    *

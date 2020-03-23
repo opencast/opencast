@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -88,7 +88,7 @@
       -->
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
-      <artifactId>javax.persistence</artifactId>
+      <artifactId>jakarta.persistence</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
@@ -121,8 +121,7 @@
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
-      <version>1.3</version>
+      <artifactId>hamcrest</artifactId>
       <scope>test</scope>
     </dependency>
     <!--
@@ -145,17 +144,12 @@
     <dependency>
       <groupId>org.mutabilitydetector</groupId>
       <artifactId>MutabilityDetector</artifactId>
-      <version>0.10.1</version>
+      <version>0.10.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -230,9 +224,7 @@
               org.opencastproject.assetmanager.impl.storage;version=${project.version}
             </Export-Package>
             <Service-Component>
-              OSGI-INF/asset-manager.xml,
               OSGI-INF/asset-manager-rest.xml,
-              OSGI-INF/asset-manager-asset-provider.xml,
               OSGI-INF/tiered-storage-job-producer.xml,
               OSGI-INF/tiered-storage-timed-media-archiver.xml
             </Service-Component>

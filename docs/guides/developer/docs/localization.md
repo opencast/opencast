@@ -138,6 +138,15 @@ To show a list of files in the current project, use the following command:
 
 Note: Do not upload translations to Crowdin. Our current subscription plan will exceeded otherwise.
 
+
+### To consider when adding a translation
+
+* Add a SVG with the flag under modules/admin-ui/src/main/webapp/img/lang/
+* Add a case to the switch-case in
+    * modules/engage-theodul-core/src/main/resources/ui/js/engage/core.js
+    * modules/engage-ui/src/main/resources/ui/js/app/engage-ui.js
+
+
 Further Information
 -------------------
 

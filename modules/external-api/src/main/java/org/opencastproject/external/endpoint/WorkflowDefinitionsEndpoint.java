@@ -27,7 +27,6 @@ import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.matterhorn.search.SearchQuery.Order.Descending;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
@@ -77,7 +76,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
 @RestService(name = "externalapiworkflowdefinitions", title = "External API Workflow Definitions Service", notes = {}, abstractText = "Provides resources and operations related to the workflow definitions")
 public class WorkflowDefinitionsEndpoint {
 
@@ -131,7 +130,7 @@ public class WorkflowDefinitionsEndpoint {
     try {
       workflowDefinitions = workflowService.listAvailableWorkflowDefinitions().stream();
     } catch (WorkflowDatabaseException e) {
-      logger.error("The workflow service was not able to get the workflow definitions: {}", getStackTrace(e));
+      logger.error("The workflow service was not able to get the workflow definitions:", e);
       return ApiResponses.serverError("Could not retrieve workflow definitions, reason: '%s'", getMessage(e));
     }
 

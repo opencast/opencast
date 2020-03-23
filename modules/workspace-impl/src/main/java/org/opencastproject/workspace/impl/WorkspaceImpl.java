@@ -67,6 +67,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +102,13 @@ import javax.ws.rs.core.UriBuilder;
  *
  * TODO Implement cache invalidation using the caching headers, if provided, from the remote server.
  */
+@Component(
+  property = {
+    "service.description=Workspace"
+  },
+  immediate = true,
+  service = { Workspace.class }
+)
 public final class WorkspaceImpl implements Workspace {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(WorkspaceImpl.class);
@@ -187,6 +198,7 @@ public final class WorkspaceImpl implements Workspace {
    * @param cc
    *          the OSGi component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     if (this.wsRoot == null) {
       if (ensureContextProp(cc, WORKSPACE_DIR_KEY)) {
@@ -300,6 +312,7 @@ public final class WorkspaceImpl implements Workspace {
   }
 
   /** Callback from OSGi on service deactivation. */
+  @Deactivate
   public void deactivate() {
     JmxUtil.unregisterMXBean(registeredMXBean);
     if (workspaceCleaner != null) {
@@ -500,7 +513,7 @@ public final class WorkspaceImpl implements Workspace {
       }
       // left: an exception occurred
       for (Exception e : result.left()) {
-        logger.warn(format("Could not copy %s to %s: %s", src.toString(), dst.getAbsolutePath(), e.getMessage()));
+        logger.warn("Could not copy {} to {}: {}", src.toString(), dst.getAbsolutePath(), e.getMessage());
         FileUtils.deleteQuietly(dst);
         throw new NotFoundException(e);
       }
@@ -700,36 +713,8 @@ public final class WorkspaceImpl implements Workspace {
   }
 
   @Override
-  public URI getURI(String mediaPackageID, String mediaPackageElementID, String filename) {
-    return wfr.getURI(mediaPackageID, mediaPackageElementID, filename);
-  }
-
-  @Override
   public URI getCollectionURI(String collectionID, String fileName) {
     return wfr.getCollectionURI(collectionID, fileName);
-  }
-
-  @Override
-  public URI copyTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
-          throws NotFoundException, IOException {
-    String path = collectionURI.toString();
-    String filename = FilenameUtils.getName(path);
-    String collection = getCollection(collectionURI);
-
-    // Copy the local file
-    final File original = toWorkspaceFile(collectionURI);
-    if (original.isFile()) {
-      URI copyURI = wfr.getURI(toMediaPackage, toMediaPackageElement, filename);
-      File copy = toWorkspaceFile(copyURI);
-      FileUtils.forceMkdir(copy.getParentFile());
-      FileSupport.link(original, copy);
-    }
-
-    // Tell working file repository
-    final URI wfrUri = wfr.copyTo(collection, filename, toMediaPackage, toMediaPackageElement, toFileName);
-    // wait for WFR
-    waitForResource(wfrUri, SC_OK, "File %s does not appear in WFR");
-    return wfrUri;
   }
 
   @Override
@@ -762,8 +747,7 @@ public final class WorkspaceImpl implements Workspace {
     return wfr.getCollectionContents(collectionId);
   }
 
-  @Override
-  public void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException {
+  private void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException {
     // local delete
     final File f = workspaceFile(WorkingFileRepository.COLLECTION_PATH_PREFIX, collectionId,
             PathSupport.toSafeName(fileName));
@@ -875,6 +859,7 @@ public final class WorkspaceImpl implements Workspace {
     return wfr.getBaseUri();
   }
 
+  @Reference(name = "REPO")
   public void setRepository(WorkingFileRepository repo) {
     this.wfr = repo;
     if (repo instanceof PathMappable) {
@@ -883,10 +868,12 @@ public final class WorkspaceImpl implements Workspace {
     }
   }
 
+  @Reference(name = "trustedHttpClient")
   public void setTrustedHttpClient(TrustedHttpClient trustedHttpClient) {
     this.trustedHttpClient = trustedHttpClient;
   }
 
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

@@ -33,12 +33,9 @@ import org.opencastproject.util.data.Tuple;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
-import org.osgi.service.component.ComponentContext;
+import org.eclipse.persistence.config.PersistenceUnitProperties;
 
 import java.beans.PropertyVetoException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -51,7 +48,6 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.persistence.TemporalType;
 import javax.persistence.spi.PersistenceProvider;
-import javax.sql.DataSource;
 
 /** Functions supporting persistence. */
 
@@ -60,68 +56,6 @@ import javax.sql.DataSource;
  */
 public final class PersistenceUtil {
   private PersistenceUtil() {
-  }
-
-  public static final Map<String, Object> NO_PERSISTENCE_PROPS = Collections
-          .unmodifiableMap(new HashMap<String, Object>());
-
-  /**
-   * Create a new entity manager factory with the persistence unit name <code>emName</code>. A
-   * {@link javax.persistence.spi.PersistenceProvider} named <code>persistence</code> has to be registered as an OSGi
-   * service. If you want to configure the factory please also register a map containing all properties under the name
-   * <code>persistenceProps</code>. See
-   * {@link javax.persistence.spi.PersistenceProvider#createEntityManagerFactory(String, java.util.Map)} for more
-   * information about config maps.
-   *
-   * @param emName
-   *          name of the persistence unit
-   */
-  public static EntityManagerFactory newEntityManagerFactory(ComponentContext cc, String emName) {
-    PersistenceProvider persistenceProvider = (PersistenceProvider) cc.locateService("persistence");
-    final Map persistenceProps;
-    Map pp = (Map) cc.locateService("persistenceProps");
-    persistenceProps = pp != null ? pp : Collections.emptyMap();
-    return persistenceProvider.createEntityManagerFactory(emName, persistenceProps);
-  }
-
-  /**
-   * Create a new entity manager factory with the persistence unit name <code>emName</code>. A
-   * {@link javax.persistence.spi.PersistenceProvider} named <code>persistence</code> has to be registered as an OSGi
-   * service. See {@link javax.persistence.spi.PersistenceProvider#createEntityManagerFactory(String, java.util.Map)}
-   * for more information about config maps.
-   *
-   * @param emName
-   *          name of the persistence unit
-   * @param persistenceProps
-   *          config map for the creation of an EntityManagerFactory
-   */
-  public static EntityManagerFactory newEntityManagerFactory(ComponentContext cc, String emName, Map persistenceProps) {
-    PersistenceProvider persistenceProvider = (PersistenceProvider) cc.locateService("persistence");
-    return persistenceProvider.createEntityManagerFactory(emName, persistenceProps);
-  }
-
-  /** Create a new persistence environment. This method is the preferred way of creating a persitence environment. */
-  public static PersistenceEnv newPersistenceEnvironment(PersistenceProvider persistenceProvider, String emName,
-          Map persistenceProps) {
-    return newPersistenceEnvironment(persistenceProvider.createEntityManagerFactory(emName, persistenceProps));
-  }
-
-  /**
-   * Shortcut for <code>newPersistenceEnvironment(newEntityManagerFactory(cc, emName, persistenceProps))</code>.
-   *
-   * @see #newEntityManagerFactory(org.osgi.service.component.ComponentContext, String, java.util.Map)
-   */
-  public static PersistenceEnv newPersistenceEnvironment(ComponentContext cc, String emName, Map persistenceProps) {
-    return newPersistenceEnvironment(newEntityManagerFactory(cc, emName, persistenceProps));
-  }
-
-  /**
-   * Shortcut for <code>newPersistenceEnvironment(newEntityManagerFactory(cc, emName))</code>.
-   *
-   * @see #newEntityManagerFactory(org.osgi.service.component.ComponentContext, String)
-   */
-  public static PersistenceEnv newPersistenceEnvironment(ComponentContext cc, String emName) {
-    return newPersistenceEnvironment(newEntityManagerFactory(cc, emName));
   }
 
   /** Create a new entity manager or return none, if the factory has already been closed. */
@@ -148,10 +82,6 @@ public final class PersistenceUtil {
         }
       }
 
-      @Override
-      public void close() {
-        penv.close();
-      }
     };
   }
 
@@ -165,32 +95,6 @@ public final class PersistenceUtil {
   @Deprecated
   public static PersistenceEnv newPersistenceEnvironment(final EntityManagerFactory emf) {
     return PersistenceEnvs.persistenceEnvironment(emf);
-  }
-
-  public static void closeQuietly(Connection c) {
-    if (c != null) {
-      try {
-        c.close();
-      } catch (SQLException ignore) {
-      }
-    }
-  }
-
-  /**
-   * Test if a connection to the given data source can be established.
-   *
-   * @return none, if the connection could be established
-   */
-  public static Option<SQLException> testConnection(DataSource ds) {
-    Connection connection = null;
-    try {
-      connection = ds.getConnection();
-      return none();
-    } catch (SQLException e) {
-      return some(e);
-    } finally {
-      closeQuietly(connection);
-    }
   }
 
   /**
@@ -370,8 +274,6 @@ public final class PersistenceUtil {
 
   /**
    * Create function to merge an object <code>a</code> with the persisten context of the given entity manage.
-   *
-   * @deprecated use {@link Queries#merge(Object)}
    */
   @Deprecated
   public static <A> Function<EntityManager, A> merge(final A a) {
@@ -418,8 +320,8 @@ public final class PersistenceUtil {
    */
   public static EntityManagerFactory newTestEntityManagerFactory(String emName) {
     Map<String, String> persistenceProperties = new HashMap<>();
-    persistenceProperties.put("eclipselink.ddl-generation", "create-tables");
-    persistenceProperties.put("eclipselink.ddl-generation.output-mode", "database");
+    persistenceProperties.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.DROP_AND_CREATE);
+    persistenceProperties.put(PersistenceUnitProperties.DDL_GENERATION_MODE, PersistenceUnitProperties.DDL_DATABASE_GENERATION);
     return newEntityManagerFactory(emName, "Auto", "org.h2.Driver", "jdbc:h2:./target/db" + System.currentTimeMillis(),
             "sa", "sa", persistenceProperties, testPersistenceProvider());
   }

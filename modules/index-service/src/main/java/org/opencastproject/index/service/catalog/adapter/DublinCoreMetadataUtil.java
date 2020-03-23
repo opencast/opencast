@@ -35,7 +35,6 @@ import org.opencastproject.metadata.dublincore.Precision;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -133,6 +132,16 @@ public final class DublinCoreMetadataUtil {
     for (DublinCoreValue periodString : periodStrings) {
       p = Opt.nul(EncodingSchemeUtils.decodePeriod(periodString.getValue()));
     }
+    if (p.isNone()) {
+      // fall back to created date with zero duration
+      // opencast keep the event start date and created date in sync
+      // if the start date isn't set, we can grab the created value
+      DublinCoreValue createdDCValue = dc.getFirstVal(DublinCore.PROPERTY_CREATED);
+      if (createdDCValue != null) {
+        Date createdDate = EncodingSchemeUtils.decodeDate(createdDCValue.getValue());
+        p = Opt.nul(new DCMIPeriod(createdDate, createdDate));
+      }
+    }
     return p;
   }
 
@@ -204,8 +213,7 @@ public final class DublinCoreMetadataUtil {
       // ensure that DC created is start date, see MH-12250
       setDate(dc, field, DublinCore.PROPERTY_CREATED);
     } catch (ParseException e) {
-      logger.error("Not able to parse date {} to update the dublin core because: {}", field.getValue(),
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Not able to parse date {} to update the dublin core because:", field.getValue(), e);
     }
   }
 

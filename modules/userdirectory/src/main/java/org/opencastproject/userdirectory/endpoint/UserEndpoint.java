@@ -53,6 +53,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +84,16 @@ import javax.ws.rs.core.Response;
   title = "User utils",
   notes = "This service offers the default CRUD Operations for the internal Opencast users.",
   abstractText = "Provides operations for internal Opencast users")
+@Component(
+  property = {
+    "service.description=User REST endpoint",
+    "opencast.service.type=org.opencastproject.userdirectory.endpoint.UserEndpoint",
+    "opencast.service.path=/user-utils",
+    "opencast.service.jobproducer=false"
+  },
+  immediate = true,
+  service = { UserEndpoint.class }
+)
 public class UserEndpoint {
 
   /** The logger */
@@ -104,6 +116,7 @@ public class UserEndpoint {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -112,6 +125,7 @@ public class UserEndpoint {
    * @param jpaUserAndRoleProvider
    *          the persistenceProperties to set
    */
+  @Reference(name = "JpaUserAndRoleProvider")
   public void setJpaUserAndRoleProvider(JpaUserAndRoleProvider jpaUserAndRoleProvider) {
     this.jpaUserAndRoleProvider = jpaUserAndRoleProvider;
   }
@@ -184,6 +198,26 @@ public class UserEndpoint {
       return Response.status(SC_NOT_FOUND).build();
     }
     return Response.ok(JaxbUser.fromUser(user)).build();
+  }
+
+  @GET
+  @Path("users/md5.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(
+      name = "users-with-insecure-hashing",
+      description = "Returns a list of users which passwords are stored using MD5 hashes",
+      returnDescription = "Returns a JSON representation of the list of matching user accounts",
+      reponses = {
+      @RestResponse(
+          responseCode = SC_OK,
+          description = "The user accounts.")
+  })
+  public JaxbUserList getUserWithInsecurePasswordHashingAsJson() {
+    JaxbUserList userList = new JaxbUserList();
+    for (User user: jpaUserAndRoleProvider.findInsecurePasswordHashes()) {
+      userList.add(user);
+    }
+    return userList;
   }
 
   @POST

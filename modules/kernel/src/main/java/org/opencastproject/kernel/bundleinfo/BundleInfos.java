@@ -20,11 +20,8 @@
  */
 package org.opencastproject.kernel.bundleinfo;
 
-import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.data.Option.option;
 
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 
 import org.osgi.framework.Bundle;
@@ -32,37 +29,9 @@ import org.osgi.framework.Bundle;
 /** Functions on {@link BundleInfo}. */
 public final class BundleInfos {
   public static final String MANIFEST_BUILD_NUMBER = "Build-Number";
-  public static final String MANIFEST_DB_VERSION = "Mh-Db-Version";
 
   private BundleInfos() {
   }
-
-  /** Check if version and build numbers are equal. */
-  public static boolean versionEq(BundleInfo a, BundleInfo b) {
-    return eq(a.getBundleVersion(), b.getBundleVersion()) && eq(a.getBuildNumber(), b.getBuildNumber());
-  }
-
-  /** {@link BundleInfos#versionEq(BundleInfo, BundleInfo)} as a function. */
-  public static final Function2<BundleInfo, BundleInfo, Boolean> versionEq = new Function2<BundleInfo, BundleInfo, Boolean>() {
-    @Override
-    public Boolean apply(BundleInfo a, BundleInfo b) {
-      return versionEq(a, b);
-    }
-  };
-
-  public static final Function<BundleInfo, String> getBundleVersion = new Function<BundleInfo, String>() {
-    @Override
-    public String apply(BundleInfo bundleInfo) {
-      return bundleInfo.getBundleVersion();
-    }
-  };
-
-  public static final Function<BundleInfo, Option<String>> getBuildNumber = new Function<BundleInfo, Option<String>>() {
-    @Override
-    public Option<String> apply(BundleInfo bundleInfo) {
-      return bundleInfo.getBuildNumber();
-    }
-  };
 
   /** Extract the build number of a bundle. */
   public static Option<String> getBuildNumber(Bundle bundle) {

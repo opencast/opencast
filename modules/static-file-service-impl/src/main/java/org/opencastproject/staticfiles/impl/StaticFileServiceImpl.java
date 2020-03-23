@@ -22,7 +22,6 @@
 package org.opencastproject.staticfiles.impl;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.security.api.Organization;
@@ -115,7 +114,7 @@ public class StaticFileServiceImpl implements StaticFileService {
     purgeService.addListener(new Listener() {
       @Override
       public void failed(State from, Throwable failure) {
-        logger.warn("Temporary storage purging service failed: {}", getStackTrace(failure));
+        logger.warn("Temporary storage purging service failed:", failure);
       }
     }, MoreExecutors.directExecutor());
     purgeService.startAsync();
@@ -205,7 +204,7 @@ public class StaticFileServiceImpl implements StaticFileService {
       Path file = getFile(org, uuid);
       return file.getFileName().toString();
     } catch (IOException e) {
-      logger.warn("Error while reading file: {}", getStackTrace(e));
+      logger.warn("Error while reading file:", e);
       throw new NotFoundException(e);
     }
   }
@@ -217,7 +216,7 @@ public class StaticFileServiceImpl implements StaticFileService {
       Path file = getFile(org, uuid);
       return Files.size(file);
     } catch (IOException e) {
-      logger.warn("Error while reading file: {}", getStackTrace(e));
+      logger.warn("Error while reading file:", e);
       throw new NotFoundException(e);
     }
   }
@@ -291,7 +290,7 @@ public class StaticFileServiceImpl implements StaticFileService {
    *           if there was an error while deleting the files.
    */
   void purgeTemporaryStorageSection(final String org, final long lifetime) throws IOException {
-    logger.info("Purge temporary storage section of organization '{}'", org);
+    logger.debug("Purge temporary storage section of organization '{}'", org);
     final Path temporaryStorageDir = getTemporaryStorageDir(org);
     if (Files.exists(temporaryStorageDir)) {
       try (DirectoryStream<Path> tempFilesStream = Files.newDirectoryStream(temporaryStorageDir,

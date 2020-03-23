@@ -43,11 +43,20 @@ execution of the workflow operation.
 
 |Variable           |Description                               |Example                               |
 |-------------------|------------------------------------------|--------------------------------------|
-|`${element_uri}`   |URI of the last media package element     |`http://ex.com/files/mediap...xy.mp4` |
 |`${event_id}`      |The event (media package) identifier      |`18633e04-1a3f-4bbb-a72a-99c15deba1b9`|
 |`${player_path}`   |The player path for the event             |`/engage/theodul/ui/core.html?id=`    |
 |`${publication_id}`|The id of this publication.               |`54f6c12d-8e68-4ec8-badf-cd045b33d01e`|
 |`${series_id}`     |The id of the series if available         |`36f3c5d8-ad4d-4dab-beb1-1400ffab4a69`|
+
+The organization properties are also available and can be accessed with the `org_` prefix followed by the property name,
+eg. `${org_player}` will be replaced by the value of the organization property named `player`.
+
+Note some organization properties contain an `.` (period) in their name (e.g. `org.opencastproject.external.api.url`).
+As this character have an special meaning in the FreeMarker library (used for substitution), all occurrences are replaced
+with `_` (underscore).
+
+Additional to the organization properties you can use `org_id`, `org_name`, `org_admin_role` and
+`org_anonymous_role` as well.
 
 ## Publication Channel Labels and Icons
 

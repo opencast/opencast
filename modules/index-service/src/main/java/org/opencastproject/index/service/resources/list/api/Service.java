@@ -63,10 +63,6 @@ public class Service implements JSONAware {
     map.put(HOST, host);
   }
 
-  public String toJson() {
-    return JSONObject.toJSONString(map);
-  }
-
   /**
    * @return the name
    */

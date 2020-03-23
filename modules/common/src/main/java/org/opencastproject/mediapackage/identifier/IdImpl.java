@@ -22,6 +22,9 @@
 
 package org.opencastproject.mediapackage.identifier;
 
+import java.util.UUID;
+import java.util.regex.Pattern;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
@@ -33,6 +36,8 @@ import javax.xml.bind.annotation.XmlValue;
 @XmlType
 @XmlAccessorType(XmlAccessType.NONE)
 public class IdImpl implements Id {
+
+  private static final Pattern pattern = Pattern.compile("[\\w-_.:;()]+");
 
   /** The identifier */
   @XmlValue
@@ -50,17 +55,11 @@ public class IdImpl implements Id {
    * @param id
    *          the identifier
    */
-  public IdImpl(String id) {
+  public IdImpl(final String id) {
+    if (!pattern.matcher(id).matches()) {
+      throw new IllegalArgumentException("Id must match " + pattern);
+    }
     this.id = id;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.identifier.Id#compact()
-   */
-  public String compact() {
-    return id.replaceAll("/", "-").replaceAll("\\\\", "-");
   }
 
   @Override
@@ -90,5 +89,13 @@ public class IdImpl implements Id {
   @Override
   public int hashCode() {
     return id.hashCode();
+  }
+
+  /**
+   * Generate a new UUID-based Id.
+   * @return New Id
+   */
+  public static Id fromUUID() {
+    return new IdImpl(UUID.randomUUID().toString());
   }
 }

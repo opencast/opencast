@@ -40,11 +40,13 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -57,7 +59,6 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -73,6 +74,8 @@ import org.apache.http.util.EntityUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +107,17 @@ import javax.ws.rs.core.Response;
                 + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
+                + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+  property = {
+    "service.description=Series Remote Service Proxy",
+    "opencast.service.type=org.opencastproject.series",
+    "opencast.service.path=/series",
+    "opencast.service.publish=false"
+  },
+  immediate = true,
+  service = { SeriesService.class, SeriesServiceRemoteImpl.class }
+)
 public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesServiceRemoteImpl.class);
@@ -115,6 +128,28 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
 
   /** Default number of items on page */
   private static final int DEFAULT_LIMIT = 20;
+
+  /**
+   * Sets the trusted http client
+   *
+   * @param client
+   */
+  @Override
+  @Reference(name = "trustedHttpClient")
+  public void setTrustedHttpClient(TrustedHttpClient client) {
+    super.setTrustedHttpClient(client);
+  }
+
+  /**
+   * Sets the remote service manager.
+   *
+   * @param remoteServiceManager
+   */
+  @Override
+  @Reference(name = "remoteServiceManager")
+  public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
+    super.setRemoteServiceManager(remoteServiceManager);
+  }
 
   @Override
   public DublinCoreCatalog updateSeries(DublinCoreCatalog dc) throws SeriesException, UnauthorizedException {
@@ -657,7 +692,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         }
       }
     } catch (Exception e) {
-      logger.warn("Error while retrieving elements from remote service: %s", ExceptionUtils.getStackTrace(e));
+      logger.warn("Error while retrieving elements from remote service:", e);
       throw new SeriesException(e);
     } finally {
       closeConnection(response);
@@ -688,7 +723,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         }
       }
     } catch (Exception e) {
-      logger.warn("Error while retrieving element from remote service: %s", ExceptionUtils.getStackTrace(e));
+      logger.warn("Error while retrieving element from remote service:", e);
       throw new SeriesException(e);
     } finally {
       closeConnection(response);

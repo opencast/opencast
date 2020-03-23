@@ -1,0 +1,380 @@
+<section ng-show="open"
+         ng-keyup="keyUp($event)"
+         tabindex="1"
+         class="modal modal-animation ng-hide"
+         id="series-details-modal"
+         ng-controller="SerieCtrl">
+  <header>
+    <a class="fa fa-times close-modal" ng-click="close()"></a>
+    <h2 translate="EVENTS.SERIES.DETAILS.HEADER" translate-values="{{titleParams}}">
+      <!-- Series details - {{resourceId}} -->
+    </h2>
+  </header>
+
+  <nav class="modal-nav" id="modal-nav">
+    <a ng-click="openTab('metadata')"
+       data-modal-tab="metadata"
+       ng-class="{ active: tab == 'metadata' }"
+       translate="EVENTS.SERIES.DETAILS.TABS.METADATA"
+       with-role="ROLE_UI_SERIES_DETAILS_METADATA_VIEW">
+      <!-- Metadata -->
+    </a>
+    <a ng-if="metadata.entries.length > 0"
+       ng-click="openTab('extended-metadata')"
+       data-modal-tab="extended-metadata"
+       ng-class="{ active: tab == 'extended-metadata' }"
+       translate="EVENTS.SERIES.DETAILS.TABS.EXTENDED_METADATA"
+       with-role="ROLE_UI_SERIES_DETAILS_METADATA_VIEW">
+      <!-- Metadata II -->
+    </a>
+    <a ng-click="openTab('permissions')"
+       data-modal-tab="permissions"
+       ng-class="{ active: tab == 'permissions' }"
+       translate="EVENTS.SERIES.DETAILS.TABS.PERMISSIONS"
+       with-role="ROLE_UI_SERIES_DETAILS_ACL_VIEW">
+      <!-- Access Policy -->
+    </a>
+    <a ng-click="openTab('theme')"
+       data-modal-tab="theme"
+       ng-class="{ active: tab == 'theme' }"
+       translate="EVENTS.SERIES.DETAILS.TABS.THEME"
+       with-role="ROLE_UI_SERIES_DETAILS_THEMES_VIEW">
+      <!-- Theme -->
+    </a>
+    <a ng-click="openTab('statistics')"
+       data-modal-tab="statistics"
+       ng-class="{ active: tab == 'statistics' }"
+       translate="EVENTS.SERIES.DETAILS.TABS.STATISTICS"
+       with-role="ROLE_UI_SERIES_DETAILS_STATISTICS_VIEW"
+       ng-if="statReusable.hasStatistics()">
+      <!-- Statistics -->
+    </a>
+    <a ng-if="feedContent" ng-click="openTab('feeds')"
+      data-modal-tab="feeds"
+      ng-class="{ active: tab == 'feeds' }"
+      translate="Feeds"
+      with-role="Feeds">
+      <!-- Feeds -->
+    </a>
+  </nav>
+
+  <!-- Left and right arrows to switch between series -->
+  <a ng-click="showAdjacent(true)"
+     ng-if="hasAdjacent(true)">
+    <i class="arrow fa fa-chevron-left"></i>
+  </a>
+  <a ng-click="showAdjacent()"
+     ng-if="hasAdjacent()">
+    <i class="arrow fa fa-chevron-right"></i>
+  </a>
+
+  <!-- Tab views -->
+
+  <!-- Metadata view -->
+  <div class="modal-content" data-modal-tab-content="metadata">
+    <div class="modal-body">
+      <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
+      <div class="full-col">
+        <div class="obj tbl-list">
+          <header class="no-expand" translate="EVENTS.SERIES.DETAILS.TABS.METADATA"><!-- Metadata --></header>
+          <div class="obj-container">
+            <table class="main-tbl">
+              <tr ng-repeat="row in seriesCatalog.fields">
+                <td>
+                  <span translate="{{ row.label }}"></span>
+                  <i ng-show="row.required" class="required">*</i>
+                </td>
+                <td admin-ng-editable
+                    required-role="ROLE_UI_SERIES_DETAILS_METADATA_EDIT"
+                    params="row" save="getSaveFunction(seriesCatalog.flavor)">
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Extended metadata view -->
+  <div class="modal-content" data-modal-tab-content="extended-metadata" ng-if="metadata.entries.length > 0">
+    <div class="modal-body">
+      <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
+      <div class="full-col">
+        <div class="obj tbl-list" ng-repeat="catalog in metadata.entries">
+          <header>{{ catalog.title }}</header>
+          <div class="obj-container">
+            <table class="main-tbl">
+              <tr ng-repeat="row in catalog.fields">
+                <td>
+                  <span translate="{{ row.label }}"></span>
+                  <i ng-show="row.required" class="required">*</i>
+                </td>
+                <td admin-ng-editable
+                    required-role="ROLE_UI_SERIES_DETAILS_METADATA_EDIT"
+                    params="row" save="getSaveFunction(catalog.flavor)">
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Permission view -->
+  <div class="modal-content" data-modal-tab-content="permissions" data-level="1">
+    <div class="modal-body">
+
+      <div data-admin-ng-notifications="" context="series-acl"></div>
+      <div data-admin-ng-notifications="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
+      <div data-admin-ng-notifications="" type="warning" context="series-acl-{{resourceId}}"></div>
+
+      <div class="full-col">
+        <ul>
+          <li>
+            <div class="obj list-obj">
+              <header translate="EVENTS.SERIES.DETAILS.TABS.PERMISSIONS"><!-- Access Policy --></header>
+              <div class="obj-container">
+                <div class="obj tbl-list">
+                  <table class="main-tbl" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')">
+                    <thead>
+                      <tr>
+                        <th translate="EVENTS.SERIES.DETAILS.ACCESS.TEMPLATES.TITLE">
+                          <!-- Templates -->
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <div class="obj-container padded">
+                            <p translate="EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION">
+                            <!-- Description -->
+                            </p>
+                            <select chosen
+                                    pre-select-from="acls"
+                                    ng-disabled="(tab == 'permissions') && (!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked)"
+                                    data-width="'200px'"
+                                    ng-change="changeBaseAcl()"
+                                    ng-model="baseAclId"
+                                    ng-options="id as name for (id, name) in acls"
+                                    placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
+                                    no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
+                                    />
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- ACL rules -->
+              <div class="obj-container">
+                <div class="obj tbl-list">
+                  <header translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.DETAILS"><!-- Details --></header>
+                  <div class="obj-container">
+                    <table class="main-tbl">
+                      <thead>
+                        <tr>
+                          <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ROLE">
+                            <!-- Role -->
+                          </th>
+                          <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.READ" class="fit">
+                            <!-- Read -->
+                          </th>
+                          <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.WRITE" class="fit">
+                            <!-- Write -->
+                          </th>
+                          <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ADDITIONAL_ACTIONS"
+                              class="fit"
+                              ng-if="hasActions">
+                            <!--Additional Actions-->
+                          </th>
+                          <th translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.ACTION"
+                              ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked"
+                              class="fit">
+                            <!-- Action -->
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr ng-repeat="policy in policies | limitTo: limit">
+                          <td>
+                            <select chosen
+                                    pre-select-from="roles"
+                                    ng-disabled="(tab == 'permissions') && (!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') || aclLocked)"
+                                    data-width="'360px'"
+                                    ng-model="policy.role"
+                                    ng-change="accessChanged(policy.role)"
+                                    ng-options="role as role for role in roles"
+                                    call-on-search="getMatchingRoles"
+                                    placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
+                                    no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
+                                    />
+                          </td>
+                          <td class="fit text-center">
+                            <input type="checkbox"
+                                   ng-disabled="::aclLocked"
+                                   ng-model="policy.read"
+                                   ng-change="accessSave()"
+                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/>
+                          </td>
+                          <td class="fit text-center">
+                            <input type="checkbox"
+                                   ng-disabled="::aclLocked"
+                                   ng-model="policy.write"
+                                   ng-change="accessSave()"
+                                   ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/>
+                          </td>
+                          <td class="fit editable" ng-if="hasActions">
+                            <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked"
+                                 save="accessSave"
+                                 admin-ng-editable-multi-select
+                                 mixed="false"
+                                 params="::policy.actions"
+                                 collection="::actions">
+                            </div>
+                            <div ng-if="(!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')) || aclLocked"
+                                 ng-repeat="customAction in ::policy.actions.value">
+                              {{ customAction }}
+                            </div>
+                          </td>
+                          <td class="fit" ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked">
+                            <a ng-click="deletePolicy(policy)" class="remove"></a>
+                          </td>
+                        </tr>
+                        <tr ng-if="limit < policies.length">
+                          <td colspan="5" >
+                            {{ limit }} / {{ policies.length }} {{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LOAD_MORE_LIMIT' | translate }}
+                            <a ng-click="loadmore()">{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LOAD_MORE_LINK' | translate }}</a>
+                          </td>
+                        </tr>
+                        <tr ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !aclLocked">
+                          <td colspan="5">
+                            <a ng-click="addPolicy()">
+                              + {{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.NEW' | translate }}
+                            </a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <footer ng-if="updateMode === 'optional'">
+                <!-- Button to remove all episode ACLs to ensure only the series ACL applies -->
+                <a ng-click="accessSave(true)"
+                   class="submit"
+                   ng-class="{disabled: !validAcl}"
+                   translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS"
+                   title="{{'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS_HINT' | translate}}">
+                  <!-- Submit -->
+                </a>
+              </footer>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics view -->
+  <div class="modal-content" data-modal-tab-content="statistics">
+    <div class="modal-body">
+      <div class="full-col">
+        <div class="modal-alert danger" ng-if="statReusable.error" translate="STATISTICS.NOT_AVAILABLE"/>
+        <div class="obj" ng-repeat="data in statReusable.statProviderData" ng-if="!statReusable.error">
+          <header class="no-expand" translate="{{ data.title }}">
+            <!-- Statistics -->
+          </header>
+          <div class="obj-container" ng-if="data.providerType == 'timeSeries'">
+            <statistics-graph
+              chart-labels="data.labels"
+              chart-options="data.options"
+              data-resolution="data.dataResolution"
+              from="data.from"
+              on-change="statReusable.recalculate(data.providerId, from, to, dataResolution, timeChooseMode)"
+              export-url="data.csvUrl"
+              export-file-name="statisticsCsvFileName(data.title | translate)"
+              source-data="data.values"
+              provider="data.providerId"
+              time-choose-mode="data.timeChooseMode"
+              to="data.to"
+              total-value="data.totalValue"
+              description="data.description"
+              >
+            </statistics-graph>
+          </div>
+          <div class="modal-alert danger" ng-if="data.providerType != 'timeSeries'" translate="STATISTICS.UNSUPPORTED_TYPE"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Theme view -->
+  <div class="modal-content" data-modal-tab-content="theme" data-level="1">
+    <div class="modal-body">
+      <div data-admin-ng-notifications="" type="warning" context="series-theme"></div>
+      <div class="full-col">
+        <div class="obj quick-actions">
+          <header translate="CONFIGURATION.NAVIGATION.THEMES"><!-- Theme --></header>
+          <div class="obj-container padded">
+            <ul>
+              <li>
+                <p translate="EVENTS.SERIES.NEW.THEME.DESCRIPTION.TEXT">
+                  <!-- Theme Dialog Explanation Text -->
+                </p>
+                <p>
+                  <!-- Available Themes Dropdown -->
+                  <select chosen
+                          pre-select-from="themes"
+                          allow-single-deselect="true"
+                          ng-disabled="(tab == 'theme') && !$root.userIs('ROLE_UI_SERIES_DETAILS_THEMES_EDIT')"
+                          data-width="'100%'"
+                          ng-change="themeSave()"
+                          ng-model="selectedTheme.id"
+                          ng-options="id as name for (id, name) in themes"
+                          placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.THEME.LABEL' | translate }}'"
+                          no-results-text="'{{ 'EVENTS.SERIES.NEW.THEME.EMPTY' | translate }}'"
+                          >
+                    <option value=""></option>
+                  </select>
+                </p>
+                <!-- Selected Theme Description Text -->
+                <p ng-if="selectedTheme.description">{{ selectedTheme.description }}</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feeds view -->
+  <div ng-if="feedsLinks" class="modal-content" data-modal-tab-content="feeds">
+    <div class="modal-body">
+      <div class="full-col">
+        <div class="obj">
+          <div class="obj-container">
+            <table class="main-tbl">
+              <tr>
+                <th>Type</th>
+                <th>Version</th>
+                <th>Link</th>
+              </tr>
+              <tr ng-repeat="row in feedsLinks">
+                <td> {{ row.type }} </td>
+                <td> {{ row.version }} </td>
+                <td> <a href="{{ row.link }}"> {{ row.link }} </a> </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="btm-spacer"></div>
+</section>

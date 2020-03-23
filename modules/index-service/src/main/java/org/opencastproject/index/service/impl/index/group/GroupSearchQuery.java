@@ -101,7 +101,6 @@ public class GroupSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public GroupSearchQuery withName(String name) {
-    clearExpectations();
     this.name = name;
     return this;
   }
@@ -123,7 +122,6 @@ public class GroupSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public GroupSearchQuery withRole(String role) {
-    clearExpectations();
     this.role = role;
     return this;
   }
@@ -143,7 +141,6 @@ public class GroupSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public GroupSearchQuery withoutActions() {
-    clearExpectations();
     this.actions.clear();
     return this;
   }
@@ -160,7 +157,6 @@ public class GroupSearchQuery extends AbstractSearchQuery {
   public GroupSearchQuery withAction(Action action) {
     if (action == null)
       throw new IllegalArgumentException("Action cannot be null");
-    clearExpectations();
     this.actions.add(action.toString());
     return this;
   }
@@ -182,7 +178,6 @@ public class GroupSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public GroupSearchQuery withDescription(String description) {
-    clearExpectations();
     this.description = description;
     return this;
   }
@@ -226,7 +221,6 @@ public class GroupSearchQuery extends AbstractSearchQuery {
   public GroupSearchQuery withRole(JpaRole role) {
     if (role == null)
       throw new IllegalArgumentException("Role cannot be null");
-    clearExpectations();
     this.roles.add(role);
     return this;
   }
@@ -253,7 +247,6 @@ public class GroupSearchQuery extends AbstractSearchQuery {
     if (StringUtils.isBlank(member)) {
       throw new IllegalArgumentException("Contributor can't be null");
     }
-    clearExpectations();
     this.members.add(member);
     return this;
   }

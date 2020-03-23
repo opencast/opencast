@@ -32,7 +32,6 @@ import static java.util.Objects.requireNonNull;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
@@ -109,6 +108,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -132,6 +132,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
@@ -195,6 +196,9 @@ public class ToolsEndpoint implements ManagedService {
   private static final String THUMBNAIL_POSITION = "POSITION";
   private static final String THUMBNAIL_DEFAULT = "DEFAULT";
 
+  /** Option to enable/disable thumbnail support */
+  private static final String OPT_THUMBNAIL_ENABLED = "thumbnail.enabled";
+
   private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
   private Boolean signWithClientIP = UrlSigningServiceOsgiUtil.DEFAULT_SIGN_WITH_CLIENT_IP;
@@ -212,6 +216,7 @@ public class ToolsEndpoint implements ManagedService {
   private UrlSigningService urlSigningService;
   private WorkflowService workflowService;
   private Workspace workspace;
+  private boolean thumbnailEnabled = true;
 
   void setConfigurablePublicationService(ConfigurablePublicationService configurablePublicationService) {
     this.configurablePublicationService = configurablePublicationService;
@@ -283,6 +288,9 @@ public class ToolsEndpoint implements ManagedService {
     expireSeconds = UrlSigningServiceOsgiUtil.getUpdatedSigningExpiration(properties, this.getClass().getSimpleName());
     signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,
             this.getClass().getSimpleName());
+
+    thumbnailEnabled = BooleanUtils.toBoolean(Objects.toString(properties.get(OPT_THUMBNAIL_ENABLED), "false"));
+    logger.debug("Thumbnail feature enabled: {}", thumbnailEnabled);
   }
 
   @GET
@@ -325,6 +333,18 @@ public class ToolsEndpoint implements ManagedService {
             && adminUIConfiguration.getPreviewSubtype().equals(element.getFlavor().getSubtype());
   }
 
+  private String signIfNecessary(final URI uri) {
+    if (!urlSigningService.accepts(uri.toString())) {
+      return uri.toString();
+    }
+    String clientIP = signWithClientIP ? securityService.getUserIP() : null;
+    try {
+      return new URI(urlSigningService.sign(uri.toString(), expireSeconds, null, clientIP)).toString();
+    } catch (URISyntaxException | UrlSigningException e) {
+      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+    }
+  }
+
   @GET
   @Path("{mediapackageid}/editor.json")
   @Produces(MediaType.APPLICATION_JSON)
@@ -345,25 +365,8 @@ public class ToolsEndpoint implements ManagedService {
     List<JValue> jPreviews = new ArrayList<>();
     List<JValue> jTracks = new ArrayList<>();
     for (MediaPackageElement element : previewPublications) {
-      final URI elementUri;
-      if (urlSigningService.accepts(element.getURI().toString())) {
-        try {
-          String clientIP = null;
-          if (signWithClientIP) {
-            clientIP = securityService.getUserIP();
-          }
-          elementUri = new URI(urlSigningService.sign(element.getURI().toString(), expireSeconds, null, clientIP));
-        } catch (URISyntaxException e) {
-          logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
-          throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-        } catch (UrlSigningException e) {
-          logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
-          throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-        }
-      } else {
-        elementUri = element.getURI();
-      }
-      JObject jPreview = obj(f("uri", v(elementUri.toString())));
+      final String elementUri = signIfNecessary(element.getURI());
+      JObject jPreview = obj(f("uri", v(elementUri)));
       // Get the elements frame rate for frame by frame skipping in the editor
       // Note that this assumes that the resulting video will have the same frame rate as the preview
       // and also that there is only one video stream for any preview element.
@@ -391,26 +394,11 @@ public class ToolsEndpoint implements ManagedService {
       // Check if there's a waveform for the current track
       Opt<Attachment> optWaveform = getWaveformForTrack(mp, element);
       if (optWaveform.isSome()) {
-        final URI waveformUri;
-        if (urlSigningService.accepts(element.getURI().toString())) {
-          try {
-            waveformUri = new URI(
-                    urlSigningService.sign(optWaveform.get().getURI().toString(), expireSeconds, null, null));
-          } catch (URISyntaxException e) {
-            logger.error("Error while trying to serialize the waveform urls because: {}", getStackTrace(e));
-            throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-          } catch (UrlSigningException e) {
-            logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
-            throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-          }
-        } else {
-          waveformUri = optWaveform.get().getURI();
-        }
-        jTracks.add(jTrack.merge(obj(f("waveform", v(waveformUri.toString())))));
+        final String waveformUri = signIfNecessary(optWaveform.get().getURI());
+        jTracks.add(jTrack.merge(obj(f("waveform", v(waveformUri)))));
       } else {
         jTracks.add(jTrack);
       }
-
     }
 
     // Get existing segments
@@ -428,22 +416,24 @@ public class ToolsEndpoint implements ManagedService {
 
     // Get thumbnail
     final List<Field> thumbnailFields = new ArrayList<>();
-    try {
-      final ThumbnailImpl thumbnailImpl = newThumbnailImpl();
-      final Optional<ThumbnailImpl.Thumbnail> optThumbnail = thumbnailImpl
-        .getThumbnail(mp, urlSigningService, expireSeconds);
+    if (thumbnailEnabled) {
+      try {
+        final ThumbnailImpl thumbnailImpl = newThumbnailImpl();
+        final Optional<ThumbnailImpl.Thumbnail> optThumbnail = thumbnailImpl
+          .getThumbnail(mp, urlSigningService, expireSeconds);
 
-      optThumbnail.ifPresent(thumbnail -> {
-        thumbnailFields.add(f("type", thumbnail.getType().name()));
-        thumbnailFields.add(f("url", thumbnail.getUrl().toString()));
-        thumbnailFields.add(f("defaultPosition",  thumbnailImpl.getDefaultPosition()));
-        thumbnail.getPosition().ifPresent(p -> thumbnailFields.add(f("position", p)));
-        thumbnail.getTrack().ifPresent(t -> thumbnailFields.add(f("track", t)));
-      });
-    } catch (UrlSigningException | URISyntaxException e) {
-      logger.error("Error while trying to serialize the thumbnail url because: {}", getStackTrace(e));
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+        optThumbnail.ifPresent(thumbnail -> {
+          thumbnailFields.add(f("type", thumbnail.getType().name()));
+          thumbnailFields.add(f("url", thumbnail.getUrl().toString()));
+          thumbnailFields.add(f("defaultPosition", thumbnailImpl.getDefaultPosition()));
+          thumbnail.getPosition().ifPresent(p -> thumbnailFields.add(f("position", p)));
+          thumbnail.getTrack().ifPresent(t -> thumbnailFields.add(f("track", t)));
+        });
+      } catch (UrlSigningException | URISyntaxException e) {
+        throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+      }
     }
+
 
     final Map<String, String> latestWfProperties = WorkflowPropertiesUtil
       .getLatestWorkflowProperties(assetManager, mediaPackageId);
@@ -480,7 +470,7 @@ public class ToolsEndpoint implements ManagedService {
         final String audioPreview = Arrays.stream(internalPub.getAttachments())
           .filter(a -> a.getFlavor().getType().equals(e.getFlavor().getType()))
           .filter(a -> a.getFlavor().getSubtype().equals(this.adminUIConfiguration.getPreviewAudioSubtype()))
-          .map(MediaPackageElement::getURI).map(this::signUrl)
+          .map(MediaPackageElement::getURI).map(this::signIfNecessary)
           .findAny()
           .orElse(null);
         final SourceTrackSubInfo audio = new SourceTrackSubInfo(e.hasAudio(), audioPreview,
@@ -489,7 +479,7 @@ public class ToolsEndpoint implements ManagedService {
         final String videoPreview = Arrays.stream(internalPub.getAttachments())
           .filter(a -> a.getFlavor().getType().equals(e.getFlavor().getType()))
           .filter(a -> a.getFlavor().getSubtype().equals(this.adminUIConfiguration.getPreviewVideoSubtype()))
-          .map(MediaPackageElement::getURI).map(this::signUrl)
+          .map(MediaPackageElement::getURI).map(this::signIfNecessary)
           .findAny()
           .orElse(null);
         final SourceTrackSubInfo video = new SourceTrackSubInfo(e.hasVideo(), videoPreview,
@@ -508,6 +498,7 @@ public class ToolsEndpoint implements ManagedService {
             f("previews", arr(jPreviews)),
             f(TRACKS_KEY, arr(jTracks)),
             f("thumbnail", obj(thumbnailFields)),
+            f("thumbnail_enabled", v(thumbnailEnabled)),
             f("duration", v(previewDuration)),
             f(SEGMENTS_KEY, arr(jSegments)),
             f("workflows", arr(jWorkflows))));
@@ -525,6 +516,10 @@ public class ToolsEndpoint implements ManagedService {
   public Response changeThumbnail(@PathParam("mediapackageid") final String mediaPackageId,
     @Context HttpServletRequest request)
     throws IndexServiceException, NotFoundException, DistributionException, MediaPackageException {
+
+    if (!thumbnailEnabled) {
+      return R.badRequest("Thumbnail creation is prohibited");
+    }
 
     final Opt<Event> optEvent = getEvent(mediaPackageId);
     if (optEvent.isNone()) {
@@ -553,7 +548,7 @@ public class ToolsEndpoint implements ManagedService {
               f("position", thumbnail.getDefaultPosition()),
               f("defaultPosition", thumbnail.getDefaultPosition()),
               f("type", ThumbnailImpl.ThumbnailSource.UPLOAD.name()),
-              f("url", signUrl(distElement.getURI()))))));
+              f("url", signIfNecessary(distElement.getURI()))))));
         } else if (current.isFormField() && THUMBNAIL_TRACK.equalsIgnoreCase(current.getFieldName())) {
           final String value = Streams.asString(current.openStream());
           if (!THUMBNAIL_DEFAULT.equalsIgnoreCase(value)) {
@@ -582,10 +577,10 @@ public class ToolsEndpoint implements ManagedService {
         f("type", thumbnailSource.name()),
         f("position", position.getAsDouble()),
         f("defaultPosition", thumbnail.getDefaultPosition()),
-        f("url", signUrl(distributedElement.getURI()))
+        f("url", signIfNecessary(distributedElement.getURI()))
       ))));
     } catch (IOException | FileUploadException e) {
-      logger.error("Error reading request body: {}", getStackTrace(e));
+      logger.error("Error reading request body:", e);
       return R.serverError();
     } catch (PublicationException | UnknownFileTypeException | EncoderException e) {
       logger.error("Could not generate or publish thumbnail", e);
@@ -607,7 +602,7 @@ public class ToolsEndpoint implements ManagedService {
     try (InputStream is = request.getInputStream()) {
       details = IOUtils.toString(is, request.getCharacterEncoding());
     } catch (IOException e) {
-      logger.error("Error reading request body: {}", getStackTrace(e));
+      logger.error("Error reading request body:", e);
       return R.serverError();
     }
 
@@ -634,7 +629,7 @@ public class ToolsEndpoint implements ManagedService {
       try {
         smil = createSmilCuttingCatalog(editingInfo, mediaPackage);
       } catch (Exception e) {
-        logger.warn("Unable to create a SMIL cutting catalog ({}): {}", details, getStackTrace(e));
+        logger.warn("Unable to create a SMIL cutting catalog ({}):", details, e);
         return R.badRequest("Unable to create SMIL cutting catalog");
       }
 
@@ -655,13 +650,13 @@ public class ToolsEndpoint implements ManagedService {
       try {
         addSmilToArchive(mediaPackage, smil);
       } catch (IOException e) {
-        logger.warn("Unable to add SMIL cutting catalog to archive: {}", getStackTrace(e));
+        logger.warn("Unable to add SMIL cutting catalog to archive:", e);
         return R.serverError();
       }
 
       // Update default thumbnail (if used) since position may change due to cutting
       MediaPackageElement distributedThumbnail = null;
-      if (editingInfo.getDefaultThumbnailPosition().isPresent()) {
+      if (thumbnailEnabled && editingInfo.getDefaultThumbnailPosition().isPresent()) {
         try {
           final ThumbnailImpl thumbnailImpl = newThumbnailImpl();
           final Optional<ThumbnailImpl.Thumbnail> optThumbnail = thumbnailImpl
@@ -671,11 +666,11 @@ public class ToolsEndpoint implements ManagedService {
               .chooseDefaultThumbnail(mediaPackage, editingInfo.getDefaultThumbnailPosition().getAsDouble());
           }
         } catch (UrlSigningException | URISyntaxException e) {
-          logger.error("Error while trying to serialize the thumbnail url because: {}", getStackTrace(e));
+          logger.error("Error while trying to serialize the thumbnail url because:", e);
           return R.serverError();
         } catch (IOException | DistributionException | EncoderException | PublicationException
             | UnknownFileTypeException | MediaPackageException e) {
-          logger.error("Error while updating default thumbnail because: {}", getStackTrace(e));
+          logger.error("Error while updating default thumbnail because:", e);
           return R.serverError();
         }
       }
@@ -684,17 +679,17 @@ public class ToolsEndpoint implements ManagedService {
         final String workflowId = editingInfo.getPostProcessingWorkflow().get();
         try {
           final Map<String, String> workflowParameters = WorkflowPropertiesUtil
-            .getLatestWorkflowProperties(assetManager, mediaPackage.getIdentifier().compact());
+            .getLatestWorkflowProperties(assetManager, mediaPackage.getIdentifier().toString());
           final Workflows workflows = new Workflows(assetManager, workflowService);
           workflows.applyWorkflowToLatestVersion($(mediaPackage.getIdentifier().toString()),
             ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId), workflowParameters))
             .run();
         } catch (AssetManagerException e) {
-          logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
-                  workflowId, mediaPackage, getStackTrace(e));
+          logger.warn("Unable to start workflow '{}' on archived media package '{}':",
+                  workflowId, mediaPackage, e);
           return R.serverError();
         } catch (WorkflowDatabaseException e) {
-          logger.warn("Unable to load workflow '{}' from workflow service: {}", workflowId, getStackTrace(e));
+          logger.warn("Unable to load workflow '{}' from workflow service:", workflowId, e);
           return R.serverError();
         } catch (NotFoundException e) {
           logger.warn("Workflow '{}' not found", workflowId);
@@ -783,7 +778,7 @@ public class ToolsEndpoint implements ManagedService {
     //get the first smil/cutting  catalog-ID to overwrite it with new smil info
     for (Catalog p: catalogs) {
        if (p.getFlavor().matches(mediaPackageElementFlavor)) {
-         logger.debug("Set Idendifier for Smil-Catalog to: " + p.getIdentifier());
+         logger.debug("Set Identifier for Smil-Catalog to: {}", p.getIdentifier());
          catalogId = p.getIdentifier();
        break;
        }
@@ -792,7 +787,7 @@ public class ToolsEndpoint implements ManagedService {
 
     URI smilURI;
     try (InputStream is = IOUtils.toInputStream(smil.toXML(), "UTF-8")) {
-      smilURI = workspace.put(mediaPackage.getIdentifier().compact(), catalogId, TARGET_FILE_NAME, is);
+      smilURI = workspace.put(mediaPackage.getIdentifier().toString(), catalogId, TARGET_FILE_NAME, is);
     } catch (SAXException e) {
       logger.error("Error while serializing the SMIL catalog to XML: {}", e.getMessage());
       throw new IOException(e);
@@ -862,7 +857,7 @@ public class ToolsEndpoint implements ManagedService {
     try {
       return index.getEvent(mediaPackageId, searchIndex);
     } catch (SearchIndexException e) {
-      logger.error("Error while reading event '{}' from search index: {}", mediaPackageId, getStackTrace(e));
+      logger.error("Error while reading event '{}' from search index:", mediaPackageId, e);
       return Opt.none();
     }
   }
@@ -905,7 +900,7 @@ public class ToolsEndpoint implements ManagedService {
     try {
       workflows = workflowService.listAvailableWorkflowDefinitions();
     } catch (WorkflowDatabaseException e) {
-      logger.warn("Error while retrieving list of workflow definitions: {}", getStackTrace(e));
+      logger.warn("Error while retrieving list of workflow definitions:", e);
       return emptyList();
     }
 
@@ -931,11 +926,11 @@ public class ToolsEndpoint implements ManagedService {
         Smil smil = smilService.fromXml(workspace.get(smilCatalog.getURI())).getSmil();
         segments = mergeSegments(segments, getSegmentsFromSmil(smil));
       } catch (NotFoundException e) {
-        logger.warn("File '{}' could not be loaded by workspace service: {}", smilCatalog.getURI(), getStackTrace(e));
+        logger.warn("File '{}' could not be loaded by workspace service:", smilCatalog.getURI(), e);
       } catch (IOException e) {
-        logger.warn("Reading file '{}' from workspace service failed: {}", smilCatalog.getURI(), getStackTrace(e));
+        logger.warn("Reading file '{}' from workspace service failed:", smilCatalog.getURI(), e);
       } catch (SmilException e) {
-        logger.warn("Error while parsing SMIL catalog '{}': {}", smilCatalog.getURI(), getStackTrace(e));
+        logger.warn("Error while parsing SMIL catalog '{}':", smilCatalog.getURI(), e);
       }
     }
 
@@ -948,11 +943,11 @@ public class ToolsEndpoint implements ManagedService {
         Smil smil = smilService.fromXml(workspace.get(smilCatalog.getURI())).getSmil();
         segments = getSegmentsFromSmil(smil);
       } catch (NotFoundException e) {
-        logger.warn("File '{}' could not be loaded by workspace service: {}", smilCatalog.getURI(), getStackTrace(e));
+        logger.warn("File '{}' could not be loaded by workspace service:", smilCatalog.getURI(), e);
       } catch (IOException e) {
-        logger.warn("Reading file '{}' from workspace service failed: {}", smilCatalog.getURI(), getStackTrace(e));
+        logger.warn("Reading file '{}' from workspace service failed:", smilCatalog.getURI(), e);
       } catch (SmilException e) {
-        logger.warn("Error while parsing SMIL catalog '{}': {}", smilCatalog.getURI(), getStackTrace(e));
+        logger.warn("Error while parsing SMIL catalog '{}':", smilCatalog.getURI(), e);
       }
     }
 
@@ -1045,26 +1040,6 @@ public class ToolsEndpoint implements ManagedService {
       }
     }
     return segments;
-  }
-
-  private String signUrl(URI baseUrl) {
-    String url = baseUrl.toString();
-    if (urlSigningService.accepts(url)) {
-      logger.trace("URL signing service has accepted '{}'", url);
-      try {
-        URI signedUrl = new URI(urlSigningService.sign(url, expireSeconds, null, null));
-        return signedUrl.toString();
-      } catch (URISyntaxException e) {
-        logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
-        throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-      } catch (UrlSigningException e) {
-        logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
-        throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-      }
-    } else {
-      logger.trace("URL signing service did not accept '{}'", url);
-      return url;
-    }
   }
 
   static final class SourceTrackSubInfo {

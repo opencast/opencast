@@ -49,9 +49,6 @@ public final class FileSupport {
   /** Delete everything including the root directory. */
   public static final int DELETE_ROOT = 1;
 
-  /** Delete all content but keep the root directory. */
-  public static final int DELETE_CONTENT = 2;
-
   /** Name of the java environment variable for the temp directory */
   private static final String IO_TMPDIR = "java.io.tmpdir";
 
@@ -63,33 +60,6 @@ public final class FileSupport {
 
   /** Disable construction of this utility class */
   private FileSupport() {
-  }
-
-  /**
-   * Moves the specified file or directory from <code>sourceLocation</code> to <code>targetDirectory</code>. If
-   * <code>targetDirectory</code> does not exist, it will be created.
-   *
-   * @param sourceLocation
-   *          the source file or directory
-   * @param targetDirectory
-   *          the target directory
-   * @return the moved file
-   */
-  public static File move(File sourceLocation, File targetDirectory) throws IOException {
-    if (!targetDirectory.isDirectory())
-      throw new IllegalArgumentException("Target location must be a directory");
-
-    if (!targetDirectory.exists())
-      targetDirectory.mkdirs();
-
-    File targetFile = new File(targetDirectory, sourceLocation.getName());
-    if (sourceLocation.renameTo(targetFile))
-      return targetFile;
-
-    // Rename doesn't work, so use copy / delete instead
-    copy(sourceLocation, targetDirectory);
-    delete(sourceLocation, true);
-    return targetFile;
   }
 
   /**
@@ -224,54 +194,6 @@ public final class FileSupport {
   }
 
   /**
-   * Copies recursively the <em>content</em> of the specified <code>sourceDirectory</code> to
-   * <code>targetDirectory</code>.
-   * <p>
-   * If <code>overwrite</code> is set to <code>false</code>, this method throws an {@link IOException} if the target
-   * file already exists.
-   *
-   * @param sourceDirectory
-   *          the source directory
-   * @param targetDirectory
-   *          the target directory to copy the content of the source directory to
-   * @param overwrite
-   *          <code>true</code> to overwrite existing files
-   * @throws IOException
-   *           if copying fails
-   */
-  public static void copyContent(File sourceDirectory, File targetDirectory, boolean overwrite) throws IOException {
-    if (sourceDirectory == null)
-      throw new IllegalArgumentException("Source directory must not by null");
-    if (!sourceDirectory.isDirectory())
-      throw new IllegalArgumentException(sourceDirectory.getAbsolutePath() + " is not a directory");
-    if (targetDirectory == null)
-      throw new IllegalArgumentException("Target directory must not by null");
-    if (!targetDirectory.isDirectory())
-      throw new IllegalArgumentException(targetDirectory.getAbsolutePath() + " is not a directory");
-
-    for (File content : sourceDirectory.listFiles()) {
-      copy(content, targetDirectory, overwrite);
-    }
-  }
-
-  /**
-   * Copies recursively the <em>content</em> of the specified <code>sourceDirectory</code> to
-   * <code>targetDirectory</code>.
-   * <p>
-   * Note that existing files and directories will be overwritten.
-   *
-   * @param sourceDirectory
-   *          the source directory
-   * @param targetDirectory
-   *          the target directory to copy the content of the source directory to
-   * @throws IOException
-   *           if copying fails
-   */
-  public static void copyContent(File sourceDirectory, File targetDirectory) throws IOException {
-    copyContent(sourceDirectory, targetDirectory, false);
-  }
-
-  /**
    * Links the specified file or directory from <code>sourceLocation</code> to <code>targetLocation</code>. If
    * <code>targetLocation</code> does not exist, it will be created, if the target file already exists, an
    * {@link IOException} will be thrown.
@@ -331,8 +253,8 @@ public final class FileSupport {
                 ExceptionUtils.getMessage(e));
         Files.copy(sourcePath, targetPath);
       } catch (IOException e) {
-        logger.debug("Copy file because creating a hard-link at '{}' for existing file '{}' did not work: {}",
-                targetPath, sourcePath, ExceptionUtils.getStackTrace(e));
+        logger.debug("Copy file because creating a hard-link at '{}' for existing file '{}' did not work:",
+                targetPath, sourcePath, e);
         if (overwrite) {
           Files.copy(sourcePath, targetPath, REPLACE_EXISTING);
         } else {
@@ -618,22 +540,6 @@ public final class FileSupport {
     if (!tmp.canWrite())
       throw new IllegalStateException("Temp directory " + tmp + " is not writable!");
     return tmp;
-  }
-
-  /**
-   * Returns true if both canonical file paths are equal.
-   *
-   * @param a
-   *          the first file or null
-   * @param b
-   *          the second file or null
-   */
-  public static boolean equals(File a, File b) {
-    try {
-      return a != null && b != null && a.getCanonicalPath().equals(b.getCanonicalPath());
-    } catch (IOException e) {
-      return false;
-    }
   }
 
 }

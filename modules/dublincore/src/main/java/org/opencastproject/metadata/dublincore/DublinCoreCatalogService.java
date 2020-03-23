@@ -25,7 +25,6 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPOR
 
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.api.CatalogService;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
@@ -36,6 +35,9 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +57,14 @@ import javax.xml.transform.stream.StreamResult;
 /**
  * Parses {@link DublinCoreCatalog}s from serialized DC representations.
  */
+@Component(
+  property = {
+    "service.description=Dublin Core Catalog Service",
+    "priority=1"
+  },
+  immediate = true,
+  service = { CatalogService.class, MediaPackageMetadataService.class, DublinCoreCatalogService.class }
+)
 public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalog>, MediaPackageMetadataService {
 
   private static final Logger logger = LoggerFactory.getLogger(DublinCoreCatalogService.class);
@@ -63,10 +73,12 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
 
   protected Workspace workspace = null;
 
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Activate
   public void activate(Map<String, ?> properties) {
     logger.debug("activate()");
     if (properties != null) {
@@ -82,12 +94,6 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.metadata.api.CatalogService#serialize(org.opencastproject.metadata.api.MetadataCatalog)
-   */
-  @Override
   public InputStream serialize(DublinCoreCatalog catalog) throws IOException {
     try {
       Transformer tf = TransformerFactory.newInstance().newTransformer();
@@ -181,38 +187,12 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
     }
   };
 
-  /**
-   *
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.metadata.api.CatalogService#load(java.io.InputStream)
-   */
-  @Override
   public DublinCoreCatalog load(InputStream in) throws IOException {
     if (in == null)
       throw new IllegalArgumentException("Stream must not be null");
     return DublinCores.read(in);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.metadata.api.CatalogService#accepts(org.opencastproject.mediapackage.Catalog)
-   */
-  @Override
-  public boolean accepts(Catalog catalog) {
-    if (catalog == null)
-      throw new IllegalArgumentException("Catalog must not be null");
-    MediaPackageElementFlavor flavor = catalog.getFlavor();
-    return flavor != null && (flavor.equals(DublinCoreCatalog.ANY_DUBLINCORE));
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.metadata.api.CatalogService#newInstance()
-   */
-  @Override
   public DublinCoreCatalog newInstance() {
     return DublinCores.mkOpencastEpisode().getCatalog();
   }

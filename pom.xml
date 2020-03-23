@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <version>8-SNAPSHOT</version>
+  <version>9-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>opencast</name>
   <description>Opencast is a media capture, processing, management and distribution system</description>
@@ -14,40 +14,40 @@
     <opencast.basedir>${basedir}</opencast.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <opencast.nexus.url>https://mvncache.opencast.org</opencast.nexus.url>
-    <opencast.nexus-backup.url>https://nexus.opencast.org</opencast.nexus-backup.url>
 
     <!-- library version specifications -->
     <aws.version>1.11.469_1</aws.version>
-    <commons-beanutils.version>1.9.3</commons-beanutils.version>
     <commons-codec.version>1.12</commons-codec.version>
     <commons-collections.version>4.3</commons-collections.version>
-    <commons-compress.version>1.18</commons-compress.version>
+    <commons-compress.version>1.19</commons-compress.version>
     <commons-csv.version>1.6</commons-csv.version>
     <commons-fileupload.version>1.4</commons-fileupload.version>
     <commons-lang3.version>3.8.1</commons-lang3.version>
     <commons-text.version>1.7</commons-text.version>
-    <cxf.version>3.2.6</cxf.version>
-    <eclipselink.version>2.7.3</eclipselink.version>
+    <cxf.version>3.3.3</cxf.version>
+    <eclipselink.version>2.7.5</eclipselink.version>
     <functional.version>1.4.2</functional.version>
     <guava.version>23.0</guava.version>
-    <httpcomponents-httpclient.version>4.5.7</httpcomponents-httpclient.version>
-    <httpcomponents-httpcore.version>4.4.11</httpcomponents-httpcore.version>
-    <jackson.version>2.9.9</jackson.version>
+    <httpcomponents-httpclient.version>4.5.10</httpcomponents-httpclient.version>
+    <httpcomponents-httpcore.version>4.4.12</httpcomponents-httpcore.version>
+    <jackson.version>2.10.0</jackson.version>
+    <jersey.version>2.29.1</jersey.version>
     <jdk.version>1.8</jdk.version>
     <joda-time.version>2.10.1</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <karaf.version>4.2.2</karaf.version>
-    <mina.version>2.1.0</mina.version>
+    <karaf.version>4.2.7</karaf.version>
+    <mina.version>2.1.3</mina.version>
     <node.version>v10.16.0</node.version>
     <npm.version>6.9.0</npm.version>
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
-    <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
     <querydsl.version>3.7.4</querydsl.version>
+    <spring.version>3.1.4.RELEASE</spring.version>
+    <spring-security.version>3.1.7.RELEASE</spring-security.version>
   </properties>
   <modules>
     <module>modules/admin-ui</module>
+    <module>modules/admin-ui-frontend</module>
     <module>modules/admin-ui-index</module>
     <module>modules/animate-api</module>
     <module>modules/animate-impl</module>
@@ -80,6 +80,10 @@
     <module>modules/cover-image-impl</module>
     <module>modules/cover-image-remote</module>
     <module>modules/cover-image-workflowoperation</module>
+    <module>modules/crop-api</module>
+    <module>modules/crop-ffmpeg</module>
+    <module>modules/crop-remote</module>
+    <module>modules/crop-workflowoperation</module>
     <module>modules/db</module>
     <module>modules/dictionary-api</module>
     <module>modules/dictionary-hunspell</module>
@@ -91,7 +95,7 @@
     <module>modules/distribution-service-aws-s3-remote</module>
     <module>modules/distribution-service-download</module>
     <module>modules/distribution-service-download-remote</module>
-    <module>modules/distribution-service-adaptive-streaming-wowza</module>
+    <module>modules/distribution-service-streaming-wowza</module>
     <module>modules/distribution-service-streaming-remote</module>
     <module>modules/distribution-workflowoperation</module>
     <module>modules/dublincore</module>
@@ -146,7 +150,6 @@
     <module>modules/message-broker-impl</module>
     <module>modules/metadata</module>
     <module>modules/metadata-api</module>
-    <module>modules/migration</module>
     <module>modules/mpeg7</module>
     <module>modules/notification-workflowoperation</module>
     <module>modules/oaipmh</module>
@@ -166,9 +169,6 @@
     <module>modules/runtime-info-ui</module>
     <module>modules/runtime-info-ui-ng</module>
     <module>modules/scheduler-api</module>
-    <module>modules/scheduler-conflict-handler</module>
-    <module>modules/scheduler-conflict-notifier-comment</module>
-    <module>modules/scheduler-conflict-notifier-email</module>
     <module>modules/scheduler-impl</module>
     <module>modules/scheduler-remote</module>
     <module>modules/schema</module>
@@ -201,12 +201,17 @@
     <module>modules/static</module>
     <module>modules/static-file-service-api</module>
     <module>modules/static-file-service-impl</module>
-    <module>modules/statistics-export-service</module>
+    <module>modules/statistics-export-service-api</module>
+    <module>modules/statistics-export-service-impl</module>
     <module>modules/statistics-service-api</module>
     <module>modules/statistics-service-impl</module>
     <module>modules/statistics-service-remote</module>
     <module>modules/statistics-provider-influx</module>
     <module>modules/statistics-provider-random</module>
+    <module>modules/studio</module>
+    <module>modules/termination-state-api</module>
+    <module>modules/termination-state-aws</module>
+    <module>modules/termination-state-impl</module>
     <module>modules/textanalyzer-api</module>
     <module>modules/textanalyzer-impl</module>
     <module>modules/textanalyzer-remote</module>
@@ -219,7 +224,10 @@
     <module>modules/timelinepreviews-remote</module>
     <module>modules/timelinepreviews-workflowoperation</module>
     <module>modules/transcription-service-api</module>
+    <module>modules/transcription-service-google-speech-impl</module>
     <module>modules/transcription-service-ibm-watson-impl</module>
+    <module>modules/transcription-service-amberscript</module>
+    <module>modules/transcription-service-persistence</module>
     <module>modules/transcription-service-workflowoperation</module>
     <module>modules/urlsigning-common</module>
     <module>modules/urlsigning-service-api</module>
@@ -230,6 +238,7 @@
     <module>modules/userdirectory-ldap</module>
     <module>modules/userdirectory-moodle</module>
     <module>modules/userdirectory-sakai</module>
+    <module>modules/userdirectory-brightspace</module>
     <module>modules/user-interface-configuration</module>
     <module>modules/usertracking-api</module>
     <module>modules/usertracking-impl</module>
@@ -279,7 +288,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.7.0</version>
+        <version>3.8.1</version>
         <configuration>
           <source>${jdk.version}</source>
           <target>${jdk.version}</target>
@@ -290,7 +299,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M1</version>
+        <version>3.0.0-M2</version>
         <executions>
           <execution>
             <id>enforce-maven</id>
@@ -344,6 +353,7 @@
             <java.util.logging.config.file>${basedir}/conf/services/java.util.logging.properties</java.util.logging.config.file>
             <logj4.configuration>${basedir}/docs/log4j/log4j.properties</logj4.configuration>
             <java.io.tmpdir>${project.build.directory}</java.io.tmpdir>
+            <java.locale.providers>COMPAT</java.locale.providers> <!-- Date formats changed with java 9 -->
           </systemPropertyVariables>
         </configuration>
       </plugin>
@@ -356,7 +366,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>8.21</version>
+            <version>8.29</version>
           </dependency>
         </dependencies>
         <configuration>
@@ -392,6 +402,17 @@
           <format>html</format>
           <aggregate>true</aggregate>
           <check/>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.8</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>false</autoReleaseAfterClose>
         </configuration>
       </plugin>
     </plugins>
@@ -479,7 +500,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-scr-plugin</artifactId>
-          <version>1.26.0</version>
+          <version>1.26.2</version>
           <executions>
             <execution>
               <id>generate-scr-scrdescriptor</id>
@@ -506,6 +527,12 @@
                 <goal>javadoc</goal>
               </goals>
               <phase>site</phase>
+            </execution>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
             </execution>
           </executions>
         </plugin>
@@ -551,7 +578,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
-          <version>3.5</version>
+          <version>3.6.0</version>
         </plugin>
         <plugin>
           <groupId>org.antlr</groupId>
@@ -564,9 +591,14 @@
           <version>3.1.0</version>
         </plugin>
         <plugin>
+          <groupId>com.googlecode.maven-download-plugin</groupId>
+          <artifactId>download-maven-plugin</artifactId>
+          <version>1.5.0</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>3.0.2</version>
+          <version>3.1.0</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -689,10 +721,109 @@
               </configuration>
             </execution>
           </executions>
+          <dependencies>
+            <dependency>
+              <groupId>org.ow2.asm</groupId>
+              <artifactId>asm</artifactId>
+              <version>7.1</version>
+            </dependency>
+            <dependency>
+              <groupId>org.apache.maven.shared</groupId>
+              <artifactId>maven-dependency-analyzer</artifactId>
+              <version>1.11.1</version>
+            </dependency>
+          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>
   </build>
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <!-- Attach sources for all builds -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- Attach javadocs for all builds -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9.1</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- Sign the builds -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>cleanFrontendCaches</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-clean-plugin</artifactId>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>node</directory>
+                  <includes>
+                    <include>**</include>
+                  </includes>
+                  <followSymlinks>false</followSymlinks>
+                </fileset>
+                <fileset>
+                  <directory>node_modules</directory>
+                  <includes>
+                    <include>**</include>
+                  </includes>
+                  <followSymlinks>false</followSymlinks>
+                </fileset>
+                <fileset>
+                  <directory>bower_components</directory>
+                  <includes>
+                    <include>**</include>
+                  </includes>
+                  <followSymlinks>false</followSymlinks>
+                </fileset>
+              </filesets>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -708,12 +839,7 @@
       <dependency>
         <groupId>org.apache.activemq</groupId>
         <artifactId>activemq-client</artifactId>
-        <version>5.15.9</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.activemq</groupId>
-        <artifactId>activeio-core</artifactId>
-        <version>3.1.4</version>
+        <version>5.15.11</version>
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
@@ -796,26 +922,31 @@
         <scope>provided</scope>
       </dependency>
       <!-- JSRs -->
-      <!-- Java 8 = JAX-B Version 2.2.8 -->
       <dependency>
-        <groupId>javax.xml.bind</groupId>
-        <artifactId>jaxb-api</artifactId>
-        <version>2.2.10</version>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+        <version>2.3.2</version>
       </dependency>
       <dependency>
         <groupId>com.sun.xml.bind</groupId>
         <artifactId>jaxb-core</artifactId>
-        <version>2.2.10</version>
+        <version>2.3.0.1</version>
       </dependency>
       <dependency>
         <groupId>com.sun.xml.bind</groupId>
         <artifactId>jaxb-impl</artifactId>
-        <version>2.2.10</version>
+        <version>2.3.3-b02</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>jakarta.activation</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
-        <groupId>javax.activation</groupId>
-        <artifactId>activation</artifactId>
-        <version>1.1.1</version>
+        <groupId>jakarta.activation</groupId>
+        <artifactId>jakarta.activation-api</artifactId>
+        <version>1.2.1</version>
       </dependency>
       <dependency>
         <groupId>javax.mail</groupId>
@@ -823,14 +954,14 @@
         <version>1.4.7</version>
       </dependency>
       <dependency>
-        <groupId>javax.ws.rs</groupId>
-        <artifactId>jsr311-api</artifactId>
-        <version>1.1.1</version>
+        <groupId>jakarta.ws.rs</groupId>
+        <artifactId>jakarta.ws.rs-api</artifactId>
+        <version>2.1.6</version>
       </dependency>
       <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-bundle</artifactId>
-        <version>1.19.4</version>
+        <groupId>org.glassfish.jersey.core</groupId>
+        <artifactId>jersey-server</artifactId>
+        <version>${jersey.version}</version>
       </dependency>
       <!-- JPA -->
       <dependency>
@@ -860,8 +991,8 @@
       </dependency>
       <dependency>
         <groupId>org.eclipse.persistence</groupId>
-        <artifactId>javax.persistence</artifactId>
-        <version>2.1.0</version>
+        <artifactId>jakarta.persistence</artifactId>
+        <version>2.2.3</version>
       </dependency>
       <!-- CXF -->
       <dependency>
@@ -872,53 +1003,43 @@
       <!-- Spring -->
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.aop</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-aop</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.asm</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-core</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.core</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-beans</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.beans</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-jdbc</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.jdbc</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-expression</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.expression</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-context</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.transaction</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-context-support</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.context</artifactId>
-        <version>3.1.4.RELEASE</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.context.support</artifactId>
-        <version>3.1.4.RELEASE</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>org.springframework.web</artifactId>
-        <version>3.1.4.RELEASE</version>
+        <artifactId>spring-web</artifactId>
+        <version>${spring.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.osgi</groupId>
@@ -938,37 +1059,37 @@
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-core</artifactId>
-        <version>3.1.7.RELEASE</version>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-config</artifactId>
-        <version>3.1.7.RELEASE</version>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-web</artifactId>
-        <version>3.1.7.RELEASE</version>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-openid</artifactId>
-        <version>3.1.7.RELEASE</version>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security.oauth</groupId>
         <artifactId>spring-security-oauth</artifactId>
-        <version>2.3.6.RELEASE</version>
+        <version>2.3.7.RELEASE</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-cas</artifactId>
-        <version>3.1.7.RELEASE</version>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-ldap</artifactId>
-        <version>3.1.7.RELEASE</version>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.velocity</groupId>
@@ -978,7 +1099,7 @@
       <dependency>
         <groupId>org.apache.santuario</groupId>
         <artifactId>xmlsec</artifactId>
-        <version>2.1.2</version>
+        <version>2.1.4</version>
       </dependency>
       <dependency>
         <groupId>org.owasp.esapi</groupId>
@@ -1013,7 +1134,7 @@
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.xerces</artifactId>
-        <version>2.9.1_3</version>
+        <version>2.12.0_1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
@@ -1029,7 +1150,7 @@
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <scope>test</scope>
-        <version>4.0.2</version>
+        <version>4.1</version>
       </dependency>
       <dependency>
         <groupId>org.easymock</groupId>
@@ -1047,11 +1168,6 @@
         <groupId>org.jdom</groupId>
         <artifactId>com.springsource.org.jdom</artifactId>
         <version>1.1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.lucene</groupId>
-        <artifactId>com.springsource.org.apache.lucene</artifactId>
-        <version>2.4.1</version>
       </dependency>
       <!-- logging -->
       <dependency>
@@ -1128,22 +1244,23 @@
         <artifactId>influxdb-java</artifactId>
         <version>2.15</version>
       </dependency>
+      <!-- testing -->
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>json-path</artifactId>
-        <version>3.3.0</version>
+        <version>4.1.2</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>xml-path</artifactId>
-        <version>3.3.0</version>
+        <version>4.1.2</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>rest-assured</artifactId>
-        <version>3.3.0</version>
+        <version>4.1.2</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -1155,23 +1272,23 @@
         <groupId>com.googlecode.json-simple</groupId>
         <artifactId>json-simple</artifactId>
         <version>${json-simple.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
         <artifactId>groovy-all</artifactId>
-        <version>2.3.6</version>
+        <version>2.5.8</version>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-library</artifactId>
-        <version>1.3</version>
+        <artifactId>hamcrest</artifactId>
+        <version>2.2</version>
       </dependency>
-      <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest-core</artifactId>
-        <version>1.3</version>
-      </dependency>
-      <!-- testing -->
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
@@ -1186,7 +1303,7 @@
       <dependency>
         <groupId>com.mchange</groupId>
         <artifactId>c3p0</artifactId>
-        <version>0.9.5.4</version>
+        <version>0.9.5.5</version>
       </dependency>
       <dependency>
         <groupId>com.entwinemedia.common</groupId>
@@ -1194,10 +1311,9 @@
         <version>${functional.version}</version>
       </dependency>
       <dependency>
-        <groupId>xalan</groupId>
-        <artifactId>xalan</artifactId>
-        <version>2.7.2</version>
-        <scope>test</scope>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.xalan</artifactId>
+        <version>2.7.2_3</version>
       </dependency>
       <dependency>
         <groupId>com.google.code.gson</groupId>
@@ -1205,14 +1321,14 @@
         <version>2.8.5</version>
       </dependency>
       <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>5.1.43</version>
+        <groupId>org.mariadb.jdbc</groupId>
+        <artifactId>mariadb-java-client</artifactId>
+        <version>2.5.3</version>
       </dependency>
       <dependency>
-        <groupId>postgresql</groupId>
+        <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>9.1-901-1.jdbc4</version>
+        <version>42.2.8.jre7</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
@@ -1252,7 +1368,12 @@
       <dependency>
         <groupId>org.opencastproject</groupId>
         <artifactId>android-mms</artifactId>
-        <version>1.1</version>
+        <version>1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>be.ugent.brightspace</groupId>
+        <artifactId>valence-sdk-java</artifactId>
+        <version>1.0.1</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.jettison</groupId>
@@ -1700,8 +1821,8 @@
     <url>https://github.com/opencast/opencast/</url>
   </scm>
   <issueManagement>
-    <system>jira</system>
-    <url>https://opencast.jira.com</url>
+    <system>GitHub</system>
+    <url>https://github.com/opencast/opencast</url>
   </issueManagement>
   <!-- Site Report generation settings -->
   <reporting>
@@ -1782,56 +1903,32 @@
       </plugin>
     </plugins>
   </reporting>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>opencast</id>
-      <name>Opencast Repo</name>
-      <url>${opencast.nexus.url}/nexus/content/groups/public</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </pluginRepository>
-    <pluginRepository>
-      <id>opencast-backup</id>
-      <name>Opencast Backup Repository</name>
-      <url>${opencast.nexus-backup.url}/nexus/content/groups/public</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </pluginRepository>
-  </pluginRepositories>
   <repositories>
     <repository>
-      <id>opencast</id>
-      <name>Opencast Repo</name>
-      <url>${opencast.nexus.url}/nexus/content/groups/public</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
+      <id>central</id>
+      <name>Central Maven Repository</name>
+      <url>https://repo.maven.apache.org/maven2/</url>
     </repository>
     <repository>
-      <id>opencast-backup</id>
-      <name>Opencast Backup Repo</name>
-      <url>${opencast.nexus-backup.url}/nexus/content/groups/public</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
+      <id>spring.io</id>
+      <name>Spring Framework Maven Plugins-Release Repository</name>
+      <url>https://repo.spring.io/plugins-release/</url>
+    </repository>
+    <repository>
+      <id>mvn.opencast.org</id>
+      <name>Opencast 3rd-Party Repository</name>
+      <url>https://mvn.opencast.org/</url>
     </repository>
   </repositories>
-
   <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
     <site>
       <!-- Note that we do not deploy the site using maven, so this is totally fake -->
       <id>fakesite.opencast.org</id>

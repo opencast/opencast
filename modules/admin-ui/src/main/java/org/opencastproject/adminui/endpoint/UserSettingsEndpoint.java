@@ -31,7 +31,6 @@ import org.opencastproject.adminui.usersettings.UserSetting;
 import org.opencastproject.adminui.usersettings.UserSettings;
 import org.opencastproject.adminui.usersettings.UserSettingsService;
 import org.opencastproject.adminui.usersettings.persistence.UserSettingsServiceException;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Tuple;
@@ -40,8 +39,12 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -66,10 +69,19 @@ import javax.ws.rs.core.Response;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+  immediate = true,
+  service = UserSettingsEndpoint.class,
+  property = {
+    "service.description=Admin UI - Users Settings facade Endpoint",
+    "opencast.service.type=org.opencastproject.adminui.endpoint.UserSettingsEndpoint",
+    "opencast.service.path=/admin-ng/user-settings"
+  }
+)
 public class UserSettingsEndpoint {
 
   /** The logging facility */
-  private static final Log logger = Log.mk(ServerEndpoint.class);
+  private static final Logger logger = LoggerFactory.getLogger(ServerEndpoint.class);
 
   /** Base url of this endpoint */
   private String endpointBaseUrl;
@@ -79,11 +91,13 @@ public class UserSettingsEndpoint {
   /**
    * OSGi callback to set the service to retrieve user settings from.
    */
+  @Reference
   public void setUserSettingsService(UserSettingsService userSettingsService) {
     this.userSettingsService = userSettingsService;
   }
 
   /** OSGi callback. */
+  @Activate
   protected void activate(ComponentContext cc) {
     logger.info("Activate the Admin ui - Users facade endpoint");
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc);
@@ -154,7 +168,7 @@ public class UserSettingsEndpoint {
     try {
       userSettingsService.deleteUserSetting(id);
     } catch (UserSettingsServiceException e) {
-      logger.error("Unable to remove user setting id:'%s':'%s'", id, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to remove user setting id:'%s':", id, e);
       return Response.serverError().build();
     }
     logger.debug("User setting with id %d removed.", id);

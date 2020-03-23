@@ -37,7 +37,6 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.auth.DigestScheme;
@@ -319,16 +318,6 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
     }
   }
 
-  @Override
-  public <T> T execute(HttpUriRequest httpUriRequest, ResponseHandler<T> responseHandler, int connectionTimeout,
-                       int socketTimeout) throws TrustedHttpClientException {
-    try {
-      return responseHandler.handleResponse(execute(httpUriRequest, connectionTimeout, socketTimeout));
-    } catch (IOException e) {
-      throw new TrustedHttpClientException(e);
-    }
-  }
-
   /**
    * {@inheritDoc}
    *
@@ -344,18 +333,6 @@ public final class StandAloneTrustedHttpClientImpl implements TrustedHttpClient 
         httpClient.getConnectionManager().shutdown();
       }
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.security.api.TrustedHttpClient#execute(org.apache.http.client.methods.HttpUriRequest,
-   * org.apache.http.client.ResponseHandler)
-   */
-  @Override
-  public <T> T execute(HttpUriRequest httpUriRequest, ResponseHandler<T> responseHandler)
-          throws TrustedHttpClientException {
-    return execute(httpUriRequest, responseHandler, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT);
   }
 
   /**

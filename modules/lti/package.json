@@ -9,11 +9,11 @@
   "dependencies": {
     "font-awesome": "^4.7.0",
     "jquery": "^3.4.1",
-    "mustache": "^3.0.1",
-    "paginationjs": "^2.1.4"
+    "mustache": "^4.0.0",
+    "paginationjs": "^2.1.5"
   },
   "devDependencies": {
-    "eslint": "^6.0.1",
+    "eslint": "^6.8.0",
     "eslint-plugin-header": "^3.0.0",
     "html-linter": "^1.1.1"
   }
