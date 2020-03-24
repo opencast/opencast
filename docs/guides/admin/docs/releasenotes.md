@@ -19,3 +19,9 @@ Features
 
 Configuration changes
 ---------------------
+
+Release managers
+----------------
+
+- Julian Kniephoff (ELAN e.V.)
+- Carlos Turro Ribalta (Universitat Politècnica de València)
