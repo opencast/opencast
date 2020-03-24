@@ -1368,7 +1368,16 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
           }
 
           // init video.js
-          videojs(id, videoOptions);
+          videojs(id, videoOptions, function () {
+            var videodisplay = this;
+            if (videoSource.length == 1 || foundQualities == undefined || foundQualities.length == 0) {
+              // set sources if there
+              //   * is only a single video (other video sets could have quality tags)
+              //   * are no quality tags in any video set
+              videodisplay.src(videoSource);
+            }
+          });
+
           // URL to the flash swf
           if (videojs_swf) {
             Engage.log('Video: Loaded flash component');
