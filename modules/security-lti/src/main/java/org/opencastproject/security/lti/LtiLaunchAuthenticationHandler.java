@@ -113,10 +113,10 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   /** The user reference provider */
   private UserReferenceProvider userReferenceProvider = null;
 
-  /** If the Role exists add CUSTOM_ROLES to this user **/
+  /** The role name of the user to add custom Roles to **/
   private static final String CUSTOM_ROLE_NAME = "lti.custom_role_name";
 
-  /** If the Role exists add CUSTOM_ROLES to this user **/
+  /** A List of Roles to add to the user if he has the custom role name **/
   private static final String CUSTOM_ROLES = "lti.custom_roles";
 
   private String customRoleName = "";
