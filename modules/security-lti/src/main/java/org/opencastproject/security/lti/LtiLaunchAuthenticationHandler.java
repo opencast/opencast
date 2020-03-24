@@ -113,6 +113,16 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   /** The user reference provider */
   private UserReferenceProvider userReferenceProvider = null;
 
+  /** The role name of the user to add custom Roles to **/
+  private static final String CUSTOM_ROLE_NAME = "lti.custom_role_name";
+
+  /** A List of Roles to add to the user if he has the custom role name **/
+  private static final String CUSTOM_ROLES = "lti.custom_roles";
+
+  private String customRoleName = "";
+
+  private String[] customRoles;
+
   /** The user details service */
   private UserDetailsService userDetailsService;
 
@@ -201,6 +211,13 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     createJpaUserReference = BooleanUtils.toBooleanDefaultIfNull(
       BooleanUtils.toBooleanObject(StringUtils.trimToNull((String) properties.get(CREATE_JPA_USER_REFERENCE_KEY))),
       false);
+
+    customRoleName = StringUtils.trimToNull((String) properties.get(CUSTOM_ROLE_NAME));
+    if (customRoleName != null) {
+      String custumRolesString = StringUtils.trimToNull((String) properties.get(CUSTOM_ROLES));
+      customRoles = custumRolesString.split(",");
+    }
+
   }
 
   /**
@@ -352,10 +369,19 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       for (String learner : roleList) {
         // Build the role
         String role;
+        String group;
+        if (learner.equals(customRoleName)) {
+          for (String rolename : customRoles) {
+            userAuthorities.add(new SimpleGrantedAuthority(rolename));
+          }
+        }
+
         if (StringUtils.isBlank(learner)) {
           role = context + "_" + DEFAULT_LEARNER;
         } else {
           role = context + "_" + learner;
+          group = "ROLE_GROUP_" + learner.toUpperCase();
+          logger.debug("Adding group: {}", group);
         }
 
         // Make sure to not accept ROLE_…
