@@ -112,6 +112,9 @@ angular.module('adminNg.controllers')
         row.checkedDelete = function() {
           ConfirmationModal.show('confirm-modal',Table.delete,row);
         };
+        row.embeddingCode = function() {
+          ConfirmationModal.show('embedding-code',Table.fullScreenUrl,row);
+        };
       }
     });
 
