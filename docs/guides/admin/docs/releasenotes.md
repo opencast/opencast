@@ -83,6 +83,8 @@ Additional Notes About 8.3
 
 - The configuration file `etc/org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler.cfg` was moved
    to `etc/org.opencastproject.security.lti.LtiLaunchAuthenticationHandler.cfg`.
+- The configuration file `etc/org.ops4j.pax.web.cfg` was updated to include the `org.ops4j.pax.web.session.timeout`
+   option with value `240`.
 
 Additional Notes About 8.2
 --------------------------
