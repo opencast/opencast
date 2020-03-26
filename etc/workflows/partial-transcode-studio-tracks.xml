@@ -7,7 +7,7 @@
   <operations>
 
     <operation
-      id="compose"
+      id="encode"
       exception-handler-workflow="partial-error"
       description="Reencode presenter video to fix framerate and resolution">
       <configurations>
