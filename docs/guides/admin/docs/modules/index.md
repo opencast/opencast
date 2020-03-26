@@ -17,6 +17,7 @@ Documentation for modules included in Opencast.
     * [Solr](searchindex/solr.md)
     * [Elasticsearch](searchindex/elasticsearch.md)
 * [Stream Security](stream-security.md)
+* [Studio](studio.md)
 * [Text Extraction](textextraction.md)
 * Videoeditor
     * [Setup](videoeditor.setup.md)

@@ -4,6 +4,40 @@ Changelog
 Opencast 8
 ----------
 
+### Opencast 8.3
+
+*Released on March 26th, 2020*
+
+- [[#1492](https://github.com/opencast/opencast/pull/1492)] -
+  Update Studio (for bugfixes) and add docs for Studio
+- [[#1489](https://github.com/opencast/opencast/pull/1489)] -
+  Workaround early lti session timeout
+- [[#1488](https://github.com/opencast/opencast/pull/1488)] -
+  Make encoding profiles support odd widths/heights
+- [[#1487](https://github.com/opencast/opencast/pull/1487)] -
+  Fix Studio login redirect
+- [[#1485](https://github.com/opencast/opencast/pull/1485)] -
+  Custom Roles for LTI users
+- [[#1483](https://github.com/opencast/opencast/pull/1483)] -
+  Read published files direct from filesystem if possible  (completed)
+- [[#1482](https://github.com/opencast/opencast/pull/1482)] -
+  Create JpaUserReference for LTI user (backport)
+- [[#1480](https://github.com/opencast/opencast/pull/1480)] -
+  Preserve ACL On Workflow Errors
+- [[#1479](https://github.com/opencast/opencast/pull/1479)] -
+  Fix Theodul quality selection
+- [[#1478](https://github.com/opencast/opencast/pull/1478)] -
+  Studio upload optimized workflows
+- [[#1476](https://github.com/opencast/opencast/pull/1476)] -
+  Fix Studio Redirect discarding GET Parameters
+- [[#1475](https://github.com/opencast/opencast/pull/1475)] -
+  Fix Theodul Matomo plugin after configuration data structure change
+- [[#1473](https://github.com/opencast/opencast/pull/1473)] -
+  Move OC Studio configuration to `etc/ui-config` and update Studio
+- [[#1468](https://github.com/opencast/opencast/pull/1468)] -
+  Studio in admin-presentation
+
+
 ### Opencast 8.2
 
 *Released on March 14th, 2020*
