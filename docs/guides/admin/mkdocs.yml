@@ -102,8 +102,8 @@ nav:
       - Configuration: 'modules/player.configuration.md'
       - URL Parameters: 'modules/player.url.parameter.md'
       - Matomo Tracking: 'modules/player.matomo.tracking.md'
-   - Paella player: 
-      - Configuration: 'modules/paella.player/configuration.md'      
+   - Paella player:
+      - Configuration: 'modules/paella.player/configuration.md'
       - URL Parameters: 'modules/paella.player/url.parameter.md'
       - Paella plugins:
         - Overview: 'modules/paella.player/plugins.md'
@@ -120,6 +120,7 @@ nav:
       - Solr: 'modules/searchindex/solr.md'
       - Elasticsearch: 'modules/searchindex/elasticsearch.md'
    - Stream Security: 'modules/stream-security.md'
+   - Studio: 'modules/studio.md'
    - Termination State:
       - Basic: 'modules/terminationstate.md'
       - AWS AutoScaling: 'modules/terminationstate.aws.autoscaling.md'
