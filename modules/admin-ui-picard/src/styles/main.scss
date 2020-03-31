@@ -1,0 +1,571 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+// Frameworks
+// ----------------------------------------
+
+// Bourbon Settings
+$disable-warnings: true !default; // disables deprecation warnings
+
+// Imports
+@import "vendor/bourbon/bourbon";
+@import "vendor/neat/neat";
+
+// Foundation
+// ----------------------------------------
+
+// Base
+@import "base/base-config";
+
+// Mixins
+@import "mixins/_mixins-config";
+
+// Components
+@import "components/components-config";
+
+// Views
+@import "views/views-config";
+
+// Extensions
+@import "extensions/extensions-config";
+
+
+// Template Files
+// ----------------------------------------
+
+// Add template files here...
+
+
+// Third Party Imports
+// ----------------------------------------
+
+// Import custome
+#new-theme-modal, #theme-details {
+
+  [data-modal-tab-content="general"] {
+
+    .input-block {
+      margin-bottom: 15px;
+    }
+
+    .drop-down-container,
+    input[type="text"],
+    textarea {
+      width: 360px;
+      margin-bottom: 0;
+    }
+
+    input[type="checkbox"]{
+      margin: 0px; // reset the top margin from form-container
+      width: 20px; // reset the width from form-container
+    }
+
+    .text-variables {
+      float: right;
+      width: 190px;
+    }
+  }
+}
+
+// JQuery UI Datepicker custom style
+@import "vendor/datepicker";
+
+@import "vendor/chosen";
+
+.filters-container {
+  div.chosen-container {
+    width: 230px !important;
+    ul.chosen-choices {
+      line-height: 34px;
+    }
+  }
+}
+
+// All anchors should behave clickable (even without href attributes)
+a {
+  cursor: pointer;
+}
+
+// Mark mockups as stubs
+div.main-view.stub, div.full-col > div.stub {
+  margin-right: 20px;
+  -webkit-background-size: 50px 50px;
+  -moz-background-size: 50px 50px;
+  background-size: 50px 50px;
+
+  background-color: rgba(236, 233, 207, 0.62);
+  background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, rgba(255, 255, 255, .2)), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, rgba(255, 255, 255, .2)), color-stop(.75, rgba(255, 255, 255, .2)), color-stop(.75, transparent), to(transparent));
+  background-image: -webkit-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+  background-image: -moz-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+  background-image: -ms-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+  background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+  background-image: linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+}
+
+
+.modal {
+  top: 30px;
+  outline: 0;
+  input[readonly] {
+    border: none;
+  }
+  &#group-modal, &#add-acl-modal, &#user-modal {
+    input[type="text"], input[type="password"], [type="email"] {
+      width: 100%;
+      padding-left: 15px;
+    }
+  }
+  .select-container > p {
+    margin-bottom: 10px;
+  }
+}
+
+.modal-animation {
+  -webkit-transition: all linear 0.2s;
+  transition: all linear 0.2s;
+  opacity: 1;
+  visibility: visible;
+  display: block;
+
+  &.ng-hide-add,
+  &.ng-hide-remove {
+    display: block!important;
+  }
+
+  &.ng-hide {
+    opacity: 0;
+  }
+}
+
+// A disabled button (cannot use the btn mixin because of specificity)
+a.disabled, button.disabled, div.disabled {
+  opacity: 0.5 !important;
+  cursor: default !important;
+  pointer-events: none !important;
+}
+
+.ng-multi-value {
+  display: inline-block;
+  padding: 0px 5px;
+  margin: 1px 5px 1px 0;
+  font-size: 11px;
+  background: $l-blue;
+  color: #fff;
+  border-radius: 4px;
+
+  a {
+    color: white;
+    font-weight: bold;
+  }
+
+  &-green {
+    background: #4bcc8f;
+  }
+
+  &-red {
+    background: #ff0000;
+  }
+}
+
+span.editable {
+  border-bottom: 1px dashed #999;
+}
+td.editable {
+  cursor: text;
+
+  &> div {
+    overflow: visible;
+  }
+
+  input {
+    padding: 0 0 0 10px;
+    width: 98%;
+    height: auto;
+    margin: 0;
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+  }
+
+  ul {
+    float: left;
+
+    li {
+      display: inline-block;
+      padding-right: 7px;
+    }
+  }
+
+  .preserve-newlines {
+    white-space: pre-wrap;
+  }
+
+  .vertical-resize {
+    resize: vertical;
+  }
+
+  span {
+    border-bottom: 1px dashed #999;
+  }
+
+  i.saved, i.edit {
+    float: right;
+    cursor: pointer;
+
+    &.edit {
+      margin: 5px;
+      font-size: 14px;
+    }
+  }
+}
+
+textarea.editable {
+  width: 98%;
+  height: auto;
+}
+
+.editable-select {
+  margin-top: -26px;
+}
+
+button.red {
+  @include btn(red);
+}
+
+button.green {
+  @include btn(green-dark-bg);
+}
+
+div[data-modal-tab-content="metadata"], div[data-modal-tab-content="extended-metadata"] {
+  & button.save {
+    float: right;
+  }
+  & td:first-child {
+    width: 200px;
+    max-width: 200px;
+  }
+}
+
+.modal .obj.comments {
+  .add-comment .chosen-container {
+    float: left;
+  }
+  .comment-container {
+    height: 300px;
+    .comment .resolve {
+      cursor: default;
+    }
+  }
+  .comment.active {
+    background: #BDDAF1;
+  }
+  .add-comment {
+    button {
+      float: right;
+    }
+
+    label, input[type=checkbox] {
+      float: left;
+    }
+
+    label, input[type=checkbox] {
+      margin-top: 10px;
+      display: inline-block;
+      margin: 4px;
+      line-height: 2em;
+    }
+    label {
+      margin-right: 20px;
+    }
+    input[type=text] {
+      padding-left: 20px;
+      color: #919FA5;
+    }
+    button.cancel {
+      @include btn(grey);
+      height: 40px;
+    }
+    button.save{
+      margin-left: 5px;
+    }
+  }
+}
+// Chosen CSS fix for custom height select fields
+.chosen-container-multi .chosen-choices li.search-field input {
+  height: auto !important;
+}
+
+// Visual search replacements
+.filters-container > input[type="search"] {
+  float: left;
+  margin-right: 0;
+}
+
+input[type="text"].small-search {
+  height: 100%;
+  width: 120px;
+  margin: 0;
+  padding: 1px;
+  text-align: center;
+}
+
+div.table-filter {
+  float: right;
+  border: 1px solid #c9d0d3;
+  border-radius: 4px;
+  margin-left: 10px;
+  position: inherit;
+
+  .filters {
+    border: 0;
+    border-radius: 4px;
+    float: left;
+    background: #fff;
+    background-color: #fafafa;
+    min-height: 23px;
+    min-width: 150px;
+    padding: 7px;
+
+    .chosen-search {
+      width: 100%;
+    }
+    &>i {
+      font-size: 18px;
+      padding: 2px;
+    }
+
+    span a i {
+      color: white;
+    }
+
+    select, input, div {
+      display: inline-block;
+    }
+
+    select, input {
+      border: 1px solid #c9d0d3;
+      border-radius: 3px;
+      background-color: white;
+      outline: 0;
+    }
+
+    select {
+      height: 24px;
+    }
+
+    .ng-multi-value {
+      padding: 5px;
+    }
+  }
+
+  i {
+    color: #8a8f99;
+    cursor: pointer;
+
+    &.clear {
+      font-size: 20px;
+      float: left;
+      padding: 8px 8px 8px 0;
+    }
+
+    &.settings {
+      font-size: 20px;
+      float: left;
+      padding: 8px 8px 8px 0;
+    }
+  }
+
+  .filter-settings-dd {
+    margin-left: 0px;
+    border: 0;
+    float: left;
+    height: 38px;
+
+    .filters-list {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}
+
+// Generic select fields
+select {
+  border: 1px solid #c9d0d3;
+  border-radius: 3px;
+  background-color: white;
+  outline: 0;
+}
+
+// Disabled input field
+input.disabled, select.disabled {
+  background: #eeeff0;
+}
+
+// Make filter profile dialog work
+.filters-container {
+  .filter-settings-dd .filter-details {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+
+.quick-actions {
+  p {
+    padding: 10px 0;
+  }
+  select {
+    width: 200px;
+  }
+}
+
+// Use HTML5 input field for file upload
+.file-upload > input[type="file"] {
+  width: inherit !important;
+  visibility: visible !important;
+  hidden: false !important;
+}
+
+// Notification alias error to danger
+.alert {
+  &.error {
+    @include alert-variant($state-danger-bg, $state-danger-border, $state-danger-text);
+  }
+  & .autonomous {
+    padding-right: 20px; /* fixes a design bug */
+  }
+}
+
+
+/*
+ * ---------------------------------------------
+ * MH-12139 notification upload ratio override
+ * ---------------------------------------------
+ */
+.alert p {
+  display: inline-flex;
+}
+
+// pagination of tables
+.main-view {
+  #tbl-view-controls-container {
+
+    .pagination {
+
+      a {
+        padding: 7px 10px;
+      }
+
+      a.wide {
+        width: inline;
+      }
+
+      a:hover:not(.active) {
+        background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fefefe), to(#f0f0f0));
+        background: -moz-linear-gradient(0% 0% 270deg, #fefefe, #f0f0f0);
+      }
+
+      &.prev {
+        //override right margin with 0
+        @include fa-icon($fa-var-chevron-left, before, inline-block, 0 0 0 0, 0, inherit, 10px);
+      }
+
+      &.next {
+        //override left margin with 0
+        @include fa-icon($fa-var-chevron-right, after, inline-block, 0 0 0 0, 0, inherit, 10px);
+      }
+
+      .active {
+        border: 1px solid #616161;
+      }
+    }
+  }
+}
+
+table.main-tbl {
+  &.vertical-headers {
+    tr > td:first-of-type {
+      white-space: nowrap;
+    }
+  }
+
+  /* we don't want to let the angular animation show up*/
+  .ng-hide-add, .ng-hide-remove {
+    display: none !important;
+  }
+
+  td{
+    .fa-check {
+      float: right;
+      color: $green;
+      margin-top: 3px;
+      font-size: 18px;
+      opacity: 0;
+      visibility: hidden;
+      @include transition(all .2s);
+
+      &.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+    } // fa-check
+  }
+}
+
+//we introduced a separate layer in file-upload to support directive
+.modal .obj .obj-container > div.file-upload > p {
+  font-size: 11px;
+  color: #999999;
+  line-height: 18px;
+  margin-bottom: 15px;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+tr.error {
+  background: $state-warning-bg !important;
+}
+
+tr.info {
+  background: $state-info-bg !important;
+}
+
+/*
+* ----------------------------------------------------------------
+* THE FOLLOWING SECTION NEEDS TO BE DELEGATED TO THE DESIGNERS!!!
+* ----------------------------------------------------------------
+*/
+.playback-toggle-pause {
+  @include fa-icon($fa-var-pause,$playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+  @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
+  @extend .playback-control-icon;
+  &:hover {
+    color: darken($grey, 15%);
+  }
+}
+// Allow for slightly wider icons
+.playback-controls-wrapper {
+  width: 280px;
+}
+

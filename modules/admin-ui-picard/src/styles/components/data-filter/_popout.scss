@@ -1,0 +1,185 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+.df-popout {
+    position: absolute;
+
+    $width: 200px;
+
+    top: 55px;
+    right: -14px;
+    width: $width;
+
+    // Styles
+    border: $thin-border-stroke $main-border-color;
+    border-radius: $main-border-radius;
+    background: rgba($white, 0.98);
+    box-shadow: 0 1px 3px rgba($black, 0.06);
+    @include triangle-point(top, 10px, 10px);
+
+    // Type
+    text-align: left;
+
+    // Visibility
+    visibility: hidden;
+    opacity: 0;
+
+    .df-popout-active & {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    &:hover {
+        color: $medium-prim-color;
+    }
+}
+
+.df-popout-header {
+    @include linear-gradient($white, #f7f7f7);
+    border-top-left-radius: $main-border-radius;
+    border-top-right-radius: $main-border-radius;
+    border-bottom: $thin-border-stroke $main-border-color;
+    height: 30px;
+    padding: 8px 10px;
+    font-weight: $weight-semibold;
+    font-size: 12px;
+}
+
+.df-table {
+    @include outer-container(100%);
+    padding: 5px 10px;
+    max-height: 150px;
+    overflow: auto;
+
+    // Row
+    .row {
+        @include fill-parent();
+        @include row(table);
+    }
+
+    // Columns
+    .df-saved-name {
+        @include span-columns(9);
+        @include pad(5px 0);
+
+        font-size: 12px;
+        font-weight: $weight-semibold;
+    }
+
+    .df-saved-actions {
+        @include span-columns(3);
+        @include reset-display;
+        @include pad(5px 0);
+    }
+}
+
+// Saved Filters Actions
+
+.df-saved-actions-container {
+    float: right;
+}
+
+$df-saved-actions-pseudo-position: before;
+$df-saved-actions-position: inline-block;
+$df-saved-actions-margin: null;
+$df-saved-actions-padding: null;
+$df-saved-actions-font-size: 11px;
+
+.df-saved-edit {
+    @include fa-icon($fa-var-pencil, $df-saved-actions-pseudo-position, $df-saved-actions-position, $df-saved-actions-margin, $df-saved-actions-padding, $bright-blue, $df-saved-actions-font-size);
+
+    &:hover {
+        @include fa-icon-color($df-saved-actions-pseudo-position, darken($bright-blue, 5%));
+    }
+}
+
+.df-saved-delete {
+    @include fa-icon($fa-var-close, $df-saved-actions-pseudo-position, $df-saved-actions-position, 0 0 0 5px, $df-saved-actions-padding, $medium-prim-color, $df-saved-actions-font-size);
+
+    &:hover {
+        @include fa-icon-color($df-saved-actions-pseudo-position, $alt-red);
+    }
+}
+
+// Save Filters Button
+
+.df-save-button {
+    @include btn(white);
+    box-sizing: border-box;
+    padding: 10px;
+    margin: 10px;
+    margin-top: 5px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: $weight-semibold;
+}
+
+// Filter Set Form
+.df-save-set-container {
+    @include outer-container(100%);
+    padding: 10px;
+
+    .row {
+        &:not(:last-child) {
+            margin-bottom: 10px;
+        }
+    }
+
+    label {
+        color: $medium-prim-color;
+        font-size: 12px;
+        font-weight: $weight-semibold;
+        margin-bottom: 5px;
+    }
+
+    %df-save-set-input {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    input[type="text"] {
+        @extend %df-save-set-input;
+        height: 32px;
+    }
+
+    textarea {
+        @extend %df-save-set-input;
+        height: 60px;
+        resize: vertical;
+    }
+
+    %df-save-set-button {
+        @include span-columns(6);
+        text-shadow: none;
+        text-align: center;
+    }
+
+    .df-save-set-button {
+        @include btn(brightblue);
+        @extend %df-save-set-button;
+    }
+
+    .df-cancel-save-set-button {
+        @include btn(white);
+        @extend %df-save-set-button;
+    }
+}

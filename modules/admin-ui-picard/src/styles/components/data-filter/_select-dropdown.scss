@@ -1,0 +1,160 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+// DF Select Dropdown
+// ----------------------------------------
+
+.df-select-container {
+    box-sizing: border-box;
+    display: inline-block;
+    width: auto;
+    margin: 0;
+    margin-top: 5px;
+
+    &:not(:first-child) {
+        margin-left: 5px;
+    }
+}
+
+$df-select-dropdown-height: 100%;
+$df-select-dropdown-vertical-padding: 8px;
+$df-select-dropdown-horizontal-padding: 6px;
+
+.df-select-dropdown {
+    box-sizing: border-box;
+    @include btn(white);
+    @include appearance(none);
+    display: inline-block;
+    float: left;
+    width: auto;
+    height: $df-select-dropdown-height;
+    position: relative; // required for floating dropdown
+    padding: $df-select-dropdown-vertical-padding $df-select-dropdown-horizontal-padding;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: clip;
+    font-size: 9px;
+    font-weight: $weight-semibold;
+    color: $medium-prim-color;
+
+    // DF Select Dropdown (1st State)
+    .js-df-state-new-filter & {
+
+        &:not(.df-paired-dropdown) {
+            @extend .animated !optional;
+            @extend .flipInX !optional;
+            @include animation-delay(400ms);
+        }
+
+        &.df-paired-dropdown {
+            visibility: hidden;
+            opacity: 0;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+
+    // DF Select Dropdown (2nd State)
+    .js-df-state-filter-attribute & {
+
+        &:not(.df-paired-dropdown) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        &.df-paired-dropdown {
+            visibility: visible;
+            opacity: 1;
+            @extend .animated !optional;
+            @extend .pulse !optional;
+            margin-left: 2px;
+        }
+    }
+
+    // Compressed State (combined)
+    // ----------------------------------------
+
+    .df-compressed & {
+        padding: 9px 0;
+        text-align: left;
+
+        &:hover {
+            @include background(linear-gradient(#fff, #f7f7f7));
+            border: $thin-border-stroke $main-border-color;
+            color: $medium-prim-color;
+        }
+
+        &:active {
+            box-shadow: inset 0px 1px 0px 0px #fff, 0px 1px 2px rgba(0,0,0,.05);
+        }
+
+
+        &:not(.df-paired-dropdown) {
+            border-right: 0;
+            padding-left: $df-select-dropdown-horizontal-padding;
+            padding-right: 4px;
+        }
+
+        &.df-paired-dropdown {
+            border-left: 0;
+            padding-right: $df-select-dropdown-horizontal-padding;
+            border-radius: 0;
+            margin-left: -1px;
+        }
+    }
+}
+
+// Delete Current Selection
+// ----------------------------------------
+
+.df-delete-select-dropdown-button {
+    box-sizing: border-box;
+    @include btn(white);
+    display: block;
+    float: left;
+    width: auto;
+    height: 29px;
+    padding: 5px $df-select-dropdown-horizontal-padding;
+    margin-left: -1px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+
+    @include fa-icon($fa-var-close, before, inline-block, 4px 0 0 0, 0, $medium-prim-color, 10px);
+
+    &.disabled {
+        @include fa-icon-color(before, $light-prim-color);
+    }
+
+    @include transition-property(visibility, opacity);
+    @include transition-duration(300ms);
+    @include transition-timing-function(ease-in-out);
+    @include transition-delay(160ms);
+
+    &:before {
+        @include transition(color 250ms ease-in-out);
+    }
+
+    &:hover:not(.disabled) {
+        @include fa-icon-color(before, $alt-red);
+    }
+}

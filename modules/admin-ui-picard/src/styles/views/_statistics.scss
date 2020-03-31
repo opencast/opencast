@@ -1,0 +1,28 @@
+.statistics header {
+    box-sizing: border-box;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    @include linear-gradient(top, #fbfbfb, #e8e8e8);
+    border-bottom: 1px solid $main-border-color;
+    @include border-top-radius($main-border-radius);
+    padding: 0 20px;
+}
+
+.statistics {
+    max-width: 700px;
+}
+
+.statistics .obj {
+    max-height: 600px;
+    height: 100%;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: $main-border-radius;
+    border: $thin-border-stroke $main-border-color;
+    color: $medium-prim-color;
+
+    &:not(:last-child) {
+        margin-bottom: 20px;
+    }
+}

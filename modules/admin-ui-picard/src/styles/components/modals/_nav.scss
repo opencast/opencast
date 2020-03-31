@@ -1,0 +1,84 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+.modal .modal-nav, .event-container .modal-nav {
+
+    $height: 50px;
+    $line-height: 20px;
+    width: 100%;
+    height: $height;
+    background: $modal-nav-bg-color;
+    border-bottom: 1px solid $modal-nav-border-color;
+
+    > a {
+        $width: 100px;
+        width: $width;
+        display: inline-block;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        padding: 14px 5px;
+        box-sizing: border-box;
+        height : $height; 
+        line-height: $line-height;
+        color: $modal-nav-link-color;
+        font-size: 13px;
+
+        &.wider {
+            padding-left: 2px;
+            padding-right: 2px;
+        }
+
+        &:first-child {
+            margin-left: 3px;
+        }
+
+        &:hover {
+            color: $modal-nav-link-active-color;
+        }
+
+        &.active {
+            color: $modal-nav-link-active-color;
+            font-weight: 600;
+
+            $size: 8px;
+            $position-from-right: ($width/2) - $size;
+
+            @include triangle-point(bottom, $size, $size, $position-from-right, $off-white, 1px, $modal-nav-border-color, -8px);
+        }
+
+        // Notifiction
+        > i.notification {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+            right: 0px;
+            background: #db3232;
+            line-height: 14px;
+            color: #fff;
+            font-size: 10px;
+            font-weight: bold;
+        }
+    }
+}

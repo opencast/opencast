@@ -1,0 +1,180 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+.table-container.top-addon {
+
+    .main-tbl {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+}
+
+.main-tbl .metadata-entry {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0 5px;
+    margin-right: 5px;
+    display: inline-block;
+}
+
+.action-bar {
+    @include clearfix();
+    border: 1px solid $main-border-color;
+    border-bottom: none;
+    border-top-left-radius: $main-border-radius;
+    border-top-right-radius: $main-border-radius;
+    @include linear-gradient(top, #fff, #f7f7f7);
+
+    $action-icon-margin: 0 4px 0 0;
+
+    .table-edit-action {
+        @include fa-icon($fa-var-pencil, before, inline-block, $action-icon-margin);
+    }
+
+    .table-export-action {
+        @include fa-icon($fa-var-external-link, before, inline-block, $action-icon-margin);
+    }
+
+    ul {
+        padding: 10px 12px 12px;
+        float: right;
+
+        li {
+            display: inline-block;
+            margin: 0 4px;
+
+            &:first-child {
+                margin-left: 0;
+            }
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+    }
+
+    a {
+        $highlight-blue: #3aa5ef;
+
+        color: $highlight-blue;
+        text-shadow: 0 1px 0 rgba($white, 0.75);
+
+        &:hover {
+            color: lighten($highlight-blue, 10%);
+        }
+    }
+}
+
+// Inline Dropdown
+// ----------------------------------------
+
+.inline-dropdown {
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    cursor: pointer;
+    @include user-select(none);
+    width: 25px;
+    height: 22px;
+    @include btn(white);
+    box-shadow: none;
+
+    @include fa-icon($fa-var-ellipsis-v, before, inline-block);
+    &:before {
+        position: relative;
+        top: -13px;
+    }
+
+
+    // Popover Styles
+
+    ul {
+        $width: 80px;
+        $offset: 15px;
+        $vertical-position: -28px;
+
+        visibility: hidden;
+        opacity: 0;
+        position: absolute;
+        z-index: $max-z + 10;
+        min-width: $width;
+        top: $vertical-position;
+        left: (-($width)) - (3px + $offset);
+        padding: 4px 0;
+        background: $body-background;
+        border: $thin-border-stroke $main-border-color;
+        border-radius: $main-border-radius;
+        @include transition(visibility 200ms, opacity 200ms);
+
+        &:before,
+        &:after {
+            border: solid transparent;
+            content: "";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none;
+            top: 40%;
+            border-width: 8px 0 8px 8px;
+            bottom: auto;
+        }
+
+        &:before {
+            right: -9px;
+            border-color: transparent #c9d0d3;
+        }
+
+        &:after {
+            right: -8px;
+            left: auto;
+            border-color: transparent #fafafa;
+        }
+
+        li {
+
+            a {
+                text-align: center;
+                font-size: 12px;
+                font-weight: 600;
+                display: block;
+                line-height: 16px;
+                text-shadow: 0 1px 0 $white;
+                padding: 8px 15px;
+            }
+
+            &:first-child a {
+                border-top-left-radius: $main-border-radius;
+                border-top-right-radius: $main-border-radius;
+            }
+
+            &:last-child a {
+                border-bottom-left-radius: $main-border-radius;
+                border-bottom-right-radius: $main-border-radius;
+            }
+        }
+    }
+
+    &.active ul {
+        visibility: visible;
+        opacity: 1;
+    }
+}

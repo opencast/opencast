@@ -1,0 +1,71 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+.df-clear-filters {
+    width: 40px;
+    height: 40px;
+    pointer-events: none; // allows scroll through object
+
+    // overlaying positioning
+    position: absolute;
+    top: 0;
+    right: 0;
+    @include background-image(linear-gradient(right, #F7F7F7 50%, rgba(#F7F7F7, 0)));
+
+    .df-clear-button {
+        display: block;
+        position: absolute;
+        top: 11px;
+        right: 8px;
+        cursor: pointer;
+        pointer-events: auto;
+        @include fa-icon($fa-var-close, before, inline-block, 0, 0, $medium-prim-color, 10px);
+        font-family: "Open Sans", sans-serif;
+        color: #555;
+
+        @include transition-property(visibility, opacity);
+        @include transition-duration(300ms);
+        @include transition-timing-function(ease-in-out);
+        @include transition-delay(160ms);
+
+        &:before {
+            @include transition(color 250ms ease-in-out);
+        }
+
+        &:hover {
+            @include fa-icon-color(before, $alt-red);
+        }
+    }
+
+    &.disabled .df-clear-button {
+        @include fa-icon-color(before, $light-prim-color);
+
+        &:hover {
+            @include fa-icon-color(before, $light-prim-color);
+        }
+    }
+
+    .js-df-state-new-filter & {
+        visibility: visible;
+        opacity: 1;
+    }
+}

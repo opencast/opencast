@@ -1,0 +1,68 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+.toggle-btn {
+    display: block;
+    margin: 20px 0;
+
+    li {
+        display: inline-block;
+
+        &:not(:first-child) {
+            margin-left: -5px;
+        }
+
+        a {
+            @include btn(white);
+            font-size: 13px;
+            border: 1px solid $main-border-color;
+            border-radius: 0;
+            padding: 10px 12px;
+            margin: 0;
+
+            &.active {
+                color: #fff !important;
+                text-shadow: 0px 1px 0px rgba(0,0,0,0.2);
+                border: 1px solid $l-blue;
+                border-right: 1px solid darken($l-blue, 10%);
+                @include linear-gradient(top, lighten(#2b77b9, 5%), #388ed6);
+                box-shadow: 0px 2px 3px 1px rgba(0,0,0,.05);
+            }
+        }
+
+        &:first-child {
+            a {
+                border-top-left-radius: $main-border-radius;
+                border-bottom-left-radius: $main-border-radius;
+                border-right: none;
+            }
+        }
+
+        &:last-child {
+            a {
+                border-top-right-radius: $main-border-radius;
+                border-bottom-right-radius: $main-border-radius;
+                border-left: none;
+            }
+        }
+    }
+}

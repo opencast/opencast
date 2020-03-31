@@ -1,0 +1,531 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+// Table styles
+.main-tbl {
+    $border-color: #c7ced3;
+    $col-padding: 7px;
+
+    width: 100%;
+    border-collapse: separate !important;
+    border-spacing: 0;
+    border-radius: $main-border-radius;
+    border: $thin-border-stroke $border-color;
+
+    @mixin apply-row-stripe() {
+        box-sizing: border-box;
+        background: #f7f7f7;
+
+        > td {
+            border-top: 1px solid #e2e2e2;
+            border-bottom: 1px solid #e2e2e2;
+
+            > .hidden-input {
+                background: #f7f7f7;
+            }
+        }
+    }
+
+
+    &.highlight-hover tr:hover {
+        background-color: $table-highlight;
+    }
+
+    th {
+        &.sortable {
+            cursor: pointer;
+            &:hover {
+                @include linear-gradient(top, $off-white, darken(#f1f3f5, 3%));
+            }
+            &:active {
+                box-shadow: inset 0 3px 10px 2px rgba($black, 0.05);
+            }
+        }
+        // Layout
+        padding-left: 10px;
+        padding-right: 10px;
+
+        &:first-child {
+            border-left: none;
+        }
+
+        &:last-child {
+            border-right: none;
+        }
+
+        input[type=checkbox] {
+            margin-left: 1px;
+            margin-right: 1px;
+            vertical-align: middle;
+        }
+
+        // Aesthetic Style
+        border-right: 1px solid #c9d0d6;
+        border-left: 1px solid #fff;
+        border-bottom: 1px solid $border-color;
+        @include user-select(none);
+        @include linear-gradient(top, darken($off-white, 1%), darken(#f1f3f5, 3%));
+
+        // Typography
+        line-height: 35px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 600;
+        color: $medium-prim-color;
+        text-shadow: 0px 1px 0px #fff;
+
+
+        // Sort icon
+        span .sort {
+            float: right;
+            margin: 12px 0 0 5px;
+            @include build-icon(auto, auto, tbl-sort, 8px, 13px);
+
+            &.asc  {
+                @include build-icon(auto, auto, tbl-sort-up, 8px, 13px);
+            }
+
+            &.desc {
+                @include build-icon(auto, auto, tbl-sort-down, 8px, 13px);
+            }
+        }
+
+        > .info {
+            padding-left: 5px;
+        }
+
+        // Darken tbl when sorted on
+        &.col-sort {
+            background: darken(#f1f3f5, 2%);
+            box-shadow: inset 0 3px 10px 2px rgba($black, 0.05);
+        }
+
+        // Special column
+        &.action {
+            width: 202px;
+            text-align: center;
+            padding-left: 0;
+
+            &.single {
+                width: 70px !important;
+            }
+
+            &.double {
+                width: 80px !important;
+            }
+
+            &.triple {
+                width: 110px !important;
+            }
+        }
+
+        &.small {
+            width: 30px;
+        }
+
+        &.medium {
+            width: 78px;
+        }
+
+        &.large {
+            width: 100px;
+        }
+
+        &.full-width {
+            width: 100%;
+        }
+
+        &.status-col {
+            width: 43px;
+        }
+    }
+
+    tr {
+        font-size: 12px;
+
+        // Give every other row a background
+        &:nth-child(even) {
+            @include apply-row-stripe;
+        }
+
+        // This selects first and last TD within the last TR.
+        &:last-child {
+            > td {
+                border-bottom: none;
+
+                &:last-child {
+                    border-bottom-right-radius: $main-border-radius;
+                }
+
+                &:first-child {
+                    border-bottom-left-radius: $main-border-radius;
+                }
+            }
+        }
+
+        // Used on main tbl views when bold items are needed
+        // at the bottom of rows.
+        &.total {
+            > td {
+                background: darken(#f8f8f8, 2%);
+                color: $medium-prim-color;
+                font-weight: bold;
+
+                &:first-child {
+                    text-align: right;
+                    padding-right: 20px;
+                }
+            }
+        }
+
+        &.darker-row {
+            background: darken(#f7f7f7, 5%);
+        }
+    }
+
+    td.highlighted-cell {
+        font-weight: bold;
+    }
+
+    td {
+        padding: $col-padding;
+        color: $medium-prim-color;
+        border-right: 1px solid #c9d0d6;
+        line-height: 20px;
+        vertical-align: middle;
+
+        // Action icons
+        > a {
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+            position: relative;
+
+            &.remove {
+                @include build-icon(auto, auto, remove-icon, 17px, 17px);
+            }
+
+            &.play {
+                color: $color-silver;
+                @include build-icon(auto, auto, play-icon, 17px, 17px);
+
+                &.on {
+                   color: $primary-color-green;
+                   @include build-icon(auto, auto, play-icon-on, 17px, 17px);
+                }
+            }
+
+            &.stop {
+                @include build-icon(auto, auto, stop-icon, 17px, 17px);
+            }
+
+            &.audio {
+                @include build-icon(auto, auto, audio-icon, 18px, 16px);
+                margin-right: 9px;
+            }
+
+            &.more {
+                @include build-icon(auto, auto, more-icon, 19px, 15px);
+            }
+
+            &.more-series {
+                @include build-icon(auto, auto, more-series-icon, 19px, 15px);
+            }
+
+            &.time {
+                @include build-icon(auto, auto, time-icon, 17px, 17px);
+                margin-right: 15px;
+            }
+
+            &.comments {
+                @include fa-icon($fa-var-comment-o, before, block, -3px 0 0 0, 0, inherit, 20px, normal,
+                                 inherit);
+            }
+
+            &.comments-open {
+                @include fa-icon($fa-var-comment, before, block, -3px 0 0 0, 0, inherit, 20px, normal, inherit);
+            }
+
+            &.cut {
+                @include fa-icon($fa-var-scissors, before, inline-block, 2px 0 0 0, 0, inherit, 18px, normal, inherit);
+
+                .badge {
+                  position: relative;
+                  margin-right: -9px;
+                  left: -8px;
+                  bottom: 8px;
+                  width: 6px;
+                  height: 6px;
+                  display: inline-block;
+                  border-radius:100%;
+                  background-color: $red;
+                }
+            }
+
+            &.edit {
+                color: $l-blue;
+            }
+
+            &.fa {
+                font-size: 18px;
+                color: #808080;
+            }
+
+            &.crosslink {
+                border-bottom: 1px solid transparent;
+
+                &:hover {
+                    border-bottom: 1px solid;
+                }
+             }
+
+            .notification {
+                position: absolute;
+                top: -3px;
+                right: -3px;
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                border: 2px solid #fff;
+                background: $red;
+                width: 10px;
+                height: 10px;
+            }
+        }
+
+        &.nowrap {
+            white-space: nowrap;
+        }
+
+        // For action row that only has one button
+        &.single-btn > a {
+            margin-left: 10px;
+        }
+
+        &:last-child {
+            border-right: none;
+        }
+
+        span[data-status]:before {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            line-height: 20px;
+            border-radius: 50%;
+            margin: 5px 5px 0;
+            content: '';
+            vertical-align: top;
+        }
+
+        span[data-status="AGENTS.STATUS.OFFLINE"]:before {
+            background: black;
+        }
+
+        span[data-status="AGENTS.STATUS.IDLE"]:before {
+            background: $green;
+        }
+
+        span[data-status="AGENTS.STATUS.SHUTTING_DOWN"]:before,span[data-status="AGENTS.STATUS.UNKNOWN"]:before {
+            background: $yellow;
+        }
+
+        span[data-status="AGENTS.STATUS.CAPTURING"]:before,span[data-status="AGENTS.STATUS.UPLOADING"]:before {
+            background: $l-blue;
+        }
+
+        span[data-status="AGENTS.STATUS.ERROR"]:before {
+            background: $red;
+        }
+
+        // Circles used on server page
+        .circle {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin: 0;
+
+            &.green {
+                background: $green;
+            }
+
+            &.red {
+                background: $red;
+            }
+
+            &.blue {
+                background: $l-blue;
+            }
+
+            &.yellow {
+                background: $yellow;
+            }
+        }
+
+        // Input
+        > input {
+            box-sizing: border-box;
+            border: $thin-border-stroke #ccc;
+            border-radius: $main-border-radius;
+            display: inline-block;
+            padding-left: 10px;
+            vertical-align: middle;
+        }
+
+        .hidden-input {
+            border: none;
+            width: 100%;
+            height: 100%;
+            color: $dark-prim-color;
+            padding-left: 0;
+        }
+
+        .required {
+            color: $red;
+        }
+
+        textarea.hidden-input {
+            resize: none;
+        }
+
+        > .ios {
+            margin: 5px 0 0 20px;
+        }
+
+        &.js-has-check {
+            @include fa-icon($fa-var-check, after, inline-block, 3px 0 0 0, 0, $green, 18px);
+
+            &:after {
+                opacity: 0;
+                visibility: hidden;
+                float: right;
+                @include transition(all .2s);
+            }
+
+            &.js-active:after {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+    }
+
+    &.accordion-tbl {
+
+        // Remove styling on all rows becasue we need to use
+        // jQuery to add the .stripe class.
+
+        // Reason for this is because there is no way to skip over
+        // hidden rows in CSS, which is needed because sub-tbl is a hidden row
+        // Annoying I know...
+        tr {
+            background: none;
+
+            &:nth-child(even) {
+                background: none;
+
+                > td {
+                    border-top: none;
+                    border-bottom: none;
+                }
+            }
+        }
+
+        // Use mixin when jQuery applies this class.
+        tr.stripe {
+            @include apply-row-stripe;
+        }
+
+        .tbl-row-toggle {
+            font-size: 15px;
+            padding-left: 3px;
+
+            &.open {
+                @include transform(rotate(90deg));
+            }
+        }
+    }
+
+    .sub-tbl-container {
+        display: none;
+
+        // Select first TD the one that contains the accordion-tbl
+        // and remove padding
+        > td {
+            padding-left: 0;
+        }
+
+        tr:nth-child(even) {
+            @include apply-row-stripe;
+        }
+
+        .main-tbl {
+            border-top: 1px solid $main-border-color;
+            border-bottom: 1px solid $main-border-color;
+        }
+
+        .sub-tbl tr:first-child > td {
+            border-top: 1px solid $main-border-color;
+        }
+
+        // This is used to know if the row that opened the tbl was striped
+        // to add the correct border
+        &.has-stripe-row {
+            .sub-tbl tr:first-child > td {
+                border-top: none;
+            }
+
+            .sub-tbl tr:last-child > td {
+                border-bottom: 1px solid $main-border-color;
+                @include border-bottom-radius(0);
+            }
+        }
+
+        .link {
+            line-height: 20px;
+        }
+
+        p {
+            line-height: 25px;
+        }
+
+        .sub-tbl td:first-child {
+            width: 180px;
+        }
+    }
+
+    // Special columns
+    // ---------------
+
+    .center-col {
+        text-align: center;
+        padding: 0;
+    }
+}
+
+
+// Object Container Nested Tables
+.obj-container table.main-tbl {
+    border-radius: 0 !important;
+
+    &:not(:first-child) {
+        border-top: 1px solid $main-border-color;
+    }
+}

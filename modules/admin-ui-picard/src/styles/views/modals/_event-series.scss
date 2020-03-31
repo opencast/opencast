@@ -1,0 +1,195 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+.modal {
+    &#event-details-modal,
+    &#series-details-modal,
+    &#task-details-modal {
+
+        // Modal Size
+        @extend .large-modal;
+
+        .status {
+            line-height: 40px;
+            padding: 2px 20px;// Overide padding
+
+            > input[type="checkbox"] {
+                float: right;
+                margin: 5px -10px 0 0;
+            }
+        }
+
+        .edit-trim {
+
+            > .obj-container {
+                padding: 0px 20px 20px;
+
+                > p {
+                    padding-bottom: 20px;
+                }
+
+                > a {
+                    @include btn(white);
+                }
+            }
+        }
+
+        .media-content {
+
+            .desc {
+                margin-bottom: 0;
+            }
+
+            .action-container {
+                border-top: 1px solid $main-border-color;
+                padding: 20px;
+                margin: 0 auto;
+                text-align: center;
+
+                .drop-down-container {
+                    text-align: left;
+                }
+
+                > a {
+                    @include btn(white);
+                    margin-left: 5px;
+                    vertical-align: middle;
+                }
+            }
+        }
+
+        .access-control {
+
+            .desc {
+                border-bottom: none;
+            }
+
+            .obj-container {
+                padding-bottom: 15px;
+            }
+
+            .main-tbl {
+                border-top: 1px solid $main-border-color;
+                margin-top: 0;
+                @include border-top-radius(0);
+            }
+
+            .add-remove-container {
+                box-sizing: border-box;
+                border-top: 1px solid $main-border-color;
+                padding: 20px;
+                width: 100%;
+
+                .left {
+                    float: left;
+                }
+
+                .right {
+                    float: right;
+                }
+
+                .fa {
+                    font-size: 20px;
+                    vertical-align: middle;
+                    margin-right: 10px;
+                }
+
+                .fa-plus-circle {
+                    color: $green;
+                }
+
+                .fa-minus-circle {
+                    color: $red;
+                }
+
+                .btn {
+                    @include btn(green);
+                }
+            }
+        }
+
+        .trim-btn-container {
+            .trim-btn {
+                @include btn(lightblue);
+                display: inline-block;
+                padding: 10px 25px;
+                margin-bottom: 10px;
+            }
+        }
+
+        .media-stream-details {
+            .main-tbl {
+                border-bottom: 1px solid $main-border-color;
+            }
+        }
+
+        .more-info-actions {
+
+            ul {
+                padding: $modal-container-padding;
+                font-size: 12px;
+
+                li {
+                    border: none;
+                }
+
+                a {
+                    float: right;
+                }
+            }
+        }
+
+        .access-control {
+
+            span {
+                font-size: 12px;
+            }
+
+            .fa-plus-circle {
+                color: $green;
+            }
+
+            .cancel {
+                @include btn(white);
+                margin-right: 5px;
+            }
+
+            .apply {
+                @include btn(green);
+            }
+
+            .btn-container {
+                padding: 10px;
+            }
+        }
+
+        .current-privilege {
+            .sel-dd {
+                width: 200px;
+                margin-top: 10px;
+            }
+        }
+
+        .scheduling-conflict {
+          @include alert-variant($state-danger-bg, $state-danger-border, $state-danger-text);
+          margin-bottom: 15px;
+        }
+    }
+}

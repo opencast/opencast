@@ -1,0 +1,394 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+.area-body {
+    // Center box
+    background: $body-background;
+    border-top: 0px;
+    padding: 10px;
+    border-radius: 4px;
+
+    // Modal Columns
+    .col {
+        width: 48.78%;
+        display: inline-block;
+        vertical-align: top;
+
+        &:not(:first-child) {
+            margin-left: 1%;
+        }
+
+        &:not(:last-child) {
+            margin-right: 1%;
+        }
+
+        // Remove bottom margin on last object
+        &:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    // Full col
+
+    .full-col {
+        width: 100%;
+
+        .obj {
+            width: $modal-full-col-width;
+
+            > header {
+                width: ($modal-full-col-width);
+            }
+        }
+
+        .tbl-container {
+            width: $modal-full-col-width;
+
+            .obj-container .table-series .wrapper {
+
+                padding: 1% 2%;
+
+                &:first-child {
+                    padding-top: 2%;
+                }
+
+                &:last-child {
+                    padding-bottom: 2%;
+                }
+
+                header {
+                    border: $thin-border-stroke $main-border-color;
+                }
+
+                .main-tbl {
+                    border: $thin-border-stroke $main-border-color;
+                    border-top: none;
+                    border-top-left-radius: 0;
+                    border-top-right-radius: 0;
+                }
+            }
+        }
+    }
+
+    // Object within columns
+    .obj {
+        box-sizing: border-box;
+        background: #fff;
+        border-radius: $main-border-radius;
+        border: $thin-border-stroke $main-border-color;
+        color: $medium-prim-color;
+
+        &:not(:last-child) {
+            margin-bottom: 20px;
+        }
+
+        table {
+            border: none;
+            padding-left: 0;
+
+            &.main-tbl.top-tbl {
+                border-bottom: 1px solid $main-border-color;
+                border-radius: 0;
+            }
+
+            td {
+                line-height: 25px !important;
+                padding: 4px 15px;
+
+                > a {
+                    float: none;
+                    margin: 0;
+                }
+
+                a.external-link {
+                    @include fa-icon($fa-var-external-link-square, before, inline-block, 4px, 0, inherit, 14px);
+                    float: right;
+
+                    &:hover {
+                        @include fa-icon-color(before, $l-blue);
+                    }
+                }
+
+                .circle {
+                    margin-top: 7px;
+                }
+            }
+        }
+
+        .fa-calendar-o {
+            margin-left: 5px;
+        }
+
+        // Main container
+        .obj-container {
+            height: auto;
+            opacity: 1;
+
+            > p,
+            pre {
+                font-size: 11px;
+                color: $medium-prim-color;
+                line-height: 18px;
+                margin-bottom: 15px;
+
+                &:last-child {
+                    margin-bottom: 8px;
+                }
+            }
+
+            .desc {
+                margin: 0 auto;
+                padding: 20px 15px;
+
+                &.no-border {
+                    border-bottom: none;
+                }
+            }
+
+            h3.section-heading {
+                color: $dark-prim-color;
+                padding: 10px 20px 5px;
+                border-bottom: 1px solid $main-border-color;
+            }
+
+            h4 {
+                color: $dark-prim-color;
+                font-size: 14px;
+                margin-bottom: 8px;
+
+                &:not(:first-child) {
+                    margin-top: 15px;
+                }
+            }
+
+            > ul {
+
+                span {
+                    font-weight: 600;
+                    font-size: 13px;
+                }
+
+                > li {
+                    line-height: 23px;
+                    border-bottom: 1px solid lighten($main-border-color, 10%);
+                    padding: 10px 0;
+
+                    &:first-child {
+                        padding-top: 0;
+                    }
+
+                    &:last-child {
+                        border-bottom: none;
+                        margin-bottom: 0;
+                        padding-bottom: 0;
+                    }
+                }
+
+            }
+
+            &.padded {
+                padding: 20px;
+            }
+        }
+    }
+
+    // Modal obj header
+    header {
+        $height: 35px;
+        @include accordion-header($height);
+        @include user-select(none);
+        position: static;
+
+        &.expand {
+            @include accordion-header($height, true);
+        }
+
+        // This is used when there is data displayed in header
+        span.header-value {
+            float: right;
+        }
+    }
+
+    .obj {
+        &.comments {
+
+            .comment-container {
+                height: auto;
+                overflow-y: auto;
+
+                .comment-view {
+                  float: left;
+                  width: 60%;
+                  padding: 10px;
+                  min-height: 340px;
+                  border-right: 1px solid $main-border-color;
+                }
+
+                .comment-creation {
+                  float: right;
+                  width: 40%;
+                  padding: 10px;
+                }
+
+                .comment {
+                    margin-bottom: 20px;
+
+                    &:first-child h4 {
+                        margin-top: 0;
+                    }
+
+                    .is-reply {
+
+                        > h4 {
+                            padding-left: 30px;
+                        }
+
+                        .category {
+                            padding-left: 30px;
+                        }
+
+                        > p {
+                            padding-left: 30px;
+                        }
+                    }
+
+                    // Hide first HR
+                    &:first-child > hr {
+                        display: none;
+                    }
+
+                    > hr {
+                        background: lighten($main-border-color, 10%);
+                        height: 1px;
+                        border: none;
+                        margin: 30px 0 20px;
+                    }
+
+                    > h4 {
+                        font-weight: 600;
+                    }
+
+                    .category {
+                        font-size: 10px;
+                        color: $medium-prim-color;
+
+                        > strong {
+                            color: $medium-prim-color;
+                        }
+                    }
+
+                    .date {
+                        float: right;
+                        font-size: 10px;
+                        color: $light-prim-color;
+                        @include fa-icon($fa-var-clock-o, before, inline-block, 0 5px 0 0, 0, inherit, 10px);
+                    }
+
+                    > p {
+                       margin: 7px 15px 0 0;
+                       font-size: 11px;
+                       line-height: 15px;
+
+                        > span {
+                            color: $l-blue;
+                        }
+                    }
+
+                    .reply,
+                    .delete,
+                    .resolve {
+                        float: right;
+                        font-size: 11px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        color: $l-blue;
+                        display: inline-block;
+                    }
+
+                    .delete {
+                        color: $red;
+                        margin-left: 10px;
+
+                    }
+
+                    .resolve {
+                        color: $light-prim-color;
+                        margin-right: 10px;
+
+                        &.resolved {
+                            color: $green;
+                        }
+                    }
+                }
+            }
+
+            .add-comment {
+
+                .drop-down-container {
+                    width: 100%;
+                }
+
+                textarea {
+                    width: 100%;
+                    height: 80px;
+                    resize: none;
+                    margin-bottom: 20px;
+                }
+
+                .btn {
+                    @include btn(green);
+                    padding: 10px 15px;
+                    float: right;
+                }
+
+                .save {
+                    float: right;
+                    margin-left: 10px;
+                }
+
+                .resolved {
+                  display: inline-block;
+                }
+
+                .resolve-select {
+                  vertical-align: middle;
+                }
+
+                .reasons {
+                    float: left;
+                }
+
+                .drop-down-container {
+                    width: 250px;
+                    display: inline-block;
+                    z-index: 100;
+                }
+
+                .chosen-container .chosen-results{
+                  max-height: 160px !important;
+                }
+
+            }
+        }
+    }
+}
+

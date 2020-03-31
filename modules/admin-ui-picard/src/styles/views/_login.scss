@@ -1,0 +1,180 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+// Login Page
+// ----------------------------------
+//
+
+.login-container {
+    $width: 490px;
+    background: #fff;
+    border: $thin-border-stroke $main-border-color;
+    border-radius: $main-border-radius;
+    margin: 0 auto;
+    text-align: center;
+    width: $width;
+    height: auto;
+    position: relative;
+    top: 150px;
+
+    .login-form form {
+        box-sizing: border-box;
+        float: right;
+        margin: 0px 70px 0px 0px;
+        display: inline-block;
+        width: 350px;
+        padding: 35px 0;
+
+        input {
+            margin: 0;
+        }
+
+        p {
+            font-size: 25px;
+            font-weight: 100;
+            color: $medium-prim-color;
+            text-align: center;
+            padding-bottom: 30px;
+
+            .subtle-text {
+                font-size: 12px;
+                font-weight: 600;
+                color: $light-prim-color;
+            }
+        }
+
+        .beta-flag {
+          display: inline-block;
+          vertical-align: top;
+          margin-top: 2px;
+          border: 1px solid $l-blue;
+          border-radius: 2px;
+          padding: 4px 5px 3px;
+          color: $l-blue;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: default;
+          text-transform: uppercase;
+        }
+
+        .error-container {
+            background: lighten($red, 10%);
+            border-radius: $main-border-radius;
+            margin: -10px 0 20px;
+            padding: 10px 0;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .form-container {
+
+            label {
+                color: $medium-prim-color;
+                font-size: 13px;
+                line-height: 18px;
+                margin-left: 10px;
+                cursor: pointer;
+            }
+        }
+
+        .forgot-pwd {
+            display: block;
+            width: 88%;
+            text-align: right;
+            margin: -15px 0 20px;
+            font-size: 10px;
+            color: $light-prim-color;
+
+            &:hover {
+                color: $medium-prim-color;
+            }
+        }
+
+        .submit {
+            display: block;
+            background: $l-blue;
+            color: #fff;
+            height: 48px;
+            width: 100%;
+            text-align: center;
+            border-radius: 4px;
+            border: none;
+            @include transition(all .2s);
+
+            &:hover {
+                background: lighten($l-blue, 5%);
+            }
+        }
+    }
+
+    .login-nav {
+        cursor: pointer;
+        position: absolute;
+        top: -40px;
+        right: 0;
+
+        .dropdown-ul {
+            position: absolute;
+            z-index: $max-z + 10;
+            opacity: 0;
+            visibility: hidden;
+            top: 35px;
+            right: -11px;
+            @extend %menu-dropdown-base;
+        }
+
+        // Nav items
+        .nav-dd {
+            color: $medium-prim-color;
+            text-align: left;
+            @include fa-icon($fa-var-chevron-down, after, inline-block, 0 0 0 5px);
+
+            span {
+                font-size: 14px;
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+            &.active .dropdown-ul {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
+    }
+}
+
+
+// Remember Me Toggle and Label
+.remember-me {
+    text-align: center;
+
+    input#remember {
+        display: inline !important;
+        width: auto;
+    }
+
+    label {
+        display: inline !important;
+        margin: 4px 0 0 10px;
+        line-height: 20px;
+    }
+}

@@ -1,0 +1,94 @@
+// controlling element of the popover
+.popover-wrapper {
+    position: relative;
+}
+
+.popover-wrapper__trigger {
+    color: #4D687E;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.popover {
+    position: absolute;
+    width: 250px;
+    background: #efefef;
+    border-radius: $main-border-radius;
+    border: $thin-border-stroke $main-border-color;
+    z-index: 1;
+}
+
+.popover.popover-right {
+    &:after {
+        right: 100%;
+        top: 2px;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        border-color: transparent;
+        border-right-color: $main-border-color;
+        border-width: 10px;
+        margin-top: 0;
+    }
+}
+@mixin popover-arrow() {
+    top: 0;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-color: transparent;
+    border-width: 10px;
+}
+
+.popover.popover-left {
+    &:after {
+        @include popover-arrow()
+        border-left-color: $main-border-color;
+        left: 100%;
+    }
+}
+
+.popover.popover-right {
+    &:after {
+        @include popover-arrow()
+        right: 100%;
+        border-right-color: $main-border-color;
+    }
+}
+
+.popover__header {
+    background: $main-border-color;
+    height: 26px;
+    position: relative;
+}
+
+.popover__content {
+    padding: 10px;
+}
+
+.popover__list-item {
+    @include retina-image("#{$img-path}play-icon-on", 20px 20px);
+    background-position-y: center;
+    margin: 6px 0;
+    padding-left: 30px;
+    line-height: 22px;
+    background-repeat: no-repeat;
+    display: block;
+}
+
+.popover__list-item-disabled {
+    @include retina-image("#{$img-path}play-icon", 20px 20px);
+    margin: 6px 0;
+    padding-left: 30px;
+    line-height: 22px;
+    background-repeat: no-repeat;
+    display: block;
+}

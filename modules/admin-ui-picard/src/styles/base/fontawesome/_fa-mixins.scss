@@ -1,0 +1,70 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+// Code Sample:
+// @include fa-icon($fa-plus);
+
+@mixin fa-icon(
+
+    // Required Values
+    $fa-icon,
+
+    // Optional Values
+    $pseudo-position: before,
+    $display-value: inline,
+    $margin: 0,
+    $padding: 0,
+    $color: inherit,
+    $font-size: 12px,
+    $font-weight: normal,
+    $line-height: 1
+
+) {
+
+    &:#{$pseudo-position} {
+        content: $fa-icon;
+        color: $color;
+        font-family: FontAwesome;
+        font-size: $font-size;
+        font-style: normal;
+        font-weight: $font-weight;
+        line-height: $line-height;
+        display: $display-value;
+        margin: $margin;
+        padding: $padding;
+        @include font-smoothing(on);
+    }
+}
+
+@mixin fa-icon-color($pseudo-position, $color) {
+
+    &:#{$pseudo-position} {
+        color: $color;
+    }
+}
+
+@mixin fa-icon-float($pseudo-position, $float) {
+
+    &:#{$pseudo-position} {
+        float: $float;
+    }
+}

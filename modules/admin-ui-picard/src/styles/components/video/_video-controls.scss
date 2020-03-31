@@ -1,0 +1,305 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+.video-controls {
+    @include clearfix();
+    box-sizing: border-box;
+    @include linear-gradient(top, #fff, #f7f7f7);
+    border: $thin-border-stroke $main-border-color;
+    height: 50px;
+    padding: 0 15px;
+    border-radius: 0 0 4px 4px;
+}
+
+.video-details {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.video-details-date {
+  font-style: italic;
+}
+
+.video-details-presenters {
+  font-weight: bold;
+}
+
+// Volume Controls
+// ----------------------------------------
+
+.volume-controls {
+    float: left;
+    width: 20%;
+    padding: 9px 0;
+
+    .volume-toggle-unmuted {
+        @include fa-icon($fa-var-volume-up, after, inline-block, 0 10px 0 0, 0, $grey, 16px);
+        display: inline-block;
+        vertical-align: top;
+        margin-top: 8px;
+    }
+
+    .volume-toggle-muted {
+        @include fa-icon($fa-var-volume-off , after, inline-block, 0 18px 0 0, 0, $grey, 16px);
+        display: inline-block;
+        vertical-align: top;
+        margin-top: 8px;
+    }
+
+    .volume-slider {
+        display: inline-block;
+        vertical-align: top;
+        margin-top: 4px;
+    }
+
+    .volume-slider-muted {
+        background: $grey;
+    }
+
+    .volume-slider-unmuted {
+        background: $bright-blue;
+    }
+
+    input {
+        @include appearance(none);
+        border-radius: 4px;
+        height: 2px;
+    }
+}
+
+
+// Playback Controls
+// ----------------------------------------
+
+.playback-controls {
+    float: left;
+    width: 60%;
+    height: 30px;
+    padding: 10px 0;
+
+    .control {
+        display: inline-block;
+        float: left;
+        margin-left: 10px;
+        text-align: center;
+
+        &:first-child {
+            margin-left: 0;
+        }
+    }
+}
+
+.playback-controls-wrapper {
+    margin: 0 auto;
+    width: 280px;
+}
+
+.playback-control-icon {
+    color: $grey;
+    font-size: 22px;
+    text-shadow: 0 1px 0 #fff;
+    cursor: pointer;
+}
+
+$playback-icon-pseudo-position: after;
+$playback-icon-display-value: inline-block;
+$playback-icon-margin: 7px 20px;
+$playback-icon-padding: 0;
+$playback-icon-float: left;
+$playback-icon-color: $grey;
+$playback-icon-font-size: 16px;
+
+.playback-jump-to-start {
+    @include fa-icon($fa-var-fast-backward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+    @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
+    @extend .playback-control-icon;
+    &:hover {
+        color: darken($grey, 15%);
+    }
+}
+
+.playback-previous-frame {
+    @include fa-icon($fa-var-step-backward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+    @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
+    @extend .playback-control-icon;
+    &:hover {
+        color: darken($grey, 15%);
+    }
+}
+
+.playback-toggle-play {
+    @include fa-icon($fa-var-play,$playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+    @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
+    @extend .playback-control-icon;
+    &:hover {
+        color: darken($grey, 15%);
+    }
+}
+
+.playback-toggle-pause {
+  @include fa-icon($fa-var-pause,$playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+  @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
+  @extend .playback-control-icon;
+  &:hover {
+    color: darken($grey, 15%);
+  }
+}
+
+.playback-next-frame {
+    @include fa-icon($fa-var-step-forward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+    @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
+    @extend .playback-control-icon;
+    &:hover {
+        color: darken($grey, 15%);
+    }
+}
+
+.playback-jump-to-end {
+    @include fa-icon($fa-var-fast-forward, $playback-icon-pseudo-position, $playback-icon-display-value, $playback-icon-margin, $playback-icon-padding, $playback-icon-color, $playback-icon-font-size);
+    @include fa-icon-float($playback-icon-pseudo-position, $playback-icon-float);
+    @extend .playback-control-icon;
+    &:hover {
+        color: darken($grey, 15%);
+    }
+}
+
+
+
+// Timecode
+// ----------------------------------------
+
+
+.timecode-controls {
+    @include clearfix();
+    box-sizing: border-box;
+    float: right;
+    width: 20%;
+
+    label {
+        display: block;
+        text-align: right;
+        margin-right: 4px;
+        margin-top: 2px;
+        font-size: 10px;
+        color: $grey;
+        font-weight: $weight-light;
+        text-transform: uppercase;
+    }
+
+    .colon-sep {
+        font-size: 22px;
+        font-weight: 100;
+        color: $grey;
+    }
+
+    .timecode-segments {
+        @include clearfix();
+        float: right;
+    }
+
+    .time-value {
+        float: left;
+    }
+
+    input[type="number"] {
+        box-sizing: border-box;
+        @include appearance(none);
+        @include font-smoothing(on);
+        background: none;
+        border: 0;
+        height: 29px;
+        border-bottom: 1px dashed $main-border-color;
+        color: $grey;
+        font-size: 22px;
+        font-weight: $weight-regular;
+        text-align: right;
+        width: 30px;
+
+        -moz-appearance: textfield; // Hides Spinner on FF
+
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+            -webkit-appearance: none; // Hides Spinner on Chrome and Safari
+            margin: 0;
+        }
+    }
+
+    input#timecode-frame {
+        width: 40px;
+    }
+}
+
+// Video Editor Actions
+
+.video-editor-actions-toolbar {
+    @include clearfix();
+
+    .video-nav-controls {
+        float: left;
+    }
+
+    .video-save-panel {
+        float: right;
+        text-align: right;
+    }
+
+    .save-button {
+        @include btn(brightblue);
+        margin-right: 10px;
+    }
+
+    .save-and-close-button {
+        @include btn(green);
+    }
+
+    .return-button {
+        @include btn(white);
+    }
+
+    .save-button,
+    .save-and-close-button,
+    .return-button {
+        font-size: 12px;
+        font-weight: $weight-semibold;
+        display: inline-block;
+        padding: 12px 15px;
+        min-width: 80px;
+        text-align: center;
+        height: 39px;
+    }
+}
+
+.video-meta-information {
+    margin: 10px 0;
+    color: $medium-prim-color;
+    font-size: 10px;
+    font-weight: $weight-semibold;
+
+    .save-info {
+
+    }
+
+    .author-edit-info {
+        margin-top: 2px;
+        color: $light-prim-color;
+    }
+}

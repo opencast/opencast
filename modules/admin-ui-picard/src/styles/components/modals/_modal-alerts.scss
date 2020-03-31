@@ -1,0 +1,77 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+// Warning Symbol Mixin
+@mixin warning-symbol($alert-type) {
+    p, a, h1, h2, h3, h4, h5, h6 {
+        &:first-child:before {
+            content: $fa-icon-warning-sign;
+            font-family: FontAwesome;
+            font-size: $modal-alert-fa-size;
+            color: '$state-${$alert-type}-text';
+            margin-right: 5px;
+        }
+    }
+}
+
+.modal-alert {
+    @include clearfix();
+    display: block;
+    padding: 15px 25px;
+    
+    p {
+        line-height: 18px;
+                
+        &:not(:last-child) {
+            margin-bottom: 10px;
+        }
+    }
+    
+    strong {
+        font-weight: 600;
+    }
+    
+    &.info {
+        @include alert-variant($state-info-bg, $state-info-border, $state-info-text);
+    }
+    
+    &.warning {
+        @include alert-variant($state-warning-bg, $state-warning-border, $state-warning-text);
+        @include warning-symbol(warning);
+    }
+    
+    &.success {
+        @include alert-variant($state-success-bg, $state-success-border, $state-success-text);
+    }
+    
+    &.danger {
+        @include alert-variant($state-danger-bg, $state-danger-border, $state-danger-text);
+        @include warning-symbol(danger);
+    }
+    
+    &.info,
+    &.warning,
+    &.success,
+    &.danger {
+        border-top: none;
+    }
+}

@@ -1,0 +1,23 @@
+.key {
+    display: inline-block;
+    background-color: $modal-heading-color;
+    box-shadow: inset 0 1px 0 $color-gray, 0 1px 0 $color-silver;
+    border: 1px solid $modal-heading-color;
+    border-radius: 5px;
+    padding: 2px 9px;
+    color: $color-white;
+    text-shadow: 1px 1px 0 $color-darkgray;
+    min-width: 32px;
+}
+
+.chord:not(:last-child) {
+    margin-right: 20px;
+}
+
+td.hotkey {
+    text-align: center;
+}
+
+p.combo:last-child {
+    margin-bottom: 0;
+}

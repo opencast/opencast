@@ -1,0 +1,136 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+.multi-select-container {
+    @include clearfix();
+
+    select[multiple] {
+        margin-top: 10px;
+        font-size: 12px;
+        padding: 5px;
+
+        option {
+            padding: 3px 0px;
+        }
+    }
+
+    select {
+        width: 100%;
+    }
+
+    p {
+        font-size: 12px;
+        color: $medium-prim-color;
+        line-height: 22px;
+    }
+
+    strong {
+        color: $medium-prim-color;
+    }
+
+    .button-container {
+        font-size: 12px;
+        display: block;
+
+        a {
+            padding: 8px 15px !important;
+        }
+
+        .submit {
+            @include btn(white);
+        }
+
+        .remove {
+            @include btn(red);
+        }
+    }
+
+    .multi-select-col {
+        width: 45%;
+        display: block;
+        float: left;
+        vertical-align: top;
+
+        input.search {
+            border-radius: $main-border-radius 0 0 $main-border-radius;
+            border-right-width: 0;
+            float: left;
+            width: 100% !important;
+        }
+
+        a.clear {
+            margin-top: 10px;
+            float: right;
+            @include btn(white);
+            @include fa-icon($fa-var-times, before, block, 0, 0.45em 0.45em 0.55em 0.45em, inherit, 14px);
+
+            border-radius: 0 $main-border-radius $main-border-radius 0;
+
+            &+input.search {
+                width: calc(100% - 46px) !important;
+            }
+        }
+    }
+}
+
+.multi-select-search {
+    @extend .multi-select-col;
+    float: none;
+}
+
+// Used to indicate the correlation between multiple select columns
+.exchange-icon:after {
+    width: 10%;
+    display: block;
+    float: left;
+    position: relative;
+    top: 60px;
+    content: "\f0ec";
+    font-family: FontAwesome;
+    font-size: 18px;
+    color: $medium-prim-color;
+    text-align: center;
+}
+
+// Extra Input Offset
+
+.multi-select-container {
+
+    $icon-top-margin: 90px;
+    $multiple-select-expanded-height: 152px;
+
+    &.offset-col-1,
+    &.offset-col-2 {
+
+        .exchange-icon:after {
+            top: $icon-top-margin;
+        }
+    }
+
+    &.offset-col-1 .multi-select-col:first-child select[multiple] {
+        height: $multiple-select-expanded-height;
+    }
+
+    &.offset-col-2 .multi-select-col:last-child select[multiple] {
+        height: $multiple-select-expanded-height;
+    }
+}

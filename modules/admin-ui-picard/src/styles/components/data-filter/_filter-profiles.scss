@@ -1,0 +1,209 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+@mixin filter-dd-mixin {
+    $width: 200px;
+    @include filter-dd-content-mixin($width);
+    &:after, &:before { left: 180px; }
+}
+
+@mixin filter-dd-content-mixin ($width) {
+    // Base styles
+    position: absolute;
+    top: 52px; left: 0;
+    z-index: $max-z;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: auto;
+    background: #fff;
+    border: $thin-border-stroke $main-border-color;
+    border-radius: $main-border-radius;
+    width: $width;
+
+    // Common Elements
+    header {
+        @include linear-gradient(#fff, #f7f7f7);
+        border-top-left-radius: $main-border-radius;
+        border-top-right-radius: $main-border-radius;
+        border-bottom: 1px solid $main-border-color;
+        height: 30px;
+        > h4 {
+            line-height: 30px;
+            padding-left: 10px;
+        }
+        > a {
+            float: right;
+            padding-right: 5px;
+            padding-top: 5px;
+            @include fa-icon($fa-var-close, before, inline-block, 0, 0, $medium-prim-color, 17px);
+        }
+    } // header
+    .footer-btn {
+        @include linear-gradient(#fafafa, #f0f2f5);
+        border-top: 1px solid darken(#f0f2f5, 10%);
+        border-bottom-left-radius: $main-border-radius;
+        border-bottom-right-radius: $main-border-radius;
+        display: block;
+        line-height: 30px;
+        text-align: center;
+    } // footer-btn
+}
+
+.df-profile-filters {
+    pointer-events: none; // allows scroll through object
+
+    display: inline-block;
+
+    border: $thin-border-stroke $main-border-color;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 12px;
+    color: black 40%;
+    text-shadow: 0px 1px 0px #fff;
+
+    .df-profile-button {
+        display: block;
+        position: absolute;
+        top: 11px;
+        right: 8px;
+        cursor: pointer;
+        pointer-events: auto;
+        @include fa-icon($fa-var-cogs, before, inline-block, 0, 0, $medium-prim-color, 10px);
+        font-family: "Open Sans", sans-serif;
+        color: #555;
+
+        @include transition-property(visibility, opacity);
+        @include transition-duration(300ms);
+        @include transition-timing-function(ease-in-out);
+        @include transition-delay(160ms);
+
+        &:before {
+            @include transition(color 250ms ease-in-out);
+        }
+
+        &:hover {
+            @include fa-icon-color(before, $alt-red);
+        }
+    }
+
+    &.disabled .df-profile-button {
+        @include fa-icon-color(before, $light-prim-color);
+
+        &:hover {
+            @include fa-icon-color(before, $light-prim-color);
+        }
+    }
+
+    .filters-list {
+        @include filter-dd-mixin();
+
+        // Content styles
+        ul {
+            line-height: 35px;
+            cursor: default;
+        } // ul
+
+        li {
+            border-top: 1px solid #e2e2e2;
+            border-bottom: 1px solid #e2e2e2;
+            padding: 0px 10px 0px 10px;
+
+            .remove {
+                @include fa-icon($fa-var-close, before, inline-block, 0, 0, $medium-prim-color, 17px);
+            }
+
+            .edit {
+                @include fa-icon($fa-var-cog, before, inline-block, 0, 0, $medium-prim-color, 17px);
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+
+            > a { word-wrap: break-word; &.active { color: $l-blue; }  }
+
+        } // li
+    }
+
+    .filter-details {
+        @include filter-dd-mixin();
+
+        .input-container {
+
+            padding: 10px;
+
+            > label {
+                display: block;
+                line-height: 20px;
+            }
+
+            > input, textarea {
+                padding-left: 10px;
+                width: 100%;
+                margin-bottom: 10px;
+                resize: none;
+                font-size: 12px;
+            }
+
+            > input {
+                height: 30px;
+            }
+
+        } // input-container
+
+        &.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+    } // filter-details
+
+    // Contains buttons and inputs
+    .input-container {
+
+        .btn-container {
+            width: 100%;
+            float: right;
+            padding: 5px 5px 30px 5px;
+            height: 28px;
+            @include border-bottom-radius($main-border-radius);
+            background: darken($body-background, 3%);
+            border-top: 1px solid $main-border-color;
+        }
+
+        .cancel {
+            @include btn(white);
+            margin-right: 5px;
+            float: left;
+        } // cancel
+
+        .save {
+            @include btn(green);
+            text-shadow: none;
+            float: right;
+        } // save
+    } // input-container
+
+    &.active { .filters-list {
+        opacity: 1;
+        visibility: visible;
+    } } // filters-list active
+}
+
+

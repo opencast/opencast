@@ -1,0 +1,47 @@
+.cb-box {
+  margin: 15px 0 0 0;
+
+  position: relative;
+  border: solid #c9d0d3;
+
+  border-width: 1px 1px 1px 1px;
+  background-color: #fafafa;
+  overflow: hidden;
+  border-radius: 4px 4px 4px 4px;
+}
+
+.cb-overflown {
+  border-radius: 4px 4px 0px 0px;
+  cursor: pointer;
+}
+
+.collapsible-box .cb-transparent-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  background-image: linear-gradient(to bottom, transparent, #fafafa);
+}
+
+.cb-text {
+  margin: 10px;
+  font-family: "Open Sans",Helvetica,sans-serif;
+  font-size: 12px;
+  white-space: pre-line;
+}
+
+.cb-arrow-box {
+  cursor: pointer;
+  border: solid #c9d0d3;
+  border-radius: 0px 0px 4px 4px;
+  border-width: 0 1px 1px 1px;
+  background-color: #e1e1e1;
+  background-image: linear-gradient(to bottom, #fafafa, #e1e1e1);
+  bottom: 0;
+}
+
+.cb-angle {
+  text-align: center;
+}

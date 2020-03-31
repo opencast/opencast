@@ -1,0 +1,183 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+// Input's
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="time"],
+input[type="date"],
+textarea {
+    height: $input-height;
+    width: 130px;
+    font-family: $font-stack;
+
+     // ## Refactor this. Hacked in a way to keep the login inputs bigger than standard.
+    &.login-input {
+        width: $login-input-width;
+        height: 50px;
+        padding-left: 50px;
+    }
+
+    background: #fff;
+    border: $thin-border-stroke $main-border-color;
+    border-radius: $main-border-radius;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    font-size: 13px;
+    font-weight: 600;
+    color: $medium-prim-color;
+
+    @include placeholder {
+        color: $light-prim-color;
+    }
+
+    &:hover {
+        border: $thin-border-stroke darken($main-border-color, 20%);
+    }
+
+    &:focus {
+        border: $thin-border-stroke $l-blue;
+    }
+
+    // Error border
+    &.error {
+        border: $thin-border-stroke $alt-red;
+        color: $red;
+    }
+
+    // Input icons
+    // ----------------------------------------
+
+    &#email {
+       @include retina-image("#{$img-path}user-input-icon", 23px 20px);
+       background-repeat: no-repeat;
+       background-position: 14px center;
+    }
+
+    &#password {
+        @include retina-image("#{$img-path}key-icon", 16px 20px);
+        background-repeat: no-repeat;
+        background-position: 19px center;
+    }
+
+    &.search,
+    &#search {
+        @include appearance(none);
+        @include retina-image("#{$img-path}search", 13px 13px);
+        background-repeat: no-repeat;
+        background-position: 14px center;
+        vertical-align: top;
+        padding: 0 20px 0 40px !important;
+        height: 40px;
+
+        &.expand {
+            @include transition(width 0.2s ease-in);
+
+            &:focus {
+                width: 200px;
+            }
+        }
+    }
+
+    &.small {
+        padding: 15px;
+        height: 30px;
+    }
+}
+
+textarea {
+    padding: 10px 20px;
+    height: auto;
+}
+
+select[multiple] {
+    background: #fff;
+    border: $thin-border-stroke $main-border-color;
+    border-radius: $main-border-radius;
+    padding: 10px;
+    color: $medium-prim-color;
+    font-size: 13px;
+
+    &:focus {
+        border: $thin-border-stroke $l-blue;
+        outline: none;
+    }
+}
+
+// Input made by Joshua Hibbert | http://codepen.io/joshnh/pen/hjbuH
+input[type="checkbox"].ios,
+input[type="radio"].ios {
+
+    $white: #fff;
+    $grey: #d3d3d3;
+    $transition-duration: 250ms;
+
+    background-color: darken($white, 2%);
+    border: 1px solid $grey;
+    border-radius: 26px;
+    box-shadow: inset 0 0 0 1px $grey;
+    outline: none;
+    cursor: pointer;
+    height: 28px;
+    position: relative;
+    @include transition(border $transition-duration 150ms, box-shadow $transition-duration 300ms, padding $transition-duration);
+    width: 44px;
+    vertical-align: top;
+
+    &:after {
+        background-color: $white;
+        border: 1px solid $grey;
+        border-radius: 24px;
+        box-shadow: inset 0 -3px 3px hsla(0, 0%, 0%, 0.025), 0 1px 4px hsla(0, 0%, 0%, 0.15), 0 4px 4px hsla(0, 0%, 0%, 0.1);
+        content: '';
+        display: block;
+        height: 24px;
+        left: 0;
+        position: absolute;
+        right: 16px;
+        top: 0;
+        @include transition(border 250ms 150ms, left 250ms 100ms, right 150ms 175ms);
+    }
+
+    &:checked {
+        border-color: $green;
+        box-shadow: inset 0 0 0 13px $green;
+        padding-left: 18px;
+        @include transition(border 250ms, box-shadow 250ms, padding 250ms 150ms);
+
+        &:after {
+            border-color: $green;
+            left: 16px;
+            right: 0;
+            @include transition(border 250ms, left 150ms 250ms, right 250ms 175ms);
+        }
+    }
+}
+
+// Select chosen
+.chosen-results {
+    width: 100%;
+}
+

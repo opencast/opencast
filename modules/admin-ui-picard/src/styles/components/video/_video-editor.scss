@@ -1,0 +1,910 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+
+// Timeline styles
+// ----------------------------------------
+
+// Layout
+$right-margin: 1.5%;
+$track-options-width: 10%;
+
+// Output
+$track-label-width: (100% - $right-margin) - $track-options-width;
+
+// Colour
+$segment-normal: #71b1f3;
+$segment-selected: saturate(darken($segment-normal, 25%), 5%);
+$segment-deleted: #f35952;
+$segment-deleted-selected: saturate(darken($segment-deleted, 25%), 5%);
+
+.video-timeline {
+    background: #fff;
+    border: $thin-border-stroke $main-border-color;
+    margin-top: 12px;
+    border-radius: 4px;
+
+    &>div {
+        margin-top: 5px;
+        background: #fff;
+        padding: 5px 10px;
+        border-radius: 4px;
+    }
+
+    .tracks-wrapper {
+        margin-top: 10px;
+        padding-top: 10px;
+    }
+
+    label {
+        color: $medium-prim-color;
+        font-size: 10px;
+        font-weight: $weight-semibold;
+        line-height: 12px;
+        display: inline-block;
+        text-transform: capitalize;
+    }
+
+    .track-container {
+        position: relative;
+
+        .timeline-track {
+            margin-top: -1px;
+            padding: 0;
+            overflow: hidden;
+
+            &>div:last-child {
+                border: $thin-border-stroke $primary-color-blue;
+                border-top-width: 0;
+                border-bottom-width: 0;
+                overflow: hidden;
+
+                &.left-normal {
+                    border-left-color: $segment-normal;
+                }
+
+                &.right-normal {
+                    border-right-color: $segment-normal;
+                }
+
+                &.left-selected {
+                    border-left-color: $segment-selected;
+                }
+
+                &.right-selected {
+                    border-right-color: $segment-selected;
+                }
+
+                &.left-deleted {
+                    border-left-color: $segment-deleted;
+                }
+
+                &.right-deleted {
+                    border-right-color: $segment-deleted;
+                }
+
+                &.left-deleted-selected {
+                    border-left-color: $segment-deleted-selected;
+                }
+
+                &.right-deleted-selected {
+                    border-right-color: $segment-deleted-selected;
+                }
+            }
+
+            .track-toolbar {
+                position: absolute;
+                @include clearfix();
+
+                label {
+                    padding-top: 6px;
+                    padding-left: 6px;
+                }
+
+                .track-label,
+                .track-options {
+                    float: left;
+                }
+
+                .track-label {
+                    width: $track-label-width;
+                    margin-right: $right-margin;
+                    font-size: 10px;
+                    line-height: 12px;
+                    font-weight: $weight-semibold;
+                    color: $medium-prim-color;
+                    z-index: $z-0;
+                }
+
+                .track-options {
+                    width: $track-options-width;
+                }
+
+                .track-options-button {
+                    @include btn(white);
+                    padding: 1px 4px;
+                    float: right;
+                    @include fa-icon($fa-var-cog, before, inline-block, 0, 0, $medium-prim-color, 10px, normal, 0);
+                    &:before {
+                        vertical-align: middle;
+                    }
+                }
+            }
+
+            .preview-toggle-control {
+                display: inline;
+                float: right;
+            }
+
+            .preview-toggle-control > * {
+                vertical-align: middle;
+            }
+
+            $segment-height: 24px;
+            $segment-background: $segment-height;
+            $segment-main-height: 60px;
+            $segment-main-background: ($segment-main-height - $thin-border * 2);
+
+            $segment-sliver-active-colors: lighten($segment-normal, 13%) lighten($segment-normal, 5%);
+            $segment-sliver-deleted-colors: lighten($segment-deleted, 13%) lighten($segment-deleted, 5%);
+            $num-colors: length($segment-sliver-active-colors);
+            $segment-sliver-vert-length: 8;
+
+            $sliver-active-stops: ();
+            $sliver-deleted-stops: ();
+
+            @for $j from 0 through floor($segment-sliver-vert-length/$num-colors) {
+              @for $i from 1 through $num-colors {
+                $active-color: nth($segment-sliver-active-colors, $i);
+                $deleted-color: nth($segment-sliver-deleted-colors, $i);
+                $new-active-stops: $active-color percentage(($i - 1) / $segment-sliver-vert-length + $j * $num-colors / $segment-sliver-vert-length),
+                                 $active-color percentage($i / $segment-sliver-vert-length + $j * $num-colors / $segment-sliver-vert-length);
+                $new-deleted-stops: $deleted-color percentage(($i - 1) / $segment-sliver-vert-length + $j * $num-colors / $segment-sliver-vert-length),
+                                 $deleted-color percentage($i / $segment-sliver-vert-length + $j * $num-colors / $segment-sliver-vert-length);
+                $sliver-active-stops: join($sliver-active-stops, $new-active-stops, comma);
+                $sliver-deleted-stops: join($sliver-deleted-stops, $new-deleted-stops, comma);
+              }
+            }
+
+            .segments {
+                // background image set inline
+                overflow: hidden;
+                background-repeat: no-repeat;
+                background-size: 100% $segment-background;
+                background-position: bottom left;
+                height: $segment-height;
+
+                // needed for zoom offset
+                position: relative;
+
+                // don't smooth the waveform
+                -ms-interpolation-mode: nearest-neighbor;
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: -moz-crisp-edges;
+                image-rendering: pixelated;
+
+                .segment-container {
+                    float: left;
+                    height: $segment-height;
+
+                    .segment-seperator {
+                          background-color: transparent;
+                          height: $segment-height;
+                          width: 9px;
+                          float: left;
+                          position: relative;
+                          left: -4px;
+                          z-index: $z-100;
+                          cursor: ew-resize;
+                          opacity: 0.5;
+
+                    }
+
+                    &:first-child .segment-seperator {
+                        display: none;
+                    }
+
+                    .segment-seperator.active:before {
+                        background: $color-black none repeat scroll 0 0;
+                        content: "";
+                        display: block;
+                        height: $segment-height;
+                        margin-left: 4px;
+                        width: 1px;
+                    }
+
+                    .segment {
+                        height: $segment-height;
+                        color: #666666;
+                        padding-right: 5px;
+                        text-align: right;
+                        background: rgba($segment-normal, 0.5);
+                        border: $thin-border-stroke $segment-normal;
+                        border-right-width: 0 !important;
+                        transition-property: background-color, background, border;
+                        transition-duration: 250ms;
+                        transition-timing-function: ease;
+
+                        a {
+                            display:none;
+                        }
+
+                        &.selected {
+                            background: rgba($segment-selected, 0.5);
+                            border: $thin-border-stroke darken($segment-selected, 10%);
+
+                            a {
+                                &:before {
+                                  color: darken($l-blue, 2%);
+                                }
+                            }
+
+                            &.deleted {
+                                background-color: rgba($segment-deleted-selected, 0.5);
+                                border: $thin-border-stroke $segment-deleted-selected;
+
+                                a {
+                                    &:before {
+                                    color: rgba(0,0,0,0.4)
+                                    }
+                                }
+                            }
+                        }
+
+                        &.deleted {
+                            background-color: rgba($segment-deleted, 0.5);
+                            border: $thin-border-stroke $segment-deleted;
+
+                            a {
+                                &:before {
+                                  color: rgba(0,0,0,0.4)
+                                }
+                            }
+                        }
+                    }
+
+                    &:first-child .segment {
+                        border-left: none;
+
+                        &.selected {
+                            border-left: none;
+
+                            &.deleted {
+                                border-left: none;
+                            }
+                        }
+
+                         &.deleted {
+                            border-left: none;
+                         }
+                    }
+
+                    &:not(.displayWaveform) {
+                        &+ .segment-container .segment-seperator {
+                            background-image: none !important;
+                        }
+                    }
+
+                    &.displayWaveform {
+
+                        position: relative;
+
+                        & .segment.sliver:before {
+                            content: '';
+                            height: 100%;
+                            width: 9px;
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            background: #b7d8f9;
+                            background: linear-gradient(0deg, $sliver-active-stops);
+                            border: 1px solid #71b1f3;
+                        }
+
+                        & .segment.sliver.deleted:before {
+                            background: #ec8b86;
+                            background: linear-gradient(0deg, $sliver-deleted-stops);
+
+                            border-color: #f35952;
+                        }
+
+                        &+ .segment-container {
+                            border-left: none !important;
+
+                        }
+
+                    }
+
+                }
+            }
+
+            &:first-child {
+                margin: 0;
+
+                .track-toolbar {
+                    position: inherit;
+                    margin: 0 0 5px 0;
+
+                    label {
+                        padding: 0px;
+                    }
+                }
+
+                .segments {
+                    background-size: 100% $segment-main-background;
+                    height: $segment-main-height;
+                    background-position: center left;
+
+                    .segment-container {
+                        height: $segment-main-height;
+
+                        .segment-seperator {
+                            height: $segment-main-height;
+                        }
+
+                        .segment-seperator.active:before {
+                            height: $segment-main-height;
+                        }
+
+                        .segment {
+                            height: $segment-main-height;
+
+                            a {
+                                display: inline-block;
+                                float: right;
+                                color: $l-blue;
+                                background-color: inherit;
+                                padding: 0.3em;
+
+                                &:before {
+                                    width: 1em;
+                                    text-align: center;
+                                }
+
+                                &:hover, &:active {
+                                    &:before {
+                                        color: $black !important; // force this for mouseover
+                                    }
+                                }
+
+                                &.unused {
+                                  @include fa-icon($fa-var-eye-slash , before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
+                                }
+
+                                &.used {
+                                  @include fa-icon($fa-var-eye, before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
+                                }
+
+                                &.remove {
+                                    @include fa-icon($fa-var-times, before, inline-block, 0 0 0 0, 0, $l-blue, 1em);
+                                }
+                            }
+
+                            a:last-child {
+                                margin: 0px;
+                            }
+
+                            &.small {
+                                a {
+                                    display: none;
+                                }
+                                a:last-child {
+                                    display: inline-block;
+                                }
+                            }
+
+                            &.tiny {
+                                a {
+                                    display: none;
+                                }
+                            }
+
+                            &.selected {
+                                a {
+                                    &:before {
+                                      color: darken($l-blue, 10%);
+                                    }
+                                }
+                            }
+
+                            &.deleted {
+                                a {
+                                    &:before {
+                                      color: rgba(0,0,0,0.4)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        #cursor-track {
+             padding: 5px 0px;
+             margin-top: 5px;
+             margin-bottom: 8px;
+             background: #eee none repeat scroll 0 0;
+             cursor: pointer;
+             border-radius: 4px;
+        }
+
+        #hover-cursor {
+            width: 1px;
+            background-color: #777;
+            height: 60px;
+            position: absolute;
+            z-index: $z-80;
+        }
+
+        #cursor, #cursor_fake {
+            width: 1px;
+            height: calc(100% - 23px);
+            background-color: #fb6257;
+            position: absolute;
+            top: 20px;
+            z-index: $z-80;
+
+            $handle-size: 14px;
+            .handle {
+                bottom: ($handle-size/-2) + 1;
+                left: ($handle-size/-2);
+                width: $handle-size;
+                height: $handle-size;
+                border-radius: $handle-size;
+                background-color: #c13832;
+                position: absolute;
+                cursor: grab;
+            }
+
+            .arrow_box {
+              background: $off-white none repeat scroll 0 0;
+              border: $thin-border-stroke $light-border-color;
+              border-radius: $main-border-radius;
+              bottom: -40px;
+              left: -13px;
+              position: absolute;
+
+              display: none;
+              @include transition(all 800ms);
+            }
+
+            .arrow_box:after, .arrow_box:before {
+            	bottom: 100%;
+            	left: 50%;
+            	border: solid transparent;
+            	content: " ";
+            	height: 0;
+            	width: 0;
+            	position: absolute;
+            	pointer-events: none;
+            }
+
+            .arrow_box:after {
+            	border-color: rgba(238, 238, 238, 0);
+            	border-bottom-color: #eee;
+            	border-width: 4px;
+            	margin-left: -4px;
+            }
+            .arrow_box:before {
+            	border-color: rgba(204, 204, 204, 0);
+            	border-bottom-color: #ccc;
+            	border-width: 5px;
+            	margin-left: -5px;
+            }
+
+            a.split {
+                width: 20px;
+                height: 20px;
+                display: block;
+                margin: 2px;
+                color: rgba(193,56,50,0.7);
+
+                &:hover,
+                &:active {
+                  color: rgba(193,56,50,1);
+                }
+
+                @include fa-icon($fa-var-scissors, before, block, 0, 2px 4px, inherit, 12px);
+            }
+
+            &.active {
+                .handle {
+                    cursor: grabbing;
+                }
+            }
+        }
+
+        #cursor_fake {
+            opacity: 0.6;
+            display: none;
+            z-index: ($z-80 + 1);
+        }
+    }
+
+    .timeline-control {
+
+        .zoom-title {
+            margin-top: 10px;
+
+            &>label {
+
+                font-size: 11px;
+                line-height: 13px;
+                padding-top: 1px;
+                margin-bottom: 5px;
+                width: 30%;
+            }
+            .zoom-control {
+                float: right;
+                margin-top: -4px;
+                margin-bottom: 4px;
+
+                &>label {
+                    float: left;
+                    line-height: 22px;
+                }
+
+                &>label:after {
+                    content: ":";
+                }
+
+                input[type=range] {
+                    width: 400px;
+                    height: 22px;
+                    margin: 0 5px;
+                }
+
+                .chosen-container {
+                    top: -10px;
+                    height: 22px;
+                }
+            }
+        }
+
+        .field-of-vision {
+            border: 1px solid $main-border-color;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            z-index: 100;
+
+            #timeline-cursor {
+                width: 1px;
+                background-color: #777;
+                height: 30px;
+                position: absolute;
+                z-index: $z-80;
+            }
+
+            &::before {
+              content: "";
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              opacity: .18;
+              z-index: -1;
+              background-size: 100% 24px;
+              background-position: center left;
+              background-repeat: no-repeat;
+            }
+
+            .field {
+                background: rgba(106, 183, 236, 0.5) none repeat scroll 0% 0%;
+                height: 24px;
+                position: relative;
+                cursor: grab;
+
+                &.active {
+                    cursor: grabbing;
+                }
+            }
+
+            .boundary {
+                color: #2F88D2;
+                position: absolute;
+                top: 0px;
+                line-height: 24px;
+                padding: 0px 5px;
+
+                &.from {
+                    left: 0px;
+                }
+
+                &.to {
+                    right: 0px;
+                }
+            }
+
+            .small {
+                .boundary {
+
+                     &.from {
+                        right: 100%;
+                        left: auto;
+                    }
+
+                    &.to {
+                        left: 100%;
+                        right: auto;
+                    }
+                }
+            }
+        }
+
+        .footer {
+             &>span {
+                font-size: 11px;
+                color: #aaa;
+                padding: 2px 0px;
+                float: left;
+            }
+            &>span:last-child {
+                float: right;
+            }
+        }
+
+        .boundaries {
+            background: rgba(106, 183, 236, 0.5);
+            position: absolute;
+            top: 0px;
+            line-height: 20px;
+
+        }
+    }
+}
+
+// Segment list styles
+// ----------------------------------------
+
+.editor-segments {
+    padding: 4px 12px 4px 12px;
+    width: 25%;
+    min-width: 400px;
+
+    $segment-list-element-height: 35px;
+
+    .segment-list {
+
+      .segment-list-entry {
+          margin: 8px auto;
+          margin-left: 0;
+          width: 98%;
+          height: $segment-list-element-height;
+          color: $dark-prim-color;
+          padding-right: 5px;
+          padding-left: 5px;
+          text-align: right;
+          //background: $off-white;
+          background: rgba($segment-normal, 0.5);
+          border: $thin-border-stroke $segment-normal;
+          transition-property: background-color, background, border;
+          transition-duration: 250ms;
+          transition-timing-function: ease;
+
+          a {
+              display: inline-block;
+              color: lighten($black, 10%);
+              padding: 9px;
+
+              &:before {
+                  width: 1em;
+                  text-align: center;
+              }
+
+              &:hover, &:active {
+                  &:before {
+                      color: $black !important; // force this for mouseover
+                  }
+              }
+
+              &.unused {
+                @include fa-icon($fa-var-eye-slash , before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
+              }
+
+              &.used {
+                @include fa-icon($fa-var-eye, before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
+              }
+
+              &.remove {
+                  @include fa-icon($fa-var-times, before, inline-block, 0 0 0 0, 0, lighten($black, 10%), 1em);
+              }
+          }
+
+
+          &.selected {
+              background: rgba($segment-selected, 0.5);
+              border: $thin-border-stroke darken($segment-selected, 10%);
+
+              &.deleted {
+                  background-color: rgba($segment-deleted-selected, 0.5);
+                  border: $thin-border-stroke $segment-deleted-selected;
+              }
+          }
+
+          &.deleted {
+              background-color: rgba($segment-deleted, 0.5);
+              border: $thin-border-stroke $segment-deleted;
+          }
+
+          .segment-start-end {
+            float: left;
+            padding: 6px;
+          }
+
+          .segment-start {
+          }
+
+          .segment-end {
+          }
+
+          .segment-remove {
+            float: left;
+          }
+
+
+          input[type="text"] {
+            height: auto;
+            width: 90px;
+            padding: 0 5px;
+
+            &:disabled {
+              color: $light-prim-color;
+              background-color: darken(#FFFFFF, 5%);
+            }
+          }
+      }
+
+    }
+}
+
+.segments-area {
+    border-radius: 4px;
+    border: $thin-border-stroke $main-border-color;
+}
+
+// Thumbnail styles
+// ----------------------------------------
+.editor-thumbnail {
+
+  .content-wrapper  {
+    display: flex;
+  }
+
+  form {
+    display: inline;
+    margin-left: 6px;
+  }
+
+  .controls {
+    position: relative;
+    padding-right: 20px;
+    margin: 20px 0 20px 0;
+    color: $medium-prim-color;
+    font-size: 12px;
+
+    .description {
+      line-height: 20px;
+      margin-bottom: 20px;
+    }
+  }
+
+  .thumbnail-canvas {
+    margin: 20px;
+    width: 320px;
+    height: 180px;
+    min-width: 320px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-origin: border-box;
+    border: $thin-border-stroke $main-border-color;
+    text-align: center;
+  }
+
+  .thumbnail-canvas>div {
+    background-color: rgba( $black, .4 );
+    width: 320px;
+    height: 180px;
+    display: table-cell;
+    vertical-align: middle;
+    color: $off-white;
+  }
+
+  .spinner, .error {
+    font-size: 3em;
+  }
+
+  .hidden {
+    display: none;
+  }
+}
+
+.editor-tracks {
+
+  .audio-canvas, .video-canvas {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-origin: border-box;
+    text-align: center;
+    border: $thin-border-stroke $main-border-color;
+
+    cursor: pointer;
+
+  }
+
+  .audio-canvas {
+    background-color: rgba(28, 131, 236, 0.5);
+    border: 1px solid #1169c5;
+    width: 690px;
+    height: 60px;
+  }
+
+  .video-canvas {
+    position: relative;
+    width: 160px;
+    height: 90px;
+  }
+
+  .track-name {
+    text-transform: capitalize;
+  }
+
+  .track, .track-hidden {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .track-hidden {
+    background-color: rgba( $red, .4 );
+  }
+
+  .audio-track-hidden-icon, .video-track-hidden-icon {
+    position: absolute;
+    height: 100%;
+    text-align: center ;
+  }
+
+  .video-track-hidden-icon {
+    line-height: 120px;
+    @include fa-icon($fa-var-eye-slash, before, inline-block, 0 0 0 0, 0, lighten($black, 90%), 60px);
+  }
+
+  .audio-track-hidden-icon {
+    line-height: 80px;
+    @include fa-icon($fa-var-microphone-slash, before, inline-block, 0 0 0 0, 0, lighten($black, 90%), 60px);
+  }
+
+  .track-hidden:hover {
+    background-color: rgba( $red, .6 );
+  }
+
+  .track:hover {
+    background-color: rgba( $black, .2 );
+  }
+}
