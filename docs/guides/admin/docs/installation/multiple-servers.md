@@ -41,10 +41,8 @@ distributions.
 
 ### Two-Server Set-up
 
-This set-up is the minimum set-up recommended for productive use. It will separate the presentation layer from the
-administrative and working layer. This means that even if one server is under heavy load while videos are processed, it
-will not effect the distribution and users should still be able to watch videos smoothly. However, it might happen that
-under heavy load the handling of the administrative user interface gets a bit rough.
+This set-up is the minimum set-up recommended for productive use. It will separate the video processing from the rest of
+the system, making the user-facing parts of your system much less affected by heavier loads.
 
 
 ### Three (or more) Server Set-up
