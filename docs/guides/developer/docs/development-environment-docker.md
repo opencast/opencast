@@ -91,15 +91,15 @@ Since the Opencast code is shared, any change from an IDE is directly visible wi
 ## Multi-node Opencast Development
 
 Development with multi-node Opencast environments are also supported using a different compose file.  Instead of
-downloading the single-node docker file, download the multi-node version:
+downloading the single-node Docker compose file, download the multi-node version:
 
 ```sh
 $ curl -o docker-compose.yml https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.multiserver.build.yml
 ```
 
 This file defines a three node (admin, presentation, worker) cluster for use in testing, with all of the appropriate
-ports exported.  To access the a node run ```docker-compose exec --user opencast-builder $nodetype bash```.  For
-example, to access the presentation node run ```docker-compose exec --user opencast-builder presentation bash```.
+ports exported.  To access the a node run ```docker-compose exec --user opencast-builder opencast-$nodetype bash```.  For
+example, to access the presentation node run ```docker-compose exec --user opencast-builder opencast-presentation bash```.
 
 Available commands are otherwise identical.
 
