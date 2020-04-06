@@ -359,36 +359,33 @@ angular.module('adminNg.directives')
         };
 
         scope.changeZoomInternal = function() {
-          var addition = scope.zoomValue / 2;
-          //if (scope.position >= scope.from && scope.position <= scope.to) {
-          if (scope.from === 0) {
-            var relativePosition = 0;
-          } else if (scope.to == scope.video.duration) {
-            var relativePosition = scope.video.duration;
+          var window = scope.to - scope.from;
+          if (scope.position > scope.from && scope.position < scope.to) {
+            // we are in between from and to window
+            // scale from-to window centered on position
+            var from = scope.position - ((scope.zoomValue / window) * (scope.position - scope.from));
+            var to = scope.position + ((scope.zoomValue / window) * (scope.to - scope.position));
           } else {
-            var relativePosition = (scope.from + scope.to) / 2;
+            // we are not in between from and to window
+            // scale from-to window centered
+            var window_diff = scope.zoomValue - window;
+            var from = scope.from - (window_diff / 2);
+            var to = scope.to + (window_diff / 2);
           }
-          // Were we to move the zoom boundaries to the right/left, by
-          // how far do we run out of the video?
-          var overheadRight = relativePosition + addition - scope.video.duration;
-          var overheadLeft = addition - relativePosition;
-          // Check for overheads and distribute the overhead space to
-          // the other side of the zoom boundary, if possible.
-          if (overheadRight > 0) {
-            // Overhead on the right, so move the boundary more to the left
-            scope.to = scope.video.duration;
-            scope.from = Math.max(0, relativePosition - addition - overheadRight);
-          } else if (overheadLeft > 0) {
-            // Overhead on the left, so move the right boundary a bit
-            // farther away.
-            scope.from = 0;
-            scope.to = Math.min(scope.video.duration, relativePosition + addition + overheadLeft);
-          } else {
-            // No overhead, simply center the zoom boundaries around
-            // the current playing position.
-            scope.from = relativePosition - addition;
-            scope.to = relativePosition + addition;
+          if (from < 0) {
+            // we are running out of boundary on the left side
+            // shift the extra amount to the right side
+            to = to - from;
+            from = 0;
           }
+          if (to > scope.video.duration) {
+            // we are running out of boundary on the right side
+            // shift the extra amount to the left side but respect the left boundary
+            from = Math.max(0, from + scope.video.duration - to);
+            to = scope.video.duration;
+          }
+          scope.from = from;
+          scope.to = to;
           scope.updatePlayHead();
           scope.updateShuttle();
           scope.setWrapperClasses();
