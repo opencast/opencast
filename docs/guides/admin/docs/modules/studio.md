@@ -14,6 +14,23 @@ The path `/studio` is accessible by users with the role `ROLE_ADMIN` or `ROLE_ST
 
 The preferred way to let your users access Studio is via LTI. Remember to configure your LTI users to have the role `ROLE_STUDIO` so that they can access Studio and all APIs used by Studio.
 
+This can be done, for example, by configuring the `LtiLaunchAuthenticationHandler` in `etc/org.opencastproject.security.lti.LtiLaunchAuthenticationHandler.cfg`. At the bottom of this file you see the two options `lti.custom_role_name` and `lti.custom_roles`. The former should be set to an LTI role that is supposed to have access to Studio, and the latter is a comma-separated list of Opencast roles that users with this LTI role should get. This list has to at least include `ROLE_STUDIO`.
+
+A minimal configuration giving LTI-`Instructor`-s access to Opencast Studio could look like this:
+
+```
+lti.custom_role_name=Instructor
+lti.custom_roles=ROLE_STUDIO
+```
+
+You will also have to enable persisting LTI users in the same file to avoid access management related failures during ingests initiated by them:
+
+```
+lti.create_jpa_user_reference=true
+```
+
+Note that with this configuration, every LTI user is persisted in the database with their ID and all the roles assigned to them! They are stored in the user references table (`oc_user_ref`) as opposed to the "normal" users table (`oc_user`), though.
+
 
 ## Configuring Studio
 
