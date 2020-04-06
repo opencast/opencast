@@ -22,7 +22,7 @@ allowedTags:
 # The browser's format setting will be engaged only after this filter has been applied.
 # Default: don't filter video/streaming formats
 # Allowed values: hls, dash, rtmp, mp4, webm, audio
-#allowedformats:
+#allowedFormats:
 #  - hls
 #  - dash
 #  - mp4
