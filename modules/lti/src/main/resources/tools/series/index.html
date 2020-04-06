@@ -32,14 +32,18 @@
         {{created}}
       </div>
     </a>
-    <div class=download>
-    {{#download}}
-      <a href={{path-to-file}} download="">
-        <button type="button" class=downloadButton>{{download-button-name}}</button>
-      </a>
-      <br>
-    {{/download}}
+    <div class=dropdown>
+      <button class=dropbtn>Direct Download</button>
+      <div class=dropdown-content>
+      {{#download}}
+        <a href={{path-to-file}} download="">
+        {{download-button-name}}
+        </a>
+        <br>
+      {{/download}}
+      </div>
     </div>
+
   </div>
 </script>
 

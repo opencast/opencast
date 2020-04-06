@@ -68,6 +68,12 @@ function getSeries() {
   return '';
 }
 
+function capitalize(s) {
+  if (typeof s !== 'string')
+    return '';
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 function loadPage(page) {
 
   var limit = 15,
@@ -123,12 +129,10 @@ function loadPage(page) {
       for (var k = 0; k < tracks.length; k++)
       {
         if( tracks[k].url.endsWith('mp4') || tracks[0].url.endsWith('webm')) {
-          var dlBtnTplData = {};
-          dlBtnTplData['download-button-name'] = tracks[k].type.split('/')[0] + ' ' + tracks[k].video.resolution;
-          dlBtnTplData['path-to-file'] = tracks[k].url;
-
           buttonData.push ({
-            'download-button-name' : tracks[k].type.split('/')[0] + ' ' + tracks[k].video.resolution,
+            'download-button-name' : capitalize( tracks[k].type.split('/')[0] )
+            + ' ' +
+            tracks[k].video.resolution,
             'path-to-file' : tracks[k].url });
         }
       }
