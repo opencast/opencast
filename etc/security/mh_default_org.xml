@@ -261,7 +261,13 @@
     <sec:intercept-url pattern="/static/**" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/export/**" method="GET" access="ROLE_ANONYMOUS" />
 
-    <!-- Enable admin access to Opencast Studio -->
+    <!-- Enable access to Opencast Studio -->
+    <!-- Admins can access it, as can users with 'ROLE_STUDIO'. A few static -->
+    <!-- files are also accessible to everyone: 'manifest.json' and source maps -->
+    <!-- are requested without cookies by most browsers. To prevent random -->
+    <!-- errors, we make those files public. They do not contain any secrets. -->
+    <sec:intercept-url pattern="/studio/manifest.json" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/studio/static/js/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/studio/**" access="ROLE_ADMIN, ROLE_STUDIO" />
 
     <!-- Enable anonymous access to the annotation and the series endpoints -->
