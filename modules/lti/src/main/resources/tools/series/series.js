@@ -115,6 +115,25 @@ function loadPage(page) {
         }
       }
 
+      // Download buttons
+      // Create a button for each track that contains a link to a mp4 or webm
+      var buttonData = [];
+      var tracks = episode.mediapackage.media.track;
+      tracks = Array.isArray(tracks) ? tracks : [tracks];
+      for (var k = 0; k < tracks.length; k++)
+      {
+        if( tracks[k].url.endsWith('mp4') || tracks[0].url.endsWith('webm')) {
+          var dlBtnTplData = {};
+          dlBtnTplData['download-button-name'] = tracks[k].type.split('/')[0] + ' ' + tracks[k].video.resolution;
+          dlBtnTplData['path-to-file'] = tracks[k].url;
+
+          buttonData.push ({
+            'download-button-name' : tracks[k].type.split('/')[0] + ' ' + tracks[k].video.resolution,
+            'path-to-file' : tracks[k].url });
+        }
+      }
+      tpldata['download'] = buttonData;
+
       // render template
       rendered += Mustache.render(template, tpldata);
     }

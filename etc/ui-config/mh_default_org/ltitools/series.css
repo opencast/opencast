@@ -45,6 +45,29 @@ a.episode div.preview {
   width: 200px;
 }
 
+div.episode-container {
+  display: flex;
+  background-color: #eee;
+  padding: 5px;
+  margin: 15px;
+}
+
+div.download {
+  display: flex;
+  background-color: red;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: 5px;
+}
+
+div.download button.downloadButton {
+  width: 100%;
+  margin-top: 1px;
+  margin-bottom: 5px;
+}
+
+
 a.episode div.desc h2 {
   margin: 0;
   margin-bottom: 5px;
