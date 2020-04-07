@@ -129,10 +129,19 @@ function loadPage(page) {
       for (var k = 0; k < tracks.length; k++)
       {
         if( tracks[k].url.endsWith('mp4') || tracks[0].url.endsWith('webm')) {
+
+          // Calculate filesize
+          var fileSize = (tracks[k].video.bitrate / 8 / 1000 / 1000)      // Converts to byte, kilobyte, megabyte /s
+            * (tracks[k].video.framecount / tracks[k].video.framerate);
+
+          // Collect output to mustache
           buttonData.push ({
             'download-button-name' : capitalize( tracks[k].type.split('/')[0] )
-            + ' ' +
-            tracks[k].video.resolution,
+            + '<br /> ('
+            + tracks[k].video.resolution
+            + ', '
+            + fileSize.toFixed(2) + 'MB'
+            + ')',
             'path-to-file' : tracks[k].url });
         }
       }
