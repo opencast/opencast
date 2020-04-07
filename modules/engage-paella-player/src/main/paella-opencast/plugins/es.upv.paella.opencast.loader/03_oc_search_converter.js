@@ -58,6 +58,15 @@ class OpencastToPaellaConverter {
     return  this._config.audioTag || { '*/*': '*' };
   }
 
+  getVideoCanvasConfig() {
+    return this._config.videoCanvas || {
+      '*/delivery+360': 'video360',
+      '*/preview+360': 'video360',
+      '*/delivery+360Theta': 'video360Theta',
+      '*/preview+360Theta': 'video360Theta'
+    };
+  }
+
   getSourceTypeFromTrack(track) {
     var sourceType = null;
 
@@ -142,6 +151,39 @@ class OpencastToPaellaConverter {
     return source;
   }
 
+  getVideoCanvasFromTrack(currentTrack) {
+    let videoCanvasConfig = this.getVideoCanvasConfig();
+    let videoCanvas;
+
+    let tags = [];
+    if ( (currentTrack.tags) && (currentTrack.tags.tag) ) {
+      tags = currentTrack.tags.tag;
+      if (!(tags instanceof Array)) {
+        tags = [tags];
+      }
+    }
+    tags.some(function(tag){
+      if (tag.startsWith('videoCanvas:')){
+        videoCanvas = tag.slice(12);
+        return true;
+      }
+    });
+
+    if (!videoCanvas) {
+      Object.entries(videoCanvasConfig).some(function(atc){
+        let sflavor = currentTrack.type.split('/');
+        let smask = atc[0].split('/');
+
+        if (((smask[0] == '*') || (smask[0] == sflavor[0])) && ((smask[1] == '*') || (smask[1] == sflavor[1]))) {
+          videoCanvas = atc[1];
+          return true;
+        }
+      });
+    }
+
+    return videoCanvas;
+  }
+
   getAudioTagFromTrack(currentTrack) {
     let audioTagConfig = this.getAudioTagConfig();
     let audioTag;
@@ -207,6 +249,11 @@ class OpencastToPaellaConverter {
           }
           else if (currentTrack.audio) {
             currentStream.type = 'audio';
+          }
+
+          var videoCanvas = this.getVideoCanvasFromTrack(currentTrack);
+          if (videoCanvas) {
+            currentStream.canvas = [videoCanvas];
           }
         }
       }
