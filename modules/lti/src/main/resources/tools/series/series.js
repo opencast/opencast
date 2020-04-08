@@ -69,8 +69,9 @@ function getSeries() {
 }
 
 function capitalize(s) {
-  if (typeof s !== 'string')
+  if (typeof s !== 'string') {
     return '';
+  }
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
@@ -126,23 +127,14 @@ function loadPage(page) {
       var buttonData = [];
       var tracks = episode.mediapackage.media.track;
       tracks = Array.isArray(tracks) ? tracks : [tracks];
-      for (var k = 0; k < tracks.length; k++)
-      {
-        if( tracks[k].url.endsWith('mp4') || tracks[0].url.endsWith('webm')) {
-
-          // Calculate filesize
-          var fileSize = (tracks[k].video.bitrate / 8 / 1000 / 1000)      // Converts to byte, kilobyte, megabyte /s
-            * (tracks[k].video.framecount / tracks[k].video.framerate);
+      for (const track of tracks) {
+        if( track.url.endsWith('mp4') || track.url.endsWith('webm')) {
 
           // Collect output to mustache
           buttonData.push ({
-            'download-button-name' : capitalize( tracks[k].type.split('/')[0] )
-            + '<br /> ('
-            + tracks[k].video.resolution
-            + ', '
-            + fileSize.toFixed(2) + 'MB'
-            + ')',
-            'path-to-file' : tracks[k].url });
+            'download-button-name' : capitalize( track.type.split('/')[0] ),
+            'download-button-description': track.video.resolution,
+            'path-to-file' : track.url });
         }
       }
       tpldata['download'] = buttonData;
