@@ -28,18 +28,17 @@
       <div class=preview><img alt=Preview src={{image}}></div>
       <div class=desc>
         <h2>{{title}}</h2>
-        {{i18ncreator}}<br>
+        {{i18ncreator}}<br />
         {{created}}
       </div>
     </a>
     <div class=dropdown>
-      <button class=dropbtn>Direct Download</button>
+      <button class=drop-button>Direct Download</button>
       <div class=dropdown-content>
       {{#download}}
         <a href={{path-to-file}} download="">
-        {{{download-button-name}}}
+          {{{download-button-name}}}
         </a>
-        <br>
       {{/download}}
       </div>
     </div>
