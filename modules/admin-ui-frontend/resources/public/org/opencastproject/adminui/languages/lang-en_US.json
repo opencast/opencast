@@ -40,7 +40,7 @@
      "UPLOAD_SUCCESS": "Upload succeded!",
      "UPLOAD_FAILURE": "Upload failed!",
      "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
-     "EDIT_SUCCESS": "Edit succeeded, republishing begins!",
+     "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
      "EDIT_FAILURE": "Edit failed!",
      "COPY_SUCCESS": "Copying started…",
      "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",

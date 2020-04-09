@@ -232,7 +232,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       return;
     }
     if (workflow == null || workflowConfiguration == null) {
-      throw new RuntimeException("no workflow configured, cannot upload");
+      throw new RuntimeException("No workflow configured, cannot upload");
     }
     try {
       MediaPackage mp = ingestService.createMediaPackage();
@@ -301,10 +301,10 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       final List<WorkflowInstance> workflowInstances = workflows
               .applyWorkflowToLatestVersion(Collections.singleton(eventId), workflow).toList();
       if (workflowInstances.isEmpty()) {
-        throw new RuntimeException(String.format("couldn't start workflow '%s' for event %s", workflowId, eventId));
+        throw new RuntimeException(String.format("Couldn't start workflow '%s' for event %s", workflowId, eventId));
       }
     } catch (WorkflowDatabaseException | NotFoundException e) {
-      logger.error("unable to get workflow definition {}", workflowId, e);
+      logger.error("Unable to get workflow definition {}", workflowId, e);
       throw new RuntimeException(e);
     }
   }
@@ -344,7 +344,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
         throw new RuntimeException(String.format("couldn't start workflow '%s' for event %s", workflowId, eventId));
       }
     } catch (WorkflowDatabaseException | NotFoundException e) {
-      logger.error("unable to get workflow definition {}", workflowId, e);
+      logger.error("Unable to get workflow definition {}", workflowId, e);
       throw new RuntimeException(e);
     }
   }
@@ -371,9 +371,9 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       mediaPackage = this.indexService.getEventMediapackage(event);
     } catch (IndexServiceException e) {
       if (e.getCause() instanceof NotFoundException) {
-        throw new NotFoundException("cannot retrieve metadata for event with id '" + eventId + "'");
+        throw new NotFoundException("Cannot retrieve metadata for event with id '" + eventId + "'");
       } else if (e.getCause() instanceof UnauthorizedException) {
-        throw new UnauthorizedException("not authorized to access event with id '" + eventId + "'");
+        throw new UnauthorizedException("Not authorized to access event with id '" + eventId + "'");
       }
       throw new RuntimeException(e);
     }
@@ -458,10 +458,10 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       final IndexService.EventRemovalResult eventRemovalResult = indexService.removeEvent(event.get(), () -> {
       }, retractWorkflowId);
       if (eventRemovalResult == IndexService.EventRemovalResult.GENERAL_FAILURE) {
-        throw new RuntimeException("error deleting event: " + eventRemovalResult);
+        throw new RuntimeException("Error deleting event: " + eventRemovalResult);
       }
     } catch (WorkflowDatabaseException | SearchIndexException | UnauthorizedException | NotFoundException e) {
-      throw new RuntimeException("error deleting event", e);
+      throw new RuntimeException("Error deleting event", e);
     }
   }
 

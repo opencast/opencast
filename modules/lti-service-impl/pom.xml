@@ -51,12 +51,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-series-service-api</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
     </dependency>
@@ -90,7 +84,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-asset-manager-util</artifactId>
+      <artifactId>opencast-shared-filesystem-utils</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -106,15 +100,27 @@
       <artifactId>opencast-search</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-workspace-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
-<!-- Gives weird error in opencast-search
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-search</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
       </plugin>
--->
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

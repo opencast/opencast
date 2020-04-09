@@ -106,12 +106,8 @@ public class LtiServiceRemoteImpl extends RemoteBase implements LtiService {
 
   @Override
   public void copyEventToSeries(final String eventId, final String seriesId) {
-    final HttpPost get = new HttpPost("/" + eventId + "/copy?seriesId=" + seriesId);
-    final HttpResponse response = getResponse(get);
-    if (response == null) {
-      throw new RuntimeException("No response from service");
-    }
-    closeConnection(response);
+    final HttpPost post = new HttpPost("/" + eventId + "/copy?seriesId=" + seriesId);
+    closeConnection(safeGetResponse(post));
   }
 
   @Override
