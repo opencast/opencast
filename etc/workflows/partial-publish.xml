@@ -76,7 +76,7 @@
         <configuration key="target-flavor">*/search+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">search-cover.http</configuration>
-        <configuration key="time">1</configuration>
+        <configuration key="time">3</configuration>
       </configurations>
     </operation>
 
@@ -85,13 +85,13 @@
     <operation
       id="image"
       exception-handler-workflow="partial-error"
-      description="Creating player preview image">
+      description="Creating player preview image for presentation video">
       <configurations>
         <configuration key="source-flavor">presentation/trimmed</configuration>
         <configuration key="target-flavor">presentation/player+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
-        <configuration key="time">1</configuration>
+        <configuration key="time">3</configuration>
       </configurations>
     </operation>
 
@@ -106,7 +106,7 @@
         <configuration key="target-flavor">*/feed+preview</configuration>
         <configuration key="target-tags">atom,rss</configuration>
         <configuration key="encoding-profile">feed-cover.http</configuration>
-        <configuration key="time">1</configuration>
+        <configuration key="time">3</configuration>
       </configurations>
     </operation>
 
@@ -116,12 +116,12 @@
     <operation
       id="image"
       exception-handler-workflow="partial-error"
-      description="Creating player preview image">
+      description="Creating player preview image for presenter video">
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
         <configuration key="target-flavor">presenter/coverbackground</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
-        <configuration key="time">1</configuration>
+        <configuration key="time">3</configuration>
       </configurations>
     </operation>
 
