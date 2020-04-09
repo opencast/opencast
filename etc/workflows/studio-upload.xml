@@ -219,9 +219,9 @@
     <!-- Encode to engage search result thumbnails -->
 
     <operation
-      id="image"
-      exception-handler-workflow="partial-error"
-      description="Creating search result default thumbnails">
+        id="image"
+        exception-handler-workflow="partial-error"
+        description="Creating search result default thumbnails">
       <configurations>
         <configuration key="source-flavors">*/prepared</configuration>
         <configuration key="target-flavor">*/search+preview</configuration>
@@ -236,10 +236,10 @@
     <operation
         id="image"
         exception-handler-workflow="partial-error"
-        description="Creating player preview image">
+        description="Creating presentation player preview image">
       <configurations>
-        <configuration key="source-flavors">*/prepared</configuration>
-        <configuration key="target-flavor">*/player+preview</configuration>
+        <configuration key="source-flavor">presentation/prepared</configuration>
+        <configuration key="target-flavor">presentation/player+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
         <configuration key="time">1</configuration>
@@ -247,20 +247,21 @@
     </operation>
 
     <operation
-        id="tag"
+        id="image"
         exception-handler-workflow="partial-error"
-        description="Tagging source material for archival">
+        description="Creating presenter cover image">
       <configurations>
-        <configuration key="source-flavors">presenter/player+preview</configuration>
+        <configuration key="source-flavors">presenter/prepared</configuration>
         <configuration key="target-flavor">presenter/coverbackground</configuration>
-        <configuration key="target-tags">-engage-download</configuration>
+        <configuration key="encoding-profile">player-preview.http</configuration>
+        <configuration key="time">1</configuration>
       </configurations>
     </operation>
 
     <operation
         id="cover-image"
         exception-handler-workflow="partial-error"
-        description="Create a cover image">
+        description="Create presenter player preview image">
       <configurations>
         <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
         <configuration key="width">1280</configuration>
