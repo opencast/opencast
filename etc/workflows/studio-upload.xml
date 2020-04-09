@@ -202,6 +202,8 @@
       </configurations>
     </operation>
 
+    <!-- Encode delivery version of the videos -->
+
     <operation
         id="encode"
         exception-handler-workflow="partial-error"
@@ -214,6 +216,21 @@
       </configurations>
     </operation>
 
+    <!-- Encode to engage search result thumbnails -->
+
+    <operation
+      id="image"
+      exception-handler-workflow="partial-error"
+      description="Creating search result default thumbnails">
+      <configurations>
+        <configuration key="source-flavors">*/prepared</configuration>
+        <configuration key="target-flavor">*/search+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">search-cover.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
     <!-- Encode to engage player preview images -->
 
     <operation
@@ -221,11 +238,36 @@
         exception-handler-workflow="partial-error"
         description="Creating player preview image">
       <configurations>
-        <configuration key="source-flavor">*/prepared</configuration>
+        <configuration key="source-flavors">*/prepared</configuration>
         <configuration key="target-flavor">*/player+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
         <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="tag"
+        exception-handler-workflow="partial-error"
+        description="Tagging source material for archival">
+      <configurations>
+        <configuration key="source-flavors">presenter/player+preview</configuration>
+        <configuration key="target-flavor">presenter/coverbackground</configuration>
+        <configuration key="target-tags">-engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="cover-image"
+        exception-handler-workflow="partial-error"
+        description="Create a cover image">
+      <configurations>
+        <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
+        <configuration key="width">1280</configuration>
+        <configuration key="height">720</configuration>
+        <configuration key="posterimage-flavor">presenter/coverbackground</configuration>
+        <configuration key="target-flavor">presenter/player+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
       </configurations>
     </operation>
 
@@ -236,50 +278,12 @@
         exception-handler-workflow="partial-error"
         description="Creating feed cover image">
       <configurations>
-        <configuration key="source-flavor">*/prepared</configuration>
+        <configuration key="source-flavors">*/prepared</configuration>
         <configuration key="source-tags"></configuration>
         <configuration key="target-flavor">*/feed+preview</configuration>
         <configuration key="target-tags">atom,rss</configuration>
         <configuration key="encoding-profile">feed-cover.http</configuration>
         <configuration key="time">1</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Create a cover image with the default template -->
-
-    <operation
-        id="tag"
-        description="Removing unneeded presenter-cover from download publication">
-      <configurations>
-        <configuration key="source-flavors">presenter/player+preview</configuration>
-        <configuration key="target-tags">-engage-download</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-        id="image"
-        exception-handler-workflow="partial-error"
-        description="Creating player preview image">
-      <configurations>
-        <configuration key="source-flavor">presenter/prepared</configuration>
-        <configuration key="source-tags"></configuration>
-        <configuration key="target-flavor">presenter/coverbackground</configuration>
-        <configuration key="encoding-profile">player-preview.http</configuration>
-        <configuration key="time">1</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-        id="cover-image"
-        exception-handler-workflow="partial-error"
-        description="Create a cover image">
-      <configurations>
-        <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
-        <configuration key="width">1920</configuration>
-        <configuration key="height">1080</configuration>
-        <configuration key="posterimage-flavor">presenter/coverbackground</configuration>
-        <configuration key="target-flavor">presenter/player+preview</configuration>
-        <configuration key="target-tags">archive, engage-download</configuration>
       </configurations>
     </operation>
 
