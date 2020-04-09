@@ -5,9 +5,11 @@
   <title>Ingest asset</title>
   <tags/>
   <description/>
-
-  <configuration_panel></configuration_panel>
-
+  <configuration_panel/>
+  <state-mappings>
+    <state-mapping state="running">EVENTS.EVENTS.STATE_MAPPING.IMPORTING</state-mapping>
+    <state-mapping state="failing">EVENTS.EVENTS.STATE_MAPPING.IMPORTING</state-mapping>
+  </state-mappings>
   <operations>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -41,6 +43,7 @@
     </operation>
 
     <!-- Apply access control lists from series to the mediapackage -->
+    <!-- Also append the series metadata catalogs                   -->
 
     <operation
       id="series"
@@ -70,39 +73,5 @@
       </configurations>
     </operation>
 
-    <!-- Tag any optionally uploaded assets -->
-
-    <operation
-      id="tag"
-      if="${downloadSourceflavorsExist}"
-      exception-handler-workflow="partial-error"
-      description="Tagging uploaded assets for distribution">
-      <configurations>
-        <configuration key="source-flavors">${download-source-flavors}</configuration>
-        <configuration key="target-tags">+engage-download</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Tag the incoming metadata catalogs for publishing -->
-
-    <operation
-      id="tag"
-      description="Tagging metadata catalogs for publication">
-      <configurations>
-        <configuration key="source-flavors">dublincore/*</configuration>
-        <configuration key="target-tags">+engage-download</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="tag"
-      description="Tagging captions for publication">
-      <configurations>
-        <configuration key="source-flavors">*/captions</configuration>
-        <configuration key="target-tags">+engage-download</configuration>
-      </configurations>
-    </operation>
-
   </operations>
-
 </definition>
