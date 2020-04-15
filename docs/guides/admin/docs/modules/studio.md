@@ -14,6 +14,7 @@ The path `/studio` is accessible by users with the role `ROLE_ADMIN` or `ROLE_ST
 
 The preferred way to let your users access Studio is via LTI. Remember to configure your LTI users to have the role `ROLE_STUDIO` so that they can access Studio and all APIs used by Studio.
 
+__Note:__ To reduce processing time, Studio's default workflow does not enable editing by default.  To turn it back on modify `etc/workflows/studio-upload.xml`, changing the value of `skipEditorPreview` to `false`.
 
 ## Configuring Studio
 
