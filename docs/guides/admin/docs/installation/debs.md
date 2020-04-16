@@ -20,23 +20,8 @@ Watch for announcements on list or just check which versions are available in th
 Currently Supported
 -------------------
 
-* Debian 8/9 amd64
-* Ubuntu 16.04 amd64
-
-
-**Debian 8 requires a manual OpenJDK install**
-
-* Add jessie-backports to your sources, replacing the mirror URL with your local mirror:
-
-        echo "deb http://[YOUR_MIRROR]/debian jessie-backports main" | sudo tee /etc/apt/sources.list.d/jessie-backports.list
-
-* Update your package listing
-
-        apt-get update
-
-* Install OpenJDK 8 from the backports
-
-        apt-get install -t jessie-backports openjdk-8-jre
+* Debian 9 and newer, amd64
+* Ubuntu 18.04, and newer amd64
 
 > *Other architectures like i386, i686, arm, … are not supported!*
 
