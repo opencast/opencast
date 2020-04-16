@@ -61,6 +61,7 @@ import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
@@ -170,6 +171,7 @@ public class SeriesEndpoint {
   @GET
   @Path("")
   @RestQuery(name = "getseries", description = "Returns a list of series.", returnDescription = "", restParameters = {
+          @RestParameter(name = "onlyWithWriteAccess", isRequired = false, description = "Whether only to get the series to which we have write access.", type = RestParameter.Type.BOOLEAN),
           @RestParameter(name = "filter", isRequired = false, description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = RestParameter.Type.INTEGER),
@@ -177,7 +179,8 @@ public class SeriesEndpoint {
                   @RestResponse(description = "A (potentially empty) list of series is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getSeriesList(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("order") String order, @QueryParam("offset") int offset,
-          @QueryParam("limit") int limit) throws UnauthorizedException {
+          @QueryParam("limit") int limit, @QueryParam("onlyWithWriteAccess") Boolean onlyWithWriteAccess
+          ) throws UnauthorizedException {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     try {
       SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
@@ -282,6 +285,11 @@ public class SeriesEndpoint {
               return Response.status(SC_BAD_REQUEST).build();
           }
         }
+      }
+
+      if (onlyWithWriteAccess) {
+        query.withoutActions();
+        query.withAction(Permissions.Action.WRITE);
       }
 
       logger.trace("Using Query: " + query.toString());
