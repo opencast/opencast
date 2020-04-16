@@ -29,6 +29,10 @@ Currently Supported
 
         echo "deb http://[YOUR_MIRROR]/debian unstable main" | sudo tee /etc/apt/sources.list.d/debian-unstable.list
 
+* Ensure you don't accidentally upgrade your entire Debian install to unstable
+
+        echo "APT::Default-Release \"`dpkg --status tzdata|grep Provides|cut -f2 -d'-'`\";" | sudo tee /etc/apt/apt.conf.d/99defaultrelease
+
 * Update your package listing
 
         apt-get update
