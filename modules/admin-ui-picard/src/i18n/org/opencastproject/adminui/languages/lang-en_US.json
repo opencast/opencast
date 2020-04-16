@@ -8,8 +8,6 @@
    "CANCEL":       "Cancel",
    "CONFIRM":      "Confirm",
    "SAVE":         "Save",
-   "CONTINUE":     "Continue",
-   "CLOSE":        "Close",
    "LOGOUT":       "Logout",
    "RESET":        "Reset",
    "SELECT_NO_OPTION_SELECTED": "No option selected",
@@ -172,13 +170,7 @@
      "VIDEO_TOO_MANY_AUDIOS": "You cannot have more than one audio stream on a single video stream",
      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
-     "ACTIVE_TRANSACTION": "This event can not be edited while there is an active workflow or transaction.",
-     "BULK_METADATA_UPDATE": {
-       "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
-       "ALL_EVENTS_UPDATED": "All events were successfully updated.",
-       "NO_EVENTS_UPDATED": "All updates failed.",
-       "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
-     }
+     "ACTIVE_TRANSACTION": "This event can not be edited while there is an active workflow or transaction."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
@@ -247,37 +239,7 @@
               "METADATA": "Metadata",
               "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
           }
-      },
-     "EDIT_EVENTS_METADATA": {
-       "CAPTION": "Edit the metadata of multiple events",
-       "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
-       "REQUEST_ERRORS": {
-         "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
-         "NOTHING_TO_EDIT": "The events cannot be edited.",
-         "NOT_FOUND": "Not found",
-         "RUNNING_WORKFLOW": "Running workflow",
-         "TABLE": {
-           "CAPTION": "Selected events",
-           "ERRORS": "Errors"
-         }
-       },
-       "EDIT": {
-         "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
-         "TABLE": {
-           "CAPTION": "Metadata of selected events",
-           "FIELDS": "Metadata",
-           "VALUES": "Values"
-         }
-       },
-       "UPDATE_FAILURES": {
-         "TABLE": {
-           "CAPTION": "Update Failures"
-         },
-         "UPDATE_FAILED": "Update failed",
-         "NO_EVENTS_UPDATED": "All updates failed.",
-         "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
-       }
-     }
+      }
    },
    "DATES": {
      "TODAY":     "Today",
@@ -1036,9 +998,7 @@
              "NEW"         : "New policy",
              "DETAILS"     : "Details",
              "REPLACE_EVENT_ACLS": "Update event permissions",
-             "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect",
-             "LOAD_MORE_LIMIT": "policies shown.",
-             "LOAD_MORE_LINK": "Load more"
+             "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
            },
            "ROLES": {
               "LABEL": "Select a role",

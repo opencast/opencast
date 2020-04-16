@@ -22,8 +22,11 @@ import svSETrans from "./org/opencastproject/adminui/languages/lang-sv_SE";
 import trTRTrans from "./org/opencastproject/adminui/languages/lang-tr_TR";
 import zhZWTrans from "./org/opencastproject/adminui/languages/lang-zh_TW";
 
+// Assignment of language code to translation file
+// !!! If translation file of a new language is added, please add assignment here, too !!!
 const resources = {
-    en: { translation: enGBTrans },
+    'en-GB': { translation: enGBTrans },
+    'en-US': { translation: enUSTrans },
     da: { translation: daDKTrans },
     de: { translation: deDETrans },
     el: { translation: elGRTrans },
@@ -40,18 +43,22 @@ const resources = {
     zh: { translation: zhZWTrans }
 };
 
-
+// Configuration of i18next
 i18n
     .use(Backend)
     .use(LanguageDetector)
     .use(initReactI18next)
     .init({
         resources,
-        fallbackLng: 'en',
+        fallbackLng: 'en-GB',
         debug: true,
 
         interpolation: {
-            escapeValue:false
+            escapeValue: false
+        },
+        react: {
+            wait: true,
+            useSuspense: false
         }
     });
 

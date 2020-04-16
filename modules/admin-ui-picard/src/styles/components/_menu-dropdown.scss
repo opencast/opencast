@@ -51,7 +51,7 @@
     box-shadow: $box-shadow;
 
     a {
-        overflow: hidden;
+        overflow: visible;
         display: block;
         padding: $link-padding;
         @include transition-property($link-transition-property);
