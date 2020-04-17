@@ -287,7 +287,7 @@ public class SeriesEndpoint {
         }
       }
 
-      if (onlyWithWriteAccess) {
+      if (onlyWithWriteAccess != null && onlyWithWriteAccess) {
         query.withoutActions();
         query.withAction(Permissions.Action.WRITE);
       }

@@ -789,7 +789,7 @@ public class EventsEndpoint implements ManagedService {
     if (optOffset.isSome())
       query.withOffset(offset);
 
-    if (onlyWithWriteAccess) {
+    if (onlyWithWriteAccess != null && onlyWithWriteAccess) {
       query.withoutActions();
       query.withAction(Permissions.Action.WRITE);
     }
