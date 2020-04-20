@@ -52,7 +52,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -137,6 +139,9 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
   /** Determines whether a JpaUserReference should be created on lti login */
   private boolean createJpaUserReference = false;
+
+  /** concurrent attemtps */
+  private Map<String, Boolean> attempts = new ConcurrentHashMap<>(1024);
 
   public void setUserDetailsService(UserDetailsService userDetailsService) {
     this.userDetailsService = userDetailsService;
@@ -315,29 +320,34 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
     // Create/Update the user reference
     if (createJpaUserReference) {
-      JpaOrganization organization = fromOrganization(securityService.getOrganization());
+      //check for same time access of very fast clients from same user
+      if (attempts.putIfAbsent(username, Boolean.TRUE) != null) {
+        logger.warn("Concurrent access of user {}. Igoring.", username);
+      } else {
+        JpaOrganization organization = fromOrganization(securityService.getOrganization());
 
-      JpaUserReference jpaUserReference = userReferenceProvider.findUserReference(username, organization.getId());
+        JpaUserReference jpaUserReference = userReferenceProvider.findUserReference(username, organization.getId());
 
-      Set<JpaRole> jpaRoles = new HashSet<JpaRole>();
-      for (GrantedAuthority authority : userAuthorities) {
-        jpaRoles.add(new JpaRole(authority.getAuthority(), organization));
-      }
+        Set<JpaRole> jpaRoles = new HashSet<JpaRole>();
+        for (GrantedAuthority authority : userAuthorities) {
+          jpaRoles.add(new JpaRole(authority.getAuthority(), organization));
+        }
 
-      Date loginDate = new Date();
+        Date loginDate = new Date();
 
-      // Create new JpaUserReference if none exists or update existing
-      if (jpaUserReference == null) {
-        String jpaContext = request.getParameter(CONTEXT_ID);
-        jpaContext = StringUtils.isBlank(jpaContext) ? DEFAULT_CONTEXT : jpaContext;
+        // Create new JpaUserReference if none exists or update existing
+        if (jpaUserReference == null) {
+          String jpaContext = request.getParameter(CONTEXT_ID);
+          jpaContext = StringUtils.isBlank(jpaContext) ? DEFAULT_CONTEXT : jpaContext;
 
-        JpaUserReference userReference = new JpaUserReference(username, username, null, jpaContext, loginDate, organization, jpaRoles);
-        userReferenceProvider.addUserReference(userReference, jpaContext);
-      }
-      else {
-        jpaUserReference.setLastLogin(loginDate);
-        jpaUserReference.setRoles(jpaRoles);
-        userReferenceProvider.updateUserReference(jpaUserReference);
+          JpaUserReference userReference = new JpaUserReference(username, username, null, jpaContext, loginDate, organization, jpaRoles);
+          userReferenceProvider.addUserReference(userReference, jpaContext);
+        }
+        else {
+          jpaUserReference.setLastLogin(loginDate);
+          jpaUserReference.setRoles(jpaRoles);
+          userReferenceProvider.updateUserReference(jpaUserReference);
+        }
       }
     }
     //Create/Update UserReference End
@@ -415,4 +425,3 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
 
 }
-
