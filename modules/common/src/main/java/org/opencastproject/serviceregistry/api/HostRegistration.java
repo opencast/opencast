@@ -115,7 +115,7 @@ public interface HostRegistration {
   void setMaintenanceMode(boolean maintenanceMode);
 
   /**
-   * @return the node id for this host
+   * @return the node name for this host or null, if not set
    */
   String getNodeName();
 

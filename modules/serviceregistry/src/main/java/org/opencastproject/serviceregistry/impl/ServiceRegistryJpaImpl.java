@@ -320,7 +320,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     // Register this host
     try {
       if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OpencastConstants.NODE_NAME_PROPERTY))) {
-        nodeName = hostName;
+        nodeName = null;
       } else {
         nodeName = cc.getBundleContext().getProperty(OpencastConstants.NODE_NAME_PROPERTY);
       }
@@ -1225,6 +1225,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         hostRegistration.setCores(cores);
         hostRegistration.setMaxLoad(maxLoad);
         hostRegistration.setOnline(true);
+        hostRegistration.setNodeName(nodeName);
         em.merge(hostRegistration);
       }
       logger.info("Registering {} with a maximum load of {}", host, maxLoad);

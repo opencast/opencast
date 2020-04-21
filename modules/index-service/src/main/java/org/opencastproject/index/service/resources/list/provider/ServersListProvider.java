@@ -142,7 +142,8 @@ public class ServersListProvider implements ResourceListProvider {
 
       switch (listName) {
         case LIST_NODE_NAME:
-          list.put(vNodeName, vNodeName);
+          if (vNodeName != null)
+            list.put(vNodeName, vNodeName);
           break;
         case LIST_HOSTNAME:
         default:
