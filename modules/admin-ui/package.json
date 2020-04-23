@@ -40,7 +40,7 @@
     "karma-firefox-launcher": "^1.1.0",
     "karma-jasmine": "^1.1.2",
     "karma-ng-html2js-preprocessor": "^1.0.0",
-    "karma-safari-launcher": "^1.0.0",
+    "karma-safari-applescript-launcher": "^0.1.0",
     "request": "^2.88.0",
     "request-digest": "^1.0.13",
     "selenium-server-standalone-jar": "3.141.5",
