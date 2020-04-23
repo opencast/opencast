@@ -16,6 +16,8 @@
   <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast"
     entry-point-ref="opencastEntryPoint">
 
+    <sec:access-denied-handler error-page="/403.html"/>
+
     <!-- ################ -->
     <!-- # URL SECURITY # -->
     <!-- ################ -->
