@@ -172,7 +172,7 @@
       <configurations>
         <configuration key="source-flavor">presenter/source</configuration>
         <configuration key="target-flavor">presenter/prepared</configuration>
-        <configuration key="target-tags">-archive</configuration>
+        <configuration key="target-tags">archive</configuration>
         <configuration key="rewrite">false</configuration>
         <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
       </configurations>
@@ -185,7 +185,7 @@
       <configurations>
         <configuration key="source-flavor">presentation/source</configuration>
         <configuration key="target-flavor">presentation/prepared</configuration>
-        <configuration key="target-tags">-archive</configuration>
+        <configuration key="target-tags">archive</configuration>
         <configuration key="rewrite">false</configuration>
         <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
       </configurations>
