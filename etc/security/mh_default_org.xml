@@ -21,6 +21,7 @@
     <!-- ################ -->
 
     <!-- Allow anonymous access to the login form -->
+    <sec:intercept-url pattern="/" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/admin-ng/login.html" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/sysinfo/bundles/version" method="GET" access="ROLE_ANONYMOUS" />
 
