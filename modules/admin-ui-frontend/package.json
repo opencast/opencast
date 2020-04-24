@@ -63,6 +63,6 @@
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'app/**/*.html'"
   },
   "dependencies": {
-    "node-sass": "^4.13.1"
+    "node-sass": "^4.14.0"
   }
 }
