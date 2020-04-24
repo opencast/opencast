@@ -169,10 +169,6 @@ Set the location of the shared storage directory:
 
     org.opencastproject.storage.dir=/srv/opencast
 
-Define that the file repository shall access all files locally:
-
-    org.opencastproject.file.repo.url=${org.opencastproject.admin.ui.url}
-
 ### org.opencastproject.organization-mh\_default\_org.cfg
 
 Set the base URL of the server hosting the administrative tools. Again use a domain name instead of an IP address if

@@ -58,7 +58,7 @@ public class HostRegistrationJpaImpl implements HostRegistration {
   @Column(name = "address", nullable = false, length = 39)
   private String ipAddress;
 
-  @Column(name = "node_name", nullable = false, length = 39)
+  @Column(name = "node_name", length = 255)
   private String nodeName;
 
   @Column(name = "memory", nullable = false)
