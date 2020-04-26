@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang=en>
+<head>
+<meta http-equiv=content-type content="text/html; charset=utf-8" />
+<title>Opencast :: Forbidden</title>
+
+<script>
+  fetch('/info/me.json')
+    .then(response => response.json())
+    .then(data => {
+      let userinfo = document.getElementById('userinfo');
+      userinfo.innerHTML = data.user.username;
+      userinfo.title = data.userRole;
+    });
+</script>
+
+<style>
+main {
+  width: 300px;
+  padding: 50px;
+  font-family: sans;
+  margin: 50px auto;
+  border: 1px solid silver;
+  border-radius: 4px;
+}
+
+a {
+  display: block;
+  background-color: #378dd4;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  border-radius: 4px;
+  border: none;
+}
+
+#userinfo {
+  font-weight: bold;
+  text-align: center;
+  margin: 25px 0;
+}
+</style>
+
+</head>
+<body>
+
+<main>
+  <h1>403 Forbidden</h1>
+  <p>Your user does not have access to this resource.</p>
+  <p>You are logged in as:
+    <div id=userinfo></div>
+  </p>
+
+  <p><a href=/j_spring_security_logout>Switch User</a></p>
+</main>
+
+</body>
+</html>
