@@ -21,6 +21,10 @@
 
 package org.opencastproject.security.lti;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
@@ -52,9 +56,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -140,8 +143,11 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   /** Determines whether a JpaUserReference should be created on lti login */
   private boolean createJpaUserReference = false;
 
-  /** concurrent attemtps */
-  private Map<String, Boolean> attempts = new ConcurrentHashMap<>(1024);
+  /** concurrent attemtps saved in a cache */
+  private LoadingCache<String, Object> userDetailsCache;
+
+  /** A token to store in the miss cache */
+  private Object nullToken = null;
 
   public void setUserDetailsService(UserDetailsService userDetailsService) {
     this.userDetailsService = userDetailsService;
@@ -283,22 +289,40 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       logger.debug("LTI user id is : {}", username);
     }
 
-    UserDetails userDetails;
-    Collection<GrantedAuthority> userAuthorities;
+    UserDetails userDetails = null;
+    Collection<GrantedAuthority> userAuthorities = new HashSet<>();
     try {
-      userDetails = userDetailsService.loadUserByUsername(username);
 
-      // userDetails returns a Collection<? extends GrantedAuthority>, which cannot be directly casted to a
-      // Collection<GrantedAuthority>.
-      // On the other hand, one cannot add non-null elements or modify the existing ones in a Collection<? extends
-      // GrantedAuthority>. Therefore, we *must* instantiate a new Collection<GrantedAuthority> (an ArrayList in this
-      // case) and populate it with whatever elements are returned by getAuthorities()
-      userAuthorities = new HashSet<>(userDetails.getAuthorities());
+      userDetailsCache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<String, Object>() {
 
-      // we still need to enrich this user with the LTI Roles
-      String roles = request.getParameter(ROLES);
-      String context = request.getParameter(CONTEXT_ID);
-      enrichRoleGrants(roles, context, userAuthorities);
+        @Override
+        public Object load(String username) {
+          logger.trace("Loading user '{}' from cache or by service", username);
+          UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+          return userDetails == null ? nullToken : userDetails;
+        }
+      });
+
+      try{
+        // use #getUnchecked since the loader does not throw any checked exceptions
+        userDetails = (UserDetails)userDetailsCache.getUnchecked(username);
+        if (userDetails != nullToken) {
+          // userDetails returns a Collection<? extends GrantedAuthority>, which cannot be directly casted to a
+          // Collection<GrantedAuthority>.
+          // On the other hand, one cannot add non-null elements or modify the existing ones in a Collection<? extends
+          // GrantedAuthority>. Therefore, we *must* instantiate a new Collection<GrantedAuthority> (an ArrayList in this
+          // case) and populate it with whatever elements are returned by getAuthorities()
+          userAuthorities = new HashSet<>(userDetails.getAuthorities());
+
+          // we still need to enrich this user with the LTI Roles
+          String roles = request.getParameter(ROLES);
+          String context = request.getParameter(CONTEXT_ID);
+          enrichRoleGrants(roles, context, userAuthorities);
+        }
+      } catch (UncheckedExecutionException e) {
+        logger.warn("Exception while loading UserDetails from cache " + username, e);
+      }
+
     } catch (UsernameNotFoundException e) {
       // This user is known to the tool consumer, but not to Opencast. Create a user "on the fly"
       userAuthorities = new HashSet<>();
@@ -320,10 +344,6 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
     // Create/Update the user reference
     if (createJpaUserReference) {
-      //check for same time access of very fast clients from same user
-      if (attempts.putIfAbsent(username, Boolean.TRUE) != null) {
-        logger.warn("Concurrent access of user {}. Igoring.", username);
-      } else {
         JpaOrganization organization = fromOrganization(securityService.getOrganization());
 
         JpaUserReference jpaUserReference = userReferenceProvider.findUserReference(username, organization.getId());
@@ -349,7 +369,6 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
           userReferenceProvider.updateUserReference(jpaUserReference);
         }
       }
-    }
     //Create/Update UserReference End
 
     Authentication ltiAuth = new PreAuthenticatedAuthenticationToken(userDetails, authentication.getCredentials(),
