@@ -63,6 +63,7 @@ Required:
     ffmpeg >= 3.2.4
     maven >= 3.1
     python >= 2.6, < 3.0
+    firefox/chrome/some other major browser
     unzip
     gcc-c++
     tar

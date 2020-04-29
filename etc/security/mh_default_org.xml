@@ -16,11 +16,14 @@
   <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast"
     entry-point-ref="opencastEntryPoint">
 
+    <sec:access-denied-handler error-page="/403.html"/>
+
     <!-- ################ -->
     <!-- # URL SECURITY # -->
     <!-- ################ -->
 
     <!-- Allow anonymous access to the login form -->
+    <sec:intercept-url pattern="/" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/admin-ng/login.html" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/sysinfo/bundles/version" method="GET" access="ROLE_ANONYMOUS" />
 
@@ -91,7 +94,10 @@
     <sec:intercept-url pattern="/admin-ng/users/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/user-settings/signature" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/resources/events/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/resources/jobs/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_JOBS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/series/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/resources/servers/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVERS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/resources/services/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVICES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/themes/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_THEMES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/recordings/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/users/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_VIEW" />
