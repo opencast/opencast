@@ -500,6 +500,26 @@ Opencast 8
 
 Opencast 7
 ----------
+### Opencast 7.7
+
+*Released on April 27, 2020*
+
+- [[#1539](https://github.com/opencast/opencast/pull/1539)] -
+  Fix Karma Safari test in mac OS
+- [[#1474](https://github.com/opencast/opencast/pull/1474)] -
+  Add comment to document remember me keys
+- [[#1442](https://github.com/opencast/opencast/pull/1442)] -
+  Fix Remember-Me Authentication
+- [[#1427](https://github.com/opencast/opencast/pull/1427)] -
+  1281: Ignoring test which randomly fails in CI testing
+- [[#1426](https://github.com/opencast/opencast/pull/1426)] -
+  Autodetect browsers for admin ui tests, fix phantomJS openssl issue
+- [[#1425](https://github.com/opencast/opencast/pull/1425)] -
+  Don't duplicate publications
+- [[#1380](https://github.com/opencast/opencast/pull/1380)] -
+  In fast, don't cleanup acls (see other workflows)
+- [[#1379](https://github.com/opencast/opencast/pull/1379)] -
+  Use active, not episode acl in scheduler service
 
 ### Opencast 7.6
 
