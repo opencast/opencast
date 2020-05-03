@@ -21,10 +21,6 @@
 
 package org.opencastproject.security.lti;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
@@ -33,6 +29,11 @@ import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -303,7 +304,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
         }
       });
 
-      try{
+      try {
         // use #getUnchecked since the loader does not throw any checked exceptions
         userDetails = (UserDetails)userDetailsCache.getUnchecked(username);
         if (userDetails != nullToken) {
