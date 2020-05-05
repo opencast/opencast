@@ -7,6 +7,11 @@ import * as serviceWorker from './serviceWorker';
 // import i18n (needs to be bundled)
 import './i18n/i18n';
 
+import 'font-awesome/css/font-awesome.min.css';
+import "react-datepicker/dist/react-datepicker.css";
+
+import 'react-dates/initialize';
+import 'react-dates/lib/css/_datepicker.css';
 ReactDOM.render(
   <React.StrictMode>
     <App />

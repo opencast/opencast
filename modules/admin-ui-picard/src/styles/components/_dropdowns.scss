@@ -67,7 +67,7 @@
     &:after {
         content: "\f078";
         color: inherit;
-        font-family: FontAwesome;
+        font-family: FontAwesome, fantasy;
         font-size: 12px;
         font-style: normal;
         font-weight: normal;
@@ -91,7 +91,7 @@
         list-style: none;
         @include border-bottom-radius($main-border-radius);
         border: $thin-border-stroke $main-border-color;
-        opacity: 0;
+        opacity: 1;
         pointer-events: none;
         z-index: $max-z + 10;
         top: 100%;

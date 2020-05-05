@@ -45,8 +45,8 @@ class Header extends Component {
 
     constructor(props) {
         super(props);
+        // State for opening (true) and closing (false) the dropdown menus for language, notification, help and user
         this.state = {
-            // State for opening (true) and closing (false) the dropdown menus for language, notification, help and user
             displayMenuLang: false,
             displayMenuUser: false,
             displayMenuHelp: false,
