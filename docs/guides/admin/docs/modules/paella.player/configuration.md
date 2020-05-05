@@ -12,7 +12,7 @@ Paella has been specially designed for lecture recordings. It works with all HTM
 Have a look to the paella [features list](https://paellaplayer.upv.es/features/)
 or see them live on paella [demos page](https://paellaplayer.upv.es/demos/)
 
-Starting with Opencast 9.0 Paella is Opencast's default player
+Paella is Opencast's default player.
 
 
 Configuration
