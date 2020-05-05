@@ -12,17 +12,7 @@ Paella has been specially designed for lecture recordings. It works with all HTM
 Have a look to the paella [features list](https://paellaplayer.upv.es/features/)
 or see them live on paella [demos page](https://paellaplayer.upv.es/demos/)
 
-Enable paella player
---------------------
-
-To enable paella player you need to edit the `prop.player` variable.
-This can be enabled for each tenant. So the configuration keys are located in
-`etc/org.opencastproject.organization-mh_default_org.cfg`.
-
-
-To activate the paella player set:
-
-    prop.player=/paella/ui/watch.html?id=#{id}
+Starting with Opencast 9.0 Paella is Opencast's default player
 
 
 Configuration
