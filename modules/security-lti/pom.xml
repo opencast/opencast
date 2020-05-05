@@ -59,6 +59,10 @@
       <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-kernel</artifactId>
       <version>${project.version}</version>
