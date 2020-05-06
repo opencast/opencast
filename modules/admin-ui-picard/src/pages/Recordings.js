@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {withTranslation} from "react-i18next";
 import TableFilters from "../components/shared/TableFilters";
+import MainNav from "../components/shared/MainNav";
 
 
 class Recordings extends Component {
@@ -9,12 +10,22 @@ class Recordings extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            displayActionMenu: false
+            displayActionMenu: false,
+            displayNavigation: false
         };
 
         this.handleActionMenu = this.handleActionMenu.bind(this);
         this.handleClickOutside = this.handleClickOutside.bind(this);
 
+        this.toggleNavigation = this.toggleNavigation.bind(this);
+
+    }
+
+    toggleNavigation() {
+        this.setState(state => ({
+            displayNavigation: !state.displayNavigation
+        }));
+        console.log("menu toggled");
     }
 
     componentDidMount() {
@@ -42,11 +53,19 @@ class Recordings extends Component {
 
     render() {
         const { t } =  this.props;
+        const styleNavOpen = {
+            marginLeft: '130px',
+        };
+        const styleNavClosed = {
+            marginLeft: '20px',
+        };
         return (
             <>
                 <section className="action-nav-bar">
                     {/*TODO: include Components containing the suitable buttons for the current view */}
                     {/*Todo: Include Burger-button menu */}
+                    <MainNav  isOpen={this.state.displayNavigation}
+                              toggleMenu={this.toggleNavigation}/>
 
                     <nav>
                         {/*Todo: Show only if user has ROLE_UI_EVENTS_VIEW*/}
@@ -59,7 +78,8 @@ class Recordings extends Component {
                     </div>
                 </section>
 
-                <div className="main-view">
+                {/*TODO: HIER STYLE EINFÜGEN, vorher welcher style soll genutzt werden*/}
+                <div className="main-view" style={this.state.displayNavigation ? styleNavOpen : styleNavClosed}>
                     {/*todo: include notification component*/}
 
                     <div className="controls-container">

@@ -32,12 +32,14 @@
     position: absolute;
     top: 1px;
     left: -1px;
+    margin-top: 42px;
 
-    // Hide menu
-    opacity: 0;
+
+    // Show menu
+    opacity: 1;
 
     #nav-container {
-        display: none;
+        display: block;
         margin-top: -1px;
         padding-top: 1px;
     }
