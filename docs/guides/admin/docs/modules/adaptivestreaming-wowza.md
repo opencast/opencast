@@ -168,7 +168,7 @@ All this can be configured in the "Options" section of the Wowza application:
 Keep in mind that you have to adapt your encoding profiles when you want generate the videos to distribute via HLS or
 DASH. Specifically, if the videos with different qualities are not keyframe-aligned, they may not play smoothly or not
 play at all. You can find more information
-[here](https://www.wowza.com/forums/content.php?546-How-to-do-adaptive-bitrate-streaming).
+[here](https://www.wowza.com/docs/how-to-do-adaptive-bitrate-streaming).
 
 
 ## Limitations
