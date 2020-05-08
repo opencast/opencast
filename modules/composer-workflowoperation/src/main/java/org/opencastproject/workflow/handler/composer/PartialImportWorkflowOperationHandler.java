@@ -407,9 +407,14 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     queueTime += checkForTrimming(mediaPackage, trimProfile, deriveAudioFlavor(targetPresenterFlavor),
             trackDurationInSeconds, elementsToClean);
 
+    // New: Mux within presentation and presenter
+    queueTime += checkForMuxing(mediaPackage, targetPresenterFlavor, deriveAudioFlavor(targetPresenterFlavor), false, elementsToClean);
+    queueTime += checkForMuxing(mediaPackage, targetPresentationFlavor, deriveAudioFlavor(targetPresentationFlavor), false, elementsToClean);
+
     adjustAudioTrackTargetFlavor(mediaPackage, targetPresenterFlavor);
     adjustAudioTrackTargetFlavor(mediaPackage, targetPresentationFlavor);
 
+    // Mux between presentation and presenter? Why?
     queueTime += checkForMuxing(mediaPackage, targetPresenterFlavor, targetPresentationFlavor, false, elementsToClean);
 
     queueTime += checkForEncodeToStandard(mediaPackage, forceEncoding, forceProfile, requiredExtensions,
@@ -1001,6 +1006,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
   private Attachment extractLastImageFrame(Track presentationTrack, List<MediaPackageElement> elementsToClean)
           throws EncoderException, MediaPackageException, WorkflowOperationException, NotFoundException {
     VideoStream[] videoStreams = TrackSupport.byType(presentationTrack.getStreams(), VideoStream.class);
+
     Map<String, String> properties = new HashMap<String, String>();
     properties.put("frame", Long.toString(videoStreams[0].getFrameCount() - 1));
 
