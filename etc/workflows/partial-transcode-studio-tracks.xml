@@ -17,6 +17,20 @@
       </configurations>
     </operation>
 
+    <!-- Cut the videos -->
+
+    <operation id="editor"
+      exception-handler-workflow="partial-error"
+      description="Cut the recording according to the edit decision list">
+      <configurations>
+        <configuration key="source-flavors">*/source+transcoded</configuration>
+        <configuration key="smil-flavors">smil/cutting</configuration>
+        <configuration key="target-smil-flavor">smil/cutting</configuration>
+        <configuration key="target-flavor-subtype">source+trimmed</configuration>
+        <configuration key="skip-if-not-trimmed">true</configuration>
+      </configurations>
+    </operation>
+
     <operation
       id="tag"
       exception-handler-workflow="partial-error"
@@ -31,9 +45,9 @@
     <operation
       id="tag"
       exception-handler-workflow="partial-error"
-      description="Tagging transcoded presenter video as source and for archive">
+      description="Tagging transcoded and trimmed presenter video as source and for archive">
       <configurations>
-        <configuration key="source-flavors">presenter/source+transcoded</configuration>
+        <configuration key="source-flavors">presenter/source+trimmed</configuration>
         <configuration key="target-flavor">presenter/source</configuration>
         <configuration key="target-tags">archive</configuration>
       </configurations>
@@ -53,9 +67,9 @@
     <operation
       id="tag"
       exception-handler-workflow="partial-error"
-      description="Tagging transcoded presentation video as source and for archive">
+      description="Tagging transcoded and trimmed presentation video as source and for archive">
       <configurations>
-        <configuration key="source-flavors">presentation/source+transcoded</configuration>
+        <configuration key="source-flavors">presentation/source+trimmed</configuration>
         <configuration key="target-flavor">presentation/source</configuration>
         <configuration key="target-tags">archive</configuration>
       </configurations>
