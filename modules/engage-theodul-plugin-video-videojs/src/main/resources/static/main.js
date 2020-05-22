@@ -1528,8 +1528,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   }
 
   function registerEventsAudioOnly(videoDisplay) {
-    var audioPlayer_id = $('#' + videoDisplay);
-    var audioPlayer = audioPlayer_id[0];
+    var video_display = $('#' + videoDisplay);
+    var audioPlayer_id = video_display.find('audio');
+    var audioPlayer = video_display[0].player;
     var audioLoadTimeout = window.setTimeout(function () {
       Engage.trigger(plugin.events.audioCodecNotSupported.getName());
       $('.' + class_audioDisplay).hide();
