@@ -1019,7 +1019,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   }
 
   Engage.on(plugin.events.aspectRatioSet.getName(), function (param) {
-    if (param === undefined) {
+    if (param === undefined && aspectRatio) {
       Engage.trigger(plugin.events.aspectRatioSet.getName(), [aspectRatio[1], aspectRatio[2], (aspectRatio[1] / aspectRatio[2]) * 100]);
     }
   })
