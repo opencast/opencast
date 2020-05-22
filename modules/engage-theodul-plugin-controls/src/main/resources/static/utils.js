@@ -143,7 +143,7 @@ define(['jquery'], function($) {
 
   Utils.prototype.removeParentIfElementExists = function(elemenId) {
     if ($('#' + elemenId) && $('#' + elemenId).parent()) {
-      +                $('#' + elemenId).parent().remove();
+      $("#" + elemenId).parent().remove();
     }
   };
 
