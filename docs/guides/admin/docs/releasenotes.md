@@ -83,12 +83,23 @@ This maintenance release contains several Opencast Studio bug fixes and enhancem
 
 ### Configuration Changes in 8.4
 
-- Additional security configuration in `etc/security/mh_default_org.xml` including 403 Logout redirect, admin access to "/"; role access to system filters, prevent normal user from deleting series,s additional studio access filters
-- Muxing fix in encoding files `etc/encoding/adaptive-streaming-movies.properties`, `etc/encoding/opencast-movies.properties`
-- Increased preview image resolution in `etc/encoding/engage-images.properties`
-- A new editor preview profile in `etc/encoding/opencast-movies.properties`
-- Default maximum job attempt increases 1 to 10 in `etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg`
 - Updated studio workflows
+- Additional security configuration in `etc/security/mh_default_org.xml` include
+    - 403 Logout redirect
+    - admin access to "/"
+    - role access to system filters
+    - prevent normal user from deleting series
+    - additional studio access filters
+- Muxing fix in encoding files
+
+    - `etc/encoding/adaptive-streaming-movies.properties`
+    - `etc/encoding/opencast-movies.properties`
+- Increased preview image resolution in
+    - `etc/encoding/engage-images.properties`
+- A new editor preview profile in
+    - `etc/encoding/opencast-movies.properties`
+- Default maximum job attempt increases 1 to 10 in
+    - `etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg`
 
 
 Additional Notes About 8.3
