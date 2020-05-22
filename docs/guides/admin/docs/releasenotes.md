@@ -76,12 +76,27 @@ API changes
     - DELETE /workflow/definition/{id}
     - PUT /workflow/definition
 
+Additional Notes About 8.4
+--------------------------
+
+This maintenance release contains several Opencast Studio bug fixes and enhancements, plus additional security filters.
+
+### Configuration Changes in 8.4
+
+- Additional security configuration in `etc/security/mh_default_org.xml` including 403 Logout redirect, admin access to "/"; role access to system filters, prevent normal user from deleting series,s additional studio access filters
+- Muxing fix in encoding files `etc/encoding/adaptive-streaming-movies.properties`, `etc/encoding/opencast-movies.properties`
+- Increased preview image resolution in `etc/encoding/engage-images.properties`
+- A new editor preview profile in `etc/encoding/opencast-movies.properties`
+- Default maximum job attempt increases 1 to 10 in `etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg`
+- Updated studio workflows
+
+
 Additional Notes About 8.3
 --------------------------
 
 To improve the integration of Opencast Studio we introduced the custom roles plugin for LTI.
 
-There are also seveal changes in Opencast Studio:
+There are also several changes in Opencast Studio:
 
 - Added
     - Add detection of cameras. If none are detected, the buttons for "Camera" and "Screen & Camera"
