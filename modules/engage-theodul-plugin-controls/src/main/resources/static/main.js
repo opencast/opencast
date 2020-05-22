@@ -448,21 +448,26 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
         segments = Utils.repairSegmentLength(segments, duration, min_segment_duration);
 
-       try {
-        // find timeline preview images in media package
-        var attachments = Engage.model.get('mediaPackage').get('attachments');
+        try {
+          // find timeline preview images in media package
+          var attachments = Engage.model.get('mediaPackage').get('attachments');
 
-        var timelinePreviewsRegex = /(timeline)+\S*(preview)+/i;
-        timelinePreview = $(attachments).filter(function(index) {
-          return $(attachments[index]).attr('type').search(timelinePreviewsRegex) !== -1;
-        });
+          var timelinePreviewsRegex = /(timeline)+\S*(preview)+/i;
+          timelinePreview = $(attachments).filter(function(index) {
+            return $(attachments[index]).attr('type').search(timelinePreviewsRegex) !== -1;
+          });
 
-        console.log("timelinePreviews loaded: ", timelinePreview);
+          if (!timelinePreview.length) {
+            console.log("No timelinePreviews detected");
+            timelinePreviewsError = true;
 
-        var timelinePreviewsProperties = timelinePreview.get(0).additionalProperties;
+          } else {
+            console.log("timelinePreviews loaded: ", timelinePreview);
 
-        timelinePreviewsProperties.property.forEach(function(property) {
-            switch (property.key) {
+            var timelinePreviewsProperties = timelinePreview.get(0).additionalProperties;
+
+            timelinePreviewsProperties.property.forEach(function(property) {
+              switch (property.key) {
                 case "imageCount":
                     timelinePreviewsImageCount = property.$;
                     break;
@@ -478,15 +483,16 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
                 case "resolutionY":
                     timelinePreviewsTileResolution[1] = property.$;
                     break;
-            }
-        });
+              }
+            });
 
-        timelinePreviewsError = false;
+            timelinePreviewsError = false;
+          }
 
-    } catch (e) {
-        timelinePreviewsError = true;
-        console.error("No valid timelinepreviews image was found.", e);
-    }
+        } catch (e) {
+          timelinePreviewsError = true;
+          console.error("No valid timelinepreviews image was found.", e);
+        }
 
         if (Engage.model.get('meInfo')) {
           if (Engage.model.get('meInfo').get('logo_player')) {
