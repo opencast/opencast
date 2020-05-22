@@ -470,31 +470,31 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           });
 
           if (!timelinePreview.length) {
-            console.log("No timelinePreviews detected");
+            Engage.log('Controls: No timelinePreviews detected');
             timelinePreviewsError = true;
 
           } else {
-            console.log("timelinePreviews loaded: ", timelinePreview);
+            Engage.log('Controls: timelinePreviews loaded: ', timelinePreview);
 
             var timelinePreviewsProperties = timelinePreview.get(0).additionalProperties;
 
             timelinePreviewsProperties.property.forEach(function(property) {
               switch (property.key) {
-                case "imageCount":
-                  timelinePreviewsImageCount = property.$;
-                  break;
-                case "imageSizeX":
-                  timelinePreviewsImageSize[0] = property.$;
-                  break;
-                case "imageSizeY":
-                  timelinePreviewsImageSize[1] = property.$;
-                  break;
-                case "resolutionX":
-                  timelinePreviewsTileResolution[0] = property.$;
-                  break;
-                case "resolutionY":
-                  timelinePreviewsTileResolution[1] = property.$;
-                  break;
+              case 'imageCount':
+                timelinePreviewsImageCount = property.$;
+                break;
+              case 'imageSizeX':
+                timelinePreviewsImageSize[0] = property.$;
+                break;
+              case 'imageSizeY':
+                timelinePreviewsImageSize[1] = property.$;
+                break;
+              case 'resolutionX':
+                timelinePreviewsTileResolution[0] = property.$;
+                break;
+              case 'resolutionY':
+                timelinePreviewsTileResolution[1] = property.$;
+                break;
               }
             });
 
@@ -503,7 +503,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
         } catch (e) {
           timelinePreviewsError = true;
-          console.error("No valid timelinepreviews image was found.", e);
         }
 
         if (Engage.model.get('meInfo')) {
