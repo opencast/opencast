@@ -156,7 +156,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
             addAuthorities(authorities, attributeValue.split(","));
           }
         } else {
-          debug("({}) Could not find any attribute named '{}' in user '{}'", attributeName, userData.getDn());
+          debug("Could not find any attribute named '{}' in user '{}'", attributeName, userData.getDn());
         }
       } catch (ClassCastException e) {
         error("Specified attribute containing user roles ('{}') was not of expected type String: {}", attributeName, e);
