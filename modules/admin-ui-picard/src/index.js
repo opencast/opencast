@@ -4,17 +4,32 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
+// redux imports
+import { persistStore } from 'redux-persist';
+import { PersistGate } from 'redux-persist/lib/integration/react';
+import { Provider } from 'react-redux';
+import { configureStore } from "./store";
+
 // import i18n (needs to be bundled)
 import './i18n/i18n';
 
+// import css files for certain libraries
 import 'font-awesome/css/font-awesome.min.css';
 import "react-datepicker/dist/react-datepicker.css";
 
-import 'react-dates/initialize';
-import 'react-dates/lib/css/_datepicker.css';
+// create redux store
+const store = configureStore();
+const persistor = persistStore(store);
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+      <Provider store={store} >
+          <PersistGate
+              loading={<div>loading...</div>}
+              persistor={persistor} >
+              <App />
+          </PersistGate>
+      </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
