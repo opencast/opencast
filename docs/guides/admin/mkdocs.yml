@@ -81,6 +81,7 @@ nav:
    - External API: 'configuration/external-api.md'
    - OAI-PMH: 'configuration/oaipmh.md'
    - External Monitoring: 'configuration/monitoring.md'
+   - Trim Segments: 'configuration/trim-segments.md'
    - Admin UI Configuration:
       - Event Filters: 'configuration/admin-ui/event-filters.md'
       - Manual Asset Upload: 'configuration/admin-ui/asset-upload.md'
