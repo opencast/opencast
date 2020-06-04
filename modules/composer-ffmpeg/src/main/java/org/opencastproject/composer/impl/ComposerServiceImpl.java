@@ -115,6 +115,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 
@@ -441,17 +442,26 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     final EncodingProfile profile = getProfile(profileId);
     final EncoderEngine encoderEngine = getEncoderEngine();
 
-    // conditional settings based on frame height
-    final int height = Arrays.stream(mediaTrack.getStreams())
+    // conditional settings based on frame height and width
+    final Optional<VideoStream> videoStream = Arrays.stream(mediaTrack.getStreams())
             .filter((stream -> stream instanceof VideoStream))
-            .map(stream -> ((VideoStream) stream).getFrameHeight())
-            .findFirst()
-            .orElse(0);
+            .map(stream -> (VideoStream) stream)
+            .findFirst();
+    final int height = videoStream.map(vs -> vs.getFrameHeight()).orElse(0);
+    final int width = videoStream.map(vs -> vs.getFrameWidth()).orElse(0);
     Map<String, String> properties = new HashMap<>();
     for (String key: profile.getExtensions().keySet()) {
       if (key.startsWith(CMD_SUFFIX + ".if-height-geq-")) {
         final int heightCondition = Integer.parseInt(key.substring((CMD_SUFFIX + ".if-height-geq-").length()));
         if (heightCondition <= height) {
+          properties.put(key, profile.getExtension(key));
+        }
+      } else if (key.startsWith(CMD_SUFFIX + ".if-width-or-height-geq-")) {
+        final String[] resCondition = key.substring((CMD_SUFFIX + ".if-width-or-height-geq-").length()).split("-");
+        final int widthCondition = Integer.parseInt(resCondition[0]);
+        final int heightCondition = Integer.parseInt(resCondition[1]);
+
+        if (heightCondition <= height || widthCondition <= width) {
           properties.put(key, profile.getExtension(key));
         }
       }
