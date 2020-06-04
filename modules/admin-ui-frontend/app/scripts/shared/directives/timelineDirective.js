@@ -1313,7 +1313,8 @@ angular.module('adminNg.directives')
 
             if (segments.length == 1) {
 
-              var _start = 0, _duration = duration;
+              var _start = 0;
+              var _duration = duration;
 
               if (startLength > 0) {
                 segments.push( setSegment(0, startLength, startLength, true) );
