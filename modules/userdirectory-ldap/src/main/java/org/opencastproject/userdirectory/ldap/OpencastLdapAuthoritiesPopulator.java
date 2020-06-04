@@ -135,18 +135,22 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
       this.additionalAuthorities = additionalAuthorities;
 
     if (logger.isDebugEnabled()) {
-      debug("Authenticated users will receive the following extra roles:");
+      StringBuilder additionalAuthoritiesAsStr = new StringBuilder();
       for (String role : this.additionalAuthorities) {
-        logger.debug("\t* {}", role);
+        additionalAuthoritiesAsStr.append(String.format("\n\t* %s", role));
       }
+      debug("Authenticated users will receive the following extra roles:{}", additionalAuthoritiesAsStr);
     }
   }
 
   @Override
   public Collection<? extends GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {
 
+    debug("user attributes for user {}:\n\t{}", username, userData.getAttributes());
+
     Set<GrantedAuthority> authorities = new HashSet<>();
     for (String attributeName : attributeNames) {
+      debug("Looking for attribute name '{}'", attributeName);
       try {
         String[] attributeValues = userData.getStringAttributes(attributeName);
         // Should the attribute not be defined, the returned array is null
@@ -156,10 +160,10 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
             addAuthorities(authorities, attributeValue.split(","));
           }
         } else {
-          debug("({}) Could not find any attribute named '{}' in user '{}'", attributeName, userData.getDn());
+          debug("Could not find any attribute named '{}' in user '{}'", attributeName, userData.getDn());
         }
       } catch (ClassCastException e) {
-        error("Specified attribute containing user roles ('{}') was not of expected type String: {}", attributeName, e);
+        error("Specified attribute containing user roles ('{}') was not of expected type String", attributeName, e);
       }
     }
 
@@ -167,10 +171,11 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     addAuthorities(authorities, additionalAuthorities);
 
     if (logger.isDebugEnabled()) {
-      debug("Returning user {} with authorities:", username);
+      StringBuilder authorityListAsString = new StringBuilder();
       for (GrantedAuthority authority : authorities) {
-        logger.debug("\t{}", authority);
+        authorityListAsString.append(String.format("\n\t%s", authority));
       }
+      debug("Returning user {} with authorities:{}", username, authorityListAsString);
     }
 
     // Update the user in the security service if it matches the user whose authorities are being returned
