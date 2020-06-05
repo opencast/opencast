@@ -345,31 +345,31 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
     // Create/Update the user reference
     if (createJpaUserReference) {
-        JpaOrganization organization = fromOrganization(securityService.getOrganization());
+      JpaOrganization organization = fromOrganization(securityService.getOrganization());
 
-        JpaUserReference jpaUserReference = userReferenceProvider.findUserReference(username, organization.getId());
+      JpaUserReference jpaUserReference = userReferenceProvider.findUserReference(username, organization.getId());
 
-        Set<JpaRole> jpaRoles = new HashSet<JpaRole>();
-        for (GrantedAuthority authority : userAuthorities) {
-          jpaRoles.add(new JpaRole(authority.getAuthority(), organization));
-        }
-
-        Date loginDate = new Date();
-
-        // Create new JpaUserReference if none exists or update existing
-        if (jpaUserReference == null) {
-          String jpaContext = request.getParameter(CONTEXT_ID);
-          jpaContext = StringUtils.isBlank(jpaContext) ? DEFAULT_CONTEXT : jpaContext;
-
-          JpaUserReference userReference = new JpaUserReference(username, username, null, jpaContext, loginDate, organization, jpaRoles);
-          userReferenceProvider.addUserReference(userReference, jpaContext);
-        }
-        else {
-          jpaUserReference.setLastLogin(loginDate);
-          jpaUserReference.setRoles(jpaRoles);
-          userReferenceProvider.updateUserReference(jpaUserReference);
-        }
+      Set<JpaRole> jpaRoles = new HashSet<JpaRole>();
+      for (GrantedAuthority authority : userAuthorities) {
+        jpaRoles.add(new JpaRole(authority.getAuthority(), organization));
       }
+
+      Date loginDate = new Date();
+
+      // Create new JpaUserReference if none exists or update existing
+      if (jpaUserReference == null) {
+        String jpaContext = request.getParameter(CONTEXT_ID);
+        jpaContext = StringUtils.isBlank(jpaContext) ? DEFAULT_CONTEXT : jpaContext;
+
+        JpaUserReference userReference = new JpaUserReference(username, username, null, jpaContext, loginDate, organization, jpaRoles);
+        userReferenceProvider.addUserReference(userReference, jpaContext);
+      }
+      else {
+        jpaUserReference.setLastLogin(loginDate);
+        jpaUserReference.setRoles(jpaRoles);
+        userReferenceProvider.updateUserReference(jpaUserReference);
+      }
+    }
     //Create/Update UserReference End
 
     Authentication ltiAuth = new PreAuthenticatedAuthenticationToken(userDetails, authentication.getCredentials(),
