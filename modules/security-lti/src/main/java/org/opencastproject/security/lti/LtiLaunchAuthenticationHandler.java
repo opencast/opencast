@@ -30,11 +30,6 @@ import org.opencastproject.security.impl.jpa.JpaUserReference;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.UncheckedExecutionException;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -58,7 +53,6 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -143,12 +137,6 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
   /** Determines whether a JpaUserReference should be created on lti login */
   private boolean createJpaUserReference = false;
-
-  /** concurrent attemtps saved in a cache */
-  private LoadingCache<String, Object> userDetailsCache;
-
-  /** A token to store in the miss cache */
-  private Object nullToken = null;
 
   public void setUserDetailsService(UserDetailsService userDetailsService) {
     this.userDetailsService = userDetailsService;
@@ -290,40 +278,22 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       logger.debug("LTI user id is : {}", username);
     }
 
-    UserDetails userDetails = null;
-    Collection<GrantedAuthority> userAuthorities = new HashSet<>();
+    UserDetails userDetails;
+    Collection<GrantedAuthority> userAuthorities;
     try {
+      userDetails = userDetailsService.loadUserByUsername(username);
 
-      userDetailsCache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<String, Object>() {
+      // userDetails returns a Collection<? extends GrantedAuthority>, which cannot be directly casted to a
+      // Collection<GrantedAuthority>.
+      // On the other hand, one cannot add non-null elements or modify the existing ones in a Collection<? extends
+      // GrantedAuthority>. Therefore, we *must* instantiate a new Collection<GrantedAuthority> (an ArrayList in this
+      // case) and populate it with whatever elements are returned by getAuthorities()
+      userAuthorities = new HashSet<>(userDetails.getAuthorities());
 
-        @Override
-        public Object load(String username) {
-          logger.trace("Loading user '{}' from cache or by service", username);
-          UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-          return userDetails == null ? nullToken : userDetails;
-        }
-      });
-
-      try {
-        // use #getUnchecked since the loader does not throw any checked exceptions
-        userDetails = (UserDetails)userDetailsCache.getUnchecked(username);
-        if (userDetails != nullToken) {
-          // userDetails returns a Collection<? extends GrantedAuthority>, which cannot be directly casted to a
-          // Collection<GrantedAuthority>.
-          // On the other hand, one cannot add non-null elements or modify the existing ones in a Collection<? extends
-          // GrantedAuthority>. Therefore, we *must* instantiate a new Collection<GrantedAuthority> (an ArrayList in this
-          // case) and populate it with whatever elements are returned by getAuthorities()
-          userAuthorities = new HashSet<>(userDetails.getAuthorities());
-
-          // we still need to enrich this user with the LTI Roles
-          String roles = request.getParameter(ROLES);
-          String context = request.getParameter(CONTEXT_ID);
-          enrichRoleGrants(roles, context, userAuthorities);
-        }
-      } catch (UncheckedExecutionException e) {
-        logger.warn("Exception while loading UserDetails from cache " + username, e);
-      }
-
+      // we still need to enrich this user with the LTI Roles
+      String roles = request.getParameter(ROLES);
+      String context = request.getParameter(CONTEXT_ID);
+      enrichRoleGrants(roles, context, userAuthorities);
     } catch (UsernameNotFoundException e) {
       // This user is known to the tool consumer, but not to Opencast. Create a user "on the fly"
       userAuthorities = new HashSet<>();
