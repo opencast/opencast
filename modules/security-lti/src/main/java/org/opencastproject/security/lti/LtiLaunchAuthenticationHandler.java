@@ -52,8 +52,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -295,7 +297,8 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       String context = request.getParameter(CONTEXT_ID);
       enrichRoleGrants(roles, context, userAuthorities);
     } catch (UsernameNotFoundException e) {
-      // This user is known to the tool consumer, but not to Opencast. Create a user "on the fly"
+      logger.trace("This user is known to the tool consumer only. Creating an Opencast user on the fly.", e);
+
       userAuthorities = new HashSet<>();
       // We should add the authorities passed in from the tool consumer?
       String roles = request.getParameter(ROLES);
@@ -319,7 +322,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
       JpaUserReference jpaUserReference = userReferenceProvider.findUserReference(username, organization.getId());
 
-      Set<JpaRole> jpaRoles = new HashSet<JpaRole>();
+      Set<JpaRole> jpaRoles = new HashSet<>();
       for (GrantedAuthority authority : userAuthorities) {
         jpaRoles.add(new JpaRole(authority.getAuthority(), organization));
       }
@@ -328,13 +331,18 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
       // Create new JpaUserReference if none exists or update existing
       if (jpaUserReference == null) {
-        String jpaContext = request.getParameter(CONTEXT_ID);
-        jpaContext = StringUtils.isBlank(jpaContext) ? DEFAULT_CONTEXT : jpaContext;
-
-        JpaUserReference userReference = new JpaUserReference(username, username, null, jpaContext, loginDate, organization, jpaRoles);
-        userReferenceProvider.addUserReference(userReference, jpaContext);
-      }
-      else {
+        try {
+          final String jpaContext = Objects.toString(request.getParameter(CONTEXT_ID), DEFAULT_CONTEXT);
+          JpaUserReference userReference = new JpaUserReference(username, username, null, jpaContext, loginDate,
+              organization, jpaRoles);
+          userReferenceProvider.addUserReference(userReference, jpaContext);
+        } catch (RollbackException e) {
+          // Being optimistic (we use optimistic locking for the db anyway) and deliberately allowing things to not be
+          // stored in case we get a rollback which should mean that someone added this user to the database in the
+          // meantime
+          logger.debug("Could not store reference since database was changed during update by another process", e);
+        }
+      } else {
         jpaUserReference.setLastLogin(loginDate);
         jpaUserReference.setRoles(jpaRoles);
         userReferenceProvider.updateUserReference(jpaUserReference);
