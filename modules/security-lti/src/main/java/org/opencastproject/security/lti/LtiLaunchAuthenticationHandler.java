@@ -352,14 +352,28 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
           Date loginDate = new Date();
 
+          // Get some user details
+          String name = request.getParameter("lis_person_name_full");
+          if (name == null) {
+            final String familyName = Objects.toString(request.getParameter("lis_person_name_family"), "");
+            final String givenName = Objects.toString(request.getParameter("lis_person_name_given"), "");
+            name = String.format("%s %s", givenName, familyName).trim();
+            if (name.isEmpty()) {
+              name = username;
+            }
+          }
+          final String email = request.getParameter("lis_person_contact_email_primary");
+
           // Create new JpaUserReference if none exists or update existing
           if (jpaUserReference == null) {
             final String jpaContext = Objects.toString(request.getParameter(CONTEXT_ID), DEFAULT_CONTEXT);
-            JpaUserReference userReference = new JpaUserReference(username, username, null, jpaContext, loginDate,
-                    organization, jpaRoles);
+            JpaUserReference userReference = new JpaUserReference(username, name, email, jpaContext, loginDate,
+                organization, jpaRoles);
             userReferenceProvider.addUserReference(userReference, jpaContext);
           } else {
             jpaUserReference.setLastLogin(loginDate);
+            jpaUserReference.setName(name);
+            jpaUserReference.setEmail(email);
             jpaUserReference.setRoles(jpaRoles);
             userReferenceProvider.updateUserReference(jpaUserReference);
           }
