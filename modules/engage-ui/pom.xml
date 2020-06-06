@@ -84,7 +84,8 @@
                         <file file="node_modules/js-yaml/dist/js-yaml.min.js" />
                         <file file="node_modules/requirejs/require.js" />
                         <file file="node_modules/seedrandom/seedrandom.min.js" />
-                        <file file="node_modules/underscore/underscore-min.js" />
+                        <file file="node_modules/underscore/underscore.js" />
+                        <file file="node_modules/underscore/underscore.js.map" />
                       </resources>
                     </copy>
                   </target>
@@ -160,7 +161,8 @@
                         <file file="node_modules/js-yaml/dist/js-yaml.min.js" />
                         <file file="node_modules/requirejs/require.js" />
                         <file file="node_modules/seedrandom/seedrandom.min.js" />
-                        <file file="node_modules/underscore/underscore-min.js" />
+                        <file file="node_modules/underscore/underscore.js" />
+                        <file file="node_modules/underscore/underscore.js.map" />
                       </resources>
                     </copy>
                   </target>

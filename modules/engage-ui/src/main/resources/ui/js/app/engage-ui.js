@@ -21,7 +21,7 @@
 
 /* global define, pushHistory */
 
-define(['jquery', 'bootbox.min', 'underscore-min', 'alertify/alertify', 'js-yaml.min', 'bootstrap-accessibility',
+define(['jquery', 'bootbox.min', 'underscore', 'alertify/alertify', 'js-yaml.min', 'bootstrap-accessibility',
   'jquery.liveSearch', 'seedrandom.min', 'jquery.utils',
   'dropdowns-enhancement'
 ],
