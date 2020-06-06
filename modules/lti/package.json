@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "i18n": "./i18n.js",
-    "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js src/main/resources/",
+    "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js src/main/resources/ --resolve-plugins-relative-to .",
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/main/resources/**/*.html'"
   },
   "dependencies": {
@@ -13,7 +13,7 @@
     "paginationjs": "^2.1.5"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
+    "eslint": "^7.2.0",
     "eslint-plugin-header": "^3.0.0",
     "html-linter": "^1.1.1"
   }
