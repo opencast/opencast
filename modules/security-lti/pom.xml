@@ -58,10 +58,6 @@
       <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>javax.persistence</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-kernel</artifactId>
       <version>${project.version}</version>

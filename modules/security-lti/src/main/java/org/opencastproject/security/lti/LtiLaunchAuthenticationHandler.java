@@ -52,10 +52,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-
-import javax.persistence.RollbackException;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -136,6 +136,9 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
   /** Set of usernames that should not authenticated as themselves even if the OAuth consumer keys is trusted */
   private Set<String> usernameBlacklist = new HashSet<>();
+
+  /** concurrent attemtps */
+  private Map<String, Boolean> attempts = new ConcurrentHashMap<>(128);
 
   /** Determines whether a JpaUserReference should be created on lti login */
   private boolean createJpaUserReference = false;
@@ -298,7 +301,6 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       enrichRoleGrants(roles, context, userAuthorities);
     } catch (UsernameNotFoundException e) {
       logger.trace("This user is known to the tool consumer only. Creating an Opencast user on the fly.", e);
-
       userAuthorities = new HashSet<>();
       // We should add the authorities passed in from the tool consumer?
       String roles = request.getParameter(ROLES);
@@ -315,37 +317,36 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     userAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
     userAuthorities.add(new SimpleGrantedAuthority("ROLE_ANONYMOUS"));
 
-
     // Create/Update the user reference
     if (createJpaUserReference) {
-      JpaOrganization organization = fromOrganization(securityService.getOrganization());
-
-      JpaUserReference jpaUserReference = userReferenceProvider.findUserReference(username, organization.getId());
-
-      Set<JpaRole> jpaRoles = new HashSet<>();
-      for (GrantedAuthority authority : userAuthorities) {
-        jpaRoles.add(new JpaRole(authority.getAuthority(), organization));
-      }
-
-      Date loginDate = new Date();
-
-      // Create new JpaUserReference if none exists or update existing
-      if (jpaUserReference == null) {
-        try {
-          final String jpaContext = Objects.toString(request.getParameter(CONTEXT_ID), DEFAULT_CONTEXT);
-          JpaUserReference userReference = new JpaUserReference(username, username, null, jpaContext, loginDate,
-              organization, jpaRoles);
-          userReferenceProvider.addUserReference(userReference, jpaContext);
-        } catch (RollbackException e) {
-          // Being optimistic (we use optimistic locking for the db anyway) and deliberately allowing things to not be
-          // stored in case we get a rollback which should mean that someone added this user to the database in the
-          // meantime
-          logger.debug("Could not store reference since database was changed during update by another process", e);
-        }
+      if (attempts.putIfAbsent(username, Boolean.TRUE) != null) {
+        logger.warn("Concurrent access of user {}. Igoring.", username);
       } else {
-        jpaUserReference.setLastLogin(loginDate);
-        jpaUserReference.setRoles(jpaRoles);
-        userReferenceProvider.updateUserReference(jpaUserReference);
+
+        try {
+          JpaOrganization organization = fromOrganization(securityService.getOrganization());
+          JpaUserReference jpaUserReference = userReferenceProvider.findUserReference(username, organization.getId());
+          Set<JpaRole> jpaRoles = new HashSet<>();
+          for (GrantedAuthority authority : userAuthorities) {
+            jpaRoles.add(new JpaRole(authority.getAuthority(), organization));
+          }
+
+          Date loginDate = new Date();
+
+          // Create new JpaUserReference if none exists or update existing
+          if (jpaUserReference == null) {
+            final String jpaContext = Objects.toString(request.getParameter(CONTEXT_ID), DEFAULT_CONTEXT);
+            JpaUserReference userReference = new JpaUserReference(username, username, null, jpaContext, loginDate,
+                    organization, jpaRoles);
+            userReferenceProvider.addUserReference(userReference, jpaContext);
+          } else {
+            jpaUserReference.setLastLogin(loginDate);
+            jpaUserReference.setRoles(jpaRoles);
+            userReferenceProvider.updateUserReference(jpaUserReference);
+          }
+        } finally {
+          attempts.remove(username);
+        }
       }
     }
     //Create/Update UserReference End
@@ -355,6 +356,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     SecurityContextHolder.getContext().setAuthentication(ltiAuth);
     return ltiAuth;
   }
+
 
   /**
    * Enrich A collection of role grants with specified LTI memberships.
