@@ -49,14 +49,18 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
@@ -102,6 +106,12 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   /** A Set of prefixes. When a role starts with any of these, the role prefix defined above will not be prepended */
   private Set<String> setExcludePrefixes = new HashSet<>();
 
+  /** Specifies, whether the roleattributes should be added as a Opencast role */
+  private boolean applyRoleattributesAsRoles = true;
+
+  /** Mapping of ldap assignments to opencast roles */
+  private Map<String, String[]> ldapAssignmentRoleMap = new HashMap();
+
   /**
    * Constructs an ldap user provider with the needed settings.
    *
@@ -120,13 +130,18 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    * @param password
    *          the user credentials
    * @param roleAttributesGlob
-   *          the comma separate list of ldap attributes to treat as roles
+   *          the comma separate list of ldap attributes to treat as roles or to consider for the ldapAssignmentRoleMap
    * @param rolePrefix
    *          a prefix to be prepended to all the roles read from the LDAP server
    * @param extraRoles
    *          an array of extra roles to add to all the users
    * @param excludePrefixes
    *          an array of role prefixes. The roles starting with any of these will not be prepended with the rolePrefix
+   * @param applyRoleattributesAsRoles
+   *          Specifies, whether the roleattributes should be added as a Opencast role
+   * @param ldapAssignmentRoleMap
+   *          a Map which maps the ldap assignments to additional roles
+   *          Key and value are expected to be uppercase if the bool uppercase is set.
    * @param convertToUppercase
    *          whether or not the role names will be converted to uppercase
    * @param cacheSize
@@ -139,8 +154,8 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
   // CHECKSTYLE:OFF
   LdapUserProviderInstance(String pid, Organization organization, String searchBase, String searchFilter, String url,
           String userDn, String password, String roleAttributesGlob, String rolePrefix, String[] extraRoles,
-          String[] excludePrefixes, boolean convertToUppercase, int cacheSize, int cacheExpiration,
-          SecurityService securityService) {
+          String[] excludePrefixes, boolean applyRoleattributesAsRoles, Map<String, String[]> ldapAssignmentRoleMap,
+          boolean convertToUppercase, int cacheSize, int cacheExpiration, SecurityService securityService) {
     // CHECKSTYLE:ON
     this.organization = organization;
     this.securityService = securityService;
@@ -212,6 +227,12 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
           }
         }
       }
+    }
+
+    this.applyRoleattributesAsRoles = applyRoleattributesAsRoles;
+
+    if (ldapAssignmentRoleMap != null) {
+      this.ldapAssignmentRoleMap = ldapAssignmentRoleMap;
     }
 
     // Process extra roles
@@ -329,13 +350,26 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
       JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
 
+      Collection<GrantedAuthority> springAuthorities = (Collection<GrantedAuthority>) userDetails.getAuthorities();
+
+      // Add mapped roles
+      Set<JaxbRole> roles = springAuthorities.stream()
+              .map(auth -> auth.getAuthority())
+              .map(strAuth -> ldapAssignmentRoleMap.get(strAuth))
+              .filter(arrRole -> arrRole != null)
+              .flatMap(arrRole -> Arrays.stream(arrRole))
+              .map(role -> new JaxbRole(role, jaxbOrganization))
+              .collect(Collectors.toCollection(HashSet::new));
+
       // Get the roles and add the extra roles
       Collection<GrantedAuthority> authorities = new HashSet<>();
-      authorities.addAll(userDetails.getAuthorities());
+      if (applyRoleattributesAsRoles) {
+        authorities.addAll(springAuthorities);
+      }
       authorities.addAll(setExtraRoles);
 
-      Set<JaxbRole> roles = new HashSet<>();
       /*
+       * Add roles
        * Please note the prefix logic for roles:
        *
        * - Roles that start with any of the "exclude prefixes" are left intact

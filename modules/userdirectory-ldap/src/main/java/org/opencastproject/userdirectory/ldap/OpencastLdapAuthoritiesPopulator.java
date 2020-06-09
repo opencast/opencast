@@ -36,10 +36,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /** Map a series of LDAP attributes to user authorities in Opencast */
@@ -52,6 +55,9 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
   private String[] additionalAuthorities;
   private String prefix = "";
   private Set<String> excludedPrefixes = new HashSet<>();
+  private String groupCheckPrefix = null;
+  private boolean applyAttributesAsGroups = true;
+  private Map<String, String[]> ldapAssignmentGroupMap = new HashMap();
   private boolean uppercase = true;
   private Organization organization;
   private SecurityService securityService;
@@ -60,8 +66,15 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
 
   /**
    * Activate component
+   *
+   * @param applyAttributesAsGroups
+   *          Specifies, whether the ldap attributes should be added as a group.
+   * @param ldapAssignmentGroupMap
+   *          Maps the ldap assignments to additional groups.
+   *          Key and value are expected to be uppercase if the bool uppercase is set.
    */
   public OpencastLdapAuthoritiesPopulator(String attributeNames, String prefix, String[] aExcludedPrefixes,
+          String groupCheckPrefix, boolean applyAttributesAsGroups, Map<String, String[]> ldapAssignmentGroupMap,
           boolean uppercase, Organization organization, SecurityService securityService,
           JpaGroupRoleProvider groupRoleProvider, String... additionalAuthorities) {
 
@@ -127,10 +140,23 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
         }
       }
 
+    if (groupCheckPrefix == null) {
+      throw new IllegalArgumentException("The parameter groupCheckPrefix cannot be null");
+    }
+    this.groupCheckPrefix = groupCheckPrefix;
+
+    this.applyAttributesAsGroups = applyAttributesAsGroups;
+
+    if (ldapAssignmentGroupMap != null) {
+      this.ldapAssignmentGroupMap = ldapAssignmentGroupMap;
+    }
+
     if (additionalAuthorities == null)
       this.additionalAuthorities = new String[0];
     else
-      this.additionalAuthorities = additionalAuthorities;
+      this.additionalAuthorities = Arrays.stream(additionalAuthorities)
+              .filter(x -> roleCleanUpperCase(x, this.uppercase).startsWith(this.groupCheckPrefix))
+              .toArray(String[]::new);
 
     if (logger.isDebugEnabled()) {
       StringBuilder additionalAuthoritiesAsStr = new StringBuilder();
@@ -155,7 +181,26 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
         if (attributeValues != null) {
           for (String attributeValue : attributeValues) {
             // The attribute value may be a single authority (a single role) or a list of roles
-            addAuthorities(authorities, attributeValue.split(","));
+            String[] splitValue =  attributeValue.split(",");
+            if (applyAttributesAsGroups) {
+              // ignore attributes which aren't groups according to groupCheckPrefix
+              String[] groups = Arrays.stream(splitValue)
+                      .filter(x -> {
+                        String filter = roleCleanUpperCase(x, uppercase);
+                        return filter.startsWith(groupCheckPrefix);
+                      })
+                      .toArray(String[]::new);
+              addAuthorities(authorities, groups);
+            }
+
+            // map attribute values to groups
+            String[] mappedGroups = Arrays.stream(splitValue)
+                    .map(x -> roleCleanUpperCase(x, uppercase))
+                    .map(x -> ldapAssignmentGroupMap.get(x))
+                    .filter(x -> x != null)
+                    .flatMap(x -> Arrays.stream(x))
+                    .toArray(String[]::new);
+            addAuthorities(authorities, mappedGroups);
           }
         } else {
           logger.debug("Could not find any attribute named '{}' in user '{}'", attributeName, userData.getDn());
@@ -242,6 +287,24 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
   }
 
   /**
+   * Cleans the spaces and unnecessary underscores out of the provided Role and converts it to uppercase if needed
+   *
+   * @param rawRole
+   *          the raw Role, which should be cleaned and converted
+   * @param toUpperCase
+   *          set if the Role should be converted to uppercase
+   */
+  private String roleCleanUpperCase(String rawRole, boolean toUpperCase) {
+    if (toUpperCase) {
+      return StringUtils.trimToEmpty(rawRole).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT)
+              .toUpperCase();
+    }
+    else {
+      return StringUtils.trimToEmpty(rawRole).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT);
+    }
+  }
+
+  /**
    * Add the specified authorities to the provided set
    *
    * @param authorities
@@ -268,12 +331,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
          * This only applies to the prefix addition. The conversion to uppercase is independent from these
          * considerations
          */
-        String authority;
-        if (uppercase)
-          authority = StringUtils.trimToEmpty(value).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT)
-                  .toUpperCase();
-        else
-          authority = StringUtils.trimToEmpty(value).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT);
+        String authority = roleCleanUpperCase(value, uppercase);
 
         // Ignore the empty parts
         if (!authority.isEmpty()) {

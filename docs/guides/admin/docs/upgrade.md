@@ -51,6 +51,10 @@ Please make sure to compare your configuration against the current configuration
 - The configuration keys `source-tags` and `source-flavors` of the _publish-configure_ workflow operation were renamed
   to `download-source-tags` and `download-source-flavors` respectively. If you use custom workflows, you may need to
   adjust them accordingly.
+- A new configuration option `org.opencastproject.userdirectory.ldap.groupcheckprefix` with default option
+  was added to the LDAP configuration. The option affects the
+  `org.opencastproject.userdirectory.ldap.roleattributes` and `org.opencastproject.userdirectory.ldap.extra.roles`
+  configuration options and should be adjusted accordingly
 
 
 Install and configure a standalone Elasticsearch node
