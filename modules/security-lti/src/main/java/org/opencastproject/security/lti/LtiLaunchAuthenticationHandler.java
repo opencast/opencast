@@ -56,6 +56,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -138,7 +139,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   private Set<String> usernameBlacklist = new HashSet<>();
 
   /** concurrent attemtps */
-  private Map<String, Boolean> attempts = new ConcurrentHashMap<>(128);
+  private Map<String, Boolean> activePersistenceTransactions = new ConcurrentHashMap<>(128);
 
   /** Determines whether a JpaUserReference should be created on lti login */
   private boolean createJpaUserReference = false;
@@ -301,6 +302,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       enrichRoleGrants(roles, context, userAuthorities);
     } catch (UsernameNotFoundException e) {
       logger.trace("This user is known to the tool consumer only. Creating an Opencast user on the fly.", e);
+
       userAuthorities = new HashSet<>();
       // We should add the authorities passed in from the tool consumer?
       String roles = request.getParameter(ROLES);
@@ -317,10 +319,11 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     userAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
     userAuthorities.add(new SimpleGrantedAuthority("ROLE_ANONYMOUS"));
 
+
     // Create/Update the user reference
     if (createJpaUserReference) {
-      if (attempts.putIfAbsent(username, Boolean.TRUE) != null) {
-        logger.warn("Concurrent access of user {}. Igoring.", username);
+      if (activePersistenceTransactions.putIfAbsent(username, Boolean.TRUE) != null) {
+        logger.debug("Concurrent access of user {}. Ignoring.", username);
       } else {
 
         try {
@@ -345,7 +348,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
             userReferenceProvider.updateUserReference(jpaUserReference);
           }
         } finally {
-          attempts.remove(username);
+          activePersistenceTransactions.remove(username);
         }
       }
     }
@@ -356,7 +359,6 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     SecurityContextHolder.getContext().setAuthentication(ltiAuth);
     return ltiAuth;
   }
-
 
   /**
    * Enrich A collection of role grants with specified LTI memberships.
