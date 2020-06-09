@@ -557,7 +557,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     return tracks.stream().filter(AdaptivePlaylist.isHLSTrackPred).collect(Collectors.toList());
   }
 
-  // #DCE OPC-357-HLS-VOD
+  // HLS-VOD
   private void decipherHLSPlaylistResults(Track track, JobInformation jobInfo, MediaPackage mediaPackage,
           List<Track> composedTracks)
           throws WorkflowOperationException, IllegalArgumentException, NotFoundException, IOException {
