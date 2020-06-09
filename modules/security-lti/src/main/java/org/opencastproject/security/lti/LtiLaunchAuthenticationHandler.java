@@ -57,6 +57,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -347,6 +348,11 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
             jpaUserReference.setRoles(jpaRoles);
             userReferenceProvider.updateUserReference(jpaUserReference);
           }
+        } catch (RollbackException e) {
+          // In the unlikely case that concurrency happens at the same time on multiple servers, we catch the
+          // rollback, assuming that the user is already persisted and let the user pass. Worst case, this means that
+          // the user is only temporarily authenticated.
+          logger.warn("Could not store reference since database was changed during update by another process", e);
         } finally {
           activePersistenceTransactions.remove(username);
         }
