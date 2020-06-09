@@ -5,7 +5,7 @@
 The MultiencodeWorkflowHandler is used to encode source media into multiple formats concurrently.
 The source recording are selected by source-flavors AND source-tags.
 Each source media selector (eg presenter or presentation) can have an independent set of encoding profile ids
-(one for each target medium) and target tags.
+(one for each target recording) and target tags.
 Encoding of each source medium runs as one ffmpeg command.
 This operation will generate one multiencode operation per source medium,
 all of them running concurrently on the same or on different workers.
@@ -21,14 +21,14 @@ The use of the semi-colon is optional. If it is absent, there is only one sectio
 ```
 <configuration key="source-flavors">*/source</configuration>
 ```
-> One source selector means that all the matching recording will be processed the same way.
+>   One source selector means that all the matching recording will be processed the same way.
 >
 ```
 <configuration key="source-flavors">presenter/source;presentation/source</configuration>
 ```
-> Two different source selectors means that all the matching recordings in the first selector will be processed
-> according to the parameters in the first section and the all the matching recordings in the second selector will
-> be processed according to the parameters in next section.
+>   Two different source selectors means that all the matching recordings in the first selector will be processed
+>   according to the parameters in the first section and the all the matching recordings in the second selector will
+>   be processed according to the parameters in next section.
 
 Each source selector can have only one corresponding section.
 If there is only one section in one parameter, eg: target-flavors,
@@ -49,9 +49,9 @@ For example:
 ```
 <configuration key="target-tags">engage-streaming,rss,atom;engage-download,rss,atom</configuration>
 ```
-> Using the example above.
-> "presenter/preview" is tagged with "engage-streaming,rss,atom".
-> "presentation/preview" is tagged with "engage-download,rss,atom".
+>   Using the example above.
+>   "presenter/preview" is tagged with "engage-streaming,rss,atom".
+>   "presentation/preview" is tagged with "engage-download,rss,atom".
 
 When a configuration has the same number of sections as the source, then the configurations for the operation
 are taken from the corresponding sections.
@@ -59,10 +59,34 @@ are taken from the corresponding sections.
 Each section runs independently as a parallel encoding job.
 
 For example, if presenter/source is to encoded with "mp4-low.http,mp4-medium.http" and
-presentation/source is to be encoded with "mp4-hd.http,mp4-hd.http"
+presentation/source is to be encoded with "*mp4-hd.http,mp4-hd.http"
 
 The target flavors are presenter/delivery and presentation/delivery and all are tagged "rss, archive".
 The target flavors are additionally tagged with encoding profiles, so that they can selected individually.
+
+This workflow supports HLS adaptive streaming.
+By:
+    1) Using only H.264/HENV encodings in the list of encoding profiles. 
+    2) In the encoding profile, use the "-<option>:<a or v>" form in ffmpeg options when appropiate
+    (eg: "-b:a" instead of "-ab"),
+    and add the suffix ":v" for options that apply to video and ":a" to options that apply to audio,
+    (eg: -maxrate:v, -g:v )
+    3) Use the same keyframe intervals (-keyint <int> and -keyint_min <int>) in each profile and 
+    segment size (see below) should be a multiple of this integer.
+    4) Adding a special encoding profile "multiencode-hls" to the list of encoding profiles. By default,
+    the segments size is 6s (-hls-time) .
+HLS Playlists are generated as part of the encoding process. Each mp4 is a fragmented MP4.
+A variant playlist is created for each mp4 and a master playlist is used to access all the different qualities.
+
+To make sure that stream switching works as expected, state the bitrates explicitly for each of mp4 encoding profiles used.
+For advices on how to pick bitrates see:
+https://developer.apple.com/documentation/http_live_streaming/hls_authoring_specification_for_apple_devices
+
+For more details on HLS, see:
+https://tools.ietf.org/html/rfc8216
+https://tools.ietf.org/html/draft-pantos-http-live-streaming-23
+
+Without HLS, it will look like the following.
 
 ## Parameter Table
 
@@ -72,7 +96,7 @@ The target flavors are additionally tagged with encoding profiles, so that they 
 |target-flavors     | */preview                  | Specifies the flavor of the new media                               |
 |target-tags        | rss,archive              | Specifies the tags of the new media                                 |
 |encoding-profiles  | mp4-low.http,mp4-medium.http*;*mp4-hd.http,mp4-hd.http | Encoding profiles for each source flavor |
-|tag-with-profile   | true  | target media are tagged with coresponding encoding profile Id (false if omitted)     |
+|tag-with-profile   | true (default to false)     | target medium are tagged with coresponding encoding profile Id      |
 
 
 
@@ -82,7 +106,7 @@ The target flavors are additionally tagged with encoding profiles, so that they 
         id="multiencode"
         fail-on-error="true"
         exception-handler-workflow="error"
-        description="Encoding media to delivery formats">
+        description="Encoding presenter (camera) video to Flash download">
         <configurations>
             <configuration key="source-flavors">presenter/work;presentation/work</configuration>
             <configuration key="target-flavors">*/delivery</configuration>
@@ -99,7 +123,7 @@ of the encoding profile commands.
 * Care must be taken that no ffmpeg complex filters are used in the encoding profiles used for this workflow,
 as it can cause a conflict.
 
-* Encoded target media are distinguished by the suffix, it is important that all the encoding profiles used have
+* Encoded target recording are distinguished by the suffix, it is important that all the encoding profiles used have
 distinct suffixes to use "tag-with-profile" configuration, for example:
 ```
 profile.mp4-vga-medium.http.suffix = -vga-medium.mp4
