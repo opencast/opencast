@@ -1035,12 +1035,14 @@ public class EncoderEngine implements AutoCloseable {
     }
 
     /**
-     * When the inputs are routed to ABR, some options need to have a v:<int> suffix for video and a:0 for audio Any
-     * options ending with ":v" will get a number, otherwise try and guess use <option>:<v or a> notables (eg: b:v,
-     * c:v), options such as ab or vb will not work
+     * When the inputs are routed to ABR, some options need to have a v:int suffix for video and a:0 for audio Any
+     * options ending with ":v" will get a number, otherwise try and guess use option:(v or a) notables (eg: b:v, c:v),
+     * options such as ab or vb will not work
      *
      * @param option
+     *          - ffmpeg option
      * @param position
+     *          - position in the command
      */
     public String adjustABRVMaps(String option, int position) {
       if (option.endsWith(":v") || option.endsWith(":a")) {

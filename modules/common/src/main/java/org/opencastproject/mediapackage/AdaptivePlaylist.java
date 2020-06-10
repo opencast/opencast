@@ -131,8 +131,10 @@ public interface AdaptivePlaylist extends Track {
    * Return true if this is a master manifest (contains variants manifest and no media segments)
    *
    * @param file
+   *          - media file
    * @return true if is a master manifest
    * @throws IOException
+   *           if bad file
    */
   static boolean checkForMaster(File file) throws IOException {
     if (!isPlaylist(file))
@@ -149,8 +151,10 @@ public interface AdaptivePlaylist extends Track {
    * Return true if this is a variant manifest (contains media segments only)
    *
    * @param file
+   *          - media file
    * @return true if is a HLS playlist but not master
    * @throws IOException
+   *           if bad file - can't access or otherwise
    */
   static boolean checkForVariant(File file) throws IOException {
     if (!isPlaylist(file))
@@ -169,8 +173,9 @@ public interface AdaptivePlaylist extends Track {
    *
    * @param file
    *          to parse
-   * @return Set<string> of names referenced
+   * @return Set of names referenced
    * @throws IOException
+   *           if can't access file
    */
   static Set<String> getVariants(File file) throws IOException {
     Set<String> files = new HashSet<String>();
@@ -194,8 +199,10 @@ public interface AdaptivePlaylist extends Track {
    * Given a playlist - recursively get all referenced files in the same filesystem with relative links
    *
    * @param file
-   * @return Set<string> of names referenced
+   *          media file
+   * @return Set of names referenced
    * @throws IOException
+   *           if can't access file
    */
   static Set<String> getReferencedFiles(File file, boolean segmentsOnly) throws IOException {
     Set<String> allFiles = new HashSet<String>(); // don't include playlist variants
@@ -223,6 +230,7 @@ public interface AdaptivePlaylist extends Track {
    * Set the path of the url as the logical name
    *
    * @param track
+   *          - tag with name
    */
   static void setLogicalName(Track track) {
     track.setLogicalName(FilenameUtils.getName(track.getURI().getPath()));
@@ -236,6 +244,7 @@ public interface AdaptivePlaylist extends Track {
    * @param getFileFromURI
    *          - a way to map uri to file
    * @throws IOException
+   *           if failed to read files
    */
   static void hlsSetReferences(List<Track> tracks, Function<URI, File> getFileFromURI) throws IOException {
     final Optional<Track> master = tracks.stream().filter(t -> t.isMaster()).findAny();
@@ -267,6 +276,7 @@ public interface AdaptivePlaylist extends Track {
    *          - the mapping of the references to the actual file location
    * @return the fixed files
    * @throws IOException
+   *           if failed to read files
    */
   static List<File> hlsRenameAllFiles(List<File> hlsFiles, Map<File, File> map) throws IOException {
     for (Map.Entry<File, File> entry : map.entrySet()) {
@@ -291,9 +301,12 @@ public interface AdaptivePlaylist extends Track {
   /**
    * Fix all the HLS file references in a manifest when a referenced file is renamed
    *
-   * @param srcFile - srcFile to be rewritten
-   * @param mapNames - mapped from old name to new name
+   * @param srcFile
+   *          - srcFile to be rewritten
+   * @param mapNames
+   *          - mapped from old name to new name
    * @throws IOException
+   *           if failed
    */
   static void hlsRewriteFileReference(File srcFile, Map<String, String> mapNames) throws IOException {
     File tmpFile = new File(srcFile.getAbsolutePath() + UUID.randomUUID() + ".tmp");
@@ -319,6 +332,7 @@ public interface AdaptivePlaylist extends Track {
    * @param mapNames
    *          - mapping from oldName to newName
    * @throws IOException
+   *           if failed
    */
   static void hlsRewriteFileReference(File srcFile, File destFile, Map<String, String> mapNames) throws IOException {
     FileWriter hlsReWriter = null;
@@ -379,7 +393,10 @@ public interface AdaptivePlaylist extends Track {
    * Return logical name mapped to file
    *
    * @param tracks
-   * @return
+   *          from a HLS manifest
+   * @param getFileFromURI
+   *          is a function to get file from an URI
+   * @return names mapped to file
    */
   static Map<String, File> logicalNameFileMap(List<Track> tracks, Function<URI, File> getFileFromURI) {
     Map<String, File> nameMap = tracks.stream().collect(Collectors.<Track, String, File> toMap(
@@ -401,7 +418,7 @@ public interface AdaptivePlaylist extends Track {
    *
    * @param tracks
    *          from an HLS playlist
-   * @return
+   * @return track urls as relative to the master playlist
    */
   static HashMap<String, String> urlRelativeToMasterMap(List<Track> tracks) {
     HashMap<String, String> nameMap = new HashMap<String, String>();
@@ -483,11 +500,14 @@ public interface AdaptivePlaylist extends Track {
    * Replace the content of a playlist file in place, use in composer only - not in workspace
    *
    * @param file
+   *          as playlist
    * @param map
    *          - mapping from reference/logical name to new path
-   * @return
+   * @return playlist with changed file names based on the map
    * @throws IOException
+   *           if can't access file
    * @throws NotFoundException
+   *           if file not found
    */
   static File replaceTrackFileInPlace(File file, Map<String, String> map) throws IOException, NotFoundException {
     File newFile = new File(file.getAbsolutePath() + UUID.randomUUID() + ".tmp");
@@ -511,9 +531,12 @@ public interface AdaptivePlaylist extends Track {
    * Find relative path to referee URL if a link is in the referer page
    *
    * @param referer
+   *          - pointer to file
    * @param referee
+   *          - pointee
    * @return referee path as a relative path from referer URL
    * @throws URISyntaxException
+   *           if bad URI
    */
 
   static String relativize(URI referer, URI referee) throws URISyntaxException {
@@ -555,7 +578,9 @@ public interface AdaptivePlaylist extends Track {
    * @throws NotFoundException
    *           if files are missing
    * @throws IOException
+   *           if can't read
    * @throws URISyntaxException
+   *           if bad URI
    */
   static List<Track> fixReferences(List<Track> tracks, File mpDir)
           throws MediaPackageException, NotFoundException, IOException, URISyntaxException {
@@ -656,7 +681,9 @@ public interface AdaptivePlaylist extends Track {
      * @param getFileFromURI
      *          - a function to get files from the media package by URI
      * @throws IOException
+     *           if can't read file
      * @throws URISyntaxException
+     *           if bad URI
      * @throws MediaPackageException
      *           - if mediapackage is incomplete and missing segments
      */
@@ -694,13 +721,16 @@ public interface AdaptivePlaylist extends Track {
      * file into a collection changes the path and new path is not known in advance. The two functions are passed in to
      * this function to manage the tracks in its storage
      *
-     * @param replaceTrackFileInMP()
+     * @param mp
+     *          to be rewrittem
+     * @param replaceTrackFileInWS
      *          A function that creates a new track with the file using the metadata in the track, returning a new track
      *          in the media package.
-     * @param removeFromMP()
+     * @param removeFromWS
      *          A function that removes() the track from the media package in the workspace
      * @return old tracks that are removed from the media package
      * @throws MediaPackageException
+     *           if bad mp
      */
 
     public List<Track> rewriteHLS(MediaPackage mp, Function2<File, Track, Track> replaceTrackFileInWS,

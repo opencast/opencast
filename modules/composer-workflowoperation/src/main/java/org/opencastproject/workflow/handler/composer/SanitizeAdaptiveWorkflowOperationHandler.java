@@ -91,11 +91,6 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
     this.workspace = workspace;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
   public SortedMap<String, String> getConfigurationOptions() {
     return CONFIG_OPTIONS;
   }
