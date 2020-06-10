@@ -30,11 +30,6 @@ import org.opencastproject.security.impl.jpa.JpaUserReference;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.UncheckedExecutionException;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -60,9 +55,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
 
+import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
 
 @Component(
@@ -152,14 +150,11 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   /** Set of usernames that should not authenticated as themselves even if the OAuth consumer keys is trusted */
   private Set<String> usernameBlacklist = new HashSet<>();
 
+  /** concurrent attemtps */
+  private Map<String, Boolean> activePersistenceTransactions = new ConcurrentHashMap<>(128);
+
   /** Determines whether a JpaUserReference should be created on lti login */
   private boolean createJpaUserReference = true;
-
-  /** concurrent attemtps saved in a cache */
-  private LoadingCache<String, Object> userDetailsCache;
-
-  /** A token to store in the miss cache */
-  private Object nullToken = null;
 
   @Reference(name = "UserDetailsService")
   public void setUserDetailsService(UserDetailsService userDetailsService) {
@@ -305,42 +300,25 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       logger.debug("LTI user id is : {}", username);
     }
 
-    UserDetails userDetails = null;
-    Collection<GrantedAuthority> userAuthorities = new HashSet<>();
+    UserDetails userDetails;
+    Collection<GrantedAuthority> userAuthorities;
     try {
+      userDetails = userDetailsService.loadUserByUsername(username);
 
-      userDetailsCache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build(new CacheLoader<String, Object>() {
+      // userDetails returns a Collection<? extends GrantedAuthority>, which cannot be directly casted to a
+      // Collection<GrantedAuthority>.
+      // On the other hand, one cannot add non-null elements or modify the existing ones in a Collection<? extends
+      // GrantedAuthority>. Therefore, we *must* instantiate a new Collection<GrantedAuthority> (an ArrayList in this
+      // case) and populate it with whatever elements are returned by getAuthorities()
+      userAuthorities = new HashSet<>(userDetails.getAuthorities());
 
-        @Override
-        public Object load(String username) {
-          logger.trace("Loading user '{}' from cache or by service", username);
-          UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-          return userDetails == null ? nullToken : userDetails;
-        }
-      });
-
-      try {
-        // use #getUnchecked since the loader does not throw any checked exceptions
-        userDetails = (UserDetails)userDetailsCache.getUnchecked(username);
-        if (userDetails != nullToken) {
-          // userDetails returns a Collection<? extends GrantedAuthority>, which cannot be directly casted to a
-          // Collection<GrantedAuthority>.
-          // On the other hand, one cannot add non-null elements or modify the existing ones in a Collection<? extends
-          // GrantedAuthority>. Therefore, we *must* instantiate a new Collection<GrantedAuthority> (an ArrayList in this
-          // case) and populate it with whatever elements are returned by getAuthorities()
-          userAuthorities = new HashSet<>(userDetails.getAuthorities());
-
-          // we still need to enrich this user with the LTI Roles
-          String roles = request.getParameter(ROLES);
-          String context = request.getParameter(CONTEXT_ID);
-          enrichRoleGrants(roles, context, userAuthorities);
-        }
-      } catch (UncheckedExecutionException e) {
-        logger.warn("Exception while loading UserDetails from cache " + username, e);
-      }
-
+      // we still need to enrich this user with the LTI Roles
+      String roles = request.getParameter(ROLES);
+      String context = request.getParameter(CONTEXT_ID);
+      enrichRoleGrants(roles, context, userAuthorities);
     } catch (UsernameNotFoundException e) {
-      // This user is known to the tool consumer, but not to Opencast. Create a user "on the fly"
+      logger.trace("This user is known to the tool consumer only. Creating an Opencast user on the fly.", e);
+
       userAuthorities = new HashSet<>();
       // We should add the authorities passed in from the tool consumer?
       String roles = request.getParameter(ROLES);
@@ -360,29 +338,39 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
     // Create/Update the user reference
     if (createJpaUserReference) {
-      JpaOrganization organization = fromOrganization(securityService.getOrganization());
+      if (activePersistenceTransactions.putIfAbsent(username, Boolean.TRUE) != null) {
+        logger.debug("Concurrent access of user {}. Ignoring.", username);
+      } else {
 
-      JpaUserReference jpaUserReference = userReferenceProvider.findUserReference(username, organization.getId());
+        try {
+          JpaOrganization organization = fromOrganization(securityService.getOrganization());
+          JpaUserReference jpaUserReference = userReferenceProvider.findUserReference(username, organization.getId());
+          Set<JpaRole> jpaRoles = new HashSet<>();
+          for (GrantedAuthority authority : userAuthorities) {
+            jpaRoles.add(new JpaRole(authority.getAuthority(), organization));
+          }
 
-      Set<JpaRole> jpaRoles = new HashSet<JpaRole>();
-      for (GrantedAuthority authority : userAuthorities) {
-        jpaRoles.add(new JpaRole(authority.getAuthority(), organization));
-      }
+          Date loginDate = new Date();
 
-      Date loginDate = new Date();
-
-      // Create new JpaUserReference if none exists or update existing
-      if (jpaUserReference == null) {
-        String jpaContext = request.getParameter(CONTEXT_ID);
-        jpaContext = StringUtils.isBlank(jpaContext) ? DEFAULT_CONTEXT : jpaContext;
-
-        JpaUserReference userReference = new JpaUserReference(username, username, null, jpaContext, loginDate, organization, jpaRoles);
-        userReferenceProvider.addUserReference(userReference, jpaContext);
-      }
-      else {
-        jpaUserReference.setLastLogin(loginDate);
-        jpaUserReference.setRoles(jpaRoles);
-        userReferenceProvider.updateUserReference(jpaUserReference);
+          // Create new JpaUserReference if none exists or update existing
+          if (jpaUserReference == null) {
+            final String jpaContext = Objects.toString(request.getParameter(CONTEXT_ID), DEFAULT_CONTEXT);
+            JpaUserReference userReference = new JpaUserReference(username, username, null, jpaContext, loginDate,
+                    organization, jpaRoles);
+            userReferenceProvider.addUserReference(userReference, jpaContext);
+          } else {
+            jpaUserReference.setLastLogin(loginDate);
+            jpaUserReference.setRoles(jpaRoles);
+            userReferenceProvider.updateUserReference(jpaUserReference);
+          }
+        } catch (RollbackException e) {
+          // In the unlikely case that concurrency happens at the same time on multiple servers, we catch the
+          // rollback, assuming that the user is already persisted and let the user pass. Worst case, this means that
+          // the user is only temporarily authenticated.
+          logger.warn("Could not store reference since database was changed during update by another process", e);
+        } finally {
+          activePersistenceTransactions.remove(username);
+        }
       }
     }
     //Create/Update UserReference End
