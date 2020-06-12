@@ -990,6 +990,23 @@ public class WorkflowServiceImplTest {
     assertEquals(0, service.getWorkflowInstances(new WorkflowQuery()).size());
   }
 
+  @Test
+  public void testRemoveWithDeletedCreator() throws Exception {
+    WorkflowInstance wi1 = startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
+    // reload instances, because operations have no id before
+    wi1 = service.getWorkflowById(wi1.getId());
+
+    UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
+    expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(null);
+    replay(userDirectoryService);
+    service.setUserDirectoryService(userDirectoryService);
+    service.remove(wi1.getId());
+    assertEquals(0, service.getWorkflowInstances(new WorkflowQuery()).size());
+    for (WorkflowOperationInstance op : wi1.getOperations()) {
+      assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
+    }
+  }
+
   /**
    * Test for {@link WorkflowServiceImpl#cleanupWorkflowInstances(int, WorkflowState)}
    *
