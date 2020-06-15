@@ -3,6 +3,23 @@ Changelog
 
 Opencast 8
 ----------
+### Opencast 8.5 
+
+*Released on June 15th, 2020*
+
+- [[#1633](https://github.com/opencast/opencast/pull/1633)] -
+  Using ConcurrentHashMap for synchronizing LTI user login
+- [[#1622](https://github.com/opencast/opencast/pull/1622)] -
+  Fix LTI Without Persistence
+- [[#1620](https://github.com/opencast/opencast/pull/1620)] -
+  Fix Formatting
+- [[#1612](https://github.com/opencast/opencast/pull/1612)] -
+  Use normal file appender instead of RandomAccessFile for logging
+- [[#1611](https://github.com/opencast/opencast/pull/1611)] -
+  Fix LDAP Debug Logging
+- [[#1593](https://github.com/opencast/opencast/pull/1593)] -
+  Update paella to 6.2.7
+
 ### Opencast 8.4
 
 *Released on May 22nd, 2020*
