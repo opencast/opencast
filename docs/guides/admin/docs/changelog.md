@@ -3,7 +3,8 @@ Changelog
 
 Opencast 8
 ----------
-### Opencast 8.5 
+
+### Opencast 8.5
 
 *Released on June 15th, 2020*
 
