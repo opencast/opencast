@@ -51,6 +51,37 @@ to be stable for a long time. The same is not true for other parts of the API an
 hardware with other parts of Opencast's API
 
 
+Authentication
+--------------
+
+Opencast supports two types of authentication which can be used by capture agents:
+
+- (Backend) HTTP Digest authentication which is historically used for machine-to-machine communication.
+- (General) HTTP Basic (or session-based) authentication used for both front-end users and integrations.
+
+HTTP Digest authentication is the legacy option for capture agents. It is still widely used today and will continue to
+be supported. HTTP Digest is more complicated and has the disadvantage that users need to be specified separately in the
+backend. There is a global HTTP Digest user with admin privileges but specific capture agent users with limited
+privileges can be defined as well.
+
+When using HTTP Digest authentication, you need to send the additional header `X-Requested-Auth: Digest`:
+
+    curl --digest -u opencast_system_account:CHANGE_ME -H "X-Requested-Auth: Digest" \
+      https://develop.opencast.org/info/me.json
+
+HTTP Basic authentication can be used with users defined via web-interface or via any regular user provider. A request
+using HTTP Basic does not need to specify any additional headers:
+
+    curl -u admin:opencast https://develop.opencast.org/info/me.json
+
+Generally, we recommend using HTTP Basic authentication since it's easier for adopters to manage capture agent users via
+the admin interface and does not rely on hidden users while being less complicated at the same time.
+
+Whatever authentication method you choose to implement – maybe even both, allowing users to choose for themselves –
+please clearly specify what authentication you expect since users have to provide different types of users which can
+easily lead to usability problems if not clearly marked.
+
+
 Action Details
 --------------
 
