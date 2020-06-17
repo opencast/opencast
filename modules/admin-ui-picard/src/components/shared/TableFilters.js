@@ -1,85 +1,59 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {useTranslation} from "react-i18next";
 import DatePicker from "react-datepicker/es";
-import filters from "../../mocks/resources/resourcesFilterResource";
+import { connect } from 'react-redux';
+import * as tfs from '../../selectors/tableFilterSelectors';
+import * as tft from '../../thunks/tableFilterThunks';
+import * as tfa from '../../actions/tableFilterActions';
+import TableFilterProfiles from "./TableFilterProfiles";
 
-const filtersList = Object.keys(filters.filters).map(key => {
-    let filter = filters.filters[key];
-    filter.name = key;
-    return filter;
-});
+
 
 //todo: implement/look if really needed (handleEnddatePicker is quite similar)
 function selectFilterPeriodValue() {
     console.log("select filter period value");
-}
-// Remove a certain filter
-const removeFilter = filter => {
-    console.log("filter to be removed:");
-    console.log(filter);
-    filter.value = "";
-    console.log("remove certain filter");
-}
-
-// todo: implement
-function loadFilterProfile() {
-    console.log("load filter profile");
-}
-
-// todo: implement
-function editFilterProfile() {
-    console.log("edit filter profile");
-}
-
-// todo: implement
-function removeFilterProfile() {
-    console.log("remove filter profile");
-}
-
-// todo: implement
-function saveProfile() {
-    console.log("save profile");
-}
-
-// todo: implement
-function onChangeSelectMainFilter(e) {
-
 }
 
 
 /**
  * This component renders the table filters in the upper right corner of the table
  */
-const TableFilters = () => {
+const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, startDate, endDate, secondFilter,
+                          onChangeTextFilter, removeTextFilter, editSelectedFilter, removeSelectedFilter,
+                          editSecondFilter, removeSecondFilter, setStartDate, setEndDate, resetStartDate, resetEndDate,
+                          resetFilterMap, editFilterValue }) => {
     const { t } = useTranslation();
-    // State of the individual filters
-    const [textFilter, setTextFilter] = useState('');
-    const [filterMap, setFilterMap] = useState(filtersList);
-    const [selectedFilter, setSelectedFilter] = useState('');
-    const [secondFilter, setSecondFilter] = useState('');
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
 
-    // variables for showing different dialogs depending on what was clicked
+    // Variables for showing different dialogs depending on what was clicked
     const [showFilterSelector, setFilterSelector] = useState(false);
     const [showFilterSettings, setFilterSettings] = useState(false);
-    const [settingsMode, setSettingsMode] = useState(false);
+
+    // Fetching available filters from opencast instance
+    useEffect(() => {
+        loadingFilters();
+    }, []);
 
     // Remove all selected filters, no filter should be "active" anymore
     const removeFilters = () => {
-        setTextFilter('');
-        setSelectedFilter('');
-        setSecondFilter('');
-        setStartDate('');
-        setEndDate('');
+        removeTextFilter();
+        removeSelectedFilter();
+        removeSelectedFilter();
+        resetStartDate();
+        resetEndDate();
 
-        // Iterate though filterMap and set all values to "" again
-        for(let filter in filterMap) {
-            removeFilter(filterMap[filter]);
-        }
+        // Set all values of the filters in filterMap back to ""
+        resetFilterMap();
 
         console.log("remove filters");
         console.log(filterMap);
+    }
+
+    // Remove a certain filter
+    const removeFilter = filter => {
+        console.log("filter to be removed:");
+        console.log(filter);
+        editFilterValue(filter.name, "");
+        console.log("remove certain filter");
     }
 
     // Handle changes when a item of the component is clicked
@@ -88,22 +62,22 @@ const TableFilters = () => {
         const itemValue = e.target.value;
 
         if (itemName === "textFilter") {
-            setTextFilter(itemValue);
+            onChangeTextFilter(itemValue);
         }
 
         if (itemName === "selectedFilter") {
-            setSelectedFilter(itemValue);
+            editSelectedFilter(itemValue);
         }
 
-        // if the change is in secondFilter (filter is picked) then the selected value is saved in filterMap
+        // If the change is in secondFilter (filter is picked) then the selected value is saved in filterMap
         // and the filter selections are cleared
         if(itemName === "secondFilter") {
             let filter = filterMap.find(({ name }) => name === selectedFilter);
-            filter.value = itemValue;
+            editFilterValue(filter.name, itemValue);
             console.log(filterMap);
             setFilterSelector(false);
-            setSelectedFilter('');
-            setSecondFilter('');
+            removeSelectedFilter();
+            removeSecondFilter();
         }
     }
 
@@ -121,9 +95,10 @@ const TableFilters = () => {
         }
         let filter = filterMap.find(({ name }) => name === selectedFilter);
         // Todo: better way to save the period
-        filter.value = startDate + ' ' + endDate;
+        // Todo: maybe need action for this
+        editFilterValue(filter.name, startDate + ' ' + endDate);
         setFilterSelector(false);
-        setSelectedFilter('');
+        removeSelectedFilter();
         console.log(startDate);
 
     };
@@ -142,7 +117,7 @@ const TableFilters = () => {
 
             {/* Selection of filters and management of filter profiles*/}
             {/*show only if filters.filters contains filters*/}
-            {!!filters.filters && (
+            {!!filterMap && (
                 <div className="table-filter">
                     <div className="filters">
                         <i title={t('TABLE_FILTERS.ADD')}
@@ -169,7 +144,7 @@ const TableFilters = () => {
                                             className="main-filter">
                                         <option value="" disabled>{t('TABLE_FILTERS.FILTER_SELECTION.PLACEHOLDER')}</option>
                                         {
-                                            filtersList.map((filter, key) => (
+                                            filterMap.map((filter, key) => (
                                                 <option
                                                     key={key}
                                                     value={filter.name}>
@@ -229,7 +204,7 @@ const TableFilters = () => {
                                             }
                                         </span>
                                         {/* Remove icon in blue area around filter */}
-                                        <a title={t('TABLE_FILTERS.REMOVE')} onClick={filter => removeFilter(filter)}>
+                                        <a title={t('TABLE_FILTERS.REMOVE')} onClick={() => removeFilter(filter)}>
                                             <i className="fa fa-times"/>
                                           </a>
                                     </span>
@@ -240,7 +215,7 @@ const TableFilters = () => {
                     </div>
 
                     {/* Remove icon to clear all filters */}
-                    <i onClick={() => removeFilters}
+                    <i onClick={removeFilters}
                        title={t('TABLE_FILTERS.CLEAR')}
                        className="clear fa fa-times" />
                     {/* Settings icon to open filters profile dialog (save and editing filter profiles)*/}
@@ -249,85 +224,8 @@ const TableFilters = () => {
                        className="settings fa fa-cog fa-times" />
 
                     {/* Filter profile dialog for saving and editing filter profiles */}
-                    {showFilterSettings && (
-                        <div className="btn-dd filter-settings-dd df-profile-filters">
-                            {/* depending on settingsMode show list of all saved profiles or the chosen profile to edit*/}
-                            {settingsMode ? (
-                                // if settingsMode is true the list with all saved profiles is shown
-                                <div className="filters-list">
-                                    <header>
-                                        <a className="icon close" onClick={() => setFilterSettings(!showFilterSettings)}/>
-                                        <h4>{t('TABLE_FILTERS.PROFILES.FILTERS_HEADER')}</h4>
-                                    </header>
-                                    <ul>
-                                        {/*todo: if no profiles saved yet (profiles.length == 0)*/}
-                                        <li>{t('TABLE_FILTERS.PROFILES.EMPTY')}</li>
-                                        {/*todo: repeat for each profile in profiles (else-case)*/}
-                                        <li>
-                                            <a title="profile.description"
-                                               onClick={() => loadFilterProfile()}>
-                                                {/*todo: just a placeholder*/}
-                                                profile.name limit 70
-                                            </a>
-                                            {/* Settings icon to edit profile */}
-                                            <a onClick={() => editFilterProfile()}
-                                               title={t('TABLE_FILTERS.PROFILES.EDIT')}
-                                               className="icon edit"/>
-                                            {/* Remove icon to remove profile */}
-                                            <a onClick={() => removeFilterProfile()}
-                                               title={t('TABLE_FILTERS.PROFILES.REMOVE')}
-                                               className="icon remove"/>
-                                        </li>
-                                    </ul>
-
-                                    {/* Save the currently selected filter options as new profile */}
-                                    {/* settingsMode is switched and save dialog is opened*/}
-                                    <div className="input-container">
-                                        <div className="btn-container">
-                                            <a className="save" onClick={() => setSettingsMode(!settingsMode)}>
-                                                {/*todo: limit to 70*/}
-                                                {t('TABLE_FILTERS.PROFILES.SAVE_FILTERS').substr(0,40)}
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            ) : (
-                                // if settingsMode is false then show editing dialog of selected filter profile
-                                <div className="filter-details">
-                                    <header>
-                                        <a className="icon close" onClick={() => setFilterSettings(!showFilterSettings)} />
-                                        <h4>{t('TABLE_FILTERS.PROFILES.FILTER_HEADER')}</h4>
-                                    </header>
-                                    {/* Input form for save/editing profile*/}
-                                    <div>
-                                        <label>{t('TABLE_FILTERS.PROFILES.NAME')} <i className="required">*</i></label>
-                                        {/*todo: find react equivalent of ng-model (profile.name), ng-change*/}
-                                        <input required
-                                               name="name"
-                                               type="text"
-                                               placeholder={t('TABLE_FILTERS.PROFILES.NAME_PLACEHOLDER')}/>
-
-                                        <label>{t('TABLE_FILTERS.PROFILES.DESCRIPTION')}</label>
-                                        {/*todo: find react equivalent of ng-model (profile.description)*/}
-                                        <textarea placeholder={t('TABLE_FILTERS.PROFILES.DESCRIPTION_PLACEHOLDER')} />
-                                    </div>
-                                    <div className="input-container">
-                                        {/* Buttons for saving and canceling editing */}
-                                        <div className="btn-container">
-                                            <a onClick={() => setFilterSettings(!showFilterSettings)} className="cancel">{t('CANCEL')}</a>
-                                            <a onClick={() => saveProfile} className="save">{t('SAVE')}</a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            )
-                            }
-
-                        </div>
-
-
-
-                    )}
+                    <TableFilterProfiles showFilterSettings={showFilterSettings}
+                                         setFilterSettings={setFilterSettings} />
 
 
                 </div>
@@ -417,7 +315,7 @@ const FilterSwitch = ({filterMap, selectedFilter, handleChange, startDate, endDa
             return (
                 <div>
                     {/* Show datepicker for start date */}
-                    {/* todo: ui is still not working right, revisit this */}
+                    {/* todo: ui is still not working right, revisit this, see bug described above */}
                     <DatePicker selected={startDate}
                                 onChange={date => handleDate(date, true)}
                                 placeholderText={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE')}
@@ -437,6 +335,31 @@ const FilterSwitch = ({filterMap, selectedFilter, handleChange, startDate, endDa
     }
 }
 
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    textFilter: tfs.getTextFilter(state),
+    filterMap: tfs.getFilters(state),
+    selectedFilter: tfs.getSelectedFilter(state),
+    secondFilter: tfs.getSecondFilter(state),
+    startDate: tfs.getStartDate(state),
+    endDate: tfs.getEndDate(state)
+});
 
+// Mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    onChangeTextFilter: textFilter => dispatch(tfa.editTextFilter(textFilter)),
+    removeTextFilter: () => dispatch(tfa.removeTextFilter()),
+    editSelectedFilter: filter => dispatch(tfa.editSelectedFilter(filter)),
+    removeSelectedFilter: () => dispatch(tfa.removeSelectedFilter()),
+    editSecondFilter: filter => dispatch(tfa.editSecondFilter(filter)),
+    removeSecondFilter: () => dispatch(tfa.removeSecondFilter()),
+    setStartDate: date => dispatch(tfa.setStartDate(date)),
+    setEndDate: date => dispatch(tfa.setEndDate(date)),
+    resetStartDate: () => dispatch(tfa.resetStartDate()),
+    resetEndDate: () => dispatch(tfa.resetEndDate()),
+    loadingFilters: () => dispatch(tft.fetchFilters()),
+    resetFilterMap: () => dispatch(tfa.resetFilterValues()),
+    editFilterValue: (filterName, value) => dispatch(tfa.editFilterValue(filterName, value))
+});
 
-export default TableFilters;
+export default connect(mapStateToProps, mapDispatchToProps)(TableFilters);

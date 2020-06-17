@@ -10,14 +10,15 @@ const version = {
 };
 const feedbackUrl = 'https://opencast.org/';
 
+
 function App() {
   return (
       //todo: add Routing and all Pages
-      <>
-        <Header />
-        <Events />
-        <Footer version={version}  feedbackUrl={feedbackUrl}/>
-      </>
+          <>
+              <Header />
+              <Events />
+              <Footer version={version}  feedbackUrl={feedbackUrl}/>
+          </>
   );
 }
 

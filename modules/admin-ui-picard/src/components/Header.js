@@ -1,6 +1,6 @@
 // React imports
-import React, {useEffect, useState} from "react";
-import {useTranslation, withTranslation} from "react-i18next";
+import React, {useContext, useEffect, useState} from "react";
+import {useTranslation} from "react-i18next";
 
 // service and library imports
 import i18n from "../i18n/i18n";
@@ -28,14 +28,22 @@ const serviceList = Object.keys(services.service).map(key => {
     return service;
 });
 
+// Get code, flag and name of the current language
+const currentLanguage = languages.find(({ code }) => code === i18n.language);
+
+
 // References for detecting a click outside of the container of the dropdown menus
 const containerLang = React.createRef();
 const containerHelp = React.createRef();
 const containerUser = React.createRef();
 const containerNotify = React.createRef();
 
-// Get code, flag and name of the current language
-const currentLanguage = languages.find(({ code }) => code === i18n.language);
+function changeLanguage(code) {
+    // Load json-file of the language with provided code
+    i18n.changeLanguage(code);
+    // Reload window for updating the flag of the language dropdown menu
+    window.location.reload();
+}
 
 function showHotkeyCheatSheet() {
     //todo: Implement method
@@ -47,12 +55,7 @@ function logout() {
     console.log('logout');
 }
 
-function changeLanguage(code) {
-    // Load json-file of the language with provided code
-    i18n.changeLanguage(code);
-    // Reload window for updating the flag of the language dropdown menu
-    window.location.reload();
-}
+
 
 /**
  * Component that renders the header and the navigation in the upper right corner.
@@ -176,22 +179,24 @@ const Header = () => {
     );
 };
 
-const MenuLang = () => (
-    <ul className="dropdown-ul">
-        {/* one list item for each available language */}
-        {languages.map((language, key) => (
-            <li key={key}>
-                <a onClick={() => changeLanguage(language.code)}>
-                    <img className="lang-flag"
-                         src={language.flag}
-                         alt={language.code}/>
-                    {language.long}
-                </a>
-            </li>
-        ))}
+const MenuLang = () => {
+    return (
+        <ul className="dropdown-ul">
+            {/* one list item for each available language */}
+            {languages.map((language, key) => (
+                <li key={key}>
+                    <a onClick={() => changeLanguage(language.code)}>
+                        <img className="lang-flag"
+                             src={language.flag}
+                             alt={language.code}/>
+                        {language.long}
+                    </a>
+                </li>
+            ))}
 
-    </ul>
-);
+        </ul>
+    )
+};
 
 const MenuNotify = () => (
     <ul className="dropdown-ul">
