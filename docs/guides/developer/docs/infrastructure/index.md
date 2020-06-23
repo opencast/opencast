@@ -101,6 +101,8 @@ Other services and the primary contact for them:
 
 - Google
     - Greg Logan
+- YouTube
+    - Greg Logan and ETH Staff
 - Twitter
     - Lars Kiesow
 - Facebook
