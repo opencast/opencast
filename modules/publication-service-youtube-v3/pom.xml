@@ -117,6 +117,17 @@
       <classifier>opencast</classifier>
       <version>2.2.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.checkerframework</groupId>
+      <artifactId>checker-qual</artifactId>
+      <version>3.4.1</version>
+    </dependency>
+    <!-- If using JDK 8, add the following additional dependency. -->
+    <dependency>
+      <groupId>com.google.errorprone</groupId>
+      <artifactId>javac</artifactId>
+      <version>9+181-r4173-1</version>
+    </dependency>
     <!-- testing -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -149,7 +160,8 @@
               org.jdom.*,
             </Private-Package>
             <Export-Package>
-              org.opencastproject.publication.youtube.*;version=${project.version}
+              org.opencastproject.publication.youtube.*;version=${project.version},
+              org.checkerframework.*
             </Export-Package>
             <_exportcontents>
               com.google.api.*
@@ -165,6 +177,7 @@
             </Import-Package>
             <Embed-Dependency>
               javax.activation-mail;inline=true,
+              checker-qual,
               org.apache.felix.http.bundle;inline=true
             </Embed-Dependency>
             <Service-Component>

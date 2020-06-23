@@ -28,7 +28,7 @@
     <cxf.version>3.2.6</cxf.version>
     <eclipselink.version>2.7.3</eclipselink.version>
     <functional.version>1.4.2</functional.version>
-    <guava.version>23.0</guava.version>
+    <guava.version>24.1.1-jre</guava.version>
     <httpcomponents-httpclient.version>4.5.7</httpcomponents-httpclient.version>
     <httpcomponents-httpcore.version>4.4.11</httpcomponents-httpcore.version>
     <jackson.version>2.10.0</jackson.version>
