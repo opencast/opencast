@@ -87,10 +87,10 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
 
       policy.setResourceStrategy(getResourceStrategy());
 
-      if (!key.getSecret().contains(":")) {
-        getLogger().error("Given key not valid. (prefix:secret)");
+      if (!key.getSecret().contains("@")) {
+        getLogger().error("Given key not valid. (prefix@secret)");
 
-        throw new Exception("Given key not valid. (prefix:secret)");
+        throw new Exception("Given key not valid. (prefix@secret)");
       }
       String[] wowzaKeyPair = key.getSecret().split(":");
       String wowzaPrefix = wowzaKeyPair[0];
