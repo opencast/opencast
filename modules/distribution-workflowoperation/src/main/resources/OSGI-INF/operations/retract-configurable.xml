@@ -15,6 +15,9 @@
   <reference cardinality="1..1" interface="org.opencastproject.distribution.api.DownloadDistributionService"
              name="DownloadDistributionService" policy="static" target="(distribution.channel=download)"
              bind="setDownloadDistributionService"/>
+  <reference interface="org.opencastproject.distribution.api.StreamingDistributionService"
+             name="StreamingDistributionService" target="(distribution.channel=streaming)"
+             bind="setStreamingDistributionService"/>
   <reference name="ServiceRegistry" cardinality="1..1"
              interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
              policy="static" bind="setServiceRegistry"/>
