@@ -281,8 +281,6 @@ class OpencastToPaellaConverter {
     if (hasAdaptiveMasterTrack && currentStream.sources.hls) {
       var filteredHls = currentStream.sources.hls.filter(track => track.master);
       currentStream.sources.hls = filteredHls;
-      /****  NOTE: This is a hack to force it to play HLS as a demo, probably wrong, Please fix ****/
-      delete currentStream.sources.mp4;
     }
 
     // Read the attachments
