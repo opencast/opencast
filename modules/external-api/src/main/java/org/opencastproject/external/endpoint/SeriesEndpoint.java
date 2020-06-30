@@ -210,7 +210,7 @@ public class SeriesEndpoint {
           }
 
           if ("managedAcl".equals(name)) {
-            query.withAccessPolicy(value);
+            query.withManagedAcl(value);
           } else if ("contributors".equals(name)) {
             query.withContributor(value);
           } else if ("CreationDate".equals(name)) {
