@@ -482,7 +482,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
       if (JOB_TYPE.equals(job.getJobType()) && Operation.START_WORKFLOW.toString().equals(job.getOperation())) {
         WorkflowInstanceImpl workflow = WorkflowParser.parseWorkflowInstance(job.getPayload());
-        assertPermission(workflow, Permissions.Action.READ.toString());
+        assertPermission(workflow, Permissions.Action.READ.toString(), job.getOrganization());
         return workflow;
       } else {
         throw new NotFoundException("'" + id + "' is a job identifier, but it is not a workflow identifier");
@@ -973,7 +973,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           throw new WorkflowStateException("Workflow instance with state '" + state
                                                      + "' cannot be removed. Only states SUCCEEDED, FAILED & STOPPED are allowed");
 
-        assertPermission(instance, Permissions.Action.WRITE.toString());
+        assertPermission(instance, Permissions.Action.WRITE.toString(), instance.getOrganizationId());
 
         // First, remove temporary files DO THIS BEFORE REMOVING FROM INDEX
         removeTempFiles(instance);
@@ -1168,7 +1168,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @throws UnauthorizedException
    *           if the action is not authorized
    */
-  protected void assertPermission(WorkflowInstance workflow, String action) throws UnauthorizedException {
+  protected void assertPermission(WorkflowInstance workflow, String action, String workflowOrgId) throws UnauthorizedException {
     User currentUser = securityService.getUser();
     Organization currentOrg = securityService.getOrganization();
     String currentOrgAdminRole = currentOrg.getAdminRole();
@@ -1185,11 +1185,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
 
     User workflowCreator = userDirectoryService.loadUser(workflow.getCreatorName());
-    String workflowOrgId = workflowCreator.getOrganization().getId();
-
     boolean authorized = currentUser.hasRole(GLOBAL_ADMIN_ROLE)
             || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(workflowOrgId))
-            || currentUser.equals(workflowCreator)
+            || (workflowCreator != null && currentUser.equals(workflowCreator))
             || (authorizationService.hasPermission(mediapackage, action) && currentOrgId.equals(workflowOrgId));
 
     if (!authorized) {
@@ -1210,13 +1208,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     try {
       WorkflowInstance originalWorkflowInstance = null;
       try {
+        // get workflow and assert permissions
         originalWorkflowInstance = getWorkflowById(workflowInstance.getId());
       } catch (NotFoundException e) {
         // That's fine, it's a new workflow instance
-      }
-
-      if (originalWorkflowInstance != null) {
-        assertPermission(originalWorkflowInstance, Permissions.Action.WRITE.toString());
       }
 
       MediaPackage updatedMediaPackage = null;
