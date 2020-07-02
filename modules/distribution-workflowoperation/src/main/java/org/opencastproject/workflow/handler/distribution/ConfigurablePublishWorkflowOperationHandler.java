@@ -22,6 +22,7 @@ package org.opencastproject.workflow.handler.distribution;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
+import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -83,14 +84,19 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
   protected static final String PLAYER_PROPERTY = "player";
   /** The template key name prefix for organization keys */
   protected static final String ORG_TEMPLATE_KEY_PREFIX = "org_";
+
   // service references
-  private DownloadDistributionService distributionService;
+  private DownloadDistributionService downloadDistributionService;
+  private StreamingDistributionService streamingDistributionService;
+  private SecurityService securityService;
 
   /** Workflow configuration options */
+  static final String DOWNLOAD_SOURCE_FLAVORS = "download-source-flavors";
+  static final String DOWNLOAD_SOURCE_TAGS = "download-source-tags";
+  static final String STREAMING_SOURCE_TAGS = "streaming-source-tags";
+  static final String STREAMING_SOURCE_FLAVORS = "streaming-source-flavors";
   static final String CHANNEL_ID_KEY = "channel-id";
   static final String MIME_TYPE = "mimetype";
-  static final String SOURCE_TAGS = "source-tags";
-  static final String SOURCE_FLAVORS = "source-flavors";
   static final String WITH_PUBLISHED_ELEMENTS = "with-published-elements";
   static final String CHECK_AVAILABILITY = "check-availability";
   static final String STRATEGY = "strategy";
@@ -108,11 +114,16 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
   /** The workflow configuration key for defining the url pattern. */
   static final String URL_PATTERN = "url-pattern";
 
-  private SecurityService securityService;
+  static final String RETRACT_STREAMING = "retract-streaming";
+  static final boolean RETRACT_STREAMING_DEFAULT = false;
 
   /** OSGi DI */
   void setDownloadDistributionService(DownloadDistributionService distributionService) {
-    this.distributionService = distributionService;
+    this.downloadDistributionService = distributionService;
+  }
+
+  void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
+    this.streamingDistributionService = streamingDistributionService;
   }
 
   /** OSGi DI */
@@ -121,9 +132,15 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
   }
 
   @Override
-  protected DownloadDistributionService getDistributionService() {
-    assert (distributionService != null);
-    return distributionService;
+  protected DownloadDistributionService getDownloadDistributionService() {
+    assert (downloadDistributionService != null);
+    return downloadDistributionService;
+  }
+
+  @Override
+  protected StreamingDistributionService getStreamingDistributionService() {
+    assert (streamingDistributionService != null);
+    return streamingDistributionService;
   }
 
   /**
@@ -199,6 +216,12 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     boolean checkAvailability = BooleanUtils
             .toBoolean(StringUtils.trimToEmpty(op.getConfiguration(CHECK_AVAILABILITY)));
 
+    boolean retractStreaming = RETRACT_STREAMING_DEFAULT;
+    String retractStreamingString = workflowInstance.getConfiguration(RETRACT_STREAMING);
+    if (retractStreamingString != null) {
+      retractStreaming = BooleanUtils.toBoolean(StringUtils.trimToEmpty(retractStreamingString));
+    }
+
     if (getPublications(mp, channelId).size() > 0) {
       final String rePublishStrategy = StringUtils.trimToEmpty(op.getConfiguration(STRATEGY));
 
@@ -212,7 +235,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
           // nothing to do here. other publication strategies can be added to this list later on
           break;
         default:
-          retract(mp, channelId);
+          retract(mp, channelId, retractStreaming);
       }
     }
 
@@ -224,47 +247,49 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
       throw new IllegalArgumentException("Unknown value for configuration key mode");
     }
 
-    final String[] sourceFlavors = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(SOURCE_FLAVORS)), ",");
-    final String[] sourceTags = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(SOURCE_TAGS)), ",");
+    final String[] downloadSourceFlavors = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(DOWNLOAD_SOURCE_FLAVORS)), ",");
+    final String[] downloadSourceTags = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(DOWNLOAD_SOURCE_TAGS)), ",");
+    final String[] streamingSourceFlavors = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_FLAVORS)), ",");
+    final String[] streamingSourceTags = StringUtils.split(StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_TAGS)), ",");
 
     String publicationUUID = UUID.randomUUID().toString();
     Publication publication = PublicationImpl.publication(publicationUUID, channelId, null, null);
 
-    // Configure the element selector
-    final SimpleElementSelector selector = new SimpleElementSelector();
-    for (String flavor : sourceFlavors) {
-      selector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
+    // Configure the element selectors
+    final SimpleElementSelector downloadSelector = new SimpleElementSelector();
+    for (String flavor : downloadSourceFlavors) {
+      downloadSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
     }
-    for (String tag : sourceTags) {
-      selector.addTag(tag);
+    for (String tag : downloadSourceTags) {
+      downloadSelector.addTag(tag);
     }
 
-    if (sourceFlavors.length > 0 || sourceTags.length > 0) {
-      if (!withPublishedElements) {
-        Set<MediaPackageElement> elements = distribute(selector.select(mp, false), mp, channelId, mode,
-                checkAvailability);
-        if (elements.size() > 0) {
-          for (MediaPackageElement element : elements) {
-            // Make sure the mediapackage is prompted to create a new identifier for this element
-            element.setIdentifier(null);
-            PublicationImpl.addElementToPublication(publication, element);
-          }
-        } else {
-          logger.info("No element found for distribution in media package '{}'", mp);
-          return createResult(mp, Action.CONTINUE);
-        }
-      } else {
-        List<MediaPackageElement> publishedElements = new ArrayList<>();
-        for (Publication alreadyPublished : mp.getPublications()) {
-          publishedElements.addAll(Arrays.asList(alreadyPublished.getAttachments()));
-          publishedElements.addAll(Arrays.asList(alreadyPublished.getCatalogs()));
-          publishedElements.addAll(Arrays.asList(alreadyPublished.getTracks()));
-        }
-        for (MediaPackageElement element : selector.select(publishedElements, false)) {
-          PublicationImpl.addElementToPublication(publication, element);
-        }
-      }
+    final SimpleElementSelector streamingSelector = new SimpleElementSelector();
+    for (String flavor : streamingSourceFlavors) {
+      streamingSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
     }
+    for (String tag : streamingSourceTags) {
+      streamingSelector.addTag(tag);
+    }
+
+    boolean streamingElementsDistributed = false;
+    boolean downloadElementsDistributed = false;
+
+    if (streamingDistributionService.publishToStreaming()
+            && (streamingSourceFlavors.length > 0 || streamingSourceTags.length > 0)) {
+      streamingElementsDistributed = distributeElements(streamingSelector, mp, publication, channelId, mode,
+              withPublishedElements, checkAvailability, true);
+    }
+
+    if (downloadSourceFlavors.length > 0 || downloadSourceTags.length > 0) {
+      downloadElementsDistributed = distributeElements(downloadSelector, mp, publication, channelId, mode,
+              withPublishedElements, checkAvailability, false);
+    }
+
+    if (!downloadElementsDistributed && !streamingElementsDistributed) {
+      return createResult(mp, Action.SKIP);
+    }
+
     if (!"".equals(urlPattern)) {
       publication.setURI(populateUrlWithVariables(urlPattern, mp, publicationUUID));
     }
@@ -275,8 +300,47 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     return createResult(mp, Action.CONTINUE);
   }
 
+  private boolean distributeElements(SimpleElementSelector selector, MediaPackage mp, Publication publication,
+          String channelId, String mode, boolean withPublishedElements, boolean checkAvailability, boolean streaming)
+          throws WorkflowOperationException {
+
+    String target = (streaming ? "streaming" : "download");
+    if (!withPublishedElements) {
+      Set<MediaPackageElement> elements = distribute(selector.select(mp, false), mp, channelId, mode,
+              checkAvailability, streaming);
+      if (elements.size() > 0) {
+        for (MediaPackageElement element : elements) {
+          // Make sure the mediapackage is prompted to create a new identifier for this element
+          element.setIdentifier(null);
+          PublicationImpl.addElementToPublication(publication, element);
+        }
+      } else {
+        logger.info("No element found for distribution to " + target + " in media package '{}'", mp);
+        return false;
+      }
+    } else {
+      List<MediaPackageElement> publishedElements = new ArrayList<>();
+      for (Publication alreadyPublished : mp.getPublications()) {
+        publishedElements.addAll(Arrays.asList(alreadyPublished.getAttachments()));
+        publishedElements.addAll(Arrays.asList(alreadyPublished.getCatalogs()));
+        publishedElements.addAll(Arrays.asList(alreadyPublished.getTracks()));
+      }
+
+      Collection<MediaPackageElement> elements = selector.select(publishedElements, false);
+      if (elements.size() > 0) {
+        for (MediaPackageElement element : elements) {
+          PublicationImpl.addElementToPublication(publication, element);
+        }
+      } else {
+        logger.info("No elements found for publication to " + target + " in media package '{}'", mp);
+        return false;
+      }
+    }
+    return true;
+  }
+
   private Set<MediaPackageElement> distribute(Collection<MediaPackageElement> elements, MediaPackage mediapackage,
-          String channelId, String mode, boolean checkAvailability) throws WorkflowOperationException {
+          String channelId, String mode, boolean checkAvailability, boolean streaming) throws WorkflowOperationException {
 
     Set<MediaPackageElement> result = new HashSet<>();
 
@@ -297,7 +361,12 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
       logger.info("Start bulk publishing of {} elements of media package '{}' to publication channel '{}'",
               bulkElementIds.size(), mediapackage, channelId);
       try {
-        Job job = distributionService.distribute(channelId, mediapackage, bulkElementIds, checkAvailability);
+        Job job;
+        if (streaming) {
+          job = streamingDistributionService.distribute(channelId, mediapackage, bulkElementIds);
+        } else {
+          job = downloadDistributionService.distribute(channelId, mediapackage, bulkElementIds, checkAvailability);
+        }
         jobs.add(job);
       } catch (DistributionException | MediaPackageException e) {
         logger.error("Creating the distribution job for {} elements of media package '{}' failed",
@@ -310,7 +379,12 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
               singleElementIds.size(), mediapackage, channelId);
       for (String elementId : singleElementIds) {
         try {
-          Job job = distributionService.distribute(channelId, mediapackage, elementId, checkAvailability);
+          Job job;
+          if (streaming) {
+            job = streamingDistributionService.distribute(channelId, mediapackage, elementId);
+          } else {
+            job = downloadDistributionService.distribute(channelId, mediapackage, elementId, checkAvailability);
+          }
           jobs.add(job);
         } catch (DistributionException | MediaPackageException e) {
           logger.error("Creating the distribution job for element '{}' of media package '{}' failed", elementId,

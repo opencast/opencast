@@ -540,7 +540,7 @@
       <configurations>
         <configuration key="channel-id">api</configuration>
         <configuration key="mimetype">application/json</configuration>
-        <configuration key="source-tags">engage-download,engage-streaming</configuration>
+        <configuration key="download-source-tags">engage-download,engage-streaming</configuration>
         <configuration key="url-pattern">http://localhost:8080/api/events/${event_id}</configuration>
         <configuration key="with-published-elements">false</configuration>
         <configuration key="check-availability">true</configuration>
