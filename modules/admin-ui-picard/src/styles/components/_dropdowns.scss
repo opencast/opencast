@@ -92,7 +92,7 @@
         @include border-bottom-radius($main-border-radius);
         border: $thin-border-stroke $main-border-color;
         opacity: 1;
-        pointer-events: none;
+        pointer-events: auto;
         z-index: $max-z + 10;
         top: 100%;
         left: -1px;
@@ -175,8 +175,8 @@
             list-style: none;
             @include border-bottom-radius($main-border-radius);
             border: $thin-border-stroke $main-border-color;
-            opacity: 0;
-            pointer-events: none;
+            opacity: 1;
+            pointer-events: auto;
             z-index: $max-z + 10;
 
             > li {

@@ -4,16 +4,28 @@ import TableFilters from "../components/shared/TableFilters";
 import MainNav from "../components/shared/MainNav";
 import Stats from "../components/shared/Stats";
 import Table from "../components/shared/Table";
+import * as et from "../thunks/eventThunks";
+import * as tt from "../thunks/tableThunks";
+import * as es from "../selectors/eventSelectors";
+import {connect} from "react-redux";
+import {eventsTemplateMap} from "../configs/tableConfigs/eventsTableConfig";
 
 // References for detecting a click outside of the container of the dropdown menu
 const containerAction = React.createRef();
 
-const Events = () => {
+const Events = ({loadingEvents, loadingEventsIntoTable, events}) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
 
     useEffect(() => {
+
+        // Fetching events from server
+        loadingEvents();
+
+        // Load events into table
+        loadingEventsIntoTable();
+
         // Function for handling clicks outside of an open dropdown menu
         const handleClickOutside = e => {
             if (containerAction.current && !containerAction.current.contains(e.target)) {
@@ -27,6 +39,8 @@ const Events = () => {
         return () => {
             window.removeEventListener('mousedown', handleClickOutside);
         }
+
+
     })
 
     const toggleNavigation = () => {
@@ -108,13 +122,23 @@ const Events = () => {
                     {/*todo: instead of events table.caption*/}
                     <h1>{t('EVENTS.EVENTS.TABLE.CAPTION')}</h1>
                     {/*todo: instead of 4 the numberOfRows (table.pagination.totalItems)*/}
-                    <h4>{t('TABLE_SUMMARY') + " " + "4"}</h4>
+                    <h4>{events.length + " " + t('TABLE_SUMMARY')}</h4>
                 </div>
                 {/*todo: include table component*/}
-                <Table />
+                <Table templateMap={eventsTemplateMap}/>
             </div>
         </>
     );
 };
 
-export default Events;
+const mapStateToProps = state => ({
+    events: es.getEvents(state)
+});
+
+
+const mapDispatchToProps = dispatch => ({
+    loadingEvents: () => dispatch(et.fetchEvents()),
+    loadingEventsIntoTable: () => dispatch(tt.loadEventsIntoTable())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Events);

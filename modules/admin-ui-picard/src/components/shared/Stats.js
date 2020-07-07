@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {withTranslation} from "react-i18next";
 
 import stats from "../../mocks/statsService";

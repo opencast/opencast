@@ -6,6 +6,8 @@ import {composeWithDevTools} from "redux-devtools-extension";
 import {applyMiddleware, combineReducers, createStore} from "redux";
 import tableFilters from './reducers/tableFilterReducers';
 import tableFilterProfiles from './reducers/tableFilterProfilesReducer';
+import events from './reducers/eventReducers';
+import table from './reducers/tableReducers';
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -14,7 +16,9 @@ import tableFilterProfiles from './reducers/tableFilterProfilesReducer';
 // all reducers used in this app
 const reducers = {
     tableFilters,
-    tableFilterProfiles
+    tableFilterProfiles,
+    events,
+    table
 };
 
 // Configuration for persisting store
