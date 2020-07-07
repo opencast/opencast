@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.workflow.handler.distribution.PartialRetractEngageWorkflowOperationHandler"
+               immediate="true"
+               activate="activate">
+  <implementation class="org.opencastproject.workflow.handler.distribution.PartialRetractEngageWorkflowOperationHandler"/>
+  <property name="service.description" value="Engage Partial Retraction Workflow Operation Handler"/>
+  <property name="workflow.operation" value="retract-partial"/>
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
+  </service>
+  <reference cardinality="1..1" interface="org.opencastproject.distribution.api.DownloadDistributionService"
+             name="DownloadDistributionService" policy="static" target="(distribution.channel=download)"
+             bind="setDownloadDistributionService"/>
+  <reference cardinality="1..1" interface="org.opencastproject.distribution.api.DistributionService"
+             name="StreamingDistributionService" policy="static" target="(distribution.channel=streaming)"
+             bind="setStreamingDistributionService"/>
+  <reference cardinality="1..1" interface="org.opencastproject.search.api.SearchService"
+             name="SearchService" policy="static" bind="setSearchService"/>
+  <reference cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             name="ServiceRegistry" policy="static" bind="setServiceRegistry"/>
+</scr:component>

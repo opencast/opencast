@@ -114,7 +114,8 @@
               OSGI-INF/operations/retract-engage.xml,
               OSGI-INF/operations/retract-aws.xml,
               OSGI-INF/operations/retract-youtube.xml,
-              OSGI-INF/operations/retract-oaipmh.xml
+              OSGI-INF/operations/retract-oaipmh.xml,
+              OSGI-INF/operations/retract-partial.xml
             </Service-Component>
           </instructions>
         </configuration>
