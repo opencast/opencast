@@ -263,7 +263,7 @@ const FilterSwitch = ({filterMap, selectedFilter, handleChange, startDate, endDa
                         ) : (
                             // Show further options for a secondary filter
                             <select className="second-filter"
-                                    onChange={() => handleChange()}
+                                    onChange={e => handleChange(e)}
                                     value={secondFilter}
                                     name="secondFilter">
                                 <option value="" disabled>{t('TABLE_FILTERS.FILTER_VALUE_SELECTION.PLACEHOLDER')}</option>

@@ -6,8 +6,7 @@ import { useTranslation } from "react-i18next";
  */
 const EventsDateCell = ({ row })  => {
     const { t } = useTranslation();
-    console.log("Row in Date Cell");
-    console.log(row);
+
     return (
         // Link template for start date of event
         <a  className="crosslink"
