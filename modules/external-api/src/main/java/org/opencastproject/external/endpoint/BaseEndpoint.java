@@ -195,6 +195,27 @@ public class BaseEndpoint {
   }
 
   @GET
+  @Path("info/organization/properties/engageuiurl")
+  @RestQuery(name = "getorganizationpropertiesengageuiurl", description = "Returns the engage ui url property.", returnDescription = "", reponses = {
+          @RestResponse(description = "The engage ui url is returned.", responseCode = HttpServletResponse.SC_OK) })
+  public Response getOrganizationPropertiesEngageUiUrl() {
+    final Organization org = securityService.getOrganization();
+
+    List<Field> props = new ArrayList<>();
+    for (Entry<String, String> prop : org.getProperties().entrySet()) {
+      if (prop.getKey().equals("org.opencastproject.engage.ui.url")) {
+        props.add(f(prop.getKey(), v(prop.getValue(), Jsons.BLANK)));
+        break;
+      }
+    }
+    if (props.size() == 0) {
+      props.add(f("org.opencastproject.engage.ui.url", v(UrlSupport.DEFAULT_BASE_URL, Jsons.BLANK)));
+    }
+
+    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(obj(props)));
+  }
+
+  @GET
   @Path("version")
   @RestQuery(name = "getversion", description = "Returns a list of available version as well as the default version.", returnDescription = "", reponses = {
           @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
