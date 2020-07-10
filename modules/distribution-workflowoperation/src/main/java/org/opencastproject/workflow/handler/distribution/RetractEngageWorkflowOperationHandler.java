@@ -23,6 +23,7 @@ package org.opencastproject.workflow.handler.distribution;
 
 import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
 
+import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
@@ -114,7 +115,7 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @throws DistributionException
    */
   protected List<Job> retractElements(Set<String> retractElementIds, MediaPackage searchMediaPackage) throws
-          DistributionException {
+    DistributionException {
     List<Job> jobs = new ArrayList<Job>();
     if (retractElementIds.size() > 0) {
       Job retractDownloadDistributionJob = downloadDistributionService.retract(CHANNEL_ID, searchMediaPackage, retractElementIds);
@@ -122,14 +123,12 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         jobs.add(retractDownloadDistributionJob);
       }
     }
-    if (distributeStreaming) {
+    if (streamingDistributionService.publishToStreaming()) {
       for (MediaPackageElement element : searchMediaPackage.getElements()) {
-        if (distributeStreaming) {
-          Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, searchMediaPackage,
-                  element.getIdentifier());
-          if (retractStreamingJob != null) {
-            jobs.add(retractStreamingJob);
-          }
+        Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, searchMediaPackage,
+                element.getIdentifier());
+        if (retractStreamingJob != null) {
+          jobs.add(retractStreamingJob);
         }
       }
     }
