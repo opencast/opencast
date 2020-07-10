@@ -22,10 +22,10 @@ Operation Example
 
 ```xml
 <operation
-    id="retract-engage"
+    id="retract-partial"
     fail-on-error="true"
     exception-handler-workflow="partial-error"
-    description="Retract recording from Engage">
+    description="Retracting elements flavored with presentation and tagged with preview from Engage">
   <configurations>
     <configuration key="retract-flavors">presentation/*</configuration>
     <configuration key="retract-tags">preview</configuration>
