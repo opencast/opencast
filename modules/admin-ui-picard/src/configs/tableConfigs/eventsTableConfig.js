@@ -25,7 +25,7 @@ export const eventsTableConfig = {
         translate: false
     }, {
         template: 'EventsPresentersCell',
-        name: 'presenter',
+        name: 'presenters',
         label: 'EVENTS.EVENTS.TABLE.PRESENTERS',
         sortable: true,
         translate: false

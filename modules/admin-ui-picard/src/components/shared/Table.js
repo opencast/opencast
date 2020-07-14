@@ -1,10 +1,36 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {useTranslation} from "react-i18next";
+import styled from "styled-components";
 import * as ts from "../../selectors/tableSelectors";
 import * as ta from "../../actions/tableActions";
 import * as tt from "../../thunks/tableThunks";
 import {connect} from "react-redux";
 import cn from 'classnames';
+
+import sortIcon from '../../img/tbl-sort.png';
+import sortUpIcon from '../../img/tbl-sort-up.png';
+import sortDownIcon from '../../img/tbl-sort-down.png';
+
+const SortIcon = styled.i`
+    float: right;
+    margin: 12px 0 0 5px;
+    top: auto;
+    left: auto;
+    width: 8px;
+    height: 13px;
+    background-image: url(${sortIcon});
+`;
+
+const SortActiveIcon = styled.i`
+    float: right;
+    margin: 12px 0 0 5px;
+    top: auto;
+    left: auto;
+    width: 8px;
+    height: 13px;
+    background-image: url(${props => (props.order === 'ASC' ? sortDownIcon : sortUpIcon)})};
+`;
+
 
 const containerPageSize = React.createRef();
 
@@ -19,6 +45,9 @@ const Table = ({table, selectAll, deselectAll, rowSelectionChanged, updatePageSi
 
     // State of dropdown menu
     const [showPageSizes, setShowPageSizes] = useState(false);
+
+    const {resources, requestSort, sortConfig } = useSortRows(table.rows);
+
 
     useEffect(() => {
         // Function for handling clicks outside of an open dropdown menu
@@ -102,19 +131,29 @@ const Table = ({table, selectAll, deselectAll, rowSelectionChanged, updatePageSi
                             </th>
                         ) : null}
 
-                        {/* todo: repeat for each column in table.columns and if not column.deactivated*/}
-                        {/* todo: onClick for table.sortby(column) how??*/}
-                        {/* TODO: SORTING!!!*/}
+                        {/* todo: if not column.deactivated*/}
                         {table.columns.map((column, key) => (
-                            <th key={key} className={cn({ 'col-sort': table.predicate === column.name, 'sortable': column.sortable })}>
-                            <span>
-                                {t(column.label)}
-                                {/* Show only if column is sortable*/}
-                                {column.sortable ? (
-                                    <i className={cn("sort", { asc: table.predicate === column.name && !table.reverse, desc: table.predicate === column.name && table.reverse })}/>
-                                ) : null}
-                            </span>
+                            // Check if column is sortable and render accordingly
+                            column.sortable ? (
+                            <th key={key}
+                                className={cn({ 'col-sort': !!sortConfig && column.name === sortConfig.key, 'sortable': true })}
+                                onClick={() => requestSort(column.name)}>
+                                <span>
+                                    <span>{t(column.label)}</span>
+                                    {(!!sortConfig && column.name === sortConfig.key) ? (
+                                            <SortActiveIcon order={sortConfig.direction} />
+                                        ) : (
+                                            <SortIcon />
+                                        )}
+                                </span>
                             </th>
+                            ) : (
+                                <th key={key} className={cn({'sortable': false})}>
+                                    <span>
+                                        {t(column.label)}
+                                    </span>
+                            </th>
+                            )
                         )) }
 
                     </tr>
@@ -134,7 +173,7 @@ const Table = ({table, selectAll, deselectAll, rowSelectionChanged, updatePageSi
                     </tr>
                 ) : (
                     //Repeat for each row in table.rows
-                    table.rows.map((row) => (
+                    resources.map((row) => (
                             <tr key={row.id}>
                                 {/* Show if multi selection is possible */}
                                 {/* Checkbox for selection of row */}
@@ -185,7 +224,7 @@ const Table = ({table, selectAll, deselectAll, rowSelectionChanged, updatePageSi
                        onClick={() => goToPage(pageOffset - 1)}/>
                     {directAccessible.map((page, key) => (
                         page.active ? (
-                                <a className="active">{page.label}</a>
+                                <a key={key} className="active">{page.label}</a>
                             ) : (
                                 <a key={key} onClick={() => goToPage(page.number)}>{page.label}</a>
                             )
@@ -248,6 +287,40 @@ const getDirectAccessiblePages = (pages, pagination) => {
     //todo: in old code is here something with maxLabel (Check if this is also needed)
 
     return directAccessible;
+}
+
+const useSortRows = (resources, config = null) => {
+    const [sortConfig, setSortConfig] = useState(config);
+
+    const sortedResources = useMemo(() => {
+        let sortableResources = [...resources];
+        if (sortConfig !== null) {
+            sortableResources.sort((a,b) => {
+                if (a[sortConfig.key] < b[sortConfig.key]) {
+                    return sortConfig.direction === 'ASC' ? -1 : 1;
+                }
+                if (a[sortConfig.key] > b[sortConfig.key]) {
+                    return sortConfig.direction === 'ASC' ? 1 : -1;
+                }
+                return 0;
+            });
+        }
+        console.log('Sortable Resources in useSortRows:');
+        console.log(sortableResources);
+        return sortableResources;
+    }, [resources, sortConfig]);
+
+    const requestSort = (key) => {
+        let direction = 'ASC';
+        if ( sortConfig && sortConfig.key && sortConfig.direction === 'ASC') {
+            direction = 'DESC';
+        }
+        setSortConfig({ key, direction });
+        console.log('SortConfig in useSortRows:');
+        console.log(sortConfig);
+    };
+
+    return { resources: sortedResources, requestSort, sortConfig };
 }
 
 

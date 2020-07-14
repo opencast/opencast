@@ -18,7 +18,9 @@ const data ={
         "has_comments": false,
         "technical_end": "2018-08-31T12:55:00Z",
         "presenters": [
-            "Peter Planner"
+            "Peter Planner",
+            "Harry Potter",
+            "Peter Parker"
         ],
         "technical_start": "2018-08-31T12:00:00Z",
         "location": "F300.1",
@@ -66,7 +68,8 @@ const data ={
         "has_comments": true,
         "technical_end": "2018-08-10T12:39:02Z",
         "presenters": [
-            "Usain Unpublished"
+            "Usain Unpublished",
+            "Sam Winchester"
         ],
         "technical_start": "2018-08-10T12:39:02Z",
         "location": "",
@@ -202,7 +205,8 @@ const data ={
             "has_comments": false,
             "technical_end": "2018-08-10T12:36:57Z",
             "presenters": [
-                "Pamela Published"
+                "Pamela Published",
+                "Geralt of Riva"
             ],
             "technical_start": "2018-08-10T12:36:57Z",
             "location": "",
@@ -290,7 +294,10 @@ const data ={
             "has_comments": true,
             "technical_end": "2018-08-10T12:39:02Z",
             "presenters": [
-                "Usain Unpublished"
+                "Usain Unpublished",
+                "Harley Quinn",
+                "Bruce Wayne",
+                "Selina Kyle"
             ],
             "technical_start": "2018-08-10T12:39:02Z",
             "location": "",
@@ -353,6 +360,12 @@ export const fetchEvents = () => async dispatch => {
         //const response = JSON.parse(data);
         const response = data;
         for (let i = 0; response.results.length > i; i++) {
+            // insert date property
+            response.results[i] = {
+                ...response.results[i],
+                date: response.results[i].start_date
+            }
+            // insert enabled and hiding property of publications, if result has publications
             let result = response.results[i]
             if(!!result.publications && result.publications.length > 0) {
                 let transformedPublications = [];
@@ -362,10 +375,12 @@ export const fetchEvents = () => async dispatch => {
                         enabled: true,
                         hiding: false});
                 }
-                response.results[i] = {...response.results[i], publications: transformedPublications};
+                response.results[i] = {
+                    ...response.results[i],
+                    publications: transformedPublications,
+                };
             }
         }
-        //const transformedResponse = transformResponse(response);
         const events = response;
         dispatch(loadEventsSuccess(events));
     } catch (e) {
