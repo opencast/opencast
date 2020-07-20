@@ -234,10 +234,6 @@
                 }
             }
 
-            &.embeddingcode {
-                @include build-icon(auto, auto, embeddingcode-icon, 17px, 17px);
-            }
-
             &.stop {
                 @include build-icon(auto, auto, stop-icon, 17px, 17px);
             }
