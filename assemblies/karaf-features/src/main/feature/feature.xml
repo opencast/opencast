@@ -258,6 +258,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-videogrid-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-condition-parser/${project.version}</bundle>
@@ -374,6 +375,9 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-videogrid-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-videogrid-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-videogrid-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-workflowoperation/${project.version}</bundle>
@@ -515,6 +519,9 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-videogrid-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-videogrid-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-videogrid-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videosegmenter-workflowoperation/${project.version}</bundle>
@@ -559,6 +566,8 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-smil-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-ffmpeg-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-videogrid-service-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-videogrid-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-ffmpeg/${project.version}</bundle>
   </feature>
