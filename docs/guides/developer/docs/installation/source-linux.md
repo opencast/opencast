@@ -102,7 +102,7 @@ install them.
     $ sudo apt-get install -y nodejs 
     $ sudo npm install -g eslint
 
-### Install and start a single-node Elasticsearch cluster with Docker
+### Install and start Elasticsearch with Docker
 
     $ sudo docker run -d --rm --name oc-elasticsearch -p 9200:9200 -p 9300:9300 -e discovery.type=single-node elasticsearch:7.5.1
 
