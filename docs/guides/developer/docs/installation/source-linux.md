@@ -106,6 +106,8 @@ install them.
 
     $ sudo docker run -d --rm --name oc-elasticsearch -p 9200:9200 -p 9300:9300 -e discovery.type=single-node elasticsearch:7.5.1
 
+Note that --rm automatically removes the container when it exits, so if it does you will need to start it again in order to run opencast properly.
+
 ### Install Chrome
 
     $ cd && cd Downloads && wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && sudo dpkg -i google-chrome-stable_current_amd64.deb
