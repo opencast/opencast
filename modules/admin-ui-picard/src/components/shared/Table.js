@@ -34,8 +34,8 @@ const SortActiveIcon = styled.i`
 
 const containerPageSize = React.createRef();
 
-const Table = ({table, selectAll, deselectAll, rowSelectionChanged, updatePageSize, templateMap, pageOffset, pages,
-                   goToPage, updatePages, setOffset}) => {
+const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOffset, pages,
+                   goToPage, updatePages, setOffset, changeSelectAll}) => {
     // Size options for pagination
     const sizeOptions = [10, 20, 50, 100];
 
@@ -47,7 +47,7 @@ const Table = ({table, selectAll, deselectAll, rowSelectionChanged, updatePageSi
     const [showPageSizes, setShowPageSizes] = useState(false);
 
     const {resources, requestSort, sortConfig } = useSortRows(table.rows);
-
+    
 
     useEffect(() => {
         // Function for handling clicks outside of an open dropdown menu
@@ -63,7 +63,7 @@ const Table = ({table, selectAll, deselectAll, rowSelectionChanged, updatePageSi
         return () => {
             window.removeEventListener('mousedown', handleClickOutside);
         }
-    });
+    }, []);
 
     const lengthDivStyle = {
         position: "absolute",
@@ -78,13 +78,8 @@ const Table = ({table, selectAll, deselectAll, rowSelectionChanged, updatePageSi
 
     // Select or deselect all rows on a page
     const onChangeAllSelected = e => {
-        const selected = e.target.checked
-        if (selected) {
-            selectAll();
-        } else {
-            deselectAll();
-        }
-
+        const selected = e.target.checked;
+        changeSelectAll(selected);
     };
 
     const changePageSize = size => {
@@ -305,8 +300,6 @@ const useSortRows = (resources, config = null) => {
                 return 0;
             });
         }
-        console.log('Sortable Resources in useSortRows:');
-        console.log(sortableResources);
         return sortableResources;
     }, [resources, sortConfig]);
 
@@ -316,8 +309,6 @@ const useSortRows = (resources, config = null) => {
             direction = 'DESC';
         }
         setSortConfig({ key, direction });
-        console.log('SortConfig in useSortRows:');
-        console.log(sortConfig);
     };
 
     return { resources: sortedResources, requestSort, sortConfig };
@@ -331,13 +322,12 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    selectAll: () => dispatch(ta.selectAll()),
-    deselectAll: () => dispatch(ta.deselectAll()),
-    rowSelectionChanged: (id, selected) => dispatch(ta.selectRow(id, selected)),
+    rowSelectionChanged: (id, selected) => dispatch(tt.changeRowSelection(id, selected)),
     updatePageSize: size => dispatch(ta.updatePageSize(size)),
     goToPage: pageNumber => dispatch(tt.goToPage(pageNumber)),
     updatePages: () => dispatch(tt.updatePages()),
-    setOffset: pageNumber => dispatch(ta.setOffset(pageNumber))
+    setOffset: pageNumber => dispatch(ta.setOffset(pageNumber)),
+    changeSelectAll: selected => dispatch(tt.changeAllSelected(selected))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Table);

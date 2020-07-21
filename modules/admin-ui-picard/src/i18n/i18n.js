@@ -21,6 +21,7 @@ import slSITrans from "./org/opencastproject/adminui/languages/lang-sl_SI";
 import svSETrans from "./org/opencastproject/adminui/languages/lang-sv_SE";
 import trTRTrans from "./org/opencastproject/adminui/languages/lang-tr_TR";
 import zhZWTrans from "./org/opencastproject/adminui/languages/lang-zh_TW";
+import moment from "moment";
 
 // Assignment of language code to translation file
 // !!! If translation file of a new language is added, please add assignment here, too !!!
@@ -54,12 +55,20 @@ i18n
         debug: true,
 
         interpolation: {
-            escapeValue: false
+            escapeValue: false,
+            format: function(value, format, lng) {
+                if (value instanceof Date) {
+                    return moment(value.toISOString()).format(format);
+                }
+
+                return value;
+            }
         },
         react: {
             wait: true,
             useSuspense: false
-        }
+        },
+
     });
 
 export default i18n;

@@ -15,7 +15,8 @@ const initialState = {
     limit: 0,
     offset: 0,
     results: [],
-    columns: initialColumns
+    columns: initialColumns,
+    showActions: false
 }
 
 const events = (state=initialState, action) => {
@@ -43,6 +44,13 @@ const events = (state=initialState, action) => {
             return {
                 ...state,
                 isLoading: false
+            }
+        }
+        case e.SHOW_ACTIONS: {
+            const { isShowing } = payload;
+            return {
+                ...state,
+                showActions: isShowing
             }
         }
         default:

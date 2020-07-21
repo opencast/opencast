@@ -29,7 +29,12 @@ const serviceList = Object.keys(services.service).map(key => {
 });
 
 // Get code, flag and name of the current language
-const currentLanguage = languages.find(({ code }) => code === i18n.language);
+let currentLang = languages.find(({ code }) => code === i18n.language);
+if (typeof currentLang === 'undefined') {
+    currentLang = languages.find(({ code }) => code === "en-GB");
+}
+const currentLanguage = currentLang;
+
 
 
 // References for detecting a click outside of the container of the dropdown menus
@@ -97,7 +102,7 @@ const Header = () => {
         return () => {
             window.removeEventListener('mousedown', handleClickOutside);
         }
-    });
+    }, []);
 
     return(
         <header className="primary-header">

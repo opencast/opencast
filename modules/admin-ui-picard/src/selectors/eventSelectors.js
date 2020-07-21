@@ -4,3 +4,4 @@
 
 export const getEvents = state => state.events.results;
 export const getVisibilityEventColumns = state => state.events.columns;
+export const isShowActions = state => state.events.showActions;

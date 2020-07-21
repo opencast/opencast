@@ -27,6 +27,7 @@ const columns = [{
 const initialState = {
     loading: false,
     multiSelect: false,
+    resource: "",
     pages: [],
     columns: [],
     sortBy: "",
@@ -48,12 +49,13 @@ const table = (state=initialState, action) => {
     const { type, payload } = action;
     switch (type) {
         case t.LOAD_RESOURCE_INTO_TABLE: {
-            const { multiSelect, columns, resource, pages } = payload;
+            const { multiSelect, columns, resource, pages, rows } = payload;
             return {
                 ...state,
                 multiSelect: multiSelect,
                 columns: columns,
-                rows: resource,
+                resource: resource,
+                rows: rows,
                 pages: pages,
                 pagination: {
                     ...state.pagination,
@@ -80,6 +82,7 @@ const table = (state=initialState, action) => {
             }
         }
         case t.SELECT_ALL: {
+            console.log("SELECT_ALL");
            return {
                ...state,
                rows: state.rows.map(row => {
@@ -91,6 +94,7 @@ const table = (state=initialState, action) => {
            }
         }
         case t.DESELECT_ALL: {
+            console.log("DESELECT_ALL");
             return {
                 ...state,
                 rows: state.rows.map(row => {

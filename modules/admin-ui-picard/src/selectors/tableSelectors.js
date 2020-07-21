@@ -1,6 +1,7 @@
 /**
  * This file contains selectors regarding the table view
  */
+import {createSelector} from "reselect";
 
 export const getTableRows = state => state.table.rows;
 export const getTableColumns = state => state.table.columns;
@@ -10,3 +11,9 @@ export const getTotalItems = state => state.table.pagination.totalItems;
 export const getPageLimit = state => state.table.pagination.limit;
 export const getPageOffset = state => state.table.pagination.offset;
 export const getNumberDirectAccessiblePages = state => state.table.pagination.directAccessibleNo;
+export const getResourceType = state => state.table.resource;
+
+export const getSelectedRows = createSelector(
+    getTableRows,
+    (rows) => rows.filter(row => row.selected)
+);

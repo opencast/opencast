@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from "react";
 import {useTranslation} from "react-i18next";
+import styled from "styled-components";
 import DatePicker from "react-datepicker/es";
 import { connect } from 'react-redux';
 import * as tfs from '../../selectors/tableFilterSelectors';
@@ -7,12 +8,20 @@ import * as tft from '../../thunks/tableFilterThunks';
 import * as tfa from '../../actions/tableFilterActions';
 import TableFilterProfiles from "./TableFilterProfiles";
 
+import searchIcon from '../../img/search.png'
+
 
 
 //todo: implement/look if really needed (handleEnddatePicker is quite similar)
 function selectFilterPeriodValue() {
     console.log("select filter period value");
 }
+
+const SearchInput = styled.input`
+    background-image: url(${searchIcon});
+￼   background-repeat: no-repeat;
+￼   background-position: 14px center;
+`;
 
 
 /**
@@ -96,7 +105,7 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
         let filter = filterMap.find(({ name }) => name === selectedFilter);
         // Todo: better way to save the period
         // Todo: maybe need action for this
-        editFilterValue(filter.name, startDate + ' ' + endDate);
+        editFilterValue(filter.name, startDate.toISOString());
         setFilterSelector(false);
         removeSelectedFilter();
         console.log(startDate);
@@ -108,12 +117,12 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
         <div className="filters-container">
             {/* Text filter - Search Query */}
             {/* todo: Search icon is not showing yet*/}
-            <input type="text"
-                   className="search expand"
-                   placeholder={t('TABLE_FILTERS.PLACEHOLDER')}
-                   onChange={e => handleChange(e)}
-                   name="textFilter"
-                   value={textFilter}/>
+            <SearchInput type="text"
+                         className="search expand"
+                         placeholder={t('TABLE_FILTERS.PLACEHOLDER')}
+                         onChange={e => handleChange(e)}
+                         name="textFilter"
+                         value={textFilter}/>
 
             {/* Selection of filters and management of filter profiles*/}
             {/*show only if filters.filters contains filters*/}
@@ -196,7 +205,8 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
                                                         <span>
                                                             <span>
                                                                 {/*todo: format date range*/}
-                                                                {t(filter.label).substr(0,40)} : Placeholder
+                                                                {t(filter.label).substr(0,40)}:
+                                                                {t('dateFormats.date.short', {date: new Date(filter.value)})}
                                                             </span>
                                                         </span>
                                                     )

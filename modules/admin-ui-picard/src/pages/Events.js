@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
+import cn from 'classnames';
+
 import TableFilters from "../components/shared/TableFilters";
 import MainNav from "../components/shared/MainNav";
 import Stats from "../components/shared/Stats";
@@ -13,7 +15,7 @@ import {eventsTemplateMap} from "../configs/tableConfigs/eventsTableConfig";
 // References for detecting a click outside of the container of the dropdown menu
 const containerAction = React.createRef();
 
-const Events = ({loadingEvents, loadingEventsIntoTable, events}) => {
+const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions}) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
@@ -41,7 +43,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events}) => {
         }
 
 
-    })
+    }, [])
 
     const toggleNavigation = () => {
         setNavigation(!displayNavigation);
@@ -63,7 +65,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events}) => {
         <>
             <section className="action-nav-bar">
                 {/*TODO: include Components containing the suitable buttons for the current view */}
-                {/*Todo: Include Burger-button menu */}
+                {/* Include Burger-button menu */}
                 <MainNav  isOpen={displayNavigation}
                           toggleMenu={toggleNavigation}/>
 
@@ -84,7 +86,9 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events}) => {
 
                 <div className="controls-container">
                     <div className="filters-container">
-                        <div className="drop-down-container" onClick={e => handleActionMenu(e)} ref={containerAction}>
+                        <div className={cn("drop-down-container", {disabled: !showActions})}
+                             onClick={e => handleActionMenu(e)}
+                             ref={containerAction} >
                             <span>{t('BULK_ACTIONS.CAPTION')}</span>
                             {/* show dropdown if actions is clicked*/}
                             { displayActionMenu && (
@@ -121,18 +125,18 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events}) => {
 
                     {/*todo: instead of events table.caption*/}
                     <h1>{t('EVENTS.EVENTS.TABLE.CAPTION')}</h1>
-                    {/*todo: instead of 4 the numberOfRows (table.pagination.totalItems)*/}
-                    <h4>{events.length + " " + t('TABLE_SUMMARY')}</h4>
+                    <h4>{t('TABLE_SUMMARY', { numberOfRows: events.length })}</h4>
                 </div>
-                {/*todo: include table component*/}
-                <Table templateMap={eventsTemplateMap}/>
+                {/*Include table component*/}
+                <Table templateMap={eventsTemplateMap} />
             </div>
         </>
     );
 };
 
 const mapStateToProps = state => ({
-    events: es.getEvents(state)
+    events: es.getEvents(state),
+    showActions: es.isShowActions(state)
 });
 
 

@@ -45,7 +45,7 @@ const PublishCell = ({ row }) => {
         }
 
 
-    })
+    }, [])
 
     return (
         <div className="popover-wrapper" ref={containerPublications}>

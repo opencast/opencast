@@ -1,4 +1,6 @@
 import * as t from "../actions/tableActions";
+import * as e from "../actions/eventActions";
+import * as s from "../selectors/tableSelectors";
 import {eventsTableConfig}  from "../configs/tableConfigs/eventsTableConfig";
 
 /**
@@ -38,7 +40,8 @@ export const loadEventsIntoTable = () => async (dispatch, getState) => {
 
 
     const tableData = {
-        resource: resource,
+        resource: "events",
+        rows: resource,
         columns: columns,
         multiSelect: multiSelect,
         pages: pages
@@ -82,4 +85,37 @@ export const updatePages = () => (dispatch,getState) => {
     }
 
     dispatch(t.updatePages(pages));
+}
+
+// Select all rows on table page
+export const changeAllSelected = selected => (dispatch, getState) => {
+    const state = getState();
+
+    if (selected) {
+        if(s.getResourceType(state) === "events") {
+            dispatch(e.showActions(true));
+        }
+        dispatch(t.selectAll());
+    } else {
+        if(s.getResourceType(state) === "events") {
+            dispatch(e.showActions(false));
+        }
+        dispatch(t.deselectAll());
+    }
+}
+
+// Select certain row
+export const changeRowSelection = (id, selected) => (dispatch, getState) => {
+    dispatch(t.selectRow(id, selected));
+
+    const state = getState();
+
+    if (s.getResourceType(state) === "events"){
+        if (s.getSelectedRows(state).length > 0) {
+            dispatch(e.showActions(true));
+        } else {
+            dispatch(e.showActions(false));
+        }
+    }
+
 }

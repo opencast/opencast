@@ -6,6 +6,8 @@ import EventsStatusCell from "../../components/events/partials/EventsStatusCell"
 import EventsTechnicalDateCell from "../../components/events/partials/EventsTechnicalDateCell";
 import PublishedCell from "../../components/events/partials/PublishedCell";
 import EventsLocationCell from "../../components/events/partials/EventsLocationCell";
+import EventsEndCell from "../../components/events/partials/EventsEndCell";
+import EventsStartCell from "../../components/events/partials/EventsStartCell";
 
 /**
  * Config that contains the columns and further information regarding events. These are the information that never or hardly changes.
@@ -42,11 +44,13 @@ export const eventsTableConfig = {
         sortable: true,
         translate: false
     }, {
+        template: 'EventsStartCell',
         name: 'start_date',
         label: 'EVENTS.EVENTS.TABLE.START',
         sortable: true,
         translate: false
     }, {
+        template: 'EventsEndCell',
         name: 'end_date',
         label: 'EVENTS.EVENTS.TABLE.STOP',
         sortable: true,
@@ -87,6 +91,8 @@ export const eventsTableConfig = {
 export const eventsTemplateMap = {
     'EventActionsCell': EventActionCell,
     'EventsDateCell': EventsDateCell,
+    'EventsStartCell': EventsStartCell,
+    'EventsEndCell': EventsEndCell,
     'EventsLocationCell': EventsLocationCell,
     'EventsPresentersCell': EventsPresentersCell,
     'EventsSeriesCell': EventsSeriesCell,

@@ -11,7 +11,7 @@ const EventsDateCell = ({ row })  => {
         // Link template for start date of event
         <a  className="crosslink"
             title={t('EVENTS.EVENTS.TABLE.TOOLTIP.START')} onClick={() => addFilter()}>
-            {row.date}
+            {t('dateFormats.date.short', { date: new Date(row.date) })}
         </a>
     );
 };
