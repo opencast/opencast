@@ -33,7 +33,7 @@ export const eventsTableConfig = {
         translate: false
     }, {
         template: 'EventsSeriesCell',
-        name: 'series_name',
+        name: 'series',
         label: 'EVENTS.EVENTS.TABLE.SERIES',
         sortable: true,
         translate: false

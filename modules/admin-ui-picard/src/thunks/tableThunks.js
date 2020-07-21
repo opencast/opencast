@@ -9,7 +9,8 @@ import {eventsTableConfig}  from "../configs/tableConfigs/eventsTableConfig";
 
 // Method to load events into the table
 export const loadEventsIntoTable = () => async (dispatch, getState) => {
-    const { events, table } = getState();
+    const { events } = getState();
+    const pagination = s.getTablePagination(getState());
     const resource = events.results.map((result) => {
         return {
             ...result,
@@ -28,13 +29,13 @@ export const loadEventsIntoTable = () => async (dispatch, getState) => {
     })
     const multiSelect = eventsTableConfig.multiSelect;
 
-    let i, numberOfPages = table.pagination.totalItems / table.pagination.limit;
+    let i, numberOfPages = resource.length / pagination.limit;
     const pages = [];
     for (i = 0; i < numberOfPages || (i === 0 && numberOfPages === 0); i++) {
         pages.push({
             number: i,
             label: (i + 1).toString(),
-            active: i === table.pagination.offset
+            active: i === pagination.offset
         });
     }
 
@@ -53,26 +54,30 @@ export const loadEventsIntoTable = () => async (dispatch, getState) => {
 
 // Navigate between pages
 export const goToPage = pageNumber => (dispatch, getState) => {
-    const firstState = getState();
-    console.log(firstState.table.pages);
-    console.log(pageNumber);
+    // const firstState = getState();
+    // console.log(firstState.table.pages);
+    // console.log(pageNumber);
 
     dispatch(t.deselectAll());
     dispatch(t.setOffset(pageNumber));
 
-    const secondState = getState();
-    console.log(secondState.table.pagination.offset);
-    console.log(secondState.table.pages[secondState.table.pagination.offset].number);
+    const state = getState();
+    const offset = s.getPageOffset(state);
+    const pages = s.getTablePages(state);
 
-    dispatch(t.setPageActive(secondState.table.pages[secondState.table.pagination.offset].number));
+    console.log(offset);
+    console.log(pages[offset].number);
+
+    dispatch(t.setPageActive(pages[offset].number));
 
 }
 
 // Update pages for example if page size was changed
 export const updatePages = () => (dispatch,getState) => {
-    const { table } = getState();
 
-    let i, numberOfPages = table.pagination.totalItems / table.pagination.limit;
+    const pagination = s.getTablePagination(getState());
+
+    let i, numberOfPages = pagination.totalItems / pagination.limit;
 
     const pages = [];
 
@@ -80,7 +85,7 @@ export const updatePages = () => (dispatch,getState) => {
         pages.push({
             number: i,
             label: (i + 1).toString(),
-            active: i === table.pagination.offset
+            active: i === pagination.offset
         });
     }
 
@@ -106,6 +111,7 @@ export const changeAllSelected = selected => (dispatch, getState) => {
 
 // Select certain row
 export const changeRowSelection = (id, selected) => (dispatch, getState) => {
+
     dispatch(t.selectRow(id, selected));
 
     const state = getState();

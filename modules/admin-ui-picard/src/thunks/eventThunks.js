@@ -3,7 +3,7 @@ import {loadEventsFailure, loadEventsInProgress, loadEventsSuccess} from "../act
 const data ={
     "total": 12000,
     "offset": 0,
-    "count": 4,
+    "count": 12,
     "limit": 0,
     "results": [
     {
@@ -54,7 +54,11 @@ const data ={
         "start_date": "2018-08-10T11:22:51Z",
         "event_status": "EVENTS.EVENTS.STATUS.PROCESSING",
         "displayable_status": "EVENTS.EVENTS.STATUS.PROCESSING",
-        "publications": []
+        "publications": [],
+        "series": {
+            "id": "32aefb11-526c-4d62-9bd1-42a2cb85233f",
+            "title": "Mock Series"
+        }
     },
     {
         "end_date": "2018-08-10T12:39:02Z",

@@ -59,7 +59,7 @@ const table = (state=initialState, action) => {
                 pages: pages,
                 pagination: {
                     ...state.pagination,
-                    totalItems: resource.length
+                    totalItems: rows.length
                 }
             }
         }

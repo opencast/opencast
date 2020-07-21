@@ -1,37 +1,59 @@
 import React from 'react';
-import {withTranslation} from "react-i18next";
+import {useTranslation} from "react-i18next";
 
 import stats from "../../mocks/statsService";
+import * as tfs from "../../selectors/tableFilterSelectors";
+import * as tfa from "../../actions/tableFilterActions";
+import {connect} from "react-redux";
 
-// todo: implement filter function
-function showStatsFilter(name) {
-    console.log("Show stats filter");
-}
+
 
 /**
  * This component renders the status bar of the event view and filters depending on these
  */
-const Stats = ({ t }) => (
+const Stats = ({ filterMap, editFilterValue }) => {
+    const { t } = useTranslation();
+
+    // Filter with value of clicked status
+    const showStatsFilter = (name) => {
+        let filter = filterMap.find(({ name }) => name === "status");
+        if (!!filter) {
+            editFilterValue(filter.name, name);
+        }
+    }
+
+    return (
         <>
             <div className="main-stats">
                 {/* Show one counter for each status */}
-                {stats.map( (st, key) => (
+                {stats.map((st, key) => (
                     <div className="col" key={key}>
-                        <div className="stat" onClick={() => showStatsFilter(st.name)} title={t(st.description)}>
+                        <div className="stat" onClick={() => showStatsFilter(st.description)} title={t(st.description)}>
                             <h1>{st.counter}</h1>
                             {/* Show the description of the status, if defined,
                             else show name of filter and its value*/}
                             {!!st.description ? (
                                 <span>{t(st.description)}</span>
-                            ):(st.filters.map((filter, key) => (
-                                        <span>{t(filter.filter)}: {t(filter.value)}</span>
+                            ) : (st.filters.map((filter, key) => (
+                                    <span>{t(filter.filter)}: {t(filter.value)}</span>
                                 ))
                             )}
                         </div>
                     </div>
-                    ))}
+                ))}
             </div>
         </>
-);
+    )
+};
 
-export default withTranslation()(Stats);
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    filterMap: tfs.getFilters(state),
+});
+
+// Mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    editFilterValue: (filterName, value) => dispatch(tfa.editFilterValue(filterName, value))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Stats);

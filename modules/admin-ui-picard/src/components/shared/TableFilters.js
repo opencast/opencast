@@ -190,8 +190,8 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
                                         <span>
                                             {
                                                 // Use different representation of name and value depending on type of filter
-                                                {
-                                                    'select': (
+                                                filter.type === 'select' ?
+                                                    (
                                                         <span>
                                                             {t(filter.label).substr(0,40)}:
                                                             {(filter.translatable) ? (
@@ -200,8 +200,9 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
                                                                 filter.value.substr(0, 40)
                                                             )}
                                                         </span>
-                                                    ),
-                                                    'period': (
+                                                    ) :
+                                                filter.type === 'period' ?
+                                                    (
                                                         <span>
                                                             <span>
                                                                 {/*todo: format date range*/}
@@ -209,9 +210,8 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
                                                                 {t('dateFormats.date.short', {date: new Date(filter.value)})}
                                                             </span>
                                                         </span>
-                                                    )
-                                                }[filter.type]
-                                            }
+                                                    ) : null
+                                                }
                                         </span>
                                         {/* Remove icon in blue area around filter */}
                                         <a title={t('TABLE_FILTERS.REMOVE')} onClick={() => removeFilter(filter)}>
