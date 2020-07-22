@@ -28,12 +28,9 @@ angular.module('adminNg.directives')
     },
     link: function ($scope, element) {
       element.on('click', function (event) {
-        var is_active = angular.element(this).hasClass('active');
-        angular.element('[old-admin-ng-dropdown]').removeClass('active');
+        angular.element('[old-admin-ng-dropdown]').not(this).removeClass('active');
         event.stopPropagation();
-        if (!is_active) {
-          angular.element(this).toggleClass('active');
-        }
+        angular.element(this).toggleClass('active');
       });
 
       $scope.$on('$destroy', function () {
