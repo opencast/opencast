@@ -70,10 +70,10 @@ public class AttributeMapperTest {
     assertNotNull(roles);
     assertEquals(4, roles.size());
 
-    List<String> sn = attributeMapper.getMappedAttributes(mockRequest, "sn");
-    assertNotNull(sn);
-    assertEquals(1, sn.size());
-    assertEquals("Doe", sn.get(0));
+    List<String> displayName = attributeMapper.getMappedAttributes(mockRequest, "displayName");
+    assertNotNull(displayName);
+    assertEquals(1, displayName.size());
+    assertEquals("John Doe", displayName.get(0));
   }
 
   @Test (expected = IllegalArgumentException.class)
@@ -98,10 +98,10 @@ public class AttributeMapperTest {
     assertNotNull(roles);
     assertEquals(4, roles.size());
 
-    List<String> sn = attributeMapper.getMappedAttributes(mockRequest, "sn");
-    assertNotNull(sn);
-    assertEquals(1, sn.size());
-    assertEquals("Doe", sn.get(0));
+    List<String> displayName = attributeMapper.getMappedAttributes(mockRequest, "displayName");
+    assertNotNull(displayName);
+    assertEquals(1, displayName.size());
+    assertEquals("John Doe", displayName.get(0));
   }
 
   @Test
@@ -115,13 +115,13 @@ public class AttributeMapperTest {
         "john.doe@example.org;ron.smith@example.org");
 
     boolean thrown = false;
-    List<String> givenName = attributeMapper.getMappedAttributes(mockRequest, "givenName");
-    assertNotNull(givenName);
-    assertEquals(1, givenName.size());
-    assertEquals("John", givenName.get(0));
-    assertNotEquals("Charles", givenName.get(0));
+    List<String> displayName = attributeMapper.getMappedAttributes(mockRequest, "displayName");
+    assertNotNull(displayName);
+    assertEquals(1, displayName.size());
+    assertEquals("John Doe", displayName.get(0));
+    assertNotEquals("Charles", displayName.get(0));
     try {
-      assertEquals("Charles", givenName.get(1));
+      assertEquals("Charles", displayName.get(1));
     } catch (ArrayIndexOutOfBoundsException e) {
       thrown = true;
     }

@@ -617,14 +617,6 @@
     <value>['eduPersonPrincipalName'].contains('john.doe@example.org') ? 'ROLE_ADMIN' : null</value>
   </util:list>
 
-  <util:list id="snMapping" value-type="java.lang.String">
-    <value>['sn'][0]</value>
-  </util:list>
-
-  <util:list id="givenNameMapping" value-type="java.lang.String">
-    <value>['givenName'][0]</value>
-  </util:list>
-
   <util:list id="displayNameMapping" value-type="java.lang.String">
     <value>['givenName'][0] + ' ' + ['sn'][0]</value>
   </util:list>
@@ -635,8 +627,6 @@
 
   <util:map id="attributeMap" map-class="java.util.HashMap">
     <entry key="roles" value-ref="roleMapping" />
-    <entry key="sn" value-ref="snMapping" />
-    <entry key="givenName" value-ref="givenNameMapping" />
     <entry key="displayName" value-ref="displayNameMapping" />
     <entry key="mail" value-ref="mailMapping" />
   </util:map>
