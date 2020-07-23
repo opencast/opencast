@@ -8,7 +8,7 @@ import {
 } from "../OpencastRest";
 import Select from "react-select";
 import i18next from "i18next";
-import { ActionMeta, ValueType } from "react-select/src/types"; // tslint:disable-line no-submodule-imports
+import { ValueType } from "react-select/src/types"; // tslint:disable-line no-submodule-imports
 
 import CreatableSelect from "react-select/creatable";
 
@@ -94,7 +94,7 @@ function MetadataFieldInner(props: MetadataFieldProps) {
             isClearable={true}
             id={field.id}
             value={(field.value as string[]).map((e) => ({ value: e, label: e }))}
-            onChange={(value: ValueType<OptionType>, _: ActionMeta) =>
+            onChange={(value: ValueType<OptionType>) =>
                 valueChange(
                     field.id,
                     value === undefined || value === null || !Array.isArray(value) ? [] : (value as OptionType[]).map((v) => v.value))} />;
@@ -104,7 +104,7 @@ function MetadataFieldInner(props: MetadataFieldProps) {
         const currentValue = options.find((o: OptionType) => o.value === field.value);
         return <Select
             id={field.id}
-            onChange={(value: ValueType<OptionType>, _: ActionMeta) =>
+            onChange={(value: ValueType<OptionType>) =>
                 valueChange(
                     field.id,
                     value === undefined || value === null || Array.isArray(value) ? "" : (value as OptionType).value)}
