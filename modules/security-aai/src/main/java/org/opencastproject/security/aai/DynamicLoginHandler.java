@@ -21,24 +21,20 @@
 package org.opencastproject.security.aai;
 
 import org.opencastproject.security.aai.api.AttributeMapper;
-import org.opencastproject.security.api.Group;
+import org.opencastproject.security.api.GroupProvider;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
-import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
 import org.opencastproject.security.shibboleth.ShibbolethLoginHandler;
-import org.opencastproject.userdirectory.ConflictException;
-import org.opencastproject.userdirectory.api.GroupRoleProvider;
+import org.opencastproject.userdirectory.api.AllRoleProvider;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
-import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -65,7 +61,10 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Dynamic login with Shibboleth data through SpEL mappings
  */
-public class DynamicLoginHandler implements ShibbolethLoginHandler, GroupRoleProvider, InitializingBean {
+public class DynamicLoginHandler implements ShibbolethLoginHandler, AllRoleProvider, GroupProvider, ManagedService, InitializingBean {
+
+  /** Default value of the configuration property CFG_ROLE_FEDERATION_KEY */
+  private static final String CFG_ROLE_FEDERATION_DEFAULT = "ROLE_AAI_USER";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(DynamicLoginHandler.class);
@@ -265,7 +264,7 @@ public class DynamicLoginHandler implements ShibbolethLoginHandler, GroupRolePro
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.userdirectory.api.GroupRoleProvider#getRoles()
+   * @see org.opencastproject.userdirectory.api.AllRoleProvider#getRoles()
    */
   @Override
   public Iterator<Role> getRoles() {
@@ -350,26 +349,4 @@ public class DynamicLoginHandler implements ShibbolethLoginHandler, GroupRolePro
     return null;
   }
 
-  @Override
-  public void updateGroupMembershipFromRoles(String userName, String orgId, List<String> roleList) {
-  }
-
-  @Override
-  public void addGroup(JpaGroup group) throws UnauthorizedException {
-  }
-
-  @Override
-  public Iterator<Group> getGroups() {
-    return null;
-  }
-
-  @Override
-  public void createGroup(String name, String description, String roles, String users)
-         throws IllegalArgumentException, UnauthorizedException, ConflictException {
-  }
-
-  @Override
-  public void updateGroup(String groupId, String name, String description, String roles, String users)
-         throws NotFoundException, UnauthorizedException {
-  }
 }

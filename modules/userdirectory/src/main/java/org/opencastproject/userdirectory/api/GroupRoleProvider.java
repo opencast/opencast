@@ -27,7 +27,6 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.impl.jpa.JpaGroup;
-import org.opencastproject.userdirectory.ConflictException;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.Iterator;
@@ -84,12 +83,31 @@ public interface GroupRoleProvider extends GroupProvider, RoleProvider {
      */
     void addGroup(JpaGroup group) throws UnauthorizedException;
 
+    /**
+     * Getting all groups
+     *
+     * @return Iterator<Group> persisted groups
+     */
     Iterator<Group> getGroups();
 
-    void createGroup(String name, String description,
-            String roles, String users)
-            throws IllegalArgumentException, UnauthorizedException, ConflictException;
-
+    /**
+     * Update a group
+     *
+     * @param groupId
+     *          the id of the group to update
+     * @param name
+     *          the name to update
+     * @param description
+     *          the description to update
+     * @param roles
+     *          the roles to update
+     * @param users
+     *          the users to update
+     * @throws NotFoundException
+     *           if the group is not found
+     * @throws UnauthorizedException
+     *           if the user does not have rights to update the group
+     */
     void updateGroup(String groupId, String name,
             String description, String roles, String users)
             throws NotFoundException, UnauthorizedException;

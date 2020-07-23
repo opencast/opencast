@@ -361,6 +361,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
    * @param group
    *          the group to add
    */
+  @Override
   public void addGroup(final JpaGroup group) throws UnauthorizedException {
     if (group != null && !UserDirectoryUtils.isCurrentUserAuthorizedHandleRoles(securityService, group.getRoles()))
       throw new UnauthorizedException("The user is not allowed to add or update a group with the admin role");
@@ -551,23 +552,11 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   }
 
   /**
-   * Update a group
+   * {@inheritDoc}
    *
-   * @param groupId
-   *          the id of the group to update
-   * @param name
-   *          the name to update
-   * @param description
-   *          the description to update
-   * @param roles
-   *          the roles to update
-   * @param users
-   *          the users to update
-   * @throws NotFoundException
-   *           if the group is not found
-   * @throws UnauthorizedException
-   *           if the user does not have rights to update the group
+   * @see org.opencastproject.userdirectory.api.GroupRoleProvider#updateGroup(String, String, String, String, String)
    */
+  @Override
   public void updateGroup(String groupId, String name, String description, String roles, String users)
           throws NotFoundException, UnauthorizedException {
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
