@@ -30,7 +30,7 @@ import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
-import org.opencastproject.userdirectory.api.GroupRoleProvider;
+import org.opencastproject.userdirectory.api.AAIRoleProvider;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
 import org.opencastproject.util.NotFoundException;
 
@@ -93,7 +93,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   protected JpaGroupRoleProvider groupRoleProvider;
 
   /** Role provider */
-  protected GroupRoleProvider roleProvider;
+  protected AAIRoleProvider roleProvider;
 
   /** The delimiter for the User cache */
   private static final String DELIMITER = ";==;";
@@ -530,7 +530,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   }
 
   public void setRoleProvider(RoleProvider roleProvider) {
-    this.roleProvider = (GroupRoleProvider) roleProvider;
+    this.roleProvider = (AAIRoleProvider) roleProvider;
   }
 
 }

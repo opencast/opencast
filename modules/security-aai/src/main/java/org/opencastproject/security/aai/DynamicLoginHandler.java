@@ -33,13 +33,10 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
 import org.opencastproject.security.shibboleth.ShibbolethLoginHandler;
-import org.opencastproject.userdirectory.api.AllRoleProvider;
+import org.opencastproject.userdirectory.api.AAIRoleProvider;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
 
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -48,9 +45,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Dictionary;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -61,7 +56,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Dynamic login with Shibboleth data through SpEL mappings
  */
-public class DynamicLoginHandler implements ShibbolethLoginHandler, AllRoleProvider, GroupProvider, InitializingBean {
+public class DynamicLoginHandler implements ShibbolethLoginHandler, AAIRoleProvider, GroupProvider, InitializingBean {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(DynamicLoginHandler.class);
@@ -76,18 +71,6 @@ public class DynamicLoginHandler implements ShibbolethLoginHandler, AllRoleProvi
   private AttributeMapper attributeMapper = null;
 
   public DynamicLoginHandler() {
-    BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();
-    registerAsManagedService(bundleContext);
-  }
-
-  protected DynamicLoginHandler(BundleContext bundleContext) {
-    registerAsManagedService(bundleContext);
-  }
-
-  private void registerAsManagedService(BundleContext bundleContext) {
-    Dictionary<String, String> properties = new Hashtable<String, String>();
-    properties.put("service.pid", this.getClass().getName());
-    bundleContext.registerService(ManagedService.class.getName(), this, properties);
   }
 
   /**
@@ -261,7 +244,7 @@ public class DynamicLoginHandler implements ShibbolethLoginHandler, AllRoleProvi
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.userdirectory.api.AllRoleProvider#getRoles()
+   * @see org.opencastproject.userdirectory.api.AAIRoleProvider#getRoles()
    */
   @Override
   public Iterator<Role> getRoles() {

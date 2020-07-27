@@ -34,12 +34,6 @@ import java.util.List;
 
 public interface GroupRoleProvider extends GroupProvider, RoleProvider {
 
-    /**
-     * Return the roles
-     *
-     * @return the roles
-     */
-    Iterator<Role> getRoles();
 
     /**
      * {@inheritDoc}

@@ -47,6 +47,7 @@ import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.userdirectory.api.AAIRoleProvider;
 import org.opencastproject.userdirectory.api.GroupRoleProvider;
 import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
 import org.opencastproject.util.NotFoundException;
@@ -82,7 +83,7 @@ import javax.persistence.EntityTransaction;
   immediate = true,
   service = { RoleProvider.class, JpaGroupRoleProvider.class }
 )
-public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleProvider, GroupProvider, GroupRoleProvider {
+public class JpaGroupRoleProvider extends AbstractIndexProducer implements AAIRoleProvider, GroupProvider, GroupRoleProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(JpaGroupRoleProvider.class);
@@ -182,7 +183,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.userdirectory.api.GroupRoleProvider#getRoles()
+   * @see org.opencastproject.userdirectory.api.AAIRoleProvider#getRoles()
    */
   @Override
   public Iterator<Role> getRoles() {

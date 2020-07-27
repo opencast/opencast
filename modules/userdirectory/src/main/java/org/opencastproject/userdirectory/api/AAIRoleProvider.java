@@ -26,7 +26,7 @@ import org.opencastproject.security.api.RoleProvider;
 
 import java.util.Iterator;
 
-public interface AllRoleProvider extends RoleProvider {
+public interface AAIRoleProvider extends RoleProvider {
 
   /**
    * Return the roles
