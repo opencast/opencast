@@ -61,10 +61,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Dynamic login with Shibboleth data through SpEL mappings
  */
-public class DynamicLoginHandler implements ShibbolethLoginHandler, AllRoleProvider, GroupProvider, ManagedService, InitializingBean {
-
-  /** Default value of the configuration property CFG_ROLE_FEDERATION_KEY */
-  private static final String CFG_ROLE_FEDERATION_DEFAULT = "ROLE_AAI_USER";
+public class DynamicLoginHandler implements ShibbolethLoginHandler, AllRoleProvider, GroupProvider, InitializingBean {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(DynamicLoginHandler.class);
