@@ -12,7 +12,8 @@ import * as tfa from "../../actions/tableFilterActions";
  * table filters.
  */
 const TableFiltersProfiles = ({showFilterSettings, setFilterSettings, createFilterProfile, filterMap,
-                                  cancelEditFilterProfile, profiles, removeFilterProfile, loadFilterProfile}) => {
+                                  cancelEditFilterProfile, profiles, removeFilterProfile, loadFilterProfile,
+                                  loadResource, loadResourceIntoTable}) => {
 
     // State for switching between list of profiles and saving/editing dialog
     const [settingsMode, setSettingsMode] = useState(true);
@@ -84,6 +85,14 @@ const TableFiltersProfiles = ({showFilterSettings, setFilterSettings, createFilt
         }
     }
 
+    const chooseFilterProfile = filterMap => {
+        loadFilterProfile(filterMap)
+
+        // Reload resources when filters are removed
+        loadResource(false, false);
+        loadResourceIntoTable();
+    }
+
    return(
        <>
            {/*Show filter profiles dialog if settings icon in TableFilters is clicked*/}
@@ -106,7 +115,7 @@ const TableFiltersProfiles = ({showFilterSettings, setFilterSettings, createFilt
                             profiles.map((profile, key) => (
                                 <li key={key}>
                                     <a title="profile.description"
-                                       onClick={() => loadFilterProfile(profile.filterMap)}>
+                                       onClick={() => chooseFilterProfile(profile.filterMap)}>
                                         {profile.name.substr(0, 70)}
                                     </a>
                                     {/* Settings icon to edit profile */}

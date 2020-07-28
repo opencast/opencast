@@ -44,7 +44,7 @@ const EventActionCell = ({ row })  => {
                          title={t('EVENTS.EVENTS.TABLE.TOOLTIP.DETAILS')}/>
 
             {/* If event belongs to a series then the corresponding series details can be opened */}
-            {!!row.series_id && (
+            {!!row.series && (
                 //{/*TODO: When series details are implemented, remove placeholder
                 //{/*TODO: with-Role ROLE_UI_SERIES_DETAILS_VIEW
                 <SeriesDetailsLink onClick={() => onClickPlaceholder()}

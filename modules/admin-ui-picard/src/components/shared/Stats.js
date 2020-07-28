@@ -5,13 +5,15 @@ import stats from "../../mocks/statsService";
 import * as tfs from "../../selectors/tableFilterSelectors";
 import * as tfa from "../../actions/tableFilterActions";
 import {connect} from "react-redux";
+import * as et from "../../thunks/eventThunks";
+import * as tt from "../../thunks/tableThunks";
 
 
 
 /**
  * This component renders the status bar of the event view and filters depending on these
  */
-const Stats = ({ filterMap, editFilterValue }) => {
+const Stats = ({ filterMap, editFilterValue, loadEvents, loadEventsIntoTable }) => {
     const { t } = useTranslation();
 
     // Filter with value of clicked status
@@ -19,6 +21,8 @@ const Stats = ({ filterMap, editFilterValue }) => {
         let filter = filterMap.find(({ name }) => name === "status");
         if (!!filter) {
             editFilterValue(filter.name, name);
+            loadEvents(true, false);
+            loadEventsIntoTable();
         }
     }
 
@@ -53,7 +57,9 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    editFilterValue: (filterName, value) => dispatch(tfa.editFilterValue(filterName, value))
+    editFilterValue: (filterName, value) => dispatch(tfa.editFilterValue(filterName, value)),
+    loadEvents: (filter, sort) => dispatch(et.fetchEvents(filter, sort)),
+    loadEventsIntoTable: () => dispatch(tt.loadEventsIntoTable())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Stats);

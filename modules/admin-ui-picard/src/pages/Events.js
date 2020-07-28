@@ -23,7 +23,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions}) =>
     useEffect(() => {
 
         // Fetching events from server
-        loadingEvents();
+        loadingEvents(false, false);
 
         // Load events into table
         loadingEventsIntoTable();
@@ -120,10 +120,9 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions}) =>
 
                         </div>
                         {/* Include filters component*/}
-                        <TableFilters />
+                        <TableFilters loadResource={loadingEvents}
+                                      loadResourceIntoTable={loadingEventsIntoTable}/>
                     </div>
-
-                    {/*todo: instead of events table.caption*/}
                     <h1>{t('EVENTS.EVENTS.TABLE.CAPTION')}</h1>
                     <h4>{t('TABLE_SUMMARY', { numberOfRows: events.length })}</h4>
                 </div>
@@ -141,7 +140,7 @@ const mapStateToProps = state => ({
 
 
 const mapDispatchToProps = dispatch => ({
-    loadingEvents: () => dispatch(et.fetchEvents()),
+    loadingEvents: (filter, sort) => dispatch(et.fetchEvents(filter, sort)),
     loadingEventsIntoTable: () => dispatch(tt.loadEventsIntoTable())
 });
 

@@ -1,4 +1,6 @@
 import {loadEventsFailure, loadEventsInProgress, loadEventsSuccess} from "../actions/eventActions";
+import * as tfs from '../selectors/tableFilterSelectors';
+import * as ts from '../selectors/tableSelectors';
 
 const data ={
     "total": 12000,
@@ -356,12 +358,37 @@ const data ={
 ]
 };
 
-export const fetchEvents = () => async dispatch => {
+export const fetchEvents = (filter, sort) => async (dispatch, getState) => {
     try {
         dispatch(loadEventsInProgress());
+
+        console.log('Filters in event thunk: ');
+        console.log(filter);
+
+        const state = getState();
+
+        // Get filter map from state if filter flag is true
+        let filterMap = null;
+        if (filter) {
+            filterMap = tfs.getFilters(state);
+        }
+
+        // Get sorting from state if sort flag is true
+        let sortBy, direction = null;
+        if (sort) {
+            sortBy = ts.getTableSorting(state);
+            direction = ts.getTableDirection(state);
+        }
+
+        // Get page info needed for fetching events from state
+        let pageLimit = ts.getPageLimit(state);
+        let offset = ts.getPageOffset(state);
+
+
         //TODO: Fetch actual data from server
         //Todo: maybe some Transfromations for publication needed
         //const response = JSON.parse(data);
+
         const response = data;
         for (let i = 0; response.results.length > i; i++) {
             // insert date property

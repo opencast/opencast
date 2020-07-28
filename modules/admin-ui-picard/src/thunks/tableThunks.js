@@ -1,5 +1,6 @@
 import * as t from "../actions/tableActions";
 import * as e from "../actions/eventActions";
+import * as et from "../thunks/eventThunks";
 import * as s from "../selectors/tableSelectors";
 import {eventsTableConfig}  from "../configs/tableConfigs/eventsTableConfig";
 
@@ -70,12 +71,21 @@ export const goToPage = pageNumber => (dispatch, getState) => {
 
     dispatch(t.setPageActive(pages[offset].number));
 
+    // Get resources of page and load them into table
+    // Load events if resource is events
+    if (s.getResourceType(state) === "events") {
+        dispatch(et.fetchEvents(false, false));
+        dispatch(loadEventsIntoTable());
+    }
+    // todo: Check for all other type of resource
+
 }
 
 // Update pages for example if page size was changed
 export const updatePages = () => (dispatch,getState) => {
+    const state = getState();
 
-    const pagination = s.getTablePagination(getState());
+    const pagination = s.getTablePagination(state);
 
     let i, numberOfPages = pagination.totalItems / pagination.limit;
 
@@ -90,6 +100,14 @@ export const updatePages = () => (dispatch,getState) => {
     }
 
     dispatch(t.updatePages(pages));
+
+    // Get resources of page and load them into table
+    // Load events if resource is events
+    if (s.getResourceType(state) === "events") {
+        dispatch(et.fetchEvents(false, false));
+        dispatch(loadEventsIntoTable());
+    }
+    // todo: Check for all other type of resource
 }
 
 // Select all rows on table page

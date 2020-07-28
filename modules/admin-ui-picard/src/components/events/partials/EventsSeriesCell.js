@@ -3,11 +3,13 @@ import { useTranslation } from "react-i18next";
 import * as tfs from "../../../selectors/tableFilterSelectors";
 import * as tfa from "../../../actions/tableFilterActions";
 import {connect} from "react-redux";
+import * as et from "../../../thunks/eventThunks";
+import * as tt from "../../../thunks/tableThunks";
 
 /**
  * This component renders the series cells of events in the table view
  */
-const EventsSeriesCell = ({ row, filterMap, editFilterValue })  => {
+const EventsSeriesCell = ({ row, filterMap, editFilterValue, loadEvents, loadEventsIntoTable })  => {
     const { t } = useTranslation();
 
     // Filter with value of current cell
@@ -15,6 +17,8 @@ const EventsSeriesCell = ({ row, filterMap, editFilterValue })  => {
         let filter = filterMap.find(({ name }) => name === "series");
         if (!!filter) {
             editFilterValue(filter.name, series.title);
+            loadEvents(true, false);
+            loadEventsIntoTable();
         }
     };
 
@@ -37,7 +41,9 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    editFilterValue: (filterName, value) => dispatch(tfa.editFilterValue(filterName, value))
+    editFilterValue: (filterName, value) => dispatch(tfa.editFilterValue(filterName, value)),
+    loadEvents: (filter, sort) => dispatch(et.fetchEvents(filter, sort)),
+    loadEventsIntoTable: () => dispatch(tt.loadEventsIntoTable())
 });
 
 

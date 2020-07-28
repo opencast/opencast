@@ -28,14 +28,14 @@ const SortActiveIcon = styled.i`
     left: auto;
     width: 8px;
     height: 13px;
-    background-image: url(${props => (props.order === 'ASC' ? sortDownIcon : sortUpIcon)})};
+    background-image: url(${props => (props.order === 'ASC' ? sortUpIcon : sortDownIcon)})};
 `;
 
 
 const containerPageSize = React.createRef();
 
 const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOffset, pages,
-                   goToPage, updatePages, setOffset, changeSelectAll}) => {
+                   goToPage, updatePages, setOffset, changeSelectAll, setSortBy, reverseTable}) => {
     // Size options for pagination
     const sizeOptions = [10, 20, 50, 100];
 
@@ -104,6 +104,17 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
         return pageOffset < pages.length - 1;
     }
 
+    const sortByColumn = colName => {
+        requestSort(colName);
+        setSortBy(colName);
+        if (sortConfig) {
+            reverseTable(sortConfig.direction);
+        } else {
+            reverseTable("ASC");
+        }
+
+    }
+
 
     return (
         <>
@@ -132,7 +143,7 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
                             column.sortable ? (
                             <th key={key}
                                 className={cn({ 'col-sort': !!sortConfig && column.name === sortConfig.key, 'sortable': true })}
-                                onClick={() => requestSort(column.name)}>
+                                onClick={() => sortByColumn(column.name)}>
                                 <span>
                                     <span>{t(column.label)}</span>
                                     {(!!sortConfig && column.name === sortConfig.key) ? (
@@ -327,7 +338,9 @@ const mapDispatchToProps = dispatch => ({
     goToPage: pageNumber => dispatch(tt.goToPage(pageNumber)),
     updatePages: () => dispatch(tt.updatePages()),
     setOffset: pageNumber => dispatch(ta.setOffset(pageNumber)),
-    changeSelectAll: selected => dispatch(tt.changeAllSelected(selected))
+    changeSelectAll: selected => dispatch(tt.changeAllSelected(selected)),
+    reverseTable: order => dispatch(ta.reverseTable(order)),
+    setSortBy: column => dispatch(ta.setSortBy(column))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Table);

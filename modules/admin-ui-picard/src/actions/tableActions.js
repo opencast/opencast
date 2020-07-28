@@ -10,6 +10,7 @@ export const SELECT_ALL = 'SELECT_ALL';
 export const DESELECT_ALL = 'DESELECT_ALL';
 export const RESET_SORT_TABLE = 'RESET_SORT_TABLE';
 export const REVERSE_TABLE = 'REVERSE_TABLE';
+export const SET_SORT_BY = 'SET_SORT_BY';
 export const SET_MULTISELECT = 'SET_MULTISELECT';
 export const LOAD_COLUMNS = 'LOAD_COLUMNS';
 
@@ -58,8 +59,14 @@ export const resetSortTable = () => ({
 });
 
 //todo: maybe some adjustments necessary, when actually implementing this
-export const reverseTable = () => ({
-   type: REVERSE_TABLE
+export const reverseTable = order => ({
+    type: REVERSE_TABLE,
+    payload: { order }
+});
+
+export const setSortBy = column => ({
+    type: SET_SORT_BY,
+    payload: { column }
 });
 
 //todo: maybe some adjustments necessary, when actually implementing this

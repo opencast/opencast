@@ -32,7 +32,7 @@ const initialState = {
     columns: [],
     sortBy: "",
     predicate: "",
-    reverse: false,
+    reverse: "ASC",
     rows: [],
     maxLabel: "",
     pagination: {
@@ -114,8 +114,18 @@ const table = (state=initialState, action) => {
             return state;
         }
         case t.REVERSE_TABLE: {
-            //todo: maybe some adjustments necessary, when actually implementing this
-            return state;
+            const { order } = payload;
+            return {
+                ...state,
+                reverse: order
+            };
+        }
+        case t.SET_SORT_BY: {
+            const { column } = payload;
+            return {
+                ...state,
+                sortBy: column
+            }
         }
         case t.SET_MULTISELECT: {
             //todo: maybe some adjustments necessary, when actually implementing this

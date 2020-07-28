@@ -3,11 +3,13 @@ import { useTranslation } from "react-i18next";
 import * as tfs from "../../../selectors/tableFilterSelectors";
 import * as tfa from "../../../actions/tableFilterActions";
 import {connect} from "react-redux";
+import * as et from "../../../thunks/eventThunks";
+import * as tt from "../../../thunks/tableThunks";
 
 /**
  * This component renders the presenters cells of events in the table view
  */
-const EventsPresentersCell = ({ row, filterMap, editFilterValue })  => {
+const EventsPresentersCell = ({ row, filterMap, editFilterValue, loadEvents, loadEventsIntoTable })  => {
     const { t } = useTranslation();
 
     // Filter with value of current cell
@@ -15,6 +17,8 @@ const EventsPresentersCell = ({ row, filterMap, editFilterValue })  => {
         let filter = filterMap.find(({ name }) => name === "presentersBibliographic");
         if (!!filter) {
             editFilterValue(filter.name, presenter);
+            loadEvents(true, false);
+            loadEventsIntoTable();
         }
     };
 
@@ -38,7 +42,9 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    editFilterValue: (filterName, value) => dispatch(tfa.editFilterValue(filterName, value))
+    editFilterValue: (filterName, value) => dispatch(tfa.editFilterValue(filterName, value)),
+    loadEvents: (filter, sort) => dispatch(et.fetchEvents(filter, sort)),
+    loadEventsIntoTable: () => dispatch(tt.loadEventsIntoTable())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventsPresentersCell);

@@ -1,5 +1,6 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import moment from "moment";
 
 import Backend from "i18next-xhr-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
@@ -21,7 +22,7 @@ import slSITrans from "./org/opencastproject/adminui/languages/lang-sl_SI";
 import svSETrans from "./org/opencastproject/adminui/languages/lang-sv_SE";
 import trTRTrans from "./org/opencastproject/adminui/languages/lang-tr_TR";
 import zhZWTrans from "./org/opencastproject/adminui/languages/lang-zh_TW";
-import moment from "moment";
+
 
 // Assignment of language code to translation file
 // !!! If translation file of a new language is added, please add assignment here, too !!!

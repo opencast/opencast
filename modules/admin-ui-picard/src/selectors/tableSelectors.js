@@ -12,6 +12,8 @@ export const getPageLimit = state => state.table.pagination.limit;
 export const getPageOffset = state => state.table.pagination.offset;
 export const getNumberDirectAccessiblePages = state => state.table.pagination.directAccessibleNo;
 export const getResourceType = state => state.table.resource;
+export const getTableSorting = state => state.table.sortBy;
+export const getTableDirection = state => state.table.reverse;
 
 export const getSelectedRows = createSelector(
     getTableRows,

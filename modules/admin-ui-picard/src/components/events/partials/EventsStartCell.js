@@ -1,6 +1,9 @@
 import {useTranslation} from "react-i18next";
 import React from "react";
 
+/**
+ * This component renders the start cells of events in the table view
+ */
 const EventsStartCell = ({row}) => {
     const {t} = useTranslation();
 

@@ -8,7 +8,7 @@ import * as tft from '../../thunks/tableFilterThunks';
 import * as tfa from '../../actions/tableFilterActions';
 import TableFilterProfiles from "./TableFilterProfiles";
 
-import searchIcon from '../../img/search.png'
+import searchIcon from '../../img/search.png';
 
 
 
@@ -30,7 +30,7 @@ const SearchInput = styled.input`
 const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, startDate, endDate, secondFilter,
                           onChangeTextFilter, removeTextFilter, editSelectedFilter, removeSelectedFilter,
                           editSecondFilter, removeSecondFilter, setStartDate, setEndDate, resetStartDate, resetEndDate,
-                          resetFilterMap, editFilterValue }) => {
+                          resetFilterMap, editFilterValue, loadResource, loadResourceIntoTable }) => {
     const { t } = useTranslation();
 
     // Variables for showing different dialogs depending on what was clicked
@@ -53,6 +53,11 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
         // Set all values of the filters in filterMap back to ""
         resetFilterMap();
 
+        // Reload resources when filters are removed
+        loadResource(false, false);
+        loadResourceIntoTable();
+
+
         console.log("remove filters");
         console.log(filterMap);
     }
@@ -63,6 +68,10 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
         console.log(filter);
         editFilterValue(filter.name, "");
         console.log("remove certain filter");
+
+        // Reload resources when filter is removed
+        loadResource(true, false);
+        loadResourceIntoTable();
     }
 
     // Handle changes when a item of the component is clicked
@@ -87,7 +96,11 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
             setFilterSelector(false);
             removeSelectedFilter();
             removeSecondFilter();
+            //Todo: ADD RELOAD OF RESOURCE
+            loadResource(true, false);
+            loadResourceIntoTable();
         }
+
     }
 
     // Set the sate of startDate and endDate picked with datepicker
@@ -235,7 +248,9 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
 
                     {/* Filter profile dialog for saving and editing filter profiles */}
                     <TableFilterProfiles showFilterSettings={showFilterSettings}
-                                         setFilterSettings={setFilterSettings} />
+                                         setFilterSettings={setFilterSettings}
+                                         loadResource={loadResource}
+                                         loadResourceIntoTable={loadResourceIntoTable} />
 
 
                 </div>
