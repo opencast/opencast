@@ -145,6 +145,9 @@
     <module>modules/live-schedule-impl</module>
     <module>modules/logging-workflowoperation</module>
     <module>modules/lti</module>
+    <module>modules/lti-service-remote</module>
+    <module>modules/lti-service-impl</module>
+    <module>modules/lti-service-api</module>
     <module>modules/mattermost-notification-workflowoperation</module>
     <module>modules/message-broker-api</module>
     <module>modules/message-broker-impl</module>

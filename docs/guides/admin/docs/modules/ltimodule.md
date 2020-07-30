@@ -48,6 +48,10 @@ For more details, take a look at the options in
 `etc/org.opencastproject.security.lti.LtiLaunchAuthenticationHandler.cfg`.
 
 
+The “delete” key in the series overview tool can be configured by specifying the retraction workflow in
+`etc/org.opencastproject.lti.endpoint.EventsEndpoint.cfg`. The property is called `retract-workflow-id`, and it defaults
+to `retract`.
+
 Configure and test an LTI tool in the LMS
 -----------------------------------------
 
@@ -86,17 +90,28 @@ custom parameters to be defined separately in each place where an LTI tool is us
 custom parameters to be defined globally.
 
 - To show the media module, use `tool=engage/ui/`
-- To show all videos for a single series, use `tool=ltitools/series/index.html?series=SERIESID`
+- To show all videos for a single series, specify the following parameters
+  - `tool=ltitools/index.html`
+  - `subtool=series`
+  - `series=SERIESID` if you have the series ID
+  - `series_name=SERIESNAME` if you just have the series name (has to be unique)
+  - `deletion=true` if you want to display a deletion button next to each episode
+  - `edit=true` if you want to display an edit button next to each episode
+- To show an upload form, specify the following parameters:
+  - `tool=ltitools/index.html`
+  - `subtool=upload`
+  - `series=SERIESID` if you have the series ID
+  - `series_name=SERIESNAME` if you just have the series name (has to be unique)
 - To show a single video, use `tool=/play/MEDIAPACKAGEID`
 - To show a debug page before proceeding to the tool, append the parameter `test=true`
 
 For more information about how to set custom LTI parameters, please check the documentation of your LMS.
 
 
-### Series LTI Tool
+### Customizing LTI’s look
 
-Opencast's series LTI tool provides the option to provide custom style sheets for configuring the look and feel of the
-tool which may be important to match the design of the LTI consumer in which it is included. The CSS file can be found
+The LTI module provides the option to provide custom style sheets for configuring the look and feel of the
+tools which may be important to match the design of the LTI consumer in which it is included. The CSS file can be found
 in the user interface configuration directory usually located at:
 
-    etc/ui-config/mh_default_org/ltitools/series.css
+    etc/ui-config/mh_default_org/ltitools/lti.css

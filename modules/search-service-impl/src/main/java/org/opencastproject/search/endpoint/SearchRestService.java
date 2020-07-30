@@ -26,11 +26,19 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageImpl;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.search.api.SearchException;
 import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResultImpl;
 import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.series.api.SeriesException;
+import org.opencastproject.series.api.SeriesQuery;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -79,6 +87,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
   /** The search service */
   protected SearchServiceImpl searchService;
+
+  /** The optional series service; has to be volatile by the OSGi spec */
+  private volatile SeriesService seriesService;
 
   /** The service registry */
   private ServiceRegistry serviceRegistry;
@@ -232,9 +243,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "The ID of the single episode to be returned, if it exists.", isRequired = false, name = "id", type = RestParameter.Type.STRING),
           @RestParameter(description = "Any episode that matches this free-text query.", isRequired = false, name = "q", type = RestParameter.Type.STRING),
           @RestParameter(description = "Any episode that belongs to specified series id.", isRequired = false, name = "sid", type = RestParameter.Type.STRING),
-          // @RestParameter(defaultValue = "false", description =
-          // "Whether to include this series episodes. This can be used in combination with \"id\" or \"q\".",
-          // isRequired = false, name = "episodes", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Any episode that belongs to specified series name (note that the specified series name must be unique).", isRequired = false, name = "sname", type = RestParameter.Type.STRING),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
                   + "of the following: DATE_CREATED, DATE_PUBLISHED, TITLE, SERIES_ID, MEDIA_PACKAGE_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT, DESCRIPTION, PUBLISHER.  Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).", type = RestParameter.Type.STRING),          
@@ -245,7 +254,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               name = "sign", type = RestParameter.Type.BOOLEAN)
   }, reponses = { @RestResponse(description = "The request was processed successfully.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The search results, formatted as xml or json.")
   public Response getEpisode(@QueryParam("id") String id, @QueryParam("q") String text,
-          @QueryParam("sid") String seriesId, @QueryParam("sort") String sort, @QueryParam("tag") String[] tags, @QueryParam("flavor") String[] flavors,
+          @QueryParam("sid") String seriesId, @QueryParam("sname") String seriesName, @QueryParam("sort") String sort, @QueryParam("tag") String[] tags, @QueryParam("flavor") String[] flavors,
           @QueryParam("limit") int limit, @QueryParam("offset") int offset, @QueryParam("admin") boolean admin,
           @QueryParam("sign") String sign, @PathParam("format") String format) throws SearchException, UnauthorizedException {
     // CHECKSTYLE:ON
@@ -258,6 +267,39 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         } catch (IllegalArgumentException e) {
           logger.debug("invalid flavor '{}' specified in query", f);
         }
+      }
+    }
+
+    if (seriesName != null && seriesId != null) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("invalid request, both 'sid' and 'sname' specified")
+              .build();
+    }
+
+    boolean invalidSeries = false;
+    if (seriesName != null) {
+      if (seriesService == null) {
+        return Response.status(Response.Status.NOT_IMPLEMENTED).build();
+      }
+      DublinCoreCatalogList result;
+      try {
+        result = seriesService.getSeries(new SeriesQuery().setSeriesTitle(seriesName));
+      } catch (SeriesException e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error while searching for series")
+                .build();
+      }
+      // Specifying a nonexistent series ID is not an error, so a nonexistent series name shouldn't be, either.
+      if (result.getTotalCount() == 0) {
+        invalidSeries = true;
+      } else {
+        if (result.getTotalCount() > 1) {
+          return Response.status(Response.Status.BAD_REQUEST).entity("more than one series matches given series name").build();
+        }
+        DublinCoreCatalog seriesResult = result.getCatalogList().get(0);
+        final List<DublinCoreValue> identifiers = seriesResult.get(DublinCore.PROPERTY_IDENTIFIER);
+        if (identifiers.size() != 1) {
+          return Response.status(Response.Status.BAD_REQUEST).entity("more than one identifier in dublin core catalog for series").build();
+        }
+        seriesId = identifiers.get(0).getValue();
       }
     }
 
@@ -301,7 +343,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     // Build the response
     ResponseBuilder rb = Response.ok();
 
-    if (admin) {
+    if (invalidSeries) {
+      rb.entity(new SearchResultImpl());
+    } else if (admin) {
       rb.entity(searchService.getForAdministrativeRead(search));
     } else {
       rb.entity(searchService.getByQuery(search));
@@ -407,6 +451,16 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
    */
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
+  }
+
+  /**
+   * Callback from OSGi to set the series service implementation.
+   *
+   * @param seriesService
+   *          the series servie
+   */
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
   }
 
   /**
