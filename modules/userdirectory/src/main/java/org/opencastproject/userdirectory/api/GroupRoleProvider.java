@@ -80,7 +80,7 @@ public interface GroupRoleProvider extends GroupProvider, RoleProvider {
     /**
      * Getting all groups
      *
-     * @return Iterator<Group> persisted groups
+     * @return Iterator&lt;Group&gt; persisted groups
      */
     Iterator<Group> getGroups();
 
