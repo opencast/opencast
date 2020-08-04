@@ -186,6 +186,19 @@ angular.module('adminNg.controllers')
             }
           });
 
+          // add policy to allow ROLE_USER_* to read and write
+          var userRole = Object.keys($scope.roles).filter(function(role){
+            return role.startsWith('ROLE_USER_') && role != 'ROLE_USER_ADMIN';
+          });
+          if (angular.isDefined(userRole) && userRole.length == 1){
+            userRole = userRole[0];
+            if (angular.isUndefined(newPolicies[userRole])){
+              newPolicies[userRole] = createPolicy(userRole);
+            }
+            newPolicies[userRole]['read'] = true;
+            newPolicies[userRole]['write'] = true;
+          }
+
           $scope.policies = [];
           angular.forEach(newPolicies, function (policy) {
             $scope.policies.push(policy);
