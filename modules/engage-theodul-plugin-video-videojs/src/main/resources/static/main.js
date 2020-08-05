@@ -1477,11 +1477,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       $engageVideoId.css('max-width', minWidth + 'px');
     }
     $engageVideoId.css('min-height', minVideoAreaHeight + 'px');
-    if (maxVideoAreaHeight > minVideoAreaHeight) {
-      $engageVideoId.css('max-height', maxVideoAreaHeight + 'px');
-    } else {
-      $engageVideoId.css('max-height', minVideoAreaHeight + 'px');
-    }
 
     if (!isDefaultLayout()) {
       if (isPiP) {
@@ -2069,7 +2064,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         });
         $videoDisplayClass.removeClass(videoFocusedClass).removeClass(videoUnfocusedClass).addClass(videoDefaultLayoutClass);
         var numberDisplays = $videoDisplayClass.length;
-        $videoDisplayClass.css('width', (((1 / numberDisplays) * 100) - 0.5) + '%');
+        $videoDisplayClass.css('width', ((1 / numberDisplays) * 100) + '%');
         delayedCalculateVideoAreaAspectRatio();
       });
 
