@@ -11,7 +11,7 @@
 }
 
 .videoDisplay {
-    margin: 1px;
+    padding: 2px;
     overflow: hidden;
 }
 
@@ -37,8 +37,8 @@
     width: 100%;
     float: left;
     z-index: 10;
-    padding-top: 0px;
 }
+
 .videoUnfocusedPiP {
     width: 19.5%;
     position: absolute;
