@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from "react-i18next";
-import * as tfs from "../../../selectors/tableFilterSelectors";
-import * as tfa from "../../../actions/tableFilterActions";
+import { getFilters } from "../../../selectors/tableFilterSelectors";
+import { editFilterValue } from "../../../actions/tableFilterActions";
 import {connect} from "react-redux";
-import * as et from "../../../thunks/eventThunks";
-import * as tt from "../../../thunks/tableThunks";
+import { fetchEvents } from "../../../thunks/eventThunks";
+import { loadEventsIntoTable } from "../../../thunks/tableThunks";
 
 /**
  * This component renders the series cells of events in the table view
@@ -36,15 +36,14 @@ const EventsSeriesCell = ({ row, filterMap, editFilterValue, loadEvents, loadEve
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    filterMap: tfs.getFilters(state),
+    filterMap: getFilters(state),
 });
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    editFilterValue: (filterName, value) => dispatch(tfa.editFilterValue(filterName, value)),
-    loadEvents: (filter, sort) => dispatch(et.fetchEvents(filter, sort)),
-    loadEventsIntoTable: () => dispatch(tt.loadEventsIntoTable())
+    editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value)),
+    loadEvents: (filter, sort) => dispatch(fetchEvents(filter, sort)),
+    loadEventsIntoTable: () => dispatch(loadEventsIntoTable())
 });
 
-
-export default connect(mapStateToProps, mapDispatchToProps)(EventsSeriesCell);
+export default connect(mapStateToProps, mapDispatchToProps)(EventsSeriesCell);;

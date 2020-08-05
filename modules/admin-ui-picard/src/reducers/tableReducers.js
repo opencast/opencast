@@ -1,4 +1,20 @@
-import * as t from "../actions/tableActions";
+import {
+    LOAD_RESOURCE_INTO_TABLE,
+    LOAD_COLUMNS,
+    SELECT_ROW,
+    DESELECT_ALL,
+    SORT_TABLE,
+    RESET_SORT_TABLE,
+    SELECT_ALL,
+    REVERSE_TABLE,
+    SET_SORT_BY,
+    SET_MULTISELECT,
+    CREATE_PAGE,
+    UPDATE_PAGESIZE,
+    SET_OFFSET,
+    SET_TOTAL_ITEMS,
+    SET_PAGES, SET_DIRECT_ACCESSIBLE_PAGES, SET_PAGE_ACTIVE,
+} from "../actions/tableActions";
 
 /*
 Overview of the structure of the data in arrays in state
@@ -24,6 +40,11 @@ const columns = [{
 }, ...]
  */
 
+/**
+ * This file contains redux reducer for actions affecting the state of table
+ */
+
+// Initial state of table in redux store
 const initialState = {
     loading: false,
     multiSelect: false,
@@ -44,11 +65,11 @@ const initialState = {
 };
 
 
-
+// Reducer for table
 const table = (state=initialState, action) => {
     const { type, payload } = action;
     switch (type) {
-        case t.LOAD_RESOURCE_INTO_TABLE: {
+        case LOAD_RESOURCE_INTO_TABLE: {
             const { multiSelect, columns, resource, pages, rows } = payload;
             return {
                 ...state,
@@ -63,10 +84,10 @@ const table = (state=initialState, action) => {
                 }
             }
         }
-        case t.LOAD_COLUMNS: {
+        case LOAD_COLUMNS: {
             return state;
         }
-        case t.SELECT_ROW: {
+        case SELECT_ROW: {
             const { id } = payload;
             return {
                 ...state,
@@ -81,7 +102,7 @@ const table = (state=initialState, action) => {
                 })
             }
         }
-        case t.SELECT_ALL: {
+        case SELECT_ALL: {
             console.log("SELECT_ALL");
            return {
                ...state,
@@ -93,7 +114,7 @@ const table = (state=initialState, action) => {
                })
            }
         }
-        case t.DESELECT_ALL: {
+        case DESELECT_ALL: {
             console.log("DESELECT_ALL");
             return {
                 ...state,
@@ -105,40 +126,40 @@ const table = (state=initialState, action) => {
                 })
             }
         }
-        case t.SORT_TABLE: {
+        case SORT_TABLE: {
             //todo: maybe some adjustments necessary, when actually implementing this
             return state;
         }
-        case t.RESET_SORT_TABLE: {
+        case RESET_SORT_TABLE: {
             //todo: maybe some adjustments necessary, when actually implementing this
             return state;
         }
-        case t.REVERSE_TABLE: {
+        case REVERSE_TABLE: {
             const { order } = payload;
             return {
                 ...state,
                 reverse: order
             };
         }
-        case t.SET_SORT_BY: {
+        case SET_SORT_BY: {
             const { column } = payload;
             return {
                 ...state,
                 sortBy: column
             }
         }
-        case t.SET_MULTISELECT: {
+        case SET_MULTISELECT: {
             //todo: maybe some adjustments necessary, when actually implementing this
             return state;
         }
-        case t.CREATE_PAGE: {
+        case CREATE_PAGE: {
             const { page } = payload;
             return {
                 ...state,
                 pages: state.pages.concat(page)
             }
         }
-        case t.UPDATE_PAGESIZE: {
+        case UPDATE_PAGESIZE: {
             const { limit } = payload;
             return {
                 ...state,
@@ -148,14 +169,14 @@ const table = (state=initialState, action) => {
                 }
             }
         }
-        case t.UPDATE_PAGES: {
+        case SET_PAGES: {
             const { pages } = payload;
             return {
                 ...state,
                 pages: pages
             }
         }
-        case t.SET_TOTAL_ITEMS: {
+        case SET_TOTAL_ITEMS: {
             const { totalItems } = payload;
             return {
                 ...state,
@@ -165,7 +186,7 @@ const table = (state=initialState, action) => {
                 }
             }
         }
-        case t.SET_OFFSET: {
+        case SET_OFFSET: {
             const { offset } = payload;
             return {
                 ...state,
@@ -175,7 +196,7 @@ const table = (state=initialState, action) => {
                 }
             }
         }
-        case t.SET_DIRECT_ACCESSIBLE_PAGES: {
+        case SET_DIRECT_ACCESSIBLE_PAGES: {
             const { directAccessible } = payload;
             return {
                 ...state,
@@ -185,7 +206,7 @@ const table = (state=initialState, action) => {
                 }
             }
         }
-        case t.SET_PAGE_ACTIVE: {
+        case SET_PAGE_ACTIVE: {
             const { pageNumber } = payload;
             return {
                 ...state,

@@ -3,12 +3,16 @@ import {useTranslation} from "react-i18next";
 import styled from "styled-components";
 import DatePicker from "react-datepicker/es";
 import { connect } from 'react-redux';
-import * as tfs from '../../selectors/tableFilterSelectors';
-import * as tft from '../../thunks/tableFilterThunks';
-import * as tfa from '../../actions/tableFilterActions';
+import { getTextFilter, getFilters, getEndDate, getStartDate, getSecondFilter,
+    getSelectedFilter} from '../../selectors/tableFilterSelectors';
+import { fetchFilters } from '../../thunks/tableFilterThunks';
+import { editTextFilter, editSelectedFilter, removeTextFilter, removeSelectedFilter, editSecondFilter,
+    removeSecondFilter, setEndDate, setStartDate, resetEndDate, resetStartDate, editFilterValue,
+    resetFilterValues} from '../../actions/tableFilterActions';
 import TableFilterProfiles from "./TableFilterProfiles";
 
 import searchIcon from '../../img/search.png';
+
 
 
 
@@ -362,29 +366,30 @@ const FilterSwitch = ({filterMap, selectedFilter, handleChange, startDate, endDa
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    textFilter: tfs.getTextFilter(state),
-    filterMap: tfs.getFilters(state),
-    selectedFilter: tfs.getSelectedFilter(state),
-    secondFilter: tfs.getSecondFilter(state),
-    startDate: tfs.getStartDate(state),
-    endDate: tfs.getEndDate(state)
+    textFilter: getTextFilter(state),
+    filterMap: getFilters(state),
+    selectedFilter: getSelectedFilter(state),
+    secondFilter: getSecondFilter(state),
+    startDate: getStartDate(state),
+    endDate: getEndDate(state)
 });
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    onChangeTextFilter: textFilter => dispatch(tfa.editTextFilter(textFilter)),
-    removeTextFilter: () => dispatch(tfa.removeTextFilter()),
-    editSelectedFilter: filter => dispatch(tfa.editSelectedFilter(filter)),
-    removeSelectedFilter: () => dispatch(tfa.removeSelectedFilter()),
-    editSecondFilter: filter => dispatch(tfa.editSecondFilter(filter)),
-    removeSecondFilter: () => dispatch(tfa.removeSecondFilter()),
-    setStartDate: date => dispatch(tfa.setStartDate(date)),
-    setEndDate: date => dispatch(tfa.setEndDate(date)),
-    resetStartDate: () => dispatch(tfa.resetStartDate()),
-    resetEndDate: () => dispatch(tfa.resetEndDate()),
-    loadingFilters: () => dispatch(tft.fetchFilters()),
-    resetFilterMap: () => dispatch(tfa.resetFilterValues()),
-    editFilterValue: (filterName, value) => dispatch(tfa.editFilterValue(filterName, value))
+    onChangeTextFilter: textFilter => dispatch(editTextFilter(textFilter)),
+    removeTextFilter: () => dispatch(removeTextFilter()),
+    editSelectedFilter: filter => dispatch(editSelectedFilter(filter)),
+    removeSelectedFilter: () => dispatch(removeSelectedFilter()),
+    editSecondFilter: filter => dispatch(editSecondFilter(filter)),
+    removeSecondFilter: () => dispatch(removeSecondFilter()),
+    setStartDate: date => dispatch(setStartDate(date)),
+    setEndDate: date => dispatch(setEndDate(date)),
+    resetStartDate: () => dispatch(resetStartDate()),
+    resetEndDate: () => dispatch(resetEndDate()),
+    loadingFilters: () => dispatch(fetchFilters()),
+    resetFilterMap: () => dispatch(resetFilterValues()),
+    editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value))
 });
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(TableFilters);

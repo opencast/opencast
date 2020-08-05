@@ -2,31 +2,48 @@ import React, {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
 import cn from 'classnames';
 
-import TableFilters from "../components/shared/TableFilters";
-import MainNav from "../components/shared/MainNav";
-import Stats from "../components/shared/Stats";
-import Table from "../components/shared/Table";
-import * as et from "../thunks/eventThunks";
-import * as tt from "../thunks/tableThunks";
-import * as es from "../selectors/eventSelectors";
+import TableFilters from "../shared/TableFilters";
+import MainNav from "../shared/MainNav";
+import Stats from "../shared/Stats";
+import Table from "../shared/Table";
+import { fetchEvents } from "../../thunks/eventThunks";
+import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
+import { getEvents, isShowActions } from "../../selectors/eventSelectors";
 import {connect} from "react-redux";
-import {eventsTemplateMap} from "../configs/tableConfigs/eventsTableConfig";
+import { eventsTemplateMap } from "../../configs/tableConfigs/eventsTableConfig";
+import Link from "react-router-dom/Link";
+import {withRouter} from "react-router-dom";
+import {fetchSeries} from "../../thunks/seriesThunks";
 
 // References for detecting a click outside of the container of the dropdown menu
 const containerAction = React.createRef();
 
-const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions}) => {
+const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
+                        loadingSeriesIntoTable}) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
 
-    useEffect(() => {
-
+    const loadEvents = () => {
         // Fetching events from server
         loadingEvents(false, false);
 
         // Load events into table
         loadingEventsIntoTable();
+    };
+
+    const loadSeries = () => {
+        //fetching series from server
+        loadingSeries(false, false);
+
+        //load series into table
+        loadingSeriesIntoTable();
+    }
+
+    useEffect(() => {
+
+        // Load events on mount
+        loadEvents();
 
         // Function for handling clicks outside of an open dropdown menu
         const handleClickOutside = e => {
@@ -43,16 +60,20 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions}) =>
         }
 
 
-    }, [])
+    }, []);
 
     const toggleNavigation = () => {
         setNavigation(!displayNavigation);
         console.log("menu toggled");
     };
 
-    const handleActionMenu = (e) => {
+    const handleActionMenu = e => {
         e.preventDefault();
         setActionMenu(!displayActionMenu);
+    }
+
+    const placeholder = () => {
+        console.log("To be implemented");
     }
 
     const styleNavOpen = {
@@ -64,17 +85,24 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions}) =>
     return (
         <>
             <section className="action-nav-bar">
-                {/*TODO: include Components containing the suitable buttons for the current view */}
+                {/*TODO: include with role things */}
+                <div className="btn-group">
+                    <button className="add" onClick={() => placeholder()}>
+                        <i className="fa fa-plus" />
+                        <span>{t('EVENTS.EVENTS.ADD_EVENT')}</span>
+                    </button>
+                </div>
+
                 {/* Include Burger-button menu */}
                 <MainNav  isOpen={displayNavigation}
                           toggleMenu={toggleNavigation}/>
 
                 <nav>
                     {/*Todo: Show only if user has ROLE_UI_EVENTS_VIEW*/}
-                    <a href="#!/events/events">{t('EVENTS.EVENTS.NAVIGATION.EVENTS')}</a>
-                    <a href="#!/events/series">{t('EVENTS.EVENTS.NAVIGATION.SERIES')}</a>
+                    <Link to="/events/events" onClick={() => loadEvents()}>{t('EVENTS.EVENTS.NAVIGATION.EVENTS')}</Link>
+                    <Link to="/events/series" onClick={() => loadSeries()}>{t('EVENTS.EVENTS.NAVIGATION.SERIES')}</Link>
                 </nav>
-                {/*Todo: show only if table resource is events and with Role ROLE_UI_EVENTS_COUNTERS_VIEW */}
+
                 <div className="stats-container">
                     {/* Include status bar component*/}
                     <Stats />
@@ -95,21 +123,21 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions}) =>
                                 <ul className="dropdown-ul">
                                     {/*todo: show only if user has right to delete resource (with-role ROLE_UI_{{ table.resource }}_DELETE*/}
                                     <li>
-                                        {/*todo: open overlay for deletion and change EVENTS to table.resource.toUpperCase() */}
+                                        {/*todo: open overlay for deletion */}
                                         <a>{t('BULK_ACTIONS.DELETE.EVENTS.CAPTION')}</a>
                                     </li>
-                                    {/*todo: show only if table resource is events and with-Role ROLE_UI_TASKS_CREATE*/}
+                                    {/*todo: show only  with-Role ROLE_UI_TASKS_CREATE*/}
                                     <li>
                                         {/*todo: open overlay for schedule task */}
                                         <a>{t('BULK_ACTIONS.SCHEDULE_TASK.CAPTION')}</a>
                                     </li>
-                                    {/*todo: show only if table resource is events and user is admin with roles
+                                    {/*todo: show only if  user is admin with roles
                                     ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT and ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT */}
                                     <li>
                                         {/*todo: open overlay for edit events */}
                                         <a>{t('BULK_ACTIONS.EDIT_EVENTS.CAPTION')}</a>
                                     </li>
-                                    {/*todo: show only if table resource is events and user is admin with roles
+                                    {/*todo: show  user is admin with roles
                                     ROLE_UI_EVENTS_DETAILS_METADATA_EDIT*/}
                                     <li>
                                         {/*todo: open overlay for edit metadata of events */}
@@ -134,14 +162,16 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions}) =>
 };
 
 const mapStateToProps = state => ({
-    events: es.getEvents(state),
-    showActions: es.isShowActions(state)
+    events: getEvents(state),
+    showActions: isShowActions(state)
 });
 
 
 const mapDispatchToProps = dispatch => ({
-    loadingEvents: (filter, sort) => dispatch(et.fetchEvents(filter, sort)),
-    loadingEventsIntoTable: () => dispatch(tt.loadEventsIntoTable())
+    loadingEvents: (filter, sort) => dispatch(fetchEvents(filter, sort)),
+    loadingEventsIntoTable: () => dispatch(loadEventsIntoTable()),
+    loadingSeries: (filter, sort) => dispatch(fetchSeries(filter, sort)),
+    loadingSeriesIntoTable: () => dispatch(loadSeriesIntoTable()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Events);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Events));

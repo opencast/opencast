@@ -8,6 +8,7 @@ import tableFilters from './reducers/tableFilterReducers';
 import tableFilterProfiles from './reducers/tableFilterProfilesReducer';
 import events from './reducers/eventReducers';
 import table from './reducers/tableReducers';
+import series from "./reducers/seriesReducer";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -18,6 +19,7 @@ const reducers = {
     tableFilters,
     tableFilterProfiles,
     events,
+    series,
     table
 };
 

@@ -7,6 +7,7 @@ import systemsIcon from '../../img/servers.png';
 import userIcon from '../../img/user-group.png';
 import configIcon from '../../img/configuration.png';
 import statisticsIcon from '../../img/activity.png';
+import {Link} from "react-router-dom";
 
 /**
  * This component renders the main navigation that opens when the burger button is clicked
@@ -19,36 +20,37 @@ const MainNav = ({t, isOpen, toggleMenu}) => (
                     <div id="nav-container">
                         {/* Todo: add role management (see MainNav in admin-ui-frontend)*/}
                         {/* todo: more than one href? how? (see MainNav admin-ui-frontend)*/}
-                        <a href="#!/events/events">
+                        {/* todo: load Events on click*/}
+                        <Link to="/events/events">
                             <i className="events" title={t('NAV.EVENTS.TITLE')}>
                                 <img src={eventIcon}/>
                             </i>
-                        </a>
-                        <a href="#!/recordings/recordings">
+                        </Link>
+                        <Link to="/recordings/recordings">
                             <i className="recordings" title={t('NAV.CAPTUREAGENTS.TITLE')}>
                                 <img src={recordingIcon} />
                             </i>
-                        </a>
-                        <a href="#!/systems/jobs">
+                        </Link>
+                        <Link to="/systems/jobs">
                             <i className="systems" title={t('NAV.SYSTEMS.TITLE')}>
                                 <img src={systemsIcon} />
                             </i>
-                        </a>
-                        <a href="#!/users/users">
+                        </Link>
+                        <Link to="/users/users">
                             <i className="users" title={t('NAV.USERS.TITLE')}>
                                 <img src={userIcon} />
                             </i>
-                        </a>
-                        <a href="#!/configuration/themes">
+                        </Link>
+                        <Link to="/configuration/themes">
                             <i className="configuration" title={t('NAV.CONFIGURATION.TITLE')}>
                                 <img src={configIcon} />
                             </i>
-                        </a>
-                        <a href="#!/statistics/organization">
+                        </Link>
+                        <Link to="/statistics/organization">
                             <i className="statistics" title={t('NAV.STATISTICS.TITLE')}>
                                 <img src={statisticsIcon} />
                             </i>
-                        </a>
+                        </Link>
                     </div>
                 </nav>
             )}
@@ -56,6 +58,5 @@ const MainNav = ({t, isOpen, toggleMenu}) => (
         </div>
     </>
 );
-
 
 export default withTranslation()(MainNav);

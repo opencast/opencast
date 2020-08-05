@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from "react-i18next";
-import * as tfa from "../../../actions/tableFilterActions";
-import * as et from "../../../thunks/eventThunks";
-import * as tt from "../../../thunks/tableThunks";
-import * as tfs from "../../../selectors/tableFilterSelectors";
+import { setStartDate, setEndDate, editFilterValue} from "../../../actions/tableFilterActions";
+import { fetchEvents } from "../../../thunks/eventThunks";
+import { loadEventsIntoTable } from "../../../thunks/tableThunks";
+import { getFilters } from "../../../selectors/tableFilterSelectors";
 import {connect} from "react-redux";
 
 /**
@@ -40,16 +40,16 @@ const EventsDateCell = ({ row, filterMap, setStartDate, setEndDate, editFilterVa
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    filterMap: tfs.getFilters(state),
+    filterMap: getFilters(state),
 });
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    setStartDate: date => dispatch(tfa.setStartDate(date)),
-    setEndDate: date => dispatch(tfa.setEndDate(date)),
-    editFilterValue: (filterName, value) => dispatch(tfa.editFilterValue(filterName, value)),
-    loadEvents: (filter, sort) => dispatch(et.fetchEvents(filter, sort)),
-    loadEventsIntoTable: () => dispatch(tt.loadEventsIntoTable())
+    setStartDate: date => dispatch(setStartDate(date)),
+    setEndDate: date => dispatch(setEndDate(date)),
+    editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value)),
+    loadEvents: (filter, sort) => dispatch(fetchEvents(filter, sort)),
+    loadEventsIntoTable: () => dispatch(loadEventsIntoTable())
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventsDateCell);

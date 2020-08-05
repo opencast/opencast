@@ -1,14 +1,13 @@
-
 /**
  * This file contains all redux actions that can be executed on events
  */
 
-// Constants of of actions types for fetching events from server
+// Constants of actions types for fetching events from server
 export const LOAD_EVENTS_IN_PROGRESS = 'LOAD_EVENTS_IN_PROGRESS';
 export const LOAD_EVENTS_SUCCESS = 'LOAD_EVENTS_SUCCESS';
 export const LOAD_EVENTS_FAILURE = 'LOAD_EVENTS_FAILURE';
 
-// Constants of of actions types affecting UI
+// Constants of actions types affecting UI
 export const SHOW_ACTIONS = 'SHOW_ACTIONS';
 
 // Actions affecting fetching of events from server

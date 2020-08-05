@@ -1,6 +1,6 @@
 import {loadEventsFailure, loadEventsInProgress, loadEventsSuccess} from "../actions/eventActions";
-import * as tfs from '../selectors/tableFilterSelectors';
-import * as ts from '../selectors/tableSelectors';
+import {getFilters} from '../selectors/tableFilterSelectors';
+import {getPageLimit, getPageOffset, getTableDirection, getTableSorting} from '../selectors/tableSelectors';
 
 const data ={
     "total": 12000,
@@ -370,19 +370,19 @@ export const fetchEvents = (filter, sort) => async (dispatch, getState) => {
         // Get filter map from state if filter flag is true
         let filterMap = null;
         if (filter) {
-            filterMap = tfs.getFilters(state);
+            filterMap = getFilters(state);
         }
 
         // Get sorting from state if sort flag is true
         let sortBy, direction = null;
         if (sort) {
-            sortBy = ts.getTableSorting(state);
-            direction = ts.getTableDirection(state);
+            sortBy = getTableSorting(state);
+            direction = getTableDirection(state);
         }
 
         // Get page info needed for fetching events from state
-        let pageLimit = ts.getPageLimit(state);
-        let offset = ts.getPageOffset(state);
+        let pageLimit = getPageLimit(state);
+        let offset = getPageOffset(state);
 
 
         //TODO: Fetch actual data from server

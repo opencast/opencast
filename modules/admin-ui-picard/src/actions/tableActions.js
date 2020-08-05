@@ -17,7 +17,7 @@ export const LOAD_COLUMNS = 'LOAD_COLUMNS';
 // Constants of of actions types concerning pagination
 export const CREATE_PAGE = 'CREATE_PAGE';
 export const UPDATE_PAGESIZE = 'UPDATE_PAGESIZE';
-export const UPDATE_PAGES = 'UPDATE_PAGES';
+export const SET_PAGES = 'UPDATE_PAGES';
 export const SET_TOTAL_ITEMS = 'SET_TOTAL_ITEMS';
 export const SET_OFFSET = 'SET_OFFSET';
 export const SET_DIRECT_ACCESSIBLE_PAGES = 'SET_DIRECT_ACCESSIBLE_PAGES';
@@ -53,12 +53,11 @@ export const sortTable = () => ({
     type: SORT_TABLE,
 });
 
-//todo: maybe some adjustments necessary, when actually implementing this
 export const resetSortTable = () => ({
     type: RESET_SORT_TABLE
 });
 
-//todo: maybe some adjustments necessary, when actually implementing this
+
 export const reverseTable = order => ({
     type: REVERSE_TABLE,
     payload: { order }
@@ -86,8 +85,8 @@ export const updatePageSize = limit => ({
     payload: { limit }
 });
 
-export const updatePages = pages => ({
-    type: UPDATE_PAGES,
+export const setPages = pages => ({
+    type: SET_PAGES,
     payload: { pages }
 });
 

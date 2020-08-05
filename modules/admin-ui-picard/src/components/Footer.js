@@ -4,7 +4,7 @@ import React from "react";
 /**
  * Component that renders the footer
  */
-export const Footer = ({ version, feedbackUrl }) => (
+const Footer = ({ version, feedbackUrl }) => (
         <footer id="main-footer" >
             <div className="default-footer">
                 {/* Only render if a version is set */}
@@ -24,4 +24,6 @@ export const Footer = ({ version, feedbackUrl }) => (
             </div>
         </footer>
 );
+
+export default Footer;
 

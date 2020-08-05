@@ -2,10 +2,11 @@ import React, {useState, useEffect} from "react";
 import {useTranslation} from "react-i18next";
 import { connect } from 'react-redux';
 import cn from 'classnames';
-import * as tfps from "../../selectors/tableFilterProfilesSelectors";
-import * as tfpa from "../../actions/tableFilterProfilesActions";
-import * as tfs from "../../selectors/tableFilterSelectors";
-import * as tfa from "../../actions/tableFilterActions";
+import { getFilterProfiles } from "../../selectors/tableFilterProfilesSelectors";
+import { createFilterProfile, editFilterProfile, cancelEditFilterProfile,
+    removeFilterProfile } from "../../actions/tableFilterProfilesActions";
+import { getFilters } from "../../selectors/tableFilterSelectors";
+import { loadFilterProfile } from "../../actions/tableFilterActions";
 
 /**
  * This component renders the table filter profiles in the upper right corner when clicked on settings icon of the
@@ -191,17 +192,17 @@ const TableFiltersProfiles = ({showFilterSettings, setFilterSettings, createFilt
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    filterMap: tfs.getFilters(state),
-    profiles: tfps.getFilterProfiles(state)
+    filterMap: getFilters(state),
+    profiles: getFilterProfiles(state)
 });
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    loadFilterProfile: filterMap => dispatch(tfa.loadFilterProfile(filterMap)),
-    createFilterProfile: filterProfile => dispatch(tfpa.createFilterProfile(filterProfile)),
-    editFilterProfile: filterProfile => dispatch(tfpa.editFilterProfile(filterProfile)),
-    removeFilterProfile: filterProfile => dispatch(tfpa.removeFilterProfile(filterProfile)),
-    cancelEditFilterProfile: () => dispatch(tfpa.cancelEditFilterProfile())
+    loadFilterProfile: filterMap => dispatch(loadFilterProfile(filterMap)),
+    createFilterProfile: filterProfile => dispatch(createFilterProfile(filterProfile)),
+    editFilterProfile: filterProfile => dispatch(editFilterProfile(filterProfile)),
+    removeFilterProfile: filterProfile => dispatch(removeFilterProfile(filterProfile)),
+    cancelEditFilterProfile: () => dispatch(cancelEditFilterProfile())
 });
 
 export default connect(mapStateToProps,mapDispatchToProps)(TableFiltersProfiles);

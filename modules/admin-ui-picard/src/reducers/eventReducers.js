@@ -1,13 +1,18 @@
-import * as e from '../actions/eventActions';
+import {LOAD_EVENTS_FAILURE, LOAD_EVENTS_IN_PROGRESS, LOAD_EVENTS_SUCCESS, SHOW_ACTIONS} from '../actions/eventActions';
 import {eventsTableConfig} from "../configs/tableConfigs/eventsTableConfig";
 
+/**
+ * This file contains redux reducer for actions affecting the state of events
+ */
+
+// Fill columns initially with columns defined in eventsTableConfig
 const initialColumns = eventsTableConfig.columns.map(column =>
     ({
-    name: column.name,
+        name: column.name,
         deactivated: false
     }));
 
-
+// Initial state of events in redux store
 const initialState = {
     isLoading: false,
     total: 0,
@@ -19,16 +24,17 @@ const initialState = {
     showActions: false
 }
 
+// Reducer for events
 const events = (state=initialState, action) => {
     const { type, payload } = action;
     switch (type) {
-        case e.LOAD_EVENTS_IN_PROGRESS: {
+        case LOAD_EVENTS_IN_PROGRESS: {
             return {
                 ...state,
                 isLoading: true
             }
         }
-        case e.LOAD_EVENTS_SUCCESS: {
+        case LOAD_EVENTS_SUCCESS: {
             const { events } = payload;
             return {
                 ...state,
@@ -40,13 +46,13 @@ const events = (state=initialState, action) => {
                 results: events.results
             }
         }
-        case e.LOAD_EVENTS_FAILURE: {
+        case LOAD_EVENTS_FAILURE: {
             return {
                 ...state,
                 isLoading: false
             }
         }
-        case e.SHOW_ACTIONS: {
+        case SHOW_ACTIONS: {
             const { isShowing } = payload;
             return {
                 ...state,

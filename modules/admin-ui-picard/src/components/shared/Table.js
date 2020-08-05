@@ -1,9 +1,9 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {useTranslation} from "react-i18next";
 import styled from "styled-components";
-import * as ts from "../../selectors/tableSelectors";
-import * as ta from "../../actions/tableActions";
-import * as tt from "../../thunks/tableThunks";
+import { getPageOffset, getTablePages} from "../../selectors/tableSelectors";
+import { updatePageSize, setOffset, reverseTable, setSortBy } from "../../actions/tableActions";
+import { changeRowSelection, goToPage, changeAllSelected, updatePages } from "../../thunks/tableThunks";
 import {connect} from "react-redux";
 import cn from 'classnames';
 
@@ -48,6 +48,8 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
 
     const {resources, requestSort, sortConfig } = useSortRows(table.rows);
     
+    console.log(templateMap);
+    console.log(table.rows);
 
     useEffect(() => {
         // Function for handling clicks outside of an open dropdown menu
@@ -328,19 +330,20 @@ const useSortRows = (resources, config = null) => {
 
 const mapStateToProps = state => ({
     table: state.table,
-    pageOffset: ts.getPageOffset(state),
-    pages: ts.getTablePages(state)
+    pageOffset: getPageOffset(state),
+    pages: getTablePages(state)
 });
 
 const mapDispatchToProps = dispatch => ({
-    rowSelectionChanged: (id, selected) => dispatch(tt.changeRowSelection(id, selected)),
-    updatePageSize: size => dispatch(ta.updatePageSize(size)),
-    goToPage: pageNumber => dispatch(tt.goToPage(pageNumber)),
-    updatePages: () => dispatch(tt.updatePages()),
-    setOffset: pageNumber => dispatch(ta.setOffset(pageNumber)),
-    changeSelectAll: selected => dispatch(tt.changeAllSelected(selected)),
-    reverseTable: order => dispatch(ta.reverseTable(order)),
-    setSortBy: column => dispatch(ta.setSortBy(column))
+    rowSelectionChanged: (id, selected) => dispatch(changeRowSelection(id, selected)),
+    updatePageSize: size => dispatch(updatePageSize(size)),
+    goToPage: pageNumber => dispatch(goToPage(pageNumber)),
+    updatePages: () => dispatch(updatePages()),
+    setOffset: pageNumber => dispatch(setOffset(pageNumber)),
+    changeSelectAll: selected => dispatch(changeAllSelected(selected)),
+    reverseTable: order => dispatch(reverseTable(order)),
+    setSortBy: column => dispatch(setSortBy(column))
 });
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(Table);
