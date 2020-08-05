@@ -76,12 +76,15 @@ API changes
     - DELETE /workflow/definition/{id}
     - PUT /workflow/definition
 
+Additional Notes About 8.6
+--------------------------
+
+This maintenance release contains some bugfixes.
+
 Additional Notes About 8.5
 --------------------------
 
 This maintenance release contains mainly fixes for LTI issues.
-
-
 
 Additional Notes About 8.4
 --------------------------
