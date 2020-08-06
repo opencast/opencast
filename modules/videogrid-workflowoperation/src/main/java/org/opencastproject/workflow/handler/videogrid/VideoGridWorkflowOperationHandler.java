@@ -540,7 +540,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
 
     // Create an edit decision list
     List<VideoEdlPart> videoEdl = new ArrayList<VideoEdlPart>();
-    HashMap<String, Long> activeVideos = new HashMap<String, Long>();   // Currently running videos
+    HashMap<String, StartStopEvent> activeVideos = new HashMap<>();   // Currently running videos
 
     // Define starting point
     VideoEdlPart start = new VideoEdlPart();
@@ -551,9 +551,9 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     for (StartStopEvent event : events) {
       if (event.start) {
         logger.info("Add start event at {}", event.timeStamp);
-        activeVideos.put(event.filename, event.timeStamp);
+        activeVideos.put(event.filename, event);
       } else {
-        logger.info("Add stop event at {}", event.timeStamp);
+        logger.info("Add stop event at {}", event);
         activeVideos.remove(event.filename);
       }
       videoEdl.add(createVideoEdl(event, activeVideos));
@@ -832,7 +832,6 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   private String msToS(long timestamp)
   {
     double s = (double)timestamp / 1000;
-    //double ms = timestamp % 1000;
     return String.format(Locale.US, "%.3f", s);   // Locale.US to get a . instead of a ,
   }
 
@@ -946,13 +945,13 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     return mediaFile.getAbsolutePath();
   }
 
-  private VideoEdlPart createVideoEdl(StartStopEvent event, HashMap<String, Long> activeVideos) {
+  private VideoEdlPart createVideoEdl(StartStopEvent event, HashMap<String, StartStopEvent> activeVideos) {
     VideoEdlPart nextEdl = new VideoEdlPart();
     nextEdl.timeStamp = event.timeStamp;
 
-    for (Map.Entry<String, Long> filename : activeVideos.entrySet()) {
-      nextEdl.areas.add(new VideoInfo(filename.getKey(), event.timeStamp, event.videoInfo.aspectRatioHeight,
-              event.videoInfo.aspectRatioWidth, event.timeStamp - filename.getValue()));
+    for (Map.Entry<String, StartStopEvent> activeVideo : activeVideos.entrySet()) {
+      nextEdl.areas.add(new VideoInfo(activeVideo.getKey(), event.timeStamp, activeVideo.getValue().videoInfo.aspectRatioHeight,
+              activeVideo.getValue().videoInfo.aspectRatioWidth, event.timeStamp - activeVideo.getValue().timeStamp));
     }
 
     return nextEdl;
