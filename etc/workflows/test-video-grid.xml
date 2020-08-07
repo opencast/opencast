@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>test-video-grid</id>
+  <title>Arne testet video grid</title>
+  <tags>
+    <tag>upload</tag>
+  </tags>
+  <displayOrder>1000</displayOrder>
+  <description>
+    Video Grid Test Test Description
+  </description>
+
+  <configuration_panel>
+    <![CDATA[
+      <div id="workflow-configuration">
+        <input id="publish" name="publish" type="checkbox" class="configField" value="true" checked=checked />
+        <label for="publish">Publish media directly</label>
+      </div>
+    ]]>
+  </configuration_panel>
+
+  <operations>
+
+    <operation
+        id="defaults"
+        description="Applying default configuration values">
+      <configurations>
+        <configuration key="publish">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Set publication variables for compatibility with the publish workflow -->
+
+    <operation
+        id="defaults"
+        if="${publish}"
+        description="Applying configuration values for publish workflow">
+      <configurations>
+        <configuration key="publishToMediaModule">true</configuration>
+        <configuration key="publishToOaiPmh">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Apply ACL from series to the mediapackage -->
+
+    <operation
+        id="series"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Applying access control entries from series">
+      <configurations>
+        <configuration key="apply-acl">true</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="snapshot"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Archiving">
+      <configurations>
+        <configuration key="source-flavors">*/source,*/prepared,dublincore/*,security/*,smil/*</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="videogrid"
+        description="Generate portions of the final video"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error">
+      <configurations>
+        <configuration key="source-flavor">presenter/source</configuration>
+        <configuration key="source-smil-flavor">smil/source+partial</configuration>
+        <configuration key="concat-encoding-profile">concat-samecodec.work</configuration>
+        <configuration key="opt-resolution">1280/720</configuration>
+        <configuration key="opt-background-color">0x1200FF</configuration>
+        <configuration key="target-flavor">presenter/prepared</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Debug -->
+    <operation
+        id="log"
+        description="Log to file2">
+      <configurations>
+        <configuration key="directory">/tmp/logtest2</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Concatenate the tracks created by multiple-webcam -->
+    <!--    <operation-->
+    <!--        id="concat"-->
+    <!--        fail-on-error="true"-->
+    <!--        exception-handler-workflow="error"-->
+    <!--        description="Concatenate the generated videos.">-->
+    <!--      <configurations>-->
+    <!--        <configuration key="source-flavor-numbered-files">presenter/partial</configuration>-->
+    <!--        <configuration key="target-flavor">presenter/prepared</configuration>-->
+    <!--        <configuration key="target-tags">engage-download,engage-streaming</configuration>-->
+    <!--        &lt;!&ndash; do not encode before concatenation &ndash;&gt;-->
+    <!--        <configuration key="same-codec">true</configuration>-->
+    <!--        <configuration key="encoding-profile">concat-samecodec.work</configuration>-->
+    <!--      </configurations>-->
+    <!--    </operation>-->
+
+    <!-- Stitch together BBB SHTUFF -->
+
+    <!-- Used before partial-import as recommended by the docs-->
+    <operation
+        id="inspect"
+        fail-on-error="true"
+        exception-handler-workflow="error"
+        description="Inspecting mediapackage track elements">
+      <configurations>
+        <configuration key="overwrite">false</configuration>
+        <configuration key="accept-no-media">false</configuration>
+        <configuration key="accurate-frame-count">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- TODO: Change Partial Import to be able to only run on a single flavor -->
+    <!-- Currently, the whole smil is iterated to find matching tracks, no matter the given source-keys -->
+    <!-- This leads to exceptions being thrown when the corresponding track to a given smil id can not be found, -->
+    <!-- for example by not including the flavor where the track resides. -->
+    <!-- No track matching smil Track-id: 610998d9-36fc-43cb-8fdc-a1d8f49be846 -->
+    <!-- at org.opencastproject.workflow.handler.composer.PartialImportWorkflowOperationHandler.getFromOriginal(PartialImportWorkflowOperationHandler.java:941) -->
+    <operation id="partial-import"
+               description="Post-processing raw audio and video files from capture agent"
+               fail-on-error="true"
+               exception-handler-workflow="partial-error">
+      <configurations>
+        <configuration key="source-presentation-flavor">presentation/source</configuration>
+        <configuration key="source-presenter-flavor">presenter/source</configuration>
+        <configuration key="source-smil-flavor">smil/source+partial</configuration>
+        <configuration key="target-presentation-flavor">presentation/prepared</configuration>
+        <configuration key="target-presenter-flavor">presenter/IntoTheGarbage</configuration>
+        <configuration key="concat-encoding-profile">concat.work</configuration>
+        <configuration key="trim-encoding-profile">trim.work</configuration>
+        <configuration key="force-encoding-profile">editor.work</configuration>
+      </configurations>
+    </operation>
+
+    <!--    <operation-->
+    <!--        id="tag"-->
+    <!--        max-attempts="2"-->
+    <!--        fail-on-error="true"-->
+    <!--        exception-handler-workflow="error"-->
+    <!--        description="Tagging media package elements">-->
+    <!--      <configurations>-->
+    <!--        <configuration key="source-flavors">*/prepared</configuration>-->
+    <!--        <configuration key="target-tags">+archive</configuration>-->
+    <!--        <configuration key="copy">false</configuration>-->
+    <!--      </configurations>-->
+    <!--    </operation>-->
+
+    <!--    &lt;!&ndash; CUT &ndash;&gt;-->
+    <!--    <operation-->
+    <!--        id="cut-marks-to-smil"-->
+    <!--        description="JA LOL"-->
+    <!--        fail-on-error="true"-->
+    <!--        exception-handler-workflow="partial-error">-->
+    <!--      <configurations>-->
+    <!--        <configuration key="source-presenter-flavor">presenter/prepared</configuration>-->
+    <!--        <configuration key="source-presentation-flavor">presentation/prepared</configuration>-->
+    <!--        <configuration key="source-smil-flavor">smil/times</configuration>-->
+    <!--        <configuration key="target-smil-flavor">smil/cutmarks</configuration>-->
+    <!--      </configurations>-->
+    <!--    </operation>-->
+
+    <!--    <operation-->
+    <!--        id="tag"-->
+    <!--        max-attempts="2"-->
+    <!--        fail-on-error="true"-->
+    <!--        exception-handler-workflow="error"-->
+    <!--        description="Tagging media package elements">-->
+    <!--      <configurations>-->
+    <!--        <configuration key="source-flavors">*/prepared, smil/*</configuration>-->
+    <!--        <configuration key="target-tags">+archive</configuration>-->
+    <!--        <configuration key="copy">false</configuration>-->
+    <!--      </configurations>-->
+    <!--    </operation>-->
+
+    <!--    <operation-->
+    <!--        id="snapshot"-->
+    <!--        fail-on-error="true"-->
+    <!--        exception-handler-workflow="partial-error"-->
+    <!--        description="Archiving">-->
+    <!--      <configurations>-->
+    <!--        <configuration key="source-flavors">*/source,*/prepared,dublincore/*,security/*,smil/*</configuration>-->
+    <!--      </configurations>-->
+    <!--    </operation>-->
+
+    <!--    <operation-->
+    <!--        id="clone"-->
+    <!--        exception-handler-workflow="partial-error">-->
+    <!--      <configurations>-->
+    <!--        <configuration key="source-flavor">smil/cutmarks</configuration>-->
+    <!--        <configuration key="target-flavor">smil/cutting</configuration>-->
+    <!--      </configurations>-->
+    <!--    </operation>-->
+
+    <!--    <operation id="editor"-->
+    <!--               exception-handler-workflow="partial-error"-->
+    <!--               description="Cut the recording according to the edit decision list">-->
+    <!--      <configurations>-->
+    <!--        <configuration key="source-flavors">*/prepared</configuration>-->
+    <!--        <configuration key="smil-flavors">smil/cutting</configuration>-->
+    <!--        <configuration key="target-smil-flavor">smil/cutting</configuration>-->
+    <!--        <configuration key="target-flavor-subtype">edited</configuration>-->
+    <!--        <configuration key="interactive">false</configuration>-->
+    <!--      </configurations>-->
+    <!--    </operation>-->
+
+
+    <!-- encode video -->
+
+    <operation
+        id="encode"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Encoding video">
+      <configurations>
+        <configuration key="source-flavor">*/prepared</configuration>
+        <configuration key="target-flavor">*/preview</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,rss,atom</configuration>
+        <configuration key="encoding-profile">fast.http</configuration>
+      </configurations>
+    </operation>
+
+
+    <!-- encode to engage search result thumbnails -->
+    <!-- skip this when manually uploaded */search+preview -->
+    <operation
+        id="image"
+        if="${publish}"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Creating Engage search result thumbnails">
+      <configurations>
+        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="target-flavor">*/search+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">search-cover.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- encode to engage player preview images -->
+
+    <operation
+        id="image"
+        if="${publish}"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Creating Engage player preview image">
+      <configurations>
+        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="target-flavor">*/player+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">player-preview.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- run the video segmentation -->
+
+    <operation
+        id="segment-video"
+        if="${publish}"
+        fail-on-error="false"
+        exception-handler-workflow="partial-error"
+        description="Detecting slide transitions in presentation track">
+      <configurations>
+        <configuration key="source-flavor">presentation/preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Generate segment preview images -->
+
+    <operation
+        id="segmentpreviews"
+        if="${publish}"
+        fail-on-error="false"
+        exception-handler-workflow="partial-error"
+        description="Creating presentation segments preview image">
+      <configurations>
+        <configuration key="source-flavor">presentation/preview</configuration>
+        <configuration key="target-flavor">presentation/segment+preview</configuration>
+        <configuration key="reference-flavor">presentation/preview</configuration>
+        <configuration key="reference-tags">engage-download</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">player-slides.http</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Generate timeline preview images -->
+
+    <operation
+        id="timelinepreviews"
+        if="${publish}"
+        fail-on-error="false"
+        exception-handler-workflow="partial-error"
+        description="Creating timeline preview images">
+      <configurations>
+        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="target-flavor">*/timeline+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="image-count">100</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Publish preview internal -->
+
+    <operation
+        id="publish-configure"
+        exception-handler-workflow="partial-error"
+        description="Publish to preview publication channel">
+      <configurations>
+        <configuration key="source-flavors">*/preview</configuration>
+        <configuration key="channel-id">internal</configuration>
+        <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
+        <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Publish to engage player -->
+
+    <operation
+        id="publish-engage"
+        if="${publish}"
+        max-attempts="2"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Publishing to Engage">
+      <configurations>
+        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
+        <configuration key="download-source-tags">engage-download</configuration>
+        <configuration key="streaming-source-tags">engage-streaming</configuration>
+        <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Archive the current state of the media package -->
+
+    <operation
+        id="snapshot"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Archiving">
+      <configurations>
+        <configuration key="source-flavors">*/source,*/prepared,*/edited,dublincore/*,security/*,smil/*</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Clean up the working file repository -->
+
+    <operation
+        id="cleanup"
+        fail-on-error="false"
+        description="Cleaning up">
+      <configurations>
+        <configuration key="delete-external">true</configuration>
+        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <configuration key="preserve-flavors">security/*</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

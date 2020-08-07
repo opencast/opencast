@@ -470,8 +470,11 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     try {
       smilDocument = SmilUtil.getSmilDocumentFromMediaPackage(mediaPackage, smilFlavor, workspace);
     } catch (SAXException e) {
-      throw new WorkflowOperationException(e);
+      throw new WorkflowOperationException("SMIL is not well formatted", e);
+    } catch (IOException | NotFoundException e) {
+      throw new WorkflowOperationException("SMIL could not be found", e);
     }
+
     final SMILParElement parallel = (SMILParElement) smilDocument.getBody().getChildNodes().item(0);
     final NodeList sequences = parallel.getTimeChildren();
     final float trackDurationInSeconds = parallel.getDur();
@@ -514,6 +517,9 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
           List<Track> tmpList = new ArrayList<Track>();
           tmpList.add(track);
           LayoutArea trackDimension = determineDimension(tmpList, true);
+          if (trackDimension == null) {
+            throw new WorkflowOperationException("One of the source video tracks did not contain a valid video stream or dimension");
+          }
           videoInfo.aspectRatioHeight = trackDimension.getHeight();
           videoInfo.aspectRatioWidth = trackDimension.getWidth();
           // "StartTime" is calculated later. It describes how far into the video the next portion starts.
@@ -525,6 +531,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
 
           events.add(new StartStopEvent(true, getTrackPath(track), beginInMs, videoInfo));
           events.add(new StartStopEvent(false, getTrackPath(track), beginInMs + durationInMs, videoInfo));
+
         }
       }
     }
@@ -941,7 +948,6 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       throw new WorkflowOperationException(
               "Error reading the media file in the workspace", e);
     }
-
     return mediaFile.getAbsolutePath();
   }
 
