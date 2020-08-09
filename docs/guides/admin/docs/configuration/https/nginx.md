@@ -69,7 +69,7 @@ http {
     server {
         listen 80;
         listen [::]:80;
-        server_name example.opencast.org;
+        server_name _;
 
         # Enforce HTTPS by redirecting requests
         location / {
@@ -111,6 +111,9 @@ http {
             # precaution and shouldn't strictly be necessary but it did prevent
             # some issues in the past and it does not cost much performance.
             proxy_redirect          http://$host https://$host;
+
+            # Make sure cookies are only allowed for secure connections
+            proxy_cookie_path / "/; HTTPOnly; Secure";
 
             # Do not buffer responses
             proxy_buffering         off;
