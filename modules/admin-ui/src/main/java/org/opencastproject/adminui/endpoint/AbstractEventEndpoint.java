@@ -2189,7 +2189,9 @@ public abstract class AbstractEventEndpoint {
             query.sortByEventStatus(criterion.getOrder());
             break;
           default:
-            throw new WebApplicationException(Status.BAD_REQUEST);
+            final String msg = String.format("Unknown sort criteria field %s", criterion.getFieldName());
+            logger.debug(msg);
+            return RestUtil.R.badRequest(msg);
         }
       }
     }
