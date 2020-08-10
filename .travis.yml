@@ -68,31 +68,7 @@ jobs:
         - pip install mkdocs markdown_inline_graphviz_extension mkdocs-windmill
         - (cd docs/guides && npm install)
       script:
-        - (! grep -rn '	' modules assemblies pom.xml --include=pom.xml)
-        - (! grep -rn ' $' modules assemblies pom.xml --include=pom.xml)
-        - (! grep -rn '	' etc)
-        - (! grep -rn ' $' etc)
-        # build number must be present in all modules
-        - grep -L '<Build-Number>${buildNumber}</Build-Number>' modules/*/pom.xml | wc -l | grep -q '^0$'
-        - >
-          ( cd docs/guides/admin &&
-            mkdocs build > mkdocs.log 2>&1 &&
-            ! grep 'WARNING.*Documentation file' mkdocs.log &&
-            ! grep 'pages exist in the docs directory' mkdocs.log &&
-            cat mkdocs.log )
-        - >
-          ( cd docs/guides/user &&
-            mkdocs build > mkdocs.log 2>&1 &&
-            ! grep 'WARNING.*Documentation file' mkdocs.log &&
-            ! grep 'pages exist in the docs directory' mkdocs.log &&
-            cat mkdocs.log )
-        - >
-          ( cd docs/guides/developer &&
-            mkdocs build > mkdocs.log 2>&1 &&
-            ! grep 'WARNING.*Documentation file' mkdocs.log &&
-            ! grep 'pages exist in the docs directory' mkdocs.log &&
-            cat mkdocs.log )
-        - (cd docs/guides && npm test)
+        - bash ./.style-and-markdown-build.sh
 
     # Test database scripts with MariaDB 10.x
     - stage: quick tests
