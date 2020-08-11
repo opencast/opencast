@@ -51,7 +51,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
