@@ -1,6 +1,6 @@
 {
     "value_locale": "zh",
-    "value_dateFormatFull": "MMMM 做 YYYY, h:mm:ss a",
+    "value_dateFormatFull": "YYYY 年 M 月 D 日 HH:mm:ss",
     "videoTitle": "视频标题",
     "creator": "创建者",
     "date": "日期"
