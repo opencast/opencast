@@ -21,8 +21,8 @@
 'use strict';
 
 angular.module('adminNg.controllers')
-.controller('UserCtrl', ['$rootScope', '$scope', 'Table', 'UserRolesResource', 'UserResource', 'UsersResource', 'JsHelper',
-  'Notifications', 'Modal', 'AuthService', 'underscore',
+.controller('UserCtrl', ['$rootScope', '$scope', 'Table', 'UserRolesResource', 'UserResource', 'UsersResource',
+  'JsHelper', 'Notifications', 'Modal', 'AuthService', 'underscore',
   function ($rootScope, $scope, Table, UserRolesResource, UserResource, UsersResource, JsHelper, Notifications, Modal,
     AuthService, _) {
     $scope.manageable = true;
