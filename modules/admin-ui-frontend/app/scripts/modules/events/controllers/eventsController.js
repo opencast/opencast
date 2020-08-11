@@ -78,9 +78,10 @@ angular.module('adminNg.controllers')
         label: 'EVENTS.EVENTS.TABLE.LOCATION',
         sortable: true
       }, {
-        name:  'published',
+        name:  'publication',
         label: 'EVENTS.EVENTS.TABLE.PUBLISHED',
-        template: 'modules/events/partials/publishedCell.html'
+        template: 'modules/events/partials/publishedCell.html',
+        sortable: true
       }, {
         template: 'modules/events/partials/eventsStatusCell.html',
         name:  'event_status',
