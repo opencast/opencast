@@ -12,6 +12,7 @@ import {seriesTemplateMap} from "../../configs/tableConfigs/seriesTableConfig";
 import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
 import {fetchEvents} from "../../thunks/eventThunks";
+import {getSeries, isShowActions} from "../../selectors/seriesSeletctor";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -139,8 +140,8 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
 
 // todo: Selectors for this
 const mapStateToProps = state => ({
-    series: state.series,
-    showActions: state.series.showActions,
+    series: getSeries(state),
+    showActions: isShowActions(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -148,6 +149,6 @@ const mapDispatchToProps = dispatch => ({
     loadingSeriesIntoTable: () => dispatch(loadSeriesIntoTable()),
     loadingEvents: (filter, sort) => dispatch(fetchEvents()),
     loadingEventsIntoTable: () => dispatch(loadEventsIntoTable())
-})
+});
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Series));
