@@ -34,7 +34,7 @@ const SearchInput = styled.input`
 const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, startDate, endDate, secondFilter,
                           onChangeTextFilter, removeTextFilter, editSelectedFilter, removeSelectedFilter,
                           editSecondFilter, removeSecondFilter, setStartDate, setEndDate, resetStartDate, resetEndDate,
-                          resetFilterMap, editFilterValue, loadResource, loadResourceIntoTable }) => {
+                          resetFilterMap, editFilterValue, loadResource, loadResourceIntoTable, resource }) => {
     const { t } = useTranslation();
 
     // Variables for showing different dialogs depending on what was clicked
@@ -43,7 +43,7 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
 
     // Fetching available filters from opencast instance
     useEffect(() => {
-        loadingFilters();
+        loadingFilters(resource);
     }, []);
 
     // Remove all selected filters, no filter should be "active" anymore
@@ -386,7 +386,7 @@ const mapDispatchToProps = dispatch => ({
     setEndDate: date => dispatch(setEndDate(date)),
     resetStartDate: () => dispatch(resetStartDate()),
     resetEndDate: () => dispatch(resetEndDate()),
-    loadingFilters: () => dispatch(fetchFilters()),
+    loadingFilters: resource => dispatch(fetchFilters(resource)),
     resetFilterMap: () => dispatch(resetFilterValues()),
     editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value))
 });

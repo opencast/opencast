@@ -6,7 +6,7 @@ import { loadFiltersSuccess, loadFiltersFailure, loadFiltersInProgress} from '..
 * Currently only a mock json containing filters of events is returned.
 *
 * */
-let data = {
+let eventsData = {
     'presentersBibliographic':{
         'translatable':false,
         'options':{
@@ -85,12 +85,46 @@ let data = {
         'type':'select'
     }
 };
+
+let seriesData = {
+    "creationDate":{
+        "translatable":false,
+        "label":"FILTERS.SERIES.CREATION_DATE.LABEL",
+        "type":"period"
+    },
+    "organizers":{
+        "translatable":false,
+        "options":{
+            "Opencast Project Administrator":"Opencast Project Administrator",
+            "System User":"System User"
+        },
+        "label":"FILTERS.SERIES.ORGANIZERS.LABEL",
+        "type":"select"
+    },
+    "contributors":{
+        "translatable":false,
+        "options":{
+            "Opencast Project Administrator":"Opencast Project Administrator",
+            "System User":"System User"
+        },
+        "label":"FILTERS.SERIES.CONTRIBUTORS.LABEL",
+        "type":"select"
+    }
+};
+
+
 // Fetch table filters from opencast instance and transform them for further use
-export const fetchFilters = () => async dispatch => {
+export const fetchFilters = resource => async dispatch => {
     try {
         dispatch(loadFiltersInProgress());
         //TODO: Fetch the actual data from server
-        const response = transformResponse(data);
+        let response;
+        if (resource === 'events') {
+            response = transformResponse(eventsData);
+        }
+        if (resource === 'series') {
+            response = transformResponse(seriesData);
+        }
         const filters = response
         const filtersList = Object.keys(filters.filters).map(key => {
             let filter = filters.filters[key];

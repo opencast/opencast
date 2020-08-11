@@ -149,7 +149,8 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
                         </div>
                         {/* Include filters component*/}
                         <TableFilters loadResource={loadingEvents}
-                                      loadResourceIntoTable={loadingEventsIntoTable}/>
+                                      loadResourceIntoTable={loadingEventsIntoTable}
+                                      resource={'events'}/>
                     </div>
                     <h1>{t('EVENTS.EVENTS.TABLE.CAPTION')}</h1>
                     <h4>{t('TABLE_SUMMARY', { numberOfRows: events.length })}</h4>

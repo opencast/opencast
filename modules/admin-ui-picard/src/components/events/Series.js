@@ -125,7 +125,8 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
                         {/* Include filters component */}
                         {/* Todo: fetch actual filters for series */}
                         <TableFilters loadResource={loadingSeries}
-                                      loadResourceIntoTable={loadingSeriesIntoTable} />
+                                      loadResourceIntoTable={loadingSeriesIntoTable}
+                                      resource={'series'} />
 
                     </div>
                     <h1>{t('EVENTS.SERIES.TABLE.CAPTION')}</h1>
