@@ -8,9 +8,9 @@ can be combined by this WOH. The resulting video puts each input video on a grid
 resizes based on the number of inputs videos currently active. Which input video is active when
 is defined by through a SMIL catalogue from e.g. a partial ingest.
 
-If the SMIL defines a portion where there are no videos active, the background color will be shown
-instead for the duration of the portion. This also holds true for potentially empty beginning and end 
-portions, ensuring that a final single video is as long as the overall duration defined in the SMIL 
+If the SMIL defines a section where there are no videos active, the background color will be shown
+instead for the duration of the section. This also holds true for potentially empty beginning and end 
+sections, ensuring that a final single video is as long as the overall duration defined in the SMIL 
 (e.g. if the first input video becomes active at 30 seconds, the first generated output is a 30 second
 long video of the background color). The background color is also shown whenever the input videos cannot
 fully fill up the available space.
@@ -26,7 +26,7 @@ a single output file.
 |source-flavor      | presenter/source            | Flavor containing all the video tracks to be combined.                              |
 |source-smil-flavor | smil/source+partial         | Flavor containing the SMIL specifying when each video track is active. The example shows the flavor used by partial ingest.                               |
 |concat-encoding-profile | concat-samecodec.work  | Encoding profile used for the final concatenation.
-|opt-resolution     | 1280/720                    | (Optional) Resolution of the output. Example value is the default.
+|opt-resolution     | 1280x720                    | (Optional) Resolution of the output. Example value is the default.
 |opt-background-color| 0xFFFFFF                   | (Optional) The color used to fill space not occupied by input videos in the output. Example value is the default.
 |target-flavor      | presenter/partial           | Flavor containing the output video tracks.                              |
 
@@ -38,19 +38,19 @@ time and end time for each individual video, as seen below:
 
 ![Figure 1](./video-grid-woh-figure-1.png)
 
-Every time a video starts or ends, it marks the beginning of a new portion. For each portion, a video is
+Every time a video starts or ends, it marks the beginning of a new section. For each section, a video is
 generated. In our case, this happens three times, so three videos are generated. The image below shows 
-how the videos from our source-flavor are arranged in each portion.
+how the videos from our source-flavor are arranged in each section.
 
 ![Figure 2](./video-grid-woh-figure-2.png)
 
-Finally, the videos for each portion are combined into one final, single video file.
+Finally, the videos for each section are combined into one final, single video file.
 
 ## Operation Example
 ```xml
 <operation
     id="video-grid"
-    description="Generate portions of the final video"
+    description="Generate sections of the final video"
     fail-on-error="true"
     exception-handler-workflow="partial-error">
   <configurations>

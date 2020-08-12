@@ -76,7 +76,6 @@ public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
   private ServiceRegistry serviceRegistry = null;
 
   /** For JSON serialization */
-  private static final Type stringType = new TypeToken<String>() { }.getType();
   private static final Type stringListOfListType = new TypeToken<List<List<String>>>() { }.getType();
 
   /**
@@ -105,27 +104,22 @@ public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
   @RestQuery(name = "videogrid", description = "Create video grid",
           restParameters = {
                   @RestParameter(name = "commands", isRequired = true, type = STRING,
-                          description = "A list of ffmpeg commands, one for each part."),
-                  @RestParameter(name = "outputFilePath", isRequired = true, type = STRING,
-                          description = "Output directory, appended at the end of each command.") },
+                          description = "A list of ffmpeg commands, one for each part.") },
           reponses = {
                   @RestResponse(description = "VideoGrid created successfully", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "Invalid data", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                   @RestResponse(description = "Internal error", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
           returnDescription = "Returns the paths to the generated videos for the grid")
-  public Response animate(
-          @FormParam("commands") String commandsString,
-          @FormParam("outputFilePath") String outputFilePathString) {
+  public Response createPartialTracks(
+          @FormParam("commands") String commandsString) {
     Gson gson = new Gson();
     try {
       List<List<String>> commands = gson.fromJson(commandsString, stringListOfListType);
-      String outputFilePath = gson.fromJson(outputFilePathString, stringType);
       logger.debug("Start videogrid");
-      Job job = videoGridService.createPartialTracks(commands, outputFilePath);
+      Job job = videoGridService.createPartialTracks(commands);
       return Response.ok(new JaxbJob(job)).build();
     } catch (JsonSyntaxException | NullPointerException e) {
-      logger.debug("Invalid data passed to REST endpoint:\ncommands: {}\noutputfilePath: {})",
-              commandsString, outputFilePathString);
+      logger.debug("Invalid data passed to REST endpoint:\ncommands: {}", commandsString);
       return Response.status(Response.Status.BAD_REQUEST).build();
     } catch (VideoGridServiceException e) {
       logger.error("Error generating videos {}", commandsString, e);

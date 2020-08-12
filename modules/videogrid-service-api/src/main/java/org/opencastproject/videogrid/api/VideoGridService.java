@@ -40,11 +40,9 @@ public interface VideoGridService {
    *
    * @param commands
    *          A list of ffmpeg commands, one for each part
-   * @param outputFilePath
-   *          Output directory, appended at the end of each command
    * @return VideoGrid service job.
    * @throws VideoGridServiceException
    *          If something went wrong during the processing
    */
-  Job createPartialTracks(List<List<String>> commands, String outputFilePath) throws VideoGridServiceException;
+  Job createPartialTracks(List<List<String>> commands) throws VideoGridServiceException;
 }

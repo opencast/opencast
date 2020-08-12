@@ -31,7 +31,6 @@ import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
@@ -43,7 +42,6 @@ import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.smil.api.util.SmilUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.util.data.VCell;
 import org.opencastproject.videogrid.api.VideoGridService;
 import org.opencastproject.videogrid.api.VideoGridServiceException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -56,7 +54,6 @@ import org.opencastproject.workspace.api.Workspace;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.slf4j.Logger;
@@ -86,7 +83,7 @@ import java.util.regex.Pattern;
  * Checks which videos of those webcam videos are currently playing and dynamically scales them to fit in a single video
  *
  * Relies on a smil with videoBegin and duration times, as is created by ingest through addPartialTrack
- * Will pad portions where no video is playing with a background color. This includes beginning and end.
+ * Will pad sections where no video is playing with a background color. This includes beginning and end.
  *
  * Returns the final video to the target flavor
  */
@@ -106,9 +103,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   private static final Logger logger = LoggerFactory.getLogger(VideoGridWorkflowOperationHandler.class);
 
   /** Constants */
-  private static final String EMPTY_VALUE = "";
   private static final String NODE_TYPE_VIDEO = "video";
-  private static final String FLAVOR_AUDIO_SUFFIX = "-audio";
 
   // TODO: Make ffmpeg commands more "opencasty"
   private static final String[] FFMPEG = {"ffmpeg", "-y", "-v", "warning", "-nostats", "-max_error_rate", "1.0"};
@@ -122,57 +117,21 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   private MediaInspectionService inspectionService = null;
   private ComposerService composerService = null;
 
-  /**
-   * Callback for declarative services configuration that will introduce us to the local workspace service.
-   * Implementation assumes that the reference is configured as being static.
-   *
-   * @param workspace
-   *          an instance of the workspace
-   */
+  /** Service Callbacks **/
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
-
   public void setVideoGridService(VideoGridService videoGridService) {
     this.videoGridService = videoGridService;
   }
-
   protected void setMediaInspectionService(MediaInspectionService inspectionService) {
     this.inspectionService = inspectionService;
   }
-
   public void setComposerService(ComposerService composerService) {
     this.composerService = composerService;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
-   */
-  @Override
-  public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
-          throws WorkflowOperationException {
-    logger.debug("Running multiple webcam workflow operation on workflow {}", workflowInstance.getId());
-
-    List<MediaPackageElement> elementsToClean = new ArrayList<MediaPackageElement>();
-
-    try {
-      return main(workflowInstance.getMediaPackage(), workflowInstance, elementsToClean);
-    } catch (Exception e) {
-      throw new WorkflowOperationException(e);
-    } finally {
-      for (MediaPackageElement elem : elementsToClean) {
-        try {
-          workspace.delete(elem.getURI());
-        } catch (Exception e) {
-          logger.warn("Unable to delete element {}: {}", elem, e);
-        }
-      }
-    }
-  }
-
+  /** Structs to store data and make code more readable **/
   class LayoutArea
   {
     private int x = 0;
@@ -401,25 +360,30 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
 
     @Override
     public int compareTo(StartStopEvent o) {
-      return this.timeStamp < o.timeStamp ? -1
-              :
-              this.timeStamp > o.timeStamp ? 1 : 0;
+      return Long.compare(this.timeStamp, o.timeStamp);
     }
   }
 
-  private WorkflowOperationResult main(MediaPackage src, WorkflowInstance workflowInstance,
-          List<MediaPackageElement> elementsToClean)
-          throws IOException, NotFoundException, MediaPackageException, WorkflowOperationException,
-          MediaInspectionException, EncoderException {
-    final MediaPackage mediaPackage = (MediaPackage) src.clone();
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
+   *      JobContext)
+   */
+  @Override
+  public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
+    logger.debug("Running multiple webcam workflow operation on workflow {}", workflowInstance.getId());
+
+    final MediaPackage mediaPackage = (MediaPackage) workflowInstance.getMediaPackage().clone();
 
     // Read config options
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     final String sourceFlavor = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR));
     final MediaPackageElementFlavor smilFlavor = MediaPackageElementFlavor.parseFlavor(
             getConfig(operation, SOURCE_SMIL_FLAVOR));
-    final MediaPackageElementFlavor targetPresenterFlavor = parseTargetFlavor(
-            getConfig(operation, TARGET_FLAVOR), "presenter");
+    final MediaPackageElementFlavor targetPresenterFlavor = MediaPackageElementFlavor.parseFlavor(
+            getConfig(operation, TARGET_FLAVOR));
     String concatEncodingProfile = StringUtils.trimToNull(operation.getConfiguration(CONCAT_ENCODING_PROFILE));
 
     // Get tracks from flavor
@@ -446,7 +410,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     // Define a general Layout for the final video
     ImmutablePair<Integer, Integer> resolution;
     try {
-      resolution = getResolution(getConfig(workflowInstance, OPT_RESOLUTION, "1280/720"));
+      resolution = getResolution(getConfig(workflowInstance, OPT_RESOLUTION, "1280x720"));
     } catch (IllegalArgumentException e) {
       logger.warn("Given resolution was not well formatted!");
       throw new WorkflowOperationException(e);
@@ -463,7 +427,8 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     logger.info("The background color of the final video: {}", bgColor);
 
     // Define general layout for the final video
-    LayoutArea layoutArea = new LayoutArea("webcam", 0, 0, resolution.getLeft(), resolution.getRight(), bgColor);
+    LayoutArea layoutArea = new LayoutArea("webcam", 0, 0, resolution.getLeft(), resolution.getRight(),
+                                            bgColor);
 
     // Get SMIL catalog
     final SMILDocument smilDocument;
@@ -490,7 +455,6 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
 
     for (int i = 0; i < sequences.getLength(); i++) {
       final SMILElement item = (SMILElement) sequences.item(i);
-      final VCell<String> sourceType = VCell.cell(EMPTY_VALUE);
       NodeList children = item.getChildNodes();
 
       for (int j = 0; j < children.getLength(); j++) {
@@ -501,7 +465,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
         if (NODE_TYPE_VIDEO.equals(e.getNodeName())) {
           Track track;
           try {
-            track = getTrackByID(e.getId(), sourceTracks, sourceType);
+            track = getTrackByID(e.getId(), sourceTracks);
           } catch (IllegalStateException ex) {
             logger.info("No track corresponding to SMIL ID found, skipping SMIL ID {}", e.getId());
             continue;
@@ -522,8 +486,8 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
           }
           videoInfo.aspectRatioHeight = trackDimension.getHeight();
           videoInfo.aspectRatioWidth = trackDimension.getWidth();
-          // "StartTime" is calculated later. It describes how far into the video the next portion starts.
-          // (E.g. If webcam2 is started 10 seconds after webcam1, the startTime for webcam1 in the next portion is 10)
+          // "StartTime" is calculated later. It describes how far into the video the next section starts.
+          // (E.g. If webcam2 is started 10 seconds after webcam1, the startTime for webcam1 in the next section is 10)
           videoInfo.startTime = 0;
 
           logger.info("Video information: Width: {}, Height {}, StartTime: {}", videoInfo.aspectRatioWidth,
@@ -538,7 +502,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
 
     // No events? Skip
     if (events.isEmpty()) {
-      logger.warn("Could not generate portions from given SMIL catalogue for tracks in given flavor, skipping ...");
+      logger.warn("Could not generate sections from given SMIL catalogue for tracks in given flavor, skipping ...");
       return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
     }
 
@@ -578,26 +542,21 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       videoEdl.get(i).nextTimeStamp = videoEdl.get(i + 1).timeStamp;
     }
 
-    // Compositing cuts
+    // Create ffmpeg command for each section
     List<List<String>> commands = new ArrayList<>();
     for (VideoEdlPart edl : videoEdl) {
       if (edl.timeStamp == edl.nextTimeStamp) {
         logger.info("Skipping 0-length edl entry");
         continue;
       }
-      // Create command for cut
-      commands.add(compositeCut(layoutArea, edl));
+      // Create command for section
+      commands.add(compositeSection(layoutArea, edl));
     }
 
-    // Create output file path
-    String outputFilePath = FilenameUtils.removeExtension(getTrackPath(sourceTracks.get(0)))
-            .concat('-' + sourceTracks.get(0).getIdentifier()).concat("-videogrid");
-    logger.info("Output file path: " + outputFilePath);
-
-    // Create video tracks for each portion
+    // Create video tracks for each section
     Job job;
     try {
-      job = videoGridService.createPartialTracks(commands, outputFilePath);
+      job = videoGridService.createPartialTracks(commands);
     } catch (VideoGridServiceException e) {
       throw new WorkflowOperationException(e);
     }
@@ -616,30 +575,55 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       track.setFlavor(targetPresenterFlavor);
       track.setURI(uri);
 
-      Job inspection = inspectionService.enrich(track, true);
+      Job inspection = null;
+      try {
+        inspection = inspectionService.enrich(track, true);
+      } catch (MediaInspectionException | MediaPackageException e) {
+        throw new WorkflowOperationException("Inspection service could not enrich track", e);
+      }
       if (!waitForStatus(inspection).isSuccess()) {
         throw new WorkflowOperationException(String.format("Failed to add metadata to track."));
       }
 
-      tracks.add((TrackImpl) MediaPackageElementParser.getFromXml(inspection.getPayload()));
+      try {
+        tracks.add((TrackImpl) MediaPackageElementParser.getFromXml(inspection.getPayload()));
+      } catch (MediaPackageException e) {
+        throw new WorkflowOperationException("Could not parse track returned by inspection service", e);
+      }
     }
 
-    // Concatenate portions
-    Job concatJob = composerService.concat(composerService.getProfile(concatEncodingProfile).getIdentifier(),
-            new Dimension(layoutArea.width,layoutArea.height) , true, tracks.toArray(new Track[tracks.size()]));
+    // Concatenate sections
+    Job concatJob = null;
+    try {
+      concatJob = composerService.concat(composerService.getProfile(concatEncodingProfile).getIdentifier(),
+              new Dimension(layoutArea.width,layoutArea.height) , true, tracks.toArray(new Track[tracks.size()]));
+    } catch (EncoderException | MediaPackageException e) {
+      throw new WorkflowOperationException("The concat job failed", e);
+    }
     if (!waitForStatus(concatJob).isSuccess()) {
       throw new WorkflowOperationException("The concat job did not complete successfully.");
     }
 
     // Add to mediapackage
     if (concatJob.getPayload().length() > 0) {
-      Track concatTrack = (Track) MediaPackageElementParser.getFromXml(concatJob.getPayload());
+      Track concatTrack;
+      try {
+        concatTrack = (Track) MediaPackageElementParser.getFromXml(concatJob.getPayload());
+      } catch (MediaPackageException e) {
+        throw new WorkflowOperationException("Could not parse track returned by concat service", e);
+      }
       concatTrack.setFlavor(targetPresenterFlavor);
       concatTrack.setURI(concatTrack.getURI());
 
       mediaPackage.add(concatTrack);
     } else {
       throw new WorkflowOperationException("Concat operation unsuccessful, no payload returned.");
+    }
+
+    try {
+      workspace.cleanup(mediaPackage.getIdentifier());
+    } catch (IOException e) {
+      throw new WorkflowOperationException(e);
     }
 
     final WorkflowOperationResult result = createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE);
@@ -655,9 +639,8 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
    * @param videoEdl
    *          The edit decision list for the current cut
    * @return A command line ready ffmpeg command
-   * @throws WorkflowOperationException
    */
-  private List<String> compositeCut(LayoutArea layoutArea, VideoEdlPart videoEdl) throws WorkflowOperationException
+  private List<String> compositeSection(LayoutArea layoutArea, VideoEdlPart videoEdl)
   {
     // Duration for this cut
     long duration = videoEdl.nextTimeStamp - videoEdl.timeStamp;
@@ -821,6 +804,19 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     return ffmpegCmd;
   }
 
+  /**
+   * Scale the video resolution to fit the new resolution while maintaining aspect ratio
+   * @param oldWidth
+   *          Width of the video
+   * @param oldHeight
+   *          Height of the video
+   * @param newWidth
+   *          Intended new width of the video
+   * @param newHeight
+   *          Intended new height of the video
+   * @return
+   *          Actual new width and height of the video, guaranteed to be the same or smaller as the intended values
+   */
   private VideoInfo aspectScale(int oldWidth, int oldHeight, int newWidth, int newHeight) {
     if ((float)oldWidth / oldHeight > (float)newWidth / newHeight) {
       newHeight = (int) (2 * Math.round((float)oldHeight * newWidth / oldWidth / 2));
@@ -830,49 +826,55 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     return new VideoInfo(newHeight, newWidth);
   }
 
+  /**
+   * Calculate video offset from borders for ffmpeg pad operation
+   * @param videoWidth
+   *          Width of the video
+   * @param videoHeight
+   *          Height of the video
+   * @param areaWidth
+   *          Width of the area
+   * @param areaHeight
+   *          Width of the area
+   * @return
+   *          The position of the video within the padded area
+   */
   private Offset padOffset(int videoWidth, int videoHeight, int areaWidth, int areaHeight) {
     int padX = (int) (2 * Math.round((float)(areaWidth - videoWidth) / 4));
     int padY = (int) (2 * Math.round((float)(areaHeight - videoHeight) / 4));
     return new Offset(padX, padY);
   }
 
+  /**
+   * Converts milliseconds to seconds and to string
+   * @param timestamp
+   *          Time in milliseconds, e.g. 12567
+   * @return
+   *          Time in seconds, e.g. "12.567"
+   */
   private String msToS(long timestamp)
   {
     double s = (double)timestamp / 1000;
     return String.format(Locale.US, "%.3f", s);   // Locale.US to get a . instead of a ,
   }
 
-  private Track getTrackByID(String trackId, List<Track> tracks, VCell<String> type) {
+  /**
+   * Finds and returns the first track matching the given id in a list of tracks
+   * @param trackId
+   *          The id of the track we're looking for
+   * @param tracks
+   *          The collection of tracks we're looking in
+   * @return
+   *          The first track with the given trackId
+   */
+  private Track getTrackByID(String trackId, List<Track> tracks) {
     for (Track t : tracks) {
       if (t.getIdentifier().contains(trackId)) {
         logger.debug("Track-Id from smil found in Mediapackage ID: " + t.getIdentifier());
-        if (EMPTY_VALUE.equals(type.get())) {
-          String suffix = (t.hasAudio() && !t.hasVideo()) ? FLAVOR_AUDIO_SUFFIX : "";
-          type.set(t.getFlavor().getType() + suffix);
-        }
         return t;
       }
     }
     throw new IllegalStateException("No track matching smil Track-id: " + trackId);
-  }
-
-  /**
-   * @param flavorType
-   *          either "presenter" or "presentation", just for error messages
-   */
-  private MediaPackageElementFlavor parseTargetFlavor(String flavor, String flavorType)
-          throws WorkflowOperationException {
-    final MediaPackageElementFlavor targetFlavor;
-    try {
-      targetFlavor = MediaPackageElementFlavor.parseFlavor(flavor);
-      if ("*".equals(targetFlavor.getType()) || "*".equals(targetFlavor.getSubtype())) {
-        throw new WorkflowOperationException(format(
-                "Target %s flavor must have a type and a subtype, '*' are not allowed!", flavorType));
-      }
-    } catch (IllegalArgumentException e) {
-      throw new WorkflowOperationException(format("Target %s flavor '%s' is malformed", flavorType, flavor));
-    }
-    return targetFlavor;
   }
 
   /**
@@ -951,6 +953,14 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     return mediaFile.getAbsolutePath();
   }
 
+  /**
+   * Collects the info for the next section of the final video into an object
+   * @param event
+   *          Event detailing the time a video has become active/inactive
+   * @param activeVideos
+   *          Currently active videos
+   * @return
+   */
   private VideoEdlPart createVideoEdl(StartStopEvent event, HashMap<String, StartStopEvent> activeVideos) {
     VideoEdlPart nextEdl = new VideoEdlPart();
     nextEdl.timeStamp = event.timeStamp;
@@ -963,8 +973,16 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     return nextEdl;
   }
 
-  ImmutablePair<Integer, Integer> getResolution(String s) throws IllegalArgumentException {
-      String[] parts = s.split("/");
+  /**
+   * Parses a string detailing a resolution into two integers
+   * @param s
+   *          String of the form "AxB"
+   * @return
+   *          The width and height
+   * @throws IllegalArgumentException
+   */
+  private ImmutablePair<Integer, Integer> getResolution(String s) throws IllegalArgumentException {
+      String[] parts = s.split("x");
       if (parts.length != 2)
         throw new IllegalArgumentException(format("Unable to create resolution from \"%s\"", s));
 

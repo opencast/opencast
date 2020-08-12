@@ -53,7 +53,7 @@ public class VideoGridServiceRemoteImpl extends RemoteBase implements VideoGridS
   }
 
   @Override
-  public Job createPartialTracks(List<List<String>> commands, String outputFilePath)
+  public Job createPartialTracks(List<List<String>> commands)
           throws VideoGridServiceException {
 
     // serialize arguments and metadata
@@ -62,7 +62,6 @@ public class VideoGridServiceRemoteImpl extends RemoteBase implements VideoGridS
     // Build form parameters
     List<NameValuePair> params = new ArrayList<>();
     params.add(new BasicNameValuePair("commands", commandsJson));
-    params.add(new BasicNameValuePair("outputFilePath", outputFilePath));
 
     logger.info("Video-gridding {}", commandsJson);
     HttpResponse response = null;
