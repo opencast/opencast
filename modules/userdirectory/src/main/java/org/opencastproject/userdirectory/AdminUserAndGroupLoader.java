@@ -49,9 +49,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * User and group loader to create a system administrator group for each tenant along with a user named after the
@@ -194,20 +197,14 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
 
         // Make sure the administrator exists for this organization. Note that the user will gain its roles through
         // membership in the administrator group
-        JpaUser adminUser = (JpaUser) userAndRoleProvider.loadUser(adminUserName);
-        boolean userExists = adminUser != null;
+        boolean userExists = userAndRoleProvider.loadUser(adminUserName) != null;
         // Add roles according to the system configuration
-        Set<JpaRole> adminRolesSet = new HashSet<JpaRole>();
-        if (adminRoles != null) {
-          for (String r : StringUtils.split(adminRoles, ',')) {
-            String roleId = StringUtils.trimToNull(r);
-            if (roleId != null) {
-              adminRolesSet.add(new JpaRole(roleId, org));
-            }
-          }
-        }
-        String adminUserFullName = organization.getName().concat(" Administrator");
-        adminUser = new JpaUser(adminUserName, adminPassword, org, adminUserFullName, adminEmail, PROVIDER_NAME,
+        Set<JpaRole> adminRolesSet = Arrays.stream(StringUtils.split(Objects.toString(adminRoles, ""), ','))
+            .map(StringUtils::trimToNull)
+            .filter(Objects::nonNull)
+            .map(r -> new JpaRole(r, org))
+            .collect(Collectors.toSet());
+        JpaUser adminUser = new JpaUser(adminUserName, adminPassword, org, "Administrator", adminEmail, PROVIDER_NAME,
                                 false, adminRolesSet);
         if (userExists) {
           userAndRoleProvider.updateUser(adminUser);
@@ -220,8 +217,8 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
         // System administrator group
         String adminGroupId = org.getId().toUpperCase().concat(SYSTEM_ADMIN_GROUP_SUFFIX);
         JpaGroup systemAdminGroup = (JpaGroup) groupRoleProvider.loadGroup(adminGroupId, org.getId());
-        Set<JpaRole> systemAdminRoles = new HashSet<JpaRole>();
-        Set<String> systemAdminRolesIds = new HashSet<String>();
+        Set<JpaRole> systemAdminRoles = new HashSet<>();
+        Set<String> systemAdminRolesIds = new HashSet<>();
 
         // Add global system roles as defined in the code base
         for (String role : SecurityConstants.GLOBAL_SYSTEM_ROLES) {
