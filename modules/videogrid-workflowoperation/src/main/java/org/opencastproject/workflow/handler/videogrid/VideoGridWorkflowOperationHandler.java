@@ -98,6 +98,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   private static final String OPT_BACKGROUND_COLOR = "opt-background-color";
 
   private static final String TARGET_FLAVOR = "target-flavor";
+  private static final String OPT_TARGET_TAGS = "opt-target-tags";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(VideoGridWorkflowOperationHandler.class);
@@ -426,6 +427,10 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     }
     logger.info("The background color of the final video: {}", bgColor);
 
+    // Target tags
+    String targetTagsOption = StringUtils.trimToNull(operation.getConfiguration(OPT_TARGET_TAGS));
+    List<String> targetTags = asList(targetTagsOption);
+
     // Define general layout for the final video
     LayoutArea layoutArea = new LayoutArea("webcam", 0, 0, resolution.getLeft(), resolution.getRight(),
                                             bgColor);
@@ -614,6 +619,9 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       }
       concatTrack.setFlavor(targetPresenterFlavor);
       concatTrack.setURI(concatTrack.getURI());
+      for (String tag : targetTags) {
+        concatTrack.addTag(tag);
+      }
 
       mediaPackage.add(concatTrack);
     } else {

@@ -29,6 +29,7 @@ a single output file.
 |opt-resolution     | 1280x720                    | (Optional) Resolution of the output. Example value is the default.
 |opt-background-color| 0xFFFFFF                   | (Optional) The color used to fill space not occupied by input videos in the output. Example value is the default.
 |target-flavor      | presenter/partial           | Flavor containing the output video tracks.                              |
+|opt-target-tags    | archive                     | (Optional) Tag(s) to add to the output track. Default is `null`.
 
 ## Example
 
