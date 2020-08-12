@@ -101,7 +101,7 @@ Example:
 Examples
 --------
 
-An institution whant to play only `*/delivery` media tracks and has two audio tracks for 
+An institution wants to play only `*/delivery` media tracks and has two audio tracks for 
 english and spanish languages
 
 ```json
