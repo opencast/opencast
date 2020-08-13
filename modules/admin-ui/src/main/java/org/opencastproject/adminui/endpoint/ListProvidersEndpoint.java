@@ -113,7 +113,7 @@ public class ListProvidersEndpoint {
   @RestQuery(name = "list", description = "Provides key-value list from the given source", pathParameters = { @RestParameter(name = "source", description = "The source for the key-value list", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {
           @RestParameter(description = "The maximum number of items to return per page", isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
           @RestParameter(description = "The offset", isRequired = false, name = "offset", type = RestParameter.Type.INTEGER),
-          @RestParameter(description = "Filters", isRequired = false, name = "filter", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "Returns the key-value list for the given source.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+          @RestParameter(description = "Filters", isRequired = false, name = "filter", type = RestParameter.Type.STRING) }, responses = { @RestResponse(description = "Returns the key-value list for the given source.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getList(@PathParam("source") final String source, @QueryParam("limit") final int limit,
           @QueryParam("filter") final String filter, @QueryParam("offset") final int offset,
           @Context HttpHeaders headers) {
@@ -148,7 +148,7 @@ public class ListProvidersEndpoint {
   @Path("components.json")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "components", description = "Provides a set of constants lists (right now only eventCommentReasons) for use in the admin UI",
-    reponses = { @RestResponse(description = "Returns a set of constants lists (right now only eventCommentReasons) for use in the admin UI",
+    responses = { @RestResponse(description = "Returns a set of constants lists (right now only eventCommentReasons) for use in the admin UI",
     responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getComponents(@Context HttpHeaders headers) {
     String[] sources = { "eventCommentReasons" };
@@ -180,7 +180,7 @@ public class ListProvidersEndpoint {
   @GET
   @Path("providers.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "availableProviders", description = "Provides the list of the available list providers", reponses = { @RestResponse(description = "Returns the availables list providers.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(name = "availableProviders", description = "Provides the list of the available list providers", responses = { @RestResponse(description = "Returns the availables list providers.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getAvailablesProviders(@Context HttpHeaders headers) {
     JSONArray list = new JSONArray();
 
@@ -192,7 +192,7 @@ public class ListProvidersEndpoint {
   @GET
   @Path("{page}/filters.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "filters", description = "Provides filters for the given page", pathParameters = { @RestParameter(name = "page", description = "The page for which the filters are required", isRequired = true, type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "Returns the filters for the given page.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(name = "filters", description = "Provides filters for the given page", pathParameters = { @RestParameter(name = "page", description = "The page for which the filters are required", isRequired = true, type = RestParameter.Type.STRING) }, responses = { @RestResponse(description = "Returns the filters for the given page.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getFilters(@PathParam("page") final String page, @Context HttpHeaders headers)
           throws ListProviderException {
 

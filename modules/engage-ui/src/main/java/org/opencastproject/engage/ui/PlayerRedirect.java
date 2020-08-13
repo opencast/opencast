@@ -68,7 +68,7 @@ public class PlayerRedirect {
   @RestQuery(name = "redirect", description = "Player redirect",
           pathParameters = {
             @RestParameter(name = "id", description = "The event identifier", isRequired = true, type = STRING)
-          }, reponses = {
+          }, responses = {
             @RestResponse(description = "Returns the paella configuration", responseCode = SC_TEMPORARY_REDIRECT)
           }, returnDescription = "")
   public Response redirect(@PathParam("id") String id) {

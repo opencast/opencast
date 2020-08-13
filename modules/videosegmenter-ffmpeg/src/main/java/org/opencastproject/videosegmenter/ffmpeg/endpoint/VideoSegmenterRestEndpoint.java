@@ -105,7 +105,7 @@ public class VideoSegmenterRestEndpoint extends AbstractJobProducerEndpoint {
   @POST
   @Path("")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "segment", description = "Submit a track for segmentation.", restParameters = { @RestParameter(description = "The track to segment.", isRequired = true, name = "track", type = RestParameter.Type.FILE) }, reponses = {
+  @RestQuery(name = "segment", description = "Submit a track for segmentation.", restParameters = { @RestParameter(description = "The track to segment.", isRequired = true, name = "track", type = RestParameter.Type.FILE) }, responses = {
           @RestResponse(description = "The job ID to use when polling for the resulting mpeg7 catalog.", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The \"segment\" is NULL or not a valid track type.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "The underlying service could not segment the video.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "The job ID to use when polling for the resulting mpeg7 catalog.")

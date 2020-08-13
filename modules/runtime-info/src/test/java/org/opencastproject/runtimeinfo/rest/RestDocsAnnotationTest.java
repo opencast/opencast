@@ -143,16 +143,16 @@ public class RestDocsAnnotationTest {
         assertEquals(RestParameter.Type.FILE, restQueryAnnotation.bodyParameter().type());
 
         // responses
-        assertTrue(restQueryAnnotation.reponses().length == 3);
+        assertTrue(restQueryAnnotation.responses().length == 3);
 
-        assertEquals(HttpServletResponse.SC_OK, restQueryAnnotation.reponses()[0].responseCode());
-        assertEquals("Returns augmented media package", restQueryAnnotation.reponses()[0].description());
+        assertEquals(HttpServletResponse.SC_OK, restQueryAnnotation.responses()[0].responseCode());
+        assertEquals("Returns augmented media package", restQueryAnnotation.responses()[0].description());
 
-        assertEquals(HttpServletResponse.SC_BAD_REQUEST, restQueryAnnotation.reponses()[1].responseCode());
-        assertEquals("", restQueryAnnotation.reponses()[1].description());
+        assertEquals(HttpServletResponse.SC_BAD_REQUEST, restQueryAnnotation.responses()[1].responseCode());
+        assertEquals("", restQueryAnnotation.responses()[1].description());
 
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, restQueryAnnotation.reponses()[2].responseCode());
-        assertEquals("", restQueryAnnotation.reponses()[2].description());
+        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, restQueryAnnotation.responses()[2].responseCode());
+        assertEquals("", restQueryAnnotation.responses()[2].description());
 
       }
     } catch (SecurityException e) {
@@ -216,7 +216,7 @@ public class RestDocsAnnotationTest {
         assertEquals(MediaType.TEXT_XML, endpoint.getFormats().get(0).getName());
 
         // responses
-        for (RestResponse restResp : restQueryAnnotation.reponses()) {
+        for (RestResponse restResp : restQueryAnnotation.responses()) {
           endpoint.addStatus(restResp);
         }
         assertEquals(3, endpoint.getStatuses().size());
@@ -301,7 +301,7 @@ public class RestDocsAnnotationTest {
     @Path("addTrack")
     @RestQuery(name = "addTrackInputStream", description = "Add a media track to a given media package using an input stream", pathParameters = { @RestParameter(defaultValue = "", description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, restParameters = {
             @RestParameter(defaultValue = "Default", description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-            @RestParameter(defaultValue = "", description = "The media package as XML", isRequired = false, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(defaultValue = "", description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
+            @RestParameter(defaultValue = "", description = "The media package as XML", isRequired = false, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(defaultValue = "", description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
             @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
             @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
             @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "augmented media package")
@@ -315,7 +315,7 @@ public class RestDocsAnnotationTest {
     @Path("addTrack")
     @RestQuery(name = "addTrackInputStream", description = "Add a media track to a given media package using an input stream", pathParameters = { @RestParameter(defaultValue = "", description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, restParameters = {
             @RestParameter(defaultValue = "Default", description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-            @RestParameter(defaultValue = "ADCD ${this.schema} XUHZSUFH ${somethingElse} UGGUH ${anotherthing} AIHID", description = "The media package as XML", isRequired = false, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(defaultValue = "", description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
+            @RestParameter(defaultValue = "ADCD ${this.schema} XUHZSUFH ${somethingElse} UGGUH ${anotherthing} AIHID", description = "The media package as XML", isRequired = false, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(defaultValue = "", description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
             @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
             @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
             @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "augmented media package")

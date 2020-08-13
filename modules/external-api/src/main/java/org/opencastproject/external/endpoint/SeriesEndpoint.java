@@ -175,7 +175,7 @@ public class SeriesEndpoint {
           @RestParameter(name = "filter", isRequired = false, description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = RestParameter.Type.INTEGER) }, reponses = {
+          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = RestParameter.Type.INTEGER) }, responses = {
                   @RestResponse(description = "A (potentially empty) list of series is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getSeriesList(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("order") String order, @QueryParam("offset") int offset,
@@ -347,7 +347,7 @@ public class SeriesEndpoint {
   @GET
   @Path("{seriesId}")
   @RestQuery(name = "getseries", description = "Returns a single series.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, responses = {
                   @RestResponse(description = "The series is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getSeries(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id)
@@ -413,7 +413,7 @@ public class SeriesEndpoint {
   @Path("{seriesId}/metadata")
   @RestQuery(name = "getseriesmetadata", description = "Returns a series' metadata of all types or returns a series' metadata collection of the given type when the query string parameter type is specified. For each metadata catalog there is a unique property called the flavor such as dublincore/series so the type in this example would be 'dublincore/series'", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "type", isRequired = false, description = "The type of metadata to return", type = STRING) }, reponses = {
+                  @RestParameter(name = "type", isRequired = false, description = "The type of metadata to return", type = STRING) }, responses = {
                           @RestResponse(description = "The series' metadata are returned.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getSeriesMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id,
@@ -594,7 +594,7 @@ public class SeriesEndpoint {
   @RestQuery(name = "updateseriesmetadata", description = "Update a series' metadata of the given type. For a metadata catalog there is the flavor such as 'dublincore/series' and this is the unique type.", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
                   @RestParameter(name = "type", isRequired = true, description = "The type of metadata to update", type = STRING),
-                  @RestParameter(name = "metadata", description = "Series metadata as Form param", isRequired = true, type = STRING) }, reponses = {
+                  @RestParameter(name = "metadata", description = "Series metadata as Form param", isRequired = true, type = STRING) }, responses = {
                           @RestResponse(description = "The series' metadata have been updated.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
@@ -684,7 +684,7 @@ public class SeriesEndpoint {
   @Path("{seriesId}/metadata")
   @RestQuery(name = "deleteseriesmetadata", description = "Deletes a series' metadata catalog of the given type. All fields and values of that catalog will be deleted.", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "type", isRequired = true, description = "The type of metadata to delete", type = STRING) }, reponses = {
+                  @RestParameter(name = "type", isRequired = true, description = "The type of metadata to delete", type = STRING) }, responses = {
                           @RestResponse(description = "The metadata have been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
                           @RestResponse(description = "The main metadata catalog dublincore/series cannot be deleted as it has mandatory fields.", responseCode = HttpServletResponse.SC_FORBIDDEN),
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
@@ -724,7 +724,7 @@ public class SeriesEndpoint {
   @GET
   @Path("{seriesId}/acl")
   @RestQuery(name = "getseriesacl", description = "Returns a series' access policy.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, responses = {
                   @RestResponse(description = "The series' access policy is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
@@ -747,7 +747,7 @@ public class SeriesEndpoint {
   @GET
   @Path("{seriesId}/properties")
   @RestQuery(name = "getseriesproperties", description = "Returns a series' properties", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, responses = {
                   @RestResponse(description = "The series' properties are returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getSeriesProperties(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
@@ -768,7 +768,7 @@ public class SeriesEndpoint {
   @DELETE
   @Path("{seriesId}")
   @RestQuery(name = "deleteseries", description = "Deletes a series.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, responses = {
                   @RestResponse(description = "The series has been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
                   @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteSeries(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id)
@@ -788,7 +788,7 @@ public class SeriesEndpoint {
   @Path("{seriesId}")
   @RestQuery(name = "updateallseriesmetadata", description = "Update all series metadata.", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "metadata", description = "Series metadata as Form param", isRequired = true, type = STRING) }, reponses = {
+                  @RestParameter(name = "metadata", description = "Series metadata as Form param", isRequired = true, type = STRING) }, responses = {
                           @RestResponse(description = "The series' metadata have been updated.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
@@ -812,7 +812,7 @@ public class SeriesEndpoint {
   @RestQuery(name = "createseries", description = "Creates a series.", returnDescription = "", restParameters = {
           @RestParameter(name = "metadata", isRequired = true, description = "Series metadata", type = STRING),
           @RestParameter(name = "acl", description = "A collection of roles with their possible action", isRequired = true, type = STRING),
-          @RestParameter(name = "theme", description = "The theme ID to be applied to the series", isRequired = false, type = STRING) }, reponses = {
+          @RestParameter(name = "theme", description = "The theme ID to be applied to the series", isRequired = false, type = STRING) }, responses = {
                   @RestResponse(description = "A new series is created and its identifier is returned in the Location header.", responseCode = HttpServletResponse.SC_CREATED),
                   @RestResponse(description = "The request is invalid or inconsistent..", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                   @RestResponse(description = "The user doesn't have the rights to create the series.", responseCode = HttpServletResponse.SC_UNAUTHORIZED) })
@@ -951,7 +951,7 @@ public class SeriesEndpoint {
   @RestQuery(name = "updateseriesacl", description = "Updates a series' access policy.", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
                   @RestParameter(name = "acl", isRequired = true, description = "Access policy", type = STRING),
-                  @RestParameter(name = "override", isRequired = false, description = "If true the series ACL will take precedence over any existing episode ACL", type = STRING)}, reponses = {
+                  @RestParameter(name = "override", isRequired = false, description = "If true the series ACL will take precedence over any existing episode ACL", type = STRING)}, responses = {
                           @RestResponse(description = "The access control list for the specified series is updated.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String seriesID,
@@ -992,7 +992,7 @@ public class SeriesEndpoint {
   @Path("{seriesId}/properties")
   @RestQuery(name = "updateseriesproperties", description = "Updates a series' properties", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "properties", isRequired = true, description = "Series properties", type = STRING) }, reponses = {
+                  @RestParameter(name = "properties", isRequired = true, description = "Series properties", type = STRING) }, responses = {
                           @RestResponse(description = "Successfully updated the series' properties.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateSeriesProperties(@HeaderParam("Accept") String acceptHeader,

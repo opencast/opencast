@@ -5,7 +5,7 @@ set of roles made up of the user's membership in Moodle courses, of the form
 COURSEID_Role. For example, an Opencast user who is also a Moodle user and a
 member of the Moodle course `myCourseID` with the Moodle capability
 `tool/opencast:learner` will be granted the Opencast role `myCourseID_Learner`.
-Analogously, users with the capability `tool/opencast:instructor` will recieve
+Analogously, users with the capability `tool/opencast:instructor` will receive
 the Opencast role `myCourseID_Instructor`. Note that by default, Moodle course
 IDs are opaque ID values such as `10765`. The `ROLE_GROUP_MOODLE` Opencast group
 role is granted to all users that also exist in Moodle.

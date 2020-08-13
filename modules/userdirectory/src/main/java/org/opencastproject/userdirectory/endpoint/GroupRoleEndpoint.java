@@ -114,7 +114,7 @@ public class GroupRoleEndpoint {
   @RestQuery(name = "allgroup", description = "Returns a list of groups", returnDescription = "Returns a JSON or XML representation of the list of groups available the current user's organization", pathParameters = {
           @RestParameter(description = "The output format (json or xml) of the response body.", isRequired = true, name = "format", type = RestParameter.Type.STRING) }, restParameters = {
           @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The groups.") })
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The groups.") })
   public Response getGroupsAsJsonOrXml(@PathParam("format") String format, @QueryParam("limit") int limit,
           @QueryParam("offset") int offset)
           throws IOException {
@@ -131,7 +131,7 @@ public class GroupRoleEndpoint {
   @DELETE
   @Path("{id}")
   @RestQuery(name = "removegroup", description = "Remove a group", returnDescription = "Return no content", pathParameters = {
-          @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = Type.STRING) }, reponses = {
+          @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = Type.STRING) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "Group deleted"),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to remove a group with the admin role."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found."),
@@ -155,7 +155,7 @@ public class GroupRoleEndpoint {
           @RestParameter(name = "name", description = "The group name", isRequired = true, type = Type.STRING),
           @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
           @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
-          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = false, type = Type.TEXT) }, reponses = {
+          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = false, type = Type.TEXT) }, responses = {
                   @RestResponse(responseCode = SC_CREATED, description = "Group created"),
                   @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long"),
                   @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a group with the admin role."),
@@ -181,7 +181,7 @@ public class GroupRoleEndpoint {
           @RestParameter(name = "name", description = "The group name", isRequired = true, type = Type.STRING),
           @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
           @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
-          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = true, type = Type.TEXT) }, reponses = {
+          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = true, type = Type.TEXT) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "Group updated"),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to update a group with the admin role."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found"),

@@ -85,7 +85,7 @@ public class SmilServiceRest {
             @RestParameter(name = "mediaPackage", description = "MediaPackage for metadata.",
                     isRequired = false, type = RestParameter.Type.TEXT)},
           returnDescription = "Returns new SmilResponse with SMIL document inside.",
-          reponses = {
+          responses = {
             @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Create new SMIL successfull"),
             @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Given mediaPackage is not valid")
           })
@@ -117,7 +117,7 @@ public class SmilServiceRest {
                     isRequired = false, type = RestParameter.Type.STRING)},
           returnDescription = "Returns SmilResponse with a parallel element inside "
           + "(the new par will be returned as response entity).",
-          reponses = {
+          responses = {
             @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Add par to SMIL successfull."),
             @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document not valid."),
             @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document doesn't contain an element with given parentId.")
@@ -154,7 +154,7 @@ public class SmilServiceRest {
                     isRequired = false, type = RestParameter.Type.STRING)},
           returnDescription = "Returns SmilResponse with a sequence element inside "
           + "(the new seq will be returned as response entity).",
-          reponses = {
+          responses = {
             @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Add seq to SMIL successfull"),
             @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document not valid"),
             @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document doesn't contain an element with given parentId")
@@ -201,7 +201,7 @@ public class SmilServiceRest {
                     isRequired = true, type = RestParameter.Type.INTEGER)},
           returnDescription = "Returns new Smil with an media element inside "
           + "(the new media and metadata elements will be returned as response entities).",
-          reponses = {
+          responses = {
             @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Add media element to SMIL successfull."),
             @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document not valid."),
             @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Track not valid."),
@@ -251,7 +251,7 @@ public class SmilServiceRest {
                     isRequired = true, type = RestParameter.Type.INTEGER)},
           returnDescription = "Returns new Smil with new media elements inside "
           + "(the new media and metadata elements will be returned as response entities).",
-          reponses = {
+          responses = {
             @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Add media elements to SMIL successfull."),
             @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document not valid."),
             @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Tracks are not valid."),
@@ -296,7 +296,7 @@ public class SmilServiceRest {
                     isRequired = true, type = RestParameter.Type.STRING)},
           returnDescription = "Returns SmilResponse with a new meta element inside "
           + "(the new meta will be returned as response entity).",
-          reponses = {
+          responses = {
             @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Add par to SMIL successfull."),
             @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document not valid.")
           })
@@ -322,7 +322,7 @@ public class SmilServiceRest {
                     isRequired = true, type = RestParameter.Type.STRING)},
           returnDescription = "Returns SMIL document without an element with given Id "
           + "(if SMIL document contains an element with given Id, this will be returned as entity).",
-          reponses = {
+          responses = {
             @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Removing element from SMIL successfull."),
             @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "SMIL document not valid.")
           })
