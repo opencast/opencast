@@ -107,7 +107,7 @@ public class VersionEndpoint {
       version = (String) data.get("tag_name");
       lastUpdated = System.currentTimeMillis() / 1000L;
     } catch (Exception e) {
-      logger.error("Error while parsing the version: " + e.toString());
+      logger.warn("Error while parsing the Opencast version from GitHub", e);
     }
   }
 }
