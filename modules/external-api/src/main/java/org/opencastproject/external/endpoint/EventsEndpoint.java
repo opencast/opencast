@@ -333,7 +333,7 @@ public class EventsEndpoint implements ManagedService {
                   @RestParameter(name = "withacl", isRequired = false, description = "Whether the acl metadata should be included in the response.", type = Type.BOOLEAN),
                   @RestParameter(name = "withmetadata", isRequired = false, description = "Whether the metadata catalogs should be included in the response.", type = Type.BOOLEAN),
                   @RestParameter(name = "withscheduling", isRequired = false, description = "Whether the scheduling information should be included in the response.", type = Type.BOOLEAN),
-                  @RestParameter(name = "withpublications", isRequired = false, description = "Whether the publication ids and urls should be included in the response.", type = Type.BOOLEAN), }, reponses = {
+                  @RestParameter(name = "withpublications", isRequired = false, description = "Whether the publication ids and urls should be included in the response.", type = Type.BOOLEAN), }, responses = {
                           @RestResponse(description = "The event is returned.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
@@ -412,7 +412,7 @@ public class EventsEndpoint implements ManagedService {
   @DELETE
   @Path("{eventId}")
   @RestQuery(name = "deleteevent", description = "Deletes an event.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
                   @RestResponse(description = "The event has been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
@@ -433,7 +433,7 @@ public class EventsEndpoint implements ManagedService {
                   @RestParameter(name = "presenter", isRequired = false, description = "Presenter movie track", type = Type.FILE),
                   @RestParameter(name = "presentation", isRequired = false, description = "Presentation movie track", type = Type.FILE),
                   @RestParameter(name = "audio", isRequired = false, description = "Audio track", type = Type.FILE),
-                  @RestParameter(name = "processing", isRequired = false, description = "Processing instructions task configuration", type = Type.STRING), }, reponses = {
+                  @RestParameter(name = "processing", isRequired = false, description = "Processing instructions task configuration", type = Type.STRING), }, responses = {
                           @RestResponse(description = "The event has been updated.", responseCode = HttpServletResponse.SC_NO_CONTENT),
                           @RestResponse(description = "The event could not be updated due to a scheduling conflict.", responseCode = HttpServletResponse.SC_CONFLICT),
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
@@ -531,7 +531,7 @@ public class EventsEndpoint implements ManagedService {
           @RestParameter(name = "presenter", description = "Presenter movie track", isRequired = false, type = Type.FILE),
           @RestParameter(name = "presentation", description = "Presentation movie track", isRequired = false, type = Type.FILE),
           @RestParameter(name = "audio", description = "Audio track", isRequired = false, type = Type.FILE),
-          @RestParameter(name = "processing", description = "Processing instructions task configuration", isRequired = false, type = STRING) }, reponses = {
+          @RestParameter(name = "processing", description = "Processing instructions task configuration", isRequired = false, type = STRING) }, responses = {
                   @RestResponse(description = "A new event is created and its identifier is returned in the Location header.", responseCode = HttpServletResponse.SC_CREATED),
                   @RestResponse(description = "The event could not be created due to a scheduling conflict.", responseCode = HttpServletResponse.SC_CONFLICT),
                   @RestResponse(description = "The request is invalid or inconsistent..", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
@@ -618,7 +618,7 @@ public class EventsEndpoint implements ManagedService {
           @RestParameter(name = "filter", isRequired = false, description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = RestParameter.Type.INTEGER) }, reponses = {
+          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = RestParameter.Type.INTEGER) }, responses = {
                   @RestResponse(description = "A (potentially empty) list of events is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getEvents(@HeaderParam("Accept") String acceptHeader, @QueryParam("id") String id,
           @QueryParam("commentReason") String reasonFilter, @QueryParam("commentResolution") String resolutionFilter,
@@ -959,7 +959,7 @@ public class EventsEndpoint implements ManagedService {
   @GET
   @Path("{eventId}/acl")
   @RestQuery(name = "geteventacl", description = "Returns an event's access policy.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
                   @RestResponse(description = "The access control list for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
@@ -975,7 +975,7 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/acl")
   @RestQuery(name = "updateeventacl", description = "Update an event's access policy.", returnDescription = "", pathParameters = {
           @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "acl", isRequired = true, description = "Access policy", type = STRING) }, reponses = {
+                  @RestParameter(name = "acl", isRequired = true, description = "Access policy", type = STRING) }, responses = {
                           @RestResponse(description = "The access control list for the specified event is updated.", responseCode = HttpServletResponse.SC_NO_CONTENT),
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
@@ -1008,7 +1008,7 @@ public class EventsEndpoint implements ManagedService {
   @RestQuery(name = "addeventace", description = "Grants permission to execute action on the specified event to any user with role role. Note that this is a convenience method to avoid having to build and post a complete access control list.", returnDescription = "", pathParameters = {
           @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING),
           @RestParameter(name = "action", description = "The action that is allowed to be executed", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "role", isRequired = true, description = "The role that is granted permission", type = STRING) }, reponses = {
+                  @RestParameter(name = "role", isRequired = true, description = "The role that is granted permission", type = STRING) }, responses = {
                           @RestResponse(description = "The permission has been created in the access control list of the specified event.", responseCode = HttpServletResponse.SC_NO_CONTENT),
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response addEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
@@ -1054,7 +1054,7 @@ public class EventsEndpoint implements ManagedService {
   @RestQuery(name = "deleteeventace", description = "Revokes permission to execute action on the specified event from any user with role role.", returnDescription = "", pathParameters = {
           @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING),
           @RestParameter(name = "action", description = "The action that is no longer allowed to be executed", isRequired = true, type = STRING),
-          @RestParameter(name = "role", description = "The role that is no longer granted permission", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "role", description = "The role that is no longer granted permission", isRequired = true, type = STRING) }, responses = {
                   @RestResponse(description = "The permission has been revoked from the access control list of the specified event.", responseCode = HttpServletResponse.SC_NO_CONTENT),
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
@@ -1092,7 +1092,7 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/metadata")
   @RestQuery(name = "geteventmetadata", description = "Returns the event's metadata of the specified type. For a metadata catalog there is the flavor such as 'dublincore/episode' and this is the unique type.", returnDescription = "", pathParameters = {
           @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "type", isRequired = false, description = "The type of metadata to get", type = STRING) }, reponses = {
+                  @RestParameter(name = "type", isRequired = false, description = "The type of metadata to get", type = STRING) }, responses = {
                           @RestResponse(description = "The metadata collection is returned.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getAllEventMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
@@ -1240,7 +1240,7 @@ public class EventsEndpoint implements ManagedService {
   @RestQuery(name = "updateeventmetadata", description = "Update the metadata with the matching type of the specified event. For a metadata catalog there is the flavor such as 'dublincore/episode' and this is the unique type.", returnDescription = "", pathParameters = {
           @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, restParameters = {
                   @RestParameter(name = "type", isRequired = true, description = "The type of metadata to update", type = STRING),
-                  @RestParameter(name = "metadata", description = "Metadata catalog in JSON format", isRequired = true, type = STRING) }, reponses = {
+                  @RestParameter(name = "metadata", description = "Metadata catalog in JSON format", isRequired = true, type = STRING) }, responses = {
                           @RestResponse(description = "The metadata of the given namespace has been updated.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
@@ -1387,7 +1387,7 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/metadata")
   @RestQuery(name = "deleteeventmetadata", description = "Delete the metadata namespace catalog of the specified event. This will remove all fields and values of the catalog.", returnDescription = "", pathParameters = {
           @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "type", isRequired = true, description = "The type of metadata to delete", type = STRING) }, reponses = {
+                  @RestParameter(name = "type", isRequired = true, description = "The type of metadata to delete", type = STRING) }, responses = {
                           @RestResponse(description = "The metadata of the given namespace has been updated.", responseCode = HttpServletResponse.SC_NO_CONTENT),
                           @RestResponse(description = "The main metadata catalog dublincore/episode cannot be deleted as it has mandatory fields.", responseCode = HttpServletResponse.SC_FORBIDDEN),
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
@@ -1434,7 +1434,7 @@ public class EventsEndpoint implements ManagedService {
                @RestParameter(name = "sign", description = "Whether public distribution urls should be signed.",
                               isRequired = false, type = Type.BOOLEAN)
              },
-             reponses = {
+             responses = {
                   @RestResponse(description = "The list of publications is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventPublications(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
@@ -1563,7 +1563,7 @@ public class EventsEndpoint implements ManagedService {
                @RestParameter(name = "sign", description = "Whether public distribution urls should be signed.",
                               isRequired = false, type = Type.BOOLEAN)
              },
-             reponses = {
+             responses = {
                   @RestResponse(description = "The track details are returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified event or publication does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventPublication(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String eventId,
@@ -1687,7 +1687,7 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
   @RestQuery(name = "geteventscheduling", description = "Returns an event's scheduling information.", returnDescription = "", pathParameters = {
-      @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
+      @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
       @RestResponse(description = "The scheduling information for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "The specified event has no scheduling information.", responseCode = HttpServletResponse.SC_NO_CONTENT),
       @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
@@ -1717,7 +1717,7 @@ public class EventsEndpoint implements ManagedService {
   @RestQuery(name = "updateeventscheduling", description = "Update an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = Type.STRING) }, restParameters = {
       @RestParameter(name = "scheduling", isRequired = true, description = "Scheduling Information", type = Type.STRING),
-      @RestParameter(name = "allowConflict", description = "Allow conflicts when updating scheduling", isRequired = false, type = Type.BOOLEAN) }, reponses = {
+      @RestParameter(name = "allowConflict", description = "Allow conflicts when updating scheduling", isRequired = false, type = Type.BOOLEAN) }, responses = {
       @RestResponse(description = "The  scheduling information for the specified event is updated.", responseCode = HttpServletResponse.SC_NO_CONTENT),
       @RestResponse(description = "The specified event has no scheduling information to update.", responseCode = HttpServletResponse.SC_NOT_ACCEPTABLE),
       @RestResponse(description = "The scheduling information could not be updated due to a conflict.", responseCode = HttpServletResponse.SC_CONFLICT),

@@ -82,7 +82,7 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
           @RestParameter(description = "The mediapackage element produced by the command", isRequired = false, name = ExecuteService.OUTPUT_NAME_FORM_PARAMETER,
           type = RestParameter.Type.STRING),
           @RestParameter(description = "The type of the returned element", isRequired = false, name = ExecuteService.TYPE_FORM_PARAMETER, type = RestParameter.Type.STRING) },
-          reponses = {
+          responses = {
           @RestResponse(description = "XML-encoded Job is returned.", responseCode = HttpServletResponse.SC_NO_CONTENT),
           @RestResponse(description = "Service unavailabe or not currently present", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
           @RestResponse(description = "Incorrect parameters", responseCode = HttpServletResponse.SC_BAD_REQUEST),

@@ -73,7 +73,7 @@ public class RoleEndpoint {
   @GET
   @Path("roles.xml")
   @Produces(MediaType.APPLICATION_XML)
-  @RestQuery(name = "rolesasxml", description = "Lists the roles as XML", returnDescription = "The list of roles as XML", reponses = { @RestResponse(responseCode = 200, description = "OK, roles returned") })
+  @RestQuery(name = "rolesasxml", description = "Lists the roles as XML", returnDescription = "The list of roles as XML", responses = { @RestResponse(responseCode = 200, description = "OK, roles returned") })
   public JaxbRoleList getRolesAsXml() {
     JaxbRoleList roleList = new JaxbRoleList();
     for (Role role: roleDirectoryService.findRoles("%", Role.Target.ALL, 0, 0)) {
@@ -85,7 +85,7 @@ public class RoleEndpoint {
   @GET
   @Path("roles.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "rolesasjson", description = "Lists the roles as JSON", returnDescription = "The list of roles as JSON", reponses = { @RestResponse(responseCode = 200, description = "OK, roles returned") })
+  @RestQuery(name = "rolesasjson", description = "Lists the roles as JSON", returnDescription = "The list of roles as JSON", responses = { @RestResponse(responseCode = 200, description = "OK, roles returned") })
   public JaxbRoleList getRolesAsJson() {
     return getRolesAsXml();
   }

@@ -244,7 +244,7 @@ public class SeriesEndpoint implements ManagedService {
   @Path("{seriesId}/access.json")
   @SuppressWarnings("unchecked")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getseriesaccessinformation", description = "Get the access information of a series", returnDescription = "The access information", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = Type.STRING) }, reponses = {
+  @RestQuery(name = "getseriesaccessinformation", description = "Get the access information of a series", returnDescription = "The access information", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = Type.STRING) }, responses = {
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
           @RestResponse(responseCode = SC_OK, description = "The access information ") })
@@ -284,7 +284,7 @@ public class SeriesEndpoint implements ManagedService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{seriesId}/metadata.json")
-  @RestQuery(name = "getseriesmetadata", description = "Returns the series metadata as JSON", returnDescription = "Returns the series metadata as JSON", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
+  @RestQuery(name = "getseriesmetadata", description = "Returns the series metadata as JSON", returnDescription = "Returns the series metadata as JSON", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The series metadata as JSON."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
@@ -390,7 +390,7 @@ public class SeriesEndpoint implements ManagedService {
 
   @PUT
   @Path("{seriesId}/metadata")
-  @RestQuery(name = "updateseriesmetadata", description = "Update the series metadata with the one given JSON", returnDescription = "Returns OK if the metadata have been saved.", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, restParameters = { @RestParameter(name = "metadata", isRequired = true, type = RestParameter.Type.TEXT, description = "The list of metadata to update") }, reponses = {
+  @RestQuery(name = "updateseriesmetadata", description = "Update the series metadata with the one given JSON", returnDescription = "Returns OK if the metadata have been saved.", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, restParameters = { @RestParameter(name = "metadata", isRequired = true, type = RestParameter.Type.TEXT, description = "The list of metadata to update") }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The series metadata as JSON."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
@@ -409,7 +409,7 @@ public class SeriesEndpoint implements ManagedService {
 
   @GET
   @Path("new/metadata")
-  @RestQuery(name = "getNewMetadata", description = "Returns all the data related to the metadata tab in the new series modal as JSON", returnDescription = "All the data related to the series metadata tab as JSON", reponses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series metadata tab as JSON") })
+  @RestQuery(name = "getNewMetadata", description = "Returns all the data related to the metadata tab in the new series modal as JSON", returnDescription = "All the data related to the series metadata tab as JSON", responses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series metadata tab as JSON") })
   public Response getNewMetadata() {
     MetadataList metadataList = indexService.getMetadataListWithAllSeriesCatalogUIAdapters();
     Opt<MetadataCollection> metadataByAdapter = metadataList
@@ -432,7 +432,7 @@ public class SeriesEndpoint implements ManagedService {
   @GET
   @Path("new/themes")
   @SuppressWarnings("unchecked")
-  @RestQuery(name = "getNewThemes", description = "Returns all the data related to the themes tab in the new series modal as JSON", returnDescription = "All the data related to the series themes tab as JSON", reponses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series themes tab as JSON") })
+  @RestQuery(name = "getNewThemes", description = "Returns all the data related to the themes tab in the new series modal as JSON", returnDescription = "All the data related to the series themes tab as JSON", responses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series themes tab as JSON") })
   public Response getNewThemes() {
     ThemeSearchQuery query = new ThemeSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
     // need to set limit because elasticsearch limit results by 10 per default
@@ -460,7 +460,7 @@ public class SeriesEndpoint implements ManagedService {
 
   @POST
   @Path("new")
-  @RestQuery(name = "createNewSeries", description = "Creates a new series by the given metadata as JSON", returnDescription = "The created series id", restParameters = { @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON", type = RestParameter.Type.TEXT) }, reponses = {
+  @RestQuery(name = "createNewSeries", description = "Creates a new series by the given metadata as JSON", returnDescription = "The created series id", restParameters = { @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON", type = RestParameter.Type.TEXT) }, responses = {
           @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Returns the created series id"),
           @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "he request could not be fulfilled due to the incorrect syntax of the request"),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If user doesn't have rights to create the series") })
@@ -480,7 +480,7 @@ public class SeriesEndpoint implements ManagedService {
   @DELETE
   @Path("{seriesId}")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "deleteseries", description = "Delete a series.", returnDescription = "Ok if the series has been deleted.", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The id of the series to delete.", type = STRING), }, reponses = {
+  @RestQuery(name = "deleteseries", description = "Delete a series.", returnDescription = "Ok if the series has been deleted.", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The id of the series to delete.", type = STRING), }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The series has been deleted."),
           @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "The series could not be found.") })
   public Response deleteSeries(@PathParam("seriesId") String id) throws NotFoundException {
@@ -498,7 +498,7 @@ public class SeriesEndpoint implements ManagedService {
   @POST
   @Path("deleteSeries")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "deletemultipleseries", description = "Deletes a json list of series by their given ids e.g. [\"Series-1\", \"Series-2\"]", returnDescription = "A JSON object with arrays that show whether a series was deleted, was not found or there was an error deleting it.", reponses = {
+  @RestQuery(name = "deletemultipleseries", description = "Deletes a json list of series by their given ids e.g. [\"Series-1\", \"Series-2\"]", returnDescription = "A JSON object with arrays that show whether a series was deleted, was not found or there was an error deleting it.", responses = {
           @RestResponse(description = "Series have been deleted", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The list of ids could not be parsed into a json list.", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
   public Response deleteMultipleSeries(String seriesIdsContent) throws NotFoundException {
@@ -541,7 +541,7 @@ public class SeriesEndpoint implements ManagedService {
           @RestParameter(name = "sort", description = "The order instructions used to sort the query result. Must be in the form '<field name>:(ASC|DESC)'", isRequired = false, type = STRING),
           @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2,value2'", type = STRING),
           @RestParameter(name = "offset", isRequired = false, description = "The page offset", type = INTEGER, defaultValue = "0"),
-          @RestParameter(name = "limit", isRequired = false, description = "The limit to define the number of returned results (-1 for all)", type = INTEGER, defaultValue = "100") }, reponses = {
+          @RestParameter(name = "limit", isRequired = false, description = "The limit to define the number of returned results (-1 for all)", type = INTEGER, defaultValue = "100") }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The access control list."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response getSeries(@QueryParam("filter") String filter, @QueryParam("sort") String sort,
@@ -708,7 +708,7 @@ public class SeriesEndpoint implements ManagedService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{id}/properties")
-  @RestQuery(name = "getSeriesProperties", description = "Returns the series properties", returnDescription = "Returns the series properties as JSON", pathParameters = { @RestParameter(name = "id", description = "ID of series", isRequired = true, type = Type.STRING) }, reponses = {
+  @RestQuery(name = "getSeriesProperties", description = "Returns the series properties", returnDescription = "Returns the series properties as JSON", pathParameters = { @RestParameter(name = "id", description = "ID of series", isRequired = true, type = Type.STRING) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The access control list."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response getSeriesPropertiesAsJson(@PathParam("id") String seriesId) throws UnauthorizedException,
@@ -741,7 +741,7 @@ public class SeriesEndpoint implements ManagedService {
   @Path("{seriesId}/property/{propertyName}.json")
   @RestQuery(name = "getSeriesProperty", description = "Returns a series property value", returnDescription = "Returns the series property value", pathParameters = {
           @RestParameter(name = "seriesId", description = "ID of series", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "propertyName", description = "Name of series property", isRequired = true, type = Type.STRING) }, reponses = {
+          @RestParameter(name = "propertyName", description = "Name of series property", isRequired = true, type = Type.STRING) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The access control list."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response getSeriesProperty(@PathParam("seriesId") String seriesId,
@@ -771,7 +771,7 @@ public class SeriesEndpoint implements ManagedService {
   @Path("/{seriesId}/property")
   @RestQuery(name = "updateSeriesProperty", description = "Updates a series property", returnDescription = "No content.", restParameters = {
           @RestParameter(name = "name", isRequired = true, description = "The property's name", type = TEXT),
-          @RestParameter(name = "value", isRequired = true, description = "The property's value", type = TEXT) }, pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
+          @RestParameter(name = "value", isRequired = true, description = "The property's value", type = TEXT) }, pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
@@ -805,7 +805,7 @@ public class SeriesEndpoint implements ManagedService {
   @Path("{seriesId}/property/{propertyName}")
   @RestQuery(name = "deleteSeriesProperty", description = "Deletes a series property", returnDescription = "No Content", pathParameters = {
           @RestParameter(name = "seriesId", description = "ID of series", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "propertyName", description = "Name of series property", isRequired = true, type = Type.STRING) }, reponses = {
+          @RestParameter(name = "propertyName", description = "Name of series property", isRequired = true, type = Type.STRING) }, responses = {
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The series property has been deleted."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series or property has not been found."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
@@ -844,7 +844,7 @@ public class SeriesEndpoint implements ManagedService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{seriesId}/theme.json")
-  @RestQuery(name = "getSeriesTheme", description = "Returns the series theme id and name as JSON", returnDescription = "Returns the series theme name and id as JSON", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
+  @RestQuery(name = "getSeriesTheme", description = "Returns the series theme id and name as JSON", returnDescription = "Returns the series theme name and id as JSON", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The series theme id and name as JSON."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series or theme has not been found") })
   public Response getSeriesTheme(@PathParam("seriesId") String seriesId) {
@@ -878,7 +878,7 @@ public class SeriesEndpoint implements ManagedService {
 
   @PUT
   @Path("{seriesId}/theme")
-  @RestQuery(name = "updateSeriesTheme", description = "Update the series theme id", returnDescription = "Returns the id and name of the theme.", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, restParameters = { @RestParameter(name = "themeId", isRequired = true, type = RestParameter.Type.INTEGER, description = "The id of the theme for this series") }, reponses = {
+  @RestQuery(name = "updateSeriesTheme", description = "Update the series theme id", returnDescription = "Returns the id and name of the theme.", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, restParameters = { @RestParameter(name = "themeId", isRequired = true, type = RestParameter.Type.INTEGER, description = "The id of the theme for this series") }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The series theme has been updated and the theme id and name are returned as JSON."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series or theme has not been found"),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
@@ -902,7 +902,7 @@ public class SeriesEndpoint implements ManagedService {
 
   @DELETE
   @Path("{seriesId}/theme")
-  @RestQuery(name = "deleteSeriesTheme", description = "Removes the theme from the series", returnDescription = "Returns no content", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
+  @RestQuery(name = "deleteSeriesTheme", description = "Removes the theme from the series", returnDescription = "Returns no content", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The series theme has been removed"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
@@ -921,7 +921,7 @@ public class SeriesEndpoint implements ManagedService {
   @Path("/{seriesId}/access")
   @RestQuery(name = "applyAclToSeries", description = "Immediate application of an ACL to a series", returnDescription = "Status code", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series ID", type = STRING) }, restParameters = {
           @RestParameter(name = "acl", isRequired = true, description = "The ACL to apply", type = STRING),
-          @RestParameter(name = "override", isRequired = false, defaultValue = "false", description = "If true the series ACL will take precedence over any existing episode ACL", type = BOOLEAN) }, reponses = {
+          @RestParameter(name = "override", isRequired = false, defaultValue = "false", description = "If true the series ACL will take precedence over any existing episode ACL", type = BOOLEAN) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the given ACL"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
@@ -991,7 +991,7 @@ public class SeriesEndpoint implements ManagedService {
   @Path("{seriesId}/hasEvents.json")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "hasEvents", description = "Check if given series has events", returnDescription = "true if series has events, otherwise false", pathParameters = {
-    @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = Type.STRING) }, reponses = {
+    @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = Type.STRING) }, responses = {
     @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
     @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
     @RestResponse(responseCode = SC_OK, description = "The access information ") })
@@ -1037,7 +1037,7 @@ public class SeriesEndpoint implements ManagedService {
   @GET
   @Path("configuration.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getseriesconfiguration", description = "Get the series configuration", returnDescription = "List of configuration keys", reponses = {
+  @RestQuery(name = "getseriesconfiguration", description = "Get the series configuration", returnDescription = "List of configuration keys", responses = {
     @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
     @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
     @RestResponse(responseCode = SC_OK, description = "The access information ") })

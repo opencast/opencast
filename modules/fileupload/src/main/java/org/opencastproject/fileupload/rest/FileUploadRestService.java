@@ -115,7 +115,7 @@ public class FileUploadRestService {
     @RestParameter(description = "The size of the chunks that will be uploaded", isRequired = false, name = REQUESTFIELD_CHUNKSIZE, type = RestParameter.Type.STRING),
     @RestParameter(description = "The flavor of this track", isRequired = false, name = REQUESTFIELD_FLAVOR, type = RestParameter.Type.STRING),
     @RestParameter(description = "The mediapackage the file should belong to", isRequired = false, name = REQUESTFIELD_MEDIAPACKAGE, type = RestParameter.Type.TEXT)},
-  reponses = {
+  responses = {
     @RestResponse(description = "job was successfully created", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "upload service gave an error", responseCode = HttpServletResponse.SC_NO_CONTENT)
   }, returnDescription = "The ID of the newly created upload job")
@@ -164,7 +164,7 @@ public class FileUploadRestService {
     @RestParameter(description = "The ID of the upload job", isRequired = false, name = "jobID", type = RestParameter.Type.STRING),
     @RestParameter(description = "The output format (json or xml) of the response body.", isRequired = true, name = "format", type = RestParameter.Type.STRING)
   },
-  reponses = {
+  responses = {
     @RestResponse(description = "the job was successfully retrieved.", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "the job was not found.", responseCode = HttpServletResponse.SC_NOT_FOUND)
   }, returnDescription = "The XML representation of the requested upload job.")
@@ -193,7 +193,7 @@ public class FileUploadRestService {
   restParameters = {
     @RestParameter(description = "The number of the current chunk", isRequired = false, name = "chunknumber", type = RestParameter.Type.STRING),
     @RestParameter(description = "The payload", isRequired = false, name = "filedata", type = RestParameter.Type.FILE)},
-  reponses = {
+  responses = {
     @RestResponse(description = "the chunk data was successfully appended to file on server", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "the upload job was not found", responseCode = HttpServletResponse.SC_NOT_FOUND),
     @RestResponse(description = "the request was malformed", responseCode = HttpServletResponse.SC_BAD_REQUEST)
@@ -239,7 +239,7 @@ public class FileUploadRestService {
   @RestQuery(name = "payload", description = "Returns the payload of the upload job.", pathParameters = {
     @RestParameter(description = "The ID of the upload job to retrieve the file from", isRequired = false, name = "jobID", type = RestParameter.Type.STRING),
     @RestParameter(description = "The name of the payload file", isRequired = false, name = "filename", type = RestParameter.Type.STRING)},
-  reponses = {
+  responses = {
     @RestResponse(description = "the job and file have been found.", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "the job or file were not found.", responseCode = HttpServletResponse.SC_NOT_FOUND)
   }, returnDescription = "The payload of the upload job")
@@ -263,7 +263,7 @@ public class FileUploadRestService {
   @Path("job/{jobID}")
   @RestQuery(name = "job", description = "Deletes an upload job on the server.", pathParameters = {
     @RestParameter(description = "The ID of the upload job to be deleted", isRequired = false, name = "jobID", type = RestParameter.Type.STRING)},
-  reponses = {
+  responses = {
     @RestResponse(description = "the job was successfully deleted.", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "the job was not found.", responseCode = HttpServletResponse.SC_NOT_FOUND)
   }, returnDescription = "A success message that starts with OK")

@@ -83,7 +83,7 @@ public class HelloWorldRestEndpoint {
   @Path("helloworld")
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(name = "helloworld", description = "example service call",
-      reponses = {@RestResponse(description = "Hello World", responseCode = HttpServletResponse.SC_OK),
+      responses = {@RestResponse(description = "Hello World", responseCode = HttpServletResponse.SC_OK),
         @RestResponse(description = "The underlying service could not output something.",
             responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
       returnDescription = "The text that the service returns.")
@@ -106,7 +106,7 @@ public class HelloWorldRestEndpoint {
   @RestQuery(name = "helloname", description = "example service call with parameter",
       restParameters = { @RestParameter(description = "name to output", isRequired = false, name = "name",
           type = RestParameter.Type.TEXT) },
-      reponses = {@RestResponse(description = "Hello or Hello Name", responseCode = HttpServletResponse.SC_OK),
+      responses = {@RestResponse(description = "Hello or Hello Name", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The underlying service could not output something.",
               responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
       returnDescription = "The text that the service returns.")

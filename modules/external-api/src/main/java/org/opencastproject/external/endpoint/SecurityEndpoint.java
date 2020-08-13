@@ -114,7 +114,7 @@ public class SecurityEndpoint implements ManagedService {
   @RestQuery(name = "signurl", description = "Returns a signed URL that can be played back for the indicated period of time, while access is optionally restricted to the specified IP address.", returnDescription = "", restParameters = {
           @RestParameter(name = "url", isRequired = true, description = "The linke to encode.", type = STRING),
           @RestParameter(name = "valid-until", description = "Until when is the signed url valid", isRequired = false, type = STRING),
-          @RestParameter(name = "valid-source", description = "The IP address from which the url can be accessed", isRequired = false, type = STRING) }, reponses = {
+          @RestParameter(name = "valid-source", description = "The IP address from which the url can be accessed", isRequired = false, type = STRING) }, responses = {
                   @RestResponse(description = "The signed URL is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The caller is not authorized to have the link signed.", responseCode = HttpServletResponse.SC_UNAUTHORIZED) })
   public Response signUrl(@HeaderParam("Accept") String acceptHeader, @FormParam("url") String url,

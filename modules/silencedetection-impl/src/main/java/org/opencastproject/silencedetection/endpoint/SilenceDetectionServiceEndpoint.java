@@ -67,7 +67,7 @@ public class SilenceDetectionServiceEndpoint extends AbstractJobProducerEndpoint
             @RestParameter(name = "referenceTracks", type = RestParameter.Type.TEXT,
                     description = "Tracks referenced by resulting smil (as sources).", isRequired = false)
           },
-          reponses = {
+          responses = {
             @RestResponse(description = "Silence detection job created successfully.", responseCode = HttpServletResponse.SC_OK),
             @RestResponse(description = "Create silence detection job failed.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
           })

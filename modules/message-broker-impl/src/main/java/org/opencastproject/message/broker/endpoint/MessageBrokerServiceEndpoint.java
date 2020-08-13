@@ -74,7 +74,7 @@ public class MessageBrokerServiceEndpoint {
     name = "status",
     description = "Return status of message broker",
     returnDescription = "Return status of message broker",
-    reponses = {
+    responses = {
       @RestResponse(
         responseCode = SC_NO_CONTENT,
         description = "Connection to message broker ok"),

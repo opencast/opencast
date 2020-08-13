@@ -56,7 +56,7 @@ public class UrlSigningEndpoint {
   @GET
   @Produces({ MediaType.TEXT_PLAIN })
   @Path("accepts")
-  @RestQuery(name = "accepts", description = "Checks if the signing service accepts to sign the URL", restParameters = { @RestParameter(name = "baseUrl", isRequired = true, description = "The URL to sign", type = STRING) }, reponses = { @RestResponse(description = "'true' or 'false'", responseCode = 200) }, returnDescription = "")
+  @RestQuery(name = "accepts", description = "Checks if the signing service accepts to sign the URL", restParameters = { @RestParameter(name = "baseUrl", isRequired = true, description = "The URL to sign", type = STRING) }, responses = { @RestResponse(description = "'true' or 'false'", responseCode = 200) }, returnDescription = "")
   public Response accepts(@QueryParam("baseUrl") final String baseUrl) {
     if (signingService.accepts(baseUrl))
       return Response.ok(Boolean.TRUE.toString()).build();
@@ -71,7 +71,7 @@ public class UrlSigningEndpoint {
           @RestParameter(name = "baseUrl", isRequired = true, description = "The URL to sign", type = STRING),
           @RestParameter(defaultValue = "0", description = "The UNIX epoch time until when a signed URL should remain valid", isRequired = true, name = "validUntil", type = RestParameter.Type.INTEGER),
           @RestParameter(defaultValue = "0", description = "The UNIX epoch time from when a signed URL should become valid", isRequired = false, name = "validFrom", type = RestParameter.Type.INTEGER),
-          @RestParameter(defaultValue = "", description = "The IP addresse of the user that is allowed to access the resource", type = STRING, isRequired = false, name = "ipAddr") }, reponses = { @RestResponse(description = "A URL", responseCode = 200) }, returnDescription = "")
+          @RestParameter(defaultValue = "", description = "The IP addresse of the user that is allowed to access the resource", type = STRING, isRequired = false, name = "ipAddr") }, responses = { @RestResponse(description = "A URL", responseCode = 200) }, returnDescription = "")
   public Response sign(@QueryParam("baseUrl") final String baseUrl, @QueryParam("validUntil") final long validUntil,
           @QueryParam("validFrom") @DefaultValue("0") long validFrom,
           @QueryParam("ipAddr") @DefaultValue("") String ipAddr) {

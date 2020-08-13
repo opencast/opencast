@@ -133,7 +133,7 @@ public class AnnotationRestService {
           @RestParameter(name = "type", description = "The type of annotation", isRequired = false, type = Type.STRING),
           @RestParameter(name = "day", description = "The day of creation (format: YYYYMMDD)", isRequired = false, type = Type.STRING),
           @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = Type.INTEGER),
-          @RestParameter(name = "offset", description = "The page number", isRequired = false, type = Type.INTEGER) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the user annotations") })
+          @RestParameter(name = "offset", description = "The page number", isRequired = false, type = Type.INTEGER) }, responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the user annotations") })
   public Response getAnnotationsAsXml(@QueryParam("episode") String id, @QueryParam("type") String type,
           @QueryParam("day") String day, @QueryParam("limit") int limit, @QueryParam("offset") int offset) {
 
@@ -170,7 +170,7 @@ public class AnnotationRestService {
           @RestParameter(name = "type", description = "The type of annotation", isRequired = false, type = Type.STRING),
           @RestParameter(name = "day", description = "The day of creation (format: YYYYMMDD)", isRequired = false, type = Type.STRING),
           @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = Type.INTEGER),
-          @RestParameter(name = "offset", description = "The page number", isRequired = false, type = Type.INTEGER) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the user annotations") })
+          @RestParameter(name = "offset", description = "The page number", isRequired = false, type = Type.INTEGER) }, responses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the user annotations") })
   public Response getAnnotationsAsJson(@QueryParam("episode") String id, @QueryParam("type") String type,
           @QueryParam("day") String day, @QueryParam("limit") int limit, @QueryParam("offset") int offset) {
     return getAnnotationsAsXml(id, type, day, limit, offset); // same logic, different @Produces annotation
@@ -186,7 +186,7 @@ public class AnnotationRestService {
           @RestParameter(name = "in", description = "The time, or inpoint, of the annotation", isRequired = true, type = Type.STRING),
           @RestParameter(name = "out", description = "The optional outpoint of the annotation", isRequired = false, type = Type.STRING),
           @RestParameter(name = "isPrivate", description = "True if the annotation is private", isRequired = false, type = Type.BOOLEAN) },
-        reponses = { @RestResponse(responseCode = SC_CREATED, description = "The URL to this annotation is returned in the Location header, and an XML representation of the annotation itelf is returned in the response body.") })
+        responses = { @RestResponse(responseCode = SC_CREATED, description = "The URL to this annotation is returned in the Location header, and an XML representation of the annotation itelf is returned in the response body.") })
   public Response add(@FormParam("episode") String mediapackageId, @FormParam("in") int inpoint,
           @FormParam("out") int outpoint, @FormParam("type") String type, @FormParam("value") String value, @FormParam("isPrivate") boolean isPrivate,
           @Context HttpServletRequest request) {
@@ -216,7 +216,7 @@ public class AnnotationRestService {
   @RestQuery(name = "change", description = "Changes the value of an annotation specified by its identifier ", returnDescription = "The user annotation.",
           pathParameters = {@RestParameter(name = "id", description = "The annotation identifier", isRequired = true, type = Type.STRING) },
           restParameters = {@RestParameter(name = "value", description = "The value of the annotation", isRequired = true, type = Type.TEXT) },
-          reponses = { @RestResponse(responseCode = SC_CREATED, description = "The URL to this annotation is returned in the Location header, and an XML representation of the annotation itelf is returned in the response body.") })
+          responses = { @RestResponse(responseCode = SC_CREATED, description = "The URL to this annotation is returned in the Location header, and an XML representation of the annotation itelf is returned in the response body.") })
   public Response change(@PathParam("id") String idAsString, @FormParam("value") String value,
           @Context HttpServletRequest request) throws NotFoundException {
     Long id = null;
@@ -241,7 +241,7 @@ public class AnnotationRestService {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("{id}.xml")
-  @RestQuery(name = "annotationasxml", description = "Gets an annotation by its identifier", returnDescription = "An XML representation of the user annotation.", pathParameters = { @RestParameter(name = "id", description = "The episode identifier", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the user annotation") })
+  @RestQuery(name = "annotationasxml", description = "Gets an annotation by its identifier", returnDescription = "An XML representation of the user annotation.", pathParameters = { @RestParameter(name = "id", description = "The episode identifier", isRequired = false, type = Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the user annotation") })
   public AnnotationImpl getAnnotationAsXml(@PathParam("id") String idAsString) throws NotFoundException {
     Long id = null;
     try {
@@ -255,7 +255,7 @@ public class AnnotationRestService {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{id}.json")
-  @RestQuery(name = "annotationasjson", description = "Gets an annotation by its identifier", returnDescription = "A JSON representation of the user annotation.", pathParameters = { @RestParameter(name = "id", description = "The episode identifier", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the user annotation") })
+  @RestQuery(name = "annotationasjson", description = "Gets an annotation by its identifier", returnDescription = "A JSON representation of the user annotation.", pathParameters = { @RestParameter(name = "id", description = "The episode identifier", isRequired = false, type = Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the user annotation") })
   public AnnotationImpl getAnnotationAsJson(@PathParam("id") String idAsString) throws NotFoundException {
     return getAnnotationAsXml(idAsString);
   }
@@ -263,7 +263,7 @@ public class AnnotationRestService {
   @DELETE
   @Path("{id}")
   @RestQuery(name = "remove", description = "Remove an annotation", returnDescription = "Return status code",
-  pathParameters = { @RestParameter(name = "id", description = "The annotation identifier", isRequired = false, type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "Annotation deleted."), @RestResponse(responseCode = SC_NO_CONTENT, description = "Annotation not found.") })
+  pathParameters = { @RestParameter(name = "id", description = "The annotation identifier", isRequired = false, type = Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "Annotation deleted."), @RestResponse(responseCode = SC_NO_CONTENT, description = "Annotation not found.") })
   public Response removeAnnotation(@PathParam("id") String idAsString) throws NotFoundException {
     Long id = null;
     Annotation a;

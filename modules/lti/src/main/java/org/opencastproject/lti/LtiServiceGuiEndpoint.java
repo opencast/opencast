@@ -138,7 +138,7 @@ public class LtiServiceGuiEndpoint {
           @RestParameter(name = "license", description = "License chosen", isRequired = false, type = Type.STRING),
           @RestParameter(name = "seriesName", description = "Series name", isRequired = false, type = Type.STRING),
           @RestParameter(name = "isPartOf", description = "Series ID", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "processing", description = "Processing instructions task configuration", isRequired = false, type = Type.STRING) }, reponses = {
+          @RestParameter(name = "processing", description = "Processing instructions task configuration", isRequired = false, type = Type.STRING) }, responses = {
                   @RestResponse(description = "A new event is created and its identifier is returned in the Location header.", responseCode = HttpServletResponse.SC_CREATED),
                   @RestResponse(description = "The event could not be created due to a scheduling conflict.", responseCode = HttpServletResponse.SC_CONFLICT),
                   @RestResponse(description = "The request is invalid or inconsistent..", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
@@ -191,7 +191,7 @@ public class LtiServiceGuiEndpoint {
   @DELETE
   @Path("{eventId}")
   @RestQuery(name = "deleteevent", description = "Deletes an event.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = Type.STRING) }, reponses = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = Type.STRING) }, responses = {
           @RestResponse(description = "The event has been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id) {
