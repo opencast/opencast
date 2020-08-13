@@ -19,20 +19,19 @@
  *
  */
 
+/*jslint browser: true, nomen: true*/
+/*global define*/
+define(['jquery'], function ($) {
+  'use strict';
 
-// Views
-@import "core";
-@import "login";
-@import "statistics";
+  function Utils() {
+    // nothing to see here
+  }
 
-// Modal Views
-@import "modals/users";
-@import "modals/action-modal";
-@import "modals/modal-dialog";
-@import "modals/group";
-@import "modals/lists";
-@import "modals/new-event-series";
-@import "modals/event-series";
-@import "modals/edit-events";
-@import "modals/hotkey-cheat-sheet";
-@import "modals/embedded-code";
+  Utils.prototype.detectLanguage = function () {
+    return navigator.language || navigator.userLanguage || navigator.browserLanguage ||
+      navigator.systemLanguage || 'en';
+  };
+
+  return Utils;
+});
