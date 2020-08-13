@@ -63,13 +63,14 @@ angular.module('adminNg.services')
           services.service[LATEST_VERSION_NAME].docs_url =
             'https://docs.opencast.org/r/' + latest_version[0] + '.x/admin/';
 
-          if (parseFloat(my_version) >= parseFloat(latest_version) || my_version.endsWith('SNAPSHOT')) {
+          if (parseFloat(my_version) >= parseFloat(latest_version)
+             || (my_version[0] == latest_version[0] && my_version.endsWith('SNAPSHOT'))) {
             services.service[LATEST_VERSION_NAME].status = OK;
             services.service[LATEST_VERSION_NAME].error = false;
           } else if (my_version[0] == latest_version[0]) {
             services.service[LATEST_VERSION_NAME].status = 'There is a minor update available.';
             services.service[LATEST_VERSION_NAME].error = true;
-          } else if (parseInt(latest_version[0]) - parseInt(my_version[0]) <= 2) {
+          } else if (parseInt(latest_version[0]) - parseInt(my_version[0]) < 2) {
             Monitoring.setError(LATEST_VERSION_NAME, 'There is a major update available.');
           } else {
             Monitoring.setError(LATEST_VERSION_NAME,
