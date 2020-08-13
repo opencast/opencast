@@ -69,7 +69,7 @@ angular.module('adminNg.services')
           } else if (my_version[0] == latest_version[0]) {
             services.service[LATEST_VERSION_NAME].status = 'There is a minor update available.';
             services.service[LATEST_VERSION_NAME].error = true;
-          } else if (parseInt(latest_version[0]) - parseInt(my_version[0]) <= 2) {
+          } else if (parseInt(latest_version[0]) - parseInt(my_version[0]) < 2) {
             Monitoring.setError(LATEST_VERSION_NAME, 'There is a major update available.');
           } else {
             Monitoring.setError(LATEST_VERSION_NAME,
