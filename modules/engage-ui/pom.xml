@@ -28,6 +28,11 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <profiles>
@@ -202,9 +207,6 @@
               *
             </Import-Package>
             <Export-Package>org.opencastproject.engage.ui</Export-Package>
-            <Service-Component>
-              OSGI-INF/player-redirect.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
