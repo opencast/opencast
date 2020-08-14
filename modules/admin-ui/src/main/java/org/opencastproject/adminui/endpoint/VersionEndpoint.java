@@ -86,7 +86,7 @@ public class VersionEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "latestversion", description = "Returns the latest Opencast version",
           returnDescription = "Returns the latest Opencast version retrieved from GitHub",
-          reponses = { @RestResponse(responseCode = SC_OK, description = "The latest Opencast version.") })
+          responses = { @RestResponse(responseCode = SC_OK, description = "The latest Opencast version.") })
   public String getVersion() {
     if (System.currentTimeMillis() / 1000L - lastUpdated >= 3600) {
       updateVersion();
