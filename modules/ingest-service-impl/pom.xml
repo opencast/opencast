@@ -181,31 +181,9 @@
               META-INF.services;-split-package:=merge-first,
               de.schlichtherle.*;-split-package:=merge-first
             </Private-Package>
-            <Service-Component>
-              OSGI-INF/ingest-service.xml,
-              OSGI-INF/ingest-service-rest.xml,
-              OSGI-INF/inbox-scanner-service.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
     </plugins>
   </build>
-  <reporting>
-    <plugins>
-      <!--
-        DISABLED to get the mvn site:site running -AZ <plugin>
-        <groupId>gr.abiss.mvn.plugins</groupId>
-        <artifactId>maven-jstools-plugin</artifactId>
-        <version>0.7</version> <inherited>false</inherited>
-        <configuration>
-        <jsDir>${basedir}/src/main/resources/ui/js</jsDir>
-        <includes>**/*.js</includes>
-        <excludes>**/*-compressed.js</excludes>
-        <caseSensitive>true</caseSensitive> </configuration>
-        <reportSets> <reportSet> <reports> <report>jsdoc</report>
-        </reports> </reportSet> </reportSets> </plugin>
-      -->
-    </plugins>
-  </reporting>
 </project>
