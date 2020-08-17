@@ -13,7 +13,7 @@
     "underscore": "^1.10.2"
   },
   "devDependencies": {
-    "eslint": "^7.6.0",
+    "eslint": "^7.7.0",
     "eslint-plugin-header": "^3.0.0"
   }
 }
