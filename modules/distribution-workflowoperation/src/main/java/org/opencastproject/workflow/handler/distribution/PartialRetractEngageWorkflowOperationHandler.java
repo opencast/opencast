@@ -72,7 +72,7 @@ public class PartialRetractEngageWorkflowOperationHandler extends RetractEngageW
 
     // Check which tags have been configured
     String retractTargetTags = StringUtils.trimToEmpty(op.getConfiguration(RETRACT_TAGS));
-    String retractTargetFlavors = StringUtils.trimToNull(op.getConfiguration(RETRACT_FLAVORS));
+    String retractTargetFlavors = StringUtils.trimToEmpty(op.getConfiguration(RETRACT_FLAVORS));
 
     String[] retractTags = StringUtils.split(retractTargetTags, ",");
     String[] retractFlavors = StringUtils.split(retractTargetFlavors, ",");
