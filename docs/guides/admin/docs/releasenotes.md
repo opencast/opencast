@@ -170,7 +170,8 @@ improvements.
 Additional Notes about 7.8
 --------------------------
 
-Opencast 7.8 contains multiple fixes for the Theodul Player to better support Audio-Only files. Additionally some other bugs were resolved and dependencies were updated to address security issues.
+Opencast 7.8 contains multiple fixes for the Theodul Player to better support Audio-Only files. Additionally some other
+bugs were resolved and dependencies were updated to address security issues.
 
 
 Release Schedule
