@@ -28,6 +28,7 @@ import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.util.NotFoundException;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -189,10 +190,8 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
     if (StringUtils.isBlank(token))
       throw new ConfigurationException(MOODLE_TOKEN_KEY, "is not set");
 
-    boolean groupRoles = false;
-    String groupRolesStr = (String) properties.get(GROUP_ROLES_KEY);
-    if ("true".equals(groupRolesStr))
-      groupRoles = true;
+    final String groupRolesStr = (String) properties.get(GROUP_ROLES_KEY);
+    final boolean groupRoles = BooleanUtils.toBoolean(groupRolesStr);
 
     String coursePattern = (String) properties.get(COURSE_PATTERN_KEY);
     String userPattern = (String) properties.get(USER_PATTERN_KEY);
