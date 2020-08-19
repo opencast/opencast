@@ -144,6 +144,9 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
    */
   private AtomicLong moodleWebServiceRequests;
 
+  /** If usernames requested from Moodle shall be converted to lowercase */
+  private final boolean lowercaseUsername;
+
   private final List<String> ignoredUsernames;
 
   /**
@@ -162,13 +165,14 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
    */
   public MoodleUserProviderInstance(String pid, MoodleWebService client, Organization organization,
           String coursePattern, String userPattern, String groupPattern, boolean groupRoles, int cacheSize,
-          int cacheExpiration, String adminUserName) {
+          int cacheExpiration, String adminUserName, final boolean lowercaseUsername) {
     this.client = client;
     this.organization = organization;
     this.groupRoles = groupRoles;
     this.coursePattern = coursePattern;
     this.userPattern = userPattern;
     this.groupPattern = groupPattern;
+    this.lowercaseUsername = lowercaseUsername;
 
     // initialize user filter
     this.ignoredUsernames = new ArrayList<>();
@@ -472,13 +476,17 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
    * @return The user.
    */
   private User loadUserFromMoodle(String username) {
+    if (lowercaseUsername) {
+      username = username.toLowerCase();
+    }
+
     logger.debug("loadUserFromMoodle({})", username);
 
     if (cache == null)
       throw new IllegalStateException("The Moodle user detail service has not yet been configured");
 
     // Don't answer for admin, anonymous or empty user
-    if (ignoredUsernames.stream().anyMatch(u -> u.equals(username))) {
+    if (ignoredUsernames.contains(username)) {
       logger.debug("We don't answer for: " + username);
       return null;
     }
