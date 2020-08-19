@@ -68,7 +68,7 @@ public class VersionEndpoint {
   private String version = "";
 
   /** GitHub URL */
-  private String url = "https://api.github.com/repos/opencast/opencast/releases/latest";
+  private String url = "https://api.github.com/repos/opencast/opencast/releases";
 
   /** The date */
   private long lastUpdated = 0;
@@ -103,8 +103,14 @@ public class VersionEndpoint {
       HttpGet request = new HttpGet(url);
       HttpResponse response = client.execute(request);
       String responseString = IOUtils.toString(response.getEntity().getContent(), "utf-8");
-      Map data = gson.fromJson(responseString, Map.class);
-      version = (String) data.get("tag_name");
+      Map[] data = gson.fromJson(responseString, Map[].class);
+      double latestVersion = 0;
+      for (Map<String,Object> release : data) {
+        if (Double.parseDouble((String) release.get("tag_name")) > latestVersion) {
+          latestVersion = Double.parseDouble((String) release.get("tag_name"));
+          version = (String) release.get("tag_name");
+        }
+      }
       lastUpdated = System.currentTimeMillis() / 1000L;
     } catch (Exception e) {
       logger.warn("Error while parsing the Opencast version from GitHub", e);

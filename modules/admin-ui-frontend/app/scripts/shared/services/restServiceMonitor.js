@@ -61,7 +61,7 @@ angular.module('adminNg.services')
           var my_version = response_my_version.data.version;
           var latest_version = response_latest_version.data;
           services.service[LATEST_VERSION_NAME].docs_url =
-            'https://docs.opencast.org/r/' + latest_version[0] + '.x/admin/';
+            'https://docs.opencast.org/r/' + parseInt(latest_version) + '.x/admin/';
 
           if (parseFloat(my_version) >= parseFloat(latest_version)
              || (my_version[0] == latest_version[0] && my_version.endsWith('SNAPSHOT'))) {
