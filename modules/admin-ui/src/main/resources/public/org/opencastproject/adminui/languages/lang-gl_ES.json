@@ -170,7 +170,7 @@
       "VIDEO_TOO_MANY_AUDIOS": "Non se pode ter máis dunha pista de audio por cada pista de vídeo",
       "SERVER_UNRESPONSIVE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
       "SERVICE_UNAVAILABLE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
-      "ACTIVE_TRANSACTION": "Este evento non se pode editar mentres exista un fluxo de traballo ou unha transacción activos."
+      "ACTIVE_TRANSACTION": "Non se pode modificar este evento mentres exista un fluxo de traballo ou unha transacción activos."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Accións",
@@ -210,7 +210,7 @@
          }
       },
       "EDIT_EVENTS": {
-         "CAPTION": "Editar eventos programados",
+         "CAPTION": "Modificar eventos programados",
          "CONFLICT_CHECK_RUNNING": "Verificación de conflitos en curso…",
          "GENERAL": {
             "CAPTION": "Xeral",
@@ -234,7 +234,7 @@
             "CAPTION": "Modificar",
             "EVENT": "evento",
             "EVENTS": "eventos",
-            "HEADER": "Esta páxina permite editar eventos programados por días da semana. Os campos xa están cumprimentados se todos os eventos programados teñen o mesmo valor para ese campo específico. En caso contrario, os campos aparecen en branco. Deixar os campos en branco significa que os valores respectivos non deben modificarse.",
+            "HEADER": "Esta páxina permite modificar eventos programados por días da semana. Os campos xa están cumprimentados se todos os eventos programados teñen o mesmo valor para ese campo específico. En caso contrario, os campos aparecen en branco. Deixar os campos en branco significa que os valores respectivos non deben cambiarse.",
             "METADATA": "Metadatos",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -1640,7 +1640,7 @@
       "PLACEHOLDER": "Procurar…",
       "PROFILES": {
          "FILTERS_HEADER": "Grupos de filtros gardados",
-         "EDIT": "Editar conxunto de filtros",
+         "EDIT": "Modificar conxunto de filtros",
          "REMOVE": "Borrar filtro gardado",
          "EMPTY": "Aínda non se gardou ningún filtro",
          "SAVE_FILTERS": "Gardar",
@@ -1984,7 +1984,7 @@
          "RANDOM": "Esta gráfica amosa datos aleatorios como exemplo. Para que deixe de mostrarse, elimine da carpeta etc/providers o ficheiro JSON coa definición correspondente a este provedor",
          "VIEWS_SUM": "Aquí amósase o número total de visualizacións por unidade de tempo.",
          "VIEWS_AVG": "Aquí amósase o número total de visualizacións diarias por unidade de tempo.",
-         "PUBLISHEDHOURS": "This displays the published hours of video"
+         "PUBLISHEDHOURS": "Aquí amósanse as horas de vídeo publicadas"
       }
    }
 }
