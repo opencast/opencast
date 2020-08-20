@@ -211,11 +211,19 @@ with `<sec:remember-me services-ref="rememberMeServices" />`
 - CVE-2020-5228 – [Public Access Via OAI-PMH
   ](https://github.com/opencast/opencast/security/advisories/GHSA-6f54-3qr9-pjgj)
 
+
 Additional Notes About 7.7
 -------------------------
 
 Opencast 7.7 brings better ACLs handling, remember-me authentication fix and other minor
 improvements.
+
+
+Additional Notes about 7.8
+--------------------------
+
+Opencast 7.8 contains multiple fixes for the Theodul Player to better support Audio-Only files. Additionally some other
+bugs were resolved and dependencies were updated to address security issues.
 
 
 Release Schedule
