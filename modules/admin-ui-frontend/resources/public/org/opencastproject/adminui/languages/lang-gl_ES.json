@@ -2072,7 +2072,7 @@
          "RANDOM": "Esta gráfica amosa datos aleatorios como exemplo. Para que deixe de mostrarse, elimine da carpeta etc/providers o ficheiro JSON coa definición correspondente a este provedor",
          "VIEWS_SUM": "Aquí amósase o número total de visualizacións por unidade de tempo.",
          "VIEWS_AVG": "Aquí amósase o número total de visualizacións diarias por unidade de tempo.",
-         "PUBLISHEDHOURS": "Aquí amósanse as horas de vídeo publicadas"
+         "PUBLISHEDHOURS": "This displays the published hours of video"
       }
    }
 }
