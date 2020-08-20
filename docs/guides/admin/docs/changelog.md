@@ -584,6 +584,25 @@ Opencast 8
 
 Opencast 7
 ----------
+### Opencast 7.8
+
+*Released on August 17, 2020*
+
+- [[#1667](https://github.com/opencast/opencast/pull/1667)] -
+  Fix managed acl filter in api
+- [[#1659](https://github.com/opencast/opencast/pull/1659)] -
+  Updating Guava version
+- [[#1657](https://github.com/opencast/opencast/pull/1657)] -
+  Fixed the video outline in the theodul player
+- [[#1641](https://github.com/opencast/opencast/pull/1641)] -
+  Capture Agent Authentication Method
+- [[#1595](https://github.com/opencast/opencast/pull/1595)] -
+  Gracefully Handle Missing Timeline Preview
+- [[#1594](https://github.com/opencast/opencast/pull/1594)] -
+  Fix Calculation of Aspect Ratio
+- [[#1589](https://github.com/opencast/opencast/pull/1589)] -
+  Engage: Theodul: Audio: Refer to correct items
+
 ### Opencast 7.7
 
 *Released on April 27, 2020*

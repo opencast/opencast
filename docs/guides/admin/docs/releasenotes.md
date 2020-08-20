@@ -19,7 +19,9 @@ Features
 
 Configuration changes
 ---------------------
+
 *TBD*
+
 
 Release Schedule
 ----------------
