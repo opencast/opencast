@@ -23,10 +23,24 @@
             </div>
 
             <div class="row">
-              <input ng-class="{error: isError}" name="j_username" type="text" id="email" placeholder="{{ 'LOGIN.USERNAME' | translate }}" class="login-input" autofocus="autofocus">
+              <input ng-class="{error: isError}"
+                     name="j_username"
+                     type="text"
+                     id="email"
+                     placeholder="{{ 'LOGIN.USERNAME' | translate }}"
+                     class="login-input"
+                     autofocus="autofocus"
+                     autocomplete="username"
+                     autocapitalize="none"
+                     spellcheck="false">
             </div>
             <div class="row">
-              <input ng-class="{error: isError}" name="j_password" type="password" id="password" placeholder="{{ 'LOGIN.PASSWORD' | translate }}" class="login-input">
+              <input ng-class="{error: isError}"
+                     name="j_password"
+                     type="password"
+                     id="password"
+                     placeholder="{{ 'LOGIN.PASSWORD' | translate }}"
+                     class="login-input">
             </div>
 
             <div class="row remember-me">
