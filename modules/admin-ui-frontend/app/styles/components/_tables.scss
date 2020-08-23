@@ -226,11 +226,11 @@
 
             &.play {
                 color: $color-silver;
-                @include build-icon(auto, auto, play-icon, 17px, 17px);
+                @include fa-icon($fa-var-play-circle-o, before, inline-block, 0, 0, $color-silver, 17px, normal, inherit);
 
                 &.on {
-                   color: $primary-color-green;
-                   @include build-icon(auto, auto, play-icon-on, 17px, 17px);
+                    color: $primary-color-green;
+                    @include fa-icon($fa-var-play-circle-o, before, inline-block, 0, 0, $primary-color-green, 17px, normal, inherit);
                 }
             }
 
@@ -249,11 +249,6 @@
 
             &.more-series {
                 @include build-icon(auto, auto, more-series-icon, 19px, 15px);
-            }
-
-            &.time {
-                @include build-icon(auto, auto, time-icon, 17px, 17px);
-                margin-right: 15px;
             }
 
             &.comments {
