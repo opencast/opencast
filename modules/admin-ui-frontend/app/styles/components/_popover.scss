@@ -75,20 +75,28 @@
 }
 
 .popover__list-item {
-    @include retina-image("#{$img-path}play-icon-on", 20px 20px);
+    @include fa-icon($fa-var-play-circle-o, before, inline-block, 0, 0, #37c180, 20px, normal, inherit);
     background-position-y: center;
     margin: 6px 0;
     padding-left: 30px;
     line-height: 22px;
     background-repeat: no-repeat;
     display: block;
+
+    > span {
+        vertical-align: top;
+    }
 }
 
 .popover__list-item-disabled {
-    @include retina-image("#{$img-path}play-icon", 20px 20px);
+    @include fa-icon($fa-var-play-circle-o, before, inline-block, 0, 0, inherit, 20px, normal, inherit);
     margin: 6px 0;
     padding-left: 30px;
     line-height: 22px;
     background-repeat: no-repeat;
     display: block;
+
+    > span {
+        vertical-align: top;
+    }
 }
