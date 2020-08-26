@@ -62,7 +62,8 @@ import javax.persistence.UniqueConstraint;
   @NamedQuery(name = "User.findInsecureHash",
               query = "select u from JpaUser u where length(u.password) = 32 and u.organization.id = :org"),
   @NamedQuery(name = "User.findAllByUserNames", query = "select u from JpaUser u where u.organization.id = :org AND u.username IN :names"),
-  @NamedQuery(name = "User.countAll", query = "select COUNT(u) from JpaUser u where u.organization.id = :org") })
+  @NamedQuery(name = "User.countAllByOrg", query = "select COUNT(u) from JpaUser u where u.organization.id = :org"),
+  @NamedQuery(name = "User.countAll", query = "select COUNT(u) from JpaUser u") })
 public class JpaUser implements User {
 
   @Id
