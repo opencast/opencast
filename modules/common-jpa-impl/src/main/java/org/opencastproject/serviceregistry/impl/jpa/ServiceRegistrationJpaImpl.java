@@ -78,9 +78,7 @@ import javax.persistence.UniqueConstraint;
         @NamedQuery(name = "ServiceRegistration.relatedservices.warning_error", query = "SELECT rh FROM ServiceRegistration rh "
                 + "WHERE rh.serviceType = :serviceType AND (rh.serviceState = 1 OR rh.serviceState = 2)"),
         @NamedQuery(name = "ServiceRegistration.relatedservices.warning", query = "SELECT rh FROM ServiceRegistration rh "
-                + "WHERE rh.serviceType = :serviceType AND rh.serviceState = 1"),
-        @NamedQuery(name = "ServiceRegistration.countNotNormal", query = "SELECT count(rh) FROM ServiceRegistration rh "
-                + "WHERE rh.serviceState <> 0 AND rh.hostRegistration.active = true") })
+                + "WHERE rh.serviceType = :serviceType AND rh.serviceState = 1") })
 public class ServiceRegistrationJpaImpl implements ServiceRegistration {
 
   /** The logger */
