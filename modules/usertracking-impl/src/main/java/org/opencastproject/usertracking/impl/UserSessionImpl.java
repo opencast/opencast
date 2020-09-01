@@ -28,7 +28,7 @@ import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Lob;
+import javax.persistence.Index;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -40,9 +40,11 @@ import javax.xml.bind.annotation.XmlType;
 
 @Entity(name = "UserSession")
 @Access(AccessType.FIELD)
-@Table(name = "oc_user_session")
+@Table(name = "oc_user_session", indexes = {
+    @Index(name = "IX_oc_user_session_user_id", columnList = "user_id")
+})
 @NamedQueries({
-        @NamedQuery(name = "findUserSessionBySessionId", query = "SELECT s FROM UserSession s WHERE s.sessionId = :sessionId") })
+    @NamedQuery(name = "findUserSessionBySessionId", query = "SELECT s FROM UserSession s WHERE s.sessionId = :sessionId") })
 @XmlType(name = "session", namespace = "http://usertracking.opencastproject.org")
 @XmlRootElement(name = "session", namespace = "http://usertracking.opencastproject.org")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -53,18 +55,15 @@ public class UserSessionImpl implements UserSession {
   @XmlElement(name = "sessionId")
   private String sessionId;
 
-  @Lob
-  @Column(name = "user_id", length = 255)
+  @Column(name = "user_id")
   @XmlElement(name = "userId")
   private String userId;
 
-  @Lob
-  @Column(name = "user_ip", length = 255)
+  @Column(name = "user_ip")
   @XmlElement(name = "userIp")
   private String userIp;
 
-  @Lob
-  @Column(name = "user_agent", length = 255)
+  @Column(name = "user_agent")
   @XmlElement(name = "userAgent")
   private String userAgent;
 

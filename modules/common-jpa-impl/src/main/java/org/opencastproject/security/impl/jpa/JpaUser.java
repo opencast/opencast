@@ -53,7 +53,8 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "oc_user", uniqueConstraints = { @UniqueConstraint(columnNames = { "username", "organization" }) })
+@Table(name = "oc_user", uniqueConstraints = {
+    @UniqueConstraint(name = "UNQ_oc_user", columnNames = { "username", "organization" }) })
 @NamedQueries({
   @NamedQuery(name = "User.findByQuery", query = "select u from JpaUser u where UPPER(u.username) like :query and u.organization.id = :org"),
   @NamedQuery(name = "User.findByIdAndOrg", query = "select u from JpaUser u where u.id=:id and u.organization.id = :org"),
@@ -73,13 +74,13 @@ public class JpaUser implements User {
   @Column(name = "username", length = 128)
   private String username;
 
-  @Column(name = "name")
+  @Column(name = "name", length = 256)
   private String name;
 
-  @Column(name = "email")
+  @Column(name = "email", length = 256)
   private String email;
 
-  @Column(name = "manageable")
+  @Column(name = "manageable", nullable = false)
   private boolean manageable = true;
 
   @Transient
@@ -94,8 +95,12 @@ public class JpaUser implements User {
   private JpaOrganization organization;
 
   @ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.LAZY)
-  @JoinTable(name = "oc_user_role", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "role_id") }, uniqueConstraints = { @UniqueConstraint(columnNames = {
-          "user_id", "role_id" }) })
+  @JoinTable(name = "oc_user_role", joinColumns = {
+      @JoinColumn(name = "user_id")
+    }, inverseJoinColumns = {
+      @JoinColumn(name = "role_id")
+    }, uniqueConstraints = {
+      @UniqueConstraint(name = "UNQ_oc_user_role", columnNames = { "user_id", "role_id" }) })
   private Set<JpaRole> roles;
 
   /**
