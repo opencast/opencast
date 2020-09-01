@@ -11,7 +11,7 @@ Important Changes
 - The `encode` worfklow operation now completely replaces `compose`,
   which is dropped now
 - MariaDB JDBC driver
-  - TODO Where is this in the changelog?!
+    - TODO Where is this in the changelog?!
 - New LTI-Tools?
 
 Features
