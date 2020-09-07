@@ -43,6 +43,10 @@ angular.module('adminNg.controllers')
     $scope.mediaModuleUrl = undefined;
     RestServiceMonitor.run();
     $scope.services = RestServiceMonitor.getServiceStatus();
+    $scope.studioReturnUrl = encodeURIComponent($location.absUrl());
+    $scope.$on('$locationChangeSuccess', function($event, newUrl) {
+      $scope.studioReturnUrl = encodeURIComponent(newUrl);
+    });
 
     AuthService.getUser().$promise.then(function (user) {
       $scope.currentUser = user;
