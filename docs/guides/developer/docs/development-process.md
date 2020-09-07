@@ -12,6 +12,7 @@ contributed, how they are merged and how releases are done.
 * *Chat with developers on [IRC (#opencast on Freenode)](http://webchat.freenode.net/?channels=opencast)*
 * *Join our weekly technical meeting (see lists or IRC)*
 
+- I am a test change - 
 
 Contributing Code
 -----------------
