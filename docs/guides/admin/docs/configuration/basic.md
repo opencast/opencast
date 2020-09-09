@@ -85,7 +85,7 @@ For more details about the setup, have a look at the [Apache ActiveMQ configurat
 Step 5: Database Configuration
 ------------------------------
 
-Opencast uses an integrated HSQL database by default. While you will find it perfectly functional, it has certain
+Opencast uses an integrated H2 database by default. While you will find it perfectly functional, it has certain
 drawbacks:
 
 * It is rather slow
@@ -103,7 +103,13 @@ Opencast requires Elasticsearch.
 For more details about the setup, have a look at the [Elasticsearch configuration
 guide](../modules/searchindex/elasticsearch.md).
 
-Step 7: Setting the Storage Directory (optional)
+Step 7: HTTPS Configuration
+---------------------------
+
+An installation without HTTPS does not make much sense today.
+Thus, make sure to follow [a configuration guide for HTTPS](https/index.md).
+
+Step 8: Setting the Storage Directory (optional)
 ------------------------------------------------
 
 Even though it is not important for all systems – on test setups you can probably omit this – you will often want to set
@@ -113,4 +119,3 @@ can set the directory by changing `org.opencastproject.storage.dir` like:
     org.opencastproject.storage.dir=/media/mhdatamount
 
 Please keep in mind that the user running Opencast must have read/write permissions to the storage directory.
-
