@@ -49,7 +49,7 @@ For more details, take a look at the options in
 
 
 The “delete” key in the series overview tool can be configured by specifying the retraction workflow in
-`etc/org.opencastproject.lti.endpoint.EventsEndpoint.cfg`. The property is called `retract-workflow-id`, and it defaults
+`etc/org.opencastproject.lti.service.impl.LtiServiceImpl.cfg`. The property is called `retract-workflow-id`, and it defaults
 to `retract`.
 
 Configure and test an LTI tool in the LMS
