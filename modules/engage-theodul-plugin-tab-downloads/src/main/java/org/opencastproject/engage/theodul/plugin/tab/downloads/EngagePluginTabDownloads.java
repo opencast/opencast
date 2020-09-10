@@ -36,26 +36,25 @@ import javax.ws.rs.Path;
 
 @Path("/")
 @Component(
-        immediate = true,
-        service = EngagePlugin.class,
-        property = {
-                "opencast.engage.plugin.name=EngagePluginTabDownloads",
-                "opencast.engage.plugin.description=List Downloads in Tab",
-                "opencast.engage.plugin.rest=false"
-        }
-)
+    immediate = true,
+    service = EngagePlugin.class,
+    property = {
+        "opencast.engage.plugin.name=EngagePluginTabDownloads",
+        "opencast.engage.plugin.description=List Downloads in Tab",
+        "opencast.engage.plugin.rest=false"
+    })
 public class EngagePluginTabDownloads extends AbstractEngagePlugin {
 
-    private static final Logger log = LoggerFactory.getLogger(EngagePluginTabDownloads.class);
+  private static final Logger log = LoggerFactory.getLogger(EngagePluginTabDownloads.class);
 
-    @Activate
-    protected void activate(ComponentContext cc) {
-        log.info("Activated.");
-    }
+  @Activate
+  protected void activate(ComponentContext cc) {
+    log.info("Activated.");
+  }
 
-    @Reference
-    protected void setPluginManager(EngagePluginManager pm) {
-        super.setPluginManager(pm);
-    }
+  @Reference
+  protected void setPluginManager(EngagePluginManager pm) {
+    super.setPluginManager(pm);
+  }
 
 }
