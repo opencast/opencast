@@ -194,6 +194,7 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-usertracking/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-description/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-description/${project.version}</bundle>
+    <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-downloads/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-shortcuts/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-slidetext/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-timeline-statistics/${project.version}</bundle>
@@ -438,6 +439,7 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-usertracking/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-description/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-description/${project.version}</bundle>
+    <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-downloads/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-shortcuts/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-slidetext/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-timeline-statistics/${project.version}</bundle>
@@ -640,6 +642,7 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-usertracking/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-description/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-description/${project.version}</bundle>
+    <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-downloads/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-shortcuts/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-slidetext/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-timeline-statistics/${project.version}</bundle>
