@@ -26,15 +26,19 @@ import org.opencastproject.coverimage.CoverImageService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Attachment;
+import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.metadata.api.MetadataValue;
-import org.opencastproject.metadata.api.StaticMetadata;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.metadata.dublincore.DublinCoreUtil;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -54,15 +58,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -70,6 +75,8 @@ import java.util.UUID;
  */
 public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWorkflowOperationHandler {
 
+  private static final String EPISODE_FLAVOR = "episodeFlavor";
+  private static final String SERIES_FLAVOR = "seriesFlavor";
   private static final String COVERIMAGE_FILENAME = "coverimage.png";
   private static final String XSL_FILE_URL = "stylesheet";
   private static final String XML_METADATA = "metadata";
@@ -107,7 +114,7 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     // User XML metadata from operation configuration, fallback to default metadata
     String xml = operation.getConfiguration(XML_METADATA);
     if (xml == null) {
-      xml = getMetadataXml(mediaPackage);
+      xml = getMetadataXml(mediaPackage, operation);
       logger.debug("Metadata was not part of operation configuration, using Dublin Core as fallback");
     }
     logger.debug("Metadata set to: {}", xml);
@@ -302,11 +309,81 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     }
   }
 
-  protected String getMetadataXml(MediaPackage mp) {
-    StaticMetadata metadata = getStaticMetadataService().getMetadata(mp);
+  protected String getMetadataXml(MediaPackage mp, WorkflowOperationInstance operation) {
 
+    String configuredEpisodeFlavor = StringUtils.trimToEmpty(operation.getConfiguration(EPISODE_FLAVOR));
+    String configuredSeriesFlavor = StringUtils.trimToEmpty(operation.getConfiguration(SERIES_FLAVOR));
+    //use dublincore/episode and dublincore/series metadata-catalogs as default
+    if (("").equals(configuredEpisodeFlavor)) {
+      configuredEpisodeFlavor = "dublincore/episode";
+    }
+    if (("").equals(configuredSeriesFlavor)) {
+      configuredSeriesFlavor = "dublincore/series";
+    }
+
+    String episodeFlavorType = configuredEpisodeFlavor.split("/")[0];
+    String episodeFlavorSubtype = configuredEpisodeFlavor.split("/")[1];
+    String seriesFlavorType = configuredSeriesFlavor.split("/")[0];
+    String seriesFlavorSubtype = configuredSeriesFlavor.split("/")[1];
+
+    //Get episode metadata-catalog (can there be more than one catalog of a certain flavor? How to differentiate?)
+    Catalog[] catalogs = mp.
+            getCatalogs(new MediaPackageElementFlavor(episodeFlavorType, StringUtils.lowerCase(episodeFlavorSubtype)));
+
+    //currently (probably) only works with dublincore catalogs
+    //Any implementations for accessing extended metadata?
+    DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(getWorkspace(), catalogs[0]);
+    Map<EName, List<DublinCoreValue>> data = dc.getValues();
+
+    //build xml from metadata
     StringBuilder xml = new StringBuilder();
     xml.append("<metadata xmlns:dcterms=\"http://purl.org/dc/terms/\">");
+
+    //TODO covert date/time format for dublincore standard fields
+    for (Map.Entry<EName, List<DublinCoreValue>> entry : data.entrySet()) {
+      String currentKey = entry.getKey().getLocalName();
+
+      switch(currentKey) {
+        case "creator": appendXml(xml, "creators", entry.getValue().get(0).getValue()); break;
+        case "isPartOf":
+          xml.append("<series>");
+          //get Series metadata
+          logger.info(entry.getValue().get(0).getValue());
+          //get series catalog
+          Catalog[] seriesCatalogs = mp.
+                  getCatalogs(new MediaPackageElementFlavor(seriesFlavorType, seriesFlavorSubtype));
+          DublinCoreCatalog dcSeries = DublinCoreUtil.loadDublinCore(getWorkspace(), seriesCatalogs[0]);
+          Map<EName, List<DublinCoreValue>> seriesMetadata = dcSeries.getValues();
+
+          //append series metadata
+          for (Map.Entry<EName, List<DublinCoreValue>> seriesEntry : seriesMetadata.entrySet()) {
+            String currentSeriesKey = seriesEntry.getKey().getLocalName();
+            switch(currentSeriesKey) {
+              case "created":
+                String[] date = seriesEntry.getValue().get(0).getValue().split("\\.");
+                appendXml(xml, "date", date[0]);
+                break;
+              default: String key = seriesEntry.getKey().getLocalName();
+                appendXml(xml, key, seriesEntry.getValue().get(0).getValue());
+            }
+          }
+          xml.append("</series>");
+          break;
+
+        case "created":
+          String[] date = entry.getValue().get(0).getValue().split("\\.");
+          appendXml(xml, "date", date[0]);
+          break;
+        default: appendXml(xml, entry.getKey().getLocalName(), entry.getValue().get(0).getValue());
+      }
+    }
+    xml.append("</metadata>");
+
+
+    /*
+    StringBuilder xml = new StringBuilder();
+    xml.append("<metadata xmlns:dcterms=\"http://purl.org/dc/terms/\">");
+
 
     for (String title : getFirstMetadataValue(metadata.getTitles()))
       appendXml(xml, "title", title);
@@ -315,7 +392,6 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     for (String language : metadata.getLanguage())
       appendXml(xml, "language", language);
     for (Date created : metadata.getCreated())
-      /* Method formatDate of org.apache.xalan.lib.ExsltDatetime requires the format CCYY-MM-DDThh:mm:ss */
       appendXml(xml, "date", new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss").format(created));
     for (Date[] period : metadata.getTemporalPeriod()) {
       if (period[0] != null) {
@@ -341,6 +417,8 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
       appendXml(xml, "subjects", subjects);
 
     xml.append("</metadata>");
+    */
+    logger.info(xml.toString());
 
     return xml.toString();
   }
@@ -366,6 +444,28 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     xml.append("</");
     xml.append(name);
     xml.append(">");
+  }
+
+  /**
+   * Loads a dublin core catalog from a mediapackage's catalog reference
+   *
+   * @param catalog
+   *          the mediapackage's reference to this catalog
+   * @return the dublin core
+   * @throws IOException
+   *           if there is a problem loading or parsing the dublin core object
+   */
+  protected DublinCoreCatalog loadDublinCoreCatalog(Catalog catalog) throws IOException {
+    InputStream in = null;
+    try {
+      File f = getWorkspace().get(catalog.getURI());
+      in = new FileInputStream(f);
+      return getDublinCoreCatalogService().load(in);
+    } catch (NotFoundException e) {
+      throw new IOException("Unable to open catalog " + catalog, e);
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
   }
 
 }
