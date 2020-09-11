@@ -15,6 +15,8 @@ versions of Opencast, please refer to [older release notes](https://docs.opencas
 9. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
 10. [Check passwords](#check-passwords)
 
+This is a test change :D
+
 Configuration Changes
 ---------------------
 
