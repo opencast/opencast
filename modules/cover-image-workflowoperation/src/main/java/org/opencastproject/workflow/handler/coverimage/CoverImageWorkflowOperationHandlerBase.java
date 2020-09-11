@@ -446,26 +446,4 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     xml.append(">");
   }
 
-  /**
-   * Loads a dublin core catalog from a mediapackage's catalog reference
-   *
-   * @param catalog
-   *          the mediapackage's reference to this catalog
-   * @return the dublin core
-   * @throws IOException
-   *           if there is a problem loading or parsing the dublin core object
-   */
-  protected DublinCoreCatalog loadDublinCoreCatalog(Catalog catalog) throws IOException {
-    InputStream in = null;
-    try {
-      File f = getWorkspace().get(catalog.getURI());
-      in = new FileInputStream(f);
-      return getDublinCoreCatalogService().load(in);
-    } catch (NotFoundException e) {
-      throw new IOException("Unable to open catalog " + catalog, e);
-    } finally {
-      IOUtils.closeQuietly(in);
-    }
-  }
-
 }
