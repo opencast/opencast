@@ -347,11 +347,11 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
         case "creator": appendXml(xml, "creators", entry.getValue().get(0).getValue()); break;
         case "isPartOf":
           xml.append("<series>");
-          //get Series metadata
-          logger.info(entry.getValue().get(0).getValue());
+
           //get series catalog
           Catalog[] seriesCatalogs = mp.
                   getCatalogs(new MediaPackageElementFlavor(seriesFlavorType, seriesFlavorSubtype));
+          //get Series metadata
           DublinCoreCatalog dcSeries = DublinCoreUtil.loadDublinCore(getWorkspace(), seriesCatalogs[0]);
           Map<EName, List<DublinCoreValue>> seriesMetadata = dcSeries.getValues();
 
@@ -418,7 +418,6 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
 
     xml.append("</metadata>");
     */
-    logger.info(xml.toString());
 
     return xml.toString();
   }
