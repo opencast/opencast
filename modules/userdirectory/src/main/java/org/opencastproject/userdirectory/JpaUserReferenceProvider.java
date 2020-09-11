@@ -21,6 +21,7 @@
 
 package org.opencastproject.userdirectory;
 
+import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
@@ -29,7 +30,9 @@ import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
+import org.opencastproject.userdirectory.api.AAIRoleProvider;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
+import org.opencastproject.util.NotFoundException;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -86,6 +89,12 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   /** The security service */
   protected SecurityService securityService = null;
 
+  /** Group Role provider */
+  protected JpaGroupRoleProvider groupRoleProvider;
+
+  /** Role provider */
+  protected AAIRoleProvider roleProvider;
+
   /** The delimiter for the User cache */
   private static final String DELIMITER = ";==;";
 
@@ -111,6 +120,15 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * @param groupRoleProvider
+   *          the GroupRoleProvider to set
+   */
+  @Reference(name = "groupRoleProvider")
+  public void setGroupRoleProvider(JpaGroupRoleProvider groupRoleProvider) {
+    this.groupRoleProvider = groupRoleProvider;
   }
 
   /**
@@ -159,10 +177,15 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    */
   @Override
   public List<Role> getRolesForUser(String userName) {
+    if (roleProvider != null) {
+      return roleProvider.getRolesForUser(userName);
+    }
+
     ArrayList<Role> roles = new ArrayList<Role>();
     User user = loadUser(userName);
-    if (user != null)
+    if (user != null) {
       roles.addAll(user.getRoles());
+    }
     return roles;
   }
 
@@ -201,8 +224,10 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    */
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
-    // The roles are returned from the JpaUserAndRoleProvider
-    return Collections.<Role> emptyList().iterator();
+    if (roleProvider == null) {
+      return Collections.<Role> emptyList().iterator();
+    }
+    return roleProvider.findRoles(query, target, offset, limit);
   }
 
   /**
@@ -248,6 +273,18 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   }
 
   /**
+   * Return the roles
+   *
+   * @return the roles
+   */
+  public Iterator<Role> getRoles() {
+    if (roleProvider == null) {
+      return Collections.<Role> emptyList().iterator();
+    }
+    return roleProvider.getRoles();
+  }
+
+  /**
    * {@inheritDoc}
    *
    * @see org.opencastproject.security.api.UserProvider#getOrganization()
@@ -290,6 +327,7 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       if (em != null)
         em.close();
     }
+    updateGroupMembership(user);
   }
 
   /**
@@ -321,6 +359,30 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       if (em != null)
         em.close();
     }
+    updateGroupMembership(user);
+  }
+
+  /**
+   * Updates a user's groups based on assigned roles
+   *
+   * @param user
+   *          the user for whom groups should be updated
+   * @throws NotFoundException
+   */
+  private void updateGroupMembership(JpaUserReference user) {
+
+    logger.debug("updateGroupMembership({}, roles={})", user.getUsername(), user.getRoles().size());
+
+    List<String> internalGroupRoles = new ArrayList<String>();
+
+    for (Role role : user.getRoles()) {
+      if (Role.Type.GROUP.equals(role.getType())
+          || (Role.Type.INTERNAL.equals(role.getType()) && role.getName().startsWith(Group.ROLE_PREFIX))) {
+        internalGroupRoles.add(role.getName());
+      }
+    }
+
+    groupRoleProvider.updateGroupMembershipFromRoles(user.getUsername(), user.getOrganization().getId(), internalGroupRoles, "ROLE_GROUP_AAI_");
   }
 
   /**
@@ -465,6 +527,10 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
   public void invalidate(String userName) {
     String orgId = securityService.getOrganization().getId();
     cache.invalidate(userName.concat(DELIMITER).concat(orgId));
+  }
+
+  public void setRoleProvider(RoleProvider roleProvider) {
+    this.roleProvider = (AAIRoleProvider) roleProvider;
   }
 
 }
