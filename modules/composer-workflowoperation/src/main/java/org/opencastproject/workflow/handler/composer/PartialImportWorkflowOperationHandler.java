@@ -1005,10 +1005,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
 
   private Attachment extractLastImageFrame(Track presentationTrack, List<MediaPackageElement> elementsToClean)
           throws EncoderException, MediaPackageException, WorkflowOperationException, NotFoundException {
-    VideoStream[] videoStreams = TrackSupport.byType(presentationTrack.getStreams(), VideoStream.class);
-
+    // Pass empty properties to the composer service, because the given profile requires none
     Map<String, String> properties = new HashMap<String, String>();
-    properties.put("frame", Long.toString(videoStreams[0].getFrameCount() - 1));
 
     Job extractImageJob = composerService.image(presentationTrack, IMAGE_FRAME_PROFILE, properties);
     if (!waitForStatus(extractImageJob).isSuccess())
