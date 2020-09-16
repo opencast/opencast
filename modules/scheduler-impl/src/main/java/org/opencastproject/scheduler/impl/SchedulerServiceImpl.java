@@ -1066,7 +1066,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   public List<MediaPackage> findConflictingEvents(String captureDeviceID, Date startDate, Date endDate)
       throws SchedulerException {
     try {
-      final Organization organization = new DefaultOrganization();
+      final Organization organization = securityService.getOrganization();
       final User user = SecurityUtil.createSystemUser(systemUserName, organization);
       List<MediaPackage> conflictingEvents = new ArrayList();
 
