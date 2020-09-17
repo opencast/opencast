@@ -407,7 +407,15 @@ public final class MetadataJson {
             .collect(Collectors.toList()));
   }
 
-  private static void fillCollectionFromJson(final DublinCoreMetadataCollection collection, final Object json) {
+  public static JSONArray extractSingleCollectionfromListJson(JSONArray json) {
+    if (json == null || json.size() != 1) {
+      throw new IllegalArgumentException("Input has to be a JSONArray with one entry");
+    }
+
+    return (JSONArray) ((JSONObject) json.get(0)).get(KEY_METADATA_FIELDS);
+  }
+
+  public static void fillCollectionFromJson(final DublinCoreMetadataCollection collection, final Object json) {
     if (!(json instanceof  JSONArray))
       throw new IllegalArgumentException("couldn't fill metadata collection, didn't get an array");
 
