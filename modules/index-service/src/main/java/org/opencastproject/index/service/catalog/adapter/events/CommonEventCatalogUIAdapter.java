@@ -32,8 +32,6 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,9 +80,9 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
     if (series.getValue() != null && series.isUpdated()) {
       if (isNotBlank(series.getValue().toString())) {
         mediaPackage.setSeries(series.getValue().toString());
-        final Opt<String> seriesTitle = getSeriesTitle(series);
+        final String seriesTitle = getSeriesTitle(series);
         if (seriesTitle != null)
-          mediaPackage.setSeriesTitle(seriesTitle.get());
+          mediaPackage.setSeriesTitle(seriesTitle);
       } else {
         mediaPackage.setSeries(null);
         mediaPackage.setSeriesTitle(null);
@@ -112,13 +110,13 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
     return storeFields;
   }
 
-  private Opt<String> getSeriesTitle(MetadataField series) {
+  private String getSeriesTitle(MetadataField series) {
     if (series.getCollection() == null)
       return null;
     for (Map.Entry<String, String> e : series.getCollection().entrySet()) {
-      if (e.getValue().equals(series.getValue().toString())) return Opt.some(e.getKey());
+      if (e.getValue().equals(series.getValue().toString())) return e.getKey();
     }
-    return Opt.none();
+    return null;
   }
 
 }
