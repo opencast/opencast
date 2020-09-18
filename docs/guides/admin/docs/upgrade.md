@@ -1,6 +1,6 @@
 Upgrading Opencast from 7.x to 8.x
 ==================================
-
+some nonsense
 This guide describes how to upgrade Opencast 7.x to 8.x. In case you need information about how to upgrade older
 versions of Opencast, please refer to [older release notes](https://docs.opencast.org).
 
