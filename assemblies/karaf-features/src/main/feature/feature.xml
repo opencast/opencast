@@ -697,4 +697,9 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-brightspace/${project.version}</bundle>
   </feature>
 
+  <feature name="opencast-canvas" version="${project.version}">
+    <feature start-level="80">opencast-core</feature>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-canvas/${project.version}</bundle>
+  </feature>
+
 </features>
