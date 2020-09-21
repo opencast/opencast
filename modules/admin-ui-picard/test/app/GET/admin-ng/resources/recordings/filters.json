@@ -1,0 +1,24 @@
+{
+  "Status":{
+    "translatable":true,
+    "options":{
+      "offline":"AGENTS.STATUS.OFFLINE",
+      "shutting_down":"AGENTS.STATUS.SHUTTING_DOWN",
+      "idle":"AGENTS.STATUS.IDLE",
+      "capturing":"AGENTS.STATUS.CAPTURING",
+      "uploading":"AGENTS.STATUS.UPLOADING",
+      "error":"AGENTS.STATUS.ERROR",
+      "unknown":"AGENTS.STATUS.UNKNOWN"
+    },
+    "label":"FILTERS.AGENTS.STATUS.LABEL",
+    "type":"select"
+  },
+  "Name":{
+    "translatable":false,
+    "options":{
+      "F300.1":"F300.1"
+    },
+    "label":"FILTERS.AGENTS.NAME.LABEL",
+    "type":"select"
+  }
+}

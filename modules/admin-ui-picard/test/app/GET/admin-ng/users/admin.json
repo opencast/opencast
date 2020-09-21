@@ -1,0 +1,14 @@
+{
+  "email": "admin@example.com",
+  "manageable": true,
+  "name": "•mock• SystemAdmin",
+  "provider": "local",
+  "roles": [
+    "•mock• ROLE_ADMIN",
+    "•mock• ROLE_USER",
+    "•mock• ROLE_OAUTH_USER",
+    "•mock• MATTERHORN_ADMINISTRATOR",
+    "•mock• ROLE_ANONYMOUS"
+  ],
+  "username": "admin"
+}

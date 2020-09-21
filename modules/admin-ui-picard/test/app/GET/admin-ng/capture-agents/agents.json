@@ -1,0 +1,51 @@
+{
+  "count": 4,
+  "limit": 0,
+  "offset": 0,
+  "results": [
+    {
+      "Name": "agent1",
+      "Status": "AGENTS.STATUS.IDLE",
+      "Update": "2014-05-26T15:37:02Z",
+      "inputs": [
+        {
+          "id": "video",
+          "value": "CAPTURE_AGENT.DEVICE.CAMERA"
+        },
+        {
+          "id": "desktop",
+          "value": "CAPTURE_AGENT.DEVICE.PRESENTATION"
+        }
+      ],
+      "roomId": 621
+    },
+    {
+      "Name": "agent2",
+      "Status": "AGENTS.STATUS.ERROR",
+      "Update": "2016-03-11T15:15:38Z",
+      "inputs": [],
+      "roomId": 622
+    },
+    {
+      "Name": "agent3",
+      "Status": "AGENTS.STATUS.UPLOADING",
+      "Update": "2014-05-26T15:37:02Z",
+      "inputs": [
+        {
+          "id": "video",
+          "value": "CAPTURE_AGENT.DEVICE.CAMERA"
+        },
+        {
+          "id": "desktop",
+          "value": "CAPTURE_AGENT.DEVICE.PRESENTATION"
+        },
+        {
+          "id": "video",
+          "value": "CAPTURE_AGENT.DEVICE.MICROPHONE"
+        }
+
+      ],
+      "roomId": -1
+    }],
+  "total": 4
+}

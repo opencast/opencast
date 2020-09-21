@@ -1,0 +1,12 @@
+{
+  "Name":{
+    "translatable":false,
+    "options":{
+      "authenticated":"authenticated",
+      "private":"private",
+      "public":"public"
+    },
+    "label":"FILTERS.ACLS.NAME.LABEL",
+    "type":"select"
+  }
+}

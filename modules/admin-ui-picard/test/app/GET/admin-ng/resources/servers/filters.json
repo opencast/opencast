@@ -1,0 +1,20 @@
+{
+  "hostname":{
+    "translatable":false,
+    "options":{
+      "http:\/\/localhost:8080":"http:\/\/localhost:8080"
+    },
+    "label":"FILTERS.SERVERS.HOSTNAME.LABEL",
+    "type":"select"
+  },
+  "status":{
+    "translatable":true,
+    "options":{
+      "offline":"FILTERS.SERVERS.STATUS.OFFLINE",
+      "online":"FILTERS.SERVERS.STATUS.ONLINE",
+      "maintenance":"FILTERS.SERVERS.STATUS.MAINTENANCE"
+    },
+    "label":"FILTERS.SERVERS.STATUS.LABEL",
+    "type":"select"
+  }
+}

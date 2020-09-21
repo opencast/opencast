@@ -1,0 +1,29 @@
+{
+    "count": 4,
+    "limit": 0,
+    "offset": 0,
+    "results": [
+        {
+            "Name": "agent4",
+            "Status": "AGENTS.STATUS.OK",
+            "Update": "2014-05-26T15:37:02Z",
+        },
+        {
+            "Name": "agent3",
+            "Status": "AGENTS.STATUS.OK",
+            "Update": "2014-05-26T15:37:02Z",
+        },
+        {
+            "Name": "agent2",
+            "Status": "AGENTS.STATUS.OK",
+            "Update": "2014-05-26T15:37:02Z",
+        },
+        {
+            "Name": "agent1",
+            "Status": "AGENTS.STATUS.OK",
+            "Update": "2014-05-26T15:37:02Z",
+        }
+    ],
+    "total": 4
+}
+

@@ -1,0 +1,25 @@
+{
+   "id":1,
+   "creationDate":"2014-12-17T14:45:31Z",
+   "default":true,
+   "usage":11,
+   "description":"Private Theme of Entwine",
+   "name":"Theme Entwine Private",
+   "creator":{
+  	"username":"admin",
+  	"email":"",
+  	"name":"Admin User"
+   },
+   "bumperActive":true,
+   "bumperFile":"uuid1",
+   "trailerActive":false,
+   "trailerFile":"uuid2",
+   "titleSlideActive":true,
+   "titleSlideBackground":"uuid23",
+   "licenseSlideActive":false,
+   "licenseSlideDescription":"250 words",
+   "licenseSlideBackground":"uuid4",
+   "watermarkActive":false,
+   "watermarkFile":"uuid3",
+   "watermarkPosition":"topRight"
+}

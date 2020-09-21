@@ -1,0 +1,11 @@
+{
+  "Creator":{
+    "translatable":false,
+    "options":{
+      "Opencast Project Administrator":"Opencast Project Administrator",
+      "System User":"System User"
+    },
+    "label":"FILTERS.THEMES.CREATOR.LABEL",
+    "type":"select"
+  }
+}

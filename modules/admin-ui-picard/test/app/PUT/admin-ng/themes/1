@@ -1,0 +1,20 @@
+{
+   "id":1,
+   "creationDate": "2014-12-17T14:45:31Z",
+   "default": true,
+   "description": "Private Theme of Entwine",
+   "name":"Updated Theme Entwine Private",
+   "creator":"Admin User",
+   "bumperActive":true,
+   "bumperFile":"uuid1",
+   "trailerActive":false,
+   "trailerFile":"uuid2",
+   "titleSlideActive":true,
+   "titleSlideBackground":"uuid23",
+   "licenseSlideActive":true,
+   "licenseSlideDescription":"250 words",
+   "licenseSlideBackground":"uuid4",
+   "watermarkActive":false,
+   "watermarkFile":"uuid3",
+   "watermarkPosition":"topRight"
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "eventId": "first",
+    "agentId": "agent1",
+    "agentConfiguration": {
+      "test": "true",
+      "clear": "all"
+    },
+    "presenters": [
+      "user1",
+      "user2"
+    ],
+    "start": "2017-01-27T10:00:37Z",
+    "end": "2017-01-27T10:10:37Z"
+  },
+  {
+    "eventId": "second",
+    "agentId": "agent1",
+    "agentConfiguration": {
+      "test": "true",
+      "clear": "all"
+    },
+    "presenters": [
+      "user1",
+      "user2"
+    ],
+    "start": "2017-01-28T10:00:37Z",
+    "end": "2017-01-28T10:10:37Z"
+  }
+]

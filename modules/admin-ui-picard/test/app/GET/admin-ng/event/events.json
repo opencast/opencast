@@ -1,0 +1,120 @@
+{
+  "total": 12000,
+  "offset": 0,
+  "count": 4,
+  "limit": 0,
+  "results": [
+    {
+      "end_date": "2018-08-31T12:55:00Z",
+      "agent_id": "F300.1",
+      "needs_cutting": false,
+      "source": "SCHEDULE",
+      "title": "Mock Event Planned",
+      "has_open_comments": false,
+      "has_preview": false,
+      "technical_presenters": [],
+      "has_comments": false,
+      "technical_end": "2018-08-31T12:55:00Z",
+      "presenters": [
+        "Peter Planner"
+      ],
+      "technical_start": "2018-08-31T12:00:00Z",
+      "location": "F300.1",
+      "managedAcl": "",
+      "workflow_state": "",
+      "id": "9cc888e8-cdf6-4974-bf18-effecdadfa94",
+      "start_date": "2018-08-31T12:00:00Z",
+      "event_status": "EVENTS.EVENTS.STATUS.SCHEDULED",
+      "displayable_status": "EVENTS.EVENTS.STATUS.SCHEDULED",
+      "publications": []
+    },
+    {
+      "end_date": "2018-08-10T11:22:51Z",
+      "agent_id": "",
+      "needs_cutting": false,
+      "source": "ARCHIVE",
+      "title": "Mock Event Processing",
+      "has_open_comments": false,
+      "has_preview": true,
+      "technical_presenters": [],
+      "has_comments": false,
+      "technical_end": "2018-08-10T11:22:51Z",
+      "presenters": [
+        "Peter Processor"
+      ],
+      "technical_start": "2018-08-10T11:22:51Z",
+      "location": "",
+      "managedAcl": "",
+      "workflow_state": "PROCESSING",
+      "id": "c3a4f68d-14d4-47e2-8981-8eb2fb300d3a",
+      "start_date": "2018-08-10T11:22:51Z",
+      "event_status": "EVENTS.EVENTS.STATUS.PROCESSING",
+      "displayable_status": "EVENTS.EVENTS.STATUS.PROCESSING",
+      "publications": []
+    },
+    {
+      "end_date": "2018-08-10T12:39:02Z",
+      "agent_id": "",
+      "needs_cutting": true,
+      "source": "ARCHIVE",
+      "title": "Mock Event Unpublished",
+      "has_open_comments": true,
+      "has_preview": true,
+      "technical_presenters": [],
+      "has_comments": true,
+      "technical_end": "2018-08-10T12:39:02Z",
+      "presenters": [
+        "Usain Unpublished"
+      ],
+      "technical_start": "2018-08-10T12:39:02Z",
+      "location": "",
+      "managedAcl": "",
+      "workflow_state": "SUCCEEDED",
+      "id": "1a2a040b-ef73-4323-93dd-052b86036b75",
+      "start_date": "2018-08-10T12:39:02Z",
+      "event_status": "EVENTS.EVENTS.STATUS.PROCESSED",
+      "displayable_status": "EVENTS.EVENTS.STATUS.PROCESSED",
+      "publications": []
+    },
+    {
+      "end_date": "2018-08-10T12:36:57Z",
+      "agent_id": "",
+      "needs_cutting": false,
+      "source": "ARCHIVE",
+      "title": "Mock Event Published",
+      "has_open_comments": false,
+      "has_preview": true,
+      "technical_presenters": [],
+      "has_comments": false,
+      "technical_end": "2018-08-10T12:36:57Z",
+      "presenters": [
+        "Pamela Published"
+      ],
+      "technical_start": "2018-08-10T12:36:57Z",
+      "location": "",
+      "managedAcl": "",
+      "workflow_state": "SUCCEEDED",
+      "id": "c990ea15-e5ed-4fcf-bc17-cb070091c343",
+      "start_date": "2018-08-10T12:36:57Z",
+      "event_status": "EVENTS.EVENTS.STATUS.PROCESSED",
+      "displayable_status": "EVENTS.EVENTS.STATUS.PROCESSED",
+      "publications": [
+        {
+          "name": "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE",
+          "id": "engage-player",
+          "url": "http://localhost:8080/engage/theodul/ui/core.html?id=c990ea15-e5ed-4fcf-bc17-cb070091c343"
+        },
+        {
+          "name": "EVENTS.EVENTS.DETAILS.PUBLICATIONS.CUSTOM",
+          "id": "api",
+          "url": "http://localhost:8080/api/events/c990ea15-e5ed-4fcf-bc17-cb070091c343"
+        },
+        {
+          "name": "EVENTS.EVENTS.DETAILS.PUBLICATIONS.CUSTOM",
+          "id": "oaipmh-default",
+          "url": "/oaipmh/default?verb=ListMetadataFormats&identifier=c990ea15-e5ed-4fcf-bc17-cb070091c343"
+        }
+      ]
+    }
+  ]
+}

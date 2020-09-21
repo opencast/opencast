@@ -1,0 +1,11 @@
+{
+  "Name":{
+    "translatable":false,
+    "options":{
+      "Opencast Project External Applications":"Opencast Project External Applications",
+      "Opencast Project System Administrators":"Opencast Project System Administrators"
+    },
+    "label":"FILTERS.USERS.NAME.LABEL",
+    "type":"select"
+  }
+}

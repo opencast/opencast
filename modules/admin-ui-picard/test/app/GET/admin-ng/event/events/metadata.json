@@ -1,0 +1,172 @@
+{
+  "runningWorkflow": [],
+  "metadata": [
+    {
+      "readOnly": false,
+      "id": "title",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+      "type": "text",
+      "differentValues": true,
+      "value": "",
+      "required": true
+    },
+    {
+      "readOnly": false,
+      "id": "subject",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
+      "type": "mixed_text",
+      "value": [],
+      "required": false
+    },
+    {
+      "readOnly": false,
+      "id": "description",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.DESCRIPTION",
+      "type": "text_long",
+      "value": "",
+      "required": false
+    },
+    {
+      "translatable": true,
+      "readOnly": false,
+      "id": "language",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.LANGUAGE",
+      "collection": {
+        "LANGUAGES.ITALIAN": "ita",
+        "LANGUAGES.FRENCH": "fra",
+        "LANGUAGES.ENGLISH": "eng",
+        "LANGUAGES.GERMAN": "deu"
+      },
+      "type": "text",
+      "value": "deu",
+      "required": false
+    },
+    {
+      "translatable": true,
+      "readOnly": false,
+      "id": "license",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.LICENSE",
+      "collection": {
+        "{\"label\":\"EVENTS.LICENSE.CC0\", \"order\":8, \"selectable\": true}": "CC0",
+        "{\"label\":\"EVENTS.LICENSE.CCBYND\", \"order\":4, \"selectable\": true}": "CC-BY-ND",
+        "{\"label\":\"EVENTS.LICENSE.CCBYNCND\", \"order\":7, \"selectable\": true}": "CC-BY-NC-ND",
+        "{\"label\":\"EVENTS.LICENSE.CCBYNCSA\", \"order\":6, \"selectable\": true}": "CC-BY-NC-SA",
+        "{\"label\":\"EVENTS.LICENSE.ALLRIGHTS\", \"order\":1, \"selectable\": true}": "ALLRIGHTS",
+        "{\"label\":\"EVENTS.LICENSE.CCBYSA\", \"order\":3, \"selectable\": true}": "CC-BY-SA",
+        "{\"label\":\"EVENTS.LICENSE.CCBYNC\", \"order\":5, \"selectable\": true}": "CC-BY-NC",
+        "{\"label\":\"EVENTS.LICENSE.CCBY\", \"order\":2, \"selectable\": true}": "CC-BY"
+      },
+      "type": "ordered_text",
+      "value": "",
+      "required": false
+    },
+    {
+      "translatable": false,
+      "readOnly": false,
+      "id": "isPartOf",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
+      "collection": {
+        "Test Series #1018 (2018, Test Series #1018 Organizer 1, Test Series #1018 Organizer 2)": "edcf1bc7-64a8-45d7-a19f-95354368aab5",
+        "Test Series #85 (2018, Test Series #85 Organizer 1, Test Series #85 Organizer 2)": "927746b5-7da2-4241-8bd8-dc53a119f0af",
+        "Test Series #2776 (2018, Test Series #2776 Organizer 1, Test Series #2776 Organizer 2)": "a410aa1d-1ccc-449a-a658-a5761f23acb2",
+        "Test Series #2987 (2018, Test Series #2987 Organizer 1, Test Series #2987 Organizer 2)": "3eef5d09-b88d-4695-867c-9fb7c4a26cb0",
+        "Test Series #1095 (2018, Test Series #1095 Organizer 1, Test Series #1095 Organizer 2)": "61e65f4f-b252-41aa-97dc-acbad73933d2"
+      },
+      "type": "text",
+      "value": "34b11b52-6f94-4e92-a516-79cdbec10029",
+      "required": true
+    },
+    {
+      "translatable": false,
+      "delimiter": ";",
+      "readOnly": false,
+      "id": "creator",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS",
+      "collection": {
+        "System User": "System User"
+      },
+      "type": "mixed_text",
+      "value": [],
+      "required": false
+    },
+    {
+      "translatable": false,
+      "delimiter": ";",
+      "readOnly": false,
+      "id": "contributor",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
+      "collection": {
+        "System User": "opencast_system_account"
+      },
+      "type": "mixed_text",
+      "value": [],
+      "required": false
+    },
+    {
+      "readOnly": false,
+      "id": "startDate",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+      "type": "date",
+      "differentValues": true,
+      "value": "",
+      "required": false
+    },
+    {
+      "readOnly": false,
+      "id": "duration",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.DURATION",
+      "type": "text",
+      "value": "00:00:00",
+      "required": false
+    },
+    {
+      "readOnly": false,
+      "id": "location",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.LOCATION",
+      "type": "text",
+      "value": "",
+      "required": false
+    },
+    {
+      "readOnly": false,
+      "id": "source",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.SOURCE",
+      "type": "text",
+      "value": "",
+      "required": false
+    },
+    {
+      "readOnly": true,
+      "id": "created",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.CREATED",
+      "type": "date",
+      "differentValues": true,
+      "value": "",
+      "required": false
+    },
+    {
+      "readOnly": true,
+      "id": "publisher",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.PUBLISHER",
+      "type": "text",
+      "differentValues": true,
+      "value": "",
+      "required": false
+    },
+    {
+      "readOnly": true,
+      "id": "identifier",
+      "label": "EVENTS.EVENTS.DETAILS.METADATA.ID",
+      "type": "text",
+      "differentValues": true,
+      "value": "",
+      "required": false
+    }
+  ],
+  "merged": [
+    "6ea5822c-3f19-41d6-b0a2-b484b789a66f",
+    "3171935d-a589-4a18-982f-2bc2ed2a2b84",
+    "17d2696b-0185-48df-a9fb-91f0ea1b7064"
+  ],
+  "notFound": []
+}

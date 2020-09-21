@@ -1,0 +1,109 @@
+{
+  "access": {
+    "acl":{
+      "ace":[
+        {
+          "action":"read",
+          "allow":true,
+          "role":"ROLE_USER_ADMIN"
+        },
+        {
+          "action":"write",
+          "allow":true,
+          "role":"ROLE_USER_ADMIN"
+        }
+      ]
+    }
+  },
+  "metadata": [
+    {
+      "flavor": "dublincore/episode",
+      "title": "EVENTS.EVENTS.DETAILS.CATALOG.EPISODE",
+      "fields": [
+        {
+          "$$hashKey": "026",
+          "collection": "users",
+          "id": "presenters",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.PRESENTER",
+          "presentableValue": [
+            "chuck.norris"
+          ],
+          "readOnly": false,
+          "required": "true",
+          "type": "text",
+          "value": [
+            "chuck.norris"
+          ]
+        },
+        {
+          "$$hashKey": "029",
+          "id": "subject",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
+          "presentableValue": [
+            "grunz"
+          ],
+          "readOnly": false,
+          "required": "true",
+          "type": "text",
+          "value": [
+            "grunz"
+          ]
+        },
+        {
+          "$$hashKey": "025",
+          "id": "title",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+          "presentableValue": "test",
+          "readOnly": false,
+          "required": "true",
+          "type": "text",
+          "value": "test"
+        }
+      ]
+    }
+  ],
+  "processing": {
+    "workflow": {
+      "description": "A workflow that puts mediapackages on hold",
+      "id": "default",
+      "operations": {
+        "operation": {
+          "description": "Hold for workflow selection",
+          "fail-on-error": "true",
+          "id": "append",
+          "max-attempts": "1",
+          "retry-strategy": "none"
+        }
+      },
+      "published": false,
+      "selection": {
+        "configuration": {
+        },
+        "id": "default"
+      },
+      "tags": ""
+    }
+  },
+  "source": {
+    "UPLOAD": {
+      "tracks": {
+        "audioOnly": {
+        }
+      },
+      "metadata": {
+        "start": {
+          "id": "startDate",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+          "value": "2018-01-29T10:19:37.943Z",
+          "type": "date",
+          "readOnly": false,
+          "required": false,
+          "tabindex": 7
+        }
+      }
+    },
+    "type": "UPLOAD"
+  },
+  "summary": {
+  }
+}

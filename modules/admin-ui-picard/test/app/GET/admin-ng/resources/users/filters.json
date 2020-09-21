@@ -1,0 +1,30 @@
+{
+  "Role":{
+    "translatable":false,
+    "options":{
+      "ROLE_OAUTH_USER":"ROLE_OAUTH_USER",
+      "ROLE_SUDO":"ROLE_SUDO",
+      "ROLE_ADMIN":"ROLE_ADMIN"
+    },
+    "label":"FILTERS.USERS.ROLE.LABEL",
+    "type":"select"
+  },
+  "Name":{
+    "translatable":false,
+    "options":{
+      "Opencast Project Administrator":"Opencast Project Administrator",
+      "System User":"System User"
+    },
+    "label":"FILTERS.USERS.NAME.LABEL",
+    "type":"select"
+  },
+  "Provider":{
+    "translatable":false,
+    "options":{
+      "system":"system",
+      "opencast":"opencast"
+    },
+    "label":"FILTERS.USERS.PROVIDER.LABEL",
+    "type":"select"
+  }
+}

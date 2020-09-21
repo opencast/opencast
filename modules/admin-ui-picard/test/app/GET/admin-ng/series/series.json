@@ -1,0 +1,37 @@
+{
+  "total": 2,
+  "offset": 0,
+  "count": 2,
+  "limit": 100,
+  "results": [
+    {
+      "license": "CC0",
+      "createdBy": "Opencast Project Administrator",
+      "organizers": [
+        "Ophelia Organizer"
+      ],
+      "language": "eng",
+      "id": "edf05757-34b1-42b8-8821-e3302b663972",
+      "contributors": [
+        "Carl Contributor",
+        "Carmen Contributor"
+      ],
+      "creation_date": "2018-08-13T07:20:41Z",
+      "title": "Mock Series"
+    },
+    {
+      "license": "CC-BY-ND",
+      "createdBy": "Opencast Project Administrator",
+      "organizers": [
+        "Olaf Organizer"
+      ],
+      "language": "nld",
+      "id": "73f9b7ab-1d8f-4c75-9da1-ceb06736d82c",
+      "contributors": [
+        "Carmen Contributor"
+      ],
+      "creation_date": "2018-08-13T08:58:18Z",
+      "title": "Mock Series 2"
+    }
+  ]
+}

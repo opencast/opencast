@@ -1,0 +1,72 @@
+{
+  "count": 4,
+  "limit": 100,
+  "offset": 0,
+  "results": [
+    {
+      "email": "mh_admin@example.com",
+      "manageable": false,
+      "name": "•mock• MH System Account",
+      "provider": "system",
+      "roles": [
+        {"name": "•mock• ROLE_ADMIN", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_OAUTH_USER", "type": "INTERNAL"},
+        {"name": "•mock• MATTERHORN_ADMINISTRATOR", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
+      ],
+      "username": "matterhorn_system_account"
+    },
+    {
+      "email": "admin@example.com",
+      "manageable": true,
+      "name": "•mock• SystemAdmin",
+      "provider": "local",
+      "roles": [
+        {"name": "•mock• ROLE_ADMIN", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_OAUTH_USER", "type": "INTERNAL"},
+        {"name": "•mock• MATTERHORN_ADMINISTRATOR", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
+      ],
+      "username": "admin"
+    },
+    {
+      "email": "pm.user.1@example.com",
+      "manageable": true,
+      "name": "•mock• PM User 1",
+      "provider": "system",
+      "personId": 1,
+      "roles": [
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
+      ],
+      "username": "pm.user.1"
+    },
+    {
+      "email": "pm.user.2@example.com",
+      "manageable": true,
+      "name": "•mock• PM User 2",
+      "provider": "system",
+      "personId": 2,
+      "roles": [
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
+      ],
+      "username": "pm.user.2"
+    },
+    {
+      "email": "pm.user.3@example.com",
+      "manageable": true,
+      "name": "•mock• PM User 3",
+      "provider": "system",
+      "personId": 3,
+      "roles": [
+        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
+        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
+      ],
+      "username": "pm.user.3"
+    }
+  ],
+  "total": 5
+}

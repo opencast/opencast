@@ -1,0 +1,9 @@
+{
+  "Status": "AGENTS.STATUS.ERROR",
+  "capabilities": [],
+  "configuration": [],
+  "inputs": [],
+  "Update": "2016-03-11T15:15:38Z",
+  "URL": "127.0.0.1",
+  "Name": "agent2"
+}

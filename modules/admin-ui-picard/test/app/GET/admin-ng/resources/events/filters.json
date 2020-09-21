@@ -1,0 +1,79 @@
+{
+  "presentersBibliographic":{
+    "translatable":false,
+    "options":{
+      "Opencast Project Administrator":"Opencast Project Administrator",
+      "System User":"System User"
+    },
+    "label":"FILTERS.EVENTS.PRESENTERS_BIBLIOGRAPHIC.LABEL",
+    "type":"select"
+  },
+  "presentersTechnical":{
+    "translatable":false,
+    "options":{
+      "opencast_system_account":"System User",
+      "admin":"Opencast Project Administrator"
+    },
+    "label":"FILTERS.EVENTS.PRESENTERS_TECHNICAL.LABEL",
+    "type":"select"
+  },
+  "agent":{
+    "translatable":false,
+    "label":"FILTERS.EVENTS.AGENT_ID.LABEL",
+    "type":"select"
+  },
+  "comments":{
+    "translatable":false,
+    "options":{
+      "RESOLVED":"RESOLVED",
+      "NONE":"NONE",
+      "OPEN":"OPEN"
+    },
+    "label":"FILTERS.EVENTS.COMMENTS.LABEL",
+    "type":"select"
+  },
+  "series":{
+    "translatable":false,
+    "options":{
+      "2c06b745-2c5b-4f9c-b856-ad0cd5b575ca":"< & >"
+    },
+    "label":"FILTERS.EVENTS.SERIES.LABEL",
+    "type":"select"
+  },
+  "location":{
+    "translatable":false,
+    "label":"FILTERS.EVENTS.LOCATION.LABEL",
+    "type":"select"
+  },
+  "contributors":{
+    "translatable":false,
+    "options":{
+      "Opencast Project Administrator":"Opencast Project Administrator",
+      "System User":"System User"
+    },
+    "label":"FILTERS.EVENTS.CONTRIBUTORS.LABEL",
+    "type":"select"
+  },
+  "startDate":{
+    "translatable":false,
+    "label":"FILTERS.EVENTS.START_DATE.LABEL",
+    "type":"period"
+  },
+  "status":{
+    "translatable":true,
+    "options":{
+      "EVENTS.EVENTS.STATUS.RECORDING_FAILURE":"EVENTS.EVENTS.STATUS.RECORDING_FAILURE",
+      "EVENTS.EVENTS.STATUS.PENDING":"EVENTS.EVENTS.STATUS.PENDING",
+      "EVENTS.EVENTS.STATUS.RECORDING":"EVENTS.EVENTS.STATUS.RECORDING",
+      "EVENTS.EVENTS.STATUS.PAUSED":"EVENTS.EVENTS.STATUS.PAUSED",
+      "EVENTS.EVENTS.STATUS.INGESTING":"EVENTS.EVENTS.STATUS.INGESTING",
+      "EVENTS.EVENTS.STATUS.PROCESSING_FAILURE":"EVENTS.EVENTS.STATUS.PROCESSING_FAILURE",
+      "EVENTS.EVENTS.STATUS.SCHEDULED":"EVENTS.EVENTS.STATUS.SCHEDULED",
+      "EVENTS.EVENTS.STATUS.PROCESSING":"EVENTS.EVENTS.STATUS.PROCESSING",
+      "EVENTS.EVENTS.STATUS.PROCESSING_CANCELED":"EVENTS.EVENTS.STATUS.PROCESSING_CANCELED",
+      "EVENTS.EVENTS.STATUS.PROCESSED":"EVENTS.EVENTS.STATUS.PROCESSED"
+    },
+    "label":"FILTERS.EVENTS.STATUS.LABEL",
+    "type":"select"
+  }
+}

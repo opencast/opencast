@@ -1,0 +1,48 @@
+{
+  "Status": "AGENTS.STATUS.UPLOADING",
+  "capabilities": [
+    {
+      "value": "defaults",
+      "key": "capture.device.names"
+    },
+    {
+      "value": "presenter/source",
+      "key": "capture.device.defaults.flavor"
+    },
+    {
+      "value": "Dual-track recorder",
+      "key": "capture.device.defaults.type"
+    }
+  ],
+  "configuration": [
+    {
+      "value": "Opencast Capture Agent",
+      "key": "capture.agent.name"
+    },
+    {
+      "value": "defaults",
+      "key": "capture.device.names"
+    },
+    {
+      "value": "presenter/source",
+      "key": "capture.device.defaults.flavor"
+    },
+    {
+      "value": "Dual-track recorder",
+      "key": "capture.device.defaults.type"
+    },
+    {
+      "value": "CET/CEST",
+      "key": "capture.device.timezone"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "defaults",
+      "value": "CAPTURE_AGENT.DEVICE.DEFAULTS"
+    }
+  ],
+  "Update": "2017-09-11T15:15:38Z",
+  "URL": "127.0.0.1",
+  "Name": "agent3"
+}
