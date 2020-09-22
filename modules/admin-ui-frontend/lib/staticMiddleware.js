@@ -74,6 +74,10 @@ module.exports = function (grunt, appPath) {
         serveStatic('./test/app/GET/sysinfo')
               ),
               connect().use(
+                '/oc-version',
+        serveStatic('./test/app/GET/oc-version')
+              ),
+              connect().use(
                 '/workflow',
         serveStatic('./test/app/GET/workflow')
               ),
