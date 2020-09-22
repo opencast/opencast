@@ -70,6 +70,44 @@
       </configurations>
     </operation>
 
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Prepare the work media                                            -->
+    <!--                                                                   -->
+    <!-- Ensure the work media is in a format that allows Opencast to do   -->
+    <!-- its work. This includes potentially rewriting the container and   -->
+    <!-- making sure that the audio track is part of each video track.     -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Prepare presenter track -->
+
+    <operation
+      id="prepare-av"
+      exception-handler-workflow="partial-error"
+      description="Preparing presenter (camera) audio and video work versions">
+      <configurations>
+        <configuration key="source-flavor">presenter/source</configuration>
+        <configuration key="target-flavor">presenter/prepared</configuration>
+        <configuration key="target-tags">archive</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Prepare presentation track -->
+
+    <operation
+      id="prepare-av"
+      exception-handler-workflow="partial-error"
+      description="Preparing presentation (screen) audio and video work version">
+      <configurations>
+        <configuration key="source-flavor">presentation/source</configuration>
+        <configuration key="target-flavor">presentation/prepared</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="target-tags">archive</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
+      </configurations>
+    </operation>
+
     <!-- encode video -->
 
     <operation
@@ -78,7 +116,7 @@
       exception-handler-workflow="partial-error"
       description="Encoding video">
       <configurations>
-        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="source-flavor">*/prepared</configuration>
         <configuration key="target-flavor">*/preview</configuration>
         <configuration key="target-tags">engage-download,engage-streaming,rss,atom</configuration>
         <configuration key="encoding-profile">fast.http</configuration>
@@ -220,7 +258,7 @@
       exception-handler-workflow="partial-error"
       description="Archiving">
       <configurations>
-        <configuration key="source-flavors">*/source,dublincore/*,security/*</configuration>
+        <configuration key="source-flavors">*/source,*/prepared,dublincore/*,security/*</configuration>
       </configurations>
     </operation>
 
