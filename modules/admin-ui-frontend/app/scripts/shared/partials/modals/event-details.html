@@ -342,7 +342,7 @@
                           data-width="'200px'"
                           ng-change="roomChanged(); saveScheduling()"
                           ng-model="source.device"
-                          ng-options="value.name for (id, value) in captureAgents | filter:currentAgentOrAccess"
+                          ng-options="ca.name for ca in captureAgents | filter:currentAgentOrAccess track by ca.id"
                           placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                           />
                 </td>

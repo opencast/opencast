@@ -186,7 +186,7 @@
                             data-width="'200px'"
                             ng-change="roomChanged();"
                             ng-model="scheduling[wd].location"
-                            ng-options="value.name for (id, value) in captureAgents | filter:hasAgentAccess"
+                            ng-options="ca.name for ca in captureAgents | filter:hasAgentAccess track by ca.id"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                             />
                   </td>
