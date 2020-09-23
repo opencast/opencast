@@ -220,6 +220,25 @@ Example:
     url.regex.archive=.*archive\/archive\/mediapackage\/.*\/.*\/.*
     url.regex.static=.*static.*
 
+Configuration of Wowza URL Signing
+----------------------------------
+
+To configure Wowza URL Signing, you should use the file configuration `org.opencastproject.security.urlsigning.provider.impl.WowzaUrlSigningProvider.cfg`.
+
+You can find three properties to configure:
+
+    # key.wowzatoken.secret=myTokenPrefix:mySharedSecret
+    # key.wowzatoken.url=http://localhost:8080
+    # key.wowzatoken.organization=mh_default_org
+
+Each property has the form: key.*keyId*.*propertyName*
+
+`key.wowzatoken.organization` is optional. By deafult is `*`, that means any organization.
+
+`key.wowzatoken.url` is mandatory. describes the url prefix that urls must have.
+
+`key.wowzatoken.secret=myTokenPrefix:mySharedSecret` is mandatory. It is a pair separated by `:`. First value, `myTokenPrefix`, means defines the prefix that all parameters of signed urls will have. Second value, `mySharedSecret`, defines a secret value, to secure urls.
+
 Testing
 -------
 

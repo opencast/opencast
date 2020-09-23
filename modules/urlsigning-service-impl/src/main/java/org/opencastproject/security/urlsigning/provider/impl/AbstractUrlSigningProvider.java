@@ -29,6 +29,7 @@ import org.opencastproject.urlsigning.common.ResourceStrategy;
 import org.opencastproject.urlsigning.utils.ResourceRequestUtil;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.osgi.service.cm.ConfigurationException;
@@ -56,10 +57,13 @@ import java.util.regex.Pattern;
 public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, ManagedService {
   /** The prefix for key configuration keys */
   public static final String KEY_PROPERTY_PREFIX = "key";
+
   /** The attribute name in the configuration file to define the encryption key. */
   public static final String SECRET = "secret";
+
   /** The attribute name in the configuration file to define the matching url. */
   public static final String URL = "url";
+
   /** The attribute name in the configuration file to define the organization owning the key. */
   public static final String ORGANIZATION = "organization";
 
@@ -85,7 +89,7 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
   /**
    * A class representing a URL signing key.
    */
-  private static class Key {
+  protected static class Key {
     private String id = null;
     private String secret = null;
     private String organizationId = ANY_ORGANIZATION;
@@ -94,13 +98,17 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
       this.id = id;
     }
 
+    public String getSecret() {
+        return secret;
+    }
+
     boolean supports(String organizationId) {
       return this.organizationId.equals(ANY_ORGANIZATION) || this.organizationId.equals(organizationId);
     }
   }
 
   /** A mapping of URL prefixes to keys used to lookup keys for a given URL. */
-  private TreeMap<String, Key> urls = new TreeMap<>();
+  protected TreeMap<String, Key> urls = new TreeMap<>();
 
   /** A regular expression pattern used to identify URLs that shall not be signed. Can be null */
   private Pattern exclusionPattern;
@@ -123,13 +131,13 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
   /**
    * Get{@link Key} for a given URL.
    * This method supports multi-tenancy in means of only returning keys that can be used by the current
-   * organization. In case the current organization cannot be determined, no key will be returned. 
+   * organization. In case the current organization cannot be determined, no key will be returned.
    *
    * @param baseUrl
    *          The URL that needs to be signed.
    * @return The {@link Key} if it is available.
    */
-  private Key getKey(String baseUrl) {
+  protected Key getKey(String baseUrl) {
     /* Optimization: Use TreeMap.floorEntry that can retrieve the greatest URL equal to or greater than 'baseUrl'
        in O(log(n)). As we are trying to find an URL that is a prefix of 'baseUrl', candidate.getKey() either is
        that URL (needs to be checked!) or there is no such URL. */
@@ -220,12 +228,17 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
     // Has the rewriter been fully configured
     if (urls.size() == 0) {
       getLogger().info("{} configured to not sign any urls.", toString());
+    } else {
+      getLogger().info("{} configured to sign urls.", toString());
     }
 
     this.urls = urls;
     this.exclusionPattern = exclusionPattern;
   }
 
+  /**
+   * @return true if the url is excluded, false otherwise
+   */
   private boolean isExcluded(String url) {
     boolean isExcluded = false;
     Pattern exclusionPattern = this.exclusionPattern;
@@ -236,6 +249,9 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
     return isExcluded;
   }
 
+  /**
+   * @return true if the url is valid, false otherwise
+   */
   private boolean isValid(String url) {
     try {
       new URI(url);
@@ -246,11 +262,17 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
     }
   }
 
+  /**
+   * @return true if the url is accepted (is valid, is not excluded and hat a key), false otherwise
+   */
   @Override
   public boolean accepts(String baseUrl) {
     return isValid(baseUrl) && !isExcluded(baseUrl) && getKey(baseUrl) != null;
   }
 
+  /**
+   * @return the policy signed
+   */
   @Override
   public String sign(Policy policy) throws UrlSigningException {
     String url = policy.getBaseUrl();
@@ -273,7 +295,7 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
       return new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), uri.getPath(),
               URLEncodedUtils.format(queryStringParameters, StandardCharsets.UTF_8), null).toString();
     } catch (Exception e) {
-      getLogger().error("Unable to create signed URL because", e);
+      getLogger().error("Unable to create signed URL because {}", ExceptionUtils.getStackTrace(e));
       throw new UrlSigningException(e);
     }
   }
