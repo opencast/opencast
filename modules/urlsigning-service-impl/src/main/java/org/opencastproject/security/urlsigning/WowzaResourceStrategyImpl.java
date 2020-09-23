@@ -46,6 +46,13 @@ public class WowzaResourceStrategyImpl implements ResourceStrategy {
   /** The possible delimiter between the server & application and the stream path and file. */
   private static final String WOWZA_STREAM_DELIMITER = "_definst_";
 
+  /**
+   * Transform a base URI into a proper stream location without the host and application name.
+   *
+   * @param baseUri
+   *          The full URI to the resource including the host and application.
+   * @return A safe standard RTMP or HTTP resource location.
+   */
   @Override
   public String getResource(String baseUri) {
     try {

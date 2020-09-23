@@ -37,7 +37,9 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
+
   private static final Logger logger = LoggerFactory.getLogger(WowzaUrlSigningProvider.class);
+
   /** The Wowza resource strategy to use to convert from the base url to a resource url. */
   private ResourceStrategy resourceStrategy = new WowzaResourceStrategyImpl();
 
@@ -56,6 +58,11 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
     return "Wowza URL Signing Provider";
   }
 
+  /**
+   * @param policy
+   *             the policy
+   * @return the signed url
+   */
   @Override
   public String sign(Policy policy) throws UrlSigningException {
     if (!accepts(policy.getBaseUrl())) {
@@ -80,7 +87,6 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
 
       policy.setResourceStrategy(getResourceStrategy());
 
-      //@todo Add error handling!
       if (!key.getSecret().contains(":")) {
           getLogger().error("Given key not valid. (prefix:secret)");
 
@@ -90,58 +96,126 @@ public class WowzaUrlSigningProvider extends AbstractUrlSigningProvider {
       String wowzaPrefix = wowzaKeyPair[0];
       String wowzaSecret = wowzaKeyPair[1];
 
-      return new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), uri.getPath(),
+      String newUri = new URI(uri.getScheme(), null, uri.getHost(), uri.getPort(), uri.getPath(),
               addSignutureToRequest(policy, wowzaPrefix, wowzaSecret), null).toString();
+      return newUri;
     } catch (Exception e) {
       getLogger().error("Unable to create signed URL because {}", ExceptionUtils.getStackTrace(e));
       throw new UrlSigningException(e);
     }
   }
 
-  //** https://www.wowza.com/docs/how-to-protect-streaming-using-securetoken-in-wowza-streaming-engine **//
-  @SuppressWarnings("unchecked")
+  /**
+   * @param policy
+   *             the policy
+   * @param encryptionKeyId
+   *             the encription key id
+   * @param encryptionKey
+   *             the encription key
+   * @return true
+   *             if the url is excluded, false otherwise
+   * @exception Exception
+   *             if something goes bad
+   */
   private String addSignutureToRequest(Policy policy, String encryptionKeyId, String encryptionKey) throws Exception  {
     final String startTime;
-    final String endTime = Long.toString(policy.getValidUntil().getMillis() / 1000);
+    final String endTime = Long.toString(policy.getValidUntil().getMillis());
+    final String ip;
+
+    String baseUrl = policy.getBaseUrl();
+    URI url = new URI(policy.getBaseUrl());
+    String resource = policy.getResource();
+    if (policy.getClientIpAddress().isPresent()) {
+      // The ip comes with a slash: /192.168.1.2
+      String ipAux = policy.getClientIpAddress().get().toString();
+      ipAux = ipAux.substring(1, ipAux.length());
+      ip = ipAux;
+    } else {
+      ip = "";
+    }
 
     if (policy.getValidFrom().isPresent()) {
-        startTime = Long.toString(policy.getValidFrom().get().getMillis() / 1000);
+      startTime = Long.toString(policy.getValidFrom().get().getMillis());
     } else {
-        startTime = "";
+      startTime = "";
     }
 
     String queryStringParameters = new String();
 
-    queryStringParameters +=  encryptionKeyId + "endtime=" + endTime;
+    queryStringParameters += encryptionKeyId + "endtime=" + endTime;
 
-    if (!"".equals(startTime))
-    {
-        queryStringParameters += "&" + encryptionKeyId + "starttime=" + startTime;
+    if (!"".equals(startTime)) {
+      queryStringParameters += "&" + encryptionKeyId + "starttime=" + startTime;
     }
 
-    queryStringParameters += "&" + encryptionKeyId + "hash=" + generateHash(policy, encryptionKeyId, encryptionKey, startTime, endTime);
+    if (url.getQuery() != null) {
+      String query = url.getQuery();
+      String[] params = query.split("&");
+      for (String param : params) {
+        if (param.contains("=")) {
+          String[] keyValue = param.split("=");
+          queryStringParameters += "&" + encryptionKeyId + keyValue[0] + "=" + keyValue[1];
+        }
+      }
+    }
+
+    queryStringParameters += "&" + encryptionKeyId + "hash=" + generateHash(baseUrl, resource, ip, encryptionKeyId, encryptionKey, startTime, endTime);
 
     return queryStringParameters;
   }
 
-  private String generateHash(Policy policy, String encryptionKeyId, String encryptionKey, String startTime, String endTime) throws Exception {
-    String urlToHash = policy.getResource();
+  /**
+   * @param baseUrl
+   *             the base url
+   * @param resource
+   *             the resource
+   * @param ip
+   *             the ip
+   * @param encryptionKeyId
+   *             the encription key id
+   * @param encryptionKey
+   *             the encription key
+   * @param startTime
+   *             start time
+   * @param endtime
+   *             end time
+   * @return the generated hashed
+   * @exception Exception
+   *             if something goes bad
+   */
+  private String generateHash(String baseUrl, String resource, String ip, String encryptionKeyId, String encryptionKey, String startTime, String endTime) throws Exception {
+    String urlToHash = resource + "?";
 
-    urlToHash += "?" + encryptionKey;
+    if (!"".equals(ip)) {
+      urlToHash += ip + "&" + encryptionKey;
+    } else {
+      urlToHash += encryptionKey;
+    }
 
     SortedMap<String, String> arguments = new TreeMap<>();
 
     arguments.put(encryptionKeyId + "endtime", endTime);
 
-    if (!"".equals(startTime))
-    {
+    if (!"".equals(startTime)) {
         arguments.put(encryptionKeyId + "starttime", startTime);
+    }
+
+    String query = new URI(baseUrl).getQuery();
+    if (null == query) {
+        query = "";
+    }
+
+    String[] params = query.split("&");
+    for (String param : params) {
+      if (param.contains("=")) {
+        String[] keyValue = param.split("=");
+        arguments.put(encryptionKeyId + keyValue[0], keyValue[1]);
+      }
     }
 
     for (Map.Entry<String,String> entry : arguments.entrySet()) {
         String value = entry.getValue();
         String key = entry.getKey();
-
         urlToHash += "&" + key + "=" + value;
     }
 
