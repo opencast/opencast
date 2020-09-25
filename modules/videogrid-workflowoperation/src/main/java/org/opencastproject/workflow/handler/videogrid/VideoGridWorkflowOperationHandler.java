@@ -550,8 +550,9 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     // Create ffmpeg command for each section
     List<List<String>> commands = new ArrayList<>();
     for (VideoEdlPart edl : videoEdl) {
-      if (edl.timeStamp == edl.nextTimeStamp) {
-        logger.info("Skipping 0-length edl entry");
+      // A too small duration will result in ffmpeg producing a faulty video, so avoid any section smaller than 50ms
+      if (edl.nextTimeStamp - edl.timeStamp < 50) {
+        logger.info("Skipping {}-length edl entry", edl.nextTimeStamp - edl.timeStamp);
         continue;
       }
       // Create command for section
