@@ -79,7 +79,6 @@ jobs:
         - echo "select version()" | mysql -u root
         - echo 'create database opencast;' | mysql -u root
       script:
-        - mysql -u root opencast < docs/scripts/ddl/mysql5.sql
         - sh docs/upgrade/.test.sh
 
     # Test database scripts with MySQL
@@ -92,7 +91,6 @@ jobs:
         - echo "select version()" | mysql -u root
         - echo 'create database opencast;' | mysql -u root
       script:
-        - mysql -u root opencast < docs/scripts/ddl/mysql5.sql
         - ./docs/upgrade/.test.sh
 
     # Make a build excluding the assembly steps
