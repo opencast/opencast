@@ -32,9 +32,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.metadata.api.MetadataValue;
 import org.opencastproject.metadata.api.StaticMetadataService;
-import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
@@ -42,7 +40,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -58,11 +55,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -310,9 +305,10 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
   }
 
   protected String getMetadataXml(MediaPackage mp, WorkflowOperationInstance operation) {
-
+    //get specified episode/series flavor
     String configuredEpisodeFlavor = StringUtils.trimToEmpty(operation.getConfiguration(EPISODE_FLAVOR));
     String configuredSeriesFlavor = StringUtils.trimToEmpty(operation.getConfiguration(SERIES_FLAVOR));
+
     //use dublincore/episode and dublincore/series metadata-catalogs as default
     if (("").equals(configuredEpisodeFlavor)) {
       configuredEpisodeFlavor = "dublincore/episode";
@@ -326,12 +322,11 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     String seriesFlavorType = configuredSeriesFlavor.split("/")[0];
     String seriesFlavorSubtype = configuredSeriesFlavor.split("/")[1];
 
-    //Get episode metadata-catalog (can there be more than one catalog of a certain flavor? How to differentiate?)
+    //Get episode metadata-catalog
     Catalog[] catalogs = mp.
             getCatalogs(new MediaPackageElementFlavor(episodeFlavorType, StringUtils.lowerCase(episodeFlavorSubtype)));
 
-    //currently (probably) only works with dublincore catalogs
-    //Any implementations for accessing extended metadata?
+   //load metadata-catalog
     DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(getWorkspace(), catalogs[0]);
     Map<EName, List<DublinCoreValue>> data = dc.getValues();
 
@@ -339,22 +334,18 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     StringBuilder xml = new StringBuilder();
     xml.append("<metadata xmlns:dcterms=\"http://purl.org/dc/terms/\">");
 
-    //TODO covert date/time format for dublincore standard fields
     for (Map.Entry<EName, List<DublinCoreValue>> entry : data.entrySet()) {
       String currentKey = entry.getKey().getLocalName();
-
       switch(currentKey) {
         case "creator": appendXml(xml, "creators", entry.getValue().get(0).getValue()); break;
         case "isPartOf":
           xml.append("<series>");
-
           //get series catalog
           Catalog[] seriesCatalogs = mp.
                   getCatalogs(new MediaPackageElementFlavor(seriesFlavorType, seriesFlavorSubtype));
           //get Series metadata
           DublinCoreCatalog dcSeries = DublinCoreUtil.loadDublinCore(getWorkspace(), seriesCatalogs[0]);
           Map<EName, List<DublinCoreValue>> seriesMetadata = dcSeries.getValues();
-
           //append series metadata
           for (Map.Entry<EName, List<DublinCoreValue>> seriesEntry : seriesMetadata.entrySet()) {
             String currentSeriesKey = seriesEntry.getKey().getLocalName();
@@ -369,65 +360,29 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
           }
           xml.append("</series>");
           break;
-
+        case "temporal":
+          String[] entries = entry.getValue().get(0).getValue().split(";");
+          entries[0] = entries[0].trim().substring(6);
+          entries[1] = entries[1].trim().substring(4);
+          if (entries[0] != null) {
+            appendXml(xml, "start", entries[0]);
+          }
+          if (entries[1] != null) {
+            appendXml(xml, "end", entries[1]);
+          }
+          break;
         case "created":
           String[] date = entry.getValue().get(0).getValue().split("\\.");
           appendXml(xml, "date", date[0]);
+          break;
+        case "contributer":
+          appendXml(xml, "contributers",  entry.getValue().get(0).getValue());
           break;
         default: appendXml(xml, entry.getKey().getLocalName(), entry.getValue().get(0).getValue());
       }
     }
     xml.append("</metadata>");
-
-
-    /*
-    StringBuilder xml = new StringBuilder();
-    xml.append("<metadata xmlns:dcterms=\"http://purl.org/dc/terms/\">");
-
-
-    for (String title : getFirstMetadataValue(metadata.getTitles()))
-      appendXml(xml, "title", title);
-    for (String description : getFirstMetadataValue(metadata.getDescription()))
-      appendXml(xml, "description", description);
-    for (String language : metadata.getLanguage())
-      appendXml(xml, "language", language);
-    for (Date created : metadata.getCreated())
-      appendXml(xml, "date", new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss").format(created));
-    for (Date[] period : metadata.getTemporalPeriod()) {
-      if (period[0] != null) {
-        appendXml(xml, "start", new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss").format(period[0]));
-      }
-      if (period[1] != null) {
-        appendXml(xml, "end", new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss").format(period[1]));
-      }
-    }
-    for (Date instant : metadata.getTemporalInstant())
-      appendXml(xml, "start", new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss").format(instant));
-    for (Long duration : metadata.getTemporalDuration())
-      appendXml(xml, "duration", new SimpleDateFormat("HH:mm:ss").format(new Date(duration)));
-    for (String license : getFirstMetadataValue(metadata.getLicenses()))
-      appendXml(xml, "license", license);
-    for (String isPartOf : metadata.getIsPartOf())
-      appendXml(xml, "series", isPartOf);
-    for (String contributors : getFirstMetadataValue(metadata.getContributors()))
-      appendXml(xml, "contributors", contributors);
-    for (String creators : getFirstMetadataValue(metadata.getCreators()))
-      appendXml(xml, "creators", creators);
-    for (String subjects : getFirstMetadataValue(metadata.getSubjects()))
-      appendXml(xml, "subjects", subjects);
-
-    xml.append("</metadata>");
-    */
-
     return xml.toString();
-  }
-
-  protected Option<String> getFirstMetadataValue(List<MetadataValue<String>> list) {
-    for (MetadataValue<String> data : list) {
-      if (DublinCore.LANGUAGE_UNDEFINED.equals(data.getLanguage()))
-        return Option.some(data.getValue());
-    }
-    return Option.<String> none();
   }
 
   protected void appendXml(StringBuilder xml, String name, String body) {
