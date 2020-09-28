@@ -4,6 +4,22 @@ Changelog
 Opencast 8
 ----------
 
+### Opencast 8.6
+
+*Released on August 5th, 2020*
+
+- [[#1744](https://github.com/opencast/opencast/pull/1744)] -
+  Fix for issue 1616: User keep write permission on ACL template selection
+- [[#1720](https://github.com/opencast/opencast/pull/1720)] -
+  Corrected title of user delete button
+- [[#1711](https://github.com/opencast/opencast/pull/1711)] -
+  Fixes issue #1642: Drop-down menu does not disappear
+- [[#1662](https://github.com/opencast/opencast/pull/1662)] -
+  Update Studio from 2020-05-20 to 2020-06-25
+- [[#1639](https://github.com/opencast/opencast/pull/1639)] -
+  Don't raise a NPE when the workflow creator was deleted
+
+
 ### Opencast 8.5
 
 *Released on June 15th, 2020*
