@@ -11,4 +11,4 @@ The configurations for the media module are done for each tenant. So the configu
     - Default: Opencast logo
 - `prop.player`
     - The player that should be use to play the videos.
-    - Default: Theodul player
+    - Default: Paella player

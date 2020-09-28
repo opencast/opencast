@@ -26,6 +26,25 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-lti-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-common</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
     </dependency>
@@ -148,7 +167,7 @@
               </execution>
 
               <execution>
-                <phase>compile</phase>
+                <phase>initialize</phase>
                 <id>i18n</id>
                 <goals>
                   <goal>npm</goal>
@@ -159,24 +178,16 @@
               </execution>
 
               <execution>
-                <phase>test</phase>
-                <id>eslint</id>
+                <phase>initialize</phase>
+                <id>npm run build</id>
                 <goals>
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>run eslint</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <phase>test</phase>
-                <id>html-linter</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>run html-linter</arguments>
+                  <arguments>run build</arguments>
+                  <environmentVariables>
+                    <EXTEND_ESLINT>true</EXTEND_ESLINT>
+                  </environmentVariables>
                 </configuration>
               </execution>
             </executions>
@@ -200,18 +211,10 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/classes/tools/lib/</outputDirectory>
+              <outputDirectory>${basedir}/target/classes/tools</outputDirectory>
               <resources>
                 <resource>
-                  <directory>node_modules/</directory>
-                  <includes>
-                    <include>font-awesome/css/font-awesome.min.css</include>
-                    <include>font-awesome/fonts/**</include>
-                    <include>jquery/dist/jquery.min.js</include>
-                    <include>mustache/mustache.min.js</include>
-                    <include>paginationjs/dist/pagination.css</include>
-                    <include>paginationjs/dist/pagination.min.js</include>
-                  </includes>
+                  <directory>build/</directory>
                   <filtering>false</filtering>
                 </resource>
               </resources>
@@ -240,7 +243,8 @@
               org.opencastproject.lti;version=${project.version}
             </Export-Package>
             <Service-Component>
-              OSGI-INF/opencast-lti.xml
+              OSGI-INF/opencast-lti.xml,
+              OSGI-INF/opencast-lti-service-gui-endpoint.xml
             </Service-Component>
             <Private-Package>tools.*</Private-Package>
             <Http-Alias>/ltitools</Http-Alias>

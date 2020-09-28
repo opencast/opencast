@@ -4,6 +4,74 @@ Changelog
 Opencast 8
 ----------
 
+### Opencast 8.5
+
+*Released on June 15th, 2020*
+
+- [[#1633](https://github.com/opencast/opencast/pull/1633)] -
+  Using ConcurrentHashMap for synchronizing LTI user login
+- [[#1622](https://github.com/opencast/opencast/pull/1622)] -
+  Fix LTI Without Persistence
+- [[#1620](https://github.com/opencast/opencast/pull/1620)] -
+  Fix Formatting
+- [[#1612](https://github.com/opencast/opencast/pull/1612)] -
+  Use normal file appender instead of RandomAccessFile for logging
+- [[#1611](https://github.com/opencast/opencast/pull/1611)] -
+  Fix LDAP Debug Logging
+- [[#1593](https://github.com/opencast/opencast/pull/1593)] -
+  Update paella to 6.2.7
+
+### Opencast 8.4
+
+*Released on May 22nd, 2020*
+
+- [[#1593](https://github.com/opencast/opencast/pull/1593)] -
+  Update player Paella to 6.2.7
+- [[#1592](https://github.com/opencast/opencast/pull/1592)] -
+  Update Studio version to 2020-05-20
+- [[#1581](https://github.com/opencast/opencast/pull/1581)] -
+  Update Studio to 2020-05-14
+- [[#1578](https://github.com/opencast/opencast/pull/1578)] -
+  Add cutting to the default Studio workflow
+- [[#1570](https://github.com/opencast/opencast/pull/1570)] -
+  Partial import muxing fix
+- [[#1568](https://github.com/opencast/opencast/pull/1568)] -
+  Fix URL to Wowza documentation
+- [[#1565](https://github.com/opencast/opencast/pull/1565)] -
+  Avoids normal user to delete series with events when option series.hasEvents.delete.allow is set to false
+- [[#1550](https://github.com/opencast/opencast/pull/1550)] -
+  Be more lenient towards service failures
+- [[#1543](https://github.com/opencast/opencast/pull/1543)] -
+  403 Logout Option
+- [[#1542](https://github.com/opencast/opencast/pull/1542)] -
+  Allow Admin UI Users to Access /
+- [[#1540](https://github.com/opencast/opencast/pull/1540)] -
+  Studio workflow should archive prepared versioned of videos
+- [[#1535](https://github.com/opencast/opencast/pull/1535)] -
+  Opencast server node name should be optional
+- [[#1534](https://github.com/opencast/opencast/pull/1534)] -
+  Admin UI systems filters should be accessible by the corresponding roles
+- [[#1532](https://github.com/opencast/opencast/pull/1532)] -
+  Fix race condition when creating or updating user references from LTI
+- [[#1516](https://github.com/opencast/opencast/pull/1516)] -
+  Studio encoding profile performance improved
+- [[#1515](https://github.com/opencast/opencast/pull/1515)] -
+  Studio-upload workflow should generate search preview images
+- [[#1509](https://github.com/opencast/opencast/pull/1509)] -
+  Allow anonymous access to static Studio files
+- [[#1508](https://github.com/opencast/opencast/pull/1508)] -
+  Fixed a typo in the Theodul Config
+- [[#1500](https://github.com/opencast/opencast/pull/1500)] -
+  Adding documentation on how to use the multiserver docker-compose
+- [[#1496](https://github.com/opencast/opencast/pull/1496)] -
+  Fix Adaptive Encoding
+- [[#1492](https://github.com/opencast/opencast/pull/1492)] -
+  Update Studio (for bug fixes) and add docs for Studio
+- [[#1488](https://github.com/opencast/opencast/pull/1488)] -
+  Make encoding profiles support odd widths/heights
+- [[#1479](https://github.com/opencast/opencast/pull/1479)] -
+  Fix Theodul quality selection
+
 ### Opencast 8.3
 
 *Released on March 26th, 2020*
@@ -500,6 +568,26 @@ Opencast 8
 
 Opencast 7
 ----------
+### Opencast 7.7
+
+*Released on April 27, 2020*
+
+- [[#1539](https://github.com/opencast/opencast/pull/1539)] -
+  Fix Karma Safari test in mac OS
+- [[#1474](https://github.com/opencast/opencast/pull/1474)] -
+  Add comment to document remember me keys
+- [[#1442](https://github.com/opencast/opencast/pull/1442)] -
+  Fix Remember-Me Authentication
+- [[#1427](https://github.com/opencast/opencast/pull/1427)] -
+  1281: Ignoring test which randomly fails in CI testing
+- [[#1426](https://github.com/opencast/opencast/pull/1426)] -
+  Autodetect browsers for admin ui tests, fix phantomJS openssl issue
+- [[#1425](https://github.com/opencast/opencast/pull/1425)] -
+  Don't duplicate publications
+- [[#1380](https://github.com/opencast/opencast/pull/1380)] -
+  In fast, don't cleanup acls (see other workflows)
+- [[#1379](https://github.com/opencast/opencast/pull/1379)] -
+  Use active, not episode acl in scheduler service
 
 ### Opencast 7.6
 

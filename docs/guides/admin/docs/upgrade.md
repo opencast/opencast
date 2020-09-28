@@ -15,6 +15,13 @@ versions of Opencast, please refer to [older release notes](https://docs.opencas
 9. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
 10. [Check passwords](#check-passwords)
 
+Configuration Changes
+---------------------
+
+1. The configuration file `etc/org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler.cfg`
+   (before Opencast 8.3) was moved to `etc/org.opencastproject.security.lti.LtiLaunchAuthenticationHandler.cfg`.
+2. The default for the configuration option `lti.create_jpa_user_reference` changed from `false` (Opencast 8.3) to `true`.
+
 Install and configure a standalone Elasticsearch node
 -----------------------------------------------------
 

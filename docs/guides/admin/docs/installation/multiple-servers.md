@@ -41,10 +41,8 @@ distributions.
 
 ### Two-Server Set-up
 
-This set-up is the minimum set-up recommended for productive use. It will separate the presentation layer from the
-administrative and working layer. This means that even if one server is under heavy load while videos are processed, it
-will not effect the distribution and users should still be able to watch videos smoothly. However, it might happen that
-under heavy load the handling of the administrative user interface gets a bit rough.
+This set-up is the minimum set-up recommended for productive use. It will separate the video processing from the rest of
+the system, making the user-facing parts of your system much less affected by heavier loads.
 
 
 ### Three (or more) Server Set-up
@@ -170,10 +168,6 @@ presentation, …).  This may either be this nodes IP address or preferable its 
 Set the location of the shared storage directory:
 
     org.opencastproject.storage.dir=/srv/opencast
-
-Define that the file repository shall access all files locally:
-
-    org.opencastproject.file.repo.url=${org.opencastproject.admin.ui.url}
 
 ### org.opencastproject.organization-mh\_default\_org.cfg
 

@@ -1036,7 +1036,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_HTML)
   @Path("ingest/{wdID}")
-  @RestQuery(name = "ingest", description = "Ingest the completed media package into the system, retrieving all URL-referenced files, and starting a specified workflow",
+  @RestQuery(name = "ingest",
+             description = "<p>Ingest the completed media package into the system and start a specified workflow.</p>"
+             + "<p>In addition to the documented form parameters, workflow parameters are accepted as well.</p>",
     pathParameters = {
       @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) },
     restParameters = {
@@ -1056,11 +1058,13 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_HTML)
   @Path("ingest")
-  @RestQuery(name = "ingest", description = "Ingest the completed media package into the system, retrieving all URL-referenced files",
+  @RestQuery(name = "ingest",
+             description = "<p>Ingest the completed media package into the system</p>"
+             + "<p>In addition to the documented form parameters, workflow parameters are accepted as well.</p>",
     restParameters = {
       @RestParameter(description = "The media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT),
       @RestParameter(description = "Workflow definition id", isRequired = false, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING),
-      @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) },
+      @RestParameter(description = "The workflow instance ID to associate this ingest with scheduled events.", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) },
     reponses = {
       @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },

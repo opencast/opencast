@@ -68,6 +68,35 @@ Your mediapackage has three audio tracks for english, spanish and german languag
 ```
 
 
+Selecting video canvas to use
+-----------------------------
+
+You can configure which canvas to use in order to render video files. This is usefull to enable 360 videos for example.
+
+Nowadays, paella has three video canvas you can use:
+
+- **video**: Default rectangular canvas (This is used by default if no other canvas defined)
+
+- **video360**: 360 videos
+
+- **video360theta**: 360 videos for Ricoh 360 cameras
+
+
+You need to configure the `videoCanvas` property. It is an object where the *key* is the flavor to configure
+and the *value* is the canvas to use.
+
+Example:
+
+```json
+{
+    "videoCanvas": {
+        "*/delivery+360": "video360",
+        "*/delivery+360Theta": "video360Theta"
+    }
+
+}
+```
+
 
 Examples
 --------
@@ -92,6 +121,10 @@ english and spanish languages
         "audioTag": {
             "audio_en/delivery" : "en",
             "audio_es/delivery" : "es"
+        },
+        "videoCanvas": {
+            "*/delivery+360": "video360",
+            "*/delivery+360Theta": "video360Theta"
         }
     }    
 }
@@ -124,6 +157,10 @@ and `presenter/delivery` and `presentation/delivery` on the other devices
             }
         ],
         "audioTag": {
+        },
+        "videoCanvas": {
+            "*/delivery+360": "video360",
+            "*/delivery+360Theta": "video360Theta"
         }
     }    
 }

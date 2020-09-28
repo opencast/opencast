@@ -82,7 +82,7 @@
       "USERS_GUIDE": "User's Guide",
       "DOCUMENTATION": "Documentation",
       "REST_DOC": "REST API Docs",
-      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
+      "HOTKEY_CHEAT_SHEET": "Keyboard shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "The access policy has been created",
@@ -102,7 +102,7 @@
       "GROUP_NOT_SAVED": "The group could not be saved",
       "GROUP_DELETED": "The group has been deleted",
       "GROUP_NOT_DELETED": "The group could not be deleted",
-      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
+      "ACCESS_DENIED": "Access denied. You are not allowed to view this page",
       "SERIES_ADDED": "The series has been created",
       "SERIES_NOT_SAVED": "The series could not be saved",
       "EVENTS_CREATED": "The event has been created",
@@ -113,9 +113,9 @@
       "EVENTS_NOT_UPDATED": "The event could not be saved",
       "EVENTS_NOT_UPDATED_ID": "The event {{ id }} could not be saved",
       "EVENTS_NOT_UPDATED_ALL": "None of the events could be saved",
-      "EVENTS_PROCESSING_ACTION_RETRY": "Processing resumed.",
+      "EVENTS_PROCESSING_ACTION_RETRY": "Processing being resumed...",
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Processing could not be resumed.",
-      "EVENTS_PROCESSING_ACTION_NONE": "Processing aborted.",
+      "EVENTS_PROCESSING_ACTION_NONE": "Processing being aborted...",
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "Processing could not be aborted.",
       "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
       "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
@@ -244,7 +244,7 @@
             "EVENTS": "events",
             "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Metadata",
-            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }} )"
          }
       },
       "EDIT_EVENTS_METADATA": {
@@ -549,7 +549,7 @@
             },
             "PUBLICATIONS": {
                "CAPTION": "Publications",
-               "NO_PUBLICATIONS_AVAILABLE": "This event has not been published",
+               "NO_PUBLICATIONS_AVAILABLE": "This event has no publications",
                "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
                "CUSTOM": "Custom",
@@ -654,7 +654,7 @@
                   }
                },
                "CATALOGS": {
-                  "TITLE": "Catalogs",
+                  "TITLE": "Catalogues",
                   "CAPTION": "Catalogs",
                   "ID": "Id",
                   "TYPE": "Type",
@@ -662,7 +662,7 @@
                   "TAGS": "Tags",
                   "LINK": "Link",
                   "DETAILS": {
-                     "TITLE": "Catalog details",
+                     "TITLE": "Catalogue details",
                      "CAPTION": "Catalog details",
                      "ID": "Id",
                      "TYPE": "Type",
@@ -689,7 +689,7 @@
                      "MIMETYPE": "Mimetype",
                      "URL": "URL",
                      "RECORDING_DATE": "Recording date",
-                     "FLAVOR": "Flavor",
+                     "FLAVOR": "Flavour",
                      "TAGS": "Tags",
                      "DURATION": "Duration",
                      "STREAM_AUDIO": "Audio streams",
@@ -820,7 +820,7 @@
                }
             },
             "SCHEDULING": {
-               "CAPTION": "Scheduling configuration",
+               "CAPTION": "Participation status",
                "PLACEHOLDER": {
                   "PRESENTERS": "Presenter(s)"
                }
@@ -983,7 +983,7 @@
                   "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
                },
                "TITLE": "Theme",
-               "LABEL": "Please select a theme",
+               "LABEL": "No theme",
                "EMPTY": "No theme found"
             },
             "SUMMARY": {
@@ -1073,7 +1073,7 @@
    },
    "RECORDINGS": {
       "NAVIGATION": {
-         "LOCATIONS": "Locations"
+         "LOCATIONS": "Location"
       },
       "ACTIONS": {
          "EXPORT": "Export",
@@ -1081,7 +1081,7 @@
       },
       "RECORDINGS": {
          "TABLE": {
-            "CAPTION": "Locations",
+            "CAPTION": "Location",
             "TITLE": "UID",
             "NAME": "Name",
             "LOCATION": "Location",
@@ -1338,22 +1338,22 @@
             },
             "BUMPER": {
                "CAPTION": "Bumper (begin)",
-               "DESCRIPTION": "Predefined video that is appended to the beginning of a recording.",
+               "DESCRIPTION": "Predefined video prepended to a recording.",
                "ACTIVE": "Active"
             },
             "TRAILER": {
                "CAPTION": "Bumper (end)",
-               "DESCRIPTION": "Predefined video that is appended to the end of a recording.",
+               "DESCRIPTION": "Predefined video appended to a recording.",
                "ACTIVE": "Active"
             },
             "TITLE": {
                "CAPTION": "Title",
-               "DESCRIPTION": "Predefined slide including descriptive metadata appended to the beginning or end of a recording.",
+               "DESCRIPTION": "Predefined slide (including descriptive metadata) affixed to the beginning or end of a recording.",
                "ACTIVE": "Active"
             },
             "WATERMARK": {
                "CAPTION": "Watermark",
-               "DESCRIPTION": "Semi-transparent image that is overlaid on every frame of the recording.",
+               "DESCRIPTION": "Semi-transparent image overlaid on every frame of the recording.",
                "ACTIVE": "Active"
             },
             "USAGE": {
@@ -1441,7 +1441,7 @@
                "BOTTOM_RIGHT": "Bottom right",
                "UPLOAD": "Upload",
                "POSITION": "Watermark position and preview",
-               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
+               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: . PNG, . GIF, . SVG, . WEBP",
                "UPLOAD_LABEL": "Upload image",
                "UPLOAD_BUTTON": "Upload"
             },
@@ -1620,7 +1620,7 @@
          "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
-            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
+            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one video track"
          },
          "TRACK": {
             "HEADER": "Track"

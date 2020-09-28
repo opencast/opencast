@@ -15,6 +15,50 @@
    "SELECT_NO_OPTION_SELECTED": "No option selected",
    "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES":          "Yes",
+   "COPY":         "Copy to clipboard",
+   "LTI": {
+     "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
+     "SERIES_TITLE": "Edit series",
+     "UPLOAD_TITLE": "Upload event",
+     "LOADING": "Loading…",
+     "NEW_UPLOAD": "Upload new event",
+     "EDIT_UPLOAD": "Edit event",
+     "CURRENT_JOBS": "Today's jobs",
+     "PRESENTER": "Presenter",
+     "PRESENTER_DESCRIPTION": "Video file for the presenter track",
+     "CAPTION": "Captions",
+     "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
+     "UPLOAD": "Upload",
+     "UPLOADING": "Uploading",
+     "EDIT": "Save",
+     "EDIT_TITLE": "Edit event",
+     "NO_OPTION_SELECTED": "No option selected",
+     "EDITING": "Saving…",
+     "SELECT_OPTION": "Select option",
+     "JOB_TITLE": "Title",
+     "JOB_STATUS": "Status",
+     "UPLOAD_SUCCESS": "Upload succeded!",
+     "UPLOAD_FAILURE": "Upload failed!",
+     "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
+     "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
+     "EDIT_FAILURE": "Edit failed!",
+     "COPY_SUCCESS": "Copying started…",
+     "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",
+     "GENERIC_ERROR": "Error: {{message}}",
+     "DELETION_SUCCESS": "Event deletion successful",
+     "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
+     "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
+     "DELETION_FAILURE": "Event deletion failed",
+     "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
+     "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
+     "CONFIRM_DELETION": "Really delete this event?",
+     "SERIES_TITLE": "View Series",
+     "COPY_TO_SERIES": "Copy event to series",
+     "SELECT_COPY_TARGET": "Select destination series",
+     "COPY": "Copy",
+     "COPY_IN_PROGRESS": "Starting copy…",
+     "CREATOR": "by {{creator}}"
+   },
    "LANGUAGES": {
       "ARABIC":"Arabic",
       "DANISH":"Danish",
@@ -49,6 +93,7 @@
       }
    },
    "CONFIRMATIONS": {
+     "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
      "CONTINUE_ACTION" : "Are you sure you want to continue?",
      "METADATA": {
        "NOTICE" : {
@@ -64,7 +109,10 @@
        "NAME" : "Name"
      },
      "ACTIONS": {
-       "CONFIRMATION" : "Confirmation"
+       "CONFIRMATION" : "Confirmation",
+       "SHOW" : {
+         "EMBEDDING_CODE" : "Embedding code"
+       }
      },
      "WARNINGS": {
        "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events.",
@@ -506,6 +554,7 @@
            "LOCATION": "Filter for this location",
            "DETAILS": "Open event details",
            "DELETE": "Delete event",
+           "EMBEDDING_CODE": "Embedding code",
            "EDITOR": "Open video Editor",
            "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
            "COMMENTS": "View comments",

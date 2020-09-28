@@ -484,4 +484,9 @@
     <Description>Windows Media Playlist</Description>
     <Extensions>wvx</Extensions>
   </MimeType>
+  <MimeType>
+    <Type>video/x-nut</Type>
+    <Description>NUT</Description>
+    <Extensions>nut</Extensions>
+  </MimeType>
 </MimeTypes>

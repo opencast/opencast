@@ -2,26 +2,31 @@
 
 ## Description
 
-The `ConfigurablePublishWorkflowOperationHandler` will distribute the given elements and create a publication element for
-it. By default it will retract all publications before publishing anew.
+The `ConfigurablePublishWorkflowOperationHandler` will distribute the given elements and create a publication element 
+for them. By default it will retract all published download elements before publishing anew.
 
 ## Parameter Table
 
-These are the keys that are configured through the workflow definition. At least one media package element must match
-the supplied `source-flavors` or `source-tags` or else the operation will not know what to publish. The `channel-id` and
-`url-pattern` are also mandatory.
+These are the keys that can be configured for this operation in the workflow definition. At least one media package 
+element must match the supplied `source-flavors` or `source-tags` (either for download or streaming or both) or else 
+the operation will not know what to publish. The `channel-id` and `url-pattern` are also mandatory.
 
-|Key                    |Description                                          |Example    |Default  |
-|-----------------------|-----------------------------------------------------|-----------|---------|
-|channel-id             |Id of the channel to publish to                      |`internal` |         |
-|mimetype               |Mime type of the published element                   |`text/html`|Type of last distributed element|
-|source-flavors         |Flavors of the media package elements to publish     |`*/trimmed`|         |
-|source-tags            |Tags of the media package elements to publish        |`engage`   |         |
-|url-pattern            |Pattern to create the URI for the published from     |`ftp://…/${event_id}`|  |
-|with-published-elements|Use the current contents of the media package instead of publishing elements to a channel|`true`|  |
-|check-availability     |Check if the media is reachable after publication    |`false`    |`false`  |
-|strategy               |Strategy for when there is already published material|`fail`     |`retract`|
-|mode                   |How elements are distributed                         |`mixed`    |`bulk`   |
+|Key                      |Description                                                |Example              |Default  |
+|-------------------------|-----------------------------------------------------------|---------------------|---------|
+|channel-id               |Id of the channel to publish to                            |`internal`           |         |
+|mimetype                 |Mime type of the published element                         |`text/html`          |Type of last distributed element|
+|download-source-flavors  |Flavors of the download media package elements to publish  |`*/trimmed`          |         |
+|download-source-tags     |Tags of the download media package elements to publish     |`engage-download`    |         |
+|streaming-source-flavors |Flavors of the streaming media package elements to publish |`*/trimmed`          |         |
+|streaming-source-tags    |Tags of the streaming media package elements to publish    |`engage-streaming`   |         |
+|url-pattern              |Pattern to create the URI for the published from           |`ftp://…/${event_id}`|         |
+|with-published-elements  |Use the current contents of the media package instead of publishing elements to a channel|`true`|  |
+|check-availability       |Check if the media is reachable after publication          |`false`              |`false`  |
+|strategy                 |Strategy for when there is already published material      |`fail`               |`retract`|
+|mode                     |How elements are distributed                               |`mixed`              |`bulk`   |
+|retract-streaming        |Whether to also retract streaming elements \*              |`true`               |`false`  |
+
+\* Enable if you have published streaming elements to this channel.
 
 ## Mode
 

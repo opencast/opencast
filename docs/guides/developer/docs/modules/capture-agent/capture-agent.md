@@ -7,8 +7,6 @@ following variables are used throughout this guide:
 - `$HOST` is your core's base URL
 - `$AGENT_NAME` is the agent's name
 - `$RECORDING_ID` is the recording's ID
-- `$SERIES_ID` is the UUID of the series
-- `$CUTOFF` is a Unix timestamp of the furthest point in time you want scheduling data for
 
 
 Basic Rules
@@ -42,6 +40,46 @@ to initiate the connections. Also note that ideally some operations may run in p
     - update ingest endpoints
     - ingest recording
     - set agent and recording state
+
+
+API Stability
+-------------
+
+The Opencast community takes care to avoid any disruptive modifications to the APIs described in this document to
+prevent hardware integrations from breaking since they are notorious hard to fix. This means that you can assume the API
+to be stable for a long time. The same is not true for other parts of the API and you should therefore avoid integrating
+hardware with other parts of Opencast's API
+
+
+Authentication
+--------------
+
+Opencast supports two types of authentication which can be used by capture agents:
+
+- (Backend) HTTP Digest authentication which is historically used for machine-to-machine communication.
+- (General) HTTP Basic (or session-based) authentication used for both front-end users and integrations.
+
+HTTP Digest authentication is the legacy option for capture agents. It is still widely used today and will continue to
+be supported. HTTP Digest is more complicated and has the disadvantage that users need to be specified separately in the
+backend. There is a global HTTP Digest user with admin privileges but specific capture agent users with limited
+privileges can be defined as well.
+
+When using HTTP Digest authentication, you need to send the additional header `X-Requested-Auth: Digest`:
+
+    curl --digest -u opencast_system_account:CHANGE_ME -H "X-Requested-Auth: Digest" \
+      https://develop.opencast.org/info/me.json
+
+HTTP Basic authentication can be used with users defined via web-interface or via any regular user provider. A request
+using HTTP Basic does not need to specify any additional headers:
+
+    curl -u admin:opencast https://develop.opencast.org/info/me.json
+
+Generally, we recommend using HTTP Basic authentication since it's easier for adopters to manage capture agent users via
+the admin interface and does not rely on hidden users while being less complicated at the same time.
+
+Whatever authentication method you choose to implement – maybe even both, allowing users to choose for themselves –
+please clearly specify what authentication you expect since users have to provide different types of users which can
+easily lead to usability problems if not clearly marked.
 
 
 Action Details
@@ -130,6 +168,40 @@ The calendar can be retrieved by sending an HTTP GET request to
     ${SCHEDULER-ENDPOINT}/calendars?agentid=<name>
 
 The format returned is iCal. The file contains all scheduled upcoming recordings the capture agent should handle.
+The output will look like this (base64 encoded parts are shortened):
+
+```ical
+BEGIN:VCALENDAR
+PRODID:Opencast Calendar File 0.5
+VERSION:2.0
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+DTSTAMP:20200616T124513Z
+DTSTART:20200616T124200Z
+DTEND:20200616T124400Z
+SUMMARY:Demo event
+UID:68b19d11-6aca-413e-b2b3-eda72eebc65a
+LAST-MODIFIED:20200616T124119Z
+DESCRIPTION:demo
+LOCATION:my_capture_agent_name
+ATTACH;FMTTYPE=application/xml;VALUE=BINARY;ENCODING=BASE64;X-APPLE-FILENAME=episode.xml:...
+ATTACH;FMTTYPE=application/text;VALUE=BINARY;ENCODING=BASE64;X-APPLE-FILENAME=org.opencastproject.capture.agent.properties:...
+END:VEVENT
+END:VCALENDAR
+```
+
+The iCal event contains start and end dates, all meta data catalogs for the event, the UID which is the `%RECORDING_ID`
+and which important when uploading media later on and additional capture agent properties which should be passed on.
+Note that most meta data like the dublin core catalogs can in most cases be ignored.
+
+In most cases, this means the data you are interested in per event are:
+
+- `DTSTART`: Date to starte the recording at
+- `DTEND`: Date at which to stop the recording
+- `UID`: Recording identifier used for updating the recording status and associating uploads with a scheduled event
+- `LOCATION`: This should always match your agent's name
+- `ATTACH;...FILENAME=org.opencastproject.capture.agent.properties`: Agent properties to pass on in case of workflow
+  properties
 
 Depending on the amount of recordings scheduled for the particular capture agent, this file may become very large. That
 is why there are two way of limiting the amount of necessary data to transfer and process:
@@ -157,7 +229,7 @@ to:
     state=capturing
     address=http(s)://<ca-web-ui>
 
-Additionally, set the recording state with an HTTP POST request to
+Additionally, set the recording state using the event's UID obtained from the schedule with an HTTP POST request to
 
     ${CAPTURE-ADMIN-ENDPOINT}/recordings/<recording_id>
 
@@ -203,6 +275,9 @@ these methods. The most commonly used are:
     - `${INGEST-ENDPOINT}/addDCCatalog`
     - `${INGEST-ENDPOINT}/addTrack`
     - `${INGEST-ENDPOINT}/ingest`
+
+Please make sure that the event's UID is passed on as `workfloeInstanceId` to the final call to `/ingest/ingest` to
+match the scheduled event to the media being uploaded.
 
 If possible, please follow these additional rules about recording files:
 

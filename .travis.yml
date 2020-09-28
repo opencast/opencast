@@ -1,7 +1,6 @@
 sudo: true
-
+dist: bionic
 language: java
-
 jdk: openjdk8
 
 # Cache maven artifacts, pip downloads and the node modules for markdownlint
@@ -63,7 +62,7 @@ jobs:
       env: name=documentation
       sudo: false
       language: python
-      python: "3.6"
+      python: "3.8"
       install:
         - pip install mkdocs markdown_inline_graphviz_extension mkdocs-windmill
         - (cd docs/guides && npm install)

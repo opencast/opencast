@@ -48,7 +48,7 @@ Required:
     jdk 8
     ffmpeg >= 3.2.4
     maven >= 3.1
-    python >= 2.6, < 3.0
+    python >= 2.6
 
 (If you are using [jEnv](http://www.jenv.be/) to set up your environment, make sure to [enable the maven plugin
 ](https://stackoverflow.com/a/37466252).)

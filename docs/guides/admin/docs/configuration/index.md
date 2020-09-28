@@ -19,6 +19,7 @@ General Configuration
 - [Message Broker Configuration](message-broker.md)
 - [Metadata Configuration](metadata.md)
 - [Multi Tenancy Configuration](multi.tenancy.md)
+- [Trim Segments Configuration](trim-segments.md)
 - [Authentication, Autorization and User Management](security.md)
     - [CAS Security Configuration](security.cas.md)
     - [LDAP Authentication and Authorization (without CAS)](security.ldap.md)

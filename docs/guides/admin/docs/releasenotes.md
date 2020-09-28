@@ -7,7 +7,7 @@ Important Changes
 - External Elasticsearch
 - MariaDB JDBC driver
 - Dropping compose operation in favor of encode
-
+- Default player is now Paella
 
 Features
 --------
@@ -19,6 +19,16 @@ Features
 
 Configuration changes
 ---------------------
+
+Release Schedule
+----------------
+
+| Date                        | Phase                   |
+|-----------------------------|-------------------------|
+| October 5th                 | Feature freeze          |
+| November 9th–November 15th  | Translation week        |
+| November 16th–November 29th | Public QA phase         |
+| December 15th               | Release of Opencast 9.0 |
 
 Release managers
 ----------------

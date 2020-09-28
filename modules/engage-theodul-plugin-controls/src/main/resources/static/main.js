@@ -461,7 +461,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         segments = Utils.repairSegmentLength(segments, duration, min_segment_duration);
 
         try {
-        // find timeline preview images in media package
+          // find timeline preview images in media package
           var attachments = Engage.model.get('mediaPackage').get('attachments');
 
           var timelinePreviewsRegex = /(timeline)+\S*(preview)+/i;
@@ -469,29 +469,37 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
             return $(attachments[index]).attr('type').search(timelinePreviewsRegex) !== -1;
           });
 
-          var timelinePreviewsProperties = timelinePreview.get(0).additionalProperties;
+          if (!timelinePreview.length) {
+            Engage.log('Controls: No timelinePreviews detected');
+            timelinePreviewsError = true;
 
-          timelinePreviewsProperties.property.forEach(function(property) {
-            switch (property.key) {
-            case 'imageCount':
-              timelinePreviewsImageCount = property.$;
-              break;
-            case 'imageSizeX':
-              timelinePreviewsImageSize[0] = property.$;
-              break;
-            case 'imageSizeY':
-              timelinePreviewsImageSize[1] = property.$;
-              break;
-            case 'resolutionX':
-              timelinePreviewsTileResolution[0] = property.$;
-              break;
-            case 'resolutionY':
-              timelinePreviewsTileResolution[1] = property.$;
-              break;
-            }
-          });
+          } else {
+            Engage.log('Controls: timelinePreviews loaded: ', timelinePreview);
 
-          timelinePreviewsError = false;
+            var timelinePreviewsProperties = timelinePreview.get(0).additionalProperties;
+
+            timelinePreviewsProperties.property.forEach(function(property) {
+              switch (property.key) {
+              case 'imageCount':
+                timelinePreviewsImageCount = property.$;
+                break;
+              case 'imageSizeX':
+                timelinePreviewsImageSize[0] = property.$;
+                break;
+              case 'imageSizeY':
+                timelinePreviewsImageSize[1] = property.$;
+                break;
+              case 'resolutionX':
+                timelinePreviewsTileResolution[0] = property.$;
+                break;
+              case 'resolutionY':
+                timelinePreviewsTileResolution[1] = property.$;
+                break;
+              }
+            });
+
+            timelinePreviewsError = false;
+          }
 
         } catch (e) {
           timelinePreviewsError = true;

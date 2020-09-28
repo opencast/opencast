@@ -27,7 +27,7 @@
     <cxf.version>3.3.3</cxf.version>
     <eclipselink.version>2.7.5</eclipselink.version>
     <functional.version>1.4.2</functional.version>
-    <guava.version>23.0</guava.version>
+    <guava.version>24.1.1-jre</guava.version>
     <httpcomponents-httpclient.version>4.5.10</httpcomponents-httpclient.version>
     <httpcomponents-httpcore.version>4.4.12</httpcomponents-httpcore.version>
     <jackson.version>2.10.0</jackson.version>
@@ -37,8 +37,8 @@
     <json-simple.version>1.1.1</json-simple.version>
     <karaf.version>4.2.7</karaf.version>
     <mina.version>2.1.3</mina.version>
-    <node.version>v10.16.0</node.version>
-    <npm.version>6.9.0</npm.version>
+    <node.version>v12.18.0</node.version>
+    <npm.version>6.14.4</npm.version>
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <querydsl.version>3.7.4</querydsl.version>
@@ -145,6 +145,9 @@
     <module>modules/live-schedule-impl</module>
     <module>modules/logging-workflowoperation</module>
     <module>modules/lti</module>
+    <module>modules/lti-service-remote</module>
+    <module>modules/lti-service-impl</module>
+    <module>modules/lti-service-api</module>
     <module>modules/mattermost-notification-workflowoperation</module>
     <module>modules/message-broker-api</module>
     <module>modules/message-broker-impl</module>
