@@ -97,13 +97,6 @@ import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Namespace;
-import org.jdom.filter.ElementFilter;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -111,17 +104,15 @@ import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -471,8 +462,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             continue;
 
           if (entry.getName().endsWith("manifest.xml") || entry.getName().endsWith("index.xml")) {
-            // Build the mediapackage
-            mp = loadMediaPackageFromManifest(new ZipEntryInputStream(zis, entry.getSize()));
+            // Build the media package
+            final InputStream is = new ZipEntryInputStream(zis, entry.getSize());
+            mp = MediaPackageParser.getFromXml(IOUtils.toString(is, StandardCharsets.UTF_8));
           } else {
             logger.info("Storing zip entry {}/{} in working file repository collection '{}'", job.getId(),
                     entry.getName(), wfrCollectionId);
@@ -564,50 +556,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         workingFileRepository.deleteFromCollection(Long.toString(job.getId()), filename, true);
       }
     }
-  }
-
-  private MediaPackage loadMediaPackageFromManifest(InputStream manifest)
-          throws IOException, MediaPackageException, IngestException {
-    // TODO: Uncomment the following line and remove the patch when the compatibility with pre-1.4 MediaPackages is
-    // discarded
-    //
-    // mp = builder.loadFromXml(manifestStream);
-    //
-    // =========================================================================================
-    // =================================== PATCH BEGIN =========================================
-    // =========================================================================================
-    ByteArrayOutputStream baos = null;
-    ByteArrayInputStream bais = null;
-    try {
-      Document domMP = new SAXBuilder().build(manifest);
-      String mpNSUri = "http://mediapackage.opencastproject.org";
-
-      Namespace oldNS = domMP.getRootElement().getNamespace();
-      Namespace newNS = Namespace.getNamespace(oldNS.getPrefix(), mpNSUri);
-
-      if (!newNS.equals(oldNS)) {
-        @SuppressWarnings("rawtypes")
-        Iterator it = domMP.getDescendants(new ElementFilter(oldNS));
-        while (it.hasNext()) {
-          Element elem = (Element) it.next();
-          elem.setNamespace(newNS);
-        }
-      }
-
-      baos = new ByteArrayOutputStream();
-      new XMLOutputter().output(domMP, baos);
-      bais = new ByteArrayInputStream(baos.toByteArray());
-      return MediaPackageParser.getFromXml(IOUtils.toString(bais, "UTF-8"));
-    } catch (JDOMException e) {
-      throw new IngestException("Error unmarshalling mediapackage", e);
-    } finally {
-      IOUtils.closeQuietly(bais);
-      IOUtils.closeQuietly(baos);
-      IOUtils.closeQuietly(manifest);
-    }
-    // =========================================================================================
-    // =================================== PATCH END ===========================================
-    // =========================================================================================
   }
 
   /**
