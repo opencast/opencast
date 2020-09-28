@@ -7,7 +7,7 @@
             value="org.opencastproject.index.service.resources.list.provider.BooleanListProvider"/>
 
   <service>
-    <provide interface="org.opencastproject.index.service.resources.list.api.ResourceListProvider"/>
+    <provide interface="org.opencastproject.list.api.ResourceListProvider"/>
   </service>
 
 </scr:component>

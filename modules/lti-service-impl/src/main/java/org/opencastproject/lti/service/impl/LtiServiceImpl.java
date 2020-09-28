@@ -27,7 +27,6 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SU
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -47,10 +46,11 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
-import org.opencastproject.metadata.dublincore.MetadataParsingException;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -75,6 +75,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -256,13 +259,14 @@ public class LtiServiceImpl implements LtiService, ManagedService {
         captionsMpe.setURI(captionsUri);
       }
 
+      JSONArray metadataJsonArray = (JSONArray) new JSONParser().parse(metadataJson);
+
       final EventCatalogUIAdapter adapter = getEventCatalogUIAdapter();
-      final MetadataCollection collection = adapter.getRawFields();
-      // What we _really_ want to call is MetadataCollection.fromJSON, but this needs some JSON destructuring first.
-      // We _could_ take a different JSON format, but that would mean we cannot easily call updateEventMetadata on
-      // the index service (see above). So either destructure it ourself here, or just call the MetadataList
-      // constructor.
-      new MetadataList(collection, metadataJson);
+      final DublinCoreMetadataCollection collection = adapter.getRawFields();
+
+      JSONArray collectionJsonArray = MetadataJson.extractSingleCollectionfromListJson(metadataJsonArray);
+      MetadataJson.fillCollectionFromJson(collection, collectionJsonArray);
+
       replaceField(collection, "isPartOf", seriesId);
       adapter.storeFields(mp, collection);
 
@@ -322,14 +326,14 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   private void updateEvent(final String eventId, final String metadata)
           throws NotFoundException, UnauthorizedException {
     final EventCatalogUIAdapter adapter = getEventCatalogUIAdapter();
-    final MetadataCollection collection = adapter.getRawFields();
+    final DublinCoreMetadataCollection collection = adapter.getRawFields();
     try {
       final MetadataList metadataList = new MetadataList();
       metadataList.add(adapter, collection);
-      metadataList.fromJSON(metadata);
+      MetadataJson.fillListFromJson(metadataList, (JSONArray) new JSONParser().parse(metadata));
       this.indexService.updateEventMetadata(eventId, metadataList, searchIndex);
       republishMetadata(eventId);
-    } catch (IndexServiceException | SearchIndexException | MetadataParsingException e) {
+    } catch (IndexServiceException | SearchIndexException | ParseException e) {
       throw new RuntimeException(e);
     }
   }
@@ -381,7 +385,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
     }
 
-    final MetadataCollection metadataCollection;
+    final DublinCoreMetadataCollection metadataCollection;
     try {
       metadataCollection = EventUtils.getEventMetadata(event, this.indexService.getCommonEventCatalogUIAdapter());
     } catch (final Exception e) {
@@ -392,16 +396,15 @@ public class LtiServiceImpl implements LtiService, ManagedService {
     final String wfState = event.getWorkflowState();
     if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState)))
       metadataList.setLocked(MetadataList.Locked.WORKFLOW_RUNNING);
-    return new SimpleSerializer().toJson(metadataList.toJSON());
+    return new SimpleSerializer().toJson(MetadataJson.listToJson(metadataList, true));
   }
 
   @Override
   public String getNewEventMetadata() {
     final MetadataList metadataList = this.indexService.getMetadataListWithAllEventCatalogUIAdapters();
-    final Opt<MetadataCollection> optMetadataByAdapter = metadataList
+    final DublinCoreMetadataCollection collection = metadataList
             .getMetadataByAdapter(this.indexService.getCommonEventCatalogUIAdapter());
-    if (optMetadataByAdapter.isSome()) {
-      final MetadataCollection collection = optMetadataByAdapter.get();
+    if (collection != null) {
       if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName()))
         collection.removeField(collection.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
       if (collection.getOutputFields().containsKey("duration"))
@@ -418,8 +421,8 @@ public class LtiServiceImpl implements LtiService, ManagedService {
         collection.removeField(collection.getOutputFields().get("location"));
 
       if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_PUBLISHER.getLocalName())) {
-        final MetadataField<String> publisher = (MetadataField<String>) collection.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
-        final Map<String, String> users = publisher.getCollection().getOr(new HashMap<>());
+        final MetadataField publisher = collection.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
+        final Map<String, String> users = publisher.getCollection() == null ? new HashMap<>() : publisher.getCollection();
         final String loggedInUser = this.securityService.getUser().getName();
         if (!users.containsKey(loggedInUser)) {
           users.put(loggedInUser, loggedInUser);
@@ -429,7 +432,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
 
       metadataList.add(this.indexService.getCommonEventCatalogUIAdapter(), collection);
     }
-    return new SimpleSerializer().toJson(metadataList.toJSON());
+    return new SimpleSerializer().toJson(MetadataJson.listToJson(metadataList, true));
   }
 
   @Override
@@ -442,10 +445,10 @@ public class LtiServiceImpl implements LtiService, ManagedService {
     }
   }
 
-  private void replaceField(MetadataCollection collection, String fieldName, String fieldValue) {
-    final MetadataField<?> field = collection.getOutputFields().get(fieldName);
+  private void replaceField(DublinCoreMetadataCollection collection, String fieldName, String fieldValue) {
+    final MetadataField field = collection.getOutputFields().get(fieldName);
     collection.removeField(field);
-    collection.addField(MetadataField.copyMetadataFieldWithValue(field, fieldValue));
+    collection.addField(MetadataJson.copyWithDifferentJsonValue(field, fieldValue));
   }
 
   @Override

@@ -41,7 +41,6 @@ import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
 import org.opencastproject.index.service.impl.index.series.Series;
@@ -55,8 +54,10 @@ import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -435,16 +436,15 @@ public class SeriesEndpoint {
     List<SeriesCatalogUIAdapter> catalogUIAdapters = indexService.getSeriesCatalogUIAdapters();
     catalogUIAdapters.remove(indexService.getCommonSeriesCatalogUIAdapter());
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
-      final Opt<MetadataCollection> optSeriesMetadata = adapter.getFields(id);
+      final Opt<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(id);
       if (optSeriesMetadata.isSome()) {
         metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), optSeriesMetadata.get());
       }
     }
-    MetadataCollection collection = getSeriesMetadata(optSeries.get());
+    DublinCoreMetadataCollection collection = getSeriesMetadata(optSeries.get());
     ExternalMetadataUtils.changeSubjectToSubjects(collection);
-    ExternalMetadataUtils.changeTypeOrderedTextToText(collection);
     metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
-    return ApiResponses.Json.ok(requestedVersion, metadataList.toJSON());
+    return ApiResponses.Json.ok(requestedVersion, MetadataJson.listToJson(metadataList, false));
   }
 
   private Response getMetadataByType(String id, String type, ApiVersion requestedVersion) throws SearchIndexException {
@@ -454,10 +454,9 @@ public class SeriesEndpoint {
 
     // Try the main catalog first as we load it from the index.
     if (typeMatchesSeriesCatalogUIAdapter(type, indexService.getCommonSeriesCatalogUIAdapter())) {
-      MetadataCollection collection = getSeriesMetadata(optSeries.get());
+      DublinCoreMetadataCollection collection = getSeriesMetadata(optSeries.get());
       ExternalMetadataUtils.changeSubjectToSubjects(collection);
-      ExternalMetadataUtils.changeTypeOrderedTextToText(collection);
-      return ApiResponses.Json.ok(requestedVersion, collection.toJSON());
+      return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false));
     }
 
     // Try the other catalogs
@@ -466,9 +465,9 @@ public class SeriesEndpoint {
 
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
       if (typeMatchesSeriesCatalogUIAdapter(type, adapter)) {
-        final Opt<MetadataCollection> optSeriesMetadata = adapter.getFields(id);
+        final Opt<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(id);
         if (optSeriesMetadata.isSome()) {
-          return ApiResponses.Json.ok(requestedVersion, optSeriesMetadata.get().toJSON());
+          return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(optSeriesMetadata.get(), true));
         }
       }
     }
@@ -480,76 +479,88 @@ public class SeriesEndpoint {
    *
    * @param series
    *          the source {@link Series}
-   * @return a {@link MetadataCollection} instance with all the series metadata
+   * @return a {@link DublinCoreMetadataCollection} instance with all the series metadata
    */
-  @SuppressWarnings("unchecked")
-  private MetadataCollection getSeriesMetadata(Series series) {
-    MetadataCollection metadata = indexService.getCommonSeriesCatalogUIAdapter().getRawFields();
+  private DublinCoreMetadataCollection getSeriesMetadata(Series series) {
+    DublinCoreMetadataCollection metadata = indexService.getCommonSeriesCatalogUIAdapter().getRawFields();
 
-    MetadataField<?> title = metadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
+    MetadataField title = metadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
     metadata.removeField(title);
-    MetadataField<String> newTitle = new MetadataField(title);
+    MetadataField newTitle = new MetadataField(title);
     newTitle.setValue(series.getTitle());
     metadata.addField(newTitle);
 
-    MetadataField<?> subject = metadata.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
+    MetadataField subject = metadata.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     metadata.removeField(subject);
-    MetadataField<String> newSubject = new MetadataField(subject);
+    MetadataField newSubject = new MetadataField(subject);
     newSubject.setValue(series.getSubject());
     metadata.addField(newSubject);
 
-    MetadataField<?> description = metadata.getOutputFields().get(DublinCore.PROPERTY_DESCRIPTION.getLocalName());
+    MetadataField description = metadata.getOutputFields().get(DublinCore.PROPERTY_DESCRIPTION.getLocalName());
     metadata.removeField(description);
-    MetadataField<String> newDescription = new MetadataField(description);
+    MetadataField newDescription = new MetadataField(description);
     newDescription.setValue(series.getDescription());
     metadata.addField(newDescription);
 
-    MetadataField<?> language = metadata.getOutputFields().get(DublinCore.PROPERTY_LANGUAGE.getLocalName());
+    MetadataField language = metadata.getOutputFields().get(DublinCore.PROPERTY_LANGUAGE.getLocalName());
     metadata.removeField(language);
-    MetadataField<String> newLanguage = new MetadataField(language);
+    MetadataField newLanguage = new MetadataField(language);
     newLanguage.setValue(series.getLanguage());
     metadata.addField(newLanguage);
 
-    MetadataField<?> rightsHolder = metadata.getOutputFields().get(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName());
+    MetadataField rightsHolder = metadata.getOutputFields().get(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName());
     metadata.removeField(rightsHolder);
-    MetadataField<String> newRightsHolder = new MetadataField(rightsHolder);
+    MetadataField newRightsHolder = new MetadataField(rightsHolder);
     newRightsHolder.setValue(series.getRightsHolder());
     metadata.addField(newRightsHolder);
 
-    MetadataField<?> license = metadata.getOutputFields().get(DublinCore.PROPERTY_LICENSE.getLocalName());
+    MetadataField license = metadata.getOutputFields().get(DublinCore.PROPERTY_LICENSE.getLocalName());
     metadata.removeField(license);
-    MetadataField<String> newLicense = new MetadataField(license);
+    MetadataField newLicense = new MetadataField(license);
     newLicense.setValue(series.getLicense());
     metadata.addField(newLicense);
 
-    MetadataField<?> organizers = metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
+    MetadataField organizers = metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
     metadata.removeField(organizers);
-    MetadataField<String> newOrganizers = new MetadataField(organizers);
+    MetadataField newOrganizers = new MetadataField(organizers);
     newOrganizers.setValue(StringUtils.join(series.getOrganizers(), ", "));
     metadata.addField(newOrganizers);
 
-    MetadataField<?> contributors = metadata.getOutputFields().get(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName());
+    MetadataField contributors = metadata.getOutputFields().get(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName());
     metadata.removeField(contributors);
-    MetadataField<String> newContributors = new MetadataField(contributors);
+    MetadataField newContributors = new MetadataField(contributors);
     newContributors.setValue(StringUtils.join(series.getContributors(), ", "));
     metadata.addField(newContributors);
 
-    MetadataField<?> publishers = metadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
+    MetadataField publishers = metadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
     metadata.removeField(publishers);
-    MetadataField<String> newPublishers = new MetadataField(publishers);
+    MetadataField newPublishers = new MetadataField(publishers);
     newPublishers.setValue(StringUtils.join(series.getPublishers(), ", "));
     metadata.addField(newPublishers);
 
     // Admin UI only field
-    MetadataField<String> createdBy = MetadataField.createTextMetadataField("createdBy", Opt.<String> none(),
-            "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY", true, false, Opt.<Boolean> none(),
-            Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(CREATED_BY_UI_ORDER), Opt.<String> none());
+    MetadataField createdBy = new MetadataField(
+            "createdBy",
+            null,
+            "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY",
+            true,
+            false,
+            null,
+            null,
+            MetadataField.Type.TEXT,
+            null,
+            null,
+            CREATED_BY_UI_ORDER,
+            null,
+            null,
+            null,
+            null);
     createdBy.setValue(series.getCreator());
     metadata.addField(createdBy);
 
-    MetadataField<?> uid = metadata.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName());
+    MetadataField uid = metadata.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName());
     metadata.removeField(uid);
-    MetadataField<String> newUID = new MetadataField(uid);
+    MetadataField newUID = new MetadataField(uid);
     newUID.setValue(series.getIdentifier());
     metadata.addField(newUID);
 
@@ -620,7 +631,7 @@ public class SeriesEndpoint {
                       metadataJSON));
     }
 
-    Opt<MetadataCollection> optCollection = Opt.none();
+    Opt<DublinCoreMetadataCollection> optCollection = Opt.none();
     SeriesCatalogUIAdapter adapter = null;
 
     Opt<Series> optSeries = indexService.getSeries(id, externalIndex);
@@ -646,7 +657,7 @@ public class SeriesEndpoint {
           optCollection = catalogUIAdapter.getFields(id);
           adapter = catalogUIAdapter;
         } else {
-          Opt<MetadataCollection> current = catalogUIAdapter.getFields(id);
+          Opt<DublinCoreMetadataCollection> current = catalogUIAdapter.getFields(id);
           if (current.isSome()) {
             metadataList.add(catalogUIAdapter, current.get());
           }
@@ -658,10 +669,10 @@ public class SeriesEndpoint {
       return ApiResponses.notFound("Cannot find a catalog with type '%s' for series with id '%s'.", type, id);
     }
 
-    MetadataCollection collection = optCollection.get();
+    DublinCoreMetadataCollection collection = optCollection.get();
 
     for (String key : updatedFields.keySet()) {
-      MetadataField<?> field = collection.getOutputFields().get(key);
+      MetadataField field = collection.getOutputFields().get(key);
       if (field == null) {
         return ApiResponses.notFound(
                 "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.", key,
@@ -672,7 +683,7 @@ public class SeriesEndpoint {
                 key, type));
       }
       collection.removeField(field);
-      collection.addField(MetadataField.copyMetadataFieldWithValue(field, updatedFields.get(key)));
+      collection.addField(MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
     }
 
     metadataList.add(adapter, collection);
@@ -797,7 +808,7 @@ public class SeriesEndpoint {
           throws UnauthorizedException, NotFoundException, SearchIndexException {
     try {
       MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, externalIndex);
-      return ApiResponses.Json.ok(acceptHeader, metadataList.toJSON());
+      return ApiResponses.Json.ok(acceptHeader, MetadataJson.listToJson(metadataList, true));
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to update series '{}' with metadata '{}'", seriesID, metadataJSON, e);
       return RestUtil.R.badRequest(e.getMessage());
@@ -895,7 +906,7 @@ public class SeriesEndpoint {
 
       MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
 
-      MetadataCollection collection = null;
+      DublinCoreMetadataCollection collection = null;
       SeriesCatalogUIAdapter adapter = null;
       for (SeriesCatalogUIAdapter seriesCatalogUIAdapter : indexService.getSeriesCatalogUIAdapters()) {
         MediaPackageElementFlavor catalogFlavor = MediaPackageElementFlavor
@@ -916,7 +927,7 @@ public class SeriesEndpoint {
         Map<String, String> fields = RequestUtils.getKeyValueMap(fieldsJson);
         for (String key : fields.keySet()) {
           if ("subjects".equals(key)) {
-            MetadataField<?> field = collection.getOutputFields().get("subject");
+            MetadataField field = collection.getOutputFields().get("subject");
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
@@ -925,19 +936,19 @@ public class SeriesEndpoint {
             try {
               JSONArray subjects = (JSONArray) parser.parse(fields.get(key));
               collection.addField(
-                      MetadataField.copyMetadataFieldWithValue(field, StringUtils.join(subjects.iterator(), ",")));
+                      MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjects.iterator(), ",")));
             } catch (ParseException e) {
               throw new IllegalArgumentException(
                       String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
             }
           } else {
-            MetadataField<?> field = collection.getOutputFields().get(key);
+            MetadataField field = collection.getOutputFields().get(key);
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
             }
             collection.removeField(field);
-            collection.addField(MetadataField.copyMetadataFieldWithValue(field, fields.get(key)));
+            collection.addField(MetadataJson.copyWithDifferentJsonValue(field, fields.get(key)));
           }
         }
       }

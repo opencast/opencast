@@ -114,6 +114,7 @@
     <bundle start-level="81">mvn:org.opencastproject/opencast-db/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dublincore/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-kernel/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-list-providers-service/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-message-broker-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-message-broker-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata-api/${project.version}</bundle>
