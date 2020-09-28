@@ -76,6 +76,11 @@ API changes
     - DELETE /workflow/definition/{id}
     - PUT /workflow/definition
 
+Additional Notes About 8.7
+--------------------------
+
+This maintenance release fixes severals bugs including problems with the scheduler in multitenant systems and adds missing ACLs after asset uploads. 
+
 Additional Notes About 8.6
 --------------------------
 
