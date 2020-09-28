@@ -569,12 +569,12 @@
 
   <bean id="passwordEncoder" class="org.opencastproject.kernel.security.CustomPasswordEncoder" />
 
-  <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
   <sec:authentication-manager alias="authenticationManager">
     <sec:authentication-provider ref="rememberMeAuthenticationProvider"/>
     <!-- Uncomment this if using Shibboleth authentication -->
     <!--sec:authentication-provider ref="preauthAuthProvider" /-->
     <sec:authentication-provider user-service-ref="userDetailsService">
+      <!-- The JPA user directory stores bcrypt hashed passwords, but can still decrypt legacy md5 hashes -->
       <sec:password-encoder ref="passwordEncoder">
         <!-- This salt is used only for decoding legacy MD5 hased passwords -->
         <sec:salt-source user-property="username" />
