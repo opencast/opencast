@@ -16,6 +16,12 @@
    "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES":          "Yes",
    "COPY":         "Copy to clipboard",
+   "UPDATE": {
+     "MINOR": "Minor update available",
+     "MAJOR": "Major update available",
+     "UNSUPPORTED": "Version {{ version }} no longer supported",
+     "UNDETERMINED": "Indeterminable version"
+   },
    "LTI": {
      "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
      "SERIES_TITLE": "Edit series",
