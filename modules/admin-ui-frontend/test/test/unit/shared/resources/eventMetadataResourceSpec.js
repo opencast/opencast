@@ -29,25 +29,11 @@ describe('Event Metadata API Resource', function () {
 
     describe('#save', function () {
         it('sends an array of metadata', function () {
-            var metadataRequest = {
+            var metadataRequest = [{
                 fields: [{ id: 'title' }, { id: 'series' }]
-            };
+            }];
             $httpBackend.expectPUT('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/metadata', function (data) {
                 var expected = [{ fields : [ { id : 'title' }, { id : 'series' } ] }];
-                expect(angular.fromJson($.deparam(data).metadata)).toEqual(expected);
-                return true;
-            }).respond(200);
-            EventMetadataResource.save({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a' }, metadataRequest);
-            $httpBackend.flush();
-        });
-
-        it('sends only the changed attribute if asked to', function () {
-            var metadataRequest = {
-                attributeToSend : 'series',
-                fields          : [{ id: 'title' }, { id: 'series' }]
-            };
-            $httpBackend.expectPUT('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/metadata', function (data) {
-                var expected = [{fields: [{'id': 'series'}]}];
                 expect(angular.fromJson($.deparam(data).metadata)).toEqual(expected);
                 return true;
             }).respond(200);

@@ -50,7 +50,7 @@ describe('Serie controller', function () {
     });
 
     it('fetches series metadata', function () {
-        expect($scope.metadata.entries).toBeUndefined();
+        expect($scope.metadata).toBeUndefined();
         $httpBackend.flush();
         expect($scope.metadata.entries).toBeDefined();
         expect($scope.metadata.entries.length).toBe(2);
@@ -118,9 +118,9 @@ describe('Serie controller', function () {
 
         it('saves the event record', function () {
             spyOn(SeriesMetadataResource, 'save');
-            $scope.metadataSave('test', function () {}, {fields: []});
+            $scope.metadataSave();
 
-            expect(SeriesMetadataResource.save).toHaveBeenCalledWith({id: '73f9b7ab-1d8f-4c75-9da1-ceb06736d82c'}, {fields: [], attributeToSend: 'test'}, jasmine.any(Function));
+            expect(SeriesMetadataResource.save).toHaveBeenCalled();
         });
 
         describe('catalog selection', function () {
@@ -133,22 +133,6 @@ describe('Serie controller', function () {
                 spyOn(callbackObject, 'callback');
                 spyOn(SeriesMetadataResource, 'save').and.callThrough();
                 $httpBackend.expectPUT('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/metadata').respond(200);
-            });
-
-            it('saves fields in the dublincore/series catalog', function () {
-                fn = $scope.getSaveFunction('dublincore/series'),
-                fn('title', callbackObject.callback);
-                $httpBackend.flush();
-                expect($scope.metadataSave).toHaveBeenCalledWith('title', callbackObject.callback, $scope.seriesCatalog);
-                expect(callbackObject.callback).toHaveBeenCalled();
-            });
-
-            it('saves fields in the dublincore/extended-1 catalog', function () {
-                fn = $scope.getSaveFunction('dublincore/extended-1'),
-                fn('title', callbackObject.callback);
-                $httpBackend.flush();
-                expect($scope.metadataSave).toHaveBeenCalledWith('title', callbackObject.callback, $scope.metadata.entries[0]);
-                expect(callbackObject.callback).toHaveBeenCalled();
             });
         });
     });

@@ -57,12 +57,15 @@ import static org.opencastproject.util.RestUtil.R.serverError;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
+import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
 import org.opencastproject.adminui.exception.JobEndpointException;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.adminui.util.BulkUpdateUtil;
 import org.opencastproject.adminui.util.QueryPreprocessor;
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
@@ -139,6 +142,7 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -156,6 +160,7 @@ import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 import com.entwinemedia.fn.data.json.Jsons.Functions;
+import com.google.gson.Gson;
 
 import net.fortuna.ical4j.model.property.RRule;
 
@@ -239,6 +244,12 @@ public abstract class AbstractEventEndpoint {
   //TODO Move to a constants file instead of declaring it at the top of multiple files?
   protected static final String WORKFLOW_DEFINITION_DEFAULT = "org.opencastproject.workflow.default.definition";
 
+  /** Workflow to execute when somebody changes metadata via the Admin UI for an event */
+  private static final String METADATA_CHANGE_WORKFLOW = "org.opencastproject.admin.ui.event-metadata-change-workflow";
+
+  /** Workflow configuration for the event change workflow */
+  private static final String METADATA_CHANGE_WORKFLOW_CONFIG = "org.opencastproject.admin.ui.event-metadata-change-workflow-config";
+
   /** The default time before a piece of signed content expires. 2 Hours. */
   protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
 
@@ -261,6 +272,8 @@ public abstract class AbstractEventEndpoint {
   public abstract AuthorizationService getAuthorizationService();
 
   public abstract SchedulerService getSchedulerService();
+
+  public abstract AssetManager getAssetManager();
 
   public abstract CaptureAgentStateService getCaptureAgentStateService();
 
@@ -288,6 +301,11 @@ public abstract class AbstractEventEndpoint {
   /** The system user name (default set here for unit tests) */
   private String systemUserName = "opencast_system_account";
 
+  private String metadataChangeWorkflow;
+
+  private Map<String, String> metadataChangeWorkflowConfig = Collections.emptyMap();
+
+
   /**
    * Activates REST service.
    *
@@ -302,6 +320,12 @@ public abstract class AbstractEventEndpoint {
         this.serverUrl = ccServerUrl;
 
       this.serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+
+      this.metadataChangeWorkflow = (String) cc.getProperties().get(METADATA_CHANGE_WORKFLOW);
+      final String changeWorkflowConfigJson = (String) cc.getProperties().get(METADATA_CHANGE_WORKFLOW_CONFIG);
+      if (changeWorkflowConfigJson != null) {
+        this.metadataChangeWorkflowConfig = new Gson().fromJson(changeWorkflowConfigJson, Map.class);
+      }
 
       String ccDefaultWorkflowDefinionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(WORKFLOW_DEFINITION_DEFAULT));
 
@@ -1452,11 +1476,27 @@ public abstract class AbstractEventEndpoint {
       return notFound("Cannot find an event with id '%s'.", id);
 
     try {
-      MetadataList metadataList = getIndexService().updateAllEventMetadata(id, metadataJSON, getIndex());
+      final MetadataList metadataList = getIndexService().updateAllEventMetadata(id, metadataJSON, getIndex());
+      if (this.metadataChangeWorkflow != null) {
+        final boolean workflowsStarted = startChangeWorkflow(Collections.singleton(id));
+        if (workflowsStarted) {
+          logger.error("couldn't start workflow {} on event {}", this.metadataChangeWorkflow, id);
+        } else {
+          metadataList.setLocked(Locked.WORKFLOW_RUNNING);
+        }
+      }
       return okJson(metadataList.toJSON());
     } catch (IllegalArgumentException e) {
       return badRequest(String.format("Event %s metadata can't be updated.: %s", id, e.getMessage()));
     }
+  }
+
+  private boolean startChangeWorkflow(final Collection<String> mpIds)
+    throws WorkflowDatabaseException, NotFoundException {
+    final WorkflowDefinition wfd = getWorkflowService().getWorkflowDefinitionById(this.metadataChangeWorkflow);
+    final Workflows workflows = new Workflows(getAssetManager(), getWorkflowService());
+    final ConfiguredWorkflow workflow = workflow(wfd, this.metadataChangeWorkflowConfig);
+    return workflows.applyWorkflowToLatestVersion(mpIds, workflow).toList().size() == mpIds.size();
   }
 
   @PUT
@@ -1500,7 +1540,7 @@ public abstract class AbstractEventEndpoint {
     // try to update each event
     Set<String> eventsNotFound = new HashSet<>();
     Set<String> eventsUpdated = new HashSet<>();
-    Set<String> eventsUpdateFailure = new HashSet();
+    Set<String> eventsUpdateFailure = new HashSet<>();
 
     for (String eventId : ids) {
       Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
@@ -1518,6 +1558,10 @@ public abstract class AbstractEventEndpoint {
       } catch (IllegalArgumentException e) {
         eventsUpdateFailure.add(eventId);
       }
+    }
+
+    if (this.metadataChangeWorkflow != null) {
+      startChangeWorkflow(eventsUpdated);
     }
 
     // errors occurred?

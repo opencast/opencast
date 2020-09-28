@@ -842,6 +842,7 @@
          },
          "METADATA": {
            "CAPTION": "Event details",
+           "SAVE": "Save",
            "TITLE":          "Title",
            "ID":            "UID",
            "SERIES":         "Series",
@@ -1057,7 +1058,8 @@
          }
        },
        "DETAILS": {
-          "HEADER": "Series details - {{resourceId}}",
+         "HEADER": "Series details - {{resourceId}}",
+         "WARNING_UNSAVED": "Warning, there are unsaved changes. Really quit?",
           "TABS": {
            "METADATA":    "Metadata",
            "EXTENDED_METADATA":    "Metadata II",
@@ -1096,6 +1098,7 @@
          },
          "METADATA": {
            "TITLE":          "Title",
+           "SAVE":          "Save",
            "ID":            "UID",
            "SERIES":         "Series",
            "PUBLISHERS":     "Publisher(s)",

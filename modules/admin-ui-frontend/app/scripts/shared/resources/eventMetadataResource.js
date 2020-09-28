@@ -38,22 +38,8 @@ angular.module('adminNg.resources')
         } catch (e) { }
         return { entries: metadata };
       },
-      transformRequest = function (catalog) {
-        if (catalog.attributeToSend) {
-          var catalogToSave = {
-            flavor: catalog.flavor,
-            title: catalog.title,
-            fields: []
-          };
-
-          angular.forEach(catalog.fields, function (entry) {
-            if (entry.id === catalog.attributeToSend) {
-              catalogToSave.fields.push(entry);
-            }
-          });
-          return $.param({metadata: angular.toJson([catalogToSave])});
-        }
-        return $.param({metadata: angular.toJson([catalog])});
+      transformRequest = function (catalogs) {
+        return $.param({metadata: angular.toJson(catalogs)});
       };
 
   return $resource('/admin-ng/event/:id/metadata:ext', { id: '@id' }, {

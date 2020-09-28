@@ -3,7 +3,7 @@
 
   <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-focus="enterEditMode()"
                                                           tabindex="{{ params.tabindex }}" focushere="{{ params.tabindex }}"></i>
-  <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
+  <i class="dirty fa fa-upload" ng-show="!editMode" ng-class="{ active: params.dirty }"></i>
 
   <textarea ng-keydown="keyDown($event)"
             ng-keyup="keyUp($event)"
