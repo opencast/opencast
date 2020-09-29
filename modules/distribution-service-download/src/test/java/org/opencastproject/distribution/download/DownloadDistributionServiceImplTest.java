@@ -52,6 +52,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
@@ -60,16 +61,24 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
 public class DownloadDistributionServiceImplTest {
 
+  private final Logger logger = LoggerFactory.getLogger(DownloadDistributionServiceImplTest.class);
   private DownloadDistributionServiceImpl service = null;
   private MediaPackage mp = null;
   private File distributionRoot = null;
@@ -142,6 +151,21 @@ public class DownloadDistributionServiceImplTest {
         return new File(mediaPackageRoot, file);
       }
     }).anyTimes();
+    final Capture<String> myId1 = Capture.newInstance();
+    final Capture<String> myId2 = Capture.newInstance();
+    final Capture<String> name = Capture.newInstance();
+    final Capture<InputStream> in = Capture.newInstance();
+    EasyMock.expect(workspace.put(EasyMock.capture(myId1), EasyMock.capture(myId2), EasyMock.capture(name),
+            EasyMock.capture(in))).andAnswer(new IAnswer<URI>() {
+              @Override
+              public URI answer() throws Throwable {
+                File file = new File(distributionRoot,
+                        myId1.getValue() + "/" + myId2.getValue() + "/" + name.getValue());
+                FileUtils.copyInputStreamToFile(in.getValue(), file);
+                return file.toURI();
+              }
+            }).anyTimes();
+
     EasyMock.replay(workspace);
 
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
@@ -302,4 +326,50 @@ public class DownloadDistributionServiceImplTest {
     Assert.assertTrue(service.getDistributionFile("oai-pmh", mp, mp.getElementById("notes")).isFile());
   }
 
+  @Test
+  public void testHLSDistribution() throws Exception {
+    // Distribute only some of the elements in the mediapackage
+    mp = MediaPackageParser
+            .getFromXml(IOUtils.toString(getClass().getResourceAsStream("/hls_1_var_mediapackage.xml"), "UTF-8"));
+
+    String[] elementIds = { "master", "variant", "segments", "dublincore", "mpeg7" };
+    Job job = service.distribute("engage-player", mp, Arrays.stream(elementIds).collect(Collectors.toSet()), true);
+    JobBarrier jobBarrier = new JobBarrier(null, serviceRegistry, 500, job);
+    jobBarrier.waitForJobs();
+
+    File mpDir = new File(distributionRoot,
+            PathSupport.path(defaultOrganization.getId(), "engage-player", mp.getIdentifier().toString()));
+    Assert.assertTrue(mpDir.exists());
+    File mediaDir = new File(mpDir, "master");
+    File variantDir = new File(mpDir, "variant");
+    File segmentDir = new File(mpDir, "segments");
+    File metadataDir = new File(mpDir, "dublincore");
+    File attachmentsDir = new File(mpDir, "mpeg7");
+    Assert.assertTrue(mediaDir.exists());
+    Assert.assertTrue(variantDir.exists());
+    Assert.assertTrue(segmentDir.exists());
+    Assert.assertTrue(metadataDir.exists());
+    Assert.assertTrue(attachmentsDir.exists());
+    Assert.assertTrue(new File(mediaDir, "master.m3u8").exists()); // the filenames are changed to reflect the element
+                                                                   // ID
+    Assert.assertTrue(new File(variantDir, "variant_0.m3u8").exists()); // the filenames are changed to reflect the
+                                                                      // element ID
+    Assert.assertTrue(new File(segmentDir, "file_0.mp4").exists()); // the filenames are changed to reflect the element
+                                                                    // ID
+    Assert.assertTrue(new File(metadataDir, "dublincore.xml").exists());
+    Assert.assertTrue(new File(attachmentsDir, "mpeg7.xml").exists()); // the filenames are changed to reflect the
+                                                                       // element ID
+    Assert.assertFalse(new File(metadataDir, "mpeg7.xml").exists());
+    Assert.assertFalse(new File(attachmentsDir, "attachment.txt").exists());
+    File playlist = new File(mediaDir, "master.m3u8");
+    logger.info("Reading playlist " + playlist);
+    Optional<String> hasRelativeLink = Files.lines(playlist.toPath())
+            .filter(s -> s.contains("../variant/variant_0.m3u8"))
+            .findFirst();
+    Assert.assertTrue(hasRelativeLink.isPresent());
+    playlist = new File(variantDir, "variant_0.m3u8");
+    hasRelativeLink = Files.lines(playlist.toPath()).filter(s -> s.contains("../segments/file_0.mp4"))
+            .findFirst();
+    Assert.assertTrue(hasRelativeLink.isPresent());
+  }
 }

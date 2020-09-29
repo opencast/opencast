@@ -95,7 +95,22 @@ presentation/work is to be encoded with "mp4-vga-medium,mp4-medium.http",
 and the target media are flavored as "presenter/delivery" and "presentation/delivery" respectively,
 and all targets are tagged with "engage" and "archive" in addition to the names of the encoding profiles used.
 
-It will look like the following.
+This workflow supports HLS adaptive streaming.
+By:
+1) Using only H.264/HENV encodings in the encoding profiles.
+2) Adding a special encoding profile "multiencode-hls" to the list of encoding profiles.
+HLS Playlists are generated as part of the encoding process. Each mp4 is a fragmented MP4.
+A variant playlist is created for each mp4 and a master playlist is used to access all the different qualities.
+
+To make sure that stream switching works as expected, state the bitrates explicitly for each of mp4 encoding profiles used.
+For advices on how to pick bitrates see:
+https://developer.apple.com/documentation/http_live_streaming/hls_authoring_specification_for_apple_devices
+
+For more details on HLS, see:
+https://tools.ietf.org/html/rfc8216
+https://tools.ietf.org/html/draft-pantos-http-live-streaming-23
+
+Without HLS, it will look like the following.
 
 ### Parameter Table
 
@@ -105,9 +120,12 @@ It will look like the following.
 |source-flavors     | presenter/work**;**presentation/work  | Which media should be encoded                               |
 |target-flavors     | */delivery                  | Specifies the flavor of the new media                               |
 |target-tags        | engage,archive              | Specifies the tags of the new media                                 |
-|encoding-profiles  | mp4-low.http,mp4-medium.http**;**mp4-vga-medium,mp4-medium.http | Profiles for each source flavor |
+|encoding-profiles  | mp4-low.http,mp4-med.http**;**mp4-vga-med,mp4-med.http | Profiles for each source flavor |
 |tag-with-profile   | true (default to false)     | target medium are tagged with coresponding encoding profile Id      |
 
+With HLS, encoding profiles will look like the following.
+
+|encoding-profiles  | mp4-low.http,mp4-med.http,multiencode-hls**;**mp4-vga-med,mp4-med.http,multiencode-hls | Profiles|
 
 
 ### Operation Example
@@ -128,6 +146,12 @@ The parameters in the table above will look like this as a workflow operation.
             <configuration key="tag-with-profile">true</configuration>
         </configurations>
     </operation>
+
+
+With HLS, encoding profiles line will look like:
+
+    <configuration key="encoding-profiles">
+        mp4-low.http,mp4-medium.http,multiencode-hls*;*mp4-vga-medium,mp4-medium.http,multiencode-hls</configuration>
 
 
 ## Note:(Very Important)
