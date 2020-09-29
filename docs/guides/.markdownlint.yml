@@ -18,7 +18,8 @@ MD007:
   indent: 4
 
 # prevent trailing spaces
-MD009: true
+MD009:
+  br_spaces: 0
 
 # prevent usage of tabs
 MD010: true
