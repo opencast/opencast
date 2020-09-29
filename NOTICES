@@ -1282,7 +1282,6 @@ ingest-service-impl
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.cxf                         cxf-rt-frontend-jaxrs                            Apache License, Version 2.0
   org.apache.felix                       org.apache.felix.fileinstall                     Apache License, Version 2.0
-  org.jdom                               com.springsource.org.jdom                        -
   org.slf4j                              slf4j-api                                        MIT License
 
 
@@ -1530,7 +1529,6 @@ publication-service-youtube-v3
   javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
   org.apache.felix                       org.apache.felix.http.bundle                     -
   org.codehaus.jackson                   jackson-mapper-asl                               The Apache Software License, Version 2.0
-  org.jdom                               com.springsource.org.jdom                        -
   org.sakaiproject.nakamura              javax.activation-mail                            -
   org.slf4j                              slf4j-api                                        MIT License
 
@@ -1631,7 +1629,7 @@ search-service-impl
   org.apache.solr                        solr-solrj                                       Apache 2
   org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
-  org.jdom                               com.springsource.org.jdom                        -
+  org.jdom                               jdom2                                            -
   org.slf4j                              slf4j-api                                        MIT License
 
 

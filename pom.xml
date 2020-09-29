@@ -1169,11 +1169,6 @@
         <version>1.6</version>
         <scope>test</scope>
       </dependency>
-      <dependency>
-        <groupId>org.jdom</groupId>
-        <artifactId>com.springsource.org.jdom</artifactId>
-        <version>1.1.0</version>
-      </dependency>
       <!-- logging -->
       <dependency>
         <groupId>org.slf4j</groupId>
