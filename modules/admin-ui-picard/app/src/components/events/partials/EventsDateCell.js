@@ -22,7 +22,7 @@ const EventsDateCell = ({ row, filterMap, setStartDate, setEndDate, editFilterVa
         if (!!filter) {
             // Todo: Currently only startDate considered
             editFilterValue(filter.name, date);
-            loadEvents(true, false);
+            loadEvents();
             loadEventsIntoTable();
         }
 
@@ -48,7 +48,7 @@ const mapDispatchToProps = dispatch => ({
     setStartDate: date => dispatch(setStartDate(date)),
     setEndDate: date => dispatch(setEndDate(date)),
     editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value)),
-    loadEvents: (filter, sort) => dispatch(fetchEvents(filter, sort)),
+    loadEvents: () => dispatch(fetchEvents()),
     loadEventsIntoTable: () => dispatch(loadEventsIntoTable())
 });
 

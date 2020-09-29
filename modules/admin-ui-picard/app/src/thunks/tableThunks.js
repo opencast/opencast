@@ -61,7 +61,8 @@ export const loadEventsIntoTable = () => async (dispatch, getState) => {
         rows: resource,
         columns: columns,
         multiSelect: multiSelect,
-        pages: pages
+        pages: pages,
+        sortBy: "title"
     };
     dispatch(loadResourceIntoTable(tableData));
 
@@ -104,7 +105,8 @@ export const loadSeriesIntoTable = () => (dispatch, getState) => {
         rows: resource,
         columns: columns,
         multiSelect: multiSelect,
-        pages: pages
+        pages: pages,
+        sortBy: "title"
     };
     dispatch(loadResourceIntoTable(tableData));
 };

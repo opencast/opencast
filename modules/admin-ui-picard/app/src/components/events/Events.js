@@ -19,22 +19,23 @@ import {fetchSeries} from "../../thunks/seriesThunks";
 const containerAction = React.createRef();
 
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
-                        loadingSeriesIntoTable}) => {
+                        loadingSeriesIntoTable, isLoadingEvents}) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
 
-    const loadEvents = () => {
+    const loadEvents = async () => {
         // Fetching events from server
-        loadingEvents(false, false);
+        await loadingEvents();
 
         // Load events into table
         loadingEventsIntoTable();
+
     };
 
     const loadSeries = () => {
         //fetching series from server
-        loadingSeries(false, false);
+        loadingSeries();
 
         //load series into table
         loadingSeriesIntoTable();
@@ -43,7 +44,9 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     useEffect(() => {
 
         // Load events on mount
-        loadEvents();
+        loadEvents().then(r => console.log(r));
+
+        console.log("Use effect fired");
 
         // Function for handling clicks outside of an open dropdown menu
         const handleClickOutside = e => {
@@ -164,14 +167,15 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
 const mapStateToProps = state => ({
     events: getEvents(state),
-    showActions: isShowActions(state)
+    showActions: isShowActions(state),
+    isLoadingEvents: state.events.isLoading
 });
 
 
 const mapDispatchToProps = dispatch => ({
-    loadingEvents: (filter, sort) => dispatch(fetchEvents(filter, sort)),
+    loadingEvents: () => dispatch(fetchEvents()),
     loadingEventsIntoTable: () => dispatch(loadEventsIntoTable()),
-    loadingSeries: (filter, sort) => dispatch(fetchSeries(filter, sort)),
+    loadingSeries: () => dispatch(fetchSeries()),
     loadingSeriesIntoTable: () => dispatch(loadSeriesIntoTable()),
 });
 

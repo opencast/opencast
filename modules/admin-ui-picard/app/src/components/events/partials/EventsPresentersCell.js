@@ -17,7 +17,7 @@ const EventsPresentersCell = ({ row, filterMap, editFilterValue, loadEvents, loa
         let filter = filterMap.find(({ name }) => name === "presentersBibliographic");
         if (!!filter) {
             editFilterValue(filter.name, presenter);
-            loadEvents(true, false);
+            loadEvents();
             loadEventsIntoTable();
         }
     };
@@ -43,7 +43,7 @@ const mapStateToProps = state => ({
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value)),
-    loadEvents: (filter, sort) => dispatch(fetchEvents(filter, sort)),
+    loadEvents: () => dispatch(fetchEvents()),
     loadEventsIntoTable: () => dispatch(loadEventsIntoTable())
 });
 

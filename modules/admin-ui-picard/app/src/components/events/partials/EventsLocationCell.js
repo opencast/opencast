@@ -17,7 +17,7 @@ const EventsLocationCell = ({ row, filterMap, editFilterValue, loadEvents, loadE
         let filter = filterMap.find(({ name }) => name === "location");
         if (!!filter) {
             editFilterValue(filter.name, location);
-            loadEvents(true, false);
+            loadEvents();
             loadEventsIntoTable();
         }
     };
@@ -40,7 +40,7 @@ const mapStateToProps = state => ({
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value)),
-    loadEvents: (filter, sort) => dispatch(fetchEvents(filter, sort)),
+    loadEvents: () => dispatch(fetchEvents()),
     loadEventsIntoTable: () => dispatch(loadEventsIntoTable())
 });
 

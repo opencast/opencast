@@ -70,7 +70,7 @@ const table = (state=initialState, action) => {
     const { type, payload } = action;
     switch (type) {
         case LOAD_RESOURCE_INTO_TABLE: {
-            const { multiSelect, columns, resource, pages, rows } = payload;
+            const { multiSelect, columns, resource, pages, rows, sortBy } = payload;
             return {
                 ...state,
                 multiSelect: multiSelect,
@@ -78,6 +78,7 @@ const table = (state=initialState, action) => {
                 resource: resource,
                 rows: rows,
                 pages: pages,
+                sortBy: sortBy,
                 pagination: {
                     ...state.pagination,
                     totalItems: rows.length

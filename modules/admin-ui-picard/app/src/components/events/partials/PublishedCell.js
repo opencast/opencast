@@ -65,11 +65,12 @@ const PublishCell = ({ row }) => {
                                         publication.enabled ? (
                                             <PublicationLink href={publication.url}
                                                              target="_blank"
+                                                             key = {key}
                                                              enabled>
                                                 {t(publication.name)}
                                             </PublicationLink>
                                         ) : (
-                                            <PublicationLink>
+                                            <PublicationLink key={key}>
                                                 {t(publication.name)}
                                             </PublicationLink>
                                         )

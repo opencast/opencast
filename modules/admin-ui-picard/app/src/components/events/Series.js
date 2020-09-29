@@ -27,15 +27,15 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
 
     const loadEvents = () => {
         // Fetching events from server
-        loadingEvents(false, false);
+        loadingEvents();
 
         // Load events into table
         loadingEventsIntoTable();
     };
 
-    const loadSeries = () => {
+    const loadSeries = async () => {
         //fetching series from server
-        loadingSeries(false, false);
+        await loadingSeries();
 
         //load series into table
         loadingSeriesIntoTable();
@@ -44,7 +44,7 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
     useEffect( () => {
 
         // Load Series on mount
-        loadSeries();
+        loadSeries().then(r => console.log(r));
 
         // Function for handling clicks outside of an dropdown menu
         const handleClickOutside = e => {
@@ -146,9 +146,9 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    loadingSeries: (filter, sort) => dispatch(fetchSeries(filter, sort)),
+    loadingSeries: () => dispatch(fetchSeries()),
     loadingSeriesIntoTable: () => dispatch(loadSeriesIntoTable()),
-    loadingEvents: (filter, sort) => dispatch(fetchEvents()),
+    loadingEvents: () => dispatch(fetchEvents()),
     loadingEventsIntoTable: () => dispatch(loadEventsIntoTable())
 });
 

@@ -90,7 +90,7 @@ const TableFiltersProfiles = ({showFilterSettings, setFilterSettings, createFilt
         loadFilterProfile(filterMap)
 
         // Reload resources when filters are removed
-        loadResource(false, false);
+        loadResource();
         loadResourceIntoTable();
     }
 

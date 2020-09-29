@@ -20,7 +20,7 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable}) =
 
     const loadEvents = () => {
         // Fetching events from server
-        loadingEvents(false, false);
+        loadingEvents();
 
         // Load events into table
         loadingEventsIntoTable();
@@ -75,7 +75,7 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable}) =
 
 
 const mapDispatchToProps = dispatch => ({
-    loadingEvents: (filter, sort) => dispatch(fetchEvents()),
+    loadingEvents: () => dispatch(fetchEvents()),
     loadingEventsIntoTable: () => dispatch(loadEventsIntoTable())
 });
 

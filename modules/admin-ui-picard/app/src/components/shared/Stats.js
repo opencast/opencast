@@ -21,7 +21,7 @@ const Stats = ({ filterMap, editFilterValue, loadEvents, loadEventsIntoTable }) 
         let filter = filterMap.find(({ name }) => name === "status");
         if (!!filter) {
             editFilterValue(filter.name, name);
-            loadEvents(true, false);
+            loadEvents();
             loadEventsIntoTable();
         }
     }
@@ -58,7 +58,7 @@ const mapStateToProps = state => ({
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value)),
-    loadEvents: (filter, sort) => dispatch(fetchEvents(filter, sort)),
+    loadEvents: () => dispatch(fetchEvents()),
     loadEventsIntoTable: () => dispatch(loadEventsIntoTable())
 });
 

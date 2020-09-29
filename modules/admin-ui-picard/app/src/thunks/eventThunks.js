@@ -2,36 +2,42 @@ import {loadEventsFailure, loadEventsInProgress, loadEventsSuccess} from "../act
 import {getFilters} from '../selectors/tableFilterSelectors';
 import {getPageLimit, getPageOffset, getTableDirection, getTableSorting} from '../selectors/tableSelectors';
 
-export const fetchEvents = (filter, sort) => async (dispatch, getState) => {
+export const fetchEvents = () => async (dispatch, getState) => {
     try {
         dispatch(loadEventsInProgress());
 
         console.log('Filters in event thunk: ');
-        console.log(filter);
 
         const state = getState();
 
+        // Todo: Check if empty values problem when using proxy backend
         // Get filter map from state if filter flag is true
-        let filterMap = null;
-        if (filter) {
-            filterMap = getFilters(state);
+        let filters;
+        let filterArray = [];
+        let filterMap = getFilters(state);
+        for (let key in filterMap) {
+            if (!!filterMap[key].value) {
+                filterArray.push(filterMap[key].name + ':' + filterMap[key].value);
+            }
         }
+        if (filterArray.length) {
+            filters = filterArray.join(',');
+        }
+        console.log(filters);
+
 
         // Get sorting from state if sort flag is true
-        let sortBy, direction = null;
-        if (sort) {
-            sortBy = getTableSorting(state);
-            direction = getTableDirection(state);
-        }
+        let sortBy = getTableSorting(state);
+        let direction = getTableDirection(state);
+
 
         // Get page info needed for fetching events from state
         let pageLimit = getPageLimit(state);
         let offset = getPageOffset(state);
 
 
-        //TODO: Fetch actual data from server
-        //Todo: maybe some Transfromations for publication needed
-        const data = await fetch('admin-ng/event/events.json');
+        //admin-ng/event/events.json?filter={filter}&sort={sort}&limit=0&offset=0
+        const data = await fetch(`admin-ng/event/events.json?filter=${filters}&sort=${sortBy}:${direction}&limit=${pageLimit}&offset=${offset}`);
 
         const response =  await data.json();
 

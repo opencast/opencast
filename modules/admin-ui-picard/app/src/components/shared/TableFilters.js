@@ -58,7 +58,7 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
         resetFilterMap();
 
         // Reload resources when filters are removed
-        loadResource(false, false);
+        loadResource();
         loadResourceIntoTable();
 
 
@@ -74,7 +74,7 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
         console.log("remove certain filter");
 
         // Reload resources when filter is removed
-        loadResource(true, false);
+        loadResource();
         loadResourceIntoTable();
     }
 
@@ -101,7 +101,7 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
             removeSelectedFilter();
             removeSecondFilter();
             //Todo: ADD RELOAD OF RESOURCE
-            loadResource(true, false);
+            loadResource();
             loadResourceIntoTable();
         }
 
