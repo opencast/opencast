@@ -13,6 +13,5 @@ modules/publication-service-youtube-v3/pom.xml
 modules/scheduler-impl/pom.xml
 modules/search/pom.xml
 modules/search-service-impl/pom.xml
-modules/security-openid/pom.xml
 modules/security-shibboleth/pom.xml
 modules/solr/pom.xml
