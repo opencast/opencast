@@ -127,8 +127,24 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
         element.setIdentifier(null);
         element.setURI(e.getURI()); // use the same URI as the original
       }
-      if (configuredTargetFlavor != null)
-        element.setFlavor(MediaPackageElementFlavor.parseFlavor(configuredTargetFlavor));
+
+      if (configuredTargetFlavor != null) {
+
+        MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(configuredTargetFlavor);
+        String targetFlavorType = targetFlavor.getType();
+        String targetFlavorSubtype = targetFlavor.getSubtype();
+
+        if (MediaPackageElementFlavor.WILDCARD.equals(targetFlavorType)) {
+          targetFlavorType = element.getFlavor().getType();
+        }
+
+        if (MediaPackageElementFlavor.WILDCARD.equals(targetFlavorSubtype)) {
+          targetFlavorSubtype = element.getFlavor().getSubtype();
+        }
+
+        String targetFlavorStr = targetFlavorType + MediaPackageElementFlavor.SEPARATOR + targetFlavorSubtype;
+        element.setFlavor(MediaPackageElementFlavor.parseFlavor(targetFlavorStr));
+      }
 
       if (overrideTags.size() > 0) {
         element.clearTags();

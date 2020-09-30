@@ -52,7 +52,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
   /**
    * Character that separates both parts of a flavor
    */
-  private static final String SEPARATOR = "/";
+  public static final String SEPARATOR = "/";
 
   /**
    * String representation of type
