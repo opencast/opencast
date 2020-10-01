@@ -1,25 +1,71 @@
-Opencast 9: Release Notes
+Opencast 8: Release Notes
 =========================
-
-Important Changes
------------------
-
-- External Elasticsearch
-- MariaDB JDBC driver
-- Dropping compose operation in favor of encode
-- Default player is now Paella
 
 Features
 --------
 
-- todo:
-- list
-- of
-- listed
+- Improved integration of external statistics providers (InfluxDB)
+    - Hourly scale for data exports
+    - Visualization of statistics in the Admin UI
+- Limit accepted file types when uploading assets
+- Support for exclusion pattern for URL signing
+- Add option to configure state mappings for workflows
+- Assembly configuration
+- Multi-tenancy support for workflows
+- Role support for workflows
+- Video-crop service
+- Paella Player 6.2.4
+- Multiple audio tracks support on Paella Player
+- Feeds-tab: adds a new tab in series properties for ATOM and RSS Feeds
+- Custom LTI series tool styles
+- Show only events with write access in the Admin UI
+- Access org properties from publish-configure WOH
+- Resolution based, conditional encoding
+- Termination State Service to integrate with AWS AutoScaling Lifecycle
+- Health check endpoint
+- Officially support URL signing keys that handle multiple URL prefixes
+- Support for exclusion pattern for URL signing
+- User-provider for the d2l Brightspace LMS
+- Provide access to file contents in the Working File Repository
+- Automatic caption using Google speech to text API
+- Admin UI: new event media upload progress bar
+- Opencast Plug-in features for Karaf
+- Single step delete of events
+- **Opencast 8.2: Opencast Studio (browser-based recording tool)**
+
+Improvements
+------------
+
+- Resume on past table page when leaving video editor
+- JavaScript dependency management
+- Highlight main table rows on hover
+- Reduces job payload size in database
+- Improved URL signing performance
+- ingest-download operation moved to worker
+- Media Module configuration now in the organization configuration file
+- Sensible names for hosts instead of URLs
+- Improved icons and wording in video editor
+- Improved delete-event submit button
+- Extended the ingest-download-woh
+- Tag elements retrieved from asset manager
+- Improve navigation in video editor when zoom is active
+- Switch to compatible file type filter definitions
+- Improved setting values from Dublin Core catalog
+- Don't start Opencast on a used port
+- ESLint used in Theodul Core
+- Theodul Player scroll/zoom overlay to use shift + scroll wheel zoom
+- Removed State Mapping "Importing"
+- Hide column "Stop" by default
+- Fixed Workflow Index rebuild ACL handling
+- Reduced memory needed for Workflow Index rebuild
+- Ansible script documentation
+- Automatic publication of streaming URLs
+- S3 compatibility - Endpoint configuration for Amazon S3 alternatives added
+- Theodul player ui config
+- Re-introduce ability to avoid data loss during ingest
 
 Configuration changes
 ---------------------
-=======
 - `etc/org.opencastproject.adminui.cfg` has a new option `retract.workflow.id` which contains the id of the workflow used
   to retract events when deleting.
 
@@ -29,6 +75,12 @@ API changes
 - Removed REST endpoints for modifying workflow definitions
     - DELETE /workflow/definition/{id}
     - PUT /workflow/definition
+
+Additional Notes About 8.7
+--------------------------
+
+This maintenance release fixes severals bugs including problems with the scheduler in multitenant systems and adds
+missing ACLs after asset uploads.
 
 Additional Notes About 8.6
 --------------------------
@@ -165,25 +217,20 @@ with `<sec:remember-me services-ref="rememberMeServices" />`
 - CVE-2020-5228 – [Public Access Via OAI-PMH
   ](https://github.com/opencast/opencast/security/advisories/GHSA-6f54-3qr9-pjgj)
 
-Additional Notes About 7.7
--------------------------
-
-Opencast 7.7 brings better ACLs handling, remember-me authentication fix and other minor
-improvements.
-
 
 Release Schedule
 ----------------
 
-| Date                        | Phase                   |
-|-----------------------------|-------------------------|
-| October 5th                 | Feature freeze          |
-| November 9th–November 15th  | Translation week        |
-| November 16th–November 29th | Public QA phase         |
-| December 15th               | Release of Opencast 9.0 |
+|Date                         |Phase
+|-----------------------------|------------------------------------------
+|October 1st 2019             |Feature Freeze
+|Nov 4th - Nov 10th 2019      |Translation week
+|Nov 11th - Nov 24th 2019     |Public QA phase
+|December 17th 2019           |Release of Opencast 8.0
+
 
 Release managers
 ----------------
 
-- Julian Kniephoff (ELAN e.V.)
-- Carlos Turro Ribalta (Universitat Politècnica de València)
+- Karen Dolan (Harvard University DCE)
+- Rüdiger Rolf (Osnabrück University)

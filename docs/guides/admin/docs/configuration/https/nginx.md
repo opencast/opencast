@@ -112,6 +112,13 @@ http {
             # some issues in the past and it does not cost much performance.
             proxy_redirect          http://$host https://$host;
 
+            # Make sure to serve cookies only via secure connections.
+            proxy_cookie_path / "/; HTTPOnly; Secure";
+
+            # Depending on your integration, you may also want to allow cookies
+            # to be used on other sites. In that case, use this instead:
+            #proxy_cookie_path / "/; HTTPOnly; Secure; SameSite=None";
+
             # Do not buffer responses
             proxy_buffering         off;
 

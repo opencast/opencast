@@ -149,12 +149,15 @@ code {
     opacity: 0;
 }
 
-a.header-link {
-    margin-left: 10px;
-    font-size: 80%;
-    opacity: 0.3;
+details {
+  border-left: 2px solid silver;
+  padding: 5px;
+  margin-bottom: 10px;
+  margin-left: 10px;
 }
 
-a.header-link:hover {
-    opacity: 1;
+details summary {
+  color: darkblue;
+  cursor: pointer;
+  padding-bottom: 5px;
 }
