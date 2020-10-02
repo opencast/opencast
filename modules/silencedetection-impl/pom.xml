@@ -39,9 +39,6 @@
               org.opencastproject.silencedetection.endpoint.*;version=${project.version},
               org.opencastproject.silencedetection.ffmpeg.*;version=${project.version},
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/silence-detection-service.xml,
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
