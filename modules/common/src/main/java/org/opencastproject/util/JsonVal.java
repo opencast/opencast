@@ -24,8 +24,6 @@ package org.opencastproject.util;
 import static org.opencastproject.util.data.functions.Misc.cast;
 
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.functions.Options;
-import org.opencastproject.util.data.functions.Strings;
 
 import java.util.List;
 import java.util.Map;
@@ -74,7 +72,6 @@ public final class JsonVal {
       return new JsonVal(o);
     }
   };
-  public static final Function<Object, Integer> stringAsInteger = Options.<Integer>getF().o(Strings.toInt.o(asString));
 
   private static <A> Function<Object, A> caster(final Class<A> ev) {
     return new Function<Object, A>() {

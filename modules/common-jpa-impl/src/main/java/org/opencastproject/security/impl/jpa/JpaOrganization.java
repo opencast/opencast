@@ -33,12 +33,14 @@ import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  * JPA-annotated organization object.
@@ -61,9 +63,15 @@ public class JpaOrganization implements Organization {
   private String name;
 
   @ElementCollection
-  @MapKeyColumn(name = "name")
-  @Column(name = "port")
-  @CollectionTable(name = "oc_organization_node", joinColumns = @JoinColumn(name = "organization"))
+  @MapKeyColumn(name = "name", nullable = false)
+  @Column(name = "port", nullable = false)
+  @CollectionTable(name = "oc_organization_node", joinColumns = @JoinColumn(name = "organization", nullable = false),
+    indexes = {
+      @Index(name = "IX_oc_organization_node_pk", columnList = ("organization")),
+      @Index(name = "IX_oc_organization_node_name", columnList = ("name")),
+      @Index(name = "IX_oc_organization_node_port", columnList = ("port"))
+    }, uniqueConstraints =
+      @UniqueConstraint(columnNames = {"organization", "name", "port"}))
   private Map<String, Integer> servers;
 
   @Column(name = "admin_role")
@@ -74,9 +82,9 @@ public class JpaOrganization implements Organization {
 
   @Lob
   @ElementCollection
-  @MapKeyColumn(name = "name")
+  @MapKeyColumn(name = "name", nullable = false)
   @Column(name = "value", length = 65535)
-  @CollectionTable(name = "oc_organization_property", joinColumns = @JoinColumn(name = "organization"))
+  @CollectionTable(name = "oc_organization_property", joinColumns = @JoinColumn(name = "organization", nullable = false))
   private Map<String, String> properties;
 
   /**

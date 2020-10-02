@@ -27,7 +27,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.UrlSupport;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -110,7 +109,6 @@ public class WorkingFileRepositoryRestEndpointTest {
   @Test
   public void testExtractImageContentTypeFromCollection() throws Exception {
     InputStream in = null;
-    InputStream responseIn = null;
 
     try {
       in = getClass().getResourceAsStream("/opencast_header.gif");
@@ -147,36 +145,6 @@ public class WorkingFileRepositoryRestEndpointTest {
         Assert.assertTrue(Arrays.equals(imageBytesFromClasspath, imageBytesFromRepo));
       }
     }
-  }
-
-  public void testEtag() throws Exception {
-    String mediaPackageId = "mp";
-    String dc = "element1";
-    InputStream in = null;
-    InputStream responseIn = null;
-    try {
-      in = getClass().getResourceAsStream("/dublincore.xml");
-      endpoint.put(mediaPackageId, dc, "dublincore.xml", in);
-    } finally {
-      IOUtils.closeQuietly(in);
-    }
-
-    try {
-      in = getClass().getResourceAsStream("/dublincore.xml");
-      String md5 = DigestUtils.md5Hex(in);
-      Response response = endpoint.restGet(mediaPackageId, dc, md5);
-      Assert.assertEquals(Response.Status.NOT_MODIFIED.getStatusCode(), response.getStatus());
-      responseIn = (InputStream) response.getEntity();
-      Assert.assertNull(responseIn);
-      response = endpoint.restGet(mediaPackageId, dc, "foo");
-      Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-      responseIn = (InputStream) response.getEntity();
-      Assert.assertNotNull(responseIn);
-    } finally {
-      IOUtils.closeQuietly(in);
-      IOUtils.closeQuietly(responseIn);
-    }
-
   }
 
 }

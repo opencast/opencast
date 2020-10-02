@@ -20,7 +20,7 @@ default settings.
 Minimal Set-up
 --------------
 
-> Note that this guide does not give any security advise but is meant to provide a minimal working example which works
+> Note that this guide does not give any security advice but is meant to provide a minimal working example which works
 > well with Opencast.
 
 The following configuration is an example for `/etc/nginx/nginx.conf`. Note that depending on your distributions
@@ -28,7 +28,7 @@ packaging, often `conf.d` or `sites-enabled` directories are used. But since thi
 use the web server for anything else), we are just using the main configuration file.
 
 Explanations for the configuration directives are provided inline. Please make sure to replace `example.opencast.org`
-with your nodes domain name.
+with your node's domain name.
 
 The main goals of this set-up are:
 
@@ -38,7 +38,7 @@ The main goals of this set-up are:
 
 
 ```
-# Check your distributions default nginx.conf to make sure the first
+# Check your distribution's default nginx.conf to make sure the first
 # configuration keys (up until the http section) make sense within your
 # distribution's set-up.
 
@@ -69,7 +69,7 @@ http {
     server {
         listen 80;
         listen [::]:80;
-        server_name example.opencast.org;
+        server_name _;
 
         # Enforce HTTPS by redirecting requests
         location / {
@@ -111,6 +111,13 @@ http {
             # precaution and shouldn't strictly be necessary but it did prevent
             # some issues in the past and it does not cost much performance.
             proxy_redirect          http://$host https://$host;
+
+            # Make sure to serve cookies only via secure connections.
+            proxy_cookie_path / "/; HTTPOnly; Secure";
+
+            # Depending on your integration, you may also want to allow cookies
+            # to be used on other sites. In that case, use this instead:
+            #proxy_cookie_path / "/; HTTPOnly; Secure; SameSite=None";
 
             # Do not buffer responses
             proxy_buffering         off;

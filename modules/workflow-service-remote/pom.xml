@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -45,6 +45,10 @@
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -63,9 +67,6 @@
             <Export-Package>
               org.opencastproject.workflow.remote;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/workflow-service-remote.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

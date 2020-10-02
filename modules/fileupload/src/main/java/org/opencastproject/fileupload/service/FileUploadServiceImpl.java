@@ -254,14 +254,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.fileupload.api.FileUploadService#storeJob(org.opencastproject.fileupload.api.job.FileUploadJob
-   *      job)
-   */
-  @Override
-  public void storeJob(FileUploadJob job) throws FileUploadException {
+  private void storeJob(FileUploadJob job) throws FileUploadException {
     try {
       logger.debug("Attempting to store job {}", job.getId());
       File jobFile = ensureExists(getJobFile(job.getId()));
@@ -304,7 +297,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
       throw fileUploadException(Severity.warn, "Job is already complete.");
     }
 
-    // job ready to recieve data?
+    // job ready to receive data?
     if (isLocked(job.getId())) {
       throw fileUploadException(Severity.error,
               "Job is locked. Seems like a concurrent upload to this job is in progress.");
@@ -342,7 +335,7 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
         if (bytesRead > 0) {
           out.write(readBuffer, 0, bytesRead);
           bytesReadTotal += bytesRead;
-          currentChunk.setRecieved(bytesReadTotal);
+          currentChunk.setReceived(bytesReadTotal);
         }
       } while (bytesRead != -1);
       if (job.getPayload().getTotalSize() == -1 && job.getChunksTotal() == 1) { // set totalSize in case of ordinary

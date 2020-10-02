@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -46,7 +46,6 @@
     <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.aws-java-sdk</artifactId>
-      <version>1.11.49_1</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -91,7 +90,7 @@
     <!-- Persistence -->
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
-      <artifactId>javax.persistence</artifactId>
+      <artifactId>jakarta.persistence</artifactId>
     </dependency>
     <dependency>
       <groupId>org.eclipse.persistence</groupId>
@@ -140,10 +139,6 @@
               com.amazonaws.services.s3.*,
               *;resolution:=optional
             </Import-Package>
-            <Service-Component>
-              OSGI-INF/aws-asset-persistence.xml,
-              OSGI-INF/aws-s3-asset-store.xml
-            </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

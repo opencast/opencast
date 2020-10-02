@@ -39,7 +39,7 @@ public interface EncodingProfile {
   @XmlType(name = "media-type", namespace = "http://composer.opencastproject.org")
   enum MediaType {
     // Nothing is a special type that indicates that the encoding process does not produce any media
-    Audio, Visual, AudioVisual, Stream, EnhancedAudio, Image, ImageSequence, Cover, Nothing;
+    Audio, Visual, AudioVisual, Stream, EnhancedAudio, Image, ImageSequence, Cover, Nothing, Manifest;
 
     /**
      * Try to parse the argument <code>type</code> and produce a
@@ -118,6 +118,21 @@ public interface EncodingProfile {
    * @return a list of the used tags
    */
   List<String> getTags();
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.composer.api.EncodingProfile#getMimeType()
+   */
+  String getMimeType();
+
+  /**
+   * Sets the Mimetype.
+   *
+   * @param mimeType
+   *          the Mimetype
+   */
+  void setMimeType(String mimeType);
 
   /**
    * Returns the media format that can be used with this encoding profile.

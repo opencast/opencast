@@ -21,26 +21,12 @@
 
 package org.opencastproject.message.broker.api.index;
 
-import static com.entwinemedia.fn.Stream.$;
-import static java.lang.String.format;
-
 import org.opencastproject.index.IndexProducer;
 import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
-import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.util.RequireUtil;
 
-import com.entwinemedia.fn.P1;
-import com.entwinemedia.fn.Products;
-import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.fns.Booleans;
-
-import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +41,6 @@ import java.util.concurrent.FutureTask;
  * This service produces messages for an elastic search index
  */
 public abstract class AbstractIndexProducer implements IndexProducer {
-  public static final P1<Serializable> IDENTITY_MSG = Products.E.<Serializable>p1(new Serializable() { });
-
   public abstract String getClassName();
 
   public abstract MessageReceiver getMessageReceiver();
@@ -91,144 +75,6 @@ public abstract class AbstractIndexProducer implements IndexProducer {
       messageWatcher.stopListening();
     }
     singleThreadExecutor.shutdown();
-  }
-
-  /* ------------------------------------------------------------------------------------------------------------------ */
-
-  /**
-   * Create a new batch.
-   *
-   * @param indexName
-   *         the name of the index to recreate
-   * @param queuePrefix
-   *         the message queue prefix where messages are sent to
-   * @param updatesTotal
-   *         the number of updates that will be sent, i.e. how many times will the
-   *         {@link org.opencastproject.message.broker.api.index.AbstractIndexProducer.IndexRecreationBatch#update(Organization, P1[])}
-   *         method be called
-   * @param endMessageOrg
-   *         the organization under which the batch's end message should be sent;
-   *         if none use the organization of the last update message
-   */
-  public IndexRecreationBatch mkRecreationBatch(String indexName, String queuePrefix, int updatesTotal,
-                                                Opt<Organization> endMessageOrg) {
-    return new IndexRecreationBatch(indexName, queuePrefix, updatesTotal, endMessageOrg);
-  }
-
-  /**
-   * Create a new batch. The organization under which the final end message is sent is set to {@link DefaultOrganization}.
-   *
-   * @param indexName
-   *         the name of the index to recreate
-   * @param queuePrefix
-   *         the message queue prefix where messages are sent to
-   * @param updatesTotal
-   *         the number of updates that will be sent, i.e. how many times will the
-   *         {@link org.opencastproject.message.broker.api.index.AbstractIndexProducer.IndexRecreationBatch#update(Organization, P1[])}
-   *         method be called
-   * @see #mkRecreationBatch(String, String, int, Opt)
-   */
-  public IndexRecreationBatch mkRecreationBatch(String indexName, String queuePrefix, int updatesTotal) {
-    return new IndexRecreationBatch(indexName, queuePrefix, updatesTotal, Opt.<Organization>some(new DefaultOrganization()));
-  }
-
-  /**
-   * State management for a batch of recreate index update messages.
-   * Messages are always sent under the identity of the system user.
-   */
-  public final class IndexRecreationBatch {
-    private final Logger logger = LoggerFactory.getLogger(IndexRecreationBatch.class);
-
-    private final String indexName;
-    private final String destinationId;
-    private final int updatesTotal;
-    private final int responseInterval;
-    private final Opt<Organization> endMessageOrg;
-
-    private int updatesCurrent;
-
-    /**
-     * Create a new batch.
-     *
-     * @param indexName
-     *         the name of the index to recreate
-     * @param queuePrefix
-     *         the message queue prefix where messages are sent to
-     * @param updatesTotal
-     *         the number of updates that will be sent, i.e. how many times will the {@link #update(Organization, P1[])}
-     *         method be called
-     * @param endMessageOrg
-     *         the organization under which the batch's end message should be sent;
-     *         if none use the organization of the last update message
-     */
-    private IndexRecreationBatch(String indexName, String queuePrefix, int updatesTotal,
-                                 Opt<Organization> endMessageOrg) {
-      this.indexName = indexName;
-      this.destinationId = queuePrefix + WordUtils.capitalize(indexName);
-      this.updatesTotal = RequireUtil.min(updatesTotal, 0);
-      this.endMessageOrg = endMessageOrg;
-      this.updatesCurrent = 0;
-      this.responseInterval = (updatesTotal < 100) ? 1 : (updatesTotal / 100);
-    }
-
-    public int getUpdatesTotal() {
-      return updatesTotal;
-    }
-
-    /**
-     * Send one update to recreate the index. An update may consist of multiple messages.
-     * Updates are sent under the identity of the system user of the given organization.
-     * <p>
-     * {@link #IDENTITY_MSG} is the identity element of messages, i.e. identity message will be filtered out
-     */
-    public void update(final Organization org, final Iterable<P1<? extends Serializable>> messages) {
-      if (updatesCurrent < updatesTotal) {
-        final User user = SecurityUtil.createSystemUser(getSystemUserName(), org);
-        SecurityUtil.runAs(getSecurityService(), org, user, () -> {
-          for (final P1<? extends Serializable> m : $(messages).filter(Booleans.<P1<? extends Serializable>>ne(IDENTITY_MSG))) {
-            getMessageSender().sendObjectMessage(destinationId, MessageSender.DestinationType.Queue, m.get1());
-          }
-          updatesCurrent = updatesCurrent + 1;
-          if (((updatesCurrent % responseInterval) == 0) || (updatesCurrent == updatesTotal)) {
-            getMessageSender().sendObjectMessage(
-                  IndexProducer.RESPONSE_QUEUE,
-                  MessageSender.DestinationType.Queue,
-                  IndexRecreateObject.update(
-                          indexName,
-                          getService(),
-                          updatesTotal,
-                          updatesCurrent));
-          }
-          if (updatesCurrent >= updatesTotal) {
-            // send end-of-batch message
-            final Organization emo = endMessageOrg.getOr(org);
-            final User emu = SecurityUtil.createSystemUser(getSystemUserName(), emo);
-            SecurityUtil.runAs(getSecurityService(), emo, emu, () -> {
-              getMessageSender().sendObjectMessage(
-                      destinationId,
-                      MessageSender.DestinationType.Queue,
-                      IndexRecreateObject.end(indexName, getService()));
-            });
-          }
-        });
-      } else {
-        throw new IllegalStateException(format("The number of allowed update messages (%d) has already been sent", updatesTotal));
-      }
-    }
-
-    /**
-     * @see #update(Organization, Iterable)
-     */
-    public void update(final Organization org, final P1<? extends Serializable>... messages) {
-      update(org, $(messages));
-    }
-
-    @Override protected void finalize() throws Throwable {
-      super.finalize();
-      if (updatesCurrent < updatesTotal) {
-        logger.warn(format("Only %d messages have been sent even though the batch has been initialized with %d", updatesCurrent, updatesTotal));
-      }
-    }
   }
 
   /* ------------------------------------------------------------------------------------------------------------------ */

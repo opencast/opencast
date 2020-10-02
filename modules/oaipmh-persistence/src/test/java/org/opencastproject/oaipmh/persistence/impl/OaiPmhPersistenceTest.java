@@ -28,7 +28,7 @@ import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntity
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageSupport;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.oaipmh.persistence.SearchResult;
 import org.opencastproject.oaipmh.persistence.SearchResultElementItem;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
@@ -208,7 +208,7 @@ public class OaiPmhPersistenceTest {
   public void testLimitOffset() throws Exception {
     oaiPmhDatabase.store(mp1, REPOSITORY_ID_1);
     MediaPackage mp2 = (MediaPackage) mp1.clone();
-    mp2.setIdentifier(IdBuilderFactory.newInstance().newIdBuilder().createNew());
+    mp2.setIdentifier(IdImpl.fromUUID());
     oaiPmhDatabase.store(mp2, REPOSITORY_ID_2);
     SearchResult search = oaiPmhDatabase.search(query().limit(2).build());
     Assert.assertEquals(2, search.size());

@@ -32,12 +32,6 @@ public class UserSettingsServiceException extends Exception {
   private static final long serialVersionUID = 2329343969108832413L;
 
   /**
-   * Create exception.
-   */
-  public UserSettingsServiceException() {
-  }
-
-  /**
    * Create exception with a message.
    *
    * @param message
@@ -53,16 +47,6 @@ public class UserSettingsServiceException extends Exception {
    */
   public UserSettingsServiceException(Throwable cause) {
     super(cause);
-  }
-
-  /**
-   * Create exception with a message and a cause.
-   *
-   * @param message
-   * @param cause
-   */
-  public UserSettingsServiceException(String message, Throwable cause) {
-    super(message, cause);
   }
 
 }

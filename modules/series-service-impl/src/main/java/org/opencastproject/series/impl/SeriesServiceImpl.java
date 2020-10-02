@@ -62,6 +62,10 @@ import com.entwinemedia.fn.data.Opt;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -80,6 +84,13 @@ import javax.xml.parsers.ParserConfigurationException;
  * Implements {@link SeriesService}. Uses {@link SeriesServiceDatabase} for permanent storage and
  * {@link SeriesServiceIndex} for searching.
  */
+@Component(
+  property = {
+    "service.description=Series Service"
+  },
+  immediate = true,
+  service = { SeriesService.class }
+)
 public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesService {
 
   /** Logging utility */
@@ -107,31 +118,37 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   private String systemUserName;
 
   /** OSGi callback for setting index. */
+  @Reference(name = "series-index")
   public void setIndex(SeriesServiceIndex index) {
     this.index = index;
   }
 
   /** OSGi callback for setting persistance. */
+  @Reference(name = "series-persistence")
   public void setPersistence(SeriesServiceDatabase persistence) {
     this.persistence = persistence;
   }
 
   /** OSGi callback for setting the security service. */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi callback for setting the organization directory service. */
+  @Reference(name = "orgDirectory")
   public void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
 
   /** OSGi callback for setting the message sender. */
+  @Reference(name = "message-broker-sender")
   public void setMessageSender(MessageSender messageSender) {
     this.messageSender = messageSender;
   }
 
   /** OSGi callback for setting the message receiver. */
+  @Reference(name = "message-broker-receiver")
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
   }
@@ -141,11 +158,17 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    * used, Executor service is set. If index is empty, persistent storage is queried if it contains any series. If that
    * is the case, series are retrieved and indexed.
    */
+  @Activate
   public void activate(ComponentContext cc) throws Exception {
     logger.info("Activating Series Service");
     systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
     populateSolr(systemUserName);
     super.activate();
+  }
+
+  @Deactivate
+  public void deactivate() {
+    super.deactivate();
   }
 
   /** If the solr index is empty, but there are series in the database, populate the solr index. */

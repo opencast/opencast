@@ -1,5 +1,15 @@
 <MimeTypes>
   <MimeType>
+    <Type>application/x-mpegURL</Type>
+    <Description>Apple HTTP Live Streaming </Description>
+    <Extensions>m3u8</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>application/dash+xml</Type>
+    <Description>Mpeg Dash</Description>
+    <Extensions>mpd</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>application/futuresplash</Type>
     <Description>FutureSplash Player</Description>
     <Extensions>spl</Extensions>
@@ -377,7 +387,7 @@
   <MimeType>
     <Type>video/mp2t</Type>
     <Description>MPEG-2 transport stream</Description>
-    <Extensions>ts</Extensions>
+    <Extensions>ts,mts</Extensions>
   </MimeType>
   <MimeType>
     <Type>video/mp4</Type>
@@ -483,5 +493,10 @@
     <Type>video/x-ms-wvx</Type>
     <Description>Windows Media Playlist</Description>
     <Extensions>wvx</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>video/x-nut</Type>
+    <Description>NUT</Description>
+    <Extensions>nut</Extensions>
   </MimeType>
 </MimeTypes>

@@ -2,11 +2,14 @@
 <definition xmlns="http://workflow.opencastproject.org">
 
   <id>update-previews</id>
-  <title>Update previews</title>
+  <title>Update editor previews</title>
   <tags>
     <tag>archive</tag>
   </tags>
-  <description/>
+  <description>
+    Update or create the preview video, the waveforms and the thumbnails
+    on the internal publication channel for use by the video editor.
+  </description>
   <displayOrder>5</displayOrder>
   <configuration_panel/>
 

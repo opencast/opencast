@@ -253,7 +253,7 @@ public class RestDocData extends DocData {
     }
 
     // Add responses
-    for (RestResponse restResp : restQuery.reponses()) {
+    for (RestResponse restResp : restQuery.responses()) {
       endpoint.addStatus(restResp);
     }
 

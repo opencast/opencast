@@ -96,7 +96,7 @@ public class AttachTranscriptionOperationHandler extends AbstractWorkflowOperati
 
     try {
       // Get transcription file from the service
-      MediaPackageElement original = service.getGeneratedTranscription(mediaPackage.getIdentifier().compact(), jobId);
+      MediaPackageElement original = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId);
       MediaPackageElement transcription = original;
 
       // If caption format passed, convert to desired format

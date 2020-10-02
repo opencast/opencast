@@ -148,7 +148,7 @@ public class FeedServiceImpl {
           @RestParameter(description = "Feed query", name = "query", type = Type.STRING, isRequired = true)
       }, restParameters = {
           @RestParameter(description = "Requested result size", name = "size", type = Type.INTEGER, isRequired = false)
-      }, reponses = {
+      }, responses = {
           @RestResponse(description = "Return the feed of the appropriate type", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
@@ -191,7 +191,7 @@ public class FeedServiceImpl {
     }
 
     // Set character encoding
-    Variant v = new Variant(MediaType.valueOf(contentType), null, feed.getEncoding());
+    Variant v = new Variant(MediaType.valueOf(contentType), (String) null, feed.getEncoding());
     String outputString = null;
     try {
       if (feedInfo.getType().equals(Feed.Type.RSS)) {

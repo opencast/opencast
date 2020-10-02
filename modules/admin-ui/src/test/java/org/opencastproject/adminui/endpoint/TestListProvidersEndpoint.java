@@ -22,11 +22,11 @@
 package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.util.TestServiceRegistryFactory;
-import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl;
 import org.opencastproject.index.service.resources.list.provider.ServersListProvider;
-import org.opencastproject.index.service.util.ListProviderUtil;
+import org.opencastproject.list.api.ResourceListProvider;
+import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.impl.ListProvidersServiceImpl;
+import org.opencastproject.list.util.ListProviderUtil;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 

@@ -1,0 +1,20 @@
+<ul ng-class="{
+  'global-notifications' : context == 'global',
+  'notifications-top-left' : globalPosition == 'top-left',
+  'notifications-top-right' : globalPosition == 'top-right',
+  'notifications-top-center' : globalPosition == 'top-center',
+  'notifications-bottom-left' : globalPosition == 'bottom-left',
+  'notifications-bottom-right' : globalPosition == 'bottom-right',
+  'notifications-bottom-center' : globalPosition == 'bottom-center'}">
+  <li ng-repeat="notification in notifications">
+    <div data-admin-ng-notification=""
+         data-show="true"
+         data-type="{{ notification.type }}"
+         data-message="{{ notification.message }}"
+         data-parameters="{{ notification.parameters }}"
+         data-duration="{{ notification.duration }}"
+         data-hidden="notification.hidden"
+         data-id="{{ notification.id }}">
+    </div>
+  </li>
+</ul>

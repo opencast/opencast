@@ -15,7 +15,7 @@ Authentication
 --------------
 
 The External API currenlty only supports basic authentication. To enable basic authentication, uncomment the following
-blocks in `/etc/security/mh_default.org`:
+blocks in `/etc/security/mh_default_org.xml`:
 
     <!-- Basic authentication
     <sec:custom-filter after="BASIC_AUTH_FILTER" ref="basicAuthenticationFilter" />

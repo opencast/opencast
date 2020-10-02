@@ -996,6 +996,90 @@ public class ProcessSmilTest {
     assertTrue(outputs.size() == 3); // One for each profile
   }
 
+  @Test
+  public void testProcessHLSTracks() throws Exception {
+    assertTrue(sourceAudioVideo1.isFile());
+    assertTrue(sourceAudioVideo2.isFile());
+    String prodsmil = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<smil xmlns='http://www.w3.org/ns/SMIL' baseProfile='Language' version='3.0' xml:id='s-aedc52a7-3207-49cf-8a9b-221ee8baba66'>"
+            + "<head xml:id='h-d9ba75ce-2b50-458d-8919-7a92933a75a0'>"
+            + "<meta content='17d14143-5bbf-4c60-b082-fbc401350691' name='media-package-id' xml:id='meta-a9d5fb98-af82-4b9e-abc2-abe5a9dd843c'/>"
+            + "<meta content='300000ms' name='track-duration' xml:id='meta-1950b9b6-cd8f-43ac-9744-f6d8173ca171'/>"
+            + "<paramGroup xml:id='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1'>"
+            + "<param name='track-id' value='220f90fb-c764-40ac-b308-cd6731d22d2e' valuetype='data' xml:id='param-31a5a322-18ae-4659-b696-b3772d99651d'/>"
+            + "<param name='track-src' value='audiovideo1.mp4' valuetype='data' xml:id='param-aed3f3db-7d68-4a76-9229-557940fb44be'/>"
+            + "<param name='track-flavor' value='presenter/source' valuetype='data' xml:id='param-1c069d4a-23cd-45e3-b951-53de908b2b69'/>"
+            + "</paramGroup></head>"
+            + "<body xml:id='b-de826a33-7858-4172-a4a2-9cf1e9a53183'>"
+            + "<par xml:id='par-c82881e2-f372-4a98-8cd4-97bc145cbfbe'>"
+            + "<video paramGroup='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1' src='sourceAudioVideo1.mp4' clipBegin='0ms' clipEnd='10000ms' xml:id='v-2fc1b286-d87b-4393-a922-161af39a9f93'/>"
+            + "</par>"
+            + "<par xml:id='par-eb80f89d-0fce-466d-b0c5-48a30006b691'>"
+            + "<video clipBegin='18000ms' clipEnd='30000ms' paramGroup='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1' src='sourceAudioVideo2.mp4' xml:id='v-d4d19997-f06b-4bdd-8e8c-d23907a971a8'/>"
+            + "</par></body>" + "</smil>";
+    // SmilResponse smilResponse = smilService.fromXml(prodsmil);
+    String paramGroupId = "pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1"; // Pick the presenter flavor
+
+    List<SmilMediaParam> params = new ArrayList<>();
+    params.add(mockSmilMediaParam("track-id", "track-1", "param-31a5a322-18ae-4659-b696-b3772d99651d"));
+    params.add(mockSmilMediaParam("track-src", "file:" + sourceAudioVideo1.getPath(),
+            "param-aed3f3db-7d68-4a76-9229-557940fb44be"));
+    params.add(mockSmilMediaParam("track-flavor", "presenter/work", "param-1c069d4a-23cd-45e3-b951-53de908b2b69"));
+
+    SmilMediaParamGroup group1 = EasyMock.createNiceMock(SmilMediaParamGroup.class);
+    EasyMock.expect(group1.getParams()).andReturn(params).anyTimes();
+    EasyMock.expect(group1.getId()).andReturn(paramGroupId).anyTimes();
+    EasyMock.replay(group1);
+
+    List<SmilMediaParamGroup> paramGroups = new ArrayList<>();
+    paramGroups.add(group1);
+
+    SmilHead head = EasyMock.createNiceMock(SmilHead.class);
+    EasyMock.expect(head.getParamGroups()).andReturn(paramGroups).anyTimes();
+    EasyMock.replay(head);
+
+    List<SmilMediaObject> objects = new ArrayList<>();
+    // Second track is not listed in paramGroup
+    objects.add(mockSmilMediaElement(sourceAudioVideo1.toURI(), 0L, 3000L, paramGroupId));
+    objects.add(mockSmilMediaElement(sourceAudioVideo2.toURI(), 5000L, 7500L, paramGroupId));
+
+    SmilMediaContainer objectContainer = EasyMock.createNiceMock(SmilMediaContainer.class);
+    EasyMock.expect(objectContainer.isContainer()).andReturn(true).anyTimes();
+    EasyMock.expect(objectContainer.getContainerType()).andReturn(SmilMediaContainer.ContainerType.PAR).anyTimes();
+    EasyMock.expect(objectContainer.getElements()).andReturn(objects).anyTimes();
+    EasyMock.replay(objectContainer);
+
+    List<SmilMediaObject> containerObjects = new ArrayList<>();
+    containerObjects.add(objectContainer);
+
+    SmilBody body = EasyMock.createNiceMock(SmilBody.class);
+    EasyMock.expect(body.getMediaElements()).andReturn(containerObjects).anyTimes();
+    EasyMock.replay(body);
+
+    Smil smil = EasyMock.createNiceMock(Smil.class);
+    EasyMock.expect(smil.get(paramGroupId)).andReturn(group1).anyTimes();
+    EasyMock.expect(smil.getBody()).andReturn(body).anyTimes();
+    EasyMock.expect(smil.getHead()).andReturn(head).anyTimes();
+    EasyMock.expect(smil.toXML()).andReturn(prodsmil).anyTimes();
+    EasyMock.expect(smil.getId()).andReturn("s-38f4fa91-c381-4c0e-a51a-e15373428f2d").anyTimes();
+    EasyMock.replay(smil);
+
+    SmilResponse response = EasyMock.createNiceMock(SmilResponse.class);
+    EasyMock.expect(response.getSmil()).andReturn(smil).anyTimes();
+    EasyMock.replay(response);
+
+    SmilService smilService = EasyMock.createNiceMock(SmilService.class);
+    EasyMock.expect(smilService.fromXml((String) EasyMock.anyObject())).andReturn(response).anyTimes();
+    EasyMock.replay(smilService);
+    composerService.setSmilService(smilService);
+    List<String> encodingProfiles = Arrays.asList("h264-large.http", "h264-low.http", "multiencode-hls");
+    Job job = composerService.processSmil(smil, paramGroupId, "x", encodingProfiles);
+    List<Track> outputs = (List<Track>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
+    assertNotNull(outputs);
+    logger.info("testProcessSmilDirect got {} files", outputs);
+    assertTrue(outputs.size() == 2 + 2 + 1); // One segment and one variant for each profile + master
+  }
+
   /**
    * Test method for
    * {@link org.opencastproject.composer.impl.ComposerServiceImpl#processSmil(org.opencastproject.smil.entity.api.Smil, String[])}

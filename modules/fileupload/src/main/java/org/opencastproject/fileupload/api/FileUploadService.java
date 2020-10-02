@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Interface for a Service that manages upload jobs and recieves and handles file parts.
+ * Interface for a Service that manages upload jobs and receives and handles file parts.
  *
  */
 public interface FileUploadService {
@@ -75,15 +75,6 @@ public interface FileUploadService {
    * Cleans outdated jobs on the file system
    */
   void cleanOutdatedJobs() throws IOException;
-
-  /**
-   * Persists the given job object.
-   *
-   * @param job
-   *          job object to persist
-   * @throws FileUploadException
-   */
-  void storeJob(FileUploadJob job) throws FileUploadException;
 
   /**
    * Deletes the job permanently, thus deleting persistent data.

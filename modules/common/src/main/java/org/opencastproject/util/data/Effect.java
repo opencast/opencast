@@ -39,22 +39,6 @@ public abstract class Effect<A> extends Function<A, Void> {
   /** Run the side effect. */
   protected abstract void run(A a);
 
-  /** Return the effect as a function. */
-  public Function<A, Void> toFunction() {
-    return this;
-  }
-
-  /** Run this and the <code>next</code> effect on the given argument. */
-  public Effect<A> and(final Effect<? super A> next) {
-    return new Effect<A>() {
-      @Override
-      protected void run(A a) {
-        Effect.this.apply(a);
-        next.apply(a);
-      }
-    };
-  }
-
   /** Version of {@link Effect} that allows for throwing a checked exception. */
   public abstract static class X<A> extends Effect<A> {
     @Override

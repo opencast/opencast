@@ -26,9 +26,6 @@ package org.opencastproject.security.api;
  */
 public interface SecurityConstants {
 
-  /** Header name for the digest authorization */
-  String AUTHORIZATION_HEADER = "X-Opencast-Matterhorn-Authorization";
-
   /** Header name for the desired organization */
   String ORGANIZATION_HEADER = "X-Opencast-Matterhorn-Organization";
 

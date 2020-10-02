@@ -20,7 +20,6 @@
  */
 package org.opencastproject.security.urlsigning.utils;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,8 +84,8 @@ public final class UrlSigningServiceOsgiUtil {
                 className, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, expireSeconds);
       } catch (NumberFormatException e) {
         logger.warn(
-                "For the class {} unable to parse when a stream should expire from '{}' so using default '{}' because: {}",
-                className, dictionaryValue, defaultExpiry, ExceptionUtils.getStackTrace(e));
+                "For the class {} unable to parse when a stream should expire from '{}' so using default '{}' because:",
+                className, dictionaryValue, defaultExpiry, e);
         expireSeconds = defaultExpiry;
       }
     } else {

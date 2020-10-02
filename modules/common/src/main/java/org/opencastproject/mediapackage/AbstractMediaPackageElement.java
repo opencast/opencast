@@ -391,14 +391,6 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   }
 
   /**
-   * @see org.opencastproject.mediapackage.MediaPackageElement#referTo(org.opencastproject.mediapackage.MediaPackage)
-   */
-  @Override
-  public void referTo(MediaPackage mediaPackage) {
-    referTo(new MediaPackageReferenceImpl(mediaPackage));
-  }
-
-  /**
    * @see org.opencastproject.mediapackage.MediaPackageElement#referTo(org.opencastproject.mediapackage.MediaPackageElement)
    */
   @Override

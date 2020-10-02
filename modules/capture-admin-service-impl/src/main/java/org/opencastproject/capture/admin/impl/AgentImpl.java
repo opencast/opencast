@@ -41,6 +41,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
@@ -48,6 +49,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.PostLoad;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 /**
  * An in-memory construct to represent the state of a capture agent, and when it was last heard from.
@@ -96,10 +98,15 @@ public class AgentImpl implements Agent {
 
   /** The roles allowed to schedule this agent */
   @ElementCollection
-  @Column(name = "role")
-  @CollectionTable(name = "oc_capture_agent_role", joinColumns = { @JoinColumn(name = "id", referencedColumnName = "id"),
-          @JoinColumn(name = "organization", referencedColumnName = "organization") })
-  protected Set<String> schedulerRoles = new HashSet<String>();
+  @Column(name = "role", nullable = false)
+  @CollectionTable(name = "oc_capture_agent_role", indexes = {
+      @Index(name = "IX_oc_capture_agent_role_pk", columnList = "id, organization")
+    }, uniqueConstraints = {
+      @UniqueConstraint(name = "UNQ_capture_agent_role_id_org_role", columnNames = {"id", "organization", "role"})
+    }, joinColumns = {
+      @JoinColumn(name = "id", referencedColumnName = "id", nullable = false),
+      @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false) })
+  protected Set<String> schedulerRoles = new HashSet<>();
 
   /**
    * The capabilities the agent has Capabilities are the devices this agent can record from, with a friendly name

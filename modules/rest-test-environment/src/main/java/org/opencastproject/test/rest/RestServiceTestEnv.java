@@ -21,25 +21,17 @@
 
 package org.opencastproject.test.rest;
 
-import static org.opencastproject.util.data.Collections.toArray;
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
-
-import com.sun.jersey.api.core.ClassNamesResourceConfig;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +39,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Random;
-import java.util.regex.Pattern;
 
 /**
  * Helper environment for creating REST service unit tests.
@@ -112,21 +103,8 @@ public final class RestServiceTestEnv {
     this.cfg = cfg;
   }
 
-  public static RestServiceTestEnv testEnvScanAllPackages(URL baseUrl) {
-    return new RestServiceTestEnv(baseUrl, Option.<ResourceConfig> none());
-  }
-
-  public static RestServiceTestEnv testEnvScanPackages(URL baseUrl, Package... servicePkgs) {
-    return new RestServiceTestEnv(baseUrl,
-            some(new PackagesResourceConfig(toArray(String.class, mlist(servicePkgs).map(pkgName).value()))));
-  }
-
   public static RestServiceTestEnv testEnvForClasses(URL baseUrl, Class... restServices) {
-    return new RestServiceTestEnv(baseUrl, some(new ClassNamesResourceConfig(restServices)));
-  }
-
-  public static RestServiceTestEnv testEnvForCustomConfig(String baseUrl, ResourceConfig cfg) {
-    return new RestServiceTestEnv(UrlSupport.url(baseUrl), some(cfg));
+    return new RestServiceTestEnv(baseUrl, some(new ResourceConfig(restServices)));
   }
 
   public static RestServiceTestEnv testEnvForCustomConfig(URL baseUrl, ResourceConfig cfg) {
@@ -195,34 +173,4 @@ public final class RestServiceTestEnv {
     }
   }
 
-  private static final Function<Package, String> pkgName = new Function<Package, String>() {
-    @Override
-    public String apply(Package pkg) {
-      return pkg.getName();
-    }
-  };
-
-  // Hamcrest matcher
-
-  public static class RegexMatcher extends BaseMatcher<String> {
-    private final Pattern p;
-
-    public RegexMatcher(String pattern) {
-      p = Pattern.compile(pattern);
-    }
-
-    public static RegexMatcher regex(String pattern) {
-      return new RegexMatcher(pattern);
-    }
-
-    @Override
-    public boolean matches(Object item) {
-      return item != null && p.matcher(item.toString()).matches();
-    }
-
-    @Override
-    public void describeTo(Description description) {
-      description.appendText("regex [" + p.pattern() + "]");
-    }
-  }
 }

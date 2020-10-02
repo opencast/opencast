@@ -11,7 +11,7 @@
   </service>
 
   <reference bind="setListProvidersService" cardinality="1..1"
-             interface="org.opencastproject.index.service.resources.list.api.ListProvidersService"
+             interface="org.opencastproject.list.api.ListProvidersService"
              name="ListProvidersService" policy="static"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
              cardinality="1..1" policy="static" bind="setSecurityService"/>

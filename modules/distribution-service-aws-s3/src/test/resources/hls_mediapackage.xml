@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mediapackage xmlns="http://mediapackage.opencastproject.org"
+	start="2015-07-27T20:50:00Z" id="efd6e4df-63b6-49af-be5f-15f598778877"
+	duration="14226">
+	<title>Test Recording</title>
+	<series>20160119999</series>
+	<seriestitle>Test Offering for Fall 2015</seriestitle>
+	<creators>
+		<creator>rute</creator>
+	</creators>
+	<media>
+		<track type="presenter/source" id="track-1">
+			<mimetype>video/mp4</mimetype>
+			<url>video-presenter.mp4</url>
+			<duration>49040</duration>
+			<audio id="audio-1">
+				<device />
+				<encoder type="AAC" />
+				<channels>2</channels>
+				<bitrate>62256.0</bitrate>
+			</audio>
+			<video id="video-1">
+				<device />
+				<encoder type="AVC" />
+				<bitrate>2433280.0</bitrate>
+				<framerate>24.98</framerate>
+				<resolution>1920x1080</resolution>
+				<scantype type="Progressive" />
+			</video>
+			<live>false</live>
+		</track>
+		<track type="presenter/delivery" id="presenter-mp4">
+			<mimetype>video/mp4</mimetype>
+			<url>presenter-mp4/video-presenter-delivery.mp4</url>
+			<duration>14226</duration>
+			<audio id="audio-1">
+				<device />
+				<encoder type="AAC" />
+				<channels>2</channels>
+				<bitrate>96000.0</bitrate>
+			</audio>
+			<video id="video-1">
+				<device />
+				<encoder type="AVC" />
+				<bitrate>507057.0</bitrate>
+				<framerate>30.0</framerate>
+				<resolution>1440x810</resolution>
+				<scantype type="Progressive" />
+			</video>
+			<live>false</live>
+		</track>
+		<track type="presenter/delivery" id="presenter-m3u8">
+			<mimetype>application/x-mpegURL</mimetype>
+			<url>presenter-m3u8/video-presenter-delivery.m3u8</url>
+			<duration>14226</duration>
+			<audio id="audio-1">
+				<device />
+				<encoder type="AAC" />
+				<channels>2</channels>
+				<bitrate>96000.0</bitrate>
+			</audio>
+			<video id="video-1">
+				<device />
+				<encoder type="AVC" />
+				<bitrate>507057.0</bitrate>
+				<framerate>30.0</framerate>
+				<resolution>1440x810</resolution>
+				<scantype type="Progressive" />
+			</video>
+			<live>false</live>
+		</track>
+	</media>
+	<metadata>
+		<catalog type="dublincore/episode" id="episode-dc">
+			<mimetype>text/xml</mimetype>
+			<url>episode-dublincore.xml</url>
+		</catalog>
+		<catalog type="dublincore/series" id="series-dc">
+			<mimetype>text/xml</mimetype>
+			<url>series-dublincore.xml</url>
+		</catalog>
+	</metadata>
+	<attachments />
+</mediapackage>

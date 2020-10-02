@@ -21,7 +21,7 @@
 
 /* global define, pushHistory */
 
-define(['jquery', 'bootbox.min', 'underscore-min', 'alertify/alertify', 'js-yaml.min', 'bootstrap-accessibility',
+define(['jquery', 'bootbox.min', 'underscore', 'alertify/alertify', 'js-yaml.min', 'bootstrap-accessibility',
   'jquery.liveSearch', 'seedrandom.min', 'jquery.utils',
   'dropdowns-enhancement'
 ],
@@ -257,7 +257,7 @@ function($, bootbox, _, alertify, jsyaml) {
     // search query from form
     searchQuery = GetURLParameter('q') == undefined ? '' : 'q=' + GetURLParameter('q') + '&';
     log('Searching for: ' + searchQuery);
-    if (searchQuery != '') $('#searchInput').val(decodeURI(GetURLParameter('q')));
+    if (searchQuery != '') $('#searchInput').val(decodeURIComponent(GetURLParameter('q').replace(/\+/g, ' ')));
 
     // sort
     if (GetURLParameter('sort') == undefined) {
@@ -624,10 +624,9 @@ function($, bootbox, _, alertify, jsyaml) {
 
       var tile = mediaContainer +
                     '<a class="tile" id="' + serID + '" role="menuitem" tabindex="' + tabIndexNumber++ + '">' +
-                    '<div class="' + seriesClass + 'seriesindicator "/> ' +
-                    '<div class="tilecontent">';
-
-      tile = tile + '<h4 class="title">' + _.escape(data.dcTitle) + '</h4>';
+                    '<div class="' + seriesClass + 'seriesindicator"></div> ' +
+                    '<div class="tilecontent">' +
+                    '<h4 class="title">' + _.escape(data.dcTitle) + '</h4>';
 
       // append thumbnail
       var thumb = '';
@@ -705,9 +704,8 @@ function($, bootbox, _, alertify, jsyaml) {
             } else live = _.escape(msg_live_in_progress);
           }
         }
-        tile = tile + '<div class="live">' + live + '</div>';
-
-        tile = tile + '</div></div></div></a>';
+        tile += '<div class="live">' + live + '</div>' +
+                '</div></div></a></div>';
 
         $($main_container).append(tile);
 
@@ -748,10 +746,9 @@ function($, bootbox, _, alertify, jsyaml) {
 
       var tile = mediaContainer +
                   '<a class=tile id="' + _.escape(data.id) + '" role=menuitem tabindex="' + tabIndexNumber++ + '"> ' +
-                  '<div class="' + seriesClass + 'seriesindicator "/> ' +
-                  '<div class="tilecontent">';
-
-      tile = tile + '<h4 class="title">' + (data.dcTitle ? _.escape(data.dcTitle) : 'Unknown title') + '</h4>';
+                  '<div class="' + seriesClass + 'seriesindicator"></div>' +
+                  '<div class="tilecontent">' +
+                  '<h4 class="title">' + (data.dcTitle ? _.escape(data.dcTitle) : 'Unknown title') + '</h4>';
 
       if (data.dcCreator) {
         creator = _.escape(data.dcCreator);
@@ -761,9 +758,8 @@ function($, bootbox, _, alertify, jsyaml) {
       if (data.dcContributor) {
         contributor = _.escape(data.dcContributor);
       }
-      tile = tile + '<div class="contributor">' + contributor + '</div>';
-
-      tile = tile + '</div></div></a>';
+      tile += '<div class="contributor">' + contributor + '</div>' +
+              '</div></a></div>';
 
       $($main_container).append(tile);
       $('#' + _.escape(data.id)).attr('href', '?e=1&p=1&epFrom=' + _.escape(data.id));

@@ -24,24 +24,34 @@
 'use strict';
 var gulp = require('gulp');
 var spawn = require('child_process').spawn;
-var mergeStream = require('merge-stream');
+var request = require('request');
+var source = require('vinyl-source-stream');
+var gunzip = require('gulp-gunzip');
+var untar = require('gulp-untar');
 
+var PAELLA_VERSION = '6.4.3';
 
 var buildPath = 'target/gulp',
-    paellaSrc = 'src/main/paella-opencast';
+    paellaSrc = 'src/main/paella-opencast',
+    paellaBuildPath = buildPath + '/paella-' + PAELLA_VERSION;
 
 
-gulp.task('paella-opencast:prepare:source', function(){
-  var s1 = gulp.src('node_modules/paellaplayer/**').pipe(gulp.dest(buildPath + '/paella'));
-  var s2 = gulp.src(paellaSrc + '/plugins/**').pipe(gulp.dest(buildPath + '/paella/plugins'));
-
-  return mergeStream(s1,s2);
+gulp.task('paella-opencast:download:paella', function(){
+  return request('https://github.com/polimediaupv/paella/archive/' + PAELLA_VERSION + '.tar.gz')
+  .pipe(source(PAELLA_VERSION + '.tar.gz'))
+  .pipe(gunzip())
+  .pipe(untar())
+  .pipe(gulp.dest(buildPath));
 });
 
 
+gulp.task('paella-opencast:prepare:source', gulp.series('paella-opencast:download:paella', function(){
+  return gulp.src(paellaSrc + '/plugins/**').pipe(gulp.dest(paellaBuildPath + '/plugins'));
+}));
+
 
 gulp.task('paella-opencast:prepare', gulp.series('paella-opencast:prepare:source', function(cb){
-  var cmd_npm = spawn('npm', ['install'], {cwd: buildPath + '/paella', stdio: 'inherit'});
+  var cmd_npm = spawn('npm', ['ci'], {cwd: paellaBuildPath });
   cmd_npm.on('close', function (code) {
     cb(code);
   });
@@ -49,14 +59,14 @@ gulp.task('paella-opencast:prepare', gulp.series('paella-opencast:prepare:source
 
 
 gulp.task('paella-opencast:compile.debug', gulp.series('paella-opencast:prepare', function(cb){
-  var cmd_npm = spawn('node', ['node_modules/gulp/bin/gulp.js', 'build.debug'], {cwd: buildPath + '/paella'});
+  var cmd_npm = spawn('node', ['node_modules/gulp/bin/gulp.js', 'build.debug'], {cwd: paellaBuildPath});
   cmd_npm.on('close', function (code) {
     cb(code);
   });
 }));
 
 gulp.task('paella-opencast:compile.release', gulp.series('paella-opencast:prepare', function(cb){
-  var cmd_npm = spawn('node', ['node_modules/gulp/bin/gulp.js', 'build.release'], {cwd: buildPath + '/paella'});
+  var cmd_npm = spawn('node', ['node_modules/gulp/bin/gulp.js', 'build.release'], {cwd: paellaBuildPath});
   cmd_npm.on('close', function (code) {
     cb(code);
   });
@@ -65,7 +75,7 @@ gulp.task('paella-opencast:compile.release', gulp.series('paella-opencast:prepar
 
 gulp.task('paella-opencast:build', gulp.series('paella-opencast:compile.debug', function(){
   return gulp.src([
-    buildPath + '/paella/build/player/**',
+    paellaBuildPath + '/build/player/**',
     paellaSrc + '/ui/**'
 
   ]).pipe(gulp.dest(buildPath + '/paella-opencast'));

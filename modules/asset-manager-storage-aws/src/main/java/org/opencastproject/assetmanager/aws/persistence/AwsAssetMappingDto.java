@@ -40,18 +40,22 @@ import javax.persistence.Query;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlAttribute;
 
 @Entity(name = "AwsAssetMapping")
-@Table(name = "oc_aws_asset_mapping")
+@Table(name = "oc_aws_asset_mapping", uniqueConstraints = @UniqueConstraint(
+    name = "UNQ_aws_archive_mapping_0",
+    columnNames = {"organization", "mediapackage", "mediapackage_element", "version"}
+))
 @NamedQueries({
-        // These exclude deleted mappings!
-        @NamedQuery(name = "AwsAssetMapping.findActiveMapping", query = "SELECT m FROM AwsAssetMapping m WHERE m.organizationId = :organizationId AND m.mediaPackageId = :mediaPackageId AND m.mediaPackageElementId = :mediaPackageElementId AND m.version = :version AND m.deletionDate IS NULL"),
-        @NamedQuery(name = "AwsAssetMapping.findAllActiveByObjectKey", query = "SELECT m FROM AwsAssetMapping m WHERE m.objectKey = :objectKey AND m.deletionDate IS NULL"),
-        @NamedQuery(name = "AwsAssetMapping.findAllActiveByMediaPackage", query = "SELECT m FROM AwsAssetMapping m WHERE m.organizationId = :organizationId AND m.mediaPackageId = :mediaPackageId  AND m.deletionDate IS NULL"),
-        @NamedQuery(name = "AwsAssetMapping.findAllActiveByMediaPackageAndVersion", query = "SELECT m FROM AwsAssetMapping m WHERE m.organizationId = :organizationId AND m.mediaPackageId = :mediaPackageId AND m.version = :version AND m.deletionDate IS NULL"),
-        // This is to be used when restoring/re-ingesting mps so includes deleted mapings!
-        @NamedQuery(name = "AwsAssetMapping.findAllByMediaPackage", query = "SELECT m FROM AwsAssetMapping m WHERE m.mediaPackageId = :mediaPackageId ORDER BY m.version DESC") })
+    // These exclude deleted mappings!
+    @NamedQuery(name = "AwsAssetMapping.findActiveMapping", query = "SELECT m FROM AwsAssetMapping m WHERE m.organizationId = :organizationId AND m.mediaPackageId = :mediaPackageId AND m.mediaPackageElementId = :mediaPackageElementId AND m.version = :version AND m.deletionDate IS NULL"),
+    @NamedQuery(name = "AwsAssetMapping.findAllActiveByObjectKey", query = "SELECT m FROM AwsAssetMapping m WHERE m.objectKey = :objectKey AND m.deletionDate IS NULL"),
+    @NamedQuery(name = "AwsAssetMapping.findAllActiveByMediaPackage", query = "SELECT m FROM AwsAssetMapping m WHERE m.organizationId = :organizationId AND m.mediaPackageId = :mediaPackageId  AND m.deletionDate IS NULL"),
+    @NamedQuery(name = "AwsAssetMapping.findAllActiveByMediaPackageAndVersion", query = "SELECT m FROM AwsAssetMapping m WHERE m.organizationId = :organizationId AND m.mediaPackageId = :mediaPackageId AND m.version = :version AND m.deletionDate IS NULL"),
+    // This is to be used when restoring/re-ingesting mps so includes deleted mapings!
+    @NamedQuery(name = "AwsAssetMapping.findAllByMediaPackage", query = "SELECT m FROM AwsAssetMapping m WHERE m.mediaPackageId = :mediaPackageId ORDER BY m.version DESC") })
 public final class AwsAssetMappingDto {
 
   @Id

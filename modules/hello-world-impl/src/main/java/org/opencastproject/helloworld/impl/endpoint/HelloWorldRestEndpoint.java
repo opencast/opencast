@@ -27,6 +27,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,16 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint for the {@link HelloWorldService} service
  */
+@Component(
+  property = {
+    "service.description=Hello World REST Endpoint",
+    "opencast.service.type=org.opencastproject.helloworld",
+    "opencast.service.path=/helloworld",
+    "opencast.service.jobproducer=false"
+  },
+  immediate = true,
+  service = HelloWorldRestEndpoint.class
+)
 @Path("/")
 @RestService(name = "HelloWorldServiceEndpoint",
     title = "Hello World Service Endpoint",
@@ -71,7 +83,7 @@ public class HelloWorldRestEndpoint {
   @Path("helloworld")
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(name = "helloworld", description = "example service call",
-      reponses = {@RestResponse(description = "Hello World", responseCode = HttpServletResponse.SC_OK),
+      responses = {@RestResponse(description = "Hello World", responseCode = HttpServletResponse.SC_OK),
         @RestResponse(description = "The underlying service could not output something.",
             responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
       returnDescription = "The text that the service returns.")
@@ -94,7 +106,7 @@ public class HelloWorldRestEndpoint {
   @RestQuery(name = "helloname", description = "example service call with parameter",
       restParameters = { @RestParameter(description = "name to output", isRequired = false, name = "name",
           type = RestParameter.Type.TEXT) },
-      reponses = {@RestResponse(description = "Hello or Hello Name", responseCode = HttpServletResponse.SC_OK),
+      responses = {@RestResponse(description = "Hello or Hello Name", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The underlying service could not output something.",
               responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
       returnDescription = "The text that the service returns.")
@@ -110,6 +122,7 @@ public class HelloWorldRestEndpoint {
     return docs;
   }
 
+  @Reference(name = "helloworld-service")
   public void setHelloWorldService(HelloWorldService service) {
     this.helloWorldService = service;
   }

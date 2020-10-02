@@ -20,8 +20,6 @@
  */
 package org.opencastproject.userdirectory.ldap;
 
-import static java.lang.String.format;
-
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -331,7 +329,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
    * @param params
    */
   private void debug(String message, Object... params) {
-    logger.debug(format("(%s) %s", hashCode(), message), params);
+    logger.debug("({}) {}", hashCode(), message, params);
   }
 
   /**
@@ -341,7 +339,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
    * @param params
    */
   private void error(String message, Object... params) {
-    logger.error(format("(%s) %s", hashCode(), message), params);
+    logger.error("({}) {}", hashCode(), message, params);
   }
 
   /**
@@ -351,7 +349,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
    * @param params
    */
   private void info(String message, Object... params) {
-    logger.info(format("(%s) %s", hashCode(), message), params);
+    logger.info("({}) {}", hashCode(), message, params);
   }
 
   /** OSGi callback for setting the role group service. */

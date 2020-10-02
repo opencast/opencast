@@ -29,6 +29,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -36,13 +38,16 @@ import javax.persistence.UniqueConstraint;
 
 /** Entity object for user settings. */
 @Entity(name = "UserSettings")
-@Table(name = "oc_user_settings", uniqueConstraints = { @UniqueConstraint(columnNames = { "id"}) })
+@Table(name = "oc_user_settings", indexes = {
+    @Index(name = "IX_oc_user_setting_organization", columnList = "organization")
+  }, uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "username", "organization" }) })
 @NamedQueries({
-        @NamedQuery(name = "UserSettings.countByUserName", query = "SELECT COUNT(us) FROM UserSettings us WHERE us.username = :username AND us.organization = :org"),
-        @NamedQuery(name = "UserSettings.findByIdAndUsernameAndOrg", query = "SELECT us FROM UserSettings us WHERE us.id = :id AND us.username = :username AND us.organization = :org"),
-        @NamedQuery(name = "UserSettings.findByUserName", query = "SELECT us FROM UserSettings us WHERE us.username = :username AND us.organization = :org"),
-        @NamedQuery(name = "UserSettings.findByKey", query = "SELECT us FROM UserSettings us WHERE us.key = :key AND us.username = :username AND us.organization = :org"),
-        @NamedQuery(name = "UserSettings.clear", query = "DELETE FROM UserSettings us WHERE us.organization = :org") })
+  @NamedQuery(name = "UserSettings.countByUserName", query = "SELECT COUNT(us) FROM UserSettings us WHERE us.username = :username AND us.organization = :org"),
+  @NamedQuery(name = "UserSettings.findByIdAndUsernameAndOrg", query = "SELECT us FROM UserSettings us WHERE us.id = :id AND us.username = :username AND us.organization = :org"),
+  @NamedQuery(name = "UserSettings.findByUserName", query = "SELECT us FROM UserSettings us WHERE us.username = :username AND us.organization = :org"),
+  @NamedQuery(name = "UserSettings.findByKey", query = "SELECT us FROM UserSettings us WHERE us.key = :key AND us.username = :username AND us.organization = :org"),
+  @NamedQuery(name = "UserSettings.clear", query = "DELETE FROM UserSettings us WHERE us.organization = :org") })
 public class UserSettingDto {
   @Id
   @GeneratedValue
@@ -52,10 +57,11 @@ public class UserSettingDto {
   @Column(name = "setting_key", nullable = false)
   private String key;
 
+  @Lob
   @Column(name = "setting_value", nullable = false)
   private String value;
 
-  @Column(name = "username", nullable = false)
+  @Column(name = "username", nullable = false, length = 128)
   private String username;
 
   @Column(name = "organization", nullable = false)

@@ -79,7 +79,6 @@ import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,7 +177,7 @@ public class ThemesEndpoint {
           @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
           @RestParameter(defaultValue = "0", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the following: NAME, CREATOR.  Add '_DESC' to reverse the sort order (e.g. CREATOR_DESC).", type = STRING) }, reponses = { @RestResponse(description = "A JSON representation of the themes", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+          @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the following: NAME, CREATOR.  Add '_DESC' to reverse the sort order (e.g. CREATOR_DESC).", type = STRING) }, responses = { @RestResponse(description = "A JSON representation of the themes", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getThemes(@QueryParam("filter") String filter, @QueryParam("limit") int limit,
           @QueryParam("offset") int offset, @QueryParam("sort") String sort) {
     Option<Integer> optLimit = Option.option(limit);
@@ -260,7 +259,7 @@ public class ThemesEndpoint {
   @GET
   @Path("{themeId}.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getTheme", description = "Returns the theme by the given id as JSON", returnDescription = "The theme as JSON", pathParameters = { @RestParameter(name = "themeId", description = "The theme id", isRequired = true, type = RestParameter.Type.INTEGER) }, reponses = {
+  @RestQuery(name = "getTheme", description = "Returns the theme by the given id as JSON", returnDescription = "The theme as JSON", pathParameters = { @RestParameter(name = "themeId", description = "The theme id", isRequired = true, type = RestParameter.Type.INTEGER) }, responses = {
           @RestResponse(description = "Returns the theme as JSON", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No theme with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getThemeResponse(@PathParam("themeId") long id) throws Exception {
@@ -274,7 +273,7 @@ public class ThemesEndpoint {
   @GET
   @Path("{themeId}/usage.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getThemeUsage", description = "Returns the theme usage by the given id as JSON", returnDescription = "The theme usage as JSON", pathParameters = { @RestParameter(name = "themeId", description = "The theme id", isRequired = true, type = RestParameter.Type.INTEGER) }, reponses = {
+  @RestQuery(name = "getThemeUsage", description = "Returns the theme usage by the given id as JSON", returnDescription = "The theme usage as JSON", pathParameters = { @RestParameter(name = "themeId", description = "The theme id", isRequired = true, type = RestParameter.Type.INTEGER) }, responses = {
           @RestResponse(description = "Returns the theme usage as JSON", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Theme with the given id does not exist", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getThemeUsage(@PathParam("themeId") long themeId) throws Exception {
@@ -288,8 +287,8 @@ public class ThemesEndpoint {
     try {
       results = searchIndex.getByQuery(query);
     } catch (SearchIndexException e) {
-      logger.error("The admin UI Search Index was not able to get the series with theme '{}': {}", themeId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("The admin UI Search Index was not able to get the series with theme '{}':", themeId,
+              e);
       return RestUtil.R.serverError();
     }
     List<JValue> seriesValues = new ArrayList<JValue>();
@@ -318,7 +317,7 @@ public class ThemesEndpoint {
           @RestParameter(name = "licenseSlideBackground", description = "The theme license slide background file", isRequired = false, type = Type.STRING),
           @RestParameter(name = "titleSlideMetadata", description = "The theme title slide metadata", isRequired = false, type = Type.STRING),
           @RestParameter(name = "licenseSlideDescription", description = "The theme license slide description", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "watermarkPosition", description = "The theme watermark position", isRequired = false, type = Type.STRING), }, reponses = {
+          @RestParameter(name = "watermarkPosition", description = "The theme watermark position", isRequired = false, type = Type.STRING), }, responses = {
           @RestResponse(responseCode = SC_OK, description = "Theme created"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "The theme references a non-existing file") })
   public Response createTheme(@FormParam("default") boolean isDefault, @FormParam("name") String name,
@@ -380,7 +379,7 @@ public class ThemesEndpoint {
           @RestParameter(name = "licenseSlideBackground", description = "The theme license slide background file", isRequired = false, type = Type.STRING),
           @RestParameter(name = "titleSlideMetadata", description = "The theme title slide metadata", isRequired = false, type = Type.STRING),
           @RestParameter(name = "licenseSlideDescription", description = "The theme license slide description", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "watermarkPosition", description = "The theme watermark position", isRequired = false, type = Type.STRING), }, reponses = {
+          @RestParameter(name = "watermarkPosition", description = "The theme watermark position", isRequired = false, type = Type.STRING), }, responses = {
           @RestResponse(responseCode = SC_OK, description = "Theme updated"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "If the theme has not been found."), })
   public Response updateTheme(@PathParam("themeId") long themeId, @FormParam("default") Boolean isDefault,
@@ -460,7 +459,7 @@ public class ThemesEndpoint {
 
   @DELETE
   @Path("{themeId}")
-  @RestQuery(name = "deleteTheme", description = "Deletes a theme", returnDescription = "The method doesn't return any content", pathParameters = { @RestParameter(name = "themeId", isRequired = true, description = "The theme identifier", type = RestParameter.Type.INTEGER) }, reponses = {
+  @RestQuery(name = "deleteTheme", description = "Deletes a theme", returnDescription = "The method doesn't return any content", pathParameters = { @RestParameter(name = "themeId", isRequired = true, description = "The theme identifier", type = RestParameter.Type.INTEGER) }, responses = {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "If the theme has not been found."),
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The method does not return any content"),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
@@ -482,8 +481,8 @@ public class ThemesEndpoint {
       logger.warn("Unable to find a theme with id " + themeId);
       throw e;
     } catch (ThemesServiceDatabaseException e) {
-      logger.error("Error getting theme {} during delete operation because: {}", themeId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Error getting theme {} during delete operation because:", themeId,
+              e);
       return RestUtil.R.serverError();
     }
   }
@@ -501,8 +500,7 @@ public class ThemesEndpoint {
     try {
       results = searchIndex.getByQuery(query);
     } catch (SearchIndexException e) {
-      logger.error("The admin UI Search Index was not able to get the series with theme '{}': {}", themeId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("The admin UI Search Index was not able to get the series with theme '{}':", themeId, e);
       throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
     }
     for (SearchResultItem<Series> item : results.getItems()) {

@@ -42,8 +42,6 @@ import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.util.DateTimeSupport;
@@ -105,7 +103,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           Opt<String> schedulingSource) throws UnauthorizedException, SchedulerConflictException,
           SchedulerException {
     HttpPost post = new HttpPost("/");
-    String eventId = mediaPackage.getIdentifier().compact();
+    String eventId = mediaPackage.getIdentifier().toString();
     logger.debug("Start adding a new event {} through remote Schedule Service", eventId);
 
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -174,7 +172,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       params.add(new BasicNameValuePair("source", schedulingSource.get()));
     post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
-    String eventId = templateMp.getIdentifier().compact();
+    String eventId = templateMp.getIdentifier().toString();
 
     HttpResponse response = getResponse(post, SC_CREATED, SC_UNAUTHORIZED, SC_CONFLICT);
     try {
@@ -430,38 +428,6 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       closeConnection(response);
     }
     throw new SchedulerException("Unable to get the technical metadata from remote scheduler service");
-  }
-
-  @Override
-  public AccessControlList getAccessControlList(String eventId)
-          throws NotFoundException, UnauthorizedException, SchedulerException {
-    HttpGet get = new HttpGet(eventId.concat("/acl"));
-    HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_NO_CONTENT, SC_UNAUTHORIZED);
-    try {
-      if (response != null) {
-        switch (response.getStatusLine().getStatusCode()) {
-          case SC_NOT_FOUND:
-            throw new NotFoundException("Event '" + eventId + "' not found on remote scheduler service!");
-          case SC_NO_CONTENT:
-            return null;
-          case SC_UNAUTHORIZED:
-            logger.info("Unauthorized to get acl of the event {}.", eventId);
-            throw new UnauthorizedException("Unauthorized to get acl of the event " + eventId);
-          default:
-            String aclString = EntityUtils.toString(response.getEntity(), "UTF-8");
-            AccessControlList accessControlList = AccessControlParser.parseAcl(aclString);
-            logger.info("Successfully get event {} access control list from the remote scheduler service", eventId);
-            return accessControlList;
-        }
-      }
-    } catch (NotFoundException | UnauthorizedException e) {
-      throw e;
-    } catch (Exception e) {
-      throw new SchedulerException("Unable to get event access control list from remote scheduler service", e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new SchedulerException("Unable to get event access control list from remote scheduler service");
   }
 
   @Override

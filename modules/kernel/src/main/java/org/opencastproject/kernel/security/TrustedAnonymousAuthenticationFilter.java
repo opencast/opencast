@@ -21,8 +21,6 @@
 
 package org.opencastproject.kernel.security;
 
-import org.opencastproject.security.api.SecurityConstants;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 
@@ -44,10 +42,7 @@ public class TrustedAnonymousAuthenticationFilter extends AnonymousAuthenticatio
   @Override
   @Deprecated
   protected boolean applyAnonymousForThisRequest(HttpServletRequest request) {
-    if (StringUtils.isNotBlank(request.getHeader(SecurityConstants.AUTHORIZATION_HEADER))) {
-      return false;
-    }
-    return true;
+    return StringUtils.isBlank(request.getHeader(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER));
   }
 
 }

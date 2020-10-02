@@ -21,10 +21,11 @@
 
 package org.opencastproject.index.service.resources.list.query;
 
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter.SourceType;
 import org.opencastproject.index.service.resources.list.provider.UsersListProvider;
 import org.opencastproject.index.service.util.FiltersUtils;
+import org.opencastproject.list.api.ResourceListFilter;
+import org.opencastproject.list.api.ResourceListFilter.SourceType;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.util.data.Option;
 
 /**
@@ -123,7 +124,7 @@ public class UsersListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createNameFilter(Option<String> name) {
     return FiltersUtils.generateFilter(name, FILTER_NAME_NAME, FILTER_NAME_LABEL, SourceType.SELECT,
-            Option.some(UsersListProvider.NAME));
+            Option.some(UsersListProvider.NAME_ONLY));
   }
 
   /**
@@ -135,7 +136,7 @@ public class UsersListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createRoleFilter(Option<String> role) {
     return FiltersUtils.generateFilter(role, FILTER_ROLE_NAME, FILTER_ROLE_LABEL, SourceType.SELECT,
-            Option.some(UsersListProvider.ROLE));
+            Option.some(UsersListProvider.ROLE_ONLY));
   }
 
   /**
@@ -147,7 +148,7 @@ public class UsersListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createProviderFilter(Option<String> provider) {
     return FiltersUtils.generateFilter(provider, FILTER_PROVIDER_NAME, FILTER_PROVIDER_LABEL, SourceType.SELECT,
-            Option.some(UsersListProvider.USERDIRECTORY));
+            Option.some(UsersListProvider.USERDIRECTORY_ONLY));
   }
 
 }

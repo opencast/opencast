@@ -31,53 +31,52 @@ import org.opencastproject.matterhorn.search.SearchQuery.Order;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.core.config.Configurator;
-import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.http.HttpHost;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.ResourceAlreadyExistsException;
+import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.DocWriteResponse;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.delete.DeleteRequestBuilder;
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.get.GetRequestBuilder;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexRequestBuilder;
-import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.support.WriteRequest;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.settings.loader.JsonSettingsLoader;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.indices.CreateIndexRequest;
+import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.node.Node;
-import org.elasticsearch.node.NodeValidationException;
+import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.ScriptSortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.ComponentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * A search index implementation based on ElasticSearch.
@@ -90,11 +89,23 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /** The Elasticsearch maximum results window size */
   private static final int ELASTICSEARCH_INDEX_MAX_RESULT_WINDOW = Integer.MAX_VALUE;
 
-  /** Configuration key defining the address of an external Elasticsearch server */
-  public static final String ELASTICSEARCH_SERVER_ADDRESS_KEY = "org.opencastproject.elasticsearch.server.address";
+  /** Configuration key defining the hostname of an external Elasticsearch server */
+  public static final String ELASTICSEARCH_SERVER_HOSTNAME_KEY = "org.opencastproject.elasticsearch.server.hostname";
+
+  /** Configuration key defining the scheme (http/https) of an external Elasticsearch server */
+  public static final String ELASTICSEARCH_SERVER_SCHEME_KEY = "org.opencastproject.elasticsearch.server.scheme";
 
   /** Configuration key defining the port of an external Elasticsearch server */
   public static final String ELASTICSEARCH_SERVER_PORT_KEY = "org.opencastproject.elasticsearch.server.port";
+
+  /** Default port of an external Elasticsearch server */
+  private static final int ELASTICSEARCH_SERVER_PORT_DEFAULT = 9200;
+
+  /** Default hostname of an external Elasticsearch server */
+  private static final String ELASTICSEARCH_SERVER_HOSTNAME_DEFAULT = "localhost";
+
+  /** Default scheme of an external Elasticsearch server */
+  private static final String ELASTICSEARCH_SERVER_SCHEME_DEFAULT = "http";
 
   /** Identifier of the root entry */
   private static final String ROOT_ID = "root";
@@ -105,14 +116,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /** The index identifier */
   private String index = null;
 
-  /** The local elastic search node */
-  private static Node elasticSearch = null;
-
-  /** List of clients to the local node */
-  private static List<Client> elasticSearchClients = new ArrayList<>();
-
-  /** Client for talking to elastic search */
-  private Client nodeClient = null;
+  /** The high level client */
+  private RestHighLevelClient client = null;
 
   /** List of sites with prepared index */
   private final List<String> preparedIndices = new ArrayList<>();
@@ -123,14 +128,14 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /** The path to the index settings */
   protected String indexSettingsPath;
 
-  /**
-   * Address of an external Elasticsearch server to connect to.
-   * Opencast will not try to launch an internal server if this is defined.
-   **/
-  private String externalServerAddress = null;
+  /** Hostname of an external Elasticsearch server to connect to. */
+  private String externalServerHostname = ELASTICSEARCH_SERVER_HOSTNAME_DEFAULT;
+
+  /** Scheme of an external Elasticsearch server to connect to. */
+  private String externalServerScheme = ELASTICSEARCH_SERVER_SCHEME_DEFAULT;
 
   /** Port of an external Elasticsearch server to connect to */
-  private int externalServerPort = 9300;
+  private int externalServerPort = ELASTICSEARCH_SERVER_PORT_DEFAULT;
 
   /**
    * Returns an array of document types for the index. For every one of these, the corresponding document type
@@ -153,64 +158,45 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     if (indexSettingsPath == null) {
       throw new ComponentException("Could not determine Karaf configuration path");
     }
-
-    // Address of an external Elasticsearch node.
-    // It's fine if this is not set. Opencast will then launch its own node.
-    externalServerAddress = StringUtils.trimToNull(ctx.getBundleContext().getProperty(ELASTICSEARCH_SERVER_ADDRESS_KEY));
-
-    // Silently fall back to port 9300
-    externalServerPort = Integer.parseInt(StringUtils.defaultIfBlank(
-            ctx.getBundleContext().getProperty(ELASTICSEARCH_SERVER_PORT_KEY), "9300"));
+    externalServerHostname = StringUtils
+            .defaultIfBlank(ctx.getBundleContext().getProperty(ELASTICSEARCH_SERVER_HOSTNAME_KEY),
+                    ELASTICSEARCH_SERVER_HOSTNAME_DEFAULT);
+    externalServerScheme = StringUtils
+            .defaultIfBlank(ctx.getBundleContext().getProperty(ELASTICSEARCH_SERVER_SCHEME_KEY),
+                    ELASTICSEARCH_SERVER_SCHEME_DEFAULT);
+    externalServerPort = Integer.parseInt(StringUtils
+            .defaultIfBlank(ctx.getBundleContext().getProperty(ELASTICSEARCH_SERVER_PORT_KEY),
+                    ELASTICSEARCH_SERVER_PORT_DEFAULT + ""));
   }
 
-  /**
-   * Returns the client used to query the index.
-   *
-   * @return the Elasticsearch node client
-   */
-  protected Client getSearchClient() {
-    return nodeClient;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public int getIndexVersion() {
     return indexVersion;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   public void clear() throws IOException {
     try {
-      IndicesExistsResponse indicesExistsResponse = nodeClient.admin().indices()
-              .exists(new IndicesExistsRequest(getIndexName())).actionGet();
-      if (indicesExistsResponse.isExists()) {
-        AcknowledgedResponse delete = nodeClient.admin().indices().delete(new DeleteIndexRequest(getIndexName()))
-                .actionGet();
-        if (!delete.isAcknowledged())
-          logger.error("Index '{}' could not be deleted", getIndexName());
-      } else {
-        logger.error("Cannot clear non-existing index '{}'", getIndexName());
+      final DeleteIndexRequest request = new DeleteIndexRequest(
+              Arrays.stream(getDocumentTypes()).map(this::getIndexName).toArray(String[]::new));
+      final AcknowledgedResponse delete = client.indices().delete(request, RequestOptions.DEFAULT);
+      if (!delete.isAcknowledged()) {
+        logger.error("Index '{}' could not be deleted", getIndexName());
       }
-    } catch (Throwable t) {
-      throw new IOException("Cannot clear index", t);
-    }
-
-    preparedIndices.remove(getIndexName());
-    // Create the index
-    try {
-      createIndex(index);
+      preparedIndices
+              .removeAll(Arrays.stream(getDocumentTypes()).map(this::getIndexName).collect(Collectors.toList()));
+      createIndex(getIndexName());
+    } catch (ElasticsearchException exception) {
+      if (exception.status() == RestStatus.NOT_FOUND) {
+        logger.error("Cannot clear non-existing index '{}'", exception.getIndex().getName());
+      }
     } catch (SearchIndexException e) {
       logger.error("Unable to re-create the index after a clear", e);
     }
   }
 
   /**
-   * Removes the given document from the specified index.
+   * Removes the given document from the index.
    *
    * @param type
    *          the document type
@@ -221,25 +207,21 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    *           if deletion fails
    */
   protected boolean delete(String type, String uid) throws SearchIndexException {
-
-    if (!preparedIndices.contains(index)) {
-      try {
-        createIndex(index);
-      } catch (IOException e) {
-        throw new SearchIndexException(e);
+    try {
+      if (!preparedIndices.contains(getIndexName(type))) {
+        createSubIndex(type, getIndexName(type));
       }
+      logger.debug("Removing element with id '{}' from searching index", uid);
+      final DeleteRequest deleteRequest = new DeleteRequest(getIndexName(type), uid)
+              .setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
+      final DeleteResponse delete = client.delete(deleteRequest, RequestOptions.DEFAULT);
+      if (delete.getResult().equals(DocWriteResponse.Result.NOT_FOUND)) {
+        logger.trace("Document {} to delete was not found", uid);
+        return false;
+      }
+    } catch (IOException e) {
+      throw new SearchIndexException(e);
     }
-
-    logger.debug("Removing element with id '{}' from searching index", uid);
-
-    DeleteRequestBuilder deleteRequest = nodeClient.prepareDelete(index, type, uid);
-    deleteRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
-    DeleteResponse delete = deleteRequest.execute().actionGet();
-    if (delete.getResult().equals(DocWriteResponse.Result.NOT_FOUND)) {
-      logger.trace("Document {} to delete was not found", uid);
-      return false;
-    }
-
     return true;
   }
 
@@ -254,22 +236,17 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    */
   protected BulkResponse update(ElasticsearchDocument... documents) throws SearchIndexException {
 
-    BulkRequestBuilder bulkRequest = nodeClient.prepareBulk();
+    final BulkRequest bulkRequest = new BulkRequest().setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
     for (ElasticsearchDocument doc : documents) {
-      String type = doc.getType();
-      String uid = doc.getUID();
-      bulkRequest.add(nodeClient.prepareIndex(index, type, uid).setSource(doc));
+      bulkRequest.add(new IndexRequest(getIndexName(doc.getType())).id(doc.getUID()).source(doc));
     }
 
-    // Make sure the operations are searchable immediately
-    bulkRequest.setRefreshPolicy(WriteRequest.RefreshPolicy.IMMEDIATE);
-
     try {
-      BulkResponse bulkResponse = bulkRequest.execute().actionGet();
+      final BulkResponse bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
 
       // Check for errors
       if (bulkResponse.hasFailures()) {
-        for (BulkItemResponse item : bulkResponse.getItems()) {
+        for (BulkItemResponse item : bulkResponse) {
           if (item.isFailed()) {
             logger.warn("Error updating {}: {}", item, item.getFailureMessage());
             throw new SearchIndexException(item.getFailureMessage());
@@ -279,7 +256,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
       return bulkResponse;
     } catch (Throwable t) {
-      throw new SearchIndexException("Cannot update documents in index " + index, t);
+      throw new SearchIndexException("Cannot update documents in index " + getIndexName(), t);
     }
   }
 
@@ -305,38 +282,9 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     this.index = index;
     this.indexVersion = version;
 
-    // Configure and start Elasticsearch
-    synchronized (AbstractElasticsearchIndex.class) {
-
-      // Prepare the configuration of the elastic search node
-      Settings settings = loadNodeSettings();
-      if (elasticSearch == null && externalServerAddress == null) {
-        logger.info("Starting local Elasticsearch node");
-
-        // Configure and start the elastic search node. In a testing scenario,
-        // the node is being created locally.
-        elasticSearch = new OpencastNode(settings);
-        try {
-          elasticSearch.start();
-        } catch (NodeValidationException e) {
-          throw new SearchIndexException(e);
-        }
-        logger.info("Elasticsearch node is up and running");
-      }
-
-      // Create the client
-      if (nodeClient == null) {
-        if (elasticSearch == null) {
-          // configure external Elasticsearch
-          final InetAddress inetAddress = InetAddress.getByName(externalServerAddress);
-          nodeClient = new PreBuiltTransportClient(settings)
-                  .addTransportAddress(new InetSocketTransportAddress(inetAddress, externalServerPort));
-        } else {
-          // configure internal Elasticsearch
-          nodeClient = elasticSearch.client();
-        }
-        elasticSearchClients.add(nodeClient);
-      }
+    if (client == null) {
+      client = new RestHighLevelClient(
+              RestClient.builder(new HttpHost(externalServerHostname, externalServerPort, externalServerScheme)));
     }
 
     // Create the index
@@ -344,26 +292,14 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   }
 
   /**
-   * Closes the client and stops and closes the Elasticsearch node.
+   * Closes the client.
    *
    * @throws IOException
    *           if stopping the Elasticsearch node fails
    */
   protected void close() throws IOException {
-    try {
-      if (nodeClient != null) {
-        nodeClient.close();
-        synchronized (AbstractElasticsearchIndex.class) {
-          elasticSearchClients.remove(nodeClient);
-          if (elasticSearchClients.isEmpty() && elasticSearch != null) {
-            logger.info("Stopping local Elasticsearch node");
-            elasticSearch.close();
-            elasticSearch = null;
-          }
-        }
-      }
-    } catch (Throwable t) {
-      throw new IOException("Error stopping the Elasticsearch node", t);
+    if (client != null) {
+      client.close();
     }
   }
 
@@ -379,46 +315,42 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    *           if loading of the type definitions fails
    */
   private void createIndex(String idx) throws SearchIndexException, IOException {
-
-    // Make sure the site index exists
-    try {
-      IndicesExistsResponse indicesExistsResponse = nodeClient.admin().indices()
-              .exists(new IndicesExistsRequest(idx)).actionGet();
-      if (!indicesExistsResponse.isExists()) {
-        logger.debug("Trying to create index for '{}'", idx);
-        CreateIndexRequest indexCreateRequest = new CreateIndexRequest(idx)
-                .settings(new JsonSettingsLoader(false).load(loadResources("indexSettings.json")));
-        CreateIndexResponse siteIdxResponse = nodeClient.admin().indices().create(indexCreateRequest).actionGet();
-        if (!siteIdxResponse.isAcknowledged()) {
-          throw new SearchIndexException("Unable to create index for '" + idx + "'");
-        }
-      }
-    } catch (ResourceAlreadyExistsException e) {
-      logger.info("Detected existing index '{}'", idx);
-    }
-
-    // Store the correct mapping
     for (String type : getDocumentTypes()) {
-      PutMappingRequest siteMappingRequest = new PutMappingRequest(idx);
-      siteMappingRequest.source(loadResources(type + "-mapping.json"));
-      siteMappingRequest.type(type);
-      AcknowledgedResponse siteMappingResponse = nodeClient.admin().indices().putMapping(siteMappingRequest).actionGet();
-      if (!siteMappingResponse.isAcknowledged()) {
-        throw new SearchIndexException("Unable to install '" + type + "' mapping for index '" + idx + "'");
+      createSubIndex(type, getIndexName(type));
+    }
+  }
+
+  private void createSubIndex(String type, String idxName) throws SearchIndexException, IOException {
+    try {
+      logger.debug("Trying to create index for '{}'", idxName);
+      final CreateIndexRequest request = new CreateIndexRequest(idxName)
+              .settings(loadResources("indexSettings.json"), XContentType.JSON)
+              .mapping(loadResources(type + "-mapping.json"), XContentType.JSON);
+
+      final CreateIndexResponse siteIdxResponse = client.indices().create(request, RequestOptions.DEFAULT);
+      if (!siteIdxResponse.isAcknowledged()) {
+        throw new SearchIndexException("Unable to create index for '" + idxName + "'");
+      }
+    } catch (ElasticsearchStatusException e) {
+      if (e.getDetailedMessage().contains("already_exists_exception")) {
+        logger.info("Detected existing index '{}'", idxName);
+      } else {
+        throw e;
       }
     }
 
     // See if the index version exists and check if it matches. The request will
     // fail if there is no version index
     boolean versionIndexExists = false;
-    GetRequestBuilder getRequestBuilder = nodeClient.prepareGet(idx, VERSION_TYPE, ROOT_ID);
+    final GetRequest getRequest = new GetRequest(idxName, ROOT_ID);
     try {
-      GetResponse response = getRequestBuilder.execute().actionGet();
-      if (response.isExists() && response.getField(VERSION) != null) {
-        int actualIndexVersion = Integer.parseInt(response.getField(VERSION).getValue().toString());
-        if (indexVersion != actualIndexVersion)
-          throw new SearchIndexException("Search index is at version " + actualIndexVersion + ", but codebase expects "
-                  + indexVersion);
+      final GetResponse getResponse = client.get(getRequest, RequestOptions.DEFAULT);
+      if (getResponse.isExists() && getResponse.getField(VERSION) != null) {
+        final int actualIndexVersion = Integer.parseInt(getResponse.getField(VERSION).getValue().toString());
+        if (indexVersion != actualIndexVersion) {
+          throw new SearchIndexException(
+                  "Search index is at version " + actualIndexVersion + ", but codebase expects " + indexVersion);
+        }
         versionIndexExists = true;
         logger.debug("Search index version is {}", indexVersion);
       }
@@ -428,14 +360,14 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
     // The index does not exist, let's create it
     if (!versionIndexExists) {
-      logger.debug("Creating version index for site '{}'", idx);
-      IndexRequestBuilder requestBuilder = nodeClient.prepareIndex(idx, VERSION_TYPE, ROOT_ID);
-      logger.debug("Index version of site '{}' is {}", idx, indexVersion);
-      requestBuilder = requestBuilder.setSource(VERSION, Integer.toString(indexVersion));
-      requestBuilder.execute().actionGet();
+      logger.debug("Creating version index for site '{}'", idxName);
+      final IndexRequest indexRequest = new IndexRequest(idxName).id(ROOT_ID)
+              .source(Collections.singletonMap(VERSION, indexVersion + ""));
+      logger.debug("Index version of site '{}' is {}", idxName, indexVersion);
+      client.index(indexRequest, RequestOptions.DEFAULT);
     }
 
-    preparedIndices.add(idx);
+    preparedIndices.add(idxName);
   }
 
   /**
@@ -446,10 +378,10 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    *           if reading the resources fails
    */
   private String loadResources(final String filename) throws IOException {
-    final String resourcePath =  "/elasticsearch/" + filename;
+    final String resourcePath = "/elasticsearch/" + filename;
     // Try loading from the index implementation first.
     // This allows index implementations to override the defaults
-    for (Class cls: Arrays.asList(this.getClass(), AbstractElasticsearchIndex.class)) {
+    for (Class cls : Arrays.asList(this.getClass(), AbstractElasticsearchIndex.class)) {
       try (InputStream is = cls.getResourceAsStream(resourcePath)) {
         if (is != null) {
           final String settings = IOUtils.toString(is, StandardCharsets.UTF_8);
@@ -462,44 +394,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   }
 
   /**
-   * Loads the settings for the elastic search configuration at <code>etc/elasticsearch.yml</code>.
-   *
-   * @return the elastic search settings
-   * @throws IOException
-   *           if the index cannot be created in case it is not there already
-   * @throws SearchIndexException
-   *           if the index configuration cannot be found
-   */
-  private Settings loadNodeSettings() throws IOException,
-          SearchIndexException {
-    File configFile = new File(indexSettingsPath, "elasticsearch.yml");
-    if (!configFile.isFile()) {
-      throw new SearchIndexException("Settings for Elasticsearch not found at " + configFile);
-    }
-
-    // Finally, try and load the index settings
-    Settings settings = Settings.builder().loadFromPath(configFile.toPath()).build();
-    Settings.Builder preparedSettings = Settings.builder();
-    for (Map.Entry<String, String> entry: settings.getAsMap().entrySet()) {
-      String value = entry.getValue();
-      for (Map.Entry prop: System.getProperties().entrySet()) {
-        value = value.replace("${" + prop.getKey() + "}", prop.getValue().toString());
-      }
-      preparedSettings.put(entry.getKey(), value);
-    }
-
-    if (externalServerAddress == null) {
-      preparedSettings.put("transport.type", "local");
-      preparedSettings.put("http.enabled", "false");
-    }
-
-    Configurator.initialize(ConfigurationBuilderFactory.newConfigurationBuilder().build());
-
-    return preparedSettings.build();
-  }
-
-  /**
-   * Creates a request builder for a search query based on the properties known by the search query.
+   * Creates a request for a search query based on the properties known by the search query.
    * <p>
    * Once this query builder has been created, support for ordering needs to be configured as needed.
    *
@@ -507,60 +402,69 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    *          the search query
    * @return the request builder
    */
-  protected SearchRequestBuilder getSearchRequestBuilder(SearchQuery query, QueryBuilder queryBuilder) {
+  protected SearchRequest getSearchRequest(SearchQuery query, QueryBuilder queryBuilder) {
 
-    SearchRequestBuilder requestBuilder = getSearchClient().prepareSearch(getIndexName());
-    requestBuilder.setSearchType(SearchType.QUERY_THEN_FETCH);
-    requestBuilder.setPreference("_local");
+    final SearchSourceBuilder searchSource = new SearchSourceBuilder().query(queryBuilder);
 
     // Create the actual search query
-    requestBuilder.setQuery(queryBuilder);
-    logger.debug("Searching for {}", requestBuilder.toString());
+    logger.debug("Searching for {}", searchSource.toString());
 
     // Make sure all fields are being returned
     if (query.getFields().length > 0) {
-      requestBuilder.storedFields(query.getFields());
+      searchSource.storedFields(Arrays.asList(query.getFields()));
     } else {
-      requestBuilder.storedFields("*");
+      searchSource.storedFields(Collections.singletonList("*"));
     }
 
-    // Types
-    requestBuilder.setTypes(query.getTypes());
-
     // Pagination
-    if (query.getOffset() >= 0)
-      requestBuilder.setFrom(query.getOffset());
+    if (query.getOffset() >= 0) {
+      searchSource.from(query.getOffset());
+    }
 
     int limit = ELASTICSEARCH_INDEX_MAX_RESULT_WINDOW;
     if (query.getLimit() > 0) {
-      // limit + offset may not exceed some limit
-      // this limit seems to be Integer.MAX_VALUE in elasticsearch v1.3 (as we currently use)
-      // elasticsearch version 2.1 onwards documented this behaviour by index.max_result_window
-      // see https://www.elastic.co/guide/en/elasticsearch/reference/2.1/index-modules.html
       if (query.getOffset() > 0
-              && (long)query.getOffset() + (long)query.getLimit() > ELASTICSEARCH_INDEX_MAX_RESULT_WINDOW)
+              && (long) query.getOffset() + (long) query.getLimit() > ELASTICSEARCH_INDEX_MAX_RESULT_WINDOW) {
         limit = ELASTICSEARCH_INDEX_MAX_RESULT_WINDOW - query.getOffset();
-      else
+      } else {
         limit = query.getLimit();
+      }
     }
-    requestBuilder.setSize(limit);
+    searchSource.size(limit);
 
     // Sort orders
-    Map<String, Order> sortCriteria = query.getSortOrders();
+    final Map<String, Order> sortCriteria = query.getSortOrders();
     for (Entry<String, Order> sortCriterion : sortCriteria.entrySet()) {
+      ScriptSortBuilder sortBuilder = null;
+      logger.debug("Event sort criteria: {}", sortCriterion.getKey());
+      if ("publication".equals(sortCriterion.getKey())) {
+        sortBuilder = SortBuilders.scriptSort(
+            new Script("params._source.publication.length"),
+            ScriptSortBuilder.ScriptSortType.NUMBER);
+      }
       switch (sortCriterion.getValue()) {
         case Ascending:
-          requestBuilder.addSort(sortCriterion.getKey(), SortOrder.ASC);
+          if (sortBuilder != null) {
+            sortBuilder.order(SortOrder.ASC);
+            searchSource.sort(sortBuilder);
+          } else {
+            searchSource.sort(sortCriterion.getKey(), SortOrder.ASC);
+          }
           break;
         case Descending:
-          requestBuilder.addSort(sortCriterion.getKey(), SortOrder.DESC);
+          if (sortBuilder != null) {
+            sortBuilder.order(SortOrder.DESC);
+            searchSource.sort(sortBuilder);
+          } else {
+            searchSource.sort(sortCriterion.getKey(), SortOrder.DESC);
+          }
           break;
         default:
           break;
       }
     }
-
-    return requestBuilder;
+    return new SearchRequest(Arrays.stream(query.getTypes()).map(this::getIndexName).toArray(String[]::new))
+            .searchType(SearchType.QUERY_THEN_FETCH).preference("_local").source(searchSource);
   }
 
   /**
@@ -572,12 +476,28 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     return index;
   }
 
-  private class OpencastNode extends Node {
+  /*
+   * This method is a workaround to avoid accessing org.apache.lucene.search.TotalHits outside this bundle.
+   * Doing so would cause OSGi dependency problems. It seems to be a bug anyway that ES exposes this
+   * class.
+   */
+  protected long getTotalHits(SearchHits hits) {
+    return hits.getTotalHits().value;
+  }
 
-    OpencastNode(Settings preparedSettings) {
-      super(preparedSettings);
-    }
+  /**
+   * Returns the name of the sub index for the given type.
+   *
+   * @param type
+   *          The type to get the sub index for.
+   * @return the index name
+   */
+  public String getIndexName(String type) {
+    return getIndexName() + "_" + type;
+  }
 
+  protected RestHighLevelClient getClient() {
+    return client;
   }
 
 }

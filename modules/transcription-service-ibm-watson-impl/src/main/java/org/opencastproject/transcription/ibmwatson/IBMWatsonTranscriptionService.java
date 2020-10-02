@@ -595,9 +595,8 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
           String jobId = (String) jsonObject.get("id");
           String jobStatus = (String) jsonObject.get("status");
           String jobUrl = (String) jsonObject.get("url");
-          logger.info(String.format(
-                  "Transcription for mp %s has been submitted. Job id: %s, job status: %s, job url: %s", mpId,
-                  jobId, jobStatus, jobUrl));
+          logger.info("Transcription for mp {} has been submitted. Job id: {}, job status: {}, job url: {}", mpId,
+                  jobId, jobStatus, jobUrl);
 
           database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.InProgress.name(),
                   track.getDuration() == null ? 0 : track.getDuration().longValue(), null, PROVIDER);
@@ -686,9 +685,8 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     } catch (TranscriptionServiceException e) {
       throw e;
     } catch (Exception e) {
-      String msg = String.format("Exception when calling the recognitions endpoint for media package %s, job id %s",
-              mpId, jobId);
-      logger.warn(String.format(msg, mpId, jobId), e);
+      logger.warn("Exception when calling the recognitions endpoint for media package {}, job id {}",
+              mpId, jobId, e);
       throw new TranscriptionServiceException(String.format(
               "Exception when calling the recognitions endpoint for media package %s, job id %s", mpId, jobId), e);
     } finally {
@@ -785,7 +783,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       smtpService.send(toEmailAddress, String.format("%s (%s)", subject, clusterName), body);
       logger.info("Sent e-mail notification to {}", toEmailAddress);
     } catch (Exception e) {
-      logger.error(String.format("Could not send email: %s\n%s", subject, body), e);
+      logger.error("Could not send email: {}\n{}", subject, body, e);
     }
   }
 

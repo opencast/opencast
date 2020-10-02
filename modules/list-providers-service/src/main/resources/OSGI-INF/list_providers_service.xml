@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.list.impl.ListProvidersServiceImpl" immediate="true">
+  <implementation class="org.opencastproject.list.impl.ListProvidersServiceImpl"/>
+  <property name="service.description" value="Resources list providers service"/>
+  <property name="opencast.service.type"
+            value="org.opencastproject.list.api.ListProvidersService"/>
+
+  <reference name="provider" interface="org.opencastproject.list.api.ResourceListProvider"
+             cardinality="0..n" policy="dynamic" bind="addProvider" unbind="removeProvider"/>
+
+  <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
+             bind="setSecurityService"/>
+
+  <service>
+    <provide interface="org.opencastproject.list.api.ListProvidersService"/>
+  </service>
+
+</scr:component>

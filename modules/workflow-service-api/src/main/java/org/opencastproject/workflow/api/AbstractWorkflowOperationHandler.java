@@ -43,6 +43,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Constants;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Reference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,6 +74,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * @param cc
    *          The component's context, containing the properties used for configuration
    */
+  @Activate
   protected void activate(ComponentContext cc) {
     this.id = (String) cc.getProperties().get(WorkflowService.WORKFLOW_OPERATION_PROPERTY);
     this.description = (String) cc.getProperties().get(Constants.SERVICE_DESCRIPTION);
@@ -183,22 +186,6 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /**
    * Creates a result for the execution of this workflow operation handler.
-   * <p>
-   * Since there is no way for the workflow service to determine the queuing time (e. g. waiting on services), it needs
-   * to be provided by the handler.
-   *
-   * @param action
-   *          the action to take
-   * @param timeInQueue
-   *          the amount of time this handle spent waiting for services
-   * @return the result
-   */
-  protected WorkflowOperationResult createResult(Action action, long timeInQueue) {
-    return createResult(null, null, action, timeInQueue);
-  }
-
-  /**
-   * Creates a result for the execution of this workflow operation handler.
    *
    * @param mediaPackage
    *          the modified mediapackage
@@ -256,6 +243,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }

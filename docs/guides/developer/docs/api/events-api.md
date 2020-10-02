@@ -90,7 +90,7 @@ Field                | Type                                 | Description
 `presenter`\*        | [`array[string]`](types.md#array)    | The presenters of this event
 `created`\*          | [`datetime`](types.md#date-and-time) | The date and time this event was created
 `subjects`\*         | [`array[string]`](types.md#array)    | The subjects of this event
-`start`\*            | [`datetime`](types.md#date-and-time) | The bibliographic start date and time of this event
+`start`              | [`datetime`](types.md#date-and-time) | The technical (version < 1.4.0) or bibliographic (version >= 1.4.0) start date and time of this event
 `description`\*      | [`string`](types.md#basic)           | The description of this event
 `title`\*            | [`string`](types.md#basic)           | The title of this event
 `processing_state`   | [`string`](types.md#basic)           | The current processing state of this event
@@ -281,7 +281,7 @@ scheduling a single event:
   "agent_id": "ca24",
   "start": "2018-03-27T16:00:00Z",
   "end": "2018-03-27T19:00:00Z",
-  "inputs": ["default"],
+  "inputs": ["default"]
 }
 ```
 
@@ -366,7 +366,7 @@ Field                | Type                                 | Description
 `presenter`\*        | [`array[string]`](types.md#array)    | The presenters of this event
 `created`\*          | [`datetime`](types.md#date-and-time) | The date and time this event was created
 `subjects`\*         | [`array[string]`](types.md#array)    | The subjects of this event
-`start`              | [`datetime`](types.md#date-and-time) | The technical start date and time of this event
+`start`              | [`datetime`](types.md#date-and-time) | The technical (version < 1.4.0) or bibliographic (version >= 1.4.0) start date and time of this event
 `description`\*      | [`string`](types.md#basic)           | The description of this event
 `title`\*            | [`string`](types.md#basic)           | The title of this event
 `processing_state`   | [`string`](types.md#basic)           | The current processing state of this event

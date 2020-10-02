@@ -12,17 +12,7 @@ Paella has been specially designed for lecture recordings. It works with all HTM
 Have a look to the paella [features list](https://paellaplayer.upv.es/features/)
 or see them live on paella [demos page](https://paellaplayer.upv.es/demos/)
 
-Enable paella player
---------------------
-
-To enable paella player you need to edit the `prop.player` variable.
-This can be enabled for each tenant. So the configuration keys are located in
-`etc/org.opencastproject.organization-mh_default_org.cfg`.
-
-
-To activate the paella player set:
-
-    prop.player=/paella/ui/watch.html?id=#{id}
+Paella is Opencast's default player.
 
 
 Configuration
@@ -50,3 +40,10 @@ decide which one to play. Read the [es.upv.paella.opencast.loader](plugins/es.up
 plugin for more information.
 
 This feature is usefull when you have multiple audio languages, so the users can switch to the audio language they want.
+
+Selecting video canvas to use
+-----------------------------
+
+You can configure which canvas to use in order to render video files. This is usefull to enable 360 videos for example.
+Read the [es.upv.paella.opencast.loader](plugins/es.upv.paella.opencast.loader.md) documentation
+plugin for more information.

@@ -150,8 +150,8 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
         } else {
           //Else, the content is *not* local and is going to a *different* remote
           String intermediateStore = getLocalAssetStore().getStoreType();
-          logger.debug(format("Moving {} from {} to {}, then to {}",
-                  s.toString(), currentStoreId, intermediateStore, targetStoreId));
+          logger.debug("Moving {} from {} to {}, then to {}",
+                  s.toString(), currentStoreId, intermediateStore, targetStoreId);
           Version version = s.getVersion();
           String mpId = s.getMediaPackage().getIdentifier().toString();
           try {
@@ -358,18 +358,18 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
     final String orgId = snap.getOrganizationId();
     final Version version = snap.getVersion();
     final String prettyMpId = mpId + "@v" + version;
-    logger.debug(format("Moving assets for snapshot %s to store %s", prettyMpId, store.getStoreType()));
+    logger.debug("Moving assets for snapshot {} to store {}", prettyMpId, store.getStoreType());
     for (final MediaPackageElement e : snap.getMediaPackage().getElements()) {
       if (!MOVABLE_TYPES.contains(e.getElementType())) {
-        logger.debug(format("Skipping %s because type is %s", e.getIdentifier(), e.getElementType()));
+        logger.debug("Skipping {} because type is {}", e.getIdentifier(), e.getElementType());
         continue;
       }
-      logger.debug(format("Moving %s to store %s", e.getIdentifier(), store.getStoreType()));
+      logger.debug("Moving {} to store {}", e.getIdentifier(), store.getStoreType());
       final StoragePath storagePath = StoragePath.mk(orgId, mpId, version, e.getIdentifier());
       if (store.contains(storagePath)) {
-        logger.debug(format("Element %s (version %s) is already in store %s so skipping it", e.getIdentifier(),
+        logger.debug("Element {} (version {}) is already in store {} so skipping it", e.getIdentifier(),
                 version.toString(),
-                store.getStoreType()));
+                store.getStoreType());
         continue;
       }
       final Opt<StoragePath> existingAssetOpt = findAssetInVersionsAndStores(e.getChecksum().toString(), store.getStoreType());

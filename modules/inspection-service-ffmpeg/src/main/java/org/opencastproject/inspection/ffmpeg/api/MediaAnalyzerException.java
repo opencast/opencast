@@ -30,20 +30,12 @@ public class MediaAnalyzerException extends Exception {
   /** Serial version uid */
   private static final long serialVersionUID = 1336936343567817393L;
 
-  public MediaAnalyzerException() {
-    super();
-  }
-
   public MediaAnalyzerException(String message) {
     super(message);
   }
 
   public MediaAnalyzerException(String message, Throwable cause) {
     super(message, cause);
-  }
-
-  public MediaAnalyzerException(Throwable cause) {
-    super(cause);
   }
 
 }

@@ -75,7 +75,7 @@ public abstract class BundleInfoRestEndpoint {
   @RestQuery(
     name = "list",
     description = "Return a list of all running bundles on the whole cluster.",
-    reponses = {
+    responses = {
       @RestResponse(description = "A list of bundles.", responseCode = HttpServletResponse.SC_OK) },
     returnDescription = "The search results, expressed as xml or json.")
   public Response getVersions() {
@@ -97,7 +97,7 @@ public abstract class BundleInfoRestEndpoint {
         isRequired = false,
         defaultValue = DEFAULT_BUNDLE_PREFIX,
         type = RestParameter.Type.STRING) },
-    reponses = {
+    responses = {
       @RestResponse(description = "true/false", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "cannot find any bundles with the given prefix", responseCode = HttpServletResponse.SC_NOT_FOUND) },
     returnDescription = "The search results, expressed as xml or json.")
@@ -130,7 +130,7 @@ public abstract class BundleInfoRestEndpoint {
         isRequired = false,
         defaultValue = DEFAULT_BUNDLE_PREFIX,
         type = RestParameter.Type.STRING) },
-    reponses = {
+    responses = {
       @RestResponse(description = "Version structure", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "No bundles with the given prefix", responseCode = HttpServletResponse.SC_NOT_FOUND) },
     returnDescription = "The search results as json.")

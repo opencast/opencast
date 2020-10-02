@@ -32,12 +32,6 @@ public class WorkflowParsingException extends WorkflowException {
   private static final long serialVersionUID = -8203912582435200347L;
 
   /**
-   * Constructs a new workflow parsing exception without a message or a cause.
-   */
-  public WorkflowParsingException() {
-  }
-
-  /**
    * Constructs a new workflow parsing exception with a message.
    *
    * @param message
@@ -55,19 +49,6 @@ public class WorkflowParsingException extends WorkflowException {
    */
   public WorkflowParsingException(Throwable cause) {
     super(cause);
-  }
-
-  /**
-   * Constructs a new workflow parsing exception with a message and the throwable that caused this exception to be
-   * thrown.
-   *
-   * @param message
-   *          the message describing the exception
-   * @param cause
-   *          the cause of this exception
-   */
-  public WorkflowParsingException(String message, Throwable cause) {
-    super(message, cause);
   }
 
 }

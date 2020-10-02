@@ -28,7 +28,9 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -37,6 +39,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +52,13 @@ import java.util.Map;
 /**
  * Proxies a remote media inspection service for use as a JVM-local service.
  */
+@Component(
+  property = {
+    "service.description=Media Inspection Remote Service Proxy"
+  },
+  immediate = true,
+  service = { MediaInspectionService.class }
+)
 public class MediaInspectionServiceRemoteImpl extends RemoteBase implements MediaInspectionService {
 
   /** The logger */
@@ -58,6 +69,28 @@ public class MediaInspectionServiceRemoteImpl extends RemoteBase implements Medi
    */
   public MediaInspectionServiceRemoteImpl() {
     super(JOB_TYPE);
+  }
+
+  /**
+   * Sets the trusted http client
+   *
+   * @param client
+   */
+  @Override
+  @Reference(name = "trustedHttpClient")
+  public void setTrustedHttpClient(TrustedHttpClient client) {
+    super.setTrustedHttpClient(client);
+  }
+
+  /**
+   * Sets the remote service manager.
+   *
+   * @param remoteServiceManager
+   */
+  @Override
+  @Reference(name = "remoteServiceManager")
+  public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
+    super.setRemoteServiceManager(remoteServiceManager);
   }
 
   /**

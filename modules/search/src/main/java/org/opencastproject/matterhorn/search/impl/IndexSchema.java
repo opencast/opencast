@@ -39,10 +39,4 @@ public interface IndexSchema {
   /** Accumulative text field with analysis targeted for fuzzy search */
   String TEXT_FUZZY = "text" + FUZZY_FIELDNAME_EXTENSION;
 
-  /** The date format */
-  String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-
-  /** The solr highlighting tag to use. */
-  String HIGHLIGHT_MATCH = "b";
-
 }

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -67,8 +67,8 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -110,7 +110,6 @@
               org.opencastproject.workflow.handler.composer;version=${project.version}
             </Export-Package>
             <Service-Component>
-              OSGI-INF/operations/compose.xml,
               OSGI-INF/operations/composite.xml,
               OSGI-INF/operations/concat.xml,
               OSGI-INF/operations/demux.xml,
@@ -122,6 +121,7 @@
               OSGI-INF/operations/partial-import.xml,
               OSGI-INF/operations/prepare-av.xml,
               OSGI-INF/operations/process-smil.xml,
+              OSGI-INF/operations/sanitize-adaptive.xml,
               OSGI-INF/operations/segmentpreviews.xml,
               OSGI-INF/operations/select-tracks.xml
             </Service-Component>

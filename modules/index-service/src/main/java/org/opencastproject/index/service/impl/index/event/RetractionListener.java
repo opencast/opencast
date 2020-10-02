@@ -62,11 +62,11 @@ public final class RetractionListener implements WorkflowListener {
     } else if (mediaPackage.getPublications() != null && mediaPackage.getPublications().length > 0) {
       logger.warn("The retract workflow \"{}\" (id: {}, created by: {}, media package {}) "
                       + "has some non-retracted publications, refusing to orphan them.",
-              workflow.getTitle(), workflow.getId(), workflow.getCreatorName(), mediaPackage.getIdentifier().compact());
+              workflow.getTitle(), workflow.getId(), workflow.getCreatorName(), mediaPackage.getIdentifier().toString());
     } else {
       final Retraction retraction = retractions.get(workflow.getId());
       SecurityUtil.runAs(securityService, retraction.getOrganization(), retraction.getUser(), () -> {
-        final String mpId = mediaPackage.getIdentifier().compact();
+        final String mpId = mediaPackage.getIdentifier().toString();
         try {
           if (!indexService.removeEvent(mpId)) {
             logger.warn("Could not delete retracted media package {}. removeEvent returned false.", mpId);

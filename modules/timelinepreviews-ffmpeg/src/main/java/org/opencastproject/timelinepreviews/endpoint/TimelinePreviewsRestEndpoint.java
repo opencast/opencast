@@ -114,7 +114,7 @@ public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
             @RestParameter(description = "The number of timeline preview images to generate.",
                     isRequired = true, name = "imageCount", type = RestParameter.Type.INTEGER)
           },
-          reponses = {
+          responses = {
             @RestResponse(description = "Timeline previews job successfully created",
                     responseCode = HttpServletResponse.SC_OK),
             @RestResponse(description = "The given track can't be parsed.",

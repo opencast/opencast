@@ -34,31 +34,9 @@ public class ServiceUnavailableException extends Exception {
    *
    * @param message
    *          the error message
-   * @param t
-   *          the exception causing the error
-   */
-  public ServiceUnavailableException(String message, Throwable t) {
-    super(message, t);
-  }
-
-  /**
-   * Creates a new service unavailable exception.
-   *
-   * @param message
-   *          the error message
    */
   public ServiceUnavailableException(String message) {
     super(message);
-  }
-
-  /**
-   * Creates a new service unavailable exception.
-   *
-   * @param t
-   *          the exception causing the error
-   */
-  public ServiceUnavailableException(Throwable t) {
-    super(t);
   }
 
 }

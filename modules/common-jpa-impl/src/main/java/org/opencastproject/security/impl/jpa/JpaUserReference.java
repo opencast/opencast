@@ -57,7 +57,8 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "oc_user_ref", uniqueConstraints = { @UniqueConstraint(columnNames = { "username", "organization" }) })
+@Table(name = "oc_user_ref", uniqueConstraints = {
+    @UniqueConstraint(name = "UNQ_oc_user_ref", columnNames = { "username", "organization" }) })
 @NamedQueries({
   @NamedQuery(name = "UserReference.findByQuery", query = "select u from JpaUserReference u where UPPER(u.username) like :query and u.organization.id = :org"),
   @NamedQuery(name = "UserReference.findByUsername", query = "select u from JpaUserReference u where u.username=:u and u.organization.id = :org"),
@@ -91,8 +92,9 @@ public class JpaUserReference {
   protected JpaOrganization organization;
 
   @ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.LAZY)
-  @JoinTable(name = "oc_user_ref_role", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "role_id") }, uniqueConstraints = { @UniqueConstraint(columnNames = {
-          "user_id", "role_id" }) })
+  @JoinTable(name = "oc_user_ref_role", joinColumns = {
+      @JoinColumn(name = "user_id") }, inverseJoinColumns = {
+      @JoinColumn(name = "role_id") })
   protected Set<JpaRole> roles;
 
   public User toUser(final String providerName) {

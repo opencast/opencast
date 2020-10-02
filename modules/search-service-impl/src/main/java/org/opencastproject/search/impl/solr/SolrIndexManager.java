@@ -297,6 +297,7 @@ public class SolrIndexManager {
       solrServer.commit();
       return true;
     } catch (Exception e) {
+      logger.error("Unable to add mediapackage {} to index", sourceMediaPackage.getIdentifier());
       throw new SolrServerException(e);
     }
   }
@@ -337,6 +338,7 @@ public class SolrIndexManager {
       solrServer.commit();
       return true;
     } catch (Exception e) {
+      logger.error("Unable to add mediapackage {} to index", sourceMediaPackage.getIdentifier());
       try {
         solrServer.rollback();
       } catch (IOException e1) {

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -58,8 +58,8 @@
       <artifactId>org.osgi.core</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -112,10 +112,6 @@
             <Export-Package>
               org.opencastproject.animate.impl.*;version=${project.version}
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/animate.xml,
-              OSGI-INF/animate-rest.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

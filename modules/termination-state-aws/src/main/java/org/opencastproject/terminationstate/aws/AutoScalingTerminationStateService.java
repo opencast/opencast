@@ -22,7 +22,6 @@ package org.opencastproject.terminationstate.aws;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.terminationstate.api.AbstractJobTerminationStateService;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
@@ -38,7 +37,6 @@ import com.amazonaws.services.autoscaling.AmazonAutoScalingClientBuilder;
 import com.amazonaws.services.autoscaling.model.AutoScalingGroup;
 import com.amazonaws.services.autoscaling.model.AutoScalingInstanceDetails;
 import com.amazonaws.services.autoscaling.model.CompleteLifecycleActionRequest;
-import com.amazonaws.services.autoscaling.model.CompleteLifecycleActionResult;
 import com.amazonaws.services.autoscaling.model.DescribeAutoScalingGroupsRequest;
 import com.amazonaws.services.autoscaling.model.DescribeAutoScalingGroupsResult;
 import com.amazonaws.services.autoscaling.model.DescribeAutoScalingInstancesRequest;
@@ -48,7 +46,6 @@ import com.amazonaws.services.autoscaling.model.DescribeLifecycleHooksResult;
 import com.amazonaws.services.autoscaling.model.LifecycleHook;
 import com.amazonaws.services.autoscaling.model.LifecycleState;
 import com.amazonaws.services.autoscaling.model.RecordLifecycleActionHeartbeatRequest;
-import com.amazonaws.services.autoscaling.model.RecordLifecycleActionHeartbeatResult;
 import com.amazonaws.util.EC2MetadataUtils;
 
 import org.osgi.service.cm.ConfigurationException;
@@ -62,13 +59,14 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.TriggerUtils;
 import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.List;
 
 public final class AutoScalingTerminationStateService extends AbstractJobTerminationStateService {
-  private static final Log logger = new Log(LoggerFactory.getLogger(AutoScalingTerminationStateService.class));
+  private static final Logger logger = LoggerFactory.getLogger(AutoScalingTerminationStateService.class);
 
   // AWS String Constants
   private static final String AUTOSCALING_INSTANCE_TERMINATING = "autoscaling:EC2_INSTANCE_TERMINATING";
@@ -352,7 +350,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
                   .withAutoScalingGroupName(parent.autoScalingGroup.getAutoScalingGroupName())
                   .withLifecycleHookName(parent.lifeCycleHook.getLifecycleHookName())
                   .withInstanceId(parent.instanceId);
-          CompleteLifecycleActionResult result = parent.autoScaling.completeLifecycleAction(request);
+          parent.autoScaling.completeLifecycleAction(request);
           logger.info("No jobs running, sent complete Lifecycle action");
         }
 
@@ -366,7 +364,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
                   .withAutoScalingGroupName(parent.autoScalingGroup.getAutoScalingGroupName())
                   .withLifecycleHookName(parent.lifeCycleHook.getLifecycleHookName())
                   .withInstanceId(parent.instanceId);
-          RecordLifecycleActionHeartbeatResult result = parent.autoScaling.recordLifecycleActionHeartbeat(request);
+          parent.autoScaling.recordLifecycleActionHeartbeat(request);
           logger.info("Jobs still running, sent Lifecycle heartbeat");
         }
       }

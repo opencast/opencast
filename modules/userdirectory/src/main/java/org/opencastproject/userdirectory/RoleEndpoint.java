@@ -29,7 +29,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import java.util.Iterator;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -42,6 +43,16 @@ import javax.ws.rs.core.MediaType;
 @Path("/")
 @RestService(name = "roles", title = "User Roles", notes = { "" }, abstractText = "Displays the roles available in "
         + "the current user's organization")
+@Component(
+  property = {
+    "service.description=Role listing REST endpoint",
+    "opencast.service.type=org.opencastproject.userdirectory.roles",
+    "opencast.service.path=/roles",
+    "opencast.service.jobproducer=false"
+  },
+  immediate = true,
+  service = { RoleEndpoint.class }
+)
 public class RoleEndpoint {
 
   /** The role directory service */
@@ -54,6 +65,7 @@ public class RoleEndpoint {
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
@@ -61,11 +73,11 @@ public class RoleEndpoint {
   @GET
   @Path("roles.xml")
   @Produces(MediaType.APPLICATION_XML)
-  @RestQuery(name = "rolesasxml", description = "Lists the roles as XML", returnDescription = "The list of roles as XML", reponses = { @RestResponse(responseCode = 200, description = "OK, roles returned") })
+  @RestQuery(name = "rolesasxml", description = "Lists the roles as XML", returnDescription = "The list of roles as XML", responses = { @RestResponse(responseCode = 200, description = "OK, roles returned") })
   public JaxbRoleList getRolesAsXml() {
     JaxbRoleList roleList = new JaxbRoleList();
-    for (Iterator<Role> i = roleDirectoryService.findRoles("%", Role.Target.ALL, 0, 0); i.hasNext();) {
-      roleList.add(i.next());
+    for (Role role: roleDirectoryService.findRoles("%", Role.Target.ALL, 0, 0)) {
+      roleList.add(role);
     }
     return roleList;
   }
@@ -73,7 +85,7 @@ public class RoleEndpoint {
   @GET
   @Path("roles.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "rolesasjson", description = "Lists the roles as JSON", returnDescription = "The list of roles as JSON", reponses = { @RestResponse(responseCode = 200, description = "OK, roles returned") })
+  @RestQuery(name = "rolesasjson", description = "Lists the roles as JSON", returnDescription = "The list of roles as JSON", responses = { @RestResponse(responseCode = 200, description = "OK, roles returned") })
   public JaxbRoleList getRolesAsJson() {
     return getRolesAsXml();
   }
@@ -84,6 +96,7 @@ public class RoleEndpoint {
    * @param roleDirectoryService
    *          the roleDirectoryService to set
    */
+  @Reference(name = "roleDirectoryService")
   public void setRoleDirectoryService(RoleDirectoryService roleDirectoryService) {
     this.roleDirectoryService = roleDirectoryService;
   }

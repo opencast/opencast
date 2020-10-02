@@ -21,6 +21,8 @@
 
 package org.opencastproject.index.service.resources.list.api;
 
+import org.opencastproject.list.api.ResourceListFilter;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 
@@ -61,10 +63,6 @@ public class Service implements JSONAware {
 
   public void setHost(String host) {
     map.put(HOST, host);
-  }
-
-  public String toJson() {
-    return JSONObject.toJSONString(map);
   }
 
   /**

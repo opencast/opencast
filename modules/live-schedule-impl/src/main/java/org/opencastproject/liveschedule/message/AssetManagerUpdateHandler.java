@@ -77,7 +77,7 @@ public class AssetManagerUpdateHandler extends UpdateHandler {
           throw new IllegalArgumentException("Unhandled type of AssetManagerItem");
       }
     } catch (Exception e) {
-      logger.warn(String.format("Exception occurred for mp %s, event type %s", mpId, item.getType()), e);
+      logger.warn("Exception occurred for mp {}, event type {}", mpId, item.getType(), e);
     } finally {
       logger.debug("Asset Manager message handler END for mp {} event type {} in thread {}", mpId, item.getType(),
               Thread.currentThread().getId());

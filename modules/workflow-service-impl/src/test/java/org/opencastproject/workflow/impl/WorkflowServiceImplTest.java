@@ -38,15 +38,12 @@ import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.assetmanager.api.query.VersionField;
-import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
-import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.security.api.AccessControlList;
@@ -58,11 +55,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.IncidentService;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
-import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
-import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -72,18 +65,17 @@ import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowIdentifier;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
-import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowSet;
+import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateListener;
 import org.opencastproject.workflow.handler.workflow.ErrorResolutionWorkflowOperationHandler;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
@@ -98,7 +90,6 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -107,10 +98,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -852,28 +841,6 @@ public class WorkflowServiceImplTest {
     Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
   }
 
-  @Test
-  @Ignore
-  public void testRetryStrategyFailover() throws Exception {
-    WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
-    def.setId("workflow-definition-1");
-    def.setTitle("workflow-definition-1");
-    def.setDescription("workflow-definition-1");
-
-    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOnHost", "fails on host", null,
-            true);
-    opDef.setRetryStrategy(RetryStrategy.RETRY);
-    def.add(opDef);
-
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-
-    WorkflowInstance workflow = startAndWait(def, mp, WorkflowState.SUCCEEDED);
-
-    Assert.assertTrue(service.getWorkflowById(workflow.getId()).getOperations().get(0).getState() == OperationState.SUCCEEDED);
-    Assert.assertTrue(service.getWorkflowById(workflow.getId()).getOperations().get(0).getMaxAttempts() == 2);
-    Assert.assertTrue(service.getWorkflowById(workflow.getId()).getOperations().get(0).getFailedAttempts() == 1);
-  }
-
   /**
    * Starts many concurrent workflows to test DB deadlock.
    *
@@ -890,7 +857,7 @@ public class WorkflowServiceImplTest {
 
     for (int i = 0; i < count; i++) {
       MediaPackage mp = i % 2 == 0 ? mediapackage1 : mediapackage2;
-      mp.setIdentifier(new UUIDIdBuilderImpl().createNew());
+      mp.setIdentifier(IdImpl.fromUUID());
       instances.add(service.start(workingDefinition, mp, Collections.emptyMap()));
     }
 
@@ -904,69 +871,8 @@ public class WorkflowServiceImplTest {
     Assert.assertEquals(count, stateListener.countStateChanges(WorkflowState.SUCCEEDED));
   }
 
-  private WorkflowInstanceImpl setupWorkflowInstanceImpl(long id, String operation, WorkflowState state, Date startDate)
-          throws ConfigurationException, MediaPackageException, NotFoundException, ServiceRegistryException {
-
-    Job job = new JobImpl(id);
-    job = serviceRegistry.updateJob(job);
-
-    MediaPackage mediapackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-    mediapackage.setDate(startDate);
-    mediapackage.setDuration(7200L);
-
-    WorkflowOperationInstanceImpl workflowOperation = new WorkflowOperationInstanceImpl(operation,
-            OperationState.PAUSED);
-    workflowOperation.setId(id);
-
-    List<WorkflowOperationInstance> workflowOperationInstanceList = new LinkedList<WorkflowOperationInstance>();
-    workflowOperationInstanceList.add(workflowOperation);
-
-    WorkflowInstanceImpl workflowInstanceImpl = new WorkflowInstanceImpl();
-    workflowInstanceImpl.setMediaPackage(mediapackage);
-    workflowInstanceImpl.setState(state);
-    workflowInstanceImpl.setId(id);
-    workflowInstanceImpl.setOperations(workflowOperationInstanceList);
-    return workflowInstanceImpl;
-  }
-
-  private void setupJob(long id, String operation, ServiceRegistry mockServiceRegistry)
-          throws ServiceRegistryException, NotFoundException {
-    ServiceRegistrationJpaImpl serviceRegistrationJpaImpl = EasyMock.createMock(ServiceRegistrationJpaImpl.class);
-    expect(serviceRegistrationJpaImpl.getHost()).andReturn("http://localhost:8080");
-    expect(serviceRegistrationJpaImpl.getServiceType()).andReturn(operation);
-    replay(serviceRegistrationJpaImpl);
-    List<String> arguments = new LinkedList<String>();
-    arguments.add(Long.toString(id));
-
-    Job job = createNiceMock(Job.class);
-    expect(job.getId()).andStubReturn(id);
-    expect(job.getCreator()).andStubReturn(securityService.getUser().getUsername());
-    expect(job.getOrganization()).andStubReturn(securityService.getOrganization().getId());
-    expect(job.getOperation()).andStubReturn("RESUME");
-    expect(job.getArguments()).andStubReturn(arguments);
-    expect(job.isDispatchable()).andStubReturn(false);
-    expect(job.getStatus()).andStubReturn(Job.Status.INSTANTIATED);
-    replay(job);
-    expect(mockServiceRegistry.getJob(id)).andReturn(job).anyTimes();
-    expect(mockServiceRegistry.updateJob(job)).andReturn(job);
-  }
-
-  private void setupExceptionJob(long id, Exception e, ServiceRegistry mockServiceRegistry)
-          throws ServiceRegistryException, NotFoundException {
-    expect(mockServiceRegistry.getJob(id)).andThrow(e).anyTimes();
-  }
-
-  private OrganizationDirectoryService setupMockOrganizationDirectoryService() {
-    List<Organization> organizations = new LinkedList<Organization>();
-    organizations.add(securityService.getOrganization());
-    OrganizationDirectoryService orgDirService = EasyMock.createMock(OrganizationDirectoryService.class);
-    expect(orgDirService.getOrganizations()).andReturn(organizations).anyTimes();
-    replay(orgDirService);
-    return orgDirService;
-  }
-
   /**
-   * Test for {@link WorkflowServiceImpl#remove(long)}
+   * Test for {@link WorkflowServiceImpl#remove(long, boolean)}
    *
    * @throws Exception
    *           if anything fails
@@ -975,19 +881,34 @@ public class WorkflowServiceImplTest {
   public void testRemove() throws Exception {
     WorkflowInstance wi1 = startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
     WorkflowInstance wi2 = startAndWait(workingDefinition, mediapackage2, WorkflowState.SUCCEEDED);
+    WorkflowInstance wi3 = startAndWait(pausingWorkflowDefinition, mediapackage1, WorkflowState.PAUSED);
 
     // reload instances, because operations have no id before
     wi1 = service.getWorkflowById(wi1.getId());
     wi2 = service.getWorkflowById(wi2.getId());
 
     service.remove(wi1.getId());
-    assertEquals(1, service.getWorkflowInstances(new WorkflowQuery()).size());
+    assertEquals(2, service.getWorkflowInstances(new WorkflowQuery()).size());
     for (WorkflowOperationInstance op : wi1.getOperations()) {
       assertEquals(0, serviceRegistry.getChildJobs(op.getId()).size());
     }
 
-    service.remove(wi2.getId());
-    assertEquals(0, service.getWorkflowInstances(new WorkflowQuery()).size());
+    service.remove(wi2.getId(), false);
+    assertEquals(1, service.getWorkflowInstances(new WorkflowQuery()).size());
+
+    try {
+      service.remove(wi3.getId(), false);
+      Assert.fail("A paused workflow shouldn't be removed without using force");
+    } catch (WorkflowStateException e) {
+      assertEquals(1, service.getWorkflowInstances(new WorkflowQuery()).size());
+    }
+
+    try {
+      service.remove(wi3.getId(), true);
+      assertEquals(0, service.getWorkflowInstances(new WorkflowQuery()).size());
+    } catch (WorkflowStateException e) {
+      Assert.fail(e.getMessage());
+    }
   }
 
   @Test

@@ -36,7 +36,6 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.waveform.api.WaveformService;
 import org.opencastproject.waveform.api.WaveformServiceException;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +76,7 @@ public class WaveformServiceEndpoint extends AbstractJobProducerEndpoint {
             @RestParameter(name = "color", type = RestParameter.Type.STRING, defaultValue = "black",
                     description = "Color of waveform image.", isRequired = true)
           },
-          reponses = {
+          responses = {
             @RestResponse(description = "Waveform generation job successfully created.",
                     responseCode = HttpServletResponse.SC_OK),
             @RestResponse(description = "The given track can't be parsed.",
@@ -96,7 +95,7 @@ public class WaveformServiceEndpoint extends AbstractJobProducerEndpoint {
       Job job = waveformService.createWaveformImage((Track) sourceTrack, pixelsPerMinute, minWidth, maxWidth, height, color);
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (WaveformServiceException ex) {
-      logger.error("Creating waveform job for track {} failed: {}", track, ExceptionUtils.getStackTrace(ex));
+      logger.error("Creating waveform job for track {} failed:", track, ex);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     } catch (MediaPackageException ex) {
       return Response.status(Response.Status.BAD_REQUEST).entity("Track element parsing failure").build();

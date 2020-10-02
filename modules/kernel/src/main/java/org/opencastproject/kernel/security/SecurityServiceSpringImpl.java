@@ -30,6 +30,10 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -45,6 +49,12 @@ import java.util.Set;
 /**
  * A Spring Security implementation of {@link SecurityService}.
  */
+@Component(
+  property = {
+    "service.description=Provides username and role information for the current user"
+  },
+  service = { SecurityService.class }
+)
 public class SecurityServiceSpringImpl implements SecurityService {
 
   /** The logger */
@@ -177,6 +187,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
    * @param userDirectory
    *          the user directory
    */
+  @Reference(name = "userDirectory", cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC, unbind = "removeUserDirectory")
   void setUserDirectory(UserDirectoryService userDirectory) {
     this.userDirectory = userDirectory;
   }
@@ -184,7 +195,7 @@ public class SecurityServiceSpringImpl implements SecurityService {
   /**
    * OSGi callback for removing the user directory.
    */
-  void removeUserDirectory() {
+  void removeUserDirectory(UserDirectoryService unused) {
     this.userDirectory = null;
   }
 

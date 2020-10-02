@@ -46,14 +46,11 @@ import org.opencastproject.event.comment.EventCommentReply;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
 import org.opencastproject.index.service.impl.index.series.Series;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.IncidentImpl;
@@ -61,6 +58,8 @@ import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.IncidentTreeImpl;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.matterhorn.search.impl.SearchResultImpl;
 import org.opencastproject.matterhorn.search.impl.SearchResultItemImpl;
@@ -77,9 +76,10 @@ import org.opencastproject.mediapackage.track.AbstractStreamImpl;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -556,9 +556,13 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     IndexService indexService = EasyMock.createNiceMock(IndexService.class);
     EasyMock.expect(indexService.getEvent("asdasd", searchIndex)).andReturn(Opt.some(event)).anyTimes();
+    EasyMock.expect(indexService.getEvent("exists", searchIndex)).andReturn(Opt.some(event)).anyTimes();
+    EasyMock.expect(indexService.getEvent("exists2", searchIndex)).andReturn(Opt.some(event2)).anyTimes();
     EasyMock.expect(indexService.getEvent("archivedid", searchIndex)).andReturn(Opt.some(event2)).anyTimes();
     EasyMock.expect(indexService.getEvent("workflowid", searchIndex)).andReturn(Opt.some(event3)).anyTimes();
     EasyMock.expect(indexService.getEvent("notExists", searchIndex)).andReturn(Opt.<Event> none()).anyTimes();
+    EasyMock.expect(indexService.getEvent("notExists2", searchIndex)).andReturn(Opt.<Event> none()).anyTimes();
+    EasyMock.expect(indexService.getEvent("updateFailure", searchIndex)).andReturn(Opt.some(event3)).anyTimes();
     EasyMock.expect(indexService.getSeries("seriesId", searchIndex)).andReturn(Opt.some(series)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(event)).andReturn(mp1).anyTimes();
     EasyMock.expect(indexService.getEventCatalogUIAdapters()).andReturn(eventCatalogAdapterList).anyTimes();
@@ -567,8 +571,10 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(indexService.getEventSource(event2)).andReturn(Source.ARCHIVE).anyTimes();
     EasyMock.expect(indexService.getEventSource(event3)).andReturn(Source.WORKFLOW).anyTimes();
     MetadataList metaDataList = new MetadataList();
+    EasyMock.expect(indexService.updateAllEventMetadata(EasyMock.eq("updateFailure"), EasyMock.anyString(),
+      EasyMock.anyObject(AbstractSearchIndex.class))).andThrow(new IllegalArgumentException());
     EasyMock.expect(indexService.updateAllEventMetadata(EasyMock.anyString(), EasyMock.anyString(),
-            EasyMock.anyObject(AbstractSearchIndex.class))).andReturn(metaDataList).anyTimes();
+      EasyMock.anyObject(AbstractSearchIndex.class))).andReturn(metaDataList).anyTimes();
     EasyMock.replay(indexService);
     env.setIndexService(indexService);
   }
@@ -624,7 +630,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       }
 
       @Override
-      public MetadataCollection getFields(MediaPackage mediapackage) {
+      public DublinCoreMetadataCollection getFields(MediaPackage mediapackage) {
         return super.getRawFields();
       }
     };

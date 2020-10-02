@@ -42,15 +42,15 @@ public class MiscTest {
 
   @Test
   public void testCast() {
-    final Integer a = Misc.cast(1, Integer.class);
-    final Double b = Misc.cast(1.0, Double.class);
-    final Double c = Misc.cast(1, Double.class);
-    final Short d = Misc.cast(1, Short.class);
-    final Byte e = Misc.cast(1, Byte.class);
-    final Float f = Misc.cast(1.0, Float.class);
-    final Float g = Misc.cast(1, Float.class);
-    final Number h = Misc.cast(1, Double.class);
-    final Number i = Misc.cast(1, Number.class);
-    final String j = Misc.cast("1", String.class);
+    Misc.cast(1, Integer.class);
+    Misc.cast(1.0, Double.class);
+    Misc.cast(1, Double.class);
+    Misc.cast(1, Short.class);
+    Misc.cast(1, Byte.class);
+    Misc.cast(1.0, Float.class);
+    Misc.cast(1, Float.class);
+    Misc.cast(1, Double.class);
+    Misc.cast(1, Number.class);
+    Misc.cast("1", String.class);
   }
 }

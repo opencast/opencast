@@ -52,7 +52,7 @@ public @interface RestQuery {
   /**
    * @return a list of possible responses from this query.
    */
-  RestResponse[] reponses();
+  RestResponse[] responses();
 
   /**
    * @return a list of path parameters for this query.

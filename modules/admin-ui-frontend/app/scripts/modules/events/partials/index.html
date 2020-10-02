@@ -1,0 +1,65 @@
+<section class="action-nav-bar">
+  <ng-include src="'modules/' + table.category + '/partials/' + table.resource + 'Buttons.html'"></ng-include>
+
+  <admin-ng-nav></admin-ng-nav>
+  <nav>
+    <a href="#!/events/events"
+       ng-class="{active: table.resource == 'events'}"
+       translate="EVENTS.EVENTS.NAVIGATION.EVENTS"
+       with-role="ROLE_UI_EVENTS_VIEW">
+      <!-- Events -->
+    </a>
+    <a href="#!/events/series"
+       ng-class="{active: table.resource == 'series'}"
+       translate="EVENTS.EVENTS.NAVIGATION.SERIES"
+       with-role="ROLE_UI_SERIES_VIEW">
+      <!-- Series -->
+    </a>
+  </nav>
+  <div ng-if="table.resource == 'events'" class="stats-container" with-role="ROLE_UI_EVENTS_COUNTERS_VIEW">
+    <div admin-ng-stats="" stats="stats"></div>
+  </div>
+</section>
+
+<div class="main-view">
+  <div data-admin-ng-notifications=""></div>
+
+  <div class="controls-container">
+    <div class="filters-container">
+      <div old-admin-ng-dropdown="" class="drop-down-container" ng-class="{disabled: table.getSelected().length === 0}">
+        <span translate="BULK_ACTIONS.CAPTION"><!-- Actions --></span>
+        <ul class="dropdown-ul">
+          <!--<li with-role="ROLE_UI_{{ table.resource | uppercase }}_STATUS_EDIT"><a href="#" data-open-modal="edit-{{table.resource}}-status-modal">{{ 'BULK_ACTIONS.EDIT_STATUS.CAPTION' | translate}}</a></li>-->
+          <li with-role="ROLE_UI_{{ table.resource | uppercase }}_DELETE">
+            <a data-open-modal="delete-{{table.resource}}-modal">
+              {{ 'BULK_ACTIONS.DELETE.' + table.resource.toUpperCase() + '.CAPTION' | translate}}
+            </a>
+          </li>
+          <li ng-if="table.resource == 'events'" with-role="ROLE_UI_TASKS_CREATE">
+            <a data-open-modal="schedule-task-modal">
+              {{ 'BULK_ACTIONS.SCHEDULE_TASK.CAPTION' | translate}}
+            </a>
+          </li>
+          <li ng-if="table.resource == 'events' && $root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT') && $root.userIs('ROLE_UI_EVENTS_DETAILS_METADATA_EDIT')">
+            <a data-open-modal="edit-events-modal">
+              {{ 'BULK_ACTIONS.EDIT_EVENTS.CAPTION' | translate}}
+            </a>
+          </li>
+          <li ng-if="table.resource == 'events' && $root.userIs('ROLE_UI_EVENTS_DETAILS_METADATA_EDIT')">
+            <a data-open-modal="edit-events-metadata-modal">
+              {{ 'BULK_ACTIONS.EDIT_EVENTS_METADATA.CAPTION' | translate}}
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div data-admin-ng-table-filter="" data-filters="filters" data-namespace="table.resource"></div>
+    </div>
+
+    <h1 translate="{{table.caption}}"><!-- Mail Templates --></h1>
+    <h4 translate="TABLE_SUMMARY" translate-values="{ numberOfRows: '{{ table.pagination.totalItems }}' }">
+      <!-- {{numberOfRows}} rows -->
+    </h4>
+
+  </div>
+  <div class="table-container top-addon" admin-ng-table="" table="table" highlight="true"></div>
+</div>

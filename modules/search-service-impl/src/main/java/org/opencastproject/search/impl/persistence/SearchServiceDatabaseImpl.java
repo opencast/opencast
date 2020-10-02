@@ -176,6 +176,27 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   /**
    * {@inheritDoc}
    *
+   * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#countMediaPackages()
+   */
+  @Override
+  public int countMediaPackages() throws SearchServiceDatabaseException {
+    EntityManager em = emf.createEntityManager();
+    Query query = em.createNamedQuery("Search.getCount");
+    try {
+      Long total = (Long) query.getSingleResult();
+      return total.intValue();
+    } catch (Exception e) {
+      logger.error("Could not find number of mediapackages", e);
+      throw new SearchServiceDatabaseException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+
+  /**
+   * {@inheritDoc}
+   *
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getAllMediaPackages()
    */
   @Override
@@ -197,7 +218,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
     try {
       for (SearchEntity entity : searchEntities) {
         MediaPackage mediaPackage = MediaPackageParser.getFromXml(entity.getMediaPackageXML());
-        mediaPackageList.add(Tuple.tuple(mediaPackage, entity.getOrganization()));
+        mediaPackageList.add(Tuple.tuple(mediaPackage, entity.getOrganization().getId()));
       }
     } catch (Exception e) {
       logger.error("Could not parse series entity: {}", e.getMessage());
@@ -257,7 +278,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
       if (entity == null) {
         // Create new search entity
         SearchEntity searchEntity = new SearchEntity();
-        searchEntity.setOrganization(securityService.getOrganization().getId());
+        searchEntity.setOrganization(securityService.getOrganization());
         searchEntity.setMediaPackageId(mediaPackageId);
         searchEntity.setMediaPackageXML(mediaPackageXML);
         searchEntity.setAccessControl(AccessControlParser.toXml(acl));
@@ -276,7 +297,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
                     + mediaPackageId);
           }
         }
-        entity.setOrganization(securityService.getOrganization().getId());
+        entity.setOrganization(securityService.getOrganization());
         entity.setMediaPackageId(mediaPackageId);
         entity.setMediaPackageXML(mediaPackageXML);
         entity.setAccessControl(AccessControlParser.toXml(acl));
@@ -448,7 +469,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString()))
           throw new UnauthorizedException(currentUser + " is not authorized to read media package " + mediaPackageId);
       }
-      return searchEntity.getOrganization();
+      return searchEntity.getOrganization().getId();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {

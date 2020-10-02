@@ -23,32 +23,25 @@ package org.opencastproject.util.persistencefn;
 
 import static com.entwinemedia.fn.Equality.eq;
 import static com.entwinemedia.fn.Stream.$;
-import static java.lang.String.format;
 
 import org.opencastproject.util.data.Collections;
 
-import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.ProductBuilder;
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Products;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.beans.PropertyVetoException;
 import java.net.URI;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.spi.PersistenceProvider;
-import javax.sql.DataSource;
 
 /**
  * Functions supporting persistence.
@@ -57,42 +50,6 @@ public final class PersistenceUtil {
   private static final Logger logger = LoggerFactory.getLogger(PersistenceUtil.class);
 
   private PersistenceUtil() {
-  }
-
-  public static final Map<String, Object> NO_PERSISTENCE_PROPS = java.util.Collections.emptyMap();
-
-  /**
-   * Create a new entity manager factory with the persistence unit name <code>emName</code>. A
-   * {@link javax.persistence.spi.PersistenceProvider} named <code>persistence</code> has to be registered as an OSGi
-   * service. If you want to configure the factory please also register a map containing all properties under the name
-   * <code>persistenceProps</code>. See
-   * {@link javax.persistence.spi.PersistenceProvider#createEntityManagerFactory(String, java.util.Map)} for more
-   * information about config maps.
-   *
-   * @param emName
-   *         name of the persistence unit
-   */
-  public static EntityManagerFactory mkEntityManagerFactory(ComponentContext cc, String emName) {
-    final PersistenceProvider persistenceProvider = (PersistenceProvider) cc.locateService("persistence");
-    final Map pp = (Map) cc.locateService("persistenceProps");
-    final Map persistenceProps = pp != null ? pp : NO_PERSISTENCE_PROPS;
-    return persistenceProvider.createEntityManagerFactory(emName, persistenceProps);
-  }
-
-  /**
-   * Create a new entity manager factory with the persistence unit name <code>emName</code>. A
-   * {@link javax.persistence.spi.PersistenceProvider} named <code>persistence</code> has to be registered as an OSGi
-   * service. See {@link javax.persistence.spi.PersistenceProvider#createEntityManagerFactory(String, java.util.Map)}
-   * for more information about config maps.
-   *
-   * @param emName
-   *         name of the persistence unit
-   * @param persistenceProps
-   *         config map for the creation of an EntityManagerFactory
-   */
-  public static EntityManagerFactory mkEntityManagerFactory(ComponentContext cc, String emName, Map persistenceProps) {
-    final PersistenceProvider persistenceProvider = (PersistenceProvider) cc.locateService("persistence");
-    return persistenceProvider.createEntityManagerFactory(emName, persistenceProps);
   }
 
   public static EntityManagerFactory mkEntityManagerFactory(
@@ -211,19 +168,19 @@ public final class PersistenceUtil {
       try {
         final String dbType = new URI(new URI(url).getSchemeSpecificPart()).getScheme();
         if (eq("mysql", dbType)) {
-          logger.info(format("Use MySQL database\n"
-                                     + " test-database-url=%s\n"
-                                     + " test-database-user=%s\n"
-                                     + " test-database-password=%s\n"
-                                     + " sql-logging=%s\n"
-                                     + " keep-database=%s",
-                             url, dbUser, dbPwd, withSqlLogging, keepDatabase));
+          logger.info("Use MySQL database\n"
+                                     + " test-database-url={}\n"
+                                     + " test-database-user={}\n"
+                                     + " test-database-password={}\n"
+                                     + " sql-logging={}\n"
+                                     + " keep-database={}",
+                             url, dbUser, dbPwd, withSqlLogging, keepDatabase);
           return mkMySqlTestEntityManagerFactory(emName, url, dbUser, dbPwd, withSqlLogging, keepDatabase);
         }
       } catch (Exception ignore) {
       }
     }
-    logger.info(format("Use H2 database\n sql-logging=%s", withSqlLogging));
+    logger.info("Use H2 database\n sql-logging={}", withSqlLogging);
     return mkTestEntityManagerFactory(emName, withSqlLogging);
   }
 
@@ -274,70 +231,6 @@ public final class PersistenceUtil {
   /** Create a new persistence provider for unit tests. */
   public static PersistenceProvider mkTestPersistenceProvider() {
     return new org.eclipse.persistence.jpa.PersistenceProvider();
-  }
-
-  public static void closeQuietly(Connection c) {
-    if (c != null) {
-      try {
-        c.close();
-      } catch (SQLException ignore) {
-      }
-    }
-  }
-
-  /**
-   * Test if a connection to the given data source can be established.
-   *
-   * @return none, if the connection could be established
-   */
-  public static Opt<SQLException> testConnection(DataSource ds) {
-    try (Connection tryConnect = ds.getConnection()) {
-      return Opt.none();
-    } catch (SQLException e) {
-      return Opt.some(e);
-    }
-  }
-
-  /**
-   * Try to get the database metadata from an entity manager. Return none, if the metadata
-   * cannot be retrieved, e.g. because the entity manager does not expose them.
-   */
-  public static Opt<DatabaseMetaData> getDatabaseMetadata(EntityManager em) {
-    try {
-      final Connection c = em.unwrap(Connection.class);
-      return Opt.some(c.getMetaData());
-    } catch (Exception e) {
-      return Opt.none();
-    }
-  }
-
-  /** {@link #getDatabaseMetadata(EntityManager)} as a function. */
-  public static final Fn<EntityManager, Opt<DatabaseMetaData>> getDatabaseMetadata = new Fn<EntityManager, Opt<DatabaseMetaData>>() {
-    @Override public Opt<DatabaseMetaData> apply(EntityManager em) {
-      return getDatabaseMetadata(em);
-    }
-  };
-
-  /**
-   * Get the database vendor from some metadata.
-   *
-   * @return {@link DatabaseVendor#UNKNOWN} in case the database is not known or an arbitrary error occurs
-   */
-  public static DatabaseVendor getVendor(DatabaseMetaData m) {
-    try {
-      switch (m.getDatabaseProductName()) {
-        case "H2":
-          return DatabaseVendor.H2;
-        case "MySQL":
-          return DatabaseVendor.MYSQL;
-        case "Postgres":
-          return DatabaseVendor.POSTGRES;
-        default:
-          return DatabaseVendor.UNKNOWN;
-      }
-    } catch (SQLException e) {
-      return DatabaseVendor.UNKNOWN;
-    }
   }
 
   public enum DatabaseVendor {

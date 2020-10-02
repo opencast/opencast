@@ -367,7 +367,7 @@
     <!-- Encode presenter (camera) to Engage player format -->
     <operation
       if="${flagQuality360p}"
-      id="compose"
+      id="encode"
       exception-handler-workflow="partial-error"
       description="Encoding 360p video to MP4 download">
       <configurations>
@@ -379,7 +379,7 @@
     </operation>
     <operation
       if="${flagQuality480p}"
-      id="compose"
+      id="encode"
       exception-handler-workflow="partial-error"
       description="Encoding 480p video to MP4 download">
       <configurations>
@@ -391,7 +391,7 @@
     </operation>
     <operation
       if="${flagQuality720p}"
-      id="compose"
+      id="encode"
       exception-handler-workflow="partial-error"
       description="Encoding 720p video to MP4 download">
       <configurations>
@@ -403,7 +403,7 @@
     </operation>
     <operation
       if="${flagQuality1080p}"
-      id="compose"
+      id="encode"
       exception-handler-workflow="partial-error"
       description="Encoding 1080p video to MP4 download">
       <configurations>
@@ -415,7 +415,7 @@
     </operation>
     <operation
       if="${flagQuality2160p}"
-      id="compose"
+      id="encode"
       exception-handler-workflow="partial-error"
       description="Encoding 2160p video to MP4 download">
       <configurations>
@@ -540,26 +540,10 @@
       <configurations>
         <configuration key="channel-id">api</configuration>
         <configuration key="mimetype">application/json</configuration>
-        <configuration key="source-tags">engage-download,engage-streaming</configuration>
+        <configuration key="download-source-tags">engage-download,engage-streaming</configuration>
         <configuration key="url-pattern">http://localhost:8080/api/events/${event_id}</configuration>
         <configuration key="with-published-elements">false</configuration>
         <configuration key="check-availability">true</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Publish to OAI-PMH -->
-
-    <operation
-      id="publish-oaipmh"
-      if="${publishToOaiPmh}"
-      exception-handler-workflow="partial-error"
-      description="Publish to OAI-PMH Default Repository">
-      <configurations>
-        <configuration key="download-flavors">dublincore/*,security/*</configuration>
-        <configuration key="download-tags">engage-download,atom,rss</configuration>
-        <configuration key="streaming-tags">engage-streaming</configuration>
-        <configuration key="check-availability">true</configuration>
-        <configuration key="repository">default</configuration>
       </configurations>
     </operation>
 

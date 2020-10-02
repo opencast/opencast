@@ -122,7 +122,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               isRequired = true,
               type = Type.TEXT,
               description = "The media package to add to the search index.")},
-      reponses = {
+      responses = {
           @RestResponse(
               description = "The media package was added, no content to return.",
               responseCode = SC_NO_CONTENT),
@@ -147,7 +147,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               isRequired = true,
               type = Type.TEXT,
               description = "The media package to take a snapshot from.")},
-      reponses = {
+      responses = {
           @RestResponse(
               description = "A snapshot of the media package has been taken, no content to return.",
               responseCode = SC_NO_CONTENT),
@@ -178,7 +178,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               type = Type.STRING,
               description = "The media package ID of the episode whose snapshots shall be removed"
                   + " from the asset manager.")},
-      reponses = {
+      responses = {
           @RestResponse(
               description = "Snapshots have been removed, no content to return.",
               responseCode = SC_NO_CONTENT),
@@ -220,7 +220,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               isRequired = true,
               type = STRING)
       },
-      reponses = {
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "Media package returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found"),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not allowed to read media package."),
@@ -267,7 +267,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               description = "a descriptive filename which will be ignored though",
               isRequired = false,
               type = STRING)},
-      reponses = {
+      responses = {
           @RestResponse(
               responseCode = SC_OK,
               description = "File returned"),
@@ -349,7 +349,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
                           isRequired = false,
                           type = STRING)
           },
-          reponses = {
+          responses = {
                   @RestResponse(responseCode = SC_OK, description = "Media package returned"),
                   @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found"),
                   @RestResponse(responseCode = SC_FORBIDDEN, description = "Not allowed to read media package."),
@@ -405,7 +405,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
                           isRequired = true,
                           type = STRING)
           },
-          reponses = {
+          responses = {
                   @RestResponse(responseCode = SC_OK, description = "Media package returned"),
                   @RestResponse(responseCode = SC_OK, description = "Invalid parameters"),
                   @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found"),
@@ -457,7 +457,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
                           type = STRING,
                           description = "JSON object containing new properties")
           },
-          reponses = {
+          responses = {
                   @RestResponse(description = "Properties successfully set", responseCode = SC_CREATED),
                   @RestResponse(description = "Invalid data", responseCode = SC_BAD_REQUEST),
                   @RestResponse(description = "Internal error", responseCode = SC_INTERNAL_SERVER_ERROR) },

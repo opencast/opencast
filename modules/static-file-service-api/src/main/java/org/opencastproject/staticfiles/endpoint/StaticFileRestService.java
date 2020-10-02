@@ -23,7 +23,6 @@ package org.opencastproject.staticfiles.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.security.api.SecurityService;
@@ -47,7 +46,6 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -153,7 +151,7 @@ public class StaticFileRestService {
 
   @GET
   @Path("{uuid}")
-  @RestQuery(name = "getStaticFile", description = "Returns a static file resource", pathParameters = { @RestParameter(description = "Static File Universal Unique Id", isRequired = true, name = "uuid", type = RestParameter.Type.STRING) }, reponses = {
+  @RestQuery(name = "getStaticFile", description = "Returns a static file resource", pathParameters = { @RestParameter(description = "Static File Universal Unique Id", isRequired = true, name = "uuid", type = RestParameter.Type.STRING) }, responses = {
           @RestResponse(description = "Returns a static file resource", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No file by the given uuid found", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
   public Response getStaticFile(@PathParam("uuid") String uuid) throws NotFoundException {
@@ -175,7 +173,7 @@ public class StaticFileRestService {
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Produces(MediaType.TEXT_PLAIN)
   @Path("")
-  @RestQuery(name = "postStaticFile", description = "Post a new static resource", bodyParameter = @RestParameter(description = "The static resource file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), reponses = {
+  @RestQuery(name = "postStaticFile", description = "Post a new static resource", bodyParameter = @RestParameter(description = "The static resource file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
           @RestResponse(description = "Returns the id of the uploaded static resource", responseCode = HttpServletResponse.SC_CREATED),
           @RestResponse(description = "No filename or file to upload found", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "The upload size is too big", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
@@ -232,8 +230,7 @@ public class StaticFileRestService {
       try {
         return Response.created(getStaticFileURL(uuid)).entity(uuid).build();
       } catch (NotFoundException e) {
-        logger.error("Previous stored file with uuid {} couldn't beren found: {}", uuid,
-                ExceptionUtils.getStackTrace(e));
+        logger.error("Previous stored file with uuid {} couldn't beren found:", uuid, e);
         return Response.serverError().build();
       }
     } catch (WebApplicationException e) {
@@ -248,7 +245,7 @@ public class StaticFileRestService {
 
   @POST
   @Path("{uuid}/persist")
-  @RestQuery(name = "persistFile", description = "Persists a recently uploaded file to the permanent storage", pathParameters = { @RestParameter(description = "File UUID", isRequired = true, name = "uuid", type = RestParameter.Type.STRING) }, reponses = {
+  @RestQuery(name = "persistFile", description = "Persists a recently uploaded file to the permanent storage", pathParameters = { @RestParameter(description = "File UUID", isRequired = true, name = "uuid", type = RestParameter.Type.STRING) }, responses = {
           @RestResponse(description = "The file has been persisted", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No file by the given UUID found", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
   public Response persistFile(@PathParam("uuid") String uuid) throws NotFoundException {
@@ -256,7 +253,7 @@ public class StaticFileRestService {
       staticFileService.persistFile(uuid);
       return R.ok();
     } catch (IOException e) {
-      logger.error("Unable to persist file '{}': {}", uuid, getStackTrace(e));
+      logger.error("Unable to persist file '{}':", uuid, e);
       return R.serverError();
     }
   }
@@ -264,7 +261,7 @@ public class StaticFileRestService {
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("{uuid}/url")
-  @RestQuery(name = "getStaticFileUrl", description = "Returns a static file resource's URL", pathParameters = { @RestParameter(description = "Static File Universal Unique Id", isRequired = true, name = "uuid", type = RestParameter.Type.STRING) }, reponses = {
+  @RestQuery(name = "getStaticFileUrl", description = "Returns a static file resource's URL", pathParameters = { @RestParameter(description = "Static File Universal Unique Id", isRequired = true, name = "uuid", type = RestParameter.Type.STRING) }, responses = {
           @RestResponse(description = "Returns a static file resource's URL", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No file by the given uuid found", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
   public Response getStaticFileUrl(@PathParam("uuid") String uuid) throws NotFoundException {
@@ -280,7 +277,7 @@ public class StaticFileRestService {
 
   @DELETE
   @Path("{uuid}")
-  @RestQuery(name = "deleteStaticFile", description = "Remove the static file", returnDescription = "No content", pathParameters = { @RestParameter(name = "uuid", description = "Static File Universal Unique Id", isRequired = true, type = STRING) }, reponses = {
+  @RestQuery(name = "deleteStaticFile", description = "Remove the static file", returnDescription = "No content", pathParameters = { @RestParameter(name = "uuid", description = "Static File Universal Unique Id", isRequired = true, type = STRING) }, responses = {
           @RestResponse(responseCode = SC_NO_CONTENT, description = "File deleted"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No file by the given uuid found") })
   public Response deleteStaticFile(@PathParam("uuid") String uuid) throws NotFoundException {

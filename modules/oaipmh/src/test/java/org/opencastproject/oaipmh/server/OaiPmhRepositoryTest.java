@@ -20,7 +20,6 @@
  */
 package org.opencastproject.oaipmh.server;
 
-import static java.lang.String.format;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -35,7 +34,6 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.xmlmatchers.transform.XmlConverters.the;
 import static org.xmlmatchers.xpath.HasXPath.hasXPath;
 import static org.xmlmatchers.xpath.XpathReturnType.returningANumber;
-import static org.xmlmatchers.xpath.XpathReturnType.returningAString;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -68,7 +66,6 @@ import org.apache.http.impl.client.HttpClients;
 import org.easymock.EasyMock;
 import org.hamcrest.Matcher;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.Timeout;
@@ -77,7 +74,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -229,52 +225,6 @@ public class OaiPmhRepositoryTest {
                    hasXPath("count(//oai20:ListRecords/oai20:record/oai20:metadata)", NS_CTX, returningANumber(), equalTo(1.0))));
   }
 
-  @Ignore
-  @Test
-  @SuppressWarnings("unchecked")
-  public void testResumption() throws Exception {
-    List<SearchResultItem> items1 = new ArrayList<SearchResultItem>();
-    items1.add(searchResultItem("id-1", utcDate(2011, 5, 10), false));
-    items1.add(searchResultItem("id-2", utcDate(2011, 5, 11), false));
-    items1.add(searchResultItem("id-3", utcDate(2011, 5, 12), false));
-
-    List<SearchResultItem> items2 = new ArrayList<SearchResultItem>();
-    items2.add(searchResultItem("id-4", utcDate(2011, 5, 13), false));
-    items2.add(searchResultItem("id-5", utcDate(2011, 5, 14), false));
-
-    // setup episode service mock
-    // this setup is really ugly since it needs knowledge about implementation details
-    OaiPmhDatabase persistence = EasyMock.createMock(OaiPmhDatabase.class);
-    SearchResult result = EasyMock.createMock(SearchResult.class);
-    EasyMock.expect(result.getItems()).andReturn(items1).times(3).andReturn(items2).times(3);
-    EasyMock.expect(result.getLimit()).andReturn(RESULT_LIMIT).anyTimes();
-    EasyMock.expect(result.getOffset()).andReturn(0L).times(3).andReturn(RESULT_LIMIT).anyTimes();
-    EasyMock.expect(result.size()).andReturn((long) items1.size()).times(4).andReturn((long) items2.size()).times(4);
-    EasyMock.expect(persistence.search(EasyMock.<Query>anyObject())).andReturn(result).anyTimes();
-    EasyMock.replay(persistence);
-    EasyMock.replay(result);
-    // do testing
-    final OaiPmhRepository repo = repo(persistence, Granularity.DAY);
-    runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
-              repo.selectVerb(params("ListIdentifiers", null, "oai_dc", null, null, null)),
-              some(IsValid),
-              list(hasXPath("count(//oai20:ListIdentifiers/oai20:header)", NS_CTX, returningANumber(), equalTo(3.0)),
-                   hasXPath("//oai20:ListIdentifiers/oai20:resumptionToken/text()", NS_CTX, returningAString(), equalTo("r-token")),
-                   hasXPath("//oai20:ListIdentifiers/oai20:header[1]/oai20:identifier/text()", NS_CTX, returningAString(), equalTo("id-1")),
-                   hasXPath("//oai20:ListIdentifiers/oai20:header[2]/oai20:identifier/text()", NS_CTX, returningAString(), equalTo("id-2")),
-                   hasXPath("//oai20:ListIdentifiers/oai20:header[3]/oai20:identifier/text()", NS_CTX, returningAString(), equalTo("id-3"))));
-    // resume query
-    runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
-              repo.selectVerb(params("ListIdentifiers", null, null, null, null, "r-token")),
-              some(IsValid),
-              list(hasXPath("count(//oai20:ListIdentifiers/oai20:header)", NS_CTX, returningANumber(), equalTo(2.0)),
-                   hasXPath("//oai20:ListIdentifiers/oai20:header[1]/oai20:identifier/text()", NS_CTX, returningAString(), equalTo("id-4")),
-                   hasXPath("//oai20:ListIdentifiers/oai20:header[2]/oai20:identifier/text()", NS_CTX, returningAString(), equalTo("id-5")),
-                   // token must be empty now since there are no more pages
-                   hasXPath("//oai20:ListIdentifiers/oai20:resumptionToken/text()", NS_CTX, returningAString(), equalTo(""))));
-    EasyMock.verify(repo.getPersistence());
-  }
-
   @Test
   public void testDateAdaption() {
     final Date d = utcDate(2012, 5, 24, 13, 24, 0);
@@ -328,7 +278,7 @@ public class OaiPmhRepositoryTest {
           if (messageObj.has("className")) {
             final String className = messageObj.val("className").as(JsonVal.asString).trim();
             final String text = messageObj.val("text").as(JsonVal.asString).trim();
-            logger.info(format("[%s] %s", className, text));
+            logger.info("[{}] {}", className, text);
             ok = ok && (eq(className, "correct")
                     // since the validator does not validate everything correctly here are some exclusions
                     || (status == IsError && eq(text, "Could not find a valid OAI-PMH command.")))

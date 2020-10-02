@@ -22,7 +22,6 @@
 package org.opencastproject.index.service.message;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.index.service.impl.index.event.EventIndexUtils.getOrCreateEvent;
 
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -174,7 +173,7 @@ public class SchedulerMessageReceiverImpl extends BaseMessageReceiverImpl<Schedu
       logger.debug("Scheduled recording {} updated in the {} search index",
         event.getIdentifier(), getSearchIndex().getIndexName());
     } catch (SearchIndexException e) {
-      logger.error("Error retrieving the recording event from the search index: {}", getStackTrace(e));
+      logger.error("Error retrieving the recording event from the search index:", e);
     }
   }
 }

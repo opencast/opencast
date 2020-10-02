@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -41,8 +41,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -62,8 +62,8 @@
     </dependency>
     <!-- javax.activation for MimetypesFileTypeMap which can probably be removed: -->
     <dependency>
-      <groupId>javax.activation</groupId>
-      <artifactId>activation</artifactId>
+      <groupId>jakarta.activation</groupId>
+      <artifactId>jakarta.activation-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -146,10 +146,6 @@
             <Private-Package>
               org.codehaus.plexus.util.cli
             </Private-Package>
-            <Service-Component>
-              OSGI-INF/composer-service.xml,
-              OSGI-INF/profile-scanner.xml
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>

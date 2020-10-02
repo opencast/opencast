@@ -22,8 +22,6 @@
 
 package org.opencastproject.util;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -227,8 +225,4 @@ public final class Checksum implements Serializable {
     return new Checksum(convertToHex(checksum.digest()), type);
   }
 
-  /** Create a checksum of type <code>type</code> for the given <code>string</code>. */
-  public static Checksum createFor(ChecksumType type, String string) throws IOException {
-    return create(type, IOUtils.toInputStream(string, "UTF-8"));
-  }
 }

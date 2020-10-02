@@ -52,7 +52,6 @@ import javax.management.ObjectName;
 
 public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
 
-  public static final String PID = "org.opencastproject.userdirectory.brightspace";
   private static final Logger logger = LoggerFactory.getLogger(BrightspaceUserProviderFactory.class);
 
   private static final String ORGANIZATION_KEY = "org.opencastproject.userdirectory.brightspace.org";

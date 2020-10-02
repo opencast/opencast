@@ -34,9 +34,6 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.videoeditor.api.VideoEditorService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -56,7 +53,6 @@ import javax.ws.rs.core.Response;
         notes = {"All paths above are relative to the REST endpoint base (something like http://your.server/videoeditor)"})
 public class VideoEditorServiceEndpoint extends AbstractJobProducerEndpoint {
 
-  private static final Logger logger = LoggerFactory.getLogger(VideoEditorServiceEndpoint.class);
   private ServiceRegistry serviceRegistry;
   private VideoEditorService videoEditorService;
   private SmilService smilService;
@@ -70,7 +66,7 @@ public class VideoEditorServiceEndpoint extends AbstractJobProducerEndpoint {
     @RestParameter(name = "smil", type = RestParameter.Type.TEXT,
             description = "Smil document to process.", isRequired = true)
   },
-          reponses = {
+          responses = {
     @RestResponse(description = "Smil processing jobs created successfully.", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "Internal server error.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
   })
