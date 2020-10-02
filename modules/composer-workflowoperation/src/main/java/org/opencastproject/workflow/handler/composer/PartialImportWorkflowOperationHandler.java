@@ -244,19 +244,15 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final TrackSelector presenterTrackSelector = mkTrackSelector(presenterFlavor);
     final TrackSelector presentationTrackSelector = mkTrackSelector(presentationFlavor);
     List<Track> originalTracks = new ArrayList<Track>();
-    final List<Track> presenterTracks = new ArrayList<Track>();
-    final List<Track> presentationTracks = new ArrayList<Track>();
     // Collecting presenter tracks
     for (Track t : presenterTrackSelector.select(mediaPackage, false)) {
       logger.info("Found partial presenter track {}", t);
       originalTracks.add(t);
-      presenterTracks.add(t);
     }
     // Collecting presentation tracks
     for (Track t : presentationTrackSelector.select(mediaPackage, false)) {
       logger.info("Found partial presentation track {}", t);
       originalTracks.add(t);
-      presentationTracks.add(t);
     }
 
     // Optionally encode all tracks to avoid any errors later on
