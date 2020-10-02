@@ -239,7 +239,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     // get tracks
     final TrackSelector presenterTrackSelector = mkTrackSelector(presenterFlavor);
     final TrackSelector presentationTrackSelector = mkTrackSelector(presentationFlavor);
-    final List<Track> originalTracks = new ArrayList<Track>();
+    List<Track> originalTracks = new ArrayList<Track>();
     final List<Track> presenterTracks = new ArrayList<Track>();
     final List<Track> presentationTracks = new ArrayList<Track>();
     // Collecting presenter tracks
@@ -254,6 +254,15 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       originalTracks.add(t);
       presentationTracks.add(t);
     }
+
+    // I am breaking things
+    if (forceProfile.isSome()) {
+      logger.info("WE PREENCODE NOW");
+      originalTracks = preencode(forceProfile.get(), originalTracks);
+    } else {
+      throw new WorkflowOperationException("You make preencode testing really hard");
+    }
+
 
     // flavor_type -> job
     final Map<String, Job> jobs = new HashMap<String, Job>();
@@ -810,6 +819,31 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     } finally {
       IOUtils.closeQuietly(in);
     }
+  }
+
+  /**
+   * I am breaking things
+   */
+  private List<Track> preencode(EncodingProfile profile, List<Track> tracks)
+          throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException,
+          ServiceRegistryException {
+    List<Track> encodedTracks = new ArrayList<>();
+    for (Track track : tracks) {
+      Job encodeJob = composerService.encode(track, profile.getIdentifier());
+      if (!waitForStatus(encodeJob).isSuccess()) {
+        throw new WorkflowOperationException("Encoding of track " + track + " failed");
+      }
+      encodeJob = serviceRegistry.getJob(encodeJob.getId());
+      Track encodedTrack = (Track) MediaPackageElementParser.getFromXml(encodeJob.getPayload());
+      if (encodedTrack == null) {
+        throw new WorkflowOperationException("Encoded track " + track + " failed to produce a track");
+      }
+      encodedTrack.setIdentifier(track.getIdentifier());
+      encodedTrack.setFlavor(track.getFlavor());
+      encodedTracks.add(encodedTrack);
+    }
+
+    return encodedTracks;
   }
 
   /**
