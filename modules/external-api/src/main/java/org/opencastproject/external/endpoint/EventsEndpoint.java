@@ -326,6 +326,10 @@ public class EventsEndpoint implements ManagedService {
     configuredMetadataFields = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
   }
 
+  public static <T> boolean isNullOrEmpty(List<String> list) {
+    return list == null || list.isEmpty();
+  }
+
   @GET
   @Path("{eventId}")
   @RestQuery(name = "getevent", description = "Returns a single event. By setting the optional sign parameter to true, the method will pre-sign distribution urls if signing is turned on in Opencast. Remember to consider the maximum validity of signed URLs when caching this response.", returnDescription = "", pathParameters = {
@@ -623,7 +627,7 @@ public class EventsEndpoint implements ManagedService {
                   @RestResponse(description = "A (potentially empty) list of events is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getEvents(@HeaderParam("Accept") String acceptHeader, @QueryParam("id") String id,
           @QueryParam("commentReason") String reasonFilter, @QueryParam("commentResolution") String resolutionFilter,
-          @QueryParam("filter") String filter, @QueryParam("sort") String sort, @QueryParam("offset") Integer offset,
+          @QueryParam("filter") List<String> filter, @QueryParam("sort") String sort, @QueryParam("offset") Integer offset,
           @QueryParam("limit") Integer limit, @QueryParam("sign") boolean sign, @QueryParam("withacl") Boolean withAcl,
           @QueryParam("withmetadata") Boolean withMetadata, @QueryParam("withscheduling") Boolean withScheduling,
           @QueryParam("onlyWithWriteAccess") Boolean onlyWithWriteAccess, @QueryParam("withpublications") Boolean withPublications) {
@@ -643,177 +647,265 @@ public class EventsEndpoint implements ManagedService {
       optLimit = Option.none();
     }
 
-    // Parse the filters
-    if (StringUtils.isNotBlank(filter)) {
-      for (String f : filter.split(",")) {
-        String[] filterTuple = f.split(":");
-        if (filterTuple.length < 2) {
-          logger.info("No value for filter {} in filters list: {}", filterTuple[0], filter);
-          continue;
-        }
+    //List of all events from the filters
+    List<IndexObject> allEvents = new ArrayList<>();
 
-        String name = filterTuple[0];
-        String value;
+    if (!isNullOrEmpty(filter)) {
+      // API version 1.5.0: Additive filter
+      if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_5_0)) {
+        filter = filter.subList(0,1);
+      }
+      for (String filterPart : filter) {
+        // Parse the filters
 
-        if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
-          // MH-13038 - 1.1.0 and higher support colons in values
-          value = f.substring(name.length() + 1);
-        } else {
-          value = filterTuple[1];
-        }
+        for (String f : filterPart.split(",")) {
+          String[] filterTuple = f.split(":");
+          if (filterTuple.length < 2) {
+            logger.info("No value for filter {} in filters list: {}", filterTuple[0], filter);
+            continue;
+          }
 
-        if ("presenters".equals(name)) {
-          query.withPresenter(value);
-        } else if ("contributors".equals(name)) {
-          query.withContributor(value);
-        } else if ("location".equals(name)) {
-          query.withLocation(value);
-        } else if ("textFilter".equals(name)) {
-          query.withText("*" + value + "*");
-        } else if ("series".equals(name)) {
-          query.withSeriesId(value);
-        } else if ("subject".equals(name)) {
-          query.withSubject(value);
-        } else if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
-          // additional filters only available with Version 1.1.0 or higher
-          if ("identifier".equals(name)) {
-            query.withIdentifier(value);
-          } else if ("title".equals(name)) {
-            query.withTitle(value);
-          } else if ("description".equals(name)) {
-            query.withDescription(value);
-          } else if ("series_name".equals(name)) {
-            query.withSeriesName(value);
-          } else if ("language".equals(name)) {
-            query.withLanguage(value);
-          } else if ("created".equals(name)) {
-            query.withCreated(value);
-          } else if ("license".equals(name)) {
-            query.withLicense(value);
-          } else if ("rightsholder".equals(name)) {
-            query.withRights(value);
-          } else if ("is_part_of".equals(name)) {
-            query.withSeriesId(value);
-          } else if ("source".equals(name)) {
-            query.withSource(value);
-          } else if ("status".equals(name)) {
-            query.withEventStatus(value);
-          } else if ("agent_id".equals(name)) {
-            query.withAgentId(value);
-          } else if ("start".equals(name)) {
-            try {
-              Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
-              query.withStartFrom(fromAndToCreationRange.getA());
-              query.withStartTo(fromAndToCreationRange.getB());
-            } catch (Exception e) {
-              return RestUtil.R
-                      .badRequest(String.format("Filter 'start' could not be parsed: %s", e.getMessage()));
+          String name = filterTuple[0];
+          String value;
 
-            }
-          } else if ("technical_start".equals(name)) {
-            try {
-              Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
-              query.withTechnicalStartFrom(fromAndToCreationRange.getA());
-              query.withTechnicalStartTo(fromAndToCreationRange.getB());
-            } catch (Exception e) {
-              return RestUtil.R
-                      .badRequest(String.format("Filter 'technical_start' could not be parsed: %s", e.getMessage()));
-
-            }
+          if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+            // MH-13038 - 1.1.0 and higher support colons in values
+            value = f.substring(name.length() + 1);
           } else {
-            logger.warn("Unknown filter criteria {}", name);
-            return RestUtil.R
-                    .badRequest(String.format("Unknown filter criterion in request: %s", name));
+            value = filterTuple[1];
+          }
 
+          if ("presenters".equals(name)) {
+            query.withPresenter(value);
+          } else if ("contributors".equals(name)) {
+            query.withContributor(value);
+          } else if ("location".equals(name)) {
+            query.withLocation(value);
+          } else if ("textFilter".equals(name)) {
+            query.withText("*" + value + "*");
+          } else if ("series".equals(name)) {
+            query.withSeriesId(value);
+          } else if ("subject".equals(name)) {
+            query.withSubject(value);
+          } else if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+            // additional filters only available with Version 1.1.0 or higher
+            if ("identifier".equals(name)) {
+              query.withIdentifier(value);
+            } else if ("title".equals(name)) {
+              query.withTitle(value);
+            } else if ("description".equals(name)) {
+              query.withDescription(value);
+            } else if ("series_name".equals(name)) {
+              query.withSeriesName(value);
+            } else if ("language".equals(name)) {
+              query.withLanguage(value);
+            } else if ("created".equals(name)) {
+              query.withCreated(value);
+            } else if ("license".equals(name)) {
+              query.withLicense(value);
+            } else if ("rightsholder".equals(name)) {
+              query.withRights(value);
+            } else if ("is_part_of".equals(name)) {
+              query.withSeriesId(value);
+            } else if ("source".equals(name)) {
+              query.withSource(value);
+            } else if ("status".equals(name)) {
+              query.withEventStatus(value);
+            } else if ("agent_id".equals(name)) {
+              query.withAgentId(value);
+            } else if ("start".equals(name)) {
+              try {
+                Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
+                query.withStartFrom(fromAndToCreationRange.getA());
+                query.withStartTo(fromAndToCreationRange.getB());
+              } catch (Exception e) {
+                return RestUtil.R
+                        .badRequest(String.format("Filter 'start' could not be parsed: %s", e.getMessage()));
+
+              }
+            } else if ("technical_start".equals(name)) {
+              try {
+                Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
+                query.withTechnicalStartFrom(fromAndToCreationRange.getA());
+                query.withTechnicalStartTo(fromAndToCreationRange.getB());
+              } catch (Exception e) {
+                return RestUtil.R
+                        .badRequest(String.format("Filter 'technical_start' could not be parsed: %s", e.getMessage()));
+
+              }
+            } else {
+              logger.warn("Unknown filter criteria {}", name);
+              return RestUtil.R.badRequest(String.format("Unknown filter criterion in request: %s", name));
+
+            }
+          }
+        }
+
+        if (optSort.isSome()) {
+          Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+          for (SortCriterion criterion : sortCriteria) {
+
+            switch (criterion.getFieldName()) {
+              case EventIndexSchema.TITLE:
+                query.sortByTitle(criterion.getOrder());
+                break;
+              case EventIndexSchema.PRESENTER:
+                query.sortByPresenter(criterion.getOrder());
+                break;
+              case EventIndexSchema.TECHNICAL_START:
+              case "technical_date":
+                query.sortByTechnicalStartDate(criterion.getOrder());
+                break;
+              case EventIndexSchema.TECHNICAL_END:
+                query.sortByTechnicalEndDate(criterion.getOrder());
+                break;
+              case EventIndexSchema.START_DATE:
+              case "date":
+                query.sortByStartDate(criterion.getOrder());
+                break;
+              case EventIndexSchema.END_DATE:
+                query.sortByEndDate(criterion.getOrder());
+                break;
+              case EventIndexSchema.WORKFLOW_STATE:
+                query.sortByWorkflowState(criterion.getOrder());
+                break;
+              case EventIndexSchema.SERIES_NAME:
+                query.sortBySeriesName(criterion.getOrder());
+                break;
+              case EventIndexSchema.LOCATION:
+                query.sortByLocation(criterion.getOrder());
+                break;
+              // For compatibility, we mimic to support the old review_status and scheduling_status sort criteria (MH-13407)
+              case "review_status":
+              case "scheduling_status":
+                break;
+              default:
+                return RestUtil.R.badRequest(String.format("Unknown sort criterion in request: %s", criterion.getFieldName()));
+            }
+          }
+        }
+
+        // TODO: Add the comment resolution filter to the query
+        if (StringUtils.isNotBlank(resolutionFilter)) {
+          try {
+            CommentResolution.valueOf(resolutionFilter);
+          } catch (Exception e) {
+            logger.debug("Unable to parse comment resolution filter {}", resolutionFilter);
+            return Response.status(Status.BAD_REQUEST).build();
+          }
+        }
+
+        if (optLimit.isSome())
+          query.withLimit(optLimit.get());
+        if (optOffset.isSome())
+          query.withOffset(offset);
+        // TODO: Add other filters to the query
+
+        SearchResult<Event> results = null;
+        try {
+          results = externalIndex.getByQuery(query);
+        } catch (SearchIndexException e) {
+          logger.error("The External Search Index was not able to get the events list", e);
+          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        }
+
+        SearchResultItem<Event>[] items = results.getItems();
+        List<IndexObject> events = new ArrayList<>();
+        for (SearchResultItem<Event> item : items) {
+          Event source = item.getSource();
+          source.updatePreview(previewSubtype);
+          events.add(source);
+        }
+        //Append  filtered results to the list
+        allEvents.addAll(events);
+      }
+    } else {
+      if (optSort.isSome()) {
+        Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+        for (SortCriterion criterion : sortCriteria) {
+
+          switch (criterion.getFieldName()) {
+            case EventIndexSchema.TITLE:
+              query.sortByTitle(criterion.getOrder());
+              break;
+            case EventIndexSchema.PRESENTER:
+              query.sortByPresenter(criterion.getOrder());
+              break;
+            case EventIndexSchema.TECHNICAL_START:
+            case "technical_date":
+              query.sortByTechnicalStartDate(criterion.getOrder());
+              break;
+            case EventIndexSchema.TECHNICAL_END:
+              query.sortByTechnicalEndDate(criterion.getOrder());
+              break;
+            case EventIndexSchema.START_DATE:
+            case "date":
+              query.sortByStartDate(criterion.getOrder());
+              break;
+            case EventIndexSchema.END_DATE:
+              query.sortByEndDate(criterion.getOrder());
+              break;
+            case EventIndexSchema.WORKFLOW_STATE:
+              query.sortByWorkflowState(criterion.getOrder());
+              break;
+            case EventIndexSchema.SERIES_NAME:
+              query.sortBySeriesName(criterion.getOrder());
+              break;
+            case EventIndexSchema.LOCATION:
+              query.sortByLocation(criterion.getOrder());
+              break;
+            // For compatibility, we mimic to support the old review_status and scheduling_status sort criteria (MH-13407)
+            case "review_status":
+            case "scheduling_status":
+              break;
+            default:
+              return RestUtil.R.badRequest(String.format("Unknown sort criterion in request: %s", criterion.getFieldName()));
           }
         }
       }
-    }
 
-    if (optSort.isSome()) {
-      Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
-      for (SortCriterion criterion : sortCriteria) {
-
-        switch (criterion.getFieldName()) {
-          case EventIndexSchema.TITLE:
-            query.sortByTitle(criterion.getOrder());
-            break;
-          case EventIndexSchema.PRESENTER:
-            query.sortByPresenter(criterion.getOrder());
-            break;
-          case EventIndexSchema.TECHNICAL_START:
-          case "technical_date":
-            query.sortByTechnicalStartDate(criterion.getOrder());
-            break;
-          case EventIndexSchema.TECHNICAL_END:
-            query.sortByTechnicalEndDate(criterion.getOrder());
-            break;
-          case EventIndexSchema.START_DATE:
-          case "date":
-            query.sortByStartDate(criterion.getOrder());
-            break;
-          case EventIndexSchema.END_DATE:
-            query.sortByEndDate(criterion.getOrder());
-            break;
-          case EventIndexSchema.WORKFLOW_STATE:
-            query.sortByWorkflowState(criterion.getOrder());
-            break;
-          case EventIndexSchema.SERIES_NAME:
-            query.sortBySeriesName(criterion.getOrder());
-            break;
-          case EventIndexSchema.LOCATION:
-            query.sortByLocation(criterion.getOrder());
-            break;
-          // For compatibilty, we mimic to support the old review_status and scheduling_status sort criteria (MH-13407)
-          case "review_status":
-          case "scheduling_status":
-            break;
-          default:
-            return RestUtil.R
-                    .badRequest(String.format("Unknown sort criterion in request: %s", criterion.getFieldName()));
+      // TODO: Add the comment resolution filter to the query
+      if (StringUtils.isNotBlank(resolutionFilter)) {
+        try {
+          CommentResolution.valueOf(resolutionFilter);
+        } catch (Exception e) {
+          logger.debug("Unable to parse comment resolution filter {}", resolutionFilter);
+          return Response.status(Status.BAD_REQUEST).build();
         }
       }
-    }
 
-    // TODO: Add the comment resolution filter to the query
-    if (StringUtils.isNotBlank(resolutionFilter)) {
-      try {
-        CommentResolution.valueOf(resolutionFilter);
-      } catch (Exception e) {
-        logger.debug("Unable to parse comment resolution filter {}", resolutionFilter);
-        return Response.status(Status.BAD_REQUEST).build();
+      if (optLimit.isSome())
+        query.withLimit(optLimit.get());
+      if (optOffset.isSome())
+        query.withOffset(offset);
+
+      if (onlyWithWriteAccess != null && onlyWithWriteAccess) {
+        query.withoutActions();
+        query.withAction(Permissions.Action.WRITE);
       }
-    }
+      // TODO: Add other filters to the query
 
-    if (optLimit.isSome())
-      query.withLimit(optLimit.get());
-    if (optOffset.isSome())
-      query.withOffset(offset);
+      SearchResult<Event> results = null;
+      try {
+        results = externalIndex.getByQuery(query);
+      } catch (SearchIndexException e) {
+        logger.error("The External Search Index was not able to get the events list", e);
+        throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      }
 
-    if (onlyWithWriteAccess != null && onlyWithWriteAccess) {
-      query.withoutActions();
-      query.withAction(Permissions.Action.WRITE);
-    }
-    // TODO: Add other filters to the query
-
-    SearchResult<Event> results = null;
-    try {
-      results = externalIndex.getByQuery(query);
-    } catch (SearchIndexException e) {
-      logger.error("The External Search Index was not able to get the events list", e);
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    }
-
-    SearchResultItem<Event>[] items = results.getItems();
-    List<IndexObject> events = new ArrayList<>();
-    for (SearchResultItem<Event> item : items) {
-      Event source = item.getSource();
-      source.updatePreview(previewSubtype);
-      events.add(source);
+      SearchResultItem<Event>[] items = results.getItems();
+      List<IndexObject> events = new ArrayList<>();
+      for (SearchResultItem<Event> item : items) {
+        Event source = item.getSource();
+        source.updatePreview(previewSubtype);
+        events.add(source);
+      }
+      //Append  filtered results to the list
+      allEvents.addAll(events);
     }
     try {
       return getJsonEvents(
-          acceptHeader, events, withAcl, withMetadata, withScheduling, withPublications, sign, requestedVersion);
+          acceptHeader, allEvents, withAcl, withMetadata, withScheduling, withPublications, sign, requestedVersion);
     } catch (Exception e) {
       logger.error("Unable to get events", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
