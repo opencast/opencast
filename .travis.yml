@@ -140,6 +140,7 @@ jobs:
              -Dcheckstyle.skip=true \
              -Dpmd.skip=true \
              -Dcpd.skip=true
+
     # Deploy translation keys to Crowdin if we are on develop or one of the release branches
     - stage: deployment
       env: name=crowdin
@@ -151,5 +152,3 @@ jobs:
         on:
           all_branches: true
           condition: $TRAVIS_BRANCH =~ ^develop|^r/
-
-
