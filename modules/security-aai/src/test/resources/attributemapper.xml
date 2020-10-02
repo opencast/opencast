@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+ xsi:schemaLocation="http://www.springframework.org/schema/beans
+                    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                    http://www.springframework.org/schema/util
+                    http://www.springframework.org/schema/util/spring-util-3.1.xsd"
+ default-autowire="no">
+
+ <util:list id="roleMapping" value-type="java.lang.String">
+   <value>'ROLE_AAI_USER'</value>
+   <value>'ROLE_AAI_USER_' + ['eduPersonPrincipalName']</value>
+   <value>['homeOrganization'] != null ? 'ROLE_AAI_ORG_' + ['homeOrganization'] + '_MEMBER' : null</value>
+   <value>['eduPersonEntitlement'].contains('urn:mace:example.org:permission:shibboleth:opencast') ? 'ROLE_GROUP_AAI_TRAINER' : null</value>
+   <value>['eduPersonPrincipalName'].contains('john.doe@example.org') ? 'ROLE_GROUP_AAI_MANAGER' : null</value>
+   <value>['eduPersonPrincipalName'].contains('ron.smith@example.org') ? 'ROLE_GROUP_AAI_EXAMPLE' : null</value>
+ </util:list>
+
+
+ <util:list id="displayNameMapping" value-type="java.lang.String">
+   <value>['givenName'][0] + ' ' + ['sn'][0]</value>
+ </util:list>
+
+ <util:list id="mailMapping" value-type="java.lang.String">
+   <value>['mail'][0]</value>
+ </util:list>
+
+ <util:map id="attributeMap" map-class="java.util.HashMap">
+   <entry key="roles" value-ref="roleMapping" />
+   <entry key="displayName" value-ref="displayNameMapping" />
+   <entry key="mail" value-ref="mailMapping" />
+ </util:map>
+
+ <util:list id="roles2Attributes" value-type="java.lang.String">
+   <value>['roles']</value>
+ </util:list>
+
+
+ <util:list id="aaiAttributes" value-type="java.lang.String">
+   <value>sn</value>
+   <value>givenName</value>
+   <value>mail</value>
+   <value>homeOrganization</value>
+   <value>eduPersonEntitlement</value>
+   <value>eduPersonPrincipalName</value>
+ </util:list>
+
+ <bean id="attributeMapper" class="org.opencastproject.security.aai.api.AttributeMapper">
+   <property name="useHeader" value="true" />
+   <property name="multiValueDelimiter" value=";" />
+   <property name="attributeMap" ref="attributeMap" />
+   <property name="aaiAttributes" ref="aaiAttributes" />
+ </bean>
+
+</beans>

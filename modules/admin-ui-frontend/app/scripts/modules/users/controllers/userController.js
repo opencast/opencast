@@ -21,9 +21,9 @@
 'use strict';
 
 angular.module('adminNg.controllers')
-.controller('UserCtrl', ['$scope', 'Table', 'RolesResource', 'UserResource', 'UsersResource', 'JsHelper',
-  'Notifications', 'Modal', 'AuthService', 'underscore',
-  function ($scope, Table, RolesResource, UserResource, UsersResource, JsHelper, Notifications, Modal,
+.controller('UserCtrl', ['$rootScope', '$scope', 'Table', 'RolesResource', 'UserResource', 'UsersResource',
+  'JsHelper', 'Notifications', 'Modal', 'AuthService', 'underscore',
+  function ($rootScope, $scope, Table, RolesResource, UserResource, UsersResource, JsHelper, Notifications, Modal,
     AuthService, _) {
     $scope.manageable = true;
 
@@ -104,6 +104,7 @@ angular.module('adminNg.controllers')
         $scope.user.$update({ username: $scope.user.username }, function () {
           Notifications.add('success', 'USER_UPDATED');
           Modal.$scope.close();
+          $rootScope.$emit('user_changed');
         }, function () {
           Notifications.add('error', 'USER_NOT_SAVED', 'user-form');
         });
@@ -113,6 +114,7 @@ angular.module('adminNg.controllers')
           Modal.$scope.close();
           Notifications.add('success', 'USER_ADDED');
           Modal.$scope.close();
+          $rootScope.$emit('user_changed');
         }, function () {
           Notifications.add('error', 'USER_NOT_SAVED', 'user-form');
         });

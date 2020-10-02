@@ -1,0 +1,42 @@
+<oc:mediapackage xmlns:oc="http://mediapackage.opencastproject.org" id="ingested" start="2007-12-05T13:40:00" duration="10044">
+  <oc:media>
+    <oc:track id="track-1" type="presentation/source">
+      <oc:mimetype>application/x-mpegURL</oc:mimetype>
+      <oc:url>http://server/ingested/id1/master.m3u8</oc:url>
+      <oc:description>narwhal</oc:description>
+      <oc:checksum type="md5">deadbeef1</oc:checksum>
+      <oc:duration>1300</oc:duration>
+    </oc:track>
+    <oc:track  id="track-2" type="presentation/source">
+      <oc:mimetype>application/x-mpegURL</oc:mimetype>
+      <oc:description>narwhal</oc:description>
+      <oc:url>http://server/ingested/id2/variant_0.m3u8</oc:url>
+      <oc:checksum type="md5">43b7d843b024a429b2f547a4f230d31</oc:checksum>
+      <oc:duration>1300</oc:duration>
+    </oc:track>
+    <oc:track  id="track-3" type="presentation/source">
+      <oc:mimetype>application/x-mpegURL</oc:mimetype>
+      <oc:description>narwhal</oc:description>
+      <oc:url>http://server/ingested/id3/variant_1.m3u8</oc:url>
+      <oc:checksum type="md5">43b7d8438b02c4a29b2f547a4f230d31</oc:checksum>
+      <oc:duration>1300</oc:duration>
+    </oc:track>
+    <oc:track  id="track-4" type="presentation/source">
+      <oc:mimetype>video/mp4</oc:mimetype>
+      <oc:url>http://server/ingested/id4/file_0.mp4</oc:url>
+      <oc:checksum type="md5">43b7d8453b02c4a29b2f547a4f230d31</oc:checksum>
+      <oc:duration>1300</oc:duration>
+    </oc:track>
+    <oc:track  id="track-5" type="presentation/source">
+      <oc:mimetype>video/mp4</oc:mimetype>
+      <oc:url>http://server/ingested/id5/file_1.mp4</oc:url>
+      <oc:checksum type="md5">43b7d0843b02c4a29b2f547a4f230d31</oc:checksum>
+      <oc:duration>1300</oc:duration>
+      <oc:tags>
+        <oc:tag>archive</oc:tag>
+        <oc:tag>engage</oc:tag>
+        <oc:tag>multiaudio</oc:tag>
+      </oc:tags>
+    </oc:track>
+  </oc:media>
+</oc:mediapackage>

@@ -97,7 +97,7 @@ public class CropRestEndpoint extends AbstractJobProducerEndpoint {
   @Path("")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "crop", description = "Submit a track for cropping", restParameters = {
-          @RestParameter(description = "The track to crop.", isRequired = true, name = "track", type = RestParameter.Type.FILE) }, reponses = {
+          @RestParameter(description = "The track to crop.", isRequired = true, name = "track", type = RestParameter.Type.FILE) }, responses = {
           @RestResponse(description = "The job ID to use when polling for the resulting mpeg7 catalog.", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The \"crop\" is NULL or not a valid track type.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "The underlying service could not crop the video.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "The job ID to use when polling for the resulting mpeg7 catalog.")

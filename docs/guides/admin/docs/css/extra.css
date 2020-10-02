@@ -158,3 +158,16 @@ a.header-link {
 a.header-link:hover {
     opacity: 1;
 }
+
+details {
+  border-left: 2px solid silver;
+  padding: 5px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+}
+
+details summary {
+  color: darkblue;
+  cursor: pointer;
+  padding-bottom: 5px;
+}

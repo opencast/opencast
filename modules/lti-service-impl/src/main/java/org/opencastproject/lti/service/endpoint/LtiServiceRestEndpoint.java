@@ -83,7 +83,7 @@ public class LtiServiceRestEndpoint {
   @Path("/jobs")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "listjobs", description = "List recent jobs for a specific series.", returnDescription = "", restParameters = {
-          @RestParameter(name = "seriesId", description = "The id of the series you want jobs for", isRequired = true, type = STRING), }, reponses = {
+          @RestParameter(name = "seriesId", description = "The id of the series you want jobs for", isRequired = true, type = STRING), }, responses = {
           @RestResponse(description = "The list of jobs", responseCode = HttpServletResponse.SC_OK), })
   public Response listJobs(@QueryParam("seriesId") String seriesId) {
     return Response.status(Status.OK)
@@ -99,7 +99,7 @@ public class LtiServiceRestEndpoint {
           @RestParameter(name = "presenter", description = "Presenter movie track", isRequired = true, type = Type.FILE),
           @RestParameter(name = "captions", description = "Caption file", isRequired = false, type = STRING),
           @RestParameter(name = "isPartOf", description = "Series id of the event", isRequired = false, type = STRING),
-          @RestParameter(name = "eventId", description = "ID of the event to update (if it's an update)", isRequired = false, type = STRING) }, reponses = {
+          @RestParameter(name = "eventId", description = "ID of the event to update (if it's an update)", isRequired = false, type = STRING) }, responses = {
                   @RestResponse(description = "A new event is created or the event is updated", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "No authorization to create or update events", responseCode = HttpServletResponse.SC_UNAUTHORIZED),
                   @RestResponse(description = "The event to be updated wasn't found", responseCode = HttpServletResponse.SC_NOT_FOUND) })
@@ -153,7 +153,7 @@ public class LtiServiceRestEndpoint {
   @Path("{eventId}/copy")
   @RestQuery(name = "copyeventtoseries", description = "Copy an event to a different series", returnDescription = "", pathParameters = {
           @RestParameter(name = "eventId", description = "The event (id) to copy", isRequired = true, type = STRING),
-          @RestParameter(name = "seriesId", description = "The series (id) to copy into", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "seriesId", description = "The series (id) to copy into", isRequired = true, type = STRING) }, responses = {
           @RestResponse(description = "The event has been copied.", responseCode = HttpServletResponse.SC_NO_CONTENT),
           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response copyEventToSeries(@PathParam("eventId") final String eventId,
@@ -166,7 +166,7 @@ public class LtiServiceRestEndpoint {
   @Path("{eventId}/metadata")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "seteventmetadata", description = "Set the metadata of an existing event", returnDescription = "", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
           @RestResponse(description = "The event's metadata has been set", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The event doesn't exist", responseCode = HttpServletResponse.SC_NOT_FOUND),
           @RestResponse(description = "The event cannot be accessed", responseCode = HttpServletResponse.SC_UNAUTHORIZED),
@@ -186,7 +186,7 @@ public class LtiServiceRestEndpoint {
   @GET
   @Path("new/metadata")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getneweventmetadata", description = "Get the metadata of a new event", returnDescription = "The metadata of a new event", reponses = {
+  @RestQuery(name = "getneweventmetadata", description = "Get the metadata of a new event", returnDescription = "The metadata of a new event", responses = {
           @RestResponse(description = "A new event's metadata", responseCode = HttpServletResponse.SC_OK),
   })
   public Response getNewEventMetadata() {
@@ -197,7 +197,7 @@ public class LtiServiceRestEndpoint {
   @Path("{eventId}/metadata")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "geteventmetadata", description = "Get the metadata of an existing event", returnDescription = "The metadata of an existing event", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
           @RestResponse(description = "Metadata is available and will be returned", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The event doesn't exist", responseCode = HttpServletResponse.SC_NOT_FOUND),
           @RestResponse(description = "The event cannot be accessed", responseCode = HttpServletResponse.SC_UNAUTHORIZED), })
@@ -214,7 +214,7 @@ public class LtiServiceRestEndpoint {
   @DELETE
   @Path("{eventId}")
   @RestQuery(name = "deleteevent", description = "Deletes an event.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
           @RestResponse(description = "The event has been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEvent(@PathParam("eventId") final String id) {

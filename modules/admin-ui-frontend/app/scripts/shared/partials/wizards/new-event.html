@@ -258,7 +258,7 @@
                         ng-disabled="wizard.step.checkingConflicts"
                         ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                         ng-model="wizard.step.ud.SCHEDULE_SINGLE.device"
-                        ng-options="value.name for (id, value) in wizard.step.captureAgents | filter:wizard.step.hasAgentAccess"
+                        ng-options="ca.name for ca in wizard.step.captureAgents | filter:wizard.step.hasAgentAccess track by ca.id"
                         placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                         >
                         <option value=""></option>
@@ -405,7 +405,7 @@
                         tabindex="19"
                         ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                         ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device"
-                        ng-options="value.name for (id, value) in wizard.step.captureAgents | filter:wizard.step.hasAgentAccess"
+                        ng-options="ca.name for ca in wizard.step.captureAgents | filter:wizard.step.hasAgentAccess track by ca.id"
                         placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                         >
                         <option value=""></option>

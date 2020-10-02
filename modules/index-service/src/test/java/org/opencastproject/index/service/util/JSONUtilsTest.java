@@ -24,15 +24,16 @@ package org.opencastproject.index.service.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
-import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl;
 import org.opencastproject.index.service.resources.list.provider.ContributorsListProvider;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
-import org.opencastproject.index.service.resources.list.query.StringListFilter;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ResourceListFilter;
+import org.opencastproject.list.api.ResourceListProvider;
+import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.impl.ListProvidersServiceImpl;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
+import org.opencastproject.list.query.StringListFilter;
+import org.opencastproject.list.util.ListProviderUtil;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.data.Option;
@@ -114,7 +115,7 @@ public class JSONUtilsTest {
 
   /**
    * Test method for
-   * {@link JSONUtils#filtersToJSON(org.opencastproject.index.service.resources.list.api.ResourceListQuery, org.opencastproject.index.service.resources.list.api.ListProvidersService, org.opencastproject.security.api.Organization)}
+   * {@link JSONUtils#filtersToJSON(org.opencastproject.list.api.ResourceListQuery, org.opencastproject.list.api.ListProvidersService, org.opencastproject.security.api.Organization)}
    * (filters, listProviderService, query, org)}
    */
   @Test

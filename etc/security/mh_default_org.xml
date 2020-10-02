@@ -1,11 +1,16 @@
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:sec="http://www.springframework.org/schema/security"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:osgi="http://www.springframework.org/schema/osgi"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/osgi
-       http://www.springframework.org/schema/osgi/spring-osgi.xsd
-       http://www.springframework.org/schema/security
-       http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util-3.1.xsd
+                           http://www.springframework.org/schema/osgi
+                           http://www.springframework.org/schema/osgi/spring-osgi.xsd
+                           http://www.springframework.org/schema/security
+                           http://www.springframework.org/schema/security/spring-security-3.1.xsd">
 
   <!-- ######################################## -->
   <!-- # Open and unsecured url patterns      # -->
@@ -410,6 +415,9 @@
         <!-- 2-legged OAuth is used by trusted 3rd party applications, including LTI. -->
         <!-- Uncomment the line below to support LTI or other OAuth clients.          -->
         <!-- <ref bean="oauthProtectedResourceFilter" /> -->
+
+        <!-- Uncomment the line below to support Shibboleth. -->
+        <!-- <ref bean="shibbolethHeaderFilter" /> -->
       </list>
     </property>
   </bean>
@@ -584,26 +592,68 @@
     <property name="userDirectoryService" ref="userDirectoryService" />
     <property name="shibbolethLoginHandler" ref="aaiLoginHandler" />
     <property name="exceptionIfHeaderMissing" value="false" />
-  </bean>
-  -->
+  </bean>-->
 
   <!-- AAI header extractor and user generator
   <bean id="aaiLoginHandler" class="org.opencastproject.security.aai.ConfigurableLoginHandler">
     <property name="securityService" ref="securityService" />
     <property name="userReferenceProvider" ref="userReferenceProvider" />
-  </bean>
-  -->
+  </bean>-->
 
+  <!-- Dynamic AAI Loginhandler
+  <bean id="aaiLoginHandler" class="org.opencastproject.security.aai.DynamicLoginHandler">
+    <property name="securityService" ref="securityService" />
+    <property name="userReferenceProvider" ref="userReferenceProvider" />
+    <property name="attributeMapper" ref="attributeMapper" />
+  </bean>-->
   <!--
-  <bean id="preauthAuthProvider"
-        class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-    <property name="preAuthenticatedUserDetailsService">
-      <bean id="userDetailsServiceWrapper" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
-        <property name="userDetailsService" ref="userDetailsService"/>
-      </bean>
-    </property>
-  </bean>
-  -->
+    <util:list id="roleMapping" value-type="java.lang.String">
+      <value>'ROLE_AAI_USER'</value>
+      <value>'ROLE_AAI_USER_' + ['eduPersonPrincipalName']</value>
+      <value>['homeOrganization'] != null ? 'ROLE_AAI_ORG_' + ['homeOrganization'] + '_MEMBER' : null</value>
+      <value>['eduPersonEntitlement'].contains('urn:mace:example.org:permission:shibboleth:opencast_editor') ? 'ROLE_GROUP_AAI_EDITOR' : null</value>
+      <value>['eduPersonPrincipalName'].contains('john.doe@example.org') ? 'ROLE_ADMIN' : null</value>
+    </util:list>
+
+    <util:list id="displayNameMapping" value-type="java.lang.String">
+      <value>['givenName'][0] + ' ' + ['sn'][0]</value>
+    </util:list>
+
+    <util:list id="mailMapping" value-type="java.lang.String">
+      <value>['mail'][0]</value>
+    </util:list>
+
+    <util:map id="attributeMap" map-class="java.util.HashMap">
+      <entry key="roles" value-ref="roleMapping" />
+      <entry key="displayName" value-ref="displayNameMapping" />
+      <entry key="mail" value-ref="mailMapping" />
+    </util:map>
+
+    <util:list id="aaiAttributes" value-type="java.lang.String">
+      <value>sn</value>
+      <value>givenName</value>
+      <value>mail</value>
+      <value>homeOrganization</value>
+      <value>eduPersonEntitlement</value>
+      <value>eduPersonPrincipalName</value>
+      <value>homeOrganization</value>
+    </util:list>
+
+    <bean id="attributeMapper" class="org.opencastproject.security.aai.api.AttributeMapper">
+      <property name="useHeader" value="true" />
+      <property name="multiValueDelimiter" value=";" />
+      <property name="attributeMap" ref="attributeMap" />
+      <property name="aaiAttributes" ref="aaiAttributes" />
+    </bean>
+
+    <bean id="preauthAuthProvider"
+          class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+      <property name="preAuthenticatedUserDetailsService">
+        <bean id="userDetailsServiceWrapper" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+          <property name="userDetailsService" ref="userDetailsService"/>
+        </bean>
+      </property>
+    </bean>-->
 
   <!-- ################ -->
   <!-- # LDAP Support # -->
@@ -694,7 +744,6 @@
 
   <bean id="passwordEncoder" class="org.opencastproject.kernel.security.CustomPasswordEncoder" />
 
-  <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
   <sec:authentication-manager alias="authenticationManager">
     <sec:authentication-provider ref="rememberMeAuthenticationProvider"/>
     <!-- CAS Auth: Uncomment this if using CAS authentication -->
@@ -704,6 +753,7 @@
     <!-- Uncomment the following line if using LDAP -->
     <!-- <sec:authentication-provider ref="ldapAuthProvider" /> -->
     <sec:authentication-provider user-service-ref="userDetailsService">
+      <!-- The JPA user directory stores bcrypt hashed passwords, but can still decrypt legacy md5 hashes -->
       <sec:password-encoder ref="passwordEncoder">
         <!-- This salt is used only for decoding legacy MD5 hased passwords -->
         <sec:salt-source user-property="username" />

@@ -115,6 +115,7 @@
     <module>modules/engage-theodul-plugin-tab-description</module>
     <module>modules/engage-theodul-plugin-tab-shortcuts</module>
     <module>modules/engage-theodul-plugin-tab-slidetext</module>
+    <module>modules/engage-theodul-plugin-tab-downloads</module>
     <module>modules/engage-theodul-plugin-timeline-statistics</module>
     <module>modules/engage-theodul-plugin-video-videojs</module>
     <module>modules/engage-ui</module>
@@ -141,6 +142,7 @@
     <module>modules/inspection-workflowoperation</module>
     <module>modules/statistics-writer-workflowoperation</module>
     <module>modules/kernel</module>
+    <module>modules/list-providers-service</module>
     <module>modules/live-schedule-api</module>
     <module>modules/live-schedule-impl</module>
     <module>modules/logging-workflowoperation</module>
@@ -186,7 +188,6 @@
     <module>modules/security-cas</module>
     <module>modules/security-ldap</module>
     <module>modules/security-lti</module>
-    <module>modules/security-openid</module>
     <module>modules/security-shibboleth</module>
     <module>modules/series-service-api</module>
     <module>modules/series-service-impl</module>

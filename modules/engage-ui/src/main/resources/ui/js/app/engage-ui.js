@@ -257,7 +257,7 @@ function($, bootbox, _, alertify, jsyaml) {
     // search query from form
     searchQuery = GetURLParameter('q') == undefined ? '' : 'q=' + GetURLParameter('q') + '&';
     log('Searching for: ' + searchQuery);
-    if (searchQuery != '') $('#searchInput').val(decodeURI(GetURLParameter('q')));
+    if (searchQuery != '') $('#searchInput').val(decodeURIComponent(GetURLParameter('q').replace(/\+/g, ' ')));
 
     // sort
     if (GetURLParameter('sort') == undefined) {

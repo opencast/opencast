@@ -28,10 +28,10 @@ import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -59,7 +59,7 @@ public class ConfigurableEventDCCatalogUIAdapter extends ConfigurableDCCatalogUI
   private Workspace workspace;
 
   @Override
-  public MetadataCollection getFields(MediaPackage mediapackage) {
+  public DublinCoreMetadataCollection getFields(MediaPackage mediapackage) {
     List<DublinCoreCatalog> dcCatalogs = Arrays.stream(mediapackage.getCatalogs(flavor))
             .map(catalog -> DublinCoreUtil.loadDublinCore(getWorkspace(), catalog))
             .collect(Collectors.toList());
@@ -68,7 +68,7 @@ public class ConfigurableEventDCCatalogUIAdapter extends ConfigurableDCCatalogUI
   }
 
   @Override
-  public Catalog storeFields(MediaPackage mediaPackage, MetadataCollection abstractMetadata) {
+  public Catalog storeFields(MediaPackage mediaPackage, DublinCoreMetadataCollection abstractMetadata) {
     final Catalog catalog;
     final DublinCoreCatalog dc;
     final String filename;

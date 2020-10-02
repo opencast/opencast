@@ -109,7 +109,7 @@ public class UserSettingsEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "getUserSettings", description = "Returns a list of the user settings for the current user", returnDescription = "Returns a JSON representation of the list of user settings", restParameters = {
           @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user settings.") })
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The user settings.") })
   public Response getUserSettings(@QueryParam("limit") int limit, @QueryParam("offset") int offset) throws IOException {
     if (limit < 1) {
       limit = 100;
@@ -131,7 +131,7 @@ public class UserSettingsEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "createUserSetting", description = "Create a new user setting", returnDescription = "Status ok", restParameters = {
           @RestParameter(description = "The key used to represent this setting.", isRequired = true, name = "key", type = STRING),
-          @RestParameter(description = "The value representing this setting.", isRequired = true, name = "value", type = STRING) }, reponses = { @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "User setting has been created.") })
+          @RestParameter(description = "The value representing this setting.", isRequired = true, name = "value", type = STRING) }, responses = { @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "User setting has been created.") })
   public Response createUserSetting(@FormParam("key") String key, @FormParam("value") String value)
           throws NotFoundException {
     try {
@@ -147,7 +147,7 @@ public class UserSettingsEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "updateUserSetting", description = "Update a user setting", returnDescription = "The updated user setting as JSON", pathParameters = { @RestParameter(name = "settingId", description = "The setting's id", isRequired = true, type = RestParameter.Type.INTEGER) }, restParameters = {
           @RestParameter(description = "The key used to represent this setting.", isRequired = true, name = "key", type = STRING),
-          @RestParameter(description = "The value representing this setting.", isRequired = true, name = "value", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "User setting has been created.") })
+          @RestParameter(description = "The value representing this setting.", isRequired = true, name = "value", type = STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "User setting has been created.") })
   public Response updateUserSetting(@PathParam("settingId") final int id, @FormParam("key") String key,
           @FormParam("value") String value) throws NotFoundException {
     try {
@@ -161,7 +161,7 @@ public class UserSettingsEndpoint {
 
   @DELETE
   @Path("/setting/{settingId}")
-  @RestQuery(name = "deleteUserSetting", description = "Delete a user setting", returnDescription = "Status ok", pathParameters = @RestParameter(name = "settingId", type = INTEGER, isRequired = true, description = "The id of the user setting."), reponses = {
+  @RestQuery(name = "deleteUserSetting", description = "Delete a user setting", returnDescription = "Status ok", pathParameters = @RestParameter(name = "settingId", type = INTEGER, isRequired = true, description = "The id of the user setting."), responses = {
           @RestResponse(responseCode = SC_OK, description = "User setting has been deleted."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "User setting not found.") })
   public Response deleteUserSetting(@PathParam("settingId") long id) throws NotFoundException {

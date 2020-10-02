@@ -21,6 +21,8 @@
 
 package org.opencastproject.userdirectory.api;
 
+import org.opencastproject.security.api.RoleProvider;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
 
 public interface UserReferenceProvider {
@@ -38,7 +40,7 @@ public interface UserReferenceProvider {
 
     /**
      * Update an existing user reference
-     * 
+     *
      * @param user
      *            the user reference to be updated
      */
@@ -54,5 +56,19 @@ public interface UserReferenceProvider {
      * @return the user reference or <code>null</code> if not found
      */
     JpaUserReference findUserReference(String userName, String organizationId);
+
+    /**
+     * Set an optional roleProvider that takes care about resolving roles
+     * @param roleProvider
+     */
+    void setRoleProvider(RoleProvider roleProvider);
+
+    /**
+     * Load a user by userName
+     *
+     * @param userName
+     * @return the user or <code>null</code> if not found
+     */
+    User loadUser(String userName);
 
 }

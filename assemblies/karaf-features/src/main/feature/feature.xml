@@ -72,10 +72,6 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlschema/1.4.3_1</bundle>
     <bundle>mvn:org.codehaus.jettison/jettison/1.4.0</bundle>
     <bundle>mvn:org.codehaus.groovy/groovy/2.4.3</bundle>
-    <!-- At least ingest-service-impl need JDOM in version 1.x -->
-    <!-- JDOM 1.x updates will be bug fixes as new features are gone to 2.x (see http://www.jdom.org/) -->
-    <bundle>mvn:org.jdom/com.springsource.org.jdom/1.1.0</bundle>
-    <!-- At least search-service-impl need JDOM in version 2.x -->
     <bundle>mvn:org.jdom/com.springsource.org.jdom/2.0.1</bundle>
     <bundle>mvn:org.opencastproject/android-mms/1.2</bundle>
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
@@ -118,6 +114,7 @@
     <bundle start-level="81">mvn:org.opencastproject/opencast-db/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dublincore/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-kernel/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-list-providers-service/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-message-broker-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-message-broker-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata-api/${project.version}</bundle>
@@ -194,6 +191,7 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-usertracking/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-description/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-description/${project.version}</bundle>
+    <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-downloads/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-shortcuts/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-slidetext/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-timeline-statistics/${project.version}</bundle>
@@ -438,6 +436,7 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-usertracking/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-description/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-description/${project.version}</bundle>
+    <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-downloads/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-shortcuts/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-slidetext/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-timeline-statistics/${project.version}</bundle>
@@ -640,6 +639,7 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-usertracking/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-description/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-description/${project.version}</bundle>
+    <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-downloads/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-shortcuts/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-slidetext/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-timeline-statistics/${project.version}</bundle>

@@ -97,7 +97,7 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                           type = RestParameter.Type.STRING,
                           defaultValue = "",
                           description = "The target storage to move the mediapackage to.")},
-          reponses = {
+          responses = {
                   @RestResponse(
                           description = "The job created to move the snapshot.",
                           responseCode = SC_OK),
@@ -152,7 +152,7 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                           type = RestParameter.Type.STRING,
                           defaultValue = "",
                           description = "The target storage to move the mediapackage to.")},
-          reponses = {
+          responses = {
                   @RestResponse(
                           description = "The job created to move the snapshot.",
                           responseCode = SC_OK),
@@ -215,7 +215,7 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                           type = RestParameter.Type.STRING,
                           defaultValue = "",
                           description = "The target storage to move the mediapackage to.")},
-          reponses = {
+          responses = {
                   @RestResponse(
                           description = "The job created to move the snapshots.",
                           responseCode = SC_OK),
@@ -285,7 +285,7 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                           type = RestParameter.Type.STRING,
                           defaultValue = "",
                           description = "The target storage to move the mediapackage to.")},
-          reponses = {
+          responses = {
                   @RestResponse(
                           description = "The job created to move the snapshots.",
                           responseCode = SC_OK),

@@ -8,13 +8,56 @@
    "CANCEL": "Cancelar",
    "CONFIRM": "Confirmar",
    "SAVE": "Gardar",
-   "CONTINUE": "Continue",
-   "CLOSE": "Close",
+   "CONTINUE": "Continuar",
+   "CLOSE": "Pechar",
    "LOGOUT": "Pechar sesión",
    "RESET": "Restablecer",
    "SELECT_NO_OPTION_SELECTED": "Sen opcións seleccionadas",
    "SELECT_NO_OPTIONS_AVAILABLE": "Sen opcións dispoñibles",
    "YES": "Si",
+   "COPY": "Copiar ó portapapeis",
+   "LTI": {
+      "ERROR_LOADING_METADATA": "Erro ó cargar os metadatos do evento. Por favor, inténteo de novo máis tarde.",
+      "SERIES_TITLE": "Ver Serie",
+      "UPLOAD_TITLE": "Importar evento",
+      "LOADING": "Cargando…",
+      "NEW_UPLOAD": "Importar un novo evento",
+      "EDIT_UPLOAD": "Modificar evento",
+      "CURRENT_JOBS": "Traballos de hoxe",
+      "PRESENTER": "Relator",
+      "PRESENTER_DESCRIPTION": "Ficheiro de vídeo coa gravación do relator",
+      "CAPTION": "Subtítulos",
+      "CAPTION_DESCRIPTION": "Ficheiro de subtítulos en formato VTT",
+      "UPLOAD": "Cargar",
+      "UPLOADING": "Cargando",
+      "EDIT": "Gardar",
+      "EDIT_TITLE": "Modificar evento",
+      "NO_OPTION_SELECTED": "Sen opcións seleccionadas",
+      "EDITING": "Gardando...",
+      "SELECT_OPTION": "Seleccionar opción",
+      "JOB_TITLE": "Título",
+      "JOB_STATUS": "Estado",
+      "UPLOAD_SUCCESS": "Carga rematada con éxito!",
+      "UPLOAD_FAILURE": "Fallo ao cargar!",
+      "UPLOAD_FAILURE_DESCRIPTION": "Por favor, inténteo de novo máis tarde.",
+      "EDIT_SUCCESS": "Edición rematada con éxito. Volvendo a publicar...",
+      "EDIT_FAILURE": "Fallo na modificación!",
+      "COPY_SUCCESS": "Comezando a copiar...",
+      "COPY_SUCCESS_DESCRIPTION": "Un momento, por favor...",
+      "GENERIC_ERROR": "Erro: {{message}}",
+      "DELETION_SUCCESS": "Evento borrado correctamente",
+      "DELETION_SUCCESS_DESCRIPTION": "O evento eliminarase da lista en breve...",
+      "EVENT_LOCKED": "O evento está a ser procesado. Por favor, espere para facer máis cambios…",
+      "DELETION_FAILURE": "Fallo ao borrar o evento",
+      "DELETION_FAILURE_DESCRIPTION": "Por favor, inténteo de novo máis tarde…",
+      "RESULT_HEADING": "Resultados {{{range.begin}}}-{{{range.end}}} de {{{total}}}",
+      "CONFIRM_DELETION": "Desexa eliminar este evento?",
+      "COPY_TO_SERIES": "Copiar o evento na serie",
+      "SELECT_COPY_TARGET": "Seleccionar serie de destino",
+      "COPY": "Copiar",
+      "COPY_IN_PROGRESS": "Iniciando copia…",
+      "CREATOR": "de {{creator}}"
+   },
    "LANGUAGES": {
       "ARABIC": "Árabe",
       "DANISH": "Danés",
@@ -49,6 +92,7 @@
       }
    },
    "CONFIRMATIONS": {
+      "EMBEDDING_CODE": "O código para incrustar copiouse no portapapeis:",
       "CONTINUE_ACTION": "Está seguro de que desexa continuar?",
       "METADATA": {
          "NOTICE": {
@@ -64,7 +108,10 @@
          "NAME": "Nome"
       },
       "ACTIONS": {
-         "CONFIRMATION": "Confirmación"
+         "CONFIRMATION": "Confirmación",
+         "SHOW": {
+            "EMBEDDING_CODE": "Código para incrustar"
+         }
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "Estas series non conteñen eventos. Eliminar as series non eliminará os eventos.",
@@ -172,12 +219,12 @@
       "VIDEO_TOO_MANY_AUDIOS": "Non se pode ter máis dunha pista de audio por cada pista de vídeo",
       "SERVER_UNRESPONSIVE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
       "SERVICE_UNAVAILABLE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
-      "ACTIVE_TRANSACTION": "Este evento non se pode editar mentres exista un fluxo de traballo ou unha transacción activos.",
+      "ACTIVE_TRANSACTION": "No se pode modificar este evento mentres exista un fluxo de traballo ou unha transacción activos.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
-         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
-         "NO_EVENTS_UPDATED": "All updates failed.",
-         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+         "UNEXPECTED_ERROR": "Produciuse un erro inesperado na actualización. Pode que algúns eventos non se actualizasen.",
+         "ALL_EVENTS_UPDATED": "Todos os eventos se actualizaron correctamente.",
+         "NO_EVENTS_UPDATED": "Fallaron tódalas actualizacións.",
+         "SOME_EVENTS_NOT_UPDATED": "Non se puideron crear algúns eventos."
       }
    },
    "BULK_ACTIONS": {
@@ -218,7 +265,7 @@
          }
       },
       "EDIT_EVENTS": {
-         "CAPTION": "Editar eventos programados",
+         "CAPTION": "Modificar eventos programados",
          "CONFLICT_CHECK_RUNNING": "Verificación de conflitos en curso…",
          "GENERAL": {
             "CAPTION": "Xeral",
@@ -242,39 +289,39 @@
             "CAPTION": "Modificar",
             "EVENT": "evento",
             "EVENTS": "eventos",
-            "HEADER": "Esta páxina permite editar eventos programados por días da semana. Os campos xa están cumprimentados se todos os eventos programados teñen o mesmo valor para ese campo específico. En caso contrario, os campos aparecen en branco. Deixar os campos en branco significa que os valores respectivos non deben modificarse.",
+            "HEADER": "Esta páxina permite modificar eventos programados por días da semana. Os campos xa están cumprimentados se todos os eventos programados teñen o mesmo valor para ese campo específico. En caso contrario, os campos aparecen en branco. Deixar os campos en branco significa que os valores respectivos non deben cambiarse.",
             "METADATA": "Metadatos",
-            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+            "SCHEDULING": "{{ weekday }}{{ noEvents }}{{ eventOrEvents }}"
          }
       },
       "EDIT_EVENTS_METADATA": {
-         "CAPTION": "Edit the metadata of multiple events",
-         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "CAPTION": "Modificar os metadatos de múltiples eventos",
+         "FATAL_ERROR": "Produciuse un erro grave: {{ fatalError }}",
          "REQUEST_ERRORS": {
-            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
-            "NOTHING_TO_EDIT": "The events cannot be edited.",
-            "NOT_FOUND": "Not found",
-            "RUNNING_WORKFLOW": "Running workflow",
+            "CANNOT_EDIT_SOME": "Non se poden modificar os eventos resaltados.",
+            "NOTHING_TO_EDIT": "No se poden modificar os eventos.",
+            "NOT_FOUND": "Non atopado",
+            "RUNNING_WORKFLOW": "Fluxo de traballo activo",
             "TABLE": {
-               "CAPTION": "Selected events",
-               "ERRORS": "Errors"
+               "CAPTION": "Eventos seleccionados",
+               "ERRORS": "Erros"
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Modificar e/ou seleccionar os metadatos que se queiran actualizar. Non se poden seleccionar os campos que non cambien o valor dun ou máis eventos, ou os que conteñan valores non válidos (por exemplo, os campos obrigatorios non poden estar baleiros). Os campos resaltados conteñen distintos valores para os eventos seleccionados.",
             "TABLE": {
-               "CAPTION": "Metadata of selected events",
-               "FIELDS": "Metadata",
-               "VALUES": "Values"
+               "CAPTION": "Metadatos dos eventos seleccionados",
+               "FIELDS": "Metadatos",
+               "VALUES": "Valores"
             }
          },
          "UPDATE_FAILURES": {
             "TABLE": {
-               "CAPTION": "Update Failures"
+               "CAPTION": "Fallos ó Actualizar"
             },
-            "UPDATE_FAILED": "Update failed",
-            "NO_EVENTS_UPDATED": "All updates failed.",
-            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+            "UPDATE_FAILED": "Fallou a actualización",
+            "NO_EVENTS_UPDATED": "Fallaron todas as actualizacións.",
+            "SOME_EVENTS_NOT_UPDATED": "Os eventos resaltados non se puideron actualizar."
          }
       }
    },
@@ -505,6 +552,7 @@
                "LOCATION": "Filtro para esta ubicación",
                "DETAILS": "Abrir detalles do evento",
                "DELETE": "Borrar evento",
+               "EMBEDDING_CODE": "Código para incrustar",
                "EDITOR": "Abrir editor de vídeo",
                "EDITOR_NEEDS_CUTTING": "Abrir editor de vídeo (un comentario indica que se solicitou cortar o vídeo)",
                "COMMENTS": "Ver comentarios",
@@ -1037,7 +1085,7 @@
                   "REPLACE_EVENT_ACLS": "Actualizar permisos do evento",
                   "REPLACE_EVENT_ACLS_HINT": "Asegura que todos os eventos desta serie teñen estes permisos en vigor",
                   "LOAD_MORE_LIMIT": "policies shown.",
-                  "LOAD_MORE_LINK": "Load more"
+                  "LOAD_MORE_LINK": "Cargar máis"
                },
                "ROLES": {
                   "LABEL": "Seleccione un rol",
@@ -1680,7 +1728,7 @@
       "PLACEHOLDER": "Procurar…",
       "PROFILES": {
          "FILTERS_HEADER": "Grupos de filtros gardados",
-         "EDIT": "Editar conxunto de filtros",
+         "EDIT": "Modificar conxunto de filtros",
          "REMOVE": "Borrar filtro gardado",
          "EMPTY": "Aínda non se gardou ningún filtro",
          "SAVE_FILTERS": "Gardar",

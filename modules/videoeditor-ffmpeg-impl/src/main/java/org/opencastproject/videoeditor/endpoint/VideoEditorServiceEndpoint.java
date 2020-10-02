@@ -66,7 +66,7 @@ public class VideoEditorServiceEndpoint extends AbstractJobProducerEndpoint {
     @RestParameter(name = "smil", type = RestParameter.Type.TEXT,
             description = "Smil document to process.", isRequired = true)
   },
-          reponses = {
+          responses = {
     @RestResponse(description = "Smil processing jobs created successfully.", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "Internal server error.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
   })

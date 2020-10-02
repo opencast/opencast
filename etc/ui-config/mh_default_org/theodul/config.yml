@@ -65,6 +65,19 @@ link_mediamodule: true
 # Default: false
 show_embed_links: true
 
+# Shows/Hides the download tab under the theodul player.
+# In order to show up, the user also needs a role that matches the
+# regex in the following configuration 'allowed_roles_for_video_download'
+# Allowed values: true, false
+# Default: true
+allow_video_download: true
+
+# Configures the roles that are allowed to see the download plugin.
+# Note that this does not restrict access to the media files itself.
+# Allowed values: regular expressions (if any role of the user matches this regex, the download tab will be shown)
+# Default: ROLE_USER
+allowed_roles_for_video_download: ROLE_USER
+
 # Shortcut definitions for the html5 player
 # - modifier keys
 #   - shift

@@ -98,4 +98,70 @@ public class TagWorkflowOperationHandlerTest {
     Assert.assertEquals("tag3", track.getTags()[1]);
   }
 
+  @Test
+  public void testTargetFlavourWithTypeWildcard() throws Exception {
+    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
+    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    ops.add(operation);
+    instance.setOperations(ops);
+    instance.setMediaPackage(mp);
+
+    operation.setConfiguration(TagWorkflowOperationHandler.SOURCE_FLAVORS_PROPERTY, "*/source");
+    operation.setConfiguration(TagWorkflowOperationHandler.TARGET_FLAVOR_PROPERTY, "*/wildcard_test");
+    operation.setConfiguration(TagWorkflowOperationHandler.TARGET_TAGS_PROPERTY, "tag1, tag2");
+    operation.setConfiguration(TagWorkflowOperationHandler.COPY_PROPERTY, "false");
+
+    WorkflowOperationResult result = operationHandler.start(instance, null);
+    MediaPackage resultingMediapackage = result.getMediaPackage();
+    Track track1 = resultingMediapackage.getTrack("track-1");
+    Track track2 = resultingMediapackage.getTrack("track-2");
+    Assert.assertEquals("presentation/wildcard_test", track1.getFlavor().toString());
+    Assert.assertEquals("presenter/wildcard_test", track2.getFlavor().toString());
+  }
+
+  @Test
+  public void testTargetFlavourWithSubtypeWildcard() throws Exception {
+    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
+    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    ops.add(operation);
+    instance.setOperations(ops);
+    instance.setMediaPackage(mp);
+
+    operation.setConfiguration(TagWorkflowOperationHandler.SOURCE_FLAVORS_PROPERTY, "*/source");
+    operation.setConfiguration(TagWorkflowOperationHandler.TARGET_FLAVOR_PROPERTY, "wildcard_test/*");
+    operation.setConfiguration(TagWorkflowOperationHandler.TARGET_TAGS_PROPERTY, "tag1, tag2");
+    operation.setConfiguration(TagWorkflowOperationHandler.COPY_PROPERTY, "false");
+
+    WorkflowOperationResult result = operationHandler.start(instance, null);
+    MediaPackage resultingMediapackage = result.getMediaPackage();
+    Track track1 = resultingMediapackage.getTrack("track-1");
+    Track track2 = resultingMediapackage.getTrack("track-2");
+    Assert.assertEquals("wildcard_test/source", track1.getFlavor().toString());
+    Assert.assertEquals("wildcard_test/source", track2.getFlavor().toString());
+  }
+
+  @Test
+  public void testTargetFlavourWithTypeAndSubtypeWildcard() throws Exception {
+    WorkflowInstanceImpl instance = new WorkflowInstanceImpl();
+    List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();
+    WorkflowOperationInstanceImpl operation = new WorkflowOperationInstanceImpl("test", OperationState.INSTANTIATED);
+    ops.add(operation);
+    instance.setOperations(ops);
+    instance.setMediaPackage(mp);
+
+    operation.setConfiguration(TagWorkflowOperationHandler.SOURCE_FLAVORS_PROPERTY, "*/source");
+    operation.setConfiguration(TagWorkflowOperationHandler.TARGET_FLAVOR_PROPERTY, "*/*");
+    operation.setConfiguration(TagWorkflowOperationHandler.TARGET_TAGS_PROPERTY, "tag1, tag2");
+    operation.setConfiguration(TagWorkflowOperationHandler.COPY_PROPERTY, "false");
+
+    WorkflowOperationResult result = operationHandler.start(instance, null);
+    MediaPackage resultingMediapackage = result.getMediaPackage();
+    Track track1 = resultingMediapackage.getTrack("track-1");
+    Track track2 = resultingMediapackage.getTrack("track-2");
+    Assert.assertEquals("presentation/source", track1.getFlavor().toString());
+    Assert.assertEquals("presenter/source", track2.getFlavor().toString());
+  }
+
 }
