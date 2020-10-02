@@ -23,7 +23,7 @@ a single output file.
 
 |configuration keys | example                     | description                                                         |
 |-------------------|-----------------------------|---------------------------------------------------------------------|
-|source-flavor      | presenter/source            | Flavor containing all the video tracks to be combined.                              |
+|source-flavors     | presenter/source            | Flavors containing all the video tracks to be combined.                              |
 |source-smil-flavor | smil/source+partial         | Flavor containing the SMIL specifying when each video track is active. The example shows the flavor used by partial ingest.                               |
 |concat-encoding-profile | concat-samecodec.work  | Encoding profile used for the final concatenation.
 |opt-resolution     | 1280x720                    | (Optional) Resolution of the output. Example value is the default.

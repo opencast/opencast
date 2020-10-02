@@ -90,7 +90,7 @@ import java.util.regex.Pattern;
 public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** Workflow configuration keys */
-  private static final String SOURCE_FLAVOR = "source-flavor";
+  private static final String SOURCE_FLAVORS = "source-flavors";
   private static final String SOURCE_SMIL_FLAVOR = "source-smil-flavor";
   private static final String CONCAT_ENCODING_PROFILE = "concat-encoding-profile";
 
@@ -380,23 +380,30 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
 
     // Read config options
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
-    final String sourceFlavor = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR));
     final MediaPackageElementFlavor smilFlavor = MediaPackageElementFlavor.parseFlavor(
             getConfig(operation, SOURCE_SMIL_FLAVOR));
     final MediaPackageElementFlavor targetPresenterFlavor = MediaPackageElementFlavor.parseFlavor(
             getConfig(operation, TARGET_FLAVOR));
     String concatEncodingProfile = StringUtils.trimToNull(operation.getConfiguration(CONCAT_ENCODING_PROFILE));
 
+    // Get source flavors
+    String sourceFlavorNames = operation.getConfiguration(SOURCE_FLAVORS);
+    final List<MediaPackageElementFlavor> sourceFlavors = new ArrayList<>();
+    for (String flavorName : asList(sourceFlavorNames)) {
+      sourceFlavors.add(MediaPackageElementFlavor.parseFlavor(flavorName));
+    }
+
     // Get tracks from flavor
-    TrackSelector trackSelector = new TrackSelector();
-    trackSelector.addFlavor(sourceFlavor);
-    final List<Track> sourceTracks = new ArrayList<>(
-            trackSelector.select(mediaPackage, false)
-    );
+    final List<Track> sourceTracks = new ArrayList<>();
+    for (MediaPackageElementFlavor sourceFlavor: sourceFlavors) {
+      TrackSelector trackSelector = new TrackSelector();
+      trackSelector.addFlavor(sourceFlavor);
+      sourceTracks.addAll(trackSelector.select(mediaPackage, false));
+    }
 
     // No tracks? Skip
     if (sourceTracks.isEmpty()) {
-      logger.warn("No tracks in source flavor, skipping ...");
+      logger.warn("No tracks in source flavors, skipping ...");
       return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
     }
 

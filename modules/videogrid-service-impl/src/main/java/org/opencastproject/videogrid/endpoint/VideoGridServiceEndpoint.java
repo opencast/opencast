@@ -105,7 +105,7 @@ public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
           restParameters = {
                   @RestParameter(name = "commands", isRequired = true, type = STRING,
                           description = "A list of ffmpeg commands, one for each part.") },
-          reponses = {
+          responses = {
                   @RestResponse(description = "VideoGrid created successfully", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "Invalid data", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                   @RestResponse(description = "Internal error", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
