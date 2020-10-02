@@ -19,11 +19,17 @@
  *
  */
 
+package org.opencastproject.adopter.registration;
 
-// Components
-@import "components/tables";
-@import "components/drag-and-drop";
+/**
+ * Interface for the statistic registration form.
+ */
+public interface IForm {
 
-// Views
-@import "views/modals/edit-table-view";
-@import "views/modals/registration";
+  /**
+   * Overwrites the fields of this object with the data from another object of the same type.
+   * @param form The form with the data for merging.
+   */
+  void merge(IForm form);
+
+}

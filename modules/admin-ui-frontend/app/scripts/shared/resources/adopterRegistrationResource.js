@@ -18,12 +18,9 @@
  * the License.
  *
  */
+'use strict';
 
-
-// Components
-@import "components/tables";
-@import "components/drag-and-drop";
-
-// Views
-@import "views/modals/edit-table-view";
-@import "views/modals/registration";
+angular.module('adminNg.resources')
+.factory('AdopterRegistrationResource', ['$resource', function ($resource) {
+  return $resource('/admin-ng/adopter/statistics/registration');
+}]);

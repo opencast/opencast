@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.adopter.registration.Service"
+               immediate="true">
+    <implementation class="org.opencastproject.adopter.registration.AdopterRegistrationServiceImpl"/>
+
+    <property name="service.description" value="Adopter Statistics Registration Service"/>
+
+    <service>
+        <provide interface="org.opencastproject.adopter.registration.Service"/>
+    </service>
+
+    <reference name="securityService"
+               interface="org.opencastproject.security.api.SecurityService"
+               bind="setSecurityService"/>
+
+    <reference name="formRepository"
+               interface="org.opencastproject.adopter.registration.FormRepository"
+               bind="setFormRepository"/>
+
+</scr:component>
