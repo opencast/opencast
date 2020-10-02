@@ -45,9 +45,9 @@
     <bundle>mvn:com.entwinemedia.common/functional/${functional.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
     <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
-    <bundle>mvn:com.google.code.gson/gson/2.8.2</bundle>
+    <bundle>mvn:com.google.code.gson/gson/${gson.version}</bundle>
     <bundle>mvn:commons-fileupload/commons-fileupload/${commons-fileupload.version}</bundle>
-    <bundle>mvn:commons-io/commons-io/2.6</bundle>
+    <bundle>mvn:commons-io/commons-io/${commons-io.version}</bundle>
     <!-- FIXME: commons-lang 2.6 only needed for the ical library in the commons bundle -->
     <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
     <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
@@ -70,7 +70,7 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlbeans/2.6.0_2</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlresolver/1.2_1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xmlschema/1.4.3_1</bundle>
-    <bundle>mvn:org.codehaus.jettison/jettison/1.4.0</bundle>
+    <bundle>mvn:org.codehaus.jettison/jettison/${jettison.version}</bundle>
     <bundle>mvn:org.codehaus.groovy/groovy/2.4.3</bundle>
     <bundle>mvn:org.jdom/com.springsource.org.jdom/2.0.1</bundle>
     <bundle>mvn:org.opencastproject/android-mms/1.2</bundle>

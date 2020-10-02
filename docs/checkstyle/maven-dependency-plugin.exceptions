@@ -14,4 +14,3 @@ modules/scheduler-impl/pom.xml
 modules/search/pom.xml
 modules/search-service-impl/pom.xml
 modules/security-shibboleth/pom.xml
-modules/solr/pom.xml
