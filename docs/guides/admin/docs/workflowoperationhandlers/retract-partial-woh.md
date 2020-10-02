@@ -29,6 +29,6 @@ Operation Example
   <configurations>
     <configuration key="retract-flavors">presentation/*</configuration>
     <configuration key="retract-tags">preview</configuration>
-  <configurations>
+  </configurations>
 </operation>
 ```
