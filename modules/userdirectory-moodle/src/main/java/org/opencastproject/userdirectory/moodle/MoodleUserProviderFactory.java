@@ -193,10 +193,8 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
     if (StringUtils.isBlank(token))
       throw new ConfigurationException(MOODLE_TOKEN_KEY, "is not set");
 
-    boolean groupRoles = false;
-    String groupRolesStr = (String) properties.get(GROUP_ROLES_KEY);
-    if ("true".equals(groupRolesStr))
-      groupRoles = true;
+    final String groupRolesStr = (String) properties.get(GROUP_ROLES_KEY);
+    final boolean groupRoles = BooleanUtils.toBoolean(groupRolesStr);
 
     String coursePattern = (String) properties.get(COURSE_PATTERN_KEY);
     String userPattern = (String) properties.get(USER_PATTERN_KEY);
