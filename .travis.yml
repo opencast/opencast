@@ -6,9 +6,9 @@ jdk: openjdk8
 # Cache maven artifacts, pip downloads and the node modules for markdownlint
 cache:
   directories:
-    - ~/.m2
-    - ~/.cache/pip
-    - docs/guides/node_modules/
+  - ~/.m2
+  - ~/.cache/pip
+  - docs/guides/node_modules/
 
 # Do not cache the opencast artifacts to detect dependency problems
 before_cache:
@@ -30,26 +30,26 @@ before_install:
 install:
   - sudo apt-get -qq update
   - >
-    sudo apt-get install -y
-    bzip2
-    gzip
-    hunspell
-    hunspell-de-de
-    procps
-    sox
-    tar
-    tesseract-ocr
-    tesseract-ocr-deu
-    unzip
+     sudo apt-get install -y
+     bzip2
+     gzip
+     hunspell
+     hunspell-de-de
+     procps
+     sox
+     tar
+     tesseract-ocr
+     tesseract-ocr-deu
+     unzip
   - mkdir -p ~/.m2 ~/bin
   - wget -q https://pkg.opencast.org/bin/ffmpeg-release-64bit-static.tar.xz
   - tar xf ffmpeg-release-64bit-static.tar.xz
   - mv ffmpeg-*/ff* ~/bin/
   - >
-    test -f ~/.m2/synfigstudio-1.0.2.deb ||
-    get_synfig https://mvncache.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
-    get_synfig https://nexus.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
-    get_synfig https://netix.dl.sourceforge.net/project/synfig/releases/1.0.2/linux/synfigstudio_1.0.2_amd64.deb
+     test -f ~/.m2/synfigstudio-1.0.2.deb ||
+     get_synfig https://mvncache.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
+     get_synfig https://nexus.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
+     get_synfig https://netix.dl.sourceforge.net/project/synfig/releases/1.0.2/linux/synfigstudio_1.0.2_amd64.deb
   - sudo dpkg -i ~/.m2/synfigstudio-1.0.2.deb
 
 jobs:
@@ -108,8 +108,8 @@ jobs:
         chrome: stable
       install:
         - ( cd modules/admin-ui-frontend &&
-          npm ci &&
-          ./node_modules/.bin/bower install)
+            npm ci &&
+            ./node_modules/.bin/bower install)
       script:
         - (cd modules/admin-ui-frontend && npm run test-chrome)
 
@@ -120,8 +120,8 @@ jobs:
         firefox: latest
       install:
         - ( cd modules/admin-ui-frontend &&
-          npm ci &&
-          ./node_modules/.bin/bower install)
+            npm ci &&
+            ./node_modules/.bin/bower install)
       script:
         - (cd modules/admin-ui-frontend && npm run test-firefox)
 
@@ -134,12 +134,12 @@ jobs:
         - mvn install -DskipTests=true -Dcheckstyle.skip=true -P "none,!frontend"
       script:
         - >
-          mvn site -Daggregate=true site:stage "-DstagingDirectory=$(pwd)/site" \
-            -P "none,!frontend" \
-            -DskipTests=true \
-            -Dcheckstyle.skip=true \
-            -Dpmd.skip=true \
-            -Dcpd.skip=true
+           mvn site -Daggregate=true site:stage "-DstagingDirectory=$(pwd)/site" \
+             -P "none,!frontend" \
+             -DskipTests=true \
+             -Dcheckstyle.skip=true \
+             -Dpmd.skip=true \
+             -Dcpd.skip=true
     # Deploy translation keys to Crowdin if we are on develop or one of the release branches
     - stage: deployment
       env: name=crowdin
@@ -151,3 +151,5 @@ jobs:
         on:
           all_branches: true
           condition: $TRAVIS_BRANCH =~ ^develop|^r/
+
+
