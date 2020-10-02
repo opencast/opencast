@@ -94,9 +94,9 @@ angular.module('adminNg.directives')
         }
         scope.editMode = true;
         scope.focusTimer = $timeout(function () {
-          if ((scope.params.type === 'text_long') && (element.find('textarea'))) {
+          if (scope.params.type === 'text_long') {
             element.find('textarea').focus();
-          } else if (element.find('input')) {
+          } else {
             element.find('input').focus();
           }
         });
