@@ -124,8 +124,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
-@RestService(name = "externalapiseries", title = "External API Series Service", notes = {}, abstractText = "Provides resources and operations related to the series")
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
+            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
+@RestService(name = "externalapiseries", title = "External API Series Service", notes = {},
+             abstractText = "Provides resources and operations related to the series")
 public class SeriesEndpoint {
 
   private static final int CREATED_BY_UI_ORDER = 9;
@@ -370,8 +372,9 @@ public class SeriesEndpoint {
   private static AccessControlList getAclFromSeries(Series series) {
     AccessControlList activeAcl = new AccessControlList();
     try {
-      if (series.getAccessPolicy() != null)
+      if (series.getAccessPolicy() != null) {
         activeAcl = AccessControlParser.parseAcl(series.getAccessPolicy());
+      }
     } catch (Exception e) {
       logger.error("Unable to parse access policy", e);
     }
