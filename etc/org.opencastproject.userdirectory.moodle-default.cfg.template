@@ -23,3 +23,10 @@ org.opencastproject.userdirectory.moodle.token=mytoken1234abcdef
 #org.opencastproject.userdirectory.moodle.course.pattern=^[0-9]+$
 #org.opencastproject.userdirectory.moodle.user.pattern=^[0-9a-zA-Z_]+$
 #org.opencastproject.userdirectory.moodle.group.pattern=^[0-9]+$
+
+# Setting this to true will convert all username requests to Moodle to lowercase.
+# This can be necessary for mapping since Moodle does not allow for uppercase letters in usernames.
+# Please note that enabling this may have security implications since two different users in Opencast may become the
+# same user in Moodle.
+# Default: false
+#org.opencastproject.userdirectory.moodle.user.lowercase.conversion=false

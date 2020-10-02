@@ -149,6 +149,16 @@ code {
     opacity: 0;
 }
 
+a.header-link {
+    margin-left: 10px;
+    font-size: 80%;
+    opacity: 0.3;
+}
+
+a.header-link:hover {
+    opacity: 1;
+}
+
 details {
   border-left: 2px solid silver;
   padding: 5px;

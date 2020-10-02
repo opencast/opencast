@@ -165,7 +165,7 @@ public class GroupsEndpoint {
         description = "The maximum number of items to return per page."),
       @RestParameter(name = "offset", isRequired = false, type = INTEGER, defaultValue = "0",
         description = "The page number.")},
-    reponses = {
+    responses = {
       @RestResponse(responseCode = SC_OK, description = "The groups.")})
   public Response getGroups(@QueryParam("filter") String filter, @QueryParam("sort") String sort,
           @QueryParam("offset") int offset, @QueryParam("limit") int limit) throws IOException {
@@ -258,7 +258,7 @@ public class GroupsEndpoint {
     returnDescription = "Returns no content",
     pathParameters = {
       @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = STRING)},
-    reponses = {
+    responses = {
       @RestResponse(responseCode = SC_OK, description = "Group deleted"),
       @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to delete the group with admin role."),
       @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found."),
@@ -288,7 +288,7 @@ public class GroupsEndpoint {
       @RestParameter(name = "description", description = "The group description", isRequired = false, type = STRING),
       @RestParameter(name = "roles", description = "Comma seperated list of roles", isRequired = false, type = TEXT),
       @RestParameter(name = "users", description = "Comma seperated list of members", isRequired = false, type = TEXT)},
-    reponses = {
+    responses = {
       @RestResponse(responseCode = SC_CREATED, description = "Group created"),
       @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long"),
       @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a group with admin role."),
@@ -321,7 +321,7 @@ public class GroupsEndpoint {
       @RestParameter(name = "description", description = "The group description", isRequired = false, type = STRING),
       @RestParameter(name = "roles", description = "Comma seperated list of roles", isRequired = false, type = TEXT),
       @RestParameter(name = "users", description = "Comma seperated list of members", isRequired = false, type = TEXT)},
-    reponses = {
+    responses = {
       @RestResponse(responseCode = SC_OK, description = "Group updated"),
       @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to update the group with admin role."),
       @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found"),
@@ -349,7 +349,7 @@ public class GroupsEndpoint {
     returnDescription = "Return the status codes",
     pathParameters = {
       @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = STRING)},
-    reponses = {
+    responses = {
       @RestResponse(responseCode = SC_OK, description = "Group found and returned as JSON"),
       @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found")})
   public Response getGroup(@PathParam("id") String groupId) throws NotFoundException, SearchIndexException {

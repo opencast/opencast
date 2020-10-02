@@ -46,6 +46,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -59,8 +60,14 @@ import javax.persistence.UniqueConstraint;
 
 /** JPA DTO. */
 @Entity(name = "Snapshot")
-@Table(name = "oc_assets_snapshot",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"mediapackage_id", "version"})})
+@Table(name = "oc_assets_snapshot", indexes = {
+    @Index(name = "IX_oc_assets_snapshot_archival_date", columnList = ("archival_date")),
+    @Index(name = "IX_oc_assets_snapshot_mediapackage_id", columnList = ("mediapackage_id")),
+    @Index(name = "IX_oc_assets_snapshot_organization_id", columnList = ("organization_id")),
+    @Index(name = "IX_oc_assets_snapshot_owner", columnList = ("owner")),
+    @Index(name = "IX_oc_assets_snapshot_series", columnList = ("series_id, version"))
+  }, uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"mediapackage_id", "version"}) })
 @NamedQueries({
         @NamedQuery(name = "Snapshot.countByMediaPackage", query = "select count(s) from Snapshot s "
                 + "where s.mediaPackageId = :mediaPackageId"),
@@ -94,13 +101,13 @@ public class SnapshotDto {
   @Temporal(TemporalType.TIMESTAMP)
   private Date archivalDate;
 
-  @Column(name = "availability", nullable = false)
+  @Column(name = "availability", nullable = false, length = 32)
   private String availability;
 
-  @Column(name = "storage_id", nullable = false)
+  @Column(name = "storage_id", nullable = false, length = 256)
   private String storageId;
 
-  @Column(name = "owner", nullable = false)
+  @Column(name = "owner", nullable = false, length = 256)
   private String owner;
 
   @Lob

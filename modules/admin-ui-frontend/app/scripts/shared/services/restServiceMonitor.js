@@ -20,8 +20,7 @@
  */
 'use strict';
 
-angular.module('adminNg.services')
-.factory('RestServiceMonitor', ['$http', '$location', 'Storage', function($http, $location, Storage) {
+function monitorService($http, $location, $translate, Storage) {
   var Monitoring = {};
   var services = {
     service: {},
@@ -29,6 +28,7 @@ angular.module('adminNg.services')
     numErr: 0
   };
 
+  var LATEST_VERSION_NAME = 'Latest Version';
   var AMQ_NAME = 'ActiveMQ';
   var STATES_NAME = 'Service States';
   var BACKEND_NAME = 'Backend Services';
@@ -36,6 +36,8 @@ angular.module('adminNg.services')
   var OK = 'OK';
   var SERVICES_FRAGMENT = '/systems/services';
   var SERVICE_NAME_ATTRIBUTE = 'service-name';
+  var LATEST_VERSION_PATH = 'oc-version/version.json';
+  var MY_VERSION_PATH = '/sysinfo/bundles/version?prefix=opencast';
 
   Monitoring.run = function() {
     //Clear existing data
@@ -45,6 +47,50 @@ angular.module('adminNg.services')
 
     Monitoring.getActiveMQStats();
     Monitoring.getBasicServiceStats();
+    Monitoring.getVersionStats();
+  };
+
+  Monitoring.getVersionStats = function() {
+    $http.get(MY_VERSION_PATH).then(function(response_my_version) {
+      $http.get(LATEST_VERSION_PATH).then(function(response_latest_version) {
+        Monitoring.populateService(LATEST_VERSION_NAME);
+
+        if (response_latest_version.status === 200 && response_my_version.status === 200
+        && response_my_version.data.consistent) {
+          var my_version = response_my_version.data.version,
+              latest_version = response_latest_version.data;
+          services.service[LATEST_VERSION_NAME].docs_url =
+            'https://docs.opencast.org/r/' + parseInt(latest_version) + '.x/admin/';
+
+          if (parseFloat(my_version) >= parseFloat(latest_version)
+             || (parseInt(my_version) == parseInt(latest_version) && my_version.endsWith('SNAPSHOT'))) {
+            services.service[LATEST_VERSION_NAME].status = OK;
+            services.service[LATEST_VERSION_NAME].error = false;
+          } else if (parseInt(my_version) == parseInt(latest_version)) {
+            $translate('UPDATE.MINOR').then(function(translation) {
+              services.service[LATEST_VERSION_NAME].status = translation;
+            }).catch(angular.noop);
+            services.service[LATEST_VERSION_NAME].error = true;
+          } else if (parseInt(latest_version) - parseInt(my_version) < 2) {
+            $translate('UPDATE.MAJOR').then(function(translation) {
+              Monitoring.setError(LATEST_VERSION_NAME, translation);
+            }).catch(angular.noop);
+          } else {
+            $translate('UPDATE.UNSUPPORTED', {'version': my_version}).then(function(translation) {
+              Monitoring.setError(LATEST_VERSION_NAME, translation);
+            }).catch(angular.noop);
+          }
+        } else {
+          $translate('UPDATE.UNDETERMINED').then(function(translation) {
+            Monitoring.setError(LATEST_VERSION_NAME, translation);
+          }).catch(angular.noop);
+          services.service[LATEST_VERSION_NAME].docs_url = 'https://docs.opencast.org';
+        }
+      });
+    }).catch(function(err) {
+      Monitoring.setError(LATEST_VERSION_NAME, err.statusText);
+      services.service[LATEST_VERSION_NAME].docs_url = 'https://docs.opencast.org';
+    });
   };
 
   Monitoring.getActiveMQStats = function() {
@@ -58,11 +104,7 @@ angular.module('adminNg.services')
         services.service[AMQ_NAME].error = true;
       }
     }).catch(function(err) {
-      Monitoring.populateService(AMQ_NAME);
-      services.service[AMQ_NAME].status = err.statusText;
-      services.service[AMQ_NAME].error = true;
-      services.error = true;
-      services.numErr++;
+      Monitoring.setError(AMQ_NAME, err.statusText);
     });
   };
 
@@ -126,7 +168,6 @@ angular.module('adminNg.services')
       serviceName = event.target.getAttribute(SERVICE_NAME_ATTRIBUTE);
     else
       serviceName = event.target.parentNode.getAttribute(SERVICE_NAME_ATTRIBUTE);
-
     if (serviceName != AMQ_NAME) {
       Storage.put('filter', 'services', 'actions', 'true');
       $location.path(SERVICES_FRAGMENT).replace();
@@ -138,4 +179,7 @@ angular.module('adminNg.services')
   };
 
   return Monitoring;
-}]);
+}
+
+angular.module('adminNg.services')
+.factory('RestServiceMonitor', ['$http', '$location', '$translate', 'Storage', monitorService]);

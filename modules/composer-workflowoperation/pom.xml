@@ -121,6 +121,7 @@
               OSGI-INF/operations/partial-import.xml,
               OSGI-INF/operations/prepare-av.xml,
               OSGI-INF/operations/process-smil.xml,
+              OSGI-INF/operations/sanitize-adaptive.xml,
               OSGI-INF/operations/segmentpreviews.xml,
               OSGI-INF/operations/select-tracks.xml
             </Service-Component>

@@ -125,7 +125,7 @@ public class AnimateServiceRestEndpoint extends AbstractJobProducerEndpoint {
               description = "Synfig command line arguments as JSON array"),
       @RestParameter(name = "metadata", isRequired = true, type = STRING,
               description = "Metadata for replacement as JSON object") },
-    reponses = {
+    responses = {
       @RestResponse(description = "Animation created successfully", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "Invalid data", responseCode = HttpServletResponse.SC_BAD_REQUEST),
       @RestResponse(description = "Internal error", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },

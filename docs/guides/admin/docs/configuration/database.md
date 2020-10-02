@@ -90,7 +90,7 @@ GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,ALTER,DROP,INDEX,TRIGGER,CREATE TEMPORA
 ```
 </details>
 
-You can choose other names for the users and the database, and you **should** use a different password.
+You can choose other names for the users and the database, and you should use a different password.
 
 In a distributed system, apart from `'username'@'localhost'` (which would allow access from the local machine only),
 you should grant a external user access to the database by running the same command for a user like
@@ -137,28 +137,16 @@ configuration.
 
 The following changes must be made in `etc/custom.properties`:
 
-1. Change the following configuration key (uncomment if necessary):
+1. Configure Opencast to use the JDBC driver for MariaDB:
 
-        org.opencastproject.db.ddl.generation=false
+        org.opencastproject.db.jdbc.driver=org.mariadb.jdbc.Driver
 
-    If set to true, the database structure will be generated automatically. It works, but without all the database
-    optimizations implemented in the DDL scripts used in the step 2. While convenient for development, you should never
-    set this to `true` in a production environment.
+2. Configure the host where Opencast should find the database (`localhost`) and the database name (`opencast`). Adjust
+   the names in this example to match your configuration:
 
-2. Configure Opencast to use MariaDB/MySQL:
+        org.opencastproject.db.jdbc.url=jdbc:mysql://localhost/opencast?useMysqlMetadata=true
 
-        org.opencastproject.db.vendor=MySQL
-
-3. Configure Opencast to use the JDBC driver for MariaDB/MySQL:
-
-        org.opencastproject.db.jdbc.driver=com.mysql.jdbc.Driver
-
-4. Configure the host where Opencast will find the database (`localhost`) and the database name (`opencast`). Adjust
-the names in this example to match your configuration:
-
-        org.opencastproject.db.jdbc.url=jdbc:mysql://localhost/opencast
-
-5. Configure the username and password with which to access the database:
+3. Configure the username and password with which to access the database:
 
         org.opencastproject.db.jdbc.user=opencast
         org.opencastproject.db.jdbc.pass=opencast_password

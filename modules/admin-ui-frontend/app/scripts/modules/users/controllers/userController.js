@@ -21,19 +21,14 @@
 'use strict';
 
 angular.module('adminNg.controllers')
-.controller('UserCtrl', ['$rootScope', '$scope', 'Table', 'UserRolesResource', 'UserResource', 'UsersResource',
+.controller('UserCtrl', ['$rootScope', '$scope', 'Table', 'RolesResource', 'UserResource', 'UsersResource',
   'JsHelper', 'Notifications', 'Modal', 'AuthService', 'underscore',
-  function ($rootScope, $scope, Table, UserRolesResource, UserResource, UsersResource, JsHelper, Notifications, Modal,
+  function ($rootScope, $scope, Table, RolesResource, UserResource, UsersResource, JsHelper, Notifications, Modal,
     AuthService, _) {
     $scope.manageable = true;
-    $scope.roleSlice = 100;
-    // Note that the initial offset is the same size as the initial slice so that the *next* slice starts at the right
-    // place
-    $scope.roleOffset = $scope.roleSlice;
-    var loading = false;
+
     // Should the External Roles tab be visible
     var showExternalRoles = false;
-
     var EXTERNAL_ROLE_DISPLAY = 'adminui.user.external_role_display';
 
     AuthService.getUser().$promise.then(function(user) {
@@ -55,25 +50,6 @@ angular.module('adminNg.controllers')
 
     $scope.searchFieldExternal = '';
     $scope.searchFieldEffective = '';
-
-    $scope.getMoreRoles = function() {
-      if (loading)
-        return;
-
-      loading = true;
-      UserRolesResource.query({
-        limit: $scope.roleSlice,
-        offset: $scope.roleOffset,
-        filter: 'role_target:USER'
-      }).$promise.then(function (data) {
-        $scope.role.available = $scope.role.available.concat(data);
-        $scope.roleOffset = $scope.roleOffset + $scope.roleSlice;
-      }, this).catch(
-        angular.noop
-      ).finally(function () {
-        loading = false;
-      });
-    };
 
     $scope.groupSort = function(role) {
 
@@ -118,16 +94,11 @@ angular.module('adminNg.controllers')
     if ($scope.action === 'edit') {
       fetchChildResources($scope.resourceId);
     } else if ($scope.action === 'add') {
-      $scope.role.available = UserRolesResource.query({limit: $scope.roleSlice, offset: 0, filter: 'role_target:USER'});
+      $scope.role.available = RolesResource.query({limit: -1, target: 'USER'});
     }
 
-
     $scope.submit = function () {
-      $scope.user.roles = [];
-
-      angular.forEach($scope.role.selected, function (value) {
-        $scope.user.roles.push({'name': value.value, 'type': value.type});
-      });
+      $scope.user.roles = $scope.role.selected;
 
       if ($scope.action === 'edit') {
         $scope.user.$update({ username: $scope.user.username }, function () {
@@ -156,7 +127,7 @@ angular.module('adminNg.controllers')
        * @param id the id of the user
        */
     function fetchChildResources(id) {
-      $scope.role.available = UserRolesResource.query({limit: $scope.roleSlice, offset: 0, filter: 'role_target:USER'});
+      $scope.role.available = RolesResource.query({limit: -1, target: 'USER'});
       $scope.user = UserResource.get({ username: id });
       $scope.user.$promise.then(function () {
         $scope.manageable = $scope.user.manageable;
@@ -170,15 +141,15 @@ angular.module('adminNg.controllers')
           angular.forEach($scope.user.roles, function (role) {
 
             if (role.type == 'INTERNAL' || role.type == 'GROUP') {
-              $scope.role.selected.push({name: role.name, value: role.name, type: role.type});
+              $scope.role.selected.push(role);
             }
 
             if (role.type == 'EXTERNAL' || role.type == 'EXTERNAL_GROUP') {
-              $scope.role.external.push({name: role.name, value: role.name, type: role.type});
+              $scope.role.external.push(role);
             }
 
             if (role.type == 'SYSTEM' || role.type == 'DERIVED') {
-              $scope.role.derived.push({name: role.name, value: role.name, type: role.type});
+              $scope.role.derived.push(role);
             }
           });
 

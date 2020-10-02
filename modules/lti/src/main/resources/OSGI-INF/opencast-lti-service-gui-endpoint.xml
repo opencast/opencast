@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.lti.LtiServiceGuiEndpoint"
+               immediate="true">
+  <implementation class="org.opencastproject.lti.LtiServiceGuiEndpoint"/>
+  <property name="service.description" value="LTI Service"/>
+  <property name="opencast.service.type" value="org.opencastproject.lti.service.remote"/>
+  <property name="opencast.service.path" value="/lti-service-gui"/>
+  <service>
+    <!-- expose interface for MH REST publisher! -->
+    <provide interface="org.opencastproject.lti.LtiServiceGuiEndpoint"/>
+  </service>
+  <reference name="LtiService"
+             interface="org.opencastproject.lti.service.api.LtiService"
+             bind="setService"/>
+</scr:component>

@@ -141,7 +141,7 @@ public class RuntimeInfo {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("components.json")
-  @RestQuery(name = "services", description = "List the REST services and user interfaces running on this host", reponses = { @RestResponse(description = "The components running on this host", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(name = "services", description = "List the REST services and user interfaces running on this host", responses = { @RestResponse(description = "The components running on this host", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public String getRuntimeInfo(@Context HttpServletRequest request) throws MalformedURLException,
           InvalidSyntaxException {
     final Organization organization = securityService.getOrganization();
@@ -197,7 +197,7 @@ public class RuntimeInfo {
   @GET
   @Path("me.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "me", description = "Information about the curent user", reponses = { @RestResponse(description = "Returns information about the current user", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(name = "me", description = "Information about the curent user", responses = { @RestResponse(description = "Returns information about the current user", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public String getMyInfo() {
     Map<String, Object> result = new HashMap<>();
 
@@ -235,7 +235,7 @@ public class RuntimeInfo {
   @Path("health")
   @Produces("application/health+json")
   @RestQuery(name = "health", description = "Opencast node health check. Implements this internet-draft health check api https://inadarei.github.io/rfc-healthcheck",
-          reponses = {
+          responses = {
             @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Node is running, check reponse for details"),
             @RestResponse(responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE, description = "Node is offline or unresponsive, check response for details")},
           returnDescription = "Details of the Opencast node's health status")

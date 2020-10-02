@@ -72,9 +72,9 @@ Example of variables in a workflow:
 How to Enable Preconfigured Asset Options
 -------------------------------------------
 
-Catalogs and attachments can be added to new and existing events. Source tracks are uploaded as new events. Some
+Catalogs and attachments can be added to new and existing events. New source tracks can only be defined for the upload of new events. Some
 predefined catalog and attachment examples are commented out in the properties file. You can uncomment any of these
-to make them upload options in the Admin UI. The workflow `publish-uploaded-assets` will automatically distribute,
+to make them upload options in the Admin UI. The default workflow `publish-uploaded-assets` will automatically distribute,
 publish, and archive uploaded assets on existing events.
 
     # Attachments and catalogs upload options are for new and existing events.

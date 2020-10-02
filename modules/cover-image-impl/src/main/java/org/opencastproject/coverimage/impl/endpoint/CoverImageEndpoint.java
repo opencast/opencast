@@ -90,7 +90,7 @@ public class CoverImageEndpoint extends AbstractJobProducerEndpoint {
           @RestParameter(description = "Width of the cover image", isRequired = true, name = "width", type = Type.INTEGER, defaultValue = "1600"),
           @RestParameter(description = "Height of the cover image", isRequired = true, name = "height", type = Type.INTEGER, defaultValue = "900"),
           @RestParameter(description = "URI of poster image", isRequired = false, name = "posterimage", type = Type.STRING),
-          @RestParameter(description = "Flavor of target cover image", isRequired = true, name = "targetflavor", type = Type.STRING, defaultValue = "image/cover") }, reponses = {
+          @RestParameter(description = "Flavor of target cover image", isRequired = true, name = "targetflavor", type = Type.STRING, defaultValue = "image/cover") }, responses = {
           @RestResponse(description = "Results in an xml document containing the job for the cover image generation task", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "If required parameters aren't set or not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response generateCoverImage(@FormParam("xml") String xml, @FormParam("xsl") String xsl,

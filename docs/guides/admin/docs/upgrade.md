@@ -18,9 +18,12 @@ versions of Opencast, please refer to [older release notes](https://docs.opencas
 Configuration Changes
 ---------------------
 
-1. The configuration file `etc/org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler.cfg`
-   (before Opencast 8.3) was moved to `etc/org.opencastproject.security.lti.LtiLaunchAuthenticationHandler.cfg`.
-2. The default for the configuration option `lti.create_jpa_user_reference` changed from `false` (Opencast 8.3) to `true`.
+Note that this section will only highlight a few important changes.
+Please make sure to compare your configuration against the current configuration files.
+
+- The default for the configuration option `lti.create_jpa_user_reference` changed from `false` (Opencast 8.3) to `true`.
+- Make sure to have `?useMysqlMetadata=true` appended to `org.opencastproject.db.jdbc.url` if you use MariaDB as
+  database.
 
 Install and configure a standalone Elasticsearch node
 -----------------------------------------------------

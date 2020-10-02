@@ -69,7 +69,7 @@ http {
     server {
         listen 80;
         listen [::]:80;
-        server_name example.opencast.org;
+        server_name _;
 
         # Enforce HTTPS by redirecting requests
         location / {
