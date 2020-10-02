@@ -2088,27 +2088,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countOfAbnormalServices()
-   */
-  @Override
-  public long countOfAbnormalServices() throws ServiceRegistryException {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query query = em.createNamedQuery("ServiceRegistration.countNotNormal");
-      Number count = (Number) query.getSingleResult();
-      return count.longValue();
-    } catch (Exception e) {
-      throw new ServiceRegistryException(e);
-    } finally {
-      if (em != null)
-        em.close();
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceStatistics()
    */
   @Override
