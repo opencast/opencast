@@ -106,8 +106,10 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String CONCAT_OUTPUT_FRAMERATE = "concat-output-framerate";
   private static final String TRIM_ENCODING_PROFILE = "trim-encoding-profile";
   private static final String FORCE_ENCODING_PROFILE = "force-encoding-profile";
+  private static final String PREENCODE_ENCODING_PROFILE = "preencode-encoding-profile";
 
   private static final String FORCE_ENCODING = "force-encoding";
+  private static final String PREENCODE_ENCODING = "preencode-encoding";
   private static final String REQUIRED_EXTENSIONS = "required-extensions";
   private static final String ENFORCE_DIVISIBLE_BY_TWO = "enforce-divisible-by-two";
 
@@ -207,6 +209,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final boolean forceEncoding = BooleanUtils.toBoolean(getOptConfig(operation, FORCE_ENCODING).getOr("false"));
     final boolean forceDivisible = BooleanUtils.toBoolean(getOptConfig(operation, ENFORCE_DIVISIBLE_BY_TWO).getOr("false"));
     final List<String> requiredExtensions = getRequiredExtensions(operation);
+    final boolean preencodeEncoding = BooleanUtils.toBoolean(getOptConfig(operation, PREENCODE_ENCODING).getOr("false"));
+    final String preencodeEncodingProfile = getConfig(operation, PREENCODE_ENCODING_PROFILE);
 
     //
     // further checks on config options
@@ -255,12 +259,14 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       presentationTracks.add(t);
     }
 
-    // I am breaking things
-    if (forceProfile.isSome()) {
-      logger.info("WE PREENCODE NOW");
-      originalTracks = preencode(forceProfile.get(), originalTracks);
-    } else {
-      throw new WorkflowOperationException("You make preencode testing really hard");
+    // Optionally encode all tracks to avoid any errors later on
+    if (preencodeEncoding) {
+      final EncodingProfile preencodeProfile = composerService.getProfile(preencodeEncodingProfile);
+      if (preencodeProfile == null) {
+        throw new WorkflowOperationException("Preencode encoding profile '" + preencodeEncodingProfile + "' was not found");
+      }
+      logger.info("Starting preencoding");
+      originalTracks = preencode(preencodeProfile, originalTracks);
     }
 
 
@@ -822,13 +828,18 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
   }
 
   /**
-   * I am breaking things
+   * Encodes a given list of <code>tracks</code> using the encoding profile <code>profile</code>
+   * and returns the encoded tracks.
+   * Makes sure to keep the tracks ID and Flavor so as to not break later operations.
+   *
+   * @return the encoded tracks
    */
   private List<Track> preencode(EncodingProfile profile, List<Track> tracks)
           throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException,
           ServiceRegistryException {
     List<Track> encodedTracks = new ArrayList<>();
     for (Track track : tracks) {
+      logger.info("Preencoding track {}", track.getIdentifier());
       Job encodeJob = composerService.encode(track, profile.getIdentifier());
       if (!waitForStatus(encodeJob).isSuccess()) {
         throw new WorkflowOperationException("Encoding of track " + track + " failed");
