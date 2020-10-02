@@ -4169,7 +4169,7 @@ Opencast 2.2.x
 - [[MH-11550]](https://opencast.jira.com/browse/MH-11550) - Update Migration documentation 2.1 to 2.2
 - [[MH-11554]](https://opencast.jira.com/browse/MH-11554) - Filtering does not work on Systems-&gt;Jobs,
   Systems-&gt;Servers and Systems-&gt;Services
-- [[MH-11555]](https://opencast.jira.com/browse/MH-11555) - Localisation of Recordings-&gt;Events and
+- [[MH-11555]](https://opencast.jira.com/browse/MH-11555) - Localization of Recordings-&gt;Events and
   Recordings-&gt;Series buggy
 - [[MH-11556]](https://opencast.jira.com/browse/MH-11556) - Failed test: Filter locations (T1733, Filter by status does
   not work)

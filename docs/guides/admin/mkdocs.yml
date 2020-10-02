@@ -67,7 +67,7 @@ nav:
    - Log: 'configuration/log.md'
    - User Statistics and Privacy Configuration: 'configuration/user-statistics.and.privacy.md'
    - Multi Tenancy: 'configuration/multi.tenancy.md'
-   - Authentication, Autorization and User Management:
+   - Authentication, Authorization and User Management:
       - General Security: 'configuration/security.md'
       - Access Control Lists: 'configuration/acl.md'
       - Authentication and Authorization Infrastructure (AAI): 'configuration/security.aai.md'
