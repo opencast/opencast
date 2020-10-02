@@ -1,15 +1,14 @@
 sudo: true
-
+dist: bionic
 language: java
-
 jdk: openjdk8
 
 # Cache maven artifacts, pip downloads and the node modules for markdownlint
 cache:
   directories:
-  - ~/.m2
-  - ~/.cache/pip
-  - docs/guides/node_modules/
+    - ~/.m2
+    - ~/.cache/pip
+    - docs/guides/node_modules/
 
 # Do not cache the opencast artifacts to detect dependency problems
 before_cache:
@@ -31,26 +30,26 @@ before_install:
 install:
   - sudo apt-get -qq update
   - >
-     sudo apt-get install -y
-     bzip2
-     gzip
-     hunspell
-     hunspell-de-de
-     procps
-     sox
-     tar
-     tesseract-ocr
-     tesseract-ocr-deu
-     unzip
+    sudo apt-get install -y
+    bzip2
+    gzip
+    hunspell
+    hunspell-de-de
+    procps
+    sox
+    tar
+    tesseract-ocr
+    tesseract-ocr-deu
+    unzip
   - mkdir -p ~/.m2 ~/bin
   - wget -q https://pkg.opencast.org/bin/ffmpeg-release-64bit-static.tar.xz
   - tar xf ffmpeg-release-64bit-static.tar.xz
   - mv ffmpeg-*/ff* ~/bin/
   - >
-     test -f ~/.m2/synfigstudio-1.0.2.deb ||
-     get_synfig https://mvncache.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
-     get_synfig https://nexus.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
-     get_synfig https://netix.dl.sourceforge.net/project/synfig/releases/1.0.2/linux/synfigstudio_1.0.2_amd64.deb
+    test -f ~/.m2/synfigstudio-1.0.2.deb ||
+    get_synfig https://mvncache.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
+    get_synfig https://nexus.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
+    get_synfig https://netix.dl.sourceforge.net/project/synfig/releases/1.0.2/linux/synfigstudio_1.0.2_amd64.deb
   - sudo dpkg -i ~/.m2/synfigstudio-1.0.2.deb
 
 jobs:
@@ -63,7 +62,7 @@ jobs:
       env: name=documentation
       sudo: false
       language: python
-      python: "3.6"
+      python: "3.8"
       install:
         - pip install mkdocs markdown_inline_graphviz_extension mkdocs-windmill
         - (cd docs/guides && npm install)
@@ -108,11 +107,11 @@ jobs:
       addons:
         chrome: stable
       install:
-        - ( cd modules/admin-ui &&
-            npm ci &&
-            ./node_modules/.bin/bower install)
+        - ( cd modules/admin-ui-frontend &&
+          npm ci &&
+          ./node_modules/.bin/bower install)
       script:
-        - (cd modules/admin-ui && npm run test-chrome)
+        - (cd modules/admin-ui-frontend && npm run test-chrome)
 
     # Run JS tests in Firefox
     - stage: build
@@ -120,11 +119,11 @@ jobs:
       addons:
         firefox: latest
       install:
-        - ( cd modules/admin-ui &&
-            npm ci &&
-            ./node_modules/.bin/bower install)
+        - ( cd modules/admin-ui-frontend &&
+          npm ci &&
+          ./node_modules/.bin/bower install)
       script:
-        - (cd modules/admin-ui && npm run test-firefox)
+        - (cd modules/admin-ui-frontend && npm run test-firefox)
 
     # Make a simple build to generate all Opencast artifacts while excluding as many checks as possible since we do a
     # proper test in parallel anyway. Then run `mvn site` to generate Javadocs. We exclude checkstyle and tests since
@@ -135,13 +134,12 @@ jobs:
         - mvn install -DskipTests=true -Dcheckstyle.skip=true -P "none,!frontend"
       script:
         - >
-           mvn site -Daggregate=true site:stage "-DstagingDirectory=$(pwd)/site" \
-             -P "none,!frontend" \
-             -DskipTests=true \
-             -Dcheckstyle.skip=true \
-             -Dpmd.skip=true \
-             -Dcpd.skip=true
-
+          mvn site -Daggregate=true site:stage "-DstagingDirectory=$(pwd)/site" \
+            -P "none,!frontend" \
+            -DskipTests=true \
+            -Dcheckstyle.skip=true \
+            -Dpmd.skip=true \
+            -Dcpd.skip=true
     # Deploy translation keys to Crowdin if we are on develop or one of the release branches
     - stage: deployment
       env: name=crowdin
