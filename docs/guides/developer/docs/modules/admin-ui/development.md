@@ -14,7 +14,7 @@ install those tools globally on your machine, or use the versions Opencast insta
 you want to do that, you may want to add the installation folders to your path variable:
 
 ```bash
-cd modules/admin-ui
+cd modules/admin-ui-frontend
 export PATH=node:node_modules/.bin:$PATH
 ```
 
@@ -23,7 +23,7 @@ Debugging Javascript unit tests
 ------------------------------------
 
 Our Javascript unit tests are built in [Jasmine](http://jasmine.github.io/) (a behavior-driven development framework for
-testing JavaScript code), and live in `modules/admin-ui/src/test/resources/test/unit`.
+testing JavaScript code), and live in `modules/admin-ui-frontend/test/test/unit`.
 
 Occasionally something breaks, or you need to disable or focus on a single test.
 While reading the Jasmine, Karma and Grunt docs are encouraged, here are a
@@ -82,11 +82,11 @@ This setup may be configured as follows:
 
 1. Change to the Admin UI module directory.
 
-        cd modules/admin-ui
+        cd modules/admin-ui-frontend
 
 1. Install project dependencies.
 
-        npm install
+        npm install && bower install
 
 1. Start the standalone web server by running:
 
@@ -129,11 +129,11 @@ This setup may be configured as follows:
 
 1. Change to the Admin UI module directory.
 
-        cd modules/admin-ui
+        cd modules/admin-ui-frontend
 
 1. Install project dependencies.
 
-        npm install
+        npm install && bower install
 
 1. Start the mockup webserver by running:
 
@@ -148,7 +148,7 @@ Started connect web server on http://localhost:9000
 
 If you make changes to the Admin UI NG source files, the page should auto reload to display the changes.
 
-[1]: http://gruntjs.com
+[1]: https://gruntjs.com
 [2]: https://nodejs.org
 [3]: http://localhost:9000
 
