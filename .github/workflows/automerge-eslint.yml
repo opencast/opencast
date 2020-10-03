@@ -1,0 +1,18 @@
+name: automerge linter updates
+on: pull_request
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - name: tell dependabot to merge eslint updates if ci succeeds
+        uses: actions/github-script@0.3.0
+        if: >
+          github.event_name == 'pull_request'
+          && github.event.pull_request.user.login == 'dependabot-preview[bot]'
+          && startsWith(github.event.pull_request.title, 'Bump eslint ')
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { issue: { number: issue_number }, repo: { owner, repo }  } = context;
+            github.issues.createComment({ issue_number, owner, repo, body: "@dependabot merge" });
