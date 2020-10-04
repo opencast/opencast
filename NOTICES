@@ -674,15 +674,19 @@ admin-ui
   com.google.code.gson                   gson                                             Apache 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
+  commons-fileupload                     commons-fileupload                               Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
   jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
   javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
   joda-time                              joda-time                                        Apache 2
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
   org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
+  org.codehaus.jettison                  jettison                                         Apache License, Version 2.0
+  org.mnode.ical4j                       ical4j                                           BSD 3-Clause
+  org.apache.servicemix.bundles          org.apache.servicemix.bundles.commons-httpclient The Apache Software License, Version 2.0
 
 
 animate-impl
