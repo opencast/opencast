@@ -1517,21 +1517,21 @@ publication-service-youtube-remote
 
 publication-service-youtube-v3
   GroupId                                ArtifactId                                       Licenses
-  com.fasterxml.jackson.core             jackson-core                                     The Apache Software License, Version 2.0
-  com.google.apis                        google-api-services-plus                         The Apache Software License, Version 2.0
   com.google.apis                        google-api-services-youtube                      The Apache Software License, Version 2.0
   com.google.http-client                 google-http-client-jackson2                      The Apache Software License, Version 2.0
+  com.google.http-client                 google-http-client                               The Apache Software License, Version 2.0
+  com.google.api-client                  google-api-client                                The Apache Software License, Version 2.0
+  com.google.oauth-client                google-oauth-client                              The Apache Software License, Version 2.0
   com.google.oauth-client                google-oauth-client-java6                        The Apache Software License, Version 2.0
   com.google.oauth-client                google-oauth-client-jetty                        The Apache Software License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.osgi                               org.osgi.compendium                              Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
-  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
-  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
   org.apache.felix                       org.apache.felix.http.bundle                     -
-  org.codehaus.jackson                   jackson-mapper-asl                               The Apache Software License, Version 2.0
-  org.sakaiproject.nakamura              javax.activation-mail                            -
   org.slf4j                              slf4j-api                                        MIT License
-
+  org.slf4j                              slf4j-log4j12                                    MIT License
 
 runtime-info
   GroupId                                ArtifactId                                       Licenses
