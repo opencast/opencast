@@ -292,6 +292,11 @@ To see the whole stacktrace of the installation you can use the following comman
 If you want to start opencast in debug mode, you could use the debug argument:
 
     $ cd build/opencast-dist-develop-*/bin && ./start-opencast debug
+    
+To recompile a single module, use the following commands: (replace `admin-ui` with the name of the module)
+
+    $ mvn clean install -Pdev --projects modules/admin-ui
+    $ mvn clean install -Pdev --projects assemblies --also-make-dependents
 
 
 ## Modify Code and Build Changes
