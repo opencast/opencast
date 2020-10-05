@@ -79,10 +79,11 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * The workflow definition for handling multiple webcam videos that have overlapping playtime
- * Checks which videos of those webcam videos are currently playing and dynamically scales them to fit in a single video
+ * The workflow definition for handling multiple videos that have overlapping playtime, e.g. webcam videos from
+ * a video conference call.
+ * Checks which videos are currently playing and dynamically scales them to fit in a single video.
  *
- * Relies on a smil with videoBegin and duration times, as is created by ingest through addPartialTrack
+ * Relies on a smil with videoBegin and duration times, as is created by ingest through addPartialTrack.
  * Will pad sections where no video is playing with a background color. This includes beginning and end.
  *
  * Returns the final video to the target flavor
@@ -94,11 +95,11 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   private static final String SOURCE_SMIL_FLAVOR = "source-smil-flavor";
   private static final String CONCAT_ENCODING_PROFILE = "concat-encoding-profile";
 
-  private static final String OPT_RESOLUTION = "opt-resolution";
-  private static final String OPT_BACKGROUND_COLOR = "opt-background-color";
+  private static final String OPT_RESOLUTION = "resolution";
+  private static final String OPT_BACKGROUND_COLOR = "background-color";
 
   private static final String TARGET_FLAVOR = "target-flavor";
-  private static final String OPT_TARGET_TAGS = "opt-target-tags";
+  private static final String OPT_TARGET_TAGS = "target-tags";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(VideoGridWorkflowOperationHandler.class);
@@ -133,6 +134,10 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   }
 
   /** Structs to store data and make code more readable **/
+  /**
+   * Holds basic information on the final video, which is for example used to appropriately place and scale
+   * individual videos.
+   */
   class LayoutArea
   {
     private int x = 0;
@@ -193,12 +198,14 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     }
   }
 
+  /**
+   * Holds information on a single video beyond what is usually stored in a Track
+   */
   class VideoInfo
   {
     private int aspectRatioWidth = 16;
     private int aspectRatioHeight = 9;
-    private long timeStamp = 0;
-    private long nextTimeStamp = 0;
+
     private long startTime = 0;
     private long duration = 0;
     private String filename = "filename.mp4";
@@ -214,18 +221,6 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     }
     public void setAspectRatioHeight(int aspectRatioHeight) {
       this.aspectRatioHeight = aspectRatioHeight;
-    }
-    public long getTimeStamp() {
-      return timeStamp;
-    }
-    public void setTimeStamp(long timeStamp) {
-      this.timeStamp = timeStamp;
-    }
-    public long getNextTimeStamp() {
-      return nextTimeStamp;
-    }
-    public void setNextTimeStamp(long nextTimeStamp) {
-      this.nextTimeStamp = nextTimeStamp;
     }
     public long getStartTime() {
       return startTime;
@@ -259,11 +254,13 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     {
       this(aspectRatioHeight, aspectRatioWidth);
       this.filename = filename;
-      this.timeStamp = timeStamp;
       this.startTime = startTime;
     }
   }
 
+  /**
+   * Pair class for readability
+   */
   class Offset
   {
     private int x = 16;
@@ -288,7 +285,12 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     }
   }
 
-  class VideoEdlPart
+  /**
+   * A section of the complete edit decision list.
+   * A new section is defined whenever a video becomes active or inactive.
+   * Therefore it contains information on the timing as well as all currently active videos in the section.
+   */
+  class EditDecisionListSection
   {
     private long timeStamp = 0;
     private long nextTimeStamp = 0;
@@ -313,12 +315,15 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       this.areas = areas;
     }
 
-    VideoEdlPart()
+    EditDecisionListSection()
     {
       areas = new ArrayList<VideoInfo>();
     }
   }
 
+  /**
+   * Stores relevant information from the source SMIL
+   */
   class StartStopEvent implements Comparable<StartStopEvent>
   {
     private boolean start;
@@ -374,7 +379,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
-    logger.debug("Running multiple webcam workflow operation on workflow {}", workflowInstance.getId());
+    logger.debug("Running videogrid workflow operation on workflow {}", workflowInstance.getId());
 
     final MediaPackage mediaPackage = (MediaPackage) workflowInstance.getMediaPackage().clone();
 
@@ -522,11 +527,11 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     Collections.sort(events);
 
     // Create an edit decision list
-    List<VideoEdlPart> videoEdl = new ArrayList<VideoEdlPart>();
+    List<EditDecisionListSection> videoEdl = new ArrayList<EditDecisionListSection>();
     HashMap<String, StartStopEvent> activeVideos = new HashMap<>();   // Currently running videos
 
     // Define starting point
-    VideoEdlPart start = new VideoEdlPart();
+    EditDecisionListSection start = new EditDecisionListSection();
     start.timeStamp = finalStartTime;
     videoEdl.add(start);
 
@@ -539,11 +544,11 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
         logger.info("Add stop event at {}", event);
         activeVideos.remove(event.filename);
       }
-      videoEdl.add(createVideoEdl(event, activeVideos));
+      videoEdl.add(createEditDecisionList(event, activeVideos));
     }
 
     // Define ending point
-    VideoEdlPart endVideo = new VideoEdlPart();
+    EditDecisionListSection endVideo = new EditDecisionListSection();
     endVideo.timeStamp = finalEndTime;
     endVideo.nextTimeStamp = finalEndTime;
     videoEdl.add(endVideo);
@@ -556,7 +561,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
 
     // Create ffmpeg command for each section
     List<List<String>> commands = new ArrayList<>();
-    for (VideoEdlPart edl : videoEdl) {
+    for (EditDecisionListSection edl : videoEdl) {
       // A too small duration will result in ffmpeg producing a faulty video, so avoid any section smaller than 50ms
       if (edl.nextTimeStamp - edl.timeStamp < 50) {
         logger.info("Skipping {}-length edl entry", edl.nextTimeStamp - edl.timeStamp);
@@ -648,15 +653,22 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   }
 
   /**
-   * Create a ffmpeg command that generate a videos for the given cutting marks
+   * Create a ffmpeg command that generates a video for the given section
+   *
+   * The videos passed as part of <code>videoEdl</code> are arranged in a grid layout.
+   * The grid layout is calculated in a way  that maximizes area usage (i.e. minimizes the areas where the background
+   * color has to be shown) by checking the area usage for each combination of vertical and horizontal rows, based
+   * on the resolution of the layout area. The number of tiles per row/column is then used to genrate a complex
+   * ffmpeg filter.
+   *
+   *
    * @param layoutArea
    *          General layout information for the video
-   *          (Originally it was possible to have multiple layout areas)
    * @param videoEdl
    *          The edit decision list for the current cut
    * @return A command line ready ffmpeg command
    */
-  private List<String> compositeSection(LayoutArea layoutArea, VideoEdlPart videoEdl)
+  private List<String> compositeSection(LayoutArea layoutArea, EditDecisionListSection videoEdl)
   {
     // Duration for this cut
     long duration = videoEdl.nextTimeStamp - videoEdl.timeStamp;
@@ -977,8 +989,8 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
    *          Currently active videos
    * @return
    */
-  private VideoEdlPart createVideoEdl(StartStopEvent event, HashMap<String, StartStopEvent> activeVideos) {
-    VideoEdlPart nextEdl = new VideoEdlPart();
+  private EditDecisionListSection createEditDecisionList(StartStopEvent event, HashMap<String, StartStopEvent> activeVideos) {
+    EditDecisionListSection nextEdl = new EditDecisionListSection();
     nextEdl.timeStamp = event.timeStamp;
 
     for (Map.Entry<String, StartStopEvent> activeVideo : activeVideos.entrySet()) {

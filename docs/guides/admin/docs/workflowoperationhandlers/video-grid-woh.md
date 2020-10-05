@@ -6,7 +6,7 @@ The VideoGridWorkflowOperationHandler offers a way to combine several, partially
 playing videos into a single video file. For example, the webcam feeds during a video conference
 can be combined by this WOH. The resulting video puts each input video on a grid that dynamically
 resizes based on the number of inputs videos currently active. Which input video is active when
-is defined by through a SMIL catalogue from e.g. a partial ingest.
+is defined through a SMIL catalogue from e.g. a partial ingest.
 
 If the SMIL defines a section where there are no videos active, the background color will be shown
 instead for the duration of the section. This also holds true for potentially empty beginning and end 
@@ -21,15 +21,17 @@ a single output file.
 
 ## Parameter Table
 
-|configuration keys | example                     | description                                                         |
-|-------------------|-----------------------------|---------------------------------------------------------------------|
-|source-flavors     | presenter/source            | Flavors containing all the video tracks to be combined.                              |
-|source-smil-flavor | smil/source+partial         | Flavor containing the SMIL specifying when each video track is active. The example shows the flavor used by partial ingest.                               |
-|concat-encoding-profile | concat-samecodec.work  | Encoding profile used for the final concatenation.
-|opt-resolution     | 1280x720                    | (Optional) Resolution of the output. Example value is the default.
-|opt-background-color| 0xFFFFFF                   | (Optional) The color used to fill space not occupied by input videos in the output. Example value is the default.
-|target-flavor      | presenter/partial           | Flavor containing the output video tracks.                              |
-|opt-target-tags    | archive                     | (Optional) Tag(s) to add to the output track. Default is `null`.
+|configuration keys         | example                     | description                                                         |
+|-------------------        |-----------------------------|---------------------------------------------------------------------|
+|**source-flavors**\*       | presenter/source            | Flavors containing all the video tracks to be combined.             |
+|**source-smil-flavor**\*   | smil/source+partial         | Flavor containing the SMIL specifying when each video track is active. The example shows the flavor used by partial ingest. |                          |
+|**concat-encoding-profile**\* | concat-samecodec.work  | Encoding profile used for the final concatenation.                  |
+|resolution                 | 1280x720                    | Resolution of the output. Example value is the default.  |
+|background-color           | 0xFFFFFF                    | The color used to fill space not occupied by input videos in the output. Example value is the default.
+|**target-flavor**\*        | presenter/partial           | Flavor containing the output video tracks.                              |
+|target-tags                | archive                     | Tag(s) to add to the output track. Default is `null`.
+
+\* **required keys**
 
 ## Example
 

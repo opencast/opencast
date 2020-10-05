@@ -185,18 +185,18 @@ public class VideoGridServiceImpl extends AbstractJobProducer implements VideoGr
     for (String outputPath : outputPaths) {
 
       FileInputStream outputFileInputStream = null;
-      URI webcamFileUri;
+      URI videoFileUri;
       try {
         outputFileInputStream = new FileInputStream(outputPath);
-        webcamFileUri = workspace.putInCollection("videogrid",
+        videoFileUri = workspace.putInCollection("videogrid",
                 FilenameUtils.getName(outputPath), outputFileInputStream);
-        uris.add(webcamFileUri);
-        logger.info("Copied the created webcam video to the workspace {}", webcamFileUri);
+        uris.add(videoFileUri);
+        logger.info("Copied the created video to the workspace {}", videoFileUri);
       } catch (FileNotFoundException ex) {
-        throw new VideoGridServiceException(String.format("Webcam file '%s' not found", outputPath), ex);
+        throw new VideoGridServiceException(String.format("Video file '%s' not found", outputPath), ex);
       } catch (IOException ex) {
         throw new VideoGridServiceException(String.format(
-                "Can't write webcam file '%s' to workspace", outputPath), ex);
+                "Can't write video file '%s' to workspace", outputPath), ex);
       } catch (IllegalArgumentException ex) {
         throw new VideoGridServiceException(ex);
       } finally {

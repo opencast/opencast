@@ -102,7 +102,7 @@ public class VideoGridWorkflowOperationHandlerTest {
     /** Prepare flavor contents **/
     // Smil
     MediaPackageBuilder mpBuilder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
-    mpSmilURI = getClass().getResource("/smil_ingest.unknown").toURI();
+    mpSmilURI = getClass().getResource("/smil_ingest.xml").toURI();
 
     // Track
     track = new TrackImpl();
