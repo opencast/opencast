@@ -97,6 +97,8 @@ jobs:
     - stage: build
       env: name=build
       script:
+        # Don't run the admin interface frontend tests. We run them in parallel anyway:
+        - sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui-frontend/pom.xml
         - mvn clean install -Pnone
 
     # Run JS tests in Chrome
