@@ -259,6 +259,10 @@
     <module>modules/videoeditor-ffmpeg-impl</module>
     <module>modules/videoeditor-remote</module>
     <module>modules/videoeditor-workflowoperation</module>
+    <module>modules/videogrid-service-api</module>
+    <module>modules/videogrid-service-impl</module>
+    <module>modules/videogrid-remote</module>
+    <module>modules/videogrid-workflowoperation</module>
     <module>modules/videosegmenter-api</module>
     <module>modules/videosegmenter-ffmpeg</module>
     <module>modules/videosegmenter-remote</module>
