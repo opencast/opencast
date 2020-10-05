@@ -251,6 +251,7 @@
     <module>modules/userdirectory-moodle</module>
     <module>modules/userdirectory-sakai</module>
     <module>modules/userdirectory-brightspace</module>
+    <module>modules/userdirectory-canvas</module>
     <module>modules/user-interface-configuration</module>
     <module>modules/usertracking-api</module>
     <module>modules/usertracking-impl</module>
