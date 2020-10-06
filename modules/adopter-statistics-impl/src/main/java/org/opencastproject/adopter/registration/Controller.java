@@ -83,7 +83,7 @@ public class Controller {
                         responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
                         returnDescription = "GETs the adopter registration data.")
   public String getRegistrationForm() {
-    logger.info("Retrieving adopter registration data.");
+    logger.debug("Retrieving adopter registration data.");
     return gson.toJson(registrationService.retrieveFormData());
   }
 
@@ -99,7 +99,7 @@ public class Controller {
           @RestResponse(responseCode = SC_BAD_REQUEST,
                   description = "Couldn't save adopter registration data.")})
   public Response register(String data) {
-    logger.info("Saving adopter registration data.");
+    logger.debug("Saving adopter registration data.");
     Form form = gson.fromJson(data, Form.class);
     try {
       registrationService.saveFormData(form);
@@ -120,7 +120,7 @@ public class Controller {
                   responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
           returnDescription = "DELETEs the adopter registration data.")
   public Response deleteRegistrationData() {
-    logger.info("Deleting adopter registration data.");
+    logger.debug("Deleting adopter registration data.");
     try {
       registrationService.deleteFormData();
       return ok();
