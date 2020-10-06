@@ -4,7 +4,7 @@ The [Canvas LMS](https://www.instructure.com/canvas/) User Provider enriches Ope
 with a set of roles made up of the user's membership in Canvas sites, of the form
 SITEID_Role. For example, an Opencast user who is also a Canvas user and a member
 of the Canvas site `CourseID` with the Canvas role `Student` will be granted the
-Opencast role `CouseID_Learner`. 
+Opencast role `CourseID_Learner`.
 
 The mapping of Canvas sites and roles to Opencast roles is consistent with the site
 and role mapping used by the [LTI](../modules/ltimodule.md) endpoint. The Canvas
