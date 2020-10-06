@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.videogrid.remote.VideoGridServiceRemoteImpl"
+               immediate="true">
+  <implementation class="org.opencastproject.videogrid.remote.VideoGridServiceRemoteImpl"/>
+  <property name="service.description" value="Remote Video Grid Service"/>
+  <service>
+    <provide interface="org.opencastproject.videogrid.api.VideoGridService"/>
+  </service>
+  <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
+             bind="setTrustedHttpClient"/>
+  <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             bind="setRemoteServiceManager"/>
+</scr:component>

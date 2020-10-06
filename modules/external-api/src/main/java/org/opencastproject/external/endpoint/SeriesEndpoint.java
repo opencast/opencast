@@ -29,7 +29,9 @@ import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_2_0;
+import static org.opencastproject.external.common.ApiVersion.VERSION_1_5_0;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -62,6 +64,7 @@ import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -121,8 +124,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
-@RestService(name = "externalapiseries", title = "External API Series Service", notes = {}, abstractText = "Provides resources and operations related to the series")
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
+            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
+@RestService(name = "externalapiseries", title = "External API Series Service", notes = {},
+             abstractText = "Provides resources and operations related to the series")
 public class SeriesEndpoint {
 
   private static final int CREATED_BY_UI_ORDER = 9;
@@ -176,13 +181,19 @@ public class SeriesEndpoint {
           @RestParameter(name = "filter", isRequired = false, description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = RestParameter.Type.INTEGER) }, responses = {
-                  @RestResponse(description = "A (potentially empty) list of series is returned.", responseCode = HttpServletResponse.SC_OK) })
+          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "withacl", isRequired = false, description = "Whether the acl should be included in the response.", type = RestParameter.Type.BOOLEAN)
+        }, responses = {
+          @RestResponse(description = "A (potentially empty) list of series is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getSeriesList(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("order") String order, @QueryParam("offset") int offset,
-          @QueryParam("limit") int limit, @QueryParam("onlyWithWriteAccess") Boolean onlyWithWriteAccess
-          ) throws UnauthorizedException {
+          @QueryParam("limit") int limit, @QueryParam("onlyWithWriteAccess") Boolean onlyWithWriteAccess,
+          @QueryParam("withacl") Boolean withAcl) throws UnauthorizedException {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
+    if (requestedVersion.isSmallerThan(VERSION_1_5_0)) {
+      // withAcl was added for version 1.5.0 and should be ignored for smaller versions.
+      withAcl = false;
+    }
     try {
       SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
               securityService.getUser());
@@ -206,7 +217,7 @@ public class SeriesEndpoint {
           String name = filterTuple[0];
 
           String value;
-          if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+          if (!requestedVersion.isSmallerThan(VERSION_1_1_0)) {
             // MH-13038 - 1.1.0 and higher support semi-colons in values
             value = f.substring(name.length() + 1);
           } else {
@@ -244,7 +255,7 @@ public class SeriesEndpoint {
             query.withSubject(value);
           } else if ("title".equals(name)) {
             query.withTitle(value);
-          } else if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+          } else if (!requestedVersion.isSmallerThan(VERSION_1_1_0)) {
             // additional filters only available with Version 1.1.0 or higher
             if ("identifier".equals(name)) {
               query.withIdentifier(value);
@@ -296,7 +307,7 @@ public class SeriesEndpoint {
       logger.trace("Using Query: " + query.toString());
 
       SearchResult<Series> result = externalIndex.getByQuery(query);
-
+      final boolean includeAcl = (withAcl != null && withAcl);
       return ApiResponses.Json.ok(requestedVersion, arr($(result.getItems()).map(new Fn<SearchResultItem<Series>, JValue>() {
         @Override
         public JValue apply(SearchResultItem<Series> a) {
@@ -309,7 +320,7 @@ public class SeriesEndpoint {
           }
           Date createdDate = s.getCreatedDateTime();
           JObject result;
-          if (requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+          if (requestedVersion.isSmallerThan(VERSION_1_1_0)) {
             result = obj(
                     f("identifier", v(s.getIdentifier())),
                     f("title", v(s.getTitle())),
@@ -334,7 +345,13 @@ public class SeriesEndpoint {
                     f("license", v(s.getLicense(), BLANK)),
                     f("rightsholder", v(s.getRightsHolder(), BLANK)),
                     f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))));
+
+            if (includeAcl) {
+              AccessControlList acl = getAclFromSeries(s);
+              result = result.merge(f("acl", arr(AclUtils.serializeAclToJson(acl))));
+            }
           }
+
           return result;
 
         }
@@ -345,15 +362,46 @@ public class SeriesEndpoint {
     }
   }
 
+  /**
+   * Get an {@link AccessControlList} from a {@link Series}.
+   *
+   * @param series
+   *          The {@link Series} to get the ACL from.
+   * @return The {@link AccessControlList} stored in the {@link Series}
+   */
+  private static AccessControlList getAclFromSeries(Series series) {
+    AccessControlList activeAcl = new AccessControlList();
+    try {
+      if (series.getAccessPolicy() != null) {
+        activeAcl = AccessControlParser.parseAcl(series.getAccessPolicy());
+      }
+    } catch (Exception e) {
+      logger.error("Unable to parse access policy", e);
+    }
+    return activeAcl;
+  }
+
   @GET
   @Path("{seriesId}")
-  @RestQuery(name = "getseries", description = "Returns a single series.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, responses = {
-                  @RestResponse(description = "The series is returned.", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getSeries(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id)
+  @RestQuery(name = "getseries", description = "Returns a single series.", returnDescription = "",
+  pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING)
+  }, restParameters = {
+          @RestParameter(name = "withacl", isRequired = false, type = RestParameter.Type.BOOLEAN,
+                         description = "Whether the acl should be included in the response.")
+  }, responses = {
+          @RestResponse(description = "The series is returned.", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND),
+  })
+  public Response getSeries(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id,
+                            @QueryParam("withacl") Boolean withAcl)
           throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
+    if (requestedVersion.isSmallerThan(VERSION_1_5_0)) {
+      // withAcl was added for version 1.5.0 and should be ignored for smaller versions.
+      withAcl = false;
+    }
+
     for (final Series s : indexService.getSeries(id, externalIndex)) {
       JValue subjects;
       if (s.getSubject() == null) {
@@ -362,8 +410,8 @@ public class SeriesEndpoint {
         subjects = arr(splitSubjectIntoArray(s.getSubject()));
       }
       Date createdDate = s.getCreatedDateTime();
-      JValue responseContent;
-      if (requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+      JObject responseContent;
+      if (requestedVersion.isSmallerThan(VERSION_1_1_0)) {
         responseContent = obj(
                 f("identifier", v(s.getIdentifier())),
                 f("title", v(s.getTitle())),
@@ -395,7 +443,13 @@ public class SeriesEndpoint {
                 f("language", v(s.getLanguage(), BLANK)),
                 f("license", v(s.getLicense(), BLANK)),
                 f("rightsholder", v(s.getRightsHolder(), BLANK)));
+
+        if (withAcl != null && withAcl) {
+          AccessControlList acl = getAclFromSeries(s);
+          responseContent = responseContent.merge(f("acl", arr(AclUtils.serializeAclToJson(acl))));
+        }
       }
+
       return ApiResponses.Json.ok(requestedVersion, responseContent);
     }
     return ApiResponses.notFound("Cannot find an series with id '%s'.", id);

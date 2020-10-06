@@ -79,7 +79,6 @@ jobs:
         - echo "select version()" | mysql -u root
         - echo 'create database opencast;' | mysql -u root
       script:
-        - mysql -u root opencast < docs/scripts/ddl/mysql5.sql
         - sh docs/upgrade/.test.sh
 
     # Test database scripts with MySQL
@@ -92,13 +91,14 @@ jobs:
         - echo "select version()" | mysql -u root
         - echo 'create database opencast;' | mysql -u root
       script:
-        - mysql -u root opencast < docs/scripts/ddl/mysql5.sql
         - ./docs/upgrade/.test.sh
 
     # Make a build excluding the assembly steps
     - stage: build
       env: name=build
       script:
+        # Don't run the admin interface frontend tests. We run them in parallel anyway:
+        - sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui-frontend/pom.xml
         - mvn clean install -Pnone
 
     # Run JS tests in Chrome

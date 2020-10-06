@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>10-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
@@ -115,6 +115,7 @@
               <feature>opencast-security-cas</feature>
               <feature>opencast-moodle</feature>
               <feature>opencast-sakai</feature>
+              <feature>opencast-canvas</feature>
             </installedFeatures>
           </configuration>
         </plugin>

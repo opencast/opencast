@@ -1,0 +1,29 @@
+# Canvas UserDirectoryProvider configuration
+
+# This is an an optional service which is not enabled by default. To enable it,
+# edit etc/org.apache.karaf.features.cfg and add opencast-canvas to the featuresBoot option.
+
+# The organization for this provider
+# default: mh_default_org
+org.opencastproject.userdirectory.canvas.org=mh_default_org
+
+# The URL and user token for Canvas LMS
+#org.opencastproject.userdirectory.canvas.url=https://demo.canvas.com/
+#org.opencastproject.userdirectory.canvas.token=token_of_a_user_with_sufficient_privilege
+
+# The maximum number of users to cache
+# default: 1000
+#org.opencastproject.userdirectory.canvas.cache.size=1000
+
+# The maximum number of minutes to cache a user
+# default: 60 (minutes)
+#org.opencastproject.userdirectory.canvas.cache.expiration=60
+
+# Optional comma-separated list of Canvas roles which are mapped to Instructor role suffix in Opencast
+# default: teacher,ta
+#org.opencastproject.userdirectory.canvas.instructor.roles=teacher,ta
+
+# Optional comma-separated list of usernames, which opencast wouldn't ask Canvas for user's detail.
+# default: admin,anonymous
+#org.opencastproject.userdirectory.canvas.ignored.usernames=admin,anonymous
+

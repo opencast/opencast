@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.videogrid.endpoint.VideoGridServiceEndpoint" immediate="true">
+  <implementation class="org.opencastproject.videogrid.endpoint.VideoGridServiceEndpoint"/>
+  <property name="service.description" value="VideoGrid Service REST Endpoint"/>
+
+  <property name="opencast.service.type" value="org.opencastproject.videogrid"/>
+  <property name="opencast.service.path" value="/videogrid"/>
+  <property name="opencast.service.jobproducer" value="true"/>
+
+  <service>
+    <provide interface="org.opencastproject.videogrid.endpoint.VideoGridServiceEndpoint"/>
+  </service>
+  <reference name="VideoGridService" interface="org.opencastproject.videogrid.api.VideoGridService"
+             bind="setVideoGridService"/>
+  <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             bind="setServiceRegistry"/>
+</scr:component>

@@ -818,16 +818,6 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countOfAbnormalServices()
-   */
-  @Override
-  public long countOfAbnormalServices() throws ServiceRegistryException {
-    throw new UnsupportedOperationException("Operation not yet implemented");
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#count(java.lang.String,
    *      org.opencastproject.job.api.Job.Status)
    */

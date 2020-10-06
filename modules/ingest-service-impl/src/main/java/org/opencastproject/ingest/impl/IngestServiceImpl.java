@@ -99,6 +99,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,6 +132,17 @@ import javax.management.ObjectInstance;
 /**
  * Creates and augments Opencast MediaPackages. Stores media into the Working File Repository.
  */
+@Component(
+  immediate = true,
+  service = {
+    IngestService.class,
+    ManagedService.class
+  },
+  property = {
+    "service.description=Ingest Service",
+    "service.pid=org.opencastproject.ingest.impl.IngestServiceImpl"
+  }
+)
 public class IngestServiceImpl extends AbstractJobProducer implements IngestService, ManagedService {
 
   /** The logger */
@@ -297,6 +314,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *          the osgi component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
     logger.info("Ingest Service started.");
@@ -310,6 +328,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /**
    * Callback from OSGi on service deactivation.
    */
+  @Deactivate
   public void deactivate() {
     JmxUtil.unregisterMXBean(registerMXBean);
   }
@@ -358,6 +377,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param httpClient
    *          the http client
    */
+  @Reference
   public void setHttpClient(TrustedHttpClient httpClient) {
     this.httpClient = httpClient;
   }
@@ -368,6 +388,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param serviceRegistry
    *          the serviceRegistry to set
    */
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -378,6 +399,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param mediaInspectionService
    *          the media inspection service to set
    */
+  @Reference
   public void setMediaInspectionService(MediaInspectionService mediaInspectionService) {
     this.mediaInspectionService = mediaInspectionService;
   }
@@ -1572,18 +1594,22 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   // ---------------------------------------------
   // --------- bind and unbind bundles ---------
   // ---------------------------------------------
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
+  @Reference
   public void setWorkingFileRepository(WorkingFileRepository workingFileRepository) {
     this.workingFileRepository = workingFileRepository;
   }
 
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }
 
+  @Reference
   public void setDublinCoreService(DublinCoreCatalogService dublinCoreService) {
     this.dublinCoreService = dublinCoreService;
   }
@@ -1614,6 +1640,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param securityService
    *          the securityService to set
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -1624,6 +1651,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -1634,8 +1662,17 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param schedulerService
    *          the scheduler service to set
    */
+  @Reference(
+    policy = ReferencePolicy.DYNAMIC,
+    cardinality = ReferenceCardinality.OPTIONAL,
+    unbind = "unsetSchedulerService"
+  )
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
+  }
+
+  public void unsetSchedulerService(SchedulerService schedulerService) {
+    this.schedulerService = null;
   }
 
   /**
@@ -1644,6 +1681,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     organizationDirectoryService = organizationDirectory;
   }

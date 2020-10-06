@@ -55,6 +55,7 @@ nav:
    - HTTPS:
       - Overview: 'configuration/https/index.md'
       - Using Nginx: 'configuration/https/nginx.md'
+      - Using Apache httpd: configuration/https/apache-httpd.md
       - Internal HTTPS: 'configuration/https/opencast.only.md'
       - Migrating old content to HTTPS: 'configuration/https/migration.md'
    - Asset Manager: 'configuration/asset-manager.md'
@@ -76,6 +77,7 @@ nav:
       - Moodle User Provider: 'configuration/security.user.moodle.md'
       - Sakai User Provider: 'configuration/security.user.sakai.md'
       - Brightspace User Provider: 'configuration/security.user.brightspace.md'
+      - Canvas User Provider: 'configuration/security.user.canvas.md'
    - Stream Security: 'configuration/stream-security.md'
    - Workflow: 'configuration/workflow.md'
    - External API: 'configuration/external-api.md'
@@ -202,6 +204,7 @@ nav:
    - Retract Engage: 'workflowoperationhandlers/retract-engage-woh.md'
    - Retract Configure: 'workflowoperationhandlers/retract-configure-woh.md'
    - Retract OAI-PMH: 'workflowoperationhandlers/retract-oaipmh-woh.md'
+   - Retract Partial: 'workflowoperationhandlers/retract-partial-woh.md'
    - Retract YouTube: 'workflowoperationhandlers/retract-youtube-woh.md'
    - Sanitize Adaptive: 'workflowoperationhandlers/sanitize-adaptive-woh.md'
    - Segment Previews: 'workflowoperationhandlers/segmentpreviews-woh.md'
@@ -218,5 +221,6 @@ nav:
    - Timelinepreviews: 'workflowoperationhandlers/timelinepreviews-woh.md'
    - Transfer Metadata: 'workflowoperationhandlers/transfer-metadata-woh.md'
    - Theme: 'workflowoperationhandlers/theme-woh.md'
+   - Video Grid: 'workflowoperationhandlers/video-grid-woh.md'
    - Waveform: 'workflowoperationhandlers/waveform-woh.md'
    - Zip: 'workflowoperationhandlers/zip-woh.md'

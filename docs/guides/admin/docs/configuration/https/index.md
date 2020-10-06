@@ -5,11 +5,13 @@ For all production systems you want to enable HTTPS. To archieve that, you can e
 httpd or Nginx (recommended) or enable HTTPS directly in Opencast.
 
 - [Using Nginx to enable HTTPS](nginx.md)
+- [Using Apache httpd to enable HTTPS](apache-httpd.md)
 - [Enable HTTPS directly in Opencast](opencast.only.md)
 
 
-Note that introducing HTTPS will not automatically migrate old content. It may still use the previously configured HTTP
-prorocol. For a semi-automatic migration, please take a look at the following guide:
+Note that introducing HTTPS will not automatically migrate old content.
+It may still use the previously configured HTTP prorocol.
+For a semi-automatic migration, please take a look at the following guide:
 
 - [Migrating old content to HTTPS](migration.md)
 
