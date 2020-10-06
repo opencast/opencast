@@ -25,16 +25,32 @@ export const fetchSeries = () => async (dispatch, getState) => {
        console.log(filters);
 
        // Get sorting from state if sort flag is true
-       let sortBy = getTableSorting(state);
-       let direction = getTableDirection(state);
+       let sort = getTableSorting(state) + ':' + getTableDirection(state);
 
        // Get page info needed for fetching events from state
        let pageLimit = getPageLimit(state);
        let offset = getPageOffset(state);
 
+       let data;
+
        // todo: maybe sortOrganizer needed
-       // /series.json?sortorganizer={sortorganizer}&sort={sort}&filter={filter}&offset=0&limit=100
-       const data = await fetch(`admin-ng/series/series.json?sort=${sortBy}:${direction}&filter=${filters}&offset=${offset}&limit=${pageLimit}`);
+       if (typeof filters == "undefined") {
+           // /series.json?sortorganizer={sortorganizer}&sort={sort}&filter={filter}&offset=0&limit=100
+           data = await fetch('admin-ng/series/series.json?' + new URLSearchParams({
+               sort: sort,
+               limit: pageLimit,
+               offset: offset
+           }));
+       } else {
+           // /series.json?sortorganizer={sortorganizer}&sort={sort}&filter={filter}&offset=0&limit=100
+           data = await fetch('admin-ng/series/series.json?' + new URLSearchParams({
+               filter: filters,
+               sort: sort,
+               limit: pageLimit,
+               offset: offset
+           }));
+       }
+
 
        const series = await data.json();
        dispatch(loadSeriesSuccess(series));

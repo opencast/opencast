@@ -135,8 +135,8 @@
         .dropdown-ul {
             position: absolute;
             z-index: $max-z + 10;
-            opacity: 0;
-            visibility: hidden;
+            opacity: 1;
+            visibility: visible;
             top: 35px;
             right: -11px;
             @extend %menu-dropdown-base;

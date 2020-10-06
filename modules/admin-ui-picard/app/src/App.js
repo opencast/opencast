@@ -10,6 +10,7 @@ import Themes from "./components/configuration/Themes";
 import Users from "./components/users/Users";
 import Statistics from "./components/statistics/Statistics";
 import Series from "./components/events/Series";
+import Login from "./components/Login";
 
 const version = {
   version: '8.03',
@@ -20,15 +21,13 @@ const feedbackUrl = 'https://opencast.org/';
 
 function App() {
   return (
-      //todo: add remaining routes
+      //todo: add remaining routes and put login on other place
           <HashRouter>
               <Header />
               <Switch>
-                  <Route exact path={"/"} render={() => {
-                      return (
-                          <Redirect to={"events/events"}/>
-                      )
-                  }} />
+                  <Route exact path={"/"}>
+                      <Login />
+                  </Route>
                   <Route exact path={"/events/events"}>
                       <Events />
                   </Route>

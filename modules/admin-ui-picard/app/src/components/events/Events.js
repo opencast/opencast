@@ -67,7 +67,6 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
     const toggleNavigation = () => {
         setNavigation(!displayNavigation);
-        console.log("menu toggled");
     };
 
     const handleActionMenu = e => {

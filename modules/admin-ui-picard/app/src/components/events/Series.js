@@ -63,7 +63,6 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
 
     const toggleNavigation = () => {
         setNavigation(!displayNavigation);
-        console.log("menu toggled");
     };
 
     const handleActionMenu = e => {

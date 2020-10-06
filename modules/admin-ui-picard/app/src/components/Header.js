@@ -72,9 +72,6 @@ const Header = () => {
     const [displayMenuUser, setMenuUser] = useState(false);
     const [displayMenuNotify, setMenuNotify] = useState(false);
     const [displayMenuHelp, setMenuHelp] = useState(false);
-    console.log(serviceList);
-    console.log('Languages: ' + currentLanguage);
-    console.log('language: ' + i18n.language);
 
     useEffect(() => {
         // Function for handling clicks outside of an open dropdown menu

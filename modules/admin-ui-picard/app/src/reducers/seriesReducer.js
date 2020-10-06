@@ -36,8 +36,6 @@ const series = (state=initialState, action) => {
         }
         case LOAD_SERIES_SUCCESS: {
             const { series } = payload;
-            console.log("Series in Reducer: ");
-            console.log(series);
             return {
                 ...state,
                 isLoading: false,

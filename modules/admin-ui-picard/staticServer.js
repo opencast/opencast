@@ -1,6 +1,5 @@
 const path = require("path");
 const express = require("express");
-const bodyParser = require('body-parser');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -45,6 +44,24 @@ app.use(
 app.use(
     "/workflow",
     express.static(path.join(__dirname, "test/app/GET/workflow"))
+);
+app.use("/app/styles",
+    express.static(path.join(__dirname, "app/src/styles"))
+);
+app.use("/i18n",
+    express.static(path.join(__dirname, "test/app/GET/i18n"))
+);
+app.use("/public",
+    express.static(path.join(__dirname, "app/public"))
+);
+app.use("/modules",
+    express.static(path.join(__dirname, "app/src/components"))
+);
+app.use("/shared",
+    express.static(path.join(__dirname, "app/src/components"))
+);
+app.use("/img",
+    express.static(path.join(__dirname, "app/src/img"))
 );
 
 app.listen(port, () => console.log(`Listing on port ${port}`));

@@ -61,17 +61,11 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
         loadResource();
         loadResourceIntoTable();
 
-
-        console.log("remove filters");
-        console.log(filterMap);
     }
 
     // Remove a certain filter
     const removeFilter = filter => {
-        console.log("filter to be removed:");
-        console.log(filter);
         editFilterValue(filter.name, "");
-        console.log("remove certain filter");
 
         // Reload resources when filter is removed
         loadResource();
@@ -96,7 +90,6 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
         if(itemName === "secondFilter") {
             let filter = filterMap.find(({ name }) => name === selectedFilter);
             editFilterValue(filter.name, itemValue);
-            console.log(filterMap);
             setFilterSelector(false);
             removeSelectedFilter();
             removeSecondFilter();
@@ -125,8 +118,6 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
         editFilterValue(filter.name, startDate.toISOString());
         setFilterSelector(false);
         removeSelectedFilter();
-        console.log(startDate);
-
     };
 
 

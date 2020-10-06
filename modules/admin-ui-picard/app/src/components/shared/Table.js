@@ -47,9 +47,7 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
     const [showPageSizes, setShowPageSizes] = useState(false);
 
     const {resources, requestSort, sortConfig } = useSortRows(table.rows);
-    
-    console.log(templateMap);
-    console.log(table.rows);
+
 
     useEffect(() => {
         // Function for handling clicks outside of an open dropdown menu

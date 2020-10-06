@@ -1,5 +1,5 @@
 import React from "react";
-import {useTranslation, withTranslation} from "react-i18next";
+import {useTranslation} from "react-i18next";
 
 import eventIcon from '../../img/events.png';
 import recordingIcon from '../../img/recordings.png';

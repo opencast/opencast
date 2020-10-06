@@ -104,7 +104,6 @@ const table = (state=initialState, action) => {
             }
         }
         case SELECT_ALL: {
-            console.log("SELECT_ALL");
            return {
                ...state,
                rows: state.rows.map(row => {
@@ -116,7 +115,6 @@ const table = (state=initialState, action) => {
            }
         }
         case DESELECT_ALL: {
-            console.log("DESELECT_ALL");
             return {
                 ...state,
                 rows: state.rows.map(row => {

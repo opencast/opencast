@@ -6,8 +6,6 @@ export const fetchEvents = () => async (dispatch, getState) => {
     try {
         dispatch(loadEventsInProgress());
 
-        console.log('Filters in event thunk: ');
-
         const state = getState();
 
         // Todo: Check if empty values problem when using proxy backend
@@ -29,15 +27,31 @@ export const fetchEvents = () => async (dispatch, getState) => {
         // Get sorting from state if sort flag is true
         let sortBy = getTableSorting(state);
         let direction = getTableDirection(state);
+        let sort = sortBy + ':' + direction;
 
 
         // Get page info needed for fetching events from state
         let pageLimit = getPageLimit(state);
         let offset = getPageOffset(state);
 
+        let data;
 
-        //admin-ng/event/events.json?filter={filter}&sort={sort}&limit=0&offset=0
-        const data = await fetch(`admin-ng/event/events.json?filter=${filters}&sort=${sortBy}:${direction}&limit=${pageLimit}&offset=${offset}`);
+        if (typeof filters == "undefined") {
+            //admin-ng/event/events.json?filter={filter}&sort={sort}&limit=0&offset=0
+            data = await fetch('admin-ng/event/events.json?' + new URLSearchParams({
+                sort: sort,
+                limit: pageLimit,
+                offset: offset
+            }));
+        } else {
+            //admin-ng/event/events.json?filter={filter}&sort={sort}&limit=0&offset=0
+            data = await fetch('admin-ng/event/events.json?' + new URLSearchParams({
+                filter: filters,
+                sort: sort,
+                limit: pageLimit,
+                offset: offset
+            }));
+        }
 
         const response =  await data.json();
 
