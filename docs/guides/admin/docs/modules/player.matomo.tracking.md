@@ -68,12 +68,12 @@ Tracked Data
 Additional to the event data that can be turned on for each event (see above), this Opencast specific data is tracked
 if tracking is allowed:
 
-* Page name as "<title of the event> - <lecturer name>"
+* Page name as `<title of the event> - <lecturer name>`
 * Custom Matomo variables:
-    * "event" as "<title of the event> (<event id>)"
-    * "series" as "<title of the series> (<series id>)"
+    * "event" as `<title of the event> (<event id>)`
+    * "series" as `<title of the series> (<series id>)`
     * "presenter"
-    * "view_mode" which can be "desktop", "mobile" or "embed"
+    * "view_mode" which can be `desktop`, `mobile` or `embed`
 
 Heartbeat data does not show how long a video has been played but how long a viewer remained on the page, while the page
 was in the foreground.
