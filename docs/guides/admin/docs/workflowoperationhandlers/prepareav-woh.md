@@ -11,7 +11,7 @@ If it there is one track with a certain flavor, the "encode" method is called wh
 using the same container and codec (-vcodec copy, -a codec copy), while the container format is determined by ffmpeg via
 the file's extension. The reason for doing this is that many media files are in a poor state with regard to their
 compatibility (most often, the stream's codec contains differing information from the container), so we are basically
-asking ffmepg to rewrite the whole thing, which will in many cases eliminate problems that would otherwise occur later
+asking FFmepg to rewrite the whole thing, which will in many cases eliminate problems that would otherwise occur later
 in the pipeline (encoding to flash, mjpeg etc.).
 
 ## Parameter Table
@@ -81,6 +81,5 @@ In this example, the PrepareAVWorkflowOperation would perform the following step
 3. Search tracks of flavor presentation/*
 4. Search tracks of flavor presenter/audio (?/audio)
 5. Search tracks of flavor \*/\*
-
 
 
