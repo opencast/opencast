@@ -93,7 +93,16 @@ public class WorkflowConditionInterpreterTest {
     assertFalse(WorkflowConditionInterpreter.interpret("1*4 < 3"));
   }
 
- @Test
+  @Test
+  public void interpretDecimalLessThan() {
+    assertTrue(WorkflowConditionInterpreter.interpret("485.0 > 50"));
+  }
+
+  @Test
+  public void interpretDecimalEquality() {
+    assertTrue(WorkflowConditionInterpreter.interpret("5.0 == 5"));
+
+  @Test
   public void interpretNumericalScientificNotationGreaterThan() {
     assertTrue(WorkflowConditionInterpreter.interpret("1.0153122E7 > 50"));
   }
