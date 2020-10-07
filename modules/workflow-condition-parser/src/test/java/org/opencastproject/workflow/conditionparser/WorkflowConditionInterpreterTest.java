@@ -92,4 +92,9 @@ public class WorkflowConditionInterpreterTest {
   public void interpretNumericalLessThanWithMultiplication() {
     assertFalse(WorkflowConditionInterpreter.interpret("1*4 < 3"));
   }
+
+ @Test
+  public void interpretNumericalScientificNotationGreaterThan() {
+    assertTrue(WorkflowConditionInterpreter.interpret("1.0153122E7 > 50"));
+  }
 }
