@@ -123,7 +123,7 @@ As specified in the guide, make sure you replace the default ActiveMQ configurat
 `docs/scripts/activemq/activemq.xml`. If you installed ActiveMQ using homebrew, you can find the installation path with
 `brew info activemq`. The configuration is probably located in `/usr/local/Cellar/activemq/<version>/libexec/conf/`.
 
-ffprobe is used to analyse new videos. It is installed with ffmpeg but usually not on the path to be automatically
+ffprobe is used to analyze new videos. It is installed with ffmpeg but usually not on the path to be automatically
 executed. You have to link the ffprobe to `/usr/local/bin/`. You can find the ffmpeg install directory with
 `brew info ffmpeg`. Usually you would link the file with
 `ln -s /usr/local/Cellar/ffmpeg/<version>/bin/ffprobe /usr/local/bin/ffprobe`.

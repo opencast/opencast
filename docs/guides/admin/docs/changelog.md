@@ -658,6 +658,33 @@ Preliminary changelog as of 2020-09-08
 Opencast 8
 ----------
 
+### Opencast 8.7
+
+*Released on September 27th, 2020*
+
+- [[#1851](https://github.com/opencast/opencast/pull/1851)] -
+  Fix conflict checking for scheduled events in multitenant systems
+- [[#1848](https://github.com/opencast/opencast/pull/1848)] -
+  Fix capture agent dropdown menus
+- [[#1837](https://github.com/opencast/opencast/pull/1837)] -
+  Adding bugfix from #1668 to 8.x
+- [[#1828](https://github.com/opencast/opencast/pull/1828)] -
+  Recommend https
+- [[#1827](https://github.com/opencast/opencast/pull/1827)] -
+  Clean up basic configuration
+- [[#1812](https://github.com/opencast/opencast/pull/1812)] -
+  Missing ACL after asset upload
+- [[#1786](https://github.com/opencast/opencast/pull/1786)] -
+  Removed servicewarnings endpoint
+- [[#1770](https://github.com/opencast/opencast/pull/1770)] -
+  Paella player should only list http(s) URLs in the download plugin
+- [[#1756](https://github.com/opencast/opencast/pull/1756)] -
+  Change markdown CI checks to bash
+- [[#1753](https://github.com/opencast/opencast/pull/1753)] -
+  Admin interface event API logs on user error
+- [[#1735](https://github.com/opencast/opencast/pull/1735)] -
+  Added reloading of filters in users page
+
 ### Opencast 8.6
 
 *Released on August 5th, 2020*
@@ -4142,7 +4169,7 @@ Opencast 2.2.x
 - [[MH-11550]](https://opencast.jira.com/browse/MH-11550) - Update Migration documentation 2.1 to 2.2
 - [[MH-11554]](https://opencast.jira.com/browse/MH-11554) - Filtering does not work on Systems-&gt;Jobs,
   Systems-&gt;Servers and Systems-&gt;Services
-- [[MH-11555]](https://opencast.jira.com/browse/MH-11555) - Localisation of Recordings-&gt;Events and
+- [[MH-11555]](https://opencast.jira.com/browse/MH-11555) - Localization of Recordings-&gt;Events and
   Recordings-&gt;Series buggy
 - [[MH-11556]](https://opencast.jira.com/browse/MH-11556) - Failed test: Filter locations (T1733, Filter by status does
   not work)

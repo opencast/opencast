@@ -73,10 +73,13 @@ because of the Opencast roles which they have. The Opencast LTI module grants an
 from the LTI parameters `context_id` and `roles`.
 
 The LTI context is typically the LMS course ID, and the default LTI role for a student in a course is `Learner`.
-The Opencast role granted would therefore be `SITEID_Learner`.
+The Opencast role granted would therefore be `<context-id>_Learner`.
 
 To make a series or video visible to students who access Opencast through LTI in an LMS course,
-add the role `SITEID_Learner` to the Series or Event Access Control List (ACL).
+add the role `<context-id>_Learner` to the series or event access control list (ACL).
+
+An additional prefix for these generated roles may be defined in Opencast's LTI configuration file based on the used
+OAuth consumer. That way, you can distinguish between users from multiple different consumers.
 
 LTI users may also have additional roles if the LTI user is created as an Opencast user in the Admin UI and
 given additional roles, or if one or more Opencast User Providers or Role Providers are configured.

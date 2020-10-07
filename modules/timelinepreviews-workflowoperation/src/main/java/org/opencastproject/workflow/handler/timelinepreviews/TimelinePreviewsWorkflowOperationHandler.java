@@ -152,7 +152,7 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
     for (String tag : asList(sourceTagsProperty)) {
       trackSelector.addTag(tag);
     }
-    Collection<Track> sourceTracks = trackSelector.select(mediaPackage, false);
+    Collection<Track> sourceTracks = trackSelector.select(mediaPackage, true);
     if (sourceTracks.isEmpty()) {
       logger.info("No tracks found in mediapackage {} with specified {} {}", mediaPackage.getIdentifier().toString(),
               SOURCE_FLAVOR_PROPERTY,

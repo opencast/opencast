@@ -48,7 +48,7 @@ Multiple audio tracks
 ---------------------
 
 An event can have multiple audio tracks. Paella only plays one at a time, but you can configure paella 
-to allow the user to decide which one to play. 
+to allow the user to decide which one to play. These tracks need to be m4a files.
 
 You need to configure the `audioTag` property. It is an object where the *key* is the flavor to configure
 and the *value* is the label that will be shown in the player interface.

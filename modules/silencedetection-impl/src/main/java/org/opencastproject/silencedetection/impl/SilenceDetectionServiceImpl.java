@@ -44,9 +44,13 @@ import org.opencastproject.util.LoadUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +64,14 @@ import java.util.Properties;
 /**
  * Implementation of SilenceDetectionService using FFmpeg.
  */
-public class SilenceDetectionServiceImpl extends AbstractJobProducer implements SilenceDetectionService, ManagedService {
+@Component(
+  property = {
+    "service.description=Silence Detection Service"
+  },
+  immediate = true,
+  service = SilenceDetectionService.class
+)
+public class SilenceDetectionServiceImpl extends AbstractJobProducer implements SilenceDetectionService {
 
   /**
    * The logging instance
@@ -215,7 +226,7 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
    */
   protected Smil generateSmil(MediaSegments segments, List<Track> referenceTracks) throws SmilException {
     SmilResponse smilResponse = smilService.createNewSmil();
-    Track[] referenceTracksArr = referenceTracks.toArray(new Track[referenceTracks.size()]);
+    Track[] referenceTracksArr = referenceTracks.toArray(new Track[0]);
 
     for (MediaSegment segment : segments.getMediaSegments()) {
       smilResponse = smilService.addParallel(smilResponse.getSmil());
@@ -247,28 +258,23 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
     return organizationDirectoryService;
   }
 
-  @Override
-  public void activate(ComponentContext context) {
-    logger.debug("activating...");
+  @Activate
+  @Modified
+  public void activate(BundleContext bundleContext, ComponentContext context) {
+    logger.debug("Loading configuration");
     super.activate(context);
-    FFmpegSilenceDetector.init(context.getBundleContext());
-  }
 
-  protected void deactivate(ComponentContext context) {
-    logger.debug("deactivating...");
-  }
-
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     this.properties = new Properties();
-    if (properties == null) {
+    if (bundleContext == null) {
       logger.info("No configuration available, using defaults");
       return;
     }
-
+    FFmpegSilenceDetector.init(bundleContext);
+    Dictionary<String, Object> properties = context.getProperties();
     Enumeration<String> keys = properties.keys();
     while (keys.hasMoreElements()) {
-      String key = keys.nextElement();
+      final String key = keys.nextElement();
+      logger.debug("{} = {}", key, properties.get(key));
       this.properties.put(key, properties.get(key));
     }
     logger.debug("Properties updated!");
@@ -276,26 +282,37 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
     jobload = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_KEY, DEFAULT_JOB_LOAD, serviceRegistry);
   }
 
+  @Deactivate
+  protected void deactivate(ComponentContext context) {
+    logger.debug("deactivating...");
+  }
+
+  @Reference
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
 
+  @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
 
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
 
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  @Reference
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }

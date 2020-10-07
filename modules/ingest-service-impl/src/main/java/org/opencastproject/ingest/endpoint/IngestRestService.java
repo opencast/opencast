@@ -71,6 +71,9 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,6 +121,16 @@ import javax.ws.rs.core.Response.Status;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                 + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+  immediate = true,
+  service = IngestRestService.class,
+  property = {
+    "service.description=Ingest REST Endpoint",
+    "opencast.service.type=org.opencastproject.ingest",
+    "opencast.service.path=/ingest",
+    "opencast.service.jobproducer=true"
+  }
+)
 public class IngestRestService extends AbstractJobProducerEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(IngestRestService.class);
@@ -141,7 +154,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   private TrustedHttpClient httpClient;
 
   /** Dublin Core Terms: http://purl.org/dc/terms/ */
-  private static List<String> dcterms = Arrays.asList("abstract", "accessRights", "accrualMethod",
+  private static final List<String> dcterms = Arrays.asList("abstract", "accessRights", "accrualMethod",
           "accrualPeriodicity", "accrualPolicy", "alternative", "audience", "available", "bibliographicCitation",
           "conformsTo", "contributor", "coverage", "created", "creator", "date", "dateAccepted", "dateCopyrighted",
           "dateSubmitted", "description", "educationLevel", "extent", "format", "hasFormat", "hasPart", "hasVersion",
@@ -150,21 +163,19 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           "provenance", "publisher", "references", "relation", "replaces", "requires", "rights", "rightsHolder",
           "source", "spatial", "subject", "tableOfContents", "temporal", "title", "type", "valid");
 
-  private MediaPackageBuilderFactory factory = null;
+  /** Formatter to for the date into a string */
+  private static final DateFormat DATE_FORMAT = new SimpleDateFormat(IngestService.UTC_DATE_FORMAT);
+
+  /** Media package builder factory */
+  private static final MediaPackageBuilderFactory MP_FACTORY = MediaPackageBuilderFactory.newInstance();
+
   private IngestService ingestService = null;
   private ServiceRegistry serviceRegistry = null;
   private DublinCoreCatalogService dublinCoreService;
   // The number of ingests this service can handle concurrently.
   private int ingestLimit = -1;
   /* Stores a map workflow ID and date to update the ingest start times post-hoc */
-  private Cache<String, Date> startCache = null;
-  /* Formatter to for the date into a string */
-  private DateFormat formatter = new SimpleDateFormat(IngestService.UTC_DATE_FORMAT);
-
-  public IngestRestService() {
-    factory = MediaPackageBuilderFactory.newInstance();
-    startCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.DAYS).build();
-  }
+  private final Cache<String, Date> startCache = CacheBuilder.newBuilder().expireAfterAccess(1, TimeUnit.DAYS).build();
 
   /**
    * Returns the maximum number of concurrent ingest operations or <code>-1</code> if no limit is enforced.
@@ -198,6 +209,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   /**
    * Callback for activation of this component.
    */
+  @Activate
   public void activate(ComponentContext cc) {
     if (cc != null) {
       defaultWorkflowDefinitionId = trimToNull(cc.getBundleContext().getProperty(DEFAULT_WORKFLOW_DEFINITION));
@@ -266,7 +278,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   public Response discardMediaPackage(@FormParam("mediaPackage") String mpx) {
     logger.debug("discardMediaPackage(MediaPackage): {}", mpx);
     try {
-      MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
+      MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
       ingestService.discardMediaPackage(mp);
       return Response.ok().build();
     } catch (Exception e) {
@@ -290,7 +302,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @FormParam("mediaPackage") String mpx) {
     logger.trace("add media package from url: {} flavor: {} tags: {} mediaPackage: {}", url, flavor, tags, mpx);
     try {
-      MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
+      MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
         return Response.serverError().status(Status.BAD_REQUEST).build();
       String[] tagsArray = null;
@@ -343,7 +355,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     logger.trace("add partial track with url: {} flavor: {} startTime: {} mediaPackage: {}",
             url, flavor, startTime, mpx);
     try {
-      MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
+      MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
         return Response.serverError().status(Status.BAD_REQUEST).build();
 
@@ -385,7 +397,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @FormParam("mediaPackage") String mpx) {
     logger.trace("add catalog with url: {} flavor: {} mediaPackage: {}", url, flavor, mpx);
     try {
-      MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
+      MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
         return Response.serverError().status(Status.BAD_REQUEST).build();
       MediaPackage resultingMediaPackage = ingestService.addCatalog(new URI(url),
@@ -426,7 +438,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @FormParam("mediaPackage") String mpx) {
     logger.trace("add attachment with url: {} flavor: {} mediaPackage: {}", url, flavor, mpx);
     try {
-      MediaPackage mp = factory.newMediaPackageBuilder().loadFromXml(mpx);
+      MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
       if (MediaPackageSupport.sanityCheck(mp).isSome())
         return Response.serverError().status(Status.BAD_REQUEST).build();
       mp = ingestService.addAttachment(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), mp);
@@ -490,7 +502,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             try {
               String mediaPackageString = Streams.asString(item.openStream(), "UTF-8");
               logger.trace("mediaPackage: {}", mediaPackageString);
-              mp = factory.newMediaPackageBuilder().loadFromXml(mediaPackageString);
+              mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mediaPackageString);
             } catch (MediaPackageException e) {
               logger.debug("Unable to parse the 'mediaPackage' parameter: {}", ExceptionUtils.getMessage(e));
               return Response.serverError().status(Status.BAD_REQUEST).build();
@@ -1110,7 +1122,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
     final MediaPackage mp;
     try {
-      mp = factory.newMediaPackageBuilder().loadFromXml(formData.getFirst("mediaPackage"));
+      mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(formData.getFirst("mediaPackage"));
       if (MediaPackageSupport.sanityCheck(mp).isSome()) {
         logger.warn("Rejected ingest with invalid mediapackage {}", mp);
         return Response.status(Status.BAD_REQUEST).build();
@@ -1124,7 +1136,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     final String workflowDefinition = wfConfig.get(WORKFLOW_DEFINITION_ID_PARAM);
 
     // Adding ingest start time to workflow configuration
-    wfConfig.put(IngestService.START_DATE_KEY, formatter.format(startCache.asMap().get(mp.getIdentifier().toString())));
+    wfConfig.put(IngestService.START_DATE_KEY, DATE_FORMAT.format(startCache.asMap().get(mp.getIdentifier().toString())));
 
     final X<WorkflowInstance> ingest = new X<WorkflowInstance>() {
       @Override
@@ -1203,7 +1215,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
     MediaPackage mp = null;
     try {
-      mp = factory.newMediaPackageBuilder().loadFromXml(mediaPackageXml);
+      mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mediaPackageXml);
       if (MediaPackageSupport.sanityCheck(mp).isSome()) {
         throw new MediaPackageException("Insane media package");
       }
@@ -1312,6 +1324,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
    * @param ingestService
    *          the ingest service
    */
+  @Reference
   void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
@@ -1322,6 +1335,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -1332,6 +1346,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
    * @param dcService
    *          the dublin core service
    */
+  @Reference
   void setDublinCoreService(DublinCoreCatalogService dcService) {
     this.dublinCoreService = dcService;
   }
@@ -1342,6 +1357,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
    * @param httpClient
    *          the http client
    */
+  @Reference
   public void setHttpClient(TrustedHttpClient httpClient) {
     this.httpClient = httpClient;
   }

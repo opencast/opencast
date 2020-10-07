@@ -17,9 +17,8 @@ The preferred way to let your users access Studio is via LTI. Remember to config
 
 ## Configuring Studio
 
-Studio is pre-configured via `etc/ui-config/mh_default_org/studio/settings.json`. You can modify that file to change the configuration, but note that you probably don't want to touch `opencast.serverUrl` and `opencast.loginProvided`. For information on possible configuration values, please see [`CONFIGURATION.md` in the Studio repository](https://github.com/elan-ev/opencast-studio/blob/master/CONFIGURATION.md).
+Studio is pre-configured via `etc/ui-config/mh_default_org/studio/settings.toml`. You can modify that file to change the configuration, but note that you probably don't want to touch `opencast.serverUrl` and `opencast.loginProvided`. For information on possible configuration values, please see [`CONFIGURATION.md` in the Studio repository](https://github.com/elan-ev/opencast-studio/blob/master/CONFIGURATION.md).
 
-If you want to pre-configure the ACL that is sent by studio, place a file `acl.xml` in `etc/ui-config/mh_default_org/studio/` and set `upload.acl` in `settings.json` to `/ui/config/studio/acl.xml`.
 
 ## Workflow requirements
 
@@ -36,4 +35,4 @@ Finally, here are some other oddities and details of videos produced by browsers
 
 - Most browsers will default to VP8 as video codec, OPUS as audio codec and WEBM (or the superset MKV) as container.
 - Desktop capture seem to happen with 30fps in Chrome and Firefox (tested on a 60hz monitor).
-- In some cases, Firefox encodes all frames as key-frames, which – given the fixed bitrate – oftne results in a fairly low quality video.
+- In some cases, Firefox encodes all frames as key-frames, which – given the fixed bitrate – often results in a fairly low quality video.

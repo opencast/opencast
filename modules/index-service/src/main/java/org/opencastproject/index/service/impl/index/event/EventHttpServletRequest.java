@@ -20,7 +20,6 @@
  */
 package org.opencastproject.index.service.impl.index.event;
 
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.util.RequestUtils;
 import org.opencastproject.ingest.api.IngestException;
@@ -30,9 +29,11 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.NotFoundException;
@@ -151,8 +152,8 @@ public class EventHttpServletRequest {
           HttpServletRequest request,
           IngestService ingestService,
           List<EventCatalogUIAdapter> eventCatalogUIAdapters,
-          Opt<String> startDatePattern,
-          Opt<String> startTimePattern)
+          String startDatePattern,
+          String startTimePattern)
                   throws IndexServiceException {
     EventHttpServletRequest eventHttpServletRequest = new EventHttpServletRequest();
     try {
@@ -239,8 +240,8 @@ public class EventHttpServletRequest {
                                    EventHttpServletRequest eventHttpServletRequest,
                                    FileItemStream item,
                                    String fieldName,
-                                   Opt<String> startDatePattern,
-                                   Opt<String> startTimePattern)
+                                   String startDatePattern,
+                                   String startTimePattern)
                   throws IOException, NotFoundException {
     if (METADATA_JSON_KEY.equals(fieldName)) {
       String metadata = Streams.asString(item.openStream());
@@ -320,8 +321,8 @@ public class EventHttpServletRequest {
           Event event,
           HttpServletRequest request,
           List<EventCatalogUIAdapter> eventCatalogUIAdapters,
-          Opt<String> startDatePattern,
-          Opt<String> startTimePattern)
+          String startDatePattern,
+          String startTimePattern)
                   throws IllegalArgumentException, IndexServiceException, NotFoundException {
     EventHttpServletRequest eventHttpServletRequest = new EventHttpServletRequest();
     if (ServletFileUpload.isMultipartContent(request)) {
@@ -399,7 +400,11 @@ public class EventHttpServletRequest {
    * @throws NotFoundException
    *           Thrown if unable to find the catalog or field that the json refers to.
    */
-  protected static MetadataList deserializeMetadataList(String json, List<EventCatalogUIAdapter> catalogAdapters, Opt<String> startDatePattern, Opt<String> startTimePattern)
+  protected static MetadataList deserializeMetadataList(
+          String json,
+          List<EventCatalogUIAdapter> catalogAdapters,
+          String startDatePattern,
+          String startTimePattern)
           throws ParseException, NotFoundException, java.text.ParseException {
     MetadataList metadataList = new MetadataList();
     JSONParser parser = new JSONParser();
@@ -413,7 +418,7 @@ public class EventHttpServletRequest {
       String flavorString = catalog.get("flavor").toString();
       MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
 
-      MetadataCollection collection = null;
+      DublinCoreMetadataCollection collection = null;
       EventCatalogUIAdapter adapter = null;
       for (EventCatalogUIAdapter eventCatalogUIAdapter : catalogAdapters) {
         if (eventCatalogUIAdapter.getFlavor().equals(flavor)) {
@@ -433,7 +438,7 @@ public class EventHttpServletRequest {
         for (String key : fields.keySet()) {
           if ("subjects".equals(key)) {
             // Handle the special case of allowing subjects to be an array.
-            MetadataField<?> field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
+            MetadataField field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id 'subject' from Catalog with Flavor '%s'.", flavorString));
@@ -441,40 +446,40 @@ public class EventHttpServletRequest {
             collection.removeField(field);
             try {
               JSONArray subjects = (JSONArray) parser.parse(fields.get(key));
-              collection.addField(
-                      MetadataField.copyMetadataFieldWithValue(field, StringUtils.join(subjects.iterator(), ",")));
+              collection.addField(MetadataJson
+                      .copyWithDifferentJsonValue(field, StringUtils.join(subjects.iterator(), ",")));
             } catch (ParseException e) {
               throw new IllegalArgumentException(
                       String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
             }
           } else if ("startDate".equals(key)) {
             // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
-            MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get(key);
+            MetadataField field = collection.getOutputFields().get(key);
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
             }
-            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startDatePattern.getOr(field.getPattern().get()));
-            SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
+            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startDatePattern == null ? field.getPattern() : startDatePattern);
+            SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
             DateTime newStartDate = new DateTime(apiSdf.parse(fields.get(key)), DateTimeZone.UTC);
-            if (field.getValue().isSome()) {
-              DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+            if (field.getValue() != null) {
+              DateTime oldStartDate = new DateTime(sdf.parse((String) field.getValue()), DateTimeZone.UTC);
               newStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(), newStartDate.dayOfMonth().get());
             }
             collection.removeField(field);
-            collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(newStartDate.toDate())));
+            collection.addField(MetadataJson.copyWithDifferentJsonValue(field, sdf.format(newStartDate.toDate())));
           } else if ("startTime".equals(key)) {
             // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
-            MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get("startDate");
+            MetadataField field = collection.getOutputFields().get("startDate");
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", "startDate", flavorString));
             }
-            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startTimePattern.getOr("HH:mm"));
-            SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
+            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startTimePattern == null ? "HH:mm" : startTimePattern);
+            SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
             DateTime newStartDate = new DateTime(apiSdf.parse(fields.get(key)), DateTimeZone.UTC);
-            if (field.getValue().isSome()) {
-              DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+            if (field.getValue() != null) {
+              DateTime oldStartDate = new DateTime(sdf.parse((String) field.getValue()), DateTimeZone.UTC);
               newStartDate = oldStartDate.withTime(
                       newStartDate.hourOfDay().get(),
                       newStartDate.minuteOfHour().get(),
@@ -482,15 +487,15 @@ public class EventHttpServletRequest {
                       newStartDate.millisOfSecond().get());
             }
             collection.removeField(field);
-            collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(newStartDate.toDate())));
+            collection.addField(MetadataJson.copyWithDifferentJsonValue(field, sdf.format(newStartDate.toDate())));
           } else {
-            MetadataField<?> field = collection.getOutputFields().get(key);
+            MetadataField field = collection.getOutputFields().get(key);
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
             }
             collection.removeField(field);
-            collection.addField(MetadataField.copyMetadataFieldWithValue(field, fields.get(key)));
+            collection.addField(MetadataJson.copyWithDifferentJsonValue(field, fields.get(key)));
           }
         }
       }
@@ -507,18 +512,16 @@ public class EventHttpServletRequest {
    *          The metadata list created from the json request to create a new event
    */
   private static void setStartDateAndTimeIfUnset(MetadataList metadataList) {
-    Opt<MetadataCollection> optCommonEventCollection = metadataList
+    final DublinCoreMetadataCollection commonEventCollection = metadataList
             .getMetadataByFlavor(MediaPackageElements.EPISODE.toString());
-    if (optCommonEventCollection.isSome()) {
-      MetadataCollection commonEventCollection = optCommonEventCollection.get();
-
-      MetadataField<?> startDate = commonEventCollection.getOutputFields().get("startDate");
+    if (commonEventCollection != null) {
+      MetadataField startDate = commonEventCollection.getOutputFields().get("startDate");
       if (!startDate.isUpdated()) {
-        SimpleDateFormat utcDateFormat = new SimpleDateFormat(startDate.getPattern().get());
+        SimpleDateFormat utcDateFormat = new SimpleDateFormat(startDate.getPattern());
         utcDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         String currentDate = utcDateFormat.format(new DateTime(DateTimeZone.UTC).toDate());
         commonEventCollection.removeField(startDate);
-        commonEventCollection.addField(MetadataField.copyMetadataFieldWithValue(startDate, currentDate));
+        commonEventCollection.addField(MetadataJson.copyWithDifferentJsonValue(startDate, currentDate));
       }
     }
   }

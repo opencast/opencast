@@ -31,6 +31,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +53,14 @@ import javax.ws.rs.core.Response;
   title = "Configurable Player Endpoint",
   abstractText = "This service redirects to configured players.",
   notes = {})
+@Component(
+  immediate = true,
+  service = PlayerRedirect.class,
+  property = {
+    "service.description=Configurable Player Endpoint",
+    "opencast.service.type=org.opencastproject.engage.ui.player.redirect",
+    "opencast.service.path=/play"
+  })
 public class PlayerRedirect {
 
   private static final Logger logger = LoggerFactory.getLogger(PlayerRedirect.class);
@@ -59,6 +69,7 @@ public class PlayerRedirect {
 
   private SecurityService securityService;
 
+  @Reference
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

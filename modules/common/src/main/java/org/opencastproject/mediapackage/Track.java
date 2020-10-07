@@ -38,7 +38,7 @@ public interface Track extends MediaPackageElement {
   Type TYPE = Type.Track;
 
   /**
-   * Return the streams that make up the track. Tracks consist of at least one stream.
+   * @return the streams that make up the track. Tracks consist of at least one stream.
    */
   Stream[] getStreams();
 
@@ -76,4 +76,39 @@ public interface Track extends MediaPackageElement {
    * @return true if live track; false otherwise
    */
   boolean isLive();
+
+  /**
+   * Returns <code>true</code> if the track is a master playlist (play this over other tracks).
+   *
+   * @return true if it is a master playlist track; false otherwise
+   */
+  Boolean isMaster();
+
+  /**
+   * @return true if master playlist value is not null
+   */
+  boolean hasMaster();
+
+  /**
+   * Sets master - it is an adaptive playlist
+   * 
+   * @param master
+   *          if true
+   */
+  void setMaster(Boolean master);
+
+  /**
+   * Returns logical name of the file which persists in spite of file name changes
+   * @return logical name
+   */
+  String getLogicalName();
+
+  /**
+   * Sets logical name of the file which persists in spite of file name changes to maintain referential integrity in the
+   * case of adaptive playlists
+   *
+   * @param name
+   *          as relative to manifest
+   */
+  void setLogicalName(String name);
 }

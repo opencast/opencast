@@ -26,6 +26,7 @@ General Configuration
     - [Moodle User Provider](security.user.moodle.md)
     - [Sakai User Provider](security.user.sakai.md)
     - [Brightspace User Provider](security.user.brightspace.md)
+    - [Canvas LMS User Provider](security.user.canvas.md)
     - [Authentication and Authorization Infrastructure (AAI)](security.aai.md)
     - [Access Control Lists](acl.md)
     - [Stream Security](stream-security.md)

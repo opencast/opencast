@@ -1,6 +1,6 @@
 # Moodle UserDirectoryProvider configuration
 
-# This is an an optional service which is not enabled by default. To enable it,
+# This is an optional service which is not enabled by default. To enable it,
 # edit etc/org.apache.karaf.features.cfg and add opencast-moodle to the featuresBoot option.
 
 # The organization for this provider
@@ -23,3 +23,19 @@ org.opencastproject.userdirectory.moodle.token=mytoken1234abcdef
 #org.opencastproject.userdirectory.moodle.course.pattern=^[0-9]+$
 #org.opencastproject.userdirectory.moodle.user.pattern=^[0-9a-zA-Z_]+$
 #org.opencastproject.userdirectory.moodle.group.pattern=^[0-9]+$
+
+# Setting this to true will convert all username requests to Moodle to lowercase.
+# This can be necessary for mapping since Moodle does not allow for uppercase letters in usernames.
+# Please note that enabling this may have security implications since two different users in Opencast may become the
+# same user in Moodle.
+# Default: false
+#org.opencastproject.userdirectory.moodle.user.lowercase.conversion=false
+
+# Context role and group prefix
+# Defines a prefix to prepend to context roles like “12345_Learner” and the main “ROLE_GROUP_MOODLE”. This can be used
+# to prevent role clashes in case multiple instances of Moodle are connected to Opencast which both could have the exact
+# same course identifier.
+# Effect on context roles: 123_Learner becomes <PREFIX>123_Learner
+# Effect on Moodle group: ROLE_GROUP_MOODLE becomes ROLE_GROUP_<PREFIX>MOODLE
+# Default: No prefix
+#org.opencastproject.userdirectory.moodle.context.role.prefix=

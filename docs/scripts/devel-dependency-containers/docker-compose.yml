@@ -1,0 +1,17 @@
+version: '2'
+services:
+  elasticsearch:
+    container_name: opencast-elasticsearch
+    image: docker.io/library/elasticsearch:7.9.2
+    ports:
+      - 127.0.0.1:9200:9200
+      - 127.0.0.1:9300:9300
+    environment:
+      discovery.type: single-node
+  activemq:
+    container_name: opencast-activemq
+    image: quay.io/lkiesow/activemq
+    ports:
+      - 127.0.0.1:61616:61616
+    volumes:
+      - ../activemq/activemq.xml:/activemq-opencast.tpl.xml:ro

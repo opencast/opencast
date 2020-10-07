@@ -23,10 +23,11 @@ package org.opencastproject.adminui.endpoint;
 
 import static org.junit.Assert.assertThat;
 
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
-import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
+import org.opencastproject.metadata.dublincore.MetadataList.Locked;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.PropertiesUtil;
 
@@ -73,11 +74,11 @@ public class MetadataListTest {
     InputStreamReader reader = new InputStreamReader(stream);
     JSONArray inputJson = (JSONArray) new JSONParser().parse(reader);
 
-    MetadataCollection abstractMetadataCollection = episodeDublinCoreCatalogUIAdapter.getRawFields();
+    DublinCoreMetadataCollection abstractMetadataCollection = episodeDublinCoreCatalogUIAdapter.getRawFields();
 
     MetadataList metadataList = new MetadataList();
     metadataList.add(episodeDublinCoreCatalogUIAdapter, abstractMetadataCollection);
-    metadataList.fromJSON(inputJson.toJSONString());
+    MetadataJson.fillListFromJson(metadataList, inputJson);
   }
 
   @Test
@@ -90,8 +91,9 @@ public class MetadataListTest {
     metadataList.add(episodeDublinCoreCatalogUIAdapter, episodeDublinCoreCatalogUIAdapter.getRawFields());
     metadataList.setLocked(Locked.WORKFLOW_RUNNING);
 
-    assertThat(inputJson.toJSONString(), SameJSONAs.sameJSONAs(new SimpleSerializer().toJson(metadataList.toJSON()))
-            .allowingAnyArrayOrdering());
+    assertThat(inputJson.toJSONString(),
+      SameJSONAs.sameJSONAs(new SimpleSerializer().toJson(MetadataJson.listToJson(metadataList, true)))
+        .allowingAnyArrayOrdering());
   }
 
 }

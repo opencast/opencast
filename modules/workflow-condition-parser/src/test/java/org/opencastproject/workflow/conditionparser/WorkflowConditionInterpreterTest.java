@@ -101,6 +101,7 @@ public class WorkflowConditionInterpreterTest {
   @Test
   public void interpretDecimalEquality() {
     assertTrue(WorkflowConditionInterpreter.interpret("5.0 == 5"));
+  }
 
   @Test
   public void interpretNumericalScientificNotationGreaterThan() {

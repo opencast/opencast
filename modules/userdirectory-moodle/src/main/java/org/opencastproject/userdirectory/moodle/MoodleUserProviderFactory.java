@@ -28,6 +28,7 @@ import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.util.NotFoundException;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -42,6 +43,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Dictionary;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.MalformedObjectNameException;
@@ -62,7 +64,7 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
   private static final Logger logger = LoggerFactory.getLogger(MoodleUserProviderFactory.class);
 
   /**
-   * The key to look up the organization identifer in the service configuration properties
+   * The key to look up the organization identifier in the service configuration properties
    */
   private static final String ORGANIZATION_KEY = "org.opencastproject.userdirectory.moodle.org";
 
@@ -106,6 +108,14 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
    */
   private static final String GROUP_PATTERN_KEY = "org.opencastproject.userdirectory.moodle.group.pattern";
 
+  /** Key specifying if usernames should be converted to lowercase */
+  private static final String LOWERCASE_USERNAME = "org.opencastproject.userdirectory.moodle.user.lowercase.conversion";
+
+  /**
+   * Key for configuring a context role prefix
+   */
+  private static final String CONTEXT_ROLE_PREFIX = "org.opencastproject.userdirectory.moodle.context.role.prefix";
+
   /**
    * The OSGI bundle context
    */
@@ -129,7 +139,7 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
    * @throws NullPointerException
    * @throws MalformedObjectNameException
    */
-  public static final ObjectName getObjectName(String pid) throws MalformedObjectNameException, NullPointerException {
+  public static ObjectName getObjectName(String pid) throws MalformedObjectNameException, NullPointerException {
     return new ObjectName(pid + ":type=MoodleRequests");
   }
 
@@ -189,14 +199,15 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
     if (StringUtils.isBlank(token))
       throw new ConfigurationException(MOODLE_TOKEN_KEY, "is not set");
 
-    boolean groupRoles = false;
-    String groupRolesStr = (String) properties.get(GROUP_ROLES_KEY);
-    if ("true".equals(groupRolesStr))
-      groupRoles = true;
+    final String groupRolesStr = (String) properties.get(GROUP_ROLES_KEY);
+    final boolean groupRoles = BooleanUtils.toBoolean(groupRolesStr);
 
     String coursePattern = (String) properties.get(COURSE_PATTERN_KEY);
     String userPattern = (String) properties.get(USER_PATTERN_KEY);
     String groupPattern = (String) properties.get(GROUP_PATTERN_KEY);
+    final boolean lowercaseUsername = BooleanUtils.toBoolean((String) properties.get(LOWERCASE_USERNAME));
+
+    final String contextRolePrefix = Objects.toString(properties.get(CONTEXT_ROLE_PREFIX), "");
 
     int cacheSize = 1000;
     try {
@@ -229,7 +240,8 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
 
     logger.debug("creating new MoodleUserProviderInstance for pid=" + pid);
     MoodleUserProviderInstance provider = new MoodleUserProviderInstance(pid, new MoodleWebServiceImpl(url, token), org,
-            coursePattern, userPattern, groupPattern, groupRoles, cacheSize, cacheExpiration, adminUserName);
+        coursePattern, userPattern, groupPattern, groupRoles, cacheSize, cacheExpiration, adminUserName,
+        lowercaseUsername, contextRolePrefix);
 
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
     providerRegistrations.put(pid, bundleContext.registerService(RoleProvider.class.getName(), provider, null));

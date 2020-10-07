@@ -57,7 +57,6 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.index.service.api.IndexService;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
@@ -75,8 +74,10 @@ import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.security.api.AccessControlList;
@@ -298,13 +299,13 @@ public class SeriesEndpoint implements ManagedService {
     List<SeriesCatalogUIAdapter> catalogUIAdapters = indexService.getSeriesCatalogUIAdapters();
     catalogUIAdapters.remove(indexService.getCommonSeriesCatalogUIAdapter());
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
-      final Opt<MetadataCollection> optSeriesMetadata = adapter.getFields(series);
+      final Opt<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(series);
       if (optSeriesMetadata.isSome()) {
         metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), optSeriesMetadata.get());
       }
     }
     metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), getSeriesMetadata(optSeries.get()));
-    return okJson(metadataList.toJSON());
+    return okJson(MetadataJson.listToJson(metadataList, true));
   }
 
   /**
@@ -312,76 +313,88 @@ public class SeriesEndpoint implements ManagedService {
    *
    * @param series
    *          the source {@link Series}
-   * @return a {@link MetadataCollection} instance with all the series metadata
+   * @return a {@link DublinCoreMetadataCollection} instance with all the series metadata
    */
-  @SuppressWarnings("unchecked")
-  private MetadataCollection getSeriesMetadata(Series series) {
-    MetadataCollection metadata = indexService.getCommonSeriesCatalogUIAdapter().getRawFields();
+  private DublinCoreMetadataCollection getSeriesMetadata(Series series) {
+    DublinCoreMetadataCollection metadata = indexService.getCommonSeriesCatalogUIAdapter().getRawFields();
 
-    MetadataField<?> title = metadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
+    MetadataField title = metadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
     metadata.removeField(title);
-    MetadataField<String> newTitle = new MetadataField(title);
+    MetadataField newTitle = new MetadataField(title);
     newTitle.setValue(series.getTitle());
     metadata.addField(newTitle);
 
-    MetadataField<?> subject = metadata.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
+    MetadataField subject = metadata.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     metadata.removeField(subject);
-    MetadataField<String> newSubject = new MetadataField(subject);
+    MetadataField newSubject = new MetadataField(subject);
     newSubject.setValue(series.getSubject());
     metadata.addField(newSubject);
 
-    MetadataField<?> description = metadata.getOutputFields().get(DublinCore.PROPERTY_DESCRIPTION.getLocalName());
+    MetadataField description = metadata.getOutputFields().get(DublinCore.PROPERTY_DESCRIPTION.getLocalName());
     metadata.removeField(description);
-    MetadataField<String> newDescription = new MetadataField(description);
+    MetadataField newDescription = new MetadataField(description);
     newDescription.setValue(series.getDescription());
     metadata.addField(newDescription);
 
-    MetadataField<?> language = metadata.getOutputFields().get(DublinCore.PROPERTY_LANGUAGE.getLocalName());
+    MetadataField language = metadata.getOutputFields().get(DublinCore.PROPERTY_LANGUAGE.getLocalName());
     metadata.removeField(language);
-    MetadataField<String> newLanguage = new MetadataField(language);
+    MetadataField newLanguage = new MetadataField(language);
     newLanguage.setValue(series.getLanguage());
     metadata.addField(newLanguage);
 
-    MetadataField<?> rightsHolder = metadata.getOutputFields().get(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName());
+    MetadataField rightsHolder = metadata.getOutputFields().get(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName());
     metadata.removeField(rightsHolder);
-    MetadataField<String> newRightsHolder = new MetadataField(rightsHolder);
+    MetadataField newRightsHolder = new MetadataField(rightsHolder);
     newRightsHolder.setValue(series.getRightsHolder());
     metadata.addField(newRightsHolder);
 
-    MetadataField<?> license = metadata.getOutputFields().get(DublinCore.PROPERTY_LICENSE.getLocalName());
+    MetadataField license = metadata.getOutputFields().get(DublinCore.PROPERTY_LICENSE.getLocalName());
     metadata.removeField(license);
-    MetadataField<String> newLicense = new MetadataField(license);
+    MetadataField newLicense = new MetadataField(license);
     newLicense.setValue(series.getLicense());
     metadata.addField(newLicense);
 
-    MetadataField<?> organizers = metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
+    MetadataField organizers = metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
     metadata.removeField(organizers);
-    MetadataField<List<String>> newOrganizers = new MetadataField(organizers);
+    MetadataField newOrganizers = new MetadataField(organizers);
     newOrganizers.setValue(series.getOrganizers());
     metadata.addField(newOrganizers);
 
-    MetadataField<?> contributors = metadata.getOutputFields().get(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName());
+    MetadataField contributors = metadata.getOutputFields().get(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName());
     metadata.removeField(contributors);
-    MetadataField<List<String>> newContributors = new MetadataField(contributors);
+    MetadataField newContributors = new MetadataField(contributors);
     newContributors.setValue(series.getContributors());
     metadata.addField(newContributors);
 
-    MetadataField<?> publishers = metadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
+    MetadataField publishers = metadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
     metadata.removeField(publishers);
-    MetadataField<List<String>> newPublishers = new MetadataField(publishers);
+    MetadataField newPublishers = new MetadataField(publishers);
     newPublishers.setValue(series.getPublishers());
     metadata.addField(newPublishers);
 
     // Admin UI only field
-    MetadataField<String> createdBy = MetadataField.createTextMetadataField("createdBy", Opt.<String> none(),
-            "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY", true, false, Opt.<Boolean> none(),
-            Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(CREATED_BY_UI_ORDER), Opt.<String> none());
+    MetadataField createdBy = new MetadataField(
+      "createdBy",
+      null,
+      "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY",
+      true,
+      false,
+      null,
+      null,
+      MetadataField.Type.TEXT,
+      null,
+      null,
+      CREATED_BY_UI_ORDER,
+      null,
+      null,
+      null,
+      null);
     createdBy.setValue(series.getCreator());
     metadata.addField(createdBy);
 
-    MetadataField<?> uid = metadata.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName());
+    MetadataField uid = metadata.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName());
     metadata.removeField(uid);
-    MetadataField<String> newUID = new MetadataField(uid);
+    MetadataField newUID = new MetadataField(uid);
     newUID.setValue(series.getIdentifier());
     metadata.addField(newUID);
 
@@ -399,7 +412,7 @@ public class SeriesEndpoint implements ManagedService {
           SearchIndexException {
     try {
       MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, searchIndex);
-      return okJson(metadataList.toJSON());
+      return okJson(MetadataJson.listToJson(metadataList, true));
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
     } catch (IndexServiceException e) {
@@ -412,18 +425,18 @@ public class SeriesEndpoint implements ManagedService {
   @RestQuery(name = "getNewMetadata", description = "Returns all the data related to the metadata tab in the new series modal as JSON", returnDescription = "All the data related to the series metadata tab as JSON", responses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series metadata tab as JSON") })
   public Response getNewMetadata() {
     MetadataList metadataList = indexService.getMetadataListWithAllSeriesCatalogUIAdapters();
-    Opt<MetadataCollection> metadataByAdapter = metadataList
+    final DublinCoreMetadataCollection metadataByAdapter = metadataList
             .getMetadataByAdapter(indexService.getCommonSeriesCatalogUIAdapter());
-    if (metadataByAdapter.isSome()) {
-      MetadataCollection collection = metadataByAdapter.get();
+    if (metadataByAdapter != null) {
+      DublinCoreMetadataCollection collection = metadataByAdapter;
       safelyRemoveField(collection, "identifier");
       metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
     }
-    return okJson(metadataList.toJSON());
+    return okJson(MetadataJson.listToJson(metadataList, true));
   }
 
-  private void safelyRemoveField(MetadataCollection collection, String fieldName) {
-    MetadataField<?> metadataField = collection.getOutputFields().get(fieldName);
+  private void safelyRemoveField(DublinCoreMetadataCollection collection, String fieldName) {
+    MetadataField metadataField = collection.getOutputFields().get(fieldName);
     if (metadataField != null) {
       collection.removeField(metadataField);
     }

@@ -31,6 +31,7 @@ import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobImpl;
+import org.opencastproject.mediapackage.AdaptivePlaylist;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
@@ -76,6 +77,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Tests the {@link ComposerServiceImpl}.
@@ -86,6 +88,7 @@ public class ComplexCmdsEncoderEngineTest {
   private File sourceVideoOnly = null;
   private File sourceAudioOnly = null;
   private File sourceAudioVideo = null;
+  private File sourceAudioVideoLarger = null;
   private File sourceMuxed = null;
   private Job job = null;
   private Workspace workspace = null;
@@ -145,6 +148,10 @@ public class ComplexCmdsEncoderEngineTest {
     sourceAudioVideo = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mov", workingDirectory);
     FileUtils.copyFile(f, sourceAudioVideo);
 
+    f = getFile("/av1.mp4");
+    sourceAudioVideoLarger = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp4", workingDirectory);
+    FileUtils.copyFile(f, sourceAudioVideoLarger);
+
     // create the needed mocks
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bc.getProperty((String) EasyMock.anyObject())).andReturn(FFMPEG_BINARY);
@@ -179,6 +186,8 @@ public class ComplexCmdsEncoderEngineTest {
         logger.info("workspace Returns " + name);
         if (name.contains("mux"))
           return sourceMuxed;
+        else if (name.contains("avlarge"))
+          return sourceAudioVideoLarger;
         else if (name.contains("audiovideo"))
           return sourceAudioVideo;
         else if (name.contains("audio"))
@@ -524,10 +533,202 @@ public class ComplexCmdsEncoderEngineTest {
       assertTrue(outputs.get(i).exists());
       assertTrue(outputs.get(i).length() > 0);
     }
-}
+  }
 
   @Test
-  public void testRawMultiEncodeNoAudio() throws EncoderException {
+  public void testRawMultiEncodeEditsNoTransition() throws EncoderException {
+    if (!ffmpegInstalled)
+      return;
+    // EncodingProfile profile = profileScanner.getProfile(multiProfile);
+    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    profiles.add(profileScanner.getProfile("h264-low.http"));
+    profiles.add(profileScanner.getProfile("flash.rtmp"));
+    profiles.add(profileScanner.getProfile("h264-medium.http"));
+    List<Long> edits = new ArrayList<Long>();
+    edits.add((long) 0);
+    edits.add((long) 0);
+    edits.add((long) 10 * 1000);
+
+    // create encoder process.
+    // no special working dir is set which means the working dir of the
+    // current java process is used
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(sourceAudioVideo), edits, profiles, 0, true, true);
+    assertTrue(outputs.size() == profiles.size());
+    for (int i = 0; i < profiles.size(); i++) {
+      assertTrue(outputs.get(i).exists());
+      assertTrue(outputs.get(i).length() > 0);
+    }
+  }
+
+  // Test Audio Only
+  @Test
+  public void testMultiEncodeHLS2ProfilesA() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+    assertTrue(sourceAudioVideoLarger.isFile());
+    // Set up workspace
+    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    profiles.add(profileScanner.getProfile("h264-medium.http"));
+    profiles.add(profileScanner.getProfile("h264-low.http"));
+    profiles.add(profileScanner.getProfile("multiencode-hls"));
+    // Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(sourceAudioVideoLarger), null, profiles, 0, false, true);
+    assertTrue(outputs.size() == (profiles.size() - 1) * 2 + 1); // master + 2 variants
+    for (int i = 0; i < profiles.size(); i++) {
+      assertTrue(outputs.get(i).exists());
+      assertTrue(outputs.get(i).length() > 0);
+    }
+    for (File file : outputs) {
+      FileUtils.deleteQuietly(file);
+    }
+  }
+
+  // Test Video Only - no video bitrate
+  @Test
+  public void testMultiEncodeHLS2ProfilesV() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+    assertTrue(sourceAudioVideoLarger.isFile());
+    // Set up workspace
+    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    profiles.add(profileScanner.getProfile("multiencode-hls"));
+    profiles.add(profileScanner.getProfile("h264-medium.http"));
+    profiles.add(profileScanner.getProfile("h264-low.http"));
+    // Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(sourceAudioVideoLarger), null, profiles, 0, true, false);
+    assertTrue(outputs.size() == (profiles.size() - 1) * 2 + 1); // master + 2 variants
+    for (int i = 0; i < profiles.size(); i++) {
+      assertTrue(outputs.get(i).exists());
+      assertTrue(outputs.get(i).length() > 0);
+    }
+    for (File file : outputs) {
+      FileUtils.deleteQuietly(file);
+    }
+  }
+
+  // Test AudioVideo Only no Video bitrate
+  @Test
+  public void testMultiEncodeHLS2ProfilesAV() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+    assertTrue(sourceAudioVideoLarger.isFile());
+    // Set up workspace
+    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    profiles.add(profileScanner.getProfile("h264-medium.http"));
+    profiles.add(profileScanner.getProfile("multiencode-hls"));
+    profiles.add(profileScanner.getProfile("h264-low.http"));
+    // Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(sourceAudioVideoLarger), null, profiles, 0, true, true);
+    assertTrue(outputs.size() == (profiles.size() - 1) * 2 + 1); // master + 2 variants
+    for (int i = 0; i < profiles.size(); i++) {
+      assertTrue(outputs.get(i).exists());
+      assertTrue(outputs.get(i).length() > 0);
+    }
+    for (File file : outputs) {
+      FileUtils.deleteQuietly(file);
+    }
+  }
+
+  // Test AudioVideo Video bitrate
+  @Test
+  public void testMultiEncodeHLS2ProfilesVBR() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+    assertTrue(sourceAudioVideoLarger.isFile());
+    // Set up workspace
+    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    profiles.add(profileScanner.getProfile("h264-hbr.http"));
+    profiles.add(profileScanner.getProfile("multiencode-hls"));
+    // Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(sourceAudioVideoLarger), null, profiles, 0, true, true);
+    assertTrue(outputs.size() == (profiles.size() - 1) * 2 + 1); // master + 2 variants
+    for (int i = 0; i < profiles.size(); i++) {
+      assertTrue(outputs.get(i).exists());
+      assertTrue(outputs.get(i).length() > 0);
+    }
+    for (File file : outputs) {
+      FileUtils.deleteQuietly(file);
+    }
+  }
+
+  // Test HLS AudioVideo Video bitrate single stream
+  @Test
+  public void testMultiEncodeHLS1ProfileAV() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+    assertTrue(sourceAudioVideoLarger.isFile());
+    // Set up workspace
+    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    // EncodingProfile hls = profileScanner.getProfile("multiencode-hls");
+    profiles.add(profileScanner.getProfile("multiencode-hls"));
+    profiles.add(profileScanner.getProfile("h264-lbr.http"));
+    // Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(sourceAudioVideoLarger), null, profiles, 0, true, true);
+    assertTrue(outputs.size() == profiles.size() + 1); // 1 variants - 1 master
+    for (int i = 0; i < profiles.size(); i++) {
+      assertTrue(outputs.get(i).exists());
+      assertTrue(outputs.get(i).length() > 0);
+    }
+    for (File file : outputs) {
+      FileUtils.deleteQuietly(file);
+    }
+  }
+
+  /*
+   * This test concatenates two trimmed and faded clips and encode to adaptive streaming with 3 qualities
+   */
+  @Test
+  public void testConcatEdit2segmentsHLS2Profiles() throws Exception {
+    logger.info("testConcatEdit2segment");
+    URL sourceUrl = getClass().getResource("/av1.mp4");
+    File sourceFile1 = new File(workingDirectory, "av1.mp4");
+    FileUtils.copyURLToFile(sourceUrl, sourceFile1);
+    URL sourceUrl1 = sourceUrl; // getClass().getResource("/slidechanges.mov");
+    File sourceFile2 = sourceFile1; // new File(workingDirectory, "slidechanges.mov");
+    FileUtils.copyURLToFile(sourceUrl1, sourceFile2);
+    EncodingProfile[] eprofiles = { profileScanner.getProfile("h264-large.http"), // suffix interpolated from src
+            profileScanner.getProfile("h264-medium.http"), // plain text
+            profileScanner.getProfile("h264-low.http"), profileScanner.getProfile("multiencode-hls") };
+    File[] files = { sourceFile1, sourceFile2 };
+    Map<String, String> params = new HashMap<String, String>();
+    String outDir = sourceFile1.getAbsoluteFile().getParent();
+    String outFileName = FilenameUtils.getBaseName(sourceFile1.getName());
+    params.put("out.file.basename", outFileName);
+    params.put("out.dir", outDir);
+    // create encoder process.
+    // no special working dir is set which means the working dir of the
+    // current java process is used
+    ArrayList<Long> edits = new ArrayList<Long>();
+    edits.add((long) 0);
+    edits.add((long) 0);
+    edits.add((long) 2500); // These 2 edits will be merged
+    edits.add((long) 0);
+    edits.add((long) 3000);
+    edits.add((long) 5500);
+    edits.add((long) 1);
+    edits.add((long) 8000);
+    edits.add((long) 10500);
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(files), edits, Arrays.asList(eprofiles), 1000); // Concat
+    // 2
+    // input files encoded into master, 3 variants manifest and 3 output fragmented mp4
+    assertTrue(outputs.size() == (eprofiles.length - 1) * 2 + 1);
+    for (int i = 0; i < outputs.size(); i++) {
+      assertTrue(outputs.get(i).length() > 0);
+    }
+    List<File> segments = outputs.stream().filter(AdaptivePlaylist.isHLSFilePred.negate()).collect(Collectors.toList());
+    segments.sort((File f1, File f2) -> f1.getName().compareTo(f2.getName()));
+    assertTrue(segments.get(0).getName().endsWith("-out.mp4")); // intepolated from src
+    for (int i = 1; i < segments.size(); i++) {
+      assertTrue(segments.get(i).getName().endsWith(eprofiles[i].getSuffix()));
+    }
+    for (File file : outputs) {
+      FileUtils.deleteQuietly(file);
+    }
+  }
+
+  @Test
+  public void testRawMultiEncodeNoAudio() throws EncoderException
+  {
     if (!ffmpegInstalled)
       return;
     // EncodingProfile profile = profileScanner.getProfile(multiProfile);

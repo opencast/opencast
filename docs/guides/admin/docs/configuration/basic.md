@@ -22,14 +22,14 @@ your own domain name:
     org.opencastproject.server.url=http://example.com:8080
 
 *Note:* This value will be written to all generated mediapackages and thus cannot be changed easily for already
-processed media. At least not without an extra amount of work involving modifications to the database. That is why you
+processed media, at least not without an extra amount of work involving modifications to the database. That is why you
 should think about this setting carefully.
 
 
 Step 2: Setting the Login Details
 ---------------------------------
 
-There are two authentication methods for Opencast. HTTP Digest authentication and form-based authentication. Both
+There are two authentication methods for Opencast: HTTP Digest authentication and form-based authentication. Both
 methods need a username and a password. Change the password for both! The important keys in the 'custom.properties'
 configuration file are:
 
@@ -50,7 +50,7 @@ set to the same value on each of you Opencast nodes (Core, Worker, Capture Agent
 Step 3: Change the default shutdown command
 -------------------------------------------
 
-Karaf provides a socket over wich you can send a shutdown command. The socket does not provide any kind of
+Karaf provides a socket over which you can send a shutdown command. The socket does not provide any kind of
 authentication. Therefore anyone who obtains write access to this socket is able to shutdown karaf and everything
 that runs on it. There is a default `karaf.shutdown.command` defined in `custom.properties`. Change this to something
 secret.

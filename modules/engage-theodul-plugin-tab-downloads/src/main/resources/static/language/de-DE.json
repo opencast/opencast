@@ -1,7 +1,7 @@
 {
-  "value_locale":"de",
-  "str_type": "Typ",
+  "value_locale": "en",
+  "str_type": "Type",
   "str_mimetype": "Mimetype",
-  "str_resolution": "Auflösung",
+  "str_resolution": "Resolution",
   "str_download": "Download"
 }
