@@ -1089,11 +1089,6 @@
         <version>${spring-security.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-openid</artifactId>
-        <version>${spring-security.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.springframework.security.oauth</groupId>
         <artifactId>spring-security-oauth</artifactId>
         <version>2.3.7.RELEASE</version>
@@ -1132,11 +1127,6 @@
         <groupId>org.jasig.cas.client</groupId>
         <artifactId>cas-client-core</artifactId>
         <version>3.3.3</version>
-      </dependency>
-      <dependency>
-        <groupId>org.openid4java</groupId>
-        <artifactId>com.springsource.org.openid4java</artifactId>
-        <version>0.9.5</version>
       </dependency>
       <dependency>
         <groupId>net.sourceforge.nekohtml</groupId>
