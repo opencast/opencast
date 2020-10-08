@@ -110,8 +110,6 @@ public class WowzaStreamingDistributionServiceTest {
     map.put(WowzaStreamingDistributionService.STREAMING_DIRECTORY_KEY, "/tmp/opencast/streams");
 
     bundleContext = createNiceMock(BundleContext.class);
-    //expect(bundleContext.getProperty(WowzaStreamingDistributionService.STREAMING_DIRECTORY_KEY)).andReturn("/")
-      //      .anyTimes();
     expect(bundleContext.getProperty(opencastStorageDirectory)).andReturn("/tmp/opencast")
             .anyTimes();
     replay(bundleContext);

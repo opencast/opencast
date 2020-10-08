@@ -214,9 +214,6 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
       Map streamingUrlConfiguration = new ConcurrentHashMap<>();
 
       // Streaming directory
-      //String distributionDirectoryPath = StringUtils.trimToNull(bundleContext.getProperty(STREAMING_DIRECTORY_KEY));
-
-      // Streaming directory
       String distributionDirectoryPath = StringUtils.trimToNull((String) properties.get(STREAMING_DIRECTORY_KEY));
 
       if (distributionDirectoryPath == null) {
