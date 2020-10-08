@@ -8,18 +8,19 @@ import Stats from "../shared/Stats";
 import Table from "../shared/Table";
 import { fetchEvents } from "../../thunks/eventThunks";
 import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
-import { getEvents, isShowActions } from "../../selectors/eventSelectors";
+import {getEvents, isLoading, isShowActions} from "../../selectors/eventSelectors";
 import {connect} from "react-redux";
 import { eventsTemplateMap } from "../../configs/tableConfigs/eventsTableConfig";
 import Link from "react-router-dom/Link";
 import {withRouter} from "react-router-dom";
 import {fetchSeries} from "../../thunks/seriesThunks";
+import {fetchFilters} from "../../thunks/tableFilterThunks";
 
 // References for detecting a click outside of the container of the dropdown menu
 const containerAction = React.createRef();
 
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
-                        loadingSeriesIntoTable, isLoadingEvents}) => {
+                        loadingSeriesIntoTable, loadingFilters }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
@@ -45,6 +46,9 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
         // Load events on mount
         loadEvents().then(r => console.log(r));
+
+        // Load event filters
+        loadingFilters("events");
 
         console.log("Use effect fired");
 
@@ -101,8 +105,16 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 
                 <nav>
                     {/*Todo: Show only if user has ROLE_UI_EVENTS_VIEW*/}
-                    <Link to="/events/events" onClick={() => loadEvents()}>{t('EVENTS.EVENTS.NAVIGATION.EVENTS')}</Link>
-                    <Link to="/events/series" onClick={() => loadSeries()}>{t('EVENTS.EVENTS.NAVIGATION.SERIES')}</Link>
+                    <Link to="/events/events"
+                          className={cn({active: true})}
+                          onClick={() => loadEvents()}>
+                        {t('EVENTS.EVENTS.NAVIGATION.EVENTS')}
+                    </Link>
+                    <Link to="/events/series"
+                          className={cn({active: false})}
+                          onClick={() => loadSeries()}>
+                        {t('EVENTS.EVENTS.NAVIGATION.SERIES')}
+                    </Link>
                 </nav>
 
                 <div className="stats-container">
@@ -167,7 +179,7 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
 const mapStateToProps = state => ({
     events: getEvents(state),
     showActions: isShowActions(state),
-    isLoadingEvents: state.events.isLoading
+    isLoadingEvents: isLoading(state)
 });
 
 
@@ -176,6 +188,7 @@ const mapDispatchToProps = dispatch => ({
     loadingEventsIntoTable: () => dispatch(loadEventsIntoTable()),
     loadingSeries: () => dispatch(fetchSeries()),
     loadingSeriesIntoTable: () => dispatch(loadSeriesIntoTable()),
+    loadingFilters: resource => dispatch(fetchFilters(resource))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Events));

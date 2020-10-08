@@ -10,7 +10,7 @@ export const fetchSeries = () => async (dispatch, getState) => {
        const state = getState();
 
        // Todo: Check if empty values problem when using proxy backend
-       // Get filter map from state if filter flag is true
+       // Get filter map from state
        let filters;
        let filterArray = [];
        let filterMap = getFilters(state);
@@ -24,10 +24,10 @@ export const fetchSeries = () => async (dispatch, getState) => {
        }
        console.log(filters);
 
-       // Get sorting from state if sort flag is true
+       // Get sorting from state
        let sort = getTableSorting(state) + ':' + getTableDirection(state);
 
-       // Get page info needed for fetching events from state
+       // Get page info needed for fetching series from state
        let pageLimit = getPageLimit(state);
        let offset = getPageOffset(state);
 

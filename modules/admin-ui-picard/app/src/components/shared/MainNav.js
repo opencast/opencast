@@ -1,21 +1,16 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
-
-import eventIcon from '../../img/events.png';
-import recordingIcon from '../../img/recordings.png';
-import systemsIcon from '../../img/servers.png';
-import userIcon from '../../img/user-group.png';
-import configIcon from '../../img/configuration.png';
-import statisticsIcon from '../../img/activity.png';
 import {Link} from "react-router-dom";
-import {loadEventsIntoTable} from "../../thunks/tableThunks";
+import {loadEventsIntoTable, loadRecordingsIntoTable} from "../../thunks/tableThunks";
 import {fetchEvents} from "../../thunks/eventThunks";
 import {connect} from "react-redux";
+import {fetchRecordings} from "../../thunks/recordingThunks";
+import {loadResourceIntoTable} from "../../actions/tableActions";
 
 /**
  * This component renders the main navigation that opens when the burger button is clicked
  */
-const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable}) => {
+const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, loadingRecordings, loadingRecordingsIntoTable}) => {
     const { t } = useTranslation();
 
     const loadEvents = () => {
@@ -24,6 +19,14 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable}) =
 
         // Load events into table
         loadingEventsIntoTable();
+    }
+
+    const loadRecordings = () => {
+        // Fetching recordings from server
+        loadingRecordings();
+
+        // Load recordings into table
+        loadingRecordingsIntoTable();
     }
 
     return (
@@ -35,34 +38,22 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable}) =
                             {/* Todo: add role management (see MainNav in admin-ui-frontend)*/}
                             {/* todo: more than one href? how? (see MainNav admin-ui-frontend)*/}
                             <Link to="/events/events" onClick={() => loadEvents()}>
-                                <i className="events" title={t('NAV.EVENTS.TITLE')}>
-                                    <img src={eventIcon}/>
-                                </i>
+                                <i className="events" title={t('NAV.EVENTS.TITLE')}/>
                             </Link>
-                            <Link to="/recordings/recordings">
-                                <i className="recordings" title={t('NAV.CAPTUREAGENTS.TITLE')}>
-                                    <img src={recordingIcon}/>
-                                </i>
+                            <Link to="/recordings/recordings" onClick={() => loadRecordings()}>
+                                <i className="recordings" title={t('NAV.CAPTUREAGENTS.TITLE')}/>
                             </Link>
                             <Link to="/systems/jobs">
-                                <i className="systems" title={t('NAV.SYSTEMS.TITLE')}>
-                                    <img src={systemsIcon}/>
-                                </i>
+                                <i className="systems" title={t('NAV.SYSTEMS.TITLE')}/>
                             </Link>
                             <Link to="/users/users">
-                                <i className="users" title={t('NAV.USERS.TITLE')}>
-                                    <img src={userIcon}/>
-                                </i>
+                                <i className="users" title={t('NAV.USERS.TITLE')}/>
                             </Link>
                             <Link to="/configuration/themes">
-                                <i className="configuration" title={t('NAV.CONFIGURATION.TITLE')}>
-                                    <img src={configIcon}/>
-                                </i>
+                                <i className="configuration" title={t('NAV.CONFIGURATION.TITLE')}/>
                             </Link>
                             <Link to="/statistics/organization">
-                                <i className="statistics" title={t('NAV.STATISTICS.TITLE')}>
-                                    <img src={statisticsIcon}/>
-                                </i>
+                                <i className="statistics" title={t('NAV.STATISTICS.TITLE')}/>
                             </Link>
                         </div>
                     </nav>
@@ -76,7 +67,9 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable}) =
 
 const mapDispatchToProps = dispatch => ({
     loadingEvents: () => dispatch(fetchEvents()),
-    loadingEventsIntoTable: () => dispatch(loadEventsIntoTable())
+    loadingEventsIntoTable: () => dispatch(loadEventsIntoTable()),
+    loadingRecordings: () => dispatch(fetchRecordings()),
+    loadingRecordingsIntoTable: () => dispatch(loadRecordingsIntoTable())
 });
 
 export default connect(null, mapDispatchToProps)(MainNav);

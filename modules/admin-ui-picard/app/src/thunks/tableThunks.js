@@ -19,6 +19,8 @@ import {eventsTableConfig}  from "../configs/tableConfigs/eventsTableConfig";
 import {seriesTableConfig} from "../configs/tableConfigs/seriesTableConfig";
 import {fetchEvents} from "./eventThunks";
 import {fetchSeries} from "./seriesThunks";
+import {recordingsTableConfig} from "../configs/tableConfigs/recordingsTableConfig";
+import {fetchRecordings} from "./recordingThunks";
 
 /**
  * This file contains methods/thunks used to manage the table in the main view and its state changes
@@ -111,6 +113,45 @@ export const loadSeriesIntoTable = () => (dispatch, getState) => {
     dispatch(loadResourceIntoTable(tableData));
 };
 
+export const loadRecordingsIntoTable = () => (dispatch, getState) => {
+    const { recordings } = getState();
+    const pagination = getTablePagination(getState());
+    const resource = recordings.results;
+
+    const c = recordingsTableConfig.columns;
+    const columns = c.map(column => {
+        const col = recordings.columns.find(co => co.name === column.name);
+        return {
+            ...column,
+            deactivated : col.deactivated
+        }
+    });
+
+    const multiSelect = recordingsTableConfig.multiSelect;
+
+    let i, numberOfPages = resource.length / pagination.limit;
+    const pages = [];
+    for (i = 0; i < numberOfPages || (i === 0 && numberOfPages === 0); i++) {
+        pages.push({
+            number: i,
+            label: (i + 1).toString(),
+            active: i === pagination.offset
+        });
+    }
+
+    const tableData = {
+        resource: "recordings",
+        rows: resource,
+        columns: columns,
+        multiSelect: multiSelect,
+        pages: pages,
+        sortBy: "status"
+    };
+    dispatch(loadResourceIntoTable(tableData));
+}
+
+
+
 // Navigate between pages
 export const goToPage = pageNumber => (dispatch, getState) => {
 
@@ -129,13 +170,18 @@ export const goToPage = pageNumber => (dispatch, getState) => {
     // Get resources of page and load them into table
     // Load events if resource is events
     if (getResourceType(state) === "events") {
-        dispatch(fetchEvents(false, false));
+        dispatch(fetchEvents());
         dispatch(loadEventsIntoTable());
     }
     // Load series if resource is series
     if(getResourceType(state) === "series") {
-        dispatch(fetchSeries(false, false));
+        dispatch(fetchSeries());
         dispatch(loadSeriesIntoTable());
+    }
+    // Load series if resource is recordings
+    if(getResourceType(state) === "recordings") {
+        dispatch(fetchRecordings());
+        dispatch(loadRecordingsIntoTable());
     }
     // todo: Check for all other type of resource
 
@@ -164,13 +210,17 @@ export const updatePages = () => (dispatch,getState) => {
     // Get resources of page and load them into table
     // Load events if resource is events
     if (getResourceType(state) === "events") {
-        dispatch(fetchEvents(false, false));
+        dispatch(fetchEvents());
         dispatch(loadEventsIntoTable());
     }
     // Load series if resource is series
     if(getResourceType(state) === "series") {
-        dispatch(fetchSeries(false, false));
+        dispatch(fetchSeries());
         dispatch(loadSeriesIntoTable());
+    }
+    if(getResourceType(state) === "recordings") {
+        dispatch(fetchRecordings());
+        dispatch(loadRecordingsIntoTable());
     }
     // todo: Check for all other type of resource
 }

@@ -13,6 +13,7 @@ import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
 import {fetchEvents} from "../../thunks/eventThunks";
 import {getSeries, isShowActions} from "../../selectors/seriesSeletctor";
+import {fetchFilters} from "../../thunks/tableFilterThunks";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -20,7 +21,7 @@ const containerAction = React.createRef();
 
 
 const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEvents, loadingEventsIntoTable,
-                    series }) => {
+                    series, loadingFilters }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
@@ -45,6 +46,9 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
 
         // Load Series on mount
         loadSeries().then(r => console.log(r));
+
+        // Load event filters
+        loadingFilters("series");
 
         // Function for handling clicks outside of an dropdown menu
         const handleClickOutside = e => {
@@ -97,10 +101,17 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
 
                 <nav>
                     {/*Todo: Show only if user has ROLE_UI_EVENTS_VIEW*/}
-                    <Link to="/events/events" onClick={() => loadEvents()}>{t('EVENTS.EVENTS.NAVIGATION.EVENTS')}</Link>
-                    <Link to="/events/series" onClick={() => loadSeries()}>{t('EVENTS.EVENTS.NAVIGATION.SERIES')}</Link>
+                    <Link to="/events/events"
+                          className={cn({active: false})}
+                          onClick={() => loadEvents()}>
+                        {t('EVENTS.EVENTS.NAVIGATION.EVENTS')}
+                    </Link>
+                    <Link to="/events/series"
+                          className={cn({active: true})}
+                          onClick={() => loadSeries()}>
+                        {t('EVENTS.EVENTS.NAVIGATION.SERIES')}
+                    </Link>
                 </nav>
-
             </section>
 
             <div className="main-view" style={displayNavigation ? styleNavOpen : styleNavClosed}>
@@ -148,7 +159,8 @@ const mapDispatchToProps = dispatch => ({
     loadingSeries: () => dispatch(fetchSeries()),
     loadingSeriesIntoTable: () => dispatch(loadSeriesIntoTable()),
     loadingEvents: () => dispatch(fetchEvents()),
-    loadingEventsIntoTable: () => dispatch(loadEventsIntoTable())
+    loadingEventsIntoTable: () => dispatch(loadEventsIntoTable()),
+    loadingFilters: resource => dispatch(fetchFilters(resource))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Series));

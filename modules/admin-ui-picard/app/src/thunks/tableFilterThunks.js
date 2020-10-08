@@ -24,6 +24,12 @@ export const fetchFilters = resource => async dispatch => {
 
             response = transformResponse(seriesData);
         }
+        if (resource === 'recordings') {
+            const data = await fetch('admin-ng/resources/recordings/filters.json');
+            const recordingsData = await data.json();
+
+            response = transformResponse(recordingsData);
+        }
         const filters = response
         const filtersList = Object.keys(filters.filters).map(key => {
             let filter = filters.filters[key];

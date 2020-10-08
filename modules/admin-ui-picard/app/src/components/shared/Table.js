@@ -179,8 +179,8 @@ const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOff
                     </tr>
                 ) : (
                     //Repeat for each row in table.rows
-                    resources.map((row) => (
-                            <tr key={row.id}>
+                    resources.map((row, key) => (
+                            <tr key={key}>
                                 {/* Show if multi selection is possible */}
                                 {/* Checkbox for selection of row */}
                                 {table.multiSelect && (

@@ -9,6 +9,7 @@ import tableFilterProfiles from './reducers/tableFilterProfilesReducer';
 import events from './reducers/eventReducers';
 import table from './reducers/tableReducers';
 import series from "./reducers/seriesReducer";
+import recordings from "./reducers/recordingReducer";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -20,7 +21,8 @@ const reducers = {
     tableFilterProfiles,
     events,
     series,
-    table
+    table,
+    recordings
 };
 
 // Configuration for persisting store
