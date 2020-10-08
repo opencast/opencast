@@ -9,6 +9,47 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### OSGi Annotations and Configuration
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Wed, 7 Oct 2020
+
+```no-highlight
+Hi everyone,
+I hereby #propose that for all new code added to opencast
+
+- OSGi annotations should be used instead of XML files for specifying
+  components and dependencies.
+
+  Reason: This is far less error prone. Even on today's Review Friday,
+  we had problems with the XML files again. No wonder if you write
+  these manually.
+
+
+- @Activate and @Modified should be used for reading and updating
+  configuration instead of implementing a Managed Service.
+
+  Reason: Managed services are usually unnecessary and often make
+  runtime updates to services problematic (see webinar below)
+
+If there is a reason to go against these rules, it must be clearly
+stated on a pull request.
+
+OSGi component annotation example:
+
+  https://vt.uos.de/e5msw
+
+
+If you want to know more about the service configuration and see
+annotations in action, watch the “Opencast OSGI Configuration“ webinar:
+
+  https://video.ethz.ch/events/opencast/webinars/7261ea70-ce36-4e17-8634-963966311028.html
+
+This proposal passes on Wednesday evening if no one objects.
+
+Best regards,
+Lars
+```
+
+
 ### JPA, PostgreSQL and DDL-Scripts
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Wed, 30 Oct 2019
 
