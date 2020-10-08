@@ -1196,12 +1196,6 @@ security-cas
   org.springframework.security           spring-security-cas                              The Apache Software License, Version 2.0
 
 
-security-openid
-  GroupId                                ArtifactId                                       License
-  org.openid4java                        com.springsource.org.openid4java                 -
-  org.springframework.security           org.springframework.security.openid              -
-
-
 security-shibboleth
   GroupId                                ArtifactId                                       License
   org.springframework.osgi               org.springframework.osgi.core                    -
