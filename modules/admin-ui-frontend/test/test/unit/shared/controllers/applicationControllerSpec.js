@@ -27,7 +27,7 @@ describe('Application controller', function () {
             JSON.stringify(getJSONFixture('info/me.json'))
         );
 
-        $httpBackend.whenGET('/admin-ng/adopter/statistics/registration').respond(
+        $httpBackend.whenGET('/admin-ng/adopter/registration').respond(
             {'lastModified' : '2020.01.16'}
         );
 
