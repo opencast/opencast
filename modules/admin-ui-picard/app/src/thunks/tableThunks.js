@@ -21,6 +21,8 @@ import {fetchEvents} from "./eventThunks";
 import {fetchSeries} from "./seriesThunks";
 import {recordingsTableConfig} from "../configs/tableConfigs/recordingsTableConfig";
 import {fetchRecordings} from "./recordingThunks";
+import {jobsTableConfig} from "../configs/tableConfigs/jobsTableConfig";
+import {fetchJobs} from "./jobThunks";
 
 /**
  * This file contains methods/thunks used to manage the table in the main view and its state changes
@@ -150,6 +152,43 @@ export const loadRecordingsIntoTable = () => (dispatch, getState) => {
     dispatch(loadResourceIntoTable(tableData));
 }
 
+export const loadJobsIntoTable = () => (dispatch, getState) => {
+    const { jobs } = getState();
+    const pagination = getTablePagination(getState());
+    const resource = jobs.results;
+
+    const c = jobsTableConfig.columns;
+    const columns = c.map(column => {
+        const col = jobs.columns.find(co => co.name === column.name);
+        return {
+            ...column,
+            deactivated: col.deactivated
+        }
+    });
+
+    const multiSelect = jobsTableConfig.multiSelect;
+
+    let i, numberOfPages = resource.length / pagination.limit;
+    const pages = [];
+    for (i = 0; i < numberOfPages || (i === 0 && numberOfPages === 0); i++) {
+        pages.push({
+            number: i,
+            label: (i +1).toString(),
+            active: i === pagination.offset
+        });
+    }
+
+    const tableData = {
+        resource: "jobs",
+        rows: resource,
+        columns: columns,
+        multiSelect: multiSelect,
+        pages: pages,
+        sortBy: "id"
+    };
+    dispatch(loadResourceIntoTable(tableData));
+}
+
 
 
 // Navigate between pages
@@ -182,6 +221,11 @@ export const goToPage = pageNumber => (dispatch, getState) => {
     if(getResourceType(state) === "recordings") {
         dispatch(fetchRecordings());
         dispatch(loadRecordingsIntoTable());
+    }
+    // Load series if resource is recordings
+    if(getResourceType(state) === "jobs") {
+        dispatch(fetchJobs());
+        dispatch(loadJobsIntoTable());
     }
     // todo: Check for all other type of resource
 
@@ -221,6 +265,11 @@ export const updatePages = () => (dispatch,getState) => {
     if(getResourceType(state) === "recordings") {
         dispatch(fetchRecordings());
         dispatch(loadRecordingsIntoTable());
+    }
+    // Load series if resource is recordings
+    if(getResourceType(state) === "jobs") {
+        dispatch(fetchJobs());
+        dispatch(loadJobsIntoTable());
     }
     // todo: Check for all other type of resource
 }

@@ -30,6 +30,13 @@ export const fetchFilters = resource => async dispatch => {
 
             response = transformResponse(recordingsData);
         }
+
+        if (resource === 'jobs') {
+            const data = await fetch('admin-ng/resources/jobs/filters.json');
+            const jobsData = await data.json();
+
+            response = transformResponse(jobsData);
+        }
         const filters = response
         const filtersList = Object.keys(filters.filters).map(key => {
             let filter = filters.filters[key];

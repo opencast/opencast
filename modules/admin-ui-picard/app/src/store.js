@@ -10,6 +10,7 @@ import events from './reducers/eventReducers';
 import table from './reducers/tableReducers';
 import series from "./reducers/seriesReducer";
 import recordings from "./reducers/recordingReducer";
+import jobs from "./reducers/jobReducer";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -22,7 +23,8 @@ const reducers = {
     events,
     series,
     table,
-    recordings
+    recordings,
+    jobs
 };
 
 // Configuration for persisting store

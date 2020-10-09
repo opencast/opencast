@@ -5,12 +5,13 @@ import {loadEventsIntoTable, loadRecordingsIntoTable} from "../../thunks/tableTh
 import {fetchEvents} from "../../thunks/eventThunks";
 import {connect} from "react-redux";
 import {fetchRecordings} from "../../thunks/recordingThunks";
-import {loadResourceIntoTable} from "../../actions/tableActions";
+import {fetchJobs} from "../../thunks/jobThunks";
 
 /**
  * This component renders the main navigation that opens when the burger button is clicked
  */
-const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, loadingRecordings, loadingRecordingsIntoTable}) => {
+const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, loadingRecordings, loadingRecordingsIntoTable,
+                     loadingJobs, loadingJobsIntoTable }) => {
     const { t } = useTranslation();
 
     const loadEvents = () => {
@@ -29,6 +30,14 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
         loadingRecordingsIntoTable();
     }
 
+    const loadJobs = () => {
+        // Fetching jobs from server
+        loadingJobs();
+
+        // Load recordings into table
+        loadingJobsIntoTable();
+    }
+
     return (
         <>
             <div className="menu-top" onClick={() => toggleMenu()}>
@@ -43,7 +52,7 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
                             <Link to="/recordings/recordings" onClick={() => loadRecordings()}>
                                 <i className="recordings" title={t('NAV.CAPTUREAGENTS.TITLE')}/>
                             </Link>
-                            <Link to="/systems/jobs">
+                            <Link to="/systems/jobs" onClick={() => loadJobs()}>
                                 <i className="systems" title={t('NAV.SYSTEMS.TITLE')}/>
                             </Link>
                             <Link to="/users/users">
@@ -69,7 +78,9 @@ const mapDispatchToProps = dispatch => ({
     loadingEvents: () => dispatch(fetchEvents()),
     loadingEventsIntoTable: () => dispatch(loadEventsIntoTable()),
     loadingRecordings: () => dispatch(fetchRecordings()),
-    loadingRecordingsIntoTable: () => dispatch(loadRecordingsIntoTable())
+    loadingRecordingsIntoTable: () => dispatch(loadRecordingsIntoTable()),
+    loadingJobs: () => dispatch(fetchJobs()),
+    loadingJobsIntoTable: () => dispatch(loadRecordingsIntoTable())
 });
 
 export default connect(null, mapDispatchToProps)(MainNav);
