@@ -10,7 +10,9 @@ image that is rasterized as PNG as a last step.
 |Name|Type|Example|Default Value|Description|
 |----|----|-------|-------------|-----------|
 stylesheet *|URL|file:///etc/opencast/branding/coverimage.xsl|-|File URI to the XSL stylesheet used to generate the SVG image
-metadata|XML|<meta><title>Hello!</title></meta>|-|XML string which is passed to the XSL transformation. If parameter is not given, a default XML is handed to the transformation
+metadata|XML|```<meta><title>Hello!</title></meta>```|-|XML string which is passed to the XSL transformation. If parameter is not given, a default XML is handed to the transformation
+episodeFlavor|Flavor|dublincore/episode|dublincore/episode|Flavor of the passed episode
+seriesFlavor|Flavor|dublincore/series|dublincore/series|Flavor of the series that the passed episode is part of
 width *|int|1920|-|Width of the resulting image
 height *|int|1080|-|Height of the resulting image
 posterimage-flavor|Flavor|image/poster|-|Flavor of a poster image which may be used as a part of the cover image (e.g. as a background)
@@ -21,7 +23,7 @@ target-tags|String|archive,download|-|Comma separated list of tags to be applied
 ## Metadata
 
 If no metadata is passed by using the configuration key `metadata`, the default metadata is passed to the cover image
-service which looks like the following example:
+service which could look like the following example:
 
     <?xml version="1.0"?>
     <metadata>
@@ -29,13 +31,18 @@ service which looks like the following example:
       <date>2014-04-24T11:21:00</date>
       <license>All rights reserved</license>
       <description>Here is a description of the video</description>
-      <series>Superbowl Commercials</series>
+      <series>
+      	<title>Superbowl Commercials</title>
+   	    <description>Here is a description of the series</description>
+      </series>
       <contributors>Budweiser</contributors>
       <creators>Budweiser</creators>
       <subjects>Commercial</subjects>
     </metadata>
 
 Note that the date is localized based on your servers Java Runtime language settings.
+
+Also note that if the default metadata is beeing used and one of the metadata fields exists multiple times, the cover image service currently only adds the first field of each type to the xml.
 
 ## Stylesheet
 
