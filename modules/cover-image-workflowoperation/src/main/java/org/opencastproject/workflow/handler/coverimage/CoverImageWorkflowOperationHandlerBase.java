@@ -63,6 +63,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -306,27 +307,16 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
 
   protected String getMetadataXml(MediaPackage mp, WorkflowOperationInstance operation) {
     //get specified episode/series flavor
-    String configuredEpisodeFlavor = StringUtils.trimToEmpty(operation.getConfiguration(EPISODE_FLAVOR));
-    String configuredSeriesFlavor = StringUtils.trimToEmpty(operation.getConfiguration(SERIES_FLAVOR));
+    final String configuredEpisodeFlavor = Objects.toString(StringUtils.trimToNull(operation.getConfiguration(EPISODE_FLAVOR)), "dublincore/episode");
+    final String configuredSeriesFlavor = Objects.toString(StringUtils.trimToNull(operation.getConfiguration(SERIES_FLAVOR)), "dublincore/series");
 
-    //use dublincore/episode and dublincore/series metadata-catalogs as default
-    if (("").equals(configuredEpisodeFlavor)) {
-      configuredEpisodeFlavor = "dublincore/episode";
-    }
-    if (("").equals(configuredSeriesFlavor)) {
-      configuredSeriesFlavor = "dublincore/series";
-    }
-
-    String episodeFlavorType = configuredEpisodeFlavor.split("/")[0];
-    String episodeFlavorSubtype = configuredEpisodeFlavor.split("/")[1];
-    String seriesFlavorType = configuredSeriesFlavor.split("/")[0];
-    String seriesFlavorSubtype = configuredSeriesFlavor.split("/")[1];
+    MediaPackageElementFlavor episodeFlavor = MediaPackageElementFlavor.parseFlavor(configuredEpisodeFlavor);
+    MediaPackageElementFlavor seriesFlavor = MediaPackageElementFlavor.parseFlavor(configuredSeriesFlavor);
 
     //Get episode metadata-catalog
-    Catalog[] catalogs = mp.
-            getCatalogs(new MediaPackageElementFlavor(episodeFlavorType, StringUtils.lowerCase(episodeFlavorSubtype)));
+    Catalog[] catalogs = mp.getCatalogs(new MediaPackageElementFlavor(episodeFlavor.getType(), StringUtils.lowerCase(episodeFlavor.getSubtype())));
 
-   //load metadata-catalog
+    //load metadata-catalog
     DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(getWorkspace(), catalogs[0]);
     Map<EName, List<DublinCoreValue>> data = dc.getValues();
 
@@ -341,8 +331,7 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
         case "isPartOf":
           xml.append("<series>");
           //get series catalog
-          Catalog[] seriesCatalogs = mp.
-                  getCatalogs(new MediaPackageElementFlavor(seriesFlavorType, seriesFlavorSubtype));
+          Catalog[] seriesCatalogs = mp.getCatalogs(new MediaPackageElementFlavor(seriesFlavor.getType(), seriesFlavor.getSubtype()));
           //get Series metadata
           DublinCoreCatalog dcSeries = DublinCoreUtil.loadDublinCore(getWorkspace(), seriesCatalogs[0]);
           Map<EName, List<DublinCoreValue>> seriesMetadata = dcSeries.getValues();
