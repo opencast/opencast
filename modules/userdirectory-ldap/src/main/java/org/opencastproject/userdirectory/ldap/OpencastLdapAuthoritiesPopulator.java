@@ -99,7 +99,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     }
 
     if (groupRoleProvider == null) {
-      info("Provided GroupRoleProvider was null. Group roles will therefore not be expanded");
+      logger.info("Provided GroupRoleProvider was null. Group roles will therefore not be expanded");
     }
     this.groupRoleProvider = groupRoleProvider;
 
