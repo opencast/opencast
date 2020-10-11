@@ -10,7 +10,7 @@ atom : '(' relationOperand ')' | NUMBER | STRING | BOOL ;
 AND: 'AND' ;
 OR: 'OR' ;
 NOT: 'NOT' ;
-NUMBER: '-'? [0-9]+ ('.' [0-9]+)? ( [E|e] [+\-]? [0-9]+ )? ;
+NUMBER: [+\-]? [0-9]+ ('.' [0-9]+)? ( [E|e] [+\-]? [0-9]+ )? ;
 COMPARISONOPERATOR: '<=' | '<' | '==' | '>' | '!=' | '>=' ;
 NUMERICALOPERATOR: '+' | '-' | '*' | '/' ;
 BOOL: 'true' | 'false' ;
