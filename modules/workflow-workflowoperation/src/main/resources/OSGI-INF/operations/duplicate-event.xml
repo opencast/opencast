@@ -20,8 +20,6 @@
              cardinality="1..1" policy="static" bind="setDistributionService"/>
   <reference name="series-service" interface="org.opencastproject.series.api.SeriesService"
              bind="setSeriesService"/>
-  <reference name="ingest-service" interface="org.opencastproject.ingest.api.IngestService"
-             bind="setIngestService"/>
   <reference name="authorization-service" interface="org.opencastproject.security.api.AuthorizationService"
              bind="setAuthorizationService"/>
 </scr:component>
