@@ -6,7 +6,7 @@
 
     <property name="service.description" value="Adopter Statistics REST Endpoint"/>
     <property name="opencast.service.type" value="org.opencastproject.adopter.registration.Controller"/>
-    <property name="opencast.service.path" value="/admin-ng/adopter/statistics"/>
+    <property name="opencast.service.path" value="/admin-ng/adopter"/>
     <property name="opencast.service.jobproducer" value="false"/>
 
     <service>
