@@ -1,7 +1,7 @@
 {
     "value_locale": "de",
-    "error_AudioCodecNotSupported": "Fehler: Der Audiocodec wird von diesem Browser nicht unterstützt",
-    "error_AudioElementNotSupported": "Fehler: Dieser Browser unterstützt das Audioelement nicht.",
+    "error_AudioCodecNotSupported": "Fehler: Der Audio-Codec wird nicht von diesem Browser unterstützt",
+    "error_AudioElementNotSupported": "Fehler: Dieser Browser unterstützt das Audio-Element nicht.",
     "video": "Video",
     "video_short": "Vid.",
     "openInPlayer": "Im Player öffnen",
