@@ -1912,11 +1912,6 @@
       <url>https://repo.maven.apache.org/maven2/</url>
     </repository>
     <repository>
-      <id>spring.io</id>
-      <name>Spring Framework Maven Plugins-Release Repository</name>
-      <url>https://repo.spring.io/plugins-release/</url>
-    </repository>
-    <repository>
       <id>mvn.opencast.org</id>
       <name>Opencast 3rd-Party Repository</name>
       <url>https://mvn.opencast.org/</url>
