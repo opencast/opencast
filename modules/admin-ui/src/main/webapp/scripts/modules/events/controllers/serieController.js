@@ -333,6 +333,15 @@ angular.module('adminNg.controllers')
     $scope.metadataSave = function (id, callback, catalog) {
       catalog.attributeToSend = id;
 
+      if (Object.prototype.hasOwnProperty.call(catalog, 'fields')) {
+        for (var fieldNo in catalog.fields) {
+          var field = catalog.fields[fieldNo];
+          if (Object.prototype.hasOwnProperty.call(field, 'collection')) {
+            field.collection = [];
+          }
+        }
+      }
+
       SeriesMetadataResource.save({ id: $scope.resourceId }, catalog,  function () {
         if (angular.isDefined(callback)) {
           callback();
