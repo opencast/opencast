@@ -266,7 +266,7 @@ class OpencastToPaellaConverter {
           if (currentTrack.video) {
             currentStream.type = 'video';
           }
-          else if (currentTrack.audio) {
+          else if (currentTrack.audio && currentStream.type !== 'video') {
             currentStream.type = 'audio';
           }
 
