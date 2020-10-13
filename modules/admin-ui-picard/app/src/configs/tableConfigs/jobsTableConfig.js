@@ -8,6 +8,9 @@
  * - category type (here: systems)
  * - is multi select possible?
  */
+import JobsStartedCell from "../../components/systems/partials/JobsStartedCell";
+import JobsSubmittedCell from "../../components/systems/partials/JobsSubmittedCell";
+
 export const jobsTableConfig = {
     columns: [{
         name:  'id',
@@ -35,10 +38,12 @@ export const jobsTableConfig = {
         label: 'SYSTEMS.JOBS.TABLE.NODE_NAME',
         sortable: true
     }, {
+        template: 'JobsSubmittedCell',
         name:  'submitted',
         label: 'SYSTEMS.JOBS.TABLE.SUBMITTED',
         sortable: true
     }, {
+        template: 'JobsStartedCell',
         name:  'started',
         label: 'SYSTEMS.JOBS.TABLE.STARTED',
         sortable: true
@@ -59,5 +64,6 @@ export const jobsTableConfig = {
  * uses template map.
  */
 export const jobsTemplateMap = {
-
+    'JobsStartedCell': JobsStartedCell,
+    'JobsSubmittedCell': JobsSubmittedCell
 };

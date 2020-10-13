@@ -19,7 +19,9 @@ import {fetchFilters} from "../../thunks/tableFilterThunks";
 // References for detecting a click outside of the container of the dropdown menu
 const containerAction = React.createRef();
 
-
+/**
+ * This component renders the table view of series
+ */
 const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEvents, loadingEventsIntoTable,
                     series, loadingFilters }) => {
     const { t } = useTranslation();
@@ -149,12 +151,13 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
     )
 };
 
-// todo: Selectors for this
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     series: getSeries(state),
     showActions: isShowActions(state),
 });
 
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingSeries: () => dispatch(fetchSeries()),
     loadingSeriesIntoTable: () => dispatch(loadSeriesIntoTable()),

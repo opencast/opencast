@@ -1,7 +1,9 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 
-
+/**
+ * This component renders the name cells of recordings in the table view
+ */
 const RecordingsNameCell = ({ row, filterMap, editFilterValue }) => {
     const { t } = useTranslation();
 

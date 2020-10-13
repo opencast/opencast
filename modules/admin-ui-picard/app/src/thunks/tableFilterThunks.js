@@ -10,7 +10,7 @@ import { loadFiltersSuccess, loadFiltersFailure, loadFiltersInProgress} from '..
 export const fetchFilters = resource => async dispatch => {
     try {
         dispatch(loadFiltersInProgress());
-        //TODO: Fetch the actual data from server
+
         let response;
         if (resource === 'events') {
             const data = await fetch('admin-ng/resources/events/filters.json');

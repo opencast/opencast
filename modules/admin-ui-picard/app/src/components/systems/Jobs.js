@@ -13,7 +13,9 @@ import {fetchJobs} from "../../thunks/jobThunks";
 import {loadJobsIntoTable} from "../../thunks/tableThunks";
 import {getJobs} from "../../selectors/jobSelectors";
 
-
+/**
+ * This component renders the table view of jobs
+ */
 const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters}) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
@@ -103,10 +105,12 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters}) => {
 
 }
 
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     jobs: getJobs(state)
 });
 
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingFilters: resource => dispatch(fetchFilters(resource)),
     loadingJobs: () => dispatch(fetchJobs()),

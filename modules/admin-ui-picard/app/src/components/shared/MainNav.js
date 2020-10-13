@@ -1,7 +1,7 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 import {Link} from "react-router-dom";
-import {loadEventsIntoTable, loadRecordingsIntoTable} from "../../thunks/tableThunks";
+import {loadEventsIntoTable, loadJobsIntoTable, loadRecordingsIntoTable} from "../../thunks/tableThunks";
 import {fetchEvents} from "../../thunks/eventThunks";
 import {connect} from "react-redux";
 import {fetchRecordings} from "../../thunks/recordingThunks";
@@ -73,14 +73,14 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
     );
 }
 
-
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingEvents: () => dispatch(fetchEvents()),
     loadingEventsIntoTable: () => dispatch(loadEventsIntoTable()),
     loadingRecordings: () => dispatch(fetchRecordings()),
     loadingRecordingsIntoTable: () => dispatch(loadRecordingsIntoTable()),
     loadingJobs: () => dispatch(fetchJobs()),
-    loadingJobsIntoTable: () => dispatch(loadRecordingsIntoTable())
+    loadingJobsIntoTable: () => dispatch(loadJobsIntoTable())
 });
 
 export default connect(null, mapDispatchToProps)(MainNav);

@@ -1,10 +1,12 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 
+/**
+ * This component renders the action cells of recordings in the table view
+ */
 const RecordingsActionCell = ({ row }) => {
     const { t } = useTranslation();
 
-    //TODO: styled components for links if icons not loaded
     return (
         <>
             {/*TODO: When recording details are implemented, remove placeholder */}

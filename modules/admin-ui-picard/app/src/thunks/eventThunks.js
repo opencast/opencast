@@ -1,57 +1,16 @@
 import {loadEventsFailure, loadEventsInProgress, loadEventsSuccess} from "../actions/eventActions";
-import {getFilters} from '../selectors/tableFilterSelectors';
-import {getPageLimit, getPageOffset, getTableDirection, getTableSorting} from '../selectors/tableSelectors';
+import {getURLParams} from "../utils/resourceUtils";
 
+// fetch events from server
 export const fetchEvents = () => async (dispatch, getState) => {
     try {
         dispatch(loadEventsInProgress());
 
         const state = getState();
+        let params = getURLParams(state);
 
-        // Todo: Check if empty values problem when using proxy backend
-        // Get filter map from state if filter flag is true
-        let filters;
-        let filterArray = [];
-        let filterMap = getFilters(state);
-        for (let key in filterMap) {
-            if (!!filterMap[key].value) {
-                filterArray.push(filterMap[key].name + ':' + filterMap[key].value);
-            }
-        }
-        if (filterArray.length) {
-            filters = filterArray.join(',');
-        }
-        console.log(filters);
-
-
-        // Get sorting from state if sort flag is true
-        let sortBy = getTableSorting(state);
-        let direction = getTableDirection(state);
-        let sort = sortBy + ':' + direction;
-
-
-        // Get page info needed for fetching events from state
-        let pageLimit = getPageLimit(state);
-        let offset = getPageOffset(state);
-
-        let data;
-
-        if (typeof filters == "undefined") {
-            //admin-ng/event/events.json?filter={filter}&sort={sort}&limit=0&offset=0
-            data = await fetch('admin-ng/event/events.json?' + new URLSearchParams({
-                sort: sort,
-                limit: pageLimit,
-                offset: offset
-            }));
-        } else {
-            //admin-ng/event/events.json?filter={filter}&sort={sort}&limit=0&offset=0
-            data = await fetch('admin-ng/event/events.json?' + new URLSearchParams({
-                filter: filters,
-                sort: sort,
-                limit: pageLimit,
-                offset: offset
-            }));
-        }
+        //admin-ng/event/events.json?filter={filter}&sort={sort}&limit=0&offset=0
+        let data = await fetch('admin-ng/event/events.json?' + params);
 
         const response =  await data.json();
 

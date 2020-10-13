@@ -32,6 +32,7 @@ export const recordingsTableConfig = {
         sortable: true
     }, {
         template: 'RecordingsActionCell',
+        name: 'actions',
         label:    'RECORDINGS.RECORDINGS.TABLE.ACTION'
     }],
     caption:    'RECORDINGS.RECORDINGS.TABLE.CAPTION',

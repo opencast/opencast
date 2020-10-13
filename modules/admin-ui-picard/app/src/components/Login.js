@@ -21,6 +21,9 @@ function changeLanguage(code) {
     window.location.reload();
 }
 
+/**
+ * This component renders the login page
+ */
 const Login = () => {
     const { t } = useTranslation();
     // State for opening (true) and closing (false) the dropdown menus for language

@@ -34,6 +34,9 @@ const SortActiveIcon = styled.i`
 
 const containerPageSize = React.createRef();
 
+/**
+ * This component renders the table in the table views of resources
+ */
 const Table = ({table, rowSelectionChanged, updatePageSize, templateMap, pageOffset, pages,
                    goToPage, updatePages, setOffset, changeSelectAll, setSortBy, reverseTable}) => {
     // Size options for pagination
@@ -325,13 +328,14 @@ const useSortRows = (resources, config = null) => {
     return { resources: sortedResources, requestSort, sortConfig };
 }
 
-
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     table: state.table,
     pageOffset: getPageOffset(state),
     pages: getTablePages(state)
 });
 
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     rowSelectionChanged: (id, selected) => dispatch(changeRowSelection(id, selected)),
     updatePageSize: size => dispatch(updatePageSize(size)),

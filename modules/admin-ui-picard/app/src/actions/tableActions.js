@@ -48,11 +48,6 @@ export const deselectAll = () => ({
     type: DESELECT_ALL
 });
 
-//todo: maybe some adjustments necessary, when actually implementing this
-export const sortTable = () => ({
-    type: SORT_TABLE,
-});
-
 export const resetSortTable = () => ({
     type: RESET_SORT_TABLE
 });
@@ -66,11 +61,6 @@ export const reverseTable = order => ({
 export const setSortBy = column => ({
     type: SET_SORT_BY,
     payload: { column }
-});
-
-//todo: maybe some adjustments necessary, when actually implementing this
-export const setMultiselect = () => ({
-   type: SET_MULTISELECT
 });
 
 // Actions affecting pagination of table

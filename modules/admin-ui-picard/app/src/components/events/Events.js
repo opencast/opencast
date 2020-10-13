@@ -19,6 +19,9 @@ import {fetchFilters} from "../../thunks/tableFilterThunks";
 // References for detecting a click outside of the container of the dropdown menu
 const containerAction = React.createRef();
 
+/**
+ * This component renders the table view of events
+ */
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
                         loadingSeriesIntoTable, loadingFilters }) => {
     const { t } = useTranslation();
@@ -176,13 +179,14 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
     );
 };
 
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     events: getEvents(state),
     showActions: isShowActions(state),
     isLoadingEvents: isLoading(state)
 });
 
-
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingEvents: () => dispatch(fetchEvents()),
     loadingEventsIntoTable: () => dispatch(loadEventsIntoTable()),

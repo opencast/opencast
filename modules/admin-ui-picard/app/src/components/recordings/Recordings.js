@@ -13,6 +13,9 @@ import {fetchRecordings} from "../../thunks/recordingThunks";
 import {loadRecordingsIntoTable} from "../../thunks/tableThunks";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
 
+/**
+ * This component renders the table view of recordings
+ */
 const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings, loadingFilters }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
@@ -21,7 +24,7 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
         // Fetching recordings from server
         await loadingRecordings();
 
-        // Load events into table
+        // Load recordings into table
         loadingRecordingsIntoTable();
     }
 
@@ -81,10 +84,12 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
     )
 }
 
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     recordings: getRecordings(state)
 });
 
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingRecordings: () => dispatch(fetchRecordings()),
     loadingRecordingsIntoTable: () => dispatch(loadRecordingsIntoTable()),

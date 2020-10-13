@@ -94,15 +94,7 @@ export const loadSeriesIntoTable = () => (dispatch, getState) => {
     });
     const multiSelect = seriesTableConfig.multiSelect;
 
-    let i, numberOfPages = resource.length / pagination.limit;
-    const pages = [];
-    for (i = 0; i < numberOfPages || (i === 0 && numberOfPages === 0); i++) {
-        pages.push({
-            number: i,
-            label: (i + 1).toString(),
-            active: i === pagination.offset
-        });
-    }
+    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
 
     const tableData = {
         resource: "series",
@@ -207,28 +199,30 @@ export const goToPage = pageNumber => (dispatch, getState) => {
     dispatch(setPageActive(pages[offset].number));
 
     // Get resources of page and load them into table
-    // Load events if resource is events
-    if (getResourceType(state) === "events") {
-        dispatch(fetchEvents());
-        dispatch(loadEventsIntoTable());
-    }
-    // Load series if resource is series
-    if(getResourceType(state) === "series") {
-        dispatch(fetchSeries());
-        dispatch(loadSeriesIntoTable());
-    }
-    // Load series if resource is recordings
-    if(getResourceType(state) === "recordings") {
-        dispatch(fetchRecordings());
-        dispatch(loadRecordingsIntoTable());
-    }
-    // Load series if resource is recordings
-    if(getResourceType(state) === "jobs") {
-        dispatch(fetchJobs());
-        dispatch(loadJobsIntoTable());
-    }
     // todo: Check for all other type of resource
-
+    // eslint-disable-next-line default-case
+    switch (getResourceType(state)) {
+        case 'events': {
+            dispatch(fetchEvents());
+            dispatch(loadEventsIntoTable());
+            break;
+        }
+        case 'series': {
+            dispatch(fetchSeries());
+            dispatch(loadSeriesIntoTable());
+            break;
+        }
+        case 'recordings': {
+            dispatch(fetchRecordings());
+            dispatch(loadRecordingsIntoTable());
+            break;
+        }
+        case 'jobs': {
+            dispatch(fetchJobs());
+            dispatch(loadJobsIntoTable());
+            break;
+        }
+    }
 }
 
 // Update pages for example if page size was changed
@@ -237,41 +231,36 @@ export const updatePages = () => (dispatch,getState) => {
 
     const pagination = getTablePagination(state);
 
-    let i, numberOfPages = pagination.totalItems / pagination.limit;
-
-    const pages = [];
-
-    for (i = 0; i < numberOfPages || (i === 0 && numberOfPages === 0); i++) {
-        pages.push({
-            number: i,
-            label: (i + 1).toString(),
-            active: i === pagination.offset
-        });
-    }
+    const pages = calculatePages(pagination.totalItems / pagination.limit, pagination.offset);
 
     dispatch(setPages(pages));
 
     // Get resources of page and load them into table
-    // Load events if resource is events
-    if (getResourceType(state) === "events") {
-        dispatch(fetchEvents());
-        dispatch(loadEventsIntoTable());
-    }
-    // Load series if resource is series
-    if(getResourceType(state) === "series") {
-        dispatch(fetchSeries());
-        dispatch(loadSeriesIntoTable());
-    }
-    if(getResourceType(state) === "recordings") {
-        dispatch(fetchRecordings());
-        dispatch(loadRecordingsIntoTable());
-    }
-    // Load series if resource is recordings
-    if(getResourceType(state) === "jobs") {
-        dispatch(fetchJobs());
-        dispatch(loadJobsIntoTable());
-    }
     // todo: Check for all other type of resource
+    // eslint-disable-next-line default-case
+    switch (getResourceType(state)) {
+        case 'events': {
+            dispatch(fetchEvents());
+            dispatch(loadEventsIntoTable());
+            break;
+        }
+        case 'series': {
+            dispatch(fetchSeries());
+            dispatch(loadSeriesIntoTable());
+            break;
+        }
+        case 'recordings': {
+            dispatch(fetchRecordings());
+            dispatch(loadRecordingsIntoTable());
+            break;
+        }
+        case 'jobs': {
+            dispatch(fetchJobs());
+            dispatch(loadJobsIntoTable());
+            break;
+        }
+    }
+
 }
 
 // Select all rows on table page
@@ -279,19 +268,29 @@ export const changeAllSelected = selected => (dispatch, getState) => {
     const state = getState();
 
     if (selected) {
-        if(getResourceType(state) === "events") {
-            dispatch(showEventsActions(true));
-        }
-        if(getResourceType(state) === "series") {
-            dispatch(showSeriesActions(true));
+        // eslint-disable-next-line default-case
+        switch (getResourceType(state)) {
+            case 'events': {
+                dispatch(showEventsActions(true));
+                break;
+            }
+            case 'series': {
+               dispatch(showSeriesActions(true));
+               break;
+            }
         }
         dispatch(selectAll());
     } else {
-        if(getResourceType(state) === "events") {
-            dispatch(showEventsActions(false));
-        }
-        if(getResourceType(state) === "series") {
-            dispatch(showSeriesActions(false));
+        // eslint-disable-next-line default-case
+        switch (getResourceType(state)) {
+            case 'events': {
+                dispatch(showEventsActions(false));
+                break;
+            }
+            case 'series': {
+                dispatch(showSeriesActions(false));
+                break;
+            }
         }
         dispatch(deselectAll());
     }
@@ -304,20 +303,37 @@ export const changeRowSelection = (id, selected) => (dispatch, getState) => {
 
     const state = getState();
 
-    if (getResourceType(state) === "events"){
-        if (getSelectedRows(state).length > 0) {
-            dispatch(showEventsActions(true));
-        } else {
-            dispatch(showEventsActions(false));
+    // eslint-disable-next-line default-case
+    switch (getResourceType(state)) {
+        case 'events': {
+            if (getSelectedRows(state).length > 0) {
+                dispatch(showEventsActions(true));
+            } else {
+                dispatch(showEventsActions(false));
+            }
+            break;
+        }
+        case 'series': {
+            if (getSelectedRows(state).length > 0) {
+                dispatch(showSeriesActions(true));
+            } else {
+                dispatch(showSeriesActions(false));
+            }
+            break;
         }
     }
+}
 
-    if (getResourceType(state) === "series"){
-        if (getSelectedRows(state).length > 0) {
-            dispatch(showSeriesActions(true));
-        } else {
-            dispatch(showSeriesActions(false));
-        }
+const calculatePages = (numberOfPages, offset) => {
+    const pages = [];
+
+    for (let i = 0; i < numberOfPages || (i === 0 && numberOfPages === 0); i++) {
+        pages.push({
+            number: i,
+            label: (i + 1).toString(),
+            active: i === offset
+        });
     }
 
+    return pages;
 }

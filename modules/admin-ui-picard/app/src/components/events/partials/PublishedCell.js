@@ -49,7 +49,7 @@ const PublishCell = ({ row }) => {
 
     return (
         <div className="popover-wrapper" ref={containerPublications}>
-            {row.publications.length && (
+            {row.publications.length ? (
                 <>
                     <a className="popover-wrapper__trigger" >
                         <span onClick={() => setShowPopup(!showPopup)}>{t('YES')}</span>
@@ -83,7 +83,7 @@ const PublishCell = ({ row }) => {
 
                 </>
 
-            )}
+            ) : null}
 
         </div>
     )

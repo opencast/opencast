@@ -3,12 +3,9 @@ import {
     LOAD_COLUMNS,
     SELECT_ROW,
     DESELECT_ALL,
-    SORT_TABLE,
-    RESET_SORT_TABLE,
     SELECT_ALL,
     REVERSE_TABLE,
     SET_SORT_BY,
-    SET_MULTISELECT,
     CREATE_PAGE,
     UPDATE_PAGESIZE,
     SET_OFFSET,
@@ -125,14 +122,6 @@ const table = (state=initialState, action) => {
                 })
             }
         }
-        case SORT_TABLE: {
-            //todo: maybe some adjustments necessary, when actually implementing this
-            return state;
-        }
-        case RESET_SORT_TABLE: {
-            //todo: maybe some adjustments necessary, when actually implementing this
-            return state;
-        }
         case REVERSE_TABLE: {
             const { order } = payload;
             return {
@@ -146,10 +135,6 @@ const table = (state=initialState, action) => {
                 ...state,
                 sortBy: column
             }
-        }
-        case SET_MULTISELECT: {
-            //todo: maybe some adjustments necessary, when actually implementing this
-            return state;
         }
         case CREATE_PAGE: {
             const { page } = payload;
