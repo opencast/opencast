@@ -41,10 +41,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 
 import java.lang.management.ManagementFactory;
+import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.MalformedObjectNameException;
@@ -207,10 +210,15 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     // optional with default values
     String rolePrefix = Objects.toString(properties.get(ROLE_PREFIX_KEY), "ROLE_");
     String[] excludePrefixes = StringUtils.split((String) properties.get(EXCLUDE_PREFIXES_KEY), ",");
-    String[] extraRoles =  StringUtils.split(Objects.toString(properties.get(EXTRA_ROLES_KEY), ""), ",");
     boolean convertToUppercase = BooleanUtils.toBoolean(Objects.toString(properties.get(UPPERCASE_KEY), "true"));
     int cacheSize = NumberUtils.toInt((String) properties.get(CACHE_SIZE), 1000);
     int cacheExpiration = NumberUtils.toInt((String) properties.get(CACHE_EXPIRATION), 5);
+
+    // extra roles
+    String[] extraRoles =  StringUtils.split(Objects.toString(properties.get(EXTRA_ROLES_KEY), ""), ",");
+    Set<String> extraRoleSet = new HashSet<>(Arrays.asList(extraRoles));
+    extraRoleSet.addAll(Arrays.asList("ROLE_ANONYMOUS", "ROLE_USER"));
+    extraRoles = extraRoleSet.toArray(new String[extraRoles.length]);
 
     // Now that we have everything we need, go ahead and activate a new provider, removing an old one if necessary
     ServiceRegistration existingRegistration = providerRegistrations.remove(pid);

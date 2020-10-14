@@ -22,5 +22,5 @@
 
 angular.module('adminNg.resources')
 .factory('AdopterRegistrationResource', ['$resource', function ($resource) {
-  return $resource('/admin-ng/adopter/statistics/registration');
+  return $resource('/admin-ng/adopter/registration');
 }]);

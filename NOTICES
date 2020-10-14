@@ -1685,12 +1685,6 @@ security-cas
   org.springframework.security           spring-security-cas                              The Apache Software License, Version 2.0
 
 
-security-openid
-  GroupId                                ArtifactId                                       Licenses
-  org.openid4java                        com.springsource.org.openid4java                 -
-  org.springframework.security           spring-security-openid                           The Apache Software License, Version 2.0
-
-
 security-shibboleth
   GroupId                                ArtifactId                                       Licenses
   javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
