@@ -23,6 +23,8 @@ import {recordingsTableConfig} from "../configs/tableConfigs/recordingsTableConf
 import {fetchRecordings} from "./recordingThunks";
 import {jobsTableConfig} from "../configs/tableConfigs/jobsTableConfig";
 import {fetchJobs} from "./jobThunks";
+import {serversTableConfig} from "../configs/tableConfigs/serversTableConfig";
+import {fetchServers} from "./serverThunks";
 
 /**
  * This file contains methods/thunks used to manage the table in the main view and its state changes
@@ -49,16 +51,7 @@ export const loadEventsIntoTable = () => async (dispatch, getState) => {
     })
     const multiSelect = eventsTableConfig.multiSelect;
 
-    let i, numberOfPages = resource.length / pagination.limit;
-    const pages = [];
-    for (i = 0; i < numberOfPages || (i === 0 && numberOfPages === 0); i++) {
-        pages.push({
-            number: i,
-            label: (i + 1).toString(),
-            active: i === pagination.offset
-        });
-    }
-
+    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
 
     const tableData = {
         resource: "events",
@@ -123,15 +116,7 @@ export const loadRecordingsIntoTable = () => (dispatch, getState) => {
 
     const multiSelect = recordingsTableConfig.multiSelect;
 
-    let i, numberOfPages = resource.length / pagination.limit;
-    const pages = [];
-    for (i = 0; i < numberOfPages || (i === 0 && numberOfPages === 0); i++) {
-        pages.push({
-            number: i,
-            label: (i + 1).toString(),
-            active: i === pagination.offset
-        });
-    }
+    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
 
     const tableData = {
         resource: "recordings",
@@ -160,15 +145,7 @@ export const loadJobsIntoTable = () => (dispatch, getState) => {
 
     const multiSelect = jobsTableConfig.multiSelect;
 
-    let i, numberOfPages = resource.length / pagination.limit;
-    const pages = [];
-    for (i = 0; i < numberOfPages || (i === 0 && numberOfPages === 0); i++) {
-        pages.push({
-            number: i,
-            label: (i +1).toString(),
-            active: i === pagination.offset
-        });
-    }
+    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
 
     const tableData = {
         resource: "jobs",
@@ -181,6 +158,35 @@ export const loadJobsIntoTable = () => (dispatch, getState) => {
     dispatch(loadResourceIntoTable(tableData));
 }
 
+export const loadServersIntoTable = () => (dispatch, getState) => {
+    const { servers } = getState();
+    const pagination = getTablePagination(getState());
+    const resource = servers.results;
+
+    const c = serversTableConfig.columns;
+    const columns = c.map(column => {
+        const col = servers.columns.find(co => co.name === column.name);
+        return {
+            ...column,
+            deactivated: col.deactivated
+        }
+    });
+
+    const multiSelect = serversTableConfig.multiSelect;
+
+    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
+
+    const tableData = {
+        resource: "servers",
+        rows: resource,
+        columns: columns,
+        multiSelect: multiSelect,
+        pages: pages,
+        sortBy: "online"
+    };
+    dispatch(loadResourceIntoTable(tableData));
+
+}
 
 
 // Navigate between pages
@@ -222,6 +228,11 @@ export const goToPage = pageNumber => (dispatch, getState) => {
             dispatch(loadJobsIntoTable());
             break;
         }
+        case 'servers': {
+            dispatch(fetchServers());
+            dispatch(loadServersIntoTable());
+            break;
+        }
     }
 }
 
@@ -257,6 +268,11 @@ export const updatePages = () => (dispatch,getState) => {
         case 'jobs': {
             dispatch(fetchJobs());
             dispatch(loadJobsIntoTable());
+            break;
+        }
+        case 'servers': {
+            dispatch(fetchServers());
+            dispatch(loadServersIntoTable());
             break;
         }
     }

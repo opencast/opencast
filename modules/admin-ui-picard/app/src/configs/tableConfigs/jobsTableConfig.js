@@ -1,3 +1,6 @@
+import JobsStartedCell from "../../components/systems/partials/JobsStartedCell";
+import JobsSubmittedCell from "../../components/systems/partials/JobsSubmittedCell";
+
 /**
  * Config that contains the columns and further information regarding jobs. These are the information that never or hardly changes.
  * That's why it is hard coded here and not fetched from server.
@@ -8,9 +11,6 @@
  * - category type (here: systems)
  * - is multi select possible?
  */
-import JobsStartedCell from "../../components/systems/partials/JobsStartedCell";
-import JobsSubmittedCell from "../../components/systems/partials/JobsSubmittedCell";
-
 export const jobsTableConfig = {
     columns: [{
         name:  'id',

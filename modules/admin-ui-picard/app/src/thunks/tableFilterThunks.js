@@ -12,31 +12,45 @@ export const fetchFilters = resource => async dispatch => {
         dispatch(loadFiltersInProgress());
 
         let response;
-        if (resource === 'events') {
-            const data = await fetch('admin-ng/resources/events/filters.json');
-            const eventsData =  await data.json();
 
-            response = transformResponse(eventsData);
+        switch (resource) {
+            case 'events': {
+                const data = await fetch('admin-ng/resources/events/filters.json');
+                const eventsData =  await data.json();
+
+                response = transformResponse(eventsData);
+                break;
+            }
+            case 'series': {
+                const data = await fetch('admin-ng/resources/series/filters.json');
+                const seriesData =  await data.json();
+
+                response = transformResponse(seriesData);
+                break;
+            }
+            case 'recordings': {
+                const data = await fetch('admin-ng/resources/recordings/filters.json');
+                const recordingsData = await data.json();
+
+                response = transformResponse(recordingsData);
+                break;
+            }
+            case 'jobs': {
+                const data = await fetch('admin-ng/resources/jobs/filters.json');
+                const jobsData = await data.json();
+
+                response = transformResponse(jobsData);
+                break;
+            }
+            case 'servers': {
+                const data = await fetch('admin-ng/resources/servers/filters.json');
+                const serversData = await data.json();
+
+                response = transformResponse(serversData);
+                break;
+            }
         }
-        if (resource === 'series') {
-            const data = await fetch('admin-ng/resources/series/filters.json');
-            const seriesData =  await data.json();
 
-            response = transformResponse(seriesData);
-        }
-        if (resource === 'recordings') {
-            const data = await fetch('admin-ng/resources/recordings/filters.json');
-            const recordingsData = await data.json();
-
-            response = transformResponse(recordingsData);
-        }
-
-        if (resource === 'jobs') {
-            const data = await fetch('admin-ng/resources/jobs/filters.json');
-            const jobsData = await data.json();
-
-            response = transformResponse(jobsData);
-        }
         const filters = response
         const filtersList = Object.keys(filters.filters).map(key => {
             let filter = filters.filters[key];

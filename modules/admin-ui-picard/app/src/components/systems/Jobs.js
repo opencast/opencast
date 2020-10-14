@@ -10,13 +10,15 @@ import {connect} from "react-redux";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
 import {jobsTemplateMap} from "../../configs/tableConfigs/jobsTableConfig";
 import {fetchJobs} from "../../thunks/jobThunks";
-import {loadJobsIntoTable} from "../../thunks/tableThunks";
+import {loadJobsIntoTable, loadServersIntoTable} from "../../thunks/tableThunks";
 import {getJobs} from "../../selectors/jobSelectors";
+import {fetchServers} from "../../thunks/serverThunks";
 
 /**
  * This component renders the table view of jobs
  */
-const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters}) => {
+const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
+                  loadingServers, loadingServersIntoTable }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -28,9 +30,10 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters}) => {
         loadingJobsIntoTable();
     }
 
-    // TODO: implement
     const loadServers = () => {
-        console.log('placeholder');
+        loadingServers()
+
+        loadingServersIntoTable()
     }
 
     // TODO: implement
@@ -114,7 +117,9 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     loadingFilters: resource => dispatch(fetchFilters(resource)),
     loadingJobs: () => dispatch(fetchJobs()),
-    loadingJobsIntoTable: () => dispatch(loadJobsIntoTable())
+    loadingJobsIntoTable: () => dispatch(loadJobsIntoTable()),
+    loadingServers: () => dispatch(fetchServers()),
+    loadingServersIntoTable: () => dispatch(loadServersIntoTable())
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Jobs));

@@ -11,6 +11,7 @@ import table from './reducers/tableReducers';
 import series from "./reducers/seriesReducer";
 import recordings from "./reducers/recordingReducer";
 import jobs from "./reducers/jobReducer";
+import servers from "./reducers/serverReducer";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -24,7 +25,8 @@ const reducers = {
     series,
     table,
     recordings,
-    jobs
+    jobs,
+    servers
 };
 
 // Configuration for persisting store

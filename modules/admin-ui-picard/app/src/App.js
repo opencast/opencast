@@ -11,6 +11,7 @@ import Users from "./components/users/Users";
 import Statistics from "./components/statistics/Statistics";
 import Series from "./components/events/Series";
 import Login from "./components/Login";
+import Servers from "./components/systems/Servers";
 
 const version = {
   version: '8.03',
@@ -39,6 +40,9 @@ function App() {
                   </Route>
                   <Route exact path={"/systems/jobs"}>
                       <Jobs />
+                  </Route>
+                  <Route exact path={"/systems/servers"}>
+                      <Servers />
                   </Route>
                   <Route exact path={"/configuration/themes"}>
                       <Themes />
