@@ -95,6 +95,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -487,18 +488,8 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       gson.fromJson(workflowConfigurationStr, Map.class);
       workflowConfiguration = workflowConfigurationStr;
       workflow = workflowStr;
-      final String retractWorkflowId = (String) properties.get("retract-workflow-id");
-      if (retractWorkflowId == null) {
-        this.retractWorkflowId = "retract";
-      } else {
-        this.retractWorkflowId = retractWorkflowId;
-      }
-      final String copyWorkflowId = (String) properties.get("copy-workflow-id");
-      if (copyWorkflowId == null) {
-        this.copyWorkflowId = "copy-event-to-series";
-      } else {
-        this.copyWorkflowId = copyWorkflowId;
-      }
+      this.retractWorkflowId = Objects.toString(properties.get("retract-workflow-id"), "retract");
+      this.copyWorkflowId = Objects.toString(properties.get("copy-workflow-id"), "copy-event-to-series");
     } catch (JsonSyntaxException e) {
       throw new IllegalArgumentException("Invalid JSON specified for workflow configuration");
     }
