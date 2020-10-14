@@ -18,7 +18,7 @@ The InspectWorkflowOperation will also set the duration and creation date of the
 ### Accept No Media
 
 If the configuration key `accept-no-media`is set to `false`, the operation will fail if the media package does not
-contain any media tracks. If this behaviour is not appropriate, set `accept-no-media` to `true`.
+contain any media tracks. If this behavior is not appropriate, set `accept-no-media` to `true`.
 
 ### Accurate Frame Count
 

@@ -8,7 +8,7 @@ Important Changes
 
 - Opencast now requires an external Elasticsearch server to function
 - Paella is now the default video player
-- The `encode` worfklow operation now completely replaces `compose`,
+- The `encode` workflow operation now completely replaces `compose`,
   which is dropped now
 - MariaDB JDBC driver
     - TODO Where is this in the changelog?!
@@ -54,7 +54,7 @@ Improvements
   when persistence is enabled
 - Fix entering custom roles in the admin UI
 - Support odd widths/heights in the default encoding profiles
-- Make image extraction more robust for streams wihtout known duration
+- Make image extraction more robust for streams without known duration
 - Fix image extraction at frame 0
 - The external API now returns the bibliographic start date
   instead of the technical one

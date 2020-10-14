@@ -22,7 +22,7 @@ pages and we don't always notice!
 - Navigate to the [**Google Developers Console**][googledevconsole]
 - Click **Create Project** and follow the instructions
 - Navigate to the [**Google Credentials Console**][googleapiconsole]
-- Select **OAuth constent screen**
+- Select **OAuth consent screen**
 - Configure the API Consent Screen, you will need to set the Product name
 - Select **Credentials**
 - Select **Create Credentials**, specifically OAuth Client ID
@@ -37,7 +37,7 @@ pages and we don't always notice!
 
 ### Enable API
 
-- Naviate to the [**Google API Dashboard**][googledashboard]
+- Navigate to the [**Google API Dashboard**][googledashboard]
 - Click **Enable APIs and Services** in the navigation pane
 - Use the filter to find and enable **YouTube Data API v3**
 

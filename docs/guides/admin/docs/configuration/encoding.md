@@ -3,7 +3,7 @@ Encoding Profile Configuration
 
 A workflow defines which operations are applied to media ingested into Opencast and the order of these operations. An
 operation can be something general like “encode this video”. The encoding profiles then specify exactly how a media is
-ancoded, which filters are applied, which codecs are used and in which container these will be stored, …
+encoded, which filters are applied, which codecs are used and in which container these will be stored, …
 
 Opencast comes with a set of such profiles generating files for both online playback and download. These profiles are
 build to work for everyone, meaning that in most cases optimization can be done according to local needs. So modifying

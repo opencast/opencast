@@ -13,7 +13,7 @@ Parameter Table
 
 |configuration keys|example         |description|
 |------------------|----------------|-----------|
-|source-tags       |text            |Comma separated list of tags. Specifies which media should be the source of a snapshop.|
+|source-tags       |text            |Comma separated list of tags. Specifies which media should be the source of a snapshot.|
 |source-flavors    |presenter/source|Comma separated list of flavors. Specifies which media should be the source of a snapshot.|
 
 

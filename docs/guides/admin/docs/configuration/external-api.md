@@ -14,7 +14,7 @@ Perform the following steps to get the External API running:
 Authentication
 --------------
 
-The External API currenlty only supports basic authentication. To enable basic authentication, uncomment the following
+The External API currently only supports basic authentication. To enable basic authentication, uncomment the following
 blocks in `/etc/security/mh_default_org.xml`:
 
     <!-- Basic authentication

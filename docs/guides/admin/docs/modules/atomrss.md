@@ -87,7 +87,7 @@ The following properties are common to all feed specifications:
 |-----------------|-----------|
 |feed.class       |Java implementation, e.g. LatestFeedService.|
 |feed.uri         |Feed location/identifier|
-|feed.size        |Maximum number of entries in the feed (defaul: 100). Set to 0 to include all available entries.|
+|feed.size        |Maximum number of entries in the feed (default: 100). Set to 0 to include all available entries.|
 |feed.selector    |Feed route pattern, e.g. latest.|
 |feed.name        |Feed title|
 |feed.description |Feed description|
@@ -105,7 +105,7 @@ The following properties are specific to custom feeds:
 
 |Name      |Description|
 |----------|-----------|
-|feed.query|A custom lucene query, matched again Java's MessageFormat using solr.|
+|feed.query|A custom Lucene query, matched again Java's MessageFormat using solr.|
 
 The query `http://opencast.example.edu:8080/feeds/alphabetical/a` would return all episodes starting with the letter a.
 

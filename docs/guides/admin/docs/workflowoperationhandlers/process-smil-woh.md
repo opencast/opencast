@@ -17,7 +17,7 @@ This workflow operation is used to bypass the generation of the temporary target
 directly.
 Subsequent workflow operations can select the highest quality source medium by tags and flavors.
 This operation saves the encoding time of one set of full length video and allows concurrent
-processing of multiple independent ffmpeg operations.
+processing of multiple independent FFmpeg operations.
 
 To use this operation with the editor, the following must be added to the [editor](editor-woh.md) workflow operation
 to bypass the video editor encoding,
@@ -34,7 +34,7 @@ In the future, each transition can be configurable as a SMIL element.
 
 The SMIL file can use more than one source video, but the caller has to take care that the dimension of
 all the source videos are the same.
-This workflow will generate one independent ffmpeg operation per SMIL paramgroup (based on source) regardless
+This workflow will generate one independent FFmpeg operation per SMIL paramgroup (based on source) regardless
 of the number of target outputs.
 
 This workflow can handle each source flavor selector independently.
@@ -121,7 +121,7 @@ Without HLS, it will look like the following.
 |target-flavors     | */delivery                  | Specifies the flavor of the new media                               |
 |target-tags        | engage,archive              | Specifies the tags of the new media                                 |
 |encoding-profiles  | mp4-low.http,mp4-med.http**;**mp4-vga-med,mp4-med.http | Profiles for each source flavor |
-|tag-with-profile   | true (default to false)     | target medium are tagged with coresponding encoding profile Id      |
+|tag-with-profile   | true (default to false)     | target medium are tagged with corresponding encoding profile Id      |
 
 With HLS, encoding profiles will look like the following.
 
@@ -156,11 +156,11 @@ With HLS, encoding profiles line will look like:
 
 ## Note:(Very Important)
 
-Each encoding section generates all the target media in one ffmpeg call by incorporating relevant parts
+Each encoding section generates all the target media in one FFmpeg call by incorporating relevant parts
 of each encoding profile command using complex filters.
 
 *  Care must be taken that **no complex filters** are used in the encoding profiles used for this workflow,
-as it can cause a conflict and ffmpeg will fail.
+as it can cause a conflict and FFmpeg will fail.
 Simple filters (i.e.: -vf, -af , -filter:v, -filter:a) can be used.
 
 *  Encoded target recording are distinguished by the suffix, it is important that **all the encoding profiles

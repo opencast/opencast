@@ -8,7 +8,7 @@ their relations. Its primary use is to post-process audio and video files ingest
 ## Prerequisite
 When using the PartialImportWorkflowOperation, it is recommended to perform a media inspection beforehand using the
 InspectWorkflowOperation with the option `accurate-frame-count` set to `true`. This ensures that
-the PartialImportWorkflowOperation works correctly in case of media files with incorrect framecount in their header.
+the PartialImportWorkflowOperation works correctly in case of media files with incorrect frame count in their header.
 Note that the use of `accurate-frame-count` will force the InspectWorkflowOperation to decode the complete video
 stream which makes the operation more expensive in terms of load.
 

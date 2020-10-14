@@ -1,15 +1,15 @@
 # Video Editor: Architecture
 
-## Modules Of The Videoeditor
+## Modules Of The Video Editor
 
-The Videoeditor consists of the following moduls. Additional to this there is a Workflow Operation Handler within the
+The Video Editor consists of the following modules. Additional to this there is a Workflow Operation Handler within the
 Conductor module that provides the UI elements for the Video Editor.
 
 * silencedetection-api
     * API for the silence detection
 * silencedetection-impl
     * Implementation of the silence detection service
-    * Provides a SMIL file that can be used by the Video Editor UI or the Video Editor service to create a new cutted
+    * Provides a SMIL file that can be used by the Video Editor UI or the Video Editor service to create a new cut
       file.
 * silencedetection-remote
     * Remote implementation of the silence detection service to enable load balancing in a distributed setup.
@@ -19,9 +19,9 @@ Conductor module that provides the UI elements for the Video Editor.
     * The SMIL service allows creation and manipulation of SMIL files. This is more or less a helper class to create
       consistent SMIL files.
 * videoeditor-api
-    * The API for the Video Editor which takes a SMIL file as an input to create a cutted version of the media files.
+    * The API for the Video Editor which takes a SMIL file as an input to create a cut version of the media files.
 * videoeditor-ffmpeg-impl
-    * The Video Editor service creates new media files that will be cutted based on the information provided in a SMIL
+    * The Video Editor service creates new media files that will be cut based on the information provided in a SMIL
       file. In the current implementation GStreamer with the gnonlin module is used to process the files.
 * videoeditor-remote
     * Remote implementation of the video editor service to enable load balancing in a distributed setup.

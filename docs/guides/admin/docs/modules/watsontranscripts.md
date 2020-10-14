@@ -32,7 +32,7 @@ Configuration
 
 ### Step 1: Get IBM Watson credentials
 
-* [Create a 30-day trial acoount in IBM Cloud](https://console.bluemix.net)
+* [Create a 30-day trial account in IBM Cloud](https://console.bluemix.net)
 * [Get service credentials](https://console.bluemix.net/docs/services/watson/getting-started-iam.html#iam)
 
 As of 10/30/2018, the service has migrated to token-based Identity and Access Management (IAM) authentication so user

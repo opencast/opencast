@@ -116,7 +116,7 @@ For a basic installation (All-In-One) just run:
     apt-get install opencast-3-allinone
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.  Note
-that while the repository provides a packaged version of ffmpeg, your distribution may have a version which is
+that while the repository provides a packaged version of FFmpeg, your distribution may have a version which is
 pre-installed or otherwise takes precedence.  This version may work, however Opencast only formally supports the
 version(s) in the repository.
 
@@ -168,7 +168,7 @@ revision, you can select it by adding it, and the packaging build, to your `apt-
     apt-get install opencast-3-admin=3.2-2
 
 Installs an Opencast 3.2 admin node, using the second build of that series.  Not all series have more than a single build,
-and older point revisions may be removed once superceded, so please explore the repository prior to attempting this.
+and older point revisions may be removed once superseded, so please explore the repository prior to attempting this.
 
 
 Install 3rd-party-tools
