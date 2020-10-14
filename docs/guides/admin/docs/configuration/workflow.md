@@ -106,7 +106,7 @@ Start by naming the workflow and giving it a meaningful description:
     * *delete*: Usable for deletion of events with publications
     * *editor*: Usable from the video editor
 * The `displayOrder` is an integer that indicates in what order workflow definitions shall be displayed by clients.
-  If ommitted, the `displayOrder` defaults to `0`. Clients are expected to list workflow definitions in descending order.
+  If omitted, the `displayOrder` defaults to `0`. Clients are expected to list workflow definitions in descending order.
 * The `description` allows you to describe the workflow in detail. Blank lines are formatted as newlines, while single
   line breaks are ignored so that the XML remains compact and readable even with long paragraphs.
 

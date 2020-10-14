@@ -11,7 +11,7 @@ won't cause any errors, it will just skip those elements.
 
 ## Parameters
 
-These are the keys that can be configured for the worklow operation in the workflow definition.  The `channel-id` is
+These are the keys that can be configured for the workflow operation in the workflow definition.  The `channel-id` is
 mandatory.
 
 |Key                    |Description                                          |Example    |Default  |

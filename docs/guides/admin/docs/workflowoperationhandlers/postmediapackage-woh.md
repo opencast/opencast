@@ -10,7 +10,7 @@ Authentication.
 
 |Configuration Keys |Description                                                                                   |
 |-------------------|----------------------------------------------------------------------------------------------|
-|url                |The target url                                                                                |
+|url                |The target URL                                                                                |
 |format             |The desired export format: `xml` or `json`                                                    |
 |debug              |Disable this on a productive system. If enabled, request bodies etc. will be written to log. If disabled, only errors will be logged. |
 |mediapackage.type  |Type of Mediapackage to send (possible values: `workflow`, `search`; default: `search`)       |

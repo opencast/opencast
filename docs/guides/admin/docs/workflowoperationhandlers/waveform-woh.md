@@ -8,7 +8,7 @@ The waveform operation creates an image showing the temporal audio activity with
 
 ![waveform](waveform.png)
 
-The implementation uses an ffmpeg filter that produces a waveform PNG image file from an audio/video file with at least
+The implementation uses an FFmpeg filter that produces a waveform PNG image file from an audio/video file with at least
 one audio channel.
 
 

@@ -8,7 +8,7 @@ audio stream only, the implementation will call the composer's "mux" method, wit
 muxed with the video, using the video's movie container.
 
 If it there is one track with a certain flavor, the "encode" method is called which will rewrite (vs. encode) the file
-using the same container and codec (-vcodec copy, -a codec copy), while the container format is determined by ffmpeg via
+using the same container and codec (-vcodec copy, -a codec copy), while the container format is determined by FFmpeg via
 the file's extension. The reason for doing this is that many media files are in a poor state with regard to their
 compatibility (most often, the stream's codec contains differing information from the container), so we are basically
 asking FFmepg to rewrite the whole thing, which will in many cases eliminate problems that would otherwise occur later

@@ -54,7 +54,7 @@ for a log entry like this:
 ```
 
 Then login to Opencast using a username which also exists in your Canvas system.
-Verify the roles granted to the user by opening the url OPENCAST-URL/info/me.json
+Verify the roles granted to the user by opening the URL OPENCAST-URL/info/me.json
 in a new browser tab.
 
 If necessary, you can increase the logging detail from the Canvas user provider by

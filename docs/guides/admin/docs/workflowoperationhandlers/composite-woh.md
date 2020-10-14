@@ -8,7 +8,7 @@ done using FFmpeg. The composition can be done in various layout formats e.g. si
 layout has to be defined in JSON format and is described in section "Layout Definition". For some general information
 about layouts see Opencast Composer Layout Module.
 
-The internal ffmpeg command is using the following filters: scale for scaling the videos, pad for defining the output
+The internal FFmpeg command is using the following filters: scale for scaling the videos, pad for defining the output
 dimension including the background color, movie for adding additional videos and images and overlay for aligning the
 videos and images to the output dimension. More info can be found here: https://trac.ffmpeg.org/wiki/FilteringGuide
 

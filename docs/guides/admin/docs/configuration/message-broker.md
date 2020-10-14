@@ -51,7 +51,7 @@ Note that the default configuration needs to be adjusted for distributed set-ups
 
 ### 1. Connection
 
-The ActiveMQ connection is configured in the `custom.properties`. The default configuration points to a local
+The ActiveMQ connection is configured in Opencast's `custom.properties` file. The default configuration points to a local
 installation of ActiveMQ. You can easily configure this to point somewhere else:
 
     activemq.broker.url = failover://tcp://example.opencast.org:61616

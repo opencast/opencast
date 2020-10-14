@@ -28,7 +28,7 @@ Parameter Table
 |streaming-source-tags      |Specifies which media should be published to the streaming server                            |
 |streaming-target-tags      |Add tags (comma separated) to published media                                                |
 |streaming-target-subflavors|Subflavor to use for distributed material                                                    |
-|merge-force-flavors        |Flavors of elements for which an update is enforced when mergeing catalogs.                  |
+|merge-force-flavors        |Flavors of elements for which an update is enforced when merging catalogs.                  |
 |                           |Defaults to `dublincore/*,security/*`.
 
 

@@ -77,5 +77,5 @@ log4j.appender.gelf.includeLocation=true
 log4j.appender.gelf.additionalFields={'environment': 'OPENCAST-TEST-ENV', 'application': 'OC-ADMIN'}
 ```
 
-You can find further gelf appender documentation [here](https://github.com/t0xa/gelfj).
+You can find further GELF appender documentation [here](https://github.com/t0xa/gelfj).
 

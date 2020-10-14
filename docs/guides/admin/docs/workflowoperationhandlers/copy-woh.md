@@ -24,7 +24,7 @@ Notes:
 ## Target Filenames
 If *target-filename* is not specified, the filename for each media package element is extracted from the media package
 element URI. If *target-filename* is specified, the filename is the result of appending the file extension (extracted
-from the media package element URI) to *target-filename*. In case the *source-flavors* and *source-tags* match mutliple
+from the media package element URI) to *target-filename*. In case the *source-flavors* and *source-tags* match multiple
 media package elements, a sequentially increasing integer number (starting at 1) can be used within *target-filename* in
 Java string formatting manner to ensure unique filenames.
 

@@ -3,7 +3,7 @@
 
 ## Description
 
-The PublishAWSS3WorkflowOperation will publish your recording to the normal publication channel (ie, engage), but the
+The PublishAWSS3WorkflowOperation will publish your recording to the normal publication channel (e.g. engage), but the
 media files will be hosted via AWS S3/Cloudfront.
 
 
@@ -21,7 +21,7 @@ media files will be hosted via AWS S3/Cloudfront.
 |                           |merges new publication with existing publication                              |
 |streaming-source-flavors   |Specifies which media should be published to the streaming server             |
 |streaming-source-tags      |Specifies which media should be published to the streaming server             |
-|streaming-tagret-tags      |Modify tags of published media                                                |
+|streaming-target-tags      |Modify tags of published media                                                |
 |streaming-target-subflavors|Subflavor to use for distributed material                                     |
 
 

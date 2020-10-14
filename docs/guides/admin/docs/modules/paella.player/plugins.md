@@ -40,6 +40,6 @@ Plugin                                             | Description
 [es.upv.paella.opencast.episodesFromSeries](plugins/es.upv.paella.opencast.episodesFromSeries.md)               | Show a list of videos in the same series.
 [es.upv.paella.opencast.loader](plugins/es.upv.paella.opencast.loader.md)                                       | Configures how events are loaded into paella player.
 [es.upv.paella.opencast.logIn](plugins/es.upv.paella.opencast.logIn.md)                                         | Adds a button to be able to login.
-[es.upv.paella.opencast.searchPlugin](plugins/es.upv.paella.opencast.searchPlugin.md)                           | Enable searches using the OCR trascription.
-[es.upv.paella.opencast.transcriptionTabBarPlugin](plugins/es.upv.paella.opencast.transcriptionTabBarPlugin.md) | Adds a panel to show the OCR transcriptios.
+[es.upv.paella.opencast.searchPlugin](plugins/es.upv.paella.opencast.searchPlugin.md)                           | Enable searches using the OCR transcription.
+[es.upv.paella.opencast.transcriptionTabBarPlugin](plugins/es.upv.paella.opencast.transcriptionTabBarPlugin.md) | Adds a panel to show the OCR transcriptions.
 [es.upv.paella.opencast.userTrackingSaverPlugIn](plugins/es.upv.paella.opencast.userTrackingSaverPlugIn.md)     | Allows to use Opencast Usertracking Service to track usage data.

@@ -42,4 +42,4 @@ migrations. For that, the following steps might help.
    https://admin.opencast.example.com/docs.html?path=/admin-ng/index
 
 Note: If the solr index does not repopulate by itself please check if your nodes are still in maintenance mode and
-reactiveate them.
+reactivate them.

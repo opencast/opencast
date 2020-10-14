@@ -4,7 +4,7 @@ Multi Tenancy Configuration
 Introduction
 ------------
 
-A single Opencast instance can handle mutliple tenants, each of which have their own recordings in the system.
+A single Opencast instance can handle multiple tenants, each of which have their own recordings in the system.
 Opencast refers to tenants as *organizations*, and an HTTP request to the Opencast installation is mapped to an
 organization using the server name. Therefore, a Opencast instance will usually be set up with multiple DNS names
 pointing to the same IP, for example:
@@ -24,7 +24,7 @@ Out of the box, Opencast has one tenant configured, called `mh_default_org` that
 `localhost:8080`. As long as there is one tenant configuration only, Opencast will map every request to that tenant
 regardless of the server name. As soon as a second tenant configuration is available, requests will be mapped to
 organizations using the server name, and an HTTP status code 404 will be returned for requests that hit the Opencast
-intallation that cannot be mapped to any organization.
+installation that cannot be mapped to any organization.
 
 
 ### Limitations
@@ -87,8 +87,8 @@ Example:
 
 ### Security Configuration
 
-Create a file called tenant1.xml in /etc/security. This file specifies access rules for individual urls that specify
-which roles are needed in order to access a given url. In addition, it allows to define the directory services that are
+Create a file called tenant1.xml in /etc/security. This file specifies access rules for individual URLs that specify
+which roles are needed in order to access a given URL. In addition, it allows to define the directory services that are
 used to authenticate users. The file follows the standard ways on configuring Spring Security and you are free to add
 anything that can go into a Spring Security configuration.
 

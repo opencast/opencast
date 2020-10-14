@@ -40,7 +40,7 @@ Media packages contain media files and metadata files describing them.
 Opencast is able to generate media packages using the
 [ZipWorkflowOperation](../workflowoperationhandlers/zip-woh/).
 
-Create the follwing files:
+Create the following files:
 
 _manifest.xml_
 ```xml
