@@ -3,7 +3,7 @@
 
 ## Description
 
-The PublishAWSS3WorkflowOperation will publish your recording to the normal publication channel (eg. engage), but the
+The PublishAWSS3WorkflowOperation will publish your recording to the normal publication channel (e.g. engage), but the
 media files will be hosted via AWS S3/Cloudfront.
 
 
