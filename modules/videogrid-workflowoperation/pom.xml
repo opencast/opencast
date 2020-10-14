@@ -90,6 +90,9 @@
             <!-- provide a logger for tests -->
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
+          <ignoredUsedUndeclaredDependencies>
+            <ignoredUsedUndeclaredDependency>org.apache.httpcomponents:httpclient-osgi:jar</ignoredUsedUndeclaredDependency>
+          </ignoredUsedUndeclaredDependencies>
         </configuration>
       </plugin>
       <plugin>

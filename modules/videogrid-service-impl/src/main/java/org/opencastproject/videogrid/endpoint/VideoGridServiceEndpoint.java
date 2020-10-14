@@ -26,6 +26,10 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -39,6 +43,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.commons.codec.EncoderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,19 +109,23 @@ public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
   @RestQuery(name = "videogrid", description = "Create video grid",
           restParameters = {
                   @RestParameter(name = "commands", isRequired = true, type = STRING,
-                          description = "A list of ffmpeg commands, one for each part.") },
+                          description = "A list of ffmpeg commands, one for each part."),
+                  @RestParameter(name = "tracks", isRequired = true, type = RestParameter.Type.TEXT,
+                          description = "The source tracks to concat as XML") },
           responses = {
                   @RestResponse(description = "VideoGrid created successfully", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "Invalid data", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                   @RestResponse(description = "Internal error", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
           returnDescription = "Returns the paths to the generated videos for the grid")
   public Response createPartialTracks(
-          @FormParam("commands") String commandsString) {
+          @FormParam("commands") String commandsString,
+          @FormParam("sourceTracks") String tracksXml) throws MediaPackageException, EncoderException {
     Gson gson = new Gson();
     try {
       List<List<String>> commands = gson.fromJson(commandsString, stringListOfListType);
+      List<? extends MediaPackageElement> tracks = MediaPackageElementParser.getArrayFromXml(tracksXml);
       logger.debug("Start videogrid");
-      Job job = videoGridService.createPartialTracks(commands);
+      Job job = videoGridService.createPartialTracks(commands, tracks.toArray(new Track[tracks.size()]));
       return Response.ok(new JaxbJob(job)).build();
     } catch (JsonSyntaxException | NullPointerException e) {
       logger.debug("Invalid data passed to REST endpoint:\ncommands: {}", commandsString);
