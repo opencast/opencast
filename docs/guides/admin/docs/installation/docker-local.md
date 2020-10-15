@@ -28,11 +28,14 @@ that no database container is needed. There are multiple 3rd-party Docker images
 repository](https://github.com/opencast/opencast-docker/tree/master/docker-compose) contains multiple configuration
 examples:
 
-| Configuration                         | Compose file                                                                                                                 |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| all-in-one + H2                       | `https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.allinone.h2.yml`         |
-| all-in-one + MariaDB                  | `https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.allinone.mariadb.yml`    |
-| admin, presentation, worker + MariaDB | `https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.multiserver.mariadb.yml` |
+| Configuration                            | Compose file                                                                                                                    |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| all-in-one + H2                          | `https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.allinone.h2.yml`            |
+| all-in-one + H2 + pyCA                   | `https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.allinone.h2+pyca.yml`       |
+| all-in-one + MariaDB                     | `https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.allinone.mariadb.yml`       |
+| all-in-one + PostgreSQL                  | `https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.allinone.postgresql.yml`    |
+| admin, presentation, worker + MariaDB    | `https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.multiserver.mariadb.yml`    |
+| admin, presentation, worker + PostgreSQL | `https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.multiserver.postgresql.yml` |
 
 Choose and download a configuration:
 
@@ -43,17 +46,15 @@ $ curl -o docker-compose.yml <URL>
 You might want to edit the compose file and add extra volumes to include custom configurations or workflows (see
 [compose file reference](https://docs.docker.com/compose/compose-file/)).
 
-The compose files assume that the ActiveMQ configuration is located at `./assets/activemq.xml`. Additionally, if you use
-MariaDB, the SQL DDL commands for the Opencast database must be available at `./assets/opencast-ddl.sql`. You can
-download both files from the repository:
+The compose files assume that the ActiveMQ configuration is located at `./assets/activemq.xml`. You can download the
+file from the repository:
 
 ```sh
 $ mkdir assets
 $ curl -o assets/activemq.xml https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/assets/activemq.xml
-$ curl -o assets/opencast-ddl.sql https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/assets/opencast-ddl.sql
 ```
 
-Alternatively, you can use the Docker images to generate these files. This has the advantage that the correct version is
+Alternatively, you can use the Docker images to generate the file. This has the advantage that the correct version is
 always used:
 
 ```sh
@@ -62,11 +63,6 @@ $ mkdir assets
 $ docker run -it --rm \
     quay.io/opencast/allinone:<version> \
     app:print:activemq.xml > assets/activemq.xml
-
-$ docker run -it --rm \
-    -e ORG_OPENCASTPROJECT_DB_VENDOR=MySQL \
-    quay.io/opencast/allinone:<version> \
-    app:print:ddl > assets/opencast-ddl.sql
 ```
 
 At this point you are ready to start Opencast with the `up` command:
