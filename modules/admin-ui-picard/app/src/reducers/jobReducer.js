@@ -24,7 +24,7 @@ const initialState = {
 }
 
 // Reducer for jobs
-const jobs = (state=initialState, action) =>{
+const jobs = (state=initialState, action) => {
     const { type, payload } = action;
     switch (type) {
         case LOAD_JOBS_IN_PROGRESS: {

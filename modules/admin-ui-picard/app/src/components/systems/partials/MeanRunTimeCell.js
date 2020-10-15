@@ -2,7 +2,7 @@ import React from "react";
 import {useTranslation} from "react-i18next";
 
 
-const ServersMeanRunCell = ({ row }) => {
+const MeanRunTimeCell = ({ row }) => {
     const { t } = useTranslation();
 
     return (
@@ -12,4 +12,4 @@ const ServersMeanRunCell = ({ row }) => {
     );
 }
 
-export default ServersMeanRunCell;
+export default MeanRunTimeCell;

@@ -11,11 +11,13 @@ import {serversTemplateMap} from "../../configs/tableConfigs/serversTableConfig"
 import {getServers} from "../../selectors/serverSelectors";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
 import {fetchServers} from "../../thunks/serverThunks";
-import {loadJobsIntoTable, loadServersIntoTable} from "../../thunks/tableThunks";
+import {loadJobsIntoTable, loadServersIntoTable, loadServicesIntoTable} from "../../thunks/tableThunks";
 import {fetchJobs} from "../../thunks/jobThunks";
+import {fetchServices} from "../../thunks/serviceThunks";
 
 const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilters,
-                     loadingJobs, loadingJobsIntoTable }) => {
+                     loadingJobs, loadingJobsIntoTable, loadingServices,
+                     loadingServicesIntoTable }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -33,9 +35,12 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
         loadingJobsIntoTable();
     }
 
-    // TODO: implement
     const loadServices = () => {
-        console.log('placeholder');
+        // Fetching services from server
+        loadingServices();
+
+        // Load services into table
+        loadingServicesIntoTable()
     }
 
     useEffect(() => {
@@ -113,7 +118,9 @@ const mapDispatchToProps = dispatch => ({
     loadingServers: () => dispatch(fetchServers()),
     loadingServersIntoTable: () => dispatch(loadServersIntoTable()),
     loadingJobs: () => dispatch(fetchJobs()),
-    loadingJobsIntoTable: () => dispatch(loadJobsIntoTable())
+    loadingJobsIntoTable: () => dispatch(loadJobsIntoTable()),
+    loadingServices: () => dispatch(fetchServices()),
+    loadingServicesIntoTable: () => dispatch(loadServicesIntoTable())
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Servers));

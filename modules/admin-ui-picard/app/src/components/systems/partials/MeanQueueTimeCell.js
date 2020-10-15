@@ -2,7 +2,7 @@ import React from "react";
 import {useTranslation} from "react-i18next";
 
 
-const ServersMeanQueueCell = ({ row }) => {
+const MeanQueueTimeCell = ({ row }) => {
     const { t } = useTranslation();
 
     return (
@@ -12,4 +12,4 @@ const ServersMeanQueueCell = ({ row }) => {
     );
 }
 
-export default ServersMeanQueueCell;
+export default MeanQueueTimeCell;

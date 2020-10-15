@@ -25,6 +25,8 @@ import {jobsTableConfig} from "../configs/tableConfigs/jobsTableConfig";
 import {fetchJobs} from "./jobThunks";
 import {serversTableConfig} from "../configs/tableConfigs/serversTableConfig";
 import {fetchServers} from "./serverThunks";
+import {fetchServices} from "./serviceThunks";
+import {servicesTableConfig} from "../configs/tableConfigs/servicesTableConfig";
 
 /**
  * This file contains methods/thunks used to manage the table in the main view and its state changes
@@ -188,6 +190,35 @@ export const loadServersIntoTable = () => (dispatch, getState) => {
 
 }
 
+export const loadServicesIntoTable = () => (dispatch, getState) => {
+    const { services } = getState();
+    const pagination = getTablePagination(getState());
+    const resource = services.results;
+
+    const c = servicesTableConfig.columns;
+    const columns = c.map(column => {
+        const col = services.columns.find(co => co.name === column.name);
+        return {
+            ...column,
+            deactivated: col.deactivated
+        }
+    });
+
+    const multiSelect = servicesTableConfig.multiSelect;
+
+    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
+
+    const tableData = {
+        resource: "services",
+        rows: resource,
+        columns: columns,
+        multiSelect: multiSelect,
+        pages: pages,
+        sortBy: "status"
+    };
+    dispatch(loadResourceIntoTable(tableData));
+}
+
 
 // Navigate between pages
 export const goToPage = pageNumber => (dispatch, getState) => {
@@ -233,6 +264,10 @@ export const goToPage = pageNumber => (dispatch, getState) => {
             dispatch(loadServersIntoTable());
             break;
         }
+        case 'services': {
+            dispatch(fetchServices());
+            dispatch(loadServicesIntoTable());
+        }
     }
 }
 
@@ -274,6 +309,10 @@ export const updatePages = () => (dispatch,getState) => {
             dispatch(fetchServers());
             dispatch(loadServersIntoTable());
             break;
+        }
+        case 'services': {
+            dispatch(fetchServices());
+            dispatch(loadServicesIntoTable());
         }
     }
 

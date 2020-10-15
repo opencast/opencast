@@ -10,15 +10,17 @@ import {connect} from "react-redux";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
 import {jobsTemplateMap} from "../../configs/tableConfigs/jobsTableConfig";
 import {fetchJobs} from "../../thunks/jobThunks";
-import {loadJobsIntoTable, loadServersIntoTable} from "../../thunks/tableThunks";
+import {loadJobsIntoTable, loadServersIntoTable, loadServicesIntoTable} from "../../thunks/tableThunks";
 import {getJobs} from "../../selectors/jobSelectors";
 import {fetchServers} from "../../thunks/serverThunks";
+import {fetchServices} from "../../thunks/serviceThunks";
 
 /**
  * This component renders the table view of jobs
  */
 const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
-                  loadingServers, loadingServersIntoTable }) => {
+                  loadingServers, loadingServersIntoTable, loadingServices,
+                  loadingServicesIntoTable }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -31,14 +33,19 @@ const Jobs = ({ loadingJobs, loadingJobsIntoTable, jobs, loadingFilters,
     }
 
     const loadServers = () => {
+        // Fetching servers from server
         loadingServers()
 
+        // Load servers into table
         loadingServersIntoTable()
     }
 
-    // TODO: implement
     const loadServices = () => {
-        console.log('placeholder');
+        // Fetching services from server
+        loadingServices();
+
+        // Load services into table
+        loadingServicesIntoTable()
     }
 
     useEffect(() => {
@@ -119,7 +126,9 @@ const mapDispatchToProps = dispatch => ({
     loadingJobs: () => dispatch(fetchJobs()),
     loadingJobsIntoTable: () => dispatch(loadJobsIntoTable()),
     loadingServers: () => dispatch(fetchServers()),
-    loadingServersIntoTable: () => dispatch(loadServersIntoTable())
+    loadingServersIntoTable: () => dispatch(loadServersIntoTable()),
+    loadingServices: () => dispatch(fetchServices()),
+    loadingServicesIntoTable: () => dispatch(loadServicesIntoTable())
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Jobs));
