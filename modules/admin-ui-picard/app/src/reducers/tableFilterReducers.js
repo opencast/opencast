@@ -1,20 +1,20 @@
 import {
+    EDIT_FILTER_VALUE,
+    EDIT_SECOND_FILTER,
+    EDIT_SELECTED_FILTER,
+    EDIT_TEXT_FILTER,
+    LOAD_FILTER_PROFILE,
+    LOAD_FILTERS_FAILURE,
     LOAD_FILTERS_IN_PROGRESS,
     LOAD_FILTERS_SUCCESS,
-    LOAD_FILTERS_FAILURE,
-    LOAD_FILTER_PROFILE,
-    EDIT_FILTER_VALUE,
-    RESET_END_DATE,
-    RESET_FILTER_VALUES,
-    RESET_START_DATE,
     REMOVE_SECOND_FILTER,
     REMOVE_SELECTED_FILTER,
     REMOVE_TEXT_FILTER,
+    RESET_END_DATE,
+    RESET_FILTER_VALUES,
+    RESET_START_DATE,
     SET_END_DATE,
-    SET_START_DATE,
-    EDIT_SECOND_FILTER,
-    EDIT_SELECTED_FILTER,
-    EDIT_TEXT_FILTER
+    SET_START_DATE
 } from "../actions/tableFilterActions";
 
 /**
@@ -33,7 +33,7 @@ const initialState = {
     endDate: ''
 };
 
-// Reducer for filter profiles
+// Reducer for table filters
 const tableFilters = (state = initialState, action) => {
     const { type, payload } = action;
     switch (type) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import {HashRouter, Switch, Route, Redirect} from "react-router-dom";
+import {HashRouter, Route, Switch} from "react-router-dom";
 import './App.scss';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
@@ -50,9 +50,6 @@ function App() {
                   <Route exact path={"/systems/services"}>
                       <Services />
                   </Route>
-                  <Route exact path={"/configuration/themes"}>
-                      <Themes />
-                  </Route>
                   <Route exact path={"/users/users"}>
                       <Users />
                   </Route>
@@ -61,6 +58,9 @@ function App() {
                   </Route>
                   <Route exact path={"/users/acls"}>
                       <Acls />
+                  </Route>
+                  <Route exact path={"/configuration/themes"}>
+                      <Themes />
                   </Route>
                   <Route exact path={"/statistics/organization"}>
                       <Statistics />

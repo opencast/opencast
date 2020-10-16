@@ -15,6 +15,9 @@ import {loadAclsIntoTable, loadGroupsIntoTable, loadUsersIntoTable} from "../../
 import {fetchGroups} from "../../thunks/groupThunks";
 import {fetchAcls} from "../../thunks/aclThunks";
 
+/**
+ * This component renders the table view of users
+ */
 const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                    loadingGroups, loadingGroupsIntoTable, loadingAcls,
                    loadingAclsIntoTable }) => {
@@ -46,7 +49,7 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
     }
 
     useEffect(() => {
-        // Load jobs on mount
+        // Load users on mount
         loadUsers().then(r => console.log(r));
 
         // Load filters
@@ -124,10 +127,12 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
     )
 }
 
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     users: getUsers(state)
 });
 
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingFilters: resource => dispatch(fetchFilters(resource)),
     loadingUsers: () => dispatch(fetchUsers()),

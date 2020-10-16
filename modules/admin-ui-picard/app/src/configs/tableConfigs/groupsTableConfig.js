@@ -1,7 +1,7 @@
 import GroupsActionsCell from "../../components/users/partials/GroupsActionsCell";
 
 /**
- * Config that contains the columns and further information regarding jobs. These are the information that never or hardly changes.
+ * Config that contains the columns and further information regarding groups. These are the information that never or hardly changes.
  * That's why it is hard coded here and not fetched from server.
  * Information configured in this file:
  * - columns: names, labels, sortable, (template)

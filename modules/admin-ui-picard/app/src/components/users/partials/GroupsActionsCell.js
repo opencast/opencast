@@ -1,7 +1,9 @@
 import React from 'react';
 import {useTranslation} from "react-i18next";
 
-
+/**
+ * This component renders the action cells of groups in the table view
+ */
 const GroupsActionsCell = ({ row }) => {
     const { t } = useTranslation();
 
@@ -13,7 +15,7 @@ const GroupsActionsCell = ({ row }) => {
                className="more"
                title={t('USERS.GROUPS.TABLE.TOOLTIP.DETAILS')}/>
 
-            {/*// TODO: When group action for deleting an event is implemented, remove placeholder*/}
+            {/*// TODO: When group action for deleting is implemented, remove placeholder*/}
             {/*// TODO: with-Role*/}
             <a onClick={() => onClickPlaceholder()}
                className="remove"

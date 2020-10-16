@@ -1,6 +1,5 @@
 import {servicesTableConfig} from "../configs/tableConfigs/servicesTableConfig";
 import {LOAD_SERVICES_FAILURE, LOAD_SERVICES_IN_PROGRESS, LOAD_SERVICES_SUCCESS} from "../actions/serviceActions";
-import {LOAD_SERVERS_SUCCESS} from "../actions/serverActions";
 
 /**
  * This file contains redux reducer for actions affecting the state of services
@@ -24,6 +23,7 @@ const initialState = {
     limit: 0
 }
 
+// Reducer for services
 const services = (state=initialState, action) => {
     const { type, payload } = action;
     switch (type) {

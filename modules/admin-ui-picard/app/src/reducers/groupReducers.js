@@ -2,7 +2,7 @@ import {groupsTableConfig} from "../configs/tableConfigs/groupsTableConfig";
 import {LOAD_GROUPS_FAILURE, LOAD_GROUPS_IN_PROGRESS, LOAD_GROUPS_SUCCESS} from "../actions/groupActions";
 
 /**
- * This file contains redux reducer for actions affecting the state of users
+ * This file contains redux reducer for actions affecting the state of groups
  */
 
 // Fill columns initially with columns defined in groupsTableConfig
@@ -23,6 +23,7 @@ const initialState = {
     limit: 0
 };
 
+// Reducer for groups
 const groups = (state=initialState, action) => {
     const { type, payload } = action;
     switch (type) {

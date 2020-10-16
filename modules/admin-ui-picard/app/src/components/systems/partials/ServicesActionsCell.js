@@ -1,6 +1,9 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 
+/**
+ * This component renders the action cells of services in the table view
+ */
 const ServicesActionCell = ({ row }) => {
     const { t } = useTranslation();
 

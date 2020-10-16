@@ -1,6 +1,7 @@
 import {loadAclsFailure, loadAclsInProgress, loadAclsSuccess} from "../actions/aclActions";
 import {getURLParams} from "../utils/resourceUtils";
 
+// fetch acls from server
 export const fetchAcls = () => async (dispatch, getState) => {
     try {
         dispatch(loadAclsInProgress());

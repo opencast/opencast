@@ -1,11 +1,111 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
+import {useTranslation} from "react-i18next";
+import MainNav from "../shared/MainNav";
+import Link from "react-router-dom/Link";
+import cn from 'classnames';
+import TableFilters from "../shared/TableFilters";
+import Table from "../shared/Table";
+import {fetchFilters} from "../../thunks/tableFilterThunks";
+import {withRouter} from "react-router-dom";
+import {connect} from "react-redux";
+import {themesTemplateMap} from "../../configs/tableConfigs/themesTableConfig";
+import {getThemes} from "../../selectors/themeSelectors";
+import {fetchThemes} from "../../thunks/themeThunks";
+import {loadThemesIntoTable} from "../../thunks/tableThunks";
 
-const Themes = () => {
+/**
+ * This component renders the table view of events
+ */
+const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters }) => {
+    const { t } = useTranslation();
+    const [displayNavigation, setNavigation] = useState(false);
+
+    const loadThemes = async () => {
+        // Fetching themes from server
+        await loadingThemes();
+
+        // Load users into table
+        loadingThemesIntoTable();
+    };
+
+    useEffect(() => {
+        // Load jobs on mount
+        loadThemes().then(r => console.log(r));
+
+        // Load filters
+        loadingFilters('themes');
+
+    }, []);
+
+    const toggleNavigation = () => {
+        setNavigation(!displayNavigation);
+    }
+
+    const placeholder = () => {
+        console.log("To be implemented");
+    }
+
+    const styleNavOpen = {
+        marginLeft: '130px',
+    };
+    const styleNavClosed = {
+        marginLeft: '20px',
+    };
+
     return (
-        <span>
-            TO BE IMPLEMENTED
-        </span>
-    )
-}
+        <>
+            <section className="action-nav-bar">
+                {/* Add theme button */}
+                <div className="btn-group">
+                    {/*todo: implement onClick and with role*/}
+                    <button className="add" onClick={() => placeholder()}>
+                        <i className="fa fa-plus"/>
+                        <span>{t('CONFIGURATION.ACTIONS.ADD_THEME')}</span>
+                    </button>
+                </div>
 
-export default Themes;
+                {/* Include Burger-button menu*/}
+                <MainNav isOpen={displayNavigation}
+                         toggleMenu={toggleNavigation}/>
+
+                <nav>
+                    {/* todo: with roles */}
+                    <Link to="/configuration/themes"
+                          className={cn({active: true})}
+                          onClick={() => loadThemes()}>
+                        {t('CONFIGURATION.NAVIGATION.THEMES')}
+                    </Link>
+                </nav>
+            </section>
+
+            <div className="main-view" style={displayNavigation ? styleNavOpen : styleNavClosed}>
+                {/*Todo: What is data-admin-ng-notifications?*/}
+
+                <div  className="controls-container">
+                    {/* Include filters component */}
+                    <TableFilters loadResource={loadingThemes}
+                                  loadResourceIntoTable={loadingThemesIntoTable}
+                                  resource={'themes'}/>
+                    <h1>{t('CONFIGURATION.THEMES.TABLE.CAPTION')}</h1>
+                    <h4>{t('TABLE_SUMMARY', { numberOfRows: themes.length})}</h4>
+                </div>
+                {/* Include table component */}
+                <Table templateMap={themesTemplateMap} />
+            </div>
+        </>
+    );
+};
+
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    themes: getThemes(state)
+});
+
+// Mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    loadingFilters: resource => dispatch(fetchFilters(resource)),
+    loadingThemes: () => dispatch(fetchThemes()),
+    loadingThemesIntoTable: () => dispatch(loadThemesIntoTable())
+});
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Themes));

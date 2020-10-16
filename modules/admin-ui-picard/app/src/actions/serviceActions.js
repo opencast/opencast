@@ -7,7 +7,7 @@ export const LOAD_SERVICES_IN_PROGRESS = 'LOAD_SERVICES_IN_PROGRESS';
 export const LOAD_SERVICES_SUCCESS = 'LOAD_SERVICES_SUCCESS';
 export const LOAD_SERVICES_FAILURE = 'LOAD_SERVICES_FAILURE';
 
-// Actions affecting fetching jobs from server
+// Actions affecting fetching services from server
 
 export const loadServicesInProgress = () => ({
     type: LOAD_SERVICES_IN_PROGRESS

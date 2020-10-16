@@ -1,10 +1,10 @@
 import React from 'react';
-import { useTranslation } from "react-i18next";
-import { getFilters } from "../../../selectors/tableFilterSelectors";
-import { editFilterValue } from "../../../actions/tableFilterActions";
+import {useTranslation} from "react-i18next";
+import {getFilters} from "../../../selectors/tableFilterSelectors";
+import {editFilterValue} from "../../../actions/tableFilterActions";
 import {connect} from "react-redux";
-import { fetchEvents } from "../../../thunks/eventThunks";
-import { loadEventsIntoTable } from "../../../thunks/tableThunks";
+import {fetchEvents} from "../../../thunks/eventThunks";
+import {loadEventsIntoTable} from "../../../thunks/tableThunks";
 
 /**
  * This component renders the status cells of events in the table view

@@ -1,12 +1,16 @@
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 import cn from 'classnames';
-import { getFilterProfiles } from "../../selectors/tableFilterProfilesSelectors";
-import { createFilterProfile, editFilterProfile, cancelEditFilterProfile,
-    removeFilterProfile } from "../../actions/tableFilterProfilesActions";
-import { getFilters } from "../../selectors/tableFilterSelectors";
-import { loadFilterProfile } from "../../actions/tableFilterActions";
+import {getFilterProfiles} from "../../selectors/tableFilterProfilesSelectors";
+import {
+    cancelEditFilterProfile,
+    createFilterProfile,
+    editFilterProfile,
+    removeFilterProfile
+} from "../../actions/tableFilterProfilesActions";
+import {getFilters} from "../../selectors/tableFilterSelectors";
+import {loadFilterProfile} from "../../actions/tableFilterActions";
 
 /**
  * This component renders the table filter profiles in the upper right corner when clicked on settings icon of the

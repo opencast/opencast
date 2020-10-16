@@ -5,19 +5,22 @@ import {
     loadEventsIntoTable,
     loadJobsIntoTable,
     loadRecordingsIntoTable,
+    loadThemesIntoTable,
     loadUsersIntoTable
 } from "../../thunks/tableThunks";
 import {fetchEvents} from "../../thunks/eventThunks";
-import {connect} from "react-redux";
 import {fetchRecordings} from "../../thunks/recordingThunks";
 import {fetchJobs} from "../../thunks/jobThunks";
 import {fetchUsers} from "../../thunks/userThunks";
+import {fetchThemes} from "../../thunks/themeThunks";
+import {connect} from "react-redux";
 
 /**
  * This component renders the main navigation that opens when the burger button is clicked
  */
 const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, loadingRecordings, loadingRecordingsIntoTable,
-                     loadingJobs, loadingJobsIntoTable, loadingUsers, loadingUsersIntoTable }) => {
+                     loadingJobs, loadingJobsIntoTable, loadingUsers, loadingUsersIntoTable, loadingThemes,
+                     loadingThemesIntoTable }) => {
     const { t } = useTranslation();
 
     const loadEvents = () => {
@@ -40,16 +43,24 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
         // Fetching jobs from server
         loadingJobs();
 
-        // Load recordings into table
+        // Load jobs into table
         loadingJobsIntoTable();
     }
 
     const loadUsers = () => {
-        // Fetching users form server
+        // Fetching users from server
         loadingUsers();
 
         // Load users into table
         loadingUsersIntoTable()
+    }
+
+    const loadThemes = () => {
+        // Fetching themes from server
+        loadingThemes();
+
+        // Load themes into table
+        loadingThemesIntoTable();
     }
 
     return (
@@ -72,7 +83,7 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
                             <Link to="/users/users" onClick={() => loadUsers()}>
                                 <i className="users" title={t('NAV.USERS.TITLE')}/>
                             </Link>
-                            <Link to="/configuration/themes">
+                            <Link to="/configuration/themes" onClick={() => loadThemes()}>
                                 <i className="configuration" title={t('NAV.CONFIGURATION.TITLE')}/>
                             </Link>
                             <Link to="/statistics/organization">
@@ -96,7 +107,9 @@ const mapDispatchToProps = dispatch => ({
     loadingJobs: () => dispatch(fetchJobs()),
     loadingJobsIntoTable: () => dispatch(loadJobsIntoTable()),
     loadingUsers: () => dispatch(fetchUsers()),
-    loadingUsersIntoTable: () => dispatch(loadUsersIntoTable())
+    loadingUsersIntoTable: () => dispatch(loadUsersIntoTable()),
+    loadingThemes: () => dispatch(fetchThemes()),
+    loadingThemesIntoTable: () => dispatch(loadThemesIntoTable())
 });
 
 export default connect(null, mapDispatchToProps)(MainNav);

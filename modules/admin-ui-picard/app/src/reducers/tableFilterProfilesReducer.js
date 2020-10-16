@@ -1,5 +1,9 @@
-import { CREATE_FILTER_PROFILE, EDIT_FILTER_PROFILE, REMOVE_FILTER_PROFILE,
-    CANCEL_EDITING_FILTER_PROFILE} from "../actions/tableFilterProfilesActions";
+import {
+    CANCEL_EDITING_FILTER_PROFILE,
+    CREATE_FILTER_PROFILE,
+    EDIT_FILTER_PROFILE,
+    REMOVE_FILTER_PROFILE
+} from "../actions/tableFilterProfilesActions";
 
 /**
  * This file contains redux reducer for actions affecting the state of table filter profiles

@@ -1,4 +1,4 @@
-import {loadRecordingsInProgress, loadRecordingsFailure, loadRecordingsSuccess} from "../actions/recordingActions";
+import {loadRecordingsFailure, loadRecordingsInProgress, loadRecordingsSuccess} from "../actions/recordingActions";
 import {getURLParams} from "../utils/resourceUtils";
 
 // fetch recordings from server

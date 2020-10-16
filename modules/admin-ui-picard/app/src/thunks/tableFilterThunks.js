@@ -3,8 +3,6 @@ import { loadFiltersSuccess, loadFiltersFailure, loadFiltersInProgress} from '..
 * This file contains methods/thunks used to query the REST-API of Opencast to get the filters of a certain resource type.
 * This information is used to filter the entries of the table in the main view.
 *
-* Currently only a mock json containing filters of events is returned.
-*
 * */
 // Fetch table filters from opencast instance and transform them for further use
 export const fetchFilters = resource => async dispatch => {
@@ -75,6 +73,13 @@ export const fetchFilters = resource => async dispatch => {
                 const aclsData = await data.json();
 
                 response = transformResponse(aclsData);
+                break;
+            }
+            case 'themes': {
+                const data = await fetch('admin-ng/resources/themes/filters.json');
+                const themesData = await data.json();
+
+                response = transformResponse(themesData);
                 break;
             }
         }

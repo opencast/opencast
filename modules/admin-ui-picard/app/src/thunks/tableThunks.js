@@ -1,10 +1,21 @@
+import {eventsTableConfig} from "../configs/tableConfigs/eventsTableConfig";
+import {seriesTableConfig} from "../configs/tableConfigs/seriesTableConfig";
+import {recordingsTableConfig} from "../configs/tableConfigs/recordingsTableConfig";
+import {jobsTableConfig} from "../configs/tableConfigs/jobsTableConfig";
+import {serversTableConfig} from "../configs/tableConfigs/serversTableConfig";
+import {servicesTableConfig} from "../configs/tableConfigs/servicesTableConfig";
+import {usersTableConfig} from "../configs/tableConfigs/usersTableConfig";
+import {groupsTableConfig} from "../configs/tableConfigs/groupsTableConfig";
+import {aclsTableConfig} from "../configs/tableConfigs/aclsTableConfig";
+import {themesTableConfig} from "../configs/tableConfigs/themesTableConfig";
 import {
     deselectAll,
     loadResourceIntoTable,
     selectAll,
     selectRow,
     setOffset,
-    setPageActive, setPages
+    setPageActive,
+    setPages
 } from "../actions/tableActions";
 import {showActions as showEventsActions} from "../actions/eventActions";
 import {showActions as showSeriesActions} from "../actions/seriesActions";
@@ -15,24 +26,16 @@ import {
     getTablePages,
     getTablePagination
 } from "../selectors/tableSelectors";
-import {eventsTableConfig}  from "../configs/tableConfigs/eventsTableConfig";
-import {seriesTableConfig} from "../configs/tableConfigs/seriesTableConfig";
 import {fetchEvents} from "./eventThunks";
 import {fetchSeries} from "./seriesThunks";
-import {recordingsTableConfig} from "../configs/tableConfigs/recordingsTableConfig";
 import {fetchRecordings} from "./recordingThunks";
-import {jobsTableConfig} from "../configs/tableConfigs/jobsTableConfig";
 import {fetchJobs} from "./jobThunks";
-import {serversTableConfig} from "../configs/tableConfigs/serversTableConfig";
 import {fetchServers} from "./serverThunks";
 import {fetchServices} from "./serviceThunks";
-import {servicesTableConfig} from "../configs/tableConfigs/servicesTableConfig";
-import {usersTableConfig} from "../configs/tableConfigs/usersTableConfig";
 import {fetchUsers} from "./userThunks";
-import {groupsTableConfig} from "../configs/tableConfigs/groupsTableConfig";
 import {fetchGroups} from "./groupThunks";
-import {aclsTableConfig} from "../configs/tableConfigs/aclsTableConfig";
 import {fetchAcls} from "./aclThunks";
+import {fetchThemes} from "./themeThunks";
 
 /**
  * This file contains methods/thunks used to manage the table in the main view and its state changes
@@ -312,6 +315,35 @@ export const loadAclsIntoTable = () => (dispatch, getState) => {
     dispatch(loadResourceIntoTable(tableData));
 }
 
+export const loadThemesIntoTable = () => (dispatch, getState) => {
+    const { themes } = getState();
+    const pagination = getTablePagination(getState());
+    const resource = themes.results;
+
+    const c = themesTableConfig.columns;
+    const columns = c.map(column => {
+        const col = themes.columns.find(co => co.name === column.name);
+        return {
+            ...column,
+            deactivated: col.deactivated
+        }
+    });
+
+    const multiSelect = themesTableConfig.multiSelect;
+
+    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
+
+    const tableData = {
+        resource: "themes",
+        rows: resource,
+        columns: columns,
+        multiSelect: multiSelect,
+        pages: pages,
+        sortBy: "name"
+    };
+    dispatch(loadResourceIntoTable(tableData));
+}
+
 
 // Navigate between pages
 export const goToPage = pageNumber => (dispatch, getState) => {
@@ -377,6 +409,11 @@ export const goToPage = pageNumber => (dispatch, getState) => {
             dispatch(loadAclsIntoTable());
             break;
         }
+        case 'themes': {
+            dispatch(fetchThemes());
+            dispatch(loadThemesIntoTable());
+            break;
+        }
     }
 }
 
@@ -437,6 +474,11 @@ export const updatePages = () => (dispatch,getState) => {
         case 'acls': {
             dispatch(fetchAcls());
             dispatch(loadAclsIntoTable());
+            break;
+        }
+        case 'themes': {
+            dispatch(fetchThemes());
+            dispatch(loadThemesIntoTable());
             break;
         }
     }

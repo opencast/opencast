@@ -15,6 +15,9 @@ import {loadJobsIntoTable, loadServersIntoTable, loadServicesIntoTable} from "..
 import {fetchJobs} from "../../thunks/jobThunks";
 import {fetchServices} from "../../thunks/serviceThunks";
 
+/**
+ * This component renders the table view of servers
+ */
 const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilters,
                      loadingJobs, loadingJobsIntoTable, loadingServices,
                      loadingServicesIntoTable }) => {
@@ -22,16 +25,18 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
     const [displayNavigation, setNavigation] = useState(false);
 
     const loadServers = async () => {
-        // Fetching jobs from server
+        // Fetching servers from server
         await loadingServers();
 
-        // Load jobs into table
+        // Load servers into table
         loadingServersIntoTable();
     }
 
     const loadJobs = () => {
+        // Fetching jobs from server
         loadingJobs();
 
+        // Load jobs into table
         loadingJobsIntoTable();
     }
 
@@ -44,7 +49,7 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
     }
 
     useEffect(() => {
-        // Load jobs on mount
+        // Load servers on mount
         loadServers().then(r => console.log(r));
 
         // Load filters
@@ -109,10 +114,12 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
     )
 }
 
+// Getting state data out of redux store
 const mapStateToProps = state =>({
     servers: getServers(state)
 });
 
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingFilters: resource => dispatch(fetchFilters(resource)),
     loadingServers: () => dispatch(fetchServers()),

@@ -1,8 +1,10 @@
+import {getFilters} from "../selectors/tableFilterSelectors";
+import {getPageLimit, getPageOffset, getTableDirection, getTableSorting} from "../selectors/tableSelectors";
+
 /**
  * This file contains methods that are needed in more than one resource thunk
  */
-import {getFilters} from "../selectors/tableFilterSelectors";
-import {getPageLimit, getPageOffset, getTableDirection, getTableSorting} from "../selectors/tableSelectors";
+
 
 export const getURLParams = state => {
     // get filter map from state

@@ -1,5 +1,5 @@
 /**
- * This file contains selectors regarding events
+ * This file contains selectors regarding series
  */
 
 export const getSeries = state => state.series.results;

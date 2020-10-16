@@ -1,6 +1,9 @@
 import {recordingsTableConfig} from "../configs/tableConfigs/recordingsTableConfig";
-import {LOAD_RECORDINGS_IN_PROGRESS, LOAD_RECORDINGS_SUCCESS} from "../actions/recordingActions";
-import {LOAD_SERIES_FAILURE} from "../actions/seriesActions";
+import {
+    LOAD_RECORDINGS_FAILURE,
+    LOAD_RECORDINGS_IN_PROGRESS,
+    LOAD_RECORDINGS_SUCCESS
+} from "../actions/recordingActions";
 
 /**
  * This file contains redux reducer for actions affecting the state of recordings
@@ -46,7 +49,7 @@ const recordings = (state=initialState, action) => {
                 results: recordings.results
             }
         }
-        case LOAD_SERIES_FAILURE: {
+        case LOAD_RECORDINGS_FAILURE: {
             return {
                 ...state,
                 isLoading: false

@@ -1,5 +1,8 @@
 import React from "react";
 
+/**
+ * This component renders the maintenance cells of servers in the table view
+ */
 const ServersMaintenanceCell = ({ row }) => {
     return (
         <>

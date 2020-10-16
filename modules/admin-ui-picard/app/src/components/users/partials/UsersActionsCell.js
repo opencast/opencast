@@ -1,7 +1,9 @@
 import React from 'react';
 import {useTranslation} from "react-i18next";
 
-
+/**
+ * This component renders the action cells of users in the table view
+ */
 const UsersActionCell = ({ row }) => {
     const { t } = useTranslation();
 
@@ -14,7 +16,7 @@ const UsersActionCell = ({ row }) => {
                title={t('USERS.USERS.TABLE.TOOLTIP.DETAILS')}/>
 
             {row.manageable ? (
-                // TODO: When user action for deleting an event is implemented, remove placeholder
+                // TODO: When user action for deleting is implemented, remove placeholder
                 // TODO: with-Role
                 <a onClick={() => onClickPlaceholder()}
                    className="remove"

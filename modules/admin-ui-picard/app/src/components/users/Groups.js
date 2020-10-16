@@ -11,10 +11,13 @@ import {loadAclsIntoTable, loadGroupsIntoTable, loadUsersIntoTable} from "../../
 import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {getGroups} from "../../selectors/groupSelectors";
-import {groupsTableConfig, groupsTemplateMap} from "../../configs/tableConfigs/groupsTableConfig";
+import {groupsTemplateMap} from "../../configs/tableConfigs/groupsTableConfig";
 import {fetchGroups} from "../../thunks/groupThunks";
 import {fetchAcls} from "../../thunks/aclThunks";
 
+/**
+ * This component renders the table view of groups
+ */
 const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
                     loadingUsers, loadingUsersIntoTable, loadingAcls,
                     loadingAclsIntoTable }) => {
@@ -46,7 +49,7 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
     }
 
     useEffect(() => {
-        // Load jobs on mount
+        // Load groups on mount
         loadGroups().then(r => console.log(r));
 
         // Load filters
@@ -73,7 +76,7 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
         <>
             <section className="action-nav-bar">
 
-                {/* Add user button */}
+                {/* Add group button */}
                 <div className="btn-group">
                     {/*todo: implement onClick and with role*/}
                     <button className="add" onClick={() => placeholder()}>
@@ -125,10 +128,12 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
 
 };
 
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     groups: getGroups(state)
 });
 
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingFilters: resource => dispatch(fetchFilters(resource)),
     loadingGroups: () => dispatch(fetchGroups()),

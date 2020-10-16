@@ -15,6 +15,9 @@ import {servicesTemplateMap} from "../../configs/tableConfigs/servicesTableConfi
 import {getServices} from "../../selectors/serviceSelector";
 import {fetchServices} from "../../thunks/serviceThunks";
 
+/**
+ * This component renders the table view of services
+ */
 const Services = ({ loadingServices, loadingServicesIntoTable, services, loadingFilters,
                       loadingJobs, loadingJobsIntoTable, loadingServers,
                       loadingServersIntoTable }) => {
@@ -46,7 +49,7 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
     }
 
     useEffect(() => {
-        // Load jobs on mount
+        // Load services on mount
         loadServices().then(r => console.log(r));
 
         // Load filters
@@ -111,10 +114,12 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
     );
 }
 
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     services: getServices(state)
 });
 
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingFilters: resource => dispatch(fetchFilters(resource)),
     loadingServices: () => dispatch(fetchServices()),

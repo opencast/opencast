@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from "styled-components";
-import { useTranslation } from "react-i18next";
+import {useTranslation} from "react-i18next";
 
 import moreIcon from '../../../img/more-icon.png';
 import moreSeriesIcon from '../../../img/more-series-icon.png';

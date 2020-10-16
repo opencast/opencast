@@ -1,5 +1,8 @@
 import React from "react";
 
+/**
+ * This component renders the status cells of servers in the table view
+ */
 const ServersStatusCell = ({ row }) => {
     return (
         (row.online && !row.maintenance) ? (

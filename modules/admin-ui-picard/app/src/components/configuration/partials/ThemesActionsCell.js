@@ -2,24 +2,24 @@ import React from 'react';
 import {useTranslation} from "react-i18next";
 
 /**
- * This component renders the action cells of acls in the table view
+ * This component renders the action cells of themes in the table view
  */
-const AclsActionsCell = ({ row }) => {
+const ThemesActionsCell = ({ row }) => {
     const { t } = useTranslation();
 
     return (
         <>
-            {/*TODO: When acl details are implemented, remove placeholder */}
+            {/*TODO: When theme details are implemented, remove placeholder */}
             {/*TODO: with-Role */}
             <a onClick={() => onClickPlaceholder()}
                className="more"
-               title={t('USERS.ACLS.TABLE.TOOLTIP.DETAILS')}/>
+               title={t('CONFIGURATION.THEMES.TABLE.TOOLTIP.DETAILS')}/>
 
-            {/*// TODO: When acl action for deleting is implemented, remove placeholder*/}
+            {/*// TODO: When theme action for deleting a theme is implemented, remove placeholder*/}
             {/*// TODO: with-Role*/}
             <a onClick={() => onClickPlaceholder()}
-               className="remove"
-               title={t('USERS.ACLS.TABLE.TOOLTIP.DETAILS')}/>
+               className="remove ng-scope ng-isolate-scope"
+               title={t('CONFIGURATION.THEMES.TABLE.TOOLTIP.DELETE')}/>
 
         </>
     );
@@ -30,4 +30,4 @@ const onClickPlaceholder = () => {
     console.log("In the Future here opens an other component, which is not implemented yet");
 }
 
-export default AclsActionsCell;
+export default ThemesActionsCell;

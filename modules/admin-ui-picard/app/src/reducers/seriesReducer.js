@@ -1,5 +1,10 @@
 import {seriesTableConfig} from "../configs/tableConfigs/seriesTableConfig";
-import { LOAD_SERIES_FAILURE, LOAD_SERIES_SUCCESS, LOAD_SERIES_IN_PROGRESS, SHOW_ACTIONS} from "../actions/seriesActions";
+import {
+    LOAD_SERIES_FAILURE,
+    LOAD_SERIES_IN_PROGRESS,
+    LOAD_SERIES_SUCCESS,
+    SHOW_ACTIONS
+} from "../actions/seriesActions";
 
 /**
  * This file contains redux reducer for actions affecting the state of series

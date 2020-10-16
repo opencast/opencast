@@ -23,6 +23,7 @@ const initialState = {
     limit: 0
 };
 
+// Reducer for users
 const users = (state=initialState, action) => {
     const { type, payload } = action;
     switch (type) {

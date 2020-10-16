@@ -1,5 +1,5 @@
 // React imports
-import React, {useContext, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 
 // service and library imports
@@ -11,8 +11,7 @@ import services from "../mocks/restServiceMonitor";
 // image and icon imports
 import opencastLogo from '../img/opencast-white.svg';
 
-import {FaPlayCircle, FaVideo, FaBell, FaQuestionCircle, FaChevronDown, FaPowerOff} from "react-icons/fa";
-
+import {FaBell, FaChevronDown, FaPlayCircle, FaPowerOff, FaQuestionCircle, FaVideo} from "react-icons/fa";
 
 
 // Todo: Find suitable place to define them and get these links out of config-file or whatever

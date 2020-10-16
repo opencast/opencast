@@ -15,6 +15,9 @@ import {aclsTemplateMap} from "../../configs/tableConfigs/aclsTableConfig";
 import {fetchAcls} from "../../thunks/aclThunks";
 import {getAcls} from "../../selectors/aclSelectors";
 
+/**
+ * This component renders the table view of acls
+ */
 const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
                     loadingUsers, loadingUsersIntoTable, loadingGroups,
                     loadingGroupsIntoTable }) => {
@@ -46,7 +49,7 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
     };
 
     useEffect(() => {
-        // Load jobs on mount
+        // Load acls on mount
         loadAcls().then(r => console.log(r));
 
         // Load filters
@@ -73,7 +76,7 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
         <>
             <section className="action-nav-bar">
 
-                {/* Add user button */}
+                {/* Add acl button */}
                 <div className="btn-group">
                     {/*todo: implement onClick and with role*/}
                     <button className="add" onClick={() => placeholder()}>
@@ -124,10 +127,12 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
     );
 };
 
+// Getting state data out of redux store
 const mapStateToProps = state => ({
     acls: getAcls(state)
 });
 
+// Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
     loadingFilters: resource => dispatch(fetchFilters(resource)),
     loadingAcls: () => dispatch(fetchAcls()),

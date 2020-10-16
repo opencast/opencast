@@ -1,9 +1,9 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {useTranslation} from "react-i18next";
 import styled from "styled-components";
-import { getPageOffset, getTablePages} from "../../selectors/tableSelectors";
-import { updatePageSize, setOffset, reverseTable, setSortBy } from "../../actions/tableActions";
-import { changeRowSelection, goToPage, changeAllSelected, updatePages } from "../../thunks/tableThunks";
+import {getPageOffset, getTablePages} from "../../selectors/tableSelectors";
+import {reverseTable, setOffset, setSortBy, updatePageSize} from "../../actions/tableActions";
+import {changeAllSelected, changeRowSelection, goToPage, updatePages} from "../../thunks/tableThunks";
 import {connect} from "react-redux";
 import cn from 'classnames';
 

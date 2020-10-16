@@ -1,6 +1,7 @@
 import {loadSeriesFailure, loadSeriesInProgress, loadSeriesSuccess} from "../actions/seriesActions";
 import {getURLParams} from "../utils/resourceUtils";
 
+// fetch series from server
 export const fetchSeries = () => async (dispatch, getState) => {
    try {
        dispatch(loadSeriesInProgress());

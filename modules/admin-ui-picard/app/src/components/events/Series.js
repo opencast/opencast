@@ -6,7 +6,7 @@ import cn from "classnames";
 import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
 
-import { fetchSeries } from"../../thunks/seriesThunks";
+import {fetchSeries} from "../../thunks/seriesThunks";
 import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
 import {seriesTemplateMap} from "../../configs/tableConfigs/seriesTableConfig";
 import {connect} from "react-redux";

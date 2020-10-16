@@ -2,7 +2,7 @@ import UsersActionCell from "../../components/users/partials/UsersActionsCell";
 import UsersRolesCell from "../../components/users/partials/UsersRolesCell";
 
 /**
- * Config that contains the columns and further information regarding jobs. These are the information that never or hardly changes.
+ * Config that contains the columns and further information regarding users. These are the information that never or hardly changes.
  * That's why it is hard coded here and not fetched from server.
  * Information configured in this file:
  * - columns: names, labels, sortable, (template)

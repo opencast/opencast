@@ -1,19 +1,34 @@
-import React, {useState, useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import styled from "styled-components";
 import DatePicker from "react-datepicker/es";
-import { connect } from 'react-redux';
-import { getTextFilter, getFilters, getEndDate, getStartDate, getSecondFilter,
-    getSelectedFilter} from '../../selectors/tableFilterSelectors';
-import { fetchFilters } from '../../thunks/tableFilterThunks';
-import { editTextFilter, editSelectedFilter, removeTextFilter, removeSelectedFilter, editSecondFilter,
-    removeSecondFilter, setEndDate, setStartDate, resetEndDate, resetStartDate, editFilterValue,
-    resetFilterValues} from '../../actions/tableFilterActions';
+import {connect} from 'react-redux';
+import {
+    getEndDate,
+    getFilters,
+    getSecondFilter,
+    getSelectedFilter,
+    getStartDate,
+    getTextFilter
+} from '../../selectors/tableFilterSelectors';
+import {fetchFilters} from '../../thunks/tableFilterThunks';
+import {
+    editFilterValue,
+    editSecondFilter,
+    editSelectedFilter,
+    editTextFilter,
+    removeSecondFilter,
+    removeSelectedFilter,
+    removeTextFilter,
+    resetEndDate,
+    resetFilterValues,
+    resetStartDate,
+    setEndDate,
+    setStartDate
+} from '../../actions/tableFilterActions';
 import TableFilterProfiles from "./TableFilterProfiles";
 
 import searchIcon from '../../img/search.png';
-
-
 
 
 //todo: implement/look if really needed (handleEnddatePicker is quite similar)
