@@ -1,0 +1,58 @@
+import {aclsTableConfig} from "../configs/tableConfigs/aclsTableConfig";
+import {LOAD_ACLS_FAILURE, LOAD_ACLS_IN_PROGRESS, LOAD_ACLS_SUCCESS} from "../actions/aclActions";
+
+/**
+ * This file contains redux reducer for actions affecting the state of users
+ */
+
+// Fill columns initially with columns defined in usersTableConfig
+const initialColumns = aclsTableConfig.columns.map(column =>
+    ({
+        name: column.name,
+        deactivated: false
+    }));
+
+// Initial state of users in redux store
+const initialState = {
+    isLoading: false,
+    results: [],
+    columns: initialColumns,
+    total: 0,
+    count: 0,
+    offset: 0,
+    limit: 0
+};
+
+const acls = (state=initialState, action) => {
+    const { type, payload } = action;
+    switch (type) {
+        case LOAD_ACLS_IN_PROGRESS: {
+            return {
+                ...state,
+                isLoading: true
+            }
+        }
+        case LOAD_ACLS_SUCCESS: {
+            const { acls } = payload;
+            return {
+                ...state,
+                isLoading: false,
+                total: acls.total,
+                count: acls.count,
+                limit: acls.limit,
+                offset: acls.offset,
+                results: acls.results
+            }
+        }
+        case LOAD_ACLS_FAILURE: {
+            return {
+                ...state,
+                isLoading: false
+            }
+        }
+        default:
+            return state;
+    }
+};
+
+export default acls;

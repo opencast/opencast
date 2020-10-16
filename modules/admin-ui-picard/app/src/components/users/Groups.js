@@ -7,15 +7,17 @@ import TableFilters from "../shared/TableFilters";
 import Table from "../shared/Table";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
 import {fetchUsers} from "../../thunks/userThunks";
-import {loadGroupsIntoTable, loadUsersIntoTable} from "../../thunks/tableThunks";
+import {loadAclsIntoTable, loadGroupsIntoTable, loadUsersIntoTable} from "../../thunks/tableThunks";
 import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {getGroups} from "../../selectors/groupSelectors";
-import {groupsTemplateMap} from "../../configs/tableConfigs/groupsTemplateMap";
+import {groupsTableConfig, groupsTemplateMap} from "../../configs/tableConfigs/groupsTableConfig";
 import {fetchGroups} from "../../thunks/groupThunks";
+import {fetchAcls} from "../../thunks/aclThunks";
 
 const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
-    loadingUsers, loadingUsersIntoTable }) => {
+                    loadingUsers, loadingUsersIntoTable, loadingAcls,
+                    loadingAclsIntoTable }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -35,8 +37,12 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
         loadingUsersIntoTable();
     }
 
-    const loadAccess = () => {
-        console.log('To be implemented');
+    const loadAcls = () => {
+        // Fetching acls from server
+        loadingAcls();
+
+        // Load acls into table
+        loadingAclsIntoTable();
     }
 
     useEffect(() => {
@@ -94,7 +100,7 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
                     </Link>
                     <Link to="/users/acls"
                           className={cn({active: false})}
-                          onClick={() => loadAccess()}>
+                          onClick={() => loadAcls()}>
                         {t('USERS.NAVIGATION.PERMISSIONS')}
                     </Link>
                 </nav>
@@ -128,7 +134,9 @@ const mapDispatchToProps = dispatch => ({
     loadingGroups: () => dispatch(fetchGroups()),
     loadingGroupsIntoTable: () => dispatch(loadGroupsIntoTable()),
     loadingUsers: () => dispatch(fetchUsers()),
-    loadingUsersIntoTable: () => dispatch(loadUsersIntoTable())
+    loadingUsersIntoTable: () => dispatch(loadUsersIntoTable()),
+    loadingAcls: () => dispatch(fetchAcls()),
+    loadingAclsIntoTable: () => dispatch(loadAclsIntoTable())
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Groups));

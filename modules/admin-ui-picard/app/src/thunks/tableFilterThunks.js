@@ -70,6 +70,13 @@ export const fetchFilters = resource => async dispatch => {
                 response = transformResponse(groupsData);
                 break;
             }
+            case 'acls': {
+                const data = await fetch('admin-ng/resources/acls/filters.json');
+                const aclsData = await data.json();
+
+                response = transformResponse(aclsData);
+                break;
+            }
         }
 
         const filters = response

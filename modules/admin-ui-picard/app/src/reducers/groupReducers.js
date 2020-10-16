@@ -1,4 +1,4 @@
-import {groupsTableConfig} from "../configs/tableConfigs/groupsTemplateMap";
+import {groupsTableConfig} from "../configs/tableConfigs/groupsTableConfig";
 import {LOAD_GROUPS_FAILURE, LOAD_GROUPS_IN_PROGRESS, LOAD_GROUPS_SUCCESS} from "../actions/groupActions";
 
 /**

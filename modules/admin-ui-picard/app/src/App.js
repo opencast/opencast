@@ -14,6 +14,7 @@ import Login from "./components/Login";
 import Servers from "./components/systems/Servers";
 import Services from "./components/systems/Services";
 import Groups from "./components/users/Groups";
+import Acls from "./components/users/Acls";
 
 const version = {
   version: '8.03',
@@ -57,6 +58,9 @@ function App() {
                   </Route>
                   <Route exact path={"/users/groups"}>
                       <Groups />
+                  </Route>
+                  <Route exact path={"/users/acls"}>
+                      <Acls />
                   </Route>
                   <Route exact path={"/statistics/organization"}>
                       <Statistics />

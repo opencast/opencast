@@ -29,8 +29,10 @@ import {fetchServices} from "./serviceThunks";
 import {servicesTableConfig} from "../configs/tableConfigs/servicesTableConfig";
 import {usersTableConfig} from "../configs/tableConfigs/usersTableConfig";
 import {fetchUsers} from "./userThunks";
-import {groupsTableConfig} from "../configs/tableConfigs/groupsTemplateMap";
+import {groupsTableConfig} from "../configs/tableConfigs/groupsTableConfig";
 import {fetchGroups} from "./groupThunks";
+import {aclsTableConfig} from "../configs/tableConfigs/aclsTableConfig";
+import {fetchAcls} from "./aclThunks";
 
 /**
  * This file contains methods/thunks used to manage the table in the main view and its state changes
@@ -281,6 +283,35 @@ export const loadGroupsIntoTable = () => (dispatch, getState) => {
     dispatch(loadResourceIntoTable(tableData));
 }
 
+export const loadAclsIntoTable = () => (dispatch, getState) => {
+    const { acls } = getState();
+    const pagination = getTablePagination(getState());
+    const resource = acls.results;
+
+    const c = aclsTableConfig.columns;
+    const columns = c.map(column => {
+        const col = acls.columns.find(co => co.name === column.name);
+        return {
+            ...column,
+            deactivated: col.deactivated
+        }
+    });
+
+    const multiSelect = aclsTableConfig.multiSelect;
+
+    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
+
+    const tableData = {
+        resource: "acls",
+        rows: resource,
+        columns: columns,
+        multiSelect: multiSelect,
+        pages: pages,
+        sortBy: "name"
+    };
+    dispatch(loadResourceIntoTable(tableData));
+}
+
 
 // Navigate between pages
 export const goToPage = pageNumber => (dispatch, getState) => {
@@ -341,6 +372,11 @@ export const goToPage = pageNumber => (dispatch, getState) => {
             dispatch(loadGroupsIntoTable());
             break;
         }
+        case 'acls': {
+            dispatch(fetchAcls());
+            dispatch(loadAclsIntoTable());
+            break;
+        }
     }
 }
 
@@ -396,6 +432,11 @@ export const updatePages = () => (dispatch,getState) => {
         case 'groups': {
             dispatch(fetchGroups());
             dispatch(loadGroupsIntoTable());
+            break;
+        }
+        case 'acls': {
+            dispatch(fetchAcls());
+            dispatch(loadAclsIntoTable());
             break;
         }
     }

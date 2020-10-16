@@ -15,6 +15,7 @@ import servers from "./reducers/serverReducer";
 import services from "./reducers/serviceReducer";
 import users from "./reducers/userReducers";
 import groups from "./reducers/groupReducers";
+import acls from "./reducers/aclReducers";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -32,7 +33,8 @@ const reducers = {
     servers,
     services,
     users,
-    groups
+    groups,
+    acls
 };
 
 // Configuration for persisting store

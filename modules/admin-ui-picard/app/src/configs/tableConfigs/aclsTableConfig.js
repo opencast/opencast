@@ -4,33 +4,25 @@
  * Information configured in this file:
  * - columns: names, labels, sortable, (template)
  * - caption for showing in table view
- * - resource type (here: groups)
+ * - resource type (here: acls)
  * - category type (here: users)
  * - is multi select possible?
  */
-import GroupsActionsCell from "../../components/users/partials/GroupsActionsCell";
+import AclsActionsCell from "../../components/users/partials/AclsActionsCell";
 
-export const groupsTableConfig = {
+export const aclsTableConfig = {
     columns: [{
-        name:  'name',
-        label: 'USERS.GROUPS.TABLE.NAME',
+        name: 'name',
+        label: 'USERS.ACLS.TABLE.NAME',
         sortable: true
     }, {
-        name:  'description',
-        label: 'USERS.GROUPS.TABLE.DESCRIPTION',
-        sortable: true
-    }, {
-        name:  'role',
-        label: 'USERS.GROUPS.TABLE.ROLE',
-        sortable: true
-    }, {
-        template: 'GroupsActionsCell',
+        template: 'AclsActionsCell',
         name: 'actions',
-        label:    'USERS.USERS.TABLE.ACTION'
+        label: 'USERS.ACLS.TABLE.ACTION'
     }],
-    caption:    'USERS.GROUPS.TABLE.CAPTION',
-    resource:   'groups',
-    category:   'users',
+    caption: 'USERS.ACLS.TABLE.CAPTION',
+    resource: 'acls',
+    category: 'users',
     multiSelect: false
 };
 
@@ -39,6 +31,6 @@ export const groupsTableConfig = {
  * This helps to render different templates of cells more dynamically. Even empty needed, because Table component
  * uses template map.
  */
-export const groupsTemplateMap = {
-    'GroupsActionsCell': GroupsActionsCell
+export const aclsTemplateMap = {
+    'AclsActionsCell': AclsActionsCell
 };
