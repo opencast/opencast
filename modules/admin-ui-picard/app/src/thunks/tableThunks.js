@@ -27,6 +27,8 @@ import {serversTableConfig} from "../configs/tableConfigs/serversTableConfig";
 import {fetchServers} from "./serverThunks";
 import {fetchServices} from "./serviceThunks";
 import {servicesTableConfig} from "../configs/tableConfigs/servicesTableConfig";
+import {usersTableConfig} from "../configs/tableConfigs/usersTableConfig";
+import {fetchUsers} from "./userThunks";
 
 /**
  * This file contains methods/thunks used to manage the table in the main view and its state changes
@@ -219,6 +221,35 @@ export const loadServicesIntoTable = () => (dispatch, getState) => {
     dispatch(loadResourceIntoTable(tableData));
 }
 
+export const loadUsersIntoTable = () => (dispatch, getState) => {
+    const {users} = getState();
+    const pagination = getTablePagination(getState());
+    const resource = users.results;
+
+    const c = usersTableConfig.columns;
+    const columns = c.map(column => {
+        const col = users.columns.find(co => co.name === column.name);
+        return {
+            ...column,
+            deactivated: col.deactivated
+        }
+    });
+
+    const multiSelect = usersTableConfig.multiSelect;
+
+    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
+
+    const tableData = {
+        resource: "users",
+        rows: resource,
+        columns: columns,
+        multiSelect: multiSelect,
+        pages: pages,
+        sortBy: "name"
+    };
+    dispatch(loadResourceIntoTable(tableData));
+};
+
 
 // Navigate between pages
 export const goToPage = pageNumber => (dispatch, getState) => {
@@ -267,6 +298,12 @@ export const goToPage = pageNumber => (dispatch, getState) => {
         case 'services': {
             dispatch(fetchServices());
             dispatch(loadServicesIntoTable());
+            break;
+        }
+        case 'users': {
+            dispatch(fetchUsers());
+            dispatch(loadUsersIntoTable());
+            break;
         }
     }
 }
@@ -313,6 +350,12 @@ export const updatePages = () => (dispatch,getState) => {
         case 'services': {
             dispatch(fetchServices());
             dispatch(loadServicesIntoTable());
+            break;
+        }
+        case 'users': {
+            dispatch(fetchUsers());
+            dispatch(loadUsersIntoTable());
+            break;
         }
     }
 

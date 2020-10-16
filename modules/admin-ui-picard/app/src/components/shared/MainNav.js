@@ -1,17 +1,23 @@
 import React from "react";
 import {useTranslation} from "react-i18next";
 import {Link} from "react-router-dom";
-import {loadEventsIntoTable, loadJobsIntoTable, loadRecordingsIntoTable} from "../../thunks/tableThunks";
+import {
+    loadEventsIntoTable,
+    loadJobsIntoTable,
+    loadRecordingsIntoTable,
+    loadUsersIntoTable
+} from "../../thunks/tableThunks";
 import {fetchEvents} from "../../thunks/eventThunks";
 import {connect} from "react-redux";
 import {fetchRecordings} from "../../thunks/recordingThunks";
 import {fetchJobs} from "../../thunks/jobThunks";
+import {fetchUsers} from "../../thunks/userThunks";
 
 /**
  * This component renders the main navigation that opens when the burger button is clicked
  */
 const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, loadingRecordings, loadingRecordingsIntoTable,
-                     loadingJobs, loadingJobsIntoTable }) => {
+                     loadingJobs, loadingJobsIntoTable, loadingUsers, loadingUsersIntoTable }) => {
     const { t } = useTranslation();
 
     const loadEvents = () => {
@@ -38,6 +44,14 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
         loadingJobsIntoTable();
     }
 
+    const loadUsers = () => {
+        // Fetching users form server
+        loadingUsers();
+
+        // Load users into table
+        loadingUsersIntoTable()
+    }
+
     return (
         <>
             <div className="menu-top" onClick={() => toggleMenu()}>
@@ -55,7 +69,7 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
                             <Link to="/systems/jobs" onClick={() => loadJobs()}>
                                 <i className="systems" title={t('NAV.SYSTEMS.TITLE')}/>
                             </Link>
-                            <Link to="/users/users">
+                            <Link to="/users/users" onClick={() => loadUsers()}>
                                 <i className="users" title={t('NAV.USERS.TITLE')}/>
                             </Link>
                             <Link to="/configuration/themes">
@@ -80,7 +94,9 @@ const mapDispatchToProps = dispatch => ({
     loadingRecordings: () => dispatch(fetchRecordings()),
     loadingRecordingsIntoTable: () => dispatch(loadRecordingsIntoTable()),
     loadingJobs: () => dispatch(fetchJobs()),
-    loadingJobsIntoTable: () => dispatch(loadJobsIntoTable())
+    loadingJobsIntoTable: () => dispatch(loadJobsIntoTable()),
+    loadingUsers: () => dispatch(fetchUsers()),
+    loadingUsersIntoTable: () => dispatch(loadUsersIntoTable())
 });
 
 export default connect(null, mapDispatchToProps)(MainNav);

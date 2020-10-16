@@ -13,6 +13,7 @@ import recordings from "./reducers/recordingReducer";
 import jobs from "./reducers/jobReducer";
 import servers from "./reducers/serverReducer";
 import services from "./reducers/serviceReducer";
+import users from "./reducers/userReducers";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -28,7 +29,8 @@ const reducers = {
     recordings,
     jobs,
     servers,
-    services
+    services,
+    users
 };
 
 // Configuration for persisting store
