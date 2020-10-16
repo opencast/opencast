@@ -475,7 +475,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
         SMILMediaElement e = (SMILMediaElement) node;
 
         // Avoid any element that is not a video or of the source type
-        if(NODE_TYPE_VIDEO.equals(e.getNodeName())) {
+        if (NODE_TYPE_VIDEO.equals(e.getNodeName())) {
           Track track;
           try {
             track = getTrackByID(e.getId(), sourceTracks);
