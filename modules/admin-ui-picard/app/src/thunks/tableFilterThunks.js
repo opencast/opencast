@@ -63,6 +63,13 @@ export const fetchFilters = resource => async dispatch => {
                 response = transformResponse(usersData);
                 break;
             }
+            case 'groups': {
+                const data = await fetch('admin-ng/resources/groups/filters.json');
+                const groupsData = await data.json();
+
+                response = transformResponse(groupsData);
+                break;
+            }
         }
 
         const filters = response

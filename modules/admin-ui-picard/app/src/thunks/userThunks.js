@@ -18,4 +18,4 @@ export const fetchUsers = () => async (dispatch, getState) => {
     } catch (e) {
         dispatch(loadUsersFailure());
     }
-}
+};

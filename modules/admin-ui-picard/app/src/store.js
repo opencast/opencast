@@ -14,6 +14,7 @@ import jobs from "./reducers/jobReducer";
 import servers from "./reducers/serverReducer";
 import services from "./reducers/serviceReducer";
 import users from "./reducers/userReducers";
+import groups from "./reducers/groupReducers";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -30,7 +31,8 @@ const reducers = {
     jobs,
     servers,
     services,
-    users
+    users,
+    groups
 };
 
 // Configuration for persisting store

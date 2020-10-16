@@ -1,45 +1,35 @@
-import UsersActionCell from "../../components/users/partials/UsersActionsCell";
-import UsersRolesCell from "../../components/users/partials/UsersRolesCell";
-
 /**
  * Config that contains the columns and further information regarding jobs. These are the information that never or hardly changes.
  * That's why it is hard coded here and not fetched from server.
  * Information configured in this file:
  * - columns: names, labels, sortable, (template)
  * - caption for showing in table view
- * - resource type (here: users)
+ * - resource type (here: groups)
  * - category type (here: users)
  * - is multi select possible?
  */
-export const usersTableConfig = {
+import GroupsActionsCell from "../../components/users/partials/GroupsActionsCell";
+
+export const groupsTableConfig = {
     columns: [{
         name:  'name',
-        label: 'USERS.USERS.TABLE.NAME',
+        label: 'USERS.GROUPS.TABLE.NAME',
         sortable: true
     }, {
-        name:  'username',
-        label: 'USERS.USERS.TABLE.USERNAME',
+        name:  'description',
+        label: 'USERS.GROUPS.TABLE.DESCRIPTION',
         sortable: true
     }, {
-        name:  'email',
-        label: 'USERS.USERS.TABLE.EMAIL',
+        name:  'role',
+        label: 'USERS.GROUPS.TABLE.ROLE',
         sortable: true
     }, {
-        template: 'UsersRolesCell',
-        name:  'roles',
-        label: 'USERS.USERS.TABLE.ROLES',
-        sortable: true
-    }, {
-        name:  'provider',
-        label: 'USERS.USERS.TABLE.PROVIDER',
-        sortable: true
-    }, {
-        template: 'UsersActionsCell',
-        name:  'actions',
+        template: 'GroupsActionsCell',
+        name: 'actions',
         label:    'USERS.USERS.TABLE.ACTION'
     }],
-    caption:    'USERS.USERS.TABLE.CAPTION',
-    resource:   'users',
+    caption:    'USERS.GROUPS.TABLE.CAPTION',
+    resource:   'groups',
     category:   'users',
     multiSelect: false
 };
@@ -49,7 +39,6 @@ export const usersTableConfig = {
  * This helps to render different templates of cells more dynamically. Even empty needed, because Table component
  * uses template map.
  */
-export const usersTemplateMap = {
-    'UsersActionsCell': UsersActionCell,
-    'UsersRolesCell': UsersRolesCell
+export const groupsTemplateMap = {
+    'GroupsActionsCell': GroupsActionsCell
 };

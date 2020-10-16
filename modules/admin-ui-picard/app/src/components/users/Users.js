@@ -11,9 +11,11 @@ import {connect} from "react-redux";
 import {usersTemplateMap} from "../../configs/tableConfigs/usersTableConfig";
 import {getUsers} from "../../selectors/userSelectors";
 import {fetchUsers} from "../../thunks/userThunks";
-import {loadUsersIntoTable} from "../../thunks/tableThunks";
+import {loadGroupsIntoTable, loadUsersIntoTable} from "../../thunks/tableThunks";
+import {fetchGroups} from "../../thunks/groupThunks";
 
-const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters }) => {
+const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
+                   loadingGroups, loadingGroupsIntoTable }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -21,12 +23,16 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters }) =
         // Fetching users from server
         await loadingUsers();
 
-        // Load jobs into table
+        // Load users into table
         loadingUsersIntoTable();
     }
 
     const loadGroups = () => {
-        console.log('To be implemented');
+        // Fetching groups from server
+        loadingGroups();
+
+        // Load groups into table
+        loadingGroupsIntoTable();
     }
 
     const loadAccess = () => {
@@ -119,7 +125,9 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
     loadingFilters: resource => dispatch(fetchFilters(resource)),
     loadingUsers: () => dispatch(fetchUsers()),
-    loadingUsersIntoTable: () => dispatch(loadUsersIntoTable())
+    loadingUsersIntoTable: () => dispatch(loadUsersIntoTable()),
+    loadingGroups: () => dispatch(fetchGroups()),
+    loadingGroupsIntoTable: () => dispatch(loadGroupsIntoTable()),
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Users));

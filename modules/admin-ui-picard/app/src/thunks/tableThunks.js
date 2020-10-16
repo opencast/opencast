@@ -29,6 +29,8 @@ import {fetchServices} from "./serviceThunks";
 import {servicesTableConfig} from "../configs/tableConfigs/servicesTableConfig";
 import {usersTableConfig} from "../configs/tableConfigs/usersTableConfig";
 import {fetchUsers} from "./userThunks";
+import {groupsTableConfig} from "../configs/tableConfigs/groupsTemplateMap";
+import {fetchGroups} from "./groupThunks";
 
 /**
  * This file contains methods/thunks used to manage the table in the main view and its state changes
@@ -250,6 +252,35 @@ export const loadUsersIntoTable = () => (dispatch, getState) => {
     dispatch(loadResourceIntoTable(tableData));
 };
 
+export const loadGroupsIntoTable = () => (dispatch, getState) => {
+    const { groups } = getState();
+    const pagination = getTablePagination(getState());
+    const resource = groups.results;
+
+    const c = groupsTableConfig.columns;
+    const columns = c.map(column => {
+        const col = groups.columns.find(co => co.name === column.name);
+        return {
+            ...column,
+            deactivated: col.deactivated
+        }
+    });
+
+    const multiSelect = groupsTableConfig.multiSelect;
+
+    const pages = calculatePages(resource.length / pagination.limit, pagination.offset);
+
+    const tableData = {
+        resource: "groups",
+        rows: resource,
+        columns: columns,
+        multiSelect: multiSelect,
+        pages: pages,
+        sortBy: "name"
+    };
+    dispatch(loadResourceIntoTable(tableData));
+}
+
 
 // Navigate between pages
 export const goToPage = pageNumber => (dispatch, getState) => {
@@ -305,6 +336,11 @@ export const goToPage = pageNumber => (dispatch, getState) => {
             dispatch(loadUsersIntoTable());
             break;
         }
+        case 'groups': {
+            dispatch(fetchGroups());
+            dispatch(loadGroupsIntoTable());
+            break;
+        }
     }
 }
 
@@ -355,6 +391,11 @@ export const updatePages = () => (dispatch,getState) => {
         case 'users': {
             dispatch(fetchUsers());
             dispatch(loadUsersIntoTable());
+            break;
+        }
+        case 'groups': {
+            dispatch(fetchGroups());
+            dispatch(loadGroupsIntoTable());
             break;
         }
     }

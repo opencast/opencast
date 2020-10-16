@@ -13,6 +13,7 @@ import Series from "./components/events/Series";
 import Login from "./components/Login";
 import Servers from "./components/systems/Servers";
 import Services from "./components/systems/Services";
+import Groups from "./components/users/Groups";
 
 const version = {
   version: '8.03',
@@ -53,6 +54,9 @@ function App() {
                   </Route>
                   <Route exact path={"/users/users"}>
                       <Users />
+                  </Route>
+                  <Route exact path={"/users/groups"}>
+                      <Groups />
                   </Route>
                   <Route exact path={"/statistics/organization"}>
                       <Statistics />

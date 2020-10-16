@@ -21,7 +21,7 @@ const initialState = {
     count: 0,
     offset: 0,
     limit: 0
-}
+};
 
 const users = (state=initialState, action) => {
     const { type, payload } = action;
@@ -53,6 +53,6 @@ const users = (state=initialState, action) => {
         default:
             return state;
     }
-}
+};
 
 export default users;
