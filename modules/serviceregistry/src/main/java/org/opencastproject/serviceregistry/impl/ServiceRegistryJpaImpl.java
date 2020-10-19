@@ -98,6 +98,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -3185,7 +3186,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         } catch (Exception e) {
           logger.warn("Unable to dispatch {}", job, e);
         } finally {
-          client.close(response);
+          try {
+            client.close(response);
+          } catch (IOException e) {
+            // ignore
+          }
           setCurrentJob(null);
         }
       }

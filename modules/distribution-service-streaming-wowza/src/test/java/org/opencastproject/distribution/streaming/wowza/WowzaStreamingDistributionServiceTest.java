@@ -43,12 +43,9 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
-import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
-import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
@@ -145,14 +142,6 @@ public class WowzaStreamingDistributionServiceTest {
 
     final TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
     EasyMock.expect(httpClient.execute((HttpUriRequest) EasyMock.anyObject())).andReturn(response).anyTimes();
-    EasyMock.expect(httpClient.run((HttpUriRequest) EasyMock.anyObject()))
-            .andAnswer(new IAnswer<Function<Function<HttpResponse, Object>, Either<Exception, Object>>>() {
-              @Override
-              public Function<Function<HttpResponse, Object>, Either<Exception, Object>> answer() throws Throwable {
-                HttpUriRequest req = (HttpUriRequest) EasyMock.getCurrentArguments()[0];
-                return StandAloneTrustedHttpClientImpl.run(httpClient, req);
-              }
-            }).anyTimes();
     EasyMock.replay(httpClient);
     streamingService.setTrustedHttpClient(httpClient);
 

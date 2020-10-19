@@ -21,25 +21,28 @@
 
 package org.opencastproject.workspace.impl;
 
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.expect;
+
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.security.api.TrustedHttpClient.RequestRunner;
-import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import com.entwinemedia.fn.Prelude;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.message.BasicStatusLine;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
@@ -109,10 +112,6 @@ public class WorkspaceImplTest {
     EasyMock.expect(response.getStatusLine()).andReturn(statusLine).anyTimes();
     EasyMock.replay(response, entity, statusLine);
     EasyMock.expect(httpClient.execute(EasyMock.anyObject(HttpUriRequest.class))).andReturn(response);
-    EasyMock.expect(httpClient.runner(EasyMock.anyObject(HttpUriRequest.class))).andAnswer(() -> {
-      HttpUriRequest req = (HttpUriRequest) EasyMock.getCurrentArguments()[0];
-      return StandAloneTrustedHttpClientImpl.runner(httpClient, req);
-    });
     EasyMock.replay(httpClient);
     workspace.setTrustedHttpClient(httpClient);
     Assert.assertTrue(urlToSource.toString().length() > 255);
@@ -240,7 +239,7 @@ public class WorkspaceImplTest {
 
   @Test
   public void testGetNoFilename() throws Exception {
-    final File expectedFile = testFolder.newFile("test.txt");
+    final File expectedFile = new File(workspaceRoot + "/http_foo.com/myaccount/videos/unknown");
     FileUtils.write(expectedFile, "asdf", StandardCharsets.UTF_8);
     expectedFile.deleteOnExit();
 
@@ -256,14 +255,16 @@ public class WorkspaceImplTest {
     EasyMock.replay(securityService, organization);
     workspace.setSecurityService(securityService);
 
-    RequestRunner<Either<String, Option<File>>> requestRunner = f -> {
-      Either<String, Option<File>> right = Either.right(Option.some(expectedFile));
-      return Either.right(right);
-    };
+    HttpEntity httpEntity = EasyMock.createMock(HttpEntity.class);
+    expect(httpEntity.getContent()).andAnswer(() -> IOUtils.toInputStream("", "UTF-8"));
+    CloseableHttpResponse response = EasyMock.createMock(CloseableHttpResponse.class);
+    expect(response.getStatusLine())
+        .andReturn(new BasicStatusLine(new ProtocolVersion("Http", 1, 1), 200, "Good to go"))
+        .anyTimes();
+    expect(response.getEntity()).andReturn(httpEntity);
     TrustedHttpClient trustedHttpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
-    EasyMock.expect(trustedHttpClient.<Either<String, Option<File>>> runner(EasyMock.anyObject(HttpUriRequest.class)))
-            .andReturn(requestRunner).anyTimes();
-    EasyMock.replay(trustedHttpClient);
+    expect(trustedHttpClient.execute(anyObject(HttpUriRequest.class))).andReturn(response).anyTimes();
+    EasyMock.replay(httpEntity, response, trustedHttpClient);
     workspace.setTrustedHttpClient(trustedHttpClient);
 
     File resultingFile = workspace.get(URI.create("http://foo.com/myaccount/videos/"));
