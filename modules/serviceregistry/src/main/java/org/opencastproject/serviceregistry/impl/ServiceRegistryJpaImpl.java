@@ -212,13 +212,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   static final int DEFAULT_DISPATCH_JOBS_LIMIT = 100;
 
   /** Default setting on job statistics collection */
-  static final boolean DEFAULT_JOB_STATISTICS = true;
+  static final boolean DEFAULT_JOB_STATISTICS = false;
 
   /** Default setting on service statistics retrieval */
   static final int DEFAULT_SERVICE_STATISTICS_MAX_JOB_AGE = 14;
 
   /** Default value for {@link #maxAttemptsBeforeErrorState} */
-  private static final int MAX_FAILURE_BEFORE_ERROR_STATE = 1;
+  private static final int MAX_FAILURE_BEFORE_ERROR_STATE = 10;
 
   /** The configuration key for setting {@link #maxAttemptsBeforeErrorState} */
   private static final String MAX_ATTEMPTS_CONFIG_KEY = "max.attempts";
