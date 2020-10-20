@@ -5,10 +5,10 @@
    "NO": "Nein",
    "SUBMIT": "Speichern",
    "UPDATE": {
-      "MINOR": "Minor update available",
-      "MAJOR": "Major update available",
-      "UNSUPPORTED": "Version {{ version }} no longer supported",
-      "UNDETERMINED": "Indeterminable version"
+      "MINOR": "Update verfügbar",
+      "MAJOR": "Neue Version verfügbar",
+      "UNSUPPORTED": "Version {{ version }} wird nicht länger unterstützt",
+      "UNDETERMINED": "Version kann nicht ermittelt werden"
    },
    "CANCEL": "Abbrechen",
    "CONFIRM": "Bestätigen",
@@ -23,45 +23,45 @@
    "COPY": "In die Zwischenablage kopieren",
    "LTI": {
       "ERROR_LOADING_METADATA": "Fehler beim Laden der Eventmetadaten. Bitte versuchen Sie es später noch einmal.",
-      "SERIES_TITLE": "View Series",
-      "UPLOAD_TITLE": "Upload event",
-      "LOADING": "Loading…",
-      "NEW_UPLOAD": "Upload new event",
-      "EDIT_UPLOAD": "Edit event",
-      "CURRENT_JOBS": "Today's jobs",
-      "PRESENTER": "Presenter",
-      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
-      "CAPTION": "Captions",
-      "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
-      "UPLOAD": "Upload",
-      "UPLOADING": "Uploading",
-      "EDIT": "Save",
-      "EDIT_TITLE": "Edit event",
-      "NO_OPTION_SELECTED": "No option selected",
-      "EDITING": "Saving…",
-      "SELECT_OPTION": "Select option",
-      "JOB_TITLE": "Title",
+      "SERIES_TITLE": "Serie anzeigen",
+      "UPLOAD_TITLE": "Event aktualisieren",
+      "LOADING": "Wird geladen…",
+      "NEW_UPLOAD": "Neues Event hochladen",
+      "EDIT_UPLOAD": "Event bearbeiten",
+      "CURRENT_JOBS": "Heutige Jobs",
+      "PRESENTER": "Vortragende(r)",
+      "PRESENTER_DESCRIPTION": "Videodatei für die Vortragenden-Spur",
+      "CAPTION": "Untertitel",
+      "CAPTION_DESCRIPTION": "Untertiteldatei; VTT-Dateiformat wird unterstützt",
+      "UPLOAD": "Hochladen",
+      "UPLOADING": "Lädt hoch",
+      "EDIT": "Speichern",
+      "EDIT_TITLE": "Event bearbeiten",
+      "NO_OPTION_SELECTED": "Keine Option ausgewählt",
+      "EDITING": "Speichere…",
+      "SELECT_OPTION": "Option wählen",
+      "JOB_TITLE": "Titel",
       "JOB_STATUS": "Status",
-      "UPLOAD_SUCCESS": "Upload succeded!",
-      "UPLOAD_FAILURE": "Upload failed!",
-      "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
-      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
-      "EDIT_FAILURE": "Edit failed!",
-      "COPY_SUCCESS": "Copying started…",
-      "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",
-      "GENERIC_ERROR": "Error: {{message}}",
-      "DELETION_SUCCESS": "Event deletion successful",
-      "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
-      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
-      "DELETION_FAILURE": "Event deletion failed",
-      "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
-      "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
-      "CONFIRM_DELETION": "Really delete this event?",
-      "COPY_TO_SERIES": "Copy event to series",
-      "SELECT_COPY_TARGET": "Select destination series",
-      "COPY": "Copy",
-      "COPY_IN_PROGRESS": "Starting copy…",
-      "CREATOR": "by {{creator}}"
+      "UPLOAD_SUCCESS": "Hochladen erfolgreich!",
+      "UPLOAD_FAILURE": "Hochladen fehlgeschlagen!",
+      "UPLOAD_FAILURE_DESCRIPTION": "Bitte versuche es später erneut.",
+      "EDIT_SUCCESS": "Bearbeiten erfolgreich, Beginn der Neuveröffentlichung.",
+      "EDIT_FAILURE": "Bearbeiten fehlgeschlagen!",
+      "COPY_SUCCESS": "Kopieren gestartet…",
+      "COPY_SUCCESS_DESCRIPTION": "Einen Moment bitte…",
+      "GENERIC_ERROR": "Fehler: {{message}}",
+      "DELETION_SUCCESS": "Ereignis erfolgreich gelöscht",
+      "DELETION_SUCCESS_DESCRIPTION": "Das Ereignis wird in wenigen Augenblicken aus der Liste entfernt…",
+      "EVENT_LOCKED": "Das Ereignis wird gerade bearbeitet. Bitte warten Sie mit der Vornahme von Änderungen…",
+      "DELETION_FAILURE": "Löschen des Ereignisses fehlgeschlagen",
+      "DELETION_FAILURE_DESCRIPTION": "Bitte versuchen Sie es später noch einmal…",
+      "RESULT_HEADING": "Ergebnisse {{range.begin}}-{{range.end}} von {{total}}",
+      "CONFIRM_DELETION": "Dieses Ereignis wirklich löschen?",
+      "COPY_TO_SERIES": "Ereignis in Serie kopieren",
+      "SELECT_COPY_TARGET": "Zielserie auswählen",
+      "COPY": "Kopieren",
+      "COPY_IN_PROGRESS": "Kopie wird gestartet…",
+      "CREATOR": "von {{creator}}"
    },
    "LANGUAGES": {
       "ARABIC": "Arabisch",
@@ -97,12 +97,12 @@
       }
    },
    "CONFIRMATIONS": {
-      "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
+      "EMBEDDING_CODE": "Einbettungscode wurde in die Zwischenablage kopiert:",
       "CONTINUE_ACTION": "Sind Sie sicher, dass Sie fortfahren möchten?",
       "METADATA": {
          "NOTICE": {
             "UNKNOWN": "Das folgende Element wird gelöscht",
-            "EVENT": "Die folgende Aufzeichnung wird gelöscht",
+            "EVENT": "Das folgende Ereignis wird gelöscht",
             "SERIES": "Die folgende Serie wird gelöscht",
             "ACL": "Folgende Zugriffsrichtlinie wird gelöscht",
             "GROUP": "Die folgende Gruppe wird gelöscht",
@@ -115,7 +115,7 @@
       "ACTIONS": {
          "CONFIRMATION": "Bestätigung",
          "SHOW": {
-            "EMBEDDING_CODE": "Embedding code"
+            "EMBEDDING_CODE": "Einbettungscode"
          }
       },
       "WARNINGS": {
@@ -135,7 +135,7 @@
       "DOCUMENTATION": "Dokumentation",
       "REST_DOC": "REST-API-Docs",
       "HOTKEY_CHEAT_SHEET": "Tastenkürzel",
-      "ADOPTER_REGISTRATION": "Adopter Registration"
+      "ADOPTER_REGISTRATION": "Adopter Registrierung"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Die Zugriffsrichtlinie wurde erstellt",
@@ -158,14 +158,14 @@
       "ACCESS_DENIED": "Zugriff verweigert. Sie sind nicht berechtigt, diese Seite anzusehen.",
       "SERIES_ADDED": "Die Serie wurde angelegt",
       "SERIES_NOT_SAVED": "Die Serie konnte nicht gespeichert werden",
-      "EVENTS_CREATED": "Die Aufzeichnung wurde angelegt",
-      "EVENTS_UPLOAD_STARTED": "Die Aufzeichnung wird hochgeladen…",
-      "EVENTS_NOT_CREATED": "Die Aufzeichnung konnte nicht angelegt werden",
-      "EVENTS_UPDATED_NB": "{{ number }} Aufzeichnungen wurden erfolgreich hochgeladen.",
-      "EVENTS_UPDATED_ALL": "Alle Aufzeichnungen wurden erfolgreich hochgeladen.",
-      "EVENTS_NOT_UPDATED": "Die Aufzeichnung konnte nicht gespeichert werden",
-      "EVENTS_NOT_UPDATED_ID": "Die Aufzeichnung {{ id }} konnte nicht übernommen werden.",
-      "EVENTS_NOT_UPDATED_ALL": "Keine der Aufzeichnungen konnte gespeichert werden",
+      "EVENTS_CREATED": "Das Ereignis wurde angelegt",
+      "EVENTS_UPLOAD_STARTED": "Das Ereignis wird hochgeladen…",
+      "EVENTS_NOT_CREATED": "Das Ereignis konnte nicht angelegt werden",
+      "EVENTS_UPDATED_NB": "{{ number }} Ereignisse wurden erfolgreich aktualisiert",
+      "EVENTS_UPDATED_ALL": "Alle Ereignisse wurden erfolgreich aktualisiert",
+      "EVENTS_NOT_UPDATED": "Das Ereignis konnte nicht gespeichert werden",
+      "EVENTS_NOT_UPDATED_ID": "Das Ereignis {{ id }} konnte nicht gespeichert werden",
+      "EVENTS_NOT_UPDATED_ALL": "Kein Ereignis konnte gespeichert werden",
       "EVENTS_PROCESSING_ACTION_RETRY": "Verarbeitung fortgesetzt.",
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Verarbeitung konnte nicht fortgesetzt werden.",
       "EVENTS_PROCESSING_ACTION_NONE": "Die Verarbeitung wurde abgebrochen.",
@@ -179,25 +179,25 @@
       "SERIES_NOT_UPDATED": "Diese Serie konnte nicht gespeichert werden",
       "SERIES_NOT_UPDATED_ID": "Die Serie {{ id }} konnte nicht gespeichert werden",
       "SERIES_NOT_UPDATED_ALL": "Keine der Serien konnte gespeichert werden",
-      "EVENT_DELETED": "Die Aufzeichnung wurde gelöscht.",
-      "EVENT_WILL_BE_DELETED": "Die Aufzeichnung wird gelöscht",
-      "EVENTS_DELETED": "Die Aufzeichnungen werden gelöscht.",
-      "EVENTS_NOT_DELETED": "Die Aufzeichnung(en) konnten nicht gelöscht werden.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Die Aufzeichnungen konnten nicht gelöscht werden da Sie nicht dazu berechtigt sind.",
+      "EVENT_DELETED": "Das Ereignis wurde gelöscht.",
+      "EVENT_WILL_BE_DELETED": "Das Ereignis wird gelöscht",
+      "EVENTS_DELETED": "Die Ereignisse werden gelöscht.",
+      "EVENTS_NOT_DELETED": "Das/die Ereignis(se) konnte(n) nicht gelöscht werden.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Die/das Ereignis(se) konnte(n) nicht gelöscht werden, da Sie dazu nicht berechtigt sind.",
       "SERIES_DELETED": "Die Serie wurde gelöscht",
       "SERIES_NOT_DELETED": "Die Serie konnte nicht gelöscht werden",
-      "LOCATION_DELETED": "Das Aufzeichnungsgerät wurde entfernt",
-      "LOCATION_NOT_DELETED": "Das Aufzeichnungsgerät konnte nicht entfernt werden",
+      "LOCATION_DELETED": "Der Raum wurde gelöscht",
+      "LOCATION_NOT_DELETED": "Der Raum konnte nicht entfernt werden",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Der Raum konnte nicht entfernt werden, weil Sie nicht dazu berechtigt sind.",
-      "CONFLICT_DETECTED": "Planungskonflikt: Die neue Aufzeichnung überlappt zeitlich mit einer bereits bestehenden Aufzeichnung. Bitte Ort, Datum oder Zeit anpassen.",
-      "CONFLICT_BULK_DETECTED": "Konflikt: Das Ändern der Aufzeichnungsdaten resultiert in Konflikten. Bitte Ort, Datum oder Zeit anpassen.",
-      "CONFLICT_ALREADY_ENDED": "Planungskonflikt: Aufzeichnungen können nicht in der Vergangenheit geplant werden.",
-      "CONFLICT_END_BEFORE_START": "Planungskonflikt: Der Endzeitpunkt der Aufzeichnung muss nach dem Anfangszeitpunkt liegen.",
+      "CONFLICT_DETECTED": "Planungs-Konflikt: Das neue Ereignis überlappt zeitlich mit einem bereits bestehenden Ereignis. Bitte Ort, Datum oder Zeit anpassen.",
+      "CONFLICT_BULK_DETECTED": "Planungs-Konflikt: Das Ändern des Ereignisses führt zu Konflikten. Bitte Ort, Datum oder Zeit anpassen.",
+      "CONFLICT_ALREADY_ENDED": "Planungs-Fehler: Das Ereignis endete bereits.",
+      "CONFLICT_END_BEFORE_START": "Planungs-Fehler: Der Endzeitpunkt des Ereignisses muss nach dem Anfangszeitpunkt liegen.",
       "CONFLICT_IN_THE_PAST": "Die Planung konnte nicht aktualisiert werden: Sie können nicht in der Vergangenheit planen.",
       "INVALID_ACL_RULES": "Regeln müssen eine gültige Rolle und Lese-/Schreibrechte enthalten.",
       "MISSING_ACL_RULES": "Es ist mindestens eine Rolle mit Lese- und Schreibberechtigungen erforderlich!",
       "SAVED_ACL_RULES": "Die Zugriffsregeln wurden gespeichert.",
-      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Die vorhandenen Aufzeichnungen in dieser Serie müssen neu verarbeitet werden",
+      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Die vorhandenen Ereignisse in dieser Serie müssen neu verarbeitet werden",
       "SERIES_ACL_LOCKED": "Das Editieren von Zugriffsrichtlinien ist nicht erlaubt, solange Aufnahmen verarbeitet werden, die Teil der Serie sind",
       "SERIES_ACL_MISSING_READWRITE_ROLE": "Der Zugriffsrichtlinie erfordert mindestens eine Rolle mit Lese- und Schreibberechtigungen.",
       "EVENT_ACL_MISSING_READWRITE_ROLE": "Der Zugriffsrichtlinie erfordert mindestens eine Rolle mit Lese- und Schreibberechtigungen.",
@@ -215,8 +215,8 @@
       "THEME_NOT_CREATED": "Das Branding konnte nicht erstellt werden",
       "THEME_DELETED": "Das Branding wurde gelöscht",
       "THEME_NOT_DELETED": "Das Branding konnte nicht gelöscht werden",
-      "TASK_CREATED": "Der Task wurde erstellt",
-      "TASK_NOT_CREATED": "Der Task konnte nicht erstellt werden",
+      "TASK_CREATED": "Die Aufgabe wurde erstellt",
+      "TASK_NOT_CREATED": "Die Aufgabe konnte nicht erstellt werden",
       "VIDEO_CUT_NOT_SAVED": "Die Änderungen konnte nicht gespeichert werden",
       "VIDEO_CUT_SAVED": "Die Änderungen wurden gespeichert",
       "VIDEO_CUT_PROCESSING": "Das Video wird verarbeitet…",
@@ -227,15 +227,15 @@
       "SERVICE_UNAVAILABLE": "Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut.",
       "ACTIVE_TRANSACTION": "Dieses Ereignis kann nicht bearbeitet werden, während ein Workflow oder eine Transaktion auf diesem aktiv sind.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
-         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
-         "NO_EVENTS_UPDATED": "All updates failed.",
-         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+         "UNEXPECTED_ERROR": "Beim Aktualisieren ist ein unerwarteter Fehler aufgetreten. Einige Ereignisse wurden möglicherweise aktualisiert.",
+         "ALL_EVENTS_UPDATED": "Alle Ereignisse wurden erfolgreich aktualisiert.",
+         "NO_EVENTS_UPDATED": "Alle Aktualisierungen schlugen fehl.",
+         "SOME_EVENTS_NOT_UPDATED": "Einige Ereignisse konnten nicht aktualisiert werden."
       },
-      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
-      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
-      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
-      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
+      "ADOPTER_PROFILE_UPDATED": "Profil-Informationen erfolgreich aktualisiert.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Hoppla! Profil-Informationen konnten nicht aktualisiert werden. Bitte versuchen Sie es erneut!",
+      "ADOPTER_PROFILE_DELETED": "Profil-Informationen erfolgreich gelöscht.",
+      "ADOPTER_PROFILE_NOT_DELETED": "Hoppla! Profil-Informationen konnten nicht gelöscht werden. Bitte versuchen Sie es erneut!"
    },
    "BULK_ACTIONS": {
       "CAPTION": "Aktionen",
@@ -243,12 +243,12 @@
          "SERIES": {
             "CAPTION": "Löschen",
             "BUTTON": "Entfernen",
-            "CANNOT_DELETE": "Die hervorgehobene Serie kann nicht gelöscht werden, da diese Aufzeichnungen enthält."
+            "CANNOT_DELETE": "Die hervorgehobene Serie kann nicht gelöscht werden, da sie Ereignisse enthält."
          },
          "EVENTS": {
             "CAPTION": "Löschen",
-            "DELETE_EVENTS": "Aufzeichnungen löschen",
-            "UNAUTHORIZED": "Sie sind nicht dazu berechtigt, die hervorgehobenen Aufzeichnungen zu löschen. Um fortzufahren können Sie diese von der Auswahl entfernen."
+            "DELETE_EVENTS": "Ereignisse löschen",
+            "UNAUTHORIZED": "Sie sind nicht berechtigt die hervorgehobenen Ereignisse zu löschen. Um forzufahren heben Sie die Auswahl dieser auf."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Sobald alle Metadaten gelöscht sind, werden die Audio- und Video-Dateien gelöscht und können nicht wiederhergestellt werden.",
@@ -256,34 +256,34 @@
       "DELETE_SERIES_WARNING_LINE1": "Die Metadaten der Serien werden unwiderruflich gelöscht.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
-         "CAPTION": "Task starten",
+         "CAPTION": "Aufgabe starten",
          "GENERAL": {
             "CAPTION": "Allgemein",
-            "SUMMARY": "({{ count }} Aufzeichnungen ausgewählt)",
-            "CANNOTSTART": "Markierte Aufzeichnungen können im Moment nicht verarbeitet werden. Entfernen Sie diese aus der Auswahl oder versuchen Sie es später erneut."
+            "SUMMARY": "({{ count }} Ereignisse ausgewählt)",
+            "CANNOTSTART": "Markierte Ereignisse können im Moment nicht verarbeitet werden. Entfernen Sie diese aus der Auswahl oder versuchen Sie es später erneut."
          },
          "TASKS": {
-            "CAPTION": "Tasks",
-            "SELECT": "Task auswählen"
+            "CAPTION": "Aufgaben",
+            "SELECT": "Aufgabe auswählen"
          },
          "SUMMARY": {
             "CAPTION": "Zusammenfassung",
-            "EVENTS": "Aufzeichnungen",
-            "EVENTS_SUMMARY": "Sie haben {{numberOfEvents}} Aufzeichnungen ausgewählt",
+            "EVENTS": "Ereignisse",
+            "EVENTS_SUMMARY": "Sie haben {{numberOfEvents}} Ereignisse ausgewählt",
             "CONFIGURATION": "Konfiguration",
-            "WORKFLOW": "Task"
+            "WORKFLOW": "Aufgabe"
          }
       },
       "EDIT_EVENTS": {
-         "CAPTION": "Geplante Aufzeichnungen bearbeiten",
+         "CAPTION": "Geplante Ereignisse bearbeiten",
          "CONFLICT_CHECK_RUNNING": "Konflikte werden geprüft…",
          "GENERAL": {
             "CAPTION": "Allgemein",
-            "CANNOTSTART": "Hervorgehobene Aufzeichnungen können nicht verarbeitet werden, nur geplante Aufzeichnungen werden unterstützt.",
+            "CANNOTSTART": "Hervorgehobene Ereignisse können nicht verarbeitet werden; nur geplante Ereignisse werden unterstützt.",
             "NOCHANGES": "Keine Änderungen der Events!",
-            "CONFLICT_FIRST_EVENT": "Geänderte Aufzeichnung",
-            "CONFLICT_SECOND_EVENT": "Kollidierende Aufzeichnung",
-            "CANNOTEDITSCHEDULE": "Für die hervorgehobenen Aufzeichnungen fehlt Ihnen die Berechtigung zum Anpassen der Planung. Sie können fortfahren, aber die Planung der Aufzeichnung können Sie nicht ändern."
+            "CONFLICT_FIRST_EVENT": "Geändertes Ereignis",
+            "CONFLICT_SECOND_EVENT": "Kollidierendes Ereignis",
+            "CANNOTEDITSCHEDULE": "Für die hervorgehobenen Ereignisse fehlt Ihnen die Berechtigung zum Anpassen der Planung. Sie können fortfahren, aber die Planung der Ereignisse können Sie nicht ändern."
          },
          "METADATA": {
             "EDIT": "Metadaten bearbeiten"
@@ -297,41 +297,41 @@
          },
          "EDIT": {
             "CAPTION": "Bearbeiten",
-            "EVENT": "Aufzeichnung",
-            "EVENTS": "Aufzeichnungen",
-            "HEADER": "Hierkönnen Sie geplante Aufzeichnungen nach Wochentagen gruppiert bearbeiten. Die Eingabefelder sind vorausgefüllt, wenn alle Aufzeichnungen den gleichen Wert haben. Andernfalls sind die Felder leer. Werden Felder leer gelassen, werden diese Felder bei den Aufzeichnungen nicht geändert.",
+            "EVENT": "Ereignis",
+            "EVENTS": "Ereignisse",
+            "HEADER": "Diese Seite erlaubt es Ihnen, geplante Ereignisse nach Wochentagen gruppiert zu bearbeiten. Die Eingabefelder sind vorausgefüllt, wenn alle Ereignisse den gleichen Wert haben. Andernfalls sind die Felder leer. Werden Felder leer gelassen, werden diese Felder bei den Aufzeichnungen nicht geändert.",
             "METADATA": "Metadaten",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       },
       "EDIT_EVENTS_METADATA": {
-         "CAPTION": "Edit the metadata of multiple events",
-         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "CAPTION": "Metadaten mehrerer Ereignisse bearbeiten",
+         "FATAL_ERROR": "Ein schwerer Fehler ist aufgetreten: {{ fatalError }}",
          "REQUEST_ERRORS": {
-            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
-            "NOTHING_TO_EDIT": "The events cannot be edited.",
-            "NOT_FOUND": "Not found",
-            "RUNNING_WORKFLOW": "Running workflow",
+            "CANNOT_EDIT_SOME": "Hervorgehobene Ereignisse können nicht bearbeitet werden.",
+            "NOTHING_TO_EDIT": "Die Ereignisse können nicht bearbeitet werden.",
+            "NOT_FOUND": "Nicht gefunden",
+            "RUNNING_WORKFLOW": "Laufender Workflow",
             "TABLE": {
-               "CAPTION": "Selected events",
-               "ERRORS": "Errors"
+               "CAPTION": "Gewählte Ereignisse",
+               "ERRORS": "Fehler"
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Bearbeiten und/oder wählen Sie die Metadatenfelder, die Sie aktualisieren möchten. Ein Feld kann nicht ausgewählt werden, wenn dies nicht zu einem geänderten Wert für mindestens ein Ereignis führt, oder wenn das Feld ungültig ist (beispielsweise dürfen Pflichtfelder nicht leer sein). Markierte Metadatenfelder haben abweichende Werte für die ausgewählten Ereignisse.",
             "TABLE": {
-               "CAPTION": "Metadata of selected events",
-               "FIELDS": "Metadata",
-               "VALUES": "Values"
+               "CAPTION": "Metadaten gewählter Ereignisse",
+               "FIELDS": "Metadaten",
+               "VALUES": "Werte"
             }
          },
          "UPDATE_FAILURES": {
             "TABLE": {
-               "CAPTION": "Update Failures"
+               "CAPTION": "Aktualisierungsfehler"
             },
-            "UPDATE_FAILED": "Update failed",
-            "NO_EVENTS_UPDATED": "All updates failed.",
-            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+            "UPDATE_FAILED": "Aktualisierung schlug fehl",
+            "NO_EVENTS_UPDATED": "Alle Aktualisierungen schlugen fehl.",
+            "SOME_EVENTS_NOT_UPDATED": "Hervorgehobene Ereignisse konnten nicht aktualisiert werden."
          }
       }
    },
@@ -394,58 +394,58 @@
    },
    "ADOPTER_REGISTRATION": {
       "MODAL": {
-         "CAPTION": "Registration",
-         "SKIP": "Not now",
-         "CONTINUE": "Continue",
-         "BACK": "Back",
+         "CAPTION": "Registrierung",
+         "SKIP": "Nicht jetzt",
+         "CONTINUE": "Weiter",
+         "BACK": "Zurück",
          "LEGAL_INFO_STATE": {
-            "HEADER": "Terms of Service and Privacy Policy"
+            "HEADER": "Nutzungsbedingungen und Datenschutzerklärung"
          },
          "INFORMATION_STATE": {
-            "HEADER": "Thank you for using Opencast!",
-            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
-            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+            "HEADER": "Danke, dass Sie Opencast nutzen!",
+            "INFORMATION_PARAGRAPH_1": "Unsere Entwickler arbeiten beständig daran, Ihnen die bestmögliche Benutzererfahrung zu bieten. Dazu müssen wir mehr darüber wissen, wer Opencast verwendet und wie es eingesetzt wird. Sie können uns mit einer kurzen Registrierung helfen.",
+            "INFORMATION_PARAGRAPH_2": "Wir freuen uns über jede Rückmeldung, da selbst ein Teil der Daten, die wir über die Opencast-Nutzung sammeln dürfen, helfen werden, bessere Software zu erstellen, die Chancen für zusätzliche Finanzierungen zu verbessern und mehr Unternehmen zu gewinnen, Dienstleistungen rund um Opencast anzubieten."
          },
          "FORM_STATE": {
             "ORGANISATION": "Organisation",
-            "DEPARTMENT": "Department",
-            "COUNTRY": "Country",
-            "POSTAL_CODE": "Postal code",
-            "CITY": "City",
-            "CONTACT_INFO": "Contact information",
-            "GENDER": "Gender",
-            "GENDER_MALE": "male",
-            "GENDER_FEMALE": "female",
-            "FIRST_NAME": "First name",
-            "LAST_NAME": "Last name",
-            "STREET": "Street",
-            "NUMBER": "Number",
+            "DEPARTMENT": "Abteilung",
+            "COUNTRY": "Land",
+            "POSTAL_CODE": "Postleitzahl",
+            "CITY": "Ort",
+            "CONTACT_INFO": "Kontaktinformationen",
+            "GENDER": "Geschlecht",
+            "GENDER_MALE": "männlich",
+            "GENDER_FEMALE": "weiblich",
+            "FIRST_NAME": "Vorname",
+            "LAST_NAME": "Nachname",
+            "STREET": "Straße",
+            "NUMBER": "Hausnummer",
             "ADDITIONAL_ADRESS_INFO": "Add. adress information",
-            "MAIL": "Email",
-            "CONTACT_ME": "Contact me for updates and secruity issues",
-            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
-            "POLICY_HEADLINE": "Privacy policy and terms of use",
-            "USAGE_STATISTICS": "Usage statistcs",
-            "ERROR_REPORTS": "Error reports",
-            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
-            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "MAIL": "E-Mail-Adresse",
+            "CONTACT_ME": "Kontaktiere mich für Aktualisierungen und Sicherheitsupdates",
+            "WHICH_DATA_TO_SHARE": "Welche Daten möchtest du teilen?",
+            "POLICY_HEADLINE": "Datenschutzerklärung und Nutzungsbedingungen",
+            "USAGE_STATISTICS": "Nutzungsstatistik",
+            "ERROR_REPORTS": "Fehlerberichte",
+            "READ_TERMS_OF_USE_BEFORE": "Ich las und akzeptiere die",
+            "READ_TERMS_OF_USE_LINK": "Datenschutzerklärung und Nutzungsbedingungen",
             "READ_TERMS_OF_USE_AFTER": ""
          },
          "SKIP_STATE": {
-            "HEADER": "Maybe next time!",
-            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+            "HEADER": "Vielleicht beim nächsten Mal",
+            "TEXT": "Wenn Sie Opencast später registrieren möchten, können Sie dies im Hilfe-Menü in der rechten, oberen Ecke tun."
          },
          "THANK_YOU_STATE": {
-            "HEADER": "Thank you for your registration!",
-            "TEXT_LEADING_TO_PATH": "You can change your data at ",
-            "TEXT_LEADING_AFTER_PATH": "at any time."
+            "HEADER": "Vielen Dank für die Registrierung!",
+            "TEXT_LEADING_TO_PATH": "Sie können Ihre Daten unter",
+            "TEXT_LEADING_AFTER_PATH": "jederzeit ändern."
          },
          "ERROR": {
-            "HEADER": "Error",
-            "TEXT": "An error occurred while processing your request."
+            "HEADER": "Fehler",
+            "TEXT": "Beim Ausführen der Abfrage ist ein Fehler aufgetreten."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Are you sure you want to delete your registration data?"
+            "TEXT": "Sind Sie sicher, dass Sie die Registrierung löschen möchten?"
          }
       }
    },
@@ -465,7 +465,7 @@
       },
       "EVENTS": {
          "NEW": {
-            "CAPTION": "Aufzeichnung erstellen",
+            "CAPTION": "Ereignis erstellen",
             "METADATA": {
                "CAPTION": "Metadaten"
             },
@@ -493,7 +493,7 @@
                "UPLOAD": {
                   "CAPTION": "Hochladen",
                   "RECORDING_ELEMENTS": "Aufnahme-Elemente",
-                  "RECORDING_METADATA": "Aufzeichnungsdaten",
+                  "RECORDING_METADATA": "Aufnahme-Metadaten",
                   "SEGMENTABLE": {
                      "SHORT": "Folien",
                      "DETAIL": "Die Datei enthält die Aufnahme einer Präsentation (Keynote, Powerpoint, etc.)."
@@ -508,7 +508,7 @@
                   },
                   "MULTIPLE_PARTS": {
                      "SHORT": "Mehrere Teile",
-                     "DETAIL": "Eine Reihe von Dateien mit verschiedenen Teilen der Aufzeichnung."
+                     "DETAIL": "Eine Reihe von Dateien mit verschiedenen Teilen des Ereignisses."
                   }
                },
                "DATE_TIME": {
@@ -521,16 +521,16 @@
                   "DURATION": "Dauer"
                },
                "SCHEDULE_SINGLE": {
-                  "CAPTION": "Einzelaufzeichnung planen"
+                  "CAPTION": "Einzel-Ereignis planen"
                },
                "SCHEDULE_MULTIPLE": {
-                  "CAPTION": "Mehrere Aufzeichnungen planen",
+                  "CAPTION": "Mehrere Ereignisse planen",
                   "REPEATS": "Wiederholt sich",
                   "REPEAT_ON": "Wiederholen am",
                   "WEEKDAYS": "Wochentage",
                   "WEEKDAY": "Wochentag"
                },
-               "NO_SOURCE_AVAILABLE": "Kein Capture-Agent zur Planung einer Aufzeichnung verfügbar"
+               "NO_SOURCE_AVAILABLE": "Kein Aufnahmegerät zur Planung verfügbar"
             },
             "PROCESSING": {
                "CAPTION": "Verarbeitung",
@@ -549,7 +549,7 @@
                   "CAPTIONS_WEBVTT": "Untertitel (WebVTT)",
                   "PREVIEW_IMAGE": "Vorschaubild",
                   "SMIL": "SMIL-Katalog",
-                  "TRACK_PARTS": "Aufzeichnungsteile"
+                  "TRACK_PARTS": "Spur-Teile"
                }
             },
             "ACCESS": {
@@ -583,13 +583,13 @@
             }
          },
          "NAVIGATION": {
-            "EVENTS": "Aufzeichnungen",
+            "EVENTS": "Ereignisse",
             "SERIES": "Serien",
             "OVERVIEW": "Übersicht"
          },
          "UPLOAD": "Hochladen",
          "ADD_SERIES": "Serie hinzufügen",
-         "ADD_EVENT": "Aufzeichnung hinzufügen",
+         "ADD_EVENT": "Ereignis hinzufügen",
          "TABLE": {
             "CAPTION": "Ereignisse",
             "TITLE": "Titel",
@@ -617,9 +617,9 @@
                "SERIES": "Nach dieser Serie filtern",
                "STATUS": "Nach diesem Verarbeitungsstatus filtern",
                "LOCATION": "Nach diesem Raum filtern",
-               "DETAILS": "Aufzeichnungsdetails anzeigen",
-               "DELETE": "Aufzeichnung löschen",
-               "EMBEDDING_CODE": "Embedding code",
+               "DETAILS": "Ereignis-Details anzeigen",
+               "DELETE": "Ereignis löschen",
+               "EMBEDDING_CODE": "Einbettungscode",
                "EDITOR": "Video Editor öffnen",
                "EDITOR_NEEDS_CUTTING": "Video Editor öffnen (ein Kommentar zeigt, dass ein Videoschnitt angefordert wurde)",
                "COMMENTS": "Kommentare ansehen",
@@ -650,7 +650,7 @@
             "UPDATING_PREVIEWS": "Vorschauen werden aktualisiert"
          },
          "DETAILS": {
-            "HEADER": "Aufzeichnungs-Details - {{resourceId}}",
+            "HEADER": "Ereignis-Details - {{resourceId}}",
             "TABS": {
                "METADATA": "Metadaten",
                "EXTENDED-METADATA": "Metadaten II",
@@ -664,9 +664,9 @@
             },
             "PUBLICATIONS": {
                "CAPTION": "Veröffentlichungen",
-               "NO_PUBLICATIONS_AVAILABLE": "Diese Aufzeichnung wurde noch nicht publiziert",
-               "PUBLICATION_DESCRIPTION": "Diese Aufzeichnung wurde zu folgenden Kanälen publiziert:",
-               "LIVE_EVENT_NOT_IN_PROGRESS": "Diese Aufzeichnung ist momentan nicht verfügbar",
+               "NO_PUBLICATIONS_AVAILABLE": "Dieses Ereignis wurde noch nicht veröffentlicht",
+               "PUBLICATION_DESCRIPTION": "Dieses Ereignis wurde über folgende Kanäle veröffentlicht:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "Dieses Ereignis findet derzeit nicht statt",
                "CUSTOM": "Benutzerdefiniert",
                "ENGAGE": "Engage",
                "ENGAGE_LIVE": "Enagage Live",
@@ -731,10 +731,10 @@
                   "DURATION": "Dauer"
                },
                "SCHEDULE_SINGLE": {
-                  "CAPTION": "Einzelaufzeichnung planen"
+                  "CAPTION": "Einzel-Ereignis planen"
                },
                "SCHEDULE_MULTIPLE": {
-                  "CAPTION": "Mehrere Aufzeichnungen planen",
+                  "CAPTION": "Mehrere Ereignisse planen",
                   "REPEATS": "Wiederholungen",
                   "REPEAT_ON": "Wiederholen am",
                   "WEEKDAYS": "Wochentage"
@@ -886,7 +886,7 @@
                   "REVIEW": "Überprüfung erforderlich",
                   "ASYNC": "A/V Spuren asynchron",
                   "AUDIO_ISSUE": "Fehlende oder beschädigte Audiospur",
-                  "CANCELED": "Abgebrochene Aufzeichnung",
+                  "CANCELED": "Abgebrochenes Ereignis",
                   "CONFLICTING_METADATA": "Widersprüchliche Metadaten",
                   "IMPROPER_POINT": "Unpassender Start- oder Endzeitpunkt",
                   "MISSING_AGREEMENT": "Fehlende Vereinbarung",
@@ -906,7 +906,7 @@
                "CAPTION": "Statistik"
             },
             "METADATA": {
-               "CAPTION": "Aufzeichnungs-Details",
+               "CAPTION": "Ereignis-Details",
                "TITLE": "Titel",
                "ID": "UID",
                "SERIES": "Serie",
@@ -931,7 +931,7 @@
                "PUBLIC": "Öffentliches Ziel",
                "OS": "Verarbeitedes Betriebssystem",
                "LOCKED": {
-                  "RUNNING": "Das Bearbeiten von Metadaten ist nicht zulässig, wenn sich die Aufzeichnung gerade in Verarbeitung befindet"
+                  "RUNNING": "Das Bearbeiten von Metadaten ist nicht zulässig während sich das Ereignis in Verarbeitung befindet"
                }
             },
             "SCHEDULING": {
@@ -1108,7 +1108,7 @@
          "TABLE": {
             "CAPTION": "Serie",
             "TITLE": "Serie",
-            "HAS_EVENTS": "Enthält Aufzeichnungen",
+            "HAS_EVENTS": "Enthält Ereignisse",
             "ORGANIZERS": "Organisator(en)",
             "CONTRIBUTORS": "Mitwirkende",
             "CREATED": "Erstellt",
@@ -1149,8 +1149,8 @@
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
                   "DETAILS": "Details",
-                  "REPLACE_EVENT_ACLS": "Zugriffsrechte der Einzelaufzeichnungen aktualisieren",
-                  "REPLACE_EVENT_ACLS_HINT": "Sicherstellen, dass alle Aufzeichnungen dieser Series genau diese Zugriffsrechte haben",
+                  "REPLACE_EVENT_ACLS": "Zugriffsrechte des Ereignisses aktualisieren",
+                  "REPLACE_EVENT_ACLS_HINT": "Sicherstellen, dass alle Ereignisse dieser Serie genau diese Zugriffsrechte haben",
                   "LOAD_MORE_LIMIT": "policies shown.",
                   "LOAD_MORE_LINK": "Load more"
                },
@@ -1201,13 +1201,13 @@
             "NAME": "Name",
             "LOCATION": "Raum",
             "UPDATED": "Zuletzt aktualisiert am",
-            "NEXT_DATE": "Nächste Aufzeichnung",
-            "NEXT_NAME": "Titel der nächsten Aufzeichnung",
+            "NEXT_DATE": "Nächstes Ereignis",
+            "NEXT_NAME": "Titel des nächsten Ereignisses",
             "STATUS": "Status",
             "VERSION": "Version",
             "ACTION": "Aktionen",
             "TOOLTIP": {
-               "NAME": "Aufzeichnungen nach diesem Raum filtern",
+               "NAME": "Ereignisse nach diesem Raum filtern",
                "DETAILS": "Raumdetails anzeigen",
                "DELETE": "Raum löschen (Capture Agent abmelden)"
             }
@@ -1447,7 +1447,7 @@
                "NAME": "Name",
                "DESCRIPTION": "Beschreibung",
                "DEFAULT": "Standard",
-               "SET_DEFAULT_INFO": "Als Standard-Branding für alle Serien und Aufzeichnungen festlegen",
+               "SET_DEFAULT_INFO": "Als Standard-Branding für alle Serien und Ereignisse festlegen",
                "NAME_ERROR": "Name wird bereits verwendet",
                "NAME_REQUIRED": "Erforderlich"
             },
@@ -1509,7 +1509,7 @@
                "NAME": "Name",
                "DESCRIPTION": "Beschreibung",
                "DEFAULT": "Standard",
-               "SET_DEFAULT_INFO": "Als Standard-Branding für alle Serien und Aufzeichnungen festlegen",
+               "SET_DEFAULT_INFO": "Als Standard-Branding für alle Serien und Ereignisse festlegen",
                "NAME_REQUIRED": "Erforderlich"
             },
             "BUMPER": {
@@ -1692,11 +1692,11 @@
          "REMOVE_SEGMENT": "Segment löschen",
          "SHOW_SEGMENT": "Segment anzeigen",
          "HIDE_SEGMENT": "Segment verbergen",
-         "START": "Zur Startseite",
+         "START": "Beginn",
          "END": "Ende"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "Ein Vorschaubild, welches die Aufzeichnung grafisch repräsentieren kann, wird automatisch erstellt. Falls Sie an anderes Vorschaubild wünschen, können Sie eines aus dem Video an der aktuellen Wiedergabeposition extrahieren oder eine Bilddatei hochladen.",
+         "DESCRIPTION": "Ein Vorschaubild, welches das Ereignis grafisch repräsentieren kann, wird automatisch erstellt. Falls Sie an anderes Vorschaubild wünschen, können Sie eines aus dem Video an der aktuellen Wiedergabeposition extrahieren oder eine Bilddatei hochladen.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
@@ -1732,7 +1732,7 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "Sie können Spuren von der Auswahl entfernen, damit diese nicht verarbeitet werden. Bitte beachten Sie, dass Sie die Aufzeichnungen erneut publizieren müssen, damit die Änderung aktiv werden.",
+         "DESCRIPTION": "Sie können Spuren von der Auswahl entfernen, damit diese nicht verarbeitet werden. Bitte beachten Sie, dass Sie die Ereignisse erneut publizieren müssen, damit die Änderung aktiv werden.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "Bitte wählen Sie mindestens eine Videospur aus",
             "NO_AUDIO_TRACK_SELECTED": "Bitte wählen Sie mindestens eine Audiospur aus"
@@ -2075,9 +2075,9 @@
             "SELECT_NEXT_DASHBOARD_FILTER": "Nächsten Dashboard-Filter auswählen",
             "SELECT_PREVIOUS_DASHBOARD_FILTER": "Vorherigen Dashboard-Filter auswählen",
             "REMOVE_FILTERS": "Alle Filter löschen",
-            "EVENT_VIEW": "Aufzeichnungen",
+            "EVENT_VIEW": "Ereignisse",
             "SERIES_VIEW": "Serien",
-            "NEW_EVENT": "Aufzeichnung hinzufügen",
+            "NEW_EVENT": "Ereignis hinzufügen",
             "NEW_SERIES": "Serie hinzufügen",
             "CHEAT_SHEET": "Tastenkürzel"
          },
