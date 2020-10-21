@@ -12,6 +12,10 @@ import services from "../mocks/restServiceMonitor";
 import opencastLogo from '../img/opencast-white.svg';
 
 import {FaBell, FaChevronDown, FaPlayCircle, FaPowerOff, FaQuestionCircle, FaVideo} from "react-icons/fa";
+import {withRouter} from "react-router-dom";
+import {connect} from "react-redux";
+import {fetchHealthStatus} from "../thunks/healthThunks";
+import {getHealthStatus} from "../selectors/healthSelectors";
 
 
 // Todo: Find suitable place to define them and get these links out of config-file or whatever
@@ -20,12 +24,6 @@ const studio = "https://opencast.org/";
 const documentationUrl = "https://opencast.org/";
 const restUrl = "https://opencast.org/";
 
-// Get status of background services and activeMQ for notification and system warnings (bell icon)
-const serviceList = Object.keys(services.service).map(key => {
-    let service = services.service[key];
-    service.name = key;
-    return service;
-});
 
 // Get code, flag and name of the current language
 let currentLang = languages.find(({ code }) => code === i18n.language);
@@ -64,7 +62,7 @@ function logout() {
 /**
  * Component that renders the header and the navigation in the upper right corner.
  */
-const Header = () => {
+const Header = ({ loadingHealthStatus, healthStatus }) => {
     const { t } = useTranslation();
     // State for opening (true) and closing (false) the dropdown menus for language, notification, help and user
     const [displayMenuLang, setMenuLang] = useState(false);
@@ -91,6 +89,10 @@ const Header = () => {
                 setMenuNotify(false);
             }
         }
+
+        // Fetching health status information at mount
+        // TODO: When to fetch? How to do it every <insertPeriod>?
+        loadingHealthStatus();
 
         // Event listener for handle a click outside of dropdown menu
         window.addEventListener('mousedown', handleClickOutside);
@@ -148,7 +150,7 @@ const Header = () => {
                         <span id="error-count" className="badge" >{services.numErr}</span>
                         {/* Click on the bell icon, a dropdown menu with all services in serviceList and their status opens */}
                         {displayMenuNotify && (
-                            <MenuNotify />
+                            <MenuNotify healthStatus={healthStatus}/>
                         )}
                     </div>
                 </div>
@@ -199,19 +201,21 @@ const MenuLang = () => {
     )
 };
 
-const MenuNotify = () => (
+const MenuNotify = ({ healthStatus }) => (
     <ul className="dropdown-ul">
         {/* For each service in the serviceList (ActiveMQ and Background Services) one list item */}
-        {serviceList.map((service, key) => (
+        {healthStatus.map((service, key) => (
             <li key={key}>
-                <a>
-                    <span> {service.name} </span>
-                    {service.error ? (
-                        <span className="ng-multi-value ng-multi-value-red">{service.status}</span>
-                    ) : (
-                        <span className="ng-multi-value ng-multi-value-green">{service.status}</span>
-                    )}
-                </a>
+                {!!service.status && (
+                    <a>
+                        <span> {service.name} </span>
+                        {service.error ? (
+                            <span className="ng-multi-value ng-multi-value-red">{service.status}</span>
+                        ) : (
+                            <span className="ng-multi-value ng-multi-value-green">{service.status}</span>
+                        )}
+                    </a>
+                )}
             </li>
         ))}
 
@@ -264,4 +268,14 @@ const MenuUser = () => {
     )
 };
 
-export default Header;
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    healthStatus: getHealthStatus(state)
+});
+
+// Mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    loadingHealthStatus: () => dispatch(fetchHealthStatus())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);

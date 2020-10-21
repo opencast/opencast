@@ -14,16 +14,20 @@ import {fetchJobs} from "../../thunks/jobThunks";
 import {fetchUsers} from "../../thunks/userThunks";
 import {fetchThemes} from "../../thunks/themeThunks";
 import {connect} from "react-redux";
+import {fetchStats} from "../../thunks/tableFilterThunks";
 
 /**
  * This component renders the main navigation that opens when the burger button is clicked
  */
-const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, loadingRecordings, loadingRecordingsIntoTable,
-                     loadingJobs, loadingJobsIntoTable, loadingUsers, loadingUsersIntoTable, loadingThemes,
-                     loadingThemesIntoTable }) => {
+const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, loadingStats, loadingRecordings,
+                     loadingRecordingsIntoTable, loadingJobs, loadingJobsIntoTable, loadingUsers, loadingUsersIntoTable,
+                     loadingThemes, loadingThemesIntoTable }) => {
     const { t } = useTranslation();
 
     const loadEvents = () => {
+        // Fetching stats from server
+        loadingStats();
+
         // Fetching events from server
         loadingEvents();
 
@@ -102,6 +106,7 @@ const MainNav = ({ isOpen, toggleMenu, loadingEvents, loadingEventsIntoTable, lo
 const mapDispatchToProps = dispatch => ({
     loadingEvents: () => dispatch(fetchEvents()),
     loadingEventsIntoTable: () => dispatch(loadEventsIntoTable()),
+    loadingStats: () => dispatch(fetchStats()),
     loadingRecordings: () => dispatch(fetchRecordings()),
     loadingRecordingsIntoTable: () => dispatch(loadRecordingsIntoTable()),
     loadingJobs: () => dispatch(fetchJobs()),

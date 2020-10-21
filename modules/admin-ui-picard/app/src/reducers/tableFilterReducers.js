@@ -7,6 +7,7 @@ import {
     LOAD_FILTERS_FAILURE,
     LOAD_FILTERS_IN_PROGRESS,
     LOAD_FILTERS_SUCCESS,
+    LOAD_STATS,
     REMOVE_SECOND_FILTER,
     REMOVE_SELECTED_FILTER,
     REMOVE_TEXT_FILTER,
@@ -30,7 +31,8 @@ const initialState = {
     selectedFilter: '',
     secondFilter: '',
     startDate: '',
-    endDate: ''
+    endDate: '',
+    stats: []
 };
 
 // Reducer for table filters
@@ -56,6 +58,13 @@ const tableFilters = (state = initialState, action) => {
                 ...state,
                 isLoading: false
             };
+        }
+        case LOAD_STATS: {
+            const { stats } = payload;
+            return {
+                ...state,
+                stats: stats
+            }
         }
         case EDIT_FILTER_VALUE: {
             const {filterName, value} = payload;

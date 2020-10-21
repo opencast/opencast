@@ -7,6 +7,9 @@ export const LOAD_FILTERS_IN_PROGRESS = 'LOAD_FILTERS_IN_PROGRESS';
 export const LOAD_FILTERS_SUCCESS = 'LOAD_FILTERS_SUCCESS';
 export const LOAD_FILTERS_FAILURE = 'LOAD_FILTERS_FAILURE';
 
+// Constants of of actions types for fetching stats (events) from server
+export const LOAD_STATS = 'LOAD_STATS';
+
 // Constants of action types concerning filter values
 export const RESET_FILTER_VALUES = 'RESET_FILTER_VALUES';
 export const EDIT_FILTER_VALUE = 'EDIT_FILTER_VALUE';
@@ -41,6 +44,13 @@ export const loadFiltersSuccess = filters => ({
 
 export const loadFiltersFailure = () => ({
     type: LOAD_FILTERS_FAILURE
+});
+
+// Actions affecting fetching of stats from server
+
+export const loadStats = stats => ({
+    type: LOAD_STATS,
+    payload: { stats }
 });
 
 // Actions affecting filter values

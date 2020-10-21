@@ -1,4 +1,4 @@
-import { loadFiltersSuccess, loadFiltersFailure, loadFiltersInProgress} from '../actions/tableFilterActions';
+import {loadFiltersSuccess, loadFiltersFailure, loadFiltersInProgress, loadStats} from '../actions/tableFilterActions';
 /**
 * This file contains methods/thunks used to query the REST-API of Opencast to get the filters of a certain resource type.
 * This information is used to filter the entries of the table in the main view.
@@ -14,6 +14,7 @@ export const fetchFilters = resource => async dispatch => {
         switch (resource) {
             case 'events': {
                 const data = await fetch('admin-ng/resources/events/filters.json');
+                console.log(data);
                 const eventsData =  await data.json();
 
                 response = transformResponse(eventsData);
@@ -93,6 +94,25 @@ export const fetchFilters = resource => async dispatch => {
         dispatch(loadFiltersSuccess(filtersList));
     } catch (e) {
         dispatch(loadFiltersFailure());
+        console.log(e);
+    }
+}
+
+export const fetchStats = () => async dispatch => {
+    try {
+        let data =  await fetch('admin-ng/resources/STATS.json');
+        console.log(data);
+        let response = await data.json();
+
+        const stats = Object.keys(response).map(key => {
+            let stat = JSON.parse(response[key]);
+            stat.name = key;
+            return stat;
+        });
+
+        dispatch(loadStats(stats));
+
+    } catch (e) {
         console.log(e);
     }
 }

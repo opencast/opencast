@@ -29,7 +29,7 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters 
     };
 
     useEffect(() => {
-        // Load jobs on mount
+        // Load themes on mount
         loadThemes().then(r => console.log(r));
 
         // Load filters

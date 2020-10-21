@@ -17,6 +17,7 @@ import users from "./reducers/userReducers";
 import groups from "./reducers/groupReducers";
 import acls from "./reducers/aclReducers";
 import themes from "./reducers/themeReducers";
+import health from "./reducers/healthReducers";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -36,7 +37,8 @@ const reducers = {
     users,
     groups,
     acls,
-    themes
+    themes,
+    health
 };
 
 // Configuration for persisting store

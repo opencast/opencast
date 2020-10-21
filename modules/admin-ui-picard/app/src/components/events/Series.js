@@ -13,7 +13,7 @@ import {connect} from "react-redux";
 import {withRouter} from "react-router-dom";
 import {fetchEvents} from "../../thunks/eventThunks";
 import {getSeries, isShowActions} from "../../selectors/seriesSeletctor";
-import {fetchFilters} from "../../thunks/tableFilterThunks";
+import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 
 
 // References for detecting a click outside of the container of the dropdown menu
@@ -23,12 +23,15 @@ const containerAction = React.createRef();
  * This component renders the table view of series
  */
 const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEvents, loadingEventsIntoTable,
-                    series, loadingFilters }) => {
+                    series, loadingFilters, loadingStats }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
 
     const loadEvents = () => {
+        // Fetching stats from server
+        loadingStats()
+
         // Fetching events from server
         loadingEvents();
 
@@ -46,10 +49,10 @@ const Series = ({ showActions, loadingSeries, loadingSeriesIntoTable, loadingEve
 
     useEffect( () => {
 
-        // Load Series on mount
+        // Load series on mount
         loadSeries().then(r => console.log(r));
 
-        // Load event filters
+        // Load series filters
         loadingFilters("series");
 
         // Function for handling clicks outside of an dropdown menu
@@ -163,7 +166,8 @@ const mapDispatchToProps = dispatch => ({
     loadingSeriesIntoTable: () => dispatch(loadSeriesIntoTable()),
     loadingEvents: () => dispatch(fetchEvents()),
     loadingEventsIntoTable: () => dispatch(loadEventsIntoTable()),
-    loadingFilters: resource => dispatch(fetchFilters(resource))
+    loadingFilters: resource => dispatch(fetchFilters(resource)),
+    loadingStats: () => dispatch(fetchStats())
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Series));

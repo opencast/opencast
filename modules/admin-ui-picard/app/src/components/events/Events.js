@@ -14,7 +14,7 @@ import {eventsTemplateMap} from "../../configs/tableConfigs/eventsTableConfig";
 import Link from "react-router-dom/Link";
 import {withRouter} from "react-router-dom";
 import {fetchSeries} from "../../thunks/seriesThunks";
-import {fetchFilters} from "../../thunks/tableFilterThunks";
+import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 
 // References for detecting a click outside of the container of the dropdown menu
 const containerAction = React.createRef();
@@ -23,12 +23,15 @@ const containerAction = React.createRef();
  * This component renders the table view of events
  */
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
-                        loadingSeriesIntoTable, loadingFilters }) => {
+                        loadingSeriesIntoTable, loadingFilters, loadingStats }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
 
     const loadEvents = async () => {
+        // Fetching stats from server
+        loadingStats();
+
         // Fetching events from server
         await loadingEvents();
 
@@ -192,7 +195,8 @@ const mapDispatchToProps = dispatch => ({
     loadingEventsIntoTable: () => dispatch(loadEventsIntoTable()),
     loadingSeries: () => dispatch(fetchSeries()),
     loadingSeriesIntoTable: () => dispatch(loadSeriesIntoTable()),
-    loadingFilters: resource => dispatch(fetchFilters(resource))
+    loadingFilters: resource => dispatch(fetchFilters(resource)),
+    loadingStats: () => dispatch(fetchStats())
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Events));
