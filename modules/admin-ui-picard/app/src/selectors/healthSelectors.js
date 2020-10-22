@@ -3,3 +3,4 @@
  */
 
 export const getHealthStatus = state => state.health.service;
+export const getErrorStatus = state => state.health.error;

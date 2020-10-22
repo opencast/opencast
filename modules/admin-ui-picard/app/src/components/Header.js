@@ -5,14 +5,12 @@ import {useTranslation} from "react-i18next";
 // service and library imports
 import i18n from "../i18n/i18n";
 import languages from "../i18n/languages";
-import services from "../mocks/restServiceMonitor";
 
 
 // image and icon imports
 import opencastLogo from '../img/opencast-white.svg';
 
 import {FaBell, FaChevronDown, FaPlayCircle, FaPowerOff, FaQuestionCircle, FaVideo} from "react-icons/fa";
-import {withRouter} from "react-router-dom";
 import {connect} from "react-redux";
 import {fetchHealthStatus} from "../thunks/healthThunks";
 import {getHealthStatus} from "../selectors/healthSelectors";
@@ -70,6 +68,10 @@ const Header = ({ loadingHealthStatus, healthStatus }) => {
     const [displayMenuNotify, setMenuNotify] = useState(false);
     const [displayMenuHelp, setMenuHelp] = useState(false);
 
+    const loadHealthStatus = async () => {
+        await loadingHealthStatus();
+    }
+
     useEffect(() => {
         // Function for handling clicks outside of an open dropdown menu
         const handleClickOutside = e => {
@@ -91,8 +93,9 @@ const Header = ({ loadingHealthStatus, healthStatus }) => {
         }
 
         // Fetching health status information at mount
-        // TODO: When to fetch? How to do it every <insertPeriod>?
-        loadingHealthStatus();
+        loadHealthStatus().then(r => console.log(r));
+        // Fetch health status every minute
+        setInterval(loadingHealthStatus, 100000);
 
         // Event listener for handle a click outside of dropdown menu
         window.addEventListener('mousedown', handleClickOutside);
@@ -147,7 +150,7 @@ const Header = ({ loadingHealthStatus, healthStatus }) => {
                 <div className="nav-dd info-dd" id="info-dd" title={t('SYSTEM_NOTIFICATIONS')} ref={containerNotify}>
                     <div onClick={() => setMenuNotify(!displayMenuNotify)}>
                         <FaBell className="fa fa-bell" aria-hidden="true"/>
-                        <span id="error-count" className="badge" >{services.numErr}</span>
+                        <span id="error-count" className="badge" >{healthStatus.numErr}</span>
                         {/* Click on the bell icon, a dropdown menu with all services in serviceList and their status opens */}
                         {displayMenuNotify && (
                             <MenuNotify healthStatus={healthStatus}/>

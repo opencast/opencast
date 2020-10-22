@@ -1,7 +1,8 @@
 import {
+    ADD_NUM_ERROR,
     LOAD_HEALTH_STATUS,
     LOAD_STATUS_FAILURE,
-    LOAD_STATUS_IN_PROGRESS,
+    LOAD_STATUS_IN_PROGRESS, RESET_NUM_ERROR,
     SET_ERROR,
     SET_NUM_ERROR
 } from "../actions/healthActions";
@@ -66,16 +67,26 @@ export const health = (state=initialState, action) => {
         }
         case SET_ERROR: {
             const { isError } = payload;
+            console.log('In set Error:');
+            console.log(isError);
             return {
                 ...state,
                 error: isError
             }
         }
-        case SET_NUM_ERROR: {
+        case ADD_NUM_ERROR: {
             const { numError } = payload;
+            console.log('In set Number of Error:');
+            console.log(numError);
             return {
                 ...state,
-                numErr: numError
+                numErr: state.numErr + numError
+            }
+        }
+        case RESET_NUM_ERROR: {
+            return {
+                ...state,
+                numErr: 0
             }
         }
         default:

@@ -1,10 +1,12 @@
 import {
+    addNumError,
     loadHealthStatus,
     loadStatusFailure,
-    loadStatusInProgress,
+    loadStatusInProgress, resetNumError,
     setError,
     setNumError
 } from "../actions/healthActions";
+import {getErrorStatus} from "../selectors/healthSelectors";
 
 /**
  * This file contains methods/thunks used to query the REST-API of Opencast to get information about the health status of OC.
@@ -29,9 +31,8 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
             error: false
         }
         dispatch(loadHealthStatus(healthStatus));
-
-        let numError = 0;
-        let isError = false;
+        dispatch(resetNumError());
+        dispatch(setError(false));
 
         fetch('/broker/status').then(
             function (response){
@@ -48,6 +49,8 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
                         status: response.statusText,
                         error: true
                     }
+
+                    dispatch(addNumError(1));
                 }
                 dispatch(loadHealthStatus(healthStatus));
             }
@@ -59,8 +62,10 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
             };
             dispatch(loadHealthStatus(healthStatus));
 
-            isError = true;
-            numError++;
+            if (getErrorStatus(getState()) === false) {
+                dispatch(setError(true));
+            }
+            dispatch(addNumError(1));
         });
 
         fetch('/services/health.json').then(
@@ -75,8 +80,10 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
                       };
                       dispatch(loadHealthStatus(healthStatus));
 
-                      isError = true;
-                      numError++;
+                      if (getErrorStatus(getState()) === false) {
+                          dispatch(setError(true));
+                      }
+                      dispatch(addNumError(1));
                       return;
                   }
                   let abnormal = 0;
@@ -96,8 +103,10 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
                       }
                       dispatch(loadHealthStatus(healthStatus));
 
-                      isError = true;
-                      numError = numError + abnormal;
+                      if (getErrorStatus(getState()) === false) {
+                          dispatch(setError(true));
+                      }
+                      dispatch(addNumError(abnormal));
                   }
               }).catch(function (err) {
                   let healthStatus = {
@@ -107,14 +116,13 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
                   }
                   dispatch(loadHealthStatus(healthStatus));
 
-                  isError = false;
-                  numError++;
+                  if (getErrorStatus(getState()) === false) {
+                      dispatch(setError(true));
+                  }
+                  dispatch(addNumError(1));
               })
           }
         );
-
-        dispatch(setError(isError));
-        dispatch(setNumError(numError));
 
 
     } catch (e) {

@@ -9,7 +9,8 @@ export const LOAD_STATUS_FAILURE = 'LOAD_STATUS_FAILURE';
 
 // Constants of action types for setting information about errors
 export const SET_ERROR = 'SET_ERROR';
-export const SET_NUM_ERROR = 'SET_NUM_ERROR';
+export const ADD_NUM_ERROR = 'ADD_NUM_ERROR';
+export const RESET_NUM_ERROR = 'RESET_NUM_ERROR';
 
 // Actions affecting fetching health status from server and loading it into state
 
@@ -33,7 +34,11 @@ export const setError = isError => ({
     payload: { isError }
 });
 
-export const setNumError = numError => ({
-    type: SET_NUM_ERROR,
+export const addNumError = numError => ({
+    type: ADD_NUM_ERROR,
     payload: { numError }
+});
+
+export const resetNumError = () => ({
+   type: RESET_NUM_ERROR
 });
