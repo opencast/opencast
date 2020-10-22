@@ -25,8 +25,20 @@ $(document).ready(function () {
         ga('create', 'UA-120509325-1', 'auto');
         ga('send', 'pageview');
     }
+    tocPaneFix();
 });
 
+
+/**
+ * Fixes the issue that you can click on the toc elements, while the toc pane on the left side is closed
+ */
+function tocPaneFix() {
+    $('#wm-toc-button').on('click', function (e) {
+        if (!isSmallScreen()) {
+            $('.wm-toc-pane').toggleClass('hidden');
+        }
+    })
+}
 
 /**
  * Adds a tooltip to all <code> block containing "etc/" via title tag
