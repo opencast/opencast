@@ -6,7 +6,7 @@
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/main/resources/**/*.html'"
   },
   "dependencies": {
-    "angular": "^1.8.1",
+    "angular": "^1.8.2",
     "angular-route": "^1.8.1",
     "jquery": "^3.5.1"
   },
