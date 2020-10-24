@@ -1,7 +1,7 @@
 {
-  "value_locale": "en",
-  "str_type": "Type",
-  "str_mimetype": "Mimetype",
-  "str_resolution": "Resolution",
-  "str_download": "Download"
+  "value_locale": "es",
+  "str_type": "Tipo",
+  "str_mimetype": "Tipo MIME",
+  "str_resolution": "Resolución",
+  "str_download": "Descargar"
 }
