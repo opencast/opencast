@@ -224,37 +224,37 @@ The `mail` and the `displayName` of an user has only one value, but when it come
     <util:list id="roleMapping" value-type="java.lang.String">
       <!-- assign every user the role ROLE_AAI_USER -->
       <value>'ROLE_AAI_USER'</value>
-      
-      <!-- assign every user the role ROLE_AAI_USER_<username>. 
-           For a user john.doe@example.org this will result in a ROLE_USER_JOHN_DOE_EXAMPLE_ORG 
-           since Opencast replaces all special chars in this case --> 
+
+      <!-- assign every user the role ROLE_AAI_USER_<username>.
+           For a user john.doe@example.org this will result in a ROLE_USER_JOHN_DOE_EXAMPLE_ORG
+           since Opencast replaces all special chars in this case -->
       <value>'ROLE_AAI_USER_' + ['eduPersonPrincipalName']</value>
-      
-      <!-- if you implement a kind of DAC based access control you may want to produce 
-      an owner role. To get the same behaviour as for ROLE_AAI_USER_<username> above 
-      you may replace all special chars from the value of `eduPersonPrincipalName` 
+
+      <!-- if you implement a kind of DAC based access control you may want to produce
+      an owner role. To get the same behaviour as for ROLE_AAI_USER_<username> above
+      you may replace all special chars from the value of `eduPersonPrincipalName`
       and convert it to uppercase -->
-      <value>('ROLE_AAI_OWNER_' + ['eduPersonPrincipalName']).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value> 
-      
-      <!-- an AAI user may provide the attribute homeOrganization. 
+      <value>('ROLE_AAI_OWNER_' + ['eduPersonPrincipalName']).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
+
+      <!-- an AAI user may provide the attribute homeOrganization.
            If so, assign an appropriate role. Otherwise not. -->
       <value>['homeOrganization'] != null ? 'ROLE_AAI_ORG_' + ['homeOrganization'] + '_MEMBER' : null</value>
-      
-      <!-- a sophisticated AAI approach would use entitlements to assign 
+
+      <!-- a sophisticated AAI approach would use entitlements to assign
            e.g. the admin role to authorized users -->
       <value>['eduPersonEntitlement'].contains('urn:mace:opencast.org:permission:shibboleth:opencast_admin') ? 'ROLE_ADMIN' : null</value>
-      
-      <!-- a less sophisticated approach would directly assign the admin role 
+
+      <!-- a less sophisticated approach would directly assign the admin role
            to users based on usernames (same as bootstrap user above) -->
       <value>['eduPersonPrincipalName'].contains('john.doe@example.org') ? 'ROLE_ADMIN' : null</value>
-            
-      <!-- to assing a common set of roles to a class of users, you may create 
-           a group (e.g. AAI_EDITOR) and assign some roles to it in the admin ui. 
-           So the group is the container of all the roles and you assign only the 
-           group to a user e.g. based on his affiliation, thus enabling a class 
-           of users for certain abilities in Opencast --> 
-      <value>['eduPersonScopedAffiliation'].contains('faculty@example.org') ? 'ROLE_GROUP_AAI_EDITOR' : null</value> 
-      
+
+      <!-- to assing a common set of roles to a class of users, you may create
+           a group (e.g. AAI_EDITOR) and assign some roles to it in the admin ui.
+           So the group is the container of all the roles and you assign only the
+           group to a user e.g. based on his affiliation, thus enabling a class
+           of users for certain abilities in Opencast -->
+      <value>['eduPersonScopedAffiliation'].contains('faculty@example.org') ? 'ROLE_GROUP_AAI_EDITOR' : null</value>
+
     </util:list>
 
 You may start by uncommenting the whole example in `mh_default_org.xml`.
