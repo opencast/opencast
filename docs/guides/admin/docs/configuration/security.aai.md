@@ -173,7 +173,6 @@ To configure complex mappings of AAI attributes via [`SpEL`](https://docs.spring
       <property name="exceptionIfHeaderMissing" value="false" />
     </bean>
 
-
 Activate the `aaiLoginHandler` bean and the `attributeMapper` bean
 
     <bean id="aaiLoginHandler" class="org.opencastproject.security.aai.DynamicLoginHandler">
@@ -188,7 +187,7 @@ Activate the `aaiLoginHandler` bean and the `attributeMapper` bean
       <property name="attributeMap" ref="attributeMap" />
       <property name="aaiAttributes" ref="aaiAttributes" />
     </bean>
-    
+
 then, define all the attributes you may want to use, so the mapper gets populated at login e.g.
 
     <util:list id="aaiAttributes" value-type="java.lang.String">
@@ -200,15 +199,14 @@ then, define all the attributes you may want to use, so the mapper gets populate
       <value>eduPersonPrincipalName</value>
       <value>homeOrganization</value>
     </util:list>
-    
-Opencast has a fairly simple account model that consists only of an username, display name and email address. Additionally an user may have some roles. For each of those attributes you define a map entry that refers to a list of mappings (username is mapped in the `shibbolethHeaderFilter` bean above). 
+
+Opencast has a fairly simple account model that consists only of an username, display name and email address. Additionally an user may have some roles. For each of those attributes you define a map entry that refers to a list of mappings (username is mapped in the `shibbolethHeaderFilter` bean above).
 
     <util:map id="attributeMap" map-class="java.util.HashMap">
       <entry key="roles" value-ref="roleMapping" />
       <entry key="displayName" value-ref="displayNameMapping" />
       <entry key="mail" value-ref="mailMapping" />
     </util:map>
-
 
  Each attribute as treated as multi-value so you have to access single value attributes (like `sn` and `givenName`) by accessing the first element of the list of values received via Shibboleth. For the email address and the `displayName` of an user the mapping is usually straight forward, see inline comments for further explanation:
 
