@@ -10,7 +10,7 @@
     "axios": "^0.19.0",
     "bootstrap": "^4.3.1",
     "http-mock-server": "^0.5.2",
-    "i18next": "^17.0.16",
+    "i18next": "^19.8.3",
     "i18next-browser-languagedetector": "^3.0.3",
     "query-string": "^6.8.3",
     "react": "^16.9.0",
