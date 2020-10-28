@@ -14,13 +14,15 @@ import {fetchUsers} from "../../thunks/userThunks";
 import {loadAclsIntoTable, loadGroupsIntoTable, loadUsersIntoTable} from "../../thunks/tableThunks";
 import {fetchGroups} from "../../thunks/groupThunks";
 import {fetchAcls} from "../../thunks/aclThunks";
+import Notifications from "../shared/Notifications";
+import {addNotification} from "../../thunks/notificationThunks";
 
 /**
  * This component renders the table view of users
  */
 const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
                    loadingGroups, loadingGroupsIntoTable, loadingAcls,
-                   loadingAclsIntoTable }) => {
+                   loadingAclsIntoTable, addNotification }) => {
     const { t } = useTranslation();
     const [displayNavigation, setNavigation] = useState(false);
 
@@ -30,6 +32,8 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
 
         // Load users into table
         loadingUsersIntoTable();
+
+
     }
 
     const loadGroups = () => {
@@ -54,6 +58,8 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
 
         // Load filters
         loadingFilters('users');
+
+        addNotification('warning', 'USER_NOT_DELETED', null, null, null);
 
     }, []);
 
@@ -110,7 +116,8 @@ const Users = ({ loadingUsers, loadingUsersIntoTable, users, loadingFilters,
             </section>
 
             <div className="main-view" style={displayNavigation ? styleNavOpen : styleNavClosed}>
-                {/*Todo: What is data-admin-ng-notifications?*/}
+                {/* Include notifications component */}
+                <Notifications />
 
                 <div  className="controls-container">
                     {/* Include filters component */}
@@ -140,7 +147,8 @@ const mapDispatchToProps = dispatch => ({
     loadingGroups: () => dispatch(fetchGroups()),
     loadingGroupsIntoTable: () => dispatch(loadGroupsIntoTable()),
     loadingAcls: () => dispatch(fetchAcls()),
-    loadingAclsIntoTable: () => dispatch(loadAclsIntoTable())
+    loadingAclsIntoTable: () => dispatch(loadAclsIntoTable()),
+    addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context))
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Users));

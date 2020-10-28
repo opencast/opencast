@@ -12,6 +12,7 @@ import {getRecordings} from "../../selectors/recordingSelectors";
 import {fetchRecordings} from "../../thunks/recordingThunks";
 import {loadRecordingsIntoTable} from "../../thunks/tableThunks";
 import {fetchFilters} from "../../thunks/tableFilterThunks";
+import Notifications from "../shared/Notifications";
 
 /**
  * This component renders the table view of recordings
@@ -66,7 +67,8 @@ const Recordings = ({ loadingRecordings, loadingRecordingsIntoTable, recordings,
             </section>
 
             <div className="main-view" style={displayNavigation ? styleNavOpen : styleNavClosed}>
-                {/*Todo: What is data-admin-ng-notifications?*/}
+                {/* Include notifications component */}
+                <Notifications />
 
                 <div className="controls-container">
                     {/* Include filters component */}

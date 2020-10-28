@@ -14,6 +14,7 @@ import {getGroups} from "../../selectors/groupSelectors";
 import {groupsTemplateMap} from "../../configs/tableConfigs/groupsTableConfig";
 import {fetchGroups} from "../../thunks/groupThunks";
 import {fetchAcls} from "../../thunks/aclThunks";
+import Notifications from "../shared/Notifications";
 
 /**
  * This component renders the table view of groups
@@ -110,7 +111,8 @@ const Groups = ({ loadingGroups, loadingGroupsIntoTable, groups, loadingFilters,
             </section>
 
             <div className="main-view" style={displayNavigation ? styleNavOpen : styleNavClosed}>
-                {/*Todo: What is data-admin-ng-notifications?*/}
+                {/* Include notifications component */}
+                <Notifications />
 
                 <div  className="controls-container">
                     {/* Include filters component */}

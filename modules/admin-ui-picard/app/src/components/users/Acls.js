@@ -14,6 +14,7 @@ import {connect} from "react-redux";
 import {aclsTemplateMap} from "../../configs/tableConfigs/aclsTableConfig";
 import {fetchAcls} from "../../thunks/aclThunks";
 import {getAcls} from "../../selectors/aclSelectors";
+import Notifications from "../shared/Notifications";
 
 /**
  * This component renders the table view of acls
@@ -110,7 +111,8 @@ const Acls = ({ loadingAcls, loadingAclsIntoTable, acls, loadingFilters,
             </section>
 
             <div className="main-view" style={displayNavigation ? styleNavOpen : styleNavClosed}>
-                {/*Todo: What is data-admin-ng-notifications?*/}
+                {/* Include notifications component */}
+                <Notifications />
 
                 <div  className="controls-container">
                     {/* Include filters component */}

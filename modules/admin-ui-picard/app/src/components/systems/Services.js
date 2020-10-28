@@ -14,6 +14,7 @@ import {fetchServers} from "../../thunks/serverThunks";
 import {servicesTemplateMap} from "../../configs/tableConfigs/servicesTableConfig";
 import {getServices} from "../../selectors/serviceSelector";
 import {fetchServices} from "../../thunks/serviceThunks";
+import Notifications from "../shared/Notifications";
 
 /**
  * This component renders the table view of services
@@ -97,7 +98,8 @@ const Services = ({ loadingServices, loadingServicesIntoTable, services, loading
             </section>
 
             <div className="main-view" style={displayNavigation ? styleNavOpen : styleNavClosed}>
-                {/*Todo: What is data-admin-ng-notifications?*/}
+                {/* Include notifications component */}
+                <Notifications />
 
                 <div  className="controls-container">
                     {/* Include filters component */}

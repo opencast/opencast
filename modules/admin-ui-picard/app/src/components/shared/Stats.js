@@ -75,4 +75,4 @@ const mapDispatchToProps = dispatch => ({
     loadEventsIntoTable: () => dispatch(loadEventsIntoTable())
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Stats);;
+export default connect(mapStateToProps, mapDispatchToProps)(Stats);

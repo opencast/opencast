@@ -12,6 +12,7 @@ import {themesTemplateMap} from "../../configs/tableConfigs/themesTableConfig";
 import {getThemes} from "../../selectors/themeSelectors";
 import {fetchThemes} from "../../thunks/themeThunks";
 import {loadThemesIntoTable} from "../../thunks/tableThunks";
+import Notifications from "../shared/Notifications";
 
 /**
  * This component renders the table view of events
@@ -79,7 +80,8 @@ const Themes = ({ loadingThemes, loadingThemesIntoTable, themes, loadingFilters 
             </section>
 
             <div className="main-view" style={displayNavigation ? styleNavOpen : styleNavClosed}>
-                {/*Todo: What is data-admin-ng-notifications?*/}
+                {/* Include notifications component */}
+                <Notifications />
 
                 <div  className="controls-container">
                     {/* Include filters component */}

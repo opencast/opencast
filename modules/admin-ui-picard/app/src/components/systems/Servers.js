@@ -14,6 +14,7 @@ import {fetchServers} from "../../thunks/serverThunks";
 import {loadJobsIntoTable, loadServersIntoTable, loadServicesIntoTable} from "../../thunks/tableThunks";
 import {fetchJobs} from "../../thunks/jobThunks";
 import {fetchServices} from "../../thunks/serviceThunks";
+import Notifications from "../shared/Notifications";
 
 /**
  * This component renders the table view of servers
@@ -97,7 +98,8 @@ const Servers = ({ loadingServers, loadingServersIntoTable, servers, loadingFilt
             </section>
 
             <div className="main-view" style={displayNavigation ? styleNavOpen : styleNavClosed}>
-                {/*Todo: What is data-admin-ng-notifications?*/}
+                {/* Include notifications component */}
+                <Notifications />
 
                 <div  className="controls-container">
                     {/* Include filters component */}

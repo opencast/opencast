@@ -15,6 +15,7 @@ import Link from "react-router-dom/Link";
 import {withRouter} from "react-router-dom";
 import {fetchSeries} from "../../thunks/seriesThunks";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
+import Notifications from "../shared/Notifications";
 
 // References for detecting a click outside of the container of the dropdown menu
 const containerAction = React.createRef();
@@ -130,7 +131,8 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
             </section>
 
             <div className="main-view" style={displayNavigation ? styleNavOpen : styleNavClosed}>
-                {/*todo: include notification component*/}
+                {/* Include notifications component */}
+                <Notifications />
 
                 <div className="controls-container">
                     <div className="filters-container">

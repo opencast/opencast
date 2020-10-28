@@ -3,8 +3,7 @@ import {
     loadHealthStatus,
     loadStatusFailure,
     loadStatusInProgress, resetNumError,
-    setError,
-    setNumError
+    setError
 } from "../actions/healthActions";
 import {getErrorStatus} from "../selectors/healthSelectors";
 
@@ -25,6 +24,7 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
     try {
         dispatch(loadStatusInProgress());
 
+        // Reset state of health status
         let healthStatus = {
             name: STATES_NAMES,
             status: '',
@@ -34,6 +34,7 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
         dispatch(resetNumError());
         dispatch(setError(false));
 
+        // Get current state of Broker
         fetch('/broker/status').then(
             function (response){
                 let healthStatus;
@@ -68,6 +69,7 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
             dispatch(addNumError(1));
         });
 
+        // Get current state of services
         fetch('/services/health.json').then(
           function(response) {
               response.json().then(function (data) {
