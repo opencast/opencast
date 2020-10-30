@@ -1,9 +1,7 @@
 sudo: true
 dist: bionic
 language: java
-jdk:
-  - openjdk8
-  - openjdk11
+jdk: openjdk8
 
 # Cache maven artifacts, pip downloads and the node modules for markdownlint
 cache:
@@ -98,6 +96,9 @@ jobs:
     # Make a build excluding the assembly steps
     - stage: build
       env: name=build
+      jdk:
+        - openjdk8
+        - openjdk11
       script:
         # Don't run the admin interface frontend tests. We run them in parallel anyway:
         - sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui-frontend/pom.xml
