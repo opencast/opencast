@@ -45,6 +45,7 @@ import org.opencastproject.util.data.Option;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -68,6 +69,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -86,6 +88,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -118,6 +121,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   public static final String AWS_S3_BUCKET_CONFIG = "org.opencastproject.distribution.aws.s3.bucket";
   public static final String AWS_S3_ENDPOINT_CONFIG = "org.opencastproject.distribution.aws.s3.endpoint";
   public static final String AWS_S3_PATH_STYLE_CONFIG = "org.opencastproject.distribution.aws.s3.path.style";
+  public static final String AWS_S3_PRESIGNED_URL_CONFIG = "org.opencastproject.distribution.aws.s3.presigned.url";
+  public static final String AWS_S3_PRESIGNED_URL_VALID_DURATION_CONFIG = "org.opencastproject.distribution.aws.s3.presigned.url.valid.duration";
   // config.properties
   public static final String OPENCAST_DOWNLOAD_URL = "org.opencastproject.download.url";
   public static final String OPENCAST_STORAGE_DIR = "org.opencastproject.storage.dir";
@@ -132,6 +137,9 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   /** The load on the system introduced by creating a restore job */
   public static final float DEFAULT_RESTORE_JOB_LOAD = 0.1f;
+
+  /** Default expiration time for presigned URL in millis, 4 hours */
+  public static final int DEFAULT_PRESIGNED_URL_EXPIRE_MILLIS = 4 * 60 * 60 * 1000;
 
   /** The keys to look for in the service configuration file to override the defaults */
   public static final String DISTRIBUTE_JOB_LOAD_KEY = "job.load.aws.s3.distribute";
@@ -166,6 +174,12 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
   /** path style enabled */
   private boolean pathStyle = false;
+
+  /** whether use presigned URL */
+  private boolean presignedUrl = false;
+
+  /** valid duration for presigned URL in milliseconds */
+  private int presignedUrlValidDuration = DEFAULT_PRESIGNED_URL_EXPIRE_MILLIS;
 
   /** The opencast download distribution url */
   private String opencastDistributionUrl = null;
@@ -226,6 +240,16 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       // AWS path style
       pathStyle = Boolean.valueOf(getAWSConfigKey(cc, AWS_S3_PATH_STYLE_CONFIG));
       logger.info("AWS path style is {}", pathStyle);
+
+      // AWS presigned URL
+      String presignedUrlConfigValue = OsgiUtil.getComponentContextProperty(cc, AWS_S3_PRESIGNED_URL_CONFIG, "false");
+      presignedUrl = StringUtils.equalsIgnoreCase("true", presignedUrlConfigValue);
+      logger.info("AWS use presigned URL: {}", presignedUrl);
+
+      // AWS presigned URL expiration time in millis
+      String presignedUrlExpTimeMillisConfigValue = OsgiUtil.getComponentContextProperty(cc,
+              AWS_S3_PRESIGNED_URL_VALID_DURATION_CONFIG, null);
+      presignedUrlValidDuration = NumberUtils.toInt(presignedUrlExpTimeMillisConfigValue, DEFAULT_PRESIGNED_URL_EXPIRE_MILLIS);
 
       opencastDistributionUrl = getAWSConfigKey(cc, AWS_S3_DISTRIBUTION_BASE_CONFIG);
       if (!opencastDistributionUrl.endsWith("/")) {
@@ -451,11 +475,17 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
       if (checkAvailability) {
         URI uri = distributedElement.getURI();
+        String distributedElementUriStr = uri.toString();
         int tries = 0;
         CloseableHttpResponse response = null;
         boolean success = false;
         while (tries < MAX_TRIES) {
           try {
+            if (presignedUrl) {
+              // 5 minutes should be enough for check availability for presigned URL.
+              Date fiveMinutesLater = new Date(System.currentTimeMillis() + 5 * 60 * 1000);
+              uri = s3.generatePresignedUrl(bucketName, objectName, fiveMinutesLater, HttpMethod.HEAD).toURI();
+            }
             CloseableHttpClient httpClient = HttpClients.createDefault();
             logger.trace("Trying to access {}", uri);
             response = httpClient.execute(new HttpHead(uri));
@@ -932,6 +962,22 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
         throw new ConfigurationException("Bucket " + bucketName + " exists, but we can't access it: " + e.getMessage(),
                 e);
       }
+    }
+  }
+
+  public URI presignedURI(URI uri) throws URISyntaxException {
+    if (!presignedUrl) {
+      return uri;
+    }
+    String s3UrlPrefix = s3.getUrl(bucketName, "").toString();
+
+    // Only handle URIs match s3 domain and bucket
+    if (uri.toString().startsWith(s3UrlPrefix)) {
+      String objectName = uri.toString().substring(s3UrlPrefix.length());
+      Date validUntil = new Date(System.currentTimeMillis() + presignedUrlValidDuration);
+      return s3.generatePresignedUrl(bucketName, objectName, validUntil).toURI();
+    } else {
+      return uri;
     }
   }
 

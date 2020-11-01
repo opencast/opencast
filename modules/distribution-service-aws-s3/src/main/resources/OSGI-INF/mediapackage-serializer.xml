@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.distribution.aws.s3.PresignedUrlMediaPackageSerializer"
+               immediate="true">
+  <service>
+    <provide interface="org.opencastproject.mediapackage.MediaPackageSerializer"/>
+  </service>
+  <implementation class="org.opencastproject.distribution.aws.s3.PresignedUrlMediaPackageSerializer"/>
+  <property name="service.pid" value="org.opencastproject.distribution.aws.s3.PresignedUrlMediaPackageSerializer"/>
+  <reference name="distributionService"
+             interface="org.opencastproject.distribution.aws.s3.api.AwsS3DistributionService"
+             cardinality="1..1" policy="static" bind="setService"/>
+</scr:component>
