@@ -37,6 +37,33 @@ Amazon CloudFront provides an *optional* way to better handle distributing your 
 configuring CloudFront is outside the scope of this documentation, we wish to note that this does affect one of the keys
 described below.  Please ensure you use the correct distribution base format depending on which service you are using!
 
+Presigned URL
+-------------
+As a typical CDN service, CloudFront can accerate the speed of distributing your media. Yet, anyone can get the media
+files if the URL is leaked. 
+
+S3 provide **Presigned URL** to generate URLs only valid in a certain duration time. That means, even the media's URL
+is leaked, the URL only can be used in a short time.
+
+Set `org.opencastproject.distribution.aws.s3.presigned.url` to `true` to enable this feature.
+
+Note: **CloudFront** and **Presigned URL** can be used together. 
+
+S3 Compatible Service
+----------------------
+The S3 API has become the de facto standard interface for almost all storage providers.
+This module also supports S3 compatible service.
+In this case, `org.opencastproject.distribution.aws.s3.endpoint` should be set to the endpoint of the S3 service.
+Meanwhile, `org.opencastproject.distribution.aws.s3.region` should not be set.
+Note: only one of these two configuration keys may be set.
+
+There are [two access](https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingBucket.html) style for bucket, virtual hosted style (default) and path style.
+- Virtual hosted style sample: `https://bucketname.s3.service.com/`
+- Path style sample: `https://s3.service.com/bucketname`
+
+AWS use virtual hosted style by default, and will deprecate path style. Yet, for self hosted s3 compatible service, path style URL is useful.  
+Set `org.opencastproject.distribution.aws.s3.path.style` to `true` to enable this feature.
+
 Opencast Service Configuration
 ------------------------------
 
@@ -47,10 +74,14 @@ The Opencast AWS S3 Distribution service has five configuration keys, which can 
 |--------|-----|-------|
 |org.opencastproject.distribution.aws.s3.distribution.enable|True to enable S3 distribution, false otherwise|true|
 |org.opencastproject.distribution.aws.s3.region|The AWS region to set|us-west-2|
+|org.opencastproject.distribution.aws.s3.endpoint|The endpoint of AWS S3 service. Only used with S3 compatible service|https://s3.service.com|
+|org.opencastproject.distribution.aws.s3.path.style|True to enable path style access URL for bucket, false otherwise|false|
 |org.opencastproject.distribution.aws.s3.bucket|The S3 bucket name|example-org-dist|
 |org.opencastproject.distribution.aws.s3.distribution.base|Where the S3 files are available from.  This value can be derived from the bucket and region values, or is set by CloudFront.|http://s3-us-west-2.amazonaws.com/example-org-dist, or DOMAIN_NAME.cloudfront.net|
 |org.opencastproject.distribution.aws.s3.access.id|Your access ID|20 alphanumeric characters|
 |org.opencastproject.distribution.aws.s3.secret.key|Your secret key|40 characters|
+|org.opencastproject.distribution.aws.s3.presigned.url|True to enable presigned URL, false otherwise|false|
+|org.opencastproject.distribution.aws.s3.presigned.url.valid.duration|Valid duration for presigned URL in milliseconds|14400000|
 
 If *org.opencastproject.distribution.aws.s3.access.id* and *org.opencastproject.distribution.aws.s3.secret.key* are
  not *explicitly* provided, search for credentials will be performed in the order specified by the
