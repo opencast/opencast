@@ -45,12 +45,12 @@ Source upload options as displayed in the Admin UI Create event:
 Asset flavor and sub-flavor are used by default Opencast workflows. When you add new asset types, you may need to adjust
 workflows to process the new asset flavor.
 
-These workflow variables are avaiable to workflows started by the create event or add asset action:
+These workflow variables are available to workflows started by the create event or add asset action:
 
 Variable Name              | Type                 | Description
 ---------------------------| ---------------------| -----------
 uploadedSearchPreview      | boolean              | true if manually uploaded preview image, false otherwise. Used to prevent image extraction overwrite in compose operation
-downloadSourceflavorsExist | boolean              | true if download-source-flavors variable exists, false otherwise. Identifies existence of download-source-flavors var for tagging
+downloadSourceflavorsExist | boolean              | true if download-source-flavors variable exists, false otherwise. Identifies existence of download-source-flavors variable for tagging
 download-source-flavors    | comma separated list | A convenience variable that lists manually uploaded asset flavors.
 
 Example of variables in a workflow:

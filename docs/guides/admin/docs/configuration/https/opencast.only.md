@@ -97,7 +97,7 @@ table https_hosts {
 Creating the keystore
 ---------------------
 
-What you need, is the TLS private key and the certificate including the
+What you need is the TLS private key and the certificate including the
 whole chain between the root certificate, all intermediates and the
 certificate itself.
 

@@ -1,10 +1,13 @@
 Basic Configuration
 ===================
 
+<!-- _Guide says nothing about how to start running OC, nor does it point to the "Next Step"
+as the Installation Docs do (i.e. Install doc refers to Config doc) -->
 This guide will help you to change the basic configuration settings which are required or at least strongly recommended
 for each Opencast installation. This is basically what you should do, right after installing Opencast on your machine.
 
-All settings are made to files residing in the Opencast configuration directory. In most cases, that should be either
+<!-- _"In most cases, ..." Unclear: the cases being the different Operating Systems? -->
+All settings changes are made to files residing in the Opencast configuration directory. In most cases, that should be either
 `/etc/opencast/` or `/opt/opencast/etc/`. Edit the files using the editor of your choice, e.g.:
 
     vim /etc/opencast/custom.properties
@@ -44,7 +47,7 @@ configuration file are:
     * The password for the communication between Opencast nodes and capture agents. This is set to `CHANGE_ME` by default.
 
 *Note:* The digest credentials are also used for internal communication of Opencast servers. So these keys have to be
-set to the same value on each of you Opencast nodes (Core, Worker, Capture Agent, …)
+set to the same value on each of your Opencast nodes (Core, Worker, Capture Agent, …)
 
 
 Step 3: Change the default shutdown command
@@ -58,7 +61,7 @@ secret.
 
 Step 4: Setting up Apache ActiveMQ Message Broker
 -------------------------------------------------
-
+<!-- _This is a very nonchalant and subdued description for how important this config probably is -->
 Since version 2.0, Opencast requires a running Apache ActiveMQ instance with a specific configuration.  The message
 broker is mostly run on the admin server of Opencast but can be run separately. It needs to be started before Opencast.
 For more details about the setup, have a look at the [Apache ActiveMQ configuration guide](message-broker.md).
@@ -87,7 +90,8 @@ guide](../modules/searchindex/elasticsearch.md).
 
 Step 7: HTTPS Configuration
 ---------------------------
-
+<!-- _Every other instance of linking to another doc so far has been a "do now, but in another doc", 
+whereas here it is very much "not necessary for right now": what to do? -->
 An installation without HTTPS does not make much sense today.
 Thus, make sure to follow [a configuration guide for HTTPS](https/index.md).
 
@@ -100,4 +104,5 @@ can set the directory by changing `org.opencastproject.storage.dir` like:
 
     org.opencastproject.storage.dir=/media/mhdatamount
 
+<!-- _Instance of "implied Note" -->
 Please keep in mind that the user running Opencast must have read/write permissions to the storage directory.
