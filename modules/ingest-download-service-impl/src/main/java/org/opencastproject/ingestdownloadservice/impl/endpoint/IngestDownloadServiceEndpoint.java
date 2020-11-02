@@ -77,7 +77,7 @@ public class IngestDownloadServiceEndpoint extends AbstractJobProducerEndpoint {
           @RestParameter(description = "select both tags and flavors: Boolean true / false", isRequired = false, name = "tagsAndFlavor",
           type = RestParameter.Type.STRING),
           },
-      reponses =  {@RestResponse(description = "Mediapackage as xml", responseCode = HttpServletResponse.SC_OK)},
+      responses =  {@RestResponse(description = "Mediapackage as xml", responseCode = HttpServletResponse.SC_OK)},
           returnDescription = "Mediapackage as xml with element urls in workspace.")
   public Response ingestdownload(@FormParam("mediapackage") String mediapackageString,
           @FormParam("sourceFlavors") String sourceFlavors,

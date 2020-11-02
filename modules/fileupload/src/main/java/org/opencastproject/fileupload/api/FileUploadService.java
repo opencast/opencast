@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Interface for a Service that manages upload jobs and recieves and handles file parts.
+ * Interface for a Service that manages upload jobs and receives and handles file parts.
  *
  */
 public interface FileUploadService {

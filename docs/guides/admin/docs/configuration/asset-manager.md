@@ -25,6 +25,6 @@ Configure the file system based asset store in `custom.properties`.
    The path where the file system based asset store of the default implementation stores the assets. This key is optional.
 - `org.opencastproject.storage.dir`
   This is Opencast’s general config key to configure the base path of everything storage related.
-  If no storage directory is configured explicitely, the file system based asset store will use
+  If no storage directory is configured explicitly, the file system based asset store will use
   `${org.opencastproject.storage.dir}/archive` as its base path.
 

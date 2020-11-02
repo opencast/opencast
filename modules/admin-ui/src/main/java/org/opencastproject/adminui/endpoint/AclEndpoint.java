@@ -157,7 +157,7 @@ public class AclEndpoint {
           @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the following: NAME. Add '_DESC' to reverse the sort order (e.g. NAME_DESC).", type = STRING),
           @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The list of ACL's has successfully been returned") })
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The list of ACL's has successfully been returned") })
   public Response getAclsAsJson(@QueryParam("filter") String filter, @QueryParam("sort") String sort,
           @QueryParam("offset") int offset, @QueryParam("limit") int limit) throws IOException {
     if (limit < 1)
@@ -233,7 +233,7 @@ public class AclEndpoint {
                               type = RestParameter.Type.STRING),
                @RestParameter(name = "offset", defaultValue = "0", description = "The page number.", isRequired = false,
                               type = RestParameter.Type.STRING) },
-             reponses = { @RestResponse(responseCode = SC_OK, description = "The list of roles.") })
+             responses = { @RestResponse(responseCode = SC_OK, description = "The list of roles.") })
   public Response getRoles(@QueryParam("query") String query, @QueryParam("target") String target,
                            @QueryParam("offset") int offset, @QueryParam("limit") int limit) {
 
@@ -269,7 +269,7 @@ public class AclEndpoint {
 
   @DELETE
   @Path("{id}")
-  @RestQuery(name = "deleteacl", description = "Delete an ACL", returnDescription = "Delete an ACL", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The ACL identifier", type = INTEGER) }, reponses = {
+  @RestQuery(name = "deleteacl", description = "Delete an ACL", returnDescription = "Delete an ACL", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The ACL identifier", type = INTEGER) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been deleted"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL has not been found"),
           @RestResponse(responseCode = SC_CONFLICT, description = "The ACL could not be deleted, there are still references on it") })
@@ -289,7 +289,7 @@ public class AclEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "createacl", description = "Create an ACL", returnDescription = "Create an ACL", restParameters = {
           @RestParameter(name = "name", isRequired = true, description = "The ACL name", type = STRING),
-          @RestParameter(name = "acl", isRequired = true, description = "The access control list", type = STRING) }, reponses = {
+          @RestParameter(name = "acl", isRequired = true, description = "The access control list", type = STRING) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been added"),
           @RestResponse(responseCode = SC_CONFLICT, description = "An ACL with the same name already exists"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the ACL") })
@@ -308,7 +308,7 @@ public class AclEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "updateacl", description = "Update an ACL", returnDescription = "Update an ACL", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The ACL identifier", type = INTEGER) }, restParameters = {
           @RestParameter(name = "name", isRequired = true, description = "The ACL name", type = STRING),
-          @RestParameter(name = "acl", isRequired = true, description = "The access control list", type = STRING) }, reponses = {
+          @RestParameter(name = "acl", isRequired = true, description = "The access control list", type = STRING) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been updated"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL has not been found"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the ACL") })
@@ -327,7 +327,7 @@ public class AclEndpoint {
   @GET
   @Path("{id}")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getacl", description = "Return the ACL by the given id", returnDescription = "Return the ACL by the given id", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The ACL identifier", type = INTEGER) }, reponses = {
+  @RestQuery(name = "getacl", description = "Return the ACL by the given id", returnDescription = "Return the ACL by the given id", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The ACL identifier", type = INTEGER) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL has not been found") })
   public Response getAcl(@PathParam("id") long aclId) throws NotFoundException {

@@ -23,9 +23,9 @@ package org.opencastproject.index.service.resources.list.provider;
 
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.index.service.util.ListProviderUtil;
+import org.opencastproject.list.api.ResourceListProvider;
+import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.util.ListProviderUtil;
 import org.opencastproject.security.api.SecurityService;
 
 import org.osgi.framework.BundleContext;

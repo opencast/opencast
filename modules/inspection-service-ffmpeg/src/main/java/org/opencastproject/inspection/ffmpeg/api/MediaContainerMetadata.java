@@ -23,6 +23,8 @@
 package org.opencastproject.inspection.ffmpeg.api;
 
 
+import org.opencastproject.util.MimeType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +41,8 @@ public class MediaContainerMetadata extends TemporalMetadata {
   private String fileName;
   private String fileExtension;
   private Boolean interleaved;
+  private MimeType mimeType;
+  private Boolean adaptiveMaster;
 
   /**
    * Returns metadata for all contained video streams.
@@ -105,6 +109,32 @@ public class MediaContainerMetadata extends TemporalMetadata {
 
   public void setInterleaved(Boolean interleaved) {
     this.interleaved = interleaved;
+  }
+
+  /**
+   * Returns the mimeType of the file
+   * 
+   * @return mimetype
+   */
+  public MimeType getMimeType() {
+    return mimeType;
+  }
+
+  public void setMimeType(MimeType mimeType) {
+    this.mimeType = mimeType;
+  }
+
+  /**
+   * Looks for adaptive master file
+   * 
+   * @return true if this is an adaptiveMaster file
+   */
+  public Boolean getAdaptiveMaster() {
+    return adaptiveMaster;
+  }
+
+  public void setAdaptiveMaster(Boolean adaptiveMaster) {
+    this.adaptiveMaster = adaptiveMaster;
   }
 
 }

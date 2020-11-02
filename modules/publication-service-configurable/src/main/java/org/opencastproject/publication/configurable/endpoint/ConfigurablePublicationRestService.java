@@ -103,7 +103,7 @@ public class ConfigurablePublicationRestService extends AbstractJobProducerEndpo
           @RestParameter(name = "addElements", isRequired = true, description =
                   "The media package elements to published", type = RestParameter.Type.STRING),
           @RestParameter(name = "retractElements", isRequired = true, description =
-                  "The identifiers of the media package elements to be retracted from the media package", type = RestParameter.Type.STRING) }, reponses = {
+                  "The identifiers of the media package elements to be retracted from the media package", type = RestParameter.Type.STRING) }, responses = {
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "An XML representation of the publication job") })
   public Response replace(@FormParam("mediapackage") final String mediaPackageXml,
           @FormParam("channel") final String channel, @FormParam("addElements") final String addElementsXml,
@@ -136,7 +136,7 @@ public class ConfigurablePublicationRestService extends AbstractJobProducerEndpo
       @RestParameter(name = "addElements", isRequired = true, description =
           "The media package elements to published", type = RestParameter.Type.STRING),
       @RestParameter(name = "retractElements", isRequired = true, description =
-          "The identifiers of the media package elements to be retracted from the media package", type = RestParameter.Type.STRING) }, reponses = {
+          "The identifiers of the media package elements to be retracted from the media package", type = RestParameter.Type.STRING) }, responses = {
       @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "An XML representation of the publication") })
   public Response replaceSync(@FormParam("mediapackage") final String mediaPackageXml,
                           @FormParam("channel") final String channel, @FormParam("addElements") final String addElementsXml,

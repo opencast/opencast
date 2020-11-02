@@ -64,6 +64,7 @@ You will need to configure a [UserProvider](security.md) to look up users as ide
 * [Sakai User Provider](security.user.sakai.md)
 * [Moodle User Provider](security.user.moodle.md)
 * [Brightspace D2L User Provider](security.user.brightspace.md)
+* [Canvas LMS User Provider](security.user.canvas.md)
 
 
 Original documentation from University of Saskatchewan

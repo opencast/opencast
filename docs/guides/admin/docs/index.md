@@ -34,6 +34,7 @@ The Opencast Release Documentation is the official Opencast documentation for ea
     * [AWS S3 Distribution](modules/awss3distribution.md)
     * [Media Module](modules/mediamodule.configuration.md)
     * [Stream Security](modules/stream-security.md)
+    * [Studio](modules/studio.md)
     * [Text Extraction](modules/textextraction.md)
     * [Video Segmentation](modules/videosegmentation.md)
     * [YouTube Publication](modules/youtubepublication.md)
@@ -43,5 +44,6 @@ The Opencast Release Documentation is the official Opencast documentation for ea
 Further Documentation
 ---------------------
 
-In addition to this official documentation, further guides and tips can be found in the on the mailing lists, the IRC
-channel and at the regular meetings.
+In addition to this official documentation, you can get help on the mailing lists, the IRC
+channel, and at the regular meetings.
+You can find all of these linked on [docs.opencast.org](https://docs.opencast.org).

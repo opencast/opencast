@@ -35,7 +35,7 @@ import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -444,7 +444,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     for (int i = 0; i < data.getLabels().size(); i++) {
       List<Object> values = new ArrayList<>();
       values.add(resourceId);
-      values.addAll(mdfs.stream().map(f -> f.getValue().getOr("")).collect(Collectors.toList()));
+      values.addAll(mdfs.stream().map(f -> f.getValue() == null ? "" : f.getValue()).collect(Collectors.toList()));
       values.add(formatDate(data.getLabels().get(i), dataResolution, zoneId));
       values.add(data.getValues().get(i));
       printer.printRecord(values.toArray());
@@ -489,7 +489,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
   }
 
   private List<MetadataField> getSeriesMetadata(String resourceId) {
-    final List<MetadataCollection> mdcs = this.indexService.getSeriesCatalogUIAdapters()
+    final List<DublinCoreMetadataCollection> mdcs = this.indexService.getSeriesCatalogUIAdapters()
             .stream()
             .filter(a -> !a.equals(this.indexService.getCommonSeriesCatalogUIAdapter()))
             .filter(a -> !a.getFlavor().equals(this.indexService.getCommonSeriesCatalogUIAdapter().getFlavor()))
@@ -501,7 +501,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       mdcs.add(0, this.indexService.getCommonSeriesCatalogUIAdapter().getFields(resourceId).get());
     }
     return mdcs.stream()
-            .map(MetadataCollection::getFields)
+            .map(DublinCoreMetadataCollection::getFields)
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
   }
@@ -511,7 +511,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     if (optMp.isEmpty()) {
       return Collections.emptyList();
     }
-    final List<MetadataCollection> mdcs = this.indexService.getEventCatalogUIAdapters()
+    final List<DublinCoreMetadataCollection> mdcs = this.indexService.getEventCatalogUIAdapters()
             .stream()
             .filter(a -> !a.equals(this.indexService.getCommonEventCatalogUIAdapter()))
             .filter(a -> !a.getFlavor().equals(this.indexService.getCommonEventCatalogUIAdapter().getFlavor()))
@@ -519,7 +519,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
             .collect(Collectors.toList());
     mdcs.add(0, this.indexService.getCommonEventCatalogUIAdapter().getFields(optMp.get()));
     return mdcs.stream()
-            .map(MetadataCollection::getFields)
+            .map(DublinCoreMetadataCollection::getFields)
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
   }

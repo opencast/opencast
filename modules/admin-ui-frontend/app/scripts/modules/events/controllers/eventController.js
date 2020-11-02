@@ -181,6 +181,19 @@ angular.module('adminNg.controllers')
             }
           });
 
+          // add policy to allow ROLE_USER_* to read and write
+          var userRole = Object.keys($scope.roles).filter(function(role){
+            return role.startsWith('ROLE_USER_') && role != 'ROLE_USER_ADMIN';
+          });
+          if (angular.isDefined(userRole) && userRole.length == 1){
+            userRole = userRole[0];
+            if (angular.isUndefined(newPolicies[userRole])){
+              newPolicies[userRole] = createPolicy(userRole);
+            }
+            newPolicies[userRole]['read'] = true;
+            newPolicies[userRole]['write'] = true;
+          }
+
           $scope.policies = [];
           angular.forEach(newPolicies, function (policy) {
             $scope.policies.push(policy);
@@ -704,6 +717,16 @@ angular.module('adminNg.controllers')
 
     $scope.metadataSave = function (id, callback, catalog) {
       catalog.attributeToSend = id;
+
+      if (Object.prototype.hasOwnProperty.call(catalog, 'fields')) {
+        for (var fieldNo in catalog.fields) {
+          var field = catalog.fields[fieldNo];
+          if (Object.prototype.hasOwnProperty.call(field, 'collection')) {
+            field.collection = [];
+          }
+        }
+      }
+
       EventMetadataResource.save({ id: $scope.resourceId }, catalog,  function () {
         if (angular.isDefined(callback)) {
           callback();

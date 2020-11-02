@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.lti.service.impl.LtiServiceImpl"
+               immediate="true">
+  <implementation class="org.opencastproject.lti.service.impl.LtiServiceImpl"/>
+  <property name="service.description" value="LTI Service"/>
+  <property name="opencast.service.type" value="org.opencastproject.lti.service"/>
+  <service>
+    <!-- expose interface for MH REST publisher! -->
+    <provide interface="org.opencastproject.lti.service.api.LtiService"/>
+    <provide interface="org.osgi.service.cm.ManagedService"/>
+  </service>
+  <reference name="EventCatalogUIAdapter"
+             interface="org.opencastproject.metadata.dublincore.EventCatalogUIAdapter"
+             cardinality="0..n"
+             policy="dynamic"
+             bind="addCatalogUIAdapter"
+             unbind="removeCatalogUIAdapter"/>
+  <reference name="IndexService"
+             interface="org.opencastproject.index.service.api.IndexService"
+             bind="setIndexService"/>
+  <reference name="IngestService"
+             interface="org.opencastproject.ingest.api.IngestService"
+             bind="setIngestService"/>
+  <reference name="SecurityService"
+             interface="org.opencastproject.security.api.SecurityService"
+             bind="setSecurityService"/>
+  <reference name="search-index"
+             interface="org.opencastproject.external.index.ExternalIndex"
+             bind="setSearchIndex"/>
+  <reference name="asset-manager"
+             interface="org.opencastproject.assetmanager.api.AssetManager"
+             bind="setAssetManager"/>
+  <reference name="workflow-service"
+             interface="org.opencastproject.workflow.api.WorkflowService"
+             bind="setWorkflowService"/>
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+             bind="setWorkspace"/>
+  <reference name="authorization-service" interface="org.opencastproject.security.api.AuthorizationService"
+             bind="setAuthorizationService"/>
+</scr:component>

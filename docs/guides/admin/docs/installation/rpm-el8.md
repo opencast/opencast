@@ -42,7 +42,7 @@ If you get an error saying that the package `epel-release` is not available, ple
 To do that, follow the
 [instructions in the EPEL documentation](https://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F).
 
-You can check if the repositories were sucessfully enabled using:
+You can check if the repositories were successfully enabled using:
 
 ```
 dnf repolist enabled

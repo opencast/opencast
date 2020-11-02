@@ -78,9 +78,10 @@ angular.module('adminNg.controllers')
         label: 'EVENTS.EVENTS.TABLE.LOCATION',
         sortable: true
       }, {
-        name:  'published',
+        name:  'publication',
         label: 'EVENTS.EVENTS.TABLE.PUBLISHED',
-        template: 'modules/events/partials/publishedCell.html'
+        template: 'modules/events/partials/publishedCell.html',
+        sortable: true
       }, {
         template: 'modules/events/partials/eventsStatusCell.html',
         name:  'event_status',
@@ -111,6 +112,9 @@ angular.module('adminNg.controllers')
         });
         row.checkedDelete = function() {
           ConfirmationModal.show('confirm-modal',Table.delete,row);
+        };
+        row.embeddingCode = function() {
+          ConfirmationModal.show('embedding-code',Table.fullScreenUrl,row);
         };
       }
     });

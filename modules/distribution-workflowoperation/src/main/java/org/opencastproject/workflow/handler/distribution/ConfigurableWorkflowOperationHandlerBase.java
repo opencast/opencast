@@ -22,6 +22,7 @@ package org.opencastproject.workflow.handler.distribution;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
+import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
@@ -38,6 +39,7 @@ import com.entwinemedia.fn.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,7 +55,8 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
 
   private static final Logger logger = LoggerFactory.getLogger(ConfigurableWorkflowOperationHandlerBase.class);
 
-  abstract DownloadDistributionService getDistributionService();
+  abstract DownloadDistributionService getDownloadDistributionService();
+  abstract StreamingDistributionService getStreamingDistributionService();
 
   /**
    * Adds all of the {@link Publication}'s {@link MediaPackageElement}s that would normally have not been in the
@@ -90,7 +93,7 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
    * @throws WorkflowOperationException
    *           Thrown if unable to retract the {@link MediaPackageElement}s.
    */
-  private int retractPublicationElements(String channelId, Publication publication, MediaPackage mp)
+  private int retractPublicationElements(String channelId, Publication publication, MediaPackage mp, boolean retractStreaming)
           throws WorkflowOperationException {
     assert ((channelId != null) && (publication != null) && (mp != null));
     MediaPackage mediapackageWithPublicationElements = (MediaPackage) mp.clone();
@@ -110,19 +113,37 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
       elementIds.add(track.getIdentifier());
     }
 
+    List<Job> jobs = new ArrayList<>();
     if (elementIds.size() > 0) {
       logger.info("Retracting {} elements of media package {} from publication channel {}", elementIds.size(), mp,
               channelId);
-      Job job = null;
       try {
-        job = getDistributionService().retract(channelId, mediapackageWithPublicationElements, elementIds);
+        Job  retractDownloadDistributionJob = getDownloadDistributionService().retract(channelId, mediapackageWithPublicationElements, elementIds);
+        if (retractDownloadDistributionJob != null) {
+          jobs.add(retractDownloadDistributionJob);
+        }
       } catch (DistributionException e) {
-        logger.error("Error while retracting '{}' elements from channel '{}' of distribution '{}':",
-                elementIds.size(), channelId, getDistributionService(), e);
-        throw new WorkflowOperationException("The retraction job did not complete successfully");
+        logger.error("Error while retracting '{}' elements of media package {} from channel '{}' of distribution '{}'",
+                elementIds.size(), mp, channelId, getDownloadDistributionService(), e);
+        throw new WorkflowOperationException(e);
       }
-      if (!waitForStatus(job).isSuccess()) {
-        throw new WorkflowOperationException("The retraction job did not complete successfully");
+
+      if (retractStreaming) {
+        try {
+          Job retractStreamingJob = getStreamingDistributionService().retract(channelId, mediapackageWithPublicationElements, elementIds);
+          if (retractStreamingJob != null) {
+            jobs.add(retractStreamingJob);
+          }
+        } catch (DistributionException e) {
+          logger.error(
+                  "Error while retracting '{}' elements of media package {} from channel '{}' of distribution '{}'",
+                  elementIds.size(), mp, channelId, getStreamingDistributionService(), e);
+          throw new WorkflowOperationException(e);
+        }
+      }
+
+      if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess()) {
+        throw new WorkflowOperationException("One of the retraction jobs did not complete successfully");
       }
     } else {
       logger.debug("No publication elements were found for retraction");
@@ -143,7 +164,7 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
     return publications;
   }
 
-  public void retract(MediaPackage mp, final String channelId) throws WorkflowOperationException {
+  public void retract(MediaPackage mp, final String channelId, boolean retractStreaming) throws WorkflowOperationException {
     assert ((mp != null) && (channelId != null));
 
     final List<Publication> publications = getPublications(mp, channelId);
@@ -151,7 +172,7 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
     if (publications.size() > 0) {
       int retractedElementsCount = 0;
       for (Publication publication : publications) {
-        retractedElementsCount += retractPublicationElements(channelId, publication, mp);
+        retractedElementsCount += retractPublicationElements(channelId, publication, mp, retractStreaming);
         mp.remove(publication);
       }
       logger.info("Successfully retracted {} publications and retracted {} elements from publication channel '{}'",

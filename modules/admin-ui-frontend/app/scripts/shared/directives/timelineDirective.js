@@ -359,36 +359,33 @@ angular.module('adminNg.directives')
         };
 
         scope.changeZoomInternal = function() {
-          var addition = scope.zoomValue / 2;
-          //if (scope.position >= scope.from && scope.position <= scope.to) {
-          if (scope.from === 0) {
-            var relativePosition = 0;
-          } else if (scope.to == scope.video.duration) {
-            var relativePosition = scope.video.duration;
+          var window = scope.to - scope.from;
+          if (scope.position > scope.from && scope.position < scope.to) {
+            // we are in between from and to window
+            // scale from-to window centered on position
+            var from = scope.position - ((scope.zoomValue / window) * (scope.position - scope.from));
+            var to = scope.position + ((scope.zoomValue / window) * (scope.to - scope.position));
           } else {
-            var relativePosition = (scope.from + scope.to) / 2;
+            // we are not in between from and to window
+            // scale from-to window centered
+            var window_diff = scope.zoomValue - window;
+            var from = scope.from - (window_diff / 2);
+            var to = scope.to + (window_diff / 2);
           }
-          // Were we to move the zoom boundaries to the right/left, by
-          // how far do we run out of the video?
-          var overheadRight = relativePosition + addition - scope.video.duration;
-          var overheadLeft = addition - relativePosition;
-          // Check for overheads and distribute the overhead space to
-          // the other side of the zoom boundary, if possible.
-          if (overheadRight > 0) {
-            // Overhead on the right, so move the boundary more to the left
-            scope.to = scope.video.duration;
-            scope.from = Math.max(0, relativePosition - addition - overheadRight);
-          } else if (overheadLeft > 0) {
-            // Overhead on the left, so move the right boundary a bit
-            // farther away.
-            scope.from = 0;
-            scope.to = Math.min(scope.video.duration, relativePosition + addition + overheadLeft);
-          } else {
-            // No overhead, simply center the zoom boundaries around
-            // the current playing position.
-            scope.from = relativePosition - addition;
-            scope.to = relativePosition + addition;
+          if (from < 0) {
+            // we are running out of boundary on the left side
+            // shift the extra amount to the right side
+            to = to - from;
+            from = 0;
           }
+          if (to > scope.video.duration) {
+            // we are running out of boundary on the right side
+            // shift the extra amount to the left side but respect the left boundary
+            from = Math.max(0, from + scope.video.duration - to);
+            to = scope.video.duration;
+          }
+          scope.from = from;
+          scope.to = to;
           scope.updatePlayHead();
           scope.updateShuttle();
           scope.setWrapperClasses();
@@ -1264,6 +1261,123 @@ angular.module('adminNg.directives')
           if (scope.timer) $timeout.cancel( scope.timer );
         });
 
+        /**
+         * Creates a promise object to load the AuthService so that user properties
+         * are available to the current scope.
+         */
+        AuthService.getUser().$promise.then(function (user) {
+          var startLength = parseInt(user.org.properties['admin.editor.segment.start_length'] || 0, 10);
+          var endLength = parseInt(user.org.properties['admin.editor.segment.end_length'] || 0, 10);
+          var minLength = parseInt(user.org.properties['admin.editor.segment.minimum_length'] || 0, 10);
+
+          scope.startLength = startLength;
+          scope.endLength = endLength;
+          scope.minLength = minLength;
+
+          if (!startLength && !endLength && !minLength) {
+            return;
+          }
+
+          scope.video.$promise.then(function(vidObj) {
+            var duration = parseInt(vidObj.duration, 10);
+            var segments = vidObj.segments;
+
+            if (duration <= startLength + endLength) {
+              return;
+            }
+
+            var setSegment = function(_start, _end, _min, _del) {
+
+              if (_min > 0) {
+                _end = (_start - _end < _min) ? _start + _min : _end;
+              }
+
+              return {
+                start: _start,
+                end: _end,
+                deleted: _del,
+                selected: false
+              };
+            };
+
+            var getSegmentLength = function(_s) {
+              return (_s.end - _s.start);
+            };
+
+            var maxSegIdx = segments.length - 1;
+            segments[0].start = 0;
+            segments[maxSegIdx].end = duration;
+
+            if (segments.length == 1) {
+
+              var _start = 0;
+              var _duration = duration;
+
+              if (startLength > 0) {
+                segments.push( setSegment(0, startLength, startLength, true) );
+                _start += startLength;
+                _duration -= startLength;
+              }
+
+              if (endLength > 0) {
+                segments.push( setSegment(duration - endLength, duration, endLength, true) );
+                _duration -= endLength;
+              }
+
+              segments[0] = setSegment(_start, _duration, _duration, false);
+
+            } else if (segments.length == 2) {
+
+              // two segments: ||    | / |  |  | / |    ||
+              var a = getSegmentLength(segments[0]) / duration,
+                  b = getSegmentLength(segments[1]) / duration;
+
+              if (a <= b) {
+
+                // small first segment add end if required
+                if (endLength > 0) {
+                  segments.push( setSegment(duration - endLength, duration, endLength, true) );
+                  if (segments[1]) segments[1].end = duration - endLength;
+                }
+              } else {
+
+                // small end segment add front if required
+                if (startLength > 0) {
+                  segments.push( setSegment(0, startLength, startLength, true) );
+                  if (segments[0]) segments[0].start = startLength;
+                }
+              }
+            }
+
+            segments.sort(function (a, b) {
+              return a.start - b.start;
+            });
+
+            maxSegIdx = segments.length - 1;
+
+            if ((startLength > 0) && (getSegmentLength(segments[0]) < startLength)) {
+              segments[0].end = startLength;
+              if (segments[1]) segments[1].start = startLength;
+            }
+
+            if ((endLength > 0) && (getSegmentLength(segments[maxSegIdx]) < endLength)) {
+              segments[maxSegIdx].start = duration - endLength;
+              if (segments[maxSegIdx - 1]) segments[maxSegIdx - 1].end = duration - endLength;
+            }
+
+            var i = maxSegIdx;
+            while (i--) {
+              var segment = segments[i];
+              if (getSegmentLength(segment) < minLength) {
+                scope.mergeSegment(null, segment);
+              }
+            }
+
+            maxSegIdx = segments.length - 1;
+            segments[0].start = 0;
+            segments[maxSegIdx].end = duration;
+          });
+        });
 
         scope.setWrapperClasses();
       }

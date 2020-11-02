@@ -58,9 +58,6 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(MessageReceiverImpl.class);
 
-  /** The OSGi service PID */
-  private static final String SERVICE_PID = "org.opencastproject.message.broker.impl.MessageReceiverImpl";
-
   @Activate
   public void activate(BundleContext bc) throws Exception {
     super.activate(bc);
@@ -143,7 +140,7 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
     while (true) {
       // Wait for a message
       Message message = waitForMessage(destinationId, type);
-      if (message != null && message instanceof ObjectMessage) {
+      if (message instanceof ObjectMessage) {
         ObjectMessage objectMessage = (ObjectMessage) message;
         return objectMessage.getObject();
       }
@@ -154,13 +151,12 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
 
   @Override
   public FutureTask<Serializable> receiveSerializable(final String destinationId, final DestinationType type) {
-    FutureTask<Serializable> futureTask = new FutureTask<Serializable>(new Callable<Serializable>() {
+    return new FutureTask<Serializable>(new Callable<Serializable>() {
       @Override
       public Serializable call() throws JMSException {
         return getSerializable(destinationId, type);
       }
     });
-    return futureTask;
   }
 
 }

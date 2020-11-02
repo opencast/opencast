@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.adopter.registration.Controller"
+               immediate="true">
+    <implementation class="org.opencastproject.adopter.registration.Controller"/>
+
+    <property name="service.description" value="Adopter Statistics REST Endpoint"/>
+    <property name="opencast.service.type" value="org.opencastproject.adopter.registration.Controller"/>
+    <property name="opencast.service.path" value="/admin-ng/adopter"/>
+    <property name="opencast.service.jobproducer" value="false"/>
+
+    <service>
+        <provide interface="org.opencastproject.adopter.registration.Controller"/>
+    </service>
+
+    <reference name="registrationService"
+               interface="org.opencastproject.adopter.registration.Service"
+               bind="setRegistrationService"/>
+
+</scr:component>

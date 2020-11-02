@@ -76,7 +76,7 @@ public class WaveformServiceEndpoint extends AbstractJobProducerEndpoint {
             @RestParameter(name = "color", type = RestParameter.Type.STRING, defaultValue = "black",
                     description = "Color of waveform image.", isRequired = true)
           },
-          reponses = {
+          responses = {
             @RestResponse(description = "Waveform generation job successfully created.",
                     responseCode = HttpServletResponse.SC_OK),
             @RestResponse(description = "The given track can't be parsed.",

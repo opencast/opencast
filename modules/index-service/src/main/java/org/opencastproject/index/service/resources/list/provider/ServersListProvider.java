@@ -21,11 +21,10 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.query.ServersListQuery;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ResourceListProvider;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -142,7 +141,8 @@ public class ServersListProvider implements ResourceListProvider {
 
       switch (listName) {
         case LIST_NODE_NAME:
-          list.put(vNodeName, vNodeName);
+          if (vNodeName != null)
+            list.put(vNodeName, vNodeName);
           break;
         case LIST_HOSTNAME:
         default:

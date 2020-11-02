@@ -18,7 +18,7 @@ URL Parameters
     * Default value
         * `-`
     * Description
-    * Seeks intially automatically to a specified time
+    * Seeks initially automatically to a specified time
     * automatically plays the video from the specified time on
 * **autoplay**
     * Possible values

@@ -12,4 +12,4 @@ Select the Opencast Player
 To activate the player set in each tenant this line in the file `.../etc/org.opencastproject.organization-<tenant>.cfg`.
 
 
-    prop.player=/engage/theodul/ui/core.html?id=#{id}
+    prop.player=/paella/ui/watch.html?id=#{id}

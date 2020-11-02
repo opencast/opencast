@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>10-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
@@ -101,7 +101,7 @@
           <configuration>
             <libraries>
               <library>mvn:jakarta.activation/jakarta.activation-api/1.2.1;type:=endorsed;export:=true</library>
-              <libaray>mvn:jakarta.xml.bind/jakarta.xml.bind-api/2.3.2;type:=endorsed;export:=true</libaray>
+              <libaray>mvn:jakarta.xml.bind/jakarta.xml.bind-api/2.3.3;type:=endorsed;export:=true</libaray>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-2.2/2.8.0;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/2.8.0;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/2.8.0;type:=endorsed;export:=true</library>
@@ -115,6 +115,7 @@
               <feature>opencast-security-cas</feature>
               <feature>opencast-moodle</feature>
               <feature>opencast-sakai</feature>
+              <feature>opencast-canvas</feature>
             </installedFeatures>
           </configuration>
         </plugin>
@@ -151,8 +152,6 @@
                   <!-- Special configuration for development -->
                   <replaceregexp file="target/classes/package.xml" match="tar\.gz" replace="dir" byline="true"/>
                   <replaceregexp file="target/classes/package.xml" match="baseDirectory&gt;.*&lt;/baseDirectory&gt;" replace="includeBaseDirectory&gt;false&lt;/includeBaseDirectory&gt;" byline="true"/>
-                  <!-- To support java11+, we need at least jakarta.xml.bind-api:2.3.3. So we delete the older version to avoid conflicts. Once karaf comes with version 2.3.3+, this is no longer necessary. -->
-                  <delete file="target/assembly/lib/jdk9plus/jakarta.xml.bind-api-2.3.2.jar" quiet="true" failonerror="false"/>
                 </target>
               </configuration>
               <goals>

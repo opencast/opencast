@@ -4,17 +4,17 @@ Authentication and Authorization Infrastructure (AAI) Configuration
 This page describes how to configure Opencast to take advantage of the Authentication and Authorization
 Infrastructure (AAI).
 
-Prerequesites
+Prerequisites
 -------------
 
 This guides assumes that you know how to setup and configure a Shibboleth Service Provider, i.e. you are assumed
 to already have performed the following steps:
 
-- Registeration of your Shibboleth Service Provider at your Shibboleth Federation Service Registry
+- Registration of your Shibboleth Service Provider at your Shibboleth Federation Service Registry
 - Setup and configuration of Shibboleth on the servers you want to use it
 - Configuration of your web server
 
-In case you require help on this, contact the institution responsilbe for managing the Shibboleth Federation you
+In case you require help on this, contact the institution responsible for managing the Shibboleth Federation you
 are part of.
 
 An informative list of Shibboleth Federations can be found on:
@@ -74,7 +74,7 @@ Step 2: Spring Security Configuration
 In order to take advantage of Shibboleth authentication, you will need to uncomment the following lines found
 in `etc/security/mh_default_org.xml`:
 
-The Shibboleth header authentification filter needs to be enabled to get access to the Shibboleth information
+The Shibboleth header authentication filter needs to be enabled to get access to the Shibboleth information
 within the HTTP request headers.
 
     <!-- Shibboleth header authentication filter -->
@@ -93,7 +93,7 @@ respective name of the Shibboleth attribute you use in your Shibboleth Federatio
     <!-- # Shibboleth Support # -->
     <!-- ###################### -->
 
-    <!-- General Shibboleth header extration filter -->
+    <!-- General Shibboleth header extraction filter -->
     <bean id="shibbolethHeaderFilter"
           class="org.opencastproject.security.shibboleth.ShibbolethRequestHeaderAuthenticationFilter">
       <property name="principalRequestHeader" value="<Shibboleth attribute name>"/>
@@ -158,3 +158,26 @@ To protect HTML pages, you will need to adapt the configuration of your web serv
         require valid-user
     </LocationMatch>
 
+Dynamic login handler configuration
+-----------------------------------
+
+To configure the dynamic login for the use of attributes via SpEL in the `mh_default_org.xml` file, it is necessary to follow the same steps above. Just change the bean class to `aaiLoginHandler`,
+
+    <bean id="aaiLoginHandler" class="org.opencastproject.security.aai.DynamicLoginHandler">
+      <property name="securityService" ref="securityService" />
+      <property name="userReferenceProvider" ref="userReferenceProvider" />
+      <property name="attributeMapper" ref="attributeMapper" />
+    </bean>
+
+activate the bean attributeMapper,
+
+    <bean id="attributeMapper" class="org.opencastproject.security.aai.api.AttributeMapper">
+      <property name="useHeader" value="true" />
+      <property name="multiValueDelimiter" value=";" />
+      <property name="attributeMap" ref="attributeMap" />
+      <property name="aaiAttributes" ref="aaiAttributes" />
+    </bean>
+
+and configure the values `<util:...>`.
+
+Everything is in the commented section Dynamic AAI Loginhandler.

@@ -106,8 +106,10 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String CONCAT_OUTPUT_FRAMERATE = "concat-output-framerate";
   private static final String TRIM_ENCODING_PROFILE = "trim-encoding-profile";
   private static final String FORCE_ENCODING_PROFILE = "force-encoding-profile";
+  private static final String PREENCODE_ENCODING_PROFILE = "preencode-encoding-profile";
 
   private static final String FORCE_ENCODING = "force-encoding";
+  private static final String PREENCODE_ENCODING = "preencode-encoding";
   private static final String REQUIRED_EXTENSIONS = "required-extensions";
   private static final String ENFORCE_DIVISIBLE_BY_TWO = "enforce-divisible-by-two";
 
@@ -207,6 +209,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final boolean forceEncoding = BooleanUtils.toBoolean(getOptConfig(operation, FORCE_ENCODING).getOr("false"));
     final boolean forceDivisible = BooleanUtils.toBoolean(getOptConfig(operation, ENFORCE_DIVISIBLE_BY_TWO).getOr("false"));
     final List<String> requiredExtensions = getRequiredExtensions(operation);
+    final boolean preencodeEncoding = BooleanUtils.toBoolean(getOptConfig(operation, PREENCODE_ENCODING).getOr("false"));
+    final String preencodeEncodingProfile = getConfig(operation, PREENCODE_ENCODING_PROFILE);
 
     //
     // further checks on config options
@@ -239,21 +243,28 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     // get tracks
     final TrackSelector presenterTrackSelector = mkTrackSelector(presenterFlavor);
     final TrackSelector presentationTrackSelector = mkTrackSelector(presentationFlavor);
-    final List<Track> originalTracks = new ArrayList<Track>();
-    final List<Track> presenterTracks = new ArrayList<Track>();
-    final List<Track> presentationTracks = new ArrayList<Track>();
+    List<Track> originalTracks = new ArrayList<Track>();
     // Collecting presenter tracks
     for (Track t : presenterTrackSelector.select(mediaPackage, false)) {
       logger.info("Found partial presenter track {}", t);
       originalTracks.add(t);
-      presenterTracks.add(t);
     }
     // Collecting presentation tracks
     for (Track t : presentationTrackSelector.select(mediaPackage, false)) {
       logger.info("Found partial presentation track {}", t);
       originalTracks.add(t);
-      presentationTracks.add(t);
     }
+
+    // Optionally encode all tracks to avoid any errors later on
+    if (preencodeEncoding) {
+      final EncodingProfile preencodeProfile = composerService.getProfile(preencodeEncodingProfile);
+      if (preencodeProfile == null) {
+        throw new WorkflowOperationException("Preencode encoding profile '" + preencodeEncodingProfile + "' was not found");
+      }
+      logger.info("Starting preencoding");
+      originalTracks = preencode(preencodeProfile, originalTracks);
+    }
+
 
     // flavor_type -> job
     final Map<String, Job> jobs = new HashMap<String, Job>();
@@ -407,9 +418,14 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     queueTime += checkForTrimming(mediaPackage, trimProfile, deriveAudioFlavor(targetPresenterFlavor),
             trackDurationInSeconds, elementsToClean);
 
+    // New: Mux within presentation and presenter
+    queueTime += checkForMuxing(mediaPackage, targetPresenterFlavor, deriveAudioFlavor(targetPresenterFlavor), false, elementsToClean);
+    queueTime += checkForMuxing(mediaPackage, targetPresentationFlavor, deriveAudioFlavor(targetPresentationFlavor), false, elementsToClean);
+
     adjustAudioTrackTargetFlavor(mediaPackage, targetPresenterFlavor);
     adjustAudioTrackTargetFlavor(mediaPackage, targetPresentationFlavor);
 
+    // Mux between presentation and presenter? Why?
     queueTime += checkForMuxing(mediaPackage, targetPresenterFlavor, targetPresentationFlavor, false, elementsToClean);
 
     queueTime += checkForEncodeToStandard(mediaPackage, forceEncoding, forceProfile, requiredExtensions,
@@ -808,6 +824,36 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
   }
 
   /**
+   * Encodes a given list of <code>tracks</code> using the encoding profile <code>profile</code>
+   * and returns the encoded tracks.
+   * Makes sure to keep the tracks ID and Flavor so as to not break later operations.
+   *
+   * @return the encoded tracks
+   */
+  private List<Track> preencode(EncodingProfile profile, List<Track> tracks)
+          throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException,
+          ServiceRegistryException {
+    List<Track> encodedTracks = new ArrayList<>();
+    for (Track track : tracks) {
+      logger.info("Preencoding track {}", track.getIdentifier());
+      Job encodeJob = composerService.encode(track, profile.getIdentifier());
+      if (!waitForStatus(encodeJob).isSuccess()) {
+        throw new WorkflowOperationException("Encoding of track " + track + " failed");
+      }
+      encodeJob = serviceRegistry.getJob(encodeJob.getId());
+      Track encodedTrack = (Track) MediaPackageElementParser.getFromXml(encodeJob.getPayload());
+      if (encodedTrack == null) {
+        throw new WorkflowOperationException("Encoded track " + track + " failed to produce a track");
+      }
+      encodedTrack.setIdentifier(track.getIdentifier());
+      encodedTrack.setFlavor(track.getFlavor());
+      encodedTracks.add(encodedTrack);
+    }
+
+    return encodedTracks;
+  }
+
+  /**
    * Encode <code>track</code> using encoding profile <code>profile</code> and add the result to media package
    * <code>mp</code> under the given <code>targetFlavor</code>.
    *
@@ -1000,9 +1046,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
 
   private Attachment extractLastImageFrame(Track presentationTrack, List<MediaPackageElement> elementsToClean)
           throws EncoderException, MediaPackageException, WorkflowOperationException, NotFoundException {
-    VideoStream[] videoStreams = TrackSupport.byType(presentationTrack.getStreams(), VideoStream.class);
+    // Pass empty properties to the composer service, because the given profile requires none
     Map<String, String> properties = new HashMap<String, String>();
-    properties.put("frame", Long.toString(videoStreams[0].getFrameCount() - 1));
 
     Job extractImageJob = composerService.image(presentationTrack, IMAGE_FRAME_PROFILE, properties);
     if (!waitForStatus(extractImageJob).isSuccess())

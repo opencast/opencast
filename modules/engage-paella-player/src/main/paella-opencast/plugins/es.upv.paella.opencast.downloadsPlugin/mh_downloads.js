@@ -64,7 +64,7 @@ paella.addPlugin(function() {
         var download = false;
         if (track.tags != undefined && track.tags.tag != undefined
             && track.mimetype.indexOf('video') >= 0
-            && track.url.indexOf('rtmp://') < 0) {
+            && track.url.startsWith('http')) {
           for (var j = 0; j < track.tags.tag.length; j++) {
             if (track.tags.tag[j] === 'engage-download') {
               download = true;

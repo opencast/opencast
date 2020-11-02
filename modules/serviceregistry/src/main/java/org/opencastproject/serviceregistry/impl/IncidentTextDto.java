@@ -45,7 +45,7 @@ public class IncidentTextDto {
   @Column(name = "id")
   private String id;
 
-  @Column(name = "text")
+  @Column(name = "text", nullable = false, length = 2038)
   private String text;
 
   public String getId() {

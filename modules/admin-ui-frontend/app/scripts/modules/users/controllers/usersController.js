@@ -21,9 +21,9 @@
 'use strict';
 
 angular.module('adminNg.controllers')
-.controller('UsersCtrl', ['$scope', 'Table', 'UsersResource', 'UserResource', 'ResourcesFilterResource',
+.controller('UsersCtrl', ['$rootScope', '$scope', 'Table', 'UsersResource', 'UserResource', 'ResourcesFilterResource',
   'Notifications', 'Modal',
-  function ($scope, Table, UsersResource, UserResource, ResourcesFilterResource, Notifications, Modal) {
+  function ($rootScope, $scope, Table, UsersResource, UserResource, ResourcesFilterResource, Notifications, Modal) {
 
     $scope.table = Table;
     $scope.table.configure({
@@ -63,10 +63,16 @@ angular.module('adminNg.controllers')
       UserResource.delete({username: row.id}, function () {
         Table.fetch();
         Modal.$scope.close();
+        $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
         Notifications.add('success', 'USER_DELETED');
       }, function () {
         Notifications.add('error', 'USER_NOT_DELETED');
       });
     };
+
+    $rootScope.$on('user_changed', function() {
+      $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
+    });
+
   }
 ]);

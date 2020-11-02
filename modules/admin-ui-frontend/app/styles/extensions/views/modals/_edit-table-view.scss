@@ -36,14 +36,14 @@
             width: 100%;
             margin-bottom: 0;
 
-        &.for-header {
-            padding-top: 0;
-        }
+            &.for-header {
+                padding-top: 0;
+            }
 
-        &.for-footer {
-            padding-bottom: 0;
-            margin-bottom: -5px;
-        }
+            &.for-footer {
+                padding-bottom: 0;
+                margin-bottom: -5px;
+            }
 
             p:not(:last-child) {
                 margin-bottom: 10px;

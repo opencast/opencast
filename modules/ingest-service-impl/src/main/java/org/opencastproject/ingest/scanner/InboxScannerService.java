@@ -52,6 +52,10 @@ import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +80,17 @@ import java.util.Objects;
  *
  * @see Ingestor
  */
+@Component(
+  immediate = true,
+  service = {
+    ArtifactInstaller.class,
+    ManagedService.class
+  },
+  property = {
+    "service.pid=org.opencastproject.ingest.scanner.InboxScannerService",
+    "service.description=Inbox Scanner"
+  }
+)
 public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   /** The logger */
@@ -120,11 +135,13 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   /** OSGi callback. */
   // synchronized with updated(Dictionary)
+  @Activate
   public synchronized void activate(ComponentContext cc) {
     this.cc = cc;
   }
 
   /** OSGi callback. */
+  @Deactivate
   public void deactivate() {
     fileInstallCfg.foreach(removeFileInstallCfg);
   }
@@ -133,6 +150,9 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   @Override
   public synchronized void updated(Dictionary properties) throws ConfigurationException {
     // build scanner configuration
+    if (properties == null) {
+      return;
+    }
     final String orgId = getCfg(properties, USER_ORG);
     final String userId = getCfg(properties, USER_NAME);
     final String mediaFlavor = getCfg(properties, MEDIA_FLAVOR);
@@ -264,21 +284,25 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   // --
 
   /** OSGi callback to set the ingest service. */
+  @Reference
   public void setIngestService(IngestService ingestService) {
     this.ingestService = ingestService;
   }
 
   /** OSGi callback to set the security service. */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
   /** OSGi callback to set the user directory. */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDir = userDirectoryService;
   }
 
   /** OSGi callback to set the organization directory server. */
+  @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.orgDir = organizationDirectoryService;
   }
@@ -312,6 +336,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     return config;
   }
 
+  @Reference
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
   }

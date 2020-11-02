@@ -79,8 +79,10 @@ import javax.ws.rs.core.Response;
  * supported API.
  */
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
-@RestService(name = "externalapiservice", title = "External API Service", notes = {}, abstractText = "Provides a location for external apis to query the current server of the API.")
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
+            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
+@RestService(name = "externalapiservice", title = "External API Service", notes = {},
+             abstractText = "Provides a location for external apis to query the current server of the API.")
 public class BaseEndpoint {
 
   /** The logging facility */
@@ -121,7 +123,7 @@ public class BaseEndpoint {
 
   @GET
   @Path("")
-  @RestQuery(name = "getendpointinfo", description = "Returns key characteristics of the API such as the server name and the default version.", returnDescription = "", reponses = {
+  @RestQuery(name = "getendpointinfo", description = "Returns key characteristics of the API such as the server name and the default version.", returnDescription = "", responses = {
           @RestResponse(description = "The api information is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getEndpointInfo() {
     Organization organization = securityService.getOrganization();
@@ -140,7 +142,7 @@ public class BaseEndpoint {
 
   @GET
   @Path("info/me")
-  @RestQuery(name = "getuserinfo", description = "Returns information on the logged in user.", returnDescription = "", reponses = {
+  @RestQuery(name = "getuserinfo", description = "Returns information on the logged in user.", returnDescription = "", responses = {
           @RestResponse(description = "The user information is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getUserInfo() {
     final User user = securityService.getUser();
@@ -153,7 +155,7 @@ public class BaseEndpoint {
 
   @GET
   @Path("info/me/roles")
-  @RestQuery(name = "getuserroles", description = "Returns current user's roles.", returnDescription = "", reponses = {
+  @RestQuery(name = "getuserroles", description = "Returns current user's roles.", returnDescription = "", responses = {
           @RestResponse(description = "The set of roles is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getUserRoles() {
     final User user = securityService.getUser();
@@ -168,7 +170,7 @@ public class BaseEndpoint {
 
   @GET
   @Path("info/organization")
-  @RestQuery(name = "getorganizationinfo", description = "Returns the current organization.", returnDescription = "", reponses = {
+  @RestQuery(name = "getorganizationinfo", description = "Returns the current organization.", returnDescription = "", responses = {
           @RestResponse(description = "The organization details are returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getOrganizationInfo() {
     final Organization org = securityService.getOrganization();
@@ -181,7 +183,7 @@ public class BaseEndpoint {
 
   @GET
   @Path("info/organization/properties")
-  @RestQuery(name = "getorganizationproperties", description = "Returns the current organization's properties.", returnDescription = "", reponses = {
+  @RestQuery(name = "getorganizationproperties", description = "Returns the current organization's properties.", returnDescription = "", responses = {
           @RestResponse(description = "The organization properties are returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getOrganizationProperties() {
     final Organization org = securityService.getOrganization();
@@ -195,8 +197,29 @@ public class BaseEndpoint {
   }
 
   @GET
+  @Path("info/organization/properties/engageuiurl")
+  @RestQuery(name = "getorganizationpropertiesengageuiurl", description = "Returns the engage ui url property.", returnDescription = "", responses = {
+          @RestResponse(description = "The engage ui url is returned.", responseCode = HttpServletResponse.SC_OK) })
+  public Response getOrganizationPropertiesEngageUiUrl() {
+    final Organization org = securityService.getOrganization();
+
+    List<Field> props = new ArrayList<>();
+    for (Entry<String, String> prop : org.getProperties().entrySet()) {
+      if (prop.getKey().equals("org.opencastproject.engage.ui.url")) {
+        props.add(f(prop.getKey(), v(prop.getValue(), Jsons.BLANK)));
+        break;
+      }
+    }
+    if (props.size() == 0) {
+      props.add(f("org.opencastproject.engage.ui.url", v(UrlSupport.DEFAULT_BASE_URL, Jsons.BLANK)));
+    }
+
+    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(obj(props)));
+  }
+
+  @GET
   @Path("version")
-  @RestQuery(name = "getversion", description = "Returns a list of available version as well as the default version.", returnDescription = "", reponses = {
+  @RestQuery(name = "getversion", description = "Returns a list of available version as well as the default version.", returnDescription = "", responses = {
           @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getVersion() throws Exception {
     List<JValue> versions = new ArrayList<>();
@@ -205,13 +228,14 @@ public class BaseEndpoint {
     versions.add(v(ApiVersion.VERSION_1_2_0.toString()));
     versions.add(v(ApiVersion.VERSION_1_3_0.toString()));
     versions.add(v(ApiVersion.VERSION_1_4_0.toString()));
+    versions.add(v(ApiVersion.VERSION_1_5_0.toString()));
     JValue json = obj(f("versions", arr(versions)), f("default", v(ApiVersion.CURRENT_VERSION.toString())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
   }
 
   @GET
   @Path("version/default")
-  @RestQuery(name = "getversiondefault", description = "Returns the default version.", returnDescription = "", reponses = {
+  @RestQuery(name = "getversiondefault", description = "Returns the default version.", returnDescription = "", responses = {
           @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getVersionDefault() throws Exception {
     JValue json = obj(f("default", v(ApiVersion.CURRENT_VERSION.toString())));
@@ -221,7 +245,7 @@ public class BaseEndpoint {
   @POST
   @Path("clearIndex")
   @RestQuery(name = "clearIndex", description = "Clear the External index",
-          returnDescription = "OK if index is cleared", reponses = {
+          returnDescription = "OK if index is cleared", responses = {
           @RestResponse(description = "Index is cleared", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Unable to clear index", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) })
   public Response clearIndex() {
@@ -248,7 +272,7 @@ public class BaseEndpoint {
                   + "The available services are: Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager and Comments. "
                   + "The service order (see above) is very important! Make sure, you do not run index rebuild for more than one "
                   + "service at a time!",
-                  type = RestParameter.Type.STRING) }, reponses = {
+                  type = RestParameter.Type.STRING) }, responses = {
           @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
   public Response recreateIndexFromService(@PathParam("service") final String service) {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
@@ -272,7 +296,7 @@ public class BaseEndpoint {
 
   @POST
   @Path("recreateIndex")
-  @RestQuery(name = "recreateIndex", description = "Repopulates the External Index directly from the Services", returnDescription = "OK if repopulation has started", reponses = {
+  @RestQuery(name = "recreateIndex", description = "Repopulates the External Index directly from the Services", returnDescription = "OK if repopulation has started", responses = {
           @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
   public Response recreateIndex() {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),

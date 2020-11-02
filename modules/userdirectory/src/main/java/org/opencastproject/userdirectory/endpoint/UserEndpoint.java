@@ -150,7 +150,7 @@ public class UserEndpoint {
         description = "The page number.",
         isRequired = false,
         type = RestParameter.Type.STRING)
-    }, reponses = {
+    }, responses = {
       @RestResponse(
         responseCode = SC_OK,
         description = "The user accounts.")
@@ -183,7 +183,7 @@ public class UserEndpoint {
         description = "The username.",
         isRequired = true,
         type = STRING)
-    }, reponses = {
+    }, responses = {
       @RestResponse(
         responseCode = SC_OK,
         description = "The user account."),
@@ -207,7 +207,7 @@ public class UserEndpoint {
       name = "users-with-insecure-hashing",
       description = "Returns a list of users which passwords are stored using MD5 hashes",
       returnDescription = "Returns a JSON representation of the list of matching user accounts",
-      reponses = {
+      responses = {
       @RestResponse(
           responseCode = SC_OK,
           description = "The user accounts.")
@@ -252,7 +252,7 @@ public class UserEndpoint {
         description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]",
         isRequired = false,
         type = STRING)
-    }, reponses = {
+    }, responses = {
       @RestResponse(
         responseCode = SC_BAD_REQUEST,
         description = "Malformed request syntax."),
@@ -327,7 +327,7 @@ public class UserEndpoint {
       description = "The username",
       isRequired = true,
       type = STRING),
-    reponses = {
+    responses = {
       @RestResponse(
         responseCode = SC_BAD_REQUEST,
         description = "Malformed request syntax."),
@@ -376,7 +376,7 @@ public class UserEndpoint {
       type = STRING,
       isRequired = true,
       description = "The username"),
-    reponses = {
+    responses = {
       @RestResponse(
         responseCode = SC_OK,
         description = "User has been deleted."),

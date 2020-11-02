@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.workflow.handler.videogrid.VideoGridWorkflowOperationHandler"
+               immediate="true">
+  <implementation class="org.opencastproject.workflow.handler.videogrid.VideoGridWorkflowOperationHandler"/>
+  <property name="service.description" value="Video Grid Workflow Operation Handler"/>
+  <property name="workflow.operation" value="videogrid"/>
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
+  </service>
+  <reference name="Workspace" interface="org.opencastproject.workspace.api.Workspace"
+             bind="setWorkspace"/>
+  <reference name="VideoGridService" interface="org.opencastproject.videogrid.api.VideoGridService"
+             bind="setVideoGridService"/>
+  <reference name="ServiceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             bind="setServiceRegistry"/>
+  <reference name="MediaInspectionService" interface="org.opencastproject.inspection.api.MediaInspectionService"
+             bind="setMediaInspectionService"/>
+  <reference name="ComposerService" interface="org.opencastproject.composer.api.ComposerService"
+             bind="setComposerService"/>
+</scr:component>

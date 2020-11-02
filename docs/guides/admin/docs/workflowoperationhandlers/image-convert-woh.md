@@ -11,9 +11,9 @@ This operation expects an attachment as input and creates one attachment as outp
 
 |configuration keys|example|description|default value|
 |------------------|-------|-----------|-------------|
-|source-tags*|preview+player,preview+search|A comma separated lsit of source image(s) tags.|EMPTY|
+|source-tags*|preview+player,preview+search|A comma separated list of source image(s) tags.|EMPTY|
 |source-flavors*|*/image|A comma separated list of source image(s) flavors.|EMPTY|
-|tags-and-flavors|false|An boolean value wether to select elements with tags and flavors (then set this option to true) or either tags or flavors (then set this option to false).|false|
+|tags-and-flavors|false|An boolean value whether to select elements with tags and flavors (then set this option to true) or either tags or flavors (then set this option to false).|false|
 |target-tags|+preview-converted,-preview+player|Apply these (comma separated) tags to the output attachments. If a target-tag starts with a '-', it will be removed from preexisting tags, if a target-tag starts with a '+', it will be added to preexisting tags. If there is no prefix, all preexisting tags are removed and replaced by the target-tags.|EMPTY|
 |target-flavor*|*/image+converted|Apply these flavor to the output attachments.|EMPTY|
 |encoding-profiles*|jpeg-player,jpeg-search|A comma separated list of encoding profiles to be applied to each input image.|EMPTY|

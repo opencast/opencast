@@ -125,7 +125,7 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("analyze")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "analyze", description = "Starts an audio analyzing process", restParameters = { @RestParameter(description = "The track just containing the audio stream", isRequired = true, name = "sourceAudioTrack", type = Type.TEXT) }, reponses = {
+  @RestQuery(name = "analyze", description = "Starts an audio analyzing process", restParameters = { @RestParameter(description = "The track just containing the audio stream", isRequired = true, name = "sourceAudioTrack", type = Type.TEXT) }, responses = {
           @RestResponse(description = "Results in an xml document containing the job for the analyzing task", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "If required parameters aren't set or if sourceAudioTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response analyze(@FormParam("sourceAudioTrack") String sourceAudioTrackAsXml) throws Exception {
@@ -164,7 +164,7 @@ public class SoxRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "normalize", description = "Starts audio normalization process", restParameters = {
           @RestParameter(description = "The track containing the audio stream", isRequired = true, name = "sourceAudioTrack", type = Type.TEXT),
-          @RestParameter(description = "The target RMS level dB", isRequired = true, name = "targetRmsLevDb", type = Type.INTEGER) }, reponses = {
+          @RestParameter(description = "The target RMS level dB", isRequired = true, name = "targetRmsLevDb", type = Type.INTEGER) }, responses = {
           @RestResponse(description = "Results in an xml document containing the job for the audio normalization task", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "If required parameters aren't set or if sourceAudioTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response normalize(@FormParam("sourceAudioTrack") String sourceAudioTrackAsXml,

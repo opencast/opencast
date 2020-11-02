@@ -522,6 +522,15 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     return UserDirectoryPersistenceUtil.countUsers(orgId, emf);
   }
 
+  /**
+   * Returns the number of all users in the database
+   *
+   * @return the count of all users in the database
+   */
+  public long countAllUsers() {
+    return UserDirectoryPersistenceUtil.countUsers(emf);
+  }
+
   @Override
   public void invalidate(String userName) {
     String orgId = securityService.getOrganization().getId();

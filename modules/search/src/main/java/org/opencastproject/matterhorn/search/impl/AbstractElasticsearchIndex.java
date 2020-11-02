@@ -56,8 +56,11 @@ import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.rest.RestStatus;
+import org.elasticsearch.script.Script;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.ScriptSortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.ComponentException;
@@ -432,12 +435,29 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     // Sort orders
     final Map<String, Order> sortCriteria = query.getSortOrders();
     for (Entry<String, Order> sortCriterion : sortCriteria.entrySet()) {
+      ScriptSortBuilder sortBuilder = null;
+      logger.debug("Event sort criteria: {}", sortCriterion.getKey());
+      if ("publication".equals(sortCriterion.getKey())) {
+        sortBuilder = SortBuilders.scriptSort(
+            new Script("params._source.publication.length"),
+            ScriptSortBuilder.ScriptSortType.NUMBER);
+      }
       switch (sortCriterion.getValue()) {
         case Ascending:
-          searchSource.sort(sortCriterion.getKey(), SortOrder.ASC);
+          if (sortBuilder != null) {
+            sortBuilder.order(SortOrder.ASC);
+            searchSource.sort(sortBuilder);
+          } else {
+            searchSource.sort(sortCriterion.getKey(), SortOrder.ASC);
+          }
           break;
         case Descending:
-          searchSource.sort(sortCriterion.getKey(), SortOrder.DESC);
+          if (sortBuilder != null) {
+            sortBuilder.order(SortOrder.DESC);
+            searchSource.sort(sortBuilder);
+          } else {
+            searchSource.sort(sortCriterion.getKey(), SortOrder.DESC);
+          }
           break;
         default:
           break;

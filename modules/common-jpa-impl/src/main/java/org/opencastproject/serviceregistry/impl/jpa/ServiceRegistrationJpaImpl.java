@@ -35,8 +35,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -52,8 +52,13 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity(name = "ServiceRegistration")
 @Access(AccessType.FIELD)
-@Table(name = "oc_service_registration", uniqueConstraints = @UniqueConstraint(columnNames = { "host_registration",
-        "service_type" }))
+@Table(name = "oc_service_registration", indexes = {
+    @Index(name = "IX_oc_service_registration_service_type", columnList = ("service_type")),
+    @Index(name = "IX_oc_service_registration_service_state", columnList = ("service_state")),
+    @Index(name = "IX_oc_service_registration_active", columnList = ("active")),
+    @Index(name = "IX_oc_service_registration_host_registration", columnList = ("host_registration"))
+  }, uniqueConstraints =
+    @UniqueConstraint(name = "UNQ_oc_service_registration", columnNames = { "host_registration", "service_type" }))
 @NamedQueries({
         @NamedQuery(name = "ServiceRegistration.statistics", query = "SELECT job.processorServiceRegistration.id as serviceRegistration, job.status, "
                 + "count(job.status) as numJobs, "
@@ -78,9 +83,7 @@ import javax.persistence.UniqueConstraint;
         @NamedQuery(name = "ServiceRegistration.relatedservices.warning_error", query = "SELECT rh FROM ServiceRegistration rh "
                 + "WHERE rh.serviceType = :serviceType AND (rh.serviceState = 1 OR rh.serviceState = 2)"),
         @NamedQuery(name = "ServiceRegistration.relatedservices.warning", query = "SELECT rh FROM ServiceRegistration rh "
-                + "WHERE rh.serviceType = :serviceType AND rh.serviceState = 1"),
-        @NamedQuery(name = "ServiceRegistration.countNotNormal", query = "SELECT count(rh) FROM ServiceRegistration rh "
-                + "WHERE rh.serviceState <> 0 AND rh.hostRegistration.active = true") })
+                + "WHERE rh.serviceType = :serviceType AND rh.serviceState = 1") })
 public class ServiceRegistrationJpaImpl implements ServiceRegistration {
 
   /** The logger */
@@ -102,11 +105,10 @@ public class ServiceRegistrationJpaImpl implements ServiceRegistration {
   @JoinColumn(name = "host_registration")
   private HostRegistrationJpaImpl hostRegistration;
 
-  @Lob
   @Column(name = "path", nullable = false, length = 255)
   private String path;
 
-  @Column(name = "service_state")
+  @Column(name = "service_state", nullable = false)
   private int serviceState = ServiceState.NORMAL.ordinal();
 
   @Column(name = "state_changed")

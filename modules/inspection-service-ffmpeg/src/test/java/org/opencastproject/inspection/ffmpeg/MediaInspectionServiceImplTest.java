@@ -215,4 +215,21 @@ public class MediaInspectionServiceImplTest {
       assertNull(newTrack.getDuration());
     }
   }
+
+  @Test
+  public void testHLSContainer() throws Exception {
+    final URI trackUri = getResource("/master.m3u8");
+    for (MediaInspector mi : init(trackUri)) {
+      Track track = mi.inspectTrack(trackUri, Options.NO_OPTION);
+      // test the returned values
+      Checksum cs = Checksum.create(ChecksumType.fromString("md5"), "66ed40c8ea9c8419f47a254668540d77");
+      assertEquals(cs, track.getChecksum());
+      assertEquals("application", track.getMimeType().getType());
+      assertEquals("x-mpegURL", track.getMimeType().getSubtype());
+      assertNotNull(track.getDuration());
+      assertTrue(track.getDuration() > 0);
+      // make changes to metadata
+    }
+  }
+
 }

@@ -29,24 +29,24 @@ public class ApiMediaTypeTest {
   @Test
   public void testDefaultVersionAndFormat() throws Exception {
     ApiMediaType type = ApiMediaType.parse("*/*");
-    assertEquals(ApiVersion.VERSION_1_4_0, type.getVersion());
+    assertEquals(ApiVersion.VERSION_1_5_0, type.getVersion());
     assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.4.0+json", type.toExternalForm());
+    assertEquals("application/v1.5.0+json", type.toExternalForm());
 
     type = ApiMediaType.parse("application/*");
-    assertEquals(ApiVersion.VERSION_1_4_0, type.getVersion());
+    assertEquals(ApiVersion.VERSION_1_5_0, type.getVersion());
     assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.4.0+json", type.toExternalForm());
+    assertEquals("application/v1.5.0+json", type.toExternalForm());
 
     type = ApiMediaType.parse("application/json");
-    assertEquals(ApiVersion.VERSION_1_4_0, type.getVersion());
+    assertEquals(ApiVersion.VERSION_1_5_0, type.getVersion());
     assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.4.0+json", type.toExternalForm());
+    assertEquals("application/v1.5.0+json", type.toExternalForm());
 
     type = ApiMediaType.parse(null);
-    assertEquals(ApiVersion.VERSION_1_4_0, type.getVersion());
+    assertEquals(ApiVersion.VERSION_1_5_0, type.getVersion());
     assertEquals(ApiFormat.JSON, type.getFormat());
-    assertEquals("application/v1.4.0+json", type.toExternalForm());
+    assertEquals("application/v1.5.0+json", type.toExternalForm());
   }
 
   @Test
@@ -75,6 +75,11 @@ public class ApiMediaTypeTest {
     assertEquals(ApiVersion.VERSION_1_4_0, type.getVersion());
     assertEquals(ApiFormat.JSON, type.getFormat());
     assertEquals("application/v1.4.0+json", type.toExternalForm());
+
+    type = ApiMediaType.parse("application/v1.5.0+json");
+    assertEquals(ApiVersion.VERSION_1_5_0, type.getVersion());
+    assertEquals(ApiFormat.JSON, type.getFormat());
+    assertEquals("application/v1.5.0+json", type.toExternalForm());
   }
 
   @Test(expected = ApiMediaTypeException.class)

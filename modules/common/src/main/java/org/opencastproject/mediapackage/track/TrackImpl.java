@@ -80,6 +80,12 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   @XmlElement(name = "live")
   protected boolean live;
 
+  @XmlElement(name = "master", required = false)
+  protected Boolean master = null;
+
+  @XmlElement(name = "logicalname", required = false) // used to maintain referential integrity for playlists
+  protected String logicalname = null;
+
   /** Needed by JAXB */
   public TrackImpl() {
     this.elementType = Track.TYPE;
@@ -212,6 +218,24 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   }
 
   /**
+   *  @return true if it is a master adaptive playlist/manifest
+   */
+  @Override
+  public Boolean isMaster() {
+    return hasMaster() && master;
+  }
+
+  @Override
+  public void setMaster(Boolean master) {
+    this.master = master;
+  }
+
+  @Override
+  public boolean hasMaster() {
+    return master != null;
+  }
+
+  /**
    * @see org.opencastproject.mediapackage.AbstractMediaPackageElement#toManifest(org.w3c.dom.Document,
    *      MediaPackageSerializer)
    */
@@ -229,6 +253,19 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
     Node liveNode = document.createElement("live");
     liveNode.appendChild(document.createTextNode(Boolean.toString(live)));
     node.appendChild(liveNode);
+
+    if (hasMaster()) { // optional - if it is a master adaptive playlist/manifest
+      Node masterNode = document.createElement("master");
+      masterNode.appendChild(document.createTextNode(Boolean.toString(isMaster())));
+      node.appendChild(masterNode);
+    }
+
+    if (logicalname != null && !logicalname.isEmpty()) { // optional
+      Node nameNode = document.createElement("logicalname");
+      liveNode.appendChild(document.createTextNode(logicalname));
+      node.appendChild(nameNode);
+    }
+
 
     for (Stream s : audio)
       node.appendChild(s.toManifest(document, serializer));
@@ -308,6 +345,18 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
     else if (uri.getScheme().toLowerCase().startsWith("rtp")) return StreamingProtocol.RTP;
     else if (uri.getScheme().toLowerCase().startsWith("rtsp")) return StreamingProtocol.RTSP;
     return StreamingProtocol.UNKNOWN;
+  }
+
+  @Override
+  public String getLogicalName() {
+    if (logicalname == null) // default to it's own path
+      return uri.getPath();
+    return logicalname;
+  }
+
+  @Override
+  public void setLogicalName(String name) {
+    logicalname = name;
   }
 
 }

@@ -86,7 +86,7 @@ public class TextAnalysisRestEndpoint extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path("")
-  @RestQuery(name = "analyze", description = "Submit a track for analysis.", restParameters = { @RestParameter(description = "The image to analyze for text.", isRequired = true, name = "image", type = RestParameter.Type.FILE) }, reponses = {
+  @RestQuery(name = "analyze", description = "Submit a track for analysis.", restParameters = { @RestParameter(description = "The image to analyze for text.", isRequired = true, name = "image", type = RestParameter.Type.FILE) }, responses = {
           @RestResponse(description = "OK, The receipt to use when polling for the resulting mpeg7 catalog.", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The argument cannot be parsed into a media package element.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "The service is unavailable at the moment.", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "The receipt to use when polling for the resulting mpeg7 catalog.")

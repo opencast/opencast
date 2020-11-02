@@ -68,7 +68,7 @@ public class EngagePluginManagerRestService {
             pathParameters = {
                 @RestParameter(description = "The output format (json or xml) of the response body.", isRequired = true, name = "format", type = RestParameter.Type.STRING)
             },
-            reponses = {
+            responses = {
                 @RestResponse(description = "the list of plugins was successfully retrieved.", responseCode = HttpServletResponse.SC_OK),
                 @RestResponse(description = "something went wrong.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
             }, returnDescription = "The list of all registered plugins.")

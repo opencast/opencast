@@ -1,11 +1,12 @@
 Enable HTTPS directly in Opencast
 =================================
 
-In `opencast/etc/`, use the `org.ops4j.pax.web.cfg` file for
-configuration:
+Edit `etc/org.ops4j.pax.web.cfg` and set:
 
 ```
-# ...
+# This property specifies the comma separated list of addresses used by Opencast to listen to (e.g. localhost or
+# localhost,10.0.0.1). Host names or IP addresses can be used. Pax Web default value is "0.0.0.0".
+org.ops4j.pax.web.listening.addresses=0.0.0.0
 
 # Whether Opencast itself should handle HTTPS traffic.
 # Even if you set this to 'false',you can still use an HTTP proxy to handle SSL.

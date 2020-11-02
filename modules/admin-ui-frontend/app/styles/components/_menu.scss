@@ -61,8 +61,15 @@
             position: relative;
             line-height: 50px;
             @include transition(all .2s);
-            color: #c9c9c9;
+            color: #c6c6c6;
         }
+
+        &:hover > i,
+        &:active > i {
+            color: #818181;
+            @include fa-icon-color(before, "#818181");
+        }
+
 
         @keyframes fadeIn {
             0% {
@@ -77,62 +84,27 @@
         }
 
         .events {
-            @include build-icon(auto, auto, events, 27px, 27px);
+            @include fa-icon($fa-var-calendar-check-o, before, block, -3px 0 0 0, 0, inherit, 29px, normal, inherit);
         }
-
-        &:hover > .events,
-        &:active > .events {
-             @include build-icon(auto, auto, events-on, 27px, 27px);
-        }
-
 
         .systems {
-            @include build-icon(auto, auto, servers, 29px, 20px);
-        }
-
-        &:hover > .systems,
-        &:active > .systems {
-             @include build-icon(auto, auto, servers-on, 29px, 20px);
+            @include fa-icon($fa-var-server, before, block, -3px 0 0 0, 0, inherit, 29px, normal, inherit);
         }
 
         .recordings {
-            @include build-icon(auto, auto, recordings, 29px, 18px);
-        }
-
-        &:hover > .recordings,
-        &:active > .recordings {
-             @include build-icon(auto, auto, recordings-on, 29px, 18px);
+            @include fa-icon($fa-var-video-camera, before, block, -3px 0 0 0, 0, inherit, 29px, normal, inherit);
         }
 
         .users {
-            @include build-icon(auto, auto, user-group, 27px, 24px);
-        }
-
-        &:hover > .users,
-        &:active > .users {
-             @include build-icon(auto, auto, user-group-on, 27px, 24px);
+            @include fa-icon($fa-var-user, before, block, -3px 0 0 0, 0, inherit, 29px, normal, inherit);
         }
 
         .statistics {
-            @include build-icon(auto, auto, activity, 27px, 24px);
-        }
-
-        .integrations {
-            @include build-icon(auto, auto, integrations, 33px, 20px);
-        }
-
-        &:hover > .integrations,
-        &:active > .integrations {
-             @include build-icon(auto, auto, integrations-on, 33px, 20px);
+            @include fa-icon($fa-var-signal, before, block, -3px 0 0 0, 0, inherit, 29px, normal, inherit);
         }
 
         .configuration {
-            @include build-icon(auto, auto, configuration, 27px, 27px);
-        }
-
-        &:hover > .configuration,
-        &:active > .configuration {
-             @include build-icon(auto, auto, configuration-on, 27px, 27px);
+            @include fa-icon($fa-var-cogs, before, block, -3px 0 0 0, 0, inherit, 29px, normal, inherit);
         }
     }
 }

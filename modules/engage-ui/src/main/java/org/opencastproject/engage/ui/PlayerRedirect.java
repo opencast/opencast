@@ -31,6 +31,8 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,14 +53,23 @@ import javax.ws.rs.core.Response;
   title = "Configurable Player Endpoint",
   abstractText = "This service redirects to configured players.",
   notes = {})
+@Component(
+  immediate = true,
+  service = PlayerRedirect.class,
+  property = {
+    "service.description=Configurable Player Endpoint",
+    "opencast.service.type=org.opencastproject.engage.ui.player.redirect",
+    "opencast.service.path=/play"
+  })
 public class PlayerRedirect {
 
   private static final Logger logger = LoggerFactory.getLogger(PlayerRedirect.class);
 
-  private static final String PLAYER_DEFAULT = "/engage/theodul/ui/core.html?id=#{id}";
+  private static final String PLAYER_DEFAULT = "/paella/ui/watch.html?id=#{id}";
 
   private SecurityService securityService;
 
+  @Reference
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -68,7 +79,7 @@ public class PlayerRedirect {
   @RestQuery(name = "redirect", description = "Player redirect",
           pathParameters = {
             @RestParameter(name = "id", description = "The event identifier", isRequired = true, type = STRING)
-          }, reponses = {
+          }, responses = {
             @RestResponse(description = "Returns the paella configuration", responseCode = SC_TEMPORARY_REDIRECT)
           }, returnDescription = "")
   public Response redirect(@PathParam("id") String id) {

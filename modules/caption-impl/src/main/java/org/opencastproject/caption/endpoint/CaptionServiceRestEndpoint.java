@@ -140,7 +140,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
           @RestParameter(description = "Captions to be converted.", isRequired = true, name = "captions", type = RestParameter.Type.TEXT),
           @RestParameter(description = "Caption input format (for example: dfxp, subrip,...).", isRequired = false, defaultValue = "dfxp", name = "input", type = RestParameter.Type.STRING),
           @RestParameter(description = "Caption output format (for example: dfxp, subrip,...).", isRequired = false, defaultValue = "subrip", name = "output", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Caption language (for those formats that store such information).", isRequired = false, defaultValue = "en", name = "language", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "OK, Conversion successfully completed.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The converted captions file")
+          @RestParameter(description = "Caption language (for those formats that store such information).", isRequired = false, defaultValue = "en", name = "language", type = RestParameter.Type.STRING) }, responses = { @RestResponse(description = "OK, Conversion successfully completed.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The converted captions file")
   public Response convert(@FormParam("input") String inputType, @FormParam("output") String outputType,
           @FormParam("captions") String catalogAsXml, @FormParam("language") String lang) {
     MediaPackageElement element;
@@ -181,7 +181,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "languages", description = "Get information about languages in caption catalog (if such information is available).", restParameters = {
           @RestParameter(description = "Captions to be examined.", isRequired = true, name = "captions", type = RestParameter.Type.TEXT),
-          @RestParameter(description = "Caption input format (for example: dfxp, subrip,...).", isRequired = false, defaultValue = "dfxp", name = "input", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(description = "OK, information was extracted and retrieved", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "Returned information about languages present in captions.")
+          @RestParameter(description = "Caption input format (for example: dfxp, subrip,...).", isRequired = false, defaultValue = "dfxp", name = "input", type = RestParameter.Type.STRING) }, responses = { @RestResponse(description = "OK, information was extracted and retrieved", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "Returned information about languages present in captions.")
   public Response languages(@FormParam("input") String inputType, @FormParam("captions") String catalogAsXml) {
     try {
       MediaPackageElement element = MediaPackageElementParser.getFromXml(catalogAsXml);

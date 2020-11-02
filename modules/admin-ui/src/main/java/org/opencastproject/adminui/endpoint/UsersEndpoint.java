@@ -177,7 +177,7 @@ public class UsersEndpoint {
           @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the following: STATUS, NAME OR LAST_UPDATED.  Add '_DESC' to reverse the sort order (e.g. STATUS_DESC).", type = STRING),
           @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
   public Response getUsers(@QueryParam("filter") String filter, @QueryParam("sort") String sort,
           @QueryParam("limit") int limit, @QueryParam("offset") int offset) throws IOException {
     if (limit < 1)
@@ -291,7 +291,7 @@ public class UsersEndpoint {
           @RestParameter(description = "The password.", isRequired = true, name = "password", type = STRING),
           @RestParameter(description = "The name.", isRequired = false, name = "name", type = STRING),
           @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
-          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, reponses = {
+          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, responses = {
           @RestResponse(responseCode = SC_CREATED, description = "User has been created."),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a user with a admin role."),
           @RestResponse(responseCode = SC_CONFLICT, description = "An user with this username already exist.")})
@@ -336,7 +336,7 @@ public class UsersEndpoint {
 
   @GET
   @Path("{username}.json")
-  @RestQuery(name = "getUser", description = "Get an user", returnDescription = "Status ok", pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
+  @RestQuery(name = "getUser", description = "Get an user", returnDescription = "Status ok", pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), responses = {
           @RestResponse(responseCode = SC_OK, description = "User has been found."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
   public Response getUser(@PathParam("username") String username) {
@@ -355,7 +355,7 @@ public class UsersEndpoint {
           @RestParameter(description = "The password.", isRequired = false, name = "password", type = STRING),
           @RestParameter(description = "The name.", isRequired = false, name = "name", type = STRING),
           @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
-          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
+          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), responses = {
           @RestResponse(responseCode = SC_OK, description = "User has been updated."),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to update a user with admin role."),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid data provided.")})
@@ -398,7 +398,7 @@ public class UsersEndpoint {
 
   @DELETE
   @Path("{username}.json")
-  @RestQuery(name = "deleteUser", description = "Deleter a new  user", returnDescription = "Status ok", pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
+  @RestQuery(name = "deleteUser", description = "Deleter a new  user", returnDescription = "Status ok", pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), responses = {
           @RestResponse(responseCode = SC_OK, description = "User has been deleted."),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to delete a user with admin role."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })

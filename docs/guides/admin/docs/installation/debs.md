@@ -20,15 +20,22 @@ Watch for announcements on list or just check which versions are available in th
 Currently Supported
 -------------------
 
-* Debian 8/9 amd64
-* Ubuntu 16.04 amd64
+* Debian 9 and newer amd64
+* Ubuntu 18.04 amd64
 
 
-**Debian 8 requires a manual OpenJDK install**
+OpenJDK 8 on Debian 10
+----------------------
 
-* Add jessie-backports to your sources, replacing the mirror URL with your local mirror:
+**Debian 10 and newer requires a manual OpenJDK install**
 
-        echo "deb http://[YOUR_MIRROR]/debian jessie-backports main" | sudo tee /etc/apt/sources.list.d/jessie-backports.list
+* Add Debian unstable to your sources, replacing the mirror URL with your local mirror:
+
+        echo "deb http://[YOUR_MIRROR]/debian unstable main" | sudo tee /etc/apt/sources.list.d/debian-unstable.list
+
+* Ensure you don't accidentally upgrade your entire Debian install to unstable
+
+        echo "APT::Default-Release \"`dpkg --status tzdata|grep Provides|cut -f2 -d'-'`\";" | sudo tee /etc/apt/apt.conf.d/99defaultrelease
 
 * Update your package listing
 
@@ -36,7 +43,7 @@ Currently Supported
 
 * Install OpenJDK 8 from the backports
 
-        apt-get install -t jessie-backports openjdk-8-jre
+        apt-get install -t unstable openjdk-8-jre
 
 > *Other architectures like i386, i686, arm, … are not supported!*
 
@@ -48,7 +55,7 @@ First you have to install the necessary repositories so that your package manage
 
 * Ensure https repositories are supported:
 
-        apt-get install apt-transport-https ca-certificates sudo
+        apt-get install apt-transport-https ca-certificates sudo wget gnupg2
 
 * Add Opencast repository:
 
@@ -78,7 +85,7 @@ The Apache ActiveMQ message broker is required by Opencast since version 2.0. It
 installed on the same machine as Opencast but would commonly for an all-in-one system. ActiveMQ is available from the
 the normal software repositories for your distribution:
 
-        apt-get install activemq-dist
+    apt-get install activemq-dist
 
 
 A prepared configuration file for ActiveMQ can be found at `/usr/share/opencast/docs/scripts/activemq/activemq.xml`
@@ -109,7 +116,7 @@ For a basic installation (All-In-One) just run:
     apt-get install opencast-3-allinone
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.  Note
-that while the repository provides a packaged version of ffmpeg, your distribution may have a version which is
+that while the repository provides a packaged version of FFmpeg, your distribution may have a version which is
 pre-installed or otherwise takes precedence.  This version may work, however Opencast only formally supports the
 version(s) in the repository.
 
@@ -147,6 +154,10 @@ Some available distributions are:
 so opencast-3-admin will install the admin profile for Opencast 3.x (currently 3.3). Once Opencast 3.4 has been packaged
 and made available your system will automatically update to Opencast 3.4 using the standard `apt-get` tools.
 
+To list all available packages and versions, use:
+
+    apt list 'opencast*'
+
 
 Point Revisions (Experts only)
 ------------------------------
@@ -154,10 +165,10 @@ Point Revisions (Experts only)
 If for some reason you wish to install a specific point revision of Opencast, and the repository still hosts that point
 revision, you can select it by adding it, and the packaging build, to your `apt-get install` line.  For example:
 
-        apt-get install opencast-3-admin=3.2-2
+    apt-get install opencast-3-admin=3.2-2
 
 Installs an Opencast 3.2 admin node, using the second build of that series.  Not all series have more than a single build,
-and older point revisions may be removed once superceded, so please explore the repository prior to attempting this.
+and older point revisions may be removed once superseded, so please explore the repository prior to attempting this.
 
 
 Install 3rd-party-tools

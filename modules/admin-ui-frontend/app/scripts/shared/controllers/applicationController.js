@@ -24,8 +24,11 @@
 angular.module('adminNg.controllers')
 .controller('ApplicationCtrl', ['$scope', '$rootScope', '$location', '$window', 'AuthService', 'Notifications',
   'ResourceModal', 'VersionResource', 'HotkeysService', '$interval', 'RestServiceMonitor',
+  'AdopterRegistrationResource',
   function ($scope, $rootScope, $location, $window, AuthService, Notifications, ResourceModal,
-    VersionResource, HotkeysService, $interval, RestServiceMonitor){
+    VersionResource, HotkeysService, $interval, RestServiceMonitor, AdopterRegistrationResource){
+
+    $scope.adopter = new AdopterRegistrationResource();
 
     $scope.bodyClicked = function () {
       angular.element('[old-admin-ng-dropdown]').removeClass('active');
@@ -35,7 +38,6 @@ angular.module('adminNg.controllers')
         DOCUMENTATION_URL_PROPERTY = 'org.opencastproject.admin.help.documentation.url',
         RESTDOCS_URL_PROPERTY = 'org.opencastproject.admin.help.restdocs.url',
         MEDIA_MODULE_URL_PROPERTY = 'org.opencastproject.admin.mediamodule.url';
-
     $scope.currentUser  = null;
     $scope.feedbackUrl = undefined;
     $scope.documentationUrl = undefined;
@@ -43,6 +45,10 @@ angular.module('adminNg.controllers')
     $scope.mediaModuleUrl = undefined;
     RestServiceMonitor.run();
     $scope.services = RestServiceMonitor.getServiceStatus();
+    $scope.studioReturnUrl = encodeURIComponent($location.absUrl());
+    $scope.$on('$locationChangeSuccess', function($event, newUrl) {
+      $scope.studioReturnUrl = encodeURIComponent(newUrl);
+    });
 
     AuthService.getUser().$promise.then(function (user) {
       $scope.currentUser = user;
@@ -104,6 +110,21 @@ angular.module('adminNg.controllers')
         }
       });
     }
+
+    AdopterRegistrationResource.get({}, function(adopter) {
+      if(adopter.dateModified == null) {
+        ResourceModal.show('registration-modal');
+        return;
+      }
+      if(adopter.registered === false) {
+        var now = new Date();
+        var lastModified = new Date(adopter.dateModified);
+        var numberOfDaysPassed = Math.ceil((now - lastModified) / 8.64e7);
+        if(numberOfDaysPassed > 30) {
+          ResourceModal.show('registration-modal');
+        }
+      }
+    });
 
     HotkeysService.activateUniversalHotkey('general.event_view', function (event) {
       event.preventDefault();

@@ -105,7 +105,7 @@ public class ServicesEndpoint {
           @RestParameter(name = "sort", description = "The sort order.  May include any "
                   + "of the following: host, name, running, queued, completed,  meanRunTime, meanQueueTime, "
                   + "status. The sort suffix must be :asc for ascending sort order and :desc for descending.", isRequired = false, type = STRING)
-  }, reponses = { @RestResponse(description = "Returns the list of services from Opencast", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The list of services")
+  }, responses = { @RestResponse(description = "Returns the list of services from Opencast", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The list of services")
   public Response getServices(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
           @QueryParam("filter") String filter, @QueryParam("sort") String sort) throws Exception {
 

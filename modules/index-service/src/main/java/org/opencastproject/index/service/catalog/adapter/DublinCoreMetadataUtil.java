@@ -25,9 +25,9 @@ import org.opencastproject.mediapackage.EName;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataField.Type;
 import org.opencastproject.metadata.dublincore.Precision;
@@ -62,17 +62,17 @@ public final class DublinCoreMetadataUtil {
   }
 
   /**
-   * Update a {@link DublinCoreCatalog} with the values contained within a {@link AbstractMetadataCollection}
+   * Update a {@link DublinCoreCatalog} with the values contained within a {@link DublinCoreMetadataCollection}
    *
    * @param dc
    *          The {@link DublinCoreCatalog} to update the values within.
    * @param metadata
-   *          The {@link AbstractMetadataCollection} data definitions and values to update the catalog with.
+   *          The {@link DublinCoreMetadataCollection} data definitions and values to update the catalog with.
    */
-  public static void updateDublincoreCatalog(DublinCoreCatalog dc, MetadataCollection metadata) {
-    for (MetadataField<?> field : metadata.getOutputFields().values()) {
-      if (field.isUpdated() && field.getValue().isSome()) {
-        final String namespace = field.getNamespace().getOr(DublinCore.TERMS_NS_URI);
+  public static void updateDublincoreCatalog(DublinCoreCatalog dc, DublinCoreMetadataCollection metadata) {
+    for (MetadataField field : metadata.getOutputFields().values()) {
+      if (field.isUpdated() && field.getValue() != null) {
+        final String namespace = field.getNamespace() == null ? DublinCore.TERMS_NS_URI : field.getNamespace();
         final EName ename = new EName(namespace, field.getInputID());
         if (field.getType() == MetadataField.Type.START_DATE) {
           setStartDate(dc, field, ename);
@@ -87,14 +87,14 @@ public final class DublinCoreMetadataUtil {
         } else if (field.getType() == MetadataField.Type.MIXED_TEXT || field.getType() == Type.ITERABLE_TEXT) {
           setIterableString(dc, field, ename);
         } else {
-          if (field.isRequired() && StringUtils.isBlank(field.getValue().get().toString()))
+          if (field.isRequired() && StringUtils.isBlank(field.getValue().toString()))
             throw new IllegalArgumentException(
                     String.format(
                             "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
                             field.getInputID(), field.getType()));
-          dc.set(ename, field.getValue().get().toString());
+          dc.set(ename, field.getValue().toString());
         }
-      } else if (field.getValue().isNone() && field.isRequired()) {
+      } else if (field.getValue() == null && field.isRequired()) {
         throw new IllegalArgumentException(String.format(
                 "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
                 field.getInputID(), field.getType()));
@@ -109,15 +109,15 @@ public final class DublinCoreMetadataUtil {
    * @param field The {@link MetadataField} with the values to update.
    * @param ename The {@link EName} of the property in the {@link DublinCoreCatalog} to update.
    */
-  private static void setIterableString(DublinCoreCatalog dc, MetadataField<?> field, final EName ename) {
-    if (field.getValue().isSome()) {
+  private static void setIterableString(DublinCoreCatalog dc, MetadataField field, final EName ename) {
+    if (field.getValue() != null) {
       dc.remove(ename);
-      if (field.getValue().get() instanceof String) {
-        String valueString = (String) field.getValue().get();
+      if (field.getValue() instanceof String) {
+        String valueString = (String) field.getValue();
         dc.set(ename, valueString);
       } else {
         @SuppressWarnings("unchecked")
-        Iterable<String> valueIterable = (Iterable<String>) field.getValue().get();
+        Iterable<String> valueIterable = (Iterable<String>) field.getValue();
         for (String valueString : valueIterable) {
           if (StringUtils.isNotBlank(valueString))
             dc.add(ename, valueString);
@@ -168,16 +168,16 @@ public final class DublinCoreMetadataUtil {
    * @param ename
    *          The unique id for the dublin core property.
    */
-  private static void setDate(DublinCoreCatalog dc, MetadataField<?> field, EName ename) {
-    if (field.getValue().get() instanceof Date && field.getPattern().isNone()) {
+  private static void setDate(DublinCoreCatalog dc, MetadataField field, EName ename) {
+    if (field.getValue() instanceof Date && field.getPattern() == null) {
       throw new IllegalArgumentException("There needs to be a pattern property set for " + field.getInputID() + ":"
               + field.getOutputID() + ":" + field.getValue() + " metadata field to store and retrieve the result.");
     }
-    if (field.getValue().get() instanceof Date) {
-      SimpleDateFormat sdf = new SimpleDateFormat(field.getPattern().get());
-      dc.set(ename, sdf.format((Date) field.getValue().get()));
+    if (field.getValue() instanceof Date) {
+      SimpleDateFormat sdf = new SimpleDateFormat(field.getPattern());
+      dc.set(ename, sdf.format((Date) field.getValue()));
     } else {
-      dc.set(ename, field.getValue().get().toString());
+      dc.set(ename, field.getValue().toString());
     }
   }
 
@@ -191,17 +191,17 @@ public final class DublinCoreMetadataUtil {
    * @param ename
    *          The EName in the catalog to identify the property that has the dublin core period.
    */
-  static void setStartDate(DublinCoreCatalog dc, MetadataField<?> field, EName ename) {
-    if (field.getValue().isNone()
-            || (field.getValue().get() instanceof String && StringUtils.isBlank(field.getValue().get().toString()))) {
+  static void setStartDate(DublinCoreCatalog dc, MetadataField field, EName ename) {
+    if (field.getValue() == null
+            || (field.getValue() instanceof String && StringUtils.isBlank(field.getValue().toString()))) {
       logger.debug("No value was set for metadata field with dublin core id '{}' and json id '{}'", field.getInputID(),
               field.getOutputID());
       return;
     }
     try {
       // Get the current date
-      SimpleDateFormat dateFormat = MetadataField.getSimpleDateFormatter(field.getPattern().get());
-      Date startDate = dateFormat.parse((String) field.getValue().get());
+      SimpleDateFormat dateFormat = MetadataField.getSimpleDateFormatter(field.getPattern());
+      Date startDate = dateFormat.parse((String) field.getValue());
       // Get the current period
       Opt<DCMIPeriod> period = getPeriodFromCatalog(dc, ename);
       // Get the current duration
@@ -258,8 +258,8 @@ public final class DublinCoreMetadataUtil {
    * @param ename
    *          The EName in the catalog to identify the property that has the dublin core period.
    */
-  static void setDuration(DublinCoreCatalog dc, MetadataField<?> field, EName ename) {
-    if (field.getValue().isNone()) {
+  static void setDuration(DublinCoreCatalog dc, MetadataField field, EName ename) {
+    if (field.getValue() == null) {
       logger.error("No value was set for metadata field with dublin core id '{}' and json id '{}'", field.getInputID(),
               field.getOutputID());
       return;
@@ -270,10 +270,10 @@ public final class DublinCoreMetadataUtil {
     // Get the current duration
     Long duration = 0L;
     try {
-      duration = Long.parseLong(field.getValue().get().toString());
+      duration = Long.parseLong(field.getValue().toString());
     } catch (NumberFormatException e) {
       logger.debug("Unable to parse the duration's value '{}' as a long value. Trying it as a period next.",
-              field.getValue().get());
+              field.getValue());
     }
     if (duration < 1L) {
       duration = getDuration(period);
@@ -286,29 +286,23 @@ public final class DublinCoreMetadataUtil {
             Precision.Second));
   }
 
-  @SuppressWarnings("unchecked")
-  public static Map<String, MetadataField<?>> getDublinCoreProperties(Dictionary configProperties) {
+  public static Map<String, MetadataField> getDublinCoreProperties(Dictionary<String, ?> configProperties) {
 
-    Map<String,Map<String, String>> allProperties = new HashMap();
+    final Map<String,Map<String, String>> allProperties = new HashMap<>();
 
-    for (Object configObject : Collections.list(configProperties.keys())) {
-      String property = configObject.toString();
+    for (String configObject : Collections.list(configProperties.keys())) {
+      String propertyName = getDublinCorePropertyName(configObject);
+      String propertyKey = getDublinCorePropertyKey(configObject);
 
-      Opt<String> propertyNameOpt = getDublinCorePropertyName(property);
-      Opt<String> propertyKeyOpt = getDublinCorePropertyKey(property);
-
-      if (propertyNameOpt.isSome() && propertyKeyOpt.isSome()) {
-
-        String propertyName = propertyNameOpt.get();
-        String propertyKey = propertyKeyOpt.get();
-
-        Map<String,String> metadataFieldProperties = allProperties.computeIfAbsent(propertyName,
+      if (propertyName != null && propertyKey != null) {
+        Map<String,String> metadataFieldProperties = allProperties.computeIfAbsent(
+                propertyName,
                 key -> new HashMap<>());
-        metadataFieldProperties.put(propertyKey, configProperties.get(property).toString());
+        metadataFieldProperties.put(propertyKey, configProperties.get(configObject).toString());
       }
     }
 
-    Map<String, MetadataField<?>> metadataFieldsMap = new TreeMap<String, MetadataField<?>>();
+    final Map<String, MetadataField> metadataFieldsMap = new TreeMap<>();
     for (Map<String, String> metadataFieldPropertiesMap : allProperties.values()) {
       MetadataField metadataField = MetadataField.createMetadataField(metadataFieldPropertiesMap);
       metadataFieldsMap.put(metadataField.getOutputID(), metadataField);
@@ -317,23 +311,23 @@ public final class DublinCoreMetadataUtil {
     return metadataFieldsMap;
   }
 
-  static boolean isDublinCoreProperty(String propertyKey) {
+  private static boolean isDublinCoreProperty(String propertyKey) {
     return !StringUtils.isBlank(propertyKey) && propertyKey.split("\\.").length == 3
             && propertyKey.split("\\.")[0].equalsIgnoreCase(MetadataField.CONFIG_PROPERTY_PREFIX);
   }
 
-  static Opt<String> getDublinCorePropertyName(String propertyKey) {
+  static String getDublinCorePropertyName(String propertyKey) {
     if (isDublinCoreProperty(propertyKey)) {
-      return Opt.some(propertyKey.split("\\.")[1]);
+      return propertyKey.split("\\.")[1];
     }
-    return Opt.none();
+    return null;
   }
 
-  static Opt<String> getDublinCorePropertyKey(String propertyKey) {
+  static String getDublinCorePropertyKey(String propertyKey) {
     if (isDublinCoreProperty(propertyKey)) {
-      return Opt.some(propertyKey.split("\\.")[2]);
+      return propertyKey.split("\\.")[2];
     }
-    return Opt.none();
+    return null;
   }
 
 }

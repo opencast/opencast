@@ -42,7 +42,7 @@ the Dublin Core term matches the specified value.
 
 Due to the way a workflow evaluates operation `if` conditions as configuration properties are created, only new
 configuration properties can be used to modify the execution of subsequent operations. Also since an undefined property
-will be evaluted as `false` in practice the only useful value which can set is `true`.  However operation `if`
+will be evaluated as `false` in practice the only useful value which can set is `true`.  However operation `if`
 conditions can be negated though so it is possible to skip subsequent operations on matched `dcterm`  value.
 
 ## Operation Example

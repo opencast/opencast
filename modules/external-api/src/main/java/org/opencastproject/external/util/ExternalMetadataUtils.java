@@ -21,14 +21,12 @@
 package org.opencastproject.external.util;
 
 import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 
-import com.entwinemedia.fn.data.Opt;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public final class ExternalMetadataUtils {
   private ExternalMetadataUtils() {
@@ -40,39 +38,32 @@ public final class ExternalMetadataUtils {
    * @param collection
    *          The collection to update subject to subjects.
    */
-  public static void changeSubjectToSubjects(MetadataCollection collection) {
+  public static void changeSubjectToSubjects(final DublinCoreMetadataCollection collection) {
     // Change subject to subjects.
-    MetadataField<?> subject = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
+    final MetadataField subject = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     collection.removeField(subject);
-    MetadataField<Iterable<String>> newSubjects = MetadataField.createIterableStringMetadataField(subject.getInputID(),
-            Opt.some("subjects"), subject.getLabel(), subject.isReadOnly(), subject.isRequired(),
-            subject.isTranslatable(), subject.getCollection(), subject.getCollectionID(), subject.getDelimiter(),
-            subject.getOrder(), subject.getNamespace());
-    List<String> subjectNames = new ArrayList<String>();
-    if (subject.getValue().isSome()) {
-      subjectNames = com.entwinemedia.fn.Stream.$(subject.getValue().get().toString().split(",")).toList();
+    final List<String> newValue;
+    if (subject.getValue() != null) {
+      newValue = Pattern.compile(",").splitAsStream(subject.getValue().toString()).collect(Collectors.toList());
+    } else {
+      newValue = null;
     }
-    newSubjects.setValue(subjectNames);
-    collection.addField(newSubjects);
-  }
-
-  /**
-   * Change the type of metadata fields from "ordered_text" to "text". This is necessary because "ordered_text" was
-   * added later on, since it is needed by the admin UI. For the external API, backwards compatibility can be achieved
-   * by just changing it back to the more general type "text". Unfortunately, meta data handling is shared between admin
-   * UI and external api, which makes these conversions necessary.
-   *
-   * @param collection The collection to update.
-   */
-  public static void changeTypeOrderedTextToText(MetadataCollection collection) {
-    for (final MetadataField<?> field : collection.getInputFields().values())  {
-      if (MetadataField.Type.ORDERED_TEXT.equals(field.getType())) {
-        field.setType(MetadataField.Type.TEXT);
-      }
-      if (MetadataField.JsonType.ORDERED_TEXT.equals(field.getJsonType())) {
-        field.setJsonType(MetadataField.JsonType.TEXT);
-      }
-    }
+    collection.addField(new MetadataField(
+            subject.getInputID(),
+            "subjects",
+            subject.getLabel(),
+            subject.isReadOnly(),
+            subject.isRequired(),
+            newValue,
+            subject.isTranslatable(),
+            MetadataField.Type.ITERABLE_TEXT,
+            subject.getCollection(),
+            subject.getCollectionID(),
+            subject.getOrder(),
+            subject.getNamespace(),
+            subject.getListprovider(),
+            subject.getPattern(),
+            subject.getDelimiter()));
   }
 
   /**
@@ -81,12 +72,12 @@ public final class ExternalMetadataUtils {
    * @param metadata
    *          The metadata from which the list have to be removed
    */
-  public static void removeCollectionList(MetadataCollection metadata) {
+  public static void removeCollectionList(final DublinCoreMetadataCollection metadata) {
     // Change subject to subjects.
-    List<MetadataField<?>> fields = metadata.getFields();
-    for (MetadataField<?> f : fields) {
-      f.setCollection(Opt.<Map<String, String>> none());
-      f.setCollectionID(Opt.<String> none());
+    final List<MetadataField> fields = metadata.getFields();
+    for (final MetadataField f : fields) {
+      f.setCollection(null);
+      f.setCollectionID(null);
     }
   }
 }

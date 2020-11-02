@@ -8,7 +8,7 @@ https://matomo.org/docs/installation/#the-5-minute-matomo-installation
 The plugin respects the [Do-Not-Track](https://en.wikipedia.org/wiki/Do_Not_Track) settings of a browser. You might also
 need to consider the legal requirements of your country when you setup Matomo.
 
-This plugin uses a Matomo javascript library that is loaded from the remote Matomo server!
+This plugin uses a Matomo JavaScript library that is loaded from the remote Matomo server!
 
 Tested Matomo version: 3.0.2+
 
@@ -51,7 +51,7 @@ property to prevent event tracking.
 Events that can be tracked:
 
 * play: play has been pressed (will also be called if after seeking).
-* pause: pause has been pressend (will also be called if before seeking).
+* pause: pause has been pressed (will also be called if before seeking).
 * seek: user jumps to a different time. Time in seconds will be stored
 * ended: video has reached the end
 * playbackrate: user changes the playback speed (values 0.75 to 3.00)
@@ -68,12 +68,12 @@ Tracked Data
 Additional to the event data that can be turned on for each event (see above), this Opencast specific data is tracked
 if tracking is allowed:
 
-* Page name as "<title of the event> - <lecturer name>"
+* Page name as `<title of the event> - <lecturer name>`
 * Custom Matomo variables:
-    * "event" as "<title of the event> (<event id>)"
-    * "series" as "<title of the series> (<series id>)"
+    * "event" as `<title of the event> (<event id>)`
+    * "series" as `<title of the series> (<series id>)`
     * "presenter"
-    * "view_mode" which can be "desktop", "mobile" or "embed"
+    * "view_mode" which can be `desktop`, `mobile` or `embed`
 
 Heartbeat data does not show how long a video has been played but how long a viewer remained on the page, while the page
 was in the foreground.

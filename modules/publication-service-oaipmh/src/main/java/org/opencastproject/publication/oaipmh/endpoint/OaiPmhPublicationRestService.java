@@ -113,7 +113,7 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "channel", isRequired = true, description = "The channel name", type = Type.STRING),
           @RestParameter(name = "downloadElementIds", isRequired = true, description = "The elements to publish to download separated by '" + SEPARATOR + "'", type = Type.STRING),
           @RestParameter(name = "streamingElementIds", isRequired = true, description = "The elements to publish to streaming separated by '" + SEPARATOR + "'", type = Type.STRING),
-          @RestParameter(name = "checkAvailability", isRequired = false, description = "Whether to check for availability", type = Type.BOOLEAN, defaultValue = "true") }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the publication job") })
+          @RestParameter(name = "checkAvailability", isRequired = false, description = "Whether to check for availability", type = Type.BOOLEAN, defaultValue = "true") }, responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the publication job") })
   public Response publish(@FormParam("mediapackage") String mediaPackageXml, @FormParam("channel") String channel,
           @FormParam("downloadElementIds") String downloadElementIds,
           @FormParam("streamingElementIds") String streamingElementIds,
@@ -143,7 +143,7 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "retractDownloadFlavors", isRequired = true, description = "The flavors of the elements to retract from download separated by  '" + SEPARATOR + "'", type = Type.STRING),
           @RestParameter(name = "retractStreamingFlavors", isRequired = true, description = "The flavors of the elements to retract from streaming separated by  '" + SEPARATOR + "'", type = Type.STRING),
           @RestParameter(name = "publications", isRequired = true, description = "The publications to update", type = Type.STRING),
-          @RestParameter(name = "checkAvailability", isRequired = false, description = "Whether to check for availability", type = Type.BOOLEAN, defaultValue = "true") }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the publication job") })
+          @RestParameter(name = "checkAvailability", isRequired = false, description = "Whether to check for availability", type = Type.BOOLEAN, defaultValue = "true") }, responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the publication job") })
   public Response replace(
           @FormParam("mediapackage") final String mediaPackageXml,
           @FormParam("channel") final String channel,
@@ -193,7 +193,7 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
       @RestParameter(name = "retractDownloadFlavors", isRequired = true, description = "The flavors of the elements to retract from download separated by  '" + SEPARATOR + "'", type = Type.STRING),
       @RestParameter(name = "retractStreamingFlavors", isRequired = true, description = "The flavors of the elements to retract from streaming separated by  '" + SEPARATOR + "'", type = Type.STRING),
       @RestParameter(name = "publications", isRequired = true, description = "The publications to update", type = Type.STRING),
-      @RestParameter(name = "checkAvailability", isRequired = false, description = "Whether to check for availability", type = Type.BOOLEAN, defaultValue = "true") }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the publication") })
+      @RestParameter(name = "checkAvailability", isRequired = false, description = "Whether to check for availability", type = Type.BOOLEAN, defaultValue = "true") }, responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the publication") })
   public Response replaceSync(
       @FormParam("mediapackage") final String mediaPackageXml,
       @FormParam("channel") final String channel,
@@ -234,7 +234,7 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "retract", description = "Retract a media package element from this publication channel", returnDescription = "The job that can be used to track the retraction", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The media package", type = Type.TEXT),
-          @RestParameter(name = "channel", isRequired = true, description = "The OAI-PMH channel to retract from", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job") })
+          @RestParameter(name = "channel", isRequired = true, description = "The OAI-PMH channel to retract from", type = Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job") })
   public Response retract(@FormParam("mediapackage") String mediaPackageXml, @FormParam("channel") String channel)
           throws Exception {
     Job job = null;
@@ -265,7 +265,7 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "flavors", isRequired = true, description = "The element flavors to be updated, separated by '" + SEPARATOR + "'", type = Type.STRING),
           @RestParameter(name = "tags", isRequired = true, description = "The element tags to be updated, separated by '" + SEPARATOR + "'", type = Type.STRING),
           @RestParameter(name = "checkAvailability", isRequired = false, description = "Whether to check for availability", type = Type.BOOLEAN, defaultValue = "true") },
-          reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the publication job") })
+          responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the publication job") })
   public Response updateMetadata(@FormParam("mediapackage") String mediaPackageXml,
           @FormParam("channel") String channel,
           @FormParam("flavors") String flavors,

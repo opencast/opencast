@@ -81,7 +81,7 @@ not be possible.
 If a user has the rights to access a resource, it does not automatically mean that permission has been granted for a
 lifetime. After a signed URL’s policy has expired, the URL must receive an updated policy and be signed again in order
 to provide continuous access to the corresponding resource, so in the case of revoked access rights, the user in
-question will be able to keep access to the resource as long as the initially signed url is valid. After that, Opencast
+question will be able to keep access to the resource as long as the initially signed URL is valid. After that, Opencast
 will not provide a signed URL anymore due to the change in permissions.
 
 On the other hand, there is no way to revoke access to that resource for that particular user unless the URL expires.

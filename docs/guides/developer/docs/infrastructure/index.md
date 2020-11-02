@@ -43,7 +43,6 @@ Institution                | Hostname                        | Admin (Software) 
 ---------------------------|---------------------------------|------------------|-------------------------
 University of Osnabrück    | pkg.opencast.org                | Lars Kiesow      | Lars Kiesow
 University of Cologne      | ci.opencast.org                 | Greg Logan       | Ruth Lang
-University of Osnabrück    | build.opencast.org              | Lars Kiesow      | Lars Kiesow
 University of Osnabrück    | docs.opencast.org               | Lars Kiesow      | Lars Kiesow
 University of Stuttgart    | testrailoc.tik.uni-stuttgart.de | Release managers | Per Pascal Grube
 
@@ -102,6 +101,8 @@ Other services and the primary contact for them:
 
 - Google
     - Greg Logan
+- YouTube
+    - Greg Logan and ETH Staff
 - Twitter
     - Lars Kiesow
 - Facebook

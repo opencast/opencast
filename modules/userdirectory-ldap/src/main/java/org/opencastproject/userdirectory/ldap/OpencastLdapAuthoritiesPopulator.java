@@ -65,7 +65,7 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
           boolean uppercase, Organization organization, SecurityService securityService,
           JpaGroupRoleProvider groupRoleProvider, String... additionalAuthorities) {
 
-    debug("Creating new instance");
+    logger.debug("Creating new instance");
 
     if (attributeNames == null) {
       throw new IllegalArgumentException("The attribute list cannot be null");
@@ -92,28 +92,28 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     }
 
     if (logger.isDebugEnabled()) {
-      debug("Roles will be read from the LDAP attributes:");
+      logger.debug("Roles will be read from the LDAP attributes:");
       for (String attribute : this.attributeNames) {
         logger.debug("\t* {}", attribute);
       }
     }
 
     if (groupRoleProvider == null) {
-      info("Provided GroupRoleProvider was null. Group roles will therefore not be expanded");
+      logger.info("Provided GroupRoleProvider was null. Group roles will therefore not be expanded");
     }
     this.groupRoleProvider = groupRoleProvider;
 
     this.uppercase = uppercase;
     if (uppercase)
-      debug("Roles will be converted to uppercase");
+      logger.debug("Roles will be converted to uppercase");
     else
-      debug("Roles will NOT be converted to uppercase");
+      logger.debug("Roles will NOT be converted to uppercase");
 
     if (uppercase)
       this.prefix = StringUtils.trimToEmpty(prefix).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT).toUpperCase();
     else
       this.prefix = StringUtils.trimToEmpty(prefix).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT);
-    debug("Role prefix set to: {}", this.prefix);
+    logger.debug("Role prefix set to: {}", this.prefix);
 
     if (aExcludedPrefixes != null)
       for (String origExcludedPrefix : aExcludedPrefixes) {
@@ -133,18 +133,22 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
       this.additionalAuthorities = additionalAuthorities;
 
     if (logger.isDebugEnabled()) {
-      debug("Authenticated users will receive the following extra roles:");
+      StringBuilder additionalAuthoritiesAsStr = new StringBuilder();
       for (String role : this.additionalAuthorities) {
-        logger.debug("\t* {}", role);
+        additionalAuthoritiesAsStr.append(String.format("\n\t* %s", role));
       }
+      logger.debug("Authenticated users will receive the following extra roles:{}", additionalAuthoritiesAsStr);
     }
   }
 
   @Override
   public Collection<? extends GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {
 
+    logger.debug("user attributes for user {}:\n\t{}", username, userData.getAttributes());
+
     Set<GrantedAuthority> authorities = new HashSet<>();
     for (String attributeName : attributeNames) {
+      logger.debug("Looking for attribute name '{}'", attributeName);
       try {
         String[] attributeValues = userData.getStringAttributes(attributeName);
         // Should the attribute not be defined, the returned array is null
@@ -154,10 +158,10 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
             addAuthorities(authorities, attributeValue.split(","));
           }
         } else {
-          debug("({}) Could not find any attribute named '{}' in user '{}'", attributeName, userData.getDn());
+          logger.debug("Could not find any attribute named '{}' in user '{}'", attributeName, userData.getDn());
         }
       } catch (ClassCastException e) {
-        error("Specified attribute containing user roles ('{}') was not of expected type String: {}", attributeName, e);
+        logger.error("Specified attribute containing user roles ('{}') was not of expected type String", attributeName, e);
       }
     }
 
@@ -165,10 +169,11 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
     addAuthorities(authorities, additionalAuthorities);
 
     if (logger.isDebugEnabled()) {
-      debug("Returning user {} with authorities:", username);
+      StringBuilder authorityListAsString = new StringBuilder();
       for (GrantedAuthority authority : authorities) {
-        logger.debug("\t{}", authority);
+        authorityListAsString.append(String.format("\n\t%s", authority));
       }
+      logger.debug("Returning user {} with authorities:{}", username, authorityListAsString);
     }
 
     // Update the user in the security service if it matches the user whose authorities are being returned
@@ -296,11 +301,11 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
 
           authority = (prefix + authority).replaceAll(ROLE_CLEAN_REGEXP, ROLE_CLEAN_REPLACEMENT);
 
-          debug("Parsed LDAP role \"{}\" to role \"{}\"", value, authority);
+          logger.debug("Parsed LDAP role \"{}\" to role \"{}\"", value, authority);
 
           if (!groupRoles.isEmpty()) {
             // The authority is a group role
-            debug("Found group for the group with group role \"{}\"", authority);
+            logger.debug("Found group for the group with group role \"{}\"", authority);
             for (Role role : groupRoles) {
               authorities.add(new SimpleGrantedAuthority(role.getName()));
               logger.debug("\tAdded role from role \"{}\"'s group: {}", authority, role);
@@ -311,40 +316,10 @@ public class OpencastLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
           authorities.add(new SimpleGrantedAuthority(authority));
 
         } else {
-          debug("Found empty authority. Ignoring...");
+          logger.debug("Found empty authority. Ignoring...");
         }
       }
     }
-  }
-
-  /**
-   * Utility class to print this instance's hash code before the debug messages
-   *
-   * @param message
-   * @param params
-   */
-  private void debug(String message, Object... params) {
-    logger.debug("({}) {}", hashCode(), message, params);
-  }
-
-  /**
-   * Utility class to print this instance's hash code before the error messages
-   *
-   * @param message
-   * @param params
-   */
-  private void error(String message, Object... params) {
-    logger.error("({}) {}", hashCode(), message, params);
-  }
-
-  /**
-   * Utility class to print this instance's hash code before INFO messages
-   *
-   * @param message
-   * @param params
-   */
-  private void info(String message, Object... params) {
-    logger.info("({}) {}", hashCode(), message, params);
   }
 
   /** OSGi callback for setting the role group service. */

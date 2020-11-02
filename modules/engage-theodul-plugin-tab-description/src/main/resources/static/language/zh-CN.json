@@ -1,6 +1,6 @@
 {
     "value_locale": "zh",
-    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "value_dateFormatFull": "YYYY 年 M 月 D 日 HH:mm:ss",
     "title": "标题",
     "noTitle": "无标题",
     "creator": "创建者",

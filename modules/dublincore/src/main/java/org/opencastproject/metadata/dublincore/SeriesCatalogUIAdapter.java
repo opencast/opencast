@@ -24,7 +24,7 @@ import com.entwinemedia.fn.data.Opt;
 
 /**
  * A {@link SeriesCatalogUIAdapter} converts between a concrete {@link org.opencastproject.metadata.api.MetadataCatalog}
- * implementation and a {@link MetadataCollection}
+ * implementation and a {@link DublinCoreMetadataCollection}
  */
 public interface SeriesCatalogUIAdapter extends CatalogUIAdapter {
 
@@ -36,7 +36,7 @@ public interface SeriesCatalogUIAdapter extends CatalogUIAdapter {
    *          The series identifer
    * @return Get the field names and values for this catalog.
    */
-  Opt<MetadataCollection> getFields(String seriesId);
+  Opt<DublinCoreMetadataCollection> getFields(String seriesId);
 
   /**
    * Store changes made to the fields of the metadata collection in the catalog and return if successful.
@@ -47,5 +47,5 @@ public interface SeriesCatalogUIAdapter extends CatalogUIAdapter {
    *          The new metadata to update the media package with
    * @return true, if the metadata could be saved successfully
    */
-  boolean storeFields(String seriesId, MetadataCollection metadata);
+  boolean storeFields(String seriesId, DublinCoreMetadataCollection metadata);
 }

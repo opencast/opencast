@@ -50,6 +50,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -70,7 +71,17 @@ import javax.persistence.Version;
  */
 @Entity(name = "Job")
 @Access(AccessType.FIELD)
-@Table(name = "oc_job")
+@Table(name = "oc_job", indexes = {
+    @Index(name = "IX_oc_job_parent", columnList = ("parent")),
+    @Index(name = "IX_oc_job_root", columnList = ("root")),
+    @Index(name = "IX_oc_job_creator_service", columnList = ("creator_service")),
+    @Index(name = "IX_oc_job_processor_service", columnList = ("processor_service")),
+    @Index(name = "IX_oc_job_status", columnList = ("status")),
+    @Index(name = "IX_oc_job_date_created", columnList = ("date_created")),
+    @Index(name = "IX_oc_job_date_completed", columnList = ("date_completed")),
+    @Index(name = "IX_oc_job_dispatchable", columnList = ("dispatchable")),
+    @Index(name = "IX_oc_job_operation", columnList = ("operation")),
+    @Index(name = "IX_oc_job_statistics", columnList = ("processor_service, status, queue_time, run_time")) })
 @NamedQueries({
         @NamedQuery(name = "Job", query = "SELECT j FROM Job j "
                 + "where j.status = :status and j.creatorServiceRegistration.serviceType = :serviceType "
@@ -146,7 +157,6 @@ public class JpaJob {
   @Column(name = "creator", nullable = false, length = 65535)
   private String creator;
 
-  @Lob
   @Column(name = "organization", nullable = false, length = 128)
   private String organization;
 
@@ -157,15 +167,15 @@ public class JpaJob {
   @Column(name = "status")
   private int status;
 
-  @Lob
-  @Column(name = "operation", length = 65535)
+  @Column(name = "operation", length = 128)
   private String operation;
 
   @Lob
   @Column(name = "argument", length = 2147483647)
   @OrderColumn(name = "argument_index")
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "oc_job_argument", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"))
+  @CollectionTable(name = "oc_job_argument",
+      joinColumns = @JoinColumn(name = "id", referencedColumnName = "id", nullable = false))
   private List<String> arguments;
 
   @Column(name = "date_completed")
@@ -196,10 +206,10 @@ public class JpaJob {
   private String payload;
 
   @Column(name = "dispatchable")
-  private boolean dispatchable;
+  private boolean dispatchable = true;
 
-  @Column(name = "job_load")
-  private Float jobLoad;
+  @Column(name = "job_load", nullable = false)
+  private Float jobLoad = 1F;
 
   @ManyToOne
   @JoinColumn(name = "creator_service")

@@ -69,6 +69,10 @@ angular.module('adminNg.directives')
         };
 
         scope.restoreFilters = function () {
+          scope.filters.map = {};
+          if (Object.keys(scope.filters.map).length === 0) {
+            scope.initializeMap();
+          }
           angular.forEach(scope.filters.filters, function (filter, name) {
             filter.value = Storage.get('filter', scope.namespace)[name];
 
@@ -80,11 +84,6 @@ angular.module('adminNg.directives')
         };
 
         scope.filters.$promise.then(function () {
-          scope.filters.map = {};
-          if (Object.keys(scope.filters.map).length === 0) {
-            scope.initializeMap();
-          }
-
           scope.restoreFilters();
         }).catch(angular.noop);
 
@@ -121,6 +120,7 @@ angular.module('adminNg.directives')
         };
 
         scope.selectFilterSelectValue = function (filter)  {
+          scope.restoreFilters();
           var filterName = scope.getFilterName();
           scope.showFilterSelector = false;
           scope.selectedFilter = null;

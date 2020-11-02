@@ -48,7 +48,7 @@ Required:
     jdk 8
     ffmpeg >= 3.2.4
     maven >= 3.1
-    python >= 2.6, < 3.0
+    python >= 2.6
 
 (If you are using [jEnv](http://www.jenv.be/) to set up your environment, make sure to [enable the maven plugin
 ](https://stackoverflow.com/a/37466252).)
@@ -116,15 +116,15 @@ Configure
 
 Please follow the steps of the [Basic Configuration guide](../configuration/basic.md). It will help you to set your host
 name, login information, etc. Be aware that the config files now reside in the build folders for the desired
-distribution. For the allinone distribution, this would be
+distribution. For the all-in-one distribution, this would be
 `/your/path/to/opencast/build/opencast-dist-allinone-[…]/etc/`, again with `[…]` representing the selected version.
 
 As specified in the guide, make sure you replace the default ActiveMQ configuration with the one provided in
 `docs/scripts/activemq/activemq.xml`. If you installed ActiveMQ using homebrew, you can find the installation path with
 `brew info activemq`. The configuration is probably located in `/usr/local/Cellar/activemq/<version>/libexec/conf/`.
 
-ffprobe is used to analyse new videos. It is installed with ffmpeg but usually not on the path to be automatically
-executed. You have to link the ffprobe to `/usr/local/bin/`. You can find the ffmpeg install directory with
+ffprobe is used to analyze new videos. It is installed with FFmpeg but usually not on the path to be automatically
+executed. You have to link the ffprobe to `/usr/local/bin/`. You can find the FFmpeg install directory with
 `brew info ffmpeg`. Usually you would link the file with
 `ln -s /usr/local/Cellar/ffmpeg/<version>/bin/ffprobe /usr/local/bin/ffprobe`.
 

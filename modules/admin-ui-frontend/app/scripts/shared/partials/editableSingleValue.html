@@ -7,18 +7,17 @@
 
   <textarea ng-keydown="keyDown($event)"
             ng-keyup="keyUp($event)"
-            type="{{ (params.type === 'time') ? 'text' : (params.type || 'text') }}"
             ng-model="params.value"
             ng-blur="submit(); editMode = false"
             class="editable vertical-resize"
             tabindex="{{ params.tabindex }}"
             ng-if="params.type === 'text_long' && editMode"
             ng-required="params.required"
-            name="{{ params.name }}"/>
+            name="{{ params.name }}"> </textarea>
 
     <input ng-keyup="keyUp($event)"
            ng-if="editMode && params.type === 'text'"
-           type="{{ (params.type === 'time') ? 'text' : (params.type || 'text') }}"
+           type="text"
            ng-model="params.value"
            ng-blur="submit()"
            tabindex="{{ params.tabindex }}"
