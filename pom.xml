@@ -971,6 +971,11 @@
         <version>1.4.7</version>
       </dependency>
       <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>1</version>
+      </dependency>
+      <dependency>
         <groupId>jakarta.ws.rs</groupId>
         <artifactId>jakarta.ws.rs-api</artifactId>
         <version>2.1.6</version>
@@ -1236,6 +1241,11 @@
         <version>${querydsl.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.mysema.querydsl</groupId>
+        <artifactId>querydsl-core</artifactId>
+        <version>${querydsl.version}</version>
+      </dependency>
+      <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
         <version>${joda-time.version}</version>
@@ -1289,6 +1299,11 @@
       <dependency>
         <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest</artifactId>
+        <version>2.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-core</artifactId>
         <version>2.2</version>
       </dependency>
       <dependency>
