@@ -72,7 +72,7 @@ public class OaiPmhEntity {
   private String repositoryId;
 
   /** Series id */
-  @Column(name = "series_id")
+  @Column(name = "series_id",length = 128)
   private String series;
 
   /** Flag indicating deletion. */
@@ -91,7 +91,7 @@ public class OaiPmhEntity {
 
   /** Serialized media package */
   @Lob
-  @Column(name = "mediapackage_xml", length = 65535)
+  @Column(name = "mediapackage_xml", length = 65535, nullable = false)
   private String mediaPackageXML;
 
   /** List of serialized media package element entities */

@@ -121,7 +121,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
                   + "current organization",
           returnDescription = "Returns whether publish to streaming is configured for the current organization as a "
                             + "boolean.",
-          reponses = {
+          responses = {
                   @RestResponse(responseCode = SC_OK, description = "Whether publish to streaming is configured for "
                                                                   + "the current organization.")})
   public Response publishToStreaming() {
@@ -134,7 +134,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
   @RestQuery(name = "distribute", description = "Distribute a media package element to this distribution channel", returnDescription = "The job that can be used to track the distribution", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
           @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
-          @RestParameter(name = "elementIds", isRequired = true, description = "The elements to distribute as Json Array['IdOne','IdTwo']", type = Type.STRING) }, reponses = {
+          @RestParameter(name = "elementIds", isRequired = true, description = "The elements to distribute as Json Array['IdOne','IdTwo']", type = Type.STRING) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job"),
           @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available")})
   public Response distribute(@FormParam("mediapackage") String mediaPackageXml,
@@ -165,7 +165,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
   @RestQuery(name = "distributesync", description = "Syncrhonously distribute a media package element to this distribution channel", returnDescription = "The distribution", restParameters = {
       @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
       @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
-      @RestParameter(name = "elementIds", isRequired = true, description = "The elements to distribute as Json Array['IdOne','IdTwo']", type = Type.STRING) }, reponses = {
+      @RestParameter(name = "elementIds", isRequired = true, description = "The elements to distribute as Json Array['IdOne','IdTwo']", type = Type.STRING) }, responses = {
       @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution"),
       @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available")})
   public Response distributeSync(@FormParam("mediapackage") String mediaPackageXml,
@@ -196,7 +196,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
   @RestQuery(name = "retract", description = "Retract a media package element from this distribution channel", returnDescription = "The job that can be used to track the retraction", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
           @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
-          @RestParameter(name = "elementIds", isRequired = true, description = "The elements to retract as Json Array['IdOne','IdTwo']", type = Type.STRING) }, reponses = {
+          @RestParameter(name = "elementIds", isRequired = true, description = "The elements to retract as Json Array['IdOne','IdTwo']", type = Type.STRING) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job"),
           @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available")})
   public Response retract(@FormParam("mediapackage") String mediaPackageXml,
@@ -228,7 +228,7 @@ public class WowzaStreamingDistributionRestService extends AbstractJobProducerEn
   @RestQuery(name = "retractsync", description = "Synchronously retract a media package element from this distribution channel", returnDescription = "The retraction", restParameters = {
       @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
       @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
-      @RestParameter(name = "elementIds", isRequired = true, description = "The elements to retract as Json Array['IdOne','IdTwo']", type = Type.STRING) }, reponses = {
+      @RestParameter(name = "elementIds", isRequired = true, description = "The elements to retract as Json Array['IdOne','IdTwo']", type = Type.STRING) }, responses = {
       @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction"),
       @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available")})
   public Response retractSync(@FormParam("mediapackage") String mediaPackageXml,

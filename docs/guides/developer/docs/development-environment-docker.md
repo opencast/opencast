@@ -6,12 +6,13 @@ because of Docker's isolation functionality, multiple environments can be operat
 
 ## Setting up a Docker build environment
 
-A `docker-compose` file is provided to start up the development environment. You also need the ActiveMQ configuration
+Two `docker-compose` files are provided to start up different development environments. You also need the ActiveMQ configuration
 (see "Testing Locally with Docker" guide in the administration documentation).
 
+
+First, download the support assets:
 ```sh
 $ mkdir assets
-$ curl -o docker-compose.yml https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.build.yml
 $ curl -o assets/activemq.xml https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/assets/activemq.xml
 ```
 
@@ -36,11 +37,19 @@ $ export OPENCAST_BUILD_USER_UID=$(id -u)
 $ export OPENCAST_BUILD_USER_GID=$(id -g)
 ```
 
+## Single node Opencast Development
+
+Now download the Docker compose file:
+```sh
+$ curl -o docker-compose.yml https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.build.yml
+```
+
 With this you are ready to start up the build environment:
 
 ```sh
 $ docker-compose up -d
 ```
+
 
 You can enter the Opencast build environment with the `exec` command. Omitting the `--user opencast-builder` argument
 would give you a root shell, but that is not necessary because the user `opencast-builder` can use `sudo` within the
@@ -78,7 +87,23 @@ script has the advantage that it automatically connects Opencast to the configur
 
 Since the Opencast code is shared, any change from an IDE is directly visible within the container.
 
+## Multi-node Opencast Development
+
+Development with multi-node Opencast environments are also supported using a different compose file.  Instead of
+downloading the single-node Docker compose file, download the multi-node version:
+
+```sh
+$ curl -o docker-compose.yml https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.multiserver.build.yml
+```
+
+This file defines a three node (admin, presentation, worker) cluster for use in testing, with all of the appropriate
+ports exported.  To access the a node run `docker-compose exec --user opencast-builder opencast-$nodetype bash`.  For
+example, to access the presentation node run `docker-compose exec --user opencast-builder opencast-presentation bash`.
+
+Available commands are otherwise identical.
+
 ## Attaching a Remote Debugger to Karaf
 
 By default, the compose file sets the necessary variables to enable remote debugging. The network port is published by
-the container so that you can connect the remote debugger of your IDE to the port `5005` on `localhost`.
+the container so that you can connect the remote debugger of your IDE to the port `5005` on `localhost`.  For multi-node
+setups each node has its debug port exposed: admin lives on `5005`, presentation on `5006`, and worker on `5007`.

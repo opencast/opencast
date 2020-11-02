@@ -29,7 +29,7 @@ deadlocks!  Fortunately, this is easy to fix.  See Troubleshooting for more deta
 Step 1: Determine your load values
 ----------------------------------
 
-This is a very subjective process, but is arguably the most imporant: How much load does each job and encoding profile
+This is a very subjective process, but is arguably the most important: How much load does each job and encoding profile
 add to your system? We have tried our best to set useful loads for each job, however these are only estimates.  If your
 installation has, for example, hardware assisted encoding then your encoding jobs may be very inexpensive.  In general,
 it is safe to assume that the first load value from the output of `uptime` is a good estimate of the load imposed by a

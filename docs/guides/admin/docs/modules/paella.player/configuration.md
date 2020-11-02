@@ -2,28 +2,17 @@ Paella Player
 =============
 
 The Paella `(pronounced 'paeja')` [Player](https://paellaplayer.upv.es) is an Open Source
-Javascript video player capable of playing an unlimited number of audio & video streams 
+JavaScript video player capable of playing an unlimited number of audio & video streams 
 synchronously, Live Streaming, Zoom, Captions, contributed user plugins and a lot more. 
 It is easy to install and customize for your own needs.
 
-Paella has been specially designed for lecture recordings, and currently is the default 
-video player of the [Opencast Community](https://opencast.org). It works with all HTML5 browsers
+Paella has been specially designed for lecture recordings. It works with all HTML5 browsers
 (Chrome, Firefox, Safari and Edge) and within iOS and Android.
 
-Have a look to the paella [features list](https://paellaplayer.upv.es/features/) 
+Have a look to the paella [features list](https://paellaplayer.upv.es/features/)
 or see them live on paella [demos page](https://paellaplayer.upv.es/demos/)
 
-Enable paella player
---------------------
-
-To enable paella player you need to edit the `prop.player` variable.
-This can be enabled for each tenant. So the configuration keys are located in
-`etc/org.opencastproject.organization-mh_default_org.cfg`.
-
-
-To activate the paella player set:
-
-    prop.player=/paella/ui/watch.html?id=#{id}
+Paella is Opencast's default player.
 
 
 Configuration
@@ -50,4 +39,11 @@ An event can have multiple audio tracks. Paella only plays one at a time, but yo
 decide which one to play. Read the [es.upv.paella.opencast.loader](plugins/es.upv.paella.opencast.loader.md) documentation
 plugin for more information.
 
-This feature is usefull when you have multiple audio languages, so the users can switch to the audio language they want.
+This feature is useful when you have multiple audio languages, so the users can switch to the audio language they want.
+
+Selecting video canvas to use
+-----------------------------
+
+You can configure which canvas to use in order to render video files. This is useful to enable 360 videos for example.
+Read the [es.upv.paella.opencast.loader](plugins/es.upv.paella.opencast.loader.md) documentation
+plugin for more information.

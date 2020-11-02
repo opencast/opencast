@@ -46,7 +46,7 @@ public class Payload {
   @XmlElement(name = "totalsize")
   private long totalsize; // size of the file
   @XmlElement(name = "currentsize")
-  private long currentsize; // number of bytes that have already been (successfully) recieved
+  private long currentsize; // number of bytes that have already been (successfully) received
   @XmlElement(name = "url")
   private URL url; // URL of the completely uploaded file
   @XmlElement(name = "mediapackage", namespace = "http://mediapackage.opencastproject.org")

@@ -8,12 +8,22 @@ versions of Opencast, please refer to [older release notes](https://docs.opencas
 2. Replace Opencast with the new version
 3. Back-up Opencast files and database (optional)
 4. Upgrade the database
-5. [Install and configure a standlone Elasticsearch node](#install-and-confifure-a-standalone-elasticsearch-node)
+5. [Install and configure a standalone Elasticsearch node](#install-and-confifure-a-standalone-elasticsearch-node)
 6. [Review the configuration changes and adjust your configuration accordingly](#configuration-changes)
 7. Remove search index data folder
 8. Start Opencast
 9. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
 10. [Check passwords](#check-passwords)
+
+Configuration Changes
+---------------------
+
+Note that this section will only highlight a few important changes.
+Please make sure to compare your configuration against the current configuration files.
+
+- The default for the configuration option `lti.create_jpa_user_reference` changed from `false` (Opencast 8.3) to `true`.
+- Make sure to have `?useMysqlMetadata=true` appended to `org.opencastproject.db.jdbc.url` if you use MariaDB as
+  database.
 
 Install and configure a standalone Elasticsearch node
 -----------------------------------------------------

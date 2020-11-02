@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>studio-upload</id>
+  <title>Studio Upload</title>
+  <tags>
+    <tag>archive</tag>
+    <tag>upload</tag>
+  </tags>
+  <description>
+    A simple and fast workflow for publishing videos created by Opencast Studio.
+  </description>
+
+  <configuration_panel>
+    <![CDATA[
+      <div id="workflow-configuration">
+        <fieldset>
+          <legend>Processing configuration:</legend>
+          <ul>
+            <li>
+              <input id="skipEditorPreview" name="skipEditorPreview" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="skipEditorPreview">Skip generating editor preview</label>
+            </li>
+          </ul>
+        </fieldset>
+        <fieldset>
+          <legend>Publish right away to</legend>
+          <ul id="publicationConfigurationPanel" class="workflow-configuration-subpanel">
+            <li>
+              <input id="publishToSearch" name="publishToSearch" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="publishToSearch">Opencast Index</label>
+              <fieldset>
+                <ul id="searchConfigurationPanel" class="workflow-configuration-subpanel">
+                  <li>
+                    <input id="publishToEngage" name="searchPublishType" type="radio" checked="checked" class="configField" value="true" />
+                    <label for="publishToEngage">Opencast Media Module</label>
+                  </li>
+                  <li>
+                    <input id="publishToAws" name="searchPublishType" type="radio" class="configField" value="true"/>
+                    <label for="publishToAws">AWS</label>
+                  </li>
+                </ul>
+              </fieldset>
+            </li>
+            <li>
+              <input id="publishToApi" name="publishToApi" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="publishToApi">External Applications</label>
+            </li>
+            <li>
+              <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" class="configField" value="false" />
+              <label for="publishToOaiPmh">OAI-PMH Default Repository</label>
+            </li>
+          </ul>
+        </fieldset>
+      </div>
+
+      <script type="text/javascript">
+        $('input[name="holdOrPublishToggle"]').change(function(){
+            var show = $(this).val() == 'publish';
+            $('#publicationConfigurationPanel').toggle(show);
+            $('#straightToPublishing').val(show);
+            // Trigger update of the schedule's workflow config
+            $('#straightToPublishing').change();
+        });
+
+        <!-- called on loading an exisiting event -->
+        $('#straightToPublishing').bind('updateConfigUI', function() {
+            var publish = $(this).val().toLowerCase() === 'true';
+            $('#publicationConfigurationPanel').toggle(publish);
+            $('#holdOrPublishToggle_' + (publish ? 'publish':'hold')).prop('checked', 'checked');
+        });
+
+        <!-- Remove the line below if you wish to publish to AWS S3 -->
+        $('#publishToAws').prop('disabled', true);
+        <!-- Remove the line above if you wish to publish to AWS S3 -->
+
+        awsWasDisabled = $('#publishToAws').prop('disabled');
+        awsWasChecked = $('#publishToAws').prop('checked');
+        engageWasChecked = $('#publishToEngage').prop('checked');
+
+        $('input[name="publishToSearch"]').change(function(){
+            if ($(this).is(':checked')) {
+              $('#publishToAws').prop('checked', awsWasChecked);
+              $('#publishToEngage').prop('checked', engageWasChecked);
+              $('#publishToAws').prop('disabled', awsWasDisabled);
+              $('#publishToEngage').prop('disabled', false);
+            } else if (!$(this).is(':checked')) {
+              awsWasChecked = $('#publishToAws').prop('checked');
+              engageWasChecked = $('#publishToEngage').prop('checked');
+
+              $('#publishToAws').prop('disabled', true);
+              $('#publishToEngage').prop('disabled', true);
+              $('#publishToAws').prop('checked', false);
+              $('#publishToEngage').prop('checked', false);
+            }
+        });
+      </script>
+    ]]>
+  </configuration_panel>
+
+  <operations>
+
+    <!-- Apply the default workflow configuration -->
+
+    <operation
+        id="defaults"
+        description="Applying default configuration values">
+      <configurations>
+        <configuration key="skipEditorPreview">true</configuration>
+        <configuration key="publishToEngage">true</configuration>
+        <configuration key="publishToApi">true</configuration>
+        <configuration key="publishToOaiPmh">false</configuration>
+        <configuration key="publishToAws">false</configuration>
+        <configuration key="thumbnailType">0</configuration>
+        <configuration key="thumbnailPosition">1</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="inspect"
+        exception-handler-workflow="partial-error"
+        description="Inspecting audio and video streams">
+      <configurations>
+        <configuration key="overwrite">false</configuration>
+        <configuration key="accept-no-media">false</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="series"
+        exception-handler-workflow="partial-error"
+        description="Applying series dublincore catalogs and access control entries">
+      <configurations>
+        <!-- <configuration key="series">[put your fixed series id here]</configuration> -->
+        <configuration key="attach">*</configuration>
+        <configuration key="apply-acl">true</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="tag"
+        exception-handler-workflow="partial-error"
+        description="Tagging source material for archival">
+      <configurations>
+        <configuration key="source-flavors">dublincore/*,security/*,*/source</configuration>
+        <configuration key="target-tags">+archive</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="include"
+        description="Include studio tracks normalization tasks">
+      <configurations>
+        <configuration key="workflow-id">partial-transcode-studio-tracks</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="snapshot"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Archiving">
+      <configurations>
+        <configuration key="source-tags">archive</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="prepare-av"
+        exception-handler-workflow="partial-error"
+        description="Preparing presenter (camera) audio and video work versions">
+      <configurations>
+        <configuration key="source-flavor">presenter/source</configuration>
+        <configuration key="target-flavor">presenter/prepared</configuration>
+        <configuration key="target-tags">archive</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="prepare-av"
+        exception-handler-workflow="partial-error"
+        description="Preparing presentation (screen) audio and video work version">
+      <configurations>
+        <configuration key="source-flavor">presentation/source</configuration>
+        <configuration key="target-flavor">presentation/prepared</configuration>
+        <configuration key="target-tags">archive</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Create preview artifacts -->
+
+    <operation
+        id="include"
+        if="NOT ${skipEditorPreview}"
+        description="Prepare preview versions of the recording">
+      <configurations>
+        <configuration key="workflow-id">partial-preview</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Encode delivery version of the videos -->
+
+    <operation
+        id="encode"
+        exception-handler-workflow="partial-error"
+        description="Encoding videos to delivery formats">
+      <configurations>
+        <configuration key="source-flavor">*/prepared</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming</configuration>
+        <configuration key="encoding-profile">studio.adaptive-parallel.http</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Encode to engage search result thumbnails -->
+
+    <operation
+        id="image"
+        exception-handler-workflow="partial-error"
+        description="Creating search result default thumbnails">
+      <configurations>
+        <configuration key="source-flavors">*/prepared</configuration>
+        <configuration key="target-flavor">*/search+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">search-cover.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Encode to engage player preview images -->
+
+    <operation
+        id="image"
+        exception-handler-workflow="partial-error"
+        description="Creating presentation player preview image">
+      <configurations>
+        <configuration key="source-flavor">presentation/prepared</configuration>
+        <configuration key="target-flavor">presentation/player+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">player-preview.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="image"
+        exception-handler-workflow="partial-error"
+        description="Creating presenter cover image">
+      <configurations>
+        <configuration key="source-flavors">presenter/prepared</configuration>
+        <configuration key="target-flavor">presenter/coverbackground</configuration>
+        <configuration key="encoding-profile">player-preview.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="cover-image"
+        exception-handler-workflow="partial-error"
+        description="Create presenter player preview image">
+      <configurations>
+        <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
+        <configuration key="width">1280</configuration>
+        <configuration key="height">720</configuration>
+        <configuration key="posterimage-flavor">presenter/coverbackground</configuration>
+        <configuration key="target-flavor">presenter/player+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Encode to feed cover images -->
+
+    <operation
+        id="image"
+        exception-handler-workflow="partial-error"
+        description="Creating feed cover image">
+      <configurations>
+        <configuration key="source-flavors">*/prepared</configuration>
+        <configuration key="source-tags"></configuration>
+        <configuration key="target-flavor">*/feed+preview</configuration>
+        <configuration key="target-tags">atom,rss</configuration>
+        <configuration key="encoding-profile">feed-cover.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Generate timeline preview images -->
+
+    <operation
+        id="timelinepreviews"
+        fail-on-error="false"
+        exception-handler-workflow="partial-error"
+        description="Creating timeline preview images">
+      <configurations>
+        <configuration key="source-flavor">*/prepared</configuration>
+        <configuration key="target-flavor">*/timeline+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="image-count">100</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Segment video streams and extract metadata                        -->
+    <!--                                                                   -->
+    <!-- Apply the video segmentation algorithm to the presentation tracks -->
+    <!-- and extract segment preview images and metadata.                  -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Run the videosegmentation -->
+
+    <operation
+        id="segment-video"
+        fail-on-error="false"
+        description="Detecting slide transitions in presentation track">
+      <configurations>
+        <configuration key="source-flavor">presentation/prepared</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Generate segment preview images -->
+
+    <operation
+        id="segmentpreviews"
+        fail-on-error="false"
+        description="Creating preview images for presentation segments">
+      <configurations>
+        <configuration key="source-flavor">presentation/prepared</configuration>
+        <configuration key="target-flavor">presentation/segment+preview</configuration>
+        <configuration key="reference-flavor">presentation/delivery</configuration>
+        <configuration key="reference-tags">engage-download</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">player-slides.http</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Extract text form slide preview images -->
+
+    <operation
+        id="extract-text"
+        fail-on-error="false"
+        description="Extracting text from presentation segments">
+      <configurations>
+        <configuration key="source-flavor">presentation/prepared</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Publish to publication channels                                   -->
+    <!--                                                                   -->
+    <!-- Send the encoded material along with the metadata to the          -->
+    <!-- publication channels.                                             -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Publish to engage player -->
+
+    <operation
+        id="publish-engage"
+        if="${publishToEngage}"
+        max-attempts="2"
+        exception-handler-workflow="partial-error"
+        description="Publishing to Opencast Media Module">
+      <configurations>
+        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
+        <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
+        <configuration key="streaming-source-tags">engage-streaming</configuration>
+        <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="publish-aws"
+        if="${publishToAws}"
+        max-attempts="2"
+        exception-handler-workflow="partial-error"
+        description="Publishing to Amazon Web Services">
+      <configurations>
+        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
+        <configuration key="download-source-tags">engage-download,atom,rss,mobile</configuration>
+        <configuration key="streaming-source-tags">engage-streaming</configuration>
+        <configuration key="strategy">merge</configuration>
+        <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="publish-configure"
+        if="${publishToApi}"
+        exception-handler-workflow="partial-error"
+        description="Publish to external api publication channel">
+      <configurations>
+        <configuration key="channel-id">api</configuration>
+        <configuration key="mimetype">application/json</configuration>
+        <configuration key="download-source-tags">engage-download,engage-streaming</configuration>
+        <configuration key="url-pattern">http://localhost:8080/api/events/${event_id}</configuration>
+        <configuration key="with-published-elements">false</configuration>
+        <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Publish to OAI-PMH -->
+
+    <operation
+        id="publish-oaipmh"
+        if="${publishToOaiPmh}"
+        exception-handler-workflow="partial-error"
+        description="Publish to OAI-PMH Default Repository">
+      <configurations>
+        <configuration key="download-flavors">dublincore/*,security/*</configuration>
+        <configuration key="download-tags">engage-download,atom,rss</configuration>
+        <configuration key="streaming-tags">engage-streaming</configuration>
+        <configuration key="check-availability">true</configuration>
+        <configuration key="repository">default</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="tag"
+        fail-on-error="false"
+        description="Remove processing tags">
+      <configurations>
+        <configuration key="source-tags">archive</configuration>
+        <configuration key="target-tags">-engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="snapshot"
+        exception-handler-workflow="partial-error"
+        description="Archiving">
+      <configurations>
+        <configuration key="source-tags">archive</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="cleanup"
+        fail-on-error="false"
+        description="Remove temporary processing artifacts">
+      <configurations>
+        <configuration key="preserve-flavors">security/*</configuration>
+        <configuration key="delete-external">true</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+</definition>

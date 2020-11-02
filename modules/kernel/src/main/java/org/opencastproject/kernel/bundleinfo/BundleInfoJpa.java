@@ -58,6 +58,7 @@ import javax.persistence.criteria.Root;
         @NamedQuery(name = "BundleInfo.delete", query = "delete from BundleInfo where host = :host and bundleId = :bundleId") })
 public class BundleInfoJpa {
   @Id
+  @Column(name = "id")
   @GeneratedValue
   protected long id;
 

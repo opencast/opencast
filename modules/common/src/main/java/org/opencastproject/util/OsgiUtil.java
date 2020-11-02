@@ -39,6 +39,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.Servlet;
 
@@ -82,6 +83,14 @@ public final class OsgiUtil {
     if (StringUtils.isBlank(p))
       throw new RuntimeException("Please provide context property " + key);
     return StringUtils.trimToEmpty(p);
+  }
+
+  /**
+   * Get a mandatory, non-blank value from the <em>component</em> context.
+   * In case the propertie is not defined (null), the default value will be returned.
+   */
+  public static String getComponentContextProperty(ComponentContext cc, String key, String defaultValue) {
+    return Objects.toString(cc.getProperties().get(key), defaultValue);
   }
 
   /**

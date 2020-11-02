@@ -19,7 +19,7 @@ The protocols supported and the transport format they use are summarized below:
 ## Requirements
 
 A Wowza Streaming Engine version >= 4.0 is required. Please pay special attention to the instructions re.
-crossdomain access.
+cross-domain access.
 
 
 ## Directory Structure
@@ -62,7 +62,7 @@ and adjust the values to match those of your scenario. Most important are:
     most cases, it is safe to comment them out or simply not include those properties in the file.
     Not defining the streaming url for a tenant will result in streams not being published for this tenant.
     
-2. Set the straming directory in `$KARAF/etc/custom.properties`:
+2. Set the streaming directory in `$KARAF/etc/custom.properties`:
 
         org.opencastproject.streaming.directory=/mnt/opencast-drive/content/streams
 
@@ -126,7 +126,7 @@ in `$KARAF/etc/custom.properties` (for instance: *opencast-engage*)
 ## Optional Settings
 
 Opencast HTML5 Player is able to play videos from Wowza using adaptive streaming protocols. However, some browsers may
-experiment problems due to crossdomain issues, which means that we need to instruct Wowza to include the right
+experiment problems due to cross-domain issues, which means that we need to instruct Wowza to include the right
 `Allow-Origin` headers in its HTTP requests.
 
 On the other hand, you may experiment problems with the MPEG-DASH protocol, depending on the encoding of the video
@@ -166,7 +166,7 @@ All this can be configured in the "Options" section of the Wowza application:
 Keep in mind that you have to adapt your encoding profiles when you want generate the videos to distribute via HLS or
 DASH. Specifically, if the videos with different qualities are not keyframe-aligned, they may not play smoothly or not
 play at all. You can find more information
-[here](https://www.wowza.com/forums/content.php?546-How-to-do-adaptive-bitrate-streaming).
+[here](https://www.wowza.com/docs/how-to-do-adaptive-bitrate-streaming).
 
 
 ## Limitations

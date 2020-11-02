@@ -118,7 +118,7 @@ public class UIConfigRest {
                @RestParameter(description = "Name of the configuration file", isRequired = true,
                               name = "filename", type = RestParameter.Type.STRING)
              },
-             reponses = {
+             responses = {
                @RestResponse(description = "the requested configuration file", responseCode = HttpServletResponse.SC_OK),
                @RestResponse(description = "if the configuration file doesn't exist", responseCode = HttpServletResponse.SC_NOT_FOUND),
              },

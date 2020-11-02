@@ -1,6 +1,6 @@
 {
     "value_locale": "zh",
-    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "value_dateFormatFull": "YYYY 年 M 月 D 日 HH:mm:ss",
     "error_videoLoading": "正在加载视频。请稍等。",
     "error_audioLoading": "正在加载音频。请稍等。",
     "msg_videoLoadedSuccessfully": "已成功加载了视频。",

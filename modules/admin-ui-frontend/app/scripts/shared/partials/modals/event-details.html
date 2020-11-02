@@ -62,7 +62,10 @@
             <ul>
               <li ng-repeat="publication in publications.publications | orderBy:'order' track by $index" ng-if="!publication.hide">
                 <div class="v-container">
-                  <span class="icon-container"><i custom-icon="{{ publication.icon }}" class="video-icon"></i></span>
+                  <span class="icon-container">
+                    <i ng-if="publication.icon" custom-icon="{{ publication.icon }}" class="custom-icon"></i>
+                    <i ng-if="!publication.icon" class="video-icon"><!-- holds the FontAwesome icon --></i>
+                  </span>
                   <div>
                     <span translate="{{ publication.label }}">{{ publication.label }}</span>
                     <p class="description" translate="{{ publication.description }}" ng-if="publication.description">{{ publication.description }}</p>
@@ -342,7 +345,7 @@
                           data-width="'200px'"
                           ng-change="roomChanged(); saveScheduling()"
                           ng-model="source.device"
-                          ng-options="value.name for (id, value) in captureAgents | filter:currentAgentOrAccess"
+                          ng-options="ca.name for ca in captureAgents | filter:currentAgentOrAccess track by ca.id"
                           placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                           />
                 </td>

@@ -79,7 +79,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
 @RestService(
   name = "externalapistatistics", title = "External API Statistics Endpoint",
   notes = {}, abstractText = "Provides statistics")
@@ -135,7 +135,7 @@ public class StatisticsEndpoint {
         description = "Whether the parameters should be included in the response.",
         type = RestParameter.Type.BOOLEAN)
     },
-    reponses = {
+    responses = {
       @RestResponse(
         description = "Returns the requested statistics providers as JSON",
         responseCode = HttpServletResponse.SC_OK),
@@ -201,7 +201,7 @@ public class StatisticsEndpoint {
         description = "Whether the parameters should be included in the response.",
         type = RestParameter.Type.BOOLEAN)
     },
-    reponses = {
+    responses = {
       @RestResponse(
         description = "Returns the requested statistics provider as JSON",
         responseCode = HttpServletResponse.SC_OK)
@@ -233,7 +233,7 @@ public class StatisticsEndpoint {
         name = "data", description = "An JSON array describing the queries to be executed",
         isRequired = true, type = RestParameter.Type.TEXT)
     },
-    reponses = {
+    responses = {
       @RestResponse(
         description = "Returns the statistical data as requested by the query as JSON array",
         responseCode = HttpServletResponse.SC_OK),
@@ -281,7 +281,7 @@ public class StatisticsEndpoint {
                           name = "filter", description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.",
                           isRequired = false, type = RestParameter.Type.STRING)
           },
-          reponses = {
+          responses = {
                   @RestResponse(
                           description = "Returns the csv data as requested by the query as plain text",
                           responseCode = HttpServletResponse.SC_OK),

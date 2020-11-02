@@ -31,11 +31,14 @@ import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.AdaptivePlaylist;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.LoadUtil;
@@ -73,9 +76,12 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -151,6 +157,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     this.distributionChannel = OsgiUtil.getComponentContextProperty(cc, CONFIG_KEY_STORE_TYPE);
   }
 
+  @Override
   public String getDistributionType() {
     return this.distributionChannel;
   }
@@ -240,10 +247,14 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     final Set<MediaPackageElement> elements = getElements(channelId, mediapackage, elementIds);
     List<MediaPackageElement> distributedElements = new ArrayList<MediaPackageElement>();
 
-    for (MediaPackageElement element : elements) {
-      MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, element, checkAvailability, preserveReference);
-      distributedElements.add(distributedElement);
-    }
+    if (AdaptivePlaylist.hasHLSPlaylist(elements)) {
+      return distributeHLSElements(channelId, mediapackage, elements, checkAvailability, preserveReference);
+    } else
+      for (MediaPackageElement element : elements) {
+        MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, element, checkAvailability,
+                preserveReference);
+        distributedElements.add(distributedElement);
+      }
     return distributedElements.toArray(new MediaPackageElement[distributedElements.size()]);
   }
 
@@ -334,6 +345,148 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
                 });
       }
       return distributedElement;
+    } catch (Exception e) {
+      logger.warn("Error distributing " + element, e);
+      if (e instanceof DistributionException) {
+        throw (DistributionException) e;
+      } else {
+        throw new DistributionException(e);
+      }
+    }
+  }
+
+  private MediaPackageElement[] distributeHLSElements(String channelId, MediaPackage mediapackage,
+          Set<MediaPackageElement> elements, boolean checkAvailability, boolean preserveReference)
+                  throws DistributionException {
+
+    List<MediaPackageElement> distributedElements = new ArrayList<MediaPackageElement>();
+    File distributionDir = getMediaPackageDirectory(channelId, mediapackage);
+    List<MediaPackageElement> nontrackElements = elements.stream()
+            .filter(e -> e.getElementType() != MediaPackageElement.Type.Track).collect(Collectors.toList());
+    // Distribute non track items
+    for (MediaPackageElement element : nontrackElements) {
+      MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, element, checkAvailability,
+              preserveReference);
+      distributedElements.add(distributedElement);
+    }
+    // Get all tracks and look for adaptive playlists
+    List<Track> trackElements = elements.stream()
+            .filter(e -> e.getElementType() == MediaPackageElement.Type.Track).map(e -> (Track) e)
+            .collect(Collectors.toList());
+    HashMap<MediaPackageElementFlavor, List<Track>> trackElementsMap = new HashMap<MediaPackageElementFlavor, List<Track>>();
+    // sort into one track list for each flavor - one video
+    for (Track element : trackElements) {
+      // clone track to destination mp and put into mediapackage
+      Track t = setUpHLSElementforDistribution(channelId, mediapackage, element, preserveReference);
+      List<Track> l = trackElementsMap.get(t.getFlavor());
+      if (l == null)
+        l = new ArrayList<Track>();
+      l.add(t);
+      trackElementsMap.put(t.getFlavor(), l);
+    }
+
+    // Run distribution flavor by flavor to ensure that there is only one master and its renditions
+    for (Entry<MediaPackageElementFlavor, List<Track>> elementSet : trackElementsMap.entrySet()) {
+      try {
+        List<Track> tracks = elementSet.getValue();
+        // If this flavor is a HLS playlist and therefore has internal references
+        if (tracks.stream().anyMatch(AdaptivePlaylist.isHLSTrackPred))
+          tracks = AdaptivePlaylist.fixReferences(tracks, distributionDir); // replace with fixed elements
+        for (Track track : tracks) {
+          MediaPackageElement distributedElement = checkDistributeHLSElement(track, checkAvailability);
+          distributedElements.add(distributedElement);
+        }
+      } catch (MediaPackageException | NotFoundException | IOException e1) {
+        logger.error("HLS Prepare failed for mediapackage {} in {}: {} ", elementSet.getKey(), mediapackage, e1);
+        throw new DistributionException("Cannot distribute " + mediapackage);
+      } catch (URISyntaxException e1) {
+        logger.error("HLS Prepare failed - Bad URI syntax {} in {}: {} ", elementSet.getKey(), mediapackage, e1);
+        throw new DistributionException("Cannot distribute - BAD URI syntax " + mediapackage);
+      }
+    }
+    return distributedElements.toArray(new MediaPackageElement[distributedElements.size()]);
+  }
+
+  public Track setUpHLSElementforDistribution(String channelId, MediaPackage mediapackage, Track element,
+          boolean preserveReference)
+                  throws DistributionException {
+
+    final String mediapackageId = mediapackage.getIdentifier().toString();
+    final String elementId = element.getIdentifier();
+
+    File source;
+    try {
+      source = workspace.get(element.getURI());
+    } catch (NotFoundException e) {
+      throw new DistributionException("Unable to find " + element.getURI() + " in the workspace", e);
+    } catch (IOException e) {
+      throw new DistributionException("Error loading " + element.getURI() + " from the workspace", e);
+    }
+
+    // Try to find a duplicated element source
+    try {
+      source = findDuplicatedElementSource(source, mediapackageId);
+    } catch (IOException e) {
+      logger.warn("Unable to find duplicated source {}: {}", source, ExceptionUtils.getMessage(e));
+    }
+
+    File destination = getDistributionFile(channelId, mediapackage, element);
+    if (!destination.equals(source)) {
+      // Put the file in place if sourcesfile differs destinationfile
+      try {
+        FileUtils.forceMkdir(destination.getParentFile());
+      } catch (IOException e) {
+        throw new DistributionException("Unable to create " + destination.getParentFile(), e);
+      }
+      logger.debug("Distributing element {} of media package {} to publication channel {} ({})", elementId,
+              mediapackageId, channelId, destination);
+
+      try {
+        if (AdaptivePlaylist.isPlaylist(source)) { // do not link text files
+          FileSupport.copy(source, destination, true);
+        } else {
+          FileSupport.link(source, destination, true);
+        }
+      } catch (IOException e) {
+        throw new DistributionException(format("Unable to copy %s to %s", source, destination), e);
+      }
+    }
+
+    MediaPackageElement distributeElement = (MediaPackageElement) element.clone();
+    // Create a media package element representation of the distributed file
+    try {
+      distributeElement.setURI(getDistributionUri(channelId, mediapackageId, element));
+      if (preserveReference) {
+        distributeElement.setReference(element.getReference());
+      }
+    } catch (URISyntaxException e) {
+      throw new DistributionException("Distributed element produces an invalid URI", e);
+    }
+
+    logger.debug("Setting up element {} of media package {} for publication channel {}", elementId,
+            mediapackageId, channelId);
+    return (Track) distributeElement;
+  }
+
+  public Track checkDistributeHLSElement(Track element, boolean checkAvailability)
+          throws DistributionException {
+
+    final URI uri = element.getURI();
+    try {
+      if (checkAvailability) {
+        logger.debug("Checking availability of distributed artifact {} at {}", element, uri);
+        waitForResource(trustedHttpClient, uri, HttpServletResponse.SC_OK, TIMEOUT, INTERVAL)
+        .fold(Misc.<Exception, Void> chuck(), new Effect.X<Integer>() {
+          @Override
+          public void xrun(Integer status) throws Exception {
+            if (ne(status, HttpServletResponse.SC_OK)) {
+              logger.warn("Attempt to access distributed file {} returned code {}", uri, status);
+              throw new DistributionException("Unable to load distributed file " + uri.toString());
+            }
+          }
+        });
+      }
+      return element;
     } catch (Exception e) {
       logger.warn("Error distributing " + element, e);
       if (e instanceof DistributionException) {

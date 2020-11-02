@@ -136,7 +136,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
     restParameters = {
         @RestParameter(description = "Location of the media file.", isRequired = false, name = "uri", type = RestParameter.Type.STRING),
         @RestParameter(description = "Options passed to media inspection service", isRequired = false, name = "options", type = RestParameter.Type.STRING) },
-    reponses = {
+    responses = {
         @RestResponse(description = "XML encoded receipt is returned.", responseCode = HttpServletResponse.SC_OK),
         @RestResponse(description = "Service unavailabe or not currently present", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
         @RestResponse(description = "Problem retrieving media file or invalid media file or URL.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
@@ -160,7 +160,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
         @RestParameter(description = "MediaPackage Element, that should be enriched with metadata ", isRequired = true, name = "mediaPackageElement", type = RestParameter.Type.TEXT),
         @RestParameter(description = "Should the existing metadata values remain", isRequired = true, name = "override", type = RestParameter.Type.BOOLEAN),
         @RestParameter(description = "Options passed to media inspection service", isRequired = false, name = "options", type = RestParameter.Type.STRING) },
-    reponses = {
+    responses = {
         @RestResponse(description = "XML encoded receipt is returned.", responseCode = HttpServletResponse.SC_OK),
         @RestResponse(description = "Service unavailabe or not currently present", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
         @RestResponse(description = "Problem retrieving media file or invalid media file or URL.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },

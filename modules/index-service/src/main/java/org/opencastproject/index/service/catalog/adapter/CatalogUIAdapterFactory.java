@@ -29,7 +29,7 @@ import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatal
 import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEventDCCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.ConfigurableSeriesDCCatalogUIAdapter;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
+import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.series.api.SeriesService;

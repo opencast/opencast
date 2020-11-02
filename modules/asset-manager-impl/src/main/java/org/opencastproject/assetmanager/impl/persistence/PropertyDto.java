@@ -41,6 +41,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -49,7 +50,14 @@ import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
 @Entity(name = "Property")
-@Table(name = "oc_assets_properties")
+@Table(name = "oc_assets_properties", indexes = {
+    @Index(name = "IX_oc_assets_properties_val_date", columnList = ("val_date")),
+    @Index(name = "IX_oc_assets_properties_val_long", columnList = ("val_long")),
+    @Index(name = "IX_oc_assets_properties_val_string", columnList = ("val_string")),
+    @Index(name = "IX_oc_assets_properties_val_bool", columnList = ("val_bool")),
+    @Index(name = "IX_oc_assets_properties_mediapackage_id", columnList = ("mediapackage_id")),
+    @Index(name = "IX_oc_assets_properties_namespace", columnList = ("namespace")),
+    @Index(name = "IX_oc_assets_properties_property_name", columnList = ("property_name")) })
 @NamedQueries({
     @NamedQuery(name = "Property.selectByMediaPackageAndNamespace", query = "select p from Property p where "
             + "p.mediaPackageId = :mediaPackageId and p.namespace = :namespace"),

@@ -8,7 +8,7 @@ their relations. Its primary use is to post-process audio and video files ingest
 ## Prerequisite
 When using the PartialImportWorkflowOperation, it is recommended to perform a media inspection beforehand using the
 InspectWorkflowOperation with the option `accurate-frame-count` set to `true`. This ensures that
-the PartialImportWorkflowOperation works correctly in case of media files with incorrect framecount in their header.
+the PartialImportWorkflowOperation works correctly in case of media files with incorrect frame count in their header.
 Note that the use of `accurate-frame-count` will force the InspectWorkflowOperation to decode the complete video
 stream which makes the operation more expensive in terms of load.
 
@@ -26,6 +26,8 @@ stream which makes the operation more expensive in terms of load.
 |**trim-encoding-profile**\*|String|Encoding profile using for trimming tracks|
 |force-encoding|Boolean|If set to *true*, all generated target files will be encoded using the encoding profile *force-encoding-profile*|false|
 |**force-encoding-profile**\*|String|Encoding profile to be used when *force-encoding* is set to *true* or a given target track has a file extension not included in *required-extensions*||
+|preencode-encoding|Boolean|If set to *true*, all source target files will be encoded using the encoding profile *preencode-encoding-profile* before they're processed further|false|
+|preencode-encoding-profile|String|Encoding profile to be used when *preencode-encoding* is set to *true* ||
 |required-extensions|String , { "," , String }|Comma-separated list of file extension names (case insensitive). All generated target files whose file extensions are not in this list will be encoded using the encoding profile *force-encoding-profile*|"mp4"|
 |enforce-divisible-by-two|Boolean|If set, all video targets will have widths and heights divisible by two. This might be necessary depending since some encoder fail when encountering uneven widths or heights.|false|
 
@@ -223,3 +225,4 @@ hard-coded and are not supposed to be changed by the user.
 |concat-encoding-profile|Used to concatenate partial tracks into tracks|
 |trim-encoding-profile|Used to trim the resulting concatenated single tracks if necessary|
 |force-encoding-profile|Used to re-encode target tracks in case the file extension of a given target track is not included in *required-extensions* or the configuration key *force-encoding* is set to *true* |
+|preencode-encoding-profile|Only used if *preencode-encoding* is set to true. Can be used to encode all source tracks before any processing happens, to avoid errors with non-uniform input. Should be used instead of [Encode](encode-woh.md), as the latter will break source-smil. |

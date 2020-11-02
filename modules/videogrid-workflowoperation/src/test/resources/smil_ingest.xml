@@ -1,0 +1,27 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
+  <head/>
+  <body>
+    <par dur="47187ms">
+      <seq>
+        <video begin="23046ms" dur="14772ms"
+               src="/files/mediapackage/b4f06863-bf53-4eb7-abb6-4433b9699081/d79699b2-d683-4f0d-95ff-2dc4da3c9c40/medium_w_g7vtgxrzp24d_1596617796429.webm"
+               xml:id="d79699b2-d683-4f0d-95ff-2dc4da3c9c40"/>
+        <video begin="24734ms" dur="22453ms"
+               src="/files/mediapackage/b4f06863-bf53-4eb7-abb6-4433b9699081/76badf4a-3ab6-45f1-aba3-87deee80516e/medium_w_3ghiyg8tmlhk_1596617798147.webm"
+               xml:id="76badf4a-3ab6-45f1-aba3-87deee80516e"/>
+      </seq>
+      <seq>
+        <video begin="5340ms" dur="34ms"
+               src="/files/mediapackage/b4f06863-bf53-4eb7-abb6-4433b9699081/4394631c-71a9-41dc-a8b8-7c0d70d110ec/slide1.mp4"
+               xml:id="4394631c-71a9-41dc-a8b8-7c0d70d110ec"/>
+        <audio begin="10330ms" dur="34000ms"
+               src="/files/mediapackage/b4f06863-bf53-4eb7-abb6-4433b9699081/696bc7dc-caca-468c-9f8d-5f8fc57f0b83/0a62baa687baef56c59d74061eb85f04fa19a6eb_1596617773457_24877875.opus"
+               xml:id="696bc7dc-caca-468c-9f8d-5f8fc57f0b83"/>
+        <video begin="32471ms" dur="34ms"
+               src="/files/mediapackage/b4f06863-bf53-4eb7-abb6-4433b9699081/452324b2-87d4-4833-a3db-32e54fc2798c/slide2.mp4"
+               xml:id="452324b2-87d4-4833-a3db-32e54fc2798c"/>
+      </seq>
+    </par>
+  </body>
+</smil>

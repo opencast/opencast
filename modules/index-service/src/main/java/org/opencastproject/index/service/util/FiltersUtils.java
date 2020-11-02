@@ -21,9 +21,8 @@
 
 package org.opencastproject.index.service.util;
 
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter.SourceType;
-import org.opencastproject.index.service.resources.list.query.AbstractListFilter;
+import org.opencastproject.list.api.ResourceListFilter;
+import org.opencastproject.list.query.AbstractListFilter;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
@@ -47,7 +46,7 @@ public final class FiltersUtils {
    * @param label
    *          The label of the filter, required.
    * @param type
-   *          the {@link SourceType}
+   *          the {@link ResourceListFilter.SourceType}
    * @param valuesListName
    *          The name of the list from a list provider providing the possible values wrapped in a {@link Option}.Can be
    *          {@link Option#none()}
@@ -56,7 +55,7 @@ public final class FiltersUtils {
    * @return a new {@link ResourceListFilter} with the parameters given
    */
   public static <A> ResourceListFilter<A> generateFilter(final Option<A> value, final String name, final String label,
-          final SourceType type, final Option<String> valuesListName) throws IllegalArgumentException {
+          final ResourceListFilter.SourceType type, final Option<String> valuesListName) throws IllegalArgumentException {
     if (StringUtils.isBlank(name) || StringUtils.isBlank(label) || type == null)
       throw new IllegalArgumentException("The filter label, name or type must not be null!");
 

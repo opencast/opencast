@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>10-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -73,7 +73,13 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-asset-manager-util</artifactId>
+      <artifactId>opencast-shared-filesystem-utils</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-list-providers-service</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -251,7 +257,6 @@
               org.opencastproject.index.service.impl.index.theme,
               org.opencastproject.index.service.message,
               org.opencastproject.index.service.resources.list.api,
-              org.opencastproject.index.service.resources.list.impl,
               org.opencastproject.index.service.resources.list.provider,
               org.opencastproject.index.service.resources.list.query,
               org.opencastproject.index.service.util
@@ -260,8 +265,6 @@
               OSGI-INF/catalog-ui-adapter-factory.xml,
               OSGI-INF/index_service.xml,
               OSGI-INF/message-receiver-lock-service.xml,
-              OSGI-INF/list_providers_scanner.xml,
-              OSGI-INF/list_providers_service.xml,
               OSGI-INF/list-providers/acl.xml,
               OSGI-INF/list-providers/agents.xml,
               OSGI-INF/list-providers/boolean.xml,

@@ -22,32 +22,14 @@ your own domain name:
     org.opencastproject.server.url=http://example.com:8080
 
 *Note:* This value will be written to all generated mediapackages and thus cannot be changed easily for already
-processed media. At least not without an extra amount of work involving modifications to the database. That is why you
+processed media, at least not without an extra amount of work involving modifications to the database. That is why you
 should think about this setting carefully.
 
-Second, adjust the binding address in your `org.ops4j.pax.web.cfg` configuration file. The binding address can be set to
-`0.0.0.0` for general network access. The property to modify is:
-
-    org.ops4j.pax.web.listening.addresses=127.0.0.1
-
-It may be necessary to adjust the jetty http connector idleTimeout value for processing large files in some configurations.
-To do so, uncomment this line in `org.ops4j.pax.web.cfg`:
-
-    org.ops4j.pax.web.config.file=${karaf.etc}/jetty-opencast.xml
-
-and modify the host and if necessary port values in `jetty-opencast.xml` to match the ops4j configuration:
-
-    <Set name="host">127.0.0.1</Set>
-
-If you are deploying to the cloud then your servers may not have useful hostnames. The node name is a descriptive title
-for this Opencast instance, eg Admin, worker-01, etc. and can be used as an alternative in the Admin UI.
-
-    org.opencastproject.server.nodename=AllInOne
 
 Step 2: Setting the Login Details
 ---------------------------------
 
-There are two authentication methods for Opencast. HTTP Digest authentication and form-based authentication. Both
+There are two authentication methods for Opencast: HTTP Digest authentication and form-based authentication. Both
 methods need a username and a password. Change the password for both! The important keys in the 'custom.properties'
 configuration file are:
 
@@ -68,7 +50,7 @@ set to the same value on each of you Opencast nodes (Core, Worker, Capture Agent
 Step 3: Change the default shutdown command
 -------------------------------------------
 
-Karaf provides a socket over wich you can send a shutdown command. The socket does not provide any kind of
+Karaf provides a socket over which you can send a shutdown command. The socket does not provide any kind of
 authentication. Therefore anyone who obtains write access to this socket is able to shutdown karaf and everything
 that runs on it. There is a default `karaf.shutdown.command` defined in `custom.properties`. Change this to something
 secret.
@@ -85,7 +67,7 @@ For more details about the setup, have a look at the [Apache ActiveMQ configurat
 Step 5: Database Configuration
 ------------------------------
 
-Opencast uses an integrated HSQL database by default. While you will find it perfectly functional, it has certain
+Opencast uses an integrated H2 database by default. While you will find it perfectly functional, it has certain
 drawbacks:
 
 * It is rather slow
@@ -103,7 +85,13 @@ Opencast requires Elasticsearch.
 For more details about the setup, have a look at the [Elasticsearch configuration
 guide](../modules/searchindex/elasticsearch.md).
 
-Step 7: Setting the Storage Directory (optional)
+Step 7: HTTPS Configuration
+---------------------------
+
+An installation without HTTPS does not make much sense today.
+Thus, make sure to follow [a configuration guide for HTTPS](https/index.md).
+
+Step 8: Setting the Storage Directory (optional)
 ------------------------------------------------
 
 Even though it is not important for all systems – on test setups you can probably omit this – you will often want to set
@@ -113,4 +101,3 @@ can set the directory by changing `org.opencastproject.storage.dir` like:
     org.opencastproject.storage.dir=/media/mhdatamount
 
 Please keep in mind that the user running Opencast must have read/write permissions to the storage directory.
-

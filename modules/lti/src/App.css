@@ -1,0 +1,8 @@
+header {
+  padding: 5px;
+  margin: 15px;
+}
+
+.episode-item {
+    cursor: pointer;
+}

@@ -8,7 +8,7 @@
             value="org.opencastproject.index.service.resources.list.provider.EventCommentsListProvider"/>
 
   <service>
-    <provide interface="org.opencastproject.index.service.resources.list.api.ResourceListProvider"/>
+    <provide interface="org.opencastproject.list.api.ResourceListProvider"/>
   </service>
 
   <reference name="EventCommentService" interface="org.opencastproject.event.comment.EventCommentService"

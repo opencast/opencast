@@ -31,6 +31,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -44,7 +45,9 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "oc_role", uniqueConstraints = @UniqueConstraint(columnNames = { "name", "organization" }))
+@Table(name = "oc_role", uniqueConstraints = @UniqueConstraint(columnNames = { "name", "organization" }), indexes = {
+    @Index(name = "IX_oc_role_pk", columnList = "name, organization")
+})
 @NamedQueries({
         @NamedQuery(name = "Role.findByQuery", query = "select r from JpaRole r where r.organization.id=:org and UPPER(r.name) like :query or UPPER(r.description) like :query"),
         @NamedQuery(name = "Role.findByName", query = "Select r FROM JpaRole r where r.name = :name and r.organization.id = :org"),

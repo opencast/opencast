@@ -52,17 +52,27 @@ angular.module('adminNg.resources')
           row.series_id = r.series.id;
         }
         row.event_status_raw = r.event_status;
-        $translate(r.event_status).then(function (translation) {
-          row.event_status = translation;
-        }).catch(angular.noop);
-        $translate(r.displayable_status, {}, undefined, r.displayable_status).then(function (translation) {
-          row.displayable_status = translation;
-        }).catch(angular.noop);
+        if (!r.event_status) {
+          row.event_status = '';
+        } else {
+          $translate(r.event_status).then(function (translation) {
+            row.event_status = translation;
+          }).catch(angular.noop);
+        }
+        if (!r.displayable_status) {
+          row.displayable_status = '';
+        } else {
+          $translate(r.displayable_status, {}, undefined, r.displayable_status).then(function (translation) {
+            row.displayable_status = translation;
+          }).catch(angular.noop);
+        }
         row.source = r.source;
         row.scheduling_status = r.scheduling_status;
-        $translate(r.scheduling_status).then(function (translation) {
-          row.scheduling_status = translation;
-        }).catch(angular.noop);
+        if (r.scheduling_status) {
+          $translate(r.scheduling_status).then(function (translation) {
+            row.scheduling_status = translation;
+          }).catch(angular.noop);
+        }
         row.workflow_state = r.workflow_state;
         row.date = Language.formatDate('short', r.start_date);
         row.date_raw = r.start_date;

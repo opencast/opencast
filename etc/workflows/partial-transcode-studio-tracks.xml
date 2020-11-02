@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>partial-transcode-studio-tracks</id>
+  <title>partial-transcode-studio-tracks</title>
+  <tags/>
+  <description/>
+  <operations>
+
+    <operation
+      id="encode"
+      exception-handler-workflow="partial-error"
+      description="Reencode presenter video to fix framerate and resolution">
+      <configurations>
+        <configuration key="source-flavors">*/source</configuration>
+        <configuration key="target-flavor">*/source+transcoded</configuration>
+        <configuration key="encoding-profile">scale.fhd.framerate.fix</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Cut the videos -->
+
+    <operation id="editor"
+      exception-handler-workflow="partial-error"
+      description="Cut the recording according to the edit decision list">
+      <configurations>
+        <configuration key="source-flavors">*/source+transcoded</configuration>
+        <configuration key="smil-flavors">smil/cutting</configuration>
+        <configuration key="target-smil-flavor">smil/cutting</configuration>
+        <configuration key="target-flavor-subtype">source+trimmed</configuration>
+        <configuration key="skip-if-not-trimmed">true</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="tag"
+      exception-handler-workflow="partial-error"
+      description="Tagging presenter source video as original and not for archive">
+      <configurations>
+        <configuration key="source-flavors">presenter/source</configuration>
+        <configuration key="target-flavor">presenter/source+original</configuration>
+        <configuration key="target-tags">-archive</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="tag"
+      exception-handler-workflow="partial-error"
+      description="Tagging transcoded and trimmed presenter video as source and for archive">
+      <configurations>
+        <configuration key="source-flavors">presenter/source+trimmed</configuration>
+        <configuration key="target-flavor">presenter/source</configuration>
+        <configuration key="target-tags">archive</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="tag"
+      exception-handler-workflow="partial-error"
+      description="Tagging presentation source video as original and not for archive">
+      <configurations>
+        <configuration key="source-flavors">presentation/source</configuration>
+        <configuration key="target-flavor">presentation/source+original</configuration>
+        <configuration key="target-tags">-archive</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="tag"
+      exception-handler-workflow="partial-error"
+      description="Tagging transcoded and trimmed presentation video as source and for archive">
+      <configurations>
+        <configuration key="source-flavors">presentation/source+trimmed</configuration>
+        <configuration key="target-flavor">presentation/source</configuration>
+        <configuration key="target-tags">archive</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+</definition>

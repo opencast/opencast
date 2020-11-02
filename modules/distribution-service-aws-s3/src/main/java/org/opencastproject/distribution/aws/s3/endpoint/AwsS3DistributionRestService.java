@@ -114,7 +114,7 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
           @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
           @RestParameter(name = "elementId", isRequired = true, description = "The element to distribute", type = Type.STRING),
-          @RestParameter(name = "checkAvailability", isRequired = false, description = "If the service should try to access the distributed element", type = Type.BOOLEAN) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job") })
+          @RestParameter(name = "checkAvailability", isRequired = false, description = "If the service should try to access the distributed element", type = Type.BOOLEAN) }, responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution job") })
   public Response distribute(@FormParam("mediapackage") String mediaPackageXml,
           @FormParam("channelId") String channelId, @FormParam("elementId") String elementId,
           @DefaultValue("true") @FormParam("checkAvailability") boolean checkAvailability) throws Exception {
@@ -141,7 +141,7 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
       @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
       @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
       @RestParameter(name = "elementId", isRequired = true, description = "The element to distribute", type = Type.STRING),
-      @RestParameter(name = "checkAvailability", isRequired = false, description = "If the service should try to access the distributed element", type = Type.BOOLEAN) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution") })
+      @RestParameter(name = "checkAvailability", isRequired = false, description = "If the service should try to access the distributed element", type = Type.BOOLEAN) }, responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution") })
   public Response distributeSync(@FormParam("mediapackage") String mediaPackageXml,
                              @FormParam("channelId") String channelId, @FormParam("elementId") String elementId,
                              @DefaultValue("true") @FormParam("checkAvailability") boolean checkAvailability) throws Exception {
@@ -167,7 +167,7 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "retract", description = "Retract a media package element from this distribution channel", returnDescription = "The job that can be used to track the retraction", restParameters = {
           @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
           @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
-          @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job") })
+          @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job") })
   public Response retract(@FormParam("mediapackage") String mediaPackageXml, @FormParam("channelId") String channelId,
           @FormParam("elementId") String elementId) throws Exception {
     Job job = null;
@@ -192,7 +192,7 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "retractsync", description = "Synchronously retract a media package element from this distribution channel", returnDescription = "The retraction", restParameters = {
       @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
       @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
-      @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction") })
+      @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction") })
   public Response retractSync(@FormParam("mediapackage") String mediaPackageXml, @FormParam("channelId") String channelId,
                           @FormParam("elementId") String elementId) throws Exception {
     List<MediaPackageElement> result = null;

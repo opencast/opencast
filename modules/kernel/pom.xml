@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>10-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -305,7 +305,6 @@
               OSGI-INF/current-job-filter.xml,
               OSGI-INF/rest.xml,
               OSGI-INF/security-filter.xml,
-              OSGI-INF/security-lti.xml,
               OSGI-INF/security-oauth.xml,
               OSGI-INF/smtp-service.xml,
               OSGI-INF/remote-user-and-role-filter.xml,

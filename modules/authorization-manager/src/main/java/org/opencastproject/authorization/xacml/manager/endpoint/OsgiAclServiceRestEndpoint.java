@@ -40,7 +40,7 @@ import javax.ws.rs.Path;
 
 /** REST endpoint for ACL manager. */
 @Path("/")
-@RestService(name = "aclmanager", title = "ACL Manager", abstractText = "This service creates, edits and retrieves and helps managing and scheduling ACL's.", notes = {})
+@RestService(name = "aclmanager", title = "ACL Manager", abstractText = "This service creates, edits, retrieves and helps managing access policies (ACL templates).", notes = {})
 public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndpoint {
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(OsgiAclServiceRestEndpoint.class);

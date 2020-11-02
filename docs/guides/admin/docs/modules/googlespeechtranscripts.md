@@ -70,10 +70,10 @@ For up to date instructions please search for _'google speech to text configurat
 
 ![Screenshot](google-speech_create_token.png)
 
-#### Getting your Refresh Token and Authorization enpdpoint
+#### Getting your Refresh Token and Authorization endpoint
 * Go to [https://developers.google.com/oauthplayground](https://developers.google.com/oauthplayground) (Make sure you added this URL to your Authorized redirect URIs in the previous step.)
 * In the top right corner, click the settings icon
-* Take note of your _Token endpoint_. It is the token endpoint url needed for the configuration. 
+* Take note of your _Token endpoint_. It is the token endpoint URL needed for the configuration. 
 * Make sure the Access token location is set to **Authorization header w/ Bearer prefix**
 * Make sure Access type is set to *Offline*
 * Make sure Force prompt is set to 'Consent Screen'

@@ -43,7 +43,6 @@ import org.opencastproject.event.comment.EventCommentParser;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.MetadataUtils;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
@@ -61,13 +60,13 @@ import org.opencastproject.index.service.impl.index.group.GroupIndexSchema;
 import org.opencastproject.index.service.impl.index.group.GroupSearchQuery;
 import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RequestUtils;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
+import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SortCriterion;
@@ -85,14 +84,15 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
-import org.opencastproject.metadata.dublincore.MetadataParsingException;
+import org.opencastproject.metadata.dublincore.MetadataJson;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -829,12 +829,7 @@ public class IndexServiceImpl implements IndexService {
     AccessControlList acl = getAccessControlList(metadataJson);
 
     MetadataList metadataList = getMetadataListWithAllEventCatalogUIAdapters();
-    try {
-      metadataList.fromJSON(allEventMetadataJson.toJSONString());
-    } catch (MetadataParsingException e) {
-      logger.warn("Unable to parse event metadata {}", allEventMetadataJson.toJSONString());
-      throw new IllegalArgumentException("Unable to parse metadata set");
-    }
+    MetadataJson.fillListFromJson(metadataList, allEventMetadataJson);
 
     EventHttpServletRequest eventHttpServletRequest = new EventHttpServletRequest();
     eventHttpServletRequest.setAcl(acl);
@@ -874,15 +869,15 @@ public class IndexServiceImpl implements IndexService {
     // Get Type of Source
     SourceType type = getSourceType(eventHttpServletRequest.getSource().get());
 
-    MetadataCollection eventMetadata = eventHttpServletRequest.getMetadataList().get()
-            .getMetadataByAdapter(eventCatalogUIAdapter).get();
+    DublinCoreMetadataCollection eventMetadata = eventHttpServletRequest.getMetadataList().get()
+            .getMetadataByAdapter(eventCatalogUIAdapter);
 
     Date currentStartDate = null;
     JSONObject sourceMetadata = (JSONObject) eventHttpServletRequest.getSource().get().get("metadata");
     if (sourceMetadata != null
             && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
       try {
-        MetadataField<?> current = eventMetadata.getOutputFields().get("location");
+        MetadataField current = eventMetadata.getOutputFields().get("location");
         eventMetadata.updateStringField(current, (String) sourceMetadata.get("device"));
       } catch (Exception e) {
         logger.warn("Unable to parse device {}", sourceMetadata.get("device"));
@@ -893,13 +888,13 @@ public class IndexServiceImpl implements IndexService {
       }
     }
 
-    MetadataField<?> startDate = eventMetadata.getOutputFields().get("startDate");
-    if (startDate != null && startDate.isUpdated() && startDate.getValue().isSome()) {
-      SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(startDate.getPattern().get());
-      currentStartDate = sdf.parse((String) startDate.getValue().get());
+    MetadataField startDate = eventMetadata.getOutputFields().get("startDate");
+    if (startDate != null && startDate.isUpdated() && startDate.getValue() != null) {
+      SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(startDate.getPattern());
+      currentStartDate = sdf.parse((String) startDate.getValue());
     } else if (currentStartDate != null) {
       eventMetadata.removeField(startDate);
-      MetadataField<String> newStartDate = new MetadataField(startDate);
+      MetadataField newStartDate = new MetadataField(startDate);
       newStartDate.setValue(EncodingSchemeUtils.encodeDate(currentStartDate, Precision.Fraction).getValue());
       eventMetadata.addField(newStartDate);
     }
@@ -909,10 +904,10 @@ public class IndexServiceImpl implements IndexService {
     // Note, even though this field borrows the DublinCore.PROPERTY_CREATED key,
     // the startDate is used to update the DublinCore catalog PROPERTY_CREATED field,
     // event, and mediapackage start fields.
-    MetadataField<?> created = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
-    if (created != null && (!created.isUpdated() || created.getValue().isNone())) {
+    MetadataField created = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
+    if (created != null && (!created.isUpdated() || created.getValue() == null)) {
       eventMetadata.removeField(created);
-      MetadataField<String> newCreated = new MetadataField(created);
+      MetadataField newCreated = new MetadataField(created);
       if (currentStartDate != null) {
         newCreated.setValue(EncodingSchemeUtils.encodeDate(currentStartDate, Precision.Second).getValue());
       } else {
@@ -1055,23 +1050,23 @@ public class IndexServiceImpl implements IndexService {
   }
 
   /**
-   * Update the presenters field in the event {@link MetadataCollection} to have friendly names loaded by the
+   * Update the presenters field in the event {@link DublinCoreMetadataCollection} to have friendly names loaded by the
    * {@link UserDirectoryService} and return the usernames of the presenters.
    *
    * @param eventMetadata
-   *          The {@link MetadataCollection} to update the presenters (creator field) with full names.
+   *          The {@link DublinCoreMetadataCollection} to update the presenters (creator field) with full names.
    * @return If the presenters (creator) field has been updated, the set of user names, if any, of the presenters. None
    *         if it wasn't updated.
    */
-  private Opt<Set<String>> updatePresenters(MetadataCollection eventMetadata) {
-    MetadataField<?> presentersMetadataField = eventMetadata.getOutputFields()
+  private Opt<Set<String>> updatePresenters(DublinCoreMetadataCollection eventMetadata) {
+    MetadataField presentersMetadataField = eventMetadata.getOutputFields()
             .get(DublinCore.PROPERTY_CREATOR.getLocalName());
     if (presentersMetadataField.isUpdated()) {
       Set<String> presenterUsernames = new HashSet<>();
       Tuple<List<String>, Set<String>> updatedPresenters = getTechnicalPresenters(eventMetadata);
       presenterUsernames = updatedPresenters.getB();
       eventMetadata.removeField(presentersMetadataField);
-      MetadataField<Iterable<String>> newPresentersMetadataField = new MetadataField(presentersMetadataField);
+      MetadataField newPresentersMetadataField = new MetadataField(presentersMetadataField);
       newPresentersMetadataField.setValue(updatedPresenters.getA());
       eventMetadata.addField(newPresentersMetadataField);
       return Opt.some(presenterUsernames);
@@ -1206,14 +1201,15 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public MetadataList updateAllEventMetadata(String id, String metadataJSON, AbstractSearchIndex index)
+  public MetadataList updateAllEventMetadata(
+          final String id, final String metadataJSON, final AbstractSearchIndex index)
           throws IllegalArgumentException, IndexServiceException, NotFoundException, SearchIndexException,
           UnauthorizedException {
-    MetadataList metadataList;
+    final MetadataList metadataList;
     try {
       metadataList = getMetadataListWithAllEventCatalogUIAdapters();
-      metadataList.fromJSON(metadataJSON);
-    } catch (Exception e) {
+      MetadataJson.fillListFromJson(metadataList, (JSONArray) new JSONParser().parse(metadataJSON));
+    } catch (final org.json.simple.parser.ParseException e) {
       logger.warn("Not able to parse the event metadata {}:", metadataJSON, e);
       throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
     }
@@ -1302,9 +1298,9 @@ public class IndexServiceImpl implements IndexService {
     Event event = optEvent.get();
     MediaPackage mediaPackage = getEventMediapackage(event);
     Opt<Set<String>> presenters = Opt.none();
-    Opt<MetadataCollection> eventCatalog = metadataList.getMetadataByAdapter(getCommonEventCatalogUIAdapter());
-    if (eventCatalog.isSome()) {
-      presenters = updatePresenters(eventCatalog.get());
+    DublinCoreMetadataCollection eventCatalog = metadataList.getMetadataByAdapter(getCommonEventCatalogUIAdapter());
+    if (eventCatalog != null) {
+      presenters = updatePresenters(eventCatalog);
     }
     updateMediaPackageMetadata(mediaPackage, metadataList);
     switch (getEventSource(event)) {
@@ -1320,7 +1316,7 @@ public class IndexServiceImpl implements IndexService {
           updateWorkflowInstance(instance);
         } catch (WorkflowException e) {
           logger.error("Unable to update workflow event {} with metadata {} because",
-                  id, RestUtils.getJsonStringSilent(metadataList.toJSON()), e);
+                  id, RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
           throw new IndexServiceException("Unable to update workflow event " + id);
         }
         break;
@@ -1333,7 +1329,7 @@ public class IndexServiceImpl implements IndexService {
                   Opt.some(mediaPackage), Opt.<Map<String, String>> none(), Opt.<Map<String, String>> none());
         } catch (SchedulerException e) {
           logger.error("Unable to update scheduled event {} with metadata {} because",
-                  id, RestUtils.getJsonStringSilent(metadataList.toJSON()), e);
+                  id, RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
           throw new IndexServiceException("Unable to update scheduled event " + id);
         }
         break;
@@ -1352,8 +1348,8 @@ public class IndexServiceImpl implements IndexService {
    * @return A {@link Tuple} with a list of friendly presenter names and a set of user names if available for the
    *         presenters.
    */
-  protected Tuple<List<String>, Set<String>> getTechnicalPresenters(MetadataCollection eventMetadata) {
-    MetadataField<?> presentersMetadataField = eventMetadata.getOutputFields()
+  protected Tuple<List<String>, Set<String>> getTechnicalPresenters(DublinCoreMetadataCollection eventMetadata) {
+    MetadataField presentersMetadataField = eventMetadata.getOutputFields()
             .get(DublinCore.PROPERTY_CREATOR.getLocalName());
     List<String> presenters = new ArrayList<>();
     Set<String> technicalPresenters = new HashSet<>();
@@ -1726,9 +1722,9 @@ public class IndexServiceImpl implements IndexService {
   private void updateMediaPackageMetadata(MediaPackage mp, MetadataList metadataList) {
     String oldSeriesId = mp.getSeries();
     for (EventCatalogUIAdapter catalogUIAdapter : getEventCatalogUIAdapters()) {
-      Opt<MetadataCollection> metadata = metadataList.getMetadataByAdapter(catalogUIAdapter);
-      if (metadata.isSome() && metadata.get().isUpdated()) {
-        catalogUIAdapter.storeFields(mp, metadata.get());
+      final DublinCoreMetadataCollection metadata = metadataList.getMetadataByAdapter(catalogUIAdapter);
+      if (metadata != null && metadata.isUpdated()) {
+        catalogUIAdapter.storeFields(mp, metadata);
       }
     }
 
@@ -1877,9 +1873,9 @@ public class IndexServiceImpl implements IndexService {
       dc.set(new EName(DublinCores.OC_PROPERTY_NS_URI, entry.getKey()), entry.getValue());
     }
 
-    Opt<MetadataCollection> seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES.toString());
-    if (seriesMetadata.isSome()) {
-      DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata.get());
+    DublinCoreMetadataCollection seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES.toString());
+    if (seriesMetadata != null) {
+      DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
     }
 
     AccessControlList acl;
@@ -1949,18 +1945,12 @@ public class IndexServiceImpl implements IndexService {
       dc.set(new EName(DublinCores.OC_PROPERTY_NS_URI, entry.getKey()), entry.getValue());
     }
 
-    MetadataList metadataList;
-    try {
-      metadataList = getMetadataListWithAllSeriesCatalogUIAdapters();
-      metadataList.fromJSON(seriesMetadataJson.toJSONString());
-    } catch (Exception e) {
-      logger.warn("Not able to parse the series metadata {}:", seriesMetadataJson, e);
-      throw new IllegalArgumentException("Not able to parse the series metadata");
-    }
+    final MetadataList metadataList = getMetadataListWithAllSeriesCatalogUIAdapters();
+    MetadataJson.fillListFromJson(metadataList, seriesMetadataJson);
 
-    Opt<MetadataCollection> seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES.toString());
-    if (seriesMetadata.isSome()) {
-      DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata.get());
+    DublinCoreMetadataCollection seriesMetadata = metadataList.getMetadataByFlavor(MediaPackageElements.SERIES.toString());
+    if (seriesMetadata != null) {
+      DublinCoreMetadataUtil.updateDublincoreCatalog(dc, seriesMetadata);
     }
 
     AccessControlList acl = getAccessControlList(metadataJson);
@@ -2119,13 +2109,16 @@ public class IndexServiceImpl implements IndexService {
     }
   }
 
-  private MetadataList updateSeriesMetadata(String seriesID, String metadataJSON, AbstractSearchIndex index,
-          MetadataList metadataList)
-                  throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException {
+  private MetadataList updateSeriesMetadata(
+          final String seriesID,
+          final String metadataJSON,
+          final AbstractSearchIndex index,
+          final MetadataList metadataList)
+          throws IllegalArgumentException, IndexServiceException, NotFoundException {
     checkSeriesExists(seriesID, index);
     try {
-      metadataList.fromJSON(metadataJSON);
-    } catch (Exception e) {
+      MetadataJson.fillListFromJson(metadataList, (JSONArray) new JSONParser().parse(metadataJSON));
+    } catch (final org.json.simple.parser.ParseException e) {
       logger.warn("Not able to parse the event metadata {}:", metadataJSON, e);
       throw new IllegalArgumentException("Not able to parse the event metadata");
     }
@@ -2135,7 +2128,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   /**
-   * @return A {@link MetadataList} with only the common SeriesCatalogUIAdapter's empty {@link MetadataCollection}
+   * @return A {@link MetadataList} with only the common SeriesCatalogUIAdapter's empty {@link DublinCoreMetadataCollection}
    *         available
    */
   private MetadataList getMetadataListWithCommonSeriesCatalogUIAdapters() {
@@ -2146,7 +2139,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   /**
-   * @return A {@link MetadataList} with all of the available CatalogUIAdapters empty {@link MetadataCollection}
+   * @return A {@link MetadataList} with all of the available CatalogUIAdapters empty {@link DublinCoreMetadataCollection}
    *         available
    */
   @Override
@@ -2183,9 +2176,9 @@ public class IndexServiceImpl implements IndexService {
    */
   private void updateSeriesMetadata(String seriesId, MetadataList metadataList) {
     for (SeriesCatalogUIAdapter adapter : seriesCatalogUIAdapters) {
-      Opt<MetadataCollection> metadata = metadataList.getMetadataByFlavor(adapter.getFlavor().toString());
-      if (metadata.isSome() && metadata.get().isUpdated()) {
-        adapter.storeFields(seriesId, metadata.get());
+      final DublinCoreMetadataCollection metadata = metadataList.getMetadataByFlavor(adapter.getFlavor().toString());
+      if (metadata != null && metadata.isUpdated()) {
+        adapter.storeFields(seriesId, metadata);
       }
     }
   }

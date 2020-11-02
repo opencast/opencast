@@ -21,15 +21,14 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.query.JobsListQuery;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;

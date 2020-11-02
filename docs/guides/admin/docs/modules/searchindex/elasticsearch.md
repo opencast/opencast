@@ -8,12 +8,12 @@ Running Elasticsearch
 
 When running Elasticsearch, it is mandatory to deploy the same major version as the client library used by Opencast has,
 since the client commands will otherwise not match the server. To check the version, take a look at
-[the maven dependency declaration for the elasticsearch bundle in the search module](https://github.com/opencast/opencast/blob/develop/modules/search/pom.xml).
+[the maven dependency declaration for the Elasticsearch bundle in the search module](https://github.com/opencast/opencast/blob/develop/modules/search/pom.xml).
 
 For example, to quickly spin up an external Elasticsearch matching the current version using Docker, run
 
 ```sh
-% docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.4.2
+% docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.9.2
 ```
 
 Configuring External Nodes

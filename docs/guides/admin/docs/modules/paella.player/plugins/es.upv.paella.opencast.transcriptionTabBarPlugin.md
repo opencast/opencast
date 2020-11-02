@@ -1,7 +1,7 @@
 Paella plugin: es.upv.paella.opencast.transcriptionTabBarPlugin
 ===============================================================
 
-This plugin adds a panel to show the OCR transcriptios. See the [Text Extraction Configuration](../../../textextraction/)
+This plugin adds a panel to show the OCR transcriptions. See the [Text Extraction Configuration](../../../textextraction/)
 page to configure the service.
 
 The configurations for this plugin are done for each tenant. So you need to modify the `plugins`

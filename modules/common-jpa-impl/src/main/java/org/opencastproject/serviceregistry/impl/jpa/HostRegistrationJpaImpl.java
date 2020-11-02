@@ -29,6 +29,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -39,7 +40,10 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity(name = "HostRegistration")
 @Access(AccessType.FIELD)
-@Table(name = "oc_host_registration", uniqueConstraints = @UniqueConstraint(columnNames = "host"))
+@Table(name = "oc_host_registration", indexes = {
+    @Index(name = "IX_oc_host_registration_online", columnList = ("online")),
+    @Index(name = "IX_oc_host_registration_active", columnList = ("active"))
+  }, uniqueConstraints = @UniqueConstraint(columnNames = "host"))
 @NamedQueries({
         @NamedQuery(name = "HostRegistration.getMaxLoad", query = "SELECT sum(hr.maxLoad) FROM HostRegistration hr where hr.active = true"),
         @NamedQuery(name = "HostRegistration.getMaxLoadByHostName", query = "SELECT hr.maxLoad FROM HostRegistration hr where hr.baseUrl = :host and hr.active = true"),
@@ -52,13 +56,13 @@ public class HostRegistrationJpaImpl implements HostRegistration {
   @GeneratedValue
   private Long id;
 
-  @Column(name = "host", nullable = false, length = 255)
+  @Column(name = "host", nullable = false)
   private String baseUrl;
 
   @Column(name = "address", nullable = false, length = 39)
   private String ipAddress;
 
-  @Column(name = "node_name", nullable = false, length = 39)
+  @Column(name = "node_name")
   private String nodeName;
 
   @Column(name = "memory", nullable = false)

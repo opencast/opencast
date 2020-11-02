@@ -134,6 +134,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
       if (fileWithIdentifier.getValue().equals(workflowIdentifier) && !fileWithIdentifier.getKey().equals(artifact)) {
         logger.warn("Workflow with identifier '{}' already registered in file '{}', ignoring", workflowIdentifier,
                 fileWithIdentifier.getKey());
+        artifactsWithError.add(artifact);
         return;
       }
     }

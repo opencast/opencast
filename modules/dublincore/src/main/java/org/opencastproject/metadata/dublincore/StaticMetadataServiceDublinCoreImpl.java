@@ -65,8 +65,6 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
@@ -388,8 +386,7 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
   private Option<DublinCoreCatalog> load(Catalog catalog) {
     InputStream in = null;
     try {
-      File f = workspace.get(catalog.getURI());
-      in = new FileInputStream(f);
+      in = workspace.read(catalog.getURI());
       return some((DublinCoreCatalog) DublinCores.read(in));
     } catch (Exception e) {
       logger.warn("Unable to load metadata from catalog '{}'", catalog);

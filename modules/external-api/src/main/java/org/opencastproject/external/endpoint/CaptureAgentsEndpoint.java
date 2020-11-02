@@ -55,7 +55,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
+            ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
 @RestService(
     name = "externalapicaptureagents",
     title = "External API Capture Agents Service",
@@ -95,7 +96,7 @@ public class CaptureAgentsEndpoint {
       pathParameters = {
           @RestParameter(name = "agentId", description = "The agent id", isRequired = true, type = STRING)
       },
-      reponses = {
+      responses = {
           @RestResponse(description = "The agent is returned.", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The specified agent does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND)
       }
@@ -122,7 +123,7 @@ public class CaptureAgentsEndpoint {
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = Type.INTEGER),
           @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = Type.INTEGER)
       },
-      reponses = {
+      responses = {
           @RestResponse(description = "A (potentially empty) list of agents is returned.", responseCode = HttpServletResponse.SC_OK)
       }
   )

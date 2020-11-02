@@ -47,7 +47,7 @@ public class NopServiceEndpoint extends OsgiAbstractJobProducerEndpoint<NopServi
           name = "nop",
           description = "Create an empty job for testing purposes.",
           returnDescription = "The service statistics.",
-          reponses = { @RestResponse(responseCode = SC_OK, description = "OK") })
+          responses = { @RestResponse(responseCode = SC_OK, description = "OK") })
   public Response nop() {
     return RestUtil.R.ok(getSvc().nop());
   }

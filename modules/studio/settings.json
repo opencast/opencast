@@ -1,9 +1,0 @@
-{
-  "opencast": {
-    "serverUrl": "/",
-    "loginProvided": true
-  },
-  "upload": {
-    "workflowId": "fast"
-  }
-}

@@ -674,15 +674,19 @@ admin-ui
   com.google.code.gson                   gson                                             Apache 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
+  commons-fileupload                     commons-fileupload                               Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
   jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
   javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
   joda-time                              joda-time                                        Apache 2
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
   org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
+  org.codehaus.jettison                  jettison                                         Apache License, Version 2.0
+  org.mnode.ical4j                       ical4j                                           BSD 3-Clause
+  org.apache.servicemix.bundles          org.apache.servicemix.bundles.commons-httpclient The Apache Software License, Version 2.0
 
 
 animate-impl
@@ -1282,7 +1286,6 @@ ingest-service-impl
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.cxf                         cxf-rt-frontend-jaxrs                            Apache License, Version 2.0
   org.apache.felix                       org.apache.felix.fileinstall                     Apache License, Version 2.0
-  org.jdom                               com.springsource.org.jdom                        -
   org.slf4j                              slf4j-api                                        MIT License
 
 
@@ -1518,22 +1521,21 @@ publication-service-youtube-remote
 
 publication-service-youtube-v3
   GroupId                                ArtifactId                                       Licenses
-  com.fasterxml.jackson.core             jackson-core                                     The Apache Software License, Version 2.0
-  com.google.apis                        google-api-services-plus                         The Apache Software License, Version 2.0
   com.google.apis                        google-api-services-youtube                      The Apache Software License, Version 2.0
   com.google.http-client                 google-http-client-jackson2                      The Apache Software License, Version 2.0
+  com.google.http-client                 google-http-client                               The Apache Software License, Version 2.0
+  com.google.api-client                  google-api-client                                The Apache Software License, Version 2.0
+  com.google.oauth-client                google-oauth-client                              The Apache Software License, Version 2.0
   com.google.oauth-client                google-oauth-client-java6                        The Apache Software License, Version 2.0
   com.google.oauth-client                google-oauth-client-jetty                        The Apache Software License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.osgi                               org.osgi.compendium                              Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
-  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
-  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
   org.apache.felix                       org.apache.felix.http.bundle                     -
-  org.codehaus.jackson                   jackson-mapper-asl                               The Apache Software License, Version 2.0
-  org.jdom                               com.springsource.org.jdom                        -
-  org.sakaiproject.nakamura              javax.activation-mail                            -
   org.slf4j                              slf4j-api                                        MIT License
-
+  org.slf4j                              slf4j-log4j12                                    MIT License
 
 runtime-info
   GroupId                                ArtifactId                                       Licenses
@@ -1631,7 +1633,7 @@ search-service-impl
   org.apache.solr                        solr-solrj                                       Apache 2
   org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
-  org.jdom                               com.springsource.org.jdom                        -
+  org.jdom                               jdom2                                            -
   org.slf4j                              slf4j-api                                        MIT License
 
 
@@ -1681,12 +1683,6 @@ security-cas-client-wrapper
 security-cas
   GroupId                                ArtifactId                                       Licenses
   org.springframework.security           spring-security-cas                              The Apache Software License, Version 2.0
-
-
-security-openid
-  GroupId                                ArtifactId                                       Licenses
-  org.openid4java                        com.springsource.org.openid4java                 -
-  org.springframework.security           spring-security-openid                           The Apache Software License, Version 2.0
 
 
 security-shibboleth
