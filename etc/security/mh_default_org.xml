@@ -654,14 +654,14 @@
 
    -->
 
-    <bean id="preauthAuthProvider"
-          class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-      <property name="preAuthenticatedUserDetailsService">
-        <bean id="userDetailsServiceWrapper" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
-          <property name="userDetailsService" ref="userDetailsService"/>
-        </bean>
-      </property>
-    </bean>-->
+  <bean id="preauthAuthProvider"
+        class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+    <property name="preAuthenticatedUserDetailsService">
+      <bean id="userDetailsServiceWrapper" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+        <property name="userDetailsService" ref="userDetailsService"/>
+      </bean>
+    </property>
+  </bean>
 
   <!-- ################ -->
   <!-- # LDAP Support # -->
