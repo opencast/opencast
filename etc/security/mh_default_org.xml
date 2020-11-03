@@ -609,55 +609,59 @@
     <property name="securityService" ref="securityService" />
     <property name="userReferenceProvider" ref="userReferenceProvider" />
     <property name="attributeMapper" ref="attributeMapper" />
-  </bean>-->
-  <!--
-    <util:list id="roleMapping" value-type="java.lang.String">
-      <value>'ROLE_AAI_USER'</value>
-      <value>'ROLE_AAI_USER_' + ['eduPersonPrincipalName']</value>
-      <value>['homeOrganization'] != null ? 'ROLE_AAI_ORG_' + ['homeOrganization'] + '_MEMBER' : null</value>
-      <value>['eduPersonEntitlement'].contains('urn:mace:example.org:permission:shibboleth:opencast_editor') ? 'ROLE_GROUP_AAI_EDITOR' : null</value>
-      <value>['eduPersonPrincipalName'].contains('john.doe@example.org') ? 'ROLE_ADMIN' : null</value>
-    </util:list>
+  </bean>
 
-    <util:list id="displayNameMapping" value-type="java.lang.String">
-      <value>['givenName'][0] + ' ' + ['sn'][0]</value>
-    </util:list>
+  <bean id="attributeMapper" class="org.opencastproject.security.aai.api.AttributeMapper">
+    <property name="useHeader" value="true" />
+    <property name="multiValueDelimiter" value=";" />
+    <property name="attributeMap" ref="attributeMap" />
+    <property name="aaiAttributes" ref="aaiAttributes" />
+  </bean>
 
-    <util:list id="mailMapping" value-type="java.lang.String">
-      <value>['mail'][0]</value>
-    </util:list>
+  <util:list id="aaiAttributes" value-type="java.lang.String">
+    <value>sn</value>
+    <value>givenName</value>
+    <value>mail</value>
+    <value>homeOrganization</value>
+    <value>eduPersonEntitlement</value>
+    <value>eduPersonPrincipalName</value>
+    <value>homeOrganization</value>
+  </util:list>
 
-    <util:map id="attributeMap" map-class="java.util.HashMap">
-      <entry key="roles" value-ref="roleMapping" />
-      <entry key="displayName" value-ref="displayNameMapping" />
-      <entry key="mail" value-ref="mailMapping" />
-    </util:map>
+  <util:map id="attributeMap" map-class="java.util.HashMap">
+    <entry key="roles" value-ref="roleMapping" />
+    <entry key="displayName" value-ref="displayNameMapping" />
+    <entry key="mail" value-ref="mailMapping" />
+  </util:map>
 
-    <util:list id="aaiAttributes" value-type="java.lang.String">
-      <value>sn</value>
-      <value>givenName</value>
-      <value>mail</value>
-      <value>homeOrganization</value>
-      <value>eduPersonEntitlement</value>
-      <value>eduPersonPrincipalName</value>
-      <value>homeOrganization</value>
-    </util:list>
+  <util:list id="displayNameMapping" value-type="java.lang.String">
+    <value>['givenName'][0] + ' ' + ['sn'][0]</value>
+  </util:list>
 
-    <bean id="attributeMapper" class="org.opencastproject.security.aai.api.AttributeMapper">
-      <property name="useHeader" value="true" />
-      <property name="multiValueDelimiter" value=";" />
-      <property name="attributeMap" ref="attributeMap" />
-      <property name="aaiAttributes" ref="aaiAttributes" />
-    </bean>
+  <util:list id="mailMapping" value-type="java.lang.String">
+    <value>['mail'][0]</value>
+  </util:list>
 
-    <bean id="preauthAuthProvider"
-          class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-      <property name="preAuthenticatedUserDetailsService">
-        <bean id="userDetailsServiceWrapper" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
-          <property name="userDetailsService" ref="userDetailsService"/>
-        </bean>
-      </property>
-    </bean>-->
+  <util:list id="roleMapping" value-type="java.lang.String">
+    <value>'ROLE_AAI_USER'</value>
+    <value>'ROLE_AAI_USER_' + ['eduPersonPrincipalName']</value>
+    <value>('ROLE_AAI_OWNER_' + ['eduPersonPrincipalName']).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
+    <value>['homeOrganization'] != null ? 'ROLE_AAI_ORG_' + ['homeOrganization'] + '_MEMBER' : null</value>
+    <value>['eduPersonEntitlement'].contains('urn:mace:opencast.org:permission:shibboleth:opencast_admin') ? 'ROLE_ADMIN' : null</value>
+    <value>['eduPersonPrincipalName'].contains('john.doe@example.org') ? 'ROLE_ADMIN' : null</value>
+    <value>['eduPersonScopedAffiliation'].contains('faculty@example.org') ? 'ROLE_GROUP_AAI_TRAINER' : null</value>
+  </util:list>
+
+   -->
+
+  <bean id="preauthAuthProvider"
+        class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+    <property name="preAuthenticatedUserDetailsService">
+      <bean id="userDetailsServiceWrapper" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+        <property name="userDetailsService" ref="userDetailsService"/>
+      </bean>
+    </property>
+  </bean>
 
   <!-- ################ -->
   <!-- # LDAP Support # -->
