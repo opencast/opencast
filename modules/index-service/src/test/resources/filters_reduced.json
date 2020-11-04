@@ -1,0 +1,14 @@
+{
+    "contributors": {
+        "label": "FILTERS.SERIES.CONTRIBUTORS.LABEL",
+        "options": {
+            "contributor2": "My second contributor"
+        },
+        "translatable": false,
+        "type": "select"
+    },
+    "textFilter": {
+        "label": "FREETEXT.LABEL",
+        "type": "freetext"
+    }
+}
