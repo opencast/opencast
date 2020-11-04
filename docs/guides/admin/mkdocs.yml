@@ -103,6 +103,7 @@ nav:
    - Live Schedule: 'modules/liveschedule.md'
    - LTI Module: 'modules/ltimodule.md'
    - Media Module: 'modules/mediamodule.configuration.md'
+   - Metrics (OpenMetrics, Prometheus): modules/metrics.md
    - Player:
       - Configuration: 'modules/player.configuration.md'
       - URL Parameters: 'modules/player.url.parameter.md'

@@ -10,6 +10,7 @@ Documentation for modules included in Opencast.
 * [Live  Schedule](liveschedule.md)
 * [LTI Module](ltimodule.md)
 * [Media Module](mediamodule.configuration.md)
+* [Metrics (OpenMetrics, Prometheus)](metrics.md)
 * Player
     * [Configuration](player.configuration.md)
     * [URL Parameter](player.url.parameter.md)
