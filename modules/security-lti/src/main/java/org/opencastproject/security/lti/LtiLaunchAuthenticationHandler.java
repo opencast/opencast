@@ -345,7 +345,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
       String context = request.getParameter(CONTEXT_ID);
       enrichRoleGrants(roles, context, rolePrefix, userAuthorities);
 
-      logger.info("Returning user with {} authorities", userAuthorities.size());
+      logger.debug("Returning user with {} authorities", userAuthorities.size());
 
       userDetails = new User(username, "oauth", true, true, true, true, userAuthorities);
     }
