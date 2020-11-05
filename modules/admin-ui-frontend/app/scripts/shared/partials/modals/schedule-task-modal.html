@@ -4,7 +4,7 @@
     <h2 translate="BULK_ACTIONS.SCHEDULE_TASK.CAPTION"><!-- Template --></h2>
   </header>
   <wizard edit-mode="false" name="scheduleTaskWz" on-finish="submit()" template="shared/partials/wizardNav.html">
-  <wz-step wz-title="General" canexit="scheduleTaskForm.generalForm.$valid" wz-disabled="!scheduleTaskForm.generalForm.$valid" ng-form="generalForm" novalidate>
+  <wz-step wz-title="{{ 'BULK_ACTIONS.SCHEDULE_TASK.GENERAL.CAPTION' | translate }}" canexit="scheduleTaskForm.generalForm.$valid" wz-disabled="!scheduleTaskForm.generalForm.$valid" ng-form="generalForm" novalidate>
     <!-- First Step: General -->
     <div class="modal-content active">
       <div class="modal-body">
