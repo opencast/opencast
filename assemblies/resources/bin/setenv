@@ -39,5 +39,7 @@ export JAVA_MAX_MEM=1G
 export JAVA_PERM_MEM=256M
 export KARAF_NOROOT=true
 
+# Mitigation for new Tesseract 4.x locking up the system
+export OMP_THREAD_LIMIT=1
 
 . "$DIRNAME/check_ports"
