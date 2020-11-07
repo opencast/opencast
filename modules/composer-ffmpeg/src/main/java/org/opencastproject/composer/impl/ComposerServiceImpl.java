@@ -471,6 +471,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         if (heightCondition <= height) {
           properties.put(key, profile.getExtension(key));
         }
+      } else if (key.startsWith(CMD_SUFFIX + ".if-height-lt-")) {
+        final int heightCondition = Integer.parseInt(key.substring((CMD_SUFFIX + ".if-height-lt-").length()));
+        if (heightCondition > height) {
+          properties.put(key, profile.getExtension(key));
+        }
       } else if (key.startsWith(CMD_SUFFIX + ".if-width-or-height-geq-")) {
         final String[] resCondition = key.substring((CMD_SUFFIX + ".if-width-or-height-geq-").length()).split("-");
         final int widthCondition = Integer.parseInt(resCondition[0]);
