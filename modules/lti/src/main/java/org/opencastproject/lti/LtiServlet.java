@@ -239,6 +239,13 @@ public class LtiServlet extends HttpServlet {
       }
     }
 
+    // Add locale param from LMS
+    String localeParamValue = req.getParameter(LOCALE);
+    if (StringUtils.isNotBlank(localeParamValue)) {
+      // 'lng' is query param for i18next-browser-languagedetector
+      builder.queryParam("lng", localeParamValue);
+    }
+
     // Build the final URL (as a string)
     String redirectUrl = builder.build().toString();
 
