@@ -24,6 +24,12 @@ Currently Supported
 * Ubuntu 18.04 amd64
 
 
+Java version support
+--------------------
+
+The only supported Java version for Opencast 8 is JDK 8.  Newer versions will not work with Opencast 8, nor will older versions.
+
+
 OpenJDK 8 on Debian 10
 ----------------------
 
