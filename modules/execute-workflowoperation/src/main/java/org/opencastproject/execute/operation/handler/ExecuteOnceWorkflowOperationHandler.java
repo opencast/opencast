@@ -26,7 +26,6 @@ import org.opencastproject.execute.api.ExecuteService;
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
-import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -191,8 +190,8 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
             // Have the track inspected and return the result
             Job inspectionJob = null;
             inspectionJob = inspectionService.inspect(resultElement.getURI());
-            JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJob);
-            if (!barrier.waitForJobs().isSuccess()) {
+
+            if (!waitForStatus(inspectionJob).isSuccess()) {
               throw new ExecuteException("Media inspection of " + resultElement.getURI() + " failed");
             }
 
