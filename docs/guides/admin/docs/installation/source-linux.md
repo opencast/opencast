@@ -72,12 +72,6 @@ Required for animate service (optional):
     synfig
 
 
-Java version support
---------------------
-
-The only supported Java version for Opencast 8 is JDK 8.  Newer versions will not work with Opencast 8, nor will older versions.
-
-
 ### Dependency Download
 
 Pre-built versions of most dependencies that are not in the repositories can be downloaded from the respective project
