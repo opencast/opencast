@@ -26,6 +26,12 @@ Currently Supported
 > *Other architectures like i386, i686, arm, … are not supported!*
 
 
+Java version support
+--------------------
+
+The only supported Java version for Opencast 8 is JDK 8.  Newer versions will not work with Opencast 8, nor will older versions.
+
+
 Activate Repository
 -------------------
 
