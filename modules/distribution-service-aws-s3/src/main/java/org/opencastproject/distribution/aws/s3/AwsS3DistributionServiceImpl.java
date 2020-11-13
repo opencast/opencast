@@ -54,9 +54,11 @@ import com.amazonaws.auth.policy.actions.S3Actions;
 import com.amazonaws.auth.policy.resources.S3ObjectResource;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.BucketWebsiteConfiguration;
 import com.amazonaws.services.s3.model.DeleteVersionRequest;
 import com.amazonaws.services.s3.model.GetObjectMetadataRequest;
 import com.amazonaws.services.s3.model.ListVersionsRequest;
+import com.amazonaws.services.s3.model.SetBucketWebsiteConfigurationRequest;
 import com.amazonaws.services.s3.model.VersionListing;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
@@ -756,6 +758,13 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
                   .withActions(S3Actions.GetObject).withResources(new S3ObjectResource(bucketName, "*"));
           Policy policy = new Policy().withStatements(allowPublicReadStatement);
           s3.setBucketPolicy(bucketName, policy.toJson());
+
+          //Set the website configuration.  This needs to be static-site-enabled currently.
+          BucketWebsiteConfiguration defaultWebsite = new BucketWebsiteConfiguration();
+          //These files don't actually exist, but that doesn't matter since no one should be looking around in the bucket anyway.
+          defaultWebsite.setIndexDocumentSuffix("index.html");
+          defaultWebsite.setErrorDocument("error.html");
+          s3.setBucketWebsiteConfiguration(new SetBucketWebsiteConfigurationRequest(bucketName, defaultWebsite));
           logger.info("AWS S3 bucket {} created", bucketName);
         } catch (Exception e2) {
           throw new ConfigurationException("Bucket " + bucketName + " cannot be created: " + e2.getMessage(), e2);
