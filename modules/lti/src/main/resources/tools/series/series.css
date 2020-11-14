@@ -1,0 +1,54 @@
+body {
+	font-size: 14px;
+	font-family: sans-serif;
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+header {
+  padding: 5px;
+  margin: 15px;
+}
+
+div.loading {
+  margin: 50px;
+  padding: 50px;
+  text-align: center;
+  color: #666;
+}
+
+a.episode {
+  display: block;
+  text-decoration: none;
+  color: black;
+  background-color: #eee;
+  padding: 5px;
+  margin: 15px;
+}
+
+a.episode:hover {
+  background-color: #fafafa;
+}
+
+a.episode div {
+  display: inline-block;
+  padding: 20px;
+}
+
+a.episode div.preview {
+  width: 200px;
+}
+
+a.episode div.desc h2 {
+  margin: 0;
+  margin-bottom: 5px;
+}
+
+footer  {
+  margin: 20px;
+  text-align: center;
+}
+
+.paginationjs {
+  display: inline-block;
+}
