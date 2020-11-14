@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Series settings</title>
+
+    <link rel="stylesheet" type="text/css" href="../shared/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../shared/css/admin.css?v=%version%" />
+    <link rel="stylesheet" type="text/css" href="../shared/css/lti.css?v=%version%" />
+    <link rel="stylesheet" type="text/css" href="../shared/css/daterangepicker.css" />
+    <link rel="stylesheet" type="text/css" href="../manage/css/font-awesome.min.css" />
+    <link href="css/settings.css?v=%version%" rel="stylesheet" />
+</head>
+
+<body>
+<div class="lti-outer">
+    <div id="addHeader">
+        <div class="lti_links">
+            <ul>
+                <li data-access="read"><a href="/ltitools/courses/index.html?sid=%courseID%&upload=%upload%" style="font-weight: 300;">Recordings</a></li>
+                <li data-access="write" data-page="manage"><a href="/ltitools/manage/index.html?sid=%courseID%&upload=%upload%&v=%version%">Manage</a></li>
+                <li data-access="write" data-page="settings"><a class="active" href="/ltitools/settings/index.html?sid=%courseID%&upload=%upload%&v=%version%">Settings</a></li>
+            </ul>
+        </div>
+
+        <div class="lti-oc-top-section">
+            <div class="lti-oc-title">
+                <h2>Manage Series Settings</h2>
+            </div>
+        </div>
+    </div>
+    <div class="container" style="width: auto;">
+        <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-12">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="series_title">Title:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="series_title" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="series_creator">Series Creator:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="series_creator" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="series_captions">Captions:</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="series_captions" name="series_captions">
+                                <option value="no_selection">No option selected</option>
+                                <option value="none">None</option>
+                                <option value="google">Google Speech-to-Text</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="series_retention">Retention cycle:</label>
+                        <div class="col-sm-10">
+                            <select class="form-control" id="series_retention" name="series_retention">
+                                <option value="normal">Default (4 years)</option>
+                                <option value="forever">Keep Forever</option>
+                                <option value="long">Long (8 years)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="retain_date">Retain until:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="retain_date" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-2" for="locked_status">Lock series:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="locked_status" readonly>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-12">
+                <p>&nbsp;</p>
+            </div>
+        </div>
+        <div id="suggestion">
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="../shared/js/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../shared/js/jquery/plugins/jquery.utils.js"></script>
+<script type="text/javascript" src="../shared/js/ext/moment.min.js"></script>
+<script type="text/javascript" src="../shared/js/daterangepicker.js"></script>
+<script type="text/javascript" src="../shared/js/he.js"></script>
+<script type="text/javascript" src="../shared/js/underscore.js?v=%version%"></script>
+<script type="text/javascript" src="../shared/js/bootstrap.js?v=%version%"></script>
+<script type="text/javascript" src="../shared/js/lti.js?v=%version%"></script>
+
+<script type="text/javascript" src="js/settings.js?v=%version%"></script>
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i" rel="stylesheet">
+</body>
+</html>

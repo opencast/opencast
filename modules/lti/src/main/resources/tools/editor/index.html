@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="css/editor.css">
+  <title>Video Editor</title>
+
+</head>
+<body>
+  <header>
+    <div id="topbar">
+      <span id="logo">OpenCast</span>
+    </div>
+    <div id="pageInfo">
+      <span class="fileUpload btn pull-right">
+        <input type="file" id="addFile" />
+      </span>
+    </div>
+    <input type="checkbox" class="hiddenCheck modalToggler" id="notifyModalToggle" />
+    <div id="bgCover">
+    </div>
+    <div id="notificationModal" class="modal">
+      <label class="close" for="notifyModalToggle" title="Close"></label>
+      <div class="modalBody">
+        <h2></h2>
+        <div class="modalContent">
+        </div>
+      </div>
+    </div>
+    <input type="checkbox" class="hiddenCheck" id="menuToggle" />
+    <label for="menuToggle"></label>
+    <ul id="menu">
+      <input type="checkbox" class="hiddenCheck" id="progressive" />
+      <li>
+        <section id="progressiveOptions">
+          <input type="checkbox" class="hiddenCheck" id="exfeatures" />
+          <span class="menuHeader">Experimental features</span>
+          <input type="checkbox" class="hiddenCheck" id="offlineToggle" />
+          <span class="togglerContainer unsupported"><label for="offlineToggle" title="Allow this application to be usable even when no internet is available.
+Protip: offline features can help minimise data usage when uploading to UCT servers">Offline mode</label><label for="offlineToggle" class="toggler"></label></span>
+          <input type="checkbox" class="hiddenCheck" id="notificationsToggle" />
+          <span class="togglerContainer unsupported"><label for="notificationsToggle" title="Receive notifications of when your videos are published">Receive notifications</label><label for="notificationsToggle" class="toggler"></label></span>
+        </section>
+      </li><li><label for="progressive"><img src="/admin-ng/img/configuration.png" /></label</li><li></li><li></li>
+    </ul>
+  </header>
+  <main>
+    <input type="radio" name="view" class="hiddenCheck" id="introView" />
+    <input type="radio" name="view" class="hiddenCheck" id="editorView" checked />
+    <input type="radio" name="view" class="hiddenCheck" id="outroView" />
+    <div id="info" class="halfWidth pull-left">
+      <span>Some Title</span>
+      <span>15 Aug 2017</span>
+      <span>Course</span>
+    </div>
+    <div class="workflowcontrols halfWidth pull-right">
+      <form>
+        <button class="btn btn-success">Save to server</button>
+      </form>
+      <!--select><option value="">Select Workflow</option></select-->
+    </div>
+    <div class="clear"></div>
+    <div id="videoContainer">
+      <div class="viewSelector">
+        <label for="introView">Intro</label>
+        <label for="editorView">Editor</label>
+        <label for="outroView">Outro</label>
+      </div>
+      <video preload="auto"></video>
+      <div class="videoControls">
+        <span>
+          <input type="range" value=0 min=0 max=100 step=5 />
+        </span><span>
+          <input id="isPlaying" type="checkbox" class="hiddenCheck" />
+          <input id="isPaused" type="checkbox" class="hiddenCheck" />
+          <label for="isPlaying"></label>
+        </span><span>
+        </span>
+      </div>
+      <div class="videoTime">
+        <div class="waveSeeker">
+          <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" fill="transparent"></svg>
+          <div class="wavePosition"></div>
+        </div>
+        <div class="waveform">
+            <div align="center" class="waveLoader">
+	      <div class="waveLoader-container-general">
+		<div class="waveLoader-internal"><div class="waveLoader-ballcolor waveLoader-ball_1"> </div></div>
+		<div class="waveLoader-internal"><div class="waveLoader-ballcolor waveLoader-ball_2"> </div></div>
+		<div class="waveLoader-internal"><div class="waveLoader-ballcolor waveLoader-ball_3"> </div></div>
+		<div class="waveLoader-internal"><div class="waveLoader-ballcolor waveLoader-ball_4"> </div></div>
+	      </div>
+            </div>
+          <div class="waveContainer">
+            <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" fill="transparent"></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" fill="transparent"></svg>
+            <!--img />
+            <img /-->
+          </div>
+          <div class="selection">
+            <button id="snip"></button>
+          </div>
+        </div>
+        <div class="seektrack">
+          <div class="seeker"></div>
+        </div>
+      </div>
+    </div>
+    <div class="actions">
+      <input type="radio" class="hiddenCheck" name="actionComponent" id="segmentComponent" checked />
+      <input type="radio" class="hiddenCheck" name="actionComponent" id="metadataComponent" />
+      <input type="radio" class="hiddenCheck" name="actionComponent" id="commentsComponent" />
+      <div class="componentSelector">
+        <label for="segmentComponent">Segments</label>
+        <label for="metadataComponent">Metadata</label>
+        <label for="commentsComponent">Comments</label>
+      </div>
+      <div class="component">
+        <div class="row">
+          <button class="btn">Thing</btn>
+        </div>
+        <ul class="row halfWidth" style="min-height: 6rem;" id="segments">
+        </ul>
+      </div>
+      <div class="component">
+        <ul class="row halfWidth">
+          <li>
+            <span class="width-1-6">Title</span><span class="width-5-6"><input name="title" /></span>
+          </li>
+          <li>
+            <span class="width-1-6">Location</span><span class="width-5-6"><input name="location" /></span>
+          </li>
+          <li>
+            <span class="width-1-6">Date</span><span class="width-5-6"><input name="date" type="date" /></span>
+          </li>
+        </ul>
+      </div>
+      <div class="component">
+      </div>
+    </div>
+    <div class="pull-right" style="margin: 1rem 0;">
+      <form>
+        <button class="btn-success btn">Save to server</button>
+      </form>
+    </div>
+  </main>
+  <svg id="clip" height="0" width="0" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <clipPath id="svgClip">
+        <rect x="0" y="-1" width="50000" height="2"></rect>
+      </clipPath>
+    </defs>
+  </svg>
+  </footer>
+  </footer>
+  <script type="text/javascript" src="../shared/js/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="../shared/js/jquery/plugins/jquery.utils.js"></script>
+  <script type="text/javascript" src="../shared/js/bootstrap.js?v=%version%"></script>
+  <script src="js/utils.js"></script>
+  <!--script src="js/ffmpeg-worker-webm.js"></script-->
+  <script src="js/waveform.js"></script>
+  <script src="js/app.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600" rel="stylesheet">
+</body>
+</html>
