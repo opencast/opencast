@@ -10,40 +10,40 @@ need to consider the legal requirements of your country when you setup Matomo.
 
 This plugin uses a Matomo JavaScript library that is loaded from the remote Matomo server!
 
-Tested Matomo version: 3.0.2+
+Tested Matomo version: 3.0.2+ ; Matomo Analytics Cloud
 
 The configurations for the Matomo player plugin are done for each tenant. So the configuration keys are located in
-`.../etc/org.opencastproject.organization-mh_default_org.cfg`.
+`etc/ui-config/mh_default_org/theodul/config.yml`.
 
 To activate the plugin set:
 
-    prop.player.matomo.server=http://localhost/matomo
+    server: http://localhost/matomo
 
-Where localhost should be replaced with your Piwik server URL.
+Where localhost should be replaced with your Matomo server URL.
 
 Configuration
 -------------
 
-### prop.player.matomo.server
-
-The plugin shows a notification about the tracking to the user. This can be disabled with this option. (Default: true)
-Before you disable the notification, make sure that you do not violate any local regulations.
-
-### prop.player.matomo.server
+### server:
 
 The Matomo server from which the Piwik JS library will be loaded and where the data will be reported.
 
-### prop.player.matomo.site_id=1
+### site_id: 1
 
 The Matomo site ID has to be numeric value. If not set this will be 1. It is recommended to use different site IDs for
 each tenant that is configured in Opencast.
 
-### prop.player.matomo.heartbeat=30
+### heartbeat: 30
 
 The heartbeat setting to track how long a user stayed on the player page. Set to 0 or comment this line to
 disable the heartbeat.
 
-### prop.player.matomo.track_events
+### notification: true
+
+The plugin shows a notification about the tracking to the user. This can be disabled with this option. (Default: true)
+Before you disable the notification, make sure that you do not violate any local regulations.
+
+### track_events: ["play", "pause", "seek", "ended"]
 
 This setting lets you track several player events. Add the events that you want to track to the list. Comment this
 property to prevent event tracking.
