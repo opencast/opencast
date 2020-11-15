@@ -58,6 +58,7 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
@@ -115,6 +116,7 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   private Workspace workspace;
   private AbstractSearchIndex searchIndex;
   private AuthorizationService authorizationService;
+  private SeriesService seriesService;
   private String workflow;
   private String workflowConfiguration;
   private String retractWorkflowId;
@@ -124,6 +126,11 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   /** OSGi DI */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
+  }
+
+  /** OSGI DI */
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
   }
 
   /** OSGi DI */
@@ -271,11 +278,21 @@ public class LtiServiceImpl implements LtiService, ManagedService {
       replaceField(collection, "isPartOf", seriesId);
       adapter.storeFields(mp, collection);
 
-      final AccessControlList accessControlList = new AccessControlList(
-              new AccessControlEntry("ROLE_ADMIN", "write", true),
-              new AccessControlEntry("ROLE_ADMIN", "read", true),
-              new AccessControlEntry("ROLE_OAUTH_USER", "write", true),
-              new AccessControlEntry("ROLE_OAUTH_USER", "read", true));
+      AccessControlList accessControlList = null;
+
+      // If series is set and it's ACL is not empty, use series' ACL as default
+      if (StringUtils.isNotBlank(seriesId)) {
+        accessControlList = seriesService.getSeriesAccessControl(seriesId);
+      }
+
+      if (accessControlList == null || accessControlList.getEntries().isEmpty()) {
+        accessControlList = new AccessControlList(
+          new AccessControlEntry("ROLE_ADMIN", "write", true),
+          new AccessControlEntry("ROLE_ADMIN", "read", true),
+          new AccessControlEntry("ROLE_OAUTH_USER", "write", true),
+          new AccessControlEntry("ROLE_OAUTH_USER", "read", true));
+      }
+
       this.authorizationService.setAcl(mp, AclScope.Episode, accessControlList);
       mp = ingestService.addTrack(file.getStream(), file.getSourceName(), MediaPackageElements.PRESENTER_SOURCE, mp);
 
