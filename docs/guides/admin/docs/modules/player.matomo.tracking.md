@@ -1,25 +1,25 @@
 Opencast Player - Matomo Tracking Plugin
 =======================================
 
-This plugin allows to use Matomo (https://matomo.org/), formerly known as Piwik, to track usage data. To setup Matomo
-please follow the instructions on the Matomo website:
-https://matomo.org/docs/installation/#the-5-minute-matomo-installation
+This plugin allows using [Matomo](https://matomo.org) to track usage data.
+To setup Matomo please follow the instructions on the Matomo website:
 
-The plugin respects the [Do-Not-Track](https://en.wikipedia.org/wiki/Do_Not_Track) settings of a browser. You might also
-need to consider the legal requirements of your country when you setup Matomo.
+- [The 5-minute Matomo Installation](https://matomo.org/docs/installation/#the-5-minute-matomo-installation)
 
-This plugin uses a Matomo javascript library that is loaded from the remote Matomo server!
+The plugin respects the [Do-Not-Track](https://en.wikipedia.org/wiki/Do_Not_Track) settings of a browser.
+Please consider the legal requirements of your country when you set up Matomo.
+
+This plugin uses a Matomo JavaScript library that is loaded from the remote Matomo server!
 
 Tested Matomo version: 3.0.2+ ; Matomo Analytics Cloud
 
-The configurations for the Matomo player plugin are done for each tenant. So the configuration keys are located in
-`etc/ui-config/mh_default_org/theodul/config.yml`.
+The configurations for the Matomo player plugin are done for each tenant.
+The configuration keys are located in `etc/ui-config/<organization>/theodul/config.yml`.
 
-To activate the plugin set:
+To activate the plugin set the Matomo server URL:
 
-    server: http://localhost/matomo
+    server: https://matomo.example.com/matomo
 
-Where localhost should be replaced with your Matomo server URL.
 
 Configuration
 -------------
@@ -40,13 +40,13 @@ disable the heartbeat.
 
 ### notification: true
 
-The plugin shows a notification about the tracking to the user. This can be disabled with this option. (Default: true)
+The plugin shows a notification about the tracking to the user. This can be disabled with this option. (Default: `true`)
 Before you disable the notification, make sure that you do not violate any local regulations.
 
 ### track_events: ["play", "pause", "seek", "ended"]
 
-This setting lets you track several player events. Add the events that you want to track to the list. Comment this
-property to prevent event tracking.
+This setting lets you track several player events. Add the events that you want to track to the list.
+Comment this property to prevent event tracking.
 
 Events that can be tracked:
 
@@ -59,7 +59,7 @@ Events that can be tracked:
 * quality: manual change of video quality (quality tag is stored)
 * fullscreen: user presses fullscreen button
 * focus: user selects one video to be enlarged (flavor of selected video is stored)
-* layout_reset: user switches back to default layout
+* layout\_reset: user switches back to default layout
 * zoom: user changes the zoom of the video
 
 Tracked Data
@@ -73,7 +73,7 @@ if tracking is allowed:
     * "event" as `<title of the event> (<event id>)`
     * "series" as `<title of the series> (<series id>)`
     * "presenter"
-    * "view_mode" which can be `desktop`, `mobile` or `embed`
+    * "view\_mode" which can be `desktop`, `mobile` or `embed`
 
 Heartbeat data does not show how long a video has been played but how long a viewer remained on the page, while the page
 was in the foreground.
