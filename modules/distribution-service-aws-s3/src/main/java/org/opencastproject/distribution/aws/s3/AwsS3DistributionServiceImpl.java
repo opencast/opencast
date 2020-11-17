@@ -220,11 +220,11 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       logger.info("AWS region is {}", regionStr);
 
       // AWS endpoint
-      endpoint = getAWSConfigKey(cc, AWS_S3_ENDPOINT_CONFIG);
+      endpoint = OsgiUtil.getComponentContextProperty(cc, AWS_S3_ENDPOINT_CONFIG, "s3." + regionStr + ".amazonaws.com");
       logger.info("AWS S3 endpoint is {}", endpoint);
 
       // AWS path style
-      pathStyle = Boolean.valueOf(getAWSConfigKey(cc, AWS_S3_PATH_STYLE_CONFIG));
+      pathStyle = Boolean.valueOf(OsgiUtil.getComponentContextProperty(cc, AWS_S3_PATH_STYLE_CONFIG, "false"));
       logger.info("AWS path style is {}", pathStyle);
 
       opencastDistributionUrl = getAWSConfigKey(cc, AWS_S3_DISTRIBUTION_BASE_CONFIG);
