@@ -309,7 +309,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           }
         }
 
-        if (streamingDistributionService.publishToStreaming()) {
+        if (streamingDistributionService != null && streamingDistributionService.publishToStreaming()) {
           for (String elementId : streamingElementIds) {
             Job job = streamingDistributionService.distribute(CHANNEL_ID, mediaPackage, elementId);
             if (job != null) {
