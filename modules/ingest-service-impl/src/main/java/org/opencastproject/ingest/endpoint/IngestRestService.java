@@ -806,16 +806,17 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
               // Add ACL in JSON, XML or XACML format
             } else if ("acl".equals(fieldName)) {
-              InputStream is = new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8));
+              InputStream inputStream = new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8));
               AccessControlList acl;
               try {
-                acl = AccessControlParser.parseAcl(is);
-                is = new ByteArrayInputStream(XACMLUtils.getXacml(mp, acl).getBytes(StandardCharsets.UTF_8));
+                acl = AccessControlParser.parseAcl(inputStream);
+                inputStream = new ByteArrayInputStream(XACMLUtils.getXacml(mp, acl).getBytes(StandardCharsets.UTF_8));
               } catch (AccessControlParsingException e) {
                 // Couldn't parse this → already XACML. Why again are we using three different formats?
-                is.reset();
+                logger.debug("Unable to parse ACL, guessing that this is already XACML");
+                inputStream.reset();
               }
-              ingestService.addAttachment(is, "episode-security.xml", XACML_POLICY_EPISODE, mp);
+              ingestService.addAttachment(inputStream, "episode-security.xml", XACML_POLICY_EPISODE, mp);
 
               /* Add media files by URL */
             } else if ("mediaUri".equals(fieldName)) {
