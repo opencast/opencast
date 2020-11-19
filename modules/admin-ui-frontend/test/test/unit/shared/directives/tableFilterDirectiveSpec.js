@@ -174,11 +174,14 @@ describe('adminNg.directives.adminNgTableFilter', function () {
 
         describe('with both from- and to dates', function () {
 
-            var filter, fromDate, toDate;
+            var filter, fromDate, toDate, fromDateIsoStr, toDateIsoStr;
 
             beforeEach(function() {
-                fromDate = new Date('2015-01-01');
-                toDate = new Date('2015-01-02');
+                // Set dates with ISO string (vs localized 2015-01-01)
+                fromDateIsoStr = '2015-01-01T00:00:00.001Z';
+                toDateIsoStr = '2015-01-02T23:59:59.999Z';
+                fromDate = new Date(fromDateIsoStr);
+                toDate = new Date(toDateIsoStr);
                 filter = { period: { type: "period", from: fromDate, to: toDate } };
                 spyOn(Storage, 'put');
                 element.find('div').scope().selectFilterPeriodValue(filter, 'from', 'to');
@@ -189,13 +192,17 @@ describe('adminNg.directives.adminNgTableFilter', function () {
                 expect(filter.prefilled.from).toBe(false);
             })
 
-            it('sets the time period filter value', function () {
-
-                var expectedFromDate = new Date(fromDate);
-                expectedFromDate.setHours(0, 0, 0, 0);
-                var expectedToDate = new Date(toDate);
+            it('sets the time period filter value (accounting for localized day)', function () {
+                // Get local time zone offset to verify user requested day range
+                var timeOffset = toDate.getTimezoneOffset();
+                var expectedFromDate = new Date(fromDateIsoStr);
+                // Adjust to local day
+                expectedFromDate =  new Date(expectedFromDate.getTime() + timeOffset * 60 * 1000);
+                expectedFromDate.setHours(0, 0, 0, 001);
+                var expectedToDate = new Date(toDateIsoStr);
+                // Adjust to local day
+                expectedToDate =  new Date(expectedToDate.getTime() + timeOffset * 60 * 1000);
                 expectedToDate.setHours(23, 59, 59, 999);
-
                 expect(Storage.put).toHaveBeenCalledWith('filter', 'furniture', undefined, expectedFromDate.toISOString() + '/' + expectedToDate.toISOString());
             });
         });
