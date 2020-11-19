@@ -4,7 +4,6 @@ modules/common-jpa-impl/pom.xml
 modules/common/pom.xml
 modules/cover-image-impl/pom.xml
 modules/db/pom.xml
-modules/distribution-service-aws-s3/pom.xml
 modules/external-api/pom.xml
 modules/index-service/pom.xml
 modules/oaipmh-persistence/pom.xml
