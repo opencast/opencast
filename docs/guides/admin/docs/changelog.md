@@ -4,6 +4,36 @@ Changelog
 Opencast 8
 ----------
 
+### Opencast 8.8
+
+*Released on November 19th, 2020*
+
+- [[#2075](https://github.com/opencast/opencast/pull/2075)] -
+  Reduce IO Load When Starting a Workflow
+- [[#2072](https://github.com/opencast/opencast/pull/2072)] -
+  Update player.matomo.tracking.md
+- [[#2067](https://github.com/opencast/opencast/pull/2067)] -
+  Solves #2034 (Execute-once subprocess issue)
+- [[#2051](https://github.com/opencast/opencast/pull/2051)] -
+  Limit OpenMP Threads to Prevent Tesseract Blocking the System
+- [[#2040](https://github.com/opencast/opencast/pull/2040)] -
+  Drop user login log level
+- [[#2020](https://github.com/opencast/opencast/pull/2020)] -
+  Set the RFC 822 "Date" header field when sending an email (r/8.x)
+- [[#2008](https://github.com/opencast/opencast/pull/2008)] -
+  Speed up preview encoding
+- [[#1988](https://github.com/opencast/opencast/pull/1988)] -
+  #1987 Admin UI event start filter datepicker timezone patch
+- [[#1954](https://github.com/opencast/opencast/pull/1954)] -
+  Fix Paella Player assuming track is audio-only when it's actually video and audio
+- [[#1894](https://github.com/opencast/opencast/pull/1894)] -
+  Remove references to removed modules
+- [[#1891](https://github.com/opencast/opencast/pull/1891)] -
+  Creating a new series doesn't send user collections anymore
+- [[#1887](https://github.com/opencast/opencast/pull/1887)] -
+  Remove Dead OpenID Module
+
+
 ### Opencast 8.7
 
 *Released on September 27th, 2020*

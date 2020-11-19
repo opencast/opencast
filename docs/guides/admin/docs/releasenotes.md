@@ -76,6 +76,11 @@ API changes
     - DELETE /workflow/definition/{id}
     - PUT /workflow/definition
 
+Additional Notes About 8.8
+--------------------------
+
+This maintenance includes 12 patches. 
+
 Additional Notes About 8.7
 --------------------------
 
