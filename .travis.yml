@@ -93,9 +93,18 @@ jobs:
       script:
         - ./docs/upgrade/.test.sh
 
-    # Make a build excluding the assembly steps
+    # Make a build excluding the assembly steps (Java 8)
     - stage: build
       env: name=build
+      script:
+        # Don't run the admin interface frontend tests. We run them in parallel anyway:
+        - sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui-frontend/pom.xml
+        - mvn clean install -Pnone
+        
+    # Make a build excluding the assembly steps (Java 11)
+    - stage: build
+      env: name=build
+      jdk: openjdk11
       script:
         # Don't run the admin interface frontend tests. We run them in parallel anyway:
         - sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui-frontend/pom.xml
