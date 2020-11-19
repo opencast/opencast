@@ -79,7 +79,7 @@ API changes
 Additional Notes About 8.8
 --------------------------
 
-This maintenance includes 12 patches. 
+This maintenance includes 12 patches.
 
 Additional Notes About 8.7
 --------------------------
