@@ -4,14 +4,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>opencast-theodul-plugin</artifactId>
-  <version>8-SNAPSHOT</version>
+  <version>8.8</version>
   <packaging>maven-archetype</packaging>
   <name>Opencast :: engage-theodul-plugin-archetype</name>
   <description>An archetype that generates a plugin for the Opencast Theodul Player</description>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>8.8</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
