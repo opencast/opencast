@@ -42,7 +42,7 @@
       "SELECT_OPTION": "选择选项",
       "JOB_TITLE": "标题",
       "JOB_STATUS": "状态",
-      "UPLOAD_SUCCESS": "上传成功！",
+      "UPLOAD_SUCCESS": "Upload succeeded!",
       "UPLOAD_FAILURE": "上传失败!",
       "UPLOAD_FAILURE_DESCRIPTION": "请稍后再试。",
       "EDIT_SUCCESS": "编辑成功，重新发布中。",
@@ -55,13 +55,13 @@
       "EVENT_LOCKED": "事件正在处理中。请等待以进行进一步更改…",
       "DELETION_FAILURE": "事件删除失败",
       "DELETION_FAILURE_DESCRIPTION": "请稍后再试…",
-      "RESULT_HEADING": "结果 {{range.begin}}-{{range.end}} / {{total}}",
+      "RESULT_HEADING": "结果： 第{{range.begin}}-{{range.end}}项，共{{total}}项",
       "CONFIRM_DELETION": "确定要删除此事件吗？",
       "COPY_TO_SERIES": "将事件复制到系列",
       "SELECT_COPY_TARGET": "选择目标系列",
       "COPY": "复制",
       "COPY_IN_PROGRESS": "正在开始复制…",
-      "CREATOR": "由 {{creator}}"
+      "CREATOR": "{{creator}}"
    },
    "LANGUAGES": {
       "ARABIC": "阿拉伯语",

@@ -42,7 +42,7 @@
       "SELECT_OPTION": "Sélectionnez une option",
       "JOB_TITLE": "Titre",
       "JOB_STATUS": "Statut",
-      "UPLOAD_SUCCESS": "Envoi réussi !",
+      "UPLOAD_SUCCESS": "Upload succeeded!",
       "UPLOAD_FAILURE": "Envoi échoué !",
       "UPLOAD_FAILURE_DESCRIPTION": "Veuillez réessayer plus tard.",
       "EDIT_SUCCESS": "Modification réussie, republication en cours.",
