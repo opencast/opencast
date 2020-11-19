@@ -31,6 +31,7 @@ import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -96,8 +97,9 @@ public final class WorkflowPropertiesUtil {
           final Map<String, String> properties) {
 
     // Properties can only be created if a snapshot exists. Hence, we create a snapshot if there is none right now.
+    // Although, to avoid lots of potentially slow IO operations, we archive an empty media package.
     if (!assetManager.snapshotExists(mediaPackage.getIdentifier().toString())) {
-      assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+      assetManager.takeSnapshot(DEFAULT_OWNER, new MediaPackageBuilderImpl().createNew(mediaPackage.getIdentifier()));
     }
 
     // Store all properties
