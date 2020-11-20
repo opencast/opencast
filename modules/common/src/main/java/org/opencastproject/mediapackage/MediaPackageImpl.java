@@ -31,6 +31,7 @@ import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.IoSupport;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ import org.w3c.dom.Node;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -1108,6 +1110,26 @@ public final class MediaPackageImpl implements MediaPackage {
       e.verify();
     }
   }
+
+  /* NOTE: DO NOT REMOVE THIS METHOD IT WILL BREAK THINGS,
+    * SEE https://github.com/opencast/opencast/issues/1860 for an example
+    */
+  /**
+   * Unmarshals XML representation of a MediaPackage via JAXB.
+   *
+   * @param xml
+   *          the serialized xml string
+   * @return the deserialized media package
+   * @throws MediaPackageException
+   */
+  public static MediaPackageImpl valueOf(String xml) throws MediaPackageException {
+    try {
+      return MediaPackageImpl.valueOf(IOUtils.toInputStream(xml, "UTF-8"));
+    } catch (IOException e) {
+      throw new MediaPackageException(e);
+    }
+  }
+
 
   /**
    * @see java.lang.Object#hashCode()
