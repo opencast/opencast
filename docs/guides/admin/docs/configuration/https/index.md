@@ -1,10 +1,11 @@
 Serve Content Via HTTPS
 =======================
 
-For all production systems you want to enable HTTPS. To achieve that, you can either use an HTTP(S) proxy like Apache
-httpd or Nginx (recommended) or enable HTTPS directly in Opencast.
+To make your installation available from the outside worls, you want to allow non-local traffic and want to secure
+connections from and to Opencast.  To archieve that, you can either use an HTTP(S) proxy like Apache httpd or Nginx
+(recommended) or enable HTTPS directly in Opencast.
 
-- [Using Nginx to enable HTTPS](nginx.md)
+- [Using Nginx to enable HTTPS](nginx.md) (recommended)
 - [Using Apache httpd to enable HTTPS](apache-httpd.md)
 - [Enable HTTPS directly in Opencast](opencast.only.md)
 
@@ -28,5 +29,5 @@ There are also a couple of great sites to test your final setup:
 - [Qualys SSL Labs](https://ssllabs.com/ssltest/)
 
 
-Additionally, if you have no easy way of obtaining proper TLS certificates for your organization, please consider using
-[Let’s Encrypt](https://letsencrypt.org) instead of self-signed certificates.
+If you have no easy way of obtaining proper TLS certificates for your organization, please consider using
+[Let’s Encrypt](https://letsencrypt.org).

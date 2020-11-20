@@ -22,7 +22,9 @@
 package org.opencastproject.ingest.endpoint;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_EPISODE;
 
+import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
@@ -45,6 +47,9 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
+import org.opencastproject.security.api.AccessControlParsingException;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -82,6 +87,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -627,6 +633,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "Episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalog", type = RestParameter.Type.STRING),
           @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
           @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Access control list in XACML or JSON form", isRequired = false, name = "acl", type = RestParameter.Type.STRING),
           @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING) },
       bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
       responses = {
@@ -705,10 +712,11 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "Episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalog", type = RestParameter.Type.STRING),
           @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
           @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Access control list in XACML or JSON form", isRequired = false, name = "acl", type = RestParameter.Type.STRING),
           @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING) },
       bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
       responses = {
-          @RestResponse(description = "Ingest successfull. Returns workflow instance as XML", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Ingest successful. Returns workflow instance as XML", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Ingest failed due to invalid requests.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "Ingest failed. Something went wrong internally. Please have a look at the log files",
               responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
@@ -795,6 +803,20 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               seriesDCCatalogNumber += 1;
               InputStream is = new ByteArrayInputStream(value.getBytes("UTF-8"));
               ingestService.addCatalog(is, fileName, MediaPackageElements.SERIES, mp);
+
+              // Add ACL in JSON, XML or XACML format
+            } else if ("acl".equals(fieldName)) {
+              InputStream inputStream = new ByteArrayInputStream(value.getBytes(StandardCharsets.UTF_8));
+              AccessControlList acl;
+              try {
+                acl = AccessControlParser.parseAcl(inputStream);
+                inputStream = new ByteArrayInputStream(XACMLUtils.getXacml(mp, acl).getBytes(StandardCharsets.UTF_8));
+              } catch (AccessControlParsingException e) {
+                // Couldn't parse this → already XACML. Why again are we using three different formats?
+                logger.debug("Unable to parse ACL, guessing that this is already XACML");
+                inputStream.reset();
+              }
+              ingestService.addAttachment(inputStream, "episode-security.xml", XACML_POLICY_EPISODE, mp);
 
               /* Add media files by URL */
             } else if ("mediaUri".equals(fieldName)) {

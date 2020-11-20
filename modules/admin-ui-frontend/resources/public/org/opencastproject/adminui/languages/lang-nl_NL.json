@@ -5,25 +5,25 @@
    "NO": "Neen",
    "SUBMIT": "Verzenden",
    "UPDATE": {
-      "MINOR": "Minor update available",
-      "MAJOR": "Major update available",
-      "UNSUPPORTED": "Version {{ version }} no longer supported",
-      "UNDETERMINED": "Indeterminable version"
+      "MINOR": "Minor update beschikbaar",
+      "MAJOR": "Majoor update beschikbaar",
+      "UNSUPPORTED": "Versie {{ version }} wordt niet langer ondersteund",
+      "UNDETERMINED": "Onbepaalde versie"
    },
    "CANCEL": "Annuleren",
    "CONFIRM": "Bevestigen",
    "SAVE": "Opslaan",
-   "CONTINUE": "Continue",
-   "CLOSE": "Close",
+   "CONTINUE": "Doorgaan",
+   "CLOSE": "Afsluiten",
    "LOGOUT": "Afmelden",
    "RESET": "Reset",
    "SELECT_NO_OPTION_SELECTED": "Geen optie geselecteerd",
    "SELECT_NO_OPTIONS_AVAILABLE": "Geen opties beschikbaar",
    "YES": "Ja",
-   "COPY": "Copy to clipboard",
+   "COPY": "Naar klembord kopiëren",
    "LTI": {
       "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
-      "SERIES_TITLE": "View Series",
+      "SERIES_TITLE": "Bekijk serie",
       "UPLOAD_TITLE": "Upload event",
       "LOADING": "Loading…",
       "NEW_UPLOAD": "Upload new event",
@@ -42,7 +42,7 @@
       "SELECT_OPTION": "Select option",
       "JOB_TITLE": "Title",
       "JOB_STATUS": "Status",
-      "UPLOAD_SUCCESS": "Upload succeded!",
+      "UPLOAD_SUCCESS": "Upload succeeded!",
       "UPLOAD_FAILURE": "Upload failed!",
       "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
       "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
@@ -52,7 +52,7 @@
       "GENERIC_ERROR": "Error: {{message}}",
       "DELETION_SUCCESS": "Event deletion successful",
       "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
-      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
+      "EVENT_LOCKED": "Deze evenement wordt momenteel verwerkt. Wacht tut u verdere wijzigingen aanbrengt...",
       "DELETION_FAILURE": "Event deletion failed",
       "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
       "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
@@ -228,9 +228,9 @@
       "ACTIVE_TRANSACTION": "Het huidige evenement kan momenteel niet worden bewerkt aangezien het bij een actieve transactie betrokken is.",
       "BULK_METADATA_UPDATE": {
          "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
-         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
+         "ALL_EVENTS_UPDATED": "Alle evenementen zijn met succes geüpdatet.",
          "NO_EVENTS_UPDATED": "All updates failed.",
-         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+         "SOME_EVENTS_NOT_UPDATED": "Sommige evenementen konden niet geüpdatet worden."
       },
       "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
       "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
@@ -282,7 +282,7 @@
             "CANNOTSTART": "Gemarkeerde Event (s) kunnen niet worden verwerkt, alleen geplande gebeurtenissen worden ondersteund.",
             "NOCHANGES": "Geen veranderingen in de gebeurtenissen gedetecteerd!",
             "CONFLICT_FIRST_EVENT": "Evenement veranderd",
-            "CONFLICT_SECOND_EVENT": "Event in conflict",
+            "CONFLICT_SECOND_EVENT": "Evenement in conflict",
             "CANNOTEDITSCHEDULE": "Onvoldoende permissies om de tijdschema informatie aan te passen voor het geselecteerde event. Je kan verdergaan, zonder de mogelijkheid om tijdschema informatie aan te passen voor alle events."
          },
          "METADATA": {
@@ -297,23 +297,23 @@
          },
          "EDIT": {
             "CAPTION": "Bewerken",
-            "EVENT": "event",
-            "EVENTS": "events",
+            "EVENT": "evenement",
+            "EVENTS": "evenementen",
             "HEADER": "Deze pagina stelt u in staat geplande gebeurtenissen te bewerken, gegroepeerd op weekdagen. De invoervelden zijn vooraf ingevuld in het geval alle geplande gebeurtenissen dezelfde waarde hebben voor een specifiek veld. Anders worden de invoervelden leeg gelaten. Door de invoervelden leeg te laten, betekent dit dat de respectieve waarden niet gewijzigd moeten worden.",
             "METADATA": "Metadata",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       },
       "EDIT_EVENTS_METADATA": {
-         "CAPTION": "Edit the metadata of multiple events",
+         "CAPTION": "Bewerk de metadata van meerdere evenementen",
          "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
          "REQUEST_ERRORS": {
-            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
-            "NOTHING_TO_EDIT": "The events cannot be edited.",
+            "CANNOT_EDIT_SOME": "Gemarkeerde evenementen kunnen niet bewerkt worden.",
+            "NOTHING_TO_EDIT": "Deze evenementen kunnen niet bewerkt worden.",
             "NOT_FOUND": "Not found",
             "RUNNING_WORKFLOW": "Running workflow",
             "TABLE": {
-               "CAPTION": "Selected events",
+               "CAPTION": "Geselecteerde evenementen",
                "ERRORS": "Errors"
             }
          },
