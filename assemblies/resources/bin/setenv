@@ -43,3 +43,8 @@ export KARAF_NOROOT=true
 export OMP_THREAD_LIMIT=1
 
 . "$DIRNAME/check_ports"
+
+if ! java -version 2>&1 | grep -q '1\.8\.'; then
+  echo "ERROR: Opencast 8 requires OpenJDK 8"
+  exit 1
+fi
