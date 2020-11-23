@@ -1,8 +1,7 @@
 Opencast
 ========
 
-[![Build Status](https://travis-ci.org/opencast/opencast.svg?branch=develop)
-](https://travis-ci.org/opencast/opencast)
+![Test Opencast](https://github.com/opencast/opencast/workflows/Test%20Opencast/badge.svg)
 
 Open Source Lecture Capture & Video Management for Education
 
