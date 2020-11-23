@@ -1,0 +1,133 @@
+name: Test Opencast
+
+on:
+  - push
+  - pull_request
+
+jobs:
+
+  # Check documentation with markdownlint and build it using mkdocs
+  documentation:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: set up python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: install dependencies
+      run: |
+        pip install -q mkdocs markdown_inline_graphviz_extension mkdocs-windmill
+        cd docs/guides
+        npm ci
+
+    - name: check documentation
+      run: bash ./.style-and-markdown-build.sh
+
+
+  # Test database upgrade path.
+  # For this, we initialize a 2.2 database and upgrade all the way to the latest version
+  database:
+    strategy:
+      matrix:
+        db:
+          - 'mysql:8'
+          - 'mariadb:10'
+    runs-on: ubuntu-20.04
+    container: ubuntu
+    services:
+      mydb:
+        image: ${{ matrix.db }}
+        env:
+          MYSQL_ROOT_PASSWORD: password
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: initialize database
+      run: |
+        apt update -q
+        apt install -q -y mysql-client curl bc
+        mysql --host mydb -uroot -ppassword -e 'select version()'
+
+    - name: check upgrade path
+      run: |
+        sed -i 's_remote=""_remote="--host mydb -ppassword"_' docs/upgrade/.test.sh
+        ./docs/upgrade/.test.sh
+
+
+  # Run admin interface browser tests
+  frontend:
+    strategy:
+      matrix:
+        browser:
+          - chrome
+          - firefox
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: use node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+
+    - name: install dependencies
+      run: |
+        cd modules/admin-ui
+        npm ci
+        ./node_modules/.bin/bower install
+
+    - name: run front-end tests
+      run: |
+        cd modules/admin-ui
+        npm run test-${{ matrix.browser }}
+
+
+  # Build Opencast
+  build:
+    name: build
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: cache local maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+
+      - name: install dependencies
+        run: |
+          sudo apt update -q
+          sudo apt install -y -q \
+            bzip2 \
+            ffmpeg \
+            gzip \
+            hunspell \
+            hunspell-de-de \
+            procps \
+            sox \
+            tar \
+            tesseract-ocr \
+            tesseract-ocr-deu \
+            unzip
+
+      - name: prepare build
+        run: |
+          sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui/pom.xml
+
+      - name: build opencast
+        run: |
+          mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            clean install -Pnone
