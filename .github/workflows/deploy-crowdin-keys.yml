@@ -1,0 +1,31 @@
+name: Deploy Crowdin keys
+
+on:
+  push:
+    branches:
+      - develop
+      - 'r/*.x'
+
+jobs:
+
+  # Check documentation with markdownlint and build it using mkdocs
+  deploy-translation-keys:
+    runs-on: ubuntu-20.04
+    env:
+      CROWDIN_API_KEY: ${{ secrets.CROWDIN_API_KEY }}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: prepare crowdin client
+      run: |
+        wget --quiet https://artifacts.crowdin.com/repo/deb/crowdin.deb
+        sudo dpkg -i crowdin.deb
+        echo "api_key: ${CROWDIN_API_KEY}" > ~/.crowdin.yaml
+
+    - name: upload translation source
+      run: |
+        if [ -z "${CROWDIN_API_KEY}" ]; then
+          echo Skipping deployment without secret
+        else
+          crowdin --config .crowdin.yaml upload sources -b "${GITHUB_REF##*/}"
+        fi
