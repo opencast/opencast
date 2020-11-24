@@ -149,8 +149,8 @@
                   <th translate="EVENTS.EVENTS.DETAILS.ASSETS.TYPE"><!-- Type --></th>
                   <th translate="EVENTS.EVENTS.DETAILS.ASSETS.SIZE"><!-- Size --></th>
                   <th class="medium">
-                    <a translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD"
-                       class="details-link"
+                    <a
+                       class="more"
                        ng-show="(uploadAssetOptions && !transactions.read_only)"
                        ng-click="openSubTab('newAssetUpload', 'EventAssetAttachmentsResource', 'newassetupload', false, true)"
                        with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT">
@@ -165,8 +165,8 @@
                   </td>
                   <td>{{ assets.attachments }}</td>
                   <td>
-                    <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS"
-                       class="details-link"
+                    <a
+                       class="more"
                        ng-show="assets.attachments > 0"
                        ng-click="openSubTab('asset-attachments', 'EventAssetAttachmentsResource', 'attachment')">
                       <!-- Details -->
@@ -179,8 +179,8 @@
                   </td>
                   <td>{{ assets.catalogs }}</td>
                   <td>
-                    <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS"
-                       class="details-link"
+                    <a
+                       class="more"
                        ng-show="assets.catalogs > 0"
                        ng-click="openSubTab('asset-catalogs', 'EventAssetCatalogsResource', 'catalog')">
                       <!-- Details -->
@@ -191,8 +191,8 @@
                   <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.CAPTION"><!-- Media --></td>
                   <td>{{ assets.media }}</td>
                   <td>
-                    <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS"
-                       class="details-link"
+                    <a
+                       class="more"
                        ng-show="assets.media > 0"
                        ng-click="openSubTab('asset-media', 'EventAssetMediaResource', 'media')">
                       <!-- Details -->
@@ -205,8 +205,8 @@
                   </td>
                   <td>{{ assets.publications }}</td>
                   <td>
-                    <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS"
-                       class="details-link"
+                    <a
+                       class="more"
                        ng-show="assets.publications > 0"
                        ng-click="openSubTab('asset-publications', 'EventAssetPublicationsResource', 'publication')">
                       <!-- Details -->
@@ -434,8 +434,7 @@
 
                       </td>
                       <td>
-                        <a class="details-link" ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)"
-                           translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">
+                        <a class="more" ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)">
                           <!-- Details -->
                         </a>
                       </td>
@@ -834,7 +833,7 @@
                   <td>{{ item.timestamp | localizeDate : 'dateTime' : 'medium'}}</td>
                   <td>{{ item.title }}</td>
                   <td>
-                    <a class="details-link" ng-click="openSubTab('error-details', 'EventErrorDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS" data-modal-tab="error-details">
+                    <a class="more" ng-click="openSubTab('error-details', 'EventErrorDetailsResource', item.id)" data-modal-tab="error-details">
                       <!-- Details -->
                     </a>
                   </td>
@@ -973,7 +972,7 @@
                   <td>{{ item.mimetype }}</td>
                   <td>{{ item.tags|joinBy:', ' }}</td>
                   <td>
-                    <a ng-click="openSubTab('attachment-details', 'EventAttachmentDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link">
+                    <a ng-click="openSubTab('attachment-details', 'EventAttachmentDetailsResource', item.id)" class="more">
                       <!-- Details -->
                     </a>
                   </td>
@@ -1012,7 +1011,7 @@
                   <td>{{ item.mimetype }}</td>
                   <td>{{ item.tags|joinBy:', ' }}</td>
                   <td>
-                    <a ng-click="openSubTab('catalog-details', 'EventCatalogDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link">
+                    <a ng-click="openSubTab('catalog-details', 'EventCatalogDetailsResource', item.id)"  class="more">
                       <!-- Details -->
                     </a>
                   </td>
@@ -1049,7 +1048,7 @@
                   <td>{{ item.mimetype }}</td>
                   <td>{{ item.tags|joinBy:', ' }}</td>
                   <td>
-                    <a ng-click="openSubTab('media-details', 'EventMediaDetailsResource', item.id, false, true)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link">
+                    <a ng-click="openSubTab('media-details', 'EventMediaDetailsResource', item.id, false, true)" class="more">
                       <!-- Details -->
                     </a>
                   </td>
@@ -1088,7 +1087,7 @@
                   <td>{{ item.channel }}</td>
                   <td>{{ item.tags|joinBy:', ' }}</td>
                   <td>
-                    <a ng-click="openSubTab('publications-details', 'EventPublicationDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link">
+                    <a ng-click="openSubTab('publications-details', 'EventPublicationDetailsResource', item.id)"  class="more">
                       <!-- Details -->
                     </a>
                   </td>
@@ -1545,23 +1544,28 @@
             <!-- More Information -->
           </header>
           <div class="obj-container">
-            <ul>
-              <li>
-                <span translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.DETAILS_LINK">
+            <table class="main-tbl">
+              <tr>
+              <td translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.DETAILS_LINK">
                   <!-- Operations -->
-                </span>
-                <a class="details-link" ng-click="openSubTab('workflow-operations', 'EventWorkflowOperationsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">
+              </td>
+              <td>
+                <a class="more" ng-click="openSubTab('workflow-operations', 'EventWorkflowOperationsResource', subNavData.id, true)">
                   <!-- Details -->
                 </a>
-              </li>
-              <li>
-                <span translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE">
+              </td>
+              </tr>
+              <tr>
+                <td translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE">
                   <!-- Errors & Warnings -->
-                </span>
-                <a class="details-link" ng-click="openSubTab('errors-and-warnings', 'EventErrorsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">
-                  <!-- Details -->
-                </a>
-              </li>
+                </td>
+                <td>
+                  <a class="more" ng-click="openSubTab('errors-and-warnings', 'EventErrorsResource', subNavData.id, true)">
+                    <!-- Details -->
+                  </a>
+                </td>
+              </tr>
+            </table>
             </ul>
           </div>
         </div>
@@ -1593,7 +1597,7 @@
                   <td>{{ item.title }}</td>
                   <td>{{ item.description }}</td>
                   <td>
-                    <a class="details-link" ng-click="openSubTab('operation-details', 'EventWorkflowOperationDetailsResource', $index)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">
+                    <a class="more" ng-click="openSubTab('operation-details', 'EventWorkflowOperationDetailsResource', $index)">
                       <!-- Details -->
                     </a>
                   </td>
