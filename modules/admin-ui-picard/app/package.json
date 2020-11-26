@@ -8,6 +8,8 @@
     "@testing-library/user-event": "^7.2.1",
     "classnames": "^2.2.6",
     "font-awesome": "^4.7.0",
+    "formik": "^2.2.5",
+    "http-proxy-middleware": "^1.0.5",
     "i18next": "^19.3.4",
     "i18next-browser-languagedetector": "^4.0.2",
     "i18next-xhr-backend": "^3.2.2",
@@ -21,13 +23,13 @@
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
+    "react-widgets": "^4.6.1",
     "redux": "^4.0.5",
     "redux-devtools-extension": "^2.13.8",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",
     "reselect": "^4.0.0",
-    "styled-components": "^5.1.1",
-    "http-proxy-middleware": "^1.0.5"
+    "styled-components": "^5.1.1"
   },
   "scripts": {
     "start": "react-app-rewired start",
@@ -57,6 +59,7 @@
     "babel-loader": "^8.1.0",
     "babel-preset-react": "^6.24.1",
     "customize-cra": "^0.9.1",
+    "prop-types": "^15.7.2",
     "react-app-rewired": "^2.1.5"
   }
 }

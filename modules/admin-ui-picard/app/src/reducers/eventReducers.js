@@ -1,4 +1,11 @@
-import {LOAD_EVENTS_FAILURE, LOAD_EVENTS_IN_PROGRESS, LOAD_EVENTS_SUCCESS, SHOW_ACTIONS} from '../actions/eventActions';
+import {
+    LOAD_EVENT_METADATA_FAILURE,
+    LOAD_EVENT_METADATA_IN_PROGRESS, LOAD_EVENT_METADATA_SUCCESS,
+    LOAD_EVENTS_FAILURE,
+    LOAD_EVENTS_IN_PROGRESS,
+    LOAD_EVENTS_SUCCESS,
+    SHOW_ACTIONS
+} from '../actions/eventActions';
 import {eventsTableConfig} from "../configs/tableConfigs/eventsTableConfig";
 
 /**
@@ -21,7 +28,8 @@ const initialState = {
     offset: 0,
     results: [],
     columns: initialColumns,
-    showActions: false
+    showActions: false,
+    metadata: {}
 }
 
 // Reducer for events
@@ -57,6 +65,26 @@ const events = (state=initialState, action) => {
             return {
                 ...state,
                 showActions: isShowing
+            }
+        }
+        case LOAD_EVENT_METADATA_IN_PROGRESS: {
+            return {
+                ...state,
+                isLoading: true
+            }
+        }
+        case LOAD_EVENT_METADATA_SUCCESS: {
+            const { metadata } = payload;
+            return {
+                ...state,
+                isLoading: false,
+                metadata: metadata
+            }
+        }
+        case LOAD_EVENT_METADATA_FAILURE: {
+            return {
+                ...state,
+                isLoading: false
             }
         }
         default:

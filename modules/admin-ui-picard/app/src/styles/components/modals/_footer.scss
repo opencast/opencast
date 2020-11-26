@@ -27,7 +27,7 @@
     background: darken($body-background, 3%);
     border-top: 1px solid $main-border-color;
 
-    a {
+    button {
         @include btn(green);
 
         &.cancel {

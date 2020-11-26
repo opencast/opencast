@@ -10,6 +10,11 @@ export const LOAD_EVENTS_FAILURE = 'LOAD_EVENTS_FAILURE';
 // Constants of actions types affecting UI
 export const SHOW_ACTIONS = 'SHOW_ACTIONS';
 
+// Constants of action types affecting fetching of event metadata from server
+export const LOAD_EVENT_METADATA_IN_PROGRESS = 'LOAD_EVENT_METADATA_IN_PROGRESS';
+export const LOAD_EVENT_METADATA_SUCCESS = 'LOAD_EVENT_METADATA_SUCCESS';
+export const LOAD_EVENT_METADATA_FAILURE = 'LOAD_EVENT_METADATA_FAILURE';
+
 // Actions affecting fetching of events from server
 
 export const loadEventsInProgress = () => ({
@@ -30,4 +35,19 @@ export const loadEventsFailure = () => ({
 export const showActions = isShowing => ({
     type: SHOW_ACTIONS,
     payload: { isShowing }
+});
+
+// Actions affecting fetching of event metadata from server
+
+export const loadEventMetadataInProgress = () => ({
+    type: LOAD_EVENT_METADATA_IN_PROGRESS
+});
+
+export const loadEventMetadataSuccess = metadata => ({
+    type: LOAD_EVENT_METADATA_SUCCESS,
+    payload: { metadata }
+});
+
+export const loadEventMetadataFailure = () => ({
+    type: LOAD_EVENT_METADATA_FAILURE
 });

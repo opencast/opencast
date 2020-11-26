@@ -12,9 +12,10 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
+    "formik": "^2.2.5",
+    "http-proxy-middleware": "^1.0.5",
     "nodemon": "^2.0.3",
-    "request-digest": "^1.0.13",
-    "http-proxy-middleware": "^1.0.5"
+    "request-digest": "^1.0.13"
   },
   "devDependencies": {
     "url-parse": "^1.4.7"

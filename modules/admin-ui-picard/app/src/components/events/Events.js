@@ -6,7 +6,7 @@ import TableFilters from "../shared/TableFilters";
 import MainNav from "../shared/MainNav";
 import Stats from "../shared/Stats";
 import Table from "../shared/Table";
-import {fetchEvents} from "../../thunks/eventThunks";
+import {fetchEventMetadata, fetchEvents} from "../../thunks/eventThunks";
 import {loadEventsIntoTable, loadSeriesIntoTable} from "../../thunks/tableThunks";
 import {getEvents, isLoading, isShowActions} from "../../selectors/eventSelectors";
 import {connect} from "react-redux";
@@ -16,6 +16,7 @@ import {withRouter} from "react-router-dom";
 import {fetchSeries} from "../../thunks/seriesThunks";
 import {fetchFilters, fetchStats} from "../../thunks/tableFilterThunks";
 import Notifications from "../shared/Notifications";
+import NewEventModal from "./partials/modals/NewEventModal";
 
 // References for detecting a click outside of the container of the dropdown menu
 const containerAction = React.createRef();
@@ -24,10 +25,11 @@ const containerAction = React.createRef();
  * This component renders the table view of events
  */
 const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loadingSeries,
-                        loadingSeriesIntoTable, loadingFilters, loadingStats }) => {
+                        loadingSeriesIntoTable, loadingFilters, loadingStats, loadingEventMetadata }) => {
     const { t } = useTranslation();
     const [displayActionMenu, setActionMenu] = useState(false);
     const [displayNavigation, setNavigation] = useState(false);
+    const [displayNewEventModal, setNewEventModal] = useState(false);
 
     const loadEvents = async () => {
         // Fetching stats from server
@@ -85,8 +87,14 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         setActionMenu(!displayActionMenu);
     }
 
-    const placeholder = () => {
-        console.log("To be implemented");
+    const showNewEventModal = async () => {
+        await loadingEventMetadata();
+
+        setNewEventModal(true);
+    }
+
+    const hideNewEventModal = () => {
+        setNewEventModal(false);
     }
 
     const styleNavOpen = {
@@ -100,11 +108,15 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
             <section className="action-nav-bar">
                 {/*TODO: include with role things */}
                 <div className="btn-group">
-                    <button className="add" onClick={() => placeholder()}>
+                    <button className="add" onClick={() => showNewEventModal()}>
                         <i className="fa fa-plus" />
                         <span>{t('EVENTS.EVENTS.ADD_EVENT')}</span>
                     </button>
                 </div>
+
+                {/* Display modal for new event if add event button is clicked */}
+                <NewEventModal showModal={displayNewEventModal}
+                               handleClose={hideNewEventModal} />
 
                 {/* Include Burger-button menu */}
                 <MainNav  isOpen={displayNavigation}
@@ -198,7 +210,8 @@ const mapDispatchToProps = dispatch => ({
     loadingSeries: () => dispatch(fetchSeries()),
     loadingSeriesIntoTable: () => dispatch(loadSeriesIntoTable()),
     loadingFilters: resource => dispatch(fetchFilters(resource)),
-    loadingStats: () => dispatch(fetchStats())
+    loadingStats: () => dispatch(fetchStats()),
+    loadingEventMetadata: () => dispatch(fetchEventMetadata())
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Events));

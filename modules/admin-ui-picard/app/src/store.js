@@ -24,7 +24,7 @@ import {notifications} from "./reducers/notificationReducers";
  * This File contains the configuration for the store used by the reducers all over the app
  */
 
-// all reducers used in this app
+// form reducer and all other reducers used in this app
 const reducers = {
     tableFilters,
     tableFilterProfiles,

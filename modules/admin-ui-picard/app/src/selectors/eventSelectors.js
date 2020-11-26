@@ -6,3 +6,4 @@ export const getEvents = state => state.events.results;
 export const getVisibilityEventColumns = state => state.events.columns;
 export const isShowActions = state => state.events.showActions;
 export const isLoading = state => state.events.isLoading;
+export const getEventMetadata = state => state.events.metadata;

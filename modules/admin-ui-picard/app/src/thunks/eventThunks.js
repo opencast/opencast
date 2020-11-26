@@ -1,4 +1,10 @@
-import {loadEventsFailure, loadEventsInProgress, loadEventsSuccess} from "../actions/eventActions";
+import {
+    loadEventMetadataFailure,
+    loadEventMetadataInProgress, loadEventMetadataSuccess,
+    loadEventsFailure,
+    loadEventsInProgress,
+    loadEventsSuccess
+} from "../actions/eventActions";
 import {getURLParams} from "../utils/resourceUtils";
 
 // fetch events from server
@@ -40,6 +46,34 @@ export const fetchEvents = () => async (dispatch, getState) => {
         dispatch(loadEventsSuccess(events));
     } catch (e) {
         dispatch(loadEventsFailure());
+        console.log(e);
+    }
+}
+
+// fetch event metadata from server
+export const fetchEventMetadata = () => async (dispatch, getState)=> {
+    try {
+        dispatch(loadEventMetadataInProgress());
+
+        let data = await fetch('admin-ng/event/new/metadata');
+        const response = await data.json();
+
+        const metadata = response[0];
+
+        for (let i = 0; metadata.fields.length > i; i++) {
+            if (!!metadata.fields[i].collection) {
+                metadata.fields[i].collection = Object.keys(metadata.fields[i].collection).map(key => {
+                    return {
+                        name: key,
+                        value: metadata.fields[i].collection[key]
+                    }
+                })
+            }
+        }
+
+        dispatch(loadEventMetadataSuccess(metadata));
+    } catch (e) {
+        dispatch(loadEventMetadataFailure());
         console.log(e);
     }
 }
