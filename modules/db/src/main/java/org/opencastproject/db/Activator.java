@@ -32,7 +32,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Hashtable;
 
 import javax.sql.DataSource;
@@ -137,6 +139,36 @@ public class Activator implements BundleActivator {
     logger.info("Database connection pool established at {}", jdbcUrl);
     logger.info("Database connection pool parameters: max.size={}, min.size={}, max.idle.time={}",
       pooledDataSource.getMaxPoolSize(), pooledDataSource.getMinPoolSize(), pooledDataSource.getMaxIdleTime());
+    Statement statement = pooledDataSource.getConnection().createStatement();
+
+    long time = System.currentTimeMillis();
+    String tableName = "oc-temp" + time;
+    try {
+      runUpdate(statement, "CREATE TABLE " + tableName + " ( id BIGINT NOT NULL, test BIGINT, PRIMARY KEY (id) );");
+      runUpdate(statement, "INSERT INTO " + tableName + " VALUES (" + time + "," + time + ");");
+      runUpdate(statement, "INSERT INTO " + tableName + " VALUES (" + time + 1 + "," + time + 1 + ");");
+      runUpdate(statement, "UPDATE " + tableName + " SET test = " + time + 2 + " WHERE id = " + time + ";");
+      ResultSet rs = statement.executeQuery("SELECT FROM " + tableName + " WHERE id = " + time + 2 + ";");
+      while (rs.next()) {
+        long id = rs.getLong("id");
+        long test = rs.getLong("test");
+        if (id != time || test != time + 2) {
+          throw new RuntimeException("Unable to verify updating a table functions correctly");
+        }
+      }
+      runUpdate(statement, "DELETE FROM " + tableName + " WHERE id = " + time + ";");
+      runUpdate(statement, "DROP TABLE " + tableName + ";");
+    } catch (Exception e) {
+      throw new RuntimeException("Unable to verify SQL credentials have required permissions!");
+    }
+
+  }
+
+  private void runUpdate(Statement statement, String sql) throws RuntimeException, SQLException {
+    int affected = statement.executeUpdate(sql);
+    if (affected != 1) {
+      throw new RuntimeException("Unable to update on a testing table, check that your database user has the right permissions!");
+    }
   }
 
   @Override
