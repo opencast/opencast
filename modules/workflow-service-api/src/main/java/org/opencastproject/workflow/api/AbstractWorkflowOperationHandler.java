@@ -68,6 +68,8 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /** The JobBarrier polling interval */
   private long jobBarrierPollingInterval = JobBarrier.DEFAULT_POLLING_INTERVAL;
 
+  protected enum Configuration { none, one, many };
+
   /**
    * Activates this component with its properties once all of the collaborating services have been set
    *
@@ -358,6 +360,56 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    */
   protected Opt<String> getOptConfig(WorkflowOperationInstance woi, String key) {
     return Opt.nul(woi.getConfiguration(key)).flatMap(Strings.trimToNone);
+  }
+
+  protected ConfiguredTagsAndFlavors getTagsAndFlavors(WorkflowInstance wi, Configuration srcTags, Configuration srcFlavors, Configuration targetTags, Configuration targetFlavors) {
+    WorkflowOperationInstance woi = wi.getCurrentOperation();
+    ConfiguredTagsAndFlavors tagsAndFlavors = new ConfiguredTagsAndFlavors();
+
+    List<String> srcTagList = new ArrayList<>();
+    switch(srcTags) {
+      case none:  break;
+      case one: srcTagList.add(woi.getConfiguration("source-tag")); break;
+      case many: srcTagList = asList(StringUtils.trimToNull(woi.getConfiguration("source-tags"))); break;
+      default: break;
+    }
+    tagsAndFlavors.setSrcTags(srcTagList);
+
+    List<String> srcFlavorList = new ArrayList<>();
+    switch(srcFlavors) {
+      case none:  break;
+      case one: srcFlavorList.add(woi.getConfiguration("source-flavor")); break;
+      case many: srcFlavorList = asList(StringUtils.trimToNull(woi.getConfiguration("source-flavors"))); break;
+      default: break;
+    }
+    tagsAndFlavors.setSrcFlavors(srcFlavorList);
+
+    List<String> targetTagList = new ArrayList<>();
+    switch(srcFlavors) {
+      case none:  break;
+      case one: targetTagList.add(woi.getConfiguration("target-tag")); break;
+      case many: targetTagList = asList(StringUtils.trimToNull(woi.getConfiguration("target-tags")));
+        if (targetTagList.isEmpty()) {
+          targetTagList.add(woi.getConfiguration("target-tag"));
+        }
+        break;
+      default: break;
+    }
+    tagsAndFlavors.setTargetTags(targetTagList);
+
+    List<String> targetFlavorList = new ArrayList<>();
+    switch(srcFlavors) {
+      case none:  break;
+      case one: targetFlavorList.add(woi.getConfiguration("target-flavor")); break;
+      case many: targetFlavorList = asList(StringUtils.trimToNull(woi.getConfiguration("target-flavors")));
+        if (targetFlavorList.isEmpty()) {
+          targetFlavorList.add(woi.getConfiguration("target-flavor"));
+        }
+        break;
+      default: break;
+    }
+    tagsAndFlavors.setTargetFlavors(targetFlavorList);
+    return tagsAndFlavors;
   }
 
   /**
