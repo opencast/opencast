@@ -39,15 +39,19 @@ described below.  Please ensure you use the correct distribution base format dep
 
 Presigned URL
 -------------
-As a typical CDN service, CloudFront can accerate the speed of distributing your media. Yet, anyone can get the media
-files if the URL is leaked. 
 
-S3 provide **Presigned URL** to generate URLs only valid in a certain duration time. That means, even the media's URL
-is leaked, the URL only can be used in a short time.
+S3 and Cloudfront work together to speed delivery of your content, but if your media URLs leak then anyone can
+download your recordings.  S3 allows you to create **Presigned URL**s, which are only valid for a limited time.  This
+means that even if your media URLs leak, they will only be valid for a configurable duration.
 
 Set `org.opencastproject.distribution.aws.s3.presigned.url` to `true` to enable this feature.
 
 Note: **CloudFront** and **Presigned URL** can be used together. 
+
+Note: Opencast's distribution files can be quite large depending on your settings, and some of your users may not be
+able to complete the download within the time limit.  While AWS should not stop a download currently in progress, some
+players may not completely download the media if playback is stopped.  If you are experiencing complaints about
+playback breaking and have presigned URLs enabled, try lengthening the timeout.
 
 S3 Compatible Service
 ----------------------
