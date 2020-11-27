@@ -53,6 +53,14 @@ able to complete the download within the time limit.  While AWS should not stop 
 players may not completely download the media if playback is stopped.  If you are experiencing complaints about
 playback breaking and have presigned URLs enabled, try lengthening the timeout.
 
+Service Default Security Note
+-----------------------------
+
+On startup, Opencast checks to see if the S3 bucket exists, and if it does not it creates it.  This bucket has default
+permissions allowing anyone to read the full contents of the bucket.  This may not be what you want, depending on your
+institutional priorites.  If you wish to protect the files with presigned URLs, then please create the bucket in advance,
+with the appropriate security settings.
+
 S3 Compatible Service
 ----------------------
 The S3 API has become the de facto standard interface for almost all storage providers.
