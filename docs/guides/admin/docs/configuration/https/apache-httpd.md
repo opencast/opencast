@@ -65,7 +65,7 @@ The main goals of this set-up are:
   RequestHeader set X-Forwarded-Proto "https"
 
   # Make sure to serve cookies only via secure connections.
-  Header edit Set-Cookie ^(.*)$ $1; HttpOnly; Secure
+  Header edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure
 
   # Depending on your integration, you may also want to allow cookies
   # to be used on other sites. In that case, use this instead:
