@@ -1,7 +1,7 @@
 Install from Source (Linux)
 ===========================
 
-These instructions outline how to install an all in one Opencast system on Linux.
+These instructions outline how to install and build an all-in-one Opencast system on Linux.
 
 Preparation
 -----------
@@ -103,9 +103,13 @@ Configure
 ---------
 
 Please follow the steps of the [Basic Configuration guide](../configuration/basic.md). It will help you to set your
-hostname, login information, …
+hostname, login information, etc.
 
+<!-- _We are redirected to this doc to run OC, but have to scroll through all the "Source Install" before getting to this point. If running OC happens after the build (or install, depending on from where it's being installed), shouldn't all Install Docs redirect to this point, or a separate Run OC Doc? (They currently don't.) -->
 
+<!-- _Up to here, the MacOS source install is pretty similar, but now the steps aren't homogenous anymore... Is running OC so different in the two OSs that in MacOS it doesn't mention running as a service? -->
+
+<!-- _No mention of running ActiveMQ first here!! -->
 Running Opencast
 ------------------
 

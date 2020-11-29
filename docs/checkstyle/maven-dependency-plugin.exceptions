@@ -1,7 +1,3 @@
-modules/asset-manager-impl/pom.xml
-modules/asset-manager-storage-aws/pom.xml
-modules/db/pom.xml
-modules/distribution-service-aws-s3/pom.xml
 modules/external-api/pom.xml
 modules/index-service/pom.xml
 modules/oaipmh-persistence/pom.xml

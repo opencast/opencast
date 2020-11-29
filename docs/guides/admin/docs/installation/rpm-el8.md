@@ -48,7 +48,7 @@ You can check if the repositories were successfully enabled using:
 dnf repolist enabled
 ```
 
-
+<!-- _This section needs reworking: important info should be beginning, or at least more clearly stated -->
 Install Apache ActiveMQ
 -----------------------
 
@@ -63,8 +63,8 @@ installation the following command should suffice:
 
     cp /usr/share/opencast/docs/scripts/activemq/activemq.xml /etc/activemq/activemq.xml
 
-ActiveMQ should be started *prior to* Opencast.
-
+ActiveMQ should be started *prior to* Opencast. <!-- _How? Where does one out how to do that? -->
+<!-- _Unclear: Is out-of-the-box ActiveMQ enough to run for OC, or does user HAVE TO do more configuration before using it? -->
 More information about how to properly set up ActiveMQ for Opencast can be found in the [message broker configuration
 documentation](../configuration/message-broker.md).
 
@@ -80,8 +80,8 @@ For a basic installation (All-In-One) just run:
 
 …where `<version>` is the major version number of the Opencast release you want to install, e.g. `opencast8-allinone`.
 This will install the default distribution of Opencast and all its dependencies.
-
-Don't forget to start configure and start ActiveMQ first as [described in the ActiveMQ installation section
+<!-- _Unclear, again: Same information as "Install ActiveMQ" section above ("Do this first."), but... now includes doing configuration beforehand?-->
+Don't forget to configure and start ActiveMQ first as [described in the ActiveMQ installation section
 ](#install-apache-activemq).
 
 Then start Opencast by running:
@@ -89,12 +89,12 @@ Then start Opencast by running:
     systemctl start opencast.service
 
 While Opencast is preconfigured, it is strongly recommended to follow at least the [Basic Configuration guide
-](../configuration/basic.md). It will help you to set your hostname, login information, …
+](../configuration/basic.md). It will help you to set your hostname, login information, etc.
 
-
+<!-- _Advanced Install doesn't need to be explained here: could be a separate doc -->
 Advanced Installation
 ---------------------
-
+<!-- _Instance of single vs multiple servers, that could link to a separate doc for setting up multiple -->
 The basic installation will give you an all-in-one Opencast distribution on a single server.  For productions, most
 users prefer deploying Opencast over several machines, which allows for a better workload distribution.  You can list
 all available Opencast packages with:

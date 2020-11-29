@@ -1,0 +1,62 @@
+name: Update translations
+
+on:
+  schedule:
+  - cron: "0 5 * * 1"
+
+jobs:
+
+  # Check documentation with markdownlint and build it using mkdocs
+  update-translations:
+    runs-on: ubuntu-20.04
+    env:
+      CROWDIN_API_KEY: ${{ secrets.CROWDIN_API_KEY }}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: prepare git
+      run: |
+        git config --global user.email 'crowdin-bot@opencast.org'
+        git config --global user.name 'Crowdin Bot'
+
+    - name: prepare crowdin client
+      run: |
+        wget --quiet https://artifacts.crowdin.com/repo/deb/crowdin.deb
+        sudo dpkg -i crowdin.deb
+        echo "api_key: ${CROWDIN_API_KEY}" > ~/.crowdin.yaml
+
+    - name: prepare github ssh key
+      env:
+        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+      run: |
+        install -dm 700 ~/.ssh/
+        echo "${DEPLOY_KEY}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+    - name: clone repository
+      run: |
+        git clone "git@github.com:opencast/opencast.git" ~/oc
+
+    - name: upload translation source
+      run: |
+        set -o errexit
+        update() {
+          git checkout "$1"
+          crowdin --config .crowdin.yaml download -b "$2"
+          git clean -f
+          if git commit -a -m "Automatically update translation keys ($1)"; then
+            git push origin "$1"
+          fi
+          git clean -fdx
+        }
+
+        if [ -z "${CROWDIN_API_KEY}" ]; then
+          echo Skipping update without secret
+        else
+          cd ~/oc
+          update develop develop
+          for branch in $(git for-each-ref --count=3 --sort=-committerdate refs/remotes/origin/r/ --format='%(refname:short)'); do
+            update "${branch##origin/}" "${branch##*/}"
+          done
+        fi

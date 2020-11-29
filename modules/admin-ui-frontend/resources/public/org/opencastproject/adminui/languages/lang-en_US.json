@@ -43,7 +43,7 @@
      "SELECT_OPTION": "Select option",
      "JOB_TITLE": "Title",
      "JOB_STATUS": "Status",
-     "UPLOAD_SUCCESS": "Upload succeded!",
+     "UPLOAD_SUCCESS": "Upload succeeded!",
      "UPLOAD_FAILURE": "Upload failed!",
      "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",

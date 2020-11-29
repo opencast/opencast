@@ -22,6 +22,10 @@
 package org.opencastproject.videogrid.api;
 
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Track;
+
+import org.apache.commons.codec.EncoderException;
 
 import java.util.List;
 
@@ -40,9 +44,12 @@ public interface VideoGridService {
    *
    * @param commands
    *          A list of ffmpeg commands, one for each part
+   * @param tracks
+   *          Source tracks used by the ffmpeg commands
    * @return VideoGrid service job.
    * @throws VideoGridServiceException
    *          If something went wrong during the processing
    */
-  Job createPartialTracks(List<List<String>> commands) throws VideoGridServiceException;
+  Job createPartialTracks(List<List<String>> commands, Track... tracks)
+          throws VideoGridServiceException, EncoderException, MediaPackageException;
 }
