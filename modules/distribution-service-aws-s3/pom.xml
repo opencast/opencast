@@ -131,7 +131,8 @@
               *;resolution:=optional
             </Import-Package>
             <Service-Component>
-              OSGI-INF/distribution-service-aws-s3.xml
+              OSGI-INF/distribution-service-aws-s3.xml,
+              OSGI-INF/mediapackage-serializer.xml
             </Service-Component>
           </instructions>
         </configuration>

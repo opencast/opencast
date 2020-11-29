@@ -1,6 +1,3 @@
-modules/asset-manager-impl/pom.xml
-modules/asset-manager-storage-aws/pom.xml
 modules/common-jpa-impl/pom.xml
 modules/common/pom.xml
 modules/cover-image-impl/pom.xml
-modules/db/pom.xml

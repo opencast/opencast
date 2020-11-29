@@ -126,8 +126,7 @@ public class Activator implements BundleActivator {
       dsProps.put("osgi.jndi.service.name", "jdbc/opencast");
       datasourceRegistration = bundleContext.registerService(DataSource.class.getName(), pooledDataSource, dsProps);
     } catch (SQLException e) {
-      logger.error("Connection attempt to {} failed", jdbcUrl);
-      logger.error("Exception: ", e);
+      logger.error("Connection attempt to {} failed", jdbcUrl, e);
       throw e;
     } finally {
       if (connection != null)
