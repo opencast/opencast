@@ -22,6 +22,12 @@
 
 .step-by-step {
 
+    .MuiStepLabel-labelContainer span {
+        color: #92a0ab;
+        margin: 3px 10px;
+        position: relative;
+    }
+
     $height: 100px;
     background: $modal-nav-bg-color;
     border-bottom: 1px solid $modal-nav-border-color;
@@ -34,7 +40,7 @@
     &:before {
         content: "";
         position: absolute;
-        top: 40px;
+        top: 33.5px;
         left: 0;
         width: 100%;
         height: 1px;

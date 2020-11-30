@@ -1,9 +1,7 @@
-const validate = values => {
-    const errors = {};
+import * as Yup from 'yup';
 
-    //todo: check input
-
-    return errors;
-}
-
-export default validate;
+export const NewEventSchema = [Yup.object().shape({
+    title: Yup.string().required("Required")
+}), Yup.object().shape({
+    bla: Yup.string().required("Required")
+})]

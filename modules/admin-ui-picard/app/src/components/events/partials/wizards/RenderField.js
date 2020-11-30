@@ -147,9 +147,15 @@ const EditableSingleSelect = ({ field, metadataField, text, editMode, setEditMod
                     {(metadataField.value === "" && !metadataField.required) && (
                         <option value="">{t('SELECT_NO_OPTION_SELECTED')}</option>
                     )}
-                    {metadataField.collection.map((item, key) => (
-                        <option key={key}>{item.value}</option>
-                    ))}
+                    {(metadataField.id === "language") ? (
+                        metadataField.collection.map((item, key) => (
+                                <option key={key}>{t(item.name)}</option>
+                        ))
+                    ) : (
+                        metadataField.collection.map((item, key) => (
+                                <option key={key}>{item.value}</option>
+                        ))
+                    )}
                 </select>
             </div>
             ) : (
@@ -183,7 +189,6 @@ const EditableSingleValueTextArea = ({ field, text, editMode, setEditMode, handl
 
 // Renders editable input for single value
 const EditableSingleValue = ({ field, text, editMode, setEditMode, handleKeyDown }) => {
-    console.log('SINGLE VALUE RENDERED');
     return (
         editMode ? (
             <div onBlur={() => setEditMode(false)}

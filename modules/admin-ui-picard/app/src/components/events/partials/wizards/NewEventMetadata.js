@@ -3,18 +3,18 @@ import {useTranslation} from "react-i18next";
 import {connect} from "react-redux";
 import {getEventMetadata} from "../../../../selectors/eventSelectors";
 import {Field} from "formik";
+import cn from 'classnames';
 import RenderField from "./RenderField";
 import RenderMultiField from "./RenderMultiField";
 
 /**
  * This component renders the metadata page for new events in the new event wizard.
  */
-const NewEventMetadata = ({ onSubmit, metadataFields, nextPage, values }) => {
+const NewEventMetadata = ({ onSubmit, metadataFields, nextPage, formik }) => {
     const { t } = useTranslation();
 
     return (
         <>
-            {/*Todo: Add Wizard Header */}
             <div className="modal-content" data-modal-tab-content="metadata" data-level="1">
                 <div className="modal-body">
                     <div className="full-col">
@@ -55,10 +55,17 @@ const NewEventMetadata = ({ onSubmit, metadataFields, nextPage, values }) => {
 
             {/* Button for navigation to next page */}
             <footer>
-                <button type="submit" className="submit" onClick={() => {
-                    nextPage(values);
-                    onSubmit();
-                }}>{t('WIZARD.NEXT_STEP')}</button>
+                <button type="submit"
+                        className={cn("submit",
+                            {
+                                active: (formik.dirty && formik.isValid),
+                                inactive: !(formik.dirty && formik.isValid)
+                            })}
+                        disabled={!(formik.dirty && formik.isValid)}
+                        onClick={() => {
+                            nextPage(formik.values);
+                            onSubmit();
+                        }}>{t('WIZARD.NEXT_STEP')}</button>
             </footer>
 
             <div className="btm-spacer"/>
