@@ -141,25 +141,29 @@ public class Activator implements BundleActivator {
       pooledDataSource.getMaxPoolSize(), pooledDataSource.getMinPoolSize(), pooledDataSource.getMaxIdleTime());
     Statement statement = pooledDataSource.getConnection().createStatement();
 
-    long time = System.currentTimeMillis();
-    String tableName = "oc-temp" + time;
+    double random = Math.random() * 1000000;
+    String tableName = "oc_temp_" + random;
     try {
       runUpdate(statement, "CREATE TABLE " + tableName + " ( id BIGINT NOT NULL, test BIGINT, PRIMARY KEY (id) );");
-      runUpdate(statement, "INSERT INTO " + tableName + " VALUES (" + time + "," + time + ");");
-      runUpdate(statement, "INSERT INTO " + tableName + " VALUES (" + time + 1 + "," + time + 1 + ");");
-      runUpdate(statement, "UPDATE " + tableName + " SET test = " + time + 2 + " WHERE id = " + time + ";");
-      ResultSet rs = statement.executeQuery("SELECT FROM " + tableName + " WHERE id = " + time + 2 + ";");
+      runUpdate(statement, "INSERT INTO " + tableName + " VALUES (" + random + ", 0);");
+      runUpdate(statement, "UPDATE " + tableName + " SET test = " + random + ";");
+      ResultSet rs = statement.executeQuery("SELECT FROM " + tableName + ";");
       while (rs.next()) {
         long id = rs.getLong("id");
         long test = rs.getLong("test");
-        if (id != time || test != time + 2) {
+        if (id != random || test != random) {
           throw new RuntimeException("Unable to verify updating a table functions correctly");
         }
       }
-      runUpdate(statement, "DELETE FROM " + tableName + " WHERE id = " + time + ";");
-      runUpdate(statement, "DROP TABLE " + tableName + ";");
+      runUpdate(statement, "DELETE FROM " + tableName + " WHERE id = " + random + ";");
     } catch (Exception e) {
       throw new RuntimeException("Unable to verify SQL credentials have required permissions!");
+    } finally {
+      try {
+        runUpdate(statement, "DROP TABLE " + tableName + ";");
+      } catch (Exception e) {
+        logger.warn("Unable to delete temp table {}, please remove this yourself!", tableName);
+      }
     }
 
   }
