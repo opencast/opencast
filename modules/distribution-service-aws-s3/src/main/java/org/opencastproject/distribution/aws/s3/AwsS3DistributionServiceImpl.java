@@ -67,6 +67,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
@@ -193,7 +194,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     // Get the configuration
     if (cc != null) {
 
-      if (!Boolean.valueOf(getAWSConfigKey(cc, AWS_S3_DISTRIBUTION_ENABLE))) {
+      if (!BooleanUtils.toBoolean(getAWSConfigKey(cc, AWS_S3_DISTRIBUTION_ENABLE))) {
         logger.info("AWS S3 distribution disabled");
         return;
       }
@@ -224,7 +225,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       logger.info("AWS S3 endpoint is {}", endpoint);
 
       // AWS path style
-      pathStyle = Boolean.valueOf(OsgiUtil.getComponentContextProperty(cc, AWS_S3_PATH_STYLE_CONFIG, "false"));
+      pathStyle = BooleanUtils.toBoolean(OsgiUtil.getComponentContextProperty(cc, AWS_S3_PATH_STYLE_CONFIG, "false"));
       logger.info("AWS path style is {}", pathStyle);
 
       opencastDistributionUrl = getAWSConfigKey(cc, AWS_S3_DISTRIBUTION_BASE_CONFIG);
