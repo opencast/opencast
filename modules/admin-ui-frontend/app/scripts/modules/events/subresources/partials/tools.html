@@ -394,20 +394,22 @@
 
           <div class="video-save-panel" ng-if="tab === 'editor' && player.adapter">
             <div class="buttons">
-              <select chosen pre-select-from="video.workflows" class="workflow"
-                                                               ng-disabled="!video.workflows || video.workflows.length === 0 || activeTransaction || activeSubmission"
-                                                               data-width="'175px'"
-                                                               ng-model="video.workflow"
-                                                               ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" />
+              <select pre-select-from="video.workflows"
+                      class="workflow"
+                      ng-disabled="!video.workflows || video.workflows.length === 0 || activeTransaction || activeSubmission"
+                      data-width="'175px'"
+                      ng-model="video.workflow"
+                      ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" >
+              </select>
 
-                <a ng-click="submit()"
-                   ng-class="{disabled: activeTransaction || activeSubmission || sanityCheckFlags()}"
-                   class="save-and-close-button"
-                   translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
-                  <!-- Save and Continue -->
-                </a>
+              <a ng-click="submit()"
+                 ng-class="{disabled: activeTransaction || activeSubmission || sanityCheckFlags()}"
+                 class="save-and-close-button"
+                 translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
+                <!-- Save and Continue -->
+              </a>
 
-                <a class="return-button" ng-click="leave()" translate>VIDEO_TOOL.BUTTONS.CLOSE</a>
+              <a class="return-button" ng-click="leave()" translate>VIDEO_TOOL.BUTTONS.CLOSE</a>
             </div>
           </div>
         </div>
