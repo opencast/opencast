@@ -19,9 +19,9 @@ Pre-requisites
 
 To use this service, you need to have:
 
-1. A streaming server (Wowza, Adobe Media Server) or CDN already set up to stream live content
+1. A streaming server (Wowza, nginx-rtmp) or CDN already set up to stream live content
 2. A capture agent capable of streaming to it
-3. A player capable of playing live streams. The Paella player using the Flash component supports the rtmp protocol.
+3. A player capable of playing live streams. The Paella player supports the HLS protocol.
    Other players/protocols have not been tested.
 
 Configuration
@@ -34,11 +34,14 @@ Edit  _etc/org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl.cfg_.
 If your capture agent does not register a _capture.device.live.resolution.WIDTHxHEIGHT_ property, it's mandatory to
 configure the _live.streamingUrl_.
 
-The _live.streamingUrl_ should be set to your streaming server url (or the subscriber url specified by your CDN).
+The _live.streamingUrl_ should be set to your streaming server's output URL (or
+the subscriber URL specified by your CDN) and is indexed by the engage server.
 
-This is the url that the player will use to play the live stream. For instance, if using rtmp, set it to something like:
+This is the URL that the player will use to play the live stream. For instance,
+if using rtmp, set it to something like:
 rtmp://STREAMING_SERVER_HOST:PORT/STREAMING_APPLICATION/
 
+For HLS, see below:
 ```
 # Configuration for the Live Schedule Service
 
@@ -48,8 +51,8 @@ rtmp://STREAMING_SERVER_HOST:PORT/STREAMING_APPLICATION/
 #
 # -----------------------------
 
-# The streaming base url e.g. rtmp://streaming.server/live/
-#live.streamingUrl=rtmp://streaming.server/live
+# The base URL that the player will use to play the live stream
+live.streamingUrl=http://streaming.server/hls/
 
 # If a comma-separated list is provided, several resolutions will be generated for each flavor
 live.resolution=1920x540,960x270
@@ -59,13 +62,13 @@ live.resolution=1920x540,960x270
 # #{flavor} = type-subtype of flavor
 # #{caName} = capture agent name
 # #{resolution} = video resolution e.g. 1920x1080
-#live.streamName=#{id}-#{flavor}.stream
-live.streamName=#{caName}-#{flavor}.stream-#{resolution}
+#live.streamName=#{caName}-#{flavor}.stream-#{resolution}
+live.streamName=#{caName}/playlist.m3u8
 
 # -----------------------------
 
 # The same mime-type applies to all flavors and resolutions
-live.mimeType=video/x-flv
+live.mimeType=application/x-mpegURL
 
 # If a comma-separated list is provided, several streams links will be generated, one for each
 # resolution-targetFlavor combination.
