@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
-import DatePicker from "react-datepicker/es";
 import {useTranslation} from "react-i18next";
+import {DatePicker, DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
 
 
 const childRef = React.createRef();
@@ -114,14 +115,16 @@ const EditableBooleanValue = ({ field, text, editMode, setEditMode, handleKeyDow
 };
 
 // Renders editable field for a data value
-// todo: change datepicker when finding some that really works
+// todo: adjust datepicker when actually use
 const EditableDateValue = ({ field, text, editMode, setEditMode, handleKeyDown }) => {
     return (
         editMode ? (
             <div onBlur={() => setEditMode(false)}
                  onKeyDown={e => handleKeyDown(e, "input")}
                  ref={childRef}>
-                <DatePicker {...field} />
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <DatePicker {...field} disableToolbar/>
+                </MuiPickersUtilsProvider>
             </div>
         ) : (
             <div onClick={() => setEditMode(true)}>
@@ -206,14 +209,16 @@ const EditableSingleValue = ({ field, text, editMode, setEditMode, handleKeyDown
 };
 
 // Renders editable field for time value
-// todo: change datepicker when finding some that really works
+// todo: adjust dateTimePicker when actually used
 const EditableSingleValueTime = ({ field, text, editMode, setEditMode, handleKeyDown }) => {
     return (
         editMode ? (
             <div onBlur={() => setEditMode(false)}
                  onKeyDown={e => handleKeyDown(e, "input")}
                  ref={childRef}>
-                <DatePicker {...field} showTimeSelect/>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <DateTimePicker {...field} disableToolbar/>
+                </MuiPickersUtilsProvider>
             </div>
         ) : (
             <div onClick={() => setEditMode(true)}>

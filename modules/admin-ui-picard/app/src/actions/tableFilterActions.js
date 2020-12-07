@@ -25,10 +25,6 @@ export const EDIT_SELECTED_FILTER = 'EDIT_SELECTED_FILTER';
 export const REMOVE_SELECTED_FILTER = 'REMOVE_SELECTED_FILTER';
 export const EDIT_SECOND_FILTER = 'EDIT_SECOND_FILTER';
 export const REMOVE_SECOND_FILTER = 'REMOVE_SECOND_FILTER';
-export const SET_START_DATE = 'SET_START_DATE';
-export const SET_END_DATE = 'SET_END_DATE';
-export const RESET_START_DATE = 'RESET_START_DATE';
-export const RESET_END_DATE = 'RESET_END_DATE';
 
 
 // Actions affecting fetching of filters from server
@@ -102,24 +98,6 @@ export const editSecondFilter = filter => ({
 
 export const removeSecondFilter = () => ({
    type: REMOVE_SECOND_FILTER
-});
-
-export const setStartDate = date => ({
-    type: SET_START_DATE,
-    payload: { date }
-});
-
-export const setEndDate = date => ({
-    type: SET_END_DATE,
-    payload: { date }
-});
-
-export const resetStartDate = () => ({
-    type: RESET_START_DATE
-});
-
-export const resetEndDate = () => ({
-    type: RESET_END_DATE
 });
 
 

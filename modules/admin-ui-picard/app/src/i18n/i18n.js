@@ -59,7 +59,7 @@ i18n
             escapeValue: false,
             format: function(value, format, lng) {
                 if (value instanceof Date) {
-                    return moment(value.toISOString()).format(format);
+                    return moment(value).format(format);
                 }
 
                 return value;

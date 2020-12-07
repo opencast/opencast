@@ -28,3 +28,17 @@ export const newEventWizardStates = [
         name: 'summary'
     }
 ];
+
+// All fields for new event form that are fix and not depending on response of backend
+// InitialValues of Formik form (others computed dynamically depending on responses from backend)
+export const initialFormValuesNewEvents = {
+    sourceMode: '',
+    scheduleStartDate: '',
+    scheduleEndDate: '',
+    scheduleStartTime: '',
+    scheduleDuration: '',
+    scheduleEndTime: '',
+    repeatOn: [],
+    location: '',
+    deviceInputs: []
+};

@@ -9,14 +9,12 @@ import {connect} from "react-redux";
 /**
  * This component renders the start date cells of events in the table view
  */
-const EventsDateCell = ({ row, filterMap, setStartDate, setEndDate, editFilterValue, loadEvents,
+const EventsDateCell = ({ row, filterMap, editFilterValue, loadEvents,
                             loadEventsIntoTable })  => {
     const { t } = useTranslation();
 
     // Filter with value of current cell
     const addFilter = date => {
-        setStartDate(date);
-        setEndDate(date);
 
         let filter = filterMap.find(({ name }) => name === "startDate");
         if (!!filter) {
@@ -45,8 +43,6 @@ const mapStateToProps = state => ({
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    setStartDate: date => dispatch(setStartDate(date)),
-    setEndDate: date => dispatch(setEndDate(date)),
     editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value)),
     loadEvents: () => dispatch(fetchEvents()),
     loadEventsIntoTable: () => dispatch(loadEventsIntoTable())

@@ -15,7 +15,7 @@ const NewEventMetadata = ({ onSubmit, metadataFields, nextPage, formik }) => {
 
     return (
         <>
-            <div className="modal-content" data-modal-tab-content="metadata" data-level="1">
+            <div className="modal-content">
                 <div className="modal-body">
                     <div className="full-col">
                         <div className="obj tbl-list">
@@ -65,7 +65,8 @@ const NewEventMetadata = ({ onSubmit, metadataFields, nextPage, formik }) => {
                         onClick={() => {
                             nextPage(formik.values);
                             onSubmit();
-                        }}>{t('WIZARD.NEXT_STEP')}</button>
+                        }}
+                        tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
             </footer>
 
             <div className="btm-spacer"/>

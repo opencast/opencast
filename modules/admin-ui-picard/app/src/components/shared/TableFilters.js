@@ -1,16 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import styled from "styled-components";
-import DatePicker from "react-datepicker/es";
 import {connect} from 'react-redux';
-import {
-    getEndDate,
-    getFilters,
-    getSecondFilter,
-    getSelectedFilter,
-    getStartDate,
-    getTextFilter
-} from '../../selectors/tableFilterSelectors';
+import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
+import {getFilters, getSecondFilter, getSelectedFilter, getTextFilter} from '../../selectors/tableFilterSelectors';
 import {fetchFilters} from '../../thunks/tableFilterThunks';
 import {
     editFilterValue,
@@ -20,16 +14,11 @@ import {
     removeSecondFilter,
     removeSelectedFilter,
     removeTextFilter,
-    resetEndDate,
-    resetFilterValues,
-    resetStartDate,
-    setEndDate,
-    setStartDate
+    resetFilterValues
 } from '../../actions/tableFilterActions';
 import TableFilterProfiles from "./TableFilterProfiles";
 
 import searchIcon from '../../img/search.png';
-
 
 //todo: implement/look if really needed (handleEnddatePicker is quite similar)
 function selectFilterPeriodValue() {
@@ -46,15 +35,21 @@ const SearchInput = styled.input`
 /**
  * This component renders the table filters in the upper right corner of the table
  */
-const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, startDate, endDate, secondFilter,
+const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, secondFilter,
                           onChangeTextFilter, removeTextFilter, editSelectedFilter, removeSelectedFilter,
-                          editSecondFilter, removeSecondFilter, setStartDate, setEndDate, resetStartDate, resetEndDate,
+                          editSecondFilter, removeSecondFilter, resetStartDate, resetEndDate,
                           resetFilterMap, editFilterValue, loadResource, loadResourceIntoTable, resource }) => {
     const { t } = useTranslation();
 
     // Variables for showing different dialogs depending on what was clicked
     const [showFilterSelector, setFilterSelector] = useState(false);
     const [showFilterSettings, setFilterSettings] = useState(false);
+
+    // Variables containing selected start date and end date for date filter
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
+    const [startDateTouched, setStartDateTouched] = useState(false);
+    const [endDateTouched, setEndDateTouched] = useState(false);
 
     // Fetching available filters from opencast instance
     useEffect(() => {
@@ -121,18 +116,20 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, st
     const handleDatepickerChange = (date, isStart) => {
         if (isStart) {
             setStartDate(date);
+            setStartDateTouched(true);
         } else {
             setEndDate(date);
+            setEndDateTouched(true);
         }
-        if (startDate === '' || endDate === '') {
-            return;
+        if (startDateTouched && endDateTouched) {
+            let filter = filterMap.find(({ name }) => name === selectedFilter);
+            // Todo: better way to save the period
+            // Todo: maybe need action for this
+            editFilterValue(filter.name, startDate);
+            setFilterSelector(false);
+            removeSelectedFilter();
         }
-        let filter = filterMap.find(({ name }) => name === selectedFilter);
-        // Todo: better way to save the period
-        // Todo: maybe need action for this
-        editFilterValue(filter.name, startDate.toISOString());
-        setFilterSelector(false);
-        removeSelectedFilter();
+
     };
 
 
@@ -351,20 +348,22 @@ const FilterSwitch = ({filterMap, selectedFilter, handleChange, startDate, endDa
                 <div>
                     {/* Show datepicker for start date */}
                     {/* todo: ui is still not working right, revisit this, see bug described above */}
-                    <DatePicker selected={startDate}
-                                onChange={date => handleDate(date, true)}
-                                placeholderText={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE')}
-                                className="small-search start-date"/>
-                    {/*<input type="date"
-                                   className="small-search start-date"
-                                   onSelect={this.selectFilterPeriodValue}
-                                   placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE')}/>*/}
-
-                    {/* Show datepicker for end date*/}
-                    <DatePicker selected={endDate}
-                                onChange={date => handleDate(date, false)}
-                                placeholderText={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE')}
-                                className="small-search end-date"/>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <DatePicker
+                            className="small-search start-date"
+                            value={startDate}
+                            disableToolbar
+                            format="dd/MM/yyyy"
+                            onChange={(date) => handleDate(date, true)}
+                        />
+                        <DatePicker
+                            className="small-search end-date"
+                            value={endDate}
+                            disableToolbar
+                            format="dd/MM/yyyy"
+                            onChange={(date) => handleDate(date, false)}
+                        />
+                    </MuiPickersUtilsProvider>
                 </div>
             );
     }
@@ -375,9 +374,7 @@ const mapStateToProps = state => ({
     textFilter: getTextFilter(state),
     filterMap: getFilters(state),
     selectedFilter: getSelectedFilter(state),
-    secondFilter: getSecondFilter(state),
-    startDate: getStartDate(state),
-    endDate: getEndDate(state)
+    secondFilter: getSecondFilter(state)
 });
 
 // Mapping actions to dispatch
@@ -388,10 +385,6 @@ const mapDispatchToProps = dispatch => ({
     removeSelectedFilter: () => dispatch(removeSelectedFilter()),
     editSecondFilter: filter => dispatch(editSecondFilter(filter)),
     removeSecondFilter: () => dispatch(removeSecondFilter()),
-    setStartDate: date => dispatch(setStartDate(date)),
-    setEndDate: date => dispatch(setEndDate(date)),
-    resetStartDate: () => dispatch(resetStartDate()),
-    resetEndDate: () => dispatch(resetEndDate()),
     loadingFilters: resource => dispatch(fetchFilters(resource)),
     resetFilterMap: () => dispatch(resetFilterValues()),
     editFilterValue: (filterName, value) => dispatch(editFilterValue(filterName, value))

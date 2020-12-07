@@ -11,11 +11,7 @@ import {
     REMOVE_SECOND_FILTER,
     REMOVE_SELECTED_FILTER,
     REMOVE_TEXT_FILTER,
-    RESET_END_DATE,
-    RESET_FILTER_VALUES,
-    RESET_START_DATE,
-    SET_END_DATE,
-    SET_START_DATE
+    RESET_FILTER_VALUES
 } from "../actions/tableFilterActions";
 
 /**
@@ -30,8 +26,6 @@ const initialState = {
     textFilter: '',
     selectedFilter: '',
     secondFilter: '',
-    startDate: '',
-    endDate: '',
     stats: []
 };
 
@@ -129,32 +123,6 @@ const tableFilters = (state = initialState, action) => {
             return {
                 ...state,
                 secondFilter: ''
-            };
-        }
-        case SET_START_DATE: {
-            const { date } = payload;
-            return {
-                ...state,
-                startDate: date
-            };
-        }
-        case SET_END_DATE: {
-            const { date } = payload;
-            return {
-                ...state,
-                endDate: date
-            };
-        }
-        case RESET_START_DATE: {
-            return {
-                ...state,
-                startDate: ''
-            };
-        }
-        case RESET_END_DATE: {
-            return {
-                ...state,
-                endDate: ''
             };
         }
         default:

@@ -103,30 +103,24 @@ const NewEventWizard = ({onSubmit, metadataFields}) => {
                                                          formik={formik}
                                                          onSubmit={() => console.log(formik.values)}/>}
                         {page === 1 && (
-                            <NewEventMetadataExtended previousPage={previousPage}
-                                                      nextPage={nextPage}
-                                                      formik={formik}
-                                                      onSubmit={() => console.log("Step 2 onSubmit")}/>
-                        )}
-                        {page === 2 && (
                             <NewEventSource previousPage={previousPage}
                                             nextPage={nextPage}
                                             formik={formik}
                                             onSubmit={() => console.log("Step 3 onSubmit")}/>
                         )}
-                        {page === 3 && (
+                        {page === 2 && (
                             <NewEventProcessing previousPage={previousPage}
                                                 nextPage={nextPage}
                                                 formik={formik}
                                                 onSubmit={() => console.log("Step 4 onSubmit")}/>
                         )}
-                        {page === 4 && (
+                        {page === 3 && (
                             <NewEventAccess previousPage={previousPage}
                                             nextPage={nextPage}
                                             formik={formik}
                                             onSubmit={() => console.log("Step 5 onSubmit")}/>
                         )}
-                        {page === 5 && (
+                        {page === 4 && (
                             <NewEventSummary previousPage={previousPage}
                                              nextPage={handleSubmit}
                                              formik={formik}
