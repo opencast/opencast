@@ -37,6 +37,7 @@ import org.opencastproject.sox.api.SoxException;
 import org.opencastproject.sox.api.SoxService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -45,7 +46,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,43 +118,32 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
     logger.debug("Running analyze audio workflow operation on workflow {}", workflowInstance.getId());
 
     try {
-      return analyze(workflowInstance.getMediaPackage(), workflowInstance.getCurrentOperation());
+      return analyze(workflowInstance.getMediaPackage(), workflowInstance.getCurrentOperation(), workflowInstance);
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
   }
 
-  private WorkflowOperationResult analyze(MediaPackage src, WorkflowOperationInstance operation) throws SoxException,
+  private WorkflowOperationResult analyze(MediaPackage src, WorkflowOperationInstance operation, WorkflowInstance wi) throws SoxException,
           IOException, NotFoundException, MediaPackageException, WorkflowOperationException, EncoderException {
     MediaPackage mediaPackage = (MediaPackage) src.clone();
 
-    // Check which tags have been configured
-    String sourceTagsOption = StringUtils.trimToNull(operation.getConfiguration("source-tags"));
-    String sourceFlavorOption = StringUtils.trimToNull(operation.getConfiguration("source-flavor"));
-    String sourceFlavorsOption = StringUtils.trimToNull(operation.getConfiguration("source-flavors"));
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi, Configuration.many, Configuration.many, Configuration.none, Configuration.none);
+
     boolean forceTranscode = BooleanUtils.toBoolean(operation.getConfiguration("force-transcode"));
 
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
     // Make sure either one of tags or flavors are provided
-    if (StringUtils.isBlank(sourceTagsOption) && StringUtils.isBlank(sourceFlavorOption)
-            && StringUtils.isBlank(sourceFlavorsOption)) {
+    List<String> sourceFlavorsOption = tagsAndFlavors.getSrcFlavors();
+    List<String> sourceTagsOption = tagsAndFlavors.getSrcTags();
+    if (sourceFlavorsOption.isEmpty() && sourceTagsOption.isEmpty()) {
       logger.info("No source tags or flavors have been specified, not matching anything");
       return createResult(mediaPackage, Action.CONTINUE);
     }
 
     // Select the source flavors
-    for (String flavor : asList(sourceFlavorsOption)) {
-      try {
-        elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
-      } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Source flavor '" + flavor + "' is malformed");
-      }
-    }
-
-    // Support legacy "source-flavor" option
-    if (StringUtils.isNotBlank(sourceFlavorOption)) {
-      String flavor = StringUtils.trim(sourceFlavorOption);
+    for (String flavor : sourceFlavorsOption) {
       try {
         elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
       } catch (IllegalArgumentException e) {
@@ -163,7 +152,7 @@ public class AnalyzeAudioWorkflowOperationHandler extends AbstractWorkflowOperat
     }
 
     // Select the source tags
-    for (String tag : asList(sourceTagsOption)) {
+    for (String tag : sourceTagsOption) {
       elementSelector.addTag(tag);
     }
 

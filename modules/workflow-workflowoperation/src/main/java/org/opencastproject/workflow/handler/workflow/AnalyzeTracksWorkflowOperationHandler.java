@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
@@ -70,7 +71,8 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
     final String sourceFlavor = getConfig(workflowInstance, OPT_SOURCE_FLAVOR);
     Map<String, String> properties = new HashMap<>();
 
-    final MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(sourceFlavor);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.one, Configuration.none, Configuration.none);
+    final MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(tagsAndFlavors.getSingleSrcFlavor());
     final Track[] tracks = mediaPackage.getTracks(flavor);
     if (tracks.length <= 0) {
       if (BooleanUtils.toBoolean(getConfig(workflowInstance, OPT_FAIL_NO_TRACK, "false"))) {
