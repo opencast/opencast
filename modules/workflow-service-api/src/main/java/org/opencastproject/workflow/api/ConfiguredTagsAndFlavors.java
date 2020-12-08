@@ -20,11 +20,15 @@
  */
 package org.opencastproject.workflow.api;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Test
+ * Class for Handling source/target tags and flavors.
+ * Consists of four lists each containing a number of configured source/target tags and flavors.
  */
 public class ConfiguredTagsAndFlavors {
 
@@ -33,6 +37,9 @@ public class ConfiguredTagsAndFlavors {
     private List<String> srcFlavors;
     private List<String> targetFlavors;
 
+    /** The logging facility */
+    private static final Logger logger = LoggerFactory.getLogger(ConfiguredTagsAndFlavors.class);
+
     protected ConfiguredTagsAndFlavors() {
         this.srcTags = new ArrayList<>();
         this.targetTags = new ArrayList<>();
@@ -40,35 +47,103 @@ public class ConfiguredTagsAndFlavors {
         this.targetFlavors = new ArrayList<>();
     }
 
+    /**
+     * Return all configured source-tags as a list
+     */
     public List<String> getSrcTags() {
         return this.srcTags;
     }
 
+    /**
+     * Return all configured target-tags as a list
+     */
     public List<String> getTargetTags() {
         return this.targetTags;
     }
 
+    /**
+     * Return all configured source-flavors as a list
+     */
     public List<String> getSrcFlavors() {
         return this.srcFlavors;
     }
 
+    /**
+     * Return all configured target-flavors as a list
+     */
     public List<String> getTargetFlavors() {
         return this.targetFlavors;
     }
 
+    /**
+     * Return a single source tag
+     */
+    public String getSingleSrcTag() {
+        if (this.srcTags.isEmpty()) {
+            throw new IllegalStateException("No source-tag was configured!");
+        }
+        return this.srcTags.get(0);
+    }
+
+    /**
+     * Return a single target tag
+     */
+    public String getSingleTargetTag() {
+        if (this.targetTags.isEmpty()) {
+            throw new IllegalStateException("No target-tag was configured!");
+        }
+        return this.targetTags.get(0);
+    }
+
+    /**
+     * Return a single source flavor
+     */
+    public String getSingleSrcFlavor() {
+        if (this.srcFlavors.isEmpty()) {
+            throw new IllegalStateException("No source-flavor was configured!");
+        }
+        return this.srcFlavors.get(0);
+    }
+
+    /**
+     * Return a single target flavor
+     */
+    public String getSingleTargetFlavor() {
+        if (this.targetFlavors.isEmpty()) {
+            throw new IllegalStateException("No target-flavor was configured!");
+        }
+        return this.targetFlavors.get(0);
+    }
+
+    /**
+     * Setter for srcTags list
+     */
     protected void setSrcTags(List<String> srcTags) {
         this.srcTags = srcTags;
+        logger.info("Added " + srcTags.size() + " elements to srcTags list");
     }
 
+    /**
+     * Setter for targetTags list
+     */
     protected void setTargetTags(List<String> targetTags) {
         this.targetTags = targetTags;
+        logger.info("Added " + targetTags.size() + " elements to targetTags list");
     }
 
+    /**
+     * Setter for srcFlavors list
+     */
     protected void setSrcFlavors(List<String> srcFlavors) {
         this.srcFlavors = srcFlavors;
+        logger.info("Added " + srcFlavors.size() + " elements to srcFlavors list");
     }
 
+    /**
+     * Setter for targetFlavor list
+     */
     protected void setTargetFlavors(List<String> targetFlavors) {
         this.targetFlavors = targetFlavors;
+        logger.info("Added " + targetFlavors.size() + " elements to targetFlavors list");
     }
 }

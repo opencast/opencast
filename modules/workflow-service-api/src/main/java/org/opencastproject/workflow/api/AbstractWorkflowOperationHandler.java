@@ -30,6 +30,7 @@ import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
@@ -45,6 +46,8 @@ import org.osgi.framework.Constants;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +58,9 @@ import java.util.Map;
  * {@link WorkflowOperationResult} with the current mediapackage and {@link Action#CONTINUE}.
  */
 public abstract class AbstractWorkflowOperationHandler implements WorkflowOperationHandler {
+
+  /** The logging facility */
+  private static final Logger logger = LoggerFactory.getLogger(AbstractWorkflowOperationHandler.class);
 
   /** The ID of this operation handler */
   protected String id = null;
@@ -68,7 +74,17 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /** The JobBarrier polling interval */
   private long jobBarrierPollingInterval = JobBarrier.DEFAULT_POLLING_INTERVAL;
 
+  /** Config for Tag Parsing operation */
   protected enum Configuration { none, one, many };
+
+  private static final String TARGET_FLAVORS = "target-flavors";
+  private static final String TARGET_FLAVOR = "target-flavor";
+  private static final String TARGET_TAGS = "target-tags";
+  private static final String TARGET_TAG = "target-tag";
+  private static final String SOURCE_FLAVORS = "source-flavors";
+  private static final String SOURCE_FLAVOR = "source-flavor";
+  private static final String SOURCE_TAG = "source-tag";
+  private static final String SOURCE_TAGS = "source-tags";
 
   /**
    * Activates this component with its properties once all of the collaborating services have been set
@@ -362,51 +378,155 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     return Opt.nul(woi.getConfiguration(key)).flatMap(Strings.trimToNone);
   }
 
-  protected ConfiguredTagsAndFlavors getTagsAndFlavors(WorkflowInstance wi, Configuration srcTags, Configuration srcFlavors, Configuration targetTags, Configuration targetFlavors) {
+  /**
+   * Returns a ConfiguredTagsAndFlavors instance, which includes all specified source/target tags and flavors if they are valid
+   * Lists can be empty, if no values were specified! This is to enable WOHs to individually check if a given tag/flavor was set.
+   * @param srcTags none, one or many
+   * @param srcFlavors none, one or many
+   * @param targetFlavors none, one or many
+   * @param targetTags none, one or many
+   * @return ConfiguredTagsAndFlavors object including lists for the configured tags/flavors
+   */
+  protected ConfiguredTagsAndFlavors getTagsAndFlavors(WorkflowInstance wi, Configuration srcTags, Configuration srcFlavors, Configuration targetTags, Configuration targetFlavors) throws WorkflowOperationException {
     WorkflowOperationInstance woi = wi.getCurrentOperation();
     ConfiguredTagsAndFlavors tagsAndFlavors = new ConfiguredTagsAndFlavors();
+    MediaPackageElementFlavor flavor;
 
     List<String> srcTagList = new ArrayList<>();
+    String srcTag;
     switch(srcTags) {
-      case none:  break;
-      case one: srcTagList.add(woi.getConfiguration("source-tag")); break;
-      case many: srcTagList = asList(StringUtils.trimToNull(woi.getConfiguration("source-tags"))); break;
-      default: break;
+      case none:
+        break;
+      case one:
+        srcTag = StringUtils.trimToNull(woi.getConfiguration(SOURCE_TAG));
+        if (srcTag == null) {
+          throw new WorkflowOperationException("Configuration key '" + SOURCE_TAG + "' must be set");
+        } else {
+          srcTagList.add(srcTag);
+        }
+        break;
+      case many:
+        srcTagList = asList(StringUtils.trimToNull(woi.getConfiguration(SOURCE_TAGS)));
+        srcTag = StringUtils.trimToNull(woi.getConfiguration(SOURCE_TAG));
+        if (srcTagList.isEmpty() && srcTag != null) {
+          srcTagList.add(srcTag);
+        }
+        if (srcTagList.isEmpty()) {
+          logger.warn("Configuration keys '" + SOURCE_TAGS + "and" + SOURCE_TAG + "' are empty");
+        }
+        break;
+      default:
+        throw new WorkflowOperationException("Couldn't process srcTags configuration option!");
     }
     tagsAndFlavors.setSrcTags(srcTagList);
 
     List<String> srcFlavorList = new ArrayList<>();
+    String sourceFlavor;
     switch(srcFlavors) {
-      case none:  break;
-      case one: srcFlavorList.add(woi.getConfiguration("source-flavor")); break;
-      case many: srcFlavorList = asList(StringUtils.trimToNull(woi.getConfiguration("source-flavors"))); break;
-      default: break;
+      case none:
+        break;
+      case one:
+        sourceFlavor = StringUtils.trimToNull(woi.getConfiguration(SOURCE_FLAVOR));
+        if (sourceFlavor == null) {
+          throw new WorkflowOperationException("Configuration key '" + SOURCE_FLAVOR + "' must be set");
+        } else {
+          srcFlavorList.add(sourceFlavor);
+          try {
+            flavor = MediaPackageElementFlavor.parseFlavor(srcFlavorList.get(0));
+          } catch (IllegalArgumentException e) {
+            throw new WorkflowOperationException(srcFlavorList.get(0) + " is not a valid flavor!");
+          }
+        }
+        break;
+      case many:
+        srcFlavorList = asList(StringUtils.trimToNull(woi.getConfiguration(SOURCE_FLAVORS)));
+        sourceFlavor = StringUtils.trimToNull(woi.getConfiguration(SOURCE_FLAVOR));
+        if (srcFlavorList.isEmpty() && sourceFlavor != null) {
+          srcFlavorList.add(sourceFlavor);
+        }
+        if (srcFlavorList.isEmpty()) {
+          logger.warn("Configuration keys '" + SOURCE_FLAVORS + "and" + SOURCE_FLAVOR + "' are empty");
+        } else {
+          for (String elem : srcFlavorList) {
+            try {
+              flavor = MediaPackageElementFlavor.parseFlavor(elem);
+            } catch (IllegalArgumentException e) {
+              throw new WorkflowOperationException(elem + " is not a valid flavor!");
+            }
+          }
+        }
+        break;
+      default:
+        throw new WorkflowOperationException("Couldn't process srcFlavors configuration option!");
     }
     tagsAndFlavors.setSrcFlavors(srcFlavorList);
 
     List<String> targetTagList = new ArrayList<>();
-    switch(srcFlavors) {
-      case none:  break;
-      case one: targetTagList.add(woi.getConfiguration("target-tag")); break;
-      case many: targetTagList = asList(StringUtils.trimToNull(woi.getConfiguration("target-tags")));
-        if (targetTagList.isEmpty()) {
-          targetTagList.add(woi.getConfiguration("target-tag"));
+    String targetTag;
+    switch(targetTags) {
+      case none:
+        break;
+      case one:
+        targetTag = StringUtils.trimToNull(woi.getConfiguration(TARGET_TAG));
+        if (targetTag == null) {
+          throw new WorkflowOperationException("Configuration key '" + TARGET_TAG + "' must be set");
+        } else {
+          targetTagList.add(targetTag);
         }
         break;
-      default: break;
+      case many:
+        targetTagList = asList(StringUtils.trimToNull(woi.getConfiguration(TARGET_TAGS)));
+        targetTag = StringUtils.trimToNull(woi.getConfiguration(TARGET_TAG));
+        if (targetTagList.isEmpty() && targetTag != null) {
+          targetTagList.add(targetTag);
+        }
+        if (targetTagList.isEmpty()) {
+          logger.warn("Configuration keys '" + TARGET_TAGS + "and" + TARGET_TAG + "' are empty");
+        }
+        break;
+      default:
+        throw new WorkflowOperationException("Couldn't process target-tag configuration option!");
     }
     tagsAndFlavors.setTargetTags(targetTagList);
 
     List<String> targetFlavorList = new ArrayList<>();
-    switch(srcFlavors) {
-      case none:  break;
-      case one: targetFlavorList.add(woi.getConfiguration("target-flavor")); break;
-      case many: targetFlavorList = asList(StringUtils.trimToNull(woi.getConfiguration("target-flavors")));
-        if (targetFlavorList.isEmpty()) {
-          targetFlavorList.add(woi.getConfiguration("target-flavor"));
+    String targetFlavor;
+    switch(targetFlavors) {
+      case none:
+        break;
+      case one:
+        targetFlavor = StringUtils.trimToNull(woi.getConfiguration(TARGET_FLAVOR));
+        if (targetFlavor == null) {
+          throw new WorkflowOperationException("Configuration key '" + TARGET_FLAVOR + "' must be set");
+        } else {
+          targetFlavorList.add(targetFlavor);
+          try {
+            flavor = MediaPackageElementFlavor.parseFlavor(targetFlavorList.get(0));
+          } catch (IllegalArgumentException e) {
+            throw new WorkflowOperationException(targetFlavorList.get(0) + " is not a valid flavor!");
+          }
         }
         break;
-      default: break;
+      case many:
+        targetFlavorList = asList(StringUtils.trimToNull(woi.getConfiguration(TARGET_FLAVORS)));
+        targetFlavor = StringUtils.trimToNull(woi.getConfiguration(TARGET_FLAVOR));
+        if (targetFlavorList.isEmpty() && targetFlavor != null) {
+          targetFlavorList.add(targetFlavor);
+        }
+        if (targetTagList.isEmpty()) {
+          logger.warn("Configuration key '" + TARGET_FLAVORS + "and" + TARGET_FLAVOR + "' are empty");
+        } else {
+          for (String elem : targetFlavorList) {
+            try {
+              flavor = MediaPackageElementFlavor.parseFlavor(elem);
+            } catch (IllegalArgumentException e) {
+              throw new WorkflowOperationException(elem + " is not a valid flavor!");
+            }
+          }
+        }
+        break;
+      default:
+        throw new WorkflowOperationException("Couldn't process targetFlavors configuration option!");
     }
     tagsAndFlavors.setTargetFlavors(targetFlavorList);
     return tagsAndFlavors;
