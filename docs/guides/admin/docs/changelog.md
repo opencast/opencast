@@ -8,6 +8,8 @@ Opencast 7
 
 *Released on December 8, 2020*
 
+- [[GHSA-44cw-p2hm-gpf6](https://github.com/opencast/opencast/security/advisories/GHSA-44cw-p2hm-gpf6)]
+  Securoty: Disabled Hostname Verification
 - [[#1964](https://github.com/opencast/opencast/pull/1964)] -
   Docs: When the sidebar is hidden, the navigation links are disabled now
 - [[#1922](https://github.com/opencast/opencast/pull/1922)] -

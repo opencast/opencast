@@ -177,8 +177,9 @@ bugs were resolved and dependencies were updated to address security issues.
 Additional Notes about 7.9
 --------------------------
 
-Opencast 7.9 contains an important security fix regarding host verification. Upgrading is strongly recommended. If you
-use self-signed certificates, you now need to properly import them.
+Opencast 7.9 contains an [important security fix
+](https://github.com/opencast/opencast/security/advisories/GHSA-44cw-p2hm-gpf6) regarding host verification.
+Upgrading is strongly recommended. If you use self-signed certificates, you now need to properly import them.
 Additionally, the UI of the docs were improved and and the Spring snapshot repository was removed to resolve build
 problems.
 
