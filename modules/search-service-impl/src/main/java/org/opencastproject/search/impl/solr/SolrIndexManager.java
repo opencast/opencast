@@ -400,7 +400,7 @@ public class SolrIndexManager {
         Mpeg7Catalog mpeg7Catalog = loadMpeg7Catalog(mpeg7Catalogs[0]);
         addMpeg7Metadata(doc, mediaPackage, mpeg7Catalog);
       } catch (IOException e) {
-        logger.error("Error loading mpeg7 catalog. Skipping catalog: {}", e.getMessage());
+        logger.error("Error loading mpeg7 catalog. Skipping catalog", e);
       }
     } else {
       logger.debug("No segmentation catalog found");

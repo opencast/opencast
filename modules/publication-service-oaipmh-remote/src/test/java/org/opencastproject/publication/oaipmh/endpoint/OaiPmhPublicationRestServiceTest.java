@@ -27,7 +27,6 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 import static org.opencastproject.util.UrlSupport.uri;
 
 import org.opencastproject.job.api.Job;
-import org.opencastproject.kernel.http.impl.HttpClientFactory;
 import org.opencastproject.kernel.security.TrustedHttpClientImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -99,7 +98,6 @@ public class OaiPmhPublicationRestServiceTest {
   private static final class TestHttpClient extends TrustedHttpClientImpl {
     TestHttpClient() {
       super("user", "pass");
-      setHttpClientFactory(new HttpClientFactory());
       setSecurityService(EasyMock.createNiceMock(SecurityService.class));
     }
 

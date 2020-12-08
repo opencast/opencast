@@ -277,7 +277,11 @@ public class RemoteBase {
    */
   protected void closeConnection(HttpResponse response) {
     if (response != null)
-      client.close(response);
+      try {
+        client.close(response);
+      } catch (IOException e) {
+        // ignore
+      }
   }
 
   /**
