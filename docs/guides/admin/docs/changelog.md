@@ -3,6 +3,16 @@ Changelog
 
 Opencast 7
 ----------
+
+### Opencast 7.9
+
+*Released on December 8, 2020*
+
+- [[#1964](https://github.com/opencast/opencast/pull/1964)] -
+  Docs: When the sidebar is hidden, the navigation links are disabled now
+- [[#1922](https://github.com/opencast/opencast/pull/1922)] -
+  Remove Spring snapshot repository from main pom
+
 ### Opencast 7.8
 
 *Released on August 17, 2020*

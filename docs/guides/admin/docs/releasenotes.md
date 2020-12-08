@@ -174,6 +174,15 @@ Opencast 7.8 contains multiple fixes for the Theodul Player to better support Au
 bugs were resolved and dependencies were updated to address security issues.
 
 
+Additional Notes about 7.9
+--------------------------
+
+Opencast 7.9 contains an important security fix regarding host verification. Upgrading is strongly recommended. If you
+use self-signed certificates, you now need to properly import them.
+Additionally, the UI of the docs were improved and and the Spring snapshot repository was removed to resolve build
+problems.
+
+
 Release Schedule
 ----------------
 
