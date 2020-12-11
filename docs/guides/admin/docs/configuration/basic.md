@@ -64,7 +64,16 @@ broker is mostly run on the admin server of Opencast but can be run separately. 
 For more details about the setup, have a look at the [Apache ActiveMQ configuration guide](message-broker.md).
 
 
-Step 5: Database Configuration
+Step 5: Setting up Elasticsearch
+--------------------------------
+
+Since version 9.0, Opencast requires a running an external Elasticsearch instance for indexing purposes.  Typically this
+runs on the admin node, although that is not required.  Instructions for installing Elasticsearch can be found in the
+[installation documentation](../installation/index.md).  Fore more details about the setup, have a look at the
+[Elasticsearch configuration guide](elasticsearch.md).
+
+
+Step 6: Database Configuration
 ------------------------------
 
 Opencast uses an integrated H2 database by default. While you will find it perfectly functional, it has certain
@@ -77,13 +86,6 @@ drawbacks:
 For testing, it is totally fine to keep the internal database, but you are highly encouraged to switch to a stand-alone
 database for productional use. For more information about database configuration, have a look at the [Database
 Configuration](database.md) section.
-
-Step 6: Elasticsearch Configuration
------------------------------------
-
-Opencast requires Elasticsearch.
-For more details about the setup, have a look at the [Elasticsearch configuration
-guide](../modules/searchindex/elasticsearch.md).
 
 Step 7: HTTPS Configuration
 ---------------------------

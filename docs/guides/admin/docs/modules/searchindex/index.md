@@ -21,4 +21,4 @@ Opencast currently uses two search index types: Solr and Elasticsearch.
 
 - Elasticsearch is the back-end for both the administrative user interface as well as the external API.
 
-    [Elasticsearch Configuration Guide](elasticsearch.md)
+    [Elasticsearch Configuration Guide](../../configuration/elasticsearch.md)
