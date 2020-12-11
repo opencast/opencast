@@ -56,6 +56,7 @@ Required:
 Required (not necessarily on the same machine):
 
     ActiveMQ >= 5.10 (older versions untested)
+    Elasticsearch >= 7.9.2 (see the search module's pom file for the correct vertion)
 
 Required for text extraction:
 
