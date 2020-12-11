@@ -9,6 +9,28 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### JDK Support
+Proposed by Greg Logan<gregorydlogan@gmail.com>, passed on Wed, 11 Nov 2020
+
+```no-highlight
+Hi all,
+
+We have some old rules[1] around which JDK is supported by which version of Opencast, but obviously they are somewhat out of date at this point.  With that in mind, here's what I'm proposing:
+
+Opencast 8: Formal support for JDK 8, and nothing else
+Opencast 9: Formal support for JDKs 8 and 11, with a provisional "it should work" for newer versions[2]
+Opencast 10: Formal support for JDK 11, with a provisional "it should work" for newer versions
+
+Going forward, I would like to see a given version of Opencast support the latest two LTS JDKs as a general rule.
+
+#proposal passes if no objections are raised by EOD 2020-11-11
+
+G
+
+1: https://docs.opencast.org/develop/developer/#proposal-log/#requiring-java-18-for-30
+2: Note that JDK 11 is currently broken, at least until https://github.com/opencast/opencast/pull/2009 gets merged
+```
+
 ### JPA, PostgreSQL and DDL-Scripts
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Wed, 30 Oct 2019
 
