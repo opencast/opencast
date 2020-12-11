@@ -118,9 +118,16 @@ that while the repository provides a packaged version of ffmpeg, your distributi
 pre-installed or otherwise takes precedence.  This version may work, however Opencast only formally supports the
 version(s) in the repository.  To install the Opencast version of ffmpeg add `ffmpeg-dist` to the end of the command above.
 
-At this point Opencast is installed and will work locally, but it is not completely configured.  Please follow the
-[Basic Configuration guide](../configuration/basic.md) from here.  Once you are ready, start Opencast:
+At this point Opencast is installed and will work locally, but it is not completely configured.  Because additional configuration
+is required, neither Opencast nor ActiveMQ are configured to start automatically. Please follow the
+[Basic Configuration guide](../configuration/basic.md).  Once you are ready, enable Opencast and ActiveMQ to start on boot with:
 
+        systemctl enable activemq.service
+        systemctl enable opencast.service
+
+then start them with:
+
+        systemctl start activemq.service
         systemctl start opencast.service
 
 
