@@ -63,7 +63,8 @@ Install Apache ActiveMQ
 -----------------------
 
 The Apache ActiveMQ message broker is required by Opencast since version 2.0. It does not necessarily have to be
-installed on the same machine as Opencast but would commonly for an all-in-one system. Install ActiveMQ with:
+installed on the same machine as Opencast, however many adopters commonly install it on their admin nodes.
+Install ActiveMQ with:
 
     apt-get install activemq-dist
 
@@ -90,7 +91,7 @@ Starting with Opencast 9, Elasticsearch is now a dependency.  Our packages do no
 because it runs externally to Opencast.  By default we expect Elasticsearch to be running on the admin node, however
 you can configure the URL in Opencast's configuration files.
 
-In our repository We provide validated Elasticsearch packages copied from the upstream repository.  Installation can be
+In our repository we provide validated Elasticsearch packages copied from the upstream repository.  Installation can be
 accomplished by running the following:
 
     apt-get install elasticsearch-oss
