@@ -38,4 +38,6 @@
              bind="setWorkspace"/>
   <reference name="authorization-service" interface="org.opencastproject.security.api.AuthorizationService"
              bind="setAuthorizationService"/>
+  <reference name="series-service" interface="org.opencastproject.series.api.SeriesService"
+             bind="setSeriesService"/>
 </scr:component>
