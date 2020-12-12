@@ -5,12 +5,11 @@ LDAP Authentication and Authorization
 > There are separate instructions on how to [configure an LDAP-backed CAS server](security.cas.md).
 
 
-Security Configuration
-----------------------
+Step 1: Security Configuration
+------------------------------
 
 Edit the security configuration file at `etc/security/mh_default_org.xml`. In a multi-tenant set-up, you will have one
 configuration file for each tenant at `etc/security/<organization_id>.xml`.
-
 
 You will find several commented out LDAP sections in this file.
 Uncomment them and fill in the necessary configuration values.
@@ -95,8 +94,8 @@ Finally, enable the authentication provider by uncommenting:
 ```
 
 
-LDAP Service Configuration
---------------------------
+Step 2: LDAP Service Configuration
+----------------------------------
 
 Make a copy of the file `etc/org.opencastproject.userdirectory.ldap.cfg.template` in the same directory and
 rename it as:
@@ -111,8 +110,8 @@ The parameters in this file control the user authorization, i.e. how the roles o
 assigned to the users.
 
 
-Combination with Existing authorization Mechanisms
---------------------------------------------------
+Step 3: Combination with Existing authorization Mechanisms
+----------------------------------------------------------
 
 In the default configuration included in the `security_sample_ldap.xml-example` file, the LDAP is tried after the
 normal authorization mechanisms (i.e. the database). This means that if a user is present in both the database and the
@@ -127,8 +126,8 @@ appear on the security file. The relevant snippet is this:
 ```
 
 
-Adding more LDAP servers
-------------------------
+Step 4: Adding more LDAP servers <!-- _Should "(Optional)" be added here? -->
+--------------------------------
 
 More LDAP servers can be added to the configuration by including the LDAP-related sections as many times as necessary
 with their corresponding configurations. The new authentication providers must also be added to the providers list

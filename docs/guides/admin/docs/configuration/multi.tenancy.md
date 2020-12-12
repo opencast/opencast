@@ -41,7 +41,7 @@ rules. For this example we have a three node install of `admin.opencast.org`, `w
 `presentation.opencast.org`.  Assume that the new tenant is called `tenant1` and should be mapped to
 `tenant1-*.opencast.org`.
 
-### Tenant Configuration
+### Step 1: Tenant Configuration
 
 Create a file called org.opencastproject.organization-tenant1.cfg in the `etc/` directory of your Opencast
 installation, on each of the nodes.  As an example, this is what the admin node looks like:
@@ -75,7 +75,7 @@ do not support multitenancy.
 Note that if you are running Apache httpd with mod\_proxy in front of the Opencast installation, the port number will be
 -1 in both files.
 
-### Tenant-specific capture agent users
+### Step 2: Tenant-specific capture agent users
 
 If you use tenant-specific capture agent users, you should use the `prop.org.opencastproject.host.<server url>` options
 to map the internal host addresses to the tenant specific ones in the endpoint services/available.
@@ -85,7 +85,7 @@ Example:
     prop.org.opencastproject.host.ingest.opencast.com=tenant1.ingest.opencast.com
     prop.org.opencastproject.host.worker.opencast.com=tenant1.worker.opencast.com
 
-### Security Configuration
+### Step 3: Security Configuration
 
 Create a file called tenant1.xml in /etc/security. This file specifies access rules for individual URLs that specify
 which roles are needed in order to access a given URL. In addition, it allows to define the directory services that are
@@ -94,7 +94,7 @@ anything that can go into a Spring Security configuration.
 
 The easiest way of creating that file is probably to create a copy of the already existing `mh_default_org.xml`.
 
-### Other Configuration
+### Step 4: Other Configuration
 
 Two additional files should be copied: `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg`
 should be copied to `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common-tenant1.cfg`, and
