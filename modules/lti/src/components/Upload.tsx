@@ -4,6 +4,7 @@ import { Loading } from "./Loading";
 import Helmet from "react-helmet";
 import React from "react";
 import { withTranslation, WithTranslation } from "react-i18next";
+import { ProgressBar } from 'react-bootstrap';
 import {
     uploadFile,
     copyEventToSeries,
@@ -37,6 +38,7 @@ interface UploadState {
     readonly copyState: "success" | "error" | "pending" | "none";
     readonly copySeries?: OptionType;
     readonly refreshTimerId?: ReturnType<typeof setTimeout>;
+    readonly uploadProgress: number;
 }
 
 function isMetadata(
@@ -56,6 +58,7 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             uploadState: "none",
             copyState: "none",
             metadata: undefined,
+            uploadProgress: 0
         };
     }
 
@@ -142,6 +145,14 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
         });
     }
 
+    setUploadPogress(progress: number) {
+        console.log(progress)
+        this.setState({
+            ...this.state,
+            uploadProgress: progress
+        });
+    }
+
     onSubmit() {
         if (!isMetadata(this.state.metadata))
             return;
@@ -158,6 +169,7 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             this.state.eventId,
             this.state.presenterFile,
             this.state.captionFile,
+            this.setUploadPogress = this.setUploadPogress.bind(this)
         ).then((_) => {
             if (!isMetadata(this.state.metadata))
                 return;
@@ -305,6 +317,7 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
                     </form>
                 </>
             }
+            { this.state.uploadProgress > 0 && <ProgressBar className="my-2" now={this.state.uploadProgress} label={`${this.state.uploadProgress}%`} />}
             <h2>{this.props.t("LTI.CURRENT_JOBS")}</h2>
             <JobList seriesId={this.state.metadata.seriesId} />
         </>;

@@ -187,7 +187,9 @@ export async function uploadFile(
     seriesId: string,
     eventId?: string,
     presenterFile?: Blob,
-    captionFile?: Blob): Promise<{}> {
+    captionFile?: Blob,
+    setUploadPogress?: (progress: number) => void): Promise<{}> {
+    const percentage = 100;
     const data = new FormData();
     data.append("metadata", JSON.stringify([metadata]));
     if (eventId !== undefined)
@@ -197,5 +199,11 @@ export async function uploadFile(
         data.append("captions", captionFile);
     if (presenterFile !== undefined)
         data.append("presenter", presenterFile);
-    return axios.post(hostAndPort() + "/lti-service-gui", data);
+    return axios.post(
+        hostAndPort() + "/lti-service-gui",
+        data,
+        setUploadPogress !== undefined ? {
+            onUploadProgress: progressEvent => setUploadPogress(Math.round(progressEvent.loaded * percentage / progressEvent.total))
+        } : {}
+    );
 }
