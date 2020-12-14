@@ -19,25 +19,26 @@ Before following this guide, you should have:
 Step 1: Select a Database
 -------------------------
 
-The EclipseLink JPA implementation which is used in Opencast supports several different databases.
-But some databases might require additional drivers.
+The EclipseLink JPA implementation which is used in Opencast supports several different databases, although
+some databases might require additional drivers.
 Official support only exists for MariaDB, MySQL, PostgreSQL and H2.
 Other database engines are not tested and specific issues will likely not be addressed.
 
 - __MariaDB__ is the recommended database engine.
   It is used by most adopters and is well tested.
 - __MySQL__ is supported but tested less than MariaDB.
-- __PostgreSQL__ support is experimental.
+- __PostgreSQL__ support is experimental. <!-- _Update support here. Is it also less tested than MariaDB -->
 - __H2__ is not suitable for anything but testing and development.
   It cannot be used in distributed environments.
 
-
-Step 2: MariaDB
----------------
+Step 2: Set up the Database
+---------------------------
 
 This step is not Opencast-specific and may be different depending on your scenario and system.
-This shall act as an example and is assuming CentOS 8 as Linux distribution.
-Look at your distributions documentation for setting up a database.
+The following is an example of database setup using MariaDB, followed by an example for PostgreSQL, and is assuming CentOS 8 as Linux distribution.
+Look at your distribution's documentation for setting up a database.
+
+### MariaDB
 
 Install and start MariaDB:
 
@@ -54,7 +55,7 @@ Finally, set root user credentials by running
 ```
 
 
-### Creating a Database
+#### Creating a Database
 
 The first step is to create a database for Opencast.
 You can use any other database client, e.g. phpMyAdmin, for this as well.
@@ -103,8 +104,7 @@ Finally, leave the client and restart the database server to enable the new user
 % systemctl restart mariadb.service
 ```
 
-Step 3: PostgreSQL
-------------------
+### PostgreSQL
 
 Opencast's official PostgreSQL support is still marked as experimental. <!-- _How up-to-date is this? -->
 
