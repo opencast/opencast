@@ -19,6 +19,7 @@ import {
 import TableFilterProfiles from "./TableFilterProfiles";
 
 import searchIcon from '../../img/search.png';
+import {getCurrentLanguageInformation} from "../../utils/utils";
 
 //todo: implement/look if really needed (handleEnddatePicker is quite similar)
 function selectFilterPeriodValue() {
@@ -37,8 +38,8 @@ const SearchInput = styled.input`
  */
 const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, secondFilter,
                           onChangeTextFilter, removeTextFilter, editSelectedFilter, removeSelectedFilter,
-                          editSecondFilter, removeSecondFilter, resetStartDate, resetEndDate,
-                          resetFilterMap, editFilterValue, loadResource, loadResourceIntoTable, resource }) => {
+                          editSecondFilter, removeSecondFilter, resetFilterMap, editFilterValue,
+                          loadResource, loadResourceIntoTable, resource }) => {
     const { t } = useTranslation();
 
     // Variables for showing different dialogs depending on what was clicked
@@ -61,8 +62,6 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
         removeTextFilter();
         removeSelectedFilter();
         removeSelectedFilter();
-        resetStartDate();
-        resetEndDate();
 
         // Set all values of the filters in filterMap back to ""
         resetFilterMap();
@@ -278,6 +277,8 @@ const FilterSwitch = ({filterMap, selectedFilter, handleChange, startDate, endDa
                           handleDate, secondFilter }) => {
     const {t} = useTranslation();
 
+    const currentLanguage = getCurrentLanguageInformation();
+
     let filter = filterMap.find(({ name }) => name === selectedFilter);
     // eslint-disable-next-line default-case
     switch(filter.type) {
@@ -348,7 +349,7 @@ const FilterSwitch = ({filterMap, selectedFilter, handleChange, startDate, endDa
                 <div>
                     {/* Show datepicker for start date */}
                     {/* todo: ui is still not working right, revisit this, see bug described above */}
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils} locale={currentLanguage.dateLocale}>
                         <DatePicker
                             className="small-search start-date"
                             value={startDate}

@@ -2,10 +2,30 @@ import React from "react";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import Notifications from "../../../shared/Notifications";
-import DatePicker from "react-datepicker/es";
+import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
+import {getTimezoneOffset} from "../../../../utils/utils";
+import {createMuiTheme, ThemeProvider} from "@material-ui/core";
+import {Field} from "formik";
+import {sourceMetadata, uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConfig";
+import RenderField from "./RenderField";
+
+
+const theme = createMuiTheme({
+    props: {
+        MuiDialog: {
+            style: {
+                zIndex: '2147483550',
+            }
+        }
+    }
+});
 
 const NewEventSource = ({ onSubmit, previousPage, nextPage, formik }) => {
     const { t } = useTranslation();
+
+    console.log("FORMIK");
+    console.log(formik);
 
     return(
         <>
@@ -29,8 +49,8 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik }) => {
                                 <ul>
                                     <li>
                                         <label>
-                                            <input type="radio"
-                                                   name="source-toggle"
+                                            <Field type="radio"
+                                                   name="sourceMode"
                                                    className="source-toggle"
                                                    value="UPLOAD"/>
                                             <span>{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.CAPTION')}</span>
@@ -38,8 +58,8 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik }) => {
                                     </li>
                                     <li>
                                         <label>
-                                            <input type="radio"
-                                                   name="source-toggle"
+                                            <Field type="radio"
+                                                   name="sourceMode"
                                                    className="source-toggle"
                                                    value="SCHEDULE_SINGLE"/>
                                             <span>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION')}</span>
@@ -47,8 +67,8 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik }) => {
                                     </li>
                                     <li>
                                         <label>
-                                            <input type="radio"
-                                                   name="source-toggle"
+                                            <Field type="radio"
+                                                   name="sourceMode"
                                                    className="source-toggle"
                                                    value="SCHEDULE_MULTIPLE"/>
                                             <span>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION')}</span>
@@ -57,10 +77,15 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik }) => {
                                 </ul>
                             </div>
                         </div>
-
-                        <Upload />
-                        <ScheduleSingle />
-                        <ScheduleMultiple />
+                        {formik.values.sourceMode === 'UPLOAD' && (
+                            <Upload />
+                        )}
+                        {formik.values.sourceMode === 'SCHEDULE_SINGLE' && (
+                            <ScheduleSingle />
+                        )}
+                        {formik.values.sourceMode === 'SCHEDULE_MULTIPLE' && (
+                            <ScheduleMultiple />
+                        )}
                     </div>
                 </div>
             </div>
@@ -93,40 +118,48 @@ const Upload = ({ }) => {
 
     return (
         <>
-            <div className="obj list-obj source-type-content">
-                <header>{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.RECORDING_ELEMENT')}</header>
+            <div className="obj list-obj">
+                <header>{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.RECORDING_ELEMENTS')}</header>
                 <div className="obj-container">
                     <ul>
                         {/*Todo: Repeat for Assets*/}
-                        <li>
-                            <div className="file-upload">
-                                <input id="asset-id"
-                                       className="blue-btn file-select-btn"
-                                       accept="asset-accept"
-                                       type="file"
-                                       tabIndex=""/>
-                            </div>
-                        </li>
-                        <span>{t('SHORT')}</span>
-                        <span className="ui-helper-hidden">asset Stuff</span>
-                        <p>{t('DETAIL')}</p>
+                        {uploadAssetOptions.map((asset, key) => (
+                            <li key={key}>
+                                <div className="file-upload">
+                                    <input id={asset.id}
+                                           className="blue-btn file-select-btn"
+                                           accept={asset.accept}
+                                           type="file"
+                                           tabIndex=""/>
+                                </div>
+                                <span>{t(asset.translate + ".SHORT")}</span>
+                                <span className="ui-helper-hidden">({asset.type} "{asset.flavorType}/{asset.flavorSubType}")</span>
+                                <p>{t(asset.translate + ".DETAIL")}</p>
+                            </li>
+                        ))
+                        }
                     </ul>
                 </div>
             </div>
-            <div className="obj list-obj source-type-content">
+            <div className="obj list-obj">
                 <header className="no-expand">{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.RECORDING_METADATA')}</header>
-                <div>
-                    <table>
+                <div className="obj-container">
+                    <table className="main-tbl">
                         {/* todo: one row for each metadata field*/}
-                        <tr>
-                            <td>
-                                <span>{'Uplaod meta data'}</span>
-                                <i className="required">*</i>
-                            </td>
-                            <td>
-                                {/* todo: Field input stuff*/}
-                            </td>
-                        </tr>
+                        {sourceMetadata.UPLOAD.metadata.map((field, key) => (
+                            <tr key={key}>
+                                <td>
+                                    <span>{t(field.label)}</span>
+                                    <i className="required">*</i>
+                                </td>
+                                <td className="editable">
+                                    {/* todo: Field input stuff*/}
+                                    <Field name={field.id}
+                                           metadataField={field}
+                                           component={RenderField}/>
+                                </td>
+                            </tr>
+                        ))}
                     </table>
                 </div>
             </div>
@@ -138,19 +171,25 @@ const ScheduleSingle = ({ }) => {
     const { t } = useTranslation();
 
     return (
-        <div className="obj source-type-content">
+        <div className="obj">
             <header>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.CAPTION')}</header>
             <div className="obj-container">
                 <table className="main-tbl">
                     <tr>
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.TIMEZONE')}</td>
-                        {/* todo: What is wizard.step.tz */}
-                        <td>wizard.step.tz</td>
+                        <td>{'UTC' + getTimezoneOffset()}</td>
                     </tr>
                     <tr>
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE')} <i className="required">*</i></td>
                         <td>
-                            <DatePicker tabIndex="4" />
+                            {/*todo: Set value and onChange according formik field*/}
+                            <ThemeProvider theme={theme}>
+                                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                    <DatePicker tabIndex="4"
+                                                disableToolbar
+                                                format="dd/MM/yyyy"/>
+                                </MuiPickersUtilsProvider>
+                            </ThemeProvider>
                         </td>
                     </tr>
                     <tr>
@@ -228,25 +267,38 @@ const ScheduleMultiple = ({ }) => {
     const { t } = useTranslation();
 
     return (
-        <div className="obj source-type-content">
+        <div className="obj">
             <header>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.CAPTION')}</header>
-            <div>
-                <table>
+            <div className="obj-container">
+                <table className="main-tbl">
                     <tr>
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.TIMEZONE')}</td>
-                        {/* todo: What is wizard.step.tz */}
-                        <td>wizard.step.tz</td>
+                        <td>{'UTC' + getTimezoneOffset()}</td>
                     </tr>
                     <tr>
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE')} <i className="required">*</i></td>
                         <td>
-                            <DatePicker tabIndex="4"/>
+                            {/*todo: Set value and onChange according formik field*/}
+                            <ThemeProvider theme={theme}>
+                                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                    <DatePicker tabIndex="4"
+                                                disableToolbar
+                                                format="dd/MM/yyyy"/>
+                                </MuiPickersUtilsProvider>
+                            </ThemeProvider>
                         </td>
                     </tr>
                     <tr>
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE')} <i className="required">*</i></td>
                         <td>
-                            <DatePicker tabIndex="5"/>
+                            {/*todo: Set value and onChange according formik field*/}
+                            <ThemeProvider theme={theme}>
+                                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                    <DatePicker tabIndex="5"
+                                                disableToolbar
+                                                format="dd/MM/yyyy"/>
+                                </MuiPickersUtilsProvider>
+                            </ThemeProvider>
                         </td>
                     </tr>
                     <tr>

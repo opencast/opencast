@@ -1,14 +1,14 @@
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
-import {DatePicker, DateTimePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
+import {DateTimePicker} from "@material-ui/pickers";
+import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 
 
 const childRef = React.createRef();
 /**
  * This component renders an editable field for single values depending on the type of the corresponding metadata
  */
-const RenderField = ({ field, metadataField }) => {
+const RenderField = ({ field, metadataField, form }) => {
     // Indicator if currently edit mode is activated
     const [editMode, setEditMode] = useState(false);
 
@@ -53,6 +53,7 @@ const RenderField = ({ field, metadataField }) => {
                                          text={field.value}
                                          editMode={editMode}
                                          setEditMode={setEditMode}
+                                         form={form}
                                          handleKeyDown={handleKeyDown}/>
             )}
             {((metadataField.type === "text" && !!metadataField.collection && metadataField.collection.length !== 0) ||
@@ -80,6 +81,7 @@ const RenderField = ({ field, metadataField }) => {
             {metadataField.type === "date" && (
                 <EditableDateValue field={field}
                                    text={field.value}
+                                   form={form}
                                    editMode={editMode}
                                    setEditMode={setEditMode}
                                    handleKeyDown={handleKeyDown}/>
@@ -115,20 +117,36 @@ const EditableBooleanValue = ({ field, text, editMode, setEditMode, handleKeyDow
 };
 
 // Renders editable field for a data value
-// todo: adjust datepicker when actually use
-const EditableDateValue = ({ field, text, editMode, setEditMode, handleKeyDown }) => {
+const EditableDateValue = ({ field, text, form: { setFieldValue }, editMode, setEditMode, handleKeyDown }) => {
+    const { t } = useTranslation();
+
+    const theme = createMuiTheme({
+        props: {
+            MuiDialog: {
+                style: {
+                    zIndex: '2147483550',
+                }
+            }
+        }
+    });
+
     return (
         editMode ? (
-            <div onBlur={() => setEditMode(false)}
-                 onKeyDown={e => handleKeyDown(e, "input")}
-                 ref={childRef}>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <DatePicker {...field} disableToolbar/>
-                </MuiPickersUtilsProvider>
+            <div>
+                <ThemeProvider theme={theme}>
+                    <DateTimePicker name={field.name}
+                                    value={field.value}
+                                    onChange={value => setFieldValue(field.name, value)}
+                                    onClose={() => setEditMode(false)}
+                                    fullWidth
+                                    format="MM/dd/yyyy"/>
+                </ThemeProvider>
             </div>
         ) : (
             <div onClick={() => setEditMode(true)}>
-                <span className="editable preserve-newlines" >{text || ''}</span>
+                <span className="editable preserve-newlines" >
+                    {t('dateFormats.dateTime.short', {dateTime: new Date(text)}) || ''}
+                </span>
                 <i className="edit fa fa-pencil-square"/>
             </div>
         )
@@ -210,19 +228,35 @@ const EditableSingleValue = ({ field, text, editMode, setEditMode, handleKeyDown
 
 // Renders editable field for time value
 // todo: adjust dateTimePicker when actually used
-const EditableSingleValueTime = ({ field, text, editMode, setEditMode, handleKeyDown }) => {
+const EditableSingleValueTime = ({ field, text, form: { setFieldValue }, editMode, setEditMode, handleKeyDown }) => {
+    const { t } = useTranslation();
+
+    const theme = createMuiTheme({
+        props: {
+            MuiDialog: {
+                style: {
+                    zIndex: '2147483550',
+                }
+            }
+        }
+    });
+
     return (
         editMode ? (
-            <div onBlur={() => setEditMode(false)}
-                 onKeyDown={e => handleKeyDown(e, "input")}
-                 ref={childRef}>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <DateTimePicker {...field} disableToolbar/>
-                </MuiPickersUtilsProvider>
+            <div>
+                <ThemeProvider theme={theme}>
+                    <DateTimePicker name={field.name}
+                                    value={field.value}
+                                    onChange={value => setFieldValue(field.name, value)}
+                                    onClose={() => setEditMode(false)}
+                                    fullWidth/>
+                </ThemeProvider>
             </div>
         ) : (
             <div onClick={() => setEditMode(true)}>
-                <span className="editable preserve-newlines">{text || ''}</span>
+                <span className="editable preserve-newlines">
+                    {t('dateFormats.dateTime.short', {dateTime: new Date(text)}) || ''}
+                </span>
                 <i className="edit fa fa-pencil-square"/>
             </div>
         )

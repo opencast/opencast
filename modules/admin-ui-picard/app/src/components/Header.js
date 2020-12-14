@@ -14,6 +14,7 @@ import {FaBell, FaChevronDown, FaPlayCircle, FaPowerOff, FaQuestionCircle, FaVid
 import {connect} from "react-redux";
 import {fetchHealthStatus} from "../thunks/healthThunks";
 import {getHealthStatus} from "../selectors/healthSelectors";
+import {getCurrentLanguageInformation} from "../utils/utils";
 
 
 // Todo: Find suitable place to define them and get these links out of config-file or whatever
@@ -24,11 +25,7 @@ const restUrl = "https://opencast.org/";
 
 
 // Get code, flag and name of the current language
-let currentLang = languages.find(({ code }) => code === i18n.language);
-if (typeof currentLang === 'undefined') {
-    currentLang = languages.find(({ code }) => code === "en-GB");
-}
-const currentLanguage = currentLang;
+const currentLanguage = getCurrentLanguageInformation();
 
 
 

@@ -14,6 +14,11 @@ import {NewEventSchema} from "./validate";
 import {makeStyles, Step, StepLabel, Stepper,} from '@material-ui/core';
 import {FaCircle, FaDotCircle} from "react-icons/all";
 import {useTranslation} from "react-i18next";
+import {sourceMetadata} from "../../../../configs/newEventConfigs/sourceConfig";
+import {initialFormValuesNewEvents} from "../../../../configs/newEventConfigs/newEventWizardStates";
+import {MuiPickersUtilsProvider} from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
+import {getCurrentLanguageInformation} from "../../../../utils/utils";
 
 // Base style for Stepper component
 const useStepperStyle = makeStyles((theme) => ({
@@ -34,7 +39,10 @@ const useStepIconStyles = makeStyles({
         width: '20px',
         height: '20px'
     },
-})
+});
+
+// Get info about the current language and its date locale
+const currentLanguage = getCurrentLanguageInformation();
 
 /**
  * This component manages the pages of the new event wizard and the submission of values
@@ -44,15 +52,13 @@ const NewEventWizard = ({onSubmit, metadataFields}) => {
 
     const classes = useStepperStyle();
 
-    // Transform all initial values needed from information provided by backend
-    let initialValues = {};
-    metadataFields.fields.forEach(field => {
-        initialValues[field.id] = field.value;
-    });
+    const initialValues = getInitialValues(metadataFields);
+
 
     const [page, setPage] = useState(0);
     const [snapshot, setSnapshot] = useState(initialValues);
     // Caption of steps used by Stepper
+    // Todo: Get Steps depending on Wizard states (see newEventWizardStates)
     const steps = [
         t('EVENTS.EVENTS.NEW.METADATA.CAPTION'),
         t('EVENTS.EVENTS.NEW.SOURCE.CAPTION'),
@@ -93,42 +99,44 @@ const NewEventWizard = ({onSubmit, metadataFields}) => {
                 ))}
             </Stepper>
             {/*// Initialize overall form*/}
-            <Formik initialValues={snapshot}
-                    validationSchema={currentValidationSchema}
-                    onSubmit={handleSubmit}>
-                {/* Render wizard pages depending on current value of page variable */}
-                {formik => (
-                    <div>
-                        {page === 0 && <NewEventMetadata nextPage={nextPage}
-                                                         formik={formik}
-                                                         onSubmit={() => console.log(formik.values)}/>}
-                        {page === 1 && (
-                            <NewEventSource previousPage={previousPage}
-                                            nextPage={nextPage}
-                                            formik={formik}
-                                            onSubmit={() => console.log("Step 3 onSubmit")}/>
-                        )}
-                        {page === 2 && (
-                            <NewEventProcessing previousPage={previousPage}
+            <MuiPickersUtilsProvider  utils={DateFnsUtils} locale={currentLanguage.dateLocale}>
+                <Formik initialValues={snapshot}
+                        validationSchema={currentValidationSchema}
+                        onSubmit={handleSubmit}>
+                    {/* Render wizard pages depending on current value of page variable */}
+                    {formik => (
+                        <div>
+                            {page === 0 && <NewEventMetadata nextPage={nextPage}
+                                                             formik={formik}
+                                                             onSubmit={() => console.log(formik.values)}/>}
+                            {page === 1 && (
+                                <NewEventSource previousPage={previousPage}
                                                 nextPage={nextPage}
                                                 formik={formik}
-                                                onSubmit={() => console.log("Step 4 onSubmit")}/>
-                        )}
-                        {page === 3 && (
-                            <NewEventAccess previousPage={previousPage}
-                                            nextPage={nextPage}
-                                            formik={formik}
-                                            onSubmit={() => console.log("Step 5 onSubmit")}/>
-                        )}
-                        {page === 4 && (
-                            <NewEventSummary previousPage={previousPage}
-                                             nextPage={handleSubmit}
-                                             formik={formik}
-                                             onSubmit={() => console.log("Step 6 onSubmit")}/>
-                        )}
-                    </div>
-                )}
-            </Formik>
+                                                onSubmit={() => console.log("Step 3 onSubmit")}/>
+                            )}
+                            {page === 2 && (
+                                <NewEventProcessing previousPage={previousPage}
+                                                    nextPage={nextPage}
+                                                    formik={formik}
+                                                    onSubmit={() => console.log("Step 4 onSubmit")}/>
+                            )}
+                            {page === 3 && (
+                                <NewEventAccess previousPage={previousPage}
+                                                nextPage={nextPage}
+                                                formik={formik}
+                                                onSubmit={() => console.log("Step 5 onSubmit")}/>
+                            )}
+                            {page === 4 && (
+                                <NewEventSummary previousPage={previousPage}
+                                                 nextPage={handleSubmit}
+                                                 formik={formik}
+                                                 onSubmit={() => console.log("Step 6 onSubmit")}/>
+                            )}
+                        </div>
+                    )}
+                </Formik>
+            </MuiPickersUtilsProvider>
         </>
 
     )
@@ -144,6 +152,41 @@ const CustomStepIcon = (props) => {
             {completed ? <FaCircle className={classes.circle}/> : <FaDotCircle className={classes.circle}/>}
         </div>
     )
+}
+
+// Transform all initial values needed from information provided by backend
+const getInitialValues = metadataFields => {
+    // Transform metadata fields provided by backend (saved in redux)
+    let initialValues = {};
+    metadataFields.fields.forEach(field => {
+        initialValues[field.id] = field.value;
+    });
+
+    // Transform additional metadata for source (provided by constant in newEventConfig)
+    if (!!sourceMetadata.UPLOAD) {
+        sourceMetadata.UPLOAD.metadata.forEach(field => {
+            initialValues[field.id] = field.value;
+        });
+    }
+    if (!!sourceMetadata.SINGLE_SCHEDULE) {
+        sourceMetadata.SINGLE_SCHEDULE.metadata.forEach(field => {
+            initialValues[field.id] = field.value;
+        });
+    }
+    if (!!sourceMetadata.MULTIPLE_SCHEDULE) {
+        sourceMetadata.MULTIPLE_SCHEDULE.metadata.forEach(field => {
+            initialValues[field.id] = field.value;
+        });
+    }
+
+    // Add all initial form values known upfront listed in newEventsConfig
+    for (const [key, value] of Object.entries(initialFormValuesNewEvents)) {
+        initialValues[key] = value;
+    }
+    console.log("INITIAL VALUES NEW EVENTS:");
+    console.log(initialValues);
+
+    return initialValues;
 }
 
 // Prop types of CustomStepIcon component
