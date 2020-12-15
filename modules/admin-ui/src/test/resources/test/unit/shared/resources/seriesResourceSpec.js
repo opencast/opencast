@@ -35,7 +35,7 @@ describe('Series API Resource', function () {
             $httpBackend.flush();
             expect(data.rows.length).toBe(2);
             expect(data.rows[0].title).toEqual('Mock Series');
-            expect(data.rows[0].creators).toEqual(['Ophelia Organizer']);
+            expect(data.rows[0].organizers).toEqual(['Ophelia Organizer']);
             expect(data.rows[0].contributors).toEqual(['Carl Contributor', 'Carmen Contributor']);
             expect(data.rows[0].createdDateTime).toEqual('2018-08-13T07:20:41Z');
         });

@@ -34,7 +34,7 @@ angular.module('adminNg.resources')
           var row = {};
           row.id = r.id;
           row.title = r.title;
-          row.creators = r.organizers;
+          row.organizers = r.organizers;
           row.contributors = r.contributors;
           row.createdDateTime = Language.formatDate('short', r.creation_date);
           row.managed_acl = r.managedAcl;

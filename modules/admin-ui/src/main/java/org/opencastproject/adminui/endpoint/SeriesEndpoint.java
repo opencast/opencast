@@ -602,7 +602,7 @@ public class SeriesEndpoint implements ManagedService {
             case SeriesIndexSchema.CONTRIBUTORS:
               query.sortByContributors(criterion.getOrder());
               break;
-            case SeriesIndexSchema.CREATOR:
+            case SeriesIndexSchema.ORGANIZERS:
               query.sortByOrganizers(criterion.getOrder());
               break;
             case SeriesIndexSchema.CREATED_DATE_TIME:

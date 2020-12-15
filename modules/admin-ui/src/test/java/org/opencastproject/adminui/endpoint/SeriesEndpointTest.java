@@ -103,7 +103,7 @@ public class SeriesEndpointTest {
     reader = new InputStreamReader(stream);
     expected = (JSONObject) new JSONParser().parse(reader);
 
-    actual = (JSONObject) parser.parse(given().queryParam("sort", "creator:DESC").expect().statusCode(HttpStatus.SC_OK)
+    actual = (JSONObject) parser.parse(given().queryParam("sort", "organizers:DESC").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).when().get(rt.host("/series.json")).asString());
     Assert.assertEquals(expected, actual);
 
@@ -111,7 +111,7 @@ public class SeriesEndpointTest {
     reader = new InputStreamReader(stream);
     expected = (JSONObject) new JSONParser().parse(reader);
 
-    actual = (JSONObject) parser.parse(given().queryParam("sort", "creator:ASC").expect().statusCode(HttpStatus.SC_OK)
+    actual = (JSONObject) parser.parse(given().queryParam("sort", "organizers:ASC").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).when().get(rt.host("/series.json")).asString());
     Assert.assertEquals(expected, actual);
     // Test Sort by Title
