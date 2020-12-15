@@ -12,12 +12,9 @@ The [installation](../installation/index.md) documentation contains instructions
 Configuring External Nodes
 --------------------------
 
-Opencast's Elasticsearch configuration settings are in the core configuration file, which can usually be found at '/etc/opencast/custom.properties'
+Opencast's Elasticsearch settings can be found in the 'etc/custom.properties' configuration file.
 
+Relevant configuration keys are:
 * `org.opencastproject.elasticsearch.server.hostname`
-    * This should be the hostname where Elasticsearch is running.
 * `org.opencastproject.elasticsearch.server.scheme`
-    * This should match the connection scheme for Elasticsearch.  Leave this commented out unless you have configured https in Elasticsearch.
 * `org.opencastproject.elasticsearch.server.port`
-    * This is the port that Elasticsearch is listening on.  Leave this commented out unless you have changed the default in Elasticsearch.
-
