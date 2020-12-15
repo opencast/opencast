@@ -105,7 +105,7 @@ Finally, leave the client and restart the database server to enable the new user
 
 ### PostgreSQL
 
-Opencast's official PostgreSQL support is still marked as experimental. <!-- _How up-to-date is this? -->
+Opencast's official PostgreSQL support is still marked as experimental.
 
 Install PostgreSQL, create a database and a user.
 You may need to enable password authentication in your `pg_hba.conf` first.
