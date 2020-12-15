@@ -114,7 +114,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   static final String ACCESS_TOKEN_EXPIRY_NAME = "expires_in";
   private static final int CONNECTION_TIMEOUT = 60000; // ms, 1 minute
   private static final int SOCKET_TIMEOUT = 60000; // ms, 1 minute
-  private static final int ACCESS_TOKEN_MINIMUN_TIME = 60000; // ms , 1 minute
+  private static final int ACCESS_TOKEN_MINIMUM_TIME = 60000; // ms , 1 minute
   // Default workflow to attach transcription results to mediapackage
   public static final String DEFAULT_WF_DEF = "google-speech-attach-transcripts";
   private static final long DEFAULT_COMPLETION_BUFFER = 300; // in seconds, default is 5 minutes
@@ -606,7 +606,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     } catch (Exception e) {
       if (hasTranscriptionRequestExpired(jobId)) {
         // Cancel the job and inform admin
-        cancelTranscription(jobId, "Transcription ERROR", "Transcription job canceled due to errors");
+        cancelTranscription(jobId, "Transcription job canceled due to errors");
       }
       String msg = String.format("Exception when calling the recognitions endpoint for media package %s, job id %s",
               mpId, jobId);
@@ -781,7 +781,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
           String error = (String) jsonObject.get("error");
           String errorDetails = (String) jsonObject.get("error_description");
           logger.warn("Invalid argument returned, status: {}", code);
-          logger.warn("Unable to refresh Google Cloud Serice token, error: {}, error details: {}", error, errorDetails);
+          logger.warn("Unable to refresh Google Cloud Service token, error: {}, error details: {}", error, errorDetails);
           break;
         default:
           logger.warn("Invalid argument returned, status: {}", code);
@@ -806,7 +806,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
 
   protected String getRefreshAccessToken() throws TranscriptionServiceException, IOException {
     // Check that token hasn't expired
-    if ((!INVALID_TOKEN.equals(accessToken)) && (System.currentTimeMillis() < (tokenExpiryTime - ACCESS_TOKEN_MINIMUN_TIME))) {
+    if ((!INVALID_TOKEN.equals(accessToken)) && (System.currentTimeMillis() < (tokenExpiryTime - ACCESS_TOKEN_MINIMUM_TIME))) {
       return accessToken;
     }
     return refreshAccessToken(clientId, clientSecret, clientToken);
@@ -817,7 +817,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     File audioFile;
     String audioUrl = null;
     String fileExtension;
-    int audioRespone;
+    int audioResponse;
     CloseableHttpClient httpClientStorage = makeHttpClient();
     GoogleSpeechTranscriptionServiceStorage storage = new GoogleSpeechTranscriptionServiceStorage();
     try {
@@ -827,13 +827,13 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       String contentType = track.getMimeType().toString();
       String token = getRefreshAccessToken();
       // Upload file to google cloud storage
-      audioRespone = storage.startUpload(httpClientStorage, storageBucket, mpId, fileExtension,
+      audioResponse = storage.startUpload(httpClientStorage, storageBucket, mpId, fileExtension,
               audioFile, String.valueOf(fileSize), contentType, token);
-      if (audioRespone == HttpStatus.SC_OK) {
+      if (audioResponse == HttpStatus.SC_OK) {
         audioUrl = String.format("gs://%s/%s.%s", storageBucket, mpId, fileExtension);
         return audioUrl;
       }
-      logger.error("Errow when uploading audio to Google Storage, error code: {}", audioRespone);
+      logger.error("Error when uploading audio to Google Storage, error code: {}", audioResponse);
       return audioUrl;
     } catch (Exception e) {
       throw new TranscriptionServiceException("Error reading audio track", e);
@@ -870,7 +870,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     return PathSupport.toSafeName(jobId + ".json");
   }
 
-  private void cancelTranscription(String jobId, String subject, String message) {
+  private void cancelTranscription(String jobId, String message) {
     try {
       database.updateJobControl(jobId, TranscriptionJobControl.Status.Canceled.name());
       String mpId = database.findByJob(jobId).getMediaPackageId();
@@ -882,7 +882,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
         logger.warn(String.format("could not delete file %s.%s from Google cloud storage", mpId, defaultEncoding), ex);
       }
       // Send notification email
-      sendEmail(subject, String.format("%s(media package %s, job id %s).", message, mpId, jobId));
+      sendEmail("Transcription ERROR", String.format("%s(media package %s, job id %s).", message, mpId, jobId));
     } catch (Exception e) {
       logger.error(String.format("ERROR while deleting transcription job: %s", jobId), e);
     }
@@ -1082,7 +1082,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
         logger.warn("Media package {} has not been archived yet. Skipped.", mpId);
       } else {
         // Close transcription job and email admin
-        cancelTranscription(jobId, "Transcription ERROR", "Transcription job canceled, archived media package not found");
+        cancelTranscription(jobId, "Transcription job canceled, archived media package not found");
       }
       return null;
     }
