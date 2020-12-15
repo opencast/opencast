@@ -8,6 +8,12 @@ University. This repository provides preconfigured Opencast installations and al
 method, you do not have to compile the software by yourself.
 
 
+> __Release__
+>
+> Opencast 9 is currently not available from the RPM repository.
+> It should be available within a week after the release of Opencast 9.
+
+
 Availability
 ------------
 
