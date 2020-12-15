@@ -573,12 +573,12 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
           JSONParser jsonParser = new JSONParser();
           JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
           Boolean jobDone = (Boolean) jsonObject.get("done");
-          if (jobDone) {
-            resultsArray = getTranscriptionResult(jsonObject);
-          }
           TranscriptionJobControl jc = database.findByJob(jobId);
           if (jc != null) {
             mpId = jc.getMediaPackageId();
+          }
+          if (jobDone) {
+            resultsArray = getTranscriptionResult(jsonObject);
           }
           logger.info("Recognitions job {} has been found, completed status {}", jobId, jobDone.toString());
           EntityUtils.consume(entity);
@@ -604,6 +604,10 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     } catch (TranscriptionServiceException e) {
       throw e;
     } catch (Exception e) {
+      if (hasTranscriptionRequestExpired(jobId)) {
+        // Cancel the job and inform admin
+        cancelTranscription(jobId, "Transcription ERROR", "Transcription job canceled due to errors");
+      }
       String msg = String.format("Exception when calling the recognitions endpoint for media package %s, job id %s",
               mpId, jobId);
       logger.warn(msg, e);
@@ -1007,8 +1011,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
               try {
                 if (!getAndSaveJobResults(jobId)) {
                   // Job still running, not finished, so check if it should have finished more than N seconds ago
-                  if (j.getDateCreated().getTime() + j.getTrackDuration()
-                          + (completionCheckBuffer + maxProcessingSeconds) * 1000 < System.currentTimeMillis()) {
+                  if (hasTranscriptionRequestExpired(jobId)) {
                     // Processing for too long, mark job as cancelled and don't check anymore
                     database.updateJobControl(jobId, TranscriptionJobControl.Status.Canceled.name());
                     // Delete file stored on Google storage
