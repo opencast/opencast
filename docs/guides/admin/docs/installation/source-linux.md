@@ -41,7 +41,7 @@ Please make sure to install the following dependencies.
 
 Required:
 
-    java-1.8.0-openjdk-devel.x86_64 / openjdk-8-jdk
+    java-1.11.0-openjdk-devel.x86_64 / openjdk-11-jdk
     ffmpeg >= 3.2.4
     maven >= 3.1
     python >= 2.6
