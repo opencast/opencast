@@ -866,6 +866,37 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     return PathSupport.toSafeName(jobId + ".json");
   }
 
+  private void cancelTranscription(String jobId, String subject, String message) {
+    try {
+      database.updateJobControl(jobId, TranscriptionJobControl.Status.Canceled.name());
+      String mpId = database.findByJob(jobId).getMediaPackageId();
+      try {
+        // Delete file stored on Google storage
+        String token = getRefreshAccessToken();
+        deleteStorageFile(mpId, token);
+      } catch (Exception ex) {
+        logger.warn(String.format("could not delete file %s.%s from Google cloud storage", mpId, defaultEncoding), ex);
+      }
+      // Send notification email
+      sendEmail(subject, String.format("%s(media package %s, job id %s).", message, mpId, jobId));
+    } catch (Exception e) {
+      logger.error(String.format("ERROR while deleting transcription job: %s", jobId), e);
+    }
+  }
+
+  private boolean hasTranscriptionRequestExpired(String jobId) {
+    try {
+      // set a time limit based on video duration and maximum processing time
+      if (database.findByJob(jobId).getDateCreated().getTime() + database.findByJob(jobId).getTrackDuration()
+              + (completionCheckBuffer + maxProcessingSeconds) * 1000 < System.currentTimeMillis()) {
+        return true;
+      }
+    } catch (Exception e) {
+      logger.error(String.format("ERROR while calculating transcription request expiration for job: %s", jobId), e);
+    }
+    return false;
+  }
+
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -1014,7 +1045,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
             // Apply workflow to attach transcripts
             Map<String, String> params = new HashMap<String, String>();
             params.put(TRANSCRIPTION_JOB_ID_KEY, jobId);
-            String wfId = startWorkflow(mpId, workflowDefinitionId, params);
+            String wfId = startWorkflow(mpId, workflowDefinitionId, jobId, params);
             if (wfId == null) {
               logger.warn("Attach transcription workflow could NOT be scheduled for mp {}, google speech job {}", mpId, jobId);
               continue;
@@ -1034,7 +1065,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     }
   }
 
-  private String startWorkflow(String mpId, String wfDefId, Map<String, String> params) {
+  private String startWorkflow(String mpId, String wfDefId, String jobId, Map<String, String> params) {
     DefaultOrganization defaultOrg = new DefaultOrganization();
     securityService.setOrganization(defaultOrg);
     securityService.setUser(SecurityUtil.createSystemUser(systemAccount, defaultOrg));
@@ -1043,8 +1074,13 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     final AQueryBuilder q = assetManager.createQuery();
     final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run();
     if (r.getSize() == 0) {
-      // Media package not archived yet.
-      logger.warn("Media package {} has not been archived yet.", mpId);
+      if (!hasTranscriptionRequestExpired(jobId)) {
+        // Media package not archived but still within completion time? Skip until next time.
+        logger.warn("Media package {} has not been archived yet. Skipped.", mpId);
+      } else {
+        // Close transcription job and email admin
+        cancelTranscription(jobId, "Transcription ERROR", "Transcription job canceled, archived media package not found");
+      }
       return null;
     }
 
