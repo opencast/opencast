@@ -13,7 +13,7 @@ by the Debian repository.
 Availability
 ------------
 
-Note that it may take some time (usually about two weeks after a new release is out) before the DEBs are available.
+Note that it may take some time (usually about a week after a new release is out) before the Debian packages are available.
 Watch for announcements on list or just check which versions are available in the repository.
 
 
@@ -24,28 +24,11 @@ Currently Supported
 * Ubuntu 18.04 amd64
 
 
-OpenJDK 8 on Debian 10
-----------------------
+Supported JDKs
+--------------
 
-**Debian 10 and newer requires a manual OpenJDK install**
-
-* Add Debian unstable to your sources, replacing the mirror URL with your local mirror:
-
-        echo "deb http://[YOUR_MIRROR]/debian unstable main" | sudo tee /etc/apt/sources.list.d/debian-unstable.list
-
-* Ensure you don't accidentally upgrade your entire Debian install to unstable
-
-        echo "APT::Default-Release \"`dpkg --status tzdata|grep Provides|cut -f2 -d'-'`\";" | sudo tee /etc/apt/apt.conf.d/99defaultrelease
-
-* Update your package listing
-
-        apt-get update
-
-* Install OpenJDK 8 from the backports
-
-        apt-get install -t unstable openjdk-8-jre
-
-> *Other architectures like i386, i686, arm, … are not supported!*
+For Opencast 9 we support JDK 8 and JDK 11, however Opencast 10 will drop support for JDK 8.  We strongly encourage you
+to use JDK 11 for Opencast 9.
 
 
 Activate Repository
@@ -59,15 +42,13 @@ First you have to install the necessary repositories so that your package manage
 
 * Add Opencast repository:
 
-        cd /etc/apt/sources.list.d/
-        echo "deb https://pkg.opencast.org/debian stable/" | sudo tee opencast.list
+        echo "deb https://pkg.opencast.org/debian 9.x stable" | sudo tee /etc/apt/sources.list.d/opencast.list
 
     It might take some time after the release of a new Opencast version before the Debs are moved to the stable
     repository. If you need the new release prior to its promotion to stable you can use the testing repository.
     Note that the testing repository is an additional repository and still requires the stable repository to be active.
 
-        cd /etc/apt/sources.list.d/
-        echo "deb https://pkg.opencast.org/debian testing/" | sudo tee opencast.list
+        echo "deb https://pkg.opencast.org/debian 9.x stable testing" | sudo tee /etc/apt/sources.list.d/opencast.list
 
 * Add the repository key to your apt keyring:
 
@@ -82,8 +63,8 @@ Install Apache ActiveMQ
 -----------------------
 
 The Apache ActiveMQ message broker is required by Opencast since version 2.0. It does not necessarily have to be
-installed on the same machine as Opencast but would commonly for an all-in-one system. ActiveMQ is available from the
-the normal software repositories for your distribution:
+installed on the same machine as Opencast, however many adopters commonly install it on their admin nodes.
+Install ActiveMQ with:
 
     apt-get install activemq-dist
 
@@ -99,13 +80,31 @@ ActiveMQ must be started *prior to* Opencast startup.
 More information about how to properly set up ActiveMQ for Opencast can be found in the [message broker configuration
 documentation](../configuration/message-broker.md).
 
-Note that most Debian based distributions also have activemq packaged by upstream package maintainers. These packages
+Note that most Debian based distributions also have ActiveMQ packaged by upstream package maintainers. These packages
 will work, however the ActiveMQ configuration file will require modification to function correctly.
+
+
+Install Elasticsearch
+---------------------
+
+Starting with Opencast 9, Elasticsearch is now a dependency.  Our packages do not explicitly depend on Elasticsearch
+because it runs externally to Opencast.  By default we expect Elasticsearch to be running on the admin node, however
+you can configure the URL in Opencast's configuration files.
+
+In our repository we provide validated Elasticsearch packages copied from the upstream repository.  Installation can be
+accomplished by running the following:
+
+    apt-get install elasticsearch-oss
+
+If you wish to use the upstream Elasticsearch repository directly be aware that Opencast only formally supports Elasticsearch
+versions with the same major and minor version values.  That is, if our 9.x repository has Elasticsearch 7.9.2 then
+Opencast only formally supports Elasticsearch versions starting with 7.9.
+
 
 Install Opencast
 ------------------
 
-For this guide we will be installing the latest released version of Opencast 3.x, however if you wish to install another
+For this guide we will be installing the latest released version of Opencast 9.x, however if you wish to install another
 version please change the name accordingly.
 
 
@@ -113,22 +112,23 @@ version please change the name accordingly.
 
 For a basic installation (All-In-One) just run:
 
-    apt-get install opencast-3-allinone
+    apt-get install opencast-9-allinone elasticsearch-oss activemq-dist
 
 This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.  Note
 that while the repository provides a packaged version of ffmpeg, your distribution may have a version which is
 pre-installed or otherwise takes precedence.  This version may work, however Opencast only formally supports the
-version(s) in the repository.
+version(s) in the repository.  To install the Opencast version of ffmpeg add `ffmpeg-dist` to the end of the command above.
 
-At this point Opencast is installed and will work locally, but it is not completely configured.  Please follow the
-[Basic Configuration guide](../configuration/basic.md) from here.  Once you are ready, start Opencast:
+At this point Opencast is installed and will work locally, but it is not completely configured.  Because additional configuration
+is required, neither Opencast nor ActiveMQ are configured to start automatically. Please follow the
+[Basic Configuration guide](../configuration/basic.md).  Once you are ready, enable Opencast and ActiveMQ to start on boot with:
 
-* On a SysV-init based system
+        systemctl enable activemq.service
+        systemctl enable opencast.service
 
-        service opencast start
+then start them with:
 
-* On a Systemd based system
-
+        systemctl start activemq.service
         systemctl start opencast.service
 
 
@@ -151,8 +151,8 @@ Some available distributions are:
 * opencast-X-worker
 
 …where `X` stands for a specific Opencast version. These packages will install the latest release for a given version,
-so opencast-3-admin will install the admin profile for Opencast 3.x (currently 3.3). Once Opencast 3.4 has been packaged
-and made available your system will automatically update to Opencast 3.4 using the standard `apt-get` tools.
+so opencast-8-admin will install the admin profile for Opencast 8.x (currently 8.9). Once Opencast 8.10 has been packaged
+and made available your system will automatically update to Opencast 8.10 using the standard `apt-get` tools.
 
 To list all available packages and versions, use:
 
@@ -165,9 +165,9 @@ Point Revisions (Experts only)
 If for some reason you wish to install a specific point revision of Opencast, and the repository still hosts that point
 revision, you can select it by adding it, and the packaging build, to your `apt-get install` line.  For example:
 
-    apt-get install opencast-3-admin=3.2-2
+    apt-get install opencast-8-admin=8.9-2
 
-Installs an Opencast 3.2 admin node, using the second build of that series.  Not all series have more than a single build,
+Installs an Opencast 8.9 admin node, using the second build of that series.  Not all series have more than a single build,
 and older point revisions may be removed once superceded, so please explore the repository prior to attempting this.
 
 
@@ -179,21 +179,15 @@ from the repository, all necessary dependencies will be installed automatically.
 
 You can install all necessary 3rd-Party-Tools for Opencast like this:
 
-    apt-get install ffmpeg-dist tesseract-ocr sox hunspell synfig netcat
+    apt-get install ffmpeg-dist tesseract-ocr sox hunspell netcat
 
 
 Upgrading Major Versions
 ------------------------
 
 While these packages will automatically upgrade you to the latest point version in a release series, they do not
-automatically upgrade you to the latest major version. In other words, if you install `opencast3-admin` you get the
-latest 3.x release, not the latest 4.x release. To upgrade from one version to another you first stop Opencast:
-
-* On a SysV-init based system
-
-        service opencast stop
-
-* On a Systemd based system
+automatically upgrade you to the latest major version. In other words, if you install `opencast-9-admin` you get the
+latest 9.x release, not the latest 10.x release. To upgrade from one version to another you first stop Opencast:
 
         systemctl stop opencast.service
 
@@ -201,13 +195,13 @@ As a reminder, these instructions will change your Opencast installation, and fi
 incompatible with older versions. If you are performing this on a production system, please ensure you have valid
 backups prior to taking the next steps.
 
-Uninstall your current Opencast packaging (using Opencast 3 as an example):
+Uninstall your current Opencast packaging (using Opencast 8 as an example):
 
-    apt-get remove opencast-3-*
+    apt-get remove opencast-8-*
 
-Then install the new version (using Opencast 4 as an example):
+Then install the new version (using Opencast 9 as an example):
 
-    apt-get install opencast-4-allinone
+    apt-get install opencast-9-allinone
 
 At this point you must follow the relevant [upgrade](../upgrade.md) instructions, prior to starting Opencast again.
 
