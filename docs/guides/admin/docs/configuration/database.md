@@ -55,7 +55,6 @@ Finally, set root user credentials by running
 ```
 
 
-#### Creating a Database
 
 The first step is to create a database for Opencast.
 You can use any other database client, e.g. phpMyAdmin, for this as well.
