@@ -1,8 +1,6 @@
 Opencast 9: Release Notes
 =========================
 
-**TODO** The following is as of 2020/08/26, and not finished, yet.
-
 Important Changes
 -----------------
 
@@ -11,13 +9,10 @@ Important Changes
 - The `encode` worfklow operation now completely replaces `compose`,
   which is dropped now
 - MariaDB JDBC driver
-    - TODO Where is this in the changelog?!
-- New LTI-Tools?
+- New LTI-Tools
 
 Features
 --------
-
-- TODO Paella changes?!
 
 - Get notified when there is a new version of Opencast,
   and if your current version reached its end of life
@@ -42,11 +37,25 @@ Features
   or move them between series
 - Export statistics to CSV using a new External API endpoint
 - Edit event meta data in bulk with a new dialog in the admin UI
+- Create Shibboleth users dynamically using configuration
+- Support Serverless HLS
+- Retract only specific flavors/tags with a new WOH
+- New download button in the Theodul player
+- New VideoGrid-WOH to handle grids of videos as presented for example
+  by BigBlueButton
+- Allow specifying role prefixes in various user providers to better
+  distinguish users from different sources
+- Adopter registration
+- New version of Opencast Studio
+- User and role provider for the Canvas LMS
+- The partial import WOH can now do certain kinds of preprocessings
+  to simplify further processing down the line
+- Support for presigned S3 URLs
 
 Improvements
 ------------
 
-- Paella Player version **TODO**
+- New Paella Player version
 - Make the `partial-import` workflow operation more robust
   in the face of containers with multiple videos in them
 - Multiple workflows with the same ID no longer bring Opencast down
@@ -85,6 +94,8 @@ Improvements
   by loading them all at once
 - Improved compatibility with S3 compatibles/alternatives
 - Display notifications as overlay instead of as "flash messages"
+- The `tag` workflow operation now allows wildcards in the target flavor
+- Use series ACL as default ACL for events in LTI upload tool if available
 
 API changes
 -----------
@@ -93,11 +104,9 @@ API changes
   instead of the technical one
 - Allow updating processing information using the Events API
 - Export statistics to CSV
-
-Configuration changes
----------------------
-
-*TBD*
+- The filter in the Events API is "additive" now, allowing you to get
+  different types of events in one request
+- The Series API can now return ACLs within its response, if you tell it to
 
 
 Release Schedule
