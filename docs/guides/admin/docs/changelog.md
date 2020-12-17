@@ -4,6 +4,17 @@ Changelog
 Opencast 9
 ----------
 
+### Opencast 9.1
+
+*Released on December 16th, 2020*
+
+- [[#2150](https://github.com/opencast/opencast/pull/2150)] -
+  Add note about Studio config changes to the 8->9 update guide
+- [[#2133](https://github.com/opencast/opencast/pull/2133)] -
+  Update Debian install documentation
+- [[#2160](https://github.com/opencast/opencast/pull/2160)] -
+  Fix Ingest by Non-privileged User
+
 ### Opencast 9.0
 
 *Released on December 15th, 2020*
