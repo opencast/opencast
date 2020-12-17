@@ -9,6 +9,8 @@
     "@fortawesome/react-fontawesome": "^0.1.4",
     "axios": "^0.19.0",
     "bootstrap": "^4.5.3",
+    "dangerously-set-html-content": "^1.0.8",
+    "engage-ui": "../engage-ui",
     "http-mock-server": "^0.5.2",
     "i18next": "^17.0.16",
     "i18next-browser-languagedetector": "^3.0.3",
@@ -21,7 +23,7 @@
     "react-js-pagination": "^3.0.2",
     "react-scripts": "^3.2.0",
     "react-select": "^3.0.8",
-    "typescript": "3.8.x"
+    "typescript": "3.8.*"
   },
   "scripts": {
     "i18n": "./copy-translations.sh",
