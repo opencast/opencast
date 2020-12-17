@@ -120,11 +120,12 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
         getLti().then((lti) => {
             this.setState({
                 ...this.state,
-                episodesFilter: lti.context_label,
-                seriesFilter: lti.context_label
+                episodesFilter: lti.context_label
             })
             this.loadEpisodesTab(1, lti.context_label);
-            this.loadSeriesTab(1, lti.context_label);
+            if(this.hasSeriesParameters() === false){
+                this.loadSeriesTab(1, '');
+            }
         }).catch((error) => this.setState({
             ...this.state,
             httpErrors: this.state.httpErrors.concat([`LTI: ${error.message}`])
@@ -151,6 +152,11 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
             hours = ("0" + Math.floor(duration / (round * max * max) % max).toString()).slice(-numOfInts);
 
         return hours + ':' + minutes + ':' + seconds;
+    }
+
+    hasSeriesParameters() {
+        const qs = parsedQueryString();
+        return qs.series !== undefined || qs.series_name !== undefined;
     }
 
     populateData(title: string, image: string, created: string, tool: string) {
@@ -294,7 +300,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
                         handlePageChange={this.handlePageChange.bind(this)}
                     />
                 </Tab>
-                <Tab eventKey="series" title="Series">
+                { !this.hasSeriesParameters() && <Tab eventKey="series" title="Series">
                     <Form.Row id="series-searchfield" className="searchfield">
                         <Col>
                             <Form.Control type="text" placeholder="Filter" value={this.state.seriesFilter} onChange={(e) => {
@@ -332,7 +338,7 @@ class TranslatedDeeplink extends React.Component<DeeplinkProps, DeeplinkState> {
                         results={this.state.searchSeriesResults}
                         handlePageChange={this.handlePageChange.bind(this)}
                     />
-                </Tab>
+                </Tab>}
             </Tabs>
         </>
     }
