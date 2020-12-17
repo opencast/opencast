@@ -1,3 +1,5 @@
+import {initArray} from "../../utils/utils";
+
 export const newEventWizardStates = [
     {
         translation: 'EVENTS.EVENTS.NEW.METADATA.CAPTION',
@@ -32,13 +34,52 @@ export const newEventWizardStates = [
 // All fields for new event form that are fix and not depending on response of backend
 // InitialValues of Formik form (others computed dynamically depending on responses from backend)
 export const initialFormValuesNewEvents = {
-    sourceMode: '',
-    scheduleStartDate: '',
-    scheduleEndDate: '',
-    scheduleStartTime: '',
-    scheduleDuration: '',
-    scheduleEndTime: '',
+    sourceMode: 'UPLOAD',
+    scheduleStartDate: new Date().toISOString(),
+    scheduleEndDate: new Date().toISOString(),
+    scheduleStartTimeHour: '',
+    scheduleStartTimeMinutes: '',
+    scheduleDurationHour: '',
+    scheduleDurationMinutes: '',
+    scheduleEndTimeHour: '',
+    scheduleEndTimeMinutes: '',
     repeatOn: [],
     location: '',
     deviceInputs: []
 };
+
+// constants for hours and minutes (used in selection for start/end time and duration)
+export const hours = initArray(24);
+export const minutes = initArray(60);
+
+// sorted weekdays and their translation key
+export const weekdays = [
+    {
+        name: 'MO',
+        label: 'EVENTS.EVENTS.NEW.WEEKDAYS.MO'
+    },
+    {
+        name: 'TU',
+        label: 'EVENTS.EVENTS.NEW.WEEKDAYS.TU'
+    },
+    {
+        name: 'WE',
+        label: 'EVENTS.EVENTS.NEW.WEEKDAYS.WE'
+    },
+    {
+        name: 'TH',
+        label: 'EVENTS.EVENTS.NEW.WEEKDAYS.TH'
+    },
+    {
+        name: 'FR',
+        label: 'EVENTS.EVENTS.NEW.WEEKDAYS.FR'
+    },
+    {
+        name: 'SA',
+        label: 'EVENTS.EVENTS.NEW.WEEKDAYS.SA'
+    },
+    {
+        name: 'SU',
+        label: 'EVENTS.EVENTS.NEW.WEEKDAYS.SU'
+    }
+];

@@ -1,16 +1,20 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import Notifications from "../../../shared/Notifications";
-import {DatePicker, MuiPickersUtilsProvider} from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
+import {DatePicker} from "@material-ui/pickers";
 import {getTimezoneOffset} from "../../../../utils/utils";
 import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 import {Field} from "formik";
 import {sourceMetadata, uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConfig";
 import RenderField from "./RenderField";
+import {hours, minutes, weekdays} from "../../../../configs/newEventConfigs/newEventWizardStates";
+import {getRecordings} from "../../../../selectors/recordingSelectors";
+import {fetchRecordings} from "../../../../thunks/recordingThunks";
+import {connect} from "react-redux";
 
 
+// Style to bring date picker pop up to front
 const theme = createMuiTheme({
     props: {
         MuiDialog: {
@@ -21,11 +25,16 @@ const theme = createMuiTheme({
     }
 });
 
-const NewEventSource = ({ onSubmit, previousPage, nextPage, formik }) => {
+/**
+ * This component renders the source page for new events in the new event wizard.
+ */
+const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInputDevices, inputDevices }) => {
     const { t } = useTranslation();
 
-    console.log("FORMIK");
-    console.log(formik);
+    useEffect(() => {
+        // Load recordings that can be used for input
+        loadingInputDevices();
+    }, []);
 
     return(
         <>
@@ -45,6 +54,7 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik }) => {
                         </table>
                         <div className="obj list-obj">
                             <header className="no-expand">{t('EVENTS.EVENTS.NEW.SOURCE.SELECT_SOURCE')}</header>
+                            {/* Radio buttons for choosing source mode */}
                             <div className="obj-container">
                                 <ul>
                                     <li>
@@ -77,18 +87,20 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik }) => {
                                 </ul>
                             </div>
                         </div>
+
+                        {/* Render rest of page depending on which source mode is chosen */}
                         {formik.values.sourceMode === 'UPLOAD' && (
-                            <Upload />
+                            <Upload setFieldValue={formik.setFieldValue} />
                         )}
-                        {formik.values.sourceMode === 'SCHEDULE_SINGLE' && (
-                            <ScheduleSingle />
-                        )}
-                        {formik.values.sourceMode === 'SCHEDULE_MULTIPLE' && (
-                            <ScheduleMultiple />
+                        {(formik.values.sourceMode === 'SCHEDULE_SINGLE' ||
+                            formik.values.sourceMode === 'SCHEDULE_MULTIPLE') && (
+                            <Schedule formik={formik}
+                                            inputDevices={inputDevices}/>
                         )}
                     </div>
                 </div>
             </div>
+
             {/* Button for navigation to next page and previous page */}
             <footer>
                 <button type="submit"
@@ -113,7 +125,10 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik }) => {
     );
 };
 
-const Upload = ({ }) => {
+/*
+ * Renders buttons for uploading files and fields for additional metadata
+ */
+const Upload = ({ setFieldValue }) => {
     const { t } = useTranslation();
 
     return (
@@ -122,13 +137,14 @@ const Upload = ({ }) => {
                 <header>{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.RECORDING_ELEMENTS')}</header>
                 <div className="obj-container">
                     <ul>
-                        {/*Todo: Repeat for Assets*/}
+                        {/*File upload button for each upload asset*/}
                         {uploadAssetOptions.map((asset, key) => (
                             <li key={key}>
                                 <div className="file-upload">
                                     <input id={asset.id}
                                            className="blue-btn file-select-btn"
                                            accept={asset.accept}
+                                           onChange={e => setFieldValue(asset.id, e.target.files[0])}
                                            type="file"
                                            tabIndex=""/>
                                 </div>
@@ -145,15 +161,16 @@ const Upload = ({ }) => {
                 <header className="no-expand">{t('EVENTS.EVENTS.NEW.SOURCE.UPLOAD.RECORDING_METADATA')}</header>
                 <div className="obj-container">
                     <table className="main-tbl">
-                        {/* todo: one row for each metadata field*/}
+                        {/* One row for each metadata field*/}
                         {sourceMetadata.UPLOAD.metadata.map((field, key) => (
                             <tr key={key}>
                                 <td>
                                     <span>{t(field.label)}</span>
-                                    <i className="required">*</i>
+                                    {field.required && (
+                                        <i className="required">*</i>
+                                    )}
                                 </td>
                                 <td className="editable">
-                                    {/* todo: Field input stuff*/}
                                     <Field name={field.id}
                                            metadataField={field}
                                            component={RenderField}/>
@@ -167,8 +184,25 @@ const Upload = ({ }) => {
     );
 };
 
-const ScheduleSingle = ({ }) => {
+/*
+ * Renders fields for providing information for schedule of event
+ */
+const Schedule = ({ formik, inputDevices }) => {
     const { t } = useTranslation();
+
+    const renderInputDeviceOptions = () => {
+        if (!!formik.values.location) {
+            let inputDevice = inputDevices.find(({ Name }) => Name === formik.values.location);
+            return (
+                inputDevice.inputs.map((input, key) => (
+                        <label key={key}>
+                            <Field type="checkbox" name="deviceInputs" value={input.id} tabIndex="12"/>
+                            {t(input.value)}
+                        </label>
+                    )
+                ));
+        }
+    }
 
     return (
         <div className="obj">
@@ -182,79 +216,149 @@ const ScheduleSingle = ({ }) => {
                     <tr>
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE')} <i className="required">*</i></td>
                         <td>
-                            {/*todo: Set value and onChange according formik field*/}
                             <ThemeProvider theme={theme}>
-                                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                    <DatePicker tabIndex="4"
-                                                disableToolbar
-                                                format="dd/MM/yyyy"/>
-                                </MuiPickersUtilsProvider>
+                                <DatePicker name="scheduleStartDate"
+                                            value={formik.values.scheduleStartDate}
+                                            onChange={value => formik.setFieldValue("scheduleStartDate", value)}
+                                            tabIndex="4"/>
                             </ThemeProvider>
                         </td>
                     </tr>
+                    {/* Render fields specific for multiple schedule (Only if this is current source mode)*/}
+                    {formik.values.sourceMode === 'SCHEDULE_MULTIPLE' && (
+                        <>
+                            <tr>
+                                <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE')} <i className="required">*</i></td>
+                                <td>
+                                    <ThemeProvider theme={theme}>
+                                        <DatePicker name="scheduleEndDate"
+                                                    value={formik.values.scheduleEndDate}
+                                                    onChange={value => formik.setFieldValue("scheduleEndDate", value)}
+                                                    tabIndex="4"/>
+                                    </ThemeProvider>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.REPEAT_ON')} <i className="required">*</i>
+                                </td>
+                                <td>
+                                    {/* Repeat checkbox for each week day*/}
+                                    {weekdays.map((day, key) => (
+                                        <div key={key} className="day-check-container">
+                                            {t(day.label)}
+                                            <br/>
+                                            <Field type="checkbox" name="repeatOn" value={day.name}/>
+                                        </div>
+                                    ))}
+                                </td>
+                            </tr>
+                        </>
+                    )}
                     <tr>
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME')} <i className="required">*</i></td>
                         <td>
-                            {/* todo: Options von wizard.step.hours*/}
-                            <select tabIndex="5"
-                                    placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
+                            {/* one options for each entry in hours*/}
+                            {/* todo: check for conflicts*/}
+                            <Field tabIndex="5"
+                                   as="select"
+                                   name="scheduleStartTimeHour"
+                                   placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
                                 <option value="" />
-                            </select>
-                            {/* todo: Options von wizard.step.minute*/}
-                            <select tabIndex="6"
-                                    placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
+                                {hours.map(i => (
+                                    <option value={i.value}>{i.value}</option>
+                                ))}
+                            </Field>
+                            {/* one options for each entry in minutes*/}
+                            {/* todo: check for conflicts*/}
+                            <Field tabIndex="6"
+                                   as="select"
+                                   name="scheduleStartTimeMinutes"
+                                   placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
                                 <option value=""/>
-                            </select>
+                                {minutes.map((i) => (
+                                    <option value={i.value}>{i.value}</option>
+                                ))}
+                            </Field>
                         </td>
                     </tr>
                     <tr>
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION')} <i className="required">*</i></td>
                         <td>
-                            {/* todo: Options von wizard.step.hours and check for conflicts*/}
-                            <select tabIndex="7"
-                                    placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
+                            {/* one options for each entry in hours*/}
+                            {/* todo: check for conflicts*/}
+                            <Field tabIndex="7"
+                                   as="select"
+                                   name="scheduleDurationHour"
+                                   placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
                                 <option value="" />
-                            </select>
-                            {/* todo: Options von wizard.step.minute and check for conflicts*/}
-                            <select tabIndex="8"
-                                    placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
+                                {hours.map((i) => (
+                                    <option value={i.value}>{i.value}</option>
+                                ))}
+                            </Field>
+                            {/* one options for each entry in minutes*/}
+                            {/* todo: check for conflicts*/}
+                            <Field tabIndex="8"
+                                   as="select"
+                                   name="scheduleDurationMinutes"
+                                   placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
                                 <option value=""/>
-                            </select>
+                                {minutes.map((i) => (
+                                    <option value={i.value}>{i.value}</option>
+                                ))}
+                            </Field>
                         </td>
                     </tr>
                     <tr>
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME')} <i className="required">*</i></td>
                         <td>
-                            {/* todo: Options von wizard.step.hours and check for conflicts*/}
-                            <select tabIndex="9"
-                                    placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
+                            {/* one options for each entry in hours*/}
+                            {/* todo: check for conflicts*/}
+                            <Field tabIndex="9"
+                                   as="select"
+                                   name="scheduleEndTimeHour"
+                                   placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}>
                                 <option value="" />
-                            </select>
-                            {/* todo: Options von wizard.step.minute and check for conflicts*/}
-                            <select tabIndex="10"
-                                    placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
+                                {hours.map((i) => (
+                                    <option value={i.value}>{i.value}</option>
+                                ))}
+                            </Field>
+                            {/* one options for each entry in minutes*/}
+                            {/* todo: check for conflicts*/}
+                            <Field tabIndex="10"
+                                   as="select"
+                                   name="scheduleEndTimeMinutes"
+                                   placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}>
                                 <option value=""/>
-                            </select>
+                                {minutes.map((i) => (
+                                    <option value={i.value}>{i.value}</option>
+                                ))}
+                            </Field>
                         </td>
                     </tr>
                     <tr>
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')} <i className="required">*</i></td>
-                        {/* todo: Options available capture agents  and check for conflicts*/}
+                        {/* one options for each capture agents that has input options */}
+                        {/* todo: check for conflicts */}
                         <td>
                             <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
-                                    tabIndex="11">
+                                    tabIndex="11"
+                                    onChange={e => {
+                                        formik.setFieldValue("location", e.target.value);
+                                        formik.setFieldValue("deviceInputs", []);
+                                    }}
+                                    name="location">
                                 <option value=""/>
+                                {inputDevices.map((inputDevice, key) => (
+                                    <option key={key} value={inputDevice.Name}>{inputDevice.Name}</option>
+                                ))}
                             </select>
                         </td>
                     </tr>
                     <tr>
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS')} <i className="required">*</i></td>
                         <td>
-                            {/* todo: repeat for each input method of chosen device */}
-                            <label>
-                                <input type="checkbox" tabIndex="12"/>
-                                Translate inputMethod.id
-                            </label>
+                            {/* Render checkbox for each input option of the selected input device*/}
+                            {renderInputDeviceOptions()}
                         </td>
                     </tr>
                 </table>
@@ -263,123 +367,16 @@ const ScheduleSingle = ({ }) => {
     );
 };
 
-const ScheduleMultiple = ({ }) => {
-    const { t } = useTranslation();
 
-    return (
-        <div className="obj">
-            <header>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.CAPTION')}</header>
-            <div className="obj-container">
-                <table className="main-tbl">
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.TIMEZONE')}</td>
-                        <td>{'UTC' + getTimezoneOffset()}</td>
-                    </tr>
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE')} <i className="required">*</i></td>
-                        <td>
-                            {/*todo: Set value and onChange according formik field*/}
-                            <ThemeProvider theme={theme}>
-                                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                    <DatePicker tabIndex="4"
-                                                disableToolbar
-                                                format="dd/MM/yyyy"/>
-                                </MuiPickersUtilsProvider>
-                            </ThemeProvider>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE')} <i className="required">*</i></td>
-                        <td>
-                            {/*todo: Set value and onChange according formik field*/}
-                            <ThemeProvider theme={theme}>
-                                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                    <DatePicker tabIndex="5"
-                                                disableToolbar
-                                                format="dd/MM/yyyy"/>
-                                </MuiPickersUtilsProvider>
-                            </ThemeProvider>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.REPEAT_ON')} <i className="required">*</i></td>
-                        <td>
-                            {/* todo: repeat for each week day*/}
-                            <div className="day-check-container">Weekday Translation
-                                <br />
-                                <input type="checkbox"/>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME')} <i className="required">*</i></td>
-                        <td>
-                            {/* todo: Options von wizard.step.hours and check for conflicts*/}
-                            <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}
-                                    tabIndex="7">
-                                <option value=""/>
-                            </select>
-                            {/* todo: Options von wizard.step.minute and check for conflicts*/}
-                            <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}
-                                    tabIndex="8">
-                                <option value=""/>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION')} <i className="required">*</i></td>
-                        <td>
-                            {/* todo: Options von wizard.step.hours and check for conflicts*/}
-                            <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}
-                                    tabIndex="9">
-                                <option value=""/>
-                            </select>
-                            {/* todo: Options von wizard.step.minute and check for conflicts*/}
-                            <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}
-                                    tabIndex="10">
-                                <option value=""/>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME')} <i className="required">*</i></td>
-                        <td>
-                            {/* todo: Options von wizard.step.hours and check for conflicts*/}
-                            <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR')}
-                                    tabIndex="15">
-                                <option value=""/>
-                            </select>
-                            {/* todo: Options von wizard.step.minute and check for conflicts*/}
-                            <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE')}
-                                    tabIndex="16">
-                                <option value=""/>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')} <i className="required">*</i></td>
-                        {/* todo: Options available capture agents  and check for conflicts*/}
-                        <td>
-                            <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
-                                    tabIndex="19">
-                                <option value=""/>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS')} <i className="required">*</i></td>
-                        <td>
-                            {/* todo: repeat for each input method of chosen device */}
-                            <label>
-                                <input type="checkbox" tabIndex="20"/>
-                                Translate inputMethod.id
-                            </label>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-    );
-}
+// Getting state data out of redux store
+const mapStateToProps = state => ({
+    inputDevices: getRecordings(state)
+});
 
-export default NewEventSource;
+// Mapping actions to dispatch
+const mapDispatchToProps = dispatch => ({
+    loadingInputDevices: () => dispatch(fetchRecordings("inputs"))
+});
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(NewEventSource);

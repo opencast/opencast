@@ -14,7 +14,7 @@ import {NewEventSchema} from "./validate";
 import {makeStyles, Step, StepLabel, Stepper,} from '@material-ui/core';
 import {FaCircle, FaDotCircle} from "react-icons/all";
 import {useTranslation} from "react-i18next";
-import {sourceMetadata} from "../../../../configs/newEventConfigs/sourceConfig";
+import {sourceMetadata, uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConfig";
 import {initialFormValuesNewEvents} from "../../../../configs/newEventConfigs/newEventWizardStates";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
@@ -176,6 +176,15 @@ const getInitialValues = metadataFields => {
     if (!!sourceMetadata.MULTIPLE_SCHEDULE) {
         sourceMetadata.MULTIPLE_SCHEDULE.metadata.forEach(field => {
             initialValues[field.id] = field.value;
+        });
+    }
+
+    // Add possible files that can be uploaded in source step
+    // Todo: exchange uploadAssetOptions with Function for getting these options
+    if (!!uploadAssetOptions) {
+        uploadAssetOptions.forEach(option => {
+            // needs to be null, because it will save a object (file) not string or int
+            initialValues[option.id] = null;
         });
     }
 

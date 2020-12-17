@@ -7,7 +7,11 @@ import i18n from "../i18n/i18n";
 
 export const getTimezoneOffset = () => {
     let d = new Date();
-    let offset = d.getTimezoneOffset();
+    let offset = d.getTimezoneOffset() * -1;
+
+    if (offset >= 0) {
+        return "+" + offset/60;
+    }
 
     return offset/60;
 };
@@ -20,4 +24,24 @@ export const getCurrentLanguageInformation = () => {
     }
 
     return currentLang;
+}
+
+// fills an array from 00 to number of elements specified
+export const initArray = (numberOfElements) => {
+    let i, result = [];
+    for (i = 0; i < numberOfElements; i++) {
+        if (i < 10) {
+            result.push({
+                index: i,
+                value: '0' + i
+            });
+        }
+        else {
+            result.push({
+                index: i,
+                value: '' + i
+            });
+        }
+    }
+    return result;
 }
