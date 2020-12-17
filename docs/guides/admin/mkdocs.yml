@@ -58,6 +58,7 @@ nav:
       - Using Apache httpd: configuration/https/apache-httpd.md
       - Internal HTTPS: 'configuration/https/opencast.only.md'
       - Migrating old content to HTTPS: 'configuration/https/migration.md'
+   - Firewall: 'configuration/firewall.md'
    - Asset Manager: 'configuration/asset-manager.md'
    - Message Broker: 'configuration/message-broker.md'
    - Metadata: 'configuration/metadata.md'

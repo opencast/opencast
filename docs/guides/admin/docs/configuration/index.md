@@ -11,6 +11,7 @@ General Configuration
 - [Basic Configuration](basic.md)
 - [Database Configuration](database.md)
 - [HTTPS Configuration](https/index.md)
+- [Firewall Configuration](firewall.md)
 - [Encoding Profile Configuration](encoding.md)
 - [List Providers](listproviders.md)
 - [Load Configuration](load.md)
