@@ -18,7 +18,9 @@ Requires python virtual environment.
 % cd guides
 % virtualenv venv
 % . ./venv/bin/activate
-% pip install mkdocs markdown_inline_graphviz_extension mkdocs-windmill
+% pip install mkdocs mkdocs-windmill
+% pip install markdown_inline_graphviz_extension
+% pip install markdown-inline-graphviz-extension-png
 % cd developer
 % python -m mkdocs serve
 ```
