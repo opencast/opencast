@@ -108,6 +108,12 @@ API changes
   different types of events in one request
 - The Series API can now return ACLs within its response, if you tell it to
 
+Additional Notes about 9.1
+--------------------------
+
+This release contains an important bugfix where unprivileged users
+could not upload videos, before.
+
 
 Release Schedule
 ----------------

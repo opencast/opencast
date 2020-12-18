@@ -24,6 +24,10 @@ Please make sure to compare your configuration against the current configuration
 - The default for the configuration option `lti.create_jpa_user_reference` changed from `false` (Opencast 8.3) to `true`.
 - Make sure to have `?useMysqlMetadata=true` appended to `org.opencastproject.db.jdbc.url` if you use MariaDB as
   database.
+- Opencast Studio now uses TOML instead of JSON as configuration format. Additionally, the ACL template is
+  now specified as a string in the TOML file and not as a separate file (usually `acl.xml`) anymore. Finally,
+  the variables passed into the Mustache ACL template have changed. For more information, see
+  [this document](https://github.com/elan-ev/opencast-studio/blob/2020-09-14/CONFIGURATION.md).
 
 Install and configure a standalone Elasticsearch node
 -----------------------------------------------------
