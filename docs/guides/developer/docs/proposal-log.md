@@ -10,6 +10,54 @@ Passed Proposals
 ----------------
 
 
+### Relocate build infrastructure to main repository
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 17 Dec 2020
+
+```no-highlight
+Hi everyone,
+as you are all aware there are multiple community members working on
+and maintaining infrastructure for different binary builds. For
+example, Greg is doing the Debian packages.
+
+All these are currently maintained in separate repositories… somewhere.
+Greg and I would like to bring these back to the main repositories to
+not loose track of what's available and where things are living.
+
+But maintaining these sometimes requires quick actions and we cannot
+really create a pull request every time a release is cut and then wait
+a week or two before it's merged until we can release the packaged
+version.
+
+That is why I #propose to allow for maintainers of these areas to work
+on these directly without running through our usual pull request and
+review rules.
+
+For example, that could mean that I could quickly update the RPM spec
+file if necessary while I would not be allowed to just modify the
+codebase (e.g. modules/*) on my own.
+
+Initially, I #propose the following areas and maintainers:
+
+  Debian build architecture              Greg Logan
+  RPM build architecture                 Lars Kiesow
+  docs.opencast.org build architecture   Lars Kiesow
+
+This doesn't really change anything at the moment since we are already
+in control of these parts right now. The difference would be that it's
+not maintained somewhere any longer but everyone knows where to find
+things and (potentially) how contribute.
+
+Of course, we can extend this whenever we need to to include more/less
+scripts. Though I suggest that we keep this to what we officially
+support.
+
+As usual, this proposal passes unless someone vetos it in the next 72h.
+
+Best regards,
+Lars
+```
+
+
 ### JDK Support
 Proposed by Greg Logan<gregorydlogan@gmail.com>, passed on Wed, 11 Nov 2020
 
