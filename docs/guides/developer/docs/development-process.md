@@ -97,7 +97,7 @@ Swift overview:
 To get a closer look at the branching model, let us consider a simple example with a single release:
 
 
-{% dot branching-simple.svg
+```graphviz dot branching-simple.png
 
 /**
     develop ---*----*----*------*------- ... -----------*-->
@@ -145,7 +145,7 @@ digraph G {
   r2 -> d4;
   r5 -> d7;
 }
-%}
+```
 
 As described above, `develop` is the branch used for preparing the next version. At some point marked in the release
 schedule, the release branch is cut from `develop`. This action also marks the feature freeze for that version since
@@ -173,7 +173,7 @@ to create a new maintenance release. The version `6.1` above is an example of th
 
 With Opencast supporting two major releases, you may find not one, but up to three active release branches.
 
-{% dot branching-two-versions.svg
+```graphviz dot branching-two-versions.png
 
 /**
     develop ---*-----*-----*------*-----*- ... -----------*------*------*---->
@@ -236,7 +236,7 @@ digraph G {
   r23 -> d9;
   r25 -> d11;
 }
-%}
+```
 
 Mostly, this is just the same as the simpler model from before. The branches exist separately from each other and only
 interact through merges from older to newer versions so that bug fixes from a release branch will automatically become
@@ -295,7 +295,7 @@ the next release branch is cut.
 
 Git tags are used to mark Opencast releases. Here is how a release looks like in the history:
 
-{% dot branching-tags.svg
+```graphviz dot branching-tags.png
 
 /**
     r/7.x  ------------(A)---->
@@ -322,7 +322,7 @@ digraph G {
   // branch names
   begin[shape=plaintext, label="r/7.x", fixedsize=false];
 }
-%}
+```
 
 To create a version based on a given state of the release branch (commit `A`), the release manager will branch off from
 this commit, make the necessary version changes to all `pom.xml` files and create a commit which is then finally tagged.
