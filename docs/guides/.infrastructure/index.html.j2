@@ -12,25 +12,9 @@
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
-    <script type=application/javascript src=versions.js></script>
-    <script type=application/javascript>
-      function init() {
-        var admin = '',
-            developer = '';
-        for (var i=0; i<versions.length; i++) {
-          admin += '<li role="presentation"><a role="menuitem" tabindex="-1" '
-            + 'href="' + versions[i] + '/admin">' + versions[i] + '</a></li>';
-          developer += '<li role="presentation"><a role="menuitem" tabindex="-1" '
-            + 'href="' + versions[i] + '/developer">' + versions[i] + '</a></li>';
-        }
-        document.getElementById('adminGuides').innerHTML = admin;
-        document.getElementById('developerGuides').innerHTML = developer;
-      }
-    </script>
   </head>
 
-  <body onload="init();">
+  <body>
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
@@ -53,7 +37,19 @@
               <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="adminGuides">
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="http://docs.opencast.org/develop/admin">Develop</a></li>
+              {% for version in version_info -%}
+                <li role="presentation">
+                  <a role="menuitem"
+                     tabindex="-1"
+                     href="http://docs.opencast.org/{{ version['branch'] }}/admin"
+                     style="display: flex; justify-content: space-between;">
+                    <span>{{ version['name'] }}</span>
+                    {%- if version['attribute'] -%}
+                    <span style="color: #888; font-size: smaller">({{ version['attribute'] }})</span>
+                    {%- endif %}
+                  </a>
+                </li>
+              {% endfor %}
             </ul>
           </div>
         </div>
@@ -66,7 +62,19 @@
               <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="developerGuides">
-              <li role="presentation"><a role="menuitem" tabindex="-1" href="http://docs.opencast.org/develop/developer">Develop</a></li>
+              {% for version in version_info -%}
+                <li role="presentation">
+                  <a role="menuitem"
+                     tabindex="-1"
+                     href="http://docs.opencast.org/{{ version['branch'] }}/developer"
+                     style="display: flex; justify-content: space-between;">
+                    <span>{{ version['name'] }}</span>
+                    {%- if version['attribute'] -%}
+                    <span style="color: #888; font-size: smaller">({{ version['attribute'] }})</span>
+                    {%- endif %}
+                  </a>
+                </li>
+              {% endfor %}
             </ul>
           </div>
         </div>
