@@ -7,7 +7,8 @@ on:
       - 'develop'
 
 jobs:
-  main:
+  deploy-documentation:
+    if: github.repository_owner == 'opencast'
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
