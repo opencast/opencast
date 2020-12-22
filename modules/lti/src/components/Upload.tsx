@@ -100,12 +100,6 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
                             seriesId: seriesId
                         },
                     });
-
-                    const timerMillis = 1000;
-                    this.setState({
-                        ...this.state,
-                        refreshTimerId: setInterval(this.refreshTimer.bind(this), timerMillis),
-                    });
                 }
             }
         }).catch((_) => this.setState({
@@ -114,31 +108,10 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
         }));
     }
 
-    componentWillUnmount() {
-        if (this.state.refreshTimerId !== undefined)
-            clearInterval(this.state.refreshTimerId);
-    }
-
-    refreshTimer() {
-        getEventMetadata(this.state.eventId).then((metadataCollection) => {
-            if (this.state.metadata === undefined || this.state.metadata === "error" || metadataCollection.length === 0)
-                return;
-
-            const metadata = metadataCollection[0];
-            const lockedBefore = this.state.metadata.edited.locked !== undefined;
-            const lockedAfter = metadata.locked !== undefined;
-            if (lockedBefore !== lockedAfter) {
-                this.setState({
-                    ...this.state,
-                    metadata: {
-                        ...this.state.metadata,
-                        initial: metadata,
-                        edited: metadata,
-                    },
-                });
-            }
-        }).catch((_) => {
-            console.log("couldn't retrieve metadata at this time, ignoring...");
+    setUploadPogress(progress: number) {
+        this.setState({
+            ...this.state,
+            uploadProgress: progress
         });
     }
 
