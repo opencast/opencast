@@ -253,6 +253,8 @@ export async function uploadFile(
     eventId?: string,
     presenterFile?: Blob,
     captionFile?: Blob,
+    captionFormat?: string,
+    captionLanguage?: string,
     setUploadPogress?: (progress: number) => void): Promise<{}> {
     const percentage = 100;
     const data = new FormData();
@@ -264,6 +266,10 @@ export async function uploadFile(
         data.append("captions", captionFile);
     if (presenterFile !== undefined)
         data.append("presenter", presenterFile);
+    if (captionFormat !== undefined)
+        data.append("captionFormat", captionFormat);
+    if (captionLanguage !== undefined)
+        data.append("captionLanguage", captionLanguage);
     return axios.post(
         hostAndPort() + "/lti-service-gui",
         data,

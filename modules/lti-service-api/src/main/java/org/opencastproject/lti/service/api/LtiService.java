@@ -49,6 +49,8 @@ public interface LtiService {
   void upsertEvent(
           LtiFileUpload file,
           String captions,
+          String captionsFormat,
+          String captionsLanguage,
           String eventId,
           String seriesId,
           String metadataJson) throws UnauthorizedException, NotFoundException;

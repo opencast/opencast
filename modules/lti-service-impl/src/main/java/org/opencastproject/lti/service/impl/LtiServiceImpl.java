@@ -235,6 +235,8 @@ public class LtiServiceImpl implements LtiService, ManagedService {
   public void upsertEvent(
           final LtiFileUpload file,
           final String captions,
+          final String captionsFormat,
+          final String captionsLanguage,
           final String eventId,
           final String seriesId,
           final String metadataJson) throws UnauthorizedException, NotFoundException {
@@ -251,19 +253,23 @@ public class LtiServiceImpl implements LtiService, ManagedService {
         throw new RuntimeException("Unable to create media package for event");
       }
       if (captions != null) {
-        final MediaPackageElementFlavor captionsFlavor = new MediaPackageElementFlavor("captions", "vtt+en");
+        final MediaPackageElementFlavor captionsFlavor = new MediaPackageElementFlavor(captionsFormat + "+" + captionsLanguage, "captions");
         final MediaPackageElementBuilder elementBuilder
             = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         final MediaPackageElement captionsMpe = elementBuilder
                 .newElement(MediaPackageElement.Type.Attachment, captionsFlavor);
-        captionsMpe.setMimeType(mimeType("text", "vtt"));
-        captionsMpe.addTag("lang:en");
+        if ("dfxp".equals(captionsFormat)) {
+          captionsMpe.setMimeType(mimeType("application", "xml"));
+        } else {
+          captionsMpe.setMimeType(mimeType("text", captionsFormat));
+        }
+        captionsMpe.addTag("lang:" + captionsLanguage);
         mp.add(captionsMpe);
         final URI captionsUri = workspace
                 .put(
                         mp.getIdentifier().toString(),
                         captionsMpe.getIdentifier(),
-                        "captions.vtt",
+                        "captions." + captionsFormat,
                         new ByteArrayInputStream(captions.getBytes(StandardCharsets.UTF_8)));
         captionsMpe.setURI(captionsUri);
       }

@@ -199,6 +199,8 @@ public class LtiServiceGuiEndpoint {
     String seriesId = "";
     try {
       String captions = null;
+      String captionsFormat = null;
+      String captionsLanguage = null;
       String metadata = null;
       String eventId = null;
       for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
@@ -210,6 +212,10 @@ public class LtiServiceGuiEndpoint {
           metadata = Streams.asString(item.openStream());
         } else if ("captions".equals(fieldName)) {
           captions = Streams.asString(item.openStream());
+        } else if ("captionsFormat".equals(fieldName)) {
+          captionsFormat = Streams.asString(item.openStream());
+        } else if ("captionsLanguage".equals(fieldName)) {
+          captionsLanguage = Streams.asString(item.openStream());
         } else if ("seriesId".equals(fieldName)) {
           final String fieldValue = Streams.asString(item.openStream());
           if (!fieldValue.isEmpty()) {
@@ -219,6 +225,8 @@ public class LtiServiceGuiEndpoint {
           service.upsertEvent(
                   new LtiFileUpload(item.openStream(), item.getName()),
                   captions,
+                  captionsFormat,
+                  captionsLanguage,
                   eventId,
                   seriesId,
                   metadata);
@@ -228,6 +236,8 @@ public class LtiServiceGuiEndpoint {
       service.upsertEvent(
               null,
               captions,
+              captionsFormat,
+              captionsLanguage,
               eventId,
               seriesId,
               metadata);
