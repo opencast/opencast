@@ -411,9 +411,6 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         if (srcTagList.isEmpty() && srcTag != null) {
           srcTagList.add(srcTag);
         }
-        if (srcTagList.isEmpty()) {
-          logger.warn("Configuration keys '" + SOURCE_TAGS + "and" + SOURCE_TAG + "' are empty");
-        }
         break;
       default:
         throw new WorkflowOperationException("Couldn't process srcTags configuration option!");
@@ -444,15 +441,11 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         if (srcFlavorList.isEmpty() && sourceFlavor != null) {
           srcFlavorList.add(sourceFlavor);
         }
-        if (srcFlavorList.isEmpty()) {
-          logger.warn("Configuration keys '" + SOURCE_FLAVORS + "and" + SOURCE_FLAVOR + "' are empty");
-        } else {
-          for (String elem : srcFlavorList) {
-            try {
-              flavor = MediaPackageElementFlavor.parseFlavor(elem);
-            } catch (IllegalArgumentException e) {
-              throw new WorkflowOperationException(elem + " is not a valid flavor!");
-            }
+        for (String elem : srcFlavorList) {
+          try {
+            flavor = MediaPackageElementFlavor.parseFlavor(elem);
+          } catch (IllegalArgumentException e) {
+            throw new WorkflowOperationException(elem + " is not a valid flavor!");
           }
         }
         break;
@@ -479,9 +472,6 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         targetTag = StringUtils.trimToNull(woi.getConfiguration(TARGET_TAG));
         if (targetTagList.isEmpty() && targetTag != null) {
           targetTagList.add(targetTag);
-        }
-        if (targetTagList.isEmpty()) {
-          logger.warn("Configuration keys '" + TARGET_TAGS + "and" + TARGET_TAG + "' are empty");
         }
         break;
       default:
@@ -513,15 +503,11 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         if (targetFlavorList.isEmpty() && targetFlavor != null) {
           targetFlavorList.add(targetFlavor);
         }
-        if (targetTagList.isEmpty()) {
-          logger.warn("Configuration key '" + TARGET_FLAVORS + "and" + TARGET_FLAVOR + "' are empty");
-        } else {
-          for (String elem : targetFlavorList) {
-            try {
-              flavor = MediaPackageElementFlavor.parseFlavor(elem);
-            } catch (IllegalArgumentException e) {
-              throw new WorkflowOperationException(elem + " is not a valid flavor!");
-            }
+        for (String elem : targetFlavorList) {
+          try {
+            flavor = MediaPackageElementFlavor.parseFlavor(elem);
+          } catch (IllegalArgumentException e) {
+            throw new WorkflowOperationException(elem + " is not a valid flavor!");
           }
         }
         break;
