@@ -34,7 +34,7 @@ angular.module('adminNg.controllers')
         sortable: true
       }, {
         template: 'modules/events/partials/seriesCreatorsCell.html',
-        name:  'creators',
+        name:  'creator',
         label: 'EVENTS.SERIES.TABLE.ORGANIZERS',
         sortable: true
       }, {
