@@ -76,6 +76,12 @@ API changes
     - DELETE /workflow/definition/{id}
     - PUT /workflow/definition
 
+Additional Notes about 8.10
+---------------------------
+
+This release contains an important bugfix where unprivileged users could not upload videos.
+
+
 Additional Notes about 8.9
 --------------------------
 
