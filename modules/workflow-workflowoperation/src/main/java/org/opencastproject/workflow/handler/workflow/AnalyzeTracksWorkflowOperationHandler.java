@@ -68,17 +68,16 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
 
     logger.info("Running analyze-tracks workflow operation on workflow {}", workflowInstance.getId());
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
-    final String sourceFlavor = getConfig(workflowInstance, OPT_SOURCE_FLAVOR);
     Map<String, String> properties = new HashMap<>();
 
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.one, Configuration.none, Configuration.none);
-    final MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(tagsAndFlavors.getSingleSrcFlavor());
-    final Track[] tracks = mediaPackage.getTracks(flavor);
+    final MediaPackageElementFlavor singleSourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
+    final Track[] tracks = mediaPackage.getTracks(singleSourceFlavor);
     if (tracks.length <= 0) {
       if (BooleanUtils.toBoolean(getConfig(workflowInstance, OPT_FAIL_NO_TRACK, "false"))) {
-        throw new WorkflowOperationException("No matching tracks for flavor " + sourceFlavor);
+        throw new WorkflowOperationException("No matching tracks for flavor " + singleSourceFlavor.toString());
       }
-      logger.info("No tracks with specified flavors ({}) to analyse.", sourceFlavor);
+      logger.info("No tracks with specified flavors ({}) to analyse.", singleSourceFlavor.toString());
       return createResult(mediaPackage, properties, Action.CONTINUE, 0);
     }
 

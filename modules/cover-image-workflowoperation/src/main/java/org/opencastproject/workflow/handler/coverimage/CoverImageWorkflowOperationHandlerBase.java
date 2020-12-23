@@ -134,12 +134,12 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
 
     // Read target flavor
-    String targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
+    MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
 
     Job generate;
     try {
       generate = getCoverImageService().generateCoverImage(xml, xsl, String.valueOf(width), String.valueOf(height),
-              posterImgUri, targetFlavor);
+              posterImgUri, targetFlavor.toString());
       logger.debug("Job for cover image generation created");
 
       if (!waitForStatus(generate).isSuccess()) {
@@ -158,9 +158,7 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
       // Add tags
       for (String tag : tagsAndFlavors.getTargetTags()) {
         logger.trace("Tagging image with '{}'", tag);
-        if (StringUtils.trimToNull(tag) != null) {
-          coverImage.addTag(tag);
-        }
+        coverImage.addTag(tag);
       }
 
       mediaPackage.add(coverImage);
