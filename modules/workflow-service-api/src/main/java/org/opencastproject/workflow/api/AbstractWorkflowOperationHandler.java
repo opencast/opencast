@@ -387,8 +387,8 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    * @param targetTags none, one or many
    * @return ConfiguredTagsAndFlavors object including lists for the configured tags/flavors
    */
-  protected ConfiguredTagsAndFlavors getTagsAndFlavors(WorkflowInstance wi, Configuration srcTags, Configuration srcFlavors, Configuration targetTags, Configuration targetFlavors) throws WorkflowOperationException {
-    WorkflowOperationInstance woi = wi.getCurrentOperation();
+  protected ConfiguredTagsAndFlavors getTagsAndFlavors(WorkflowInstance workflow, Configuration srcTags, Configuration srcFlavors, Configuration targetTags, Configuration targetFlavors) throws WorkflowOperationException {
+    WorkflowOperationInstance operation = workflow.getCurrentOperation();
     ConfiguredTagsAndFlavors tagsAndFlavors = new ConfiguredTagsAndFlavors();
     MediaPackageElementFlavor flavor;
 
@@ -398,16 +398,15 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
       case none:
         break;
       case one:
-        srcTag = StringUtils.trimToNull(woi.getConfiguration(SOURCE_TAG));
+        srcTag = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAG));
         if (srcTag == null) {
           throw new WorkflowOperationException("Configuration key '" + SOURCE_TAG + "' must be set");
-        } else {
-          srcTagList.add(srcTag);
         }
+        srcTagList.add(srcTag);
         break;
       case many:
-        srcTagList = asList(StringUtils.trimToNull(woi.getConfiguration(SOURCE_TAGS)));
-        srcTag = StringUtils.trimToNull(woi.getConfiguration(SOURCE_TAG));
+        srcTagList = asList(StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS)));
+        srcTag = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAG));
         if (srcTagList.isEmpty() && srcTag != null) {
           srcTagList.add(srcTag);
         }
@@ -423,7 +422,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
       case none:
         break;
       case one:
-        singleSourceFlavor = StringUtils.trimToNull(woi.getConfiguration(SOURCE_FLAVOR));
+        singleSourceFlavor = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR));
         if (singleSourceFlavor == null) {
           throw new WorkflowOperationException("Configuration key '" + SOURCE_FLAVOR + "' must be set");
         }
@@ -433,12 +432,11 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
           throw new WorkflowOperationException(singleSourceFlavor + " is not a valid flavor!");
         }
         srcFlavorList.add(flavor);
-
         break;
       case many:
-        List<String> srcFlavorString = asList(StringUtils.trimToNull(woi.getConfiguration(SOURCE_FLAVORS)));
-        singleSourceFlavor = StringUtils.trimToNull(woi.getConfiguration(SOURCE_FLAVOR));
-        if (srcFlavorList.isEmpty() && singleSourceFlavor != null) {
+        List<String> srcFlavorString = asList(StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVORS)));
+        singleSourceFlavor = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR));
+        if (srcFlavorString.isEmpty() && singleSourceFlavor != null) {
           srcFlavorString.add(singleSourceFlavor);
         }
         for (String elem : srcFlavorString) {
@@ -461,16 +459,15 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
       case none:
         break;
       case one:
-        targetTag = StringUtils.trimToNull(woi.getConfiguration(TARGET_TAG));
+        targetTag = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAG));
         if (targetTag == null) {
           throw new WorkflowOperationException("Configuration key '" + TARGET_TAG + "' must be set");
-        } else {
-          targetTagList.add(targetTag);
         }
+        targetTagList.add(targetTag);
         break;
       case many:
-        targetTagList = asList(StringUtils.trimToNull(woi.getConfiguration(TARGET_TAGS)));
-        targetTag = StringUtils.trimToNull(woi.getConfiguration(TARGET_TAG));
+        targetTagList = asList(StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS)));
+        targetTag = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAG));
         if (targetTagList.isEmpty() && targetTag != null) {
           targetTagList.add(targetTag);
         }
@@ -486,7 +483,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
       case none:
         break;
       case one:
-        singleTargetFlavor = StringUtils.trimToNull(woi.getConfiguration(TARGET_FLAVOR));
+        singleTargetFlavor = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR));
         if (singleTargetFlavor == null) {
           throw new WorkflowOperationException("Configuration key '" + TARGET_FLAVOR + "' must be set");
         }
@@ -498,9 +495,9 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         targetFlavorList.add(flavor);
         break;
       case many:
-        List<String> targetFlavorString = asList(StringUtils.trimToNull(woi.getConfiguration(TARGET_FLAVORS)));
-        singleTargetFlavor = StringUtils.trimToNull(woi.getConfiguration(TARGET_FLAVOR));
-        if (targetFlavorList.isEmpty() && singleTargetFlavor != null) {
+        List<String> targetFlavorString = asList(StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVORS)));
+        singleTargetFlavor = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR));
+        if (targetFlavorString.isEmpty() && singleTargetFlavor != null) {
           targetFlavorString.add(singleTargetFlavor);
         }
         for (String elem : targetFlavorString) {

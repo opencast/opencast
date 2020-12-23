@@ -21,6 +21,7 @@
 package org.opencastproject.workflow.api;
 
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,7 @@ import java.util.List;
 /**
  * Class for Handling source/target tags and flavors.
  * Consists of four lists each containing a number of configured source/target tags and flavors.
+ * Tags are stored as strings, while flavors ar stored as flavor objects.
  */
 public class ConfiguredTagsAndFlavors {
 
