@@ -20,6 +20,7 @@
  */
 package org.opencastproject.workflow.api;
 
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +35,8 @@ public class ConfiguredTagsAndFlavors {
 
     private List<String> srcTags;
     private List<String> targetTags;
-    private List<String> srcFlavors;
-    private List<String> targetFlavors;
+    private List<MediaPackageElementFlavor> srcFlavors;
+    private List<MediaPackageElementFlavor> targetFlavors;
 
     /** The logging facility */
     private static final Logger logger = LoggerFactory.getLogger(ConfiguredTagsAndFlavors.class);
@@ -64,14 +65,14 @@ public class ConfiguredTagsAndFlavors {
     /**
      * Return all configured source-flavors as a list
      */
-    public List<String> getSrcFlavors() {
+    public List<MediaPackageElementFlavor> getSrcFlavors() {
         return this.srcFlavors;
     }
 
     /**
      * Return all configured target-flavors as a list
      */
-    public List<String> getTargetFlavors() {
+    public List<MediaPackageElementFlavor> getTargetFlavors() {
         return this.targetFlavors;
     }
 
@@ -98,7 +99,7 @@ public class ConfiguredTagsAndFlavors {
     /**
      * Return a single source flavor
      */
-    public String getSingleSrcFlavor() {
+    public MediaPackageElementFlavor getSingleSrcFlavor() {
         if (this.srcFlavors.isEmpty()) {
             throw new IllegalStateException("No source-flavor was configured!");
         }
@@ -108,7 +109,7 @@ public class ConfiguredTagsAndFlavors {
     /**
      * Return a single target flavor
      */
-    public String getSingleTargetFlavor() {
+    public MediaPackageElementFlavor getSingleTargetFlavor() {
         if (this.targetFlavors.isEmpty()) {
             throw new IllegalStateException("No target-flavor was configured!");
         }
@@ -134,7 +135,7 @@ public class ConfiguredTagsAndFlavors {
     /**
      * Setter for srcFlavors list
      */
-    protected void setSrcFlavors(List<String> srcFlavors) {
+    protected void setSrcFlavors(List<MediaPackageElementFlavor> srcFlavors) {
         this.srcFlavors = srcFlavors;
         logger.info("Added " + srcFlavors.size() + " elements to srcFlavors list");
     }
@@ -142,7 +143,7 @@ public class ConfiguredTagsAndFlavors {
     /**
      * Setter for targetFlavor list
      */
-    protected void setTargetFlavors(List<String> targetFlavors) {
+    protected void setTargetFlavors(List<MediaPackageElementFlavor> targetFlavors) {
         this.targetFlavors = targetFlavors;
         logger.info("Added " + targetFlavors.size() + " elements to targetFlavors list");
     }

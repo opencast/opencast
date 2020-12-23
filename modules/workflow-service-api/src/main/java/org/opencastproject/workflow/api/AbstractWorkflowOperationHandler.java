@@ -417,33 +417,34 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     }
     tagsAndFlavors.setSrcTags(srcTagList);
 
-    List<String> srcFlavorList = new ArrayList<>();
-    String sourceFlavor;
+    List<MediaPackageElementFlavor> srcFlavorList = new ArrayList<>();
+    String singleSourceFlavor;
     switch(srcFlavors) {
       case none:
         break;
       case one:
-        sourceFlavor = StringUtils.trimToNull(woi.getConfiguration(SOURCE_FLAVOR));
-        if (sourceFlavor == null) {
+        singleSourceFlavor = StringUtils.trimToNull(woi.getConfiguration(SOURCE_FLAVOR));
+        if (singleSourceFlavor == null) {
           throw new WorkflowOperationException("Configuration key '" + SOURCE_FLAVOR + "' must be set");
-        } else {
-          srcFlavorList.add(sourceFlavor);
-          try {
-            flavor = MediaPackageElementFlavor.parseFlavor(srcFlavorList.get(0));
-          } catch (IllegalArgumentException e) {
-            throw new WorkflowOperationException(srcFlavorList.get(0) + " is not a valid flavor!");
-          }
         }
+        try {
+          flavor = MediaPackageElementFlavor.parseFlavor(singleSourceFlavor);
+        } catch (IllegalArgumentException e) {
+          throw new WorkflowOperationException(singleSourceFlavor + " is not a valid flavor!");
+        }
+        srcFlavorList.add(flavor);
+
         break;
       case many:
-        srcFlavorList = asList(StringUtils.trimToNull(woi.getConfiguration(SOURCE_FLAVORS)));
-        sourceFlavor = StringUtils.trimToNull(woi.getConfiguration(SOURCE_FLAVOR));
-        if (srcFlavorList.isEmpty() && sourceFlavor != null) {
-          srcFlavorList.add(sourceFlavor);
+        List<String> srcFlavorString = asList(StringUtils.trimToNull(woi.getConfiguration(SOURCE_FLAVORS)));
+        singleSourceFlavor = StringUtils.trimToNull(woi.getConfiguration(SOURCE_FLAVOR));
+        if (srcFlavorList.isEmpty() && singleSourceFlavor != null) {
+          srcFlavorString.add(singleSourceFlavor);
         }
-        for (String elem : srcFlavorList) {
+        for (String elem : srcFlavorString) {
           try {
             flavor = MediaPackageElementFlavor.parseFlavor(elem);
+            srcFlavorList.add(flavor);
           } catch (IllegalArgumentException e) {
             throw new WorkflowOperationException(elem + " is not a valid flavor!");
           }
@@ -479,36 +480,36 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     }
     tagsAndFlavors.setTargetTags(targetTagList);
 
-    List<String> targetFlavorList = new ArrayList<>();
-    String targetFlavor;
+    List<MediaPackageElementFlavor> targetFlavorList = new ArrayList<>();
+    String singleTargetFlavor;
     switch(targetFlavors) {
       case none:
         break;
       case one:
-        targetFlavor = StringUtils.trimToNull(woi.getConfiguration(TARGET_FLAVOR));
-        if (targetFlavor == null) {
+        singleTargetFlavor = StringUtils.trimToNull(woi.getConfiguration(TARGET_FLAVOR));
+        if (singleTargetFlavor == null) {
           throw new WorkflowOperationException("Configuration key '" + TARGET_FLAVOR + "' must be set");
-        } else {
-          targetFlavorList.add(targetFlavor);
-          try {
-            flavor = MediaPackageElementFlavor.parseFlavor(targetFlavorList.get(0));
-          } catch (IllegalArgumentException e) {
-            throw new WorkflowOperationException(targetFlavorList.get(0) + " is not a valid flavor!");
-          }
         }
+        try {
+          flavor = MediaPackageElementFlavor.parseFlavor(singleTargetFlavor);
+        } catch (IllegalArgumentException e) {
+          throw new WorkflowOperationException(singleTargetFlavor + " is not a valid flavor!");
+        }
+        targetFlavorList.add(flavor);
         break;
       case many:
-        targetFlavorList = asList(StringUtils.trimToNull(woi.getConfiguration(TARGET_FLAVORS)));
-        targetFlavor = StringUtils.trimToNull(woi.getConfiguration(TARGET_FLAVOR));
-        if (targetFlavorList.isEmpty() && targetFlavor != null) {
-          targetFlavorList.add(targetFlavor);
+        List<String> targetFlavorString = asList(StringUtils.trimToNull(woi.getConfiguration(TARGET_FLAVORS)));
+        singleTargetFlavor = StringUtils.trimToNull(woi.getConfiguration(TARGET_FLAVOR));
+        if (targetFlavorList.isEmpty() && singleTargetFlavor != null) {
+          targetFlavorString.add(singleTargetFlavor);
         }
-        for (String elem : targetFlavorList) {
+        for (String elem : targetFlavorString) {
           try {
             flavor = MediaPackageElementFlavor.parseFlavor(elem);
           } catch (IllegalArgumentException e) {
             throw new WorkflowOperationException(elem + " is not a valid flavor!");
           }
+          targetFlavorList.add(flavor);
         }
         break;
       default:
