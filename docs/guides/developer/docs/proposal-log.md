@@ -10,6 +10,75 @@ Passed Proposals
 ----------------
 
 
+### Release Process Update
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 24 Dec 2020
+
+```no-highlight
+Hi everyone,
+based on the discussion on list and in the technical meeting, Lukas and
+I have created a proposal for changing our release process and applying
+a new set of rules. You might notice that we have deliberately not
+included all of what we discussed but hopefully only what can get
+consensus for now.
+
+Apart from some minor changes, the main difference in here is that we
+transition from making a distinction between feature and bug fix to
+defining a set of rules that hopefully ensure smooth minor updates.
+
+If this proposal passes, we can work for there and refine this but we
+hope that this is a good starting point.
+
+
+## Release Schedule
+
+- Major releases happen every half year
+- Minor stable releases are cut monthly monthly
+- Minor legacy releases are cut on demand
+- Urgent minor releases may be cut if necessary
+- Feature freeze for a major version should be about a month before the
+  release
+
+
+## Accepting patches for minor releases
+
+- All patches need to be discussed in the technical meeting
+    - Minor changes should not take much time
+    - Protects against problematic changes in minor releases
+    - Exceptions may be discussed if necessary (e.g. version bumps for
+      libraries on develop)
+- Patches for minor releases must not
+    - Modify any existing database tables
+    - Modify the indexes or otherwise cause re-indexing
+    - Require a different ActiveMQ configuration
+    - Modify existing translations
+- Patches for minor releases must
+    - Work with the same configuration within a major version
+
+
+## Be Pragmatic
+
+- If everything is broken, don't let rules hold you back…
+    - There is always a special case: If in doubt talk to the community
+      and find a solution that works.
+    - Communication is key: If you think you need to break a rule,
+      coordinate that with the community.
+
+
+## Additional suggestions
+
+- Patches should be applied to the latest release branch if possible
+    - Avoid the risk of breaking legacy due to less testing
+    - Avoid unnecessary merge conflicts
+- Patches should avoid unnecessarily large changes in any release branch
+
+
+As usual, if no one objects, this proposal passes in three days.
+
+Best regards,
+Lars
+```
+
+
 ### Relocate build infrastructure to main repository
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 17 Dec 2020
 
