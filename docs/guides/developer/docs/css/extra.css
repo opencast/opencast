@@ -158,3 +158,9 @@ a.header-link {
 a.header-link:hover {
     opacity: 1;
 }
+
+div.warn {
+  border-left: 3px solid red;
+  padding: 15px;
+  margin-bottom: 10px;
+}

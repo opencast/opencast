@@ -887,6 +887,16 @@ Opencast 9
 Opencast 8
 ----------
 
+### Opencast 8.10
+
+*Released on December 23rd, 2020*
+
+- [[#2160](https://github.com/opencast/opencast/pull/2160)] -
+  Fix Ingest by Non-privileged User
+- [[#2049](https://github.com/opencast/opencast/pull/2049)] -
+  Endtime of segments fixed in the editor
+
+
 ### Opencast 8.9
 
 *Released on December 8th, 2020*
