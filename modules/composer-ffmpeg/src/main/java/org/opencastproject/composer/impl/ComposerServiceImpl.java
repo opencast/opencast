@@ -1196,9 +1196,14 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     cleanup(videoFile);
 
     MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-    List<Attachment> imageAttachments = new LinkedList<Attachment>();
+    List<Attachment> imageAttachments = new LinkedList<>();
     for (URI url : workspaceURIs) {
       Attachment attachment = (Attachment) builder.elementFromURI(url, Attachment.TYPE, null);
+      try {
+        attachment.setSize(workspace.get(url).length());
+      } catch (NotFoundException | IOException e) {
+        logger.warn("Could not get file size of {}", url);
+      }
       imageAttachments.add(attachment);
     }
 
@@ -1340,6 +1345,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
         MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         Attachment convertedImage = (Attachment) builder.elementFromURI(workspaceURI, Attachment.TYPE, null);
+        convertedImage.setSize(output.length());
         convertedImage.setIdentifier(IdImpl.fromUUID().toString());
         try {
           convertedImage.setMimeType(MimeTypes.fromURI(convertedImage.getURI()));
