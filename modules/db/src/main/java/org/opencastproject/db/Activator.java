@@ -141,13 +141,13 @@ public class Activator implements BundleActivator {
       pooledDataSource.getMaxPoolSize(), pooledDataSource.getMinPoolSize(), pooledDataSource.getMaxIdleTime());
     Statement statement = pooledDataSource.getConnection().createStatement();
 
-    double random = Math.random() * 1000000;
+    long random = Math.round(Math.random() * 1000000);
     String tableName = "oc_temp_" + random;
     try {
-      runUpdate(statement, "CREATE TABLE " + tableName + " ( id BIGINT NOT NULL, test BIGINT, PRIMARY KEY (id) );");
+      statement.executeUpdate("CREATE TABLE " + tableName + " ( id BIGINT NOT NULL, test BIGINT, PRIMARY KEY (id) );");
       runUpdate(statement, "INSERT INTO " + tableName + " VALUES (" + random + ", 0);");
       runUpdate(statement, "UPDATE " + tableName + " SET test = " + random + ";");
-      ResultSet rs = statement.executeQuery("SELECT FROM " + tableName + ";");
+      ResultSet rs = statement.executeQuery("SELECT * FROM " + tableName + ";");
       while (rs.next()) {
         long id = rs.getLong("id");
         long test = rs.getLong("test");
@@ -156,11 +156,12 @@ public class Activator implements BundleActivator {
         }
       }
       runUpdate(statement, "DELETE FROM " + tableName + " WHERE id = " + random + ";");
+      logger.info("Database credentials passed basic tests!");
     } catch (Exception e) {
-      throw new RuntimeException("Unable to verify SQL credentials have required permissions!");
+      throw new RuntimeException("Unable to verify SQL credentials have required permissions!", e);
     } finally {
       try {
-        runUpdate(statement, "DROP TABLE " + tableName + ";");
+        statement.executeQuery("DROP TABLE " + tableName + ";");
       } catch (Exception e) {
         logger.warn("Unable to delete temp table {}, please remove this yourself!", tableName);
       }
