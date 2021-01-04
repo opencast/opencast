@@ -67,10 +67,8 @@ For more details about the setup, have a look at the [Apache ActiveMQ configurat
 Step 5: Setting up Elasticsearch
 --------------------------------
 
-Since version 9.0, Opencast requires running an external Elasticsearch instance for indexing purposes.  Typically this
-runs on the admin node, although that is not required.  Instructions for installing Elasticsearch can be found in the
-[installation documentation](../installation/index.md).  For more details about the setup, have a look at the
-[Elasticsearch configuration guide](elasticsearch.md).
+Opencast requires Elasticsearch. Instructions for installing Elasticsearch can be found in the
+[installation documentation](../installation/index.md).
 
 
 Step 6: Database Configuration

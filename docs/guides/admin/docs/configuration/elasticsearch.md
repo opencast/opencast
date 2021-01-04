@@ -3,11 +3,6 @@ Elasticsearch Configuration
 
 Elasticsearch powers the external API as well as the administrative user interface of Opencast.
 
-Installing Elasticsearch
-------------------------
-
-The [installation](../installation/index.md) documentation contains instructions for installing Elasticsearch along with your Opencast packaging of choice.
-
 
 Configuring External Nodes
 --------------------------
