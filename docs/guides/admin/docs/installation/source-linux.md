@@ -54,6 +54,7 @@ Required:
 Required (not necessarily on the same machine):
 
     ActiveMQ >= 5.10 (older versions untested)
+    Elasticsearch 7.9.x
 
 Required for text extraction (recommended):
 
@@ -79,7 +80,7 @@ website:
 * [Get FFmpeg](http://ffmpeg.org/download.html)
 * [Get Apache Maven](https://maven.apache.org/download.cgi)
 * [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
-
+* [Get Elasticsaerch](https://elastic.co)
 
 Building Opencast
 -----------------
