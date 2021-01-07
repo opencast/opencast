@@ -18,6 +18,13 @@ jobs:
       with:
         python-version: 3.9
 
+    - name: install graphviz
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        apt-get -q update
+        apt-get -yq install graphviz
+
     - name: install dependencies
       run: |
         pip install -q mkdocs mkdocs-windmill requests
