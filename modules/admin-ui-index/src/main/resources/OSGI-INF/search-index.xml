@@ -9,11 +9,4 @@
     <provide interface="org.opencastproject.matterhorn.search.SearchIndex"/>
     <provide interface="org.opencastproject.adminui.index.AdminUISearchIndex"/>
   </service>
-
-  <reference name="MessageSender"
-             interface="org.opencastproject.message.broker.api.MessageSender"
-             bind="setMessageSender"/>
-  <reference name="MessageReceiver"
-             interface="org.opencastproject.message.broker.api.MessageReceiver"
-             bind="setMessageReceiver"/>
 </scr:component>

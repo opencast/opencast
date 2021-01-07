@@ -22,6 +22,7 @@
 package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.index.AdminUISearchIndex;
+import org.opencastproject.index.rebuild.service.IndexRebuildService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.util.RestUtil.R;
@@ -70,11 +71,17 @@ public class IndexEndpoint {
   /** The security service */
   protected SecurityService securityService = null;
 
+  private IndexRebuildService indexRebuildService = null;
+
   /**
    * OSGI DI
    */
   public void setAdminUISearchIndex(AdminUISearchIndex adminUISearchIndex) {
     this.adminUISearchIndex = adminUISearchIndex;
+  }
+
+  public void setIndexRebuildService(IndexRebuildService indexRebuildService) {
+    this.indexRebuildService = indexRebuildService;
   }
 
   /**
@@ -126,7 +133,7 @@ public class IndexEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index from service {}", service);
-        adminUISearchIndex.recreateIndex(service);
+        indexRebuildService.recreateIndex(adminUISearchIndex, service);
       } catch (InterruptedException e) {
         logger.error("Repopulating the index was interrupted", e);
       } catch (CancellationException e) {
@@ -151,7 +158,7 @@ public class IndexEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index");
-        adminUISearchIndex.recreateIndex();
+        indexRebuildService.recreateIndex(adminUISearchIndex);
       } catch (InterruptedException e) {
         logger.error("Repopulating the index was interrupted", e);
       } catch (CancellationException e) {

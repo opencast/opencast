@@ -21,11 +21,8 @@
 
 package org.opencastproject.index.service.impl.index;
 
-import static java.lang.String.format;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
-import org.opencastproject.index.IndexProducer;
-import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventIndexUtils;
 import org.opencastproject.index.service.impl.index.event.EventQueryBuilder;
@@ -53,15 +50,10 @@ import org.opencastproject.matterhorn.search.impl.SearchMetadataCollection;
 import org.opencastproject.matterhorn.search.impl.SearchMetadataImpl;
 import org.opencastproject.matterhorn.search.impl.SearchResultImpl;
 import org.opencastproject.matterhorn.search.impl.SearchResultItemImpl;
-import org.opencastproject.message.broker.api.BaseMessage;
-import org.opencastproject.message.broker.api.MessageReceiver;
-import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -80,15 +72,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 import java.util.function.Function;
 
 import javax.xml.bind.Unmarshaller;
@@ -97,151 +83,8 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractSearchIndex.class);
 
-  /** The message sender */
-  private MessageSender messageSender;
-
-  /** The message receiver */
-  private MessageReceiver messageReceiver;
-
-  /** An Executor to get messages */
-  private ExecutorService executor = Executors.newSingleThreadExecutor();
-
   @Override
   public abstract String getIndexName();
-
-  /** OSGi DI. */
-  public void setMessageSender(MessageSender messageSender) {
-    this.messageSender = messageSender;
-  }
-
-  /** OSGi DI. */
-  public void setMessageReceiver(MessageReceiver messageReceiver) {
-    this.messageReceiver = messageReceiver;
-  }
-
-  /**
-   * Recreate the index from all of the services that provide data.
-   *
-   * @throws InterruptedException
-   *           Thrown if the process is interupted.
-   * @throws CancellationException
-   *           Thrown if listeing to messages has been canceled.
-   * @throws ExecutionException
-   *           Thrown if there is a problem executing the process.
-   * @throws IOException
-   *           Thrown if the index cannot be cleared.
-   * @throws IndexServiceException
-   *           Thrown if there was a problem adding some of the data back into the index.
-   */
-  public synchronized void recreateIndex()
-          throws InterruptedException, CancellationException, ExecutionException, IOException, IndexServiceException {
-    // Clear index first
-    clear();
-    recreateService(IndexRecreateObject.Service.Groups);
-    recreateService(IndexRecreateObject.Service.Acl);
-    recreateService(IndexRecreateObject.Service.Themes);
-    recreateService(IndexRecreateObject.Service.Series);
-    recreateService(IndexRecreateObject.Service.Scheduler);
-    recreateService(IndexRecreateObject.Service.Workflow);
-    recreateService(IndexRecreateObject.Service.AssetManager);
-    recreateService(IndexRecreateObject.Service.Comments);
-  }
-
-  /**
-   * Recreate the index from a specific service that provide data.
-   *
-   * @param service
-   *           The service name. The available services are:
-   *           Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager, Comments
-   *
-   * @throws IllegalArgumentException
-   *           Thrown if the service name is invalid
-   * @throws InterruptedException
-   *           Thrown if the process is interupted.
-   * @throws ExecutionException
-   *           Thrown if there is a problem executing the process.
-   * @throws IndexServiceException
-   *           Thrown if there was a problem adding some of the data back into the index.
-   */
-  public synchronized void recreateIndex(String service)
-          throws IllegalArgumentException, InterruptedException, ExecutionException, IndexServiceException {
-    if (StringUtils.equalsIgnoreCase("Groups", StringUtils.trim(service)))
-      recreateService(IndexRecreateObject.Service.Groups);
-    else if (StringUtils.equalsIgnoreCase("Acl", StringUtils.trim(service)))
-      recreateService(IndexRecreateObject.Service.Acl);
-    else if (StringUtils.equalsIgnoreCase("Themes", StringUtils.trim(service)))
-      recreateService(IndexRecreateObject.Service.Themes);
-    else if (StringUtils.equalsIgnoreCase("Series", StringUtils.trim(service)))
-      recreateService(IndexRecreateObject.Service.Series);
-    else if (StringUtils.equalsIgnoreCase("Scheduler", StringUtils.trim(service)))
-      recreateService(IndexRecreateObject.Service.Scheduler);
-    else if (StringUtils.equalsIgnoreCase("Workflow", StringUtils.trim(service)))
-      recreateService(IndexRecreateObject.Service.Workflow);
-    else if (StringUtils.equalsIgnoreCase("AssetManager", StringUtils.trim(service)))
-      recreateService(IndexRecreateObject.Service.AssetManager);
-    else if (StringUtils.equalsIgnoreCase("Comments", StringUtils.trim(service)))
-      recreateService(IndexRecreateObject.Service.Comments);
-    else
-      throw new IllegalArgumentException("Unknown service " + service);
-  }
-
-  /**
-   * Ask for data to be rebuilt from a service.
-   *
-   * @param service
-   *          The {@link IndexRecreateObject.Service} representing the service to start re-sending the data from.
-   * @throws IndexServiceException
-   *           Thrown if there is a problem re-sending the data from the service.
-   * @throws InterruptedException
-   *           Thrown if the process of re-sending the data is interupted.
-   * @throws CancellationException
-   *           Thrown if listening to messages has been canceled.
-   * @throws ExecutionException
-   *           Thrown if the process of re-sending the data has an error.
-   */
-  private void recreateService(IndexRecreateObject.Service service)
-          throws IndexServiceException, InterruptedException, CancellationException, ExecutionException {
-    logger.info("Starting to recreate index for service '{}'", service);
-    messageSender.sendObjectMessage(IndexProducer.RECEIVER_QUEUE + "." + service, MessageSender.DestinationType.Queue,
-            IndexRecreateObject.start(getIndexName(), service));
-    boolean done = false;
-    // TODO Add a timeout for services that are not going to respond.
-    while (!done) {
-      FutureTask<Serializable> future = messageReceiver.receiveSerializable(IndexProducer.RESPONSE_QUEUE,
-              MessageSender.DestinationType.Queue);
-      executor.execute(future);
-      BaseMessage message = (BaseMessage) future.get();
-      if (message.getObject() instanceof IndexRecreateObject) {
-        IndexRecreateObject indexRecreateObject = (IndexRecreateObject) message.getObject();
-        switch (indexRecreateObject.getStatus()) {
-          case Update:
-            logger.info("Updating service: '{}' with {}/{} finished, {}% complete.", indexRecreateObject.getService(),
-                    indexRecreateObject.getCurrent(), indexRecreateObject.getTotal(), (int) (indexRecreateObject.getCurrent() * 100 / indexRecreateObject.getTotal()));
-            if (indexRecreateObject.getCurrent() == indexRecreateObject.getTotal()) {
-              logger.info("Waiting for service '{}' indexing to complete", indexRecreateObject.getService());
-            }
-            break;
-          case End:
-            done = true;
-            logger.info("Finished re-creating data for service '{}'", indexRecreateObject.getService());
-            break;
-          case Error:
-            logger.error("Error updating service '{}' with {}/{} finished.",
-                    indexRecreateObject.getService(), indexRecreateObject.getCurrent(),
-                            indexRecreateObject.getTotal());
-            throw new IndexServiceException(
-                    format("Error updating service '%s' with %s/%s finished.", indexRecreateObject.getService(),
-                            indexRecreateObject.getCurrent(), indexRecreateObject.getTotal()));
-          default:
-            logger.error("Unable to handle the status '{}' for service '{}'", indexRecreateObject.getStatus(),
-                    indexRecreateObject.getService());
-            throw new IllegalArgumentException(format("Unable to handle the status '%s' for service '%s'",
-                    indexRecreateObject.getStatus(), indexRecreateObject.getService()));
-
-        }
-      }
-    }
-  }
 
   /**
    * Adds the recording event to the search index or updates it accordingly if it is there.

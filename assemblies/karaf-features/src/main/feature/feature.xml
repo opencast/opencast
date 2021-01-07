@@ -202,6 +202,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-incident-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-index-service/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-index-rebuild-service/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
@@ -314,6 +315,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-incident-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-index-service/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-index-rebuild-service/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-workflowoperation/${project.version}</bundle>
@@ -459,6 +461,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-fileupload/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-incident-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-index-service/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-index-rebuild-service/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-download-service-workflowoperation/${project.version}</bundle>

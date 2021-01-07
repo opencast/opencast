@@ -30,6 +30,7 @@ import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.external.index.ExternalIndex;
+import org.opencastproject.index.rebuild.service.IndexRebuildService;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
@@ -101,6 +102,8 @@ public class BaseEndpoint {
   private SecurityService securityService;
   private ExternalIndex externalIndex;
 
+  private IndexRebuildService indexRebuildService = null;
+
   /** OSGi DI */
   void setExternalIndex(ExternalIndex externalIndex) {
     this.externalIndex = externalIndex;
@@ -109,6 +112,10 @@ public class BaseEndpoint {
   /** OSGi DI */
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  public void setIndexRebuildService(IndexRebuildService indexRebuildService) {
+    this.indexRebuildService = indexRebuildService;
   }
 
   /** OSGi activation method */
@@ -280,7 +287,7 @@ public class BaseEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index from service {}", service);
-        externalIndex.recreateIndex(service);
+        indexRebuildService.recreateIndex(externalIndex, service);
       } catch (InterruptedException e) {
         logger.error("Repopulating the index was interrupted", e);
       } catch (CancellationException e) {
@@ -304,7 +311,7 @@ public class BaseEndpoint {
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the external index");
-        externalIndex.recreateIndex();
+        indexRebuildService.recreateIndex(externalIndex);
         logger.info("Finished repopulating the external index");
       } catch (InterruptedException e) {
         logger.error("Repopulating the external index was interrupted", e);
