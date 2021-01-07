@@ -22,13 +22,13 @@
 package org.opencastproject.adminui.index;
 
 import org.opencastproject.index.service.api.EventIndex;
-import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
-import org.opencastproject.index.service.impl.index.event.Event;
-import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
-import org.opencastproject.index.service.impl.index.group.Group;
-import org.opencastproject.index.service.impl.index.series.Series;
-import org.opencastproject.index.service.impl.index.theme.Theme;
-import org.opencastproject.index.service.impl.index.theme.ThemeIndexSchema;
+import org.opencastproject.search.index.AbstractSearchIndex;
+import org.opencastproject.search.index.event.Event;
+import org.opencastproject.search.index.event.EventIndexSchema;
+import org.opencastproject.search.index.group.Group;
+import org.opencastproject.search.index.series.Series;
+import org.opencastproject.search.index.theme.Theme;
+import org.opencastproject.search.index.theme.ThemeIndexSchema;
 import org.opencastproject.util.data.Option;
 
 import org.osgi.service.component.ComponentContext;

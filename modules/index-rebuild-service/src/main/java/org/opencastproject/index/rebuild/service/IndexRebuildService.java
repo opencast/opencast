@@ -23,12 +23,12 @@ package org.opencastproject.index.rebuild.service;
 
 import static java.lang.String.format;
 
-import org.opencastproject.index.IndexProducer;
-import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
+import org.opencastproject.search.index.AbstractSearchIndex;
+import org.opencastproject.search.index.IndexProducer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;

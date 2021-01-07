@@ -23,13 +23,13 @@ package org.opencastproject.index.service.message;
 
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.index.service.impl.index.series.Series;
-import org.opencastproject.index.service.impl.index.series.SeriesIndexUtils;
 import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.series.SeriesItem;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.search.index.series.Series;
+import org.opencastproject.search.index.series.SeriesIndexUtils;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.data.Option;

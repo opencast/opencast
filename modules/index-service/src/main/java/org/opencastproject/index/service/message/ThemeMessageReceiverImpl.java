@@ -21,12 +21,12 @@
 
 package org.opencastproject.index.service.message;
 
-import org.opencastproject.index.service.impl.index.theme.Theme;
-import org.opencastproject.index.service.impl.index.theme.ThemeIndexUtils;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.theme.SerializableTheme;
 import org.opencastproject.message.broker.api.theme.ThemeItem;
+import org.opencastproject.search.index.theme.Theme;
+import org.opencastproject.search.index.theme.ThemeIndexUtils;
 import org.opencastproject.security.api.User;
 
 import org.slf4j.Logger;

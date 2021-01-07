@@ -21,13 +21,11 @@
 package org.opencastproject.index.service.message;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.opencastproject.index.service.impl.index.event.EventIndexUtils.getOrCreateEvent;
-import static org.opencastproject.index.service.impl.index.event.EventIndexUtils.updateEvent;
+import static org.opencastproject.search.index.event.EventIndexUtils.getOrCreateEvent;
+import static org.opencastproject.search.index.event.EventIndexUtils.updateEvent;
 
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.index.service.impl.index.event.Event;
-import org.opencastproject.index.service.impl.index.event.EventIndexUtils;
 import org.opencastproject.index.service.util.AccessInformationUtil;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -37,6 +35,8 @@ import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.Dele
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteSnapshot;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.search.index.event.Event;
+import org.opencastproject.search.index.event.EventIndexUtils;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.User;

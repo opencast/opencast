@@ -21,9 +21,6 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
-import org.opencastproject.index.service.impl.index.theme.Theme;
-import org.opencastproject.index.service.impl.index.theme.ThemeSearchQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
@@ -31,6 +28,9 @@ import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
+import org.opencastproject.search.index.AbstractSearchIndex;
+import org.opencastproject.search.index.theme.Theme;
+import org.opencastproject.search.index.theme.ThemeSearchQuery;
 import org.opencastproject.security.api.SecurityService;
 
 import org.osgi.framework.BundleContext;

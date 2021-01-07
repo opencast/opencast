@@ -23,13 +23,13 @@ package org.opencastproject.event.comment.persistence;
 import static org.opencastproject.util.persistencefn.Queries.persistOrUpdate;
 
 import org.opencastproject.event.comment.EventComment;
-import org.opencastproject.index.IndexProducer;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.comments.CommentItem;
-import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
+import org.opencastproject.search.index.AbstractIndexProducer;
+import org.opencastproject.search.index.IndexProducer;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;

@@ -12,7 +12,6 @@
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <elasticsearch.version>7.9.2</elasticsearch.version>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
@@ -144,6 +143,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-search-index</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
@@ -154,10 +159,6 @@
     <dependency>
       <groupId>com.googlecode.json-simple</groupId>
       <artifactId>json-simple</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -196,27 +197,6 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-    </dependency>
-    <!-- elasticsearch -->
-    <dependency>
-      <groupId>org.elasticsearch.client</groupId>
-      <artifactId>elasticsearch-rest-high-level-client</artifactId>
-      <version>${elasticsearch.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.elasticsearch.client</groupId>
-      <artifactId>elasticsearch-rest-client</artifactId>
-      <version>${elasticsearch.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.elasticsearch</groupId>
-      <artifactId>elasticsearch</artifactId>
-      <version>${elasticsearch.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.elasticsearch</groupId>
-      <artifactId>elasticsearch-core</artifactId>
-      <version>${elasticsearch.version}</version>
     </dependency>
     <!-- Testing -->
     <dependency>
@@ -280,11 +260,7 @@
               org.opencastproject.index.service.catalog.adapter.series,
               org.opencastproject.index.service.exception,
               org.opencastproject.index.service.impl,
-              org.opencastproject.index.service.impl.index,
-              org.opencastproject.index.service.impl.index.event,
-              org.opencastproject.index.service.impl.index.group,
-              org.opencastproject.index.service.impl.index.series,
-              org.opencastproject.index.service.impl.index.theme,
+              org.opencastproject.index.service.impl.util,
               org.opencastproject.index.service.message,
               org.opencastproject.index.service.resources.list.api,
               org.opencastproject.index.service.resources.list.provider,
