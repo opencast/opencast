@@ -105,3 +105,4 @@ nav:
    - Workflow API: 'api/workflow-api.md'
    - Data Types: 'api/types.md'
    - Glossary: 'api/glossary.md'
+- Configure a Local Cluster for Testing: local-cluster.md
