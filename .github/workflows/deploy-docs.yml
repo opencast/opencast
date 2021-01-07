@@ -22,8 +22,8 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        apt-get -q update
-        apt-get -yq install graphviz
+        apt update -q
+        apt install -yq graphviz
 
     - name: install dependencies
       run: |
