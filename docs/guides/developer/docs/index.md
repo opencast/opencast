@@ -26,6 +26,7 @@ These guides will help you if you want to participate in Opencast development.
     * [Capture Agent](modules/capture-agent/capture-agent.md)
     * [Stream Security](modules/stream-security.md)
     * […](modules/index.md)
+* [Configure a Local Cluster for Testing](local-cluster.md)
 * [External API](api/index.md)
 * [Project Infrastructure](infrastructure/index.md)
     * [Maven Repository](infrastructure/maven-repository.md)
