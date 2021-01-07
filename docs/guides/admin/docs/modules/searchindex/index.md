@@ -8,8 +8,6 @@ While this works well, all indexes can be deployed separately. This comes with t
 deployment but has also a few advantages like a smaller core system or being able to have some service redundancies
 which would not be possible otherwise.
 
-Opencast currently uses two search index types: Solr and Elasticsearch.
-
 ---
 
 - Solr is mostly powering older services and replacing this index type is planned for the future. But for now it is
@@ -18,7 +16,3 @@ Opencast currently uses two search index types: Solr and Elasticsearch.
     [Solr Configuration Guide](solr.md)
 
 ---
-
-- Elasticsearch is the back-end for both the administrative user interface as well as the external API.
-
-    [Elasticsearch Configuration Guide](elasticsearch.md)
