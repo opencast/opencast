@@ -48,8 +48,9 @@ installation, on each of the nodes.  As an example, this is what the admin node 
 
     id=tenant1
     name=Tenant 1
-    server=tenant1-admin.opencast.org,tenant1-presentation.opencast.org
     port=8080
+    prop.org.opencastproject.host.admin.opencast.org=tenant1-admin.opencast.org
+    prop.org.opencastproject.host.presentation.opencast.org=tenant1-presentation.opencast.org
     admin_role=ROLE_ADMIN
     anonymous_role=ROLE_ANONYMOUS
 
