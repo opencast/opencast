@@ -104,7 +104,7 @@ certificate itself.
 
 ### Step 1: Obtaining the certificate chain
 
-If you only have the key and the certificate, I recommend 
+If you only have the key and the certificate, I recommend
 [certificatechain.io](https://certificatechain.io/) or
 [cert-chain-resolver](https://github.com/zakjan/cert-chain-resolver).
 The latter can be used as follows:
