@@ -33,10 +33,8 @@ longer support being embedded in applications.
 Since the Elasticsearch client was updated to version 7, Opencast requires an external Elasticsearch node of the same
 version to be present. This means all Opencast adopters now have to run Elasticsearch as a service.
 
-Please check [the documentation](modules/searchindex/elasticsearch.md) for information about how to setup an external node.
-
 If you already used an external Elasticsearch node in the past, please update your node to version 7. Since the index
-schema has changed, you will need to drop you indices and [rebuild them](#rebuild-the-elasticsearch-indexes).
+schema has changed, you will need to drop your indices and [rebuild them](#rebuild-the-elasticsearch-indexes).
 
 Rebuild the Elasticsearch Indexes
 ----------------------------------
