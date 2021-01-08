@@ -15,6 +15,15 @@ services:
       - 127.0.0.1:61616:61616
     volumes:
       - ../activemq/activemq.xml:/activemq-opencast.tpl.xml:ro
+  postgresql:
+    container_name: opencast-postgresql
+    image: docker.io/library/postgres:12.3
+    ports:
+      - 127.0.0.1:5432:5432
+    environment:
+      POSTGRES_USER: opencast
+      POSTGRES_PASSWORD: opencast
+      POSTGRES_DB: dbpassword
   mariadb:
     container_name: opencast-mariadb
     image: docker.io/library/mariadb:10.5.5
