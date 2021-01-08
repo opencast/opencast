@@ -31,6 +31,8 @@ jobs:
             Doing that (once) helps us to ensure that Opencast stays free for all.
             If you make your contribution on behalf of an institution, you might also want to file a
             [Corporate Contributor License Agreement](https://www.apereo.org/licensing/agreements/ccla)
-            (giving you as individual contributor a bit more security as well).
+            (giving you as individual contributor a bit more security as well). It can take a while for
+            this bot to find out about new filings, so if you just filed one or both of the above do not
+            worry about this message!
 
             Please let us know if you have any questions regarding the CLA.
