@@ -10,8 +10,7 @@ member of the Brightspace course `myCourseID` will be granted the Opencast role 
 
 <!-- _This section has been left blank! It should be filled with the necessary info, or removed entirely! -->
 
-### Step 1 
-<!-- _Prefer to add titles to steps as in "Step 1: Do this" -->
+### Step 1: Configure Brightspace in Opencast
 
 To enable the Brightspace User Provider, copy and rename the bundled configuration
 template from
@@ -41,8 +40,8 @@ org.opencastproject.userdirectory.brightspace.application.key=application-key
 #org.opencastproject.userdirectory.brightspace.cache.expiration=60
 ```
 
-### Step 2
-<!-- _Prefer to add titles to steps as in "Step 2: Do this" -->
+### Step 2: Verify Granted Access
+
 Verify that the Brightspace User Provider starts up with the correct Brightspace URL by looking
 for a log entry like this:
 
