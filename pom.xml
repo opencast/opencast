@@ -154,6 +154,7 @@
     <module>modules/inspection-workflowoperation</module>
     <module>modules/statistics-writer-workflowoperation</module>
     <module>modules/kernel</module>
+    <module>modules/klipping</module>
     <module>modules/list-providers-service</module>
     <module>modules/live-schedule-api</module>
     <module>modules/live-schedule-impl</module>
