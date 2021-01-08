@@ -227,9 +227,9 @@ Testing
 Once all components of Stream Security are installed and properly configured, it is important to verify that the system
 is working as expected. It is especially important to try to access resources that should *not* be accessible.
 
-There are ways to test in a structured way which will be explained below.
+The following explains how to test if Stream Security has been correctly configured.
 
-### Test 1: Creating Signed URLs with Signing Endpoint
+### Step 1: Creating Signed URLs with Signing Endpoint
 
 The signing service provides a REST endpoint, which allows for the signing of arbitrary URLs. For manual use it is
 recommended to visit the endpoint’s documentation page at `http://localhost:8080/signing/docs`.
@@ -243,7 +243,7 @@ checked again to ensure that at least one signing provider is responsible for th
 If the service is fully operational, the response code will be *200 OK* and the response body either *true* (accepted)
 or *false* (refused).
 
-### Test 2: Signing the URL
+### Step 2: Signing the URL
 
 On the same documentation page URLs can be signed using the `/signing/sign` endpoint, and the access policy may be
 specified in that form as well. With this, several scenarios can be tested. Examples are:
@@ -253,7 +253,7 @@ specified in that form as well. With this, several scenarios can be tested. Exam
 * URLs that are missing some or all of the signing parameters (policy, keyId or signature)
 * URLs that are attempting to use signing parameters (policy and signature) from a different signed URL
 
-### Test 3: Verifying the URL
+### Step 3: Verifying the URL
 
 The signed URLs can then be passed to the appropriate testing tool (web browser, cURL, player, …) to test the
 functionality of the verification component(s). The following table is the return codes associated with different
@@ -272,7 +272,7 @@ rejection conditions:
 The components that verify a URL is signed will run before a request is checked to be valid, so if a non-existent URL is
 signed for example, the above conditions will need to be fixed before a missing (404) response code will be returned.
 
-### Test 4: Inspect policy
+### Step 4: Inspect policy
 
 The generated policy which is added to the signed URLs can be inspected. It needs to be decoded from Base64 and the
 result must be a JSON document that contains exactly the values which have been passed during signing.
