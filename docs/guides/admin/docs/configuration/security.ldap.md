@@ -125,7 +125,7 @@ appear on the security file. The relevant snippet is this:
 ```
 
 
-Adding more LDAP servers <!-- _Should "(Optional)" be added here? -->
+Adding more LDAP servers
 ------------------------
 
 More LDAP servers can be added to the configuration by including the LDAP-related sections as many times as necessary
