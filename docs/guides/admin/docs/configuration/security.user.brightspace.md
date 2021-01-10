@@ -10,7 +10,7 @@ member of the Brightspace course `myCourseID` will be granted the Opencast role 
 
 <!-- _This section has been left blank! It should be filled with the necessary info, or removed entirely! -->
 
-### Step 1: Configure Brightspace in Opencast
+### Step 1: Configure the User Provider
 
 To enable the Brightspace User Provider, copy and rename the bundled configuration
 template from
