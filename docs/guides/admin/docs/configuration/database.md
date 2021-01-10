@@ -27,7 +27,7 @@ Other database engines are not tested and specific issues will likely not be add
 - __MariaDB__ is the recommended database engine.
   It is used by most adopters and is well tested.
 - __MySQL__ is supported but tested less than MariaDB.
-- __PostgreSQL__ support is experimental. <!-- _Update support here. Is it also less tested than MariaDB -->
+- __PostgreSQL__ support is experimental.
 - __H2__ is not suitable for anything but testing and development.
   It cannot be used in distributed environments.
 
