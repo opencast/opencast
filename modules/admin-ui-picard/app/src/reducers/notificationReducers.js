@@ -1,4 +1,9 @@
-import {CREATE_NOTIFICATION, REMOVE_NOTIFICATION, SET_HIDDEN} from "../actions/notificationActions";
+import {
+    CREATE_NOTIFICATION,
+    REMOVE_NOTIFICATION,
+    REMOVE_NOTIFICATION_EVENTS_FORM,
+    SET_HIDDEN
+} from "../actions/notificationActions";
 
 /*
 State is looking something like this
@@ -57,6 +62,12 @@ export const notifications = (state=initialState, action) => {
             return {
                 ...state,
                 notifications: state.notifications.filter(notification => notification.id !== idToRemove)
+            }
+        }
+        case REMOVE_NOTIFICATION_EVENTS_FORM: {
+            return {
+                ...state,
+                notifications: state.notifications.filter(notification => notification.context !== 'events-form')
             }
         }
         case SET_HIDDEN: {

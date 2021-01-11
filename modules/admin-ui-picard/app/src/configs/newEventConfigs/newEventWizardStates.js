@@ -83,3 +83,6 @@ export const weekdays = [
         label: 'EVENTS.EVENTS.NEW.WEEKDAYS.SU'
     }
 ];
+
+// Context for notifications shown in events-form
+export const NOTIFICATION_CONTEXT = 'events-form';

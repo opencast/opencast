@@ -102,7 +102,7 @@ const TableFilters = ({loadingFilters, filterMap, textFilter, selectedFilter, se
             setFilterSelector(false);
             removeSelectedFilter();
             removeSecondFilter();
-            //Todo: ADD RELOAD OF RESOURCE
+            // Reload of resource
             loadResource();
             loadResourceIntoTable();
         }
@@ -348,7 +348,6 @@ const FilterSwitch = ({filterMap, selectedFilter, handleChange, startDate, endDa
             return (
                 <div>
                     {/* Show datepicker for start date */}
-                    {/* todo: ui is still not working right, revisit this, see bug described above */}
                     <MuiPickersUtilsProvider utils={DateFnsUtils} locale={currentLanguage.dateLocale}>
                         <DatePicker
                             className="small-search start-date"

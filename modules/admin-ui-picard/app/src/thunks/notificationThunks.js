@@ -23,36 +23,36 @@ export const addNotification = (type, key, duration, parameter, context) => (dis
                 duration = ADMIN_NOTIFICATION_DURATION_WARNING;
                 break;
         }
-        // default durations are in seconds. duration needs to be in milliseconds
-        if (duration > 0) duration *= 1000;
+    }
+    // default durations are in seconds. duration needs to be in milliseconds
+    if (duration > 0) duration *= 1000;
 
-        if (!context) {
-            context = 'global';
-        }
+    if (!context) {
+        context = 'global';
+    }
 
-        if (!parameter) {
-            parameter = {};
-        }
+    if (!parameter) {
+        parameter = {};
+    }
 
-        // Create new notification, id is set in action
-        const notification = {
-            type: type,
-            key: key,
-            message: 'NOTIFICATIONS.' + key,
-            parameter: parameter,
-            duration: duration,
-            hidden: false,
-            context: context
-        }
-        dispatch(createNotification(notification));
+    // Create new notification, id is set in action
+    const notification = {
+        type: type,
+        key: key,
+        message: 'NOTIFICATIONS.' + key,
+        parameter: parameter,
+        duration: duration,
+        hidden: false,
+        context: context
+    }
+    dispatch(createNotification(notification));
 
-        // Get newly created notification and its id
-        let latestNotification = getLastAddedNotification(getState());
+    // Get newly created notification and its id
+    let latestNotification = getLastAddedNotification(getState());
 
-        // Fade out notification if it is not -1 -> -1 means 'stay forever'
-        // Start timeout for fading out after time in duration is over
-        if(parseInt(latestNotification.duration) && parseInt(latestNotification.duration) !== -1) {
-            setTimeout(() => dispatch(removeNotification(latestNotification.id)), latestNotification.duration);
-        }
+    // Fade out notification if it is not -1 -> -1 means 'stay forever'
+    // Start timeout for fading out after time in duration is over
+    if (parseInt(latestNotification.duration) && parseInt(latestNotification.duration) !== -1) {
+        setTimeout(() => dispatch(removeNotification(latestNotification.id)), latestNotification.duration);
     }
 }

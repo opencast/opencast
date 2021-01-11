@@ -2,7 +2,6 @@ import React, {useState} from "react";
 import PropTypes from 'prop-types';
 import {Formik} from "formik";
 import NewEventMetadata from "./NewEventMetadata";
-import NewEventMetadataExtended from "./NewEventMetadataExtended";
 import NewEventSource from "./NewEventSource";
 import NewEventProcessing from "./NewEventProcessing";
 import NewEventAccess from "./NewEventAccess";

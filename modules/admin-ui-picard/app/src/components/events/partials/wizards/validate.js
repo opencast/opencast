@@ -1,5 +1,8 @@
 import * as Yup from 'yup';
 
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
 export const NewEventSchema = [Yup.object().shape({
     title: Yup.string().required('Required')
 }), Yup.object().shape({
@@ -10,7 +13,7 @@ export const NewEventSchema = [Yup.object().shape({
     }),
     scheduleEndDate: Yup.date().when('sourceMode', {
         is: 'SCHEDULE_MULTIPLE',
-        then: Yup.date().min(Yup.ref('scheduleStartDate')).required('Required')
+        then: Yup.date().required('Required')
     }),
     repeatOn: Yup.array().when('sourceMode', {
         is: 'SCHEDULE_MULTIPLE',

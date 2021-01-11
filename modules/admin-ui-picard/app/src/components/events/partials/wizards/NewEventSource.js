@@ -8,10 +8,20 @@ import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 import {Field} from "formik";
 import {sourceMetadata, uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConfig";
 import RenderField from "./RenderField";
-import {hours, minutes, weekdays} from "../../../../configs/newEventConfigs/newEventWizardStates";
+import {
+    hours,
+    minutes,
+    newEventWizardStates,
+    NOTIFICATION_CONTEXT,
+    weekdays
+} from "../../../../configs/newEventConfigs/newEventWizardStates";
 import {getRecordings} from "../../../../selectors/recordingSelectors";
 import {fetchRecordings} from "../../../../thunks/recordingThunks";
 import {connect} from "react-redux";
+import {addNotification} from "../../../../thunks/notificationThunks";
+import {getNotifications} from "../../../../selectors/notificationSelector";
+import {removeNotificationEventsForm} from "../../../../actions/notificationActions";
+import {checkForConflicts} from "../../../../thunks/eventThunks";
 
 
 // Style to bring date picker pop up to front
@@ -28,7 +38,8 @@ const theme = createMuiTheme({
 /**
  * This component renders the source page for new events in the new event wizard.
  */
-const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInputDevices, inputDevices }) => {
+const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInputDevices, inputDevices, addNotification,
+                            removeNotificationEventsForm }) => {
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -36,22 +47,71 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInput
         loadingInputDevices();
     }, []);
 
+    // check user input for conflicts
+    const checkConflicts = async () =>  {
+        const values = formik.values
+        let check = true;
+        // Only perform checks if source mode is SCHEDULE_SINGLE or SCHEDULE_MULTIPLE
+        if (values.sourceMode === 'SCHEDULE_SINGLE' ||
+            values.sourceMode === 'SCHEDULE_MULTIPLE') {
+            // Get timezone offset; Checks should be performed on UTC times
+            let offset = getTimezoneOffset();
+
+            // Prepare start date of event for check
+            let startDate = new Date(values.scheduleStartDate);
+            startDate.setHours((values.scheduleStartTimeHour - offset), values.scheduleStartTimeMinutes, 0, 0);
+
+            // If start date of event is smaller than today --> Event is in past
+            if (startDate < new Date()) {
+                addNotification('error', 'CONFLICT_ALREADY_ENDED', -1, null, NOTIFICATION_CONTEXT);
+                check = false;
+            }
+
+            let endDate;
+
+            // Prepare end date of event for check
+            if(values.sourceMode === 'SCHEDULE_SINGLE') {
+                endDate = new Date(values.scheduleStartDate);
+            } else {
+                endDate = new Date(values.scheduleEndDate);
+            }
+            endDate.setHours((values.scheduleEndTimeHour - offset), values.scheduleEndTimeMinutes, 0, 0);
+
+            // if start date is higher than end date --> end date is before start date
+            if (startDate > endDate) {
+                addNotification('error', 'CONFLICT_END_BEFORE_START', -1, null, NOTIFICATION_CONTEXT);
+                check = false;
+            }
+
+            // transform duration into milliseconds (needed for API request)
+            let duration = values.scheduleDurationHour * 3600000 + values.scheduleDurationMinutes * 60000;
+
+            // Check for conflicts with other already scheduled events
+            let conflicts = await checkForConflicts(startDate, endDate, duration, values.location);
+
+            // If conflicts with already scheduled events detected --> need to change times/date
+            if(!conflicts) {
+                addNotification('error', 'CONFLICT_DETECTED', -1, null, NOTIFICATION_CONTEXT);
+                check = false;
+            }
+
+        }
+        return check;
+    }
+
+    // Remove old notifications of context event-form
+    // Helps to prevent multiple notifications for same problem
+    const removeOldNotifications = () => {
+        removeNotificationEventsForm();
+    }
+
     return(
         <>
             <div className="modal-content">
                 <div className="modal-body">
                     <div className="full-col">
-                        {/*todo: Implement context event-form and add notification if conflict*/}
-                        <Notifications />
-                        {/*Todo: Show Table only if there are conflicts*/}
-                        <table>
-                            {/*Todo: Repeat row for each conflict that occurs*/}
-                            <tr>
-                                <td>Conflict Title</td>
-                                <td>Conflict Start</td>
-                                <td>Conflict End</td>
-                            </tr>
-                        </table>
+                        {/*Show notifications with context events-form*/}
+                        <Notifications context={NOTIFICATION_CONTEXT}/>
                         <div className="obj list-obj">
                             <header className="no-expand">{t('EVENTS.EVENTS.NEW.SOURCE.SELECT_SOURCE')}</header>
                             {/* Radio buttons for choosing source mode */}
@@ -95,7 +155,7 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInput
                         {(formik.values.sourceMode === 'SCHEDULE_SINGLE' ||
                             formik.values.sourceMode === 'SCHEDULE_MULTIPLE') && (
                             <Schedule formik={formik}
-                                            inputDevices={inputDevices}/>
+                                      inputDevices={inputDevices}/>
                         )}
                     </div>
                 </div>
@@ -110,9 +170,12 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInput
                                 inactive: !(formik.dirty && formik.isValid)
                             })}
                         disabled={!(formik.dirty && formik.isValid)}
-                        onClick={() => {
-                            nextPage(formik.values);
-                            onSubmit();
+                        onClick={async () => {
+                            removeOldNotifications();
+                            if(await checkConflicts()) {
+                                nextPage(formik.values);
+                                onSubmit();
+                            }
                         }}
                         tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
                 <button className="cancel"
@@ -219,7 +282,10 @@ const Schedule = ({ formik, inputDevices }) => {
                             <ThemeProvider theme={theme}>
                                 <DatePicker name="scheduleStartDate"
                                             value={formik.values.scheduleStartDate}
-                                            onChange={value => formik.setFieldValue("scheduleStartDate", value)}
+                                            onChange={value => {
+                                                formik.setFieldValue("scheduleStartDate", value);
+                                                console.log(formik);
+                                            }}
                                             tabIndex="4"/>
                             </ThemeProvider>
                         </td>
@@ -370,12 +436,15 @@ const Schedule = ({ formik, inputDevices }) => {
 
 // Getting state data out of redux store
 const mapStateToProps = state => ({
-    inputDevices: getRecordings(state)
+    inputDevices: getRecordings(state),
+    notifications: getNotifications(state)
 });
 
 // Mapping actions to dispatch
 const mapDispatchToProps = dispatch => ({
-    loadingInputDevices: () => dispatch(fetchRecordings("inputs"))
+    loadingInputDevices: () => dispatch(fetchRecordings("inputs")),
+    addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
+    removeNotificationEventsForm: () => dispatch(removeNotificationEventsForm())
 });
 
 

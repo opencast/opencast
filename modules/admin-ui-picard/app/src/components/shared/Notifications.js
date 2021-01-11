@@ -8,7 +8,7 @@ import {setHidden} from "../../actions/notificationActions";
 /**
  * This component renders notifications about occurred errors, warnings and info
  */
-const Notifications = ({ setNotificationHidden, notifications, globalPosition }) => {
+const Notifications = ({ setNotificationHidden, notifications, globalPosition, context }) => {
     const { t } = useTranslation();
 
     const closeNotification = id => {
@@ -16,15 +16,10 @@ const Notifications = ({ setNotificationHidden, notifications, globalPosition })
     }
 
     return (
-        <ul className={cn({'global-notifications' : true,
-            'notifications-top-left': globalPosition === 'top-left',
-            'notifications-top-right': globalPosition === 'top-right',
-            'notification-top-center': globalPosition === 'top-center',
-            'notifications-bottom-left': globalPosition === 'bottom-left',
-            'notifications-bottom-right': globalPosition === 'bottom-right',
-            'notifications-bottom-center': globalPosition === 'bottom-center'})}>
-            {notifications.map((notification, key) => (
-                !notification.hidden ? (
+        // if context is events-form then render notification without consider global notification position
+        context === 'events-form' ? (
+            <ul>{notifications.map((notification, key) => (
+                (!notification.hidden && notification.context === 'events-form') ? (
                     <li key={key}>
                         <div className={cn(notification.type, 'alert sticky')}>
                             <a onClick={() => closeNotification(notification.id)}
@@ -34,11 +29,35 @@ const Notifications = ({ setNotificationHidden, notifications, globalPosition })
                             </p>
                         </div>
                     </li>
+                ) : null
+            ))}
+            </ul>
+        ) : (
+            <ul className={cn({'global-notifications' : true,
+                'notifications-top-left': globalPosition === 'top-left',
+                'notifications-top-right': globalPosition === 'top-right',
+                'notification-top-center': globalPosition === 'top-center',
+                'notifications-bottom-left': globalPosition === 'bottom-left',
+                'notifications-bottom-right': globalPosition === 'bottom-right',
+                'notifications-bottom-center': globalPosition === 'bottom-center'})}>
+                {notifications.map((notification, key) => (
+                    (!notification.hidden && notification.context === 'global') ? (
+                        <li key={key}>
+                            <div className={cn(notification.type, 'alert sticky')}>
+                                <a onClick={() => closeNotification(notification.id)}
+                                   className="fa fa-times close"/>
+                                <p>
+                                    {t(notification.message)}
+                                </p>
+                            </div>
+                        </li>
                     ) : null
-            ))
+                ))
 
-            }
-        </ul>
+                }
+            </ul>
+        )
+
     )
 }
 

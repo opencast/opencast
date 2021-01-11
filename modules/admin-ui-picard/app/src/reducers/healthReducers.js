@@ -3,8 +3,7 @@ import {
     LOAD_HEALTH_STATUS,
     LOAD_STATUS_FAILURE,
     LOAD_STATUS_IN_PROGRESS, RESET_NUM_ERROR,
-    SET_ERROR,
-    SET_NUM_ERROR
+    SET_ERROR
 } from "../actions/healthActions";
 import {AMQ_NAME, BACKEND_NAMES, STATES_NAMES} from "../thunks/healthThunks";
 

@@ -78,3 +78,28 @@ export const fetchEventMetadata = () => async (dispatch, getState)=> {
     }
 }
 
+// Check for conflicts with already scheduled events
+export const checkForConflicts =  async (startDate, endDate, duration, device) => {
+
+    let metadata = {
+        start: startDate,
+        device: device,
+        duration: duration,
+        end: endDate
+    }
+
+    let response = await fetch('/admin-ng/event/new/conflicts', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: metadata
+    });
+
+    let status = response.status;
+
+    return status !== 409;
+
+
+}
+

@@ -1,6 +1,13 @@
 const {createProxyMiddleware} = require('http-proxy-middleware');
 module.exports = function (app) {
     app.use(
+        '/admin-ng/event/new/conflicts',
+        createProxyMiddleware({
+            target: 'http://localhost:5000',
+            changeOrigin: true,
+        })
+    );
+    app.use(
         '/admin-ng',
         createProxyMiddleware({
             target: 'http://localhost:5000',

@@ -10,7 +10,7 @@ const ServicesActionCell = ({ row }) => {
     return (
         row.status !== 'SYSTEMS.SERVICES.STATUS.NORMAL' ? (
             // todo: with-role
-            //  TODO: When action for sanitize is implemented, remove placeholder
+            // TODO: When action for sanitize is implemented, remove placeholder
             <a className="sanitize fa fa-undo"
                onChange={() => onClickPlaceholder()}
                title={t('SYSTEMS.SERVICES.TABLE.SANITIZE')}/>
