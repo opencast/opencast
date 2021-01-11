@@ -1,6 +1,5 @@
 name: Check ICLA
 on:
-  push:
   pull_request:
     types:
       - opened
