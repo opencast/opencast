@@ -358,7 +358,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-index-rebuild-service</artifactId>
+      <artifactId>opencast-index-rebuild</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>

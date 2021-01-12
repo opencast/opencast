@@ -27,7 +27,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search-index</artifactId>
+      <artifactId>opencast-index-rebuild</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

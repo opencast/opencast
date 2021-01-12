@@ -21,6 +21,6 @@
              policy="static"
              bind="setSecurityService"/>
   <reference name="IndexRebuildService"
-             interface="org.opencastproject.index.rebuild.service.IndexRebuildService"
+             interface="org.opencastproject.index.rebuild.IndexRebuildService"
              bind="setIndexRebuildService"/>
 </scr:component>

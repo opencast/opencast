@@ -21,14 +21,14 @@
 
 package org.opencastproject.themes.persistence;
 
+import org.opencastproject.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.theme.SerializableTheme;
 import org.opencastproject.message.broker.api.theme.ThemeItem;
-import org.opencastproject.search.index.AbstractIndexProducer;
-import org.opencastproject.search.index.IndexProducer;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;

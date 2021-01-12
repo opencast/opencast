@@ -135,7 +135,7 @@
     <module>modules/adopter-statistics-impl</module>
     <module>modules/incident-workflowoperation</module>
     <module>modules/index-service</module>
-    <module>modules/index-rebuild-service</module>
+    <module>modules/index-rebuild</module>
     <module>modules/ingest-download-service-api</module>
     <module>modules/ingest-download-service-impl</module>
     <module>modules/ingest-download-service-remote</module>

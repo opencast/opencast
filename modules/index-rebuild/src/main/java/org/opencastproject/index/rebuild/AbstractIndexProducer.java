@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.search.index;
+package org.opencastproject.index.rebuild;
 
 import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageReceiver;

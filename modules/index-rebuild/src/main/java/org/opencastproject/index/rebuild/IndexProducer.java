@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.search.index;
+package org.opencastproject.index.rebuild;
 
 /**
  * This service produces messages for an elastic search index

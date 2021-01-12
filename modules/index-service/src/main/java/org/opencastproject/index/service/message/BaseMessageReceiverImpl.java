@@ -21,6 +21,7 @@
 
 package org.opencastproject.index.service.message;
 
+import org.opencastproject.index.rebuild.IndexProducer;
 import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
@@ -28,7 +29,6 @@ import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Status;
 import org.opencastproject.search.index.AbstractSearchIndex;
-import org.opencastproject.search.index.IndexProducer;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Effect2;

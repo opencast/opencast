@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.index.rebuild.service;
+package org.opencastproject.index.rebuild;
 
 /**
  * An exception which indicates an error when creating a response.
