@@ -61,12 +61,10 @@ Install Opencast
 For a basic all-in-one installation just run:
 
 ```sh
-yum install opencast<version>-allinone
+yum install opencast-allinone
 ```
 
-…where `<version>` is the major version number of the Opencast release you want to install, e.g. `opencast9-allinone`.
 This will install the default distribution of Opencast and all its dependencies.
-
 For more options, see the [advanced installation section below](#advanced-installation).
 
 
@@ -149,41 +147,46 @@ You can list all available Opencast packages/distributions with:
 yum search opencast
 ```
 
-This will list all available Opencast distributions in the form `opencast<version>-<dist-type>`.
+This will list all available Opencast distributions in the form `opencast-<dist-type>`.
 Some commonly used distributions are:
 
-- `opencast<version>-allinone`
-- `opencast<version>-admin`
-- `opencast<version>-presentation`
-- `opencast<version>-worker`
+- `opencast-allinone`
+- `opencast-admin`
+- `opencast-presentation`
+- `opencast-worker`
 
 
 Upgrading
 ---------
 
-Packages will automatically upgrade to the latest minor version in a release series. They do not automatically upgrade
-the latest major version. This is intentional since additional migration steps might be necessary for that. For example,
-if you install `opencast7-admin` you get the latest 7.x release, not the latest 8.x release. To upgrade from one major
-version to another, please consult the upgrade guide for each major version. Still, here is a short overview of the
-required steps:
+Packages will automatically upgrade to the latest minor version in a release series when running `dnf update`.
+They do not automatically upgrade the latest major version.
+This is intentional since additional migration steps might be required.
+For example, if you install Opencast 9.1, you get the latest 9.x release, but no 10 release.
 
-First, stop Opencast:
+These instructions will upgrade Opencast to a new version which may be incompatible with older versions.
+Thus, a rollback might not be possible.
+If you are performing this on a production system, please ensure you have valid backups prior to taking the next steps.
+
+For an RPM-based upgrade, first, stop Opencast:
 
 ```sh
 systemctl stop opencast.service
 ```
 
-As a reminder, these instructions will upgrade your Opencast installation to a new version which is likely incompatible
-with older versions, and cannot be rolled back. If you are performing this on a production system, please ensure you
-have valid backups prior to taking the next steps.
+Then, replace the repository
 
-Uninstall your current Opencast package:
+```sh
+yum remove -y opencast-repository-8
+rm -f /etc/yum.repos.d/opencast*.repo* || :
+yum install -y https://pkg.opencast.org/rpms/release/el/7/oc-09/noarch/opencast-repository-9-0-1.el8.noarch.rpm
+```
 
-    yum remove opencast
+Upgrade to the new Opencast package by running:
 
-Then install the new version:
-
-    yum install opencast<version>-<distribution>
+```sh
+yum  install opencast-<distribution>
+```
 
 At this point you must follow the relevant [upgrade instructions](../upgrade.md), prior to starting Opencast again.
 
