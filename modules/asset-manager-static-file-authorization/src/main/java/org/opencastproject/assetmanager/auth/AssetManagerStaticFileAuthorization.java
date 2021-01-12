@@ -133,6 +133,15 @@ public class AssetManagerStaticFileAuthorization implements StaticFileAuthorizat
     }
 
     // Check role access
+
+    // As part of the asset manager modules, this will read the internal asset manager state directly and not talk to
+    // the main implementation module since the file authorization needs to be present on all nodes while the main
+    // asset manager implementation runs on the admin node only.
+
+    // Getting the data directly is more flexible and a lot faster which is important since this may get a high
+    // number of requests. Note that this code is only reading the state and will not modify any data to ensure
+    // consistency with the main implementation. If writing is necessary in the future, we need to enable a way to
+    // talk to the main implementation module like we do with the remote implementations.
     final List<String> roles = user.getRoles().parallelStream()
         .map(Role::getName)
         .filter(roleFilter)
@@ -162,7 +171,7 @@ public class AssetManagerStaticFileAuthorization implements StaticFileAuthorizat
       if (parent instanceof RuntimeException) {
         parent = parent.getCause();
         if (parent instanceof SQLSyntaxErrorException) {
-          // We may get a SyntaxException if the Table does not yet exist
+          // We may get a SyntaxException if the table does not yet exist
           // This also means that there are no access rules allowing access
           logger.info("Denying access to static file {}. {}", path, parent.getMessage());
           return false;
