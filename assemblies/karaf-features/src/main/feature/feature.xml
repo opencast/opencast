@@ -106,6 +106,7 @@
 
     <!-- Opencast -->
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-static-file-authorization/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-shared-filesystem-utils/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-authorization-xacml/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-common/${project.version}</bundle>

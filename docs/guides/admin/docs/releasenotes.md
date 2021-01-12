@@ -1,4 +1,4 @@
-Opencast 9: Release Notes
+Opencast 10: Release Notes
 =========================
 
 Important Changes
@@ -16,6 +16,10 @@ Improvements
 
 - …
 
+API changes
+-----------
+
+- …
 
 Release Schedule
 ----------------
