@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -23,11 +23,6 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-workflow-service-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-composer-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -47,7 +47,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Arrays;
+import java.util.Collections;
 
 public class CutMarksToSmilWorkflowOperationHandlerTest {
 
@@ -64,19 +64,16 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
   private static final String SOME_RESULT_SMIL_PATH = "/smil.smil";
 
   private CutMarksToSmilWorkflowOperationHandler handler;
-  private SmilService smilService;
 
   private Workspace workspace;
   private WorkflowInstanceImpl workflow;
   private WorkflowOperationInstance instance;
 
-  private URI mpSmilURI;
-
   @Before
   public void setUp() throws Exception {
     handler = new CutMarksToSmilWorkflowOperationHandler();
 
-    /** Create Mocks **/
+    // Create mocks
     instance = EasyMock.createNiceMock(WorkflowOperationInstanceImpl.class);
     EasyMock.expect(instance.getConfiguration(TARGET_SMIL_FLAVOR)).andReturn(TARGET_SMIL_FLAVOR_KEY).anyTimes();
 
@@ -103,7 +100,8 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
     // Add JSON to mp
     for (String path : jsonPaths) {
       URI newURI = getClass().getResource(path).toURI();
-      EasyMock.expect(workspace.get(newURI)).andReturn(new File(newURI)).anyTimes();    // To avoid NullPointerEx when grabbing Absolute Track Path
+      // To avoid NullPointerEx when grabbing Absolute Track Path
+      EasyMock.expect(workspace.get(newURI)).andReturn(new File(newURI)).anyTimes();
       mediaPackage.add(newURI, MediaPackageElement.Type.Catalog,
               MediaPackageElementFlavor.parseFlavor(SOURCE_JSON_FLAVOR_KEY));
     }
@@ -114,10 +112,10 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
       track.setFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
       // Make sure track contains a video
       VideoStreamImpl videoStream = new VideoStreamImpl("test1");
-      track.setVideo(Arrays.asList(videoStream));
+      track.setVideo(Collections.singletonList(videoStream));
       URI trackURI = getClass().getResource(SOME_TEST_VIDEO_PATH).toURI();   // Absolute URI
       track.setURI(trackURI);
-      track.setDuration(new Long(10000));
+      track.setDuration(10000L);
       mediaPackage.add(track);
     }
 
@@ -137,7 +135,7 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
    * @throws Exception
    */
   private void smilServiceSetup() throws Exception {
-    mpSmilURI = getClass().getResource(SOME_RESULT_SMIL_PATH).toURI();
+    final URI mpSmilURI = getClass().getResource(SOME_RESULT_SMIL_PATH).toURI();
 
     SmilMediaContainer objectPar = EasyMock.createNiceMock(SmilMediaContainer.class);
     EasyMock.expect(objectPar.getId()).andReturn("test").anyTimes();
@@ -152,13 +150,13 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
     EasyMock.expect(response.getEntity()).andReturn(objectPar).anyTimes();
     EasyMock.replay(response);
 
-    smilService = EasyMock.createNiceMock(SmilService.class);
-    EasyMock.expect(smilService.createNewSmil((MediaPackage) EasyMock.anyObject())).andReturn(response).anyTimes();
+    SmilService smilService = EasyMock.createNiceMock(SmilService.class);
+    EasyMock.expect(smilService.createNewSmil(EasyMock.anyObject(MediaPackage.class))).andReturn(response).anyTimes();
     EasyMock.expect(smilService.addParallel(smil)).andReturn(response).anyTimes();
-    EasyMock.expect(smilService.addClips((Smil) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            (Track[]) EasyMock.anyObject(), EasyMock.anyLong(), EasyMock.anyLong())).andReturn(response).anyTimes();
-    EasyMock.expect(workspace.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (String) EasyMock.anyObject(), (InputStream) EasyMock.anyObject())).andReturn(mpSmilURI);
+    EasyMock.expect(smilService.addClips(EasyMock.anyObject(Smil.class), EasyMock.anyString(),
+        EasyMock.anyObject(Track[].class), EasyMock.anyLong(), EasyMock.anyLong())).andReturn(response).anyTimes();
+    EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(),
+        EasyMock.anyObject(InputStream.class))).andReturn(mpSmilURI);
     EasyMock.replay(smilService);
     handler.setSmilService(smilService);
   }
@@ -193,11 +191,9 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
     String[] trackFlavors = new String[] {SOURCE_MEDIA_FLAVORS_KEY};
     specificSetUp(jsonPaths, trackFlavors);
 
-    try {
+    Assert.assertThrows(Exception.class, () -> {
       handler.start(workflow, null);
-      Assert.fail();
-    } catch (Exception e) {
-    }
+    });
   }
 
   @Test
@@ -206,11 +202,9 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
     String[] trackFlavors = new String[] {SOURCE_MEDIA_FLAVORS_KEY};
     specificSetUp(jsonPaths, trackFlavors);
 
-    try {
+    Assert.assertThrows(Exception.class, () -> {
       handler.start(workflow, null);
-      Assert.fail();
-    } catch (Exception e) {
-    }
+    });
   }
 
   @Test

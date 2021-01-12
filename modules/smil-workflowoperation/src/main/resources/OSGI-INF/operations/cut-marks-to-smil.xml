@@ -8,8 +8,6 @@
   <service>
     <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
   </service>
-  <reference name="ComposerService" interface="org.opencastproject.composer.api.ComposerService"
-             bind="setComposerService"/>
   <reference name="Workspace" interface="org.opencastproject.workspace.api.Workspace"
              bind="setWorkspace"/>
   <reference name="ServiceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"

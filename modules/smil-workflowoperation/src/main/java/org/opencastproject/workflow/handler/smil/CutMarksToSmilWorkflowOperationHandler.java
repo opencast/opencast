@@ -20,7 +20,6 @@
  */
 package org.opencastproject.workflow.handler.smil;
 
-import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -44,6 +43,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -56,11 +56,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -81,23 +80,10 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
   private static final String CUTTING_SMIL_NAME = "prepared_cutting_smil";
 
   /** The logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(PartialImportWorkflowOperationHandler.class);
-
-  /** The composer service */
-  private ComposerService composerService = null;
+  private static final Logger logger = LoggerFactory.getLogger(CutMarksToSmilWorkflowOperationHandler.class);
 
   /** The local workspace */
   private Workspace workspace = null;
-
-  /**
-   * Callback for the OSGi declarative services configuration.
-   *
-   * @param composerService
-   *          the local composer service
-   */
-  public void setComposerService(ComposerService composerService) {
-    this.composerService = composerService;
-  }
 
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
@@ -120,24 +106,12 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
 
   /** JSON Parser */
   private static final Gson gson = new Gson();
+  private static final Type timesListType = new TypeToken<List<Times>>() { }.getType();
 
   /** Stores information read from JSON */
-  class Times {
+  static class Times {
     private Long begin;
     private Long duration;
-
-    public Long getStartTime() {
-      return begin;
-    }
-    public void setStartTime(Long startTime) {
-      this.begin = startTime;
-    }
-    public Long getDuration() {
-      return duration;
-    }
-    public void setDuration(Long duration) {
-      this.duration = duration;
-    }
   }
 
   /**
@@ -173,32 +147,29 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
     Catalog[] catalogs = mediaPackage.getCatalogs(jsonFlavor);
     if (catalogs.length < 1) {
       logger.warn("No catalogs in the source flavor. Skipping...");
-      final WorkflowOperationResult result = createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
-      return result;
+      return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
     } else if (catalogs.length > 1) {
       throw new WorkflowOperationException("More than one catalog in the source flavor! Make sure there is only catalog.");
     }
 
     // Parse JSON
-    Times[] cutmarks;
+    List<Times> cutMarks;
     Catalog jsonWithTimes = catalogs[0];
     try (BufferedReader bufferedReader = new BufferedReader(new FileReader(getMediaPackageElementPath(jsonWithTimes)))) {
-      cutmarks = gson.fromJson(bufferedReader, Times[].class);
+      cutMarks = gson.fromJson(bufferedReader, timesListType);
     } catch (Exception e) {
       throw new WorkflowOperationException("Could not read JSON", e);
     }
-    LinkedList<Times> cutmarksList = new LinkedList<Times>(Arrays.asList(cutmarks));
 
     // If the catalog was empty, give up
-    if (cutmarksList.size() < 1) {
+    if (cutMarks.size() < 1) {
       logger.warn("Source JSON did not contain any timestamps! Skipping...");
-      final WorkflowOperationResult result = createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
-      return result;
+      return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
     }
 
     // Check parsing results
-    for (Times entry : cutmarksList) {
-      logger.info("Entry begin {}, Entry duration {}", entry.begin, entry.duration);
+    for (Times entry : cutMarks) {
+      logger.debug("Entry begin={}, duration={}", entry.begin, entry.duration);
       if (entry.begin < 0 || entry.duration < 0) {
         throw new WorkflowOperationException("Times may not be negative.");
       }
@@ -219,8 +190,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
     // Are there actually any tracks?
     if (tracksFromFlavors.isEmpty()) {
       logger.warn("None of the given flavors contained a track. Skipping...");
-      final WorkflowOperationResult result = createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
-      return result;
+      return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
     }
 
     // Check for cut marks that would lead to errors with the given tracks and remove them
@@ -233,7 +203,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
       }
     }
     // Remove all timestamps that begin after the shortest duration
-    ListIterator<Times> iter = cutmarksList.listIterator();
+    ListIterator<Times> iter = cutMarks.listIterator();
     while (iter.hasNext()) {
       long begin = iter.next().begin;
       if (begin > shortestDuration) {
@@ -242,10 +212,9 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
       }
     }
     // If the timestamp list is now empty, give up
-    if (cutmarksList.size() < 1) {
+    if (cutMarks.size() < 1) {
       logger.warn("No timestamps are valid for the given tracks! Skipping...");
-      final WorkflowOperationResult result = createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
-      return result;
+      return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
     }
 
     // Create the new SMIL document
@@ -254,7 +223,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
       SmilResponse smilResponse = smilService.createNewSmil(mediaPackage);
 
       logger.info("Start adding tracks");
-      for (Times mark : cutmarksList) {
+      for (Times mark : cutMarks) {
         smilResponse = smilService.addParallel(smilResponse.getSmil());
         SmilMediaContainer par = (SmilMediaContainer) smilResponse.getEntity();
         logger.debug("Segment begin: {}; Segment duration: {}", mark.begin, mark.duration);
@@ -262,7 +231,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
         smilResponse = smilService
                 .addClips(smilResponse.getSmil(),
                         par.getId(),
-                        tracksFromFlavors.toArray(new Track[tracksFromFlavors.size()]), //new Track[] { presenterTrack, presentationTrack },
+                        tracksFromFlavors.toArray(new Track[0]),
                         mark.begin,
                         mark.duration);
       }
@@ -273,7 +242,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
       throw new WorkflowOperationException("Failed to create SMIL Catalog", e);
     }
 
-    // Put new SMIL into workspace and add it to mediapackage
+    // Put new SMIL into workspace and add it to media package
     try (InputStream is = IOUtils.toInputStream(smil.toXML(), "UTF-8")) {
       URI smilURI = workspace.put(mediaPackage.getIdentifier().toString(), smil.getId(), CUTTING_SMIL_NAME, is);
       MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
@@ -300,10 +269,12 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
     Collection<Track> tracks = trackSelector.select(mediaPackage, false);
 
     // Get only videos
-    ArrayList<Track> videos = new ArrayList<Track>();
+    ArrayList<Track> videos = new ArrayList<>();
     for (Track video : tracks) {
       if (video.hasVideo()) {
         videos.add((video));
+      } else {
+        logger.debug("Skipping track {} since it does not seem to have a vide track.", video);
       }
     }
 
