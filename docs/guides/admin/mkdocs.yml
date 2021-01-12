@@ -79,6 +79,7 @@ nav:
       - Sakai User Provider: 'configuration/security.user.sakai.md'
       - Brightspace User Provider: 'configuration/security.user.brightspace.md'
       - Canvas User Provider: 'configuration/security.user.canvas.md'
+   - Serving Static Files: 'configuration/serving-static-files.md'
    - Stream Security: 'configuration/stream-security.md'
    - Workflow: 'configuration/workflow.md'
    - External API: 'configuration/external-api.md'

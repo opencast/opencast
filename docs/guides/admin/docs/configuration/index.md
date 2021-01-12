@@ -31,6 +31,7 @@ General Configuration
     - [Authentication and Authorization Infrastructure (AAI)](security.aai.md)
     - [Access Control Lists](acl.md)
     - [Stream Security](stream-security.md)
+- [Serving Static Files](serving-static-files.md)
 - [Workflow Configuration](workflow.md)
     - [Workflow Operation Handler](../workflowoperationhandlers/index.md)
 - [External API Configuration](external-api.md)
