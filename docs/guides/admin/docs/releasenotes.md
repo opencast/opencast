@@ -119,7 +119,7 @@ Additional Notes about 9.1
 This release contains an important bugfix where unprivileged users
 could not upload videos, before.
 
-Additional Notes about 9.1
+Additional Notes about 9.2
 --------------------------
 
 A [completely new system for securing static file content](configuration/serving-static-files.md) has been integrated.
