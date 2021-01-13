@@ -1556,7 +1556,7 @@ Opencast 7
 *Released on December 8, 2020*
 
 - [[GHSA-44cw-p2hm-gpf6](https://github.com/opencast/opencast/security/advisories/GHSA-44cw-p2hm-gpf6)]
-  Securoty: Disabled Hostname Verification
+  Security: Disabled Hostname Verification
 - [[#1964](https://github.com/opencast/opencast/pull/1964)] -
   Docs: When the sidebar is hidden, the navigation links are disabled now
 - [[#1922](https://github.com/opencast/opencast/pull/1922)] -
@@ -1567,11 +1567,11 @@ Opencast 7
 *Released on August 17, 2020*
 
 - [[#1667](https://github.com/opencast/opencast/pull/1667)] -
-  Fix managed acl filter in api
+  Fix managed ACL filter in API
 - [[#1659](https://github.com/opencast/opencast/pull/1659)] -
   Updating Guava version
 - [[#1657](https://github.com/opencast/opencast/pull/1657)] -
-  Fixed the video outline in the theodul player
+  Fixed the video outline in the Theodul Player
 - [[#1641](https://github.com/opencast/opencast/pull/1641)] -
   Capture Agent Authentication Method
 - [[#1595](https://github.com/opencast/opencast/pull/1595)] -
@@ -1594,13 +1594,13 @@ Opencast 7
 - [[#1427](https://github.com/opencast/opencast/pull/1427)] -
   1281: Ignoring test which randomly fails in CI testing
 - [[#1426](https://github.com/opencast/opencast/pull/1426)] -
-  Autodetect browsers for admin ui tests, fix phantomJS openssl issue
+  Autodetect browsers for Admin UI tests, fix phantomJS OpenSSL issue
 - [[#1425](https://github.com/opencast/opencast/pull/1425)] -
   Don't duplicate publications
 - [[#1380](https://github.com/opencast/opencast/pull/1380)] -
-  In fast, don't cleanup acls (see other workflows)
+  In fast, don't cleanup ACLs (see other workflows)
 - [[#1379](https://github.com/opencast/opencast/pull/1379)] -
-  Use active, not episode acl in scheduler service
+  Use active, not episode ACL in scheduler service
 
 ### Opencast 7.6
 
@@ -1623,13 +1623,13 @@ Opencast 7
 - [[#1352](https://github.com/opencast/opencast/pull/1352)] -
   Remove unsafe option in ffmpeg command for SMIL processing
 - [[#1343](https://github.com/opencast/opencast/pull/1343)] -
-  ] Fixes Admin-UI Presenter's column
+  Fixes Admin-UI Presenter's column
 - [[#1333](https://github.com/opencast/opencast/pull/1333)] -
   Switch to mvn.opencast.org
 - [[#1329](https://github.com/opencast/opencast/pull/1329)] -
   Remove Spring Request Logger Configuration
 - [[#1325](https://github.com/opencast/opencast/pull/1325)] -
-  Secure FPS For Smil Processing
+  Secure FPS For SMIL Processing
 - [[#1318](https://github.com/opencast/opencast/pull/1318)] -
   Remove Custom Plugin Repositories
 - [[#1315](https://github.com/opencast/opencast/pull/1315)] -
@@ -1669,7 +1669,7 @@ Opencast 7
 *Released on October 02, 2019*
 
 - [[MH-13517](https://opencast.jira.com/browse/MH-13517)][[#1092](https://github.com/opencast/opencast/pull/1092)] -
-  Set an absolute limit on solr query size
+  Set an absolute limit on Solr query size
 - [[MH-13476](https://opencast.jira.com/browse/MH-13476)][[#1088](https://github.com/opencast/opencast/pull/1088)] -
   Filter capture agent roles for ACLs
 - [[#1087](https://github.com/opencast/opencast/pull/1087)] -
