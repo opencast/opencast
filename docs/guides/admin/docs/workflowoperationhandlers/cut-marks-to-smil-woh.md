@@ -1,15 +1,16 @@
-CutMarksToSmilWorkflowOperationHandler
-===================================
+Cut Marks to Smil Operation
+===========================
+
+ID: `cut-marks-to-smil`
 
 Description
 -----------
 
-This operation parses a JSON containing cut marks into a SMIL that can be used by the
-[VideoEditorWorkflowOperation](editor-woh.md). It does this by attributing the given times to the tracks in the
-given presentation and presenter flavors.
+This operation parses a JSON containing cut marks into a SMIL that can be used by the [Video Editor](editor-woh.md).
+It does this by attributing the given times to the specified tracks.
 
-Tracks are assumed to start at 0. Likewise, cut marks are assumed to be specified relative to the beginning
-of the tracks.
+Tracks are assumed to start at 0.
+Likewise, cut marks are assumed to be specified relative to the beginning of the tracks.
 
 
 Parameter Table
@@ -18,7 +19,7 @@ Parameter Table
 |Configuration Keys    |Example              |Description                                                    |
 |----------------------|---------------------|---------------------------------------------------------------|
 |source-media-flavors  |`presenter/prepared` |The flavors containing the video tracks.                       |
-|source-json-flavor    |`smil/times`         |The flavor of the JSON. Must contain exactly one file.         |
+|source-json-flavor    |`json/times`         |The flavor of the JSON. Must contain exactly one file.         |
 |target-smil-flavor    |`smil/cutmarks`      |The flavor of the resulting SMIL.                              |
 |target-tags           |`archive`            |(Optional) Tags to add to the resulting SMIL. Default is `null`|
 
@@ -45,7 +46,7 @@ Operation Example
 ```xml
 <operation
     id="cut-marks-to-smil"
-    description="Process ingested cutmarks by applying them to current tracks"
+    description="Process ingested cut marks by applying them to current tracks"
     fail-on-error="true"
     exception-handler-workflow="partial-error">
   <configurations>

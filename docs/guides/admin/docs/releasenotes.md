@@ -133,6 +133,10 @@ While is is not active by default for compatibility to older 9.x releases, it ca
 access to static files has the same security checks you are already used to from the player and from other user
 interfaces.
 
+A new [workflow operation `cut-marks-to-smil`](workflowoperationhandlers/cut-marks-to-smil-woh.md) has been added to
+allow a simpler specification of cutting information for the video editor. This was also the last piece missing from the
+[BigBlueButton recordings integration](https://github.com/elan-ev/opencast-bigbluebutton-integration) in Opencast.
+
 
 Release Schedule
 ----------------
