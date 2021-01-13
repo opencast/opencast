@@ -1,18 +1,29 @@
-# PartialImportWorkflowOperation
+Partial Import Operation
+========================
 
-## Description
+ID: `animate`
+
+
+Description
+-----------
+
 The PartialImportWorkflowOperation processes a set of audio and video files according to a SMIL document describing
 their relations. Its primary use is to post-process audio and video files ingested by capture agents using
 /ingest/addPartialTrack of the ingest endpoint.
 
-## Prerequisite
+
+Prerequisite
+------------
+
 When using the PartialImportWorkflowOperation, it is recommended to perform a media inspection beforehand using the
 InspectWorkflowOperation with the option `accurate-frame-count` set to `true`. This ensures that
 the PartialImportWorkflowOperation works correctly in case of media files with incorrect framecount in their header.
 Note that the use of `accurate-frame-count` will force the InspectWorkflowOperation to decode the complete video
 stream which makes the operation more expensive in terms of load.
 
-## Parameter Table
+
+Parameter Table
+---------------
 
 |configuration keys|type|description|default value|
 |------------------|-------|-----------|-------------|
@@ -36,7 +47,9 @@ stream which makes the operation more expensive in terms of load.
 Note that it is allowed to set the configuration keys 'target-presenter-flavor' and 'target-presentation-flavor' to the
 same value.
 
-## Operation Example
+
+Operation Example
+-----------------
 
 What exactly the PartialImportWorkflowOperation does is best described by example. In our example, a capture agent
 records three sources:
@@ -69,45 +82,49 @@ describing how the files relate to each other and add it to the media package as
 
 In our example, this SMIL file would like something like:
 
-      <?xml version="1.1" encoding="UTF-8"?>
-      <smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
-        <head/>
-        <body>
-          <par dur="93861ms">
-            <seq>
-              <video begin="412ms" dur="13440ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/5133d85c-5813-4b54-8a43-0cce9ddc1c4a/video_file.mov"/>
-              <video begin="15324ms" dur="73440ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/5133d85c-5813-4b54-8a43-0cce9ddc1c4a/video_file.mov"/>
-              <audio begin="0ms" dur="40861ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/72a42596-e1d0-47a5-b9c8-60180b466954/audio_file.mov"/>
-              <audio begin="43400ms" dur="13861ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/72a42596-e1d0-47a5-b9c8-60180b466954/audio_file.mov"/>
-            </seq>
-            <seq>
-              <video begin="948ms" dur="33440ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/bf5ea647-b99b-4ec3-a10c-29445fb01eca/video_file.mov"/>
-              <video begin="35643ms" dur="15430ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/bf5ea647-b99b-4ec3-a10c-29445fb01eca/video_file.mov"/>
-              <video begin="45448ms" dur="25440ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/bf5ea647-b99b-4ec3-a10c-29445fb01eca/video_file.mov"/>
-            </seq>
-          </par>
-        </body>
-      </smil>
+```xml
+<?xml version="1.1" encoding="UTF-8"?>
+<smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
+  <head/>
+  <body>
+    <par dur="93861ms">
+      <seq>
+        <video begin="412ms" dur="13440ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/5133d85c-5813-4b54-8a43-0cce9ddc1c4a/video_file.mov"/>
+        <video begin="15324ms" dur="73440ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/5133d85c-5813-4b54-8a43-0cce9ddc1c4a/video_file.mov"/>
+        <audio begin="0ms" dur="40861ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/72a42596-e1d0-47a5-b9c8-60180b466954/audio_file.mov"/>
+        <audio begin="43400ms" dur="13861ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/72a42596-e1d0-47a5-b9c8-60180b466954/audio_file.mov"/>
+      </seq>
+      <seq>
+        <video begin="948ms" dur="33440ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/bf5ea647-b99b-4ec3-a10c-29445fb01eca/video_file.mov"/>
+        <video begin="35643ms" dur="15430ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/bf5ea647-b99b-4ec3-a10c-29445fb01eca/video_file.mov"/>
+        <video begin="45448ms" dur="25440ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/bf5ea647-b99b-4ec3-a10c-29445fb01eca/video_file.mov"/>
+      </seq>
+    </par>
+  </body>
+</smil>
+```
 
 What we finally want, however, is a single presenter and a single presentation track that can be processed by Opencast
 workflow operations. To achieve this, the PartialImportWorkflowOperation is used to post-process the files as described
 in the SMIL file:
 
-     <operation id="partial-import"
-               description="Post-processing raw audio and video files from capture agent"
-               fail-on-error="true"
-               exception-handler-workflow="partial-error">
-      <configurations>
-        <configuration key="source-presenter-flavor">presenter/source</configuration>
-        <configuration key="source-presentation-flavor">presentation/source</configuration>
-        <configuration key="source-smil-flavor">smil/source+partial</configuration>
-        <configuration key="target-presenter-flavor">presenter/standard</configuration>
-        <configuration key="target-presentation-flavor">presentation/standard</configuration>
-        <configuration key="concat-encoding-profile">concat.work</configuration>
-        <configuration key="trim-encoding-profile">trim.work</configuration>
-        <configuration key="force-encoding-profile">editor.work</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation id="partial-import"
+     description="Post-processing raw audio and video files from capture agent"
+     fail-on-error="true"
+     exception-handler-workflow="partial-error">
+  <configurations>
+    <configuration key="source-presenter-flavor">presenter/source</configuration>
+    <configuration key="source-presentation-flavor">presentation/source</configuration>
+    <configuration key="source-smil-flavor">smil/source+partial</configuration>
+    <configuration key="target-presenter-flavor">presenter/standard</configuration>
+    <configuration key="target-presentation-flavor">presentation/standard</configuration>
+    <configuration key="concat-encoding-profile">concat.work</configuration>
+    <configuration key="trim-encoding-profile">trim.work</configuration>
+    <configuration key="force-encoding-profile">editor.work</configuration>
+  </configurations>
+</operation>
+```
 
 In our example, the PartialImportWorkflowOperation will create the target flavors presenter/standard and
 presentation/standard as depicted below:
@@ -142,28 +159,32 @@ To achieve this, the PartialImportWorkflowOperation performs the following steps
    target tracks will also be re-encoded using that encoding profile in case its file extensions don't match the
    *required_extensions*.
 
-## SMIL File Structure
+
+SMIL File Structure
+-------------------
 
 The PartialImportWorkflowOperation expects a specific subset of SMIL that is described in this section.
 The overall structure of the SMIL file is shown by example below:
 
-      <?xml version="1.1" encoding="UTF-8"?>
-      <smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
-        <head/>
-        <body>
-          <par dur="15000ms">
-            <seq>
-              <video begin="400ms" dur="13000ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/5133d85c-5813-4b54-8a43-0cce9ddc1c4a/video_file.mov"/>
-              <video begin="15000ms" dur="70000ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/5133d85c-5813-4b54-8a43-0cce9ddc1c4a/video_file.mov"/>
-              <audio begin="0ms" dur="400ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/72a42596-e1d0-47a5-b9c8-60180b466954/audio_file.mov"/>
-              <audio begin="900ms" dur="13000ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/72a42596-e1d0-47a5-b9c8-60180b466954/audio_file.mov"/>
-            </seq>
-            <seq>
-              <video begin="900ms" dur="30000ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/bf5ea647-b99b-4ec3-a10c-29445fb01eca/video_file.mov"/>
-            </seq>
-          </par>
-        </body>
-      </smil>
+```xml
+<?xml version="1.1" encoding="UTF-8"?>
+<smil xmlns="http://www.w3.org/ns/SMIL" version="3.0">
+  <head/>
+  <body>
+    <par dur="15000ms">
+      <seq>
+        <video begin="400ms" dur="13000ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/5133d85c-5813-4b54-8a43-0cce9ddc1c4a/video_file.mov"/>
+        <video begin="15000ms" dur="70000ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/5133d85c-5813-4b54-8a43-0cce9ddc1c4a/video_file.mov"/>
+        <audio begin="0ms" dur="400ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/72a42596-e1d0-47a5-b9c8-60180b466954/audio_file.mov"/>
+        <audio begin="900ms" dur="13000ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/72a42596-e1d0-47a5-b9c8-60180b466954/audio_file.mov"/>
+      </seq>
+      <seq>
+        <video begin="900ms" dur="30000ms" src="/files/mediapackage/7b56bf47-8065-4244-96a0-412a759ccc3f/bf5ea647-b99b-4ec3-a10c-29445fb01eca/video_file.mov"/>
+      </seq>
+    </par>
+  </body>
+</smil>
+```
 
 The PartialImportWorkflowOperation can handle at most one ***par*** element that is used to describe to overall media
 duration using the attribute *dur*. The resulting tracks will be trimmed to this duration if necessary. In the example
@@ -177,6 +198,7 @@ partial track in milliseconds) The *audio* elements are used to indicate that th
 audio-only media file, whereas *video* elements can refer to either video-only or audio-video media files. The following
 combinations result in a defined behavior:
 
+
 ### Supported Combinations of Video and Audio Elements
 
 |video|audio|resulting track|
@@ -189,6 +211,7 @@ combinations result in a defined behavior:
 All other combinations of *video* and *audio* elements result in unspecified behavior of the
 PartialImportWorkflowOperation.
 
+
 ### Order of Video and Audio Elements
 
 Within a sequence (*seq*), the *video* elements most occur in ascending order considering the values of their attributes
@@ -198,6 +221,7 @@ order of occurrences of *video* and *audio* elements are independent from each o
 **Important:** The PartialImportWorkflowOperation will not process *video* or *audio* elements correctly if the order of
 appearance in the SMIL file is not correct.
 
+
 ### Overlapping Partial Tracks
 
 The behavior of overlapping partial tracks is unspecified, i.e. for a given element *e* (*video* or *audio*), the value
@@ -205,9 +229,13 @@ of *begin* for the subsequent element *(e+1)* of the same type (*video* or *audi
 equal or greater than *e.begin + e.dur*, i.e. make sure that the following invariant holds: *(e+1).begin >= e.begin +
 e.dur*
 
-## Encoding Profiles The PartialImportWorkflowOperation uses a number of encoding profiles to perform its processing.
-Some of the encoding profiles can be explicitly configured by the user, others are used implicitly in means of being
-hard-coded and are not supposed to be changed by the user.
+Encoding Profiles
+-----------------
+
+The PartialImportWorkflowOperation uses a number of encoding profiles to perform its processing.  Some of the encoding
+profiles can be explicitly configured by the user, others are used implicitly in means of being hard-coded and are not
+supposed to be changed by the user.
+
 
 ### Hard-coded Encoding Profiles
 
@@ -217,6 +245,7 @@ hard-coded and are not supposed to be changed by the user.
 |import.image-frame|Extract the last frame of a given partial track. Note that this profile is used to extract the *exactly* last frame of a partial track - not just a frame close to the last one. To make this work for video files with headers that don't contain the exact frame count, set *accurate\_frame\_count* to *true* in  etc/org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl.cfg|
 |image-movie.work|Generate video partial tracks based on extracted images used to fill video gaps|
 |import.silent|Generate silent audio tracks used to fill audio gaps|
+
 
 ### Configurable Encoding Profiles
 
