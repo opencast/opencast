@@ -6,28 +6,16 @@
 
 <suppressions>
     <suppress checks="LineLength" files="modules/admin-ui/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/admin-ui-frontend/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/admin-ui-index/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/adopter-statistics-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/adopter-statistics-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/animate-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/animate-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/animate-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/animate-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/annotation-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/annotation-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/asset-manager-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/asset-manager-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/asset-manager-static-file-authorization/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/asset-manager-storage-aws/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/asset-manager-storage-fs/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/asset-manager-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/authorization-manager/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/authorization-xacml/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/caption-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/caption-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/caption-remote/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/capture-admin-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/capture-admin-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/comments-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/common/.+\.(java|properties)"/>
@@ -39,165 +27,90 @@
     <suppress checks="LineLength" files="modules/conductor/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/cover-image-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/cover-image-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/cover-image-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/cover-image-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/crop-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/crop-ffmpeg/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/crop-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/crop-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/db/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/dictionary-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/dictionary-hunspell/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/dictionary-none/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/dictionary-regexp/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/distribution-service-adaptive-streaming-wowza/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/distribution-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/distribution-service-aws-s3/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/distribution-service-aws-s3-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/distribution-service-aws-s3-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/distribution-service-download/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/distribution-service-download-remote/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/distribution-service-streaming-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/distribution-service-streaming-wowza/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/distribution-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/dublincore/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/email-template-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/email-template-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-paella-player/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/engage-theodul-core/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-plugin-archetype/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-plugin-controls/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-plugin-custom-matomo/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-plugin-custom-mhConnection/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-plugin-custom-notifications/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-plugin-custom-usertracking/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-plugin-description/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-plugin-tab-description/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-plugin-tab-downloads/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-plugin-tab-shortcuts/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-plugin-tab-slidetext/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-plugin-timeline-statistics/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-theodul-plugin-video-videojs/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/engage-ui/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/event-comment/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/execute-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/execute-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/execute-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/execute-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/external-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/external-api-index/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/fileupload/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/hello-world-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/hello-world-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/incident-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/index-service/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/ingest-download-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/ingest-download-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/ingest-download-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/ingest-download-service-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/ingest-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/ingest-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/inspection-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/inspection-service-ffmpeg/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/inspection-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/inspection-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/kernel/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/list-providers-service/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/live-schedule-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/live-schedule-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/logging-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/lti/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/lti-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/lti-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/lti-service-remote/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/mattermost-notification-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/message-broker-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/message-broker-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/metadata/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/metadata-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/mpeg7/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/notification-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/oaipmh-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh-persistence/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/oaipmh-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/presets/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/publication-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/publication-service-configurable/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/publication-service-configurable-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/publication-service-oaipmh/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/publication-service-oaipmh-remote/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/publication-service-youtube-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/publication-service-youtube-v3/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/rest-test-environment/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/runtime-info/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/runtime-info-ui/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/runtime-info-ui-ng/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/scheduler-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/scheduler-conflict-handler/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/scheduler-conflict-notifier-comment/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/scheduler-conflict-notifier-email/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/scheduler-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/scheduler-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/schema/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/search/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/search-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/search-service-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/search-service-feeds/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/search-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/search-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/security-aai/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/security-cas/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/security-cas-client-wrapper/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/security-ldap/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/security-lti/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/security-openid/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/security-shibboleth/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/series-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/series-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/series-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/shared-filesystem-utils/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/silencedetection-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/silencedetection-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/silencedetection-remote/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/smil-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/smil-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/solr/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/sox-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/sox-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/sox-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/sox-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/static/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/static-file-service-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/static-file-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/statistics-export-service/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-export-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-export-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-provider-influx/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/statistics-provider-random/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/statistics-writer-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/studio/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/termination-state-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/termination-state-aws/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/termination-state-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/textanalyzer-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/textanalyzer-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/textanalyzer-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/textanalyzer-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/textextractor-tesseract/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/themes/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/themes-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/timelinepreviews-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/timelinepreviews-ffmpeg/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/timelinepreviews-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/timelinepreviews-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-amberscript/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/transcription-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-google-speech-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-ibm-watson-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/transcription-service-persistence/.+\.(java|properties)"/>
@@ -216,19 +129,13 @@
     <suppress checks="LineLength" files="modules/user-interface-configuration/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/usertracking-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/usertracking-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/videoeditor-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videoeditor-ffmpeg-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/videoeditor-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videoeditor-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videogrid-remote/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/videogrid-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videogrid-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videogrid-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/videosegmenter-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videosegmenter-ffmpeg/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/videosegmenter-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/videosegmenter-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/waveform-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/waveform-ffmpeg/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/waveform-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/waveform-workflowoperation/.+\.(java|properties)"/>
@@ -237,9 +144,6 @@
     <suppress checks="LineLength" files="modules/workflow-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/working-file-repository-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/working-file-repository-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/working-file-repository-service-remote/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/workspace-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workspace-impl/.+\.(java|properties)"/>
 </suppressions>
