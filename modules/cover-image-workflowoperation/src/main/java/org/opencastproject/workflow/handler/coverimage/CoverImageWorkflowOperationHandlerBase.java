@@ -213,7 +213,8 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
     if (atts.length > 1) {
       logger.warn("More than one attachment with the flavor '{}' found in media package '{}'", posterimageFlavor,
               mediaPackage.getIdentifier());
-      throw new WorkflowOperationException("More than one attachment with the flavor'" + posterimageFlavor + "' found.");
+      throw new WorkflowOperationException(
+              "More than one attachment with the flavor'" + posterimageFlavor + "' found.");
     } else if (atts.length == 0) {
       logger.warn("No attachment with the flavor '{}' found in media package '{}'", posterimageFlavor,
               mediaPackage.getIdentifier());

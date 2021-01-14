@@ -172,8 +172,8 @@ public interface UserTrackingService {
    * @throws UserTrackingException
    *           if the user tracking service encounters an error
    */
-  UserActionList getUserActionsByTypeAndMediapackageIdByDescendingDate(String key, String mediapackageId, int offset, int limit)
-          throws UserTrackingException;
+  UserActionList getUserActionsByTypeAndMediapackageIdByDescendingDate(String key, String mediapackageId, int offset,
+          int limit) throws UserTrackingException;
 
   /**
    * Returns the views of a mediapackage

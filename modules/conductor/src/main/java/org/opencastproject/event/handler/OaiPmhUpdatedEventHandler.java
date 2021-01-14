@@ -179,7 +179,8 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
                     .updateMetadata(snapshotMp, searchResultItem.getRepository(), flavors, tags, false);
             // we don't want to wait for job completion here because it will block the message queue
           } catch (Exception e) {
-            logger.error("Unable to update OAI-PMH publication for the media package {} in repository {}", snapshotItem.getId(), searchResultItem.getRepository(), e);
+            logger.error("Unable to update OAI-PMH publication for the media package {} in repository {}",
+                    snapshotItem.getId(), searchResultItem.getRepository(), e);
           }
         }
       }
