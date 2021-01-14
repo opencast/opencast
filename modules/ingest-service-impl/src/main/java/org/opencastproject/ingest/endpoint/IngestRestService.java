@@ -41,6 +41,7 @@ import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
@@ -1254,7 +1255,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       try {
         dcFlavor = MediaPackageElementFlavor.parseFlavor(flavor);
       } catch (IllegalArgumentException e) {
-        logger.warn("Unable to set dublin core flavor to {}, using {} instead", flavor, MediaPackageElements.EPISODE);
+        return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
       }
     }
     MediaPackage mediaPackage;
@@ -1265,29 +1266,26 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       return Response.serverError().status(Status.BAD_REQUEST).build();
     }
     if (MediaPackageSupport.sanityCheck(mediaPackage).isSome()) {
-      return Response.serverError().status(Status.BAD_REQUEST).build();
+      return Response.status(Status.BAD_REQUEST).build();
     }
 
     /* Check if we got a proper catalog */
-    if (StringUtils.isBlank(dc)) {
-      return Response.serverError().status(Status.BAD_REQUEST).build();
+    try {
+      DublinCoreXmlFormat.read(dc);
+    } catch (Exception e) {
+      return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
     }
 
-    InputStream in = null;
-    try {
-      in = IOUtils.toInputStream(dc, "UTF-8");
+    try (InputStream in = IOUtils.toInputStream(dc, "UTF-8")) {
       mediaPackage = ingestService.addCatalog(in, "dublincore.xml", dcFlavor, mediaPackage);
     } catch (MediaPackageException e) {
-      return Response.serverError().status(Status.BAD_REQUEST).build();
+      return Response.serverError().status(Status.BAD_REQUEST).entity(e.getMessage()).build();
     } catch (IOException e) {
-      /* Return an internal server error if we could not write to disk */
-      logger.error("Could not write catalog to disk: {}", e.getMessage());
+      logger.error("Could not write catalog to disk", e);
       return Response.serverError().build();
     } catch (Exception e) {
-      logger.error("Unable to add catalog: {}", e.getMessage());
+      logger.error("Unable to add catalog", e);
       return Response.serverError().build();
-    } finally {
-      IOUtils.closeQuietly(in);
     }
     return Response.ok(mediaPackage).build();
   }
