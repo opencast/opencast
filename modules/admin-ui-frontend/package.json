@@ -3,7 +3,7 @@
   "private": true,
   "devDependencies": {
     "autoprefixer": "^9.8.6",
-    "bower": "^1.8.8",
+    "bower": "^1.8.10",
     "chromedriver": "^87.0.5",
     "eslint": "^7.17.0",
     "eslint-plugin-header": "^3.1.0",
