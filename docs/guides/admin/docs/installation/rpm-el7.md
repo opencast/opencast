@@ -36,7 +36,7 @@ Activate Repository
 First you have to install the necessary repositories:
 
 ```sh
-yum install -y https://pkg.opencast.org/rpms/release/el/7/oc-09/noarch/opencast-repository-9-0-1.el8.noarch.rpm
+yum install -y https://pkg.opencast.org/rpms/release/el/7/oc-09/noarch/opencast-repository-9-1.el7.noarch.rpm
 ```
 
 It might take some time after the release of a new Opencast version before the RPMs are moved to the stable repository.
@@ -177,9 +177,8 @@ systemctl stop opencast.service
 Then, replace the repository
 
 ```sh
-yum remove -y opencast-repository-8
 rm -f /etc/yum.repos.d/opencast*.repo* || :
-yum install -y https://pkg.opencast.org/rpms/release/el/7/oc-09/noarch/opencast-repository-9-0-1.el8.noarch.rpm
+yum install -y https://pkg.opencast.org/rpms/release/el/7/oc-09/noarch/opencast-repository-9-1.el7.noarch.rpm
 ```
 
 Upgrade to the new Opencast package by running:
