@@ -730,10 +730,7 @@ public class SolrIndexManager {
     DublinCoreCatalog dc = null;
     try {
       dc = seriesService.getSeries(seriesId);
-    } catch (SeriesException e) {
-      logger.debug("No series dublincore found for series id " + seriesId);
-      return null;
-    } catch (NotFoundException e) {
+    } catch (SeriesException | NotFoundException e) {
       logger.debug("No series dublincore found for series id " + seriesId);
       return null;
     }
@@ -742,9 +739,7 @@ public class SolrIndexManager {
 
     // Populate document with existing data
     try {
-      StringBuffer query = new StringBuffer("q=");
-      query = query.append(Schema.ID).append(":").append(SolrUtils.clean(seriesId));
-      SolrParams params = SolrRequestParsers.parseQueryString(query.toString());
+      SolrParams params = SolrRequestParsers.parseQueryString("q=" + Schema.ID + ":" + SolrUtils.clean(seriesId));
       QueryResponse solrResponse = solrServer.query(params);
       if (solrResponse.getResults().size() > 0) {
         SolrDocument existingSolrDocument = solrResponse.getResults().get(0);

@@ -240,7 +240,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    */
   @Override
   public AccessControlList getAccessControlList(String mediaPackageId) throws NotFoundException,
-  SearchServiceDatabaseException {
+      SearchServiceDatabaseException {
     EntityManager em = null;
     try {
       em = emf.createEntityManager();

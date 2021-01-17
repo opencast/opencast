@@ -360,7 +360,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
           UnauthorizedException, ServiceRegistryException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Add.toString(),
-              Arrays.asList(MediaPackageParser.getAsXml(mediaPackage)), addJobLoad);
+          Collections.singletonList(MediaPackageParser.getAsXml(mediaPackage)), addJobLoad);
     } catch (ServiceRegistryException e) {
       throw new SearchException(e);
     }
@@ -439,9 +439,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     try {
       result = solrRequester.getForWrite(new SearchQuery().withId(mediaPackageId));
       if (result.getItems().length == 0) {
-        logger.warn(
-                "Can not delete mediapackage {}, which is not available for the current user to delete from the search index.",
-                mediaPackageId);
+        logger.warn("Can not delete mediapackage {}, which is not available for the current user to delete from the "
+                    + "search index.", mediaPackageId);
         return false;
       }
       final String seriesId = result.getItems()[0].getDcIsPartOf();
@@ -453,11 +452,11 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
         logger.info("Removed mediapackage {} from search persistence", mediaPackageId);
       } catch (NotFoundException e) {
         // even if mp not found in persistence, it might still exist in search index.
-        logger.info("Could not find mediapackage with id {} in persistence, but will try remove it from index, anyway.",
+        logger.info("Could not find mediapackage with id {} in persistence, but will try remove it from index anyway.",
                 mediaPackageId);
       } catch (SearchServiceDatabaseException e) {
-        logger.error("Could not delete media package with id {} from persistence storage", mediaPackageId);
-        throw new SearchException(e);
+        throw new SearchException(String.format("Could not delete mediapackage with id %s from persistence storage",
+            mediaPackageId), e);
       }
 
       final boolean success = indexManager.delete(mediaPackageId, now);
