@@ -273,32 +273,47 @@ public class SolrIndexManager {
    * @throws SolrServerException
    *           if an errors occurs while talking to solr
    */
-  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl, Date now) throws SolrServerException,
-          UnauthorizedException {
+  public boolean add(MediaPackage sourceMediaPackage, AccessControlList acl, AccessControlList seriesAcl, Date now)
+      throws SolrServerException, UnauthorizedException {
     try {
       SolrInputDocument episodeDocument = createEpisodeInputDocument(sourceMediaPackage, acl);
       Schema.setOcModified(episodeDocument, now);
 
-      SolrInputDocument seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), acl);
+      SolrInputDocument seriesDocument = createSeriesInputDocument(sourceMediaPackage.getSeries(), seriesAcl);
       if (seriesDocument != null)
         Schema.enrich(episodeDocument, seriesDocument);
 
-      // If neither an episode nor a series was contained, there is no point in trying to update
-      if (episodeDocument == null && seriesDocument == null) {
-        logger.warn("Neither episode nor series metadata found");
-        return false;
-      }
-
       // Post everything to the search index
-      if (episodeDocument != null)
-        solrServer.add(episodeDocument);
+      solrServer.add(episodeDocument);
       if (seriesDocument != null)
         solrServer.add(seriesDocument);
       solrServer.commit();
       return true;
     } catch (Exception e) {
-      logger.error("Unable to add mediapackage {} to index", sourceMediaPackage.getIdentifier());
-      throw new SolrServerException(e);
+      throw new SolrServerException(
+          String.format("Unable to add media package %s to index", sourceMediaPackage.getIdentifier()), e);
+    }
+  }
+
+  /**
+   * Posts a series to Solr. If the entry already exists, this will update the series.
+   *
+   * @param seriesId
+   *          the series to post
+   * @param acl
+   *          the access control list for this series
+   * @throws SolrServerException
+   *           if an errors occurs while talking to solr
+   */
+  public void addSeries(final String seriesId, final AccessControlList acl) throws SolrServerException {
+    try {
+      SolrInputDocument seriesDocument = createSeriesInputDocument(seriesId, acl);
+      if (seriesDocument != null) {
+        solrServer.add(seriesDocument);
+        solrServer.commit();
+      }
+    } catch (Exception e) {
+      throw new SolrServerException(String.format("Unable to add series %s to index", seriesId), e);
     }
   }
 
