@@ -14,6 +14,8 @@ versions of Opencast, please refer to [older release notes](https://docs.opencas
 8. Start Opencast
 9. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
 10. [Check passwords](#check-passwords)
+11. Static file delivery
+
 
 Configuration Changes
 ---------------------
@@ -89,3 +91,16 @@ but to benefit from this mechanism, users have to reset their password.
 
 You can use the endpoint `/user-utils/users/md5.json` to find out which users are still using MD5-hashed passwords and
 suggest to them that they update their passwords.
+
+
+Static File Delivery
+--------------------
+
+Opencast 9.2 came with a [completely new system for securing static file content](configuration/serving-static-files.md)
+which is now active by default in Opencast 10. If you are deferring the file access authorization to another system
+using Opencast's [security token mechanism](configuration/stream-security.md), you need to deactivate this protection
+in:
+
+```
+etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
+```
