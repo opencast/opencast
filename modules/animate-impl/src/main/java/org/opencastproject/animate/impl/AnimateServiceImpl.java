@@ -249,7 +249,8 @@ public class AnimateServiceImpl extends AbstractJobProducer implements AnimateSe
 
 
   @Override
-  public Job animate(URI animation, Map<String, String> metadata, List<String> arguments) throws AnimateServiceException {
+  public Job animate(URI animation, Map<String, String> metadata, List<String> arguments)
+          throws AnimateServiceException {
     Gson gson = new Gson();
     List<String> jobArguments = Arrays.asList(animation.toString(), gson.toJson(metadata), gson.toJson(arguments));
     try {

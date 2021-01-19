@@ -34,8 +34,8 @@ public interface CoverImageService {
    * Creates a job for creating a cover image for movie/media package.
    *
    * @param xml
-   *          metadata as XML. Will be handed over to the XSL transformation. Optional, if not given, there should be a
-   *          fallback
+   *          metadata as XML. Will be handed over to the XSL transformation. Optional, if not given,
+   *          there should be a fallback
    * @param xsl
    *          the XSL stylesheet used to create the SVG version of the cover image
    * @param width
@@ -50,7 +50,7 @@ public interface CoverImageService {
    * @throws CoverImageException
    *           if there is an error while creating the job
    */
-  Job generateCoverImage(String xml, String xsl, String width, String height, String posterImageUri, String targetFlavor)
-          throws CoverImageException;
+  Job generateCoverImage(String xml, String xsl, String width, String height, String posterImageUri,
+          String targetFlavor) throws CoverImageException;
 
 }

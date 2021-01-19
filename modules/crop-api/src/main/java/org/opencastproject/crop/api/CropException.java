@@ -38,7 +38,8 @@ public class CropException extends Exception {
     public CropException(String message) { super(message); }
 
     /**
-     * Create a new crop exception <code>message</code> as a reason and <code>cause</code> as the original cause of failure.
+     * Create a new crop exception <code>message</code> as a reason and <code>cause</code>
+     * as the original cause of failure.
      *
      * @param message
      *          the reason of failure

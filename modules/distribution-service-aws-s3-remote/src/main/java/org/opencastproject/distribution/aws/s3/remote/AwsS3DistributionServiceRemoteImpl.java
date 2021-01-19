@@ -169,7 +169,8 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
   }
 
   @Override
-  public Job restore(String channelId, MediaPackage mediaPackage, String elementId, String fileName) throws DistributionException {
+  public Job restore(String channelId, MediaPackage mediaPackage, String elementId, String fileName)
+          throws DistributionException {
     logger.info("Restoring {} from {}@{}", elementId, channelId, distributionChannel);
     final HttpPost req = post("/restore", param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
             param(PARAM_ELEMENT_ID, elementId), param(PARAM_CHANNEL_ID, channelId), param(PARAM_FILENAME, fileName));
