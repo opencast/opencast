@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Opencast Docs: Error Page</title>
+    <script type="text/javascript">
+      // Redirect if URL links to stable
+      if (window.location.pathname.startsWith('/stable/')) {
+        window.location.pathname = window.location.pathname.replace(/^\/stable\//, '/{{ stable_branch }}/')
+      }
+    </script>
+  </head>
+  <body style="background-color: #fff; color: #000; margin: 0; padding: 0px; font-family: sans">
+    <header style="margin: 0px; padding: 0px; font-size: 32px; color: #fff">
+      <div style="background-color: #24425c; margin: 0px; padding: 30px;">Opencast</div>
+      <div style="margin: 0; padding: 10px; background-color: #2075b1;">&nbsp;</div>
+    </header>
+    <div style="margin: auto; max-width: 400px; padding: 100px 30px; font-weight: 50; text-align: center">
+      <div style="font-size: 180px;">404</div>
+      <div>Page not found.</div>
+      <div style="padding: 30px 0">
+        <a style="color: #000" href=/>Back to landing page</a>
+      </div>
+    </div>
+  </body>
+</html>

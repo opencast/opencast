@@ -67,13 +67,11 @@ Details about the configuration can be found at:
 - [Database Configuration](database.md)
 
 
-Step 5: Elasticsearch Configuration
------------------------------------
+Step 5: Setting up Elasticsearch
+--------------------------------
 
-Opencast requires Elasticsearch for quick full-text search and data caching.
-For more details about the setup, have a look at the:
-
-- [Elasticsearch configuration guide](../modules/searchindex/elasticsearch.md).
+Opencast requires Elasticsearch. Instructions for installing Elasticsearch can be found in the
+[installation documentation](../installation/index.md).
 
 
 Step 6: HTTPS Configuration

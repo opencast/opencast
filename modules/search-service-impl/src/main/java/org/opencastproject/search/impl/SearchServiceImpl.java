@@ -44,6 +44,7 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.StaticFileAuthorization;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -56,6 +57,10 @@ import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -78,15 +83,20 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A Solr-based {@link SearchService} implementation.
  */
-public final class SearchServiceImpl extends AbstractJobProducer implements SearchService, ManagedService {
+public final class SearchServiceImpl extends AbstractJobProducer implements SearchService, ManagedService,
+    StaticFileAuthorization {
 
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
@@ -163,11 +173,25 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   /** The optional Mediapackage serializer */
   protected MediaPackageSerializer serializer = null;
 
+  private LoadingCache<Tuple<User, String>, Boolean> cache = null;
+
+  private static final Pattern staticFilePattern = Pattern.compile("^/([^/]+)/engage-player/([^/]+)/.*$");
+
   /**
    * Creates a new instance of the search service.
    */
   public SearchServiceImpl() {
     super(JOB_TYPE);
+
+    cache = CacheBuilder.newBuilder()
+        .maximumSize(2048)
+        .expireAfterWrite(1, TimeUnit.MINUTES)
+        .build(new CacheLoader<Tuple<User, String>, Boolean>() {
+          @Override
+          public Boolean load(Tuple<User, String> key) {
+            return loadUrlAccess(key.getB());
+          }
+        });
   }
 
   /**
@@ -742,5 +766,49 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
     addJobLoad = LoadUtil.getConfiguredLoadValue(properties, ADD_JOB_LOAD_KEY, DEFAULT_ADD_JOB_LOAD, serviceRegistry);
     deleteJobLoad = LoadUtil.getConfiguredLoadValue(properties, DELETE_JOB_LOAD_KEY, DEFAULT_DELETE_JOB_LOAD, serviceRegistry);
+  }
+
+  @Override
+  public List<Pattern> getProtectedUrlPattern() {
+    return Collections.singletonList(staticFilePattern);
+  }
+
+  private boolean loadUrlAccess(final String mediaPackageId) {
+    logger.debug("Check if user `{}` has access to media package `{}`", securityService.getUser(), mediaPackageId);
+    final SearchQuery query = new SearchQuery()
+        .withId(mediaPackageId)
+        .includeEpisodes(true)
+        .includeSeries(false);
+    return getByQuery(query).size() > 0;
+  }
+
+  @Override
+  public boolean verifyUrlAccess(final String path) {
+    // Always allow access for admin
+    final User user = securityService.getUser();
+    if (user.hasRole(GLOBAL_ADMIN_ROLE)) {
+      logger.debug("Allow access for admin `{}`", user);
+      return true;
+    }
+
+    // Check pattern
+    final Matcher m = staticFilePattern.matcher(path);
+    if (!m.matches()) {
+      logger.debug("Path does not match pattern. Preventing access.");
+      return false;
+    }
+
+    // Check organization
+    final String organizationId = m.group(1);
+    if (!securityService.getOrganization().getId().equals(organizationId)) {
+      logger.debug("The user's organization does not match. Preventing access.");
+      return false;
+    }
+
+    // Check search index/cache
+    final String mediaPackageId = m.group(2);
+    final boolean access = cache.getUnchecked(Tuple.tuple(user, mediaPackageId));
+    logger.debug("Check if user `{}` has access to media package `{}` using cache: {}", user, mediaPackageId, access);
+    return access;
   }
 }
