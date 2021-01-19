@@ -31,3 +31,5 @@ There are also a couple of great sites to test your final setup:
 
 If you have no easy way of obtaining proper TLS certificates for your organization, please consider using
 [Let’s Encrypt](https://letsencrypt.org).
+
+For testing and developer servers, [properly configured self-signed certificates](self-signed-certificates.md) can be an option.
