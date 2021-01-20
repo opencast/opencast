@@ -1,0 +1,53 @@
+<div ng-click="enterEditMode()" ng-form="innerForm">
+  &nbsp;<span ng-show="!editMode" class="preserve-newlines">{{ presentableValue | localizeDate:params.type:'short' }}</span>
+
+  <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-focus="enterEditMode()"
+                                                          tabindex="{{ params.tabindex }}" focushere="{{ params.tabindex }}"></i>
+  <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
+
+  <textarea ng-keydown="keyDown($event)"
+            ng-keyup="keyUp($event)"
+            ng-model="params.value"
+            ng-blur="submit(); editMode = false"
+            class="editable vertical-resize"
+            tabindex="{{ params.tabindex }}"
+            ng-if="params.type === 'text_long' && editMode"
+            ng-required="params.required"
+            name="{{ params.name }}"> </textarea>
+
+    <input ng-keyup="keyUp($event)"
+           ng-if="editMode && params.type === 'text'"
+           type="text"
+           ng-model="params.value"
+           ng-blur="submit()"
+           tabindex="{{ params.tabindex }}"
+           ng-required="params.required"
+           name="{{ params.id }}"/>
+
+    <select chosen
+            ng-if="params.type === 'time' && editMode"
+            ng-change="submit()"
+            ng-keyup="keyUp($event)"
+            tabindex="{{ params.tabindex }}"
+            data-width="'100px'"
+            ng-model="params.hours"
+            ng-disabled="!editMode && params.type === 'time'"
+            ng-required="params.required"
+            name="hours"
+            placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
+            ng-options="h.index as h.value for h in hours"
+            />
+      <select chosen
+              ng-if="params.type === 'time' && editMode"
+              ng-change="submit()"
+              ng-keyup="keyUp($event)"
+              tabindex="{{ params.tabindex }}"
+              data-width="'100px'"
+              ng-model="params.minutes"
+              ng-disabled="!editMode && params.type === 'time'"
+              ng-required="params.required"
+              name="minutes"
+              placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
+              ng-options="m.index as m.value for m in minutes"
+              />
+</div>

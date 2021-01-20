@@ -109,12 +109,6 @@ public class CatalogBuilderPlugin implements MediaPackageElementBuilderPlugin {
     return "Indefinite Catalog Builder Plugin";
   }
 
-  protected Catalog catalogFromManifest(String id, URI uri) {
-    Catalog cat = CatalogImpl.fromURI(uri);
-    cat.setIdentifier(id);
-    return cat;
-  }
-
   /**
    * {@inheritDoc}
    *

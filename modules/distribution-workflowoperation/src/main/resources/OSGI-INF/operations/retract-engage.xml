@@ -12,7 +12,7 @@
   <reference cardinality="1..1" interface="org.opencastproject.distribution.api.DownloadDistributionService"
              name="DownloadDistributionService" policy="static" target="(distribution.channel=download)"
              bind="setDownloadDistributionService"/>
-  <reference cardinality="1..1" interface="org.opencastproject.distribution.api.DistributionService"
+  <reference cardinality="1..1" interface="org.opencastproject.distribution.api.StreamingDistributionService"
              name="StreamingDistributionService" policy="static" target="(distribution.channel=streaming)"
              bind="setStreamingDistributionService"/>
   <reference cardinality="1..1" interface="org.opencastproject.search.api.SearchService"

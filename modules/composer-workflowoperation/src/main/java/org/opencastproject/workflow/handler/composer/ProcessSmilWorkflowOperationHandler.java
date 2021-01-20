@@ -27,6 +27,7 @@ import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.EncodingProfile.MediaType;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.AdaptivePlaylist;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -52,6 +53,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +71,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * The workflow definition for handling "compose" operations
@@ -84,6 +88,8 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
   private SmilService smilService;
   /** The local workspace */
   private Workspace workspace = null;
+
+  private Predicate<EncodingProfile> isManifestEP = p -> p.getOutputType() == EncodingProfile.MediaType.Manifest;
 
   /**
    * A convenience structure to hold info for each paramgroup in the Smil which will produce one trim/concat/encode job
@@ -450,6 +456,27 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
   }
 
   /**
+   * Find the matching encoding profile for this track and tag by name
+   * 
+   * @param track
+   * @param profiles
+   *          - profiles used to encode a track to multiple formats
+   * @return
+   */
+  private void tagByProfile(Track track, List<EncodingProfile> profiles) {
+    String rawfileName = track.getURI().getRawPath();
+    for (EncodingProfile ep : profiles) {
+      String suffix = ep.getSuffix();
+      // !! workspace.putInCollection renames the file - need to do the same with suffix
+      suffix = PathSupport.toSafeName(suffix);
+      if (suffix.length() > 0 && rawfileName.endsWith(suffix)) {
+        track.addTag(ep.getIdentifier());
+        return;
+      }
+    }
+  }
+
+  /**
    * parse all the encoding jobs to collect all the composed tracks, if any of them fail, just fail the whole thing and
    * try to clean up
    *
@@ -463,10 +490,11 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    * @throws NotFoundException
    * @throws IOException
    * @throws MediaPackageException
+   * @throws WorkflowOperationException
    */
   @SuppressWarnings("unchecked")
   private ResultTally parseResults(Map<Job, JobInformation> encodingJobs, MediaPackage mediaPackage)
-          throws IllegalArgumentException, NotFoundException, IOException, MediaPackageException {
+          throws IllegalArgumentException, NotFoundException, IOException, MediaPackageException, WorkflowOperationException {
     // Process the result
     long totalTimeInQueue = 0;
     for (Map.Entry<Job, JobInformation> entry : encodingJobs.entrySet()) {
@@ -479,6 +507,10 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
       List<Track> composedTracks = null;
       if (job.getPayload().length() > 0) {
         composedTracks = (List<Track>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
+        boolean isHLS = entry.getValue().getProfiles().stream().anyMatch(isManifestEP);
+        if (isHLS) { // check that manifests and segments counts are correct
+          decipherHLSPlaylistResults(track, entry.getValue(), mediaPackage, composedTracks);
+        }
         // Adjust the target tags
         for (Track composedTrack : composedTracks) {
           if (entry.getValue().getTags() != null) {
@@ -498,21 +530,17 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
             composedTrack.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
             logger.debug("Composed track has flavor '{}'", composedTrack.getFlavor());
           }
+          List<EncodingProfile> eps = entry.getValue().getProfiles();
           String fileName = composedTrack.getURI().getRawPath();
+          // Tag each output with encoding profile name, if configured
           if (entry.getValue().getTagProfile()) {
-            // Tag each output with encoding profile name, if configured
-            List<EncodingProfile> eps = entry.getValue().getProfiles();
-            for (EncodingProfile ep : eps) {
-              String suffix = ep.getSuffix();
-              // !! workspace.putInCollection renames the file - need to do the same with suffix
-              suffix = PathSupport.toSafeName(suffix);
-              if (suffix.length() > 0 && fileName.endsWith(suffix)) {
-                composedTrack.addTag(ep.getIdentifier());
-                logger.debug("Tagging composed track {} with '{}'", composedTrack.getURI(), ep.getIdentifier());
-                break;
-              }
-            }
+            tagByProfile(composedTrack, eps);
           }
+
+          if (!isHLS || composedTrack.isMaster()) {
+            fileName = getFileNameFromElements(track, composedTrack);
+          } else // preserve name from profile - should we do this?
+            fileName = FilenameUtils.getName(composedTrack.getURI().getPath());
 
           composedTrack.setURI(workspace.moveTo(composedTrack.getURI(), mediaPackage.getIdentifier().toString(),
                   composedTrack.getIdentifier(), fileName));
@@ -523,6 +551,25 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
       }
     }
     return new ResultTally(mediaPackage, totalTimeInQueue);
+  }
+
+  private List<Track> getManifest(Collection<Track> tracks) {
+    return tracks.stream().filter(AdaptivePlaylist.isHLSTrackPred).collect(Collectors.toList());
+  }
+
+  // HLS-VOD
+  private void decipherHLSPlaylistResults(Track track, JobInformation jobInfo, MediaPackage mediaPackage,
+          List<Track> composedTracks)
+          throws WorkflowOperationException, IllegalArgumentException, NotFoundException, IOException {
+    int nprofiles = jobInfo.getProfiles().size();
+    List<Track> manifests = getManifest(composedTracks);
+
+    if (manifests.size() != nprofiles) {
+      throw new WorkflowOperationException("Number of output playlists does not match number of encoding profiles");
+    }
+    if (composedTracks.size() != manifests.size() * 2 - 1) {
+      throw new WorkflowOperationException("Number of output media does not match number of encoding profiles");
+    }
   }
 
   /**

@@ -49,22 +49,6 @@ public final class RequireUtil {
   }
 
   /**
-   * Require an expression to be false.
-   *
-   * @param expr
-   *         the expression
-   * @param exprName
-   *         the name of the expression used to create an error message in case <code>expr</code> evaluates to false
-   * @throws IllegalArgumentException
-   *         in case <code>expr</code> evaluates to true
-   */
-  public static void requireFalse(boolean expr, String exprName) {
-    if (expr) {
-      throw new IllegalArgumentException("Requirement '" + exprName + "' must be false");
-    }
-  }
-
-  /**
    * The given value must not be null.
    * <p>
    * Example:
@@ -138,13 +122,6 @@ public final class RequireUtil {
     return value;
   }
 
-  /** The value may be null but if it is not null it must not be of size 0. */
-  public static String nullOrNotEmpty(String value, String valueName) {
-    if (value != null && value.length() == 0)
-      throw new IllegalArgumentException(valueName + " must either be null or not empty");
-    return value;
-  }
-
   public static double between(double value, double min, double max) {
     if (min <= value && value <= max)
       return value;
@@ -157,9 +134,4 @@ public final class RequireUtil {
     throw new IllegalArgumentException(value + " must not be smaller than " + min);
   }
 
-  public static long min(long value, long min) {
-    if (min <= value)
-      return value;
-    throw new IllegalArgumentException(value + " must not be smaller than " + min);
-  }
 }

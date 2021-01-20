@@ -38,9 +38,12 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +51,6 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -83,8 +85,8 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
     MediaPackage workflowMP = workflowInstance.getMediaPackage();
     MediaPackage mp = workflowMP;
 
-    /* Check if we need to replace the Mediapackage we got with the published
-     * Mediapackage from the Search Service */
+    // check if we need to replace the media package we got with the published
+    // media package from the search service
     if (config.mpFromSearch()) {
       SearchQuery searchQuery = new SearchQuery();
       searchQuery.withId(mp.getIdentifier().toString());
@@ -93,12 +95,11 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
           throw new WorkflowOperationException("Received multiple results for identifier"
               + "\"" + mp.getIdentifier().toString() + "\" from search service. ");
       }
-      logger.info("Getting Mediapackage from Search Service");
+      logger.info("Getting media package from search service");
       mp = result.getItems()[0].getMediaPackage();
     }
 
-    logger.info("Submitting \"" + mp.getTitle() + "\" (" + mp.getIdentifier().toString() + ") as "
-        + config.getFormat().name() + " to " + config.getUrl().toString());
+    logger.info("Submitting {} ({}) as {} to {}", mp.getTitle(), mp.getIdentifier(), config.getFormat().name(), config.getUrl());
 
     try {
       // serialize MediaPackage to target format
@@ -109,13 +110,13 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
         mpStr = MediaPackageParser.getAsXml(mp);
       }
 
-      // Log mediapackge
+      // Log media packge
       if (config.debug()) {
         logger.info(mpStr);
       }
 
-      // constrcut message body
-      List<NameValuePair> data = new ArrayList<NameValuePair>();
+      // construct message body
+      List<NameValuePair> data = new ArrayList<>();
       data.add(new BasicNameValuePair("mediapackage", mpStr));
       data.addAll(config.getAdditionalFields());
 
@@ -124,15 +125,18 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
       post.setEntity(new UrlEncodedFormEntity(data, config.getEncoding()));
 
       // execute POST
-      DefaultHttpClient client = new DefaultHttpClient();
+      HttpClientBuilder clientBuilder = HttpClientBuilder.create();
 
       // Handle authentication
       if (config.authenticate()) {
         URL targetUrl = config.getUrl().toURL();
-        client.getCredentialsProvider().setCredentials(
+        CredentialsProvider provider = new BasicCredentialsProvider();
+        provider.setCredentials(
             new AuthScope(targetUrl.getHost(), targetUrl.getPort()),
             config.getCredentials());
+        clientBuilder.setDefaultCredentialsProvider(provider);
       }
+      CloseableHttpClient client = clientBuilder.build();
 
       HttpResponse response = client.execute(post);
 
@@ -140,17 +144,15 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
       int status = response.getStatusLine().getStatusCode();
       if ((status >= 200) && (status < 300)) {
         if (config.debug()) {
-          logger.info("Successfully submitted \"" + mp.getTitle()
-              + "\" (" + mp.getIdentifier().toString() + ") to " + config.getUrl().toString()
-              + ": " + status);
+          logger.info("Successfully submitted '{}' ({}) to {}: {}", mp.getTitle(), mp.getIdentifier(),
+              config.getUrl(), status);
         }
       } else if (status == 418) {
-        logger.warn("Submitted \"" + mp.getTitle() + "\" ("
-            + mp.getIdentifier().toString() + ") to " + config.getUrl().toString()
-            + ": The target claims to be a teapot. "
-            + "The Reason for this is probably an insane programmer.");
+        logger.warn("Submitted '{}' ({}) to {}: The target claims to be a teapot. "
+                + "The Reason for this is probably an insane developer. Go and help that person!",
+            mp.getTitle(), mp.getIdentifier(), config.getUrl());
       } else {
-        throw new WorkflowOperationException("Faild to submit \"" + mp.getTitle()
+        throw new WorkflowOperationException("Failed to submit \"" + mp.getTitle()
             + "\" (" + mp.getIdentifier().toString() + "), " + config.getUrl().toString()
             + " answered with: " + Integer.toString(status));
       }
@@ -158,7 +160,6 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
       if (e instanceof WorkflowOperationException) {
         throw (WorkflowOperationException) e;
       } else {
-        logger.error("Submitting mediapackage failed: {}", e.toString());
         throw new WorkflowOperationException(e);
       }
     }
@@ -242,8 +243,7 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
         }
 
         // get additional form fields
-        for (Iterator<String> iter = operation.getConfigurationKeys().iterator(); iter.hasNext();) {
-          String key = iter.next();
+        for (String key : operation.getConfigurationKeys()) {
           if (key.startsWith("+")) {
             String value = operation.getConfiguration(key);
             additionalFields.add(new BasicNameValuePair(key.substring(1), value));

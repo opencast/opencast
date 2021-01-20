@@ -24,38 +24,18 @@ package org.opencastproject.util.data.functions;
 
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.option;
 
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.data.Effect2;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
-import org.opencastproject.util.data.Tuple;
-
-import com.entwinemedia.fn.Fn;
-
-import java.util.List;
-import java.util.Map;
 
 /** General purpose functions, especially function transformations. */
 public final class Functions {
   private Functions() {
-  }
-
-  /** Create a function from the matterhorn-fn module from a common function. */
-  public static <A, B> Fn<A, B> fn(final Function<A, B> f) {
-    return new Fn<A, B>() {
-      @Override
-      public B apply(A a) {
-        return f.apply(a);
-      }
-    };
   }
 
   /** Function composition: <code>f . g = f(g(x)) = o(f, g)</code> */
@@ -75,43 +55,6 @@ public final class Functions {
       @Override
       public B apply() {
         return f.apply(g.apply());
-      }
-    };
-  }
-
-  /** <code>f . g . h</code> */
-  public static <A, B, C, D> Function<A, D> o(final Function<? super C, ? extends D> f,
-          final Function<? super B, ? extends C> g, final Function<? super A, ? extends B> h) {
-    return new Function<A, D>() {
-      @Override
-      public D apply(A a) {
-        return f.apply(g.apply(h.apply(a)));
-      }
-    };
-  }
-
-  /** <code>f . g . h . i</code> */
-  public static <A, B, C, D, E> Function<A, E> o(final Function<? super D, ? extends E> f,
-          final Function<? super C, ? extends D> g, final Function<? super B, ? extends C> h,
-          final Function<? super A, ? extends B> i) {
-    return new Function<A, E>() {
-      @Override
-      public E apply(A a) {
-        return f.apply(g.apply(h.apply(i.apply(a))));
-      }
-    };
-  }
-
-  /** Multiple `then` concatenation. f1 then f2 then ... fn */
-  public static <A> Function<A, A> concat(final Function<? super A, ? extends A>... fs) {
-    return new Function<A, A>() {
-      @Override
-      public A apply(A a) {
-        A dc = a;
-        for (Function<? super A, ? extends A> f : fs) {
-          dc = f.apply(dc);
-        }
-        return dc;
       }
     };
   }
@@ -266,16 +209,6 @@ public final class Functions {
     };
   }
 
-  /** Create a tupled version of a function of arity 2. */
-  public static <A, B, C> Function<Tuple<A, B>, C> tupled(final Function2<? super A, ? super B, ? extends C> f) {
-    return new Function<Tuple<A, B>, C>() {
-      @Override
-      public C apply(Tuple<A, B> t) {
-        return f.apply(t.getA(), t.getB());
-      }
-    };
-  }
-
   /** Flip arguments of a function of arity 2. */
   public static <A, B, C> Function2<B, A, C> flip(final Function2<? super A, ? super B, ? extends C> f) {
     return new Function2<B, A, C>() {
@@ -286,32 +219,12 @@ public final class Functions {
     };
   }
 
-  /** Turn a function of arity 0 into an effect by discarding its result. */
-  public static <A> Effect0 toEffect(final Function0<A> f) {
-    return new Effect0() {
-      @Override
-      protected void run() {
-        f.apply();
-      }
-    };
-  }
-
   /** Turn a function into an effect by discarding its result. */
   public static <A, B> Effect<A> toEffect(final Function<? super A, ? extends B> f) {
     return new Effect<A>() {
       @Override
       protected void run(A a) {
         f.apply(a);
-      }
-    };
-  }
-
-  /** Turn a function of arity 2 into an effect by discarding its result. */
-  public static <A, B, C> Effect2<A, B> toEffect(final Function2<? super A, ? super B, ? extends C> f) {
-    return new Effect2<A, B>() {
-      @Override
-      protected void run(A a, B b) {
-        f.apply(a, b);
       }
     };
   }
@@ -331,15 +244,6 @@ public final class Functions {
     protected void run() {
     }
   };
-
-  /** Noop effect. */
-  public static <A> Effect<A> noop() {
-    return new Effect<A>() {
-      @Override
-      protected void run(A a) {
-      }
-    };
-  }
 
   /** Identity function. */
   public static <A> Function<A, A> identity() {
@@ -371,88 +275,6 @@ public final class Functions {
     return identity();
   }
 
-  /** Constant function that always returns <code>a</code>. */
-  public static <A> Function0<A> constant0(final A a) {
-    return new Function0<A>() {
-      @Override
-      public A apply() {
-        return a;
-      }
-    };
-  }
-
-  /** Constant function that always returns <code>b</code>. */
-  public static <A, B> Function<A, B> constant(final B b) {
-    return new Function<A, B>() {
-      @Override
-      public B apply(A ignore) {
-        return b;
-      }
-    };
-  }
-
-  /** Constant function that ignores its argument and always returns <code>a</code>. */
-  public static <A, B> Function<A, B> ignore(final B b) {
-    return new Function<A, B>() {
-      @Override
-      public B apply(A a) {
-        return b;
-      }
-    };
-  }
-
-  /** Promote function <code>a -&gt; b</code> to an {@link Option}. */
-  public static <A, B> Function<Option<A>, Option<B>> liftOpt(final Function<? super A, ? extends B> f) {
-    return new Function<Option<A>, Option<B>>() {
-      @Override
-      public Option<B> apply(Option<A> a) {
-        return a.fmap(f);
-      }
-    };
-  }
-
-  /** Promote effect <code>a -&gt; ()</code> to an {@link Option}. */
-  public static <A> Function<Option<A>, Option<A>> liftOpt(final Effect<? super A> f) {
-    return new Function<Option<A>, Option<A>>() {
-      @Override
-      public Option<A> apply(Option<A> a) {
-        for (A x : a)
-          f.apply(x);
-        return a;
-      }
-    };
-  }
-
-  /** Create a bound version of <code>f</code> for {@link Option}. */
-  public static <A, B> Function<Option<A>, Option<B>> bindOpt(final Function<A, Option<B>> f) {
-    return new Function<Option<A>, Option<B>>() {
-      @Override
-      public Option<B> apply(Option<A> a) {
-        return a.bind(f);
-      }
-    };
-  }
-
-  /** Promote function <code>a -&gt; b</code> to a {@link List}. */
-  public static <A, B> Function<List<A>, List<B>> liftList(final Function<A, B> f) {
-    return new Function<List<A>, List<B>>() {
-      @Override
-      public List<B> apply(List<A> as) {
-        return mlist(as).fmap(f).value();
-      }
-    };
-  }
-
-  /** Create a bound version of <code>f</code> for {@link List}. */
-  public static <A, B> Function<List<A>, List<B>> bind(final Function<A, List<B>> f) {
-    return new Function<List<A>, List<B>>() {
-      @Override
-      public List<B> apply(List<A> as) {
-        return mlist(as).bind(f).value();
-      }
-    };
-  }
-
   /** Create an effect that runs its argument. */
   public static final Effect<Effect0> run = new Effect<Effect0>() {
     @Override
@@ -461,50 +283,9 @@ public final class Functions {
     }
   };
 
-  /** Create an effect that runs its argument passing in <code>a</code>. */
-  public static <A> Effect<Effect<A>> run(final A a) {
-    return new Effect<Effect<A>>() {
-      @Override
-      protected void run(Effect<A> e) {
-        e.apply(a);
-      }
-    };
-  }
-
-  /** Create an effect that runs all given effects in order. */
-  public static Effect0 all(final Effect0... es) {
-    return new Effect0() {
-      @Override
-      protected void run() {
-        mlist(es).each(run);
-      }
-    };
-  }
-
-  /** Create an effect that runs all given effects in order. */
-  public static <A> Effect<A> all(final Effect<? super A>... es) {
-    return new Effect<A>() {
-      @Override
-      protected void run(A a) {
-        for (Effect<? super A> e : es) {
-          e.apply(a);
-        }
-      }
-    };
-  }
-
   /** Pure functions are covariant in their result type. */
   public static <A, B> Function<A, B> co(Function<? super A, ? extends B> f) {
     return (Function<A, B>) f;
-  }
-
-  public static <A, B> Function<Function<A, ? extends B>, Function<A, B>> co() {
-    return new Function<Function<A, ? extends B>, Function<A, B>>() {
-      @Override
-      public Function<A, B> apply(Function<A, ? extends B> f) {
-        return co(f);
-      }
-    };
   }
 
   /** Pure functions are contravariant in their argument type. */
@@ -533,17 +314,6 @@ public final class Functions {
     return Functions.<RuntimeException, A> castGeneric(t);
   }
 
-  /** Kleisli composition of list monads. (a -&gt; m b) -&gt; (b -&gt; m c) -&gt; a -&gt; m c */
-  public static <A, B, C> Function<A, List<C>> kleisliCompList(final Function<? super A, List<B>> m,
-          final Function<? super B, List<C>> n) {
-    return new Function<A, List<C>>() {
-      @Override
-      public List<C> apply(A a) {
-        return mlist(m.apply(a)).bind(n).value();
-      }
-    };
-  }
-
   /** Convert function <code>f</code> into a guava function. */
   public static <A, B> com.google.common.base.Function<A, B> toGuava(final Function<? super A, ? extends B> f) {
     return new com.google.common.base.Function<A, B>() {
@@ -554,34 +324,4 @@ public final class Functions {
     };
   }
 
-  /** Create a (partial) function from a map. */
-  public static <A, B> Function<A, Option<B>> toFn(final Map<? extends A, ? extends B> m) {
-    return new Function<A, Option<B>>() {
-      @Override
-      public Option<B> apply(A a) {
-        B b = m.get(a);
-        return option(b);
-      }
-    };
-  }
-
-  /**
-   * Treat <code>fs</code> as partial functions. Apply the argument <code>a</code> of the returned function to the
-   * functions <code>fs</code> in order unless some value is returned. Return <code>zero</code> if none of the functions
-   * is defined at <code>a</code>.
-   */
-  public static <A, B> Function<A, B> orElse(final B zero, final Function<? super A, Option<B>>... fs) {
-    return new Function<A, B>() {
-      @Override
-      public B apply(A a) {
-        for (Function<? super A, Option<B>> f : fs) {
-          final Option<? extends B> r = f.apply(a);
-          if (r.isSome()) {
-            return r.get();
-          }
-        }
-        return zero;
-      }
-    };
-  }
 }

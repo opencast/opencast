@@ -94,6 +94,8 @@ public final class MimeTypes {
   public static final MimeType JAR;
   public static final MimeType SMIL;
   public static final MimeType PNG;
+  public static final MimeType HLS;
+  public static final MimeType DASH;
 
   // Initialize common mime types
   static {
@@ -114,6 +116,8 @@ public final class MimeTypes {
     JAR = MimeTypes.parseMimeType("application/java-archive");
     SMIL = MimeTypes.parseMimeType("application/smil");
     PNG = MimeTypes.parseMimeType("image/png");
+    HLS = MimeTypes.parseMimeType("application/X-mpegURL");
+    DASH = MimeTypes.parseMimeType("application/dash+xml");
 
     // initialize from file
     try {
@@ -140,6 +144,7 @@ public final class MimeTypes {
       }
     }
   };
+
 
   /**
    * Returns a mime type for the given type and subtype, e. g. <code>video/mj2</code>.

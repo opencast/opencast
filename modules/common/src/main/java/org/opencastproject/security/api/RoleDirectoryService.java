@@ -21,7 +21,7 @@
 
 package org.opencastproject.security.api;
 
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * A marker interface for the federation of all {@link RoleProvider}s.
@@ -29,7 +29,7 @@ import java.util.Iterator;
 public interface RoleDirectoryService {
 
   /**
-   * Return the found roles as an iterator.
+   * Return the found roles as a list.
    *
    * @param query
    *          the query. Use the wildcards "_" to match any single character and "%" to match an arbitrary number of
@@ -38,10 +38,9 @@ public interface RoleDirectoryService {
    *          the offset.
    * @param limit
    *          the limit. 0 means no limit
-   * @return an iterator of role's
+   * @return a list of roles
    * @throws IllegalArgumentException
    *           if the query is <code>null</code>
    */
-  Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit);
-
+  List<Role> findRoles(String query, Role.Target target, int offset, int limit);
 }

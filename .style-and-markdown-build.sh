@@ -31,14 +31,14 @@ if ! grep -L '<Build-Number>${buildNumber}</Build-Number>' modules/*/pom.xml | w
 fi
 
 # maven-dependency-plugin should be active for all new modules
-#grep -L maven-dependency-plugin modules/*/pom.xml > maven-dependency-plugin.list
-#if ! diff -q maven-dependency-plugin.list docs/checkstyle/maven-dependency-plugin.exceptions; then
-#  ret=1
-#fi
+grep -L maven-dependency-plugin modules/*/pom.xml > maven-dependency-plugin.list
+if ! diff -q maven-dependency-plugin.list docs/checkstyle/maven-dependency-plugin.exceptions; then
+  ret=1
+fi
 
 cd docs/guides
 
-for docs in admin developer user; do
+for docs in admin developer; do
   cd $docs
   echo "Markdown doc $docs build log:"
   mkdocs build 2>&1 | tee mkdocs.log

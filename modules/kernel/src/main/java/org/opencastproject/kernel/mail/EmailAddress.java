@@ -24,10 +24,6 @@ package org.opencastproject.kernel.mail;
 import static org.opencastproject.util.EqualsUtil.eqObj;
 import static org.opencastproject.util.EqualsUtil.hash;
 
-import org.opencastproject.util.Jsons;
-import org.opencastproject.util.Jsons.Obj;
-import org.opencastproject.util.data.Function;
-
 /** An email address. */
 public final class EmailAddress {
   private final String address;
@@ -36,18 +32,6 @@ public final class EmailAddress {
   public EmailAddress(String address, String name) {
     this.address = address;
     this.name = name;
-  }
-
-  public static EmailAddress emailAddress(String address, String name) {
-    return new EmailAddress(address, name);
-  }
-
-  public String getAddress() {
-    return address;
-  }
-
-  public String getName() {
-    return name;
   }
 
   @Override
@@ -67,23 +51,5 @@ public final class EmailAddress {
   @Override
   public String toString() {
     return name + " <" + address + ">";
-  }
-
-  public static final Function<EmailAddress, String> getAddress = new Function<EmailAddress, String>() {
-    @Override
-    public String apply(EmailAddress a) {
-      return a.getAddress();
-    }
-  };
-
-  public static final Function<EmailAddress, String> getName = new Function<EmailAddress, String>() {
-    @Override
-    public String apply(EmailAddress a) {
-      return a.getName();
-    }
-  };
-
-  public Obj toJson() {
-    return Jsons.obj(Jsons.p("address", address), Jsons.p("name", name));
   }
 }

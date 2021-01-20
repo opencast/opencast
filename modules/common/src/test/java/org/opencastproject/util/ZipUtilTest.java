@@ -25,7 +25,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -34,9 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.Enumeration;
-import java.util.Random;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -75,8 +72,6 @@ public class ZipUtilTest {
   private File sampleZip;
   private File dummieFile;
   private File bigFile;
-
-  public static final long bigFileSize = (long) 4.5 * 1024 * 1024 * 1024;
 
   @Rule
   public TemporaryFolder testFolder = new TemporaryFolder();
@@ -982,40 +977,6 @@ public class ZipUtilTest {
 
     test.close();
 
-  }
-
-  /**
-   * Test compression of >4GB file
-   */
-  @Test
-  @Ignore
-  public void testOver4GB() throws Exception {
-
-    if (bigFile.exists() || bigFile.createNewFile()) {
-      if (bigFile.getUsableSpace() >= bigFileSize) {
-
-        FileOutputStream fos = new FileOutputStream(bigFile);
-        byte[] buffer = new byte[1024];
-        Random rdn = new Random();
-        File destZip = new File(destDir, "bigZip.zip");
-
-        for (long i = 0; i < bigFileSize; i += buffer.length) {
-          rdn.nextBytes(buffer);
-          fos.write(buffer);
-        }
-
-        fos.close();
-
-        ZipUtil.zip(new File[] { bigFile }, destZip, ZipUtil.NO_COMPRESSION);
-
-        Assert.assertTrue(destZip.exists());
-        Assert.assertTrue(destZip.length() >= bigFileSize);
-      } else {
-        logger.warn("This test needs more than 4GB of disk free space: {}", bigFile.getUsableSpace());
-        logger.warn("Skipping...");
-      }
-    } else
-      logger.warn("Couldn't create the File descriptor");
   }
 
 }

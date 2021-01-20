@@ -25,6 +25,11 @@ import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.SecurityService;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +43,14 @@ import javax.jms.Session;
 /**
  * A class built to send JMS messages through ActiveMQ.
  */
+@Component(
+  property = {
+    "service.description=Message Broker Sender",
+    "service.pid=org.opencastproject.message.broker.impl.MessageSenderImpl"
+  },
+  immediate = true,
+  service = { MessageSender.class }
+)
 public class MessageSenderImpl extends MessageBaseFacility implements MessageSender {
 
   /** The logging facility */
@@ -48,6 +61,16 @@ public class MessageSenderImpl extends MessageBaseFacility implements MessageSen
 
   /** The security service */
   private SecurityService securityService;
+
+  @Activate
+  public void activate(BundleContext bc) throws Exception {
+    super.activate(bc);
+  }
+
+  @Deactivate
+  public void deactivate() {
+    super.deactivate();
+  }
 
   @Override
   public void sendObjectMessage(String destinationId, DestinationType type, Serializable object) {
@@ -86,6 +109,7 @@ public class MessageSenderImpl extends MessageBaseFacility implements MessageSen
   }
 
   /** OSGi DI callback */
+  @Reference(name = "security-service")
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

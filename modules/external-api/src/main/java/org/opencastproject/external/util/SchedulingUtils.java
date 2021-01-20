@@ -362,7 +362,7 @@ public final class SchedulingUtils {
   ) throws SearchIndexException {
     final List<JValue> result = new ArrayList<>();
     for (MediaPackage mediaPackage : mediaPackages) {
-      final Opt<Event> eventOpt = indexService.getEvent(mediaPackage.getIdentifier().compact(), externalIndex);
+      final Opt<Event> eventOpt = indexService.getEvent(mediaPackage.getIdentifier().toString(), externalIndex);
       if (eventOpt.isSome()) {
         final Event event = eventOpt.get();
         if (checkedEventId.isPresent() && checkedEventId.equals(event.getIdentifier())) {
@@ -372,7 +372,7 @@ public final class SchedulingUtils {
             f("title", v(event.getTitle()))));
       } else {
         logger.warn("Index out of sync! Conflicting event catalog {} not found on event index!",
-            mediaPackage.getIdentifier().compact());
+            mediaPackage.getIdentifier().toString());
       }
     }
     return result;

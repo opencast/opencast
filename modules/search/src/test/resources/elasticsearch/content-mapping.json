@@ -1,8 +1,0 @@
-{
-	"content" : {
-	    "_source" : { "enabled" : false },
-	    "properties" : {
-	        "title" : { "type" : "text", "index" : true }
-	    }
-	}
-}

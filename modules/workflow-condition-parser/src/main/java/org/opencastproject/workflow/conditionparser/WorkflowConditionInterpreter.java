@@ -90,7 +90,7 @@ public final class WorkflowConditionInterpreter {
             if ("false".equals(toAppend) || "true".equals(toAppend)) {
               result.append(toAppend);
             } else {
-              Integer.parseInt(toAppend);
+              Float.parseFloat(toAppend);
               result.append(toAppend);
             }
           } catch (NumberFormatException e) {

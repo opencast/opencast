@@ -36,8 +36,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -47,7 +45,6 @@ import java.nio.file.Paths;
 import javax.ws.rs.core.Response;
 
 public class UIConfigTest {
-  private static final Logger logger = LoggerFactory.getLogger(UIConfigTest.class);
 
   private UIConfigRest uiConfigRest;
 

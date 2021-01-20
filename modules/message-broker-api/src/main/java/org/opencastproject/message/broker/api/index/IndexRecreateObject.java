@@ -81,29 +81,6 @@ public final class IndexRecreateObject implements Serializable {
     this.current = current;
   }
 
-  /**
-   * The constructor for an error message.
-   *
-   * @param indexName
-   *          The index name
-   * @param service
-   *          The service that has had the error.
-   * @param total
-   *          The total number of objects that were supposed to be added.
-   * @param current
-   *          The current number of objects added before the error.
-   * @param message
-   *          The error message about the problem.
-   */
-  private IndexRecreateObject(String indexName, Service service, int total, int current, String message) {
-    this.indexName = indexName;
-    this.service = service;
-    this.status = Status.Error;
-    this.total = total;
-    this.current = current;
-    this.message = message;
-  }
-
   public static IndexRecreateObject start(String indexName, Service service) {
     return new IndexRecreateObject(indexName, service, Status.Start);
   }

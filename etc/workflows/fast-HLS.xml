@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>fasthls</id>
+  <title>Fast HLS Testing Workflow</title>
+  <tags>
+    <tag>upload</tag>
+    <tag>schedule</tag>
+  </tags>
+  <displayOrder>100</displayOrder>
+  <description>
+    A minimal workflow that transcodes the media into serverless HLS distribution formats, then
+    sends the resulting distribution files, along with their associated metadata,
+    to the distribution channels.
+  </description>
+
+  <configuration_panel>
+    <![CDATA[
+      <div id="workflow-configuration">
+        <input id="publish" name="publish" type="checkbox" class="configField" value="true" checked=checked />
+        <label for="publish">Publish media directly</label>
+      </div>
+    ]]>
+  </configuration_panel>
+
+  <operations>
+
+    <operation
+      id="defaults"
+      description="Applying default configuration values">
+      <configurations>
+        <configuration key="publish">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Set publication variables for compatibility with the publish workflow -->
+
+    <operation
+      id="defaults"
+      if="${publish}"
+      description="Applying configuration values for publish workflow">
+      <configurations>
+        <configuration key="publishToMediaModule">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Apply ACL from series to the mediapackage -->
+
+    <operation
+      id="series"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Applying access control entries from series">
+      <configurations>
+        <configuration key="apply-acl">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Inspect the media -->
+
+    <operation
+      id="inspect"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Inspecting audio and video streams">
+      <configurations>
+        <configuration key="overwrite">false</configuration>
+        <configuration key="accept-no-media">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- encode video -->
+
+    <operation
+      id="multiencode"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Encode to delivery formats, with different encoding settings for each video source">
+      <configurations>
+        <configuration key="source-flavors">*/source</configuration>
+
+        <configuration key="target-flavors">*/delivery</configuration>
+        <!-- List tags for all target flavors -->
+        <configuration key="target-tags">engage-download,engage-streaming,rss,atom</configuration>
+        <!-- List set of encoding profiles for each variant and the manifest -->
+        <configuration key="encoding-profiles">hls-full-res-presenter-mp4,hls-half-res-presenter-mp4,hls-quarter-15fps-presenter-mp4,multiencode-hls</configuration>
+        <!-- Tag with profile id -->
+        <configuration key="tag-with-profile">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- encode to engage search result thumbnails -->
+    <!-- skip this when manually uploaded */search+preview -->
+    <operation
+      id="image"
+      if="${publish}"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Creating Engage search result thumbnails">
+      <configurations>
+        <configuration key="source-flavor">*/delivery</configuration>
+        <configuration key="source-tags">hls-full-res-presenter-mp4</configuration>
+        <configuration key="target-flavor">*/search+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">search-cover.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- encode to engage player preview images -->
+
+    <operation
+      id="image"
+      if="${publish}"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Creating Engage player preview image">
+      <configurations>
+        <configuration key="source-flavor">*/delivery</configuration>
+        <configuration key="source-tags">hls-full-res-presenter-mp4</configuration>
+        <configuration key="target-flavor">*/player+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">player-preview.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- run the video segmentation -->
+
+    <operation
+      id="segment-video"
+      if="${publish}"
+      fail-on-error="false"
+      exception-handler-workflow="partial-error"
+      description="Detecting slide transitions in presentation track">
+      <configurations>
+        <configuration key="source-tags">hls-full-res-presenter-mp4</configuration>
+        <configuration key="source-flavor">presentation/delivery</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Generate segment preview images -->
+
+    <operation
+      id="segmentpreviews"
+      if="${publish}"
+      fail-on-error="false"
+      exception-handler-workflow="partial-error"
+      description="Creating presentation segments preview image">
+      <configurations>
+        <configuration key="source-tags">hls-full-res-presenter-mp4</configuration>
+        <configuration key="source-flavor">presentation/delivery</configuration>
+        <configuration key="target-flavor">presentation/segment+preview</configuration>
+        <configuration key="reference-flavor">presentation/preview</configuration>
+        <configuration key="reference-tags">engage-download</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">player-slides.http</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Generate timeline preview images -->
+
+    <operation
+      id="timelinepreviews"
+      if="${publish}"
+      fail-on-error="false"
+      exception-handler-workflow="partial-error"
+      description="Creating timeline preview images">
+      <configurations>
+        <!-- Add source-tag to narrow down source media -->
+        <configuration key="source-tags">hls-full-res-presenter-mp4</configuration>
+        <configuration key="source-flavor">*/delivery</configuration>
+        <configuration key="target-flavor">*/timeline+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="image-count">100</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Extract text form slide preview images -->
+
+    <operation
+      id="extract-text"
+      if="${publish}"
+      fail-on-error="false"
+      exception-handler-workflow="partial-error"
+      description="Extracting text from presentation segments">
+      <configurations>
+        <configuration key="source-tags">hls-full-res-presenter-mp4</configuration>
+        <configuration key="source-flavor">presentation/delivery</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Publish preview internal -->
+
+    <operation
+      id="publish-configure"
+      exception-handler-workflow="partial-error"
+      description="Publish to preview publication channel">
+      <configurations>
+        <configuration key="source-flavors">*/delivery</configuration>
+        <configuration key="channel-id">internal</configuration>
+        <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
+        <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Publish to engage player -->
+
+    <operation
+      id="publish-engage"
+      if="${publish}"
+      max-attempts="2"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Publishing to Engage">
+      <configurations>
+        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
+        <configuration key="download-source-tags">engage-download</configuration>
+        <configuration key="streaming-source-tags">engage-streaming</configuration>
+        <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Archive the current state of the media package -->
+
+    <operation
+      id="snapshot"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Archiving">
+      <configurations>
+        <configuration key="source-flavors">*/source,dublincore/*,security/*</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Clean up the working file repository -->
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+      <configurations>
+        <configuration key="delete-external">true</configuration>
+        <!-- FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR. -->
+        <configuration key="preserve-flavors">security/*</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>
+

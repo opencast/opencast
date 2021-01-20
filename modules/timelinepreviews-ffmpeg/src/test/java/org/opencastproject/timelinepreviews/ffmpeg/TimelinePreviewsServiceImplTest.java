@@ -30,7 +30,7 @@ import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -71,7 +71,7 @@ public class TimelinePreviewsServiceImplTest {
     track.setMimeType(MimeTypes.MJPEG);
     track.addStream(new VideoStreamImpl());
     track.setDuration(mediaDuration);
-    track.setIdentifier(IdBuilderFactory.newInstance().newIdBuilder().createNew().compact());
+    track.setIdentifier(IdImpl.fromUUID().toString());
   }
 
   /**

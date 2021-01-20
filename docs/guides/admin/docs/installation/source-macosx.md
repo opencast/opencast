@@ -45,10 +45,10 @@ Please make sure to install the following dependencies.
 Required:
 
     Xcode
-    jdk 8
+    jdk 11
     ffmpeg >= 3.2.4
     maven >= 3.1
-    python >= 2.6, < 3.0
+    python >= 2.6
 
 (If you are using [jEnv](http://www.jenv.be/) to set up your environment, make sure to [enable the maven plugin
 ](https://stackoverflow.com/a/37466252).)
@@ -56,6 +56,7 @@ Required:
 Required (not necessarily on the same machine):
 
     ActiveMQ >= 5.10 (older versions untested)
+    Elasticsearch 7.9.x
 
 Required for text extraction:
 

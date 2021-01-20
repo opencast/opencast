@@ -30,6 +30,9 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.security.util.SecurityUtil;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +42,13 @@ import java.util.stream.Stream;
 /**
  * The capture agent admin role provider provides a role for each registered capture agent
  */
+@Component(
+  property = {
+    "service.description=Manages Roles for each capture agent"
+  },
+  immediate = true,
+  service = { RoleProvider.class }
+)
 public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
 
   private SecurityService securityService;
@@ -47,6 +57,7 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
    * @param service
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(final SecurityService service) {
     this.securityService = service;
   }
@@ -54,6 +65,7 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
 
   private CaptureAgentStateService captureAgentService;
 
+  @Reference(name = "CaptureAgentStateService")
   public void setCaptureAgentStateService(final CaptureAgentStateService service) {
     this.captureAgentService = service;
   }

@@ -108,6 +108,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   public static final String OPT_END_MARGIN = "end-margin";
 
   private static final long END_MARGIN_DEFAULT = 100;
+  public static final double SINGLE_FRAME_POS = 0.0;
 
   /** The composer service */
   private ComposerService composerService = null;
@@ -173,7 +174,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
           if (p.size() != cfg.positions.size()) {
             logger.warn("Could not apply all configured positions to track " + t);
           } else {
-            logger.info(format("Extracting images from %s at position %s", t, $(p).mkString(", ")));
+            logger.info("Extracting images from {} at position {}", t, $(p).mkString(", "));
           }
           // create one extraction per encoding profile
           return $(cfg.profiles).map(new Fn<EncodingProfile, Extraction>() {
@@ -582,12 +583,16 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * A position in time in a media file.
    */
   static final class MediaPosition {
-    private final double position;
+    private double position;
     private final PositionType type;
 
     MediaPosition(PositionType type, double position) {
       this.position = position;
       this.type = type;
+    }
+
+    public void setPosition(double position) {
+      this.position = position;
     }
 
     @Override public int hashCode() {

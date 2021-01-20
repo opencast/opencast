@@ -71,7 +71,7 @@ public class JobBarrierTest {
     }).anyTimes();
     EasyMock.replay(sr);
     // wait for all jobs to complete
-    final JobBarrier.Result res = new JobBarrier(null, sr, 10, toArray(Job.class, jobs.values())).waitForJobs();
+    new JobBarrier(null, sr, 10, toArray(Job.class, jobs.values())).waitForJobs();
     // check if there are still running jobs
     final boolean noRunningJobs = mlist(jobs.values()).foldl(true, new Function2<Boolean, TestJob, Boolean>() {
       @Override

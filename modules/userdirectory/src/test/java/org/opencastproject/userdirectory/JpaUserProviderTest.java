@@ -309,8 +309,8 @@ public class JpaUserProviderTest {
 
   @Test
   public void testDuplicateUser() {
-    Set<JpaRole> authorities1 = set(new JpaRole("ROLE_COOL_ONE", org1));
-    Set<JpaRole> authorities2 = set(new JpaRole("ROLE_COOL_ONE", org2));
+    set(new JpaRole("ROLE_COOL_ONE", org1));
+    set(new JpaRole("ROLE_COOL_ONE", org2));
     try {
       provider.addUser(createUserWithRoles(org1, "user1", "ROLE_COOL_ONE"));
       provider.addUser(createUserWithRoles(org1, "user2", "ROLE_COOL_ONE"));

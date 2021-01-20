@@ -126,26 +126,10 @@ public final class JpaFns {
   }
 
   /**
-   * The function's return value may be null.
-   */
-  static Fn<EntityPath<?>, BooleanExpression> allOfF(Iterable<Fn<EntityPath<?>, BooleanExpression>> expressions) {
-    return allOf(Collections.toArray(Fn.class, $(expressions).toSet()));
-  }
-
-  /**
    * Combine expressions with boolean 'or' operation while removing all duplicate expressions.
    */
   @Nullable static BooleanExpression anyOf(Iterable<BooleanExpression> expressions) {
     return Expressions.anyOf(Collections.toArray(BooleanExpression.class, $(expressions).toSet()));
-  }
-
-  /**
-   * Combine expressions with boolean 'or' operation while removing all duplicate expressions.
-   */
-  @SafeVarargs
-  @Nullable
-  static BooleanExpression anyOf(Opt<BooleanExpression>... expressions) {
-    return anyOf($(expressions).bind(Fns.<Opt<BooleanExpression>>id()));
   }
 
   /**

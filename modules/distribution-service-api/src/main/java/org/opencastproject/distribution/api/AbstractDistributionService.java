@@ -33,9 +33,6 @@ import java.io.File;
 
 public abstract class AbstractDistributionService extends AbstractJobProducer {
 
-  /** Default distribution directory */
-  public static final String DEFAULT_DISTRIBUTION_DIR = "opencast" + File.separator + "static";
-
   /** Path to the distribution directory */
   protected File distributionDirectory = null;
 

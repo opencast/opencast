@@ -58,7 +58,6 @@ import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Strings;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -189,8 +188,7 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
                 mediaPackage.getIdentifier());
         return createResult(Action.SKIP);
       } catch (UnauthorizedException e) {
-        logger.warn("Skipping theme workflow operation, user not authorized to perform operation: {}",
-                ExceptionUtils.getStackTrace(e));
+        logger.warn("Skipping theme workflow operation, user not authorized to perform operation:", e);
         return createResult(Action.SKIP);
       }
 
@@ -319,7 +317,7 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
     for (String tag : tags) {
       element.addTag(tag);
     }
-    URI uri = workspace.put(mediaPackage.getIdentifier().compact(), element.getIdentifier(), filename, file);
+    URI uri = workspace.put(mediaPackage.getIdentifier().toString(), element.getIdentifier(), filename, file);
     element.setURI(uri);
     try {
       MimeType mimeType = MimeTypes.fromString(filename);

@@ -60,8 +60,8 @@ public class TrustedAnonymousAthenticationFilterTest {
   @SuppressWarnings("deprecation")
   public void testTrusedAnonymousAuthenticationFilter() {
     HttpServletRequest request = EasyMock.createNiceMock(HttpServletRequest.class);
-    EasyMock.expect(request.getHeader(SecurityConstants.AUTHORIZATION_HEADER)).andReturn("true");
-    EasyMock.expect(request.getHeader(SecurityConstants.AUTHORIZATION_HEADER)).andReturn(null);
+    EasyMock.expect(request.getHeader(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER)).andReturn("true");
+    EasyMock.expect(request.getHeader(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER)).andReturn(null);
     EasyMock.replay(request);
 
     TrustedAnonymousAuthenticationFilter filter = new TrustedAnonymousAuthenticationFilter();

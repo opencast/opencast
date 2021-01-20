@@ -20,7 +20,6 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static java.lang.String.format;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 
@@ -132,7 +131,7 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
           final AQueryBuilder q = delegate.createQuery();
           final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
           final int total = r.countSnapshots();
-          logger.info(format("Populating index '%s' with %d snapshots | start", indexName, total));
+          logger.info("Populating index '{}' with {} snapshots | start", indexName, total);
           final int responseInterval = (total < 100) ? 1 : (total / 100);
           int current = 0;
 
@@ -152,7 +151,7 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
                           MessageSender.DestinationType.Queue, takeSnapshot);
                 } catch (Throwable t) {
                   logger.error("Unable to recreate event {} from organization {}",
-                          snapshot.getMediaPackage().getIdentifier().compact(), orgId, t);
+                          snapshot.getMediaPackage().getIdentifier().toString(), orgId, t);
                 }
                 if (((current % responseInterval) == 0) || (current == total)) {
                   getMessageSender().sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
@@ -208,22 +207,22 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
   }
 
   public void notifyTakeSnapshot(Snapshot snapshot, MediaPackage mp) {
-    logger.info(format("Send update message for snapshot %s, %s to ActiveMQ",
-            snapshot.getMediaPackage().getIdentifier().toString(), snapshot.getVersion()));
+    logger.info("Send update message for snapshot {}, {} to ActiveMQ",
+            snapshot.getMediaPackage().getIdentifier().toString(), snapshot.getVersion());
     messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, DestinationType.Queue,
             mkTakeSnapshotMessage(snapshot, mp));
   }
 
   @Override
   public void notifyDeleteSnapshot(String mpId, VersionImpl version) {
-    logger.info(format("Send delete message for snapshot %s, %s to ActiveMQ", mpId, version));
+    logger.info("Send delete message for snapshot {}, {} to ActiveMQ", mpId, version);
     messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, DestinationType.Queue,
             AssetManagerItem.deleteSnapshot(mpId, version.value(), new Date()));
   }
 
   @Override
   public void notifyDeleteEpisode(String mpId) {
-    logger.info(format("Send delete message for episode %s to ActiveMQ", mpId));
+    logger.info("Send delete message for episode {} to ActiveMQ", mpId);
     messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, DestinationType.Queue,
             AssetManagerItem.deleteEpisode(mpId, new Date()));
   }

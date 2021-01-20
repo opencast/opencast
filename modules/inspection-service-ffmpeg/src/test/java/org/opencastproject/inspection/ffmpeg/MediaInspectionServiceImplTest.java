@@ -38,9 +38,7 @@ import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
-import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeType;
-import org.opencastproject.util.StreamHelper;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -63,30 +61,14 @@ public class MediaInspectionServiceImplTest {
 
   @BeforeClass
   public static void setupClass() {
-    StreamHelper stdout = null;
-    StreamHelper stderr = null;
-    Process p = null;
     try {
-      // ffprobe requires a track in order to return a status code of 0, indicating that it is working as expected
-      URI uriTrack = MediaInspectionServiceImpl.class.getResource("/test.mp4").toURI();
-      File f = new File(uriTrack);
-      p = new ProcessBuilder(FFmpegAnalyzer.FFPROBE_BINARY_DEFAULT, f.getAbsolutePath()).start();
-      stdout = new StreamHelper(p.getInputStream());
-      stderr = new StreamHelper(p.getErrorStream());
-      int exitCode = p.waitFor();
-      stdout.stopReading();
-      stderr.stopReading();
-      if (exitCode != 0) {
-        throw new IllegalStateException("process returned " + exitCode);
-      }
+      Process p = new ProcessBuilder(FFmpegAnalyzer.FFPROBE_BINARY_DEFAULT, "-version").start();
+      if (p.waitFor() != 0)
+        throw new IllegalStateException();
       ffprobePath = some(FFmpegAnalyzer.FFPROBE_BINARY_DEFAULT);
     } catch (Throwable t) {
-      logger.warn("Skipping media inspection tests due to unsatisfied FFmpeg (ffprobe) installation: " + t.getMessage());
+      logger.warn("Skipping composer tests due to missing ffprobe binary");
       ffprobePath = none();
-    } finally {
-      IoSupport.closeQuietly(stdout);
-      IoSupport.closeQuietly(stderr);
-      IoSupport.closeQuietly(p);
     }
   }
 
@@ -215,4 +197,21 @@ public class MediaInspectionServiceImplTest {
       assertNull(newTrack.getDuration());
     }
   }
+
+  @Test
+  public void testHLSContainer() throws Exception {
+    final URI trackUri = getResource("/master.m3u8");
+    for (MediaInspector mi : init(trackUri)) {
+      Track track = mi.inspectTrack(trackUri, Options.NO_OPTION);
+      // test the returned values
+      Checksum cs = Checksum.create(ChecksumType.fromString("md5"), "66ed40c8ea9c8419f47a254668540d77");
+      assertEquals(cs, track.getChecksum());
+      assertEquals("application", track.getMimeType().getType());
+      assertEquals("x-mpegURL", track.getMimeType().getSubtype());
+      assertNotNull(track.getDuration());
+      assertTrue(track.getDuration() > 0);
+      // make changes to metadata
+    }
+  }
+
 }

@@ -70,11 +70,6 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
 
   public abstract Workspace getWorkspace();
 
-  /** Return the current date. Used in implementation instead of new Date(); to facilitate unit testing. */
-  public Date currentDate() {
-    return new Date();
-  }
-
   @Override
   public void store(MediaPackage mediaPackage, String repository) throws OaiPmhDatabaseException {
     try {
@@ -168,12 +163,12 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
         catalogXml = IOUtils.toString(in, "UTF-8");
       } catch (Throwable e) {
         logger.warn("Unable to load catalog {} from media package {}",
-                mpe.getIdentifier(), mediaPackage.getIdentifier().compact(), e);
+                mpe.getIdentifier(), mediaPackage.getIdentifier().toString(), e);
         continue;
       }
       if (catalogXml == null || StringUtils.isBlank(catalogXml) || !XmlUtil.parseNs(catalogXml).isRight()) {
         logger.warn("The catalog {} from media package {} isn't a well formatted XML document",
-                mpe.getIdentifier(), mediaPackage.getIdentifier().compact());
+                mpe.getIdentifier(), mediaPackage.getIdentifier().toString());
         continue;
       }
 

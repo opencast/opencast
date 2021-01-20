@@ -29,8 +29,10 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -59,6 +61,8 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.json.simple.parser.JSONParser;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +79,13 @@ import java.util.Map.Entry;
 /**
  * An implementation of the workflow service that communicates with a remote workflow service via HTTP.
  */
+@Component(
+  property = {
+    "service.description=Workflow Remote Service Proxy"
+  },
+  immediate =  true,
+  service = { WorkflowService.class }
+)
 public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowService {
 
   /** The logger */
@@ -82,6 +93,28 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
   public WorkflowServiceRemoteImpl() {
     super(JOB_TYPE);
+  }
+
+  /**
+   * Sets the trusted http client
+   *
+   * @param client
+   */
+  @Override
+  @Reference(name = "trustedHttpClient")
+  public void setTrustedHttpClient(TrustedHttpClient client) {
+    super.setTrustedHttpClient(client);
+  }
+
+  /**
+   * Sets the remote service manager.
+   *
+   * @param remoteServiceManager
+   */
+  @Override
+  @Reference(name = "remoteServiceManager")
+  public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
+    this.remoteServiceManager = remoteServiceManager;
   }
 
   /**
@@ -570,7 +603,26 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
    */
   @Override
   public void remove(long workflowInstanceId) throws WorkflowDatabaseException, NotFoundException {
-    HttpDelete delete = new HttpDelete("/remove/" + Long.toString(workflowInstanceId));
+    remove(workflowInstanceId, false);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowService#remove(long, boolean)
+   */
+  @Override
+  public void remove(long workflowInstanceId, boolean force) throws WorkflowDatabaseException, NotFoundException {
+    String deleteString = "/remove/" + Long.toString(workflowInstanceId);
+
+    if (force) {
+      List<NameValuePair> queryStringParams = new ArrayList<NameValuePair>();
+      queryStringParams.add(new BasicNameValuePair("force", "true"));
+      deleteString = deleteString + "?" + URLEncodedUtils.format(queryStringParams, "UTF_8");
+    }
+
+    HttpDelete delete = new HttpDelete(deleteString);
+
     HttpResponse response = getResponse(delete, SC_NO_CONTENT, SC_NOT_FOUND);
     try {
       if (response != null) {

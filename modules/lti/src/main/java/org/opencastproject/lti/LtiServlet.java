@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -200,9 +202,12 @@ public class LtiServlet extends HttpServlet {
     // We must return a 200 for some OAuth client libraries to accept this as a valid response
 
     // The URL of the LTI tool. If no specific tool is passed we use the test tool
-    UriBuilder builder = null;
+    UriBuilder builder;
     try {
-      URI toolUri = new URI(StringUtils.trimToEmpty(req.getParameter(LTI_CUSTOM_TOOL)));
+      String customTool = URLDecoder
+              .decode(StringUtils.trimToEmpty(req.getParameter(LTI_CUSTOM_TOOL)), StandardCharsets.UTF_8.displayName());
+      customTool = customTool.replaceAll("/?ltitools/(?<tool>[^/]*)/index.html\\??", "/ltitools/index.html?subtool=${tool}&");
+      URI toolUri = new URI(customTool);
 
       if (toolUri.getPath().isEmpty())
         throw new URISyntaxException(toolUri.toString(), "Provided 'custom_tool' has an empty path");
@@ -230,9 +235,15 @@ public class LtiServlet extends HttpServlet {
         String paramValue = req.getParameter(key);
         // we need to remove the prefix custom_
         String paramName = key.substring(LTI_CUSTOM_PREFIX.length());
-        logger.debug("Found custom var: {}:{}", paramName, paramValue);
         builder.queryParam(paramName, paramValue);
       }
+    }
+
+    // Add locale param from LMS
+    String localeParamValue = req.getParameter(LOCALE);
+    if (StringUtils.isNotBlank(localeParamValue)) {
+      // 'lng' is query param for i18next-browser-languagedetector
+      builder.queryParam("lng", localeParamValue);
     }
 
     // Build the final URL (as a string)
@@ -249,7 +260,6 @@ public class LtiServlet extends HttpServlet {
       resp.getWriter().write("<a href=\"" + redirectUrl + "\">continue...</a></body></html>");
       // TODO we should probably print the parameters.
     } else {
-      logger.debug(redirectUrl);
       resp.sendRedirect(redirectUrl);
     }
   }
@@ -288,7 +298,8 @@ public class LtiServlet extends HttpServlet {
     } else {
       Map<String, String> ltiAttributes = (Map<String, String>) session.getAttribute(SESSION_ATTRIBUTE_KEY);
       if (ltiAttributes == null) {
-        ltiAttributes = new HashMap<String, String>();
+        ltiAttributes = new HashMap<>();
+        ltiAttributes.put("roles", "Instructor");
       }
       resp.setContentType("application/json");
       JSONObject.writeJSONString(ltiAttributes, resp.getWriter());

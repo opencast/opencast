@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletResponse;
 public class DelegatingAuthenticationEntryPoint implements AuthenticationEntryPoint {
   public static final String REQUESTED_AUTH_HEADER = "X-Requested-Auth";
   public static final String DIGEST_AUTH = "Digest";
-  public static final String OAUTH_SIGNATURE = "oauth_signature";
   public static final String INITIAL_REQUEST_PATH = "initial_request_path";
 
   protected AuthenticationEntryPoint userEntryPoint;

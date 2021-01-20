@@ -39,6 +39,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +58,14 @@ import java.util.concurrent.Executors;
  * Implements the organizational directory. As long as no organizations are published in the service registry, the
  * directory will contain the default organization as the only instance.
  */
+@Component(
+  property = {
+    "service.pid=org.opencastproject.organization",
+    "service.description=Organization Directory Service"
+  },
+  immediate = true,
+  service = { OrganizationDirectoryService.class, ManagedServiceFactory.class }
+)
 public class OrganizationDirectoryServiceImpl implements OrganizationDirectoryService, ManagedServiceFactory {
 
   /** The logger */
@@ -74,7 +84,10 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   public static final String ORG_NAME_KEY = "name";
 
   /** The managed property that specifies the organization server name */
-  public static final String ORG_SERVER_KEY = "server";
+  public static final String ORG_SERVER_PREFIX = "prop.org.opencastproject.host.";
+
+  /** The default in case no server is configured */
+  public static final String DEFAULT_SERVER = "localhost";
 
   /** The managed property that specifies the server port */
   public static final String ORG_PORT_KEY = "port";
@@ -100,6 +113,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   private OrgCache cache;
 
   /** OSGi DI */
+  @Reference(name = "persistence")
   public void setOrgPersistence(OrganizationDatabase setOrgPersistence) {
     this.persistence = setOrgPersistence;
     this.cache = new OrgCache(60000, persistence);
@@ -109,6 +123,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    * @param configAdmin
    *          the configAdmin to set
    */
+  @Reference(name = "configAdmin")
   public void setConfigurationAdmin(ConfigurationAdmin configAdmin) {
     this.configAdmin = configAdmin;
   }
@@ -163,15 +178,10 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     // Gather the properties
     final String id = (String) properties.get(ORG_ID_KEY);
     final String name = (String) properties.get(ORG_NAME_KEY);
-    final String server = (String) properties.get(ORG_SERVER_KEY);
 
     // Make sure the configuration meets the minimum requirements
     if (StringUtils.isBlank(id))
       throw new ConfigurationException(ORG_ID_KEY, ORG_ID_KEY + " must be set");
-    if (StringUtils.isBlank(server))
-      throw new ConfigurationException(ORG_SERVER_KEY, ORG_SERVER_KEY + " must be set");
-
-    String[] serverUrls = StringUtils.split(server, ",");
 
     final String portAsString = StringUtils.trimToNull((String) properties.get(ORG_PORT_KEY));
     final int port = portAsString != null ? Integer.parseInt(portAsString) : 80;
@@ -180,11 +190,20 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
     // Build the properties map
     final Map<String, String> orgProperties = new HashMap<String, String>();
+    ArrayList<String> serverUrls = new ArrayList();
+
     for (Enumeration<?> e = properties.keys(); e.hasMoreElements();) {
       final String key = (String) e.nextElement();
+
       if (!key.startsWith(ORG_PROPERTY_PREFIX)) {
         continue;
       }
+
+      if (key.startsWith(ORG_SERVER_PREFIX)) {
+        String tenantSpecificHost = StringUtils.trimToNull((String) properties.get(key));
+        serverUrls.add(tenantSpecificHost);
+      }
+
       orgProperties.put(key.substring(ORG_PROPERTY_PREFIX.length()), (String) properties.get(key));
     }
 

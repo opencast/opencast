@@ -33,7 +33,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Effect2;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,13 +138,13 @@ public abstract class BaseMessageReceiverImpl<T extends Serializable> {
             lockService.synchronize(baseMessage.getId().get(), execute.curry(baseMessage.getObject()).toFn());
           }
         } catch (InterruptedException e) {
-          logger.error("Problem while getting {} message events {}", clazzName, ExceptionUtils.getStackTrace(e));
+          logger.error("Problem while getting {} message events", clazzName, e);
         } catch (ExecutionException e) {
-          logger.error("Problem while getting {} message events {}", clazzName, ExceptionUtils.getStackTrace(e));
+          logger.error("Problem while getting {} message events", clazzName, e);
         } catch (CancellationException e) {
           logger.trace("Listening for messages {} has been cancelled.", clazzName);
         } catch (Throwable t) {
-          logger.error("Problem while getting {} message events {}", clazzName, ExceptionUtils.getStackTrace(t));
+          logger.error("Problem while getting {} message events", clazzName, t);
         } finally {
           securityService.setOrganization(null);
           securityService.setUser(null);

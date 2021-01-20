@@ -1,0 +1,2145 @@
+{
+   "MATTERHORN": "Opencast",
+   "NAV_HOME": "Inicio",
+   "NAV_ABOUT": "Acerca de",
+   "NO": "No",
+   "SUBMIT": "Enviar",
+   "UPDATE": {
+      "MINOR": "Actualización menor disponible",
+      "MAJOR": "Actualización principal disponible",
+      "UNSUPPORTED": "La versión {{ version }} ya no está soportada",
+      "UNDETERMINED": "Versión indeterminable"
+   },
+   "CANCEL": "Cancelar",
+   "CONFIRM": "Confirmar",
+   "SAVE": "Guardar",
+   "CONTINUE": "Continuar",
+   "CLOSE": "Cerrar",
+   "LOGOUT": "Cerrar sesión",
+   "RESET": "Reestablecer",
+   "SELECT_NO_OPTION_SELECTED": "Sin opción seleccionada",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No hay opciones disponibles",
+   "YES": "Sí",
+   "COPY": "Copiar en el portapapeles",
+   "LTI": {
+      "ERROR_LOADING_METADATA": "Error al cargar los metadatos del evento. Inténtalo de nuevo más tarde.",
+      "SERIES_TITLE": "Ver series",
+      "UPLOAD_TITLE": "Subir un evento",
+      "LOADING": "Cargando…",
+      "NEW_UPLOAD": "Subir un nuevo evento",
+      "EDIT_UPLOAD": "Editar el evento",
+      "CURRENT_JOBS": "Trabajos de hoy",
+      "PRESENTER": "Ponente",
+      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
+      "CAPTION": "Subtítulos",
+      "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
+      "UPLOAD": "Subir",
+      "UPLOADING": "Subiendo",
+      "EDIT": "Guardar",
+      "EDIT_TITLE": "Editar el evento",
+      "NO_OPTION_SELECTED": "Sin opción seleccionada",
+      "EDITING": "Guardando…",
+      "SELECT_OPTION": "Selecciona la opción",
+      "JOB_TITLE": "Título",
+      "JOB_STATUS": "Estado",
+      "UPLOAD_SUCCESS": "Upload succeeded!",
+      "UPLOAD_FAILURE": "Upload failed!",
+      "UPLOAD_FAILURE_DESCRIPTION": "Por favor, inténtelo más tarde.",
+      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
+      "EDIT_FAILURE": "Edit failed!",
+      "COPY_SUCCESS": "Copying started…",
+      "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",
+      "GENERIC_ERROR": "Error: {{message}}",
+      "DELETION_SUCCESS": "Event deletion successful",
+      "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
+      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
+      "DELETION_FAILURE": "Event deletion failed",
+      "DELETION_FAILURE_DESCRIPTION": "Por favor, inténtelo más tarde...",
+      "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
+      "CONFIRM_DELETION": "Really delete this event?",
+      "COPY_TO_SERIES": "Copy event to series",
+      "SELECT_COPY_TARGET": "Select destination series",
+      "COPY": "Copiar",
+      "COPY_IN_PROGRESS": "Iniciando copia…",
+      "CREATOR": "por {{creator}}"
+   },
+   "LANGUAGES": {
+      "ARABIC": "Árabe",
+      "DANISH": "Danés",
+      "GERMAN": "Alemán",
+      "GERMAN_CH": "Alemán de Suiza",
+      "FINNISH": "Finlandés",
+      "HINDI": "Hindi",
+      "ITALIAN": "Italiano",
+      "JAPANESE": "Japonés",
+      "DUTCH": "Neerlandés",
+      "NORWEGIAN": "Noruego",
+      "FRENCH": "Francés",
+      "ENGLISH": "Inglés",
+      "SPANISH": "Español",
+      "ROMANSH": "Romanche",
+      "POLISH": "Polaco",
+      "PORTUGESE": "Portugués",
+      "SLOVENIAN": "Esloveno",
+      "SWEDISH": "Sueco",
+      "RUSSIAN": "Ruso",
+      "TURKISH": "Turco",
+      "UKRAINIAN": "Ucraniano",
+      "CHINESE": "Chino"
+   },
+   "PREFERENCES": {
+      "TABLE": {
+         "CAPTION": "Modificar Vista de Tabla",
+         "SUBHEADING": "Seleccione los datos que se mostrarán por defecto en la vista de la tabla {{ tableName }}",
+         "AVAILABLE_COLUMNS": "Columnas disponibles",
+         "SELECTED_COLUMNS": "Columnas seleccionadas",
+         "FOOTER_TEXT": "El orden y la selección se guardarán automáticamente. Pulse \"{{resetTranslation}}\" para restaurar la vista por defecto."
+      }
+   },
+   "CONFIRMATIONS": {
+      "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
+      "CONTINUE_ACTION": "¿Está seguro de que desea continuar?",
+      "METADATA": {
+         "NOTICE": {
+            "UNKNOWN": "Se va a borrar el siguiente elemento",
+            "EVENT": "Se va a borrar el siguiente evento",
+            "SERIES": "Se va a borrar la siguiente serie",
+            "ACL": "Se va a borrar el siguiente ACL",
+            "GROUP": "Se va a borrar el siguiente grupo",
+            "USER": "Se va a borrar el siguiente usuario",
+            "THEME": "Se va a borrar el siguiente estilo",
+            "LOCATION": "Se va a borrar la siguiente localización"
+         },
+         "NAME": "Nombre"
+      },
+      "ACTIONS": {
+         "CONFIRMATION": "Confirmación",
+         "SHOW": {
+            "EMBEDDING_CODE": "Embedding code"
+         }
+      },
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "Esta serie contiene eventos. Eliminar la serie no eliminará los acontecimientos.",
+         "EVENT_WILL_BE_GONE": "Si continúa, el evento se eliminará permanentemente."
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "Esta serie no se puede eliminar ya que todavía contiene eventos."
+      }
+   },
+   "MEDIAMODULE": "Módulo Multimedia",
+   "SYSTEM_NOTIFICATIONS": "Notificaciones y avisos de sistema",
+   "LANGUAGE": "Seleccione el idioma",
+   "HELP": {
+      "HELP": "Ayuda",
+      "USERS_GUIDE": "Guía del usuario",
+      "DOCUMENTATION": "Documentación",
+      "REST_DOC": "Documentación de la API REST",
+      "HOTKEY_CHEAT_SHEET": "Atajos de Teclado",
+      "ADOPTER_REGISTRATION": "Adopter Registration"
+   },
+   "NOTIFICATIONS": {
+      "ACL_ADDED": "Se ha creado la política de acceso",
+      "ACL_NOT_SAVED": "No se ha podido guardar la política de acceso",
+      "ACL_UPDATED": "La política de acceso ha sido actualizada",
+      "ACL_DELETED": "La política de acceso ha sido eliminada",
+      "ACL_NOT_DELETED": "No se ha podido eliminar la política de acceso",
+      "USER_ADDED": "Se ha creado el usuario",
+      "USER_UPDATED": "El usuario ha sido actualizado",
+      "USER_NOT_SAVED": "No se ha podido guardar el usuario",
+      "USER_DELETED": "El usuario ha sido eliminado",
+      "USER_NOT_DELETED": "No se ha podido eliminar el usuario",
+      "USER_NOT_MANAGEABLE": "No es posible administrar el usuario",
+      "GROUP_ADDED": "Se ha creado el grupo",
+      "GROUP_CONFLICT": "El nombre de grupo generado ya existe",
+      "GROUP_UPDATED": "El grupo ha sido actualizado",
+      "GROUP_NOT_SAVED": "No se ha podido guardar el grupo",
+      "GROUP_DELETED": "El grupo ha sido eliminado",
+      "GROUP_NOT_DELETED": "No se ha podido eliminar el grupo",
+      "ACCESS_DENIED": "Acceso denegado. No está autorizado a ver esta página",
+      "SERIES_ADDED": "Se ha creado la serie",
+      "SERIES_NOT_SAVED": "No se ha podido guardar la serie",
+      "EVENTS_CREATED": "Se ha creado el evento",
+      "EVENTS_UPLOAD_STARTED": "Subiendo el evento…",
+      "EVENTS_NOT_CREATED": "No se ha podido crear el evento",
+      "EVENTS_UPDATED_NB": "{{ number }} eventos se han actualizado correctamente",
+      "EVENTS_UPDATED_ALL": "Todos los eventos se han actualizado correctamente",
+      "EVENTS_NOT_UPDATED": "No se ha podido guardar el evento",
+      "EVENTS_NOT_UPDATED_ID": "No se ha podido guardar el evento {{ id }}",
+      "EVENTS_NOT_UPDATED_ALL": "No se ha podido guardar ningún evento",
+      "EVENTS_PROCESSING_ACTION_RETRY": "Reiniciando el proceso...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "El proceso no ha podido ser reiniciado.",
+      "EVENTS_PROCESSING_ACTION_NONE": "El proceso está siendo interrumpido...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "El proceso no ha podido interrumpirse.",
+      "EVENTS_PROCESSING_ACTION_STOP": "Procesamiento interrumpido.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "El proceso no ha podido interrumpirse.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Workflow eliminado.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "No se pudo eliminar el Workflow.",
+      "SERIES_UPDATED_NB": "{{ number }} series se han actualizado correctamente",
+      "SERIES_UPDATED_ALL": "Todas las series se han actualizado correctamente",
+      "SERIES_NOT_UPDATED": "No se ha podido guardar la serie",
+      "SERIES_NOT_UPDATED_ID": "No se ha podido guardar la serie {{ id }}",
+      "SERIES_NOT_UPDATED_ALL": "No se ha podido guardar ninguna serie",
+      "EVENT_DELETED": "El evento ha sido eliminado.",
+      "EVENT_WILL_BE_DELETED": "Se está eliminando el evento",
+      "EVENTS_DELETED": "Se están eliminando los eventos.",
+      "EVENTS_NOT_DELETED": "No se ha(n) podido eliminar el/los evento(s).",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "No se ha(n) podido borrar el/los evento(s) porque no se dispone del permiso para ello.",
+      "SERIES_DELETED": "Se ha borrado la serie",
+      "SERIES_NOT_DELETED": "No se ha podido borrar la serie",
+      "LOCATION_DELETED": "Se ha borrado la ubicación",
+      "LOCATION_NOT_DELETED": "No se ha podido borrar la ubicación",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "No se ha podido borrar la ubicación porque no se dispone del permiso para ello.",
+      "CONFLICT_DETECTED": "Conflicto de programación: el nuevo evento se solapa con otro existente. Por favor, cambie la sala, las fechas o las horas.",
+      "CONFLICT_BULK_DETECTED": "Conflicto de programación: los cambios propuestos causan un conflicto. Por favor, cambia la ubicación, las fechas o horas.",
+      "CONFLICT_ALREADY_ENDED": "Error de programación: El evento ya ha terminado.",
+      "CONFLICT_END_BEFORE_START": "Error de programación: El final tiene que ser más tarde que el comienzo.",
+      "CONFLICT_IN_THE_PAST": "El programa no podría ser actualizado: no se puede programar un evento que en el pasado.",
+      "INVALID_ACL_RULES": "Las reglas deben contener un nombre de rol válido y permiso(s) de lectura y/o escritura.",
+      "MISSING_ACL_RULES": "¡Se requiere al menos un rol con permisos de Lectura y Escritura!",
+      "SAVED_ACL_RULES": "Se han guardado las reglas de acceso.",
+      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Los eventos que contiene esta serie deberán ser reprocesados",
+      "SERIES_ACL_LOCKED": "No es posible editar las Políticas de Acceso cuando existen operaciones activas en algún evento de la serie",
+      "SERIES_ACL_MISSING_READWRITE_ROLE": "La Política de Acceso requiere al menos un rol con permisos de Lectura y Escritura.",
+      "EVENT_ACL_MISSING_READWRITE_ROLE": "La Política de Acceso requiere al menos un rol con permisos de Lectura y Escritura.",
+      "THEME_NAME_ALREADY_TAKEN": "Este nombre ya está en uso",
+      "THEME_NAME_EMPTY": "El nombre no puede estar vacío",
+      "BUMPER_UPLOAD_ERROR": "Error en la subida de archivos",
+      "BUMPER_REQUIRED": "Debe subir una cortinilla de cierre",
+      "TRAILER_UPLOAD_ERROR": "Error en la subida de archivos",
+      "TITLE_UPLOAD_ERROR": "Error en la subida de archivos",
+      "LICENSE_UPLOAD_ERROR": "Error en la subida de archivos",
+      "WATERMARK_UPLOAD_ERROR": "Error en la subida de archivos",
+      "WATERMARK_REQUIRED": "Debe añadir una marca de agua",
+      "THEME_UPLOAD_STARTED": "Se están subiendo los archivos…",
+      "THEME_CREATED": "Se ha creado el estilo",
+      "THEME_NOT_CREATED": "No se ha podido crear el estilo",
+      "THEME_DELETED": "El estilo ha sido eliminado",
+      "THEME_NOT_DELETED": "No se ha podido eliminar el estilo",
+      "TASK_CREATED": "Se ha creado la tarea",
+      "TASK_NOT_CREATED": "No se ha podido crear la tarea",
+      "VIDEO_CUT_NOT_SAVED": "No se han podido guardar los cambios",
+      "VIDEO_CUT_SAVED": "Los cambios se han guardado",
+      "VIDEO_CUT_PROCESSING": "Se está procesando el vídeo…",
+      "THUMBNAIL_CHANGE_FAILED": "No se pudo cambiar la miniatura.",
+      "VIDEO_SOURCE_TRACKS_INVALID": "No ha seleccionado pistas de vídeo para procesar",
+      "VIDEO_TOO_MANY_AUDIOS": "No se puede tener más de una pista de audio en una única pista de vídeo",
+      "SERVER_UNRESPONSIVE": "¡Uy! Parece que el servidor no responde. Por favor, inténtelo de nuevo más tarde.",
+      "SERVICE_UNAVAILABLE": "¡Uy! Parece que el servidor no responde. Por favor, inténtelo de nuevo más tarde.",
+      "ACTIVE_TRANSACTION": "Este evento no puede editarse mientras exista un flujo de trabajo o una transacción activos.",
+      "BULK_METADATA_UPDATE": {
+         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
+         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
+         "NO_EVENTS_UPDATED": "All updates failed.",
+         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+      },
+      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
+      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
+      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
+   },
+   "BULK_ACTIONS": {
+      "CAPTION": "Acciones",
+      "DELETE": {
+         "SERIES": {
+            "CAPTION": "Eliminar",
+            "BUTTON": "Eliminar",
+            "CANNOT_DELETE": "Esta serie no se puede eliminar ya que todavía contiene eventos."
+         },
+         "EVENTS": {
+            "CAPTION": "Eliminar",
+            "DELETE_EVENTS": "Eliminar Eventos",
+            "UNAUTHORIZED": "No está autorizado a borrar los eventos seleccionados. Por favor, desmárquelos para continuar."
+         }
+      },
+      "DELETE_EVENTS_WARNING_LINE1": "Al eliminar un evento, todos sus metadatos y sus archivos de audio y vídeo se eliminarán y serán irrecuperables.",
+      "DELETE_EVENTS_WARNING_LINE2": "",
+      "DELETE_SERIES_WARNING_LINE1": "Al eliminar una serie, todos sus metadatos serán irrecuperables. Los eventos de la serie no se borrarán.",
+      "DELETE_SERIES_WARNING_LINE2": "",
+      "SCHEDULE_TASK": {
+         "CAPTION": "Comenzar Tarea",
+         "GENERAL": {
+            "CAPTION": "General",
+            "SUMMARY": "({{ count }} eventos seleccionados)",
+            "CANNOTSTART": "El/Los evento(s) indicados no pueden procesarse en este momento. Desmárquelo(s) o inténtelo de nuevo más tarde."
+         },
+         "TASKS": {
+            "CAPTION": "Tareas",
+            "SELECT": "Seleccione Tarea"
+         },
+         "SUMMARY": {
+            "CAPTION": "Resumen",
+            "EVENTS": "Eventos",
+            "EVENTS_SUMMARY": "Ha seleccionado {{numberOfEvents}} eventos",
+            "CONFIGURATION": "Configuración",
+            "WORKFLOW": "Tarea"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Editar eventos programados",
+         "CONFLICT_CHECK_RUNNING": "Ejecutando el control de conflictos…",
+         "GENERAL": {
+            "CAPTION": "General",
+            "CANNOTSTART": "Los eventos remarcados no se pueden procesar, sólo se admiten eventos programados.",
+            "NOCHANGES": "No se han detectado cambios en los eventos.",
+            "CONFLICT_FIRST_EVENT": "Evento modificado",
+            "CONFLICT_SECOND_EVENT": "Evento en conflicto",
+            "CANNOTEDITSCHEDULE": "No tiene permiso para modificar la programación de los eventos indicados. Puede continuar, pero no podrá modificar la programación de ningún evento."
+         },
+         "METADATA": {
+            "EDIT": "Editar metadatos"
+         },
+         "SUMMARY": {
+            "CAPTION": "Resumen",
+            "SINGLE_EVENT_CAPTION": "Evento \"{{ title }}\"",
+            "TYPE": "Tipo",
+            "PREVIOUS": "Valor anterior",
+            "NEXT": "Nuevo valor"
+         },
+         "EDIT": {
+            "CAPTION": "Modificar",
+            "EVENT": "evento",
+            "EVENTS": "eventos",
+            "HEADER": "Esta página le permite editar eventos programados agrupados por días de semana. Los campos de entrada están ya preconfigurados en caso de que todos los eventos tengan el mismo valor para un campo en específico. De otra forma, los campos de entrada quedan en blanco. Dejar los campos de entrada en blanco significa que los valores respectivos para cada evento no debieran ser cambiados.",
+            "METADATA": "Metadatos",
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+         }
+      },
+      "EDIT_EVENTS_METADATA": {
+         "CAPTION": "Edit the metadata of multiple events",
+         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "REQUEST_ERRORS": {
+            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
+            "NOTHING_TO_EDIT": "The events cannot be edited.",
+            "NOT_FOUND": "Not found",
+            "RUNNING_WORKFLOW": "Running workflow",
+            "TABLE": {
+               "CAPTION": "Selected events",
+               "ERRORS": "Errors"
+            }
+         },
+         "EDIT": {
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "TABLE": {
+               "CAPTION": "Metadata of selected events",
+               "FIELDS": "Metadata",
+               "VALUES": "Values"
+            }
+         },
+         "UPDATE_FAILURES": {
+            "TABLE": {
+               "CAPTION": "Update Failures"
+            },
+            "UPDATE_FAILED": "Update failed",
+            "NO_EVENTS_UPDATED": "All updates failed.",
+            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+         }
+      }
+   },
+   "DATES": {
+      "TODAY": "Hoy",
+      "TOMORROW": "Mañana",
+      "YESTERDAY": "Ayer",
+      "THIS_WEEK": "Esta semana",
+      "THIS_MONTH": "Este mes",
+      "THIS_YEAR": "Este año"
+   },
+   "DATETIMES": {
+      "TODAY": "Hoy a la(s) {{ time }}",
+      "TOMORROW": "Mañana a la(s) {{ time }}",
+      "YESTERDAY": "Ayer a la(s) {{ time }}"
+   },
+   "WIZARD": {
+      "NEXT_STEP": "Siguiente",
+      "BACK": "Anterior",
+      "CREATE": "Crear",
+      "DELETE": "Eliminar",
+      "UPDATE": "Actualizar",
+      "DURATION": {
+         "HOURS": "Horas",
+         "MINUTES": "Minutos"
+      }
+   },
+   "CAPTURE_AGENT": {
+      "DEVICE": {
+         "MICROPHONE": "Micrófono",
+         "CAMERA": "Cámara",
+         "PRESENTATION": "Presentación"
+      }
+   },
+   "NAV": {
+      "DASHBOARD": {
+         "TITLE": "Panel de Control"
+      },
+      "EVENTS": {
+         "TITLE": "Grabaciones"
+      },
+      "SYSTEMS": {
+         "TITLE": "Sistemas"
+      },
+      "CAPTUREAGENTS": {
+         "TITLE": "Captura"
+      },
+      "USERS": {
+         "TITLE": "Organización"
+      },
+      "INTEGRATIONS": {
+         "TITLE": "Integraciones"
+      },
+      "CONFIGURATION": {
+         "TITLE": "Configuración"
+      },
+      "STATISTICS": {
+         "TITLE": "Estatísticas"
+      }
+   },
+   "ADOPTER_REGISTRATION": {
+      "MODAL": {
+         "CAPTION": "Registration",
+         "SKIP": "Not now",
+         "CONTINUE": "Continue",
+         "BACK": "Back",
+         "LEGAL_INFO_STATE": {
+            "HEADER": "Terms of Service and Privacy Policy"
+         },
+         "INFORMATION_STATE": {
+            "HEADER": "Thank you for using Opencast!",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+         },
+         "FORM_STATE": {
+            "ORGANISATION": "Organisation",
+            "DEPARTMENT": "Department",
+            "COUNTRY": "Country",
+            "POSTAL_CODE": "Postal code",
+            "CITY": "City",
+            "CONTACT_INFO": "Contact information",
+            "GENDER": "Gender",
+            "GENDER_MALE": "male",
+            "GENDER_FEMALE": "female",
+            "FIRST_NAME": "First name",
+            "LAST_NAME": "Last name",
+            "STREET": "Street",
+            "NUMBER": "Number",
+            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "MAIL": "Email",
+            "CONTACT_ME": "Contact me for updates and secruity issues",
+            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
+            "POLICY_HEADLINE": "Privacy policy and terms of use",
+            "USAGE_STATISTICS": "Usage statistcs",
+            "ERROR_REPORTS": "Error reports",
+            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
+            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "READ_TERMS_OF_USE_AFTER": ""
+         },
+         "SKIP_STATE": {
+            "HEADER": "Maybe next time!",
+            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+         },
+         "THANK_YOU_STATE": {
+            "HEADER": "Thank you for your registration!",
+            "TEXT_LEADING_TO_PATH": "You can change your data at ",
+            "TEXT_LEADING_AFTER_PATH": "at any time."
+         },
+         "ERROR": {
+            "HEADER": "Error",
+            "TEXT": "An error occurred while processing your request."
+         },
+         "DELETE_SUBMIT_STATE": {
+            "TEXT": "Are you sure you want to delete your registration data?"
+         }
+      }
+   },
+   "EVENTS": {
+      "LICENSE": {
+         "ALLRIGHTS": "Todos los derechos reservados",
+         "CCBY": "CC BY",
+         "CCBYSA": "CC BY-SA",
+         "CCBYND": "CC BY-ND",
+         "CCBYNC": "CC BY-NC",
+         "CCBYNCSA": "CC BY-NC-SA",
+         "CCBYNCND": "CC BY-NC-ND",
+         "CC0": "CC0",
+         "BSD": "BSD",
+         "CCND": "CCND",
+         "GPL": "GPL"
+      },
+      "EVENTS": {
+         "NEW": {
+            "CAPTION": "Crear evento",
+            "METADATA": {
+               "CAPTION": "Metadatos"
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "Metadatos extendidos",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Metadatos extendidos"
+               }
+            },
+            "SOURCE": {
+               "CAPTION": "Origen",
+               "SELECT_SOURCE": "Seleccionar origen",
+               "PLACEHOLDER": {
+                  "LOCATION": "Ubicación",
+                  "INPUTS": "Entradas",
+                  "HOUR": "Hora",
+                  "MINUTE": "Minuto",
+                  "REPEATS": "Repeticiones",
+                  "START_DATE": "aaaa-mm-dd",
+                  "START_DATE_FORMAT": "aaaa-mm-dd",
+                  "END_DATE": "aaaa-mm-dd",
+                  "END_DATE_FORMAT": "aaaa-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "Subir archivos",
+                  "RECORDING_ELEMENTS": "Elementos de la grabación",
+                  "RECORDING_METADATA": "Metadatos",
+                  "SEGMENTABLE": {
+                     "SHORT": "Diapositivas",
+                     "DETAIL": "El archivo contiene la grabación de una presentación de diapositivas (Keynote, Powerpoint, etc.)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Ponente",
+                     "DETAIL": "El archivo contiene la grabación de una persona dirigiéndose a una audiencia."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Solo audio",
+                     "DETAIL": "El archivo solo contiene audio."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "Multiparte",
+                     "DETAIL": "Un conjunto de ficheros que contienen las diferentes partes de un evento."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Programación",
+                  "START_DATE": "Fecha de inicio",
+                  "START_TIME": "Hora de inicio",
+                  "TIMEZONE": "Zona horaria",
+                  "END_DATE": "Fecha de finalización",
+                  "END_TIME": "Hora de fin",
+                  "DURATION": "Duración"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Programar un único evento"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Programar múltiples eventos",
+                  "REPEATS": "Repetir",
+                  "REPEAT_ON": "Repetir",
+                  "WEEKDAYS": "Entre semana",
+                  "WEEKDAY": "Día de semana"
+               },
+               "NO_SOURCE_AVAILABLE": "No hay agentes de captura disponibles"
+            },
+            "PROCESSING": {
+               "CAPTION": "Procesando",
+               "SELECT_WORKFLOW": "Seleccione flujo de trabajo",
+               "SELECT_WORKFLOW_EMPTY": "No hay flujos de trabajo disponibles",
+               "WORKFLOW": "Flujo de trabajo"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "Subida de recursos",
+               "SELECT_TYPE": "Seleccione un tipo de contenido",
+               "ADD": "Añadir recurso",
+               "NO_OPTIONS": "¡No se ha proporcionado una lista de opciones de recursos para esta sección de la página web!",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "Notas",
+                  "CAPTIONS_DFXP": "Subtítulos DXFP",
+                  "CAPTIONS_WEBVTT": "Subtítulos WebVTT",
+                  "PREVIEW_IMAGE": "Imagen de vista previa",
+                  "SMIL": "Catálogo SMIL",
+                  "TRACK_PARTS": "Pistas"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Política de acceso",
+               "POLICY": "Política de acceso",
+               "ACL": "Política de acceso"
+            },
+            "SUMMARY": {
+               "CAPTION": "Resumen",
+               "SOURCE": {
+                  "INPUT": "Entrada"
+               }
+            },
+            "WEEKDAYS": {
+               "MO": "Lu",
+               "TU": "Ma",
+               "WE": "Mi",
+               "TH": "Ju",
+               "FR": "Vi",
+               "SA": "Sá",
+               "SU": "Do"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Lunes",
+               "TU": "Martes",
+               "WE": "Miércoles",
+               "TH": "Jueves",
+               "FR": "Viernes",
+               "SA": "Sábado",
+               "SU": "Domingo"
+            }
+         },
+         "NAVIGATION": {
+            "EVENTS": "Eventos",
+            "SERIES": "Series",
+            "OVERVIEW": "Resumen"
+         },
+         "UPLOAD": "Subir",
+         "ADD_SERIES": "Añadir serie",
+         "ADD_EVENT": "Añadir evento",
+         "TABLE": {
+            "CAPTION": "Eventos",
+            "TITLE": "Título",
+            "PRESENTERS": "Ponente(s)",
+            "SERIES": "Serie",
+            "DATE": "Fecha",
+            "START": "Inicio",
+            "END": "Fin",
+            "STOP": "Fin",
+            "STATUS": "Estado",
+            "LOCATION": "Ubicación",
+            "ACTION": "Acciones",
+            "FIRST": "Primero",
+            "LAST": "Último",
+            "NEXT": "Siguiente",
+            "MANAGED_ACL": "Política de acceso",
+            "WORKFLOW_STATE": "Progreso",
+            "PREVIOUS": "Anterior",
+            "NOCONTENT": "No hay información disponible",
+            "PUBLISHED": "Publicado",
+            "WEEKDAY": "Día de la semana",
+            "TOOLTIP": {
+               "ASSETS": "Abrir los detalles del recurso",
+               "START": "Filtrar para esta fecha de inicio",
+               "SERIES": "Filtrar para esta serie",
+               "STATUS": "Filtrar para este estado de evento",
+               "LOCATION": "Filtrar para esta ubicación",
+               "DETAILS": "Abrir detalles de evento",
+               "DELETE": "Borrar evento",
+               "EMBEDDING_CODE": "Embedding code",
+               "EDITOR": "Abrir en el editor",
+               "EDITOR_NEEDS_CUTTING": "Abrir editor de vídeo (un comentario indica que se ha solicitado edición)",
+               "COMMENTS": "Ver comentarios",
+               "PAUSED_WORKFLOW": "Ver Workflows pausados",
+               "PRESENTER": "Filtrar para este presentador"
+            }
+         },
+         "STATUS": {
+            "SCHEDULED": "Programado",
+            "RECORDING": "Grabando",
+            "UPLOADING": "Subiendo",
+            "INGESTING": "Ingestando",
+            "PENDING": "Pendiente",
+            "PROCESSING": "Procesando",
+            "PAUSED": "En pausa",
+            "PROCESSED": "Procesado",
+            "RECORDING_FAILURE": "Fallo en la grabación",
+            "PROCESSING_FAILURE": "Fallo en el procesamiento",
+            "PROCESSING_CANCELED": "Procesamiento cancelado"
+         },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retirando",
+            "DELETING": "Borrando",
+            "DUPLICATING": "Duplicando",
+            "PUBLISHING": "Publicando",
+            "IMPORTING": "Importando",
+            "REPUBLISHING_METADATA": "Republicando metadatos",
+            "UPDATING_PREVIEWS": "Actualizando vistas previas"
+         },
+         "DETAILS": {
+            "HEADER": "Detalles del evento - {{resourceId}}",
+            "TABS": {
+               "METADATA": "Metadatos",
+               "EXTENDED-METADATA": "Metadatos II",
+               "ASSETS": "Recursos",
+               "PUBLICATIONS": "Publicaciones",
+               "SCHEDULING": "Programación",
+               "WORKFLOWS": "Flujos de Trabajo",
+               "ACCESS": "Política de acceso",
+               "COMMENTS": "Comentarios",
+               "STATISTICS": "Estatísticas"
+            },
+            "PUBLICATIONS": {
+               "CAPTION": "Publicaciones",
+               "NO_PUBLICATIONS_AVAILABLE": "Este evento no ha sido publicado",
+               "PUBLICATION_DESCRIPTION": "Este evento ha sido publicado en los siguientes canales de publicación:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "Este evento no está actualmente en progreso",
+               "CUSTOM": "Personalizado",
+               "ENGAGE": "Engage",
+               "ENGAGE_LIVE": "Engage Live",
+               "EXTERNAL_API": "Publicación en la API Externa",
+               "YOUTUBE": "Youtube",
+               "OAIPMH": "OAI-PMH",
+               "SELECT_WORKFLOW": "Seleccione flujo de trabajo",
+               "SELECT_WORKFLOW_EMPTY": "No hay flujos de trabajo disponibles"
+            },
+            "MEDIA": {
+               "TRIM_MEDIA": "Cortar vídeos",
+               "MEDIA": "Archivos multimedia",
+               "ID": "ID",
+               "TYPE": "Tipo",
+               "MIMETYPE": "Tipo MIME",
+               "URL": "URL",
+               "DETAILS": "Detalles"
+            },
+            "ATTACHMENTS": {
+               "CAPTION": "Adjuntos",
+               "ID": "Identificador",
+               "TYPE": "Tipo",
+               "MIMETYPE": "Tipo MIME",
+               "TAGS": "Etiquetas",
+               "LINK": "Enlace"
+            },
+            "SOURCE": {
+               "CAPTION": "Origen",
+               "SELECT_SOURCE": "Seleccionar origen",
+               "PLACEHOLDER": {
+                  "LOCATION": "Ubicación",
+                  "INPUTS": "Entradas",
+                  "HOUR": "Hora",
+                  "MINUTE": "Minuto",
+                  "REPEATS": "Repetir",
+                  "START_DATE": "aaaa-mm-dd",
+                  "END_DATE": "aaaa-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "Subida",
+                  "RECORDING_ELEMENTS": "Elementos de la grabación",
+                  "SEGMENTABLE": {
+                     "SHORT": "Diapositivas",
+                     "DETAIL": "El archivo contiene la grabación de una presentación de diapositivas (Keynote, Powerpoint, etc.)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Ponente",
+                     "DETAIL": "El archivo contiene la grabación de una persona dirigiéndose a una audiencia."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Solo audio",
+                     "DETAIL": "El archivo solo contiene audio."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Programación",
+                  "START_DATE": "Fecha de inicio",
+                  "START_TIME": "Hora de inicio",
+                  "TIMEZONE": "Zona horaria",
+                  "END_DATE": "Fecha de finalización",
+                  "END_TIME": "Hora de fin",
+                  "DURATION": "Duración"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Programar un único evento"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Programar múltiples eventos",
+                  "REPEATS": "Repeticiones",
+                  "REPEAT_ON": "Repetir",
+                  "WEEKDAYS": "Días de la semana"
+               }
+            },
+            "ASSETS": {
+               "CAPTION": "Recursos",
+               "TYPE": "Tipo",
+               "SIZE": "Tamaño",
+               "DETAILS": "Detalles",
+               "STREAMS": "Flujos",
+               "PREVIEW": "Vista Previa",
+               "ATTACHMENTS": {
+                  "TITLE": "Adjuntos",
+                  "CAPTION": "Adjuntos",
+                  "ID": "Identificador",
+                  "TYPE": "Tipo",
+                  "MIMETYPE": "Tipo MIME",
+                  "TAGS": "Etiquetas",
+                  "LINK": "Enlace",
+                  "DETAILS": {
+                     "TITLE": "Detalles del adjunto",
+                     "CAPTION": "Detalles del adjunto",
+                     "ID": "Identificador",
+                     "TYPE": "Tipo",
+                     "MIMETYPE": "Tipo MIME",
+                     "TAGS": "Etiquetas",
+                     "URL": "URL",
+                     "SIZE": "Tamaño",
+                     "CHECKSUM": "Suma de verificación",
+                     "REFERENCE": "Referencia"
+                  }
+               },
+               "CATALOGS": {
+                  "TITLE": "Catálogos",
+                  "CAPTION": "Catálogos",
+                  "ID": "Identificador",
+                  "TYPE": "Tipo",
+                  "MIMETYPE": "Tipo MIME",
+                  "TAGS": "Etiquetas",
+                  "LINK": "Enlace",
+                  "DETAILS": {
+                     "TITLE": "Detalles del catálogo",
+                     "CAPTION": "Detalles del catálogo",
+                     "ID": "Identificador",
+                     "TYPE": "Tipo",
+                     "MIMETYPE": "Tipo MIME",
+                     "TAGS": "Etiquetas",
+                     "URL": "URL",
+                     "SIZE": "Tamaño",
+                     "CHECKSUM": "Suma de verificación",
+                     "REFERENCE": "Referencia"
+                  }
+               },
+               "MEDIA": {
+                  "TITLE": "Archivos multimedia",
+                  "CAPTION": "Archivos multimedia",
+                  "ID": "Identificador",
+                  "TYPE": "Tipo",
+                  "MIMETYPE": "Tipo MIME",
+                  "TAGS": "Etiquetas",
+                  "LINK": "Enlace",
+                  "DETAILS": {
+                     "TITLE": "Detalles de los archivos multimedia",
+                     "ID": "ID",
+                     "TYPE": "Tipo",
+                     "MIMETYPE": "Tipo MIME",
+                     "URL": "URL",
+                     "RECORDING_DATE": "Fecha de grabación",
+                     "FLAVOR": "Sabor",
+                     "TAGS": "Etiquetas",
+                     "DURATION": "Duración",
+                     "STREAM_AUDIO": "Flujos de audio",
+                     "STREAM_VIDEO": "Flujos de vídeo",
+                     "CHANNELS": "Canales",
+                     "BITRATE": "Tasa de bit",
+                     "BITDEPTH": "Profundidad de bits",
+                     "SAMPLINGRATE": "Frecuencia de muestreo",
+                     "FRAMECOUNT": "Número de cuadros",
+                     "PEAKLEVELDB": "Nivel de pico (dB)",
+                     "RMSLEVELDB": "Nivel RMS (dB)",
+                     "RMSPEAKDB": "Pico RMS (dB)",
+                     "FRAMERATE": "Velocidad de cuadro",
+                     "RESOLUTION": "Resolución",
+                     "SIZE": "Tamaño",
+                     "SCANTYPE": "Tipo de barrido",
+                     "SCANORDER": "Orden de barrido"
+                  }
+               },
+               "PUBLICATIONS": {
+                  "TITLE": "Publicaciones",
+                  "CAPTION": "Publicaciones",
+                  "CHANNEL": "Canal",
+                  "ID": "Identificador",
+                  "TYPE": "Tipo",
+                  "MIMETYPE": "Tipo MIME",
+                  "TAGS": "Etiquetas",
+                  "LINK": "Enlace",
+                  "DETAILS": {
+                     "TITLE": "Detalles de publicación",
+                     "CAPTION": "Detalles de publicación",
+                     "ID": "Identificador",
+                     "TYPE": "Tipo",
+                     "MIMETYPE": "Tipo MIME",
+                     "TAGS": "Etiquetas",
+                     "URL": "URL",
+                     "SIZE": "Tamaño",
+                     "CHANNEL": "Canal",
+                     "REFERENCE": "Referencia"
+                  }
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Política de acceso",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Plantillas"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Política de acceso",
+                  "DESCRIPTION": "",
+                  "LABEL": "Seleccione una plantilla",
+                  "EMPTY": "No hay plantillas disponibles",
+                  "ROLE": "Rol",
+                  "WRITE": "Escritura",
+                  "READ": "Lectura",
+                  "ADDITIONAL_ACTIONS": "Más Acciones",
+                  "ACTION": "Acciones",
+                  "NEW": "Nueva política",
+                  "DETAILS": "Detalles"
+               },
+               "ROLES": {
+                  "LABEL": "Seleccione un rol",
+                  "EMPTY": "No hay roles disponibles"
+               }
+            },
+            "COMMENTS": {
+               "CAPTION": "Comentarios",
+               "PLACEHOLDER": "Comentario…",
+               "SELECTPLACEHOLDER": "Seleccione motivos",
+               "RESOLVED": "Resuelto",
+               "REPLY": "Responder",
+               "REPLY_TO": "Responder a",
+               "CANCEL_REPLY": "Cancelar",
+               "DELETE": "Suprimir",
+               "REASON": "Motivo",
+               "REASONS": {
+                  "CUTTING": "Pendiente de cortar",
+                  "REVIEW": "Pendiente de revisar",
+                  "ASYNC": "Pistas de A/V asíncronas",
+                  "AUDIO_ISSUE": "Pista de audio no disponible o defectuosa",
+                  "CANCELED": "Evento cancelado",
+                  "CONFLICTING_METADATA": "Conflicto de metadatos",
+                  "IMPROPER_POINT": "Punto inicial o final incorrecto",
+                  "MISSING_AGREEMENT": "Acuerdo no disponible",
+                  "OTHER": "Otro",
+                  "PRIVACY": "Problema de privacidad",
+                  "SEGMENTATION": "Segmentación incorrecta",
+                  "UNKNOWN_CREATOR": "Creador desconocido",
+                  "VIDEO_ISSUE": "Vídeo cortado o distorsionado",
+                  "WRONG_INPUT_FORMAT": "Formato de archivo no soportado",
+                  "WRONG_METADATA": "Necesario corregir los metadatos",
+                  "WRONG_SERIES_PUBLICATION": "Serie o canal de publicación incorrectos",
+                  "WRONG_WORKFLOW": "Flujo de trabajo incorrecto",
+                  "PROCESSING_FAILURE": "Fallo en el procesamiento"
+               }
+            },
+            "STATISTICS": {
+               "CAPTION": "Estadísticas"
+            },
+            "METADATA": {
+               "CAPTION": "Detalles del evento",
+               "TITLE": "Título",
+               "ID": "UID",
+               "SERIES": "Series",
+               "RECORDING_DATE": "Fecha de grabación",
+               "SUBJECT": "Tema",
+               "DESCRIPTION": "Descripción",
+               "START_DATE": "Fecha de inicio",
+               "START_TIME": "Hora de inicio",
+               "DURATION": "Duración",
+               "LOCATION": "Ubicación",
+               "SOURCE": "Origen",
+               "CREATED": "Fecha de creación",
+               "CREATED_BY": "Creado por",
+               "PUBLISHER": "Editor",
+               "LICENSE": "Licencia",
+               "CONTRIBUTORS": "Colaborador(es)",
+               "RIGHTS": "Permisos",
+               "PRESENTERS": "Ponente(s)",
+               "LANGUAGE": "Idioma",
+               "COPYRIGHT": "Copyright",
+               "VISIBILITY": "Visibilidad",
+               "PUBLIC": "Objetivo público",
+               "OS": "Procesado en el sistema operativo",
+               "LOCKED": {
+                  "RUNNING": "No está permitida la edición de metadatos mientras se ejecutan operaciones en un evento"
+               }
+            },
+            "SCHEDULING": {
+               "CAPTION": "Estado de aprobación",
+               "PLACEHOLDER": {
+                  "PRESENTERS": "Ponente(s)"
+               }
+            },
+            "WORKFLOWS": {
+               "ACTIONS": "Acciones",
+               "DETAILS": "Detalles",
+               "DESCRIPTION": "Descripción",
+               "MORE_INFO": "Más información",
+               "ID": "ID",
+               "TYPE": "Tipo",
+               "TITLE": "Título",
+               "STATUS": "Estado",
+               "STARTED": "Iniciado",
+               "SERIES": "Series",
+               "SUBMITTED": "Enviado",
+               "SUBMITTER": "Enviado por",
+               "EXECUTION_TIME": "Tiempo de ejecución",
+               "WDID": "Definición del flujo de trabajo",
+               "MIMETYPE": "Tipo MIME",
+               "URL": "URL",
+               "CONFIGURATION": "Configuración",
+               "NO_CONFIGURATION": "No existen parámetros de configuración para el flujo de trabajo seleccionado.",
+               "WORKFLOW": "Flujo de trabajo",
+               "TOOLTIP": {
+                  "STOP": "Detener flujo de trabajo",
+                  "ABORT": "Abortar la ejecución del flujo de trabajo (No reintentar la operación fallida de nuevo)",
+                  "RETRY": "Reintentar la ejecución del flujo de trabajo",
+                  "DELETE": "Borrar flujo de trabajo",
+                  "DETAILS": "Abrir detalles del flujo de trabajo"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Instanciado",
+                  "RUNNING": "Procesando",
+                  "PAUSED": "En pausa",
+                  "SUCCEEDED": "Finalizado",
+                  "FAILED": "Error",
+                  "FAILING": "Fallando",
+                  "SKIPPED": "Omitido",
+                  "STOPPED": "Detenido",
+                  "RETRY": "Reintentar"
+               }
+            },
+            "WORKFLOW_INSTANCES": {
+               "TITLE": "Flujos de Trabajo"
+            },
+            "WORKFLOW_DETAILS": {
+               "TITLE": "Detalles del flujo de trabajo",
+               "CONFIGURATION": "Configuración del flujo de trabajo"
+            },
+            "WORKFLOW_OPERATIONS": {
+               "TITLE": "Operaciones del flujo de trabajo",
+               "DETAILS_LINK": "Operaciones",
+               "TABLE_HEADERS": {
+                  "TITLE": "Título",
+                  "STATUS": "Estado",
+                  "DESCRIPTION": "Descripción"
+               }
+            },
+            "OPERATION_DETAILS": {
+               "TITLE": "Detalles de la operación",
+               "TABLE_HEADERS": {
+                  "TITLE": "Título",
+                  "STATE": "Estado",
+                  "DESCRIPTION": "Descripción",
+                  "EXECUTION_HOST": "Servidor",
+                  "JOB": "Trabajo",
+                  "TIME_IN_QUEUE": "Tiempo en cola",
+                  "STARTED": "Iniciado",
+                  "FINISHED": "Procesado",
+                  "RETRY_STRATEGY": "Estrategia de reintento",
+                  "FAILED_ATTEMPTS": "Intentos fallidos",
+                  "MAX_ATTEMPTS": "Máx",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Flujo de Trabajo para Manejar Excepciones",
+                  "FAIL_ON_ERROR": "Fallar en Caso de Error"
+               }
+            },
+            "QUICKACTION_WORKFLOW_DETAILS": {
+               "TITLE": "Detalles del flujo de trabajo"
+            },
+            "MEDIA_DETAILS": {
+               "TITLE": "Detalles de los archivos multimedia",
+               "ID": "ID",
+               "TYPE": "Tipo",
+               "MIMETYPE": "Tipo MIME",
+               "URL": "URL",
+               "RECORDING_DATE": "Fecha de grabación",
+               "TAGS": "Etiquetas",
+               "DURATION": "Duración",
+               "STREAM_AUDIO": "Flujos de audio",
+               "STREAM_VIDEO": "Flujos de vídeo",
+               "CHANNELS": "Canales",
+               "BITRATE": "Velocidad de bit",
+               "FRAMERATE": "Velocidad de cuadro",
+               "RESOLUTION": "Resolución"
+            },
+            "ERRORS_AND_WARNINGS": {
+               "HEADER": "Errores y avisos",
+               "TITLE": "Errores y avisos",
+               "DATE": "Fecha",
+               "HOST": "Servidor",
+               "TYPE": "Tipo",
+               "EMPTY": "Sin errores",
+               "DETAILS": {
+                  "HEADER": "Detalles del error",
+                  "SEVERITY": "Gravedad",
+                  "TITLE": "Título",
+                  "DESCRIPTION": "Descripción",
+                  "JOB_ID": "Id. del trabajo",
+                  "DATE": "Fecha",
+                  "HOST": "Procesado en el servidor",
+                  "TYPE": "Tipo de servicio",
+                  "TECHNICAL_DETAILS": "Detalles técnicos"
+               }
+            }
+         }
+      },
+      "SERIES": {
+         "NEW": {
+            "CAPTION": "Crear serie",
+            "METADATA": {
+               "CAPTION": "Metadatos",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Metadatos"
+               }
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "Metadatos extendidos",
+               "METADATA": {
+                  "TITLE": "Metadatos extendidos"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Política de acceso",
+               "TEMPLATES": {
+                  "TITLE": "Plantillas"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Política de acceso",
+                  "DESCRIPTION": "Se requiere al menos un rol con permisos de Lectura y Escritura.",
+                  "LABEL": "Seleccione una plantilla",
+                  "EMPTY": "No hay plantillas disponibles",
+                  "ROLE": "Rol",
+                  "WRITE": "Escritura",
+                  "READ": "Lectura",
+                  "ADDITIONAL_ACTIONS": "Acciones Adicionales",
+                  "ACTION": "Acciones",
+                  "NEW": "Nueva política",
+                  "DETAILS": "Detalles"
+               },
+               "ROLES": {
+                  "LABEL": "Seleccione un rol",
+                  "EMPTY": "No hay roles disponibles"
+               }
+            },
+            "THEME": {
+               "CAPTION": "Estilo",
+               "DESCRIPTION": {
+                  "TEXT": "Opcionalmente se pueden utilizar temas para personalizar los vídeos. Los temas pueden incluir videos de inicio y fin, marcas de agua y diapositivas de título que pueden obtenerse de los metadatos."
+               },
+               "TITLE": "Estilo",
+               "LABEL": "Seleccione tema",
+               "EMPTY": "No  hay estilos disponibles"
+            },
+            "SUMMARY": {
+               "CAPTION": "Resumen"
+            }
+         },
+         "TABLE": {
+            "CAPTION": "Series",
+            "TITLE": "Series",
+            "HAS_EVENTS": "Contiene eventos",
+            "ORGANIZERS": "Organizador(es)",
+            "CONTRIBUTORS": "Colaborador(es)",
+            "CREATED": "Fecha de creación",
+            "MANAGED_ACL": "Política de acceso",
+            "EVENTS": "Eventos",
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "SERIES": "Filtrar para esta serie",
+               "DETAILS": "Detalles de la serie",
+               "DELETE": "Eliminar serie"
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Detalles de la serie - {{resourceId}}",
+            "TABS": {
+               "METADATA": "Metadatos",
+               "EXTENDED_METADATA": "Metadatos II",
+               "EVENTS": "Eventos",
+               "PERMISSIONS": "Política de acceso",
+               "THEME": "Estilo",
+               "STATISTICS": "Estadísticas"
+            },
+            "ACCESS": {
+               "CAPTION": "Política de acceso",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Plantillas"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Política de acceso",
+                  "DESCRIPTION": "",
+                  "LABEL": "Seleccione una plantilla",
+                  "EMPTY": "No hay plantillas disponibles",
+                  "ROLE": "Rol",
+                  "WRITE": "Escritura",
+                  "READ": "Lectura",
+                  "ADDITIONAL_ACTIONS": "Acciones Adicionales",
+                  "ACTION": "Acciones",
+                  "NEW": "Nueva política",
+                  "DETAILS": "Detalles",
+                  "REPLACE_EVENT_ACLS": "Actualizar permisos de evento",
+                  "REPLACE_EVENT_ACLS_HINT": "Asegúrese de que todos los eventos de esta serie tengan estos permisos en vigor",
+                  "LOAD_MORE_LIMIT": "policies shown.",
+                  "LOAD_MORE_LINK": "Load more"
+               },
+               "ROLES": {
+                  "LABEL": "Seleccione un rol",
+                  "EMPTY": "No hay roles disponibles"
+               }
+            },
+            "METADATA": {
+               "TITLE": "Título",
+               "ID": "UID",
+               "SERIES": "Series",
+               "PUBLISHERS": "Editor(es)",
+               "ORGANIZERS": "Organizador(es)",
+               "CONTRIBUTORS": "Colaborador(es)",
+               "RECORDING_DATE": "Fecha de grabación",
+               "CREATED_BY": "Creado por",
+               "RIGHTS": "Permisos",
+               "SUBJECT": "Tema",
+               "LANGUAGE": "Idioma",
+               "LICENSE": "Licencia",
+               "DESCRIPTION": "Descripción"
+            },
+            "EVENTS": {
+               "TITLE": "Título",
+               "PRESENTER": "Ponente(s)",
+               "CREATED": "Fecha de creación",
+               "MODIFIED": "Fecha de modificación",
+               "STATUS": "Estado",
+               "LOCATION": "Ubicación",
+               "LINK": "Enlace"
+            }
+         }
+      }
+   },
+   "RECORDINGS": {
+      "NAVIGATION": {
+         "LOCATIONS": "Ubicaciones"
+      },
+      "ACTIONS": {
+         "EXPORT": "Exportar",
+         "REMOVE": "Eliminar"
+      },
+      "RECORDINGS": {
+         "TABLE": {
+            "CAPTION": "Ubicaciones",
+            "TITLE": "UID",
+            "NAME": "Nombre",
+            "LOCATION": "Ubicación",
+            "UPDATED": "Última actualización",
+            "NEXT_DATE": "Próximo evento",
+            "NEXT_NAME": "Título del próximo evento",
+            "STATUS": "Estado",
+            "VERSION": "Versión",
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "NAME": "Filtrar para esta ubicación",
+               "DETAILS": "Detalles de la ubicación",
+               "DELETE": "Eliminar ubicación (Eliminar registro de agente de captura)"
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Detalles del evento - {{resourceId}}",
+            "TAB": {
+               "GENERAL": "General",
+               "CONFIGURATION": "Configuración",
+               "CAPABILITIES": "Capacidades"
+            },
+            "GENERAL": {
+               "CAPTION": "General",
+               "NAME": "Nombre",
+               "URL": "URL",
+               "STATUS": "Estado",
+               "UPDATE": "Última conexión desde"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "Configuración",
+               "NO_CONFIGURATION": "Falta configuración"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "Capacidades",
+               "NO_CAPABILITIES": "Faltan capacidades"
+            }
+         }
+      }
+   },
+   "USERS": {
+      "ACTIONS": {
+         "ADD_USER": "Añadir usuario",
+         "ADD_GROUP": "Añadir grupo",
+         "ADD_ACL": "Añadir política de acceso"
+      },
+      "NAVIGATION": {
+         "USERS": "Usuarios",
+         "GROUPS": "Grupos",
+         "PERMISSIONS": "Políticas de acceso"
+      },
+      "USERS": {
+         "TABLE": {
+            "CAPTION": "Usuarios",
+            "NAME": "Nombre",
+            "USERNAME": "Nombre de usuario",
+            "EMAIL": "Correo electrónico",
+            "ROLES": "Roles",
+            "TYPE": "Tipo",
+            "PROVIDER": "Proveedor",
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "DELETE": "Eliminar usuario",
+               "DETAILS": "Detalles de usuario"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Crear usuario",
+            "EDITCAPTION": "Datos del usuario - {{username}}",
+            "TABS": {
+               "USER": "Usuario",
+               "ROLES": "Roles",
+               "EXTERNALROLES": "Roles externos",
+               "EFFECTIVEROLES": "Roles efectivos"
+            },
+            "DESCRIPTION": {
+               "ROLES": "Roles y grupos que pueden asignarse o ya se han asignado al usuario.",
+               "EXTERNALROLES": "La lista de roles externos asignados al usuario y proporcionados por el/los proveedor/es de roles externo/s.",
+               "EFFECTIVEROLES": "La lista de roles efectivos asignados directamente al usuario y los roles obtenidos indirectamente por pertenecer a grupos."
+            },
+            "FORM": {
+               "USERNAME": "Nombre de usuario",
+               "NAME": "Nombre",
+               "EMAIL": "Correo electrónico",
+               "PASSWORD": "Contraseña",
+               "REPEAT_PASSWORD": "Repetir contraseña"
+            },
+            "ROLES": {
+               "LEFT": "Roles",
+               "RIGHT": "Roles seleccionados",
+               "REMOVE": "Eliminar rol",
+               "ADD": "Añadir rol"
+            }
+         }
+      },
+      "GROUPS": {
+         "NEW": {
+            "CAPTION": "Crear grupo"
+         },
+         "TABLE": {
+            "CAPTION": "Grupos",
+            "NAME": "Nombre",
+            "DESCRIPTION": "Descripción",
+            "ROLE": "Rol",
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "DETAILS": "Detalles de grupo",
+               "DELETE": "Eliminar grupo"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Crear grupo",
+            "EDITCAPTION": "Datos del grupo - {{name}}",
+            "TABS": {
+               "GROUP": "Grupo",
+               "ROLES": "Roles",
+               "METADATA": "Metadatos",
+               "USERS": "Usuarios",
+               "SUMMARY": "Resumen"
+            },
+            "FORM": {
+               "NAME": "Nombre",
+               "DESCRIPTION": "Descripción",
+               "SUMMARY": "Resumen",
+               "ROLES": "Roles",
+               "USERS": "Usuarios"
+            },
+            "USERS": {
+               "LEFT": "Usuarios",
+               "RIGHT": "Usuarios seleccionados",
+               "REMOVE": "Eliminar usuario",
+               "ADD": "Añadir usuario"
+            },
+            "ROLES": {
+               "LEFT": "Roles",
+               "RIGHT": "Roles seleccionados",
+               "REMOVE": "Eliminar rol",
+               "ADD": "Añadir rol"
+            }
+         }
+      },
+      "ACLS": {
+         "TABLE": {
+            "CAPTION": "Políticas de acceso",
+            "NAME": "Nombre",
+            "CREATED": "Fecha de creación",
+            "CREATOR": "Creador",
+            "IN_USE": "En uso",
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "DELETE": "Eliminar política de acceso",
+               "DETAILS": "Detalles de política de acceso"
+            }
+         },
+         "NEW": {
+            "CAPTION": "Nueva política de acceso",
+            "TABS": {
+               "SUMMARY": "Resumen",
+               "METADATA": "Metadatos",
+               "ACCESS": "Acceso"
+            },
+            "METADATA": {
+               "TITLE": "Metadatos",
+               "NAME": {
+                  "CAPTION": "Nombre",
+                  "PLACEHOLDER": "Nombre…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Política de acceso",
+               "TEMPLATES": {
+                  "TITLE": "Plantillas"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Política de acceso",
+                  "LABEL": "Seleccione una plantilla",
+                  "EMPTY": "No hay plantillas disponibles",
+                  "ROLE": "Rol",
+                  "WRITE": "Escritura",
+                  "READ": "Lectura",
+                  "ADDITIONAL_ACTIONS": "Acciones Adicionales",
+                  "ACTION": "Acciones",
+                  "NEW": "Nueva política",
+                  "DETAILS": "Detalles",
+                  "DESCRIPTION": "Por favor, elija un conjunto de políticas preconfigurado o añada políticas personalizadas"
+               },
+               "ROLES": {
+                  "LABEL": "Seleccione un rol",
+                  "EMPTY": "No hay roles disponibles"
+               }
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Detalles de la política de acceso - {{name}}",
+            "TABS": {
+               "SUMMARY": "Resumen",
+               "METADATA": "Metadatos",
+               "ACCESS": "Acceso"
+            },
+            "METADATA": {
+               "TITLE": "Metadatos",
+               "NAME": {
+                  "CAPTION": "Nombre",
+                  "PLACEHOLDER": "Nombre…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Política de acceso",
+               "TEMPLATES": {
+                  "TITLE": "Plantillas"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Política de acceso",
+                  "LABEL": "Seleccione una plantilla",
+                  "EMPTY": "No hay plantillas disponibles",
+                  "ROLE": "Rol",
+                  "WRITE": "Escritura",
+                  "READ": "Lectura",
+                  "ADDITIONAL_ACTIONS": "Acciones Adicionales",
+                  "ACTION": "Acciones",
+                  "NEW": "Nueva política",
+                  "DETAILS": "Detalles",
+                  "DESCRIPTION": "Por favor, elija un conjunto de políticas preconfigurado o añada políticas personalizadas"
+               },
+               "ROLES": {
+                  "LABEL": "Seleccione un rol",
+                  "EMPTY": "No hay roles disponibles"
+               }
+            }
+         }
+      }
+   },
+   "THEMES": {
+      "THEMES": {
+         "DETAILS": {
+            "HEADER": "Detalles del estilo {{resourceId}}",
+            "TABS": {
+               "GENERAL": "General",
+               "BUMPER": "Cortinilla (principio)",
+               "TRAILER": "Cortinilla (final)",
+               "TITLE": "Título",
+               "LICENSE": "Licencia",
+               "WATERMARK": "Marca de agua",
+               "USAGE": "Uso"
+            },
+            "GENERAL": {
+               "CAPTION": "General",
+               "NAME": "Nombre",
+               "DESCRIPTION": "Descripción",
+               "DEFAULT": "Por defecto",
+               "SET_DEFAULT_INFO": "Establecer como estilo por defecto para todas las series y eventos",
+               "NAME_ERROR": "El nombre ya está en uso",
+               "NAME_REQUIRED": "Obligatorio"
+            },
+            "BUMPER": {
+               "CAPTION": "Cortinilla (principio)",
+               "DESCRIPTION": "Vídeo predefinido que se anexa al principio de la grabación.",
+               "ACTIVE": "Activada"
+            },
+            "TRAILER": {
+               "CAPTION": "Cortinilla (final)",
+               "DESCRIPTION": "Vídeo predefinido que se anexa al final de la grabación.",
+               "ACTIVE": "Activada"
+            },
+            "TITLE": {
+               "CAPTION": "Título",
+               "DESCRIPTION": "Diapositiva predefinida que se adjunta al principio o al final de las grabación y contiene metadatos descriptivos.",
+               "ACTIVE": "Activado"
+            },
+            "WATERMARK": {
+               "CAPTION": "Marca de agua",
+               "DESCRIPTION": "Imagen semitransparente que se superpone sobre cada fotograma de la grabación.",
+               "ACTIVE": "Activado"
+            },
+            "USAGE": {
+               "CAPTION": "Uso",
+               "SERIES": "Nombre de la serie"
+            }
+         }
+      }
+   },
+   "CONFIGURATION": {
+      "ACTIONS": {
+         "ADD_MAIL_TEMPLATE": "Añadir plantilla",
+         "ADD_THEME": "Añadir estilo"
+      },
+      "NAVIGATION": {
+         "THEMES": "Estilos"
+      },
+      "THEMES": {
+         "TABLE": {
+            "CAPTION": "Estilos",
+            "NAME": "Nombre",
+            "DESCRIPTION": "Descripción",
+            "CREATOR": "Creador",
+            "CREATED": "Fecha de creación",
+            "DEFAULT": "Por defecto",
+            "USAGE": "Uso",
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "DELETE": "Eliminar tema",
+               "DETAILS": "Detalles de tema"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Crear estilo",
+            "EDITCAPTION": "Detalles del tema - {{name}}",
+            "GENERAL": {
+               "CAPTION": "General",
+               "NAME": "Nombre",
+               "DESCRIPTION": "Descripción",
+               "DEFAULT": "Por defecto",
+               "SET_DEFAULT_INFO": "Establecer como estilo por defecto para todas las series y eventos",
+               "NAME_REQUIRED": "Obligatorio"
+            },
+            "BUMPER": {
+               "CAPTION": "Cortinilla (principio)",
+               "FILE_UPLOADED": "Archivo subido: ",
+               "DESCRIPTION": "Vídeo predefinido que se anexa al principio de la grabación.",
+               "ACTIVE": "Activado",
+               "ENABLE": "Activar cortinilla",
+               "SELECT": "Seleccionar",
+               "UPLOAD_LABEL": "Subir vídeo",
+               "UPLOAD_BUTTON": "Subida"
+            },
+            "TRAILER": {
+               "CAPTION": "Cortinilla (final)",
+               "FILE_UPLOADED": "Archivo subido: ",
+               "DESCRIPTION": "Vídeo predefinido que se anexa al final de la grabación.",
+               "ACTIVE": "Activado",
+               "ENABLE": "Activar cortinilla",
+               "UPLOAD_LABEL": "Subir vídeo",
+               "UPLOAD_BUTTON": "Subida",
+               "SELECT": "Seleccionar"
+            },
+            "TITLE": {
+               "CAPTION": "Título",
+               "FILE_UPLOADED": "Archivo subido: ",
+               "DESCRIPTION": "Diapositiva predefinida que se adjunta al principio o al final de la grabación y contiene metadatos descriptivos.",
+               "ACTIVE": "Activado",
+               "ENABLE": "Activar la diapositiva de título",
+               "BACKGROUND": "Fondo",
+               "EXTRACT": "Extraer fondo",
+               "UPLOAD": "Subida",
+               "UPLOAD_LABEL": "Subir imagen",
+               "UPLOAD_BUTTON": "Subida"
+            },
+            "WATERMARK": {
+               "CAPTION": "Marca de agua",
+               "FILE_UPLOADED": "Archivo subido: ",
+               "DESCRIPTION": "Imagen semitransparente que se superpone sobre cada fotograma de la grabación.",
+               "ACTIVE": "Activado",
+               "ENABLE": "Activar marca de agua",
+               "TOP_LEFT": "Esquina superior izquierda",
+               "TOP_RIGHT": "Esquina superior derecha",
+               "BOTTOM_LEFT": "Esquina inferior izquierda",
+               "BOTTOM_RIGHT": "Esquina inferior derecha",
+               "UPLOAD": "Subida",
+               "POSITION": "Posición y vista previa de la marca de agua",
+               "FILEUPLOAD_DESCRIPTION": "El archivo debería tener un canal alfa (fondo transparente). Los tipos de archivo soportados son: .PNG, .GIF, .SVG, .WEBP",
+               "UPLOAD_LABEL": "Subir imagen",
+               "UPLOAD_BUTTON": "Subida"
+            },
+            "SUMMARY": {
+               "CAPTION": "Resumen"
+            },
+            "USAGE": {
+               "CAPTION": "Uso",
+               "SERIE": "Nombre de la serie",
+               "EMPTY": "No existen series para el estilo actual"
+            }
+         }
+      }
+   },
+   "SYSTEMS": {
+      "NAVIGATION": {
+         "JOBS": "Trabajos",
+         "SERVERS": "Servidores",
+         "SERVICES": "Servicios"
+      },
+      "JOBS": {
+         "TABLE": {
+            "ID": "Identificador del Trabajo",
+            "CAPTION": "Trabajos",
+            "CREATED": "Fecha de creación",
+            "CREATOR": "Creador",
+            "HOST_NAME": "Nombre del equipo",
+            "NODE_NAME": "Nombre del nodo",
+            "OPERATION": "Operación",
+            "STARTED": "Iniciado",
+            "STATUS": "Estado",
+            "SUBMITTED": "Enviado",
+            "TYPE": "Tipo"
+         },
+         "STATUS": {
+            "QUEUED": "En cola",
+            "PAUSED": "En pausa",
+            "RUNNING": "Procesando",
+            "FINISHED": "Procesado",
+            "FAILED": "Error",
+            "DELETED": "Eliminado",
+            "INSTANTIATED": "Instanciado",
+            "DISPATCHING": "Asignando",
+            "RESTART": "Reiniciar",
+            "CANCELED": "Cancelado",
+            "WAITING": "Esperando"
+         }
+      },
+      "SERVERS": {
+         "TABLE": {
+            "CAPTION": "Servidores",
+            "STATUS": "Estado",
+            "HOST_NAME": "Nombre del equipo",
+            "NODE_NAME": "Nombre del nodo",
+            "CORES": "Núcleos",
+            "COMPLETED": "Trabajos completados",
+            "RUNNING": "Trabajos en ejecución",
+            "QUEUED": "Trabajos en cola",
+            "MEAN_RUN_TIME": "Tiempo medio de ejecución",
+            "MEAN_QUEUE_TIME": "Tiempo medio de espera en cola",
+            "MAINTENANCE": "Mantenimiento",
+            "MAINTENANCE_OFF": "Activar el modo de mantenimiento",
+            "MAINTENANCE_ON": "Desactivar el modo de mantenimiento"
+         }
+      },
+      "SERVICES": {
+         "TABLE": {
+            "CAPTION": "Servicios",
+            "STATUS": "Estado",
+            "NAME": "Nombre del servicio",
+            "HOST_NAME": "Nombre del equipo",
+            "NODE_NAME": "Nombre del nodo",
+            "COMPLETED": "Trabajos completados",
+            "RUNNING": "Trabajos en ejecución",
+            "QUEUED": "Trabajos en cola",
+            "MEAN_RUN_TIME": "Tiempo medio de ejecución",
+            "MEAN_QUEUE_TIME": "Tiempo medio de espera en cola",
+            "SANITIZE": "Limpiar estado de error",
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "SANITIZE": "Reiniciar servicio (Devolver el servicio al estado normal)"
+            }
+         },
+         "STATUS": {
+            "NORMAL": "Normal",
+            "WARNING": "Advertencia",
+            "ERROR": "Error"
+         }
+      }
+   },
+   "VIDEO_TOOL": {
+      "WARNING_UNSAVED": "ADVERTENCIA: Algunos de los cambios no se han guardado. Si deja el editor de vídeo, estos cambios se perderán ¿Desea continuar?",
+      "TIMELINE": "Línea de tiempo",
+      "ZOOMLEVEL": "Nivel de Zoom",
+      "PREVIEW_MODE": "Modo vista previa",
+      "PREVIEW_MODE_TOOLTIP": "Reproducir los segmentos seleccionados",
+      "ZOOM": "Zoom",
+      "BUTTONS": {
+         "CLOSE": "Cerrar",
+         "SAVE": "Guardar",
+         "PROCESS": "Guardar y Continuar",
+         "ADD_COMMENT": "Añadir comentario"
+      },
+      "TABS": {
+         "EDIT": "Editor",
+         "CAPTIONS": "Subtítulos",
+         "ANNOTATIONS": "Anotaciones"
+      },
+      "AREAS": {
+         "METADATA": "Metadatos",
+         "THUMBNAIL": "Miniatura",
+         "COMMENTS": "Comentarios",
+         "SEGMENTS": "Segmentos",
+         "TRACKS": "Pistas"
+      },
+      "ACTIONS": {
+         "SPLIT": "Dividir",
+         "SPLIT_TOOLTIP": "Dividir segmento en la posición actual del cursor.",
+         "CUT": "Ocultar/Mostrar",
+         "CUT_TOOLTIP": "Ocultar o mostrar la parte seleccionada del vídeo.",
+         "REPLAY_SEGMENT": "Reproducir Inicio del Segmento",
+         "REPLAY_SEGMENT_TOOLTIP": "Reproducir el segmento actual desde el principio.",
+         "REPLAY_END_OF_SEGMENT": "Reproducir Final del Segmento",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Reproducir algunos segundos al final del segmento actual.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Reproducir transición",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Reproducir algunos segundos que contengan el final del anterior y el principio del siguiente segmento.",
+         "UNDO": "Deshacer",
+         "REDO": "Rehacer",
+         "CLEAR_SEGMENTS": "Borrar todos los segmentos",
+         "CLEAR_SEGMENTS_TOOLTIP": "Borrar todos los segmentos, dejando un segmento grande."
+      },
+      "SEGMENTS": {
+         "REMOVE_SEGMENT": "Eliminar Segmento",
+         "SHOW_SEGMENT": "Mostrar este segmento",
+         "HIDE_SEGMENT": "Ocultar este segmento",
+         "START": "Inicio",
+         "END": "Fin"
+      },
+      "THUMBNAIL": {
+         "DESCRIPTION": "Se genera automáticamente una miniatura por defecto, que se usa para representar visualmente el evento. Si desea usar una miniatura diferente, puede extraerse una del vídeo en la posición actual o subir una imagen.",
+         "ACTIONS": {
+            "EXTRACT": {
+               "FROM_VIDEO": {
+                  "LABEL": "Extraer del vídeo",
+                  "TOOLTIP": "Extraer la miniatura del vídeo en la posición actual"
+               },
+               "FROM_LEFT_VIDEO": {
+                  "LABEL": "Extraer del vídeo izquierdo",
+                  "TOOLTIP": "Extraer la miniatura del vídeo izquierdo en la posición actual"
+               },
+               "FROM_RIGHT_VIDEO": {
+                  "LABEL": "Extraer del vídeo derecho",
+                  "TOOLTIP": "Extraer la miniatura del vídeo derecho en la posición actual"
+               }
+            },
+            "UPLOAD": {
+               "LABEL": "Subir imagen",
+               "TOOLTIP": "Subir una imagen para miniatura"
+            },
+            "USE_DEFAULT": {
+               "LABEL": "Usar miniatura por defecto",
+               "TOOLTIP": "Usar la miniatura por defecto que se genera automáticamente"
+            }
+         },
+         "PREVIEW": {
+            "NOT_AVAILABLE": "No hay vista previa disponible",
+            "OUTDATED": "La vista previa está desactualizada porque los segmentos han cambiado. Se actualizará al guardar los cambios."
+         },
+         "CURRENT": {
+            "DEFAULT": "Se está usando la miniatura por defecto.",
+            "SNAPSHOT": "La miniatura actual se ha extraído del vídeo.",
+            "UPLOAD": "Se está usando una miniatura subida al servidor."
+         }
+      },
+      "TRACKS": {
+         "DESCRIPTION": "Se pueden deseleccionar pistas para que no sigan siendo procesadas. Tenga en cuenta que es necesario (re-)publicar el evento para que los cambios tengan efecto.",
+         "NOTIFICATION": {
+            "NO_VIDEO_TRACK_SELECTED": "Debe activar al menos una pista de vídeo",
+            "NO_AUDIO_TRACK_SELECTED": "Debe activar al menos una pista de audio"
+         },
+         "TRACK": {
+            "HEADER": "Pista"
+         },
+         "VIDEO": {
+            "HEADER": "Pista de vídeo",
+            "NOT_AVAILABLE": "No hay pistas de vídeo disponibles",
+            "NO_PREVIEW_AVAILABLE": "No se han encontrado imágenes de vista previa",
+            "NO_TRACK_SELECTED": "No se ha seleccionado una pista de vídeo",
+            "TOOLTIPS": {
+               "HIDE": "Esta pista de vídeo está activada. Haga clic para desactivar",
+               "UNHIDE": "Esta pista de vídeo está desactivada. Haga clic para activar."
+            }
+         },
+         "AUDIO": {
+            "HEADER": "Pista de audio",
+            "NOT_AVAILABLE": "No hay pistas de vídeo disponibles",
+            "NO_PREVIEW_AVAILABLE": "No se han encontrado imágenes de vista previa",
+            "NO_TRACK_SELECTED": "No se ha seleccionado una pista de audio",
+            "TOOLTIPS": {
+               "HIDE": "Esta pista de audio está activada. Haga clic para desactivar",
+               "UNHIDE": "Esta pista de audio está desactivada. Haga clic para activar"
+            }
+         }
+      },
+      "PLAYER": {
+         "PLAY": "Reproducir",
+         "PAUSE": "Pausa",
+         "NEXT_FRAME": "Siguiente fotograma",
+         "PREVIOUS_FRAME": "Fotograma anterior",
+         "NEXT_SEGMENT": "Siguiente segmento / Saltar al final",
+         "PREVIOUS_SEGMENT": "Segmento anterior / Saltar al principio",
+         "MUTE": "Silenciar",
+         "VOLUME": "Volumen"
+      }
+   },
+   "LOGIN": {
+      "WELCOME": "Bienvenidos a Opencast",
+      "REMEMBER": "Recordarme en este equipo",
+      "USERNAME": "Nombre de usuario…",
+      "PASSWORD": "Contraseña…",
+      "LOGIN": "Identificarse",
+      "ERROR": "Nombre de usuario y/o contraseña incorrecto(s)"
+   },
+   "TABLE_FILTERS": {
+      "FILTER_SELECTION": {
+         "PLACEHOLDER": "Por favor, seleccione un filtro…",
+         "NO_OPTIONS": "No se han encontrado filtros"
+      },
+      "FILTER_VALUE_SELECTION": {
+         "PLACEHOLDER": "Por favor, seleccione un valor...",
+         "NO_OPTIONS": "No se han encontrado valores"
+      },
+      "CLEAR": "Borrar todos los filtros",
+      "REMOVE": "Quitar filtro",
+      "ADD": "Añadir filtros",
+      "PLACEHOLDER": "Buscar…",
+      "PROFILES": {
+         "FILTERS_HEADER": "Grupos de filtros guardados",
+         "EDIT": "Editar filtros",
+         "REMOVE": "Quitar filtro",
+         "EMPTY": "Aún no se ha guardado ningún filtro",
+         "SAVE_FILTERS": "Guardar",
+         "FILTER_HEADER": "Guardar grupo de filtros",
+         "NAME": "Nombre",
+         "NAME_PLACEHOLDER": "Nombre…",
+         "DESCRIPTION": "Descripción",
+         "DESCRIPTION_PLACEHOLDER": "Descripción…"
+      }
+   },
+   "FILTERS": {
+      "ACLS": {
+         "NAME": {
+            "LABEL": "Nombre"
+         }
+      },
+      "AGENTS": {
+         "NAME": {
+            "LABEL": "Nombre"
+         },
+         "STATUS": {
+            "LABEL": "Estado"
+         }
+      },
+      "EVENTS": {
+         "AGENT_ID": {
+            "LABEL": "Id. del Agente de Captura"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Política de acceso"
+         },
+         "COMMENTS": {
+            "LABEL": "Comentarios",
+            "NONE": "Ninguno",
+            "OPEN": "Abrir",
+            "RESOLVED": "Resuelto"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Colaboradores"
+         },
+         "CREATOR": {
+            "LABEL": "Creador"
+         },
+         "PUBLISHER": {
+            "LABEL": "Editor"
+         },
+         "HOSTNAME": {
+            "LABEL": "Nombre del equipo"
+         },
+         "LANGUAGE": {
+            "LABEL": "Idioma"
+         },
+         "LICENSE": {
+            "LABEL": "Licencia"
+         },
+         "LOCATION": {
+            "LABEL": "Ubicación"
+         },
+         "PERIOD": {
+            "LABEL": "Periodo"
+         },
+         "PRESENTERS_BIBLIOGRAPHIC": {
+            "LABEL": "Ponente Bibliográfico"
+         },
+         "PRESENTERS_TECHNICAL": {
+            "LABEL": "Ponente Técnico"
+         },
+         "PROGRESS": {
+            "LABEL": "Progreso"
+         },
+         "SERIES": {
+            "LABEL": "Serie"
+         },
+         "SOURCE": {
+            "LABEL": "Origen"
+         },
+         "START_DATE": {
+            "LABEL": "Fecha de inicio"
+         },
+         "STATUS": {
+            "LABEL": "Estado",
+            "SCHEDULED": "Programado",
+            "RECORDING": "Grabando",
+            "INGESTING": "Ingestando",
+            "PROCESSING": "Procesando",
+            "ARCHIVE": "Archivo",
+            "WAITINGFOR": "Esperando",
+            "UPLOAD": "Subida",
+            "ONHOLD": "En espera"
+         },
+         "SUBJECT": {
+            "LABEL": "Tema"
+         },
+         "TRACK_MIMETYPE": {
+            "LABEL": "Tipo MIME"
+         },
+         "TRACK_RESOLUTION": {
+            "LABEL": "Resolución"
+         },
+         "TRACK_TYPE": {
+            "LABEL": "Tipo"
+         },
+         "WORKFLOW_DEFINITION": {
+            "LABEL": "Definición del flujo de trabajo"
+         },
+         "WORKFLOW_STATE": {
+            "LABEL": "Estado del flujo de trabajo"
+         }
+      },
+      "JOBS": {
+         "HOSTNAME": {
+            "LABEL": "Nombre del equipo"
+         },
+         "NODE_NAME": {
+            "LABEL": "Nombre del nodo"
+         },
+         "STATUS": {
+            "LABEL": "Estado",
+            "PAUSED": "En pausa",
+            "QUEUED": "En cola",
+            "RUNNING": "Procesando",
+            "WAITING": "Esperando"
+         }
+      },
+      "SERIES": {
+         "TITLE": {
+            "LABEL": "Nombre"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Colaboradores"
+         },
+         "ORGANIZERS": {
+            "LABEL": "Organizadores"
+         },
+         "SUBJECT": {
+            "LABEL": "Tema"
+         },
+         "LANGUAGE": {
+            "LABEL": "Idioma"
+         },
+         "CREATOR": {
+            "LABEL": "Creador"
+         },
+         "LICENSE": {
+            "LABEL": "Licencia"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Política de acceso"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Fecha de creación"
+         }
+      },
+      "SERVERS": {
+         "HOSTNAME": {
+            "LABEL": "Nombre del equipo"
+         },
+         "NODE_NAME": {
+            "LABEL": "Nombre del nodo"
+         },
+         "STATUS": {
+            "LABEL": "Estado",
+            "MAINTENANCE": "Mantenimiento",
+            "ONLINE": "Conectado",
+            "OFFLINE": "Desconectado"
+         }
+      },
+      "SERVICES": {
+         "ACTIONS": {
+            "LABEL": "Hay acciones disponibles"
+         },
+         "HOSTNAME": {
+            "LABEL": "Nombre del equipo"
+         },
+         "NODE_NAME": {
+            "LABEL": "Nombre del nodo"
+         },
+         "NAME": {
+            "LABEL": "Nombre"
+         },
+         "STATUS": {
+            "LABEL": "Estado",
+            "ERROR": "Error",
+            "NORMAL": "Normal",
+            "WARNING": "Advertencia"
+         }
+      },
+      "THEMES": {
+         "NAME": {
+            "LABEL": "Nombre"
+         },
+         "DESCRIPTION": {
+            "LABEL": "Descripción"
+         },
+         "CREATOR": {
+            "LABEL": "Creador"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Fecha de creación"
+         }
+      },
+      "USERS": {
+         "PROVIDER": {
+            "LABEL": "Proveedor"
+         },
+         "ROLE": {
+            "LABEL": "Rol"
+         },
+         "USERNAME": {
+            "LABEL": "Nombre de usuario"
+         },
+         "NAME": {
+            "LABEL": "Nombre"
+         },
+         "USER_DIRECTORY": {
+            "LABEL": "Directorio de usuarios"
+         }
+      },
+      "REVIEW_STATUS": {
+         "UNSENT": "No enviado",
+         "UNCONFIRMED": "Sin confirmar",
+         "CONFIRMED": "Confirmado"
+      }
+   },
+   "TABLE_SUMMARY": "{{numberOfRows}} filas",
+   "TABLE_NO_RESULT": "No se han encontrado resultados.",
+   "TABLE_LOADING": "Cargando…",
+   "TABLE_EDIT": "Modificar",
+   "DASHBOARD": {
+      "RUNNING": "Procesando",
+      "FINISHED": "Procesado",
+      "PAUSED": "En pausa",
+      "FAILED": "Error",
+      "FINISHED_WITH_COMMENTS": "Pendiente",
+      "SCHEDULED": "Programado",
+      "RECORDING": "Grabando"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Atajos de teclado",
+         "HINT": "Esta página enumera los atajos de teclado disponibles en este momento. Tenga en cuenta que éstos pueden cambiar dependiendo de qué página se esté visitando."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Espacio",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Pág↑",
+         "PAGEDOWN": "Pág↓",
+         "END": "Fin",
+         "HOME": "Inicio",
+         "INS": "Ins",
+         "DEL": "Supr"
+      },
+      "GROUPS": {
+         "GENERAL": "General",
+         "PLAYER": "Reproductor",
+         "EDITOR": "Editor"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Menú principal",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Seleccionar el filtro del panel siguiente",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Seleccionar el filtro del panel anterior",
+            "REMOVE_FILTERS": "Borrar todos los filtros",
+            "EVENT_VIEW": "Eventos",
+            "SERIES_VIEW": "Series",
+            "NEW_EVENT": "Añadir evento",
+            "NEW_SERIES": "Añadir serie",
+            "CHEAT_SHEET": "Atajos de teclado"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Reproducir/pausar",
+            "PREVIOUS_FRAME": "Fotograma anterior",
+            "NEXT_FRAME": "Siguiente fotograma",
+            "STEP_BACKWARD": "Retroceder 10s",
+            "STEP_FORWARD": "Avanzar 10s",
+            "PREVIOUS_SEGMENT": "Segmento anterior / Saltar al principio",
+            "NEXT_SEGMENT": "Segmento siguiente / Saltar al final",
+            "VOLUME_UP": "Subir volumen",
+            "VOLUME_DOWN": "Bajar volumen",
+            "MUTE": "Activar/desactivar sonido"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Dividir",
+            "CUT_SELECTED_SEGMENT": "Cortar",
+            "PLAY_CURRENT_SEGMENT": "Reproducir segmento actual",
+            "CLEAR_LIST": "Borrar segmento",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Reproducir segmento con previo",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Fin de segmento"
+         }
+      }
+   },
+   "AGENTS": {
+      "STATUS": {
+         "CAPTURING": "Capturando",
+         "ERROR": "Error",
+         "IDLE": "Inactivo",
+         "OFFLINE": "Desconectado",
+         "SHUTTING_DOWN": "Apagando",
+         "UNKNOWN": "Desconocido",
+         "UPLOADING": "Subiendo"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "Para insertar varios valores, pulse Enter"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Las estadísticas no se pueden mostrar en este momento. Por favor, inténtalo de nuevo más tarde.",
+      "UNSUPPORTED_TYPE": "Lo sentimos, Opencast no puede procesar este tipo de datos estadísticos.",
+      "FROM": "Desde",
+      "TO": "Hasta",
+      "TOTAL": "Total",
+      "GRANULARITY": "Granularidad",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organización"
+      },
+      "TITLE": {
+         "RANDOM": "Datos aleatorios",
+         "VIEWS_SUM": "Número total de vistas",
+         "VIEWS_AVG": "Promedio de visitas",
+         "PUBLISHEDHOURS": "Horas de Vídeo Publicadas"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "Esto muestra datos aleatorios como muestra. Puede desactivar este gráfico eliminando la definición json del proveedor de estadísticas correspondiente de etc/providers",
+         "VIEWS_SUM": "Aquí se muestra el número total de vistas por unidad de tiempo.",
+         "VIEWS_AVG": "Aquí se muestra el número medio de vistas diarias por unidad de tiempo.",
+         "PUBLISHEDHOURS": "Esto muestra las horas de video publicadas"
+      }
+   }
+}

@@ -2,18 +2,18 @@
   "name": "opencast-engage-ui",
   "private": true,
   "scripts": {
-    "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js src/main/resources/ui/js/app/ src/main/resources/ui/js/*.js"
+    "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js src/main/resources/ui/js/app/ src/main/resources/ui/js/*.js --resolve-plugins-relative-to ."
   },
   "dependencies": {
-    "bootbox": "^5.3.2",
-    "jquery": "^3.4.1",
-    "js-yaml": "^3.13.1",
+    "bootbox": "^5.4.1",
+    "jquery": "^3.5.1",
+    "js-yaml": "^3.14.0",
     "requirejs": "^2.3.6",
-    "seedrandom": "^3.0.3",
-    "underscore": "^1.9.1"
+    "seedrandom": "^3.0.5",
+    "underscore": "^1.11.0"
   },
   "devDependencies": {
-    "eslint": "^6.5.0",
-    "eslint-plugin-header": "^3.0.0"
+    "eslint": "^7.10.0",
+    "eslint-plugin-header": "^3.1.0"
   }
 }

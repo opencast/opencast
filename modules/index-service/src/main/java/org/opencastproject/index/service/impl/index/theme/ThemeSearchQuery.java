@@ -121,7 +121,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withDescription(String description) {
-    clearExpectations();
     this.description = description;
     return this;
   }
@@ -161,7 +160,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withCreator(String creator) {
-    clearExpectations();
     this.creator = creator;
     return this;
   }
@@ -221,7 +219,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withIsDefault(Boolean isDefault) {
-    clearExpectations();
     this.isDefault = isDefault;
     return this;
   }
@@ -243,7 +240,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withName(String name) {
-    clearExpectations();
     this.name = name;
     return this;
   }
@@ -265,7 +261,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withBumperActive(Boolean bumperActive) {
-    clearExpectations();
     this.bumperActive = bumperActive;
     return this;
   }
@@ -287,7 +282,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withBumperFile(String bumperFile) {
-    clearExpectations();
     this.bumperFile = bumperFile;
     return this;
   }
@@ -309,7 +303,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withLicenseSlideActive(Boolean licenseSlideActive) {
-    clearExpectations();
     this.licenseSlideActive = licenseSlideActive;
     return this;
   }
@@ -331,7 +324,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withLicenseSlideBackground(String licenseSlideBackground) {
-    clearExpectations();
     this.licenseSlideBackground = licenseSlideBackground;
     return this;
   }
@@ -353,7 +345,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withLicenseSlideDescription(String licenseSlideDescription) {
-    clearExpectations();
     this.licenseSlideDescription = licenseSlideDescription;
     return this;
   }
@@ -375,7 +366,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withTrailerActive(Boolean trailerActive) {
-    clearExpectations();
     this.trailerActive = trailerActive;
     return this;
   }
@@ -397,7 +387,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withTrailerFile(String trailerFile) {
-    clearExpectations();
     this.trailerFile = trailerFile;
     return this;
   }
@@ -419,7 +408,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withTitleSlideActive(Boolean titleSlideActive) {
-    clearExpectations();
     this.titleSlideActive = titleSlideActive;
     return this;
   }
@@ -441,7 +429,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withTitleSlideMetadata(String titleSlideMetadata) {
-    clearExpectations();
     this.titleSlideMetadata = titleSlideMetadata;
     return this;
   }
@@ -463,7 +450,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withTitleSlideBackground(String titleSlideBackground) {
-    clearExpectations();
     this.titleSlideBackground = titleSlideBackground;
     return this;
   }
@@ -483,7 +469,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withWatermarkActive(Boolean watermarkActive) {
-    clearExpectations();
     this.watermarkActive = watermarkActive;
     return this;
   }
@@ -503,7 +488,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withWatermarkFile(String watermarkFile) {
-    clearExpectations();
     this.watermarkFile = watermarkFile;
     return this;
   }
@@ -523,7 +507,6 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public ThemeSearchQuery withLicense(String watermarkPosition) {
-    clearExpectations();
     this.watermarkPosition = watermarkPosition;
     return this;
   }

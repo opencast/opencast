@@ -38,7 +38,6 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,9 +72,6 @@ public class Activator extends HttpServlet implements BundleActivator {
 
   /** The OSGI bundle context */
   protected BundleContext bundleContext;
-
-  /** The registration for the documentation servlet. */
-  protected ServiceRegistration docServletRegistration;
 
   /** A map of global macro values for REST documentation. */
   private Map<String, String> globalMacro;

@@ -26,12 +26,11 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListFilter;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.data.Option;
 
 import com.entwinemedia.fn.data.json.Field;
@@ -39,13 +38,11 @@ import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 
-import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -57,8 +54,6 @@ import java.util.Set;
  * Utility class providing helpers for all operation related to JSON.
  */
 public final class JSONUtils {
-
-  public static final String PATTERN_ISO_DATE = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
   private JSONUtils() {
 
@@ -99,45 +94,6 @@ public final class JSONUtils {
       arrEntries.add(v(item, Jsons.BLANK));
     }
     return arr(arrEntries);
-  }
-
-  /**
-   * Create a JSON Array with the list given as String containing values separated by the given separator;
-   *
-   * @param list
-   *          The list of values as String
-   * @param separator
-   *          The separator used in the list between each value
-   * @return a JSON Array as {@link JValue}
-   * @throws IllegalArgumentException
-   *           - if the separator is not set
-   */
-  public static JValue jsonArrayFromString(String list, String separator) {
-    if (StringUtils.isEmpty(separator))
-      throw new IllegalArgumentException("The separator must be defined!");
-
-    if (StringUtils.isBlank(list))
-      return arr();
-
-    List<JValue> values = new ArrayList<JValue>();
-    for (String value : list.split(separator))
-      values.add(v(value));
-
-    return arr(values);
-  }
-
-  /**
-   * Format the given Date as ISO String Date using the pattern "yyyy-MM-dd'T'HH:mm:ss'Z'".
-   *
-   * @param date
-   *          The date to format
-   * @return The date as ISO Date String
-   * @throws IllegalArgumentException
-   */
-  public static String formatIsoDate(Date date) {
-    if (date == null)
-      throw new IllegalArgumentException("The given date must not be null.");
-    return DateTimeSupport.toUTC(date.getTime());
   }
 
   /**
@@ -251,29 +207,6 @@ public final class JSONUtils {
     }
 
     return obj(filtersJSON);
-  }
-
-  /**
-   * Format the given period (define by start and end dates) to a JSON value.
-   *
-   * <pre>
-   * {
-   *    "start": 2012-12-20T23:11:23Z,
-   *    "end": 2012-12-22T10:11:23Z
-   * }
-   * </pre>
-   *
-   * @param start
-   *          The period start date
-   * @param end
-   *          The period end date
-   * @return A {@link JValue} representing the period with a start and end property
-   */
-  public static JValue formatPeriod(Date start, Date end) {
-    if (start == null || end == null)
-      throw new IllegalArgumentException("The given start or end date from the period must not be null!");
-
-    return obj(f("start", v(formatIsoDate(start))), f("end", v(formatIsoDate(end))));
   }
 
   /**

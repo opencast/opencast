@@ -22,7 +22,6 @@
 package org.opencastproject.composer.impl;
 
 import static java.lang.String.format;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.composer.impl.EncoderEngine.CMD_SUFFIX;
 import static org.opencastproject.serviceregistry.api.Incidents.NO_DETAILS;
 import static org.opencastproject.util.data.Option.none;
@@ -42,6 +41,7 @@ import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
+import org.opencastproject.mediapackage.AdaptivePlaylist;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
@@ -51,8 +51,7 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
-import org.opencastproject.mediapackage.identifier.IdBuilder;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -71,6 +70,8 @@ import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
@@ -87,6 +88,11 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,10 +117,20 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /** FFMPEG based implementation of the composer service api. */
+@Component(
+  property = {
+    "service.description=Composer (Encoder) Local Service",
+    "service.pid=org.opencastproject.composer.impl.ComposerServiceImpl"
+  },
+  immediate = true,
+  service = { ComposerService.class, ManagedService.class }
+)
 public class ComposerServiceImpl extends AbstractJobProducer implements ComposerService, ManagedService {
   /**
    * The indexes the composite job uses to create a Job
@@ -184,10 +200,22 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   public static final String JOB_LOAD_MAX_MULTIPLE_PROFILES = "job.load.max.multiple.profiles";
   public static final String JOB_LOAD_FACTOR_PROCESS_SMIL = "job.load.factor.process.smil";
+  public static final String JOB_LOAD_FACTOR_MULTI_ENCODE = "job.load.factor.multiencode";
 
   private float maxMultipleProfilesJobLoad = DEFAULT_JOB_LOAD_MAX_MULTIPLE_PROFILES;
   private float processSmilJobLoadFactor = DEFAULT_PROCESS_SMIL_JOB_LOAD_FACTOR;
   private float multiEncodeJobLoadFactor = DEFAULT_MULTI_ENCODE_JOB_LOAD_FACTOR;
+
+  // NOMINAL TRIM - remove this from the beginning of all mylti-encoded videos
+  // This was added to deal with lipsync issue with ffmpeg4, using libfdk_aac appears to fix it
+  public static final int DEFAULT_MULTI_ENCODE_TRIM_MILLISECONDS = 0;
+  public static final String MULTI_ENCODE_TRIM_MILLISECONDS = "org.composer.multi_encode.trim.milliseconds";
+  private int multiEncodeTrim = DEFAULT_MULTI_ENCODE_TRIM_MILLISECONDS;
+
+  // Add fade to multi_encode - Fade in and fade out duration
+  public static final int DEFAULT_MULTI_ENCODE_FADE_MILLISECONDS = 0;
+  public static final String MULTI_ENCODE_FADE_MILLISECONDS = "org.composer.multi_encode.fade.milliseconds";
+  private int multiEncodeFade = DEFAULT_MULTI_ENCODE_FADE_MILLISECONDS;
 
   /** default transition */
   private int transitionDuration = (int) (DEFAULT_PROCESS_SMIL_CLIP_TRANSITION_DURATION * 1000);
@@ -215,9 +243,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /** The organization directory service */
   private OrganizationDirectoryService organizationDirectoryService = null;
 
-  /** Id builder used to create ids for encoded tracks */
-  private final IdBuilder idBuilder = IdBuilderFactory.newInstance().newIdBuilder();
-
   /** The security service */
   private SecurityService securityService = null;
 
@@ -242,6 +267,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    *          the component context
    */
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
     ffmpegBinary = StringUtils.defaultString(cc.getBundleContext().getProperty(CONFIG_FFMPEG_PATH),
@@ -253,6 +279,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /**
    * OSGi callback on component deactivation.
    */
+  @Deactivate
   public void deactivate() {
     logger.info("Deactivating composer service");
     for (EncoderEngine engine: activeEncoder) {
@@ -347,7 +374,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   private Option<Track> encode(final Job job, Map<String, Track> tracks, String profileId)
           throws EncoderException, MediaPackageException {
 
-    final String targetTrackId = idBuilder.createNew().toString();
+    final String targetTrackId = IdImpl.fromUUID().toString();
 
     Map<String, File> files = new HashMap<>();
     // Get the tracks and make sure they exist
@@ -430,17 +457,31 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     final EncodingProfile profile = getProfile(profileId);
     final EncoderEngine encoderEngine = getEncoderEngine();
 
-    // conditional settings based on frame height
-    final int height = Arrays.stream(mediaTrack.getStreams())
+    // conditional settings based on frame height and width
+    final Optional<VideoStream> videoStream = Arrays.stream(mediaTrack.getStreams())
             .filter((stream -> stream instanceof VideoStream))
-            .map(stream -> ((VideoStream) stream).getFrameHeight())
-            .findFirst()
-            .orElse(0);
+            .map(stream -> (VideoStream) stream)
+            .findFirst();
+    final int height = videoStream.map(vs -> vs.getFrameHeight()).orElse(0);
+    final int width = videoStream.map(vs -> vs.getFrameWidth()).orElse(0);
     Map<String, String> properties = new HashMap<>();
     for (String key: profile.getExtensions().keySet()) {
       if (key.startsWith(CMD_SUFFIX + ".if-height-geq-")) {
         final int heightCondition = Integer.parseInt(key.substring((CMD_SUFFIX + ".if-height-geq-").length()));
         if (heightCondition <= height) {
+          properties.put(key, profile.getExtension(key));
+        }
+      } else if (key.startsWith(CMD_SUFFIX + ".if-height-lt-")) {
+        final int heightCondition = Integer.parseInt(key.substring((CMD_SUFFIX + ".if-height-lt-").length()));
+        if (heightCondition > height) {
+          properties.put(key, profile.getExtension(key));
+        }
+      } else if (key.startsWith(CMD_SUFFIX + ".if-width-or-height-geq-")) {
+        final String[] resCondition = key.substring((CMD_SUFFIX + ".if-width-or-height-geq-").length()).split("-");
+        final int widthCondition = Integer.parseInt(resCondition[0]);
+        final int heightCondition = Integer.parseInt(resCondition[1]);
+
+        if (heightCondition <= height || widthCondition <= width) {
           properties.put(key, profile.getExtension(key));
         }
       }
@@ -457,7 +498,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     for (File encodingOutput: outputFiles) {
       // Put the file in the workspace
       URI returnURL;
-      final String targetTrackId = idBuilder.createNew().toString();
+      final String targetTrackId = IdImpl.fromUUID().toString();
 
       try (InputStream in = new FileInputStream(encodingOutput)) {
         returnURL = workspace.putInCollection(COLLECTION,
@@ -547,7 +588,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    */
   private Option<Track> trim(Job job, Track sourceTrack, String profileId, long start, long duration)
           throws EncoderException {
-    String targetTrackId = idBuilder.createNew().toString();
+    String targetTrackId = IdImpl.fromUUID().toString();
 
     // Get the track and make sure it exists
     final File trackFile = loadTrackIntoWorkspace(job, "source", sourceTrack, false);
@@ -670,7 +711,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // Create the engine
     final EncoderEngine encoderEngine = getEncoderEngine();
 
-    final String targetTrackId = idBuilder.createNew().toString();
+    final String targetTrackId = IdImpl.fromUUID().toString();
     Option<File> upperVideoFile = Option.none();
     try {
       // Get the tracks and make sure they exist
@@ -771,10 +812,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       return some(inspectedTrack);
     } catch (Exception e) {
       if (upperLaidOutElement.isSome()) {
-        logger.warn("Error composing {}  and {}: {}", lowerLaidOutElement.getElement(), upperLaidOutElement.get().getElement(),
-                getStackTrace(e));
+        logger.warn("Error composing {}  and {}:",
+                lowerLaidOutElement.getElement(), upperLaidOutElement.get().getElement(), e);
       } else {
-        logger.warn("Error composing {}: {}", lowerLaidOutElement.getElement(), getStackTrace(e));
+        logger.warn("Error composing {}:", lowerLaidOutElement.getElement(), e);
       }
       if (e instanceof EncoderException) {
         throw (EncoderException) e;
@@ -840,7 +881,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       throw new EncoderException("The output dimension id parameter must not be null when concatenating video");
     }
 
-    final String targetTrackId = idBuilder.createNew().toString();
+    final String targetTrackId = IdImpl.fromUUID().toString();
     // Get the tracks and make sure they exist
     List<File> trackFiles = new ArrayList<>();
     int i = 0;
@@ -944,7 +985,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // Get the encoding profile
     final EncodingProfile profile = getProfile(job, profileId);
 
-    final String targetTrackId = idBuilder.createNew().toString();
+    final String targetTrackId = IdImpl.fromUUID().toString();
     // Get the attachment and make sure it exist
     File imageFile;
     try {
@@ -1155,9 +1196,14 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     cleanup(videoFile);
 
     MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-    List<Attachment> imageAttachments = new LinkedList<Attachment>();
+    List<Attachment> imageAttachments = new LinkedList<>();
     for (URI url : workspaceURIs) {
       Attachment attachment = (Attachment) builder.elementFromURI(url, Attachment.TYPE, null);
+      try {
+        attachment.setSize(workspace.get(url).length());
+      } catch (NotFoundException | IOException e) {
+        logger.warn("Could not get file size of {}", url);
+      }
       imageAttachments.add(attachment);
     }
 
@@ -1299,7 +1345,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
         MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         Attachment convertedImage = (Attachment) builder.elementFromURI(workspaceURI, Attachment.TYPE, null);
-        convertedImage.setIdentifier(idBuilder.createNew().toString());
+        convertedImage.setSize(output.length());
+        convertedImage.setIdentifier(IdImpl.fromUUID().toString());
         try {
           convertedImage.setMimeType(MimeTypes.fromURI(convertedImage.getURI()));
         } catch (UnknownFileTypeException e) {
@@ -1761,12 +1808,32 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     return sb.toString();
   }
 
+  // Rewrite files to use the new names that will happen when files are saved by calling
+  // putToCollection
+  protected void hlsFixReference(long id, List<File> outputs) throws IOException {
+      Map<String, String> nameMap = outputs.stream().collect(Collectors.<File, String, String> toMap(
+              file -> FilenameUtils.getName(file.getAbsolutePath()), file -> renameJobFile(id, file)));
+      for (File file : outputs) {
+        if (AdaptivePlaylist.isPlaylist(file))
+          AdaptivePlaylist.hlsRewriteFileReference(file, nameMap); // fix references
+      }
+    }
+
+  // generate a "unique" name by jobid
+  private String renameJobFile(long jobId, File file) {
+      return PathSupport.toSafeName(format("%s.%s", jobId, FilenameUtils.getName(file.getAbsolutePath())));
+  }
+
+  protected void hlsSetReference(Track track) throws IOException {
+    if (!AdaptivePlaylist.checkForMaster(new File(track.getURI().getPath())))
+      track.setLogicalName(FilenameUtils.getName(track.getURI().getPath()));
+  }
+
   private List<URI> putToCollection(Job job, List<File> files, String description) throws EncoderException {
     List<URI> returnURLs = new ArrayList<>(files.size());
     for (File file: files) {
       try (InputStream in = new FileInputStream(file)) {
-        String newFileName = format("%s.%s", job.getId(), FilenameUtils.getName(file.getAbsolutePath()));
-        URI newFileURI = workspace.putInCollection(COLLECTION, newFileName, in);
+        URI newFileURI = workspace.putInCollection(COLLECTION, renameJobFile(job.getId(), file), in);
         logger.info("Copied the {} to the workspace at {}", description, newFileURI);
         returnURLs.add(newFileURI);
       } catch (Exception e) {
@@ -1788,9 +1855,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   private static List<Tuple<String, String>> detailsFor(EncoderException ex, EncoderEngine engine) {
     final List<Tuple<String, String>> d = new ArrayList<>();
     d.add(tuple("encoder-engine-class", engine.getClass().getName()));
-    if (ex instanceof CmdlineEncoderException) {
-      d.add(tuple("encoder-commandline", ((CmdlineEncoderException) ex).getCommandLine()));
-    }
     return d;
   }
 
@@ -1823,6 +1887,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param mediaInspectionService
    *          an instance of the media inspection service
    */
+  @Reference(name = "inspection-service")
   protected void setMediaInspectionService(MediaInspectionService mediaInspectionService) {
     this.inspectionService = mediaInspectionService;
   }
@@ -1833,6 +1898,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param workspace
    *          an instance of the workspace
    */
+  @Reference(name = "workspace")
   protected void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -1843,6 +1909,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -1863,6 +1930,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param scanner
    *          the profile scanner
    */
+  @Reference(name = "profileScanner")
   protected void setProfileScanner(EncodingProfileScanner scanner) {
     this.profileScanner = scanner;
   }
@@ -1873,6 +1941,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -1883,6 +1952,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -1893,6 +1963,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
@@ -1907,6 +1978,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     return securityService;
   }
 
+  @Reference(name = "smil-service")
   public void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
@@ -1931,6 +2003,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     return organizationDirectoryService;
   }
 
+  @Reference(name = "profilesReadyIndicator", target = "(artifact=encodingprofile)")
+  public void setEncodingProfileReadinessIndicator(ReadinessIndicator unused) {
+    //  Wait for the encoding profiles to load
+  }
+
   @Override
   public Job demux(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException {
     try {
@@ -1952,7 +2029,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       // Get the encoding profile
       EncodingProfile profile = getProfile(job, encodingProfile);
       // Create the engine/get
-      logger.info(format("Encoding video track %s using profile '%s'", videoTrack.getIdentifier(), profile));
+      logger.info("Encoding video track {} using profile '{}'", videoTrack.getIdentifier(), profile);
       final EncoderEngine encoderEngine = getEncoderEngine();
 
       // Do the work
@@ -1978,7 +2055,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
       List<URI> workspaceURIs = putToCollection(job, outputs, "demuxed file");
       List<Track> tracks = inspect(job, workspaceURIs);
-      tracks.forEach(track -> track.setIdentifier(idBuilder.createNew().toString()));
+      tracks.forEach(track -> track.setIdentifier(IdImpl.fromUUID().toString()));
       return tracks;
     } catch (Exception e) {
       logger.warn("Demux/MultiOutputEncode operation failed to encode " + videoTrack, e);
@@ -1995,6 +2072,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * configuration admin service from calling the service deactivate and activate methods
    * for a config update. It does not have to do anything as the updates are handled by updated().
    */
+  @Modified
   public void modified(Map<String, Object> config)
      throws ConfigurationException {
     logger.debug("Modified");
@@ -2011,11 +2089,21 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
             DEFAULT_JOB_LOAD_MAX_MULTIPLE_PROFILES, serviceRegistry);
     processSmilJobLoadFactor = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_FACTOR_PROCESS_SMIL,
             DEFAULT_PROCESS_SMIL_JOB_LOAD_FACTOR, serviceRegistry);
-    if (processSmilJobLoadFactor == 0) {
-      processSmilJobLoadFactor = DEFAULT_PROCESS_SMIL_JOB_LOAD_FACTOR;
+    multiEncodeJobLoadFactor = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_FACTOR_MULTI_ENCODE,
+            DEFAULT_MULTI_ENCODE_JOB_LOAD_FACTOR, serviceRegistry);
+    // This should throw exceptions if the property is misconfigured
+    String multiEncodeFadeStr = StringUtils.trimToNull((String) properties.get(MULTI_ENCODE_FADE_MILLISECONDS));
+    multiEncodeTrim = DEFAULT_MULTI_ENCODE_FADE_MILLISECONDS;
+    if (multiEncodeFadeStr != null) {
+      multiEncodeFade = Integer.parseInt(multiEncodeFadeStr);
     }
-    transitionDuration = 1000 * (int) LoadUtil.getConfiguredLoadValue(properties, PROCESS_SMIL_CLIP_TRANSITION_DURATION,
-            DEFAULT_PROCESS_SMIL_CLIP_TRANSITION_DURATION, serviceRegistry);
+    String multiEncodeTrimStr = StringUtils.trimToNull((String) properties.get(MULTI_ENCODE_TRIM_MILLISECONDS));
+    multiEncodeTrim = DEFAULT_MULTI_ENCODE_TRIM_MILLISECONDS;
+    if (multiEncodeTrimStr != null) {
+      multiEncodeTrim = Integer.parseInt(multiEncodeTrimStr);
+    }
+    transitionDuration = (int) (1000 * LoadUtil.getConfiguredLoadValue(properties,
+            PROCESS_SMIL_CLIP_TRANSITION_DURATION, DEFAULT_PROCESS_SMIL_CLIP_TRANSITION_DURATION, serviceRegistry));
   }
 
   /**
@@ -2247,10 +2335,19 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       } finally {
         activeEncoder.remove(encoderEngine);
       }
+      logger.info("ProcessSmil returns " + outputs.size() + " media files ", outputs);
+      boolean isHLS = outputs.parallelStream().anyMatch(AdaptivePlaylist.isHLSFilePred);
+      /**
+        * putToCollection changes the name of the output file (a.mp4 -> 12345-a.mp4) so that it
+        * is "unique" in the collections directory.
+       */
+      if (isHLS) {
+        hlsFixReference(job.getId(), outputs); // for inspection in collection
+      }
       logger.info("ProcessSmil/MultiTrimConcat returns {} media files {}", outputs.size(), outputs);
       List<URI> workspaceURIs = putToCollection(job, outputs, "processSmil files");
       List<Track> tracks = inspect(job, workspaceURIs);
-      tracks.forEach(track -> track.setIdentifier(idBuilder.createNew().toString()));
+      tracks.forEach(track -> track.setIdentifier(IdImpl.fromUUID().toString()));
       return tracks;
     } catch (Exception e) { // clean up all the stored files
       throw new EncoderException("ProcessSmil operation failed to run ", e);
@@ -2273,14 +2370,14 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   /**
    * A single encoding process that produces multiple outputs from a single track(s) using a list of encoding profiles.
-   * Each output can be tagged by the profile name.
+   * Each output can be tagged by the profile name. This supports adaptive bitrate outputs.
    *
    * @param job
    *          - encoding job
    * @param track
    *          - source track
    * @param profileIds
-   *          - list of encoding profile Ids
+   *          - list of encoding profile Ids, can include one adaptive profile
    * @return encoded files
    * @throws EncoderException
    *           - if can't encode
@@ -2305,11 +2402,20 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         EncodingProfile profile = getProfile(job, profileId);
         profiles.add(profile);
       }
+      final long nominalTrim = multiEncodeTrim; // in ms - minimal amount if needed to adjust lipsync
+      List<Long> edits = null;
+      if (nominalTrim > 0) {
+        edits = new ArrayList<>(); // Nominal edit points if there is need to automatically trim off the beginning
+        edits.add((long) 0);
+        edits.add(nominalTrim);
+        edits.add(track.getDuration() - nominalTrim);
+      }
       logger.info("Encoding source track {} using profiles '{}'", track.getIdentifier(), profileIds);
       // Do the work
       EncoderEngine encoderEngine = getEncoderEngine();
       try {
-        outputs = encoderEngine.multiTrimConcat(Arrays.asList(videoFile), null, profiles, 0, track.hasVideo(),
+        outputs = encoderEngine.multiTrimConcat(Arrays.asList(videoFile), null, profiles, multiEncodeFade,
+                track.hasVideo(),
                 track.hasAudio());
       } catch (EncoderException e) {
         Map<String, String> params = new HashMap<>();
@@ -2321,9 +2427,16 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         activeEncoder.remove(encoderEngine);
       }
       logger.info("MultiEncode returns {} media files {} ", outputs.size(), outputs);
-      List<URI> workspaceURIs = putToCollection(job, outputs, "multiencode files");
+      List<File> saveFiles = outputs; // names may be changed in the following ops
+      boolean isHLS = outputs.parallelStream().anyMatch(AdaptivePlaylist.isHLSFilePred);
+      if (isHLS)
+        hlsFixReference(job.getId(), outputs); // for inspection in collection
+
+      List<URI> workspaceURIs = putToCollection(job, saveFiles, "multiencode files");
       List<Track> tracks = inspect(job, workspaceURIs);
-      tracks.forEach(eachtrack -> eachtrack.setIdentifier(idBuilder.createNew().toString()));
+      if (isHLS) // Keep a snapshot of its name and we will reconciled them later
+        tracks.forEach(eachtrack -> AdaptivePlaylist.setLogicalName(eachtrack));
+      tracks.forEach(eachtrack -> eachtrack.setIdentifier(IdImpl.fromUUID().toString()));
       return tracks;
     } catch (Exception e) {
       throw new EncoderException("MultiEncode operation failed to run ", e);

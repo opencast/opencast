@@ -38,15 +38,15 @@ public class Chunk {
 
   @XmlElement(name = "number")
   private int number = -1; // number of the current chunk
-  @XmlElement(name = "bytes-recieved")
-  private long recieved = 0; // number of bytes of the current chunk that have already been recieved
+  @XmlElement(name = "bytes-received")
+  private long received = 0; // number of bytes of the current chunk that have already been received
 
   public Chunk() {
   }
 
-  public Chunk(int number, long recieved) {
+  public Chunk(int number, long received) {
     this.number = number;
-    this.recieved = recieved;
+    this.received = received;
   }
 
   public int getNumber() {
@@ -61,11 +61,11 @@ public class Chunk {
     return ++number;
   }
 
-  public long getRecieved() {
-    return recieved;
+  public long getReceived() {
+    return received;
   }
 
-  public void setRecieved(long recieved) {
-    this.recieved = recieved;
+  public void setReceived(long received) {
+    this.received = received;
   }
 }

@@ -344,10 +344,18 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
   private float parseFloat(String val) {
     if (val.contains("/")) {
       String[] v = val.split("/");
-      return Float.parseFloat(v[0]) / Float.parseFloat(v[1]);
+      if (Float.parseFloat(v[1]) == 0) {
+        return 0;
+      } else {
+        return Float.parseFloat(v[0]) / Float.parseFloat(v[1]);
+      }
     } else if (val.contains(":")) {
       String[] v = val.split(":");
-      return Float.parseFloat(v[0]) / Float.parseFloat(v[1]);
+      if (Float.parseFloat(v[1]) == 0) {
+        return 0;
+      } else {
+        return Float.parseFloat(v[0]) / Float.parseFloat(v[1]);
+      }
     } else {
       return Float.parseFloat(val);
     }

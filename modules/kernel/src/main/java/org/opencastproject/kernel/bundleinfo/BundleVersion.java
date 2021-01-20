@@ -35,10 +35,6 @@ public final class BundleVersion {
     this.buildNumber = buildNumber;
   }
 
-  public static BundleVersion version(String bundleVersion, Option<String> buildNumber) {
-    return new BundleVersion(bundleVersion, buildNumber);
-  }
-
   public String getBundleVersion() {
     return bundleVersion;
   }

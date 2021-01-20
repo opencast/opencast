@@ -21,13 +21,9 @@
 
 package org.opencastproject.security.api;
 
-import static org.opencastproject.util.data.Either.left;
-import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.util.XmlSafeParser;
-import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
 
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
@@ -113,26 +109,6 @@ public final class AccessControlParser {
       return chuck(e);
     }
   }
-
-  /** {@link #parseAclSilent(String)} as a function. */
-  public static final Function<String, AccessControlList> parseAclSilent = new Function<String, AccessControlList>() {
-    @Override
-    public AccessControlList apply(String s) {
-      return parseAclSilent(s);
-    }
-  };
-
-  /** Functional version of {@link #parseAcl(String)}. */
-  public static final Function<String, Either<Exception, AccessControlList>> parseAcl = new Function<String, Either<Exception, AccessControlList>>() {
-    @Override
-    public Either<Exception, AccessControlList> apply(String s) {
-      try {
-        return right(parseAcl(s));
-      } catch (Exception e) {
-        return left(e);
-      }
-    }
-  };
 
   /**
    * Unmarshals an ACL from an xml input stream.
@@ -282,10 +258,4 @@ public final class AccessControlParser {
     }
   }
 
-  public static final Function<AccessControlList, String> toJsonSilent = new Function<AccessControlList, String>() {
-    @Override
-    public String apply(AccessControlList acl) {
-      return toJsonSilent(acl);
-    }
-  };
 }

@@ -40,6 +40,9 @@ import org.opencastproject.workspace.api.Workspace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +53,14 @@ import java.util.List;
 import java.util.Map;
 
 /** Inspects media via ffprobe. */
+@Component(
+  property = {
+    "service.description=Media Inspection Service",
+    "service.pid=org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl"
+  },
+  immediate = true,
+  service = { MediaInspectionService.class, ManagedService.class }
+)
 public class MediaInspectionServiceImpl extends AbstractJobProducer implements MediaInspectionService, ManagedService {
 
   /** The load introduced on the system by creating an inspect job */
@@ -91,6 +102,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   }
 
   @Override
+  @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
     /* Configure analyzer */
@@ -214,11 +226,13 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
     }
   }
 
+  @Reference(name = "workspace")
   protected void setWorkspace(Workspace workspace) {
     logger.debug("setting " + workspace);
     this.workspace = workspace;
   }
 
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry jobManager) {
     this.serviceRegistry = jobManager;
   }
@@ -239,6 +253,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -249,6 +264,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -259,6 +275,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }

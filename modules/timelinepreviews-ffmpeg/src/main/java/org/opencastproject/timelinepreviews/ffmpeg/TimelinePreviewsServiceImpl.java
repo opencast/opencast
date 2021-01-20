@@ -30,7 +30,7 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -469,7 +469,7 @@ TimelinePreviewsService, ManagedService {
 
     // set the flavor and an ID
     timelinepreviewsMpe.setFlavor(track.getFlavor());
-    timelinepreviewsMpe.setIdentifier(IdBuilderFactory.newInstance().newIdBuilder().createNew().compact());
+    timelinepreviewsMpe.setIdentifier(IdImpl.fromUUID().toString());
 
     return timelinepreviewsMpe;
   }

@@ -30,16 +30,6 @@ public abstract class PersistenceEnv implements AutoCloseable {
   /** Run code inside a transaction. */
   public abstract <A> A tx(Fn<EntityManager, A> transactional);
 
-  /** {@link #tx(com.entwinemedia.fn.Fn)} as a function. */
-  public <A> Fn<Fn<EntityManager, A>, A> tx() {
-    return new Fn<Fn<EntityManager, A>, A>() {
-      @Override
-      public A apply(Fn<EntityManager, A> transactional) {
-        return tx(transactional);
-      }
-    };
-  }
-
   /** Close the environment and free all associated resources. */
   @Override public abstract void close();
 }

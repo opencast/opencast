@@ -43,12 +43,4 @@ public interface MediaPackageObserver {
    */
   void elementRemoved(MediaPackageElement element);
 
-  /**
-   * This method is called if the media package was moved to another location.
-   *
-   * @param mediaPackage
-   *          the moved media package
-   */
-  void packageMoved(MediaPackage mediaPackage);
-
 }

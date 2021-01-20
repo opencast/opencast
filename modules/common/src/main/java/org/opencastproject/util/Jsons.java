@@ -56,13 +56,6 @@ public final class Jsons {
     }
   };
 
-  /** {@link #toJson(org.opencastproject.util.Jsons.Obj)} as a function. */
-  public static final Function<Obj, String> toJson = new Function<Obj, String>() {
-    @Override public String apply(Obj obj) {
-      return obj.toJson();
-    }
-  };
-
   /** JSON null. */
   public static final Val NULL = new Val() {
   };
@@ -143,13 +136,6 @@ public final class Jsons {
 
     public List<Val> getVals() {
       return vals;
-    }
-
-    public Arr append(Arr a) {
-      if (!ZERO_ARR.equals(a))
-        return new Arr(Collections.<Val, List>concat(vals, a.getVals()));
-      else
-        return a;
     }
 
     public String toJson() {
@@ -265,11 +251,6 @@ public final class Jsons {
 
   /** Create a property. Convenience. */
   public static Prop p(String key, Boolean value) {
-    return new Prop(key, v(value));
-  }
-
-  /** Create a property. Convenience. */
-  public static Prop p(String key, Date value) {
     return new Prop(key, v(value));
   }
 

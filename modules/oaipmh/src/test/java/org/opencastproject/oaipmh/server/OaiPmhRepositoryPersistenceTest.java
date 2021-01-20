@@ -51,7 +51,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
@@ -67,12 +66,8 @@ import java.util.List;
 
 import javax.persistence.EntityManagerFactory;
 import javax.xml.namespace.NamespaceContext;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 /** Second test suite for OAI-PMH including a fully functional persistence backend. */
 public class OaiPmhRepositoryPersistenceTest {
@@ -290,10 +285,6 @@ public class OaiPmhRepositoryPersistenceTest {
           return workspace;
         }
 
-        @Override
-        public Date currentDate() {
-          return new Date();
-        }
       };
       for (MediaPackage mp : mps)
         db.store(mp, REPOSITORY_ID);
@@ -357,13 +348,4 @@ public class OaiPmhRepositoryPersistenceTest {
     };
   }
 
-  public static void print(Source source) {
-    try {
-      final Transformer t = XmlSafeParser.newTransformerFactory().newTransformer();
-      t.setOutputProperty(OutputKeys.INDENT, "yes");
-      t.transform(source, new StreamResult(System.out));
-    } catch (TransformerException e) {
-      chuck(e);
-    }
-  }
 }

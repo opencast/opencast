@@ -44,16 +44,6 @@
       </configurations>
     </operation>
 
-    <!-- Remove from default OAI-PMH repository -->
-    <operation
-      id="retract-oaipmh"
-      exception-handler-workflow="partial-error"
-      description="Retract recording from the default OAI-PMH repository">
-      <configurations>
-        <configuration key="repository">default</configuration>
-      </configurations>
-    </operation>
-
     <!-- Resolve the comment for cutting -->
     <operation
       id="comment"
@@ -80,7 +70,7 @@
 
     <!-- Copy placeholder Video for publication -->
     <operation
-      id="compose"
+      id="encode"
       fail-on-error="true"
       exception-handler-workflow="partial-error"
       description="create placeholder Video">
@@ -155,25 +145,10 @@
       <configurations>
         <configuration key="channel-id">api</configuration>
         <configuration key="mimetype">application/json</configuration>
-        <configuration key="source-tags">engage-download,engage-streaming</configuration>
+        <configuration key="download-source-tags">engage-download,engage-streaming</configuration>
         <configuration key="url-pattern">http://localhost:8080/api/events/${event_id}</configuration>
         <configuration key="with-published-elements">false</configuration>
         <configuration key="check-availability">true</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Publish to OAI-PMH -->
-    <operation
-      id="publish-oaipmh"
-      if="${publishToOaiPmh}"
-      exception-handler-workflow="partial-error"
-      description="Publish to OAI-PMH Default Repository">
-      <configurations>
-        <configuration key="download-flavors">dublincore/*,security/*</configuration>
-        <configuration key="download-tags">engage-download,atom,rss</configuration>
-        <configuration key="streaming-tags">engage-streaming</configuration>
-        <configuration key="check-availability">true</configuration>
-        <configuration key="repository">default</configuration>
       </configurations>
     </operation>
 

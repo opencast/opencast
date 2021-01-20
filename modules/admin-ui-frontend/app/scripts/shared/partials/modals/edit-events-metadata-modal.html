@@ -1,0 +1,199 @@
+<section ng-form="editEventsMetadataForm" ng-show="open" ng-keyup="keyUp($event)" tabindex="1"
+         class="modal wizard modal-animation ng-hide" ng-controller="EditEventsMetadataCtrl">
+
+  <header>
+    <a class="fa fa-times close-modal" ng-click="close()"></a>
+    <h2 translate="BULK_ACTIONS.EDIT_EVENTS_METADATA.CAPTION"></h2>
+  </header>
+
+  <!-- loading spinner -->
+  <div class="modal-content" ng-show="currentForm === ''">
+    <div class="modal-body">
+      <div class="loading">
+        <i class="fa fa-spinner fa-spin fa-2x fa-fw"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fatal Error View -->
+  <div class="modal-content" ng-show="currentForm === 'fatalErrorForm'">
+    <div class="modal-body">
+      <div class="row">
+        <div class="alert sticky error">
+          <p translate="BULK_ACTIONS.EDIT_EVENTS_METADATA.FATAL_ERROR" translate-values='{ fatalError: fatalError}'></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Request Errors View -->
+  <div class="modal-content" ng-show="currentForm === 'requestErrorsForm'">
+    <div class="modal-body">
+      <div class="row">
+        <div ng-show="!noEventsToEdit" class="alert sticky warning">
+          <p translate="BULK_ACTIONS.EDIT_EVENTS_METADATA.REQUEST_ERRORS.CANNOT_EDIT_SOME">
+            <!-- Cannot edit some events -->
+          </p>
+        </div>
+        <div ng-show="noEventsToEdit" class="alert sticky error">
+          <p translate="BULK_ACTIONS.EDIT_EVENTS_METADATA.REQUEST_ERRORS.NOTHING_TO_EDIT">
+            <!-- No events to edit -->
+          </p>
+        </div>
+      </div>
+      <div class="full-col">
+        <div class="obj tbl-list">
+          <header translate="BULK_ACTIONS.EDIT_EVENTS_METADATA.REQUEST_ERRORS.TABLE.CAPTION" />
+          <div class="obj-container">
+            <table class="main-tbl">
+              <thead>
+              <tr>
+                <th class="full-width" translate="EVENTS.EVENTS.TABLE.TITLE">
+                  <!-- Title -->
+                </th>
+                <th class="nowrap" translate="EVENTS.EVENTS.TABLE.SERIES">
+                  <!-- Series -->
+                </th>
+                <th class="nowrap" translate="BULK_ACTIONS.EDIT_EVENTS_METADATA.REQUEST_ERRORS.TABLE.ERRORS">
+                  <!-- Encountered error -->
+                </th>
+              </tr>
+              </thead>
+              <tbody >
+              <tr ng-repeat="row in selectedRows" ng-form="rowsForm" ng-class="{error: row.error}">
+                <td>{{ row.title }}</td>
+                <td class="nowrap">{{ row.series_name}}</td>
+                <td class="nowrap">{{ row.error | translate }}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer ng-show="currentForm === 'requestErrorsForm'">
+    <a class="submit" ng-click="setForm('editMetadataForm')" tabindex="100"
+       ng-class="{active: !noEventsToEdit, disabled: noEventsToEdit}">
+      {{ 'CONTINUE' | translate }}
+    </a>
+    <a class="cancel" ng-click="close()" tabindex="99">
+      {{ 'CANCEL' | translate }}
+    </a>
+  </footer>
+
+  <!-- Edit View -->
+  <div class="modal-content" ng-show="currentForm === 'editMetadataForm'">
+    <div class="modal-body">
+      <div class="full-col">
+        <div class="obj header-description">
+          <span translate="BULK_ACTIONS.EDIT_EVENTS_METADATA.EDIT.DESCRIPTION"></span>
+        </div>
+        <div class="obj tbl-details">
+          <header><span translate="BULK_ACTIONS.EDIT_EVENTS_METADATA.EDIT.TABLE.CAPTION"></span></header>
+          <div class="obj-container">
+            <table class="main-tbl">
+              <thead>
+              <tr>
+                <th class="small">
+                </th>
+                <th>
+                  {{ 'BULK_ACTIONS.EDIT_EVENTS_METADATA.EDIT.TABLE.FIELDS' | translate }}
+                </th>
+                <th>
+                  {{ 'BULK_ACTIONS.EDIT_EVENTS_METADATA.EDIT.TABLE.VALUES' | translate }}
+                </th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="row in rows | filter: {readOnly: false}" ng-class="{info: row.differentValues}">
+                <td>
+                  <input name="selection" type="checkbox" ng-model="row.selected"
+                         ng-change="rowSelectionChanged($index)" class="child-cbox"
+                         ng-disabled="!metadataFieldValid($index)">
+                </td>
+                <td>
+                  <span translate="{{ row.label }}"></span>
+                  <i ng-show="row.required" class="required">*</i>
+                </td>
+                <td
+                  admin-ng-editable
+                  name="row.id"
+                  required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
+                  params="row"
+                  save="metadataUpdatedFunctions[$index]">
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer ng-show="currentForm === 'editMetadataForm'">
+    <a
+      ng-click="submit()" class="submit" tabindex="100"
+      ng-class="{active: metadataValid(), disabled: !metadataValid()}">
+      {{ 'WIZARD.UPDATE' | translate }}
+    </a>
+    <a class="cancel" tabindex="99" ng-if="hasRequestErrors" ng-click="setForm('requestErrorsForm')">
+      {{ 'WIZARD.BACK' | translate }}
+    </a>
+  </footer>
+
+  <!-- Update Errors View -->
+  <div class="modal-content" ng-show="currentForm === 'updateErrorsForm'">
+    <div class="modal-body">
+      <div class="row">
+
+        <div ng-show="someUpdatedSuccessfully" class="alert sticky warning">
+          <p translate="BULK_ACTIONS.EDIT_EVENTS_METADATA.UPDATE_FAILURES.SOME_EVENTS_NOT_UPDATED">
+            <!-- Could not update some events -->
+          </p>
+        </div>
+        <div ng-show="!someUpdatedSuccessfully" class="alert sticky error">
+          <p translate="BULK_ACTIONS.EDIT_EVENTS_METADATA.UPDATE_FAILURES.NO_EVENTS_UPDATED">
+            <!-- No events could be updated -->
+          </p>
+        </div>
+      </div>
+      <div class="full-col">
+        <div class="obj tbl-list">
+          <header translate="BULK_ACTIONS.EDIT_EVENTS_METADATA.UPDATE_FAILURES.TABLE.CAPTION"><!-- Summary --></header>
+          <div class="obj-container">
+            <table class="main-tbl">
+              <thead>
+              <tr>
+                <th class="full-width" translate="EVENTS.EVENTS.TABLE.TITLE">
+                  <!-- Title -->
+                </th>
+                <th class="nowrap" translate="EVENTS.EVENTS.TABLE.SERIES">
+                  <!-- Series -->
+                </th>
+                <th class="nowrap" translate="BULK_ACTIONS.EDIT_EVENTS_METADATA.REQUEST_ERRORS.TABLE.ERRORS">
+                  <!-- Encountered error -->
+                </th>
+              </tr>
+              </thead>
+              <tbody >
+              <tr ng-repeat="row in eventsToUpdate" ng-form="rowsForm" ng-class="{error: row.error}">
+                <td>{{ row.title }}</td>
+                <td class="nowrap">{{ row.series_name}}</td>
+                <td class="nowrap">{{ row.error | translate }}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer ng-show="currentForm === 'updateErrorsForm'">
+    <a class="submit" ng-click="closeUpdateErrorsForm()" tabindex="100">
+      {{ 'CLOSE' | translate }}
+    </a>
+  </footer>
+  <div class="btm-spacer"></div>
+</section>

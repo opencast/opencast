@@ -24,7 +24,6 @@ package org.opencastproject.matterhorn.search.impl;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -37,9 +36,6 @@ public final class IndexUtils {
 
   /** The solr supported date format. **/
   protected static DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-
-  /** The solr supported date format for days **/
-  protected static DateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd");
 
   /** The regular filter expression for single characters */
   private static final String charCleanerRegex = "([\\+\\-\\!\\(\\)\\{\\}\\[\\]\\\\^\"\\~\\*\\?\\:])";
@@ -99,44 +95,6 @@ public final class IndexUtils {
     buf.append(dateFormat.format(endDate));
     buf.append("]");
     return buf.toString();
-  }
-
-  /**
-   * Returns the date with all time related fields set to the start of the day.
-   *
-   * @param date
-   *          the date
-   * @return the date with its time component set to the beginning of the day
-   */
-  public static Date beginningOfDay(Date date) {
-    if (date == null)
-      return null;
-    Calendar c = Calendar.getInstance();
-    c.setTime(date);
-    c.set(Calendar.HOUR_OF_DAY, 0);
-    c.set(Calendar.MINUTE, 0);
-    c.set(Calendar.SECOND, 0);
-    c.set(Calendar.MILLISECOND, 0);
-    return c.getTime();
-  }
-
-  /**
-   * Returns the date with all time related fields set to the end of the day.
-   *
-   * @param date
-   *          the date
-   * @return the date with its time component set to the beginning of the day
-   */
-  public static Date endOfDay(Date date) {
-    if (date == null)
-      return null;
-    Calendar c = Calendar.getInstance();
-    c.setTime(date);
-    c.set(Calendar.HOUR_OF_DAY, 23);
-    c.set(Calendar.MINUTE, 59);
-    c.set(Calendar.SECOND, 59);
-    c.set(Calendar.MILLISECOND, 99);
-    return c.getTime();
   }
 
 }

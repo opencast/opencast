@@ -55,8 +55,10 @@ nav:
    - HTTPS:
       - Overview: 'configuration/https/index.md'
       - Using Nginx: 'configuration/https/nginx.md'
+      - Using Apache httpd: configuration/https/apache-httpd.md
       - Internal HTTPS: 'configuration/https/opencast.only.md'
       - Migrating old content to HTTPS: 'configuration/https/migration.md'
+   - Firewall: 'configuration/firewall.md'
    - Asset Manager: 'configuration/asset-manager.md'
    - Message Broker: 'configuration/message-broker.md'
    - Metadata: 'configuration/metadata.md'
@@ -76,17 +78,22 @@ nav:
       - Moodle User Provider: 'configuration/security.user.moodle.md'
       - Sakai User Provider: 'configuration/security.user.sakai.md'
       - Brightspace User Provider: 'configuration/security.user.brightspace.md'
+      - Canvas User Provider: 'configuration/security.user.canvas.md'
+   - Serving Static Files: 'configuration/serving-static-files.md'
    - Stream Security: 'configuration/stream-security.md'
    - Workflow: 'configuration/workflow.md'
    - External API: 'configuration/external-api.md'
    - OAI-PMH: 'configuration/oaipmh.md'
    - External Monitoring: 'configuration/monitoring.md'
+   - Trim Segments: 'configuration/trim-segments.md'
    - Admin UI Configuration:
       - Event Filters: 'configuration/admin-ui/event-filters.md'
       - Manual Asset Upload: 'configuration/admin-ui/asset-upload.md'
       - Languages: 'configuration/admin-ui/languages.md'
       - Statistics: 'configuration/admin-ui/statistics.md'
       - Thumbnails: 'configuration/admin-ui/thumbnails.md'
+      - Role-based Visibility: 'configuration/admin-ui/role-based-visibility.md'
+      - Capture-Agent Access: configuration/admin-ui/capture-agent-access.md
 - Version Support: 'version-support.md'
 - Modules:
    - Overview: 'modules/index.md'
@@ -98,6 +105,7 @@ nav:
    - Live Schedule: 'modules/liveschedule.md'
    - LTI Module: 'modules/ltimodule.md'
    - Media Module: 'modules/mediamodule.configuration.md'
+   - Metrics (OpenMetrics, Prometheus): modules/metrics.md
    - Player:
       - Configuration: 'modules/player.configuration.md'
       - URL Parameters: 'modules/player.url.parameter.md'
@@ -118,7 +126,7 @@ nav:
    - Search Index:
       - Overview: 'modules/searchindex/index.md'
       - Solr: 'modules/searchindex/solr.md'
-      - Elasticsearch: 'modules/searchindex/elasticsearch.md'
+      - Elasticsearch: 'configuration/elasticsearch.md'
    - Stream Security: 'modules/stream-security.md'
    - Studio: 'modules/studio.md'
    - Termination State:
@@ -126,6 +134,7 @@ nav:
       - AWS AutoScaling: 'modules/terminationstate.aws.autoscaling.md'
    - Text Extraction: 'modules/textextraction.md'
    - Timeline Previews: 'modules/timelinepreviews.md'
+   - Transcripts (AmberScript): 'modules/amberscripttranscripts.md'
    - Transcripts (Google Speech): 'modules/googlespeechtranscripts.md'
    - Transcripts (IBM Watson): 'modules/watsontranscripts.md'
    - Video Editor:
@@ -133,7 +142,7 @@ nav:
       - Architecture: 'modules/videoeditor.architecture.md'
    - Video Segmentation: 'modules/videosegmentation.md'
    - Waveform Service: 'modules/waveform.md'
-   - Wowza Adaptive Streaming Distribution Service: 'modules/adaptivestreaming-wowza.md'
+   - Wowza Streaming Distribution Service: 'modules/streaming-wowza.md'
    - YouTube Publication: 'modules/youtubepublication.md'
 - Workflow Operation Handler:
    - Overview: 'workflowoperationhandlers/index.md'
@@ -142,12 +151,13 @@ nav:
    - Analyze Tracks: 'workflowoperationhandlers/analyze-tracks-woh.md'
    - Analyze Audio: 'workflowoperationhandlers/analyzeaudio-woh.md'
    - Animate: 'workflowoperationhandlers/animate-woh.md'
+   - AmberScript Start Transcription: 'workflowoperationhandlers/amberscript-start-transcription-woh.md'
+   - AmberScript Attach Transcription: 'workflowoperationhandlers/amberscript-attach-transcription-woh.md'
    - Asset Snapshot: 'workflowoperationhandlers/snapshot-woh.md'
    - Asset Delete: 'workflowoperationhandlers/asset-delete-woh.md'
    - Attach Watson Transcription: 'workflowoperationhandlers/attach-watson-transcription-woh.md'
    - Cleanup: 'workflowoperationhandlers/cleanup-woh.md'
    - Comment: 'workflowoperationhandlers/comment-woh.md'
-   - Compose: 'workflowoperationhandlers/compose-woh.md'
    - Composite: 'workflowoperationhandlers/composite-woh.md'
    - Concat: 'workflowoperationhandlers/concat-woh.md'
    - Configure-By-DCTerm: 'workflowoperationhandlers/configure-by-dcterm-woh.md'
@@ -197,7 +207,9 @@ nav:
    - Retract Engage: 'workflowoperationhandlers/retract-engage-woh.md'
    - Retract Configure: 'workflowoperationhandlers/retract-configure-woh.md'
    - Retract OAI-PMH: 'workflowoperationhandlers/retract-oaipmh-woh.md'
+   - Retract Partial: 'workflowoperationhandlers/retract-partial-woh.md'
    - Retract YouTube: 'workflowoperationhandlers/retract-youtube-woh.md'
+   - Sanitize Adaptive: 'workflowoperationhandlers/sanitize-adaptive-woh.md'
    - Segment Previews: 'workflowoperationhandlers/segmentpreviews-woh.md'
    - Segment Video: 'workflowoperationhandlers/segmentvideo-woh.md'
    - Select Streams: 'workflowoperationhandlers/select-streams-woh.md'
@@ -212,5 +224,6 @@ nav:
    - Timelinepreviews: 'workflowoperationhandlers/timelinepreviews-woh.md'
    - Transfer Metadata: 'workflowoperationhandlers/transfer-metadata-woh.md'
    - Theme: 'workflowoperationhandlers/theme-woh.md'
+   - Video Grid: 'workflowoperationhandlers/video-grid-woh.md'
    - Waveform: 'workflowoperationhandlers/waveform-woh.md'
    - Zip: 'workflowoperationhandlers/zip-woh.md'

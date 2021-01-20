@@ -22,7 +22,6 @@
 package org.opencastproject.util.data;
 
 import static org.opencastproject.util.data.Tuple.tuple;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -43,11 +42,6 @@ public abstract class Option<A> implements Iterable<A> {
   /** Safe decomposition of the option type. */
   public abstract <B> B fold(Match<A, B> visitor);
 
-  /** Safe decomposition of the option type using functions. */
-  public <B> B fold(Function<A, B> some, Function0<B> none) {
-    return isSome() ? some.apply(get()) : none.apply();
-  }
-
   public abstract Option<A> foreach(Function<? super A, Void> f);
 
   public abstract <B> Option<B> fmap(Function<? super A, ? extends B> f);
@@ -59,7 +53,6 @@ public abstract class Option<A> implements Iterable<A> {
   /** Monadic bind operation <code>m a -&gt; (a -&gt; m b) -&gt; m b</code>. */
   public abstract <B> Option<B> bind(Function<A, Option<B>> f);
 
-  /** @see org.opencastproject.util.data.functions.Functions#bind(Function) */
   public <B> Option<B> flatMap(Function<A, Option<B>> f) {
     return bind(f);
   }
@@ -68,26 +61,6 @@ public abstract class Option<A> implements Iterable<A> {
 
   public boolean isNone() {
     return !isSome();
-  }
-
-  /** If this is some return <code>some</code>. Like {@link #bind(Function)} but ignores the option's content. */
-  public <B> Option<B> andThen(Option<B> some) {
-    return isSome() ? some : Option.<B> none();
-  }
-
-  /** If this is some return <code>some</code>. Like {@link #map(Function)} but ignores the option's content. */
-  public <B> Option<B> andThenV(B some) {
-    return isSome() ? some(some) : Option.<B> none();
-  }
-
-  /** Lazy version of {@link #andThen(Option)}. */
-  public <B> Option<B> andThen(Function0<Option<B>> some) {
-    return isSome() ? some.apply() : Option.<B> none();
-  }
-
-  /** Lazy version of {@link #andThenV(Object)}. */
-  public <B> Option<B> andThenV(Function0<B> some) {
-    return isSome() ? some(some.apply()) : Option.<B> none();
   }
 
   /** If this is none return <code>none</code> else this. */
@@ -106,31 +79,6 @@ public abstract class Option<A> implements Iterable<A> {
       return this;
     else
       throw none;
-  }
-
-  /** Throw <code>none</code> if none. */
-  public <T extends Throwable> Option<A> orError(Class<T> none) throws T {
-    if (isSome())
-      return this;
-    else {
-      T t;
-      try {
-        t = none.newInstance();
-      } catch (InstantiationException e) {
-        return chuck(new Error("Error creating exception", e));
-      } catch (IllegalAccessException e) {
-        return chuck(new Error("Error creating exception", e));
-      }
-      throw t;
-    }
-  }
-
-  /** Throw exception returned by <code>none</code> if none. */
-  public <T extends Throwable> Option<A> orError(Function0<T> none) throws T {
-    if (isSome())
-      return this;
-    else
-      throw none.apply();
   }
 
   public <B> Option<Tuple<A, B>> and(Option<B> b) {
@@ -153,30 +101,10 @@ public abstract class Option<A> implements Iterable<A> {
   /** To interface with legacy applications or frameworks that still use <code>null</code> values. */
   public abstract A getOrElseNull();
 
-  /** Transform the option into a monadic list. */
-  public abstract Monadics.ListMonadic<A> mlist();
-
   /** Transform an option into a list, either with a single element or an empty list. */
   public abstract List<A> list();
 
-  /**
-   * Left projection of this option. If the option is <code>some</code> return the value in an
-   * {@link Either#left(Object)} else return <code>right</code> in an {@link Either#right(Object)}.
-   */
-  public abstract <B> Either<A, B> left(B right);
-
-  /**
-   * Right projection of this optio. If the option is <code>some</code> return the value in an
-   * {@link Either#left(Object)} else return <code>right</code> in an {@link Either#right(Object)}.
-   */
-  public abstract <B> Either<B, A> right(B left);
-
   public abstract Opt<A> toOpt();
-
-  /** Inversion. If some return none. If none return some(zero). */
-  public Option<A> inv(A zero) {
-    return isSome() ? Option.<A> none() : some(zero);
-  }
 
   @Override
   public abstract int hashCode();
@@ -244,23 +172,8 @@ public abstract class Option<A> implements Iterable<A> {
       }
 
       @Override
-      public Monadics.ListMonadic<A> mlist() {
-        return Monadics.mlist(list());
-      }
-
-      @Override
       public List<A> list() {
         return Collections.singletonList(a);
-      }
-
-      @Override
-      public <B> Either<A, B> left(B right) {
-        return Either.left(a);
-      }
-
-      @Override
-      public <B> Either<B, A> right(B left) {
-        return Either.right(a);
       }
 
       @Override
@@ -346,23 +259,8 @@ public abstract class Option<A> implements Iterable<A> {
       }
 
       @Override
-      public Monadics.ListMonadic<A> mlist() {
-        return Monadics.<A> mlist(list());
-      }
-
-      @Override
       public List<A> list() {
         return Collections.emptyList();
-      }
-
-      @Override
-      public <B> Either<A, B> left(B right) {
-        return Either.right(right);
-      }
-
-      @Override
-      public <B> Either<B, A> right(B left) {
-        return Either.left(left);
       }
 
       @Override
@@ -416,16 +314,6 @@ public abstract class Option<A> implements Iterable<A> {
       return some(x);
     }
     return none();
-  }
-
-  /** {@link #option(Object)} as a function. */
-  public static <A> Function<A, Option<A>> option() {
-    return new Function<A, Option<A>>() {
-      @Override
-      public Option<A> apply(A a) {
-        return option(a);
-      }
-    };
   }
 
   /**

@@ -1,0 +1,29 @@
+<div ng-click="enterEditMode()" ng-form="innerForm">
+  &nbsp;<ul ng-show="!editMode">
+    <li ng-repeat="value in params.value track by $index">
+      <span ng-if="value">{{ getText(value).value | translate }}</span>
+    </li>
+  </ul>
+
+  <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
+  <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
+
+  <div class="editable-select" ng-if="editMode">
+    <input type="text" ng-blur="onBlur()" ng-required="params.required" tabindex="{{ params.tabindex }}"
+           list="{{ data.list.id }}-data-list" ng-keyup="keyUp($event)" name="{{ params.name }}" ng-model="data.value"
+           placeholder="{{ 'EDITABLE.MULTI.PLACEHOLDER' | translate}}">
+    <datalist id="{{ data.list.id }}-data-list">
+      <option ng-repeat="(item, label) in ::collection track by $index"
+              value="{{ item }}">
+      {{ label | translate | limitTo : 70 }}
+      </option>
+    </datalist>
+  </div>
+  <span ng-show="editMode" class="ng-multi-value"
+                           ng-repeat="value in params.value track by $index">
+    {{ getText(value).value | translate | limitTo : 70 }}
+    <a ng-mousedown="removeValue($index)">
+      <i class="fa fa-times"></i>
+    </a>
+  </span>
+</div>

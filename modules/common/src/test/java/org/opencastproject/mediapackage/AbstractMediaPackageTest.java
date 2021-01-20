@@ -87,12 +87,6 @@ public abstract class AbstractMediaPackageTest {
   /** The audio track */
   protected File audioFile = null;
 
-  /** The zip file */
-  protected File archiveFile = null;
-
-  /** The unzipped media package */
-  protected MediaPackage unzippedMediaPackage = null;
-
   @Rule
   public TemporaryFolder testFolder = new TemporaryFolder();
 

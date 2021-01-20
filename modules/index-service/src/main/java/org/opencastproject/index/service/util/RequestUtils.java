@@ -20,9 +20,9 @@
  */
 package org.opencastproject.index.service.util;
 
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
 
 import com.google.common.net.MediaType;
 

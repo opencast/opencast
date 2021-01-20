@@ -53,6 +53,7 @@ For example, if you want OCR for German content, you want to run something like 
 * Finally `--psm 3` specifies the layout analysis for Tesseract. The value `3` means *Fully automatic page segmentation,
   but no orientation and script detection* which is actually the default. Hence in this case, the argument could simply
   be omitted. If you know more about your input videos, you might want to use different options here (not likely).
+  This option might be just `-psm` with only one dash in your system.
 
 In Opencast, you can modify this options in the `custom.properties` file by setting the following option:
 
@@ -60,6 +61,13 @@ In Opencast, you can modify this options in the `custom.properties` file by sett
 
 It is highly recommended to configure Tesseract to use your local language. It will improve the recognition a lot and
 only this will enable the recognition of special characters specific to your local language.
+
+If you supply a reference to a list of additional words using `--user-words`, the path to that file must not be enclosed
+in quotation marks.
+
+Newer versions of Tesseract come with additional neural nets LSTM. Its performance might be significiantly different
+from the previous Tesseract engine. Its usage might be specified using `--oem N` with `N` being a number documented in
+your Tesseract manual.
 
 
 ### Encoding (Image Preprocessing)

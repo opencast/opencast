@@ -40,16 +40,8 @@ public final class GroupParser extends JaxbParser {
     return unmarshal(JaxbGroup.class, new ByteArrayInputStream(xml.getBytes()));
   }
 
-  public JaxbGroupList parseGroupListFromXml(String xml) throws IOException {
-    return unmarshal(JaxbGroupList.class, new ByteArrayInputStream(xml.getBytes()));
-  }
-
   public String toXml(JaxbGroup group) throws IOException {
     return marshal(group);
-  }
-
-  public String toXml(JaxbGroupList groupList) throws IOException {
-    return marshal(groupList);
   }
 
 }

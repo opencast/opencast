@@ -80,8 +80,6 @@ public class AwsS3AssetStoreTest {
 
   @Before
   public void setUp() throws Exception {
-    long currentTime = System.currentTimeMillis();
-
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
     cc = EasyMock.createNiceMock(ComponentContext.class);
     EasyMock.expect(cc.getBundleContext()).andReturn(bc).anyTimes();

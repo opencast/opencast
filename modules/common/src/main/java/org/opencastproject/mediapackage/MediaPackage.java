@@ -27,7 +27,6 @@ import org.opencastproject.mediapackage.identifier.Id;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Map;
 
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -195,15 +194,6 @@ public interface MediaPackage extends Cloneable {
   MediaPackageElement getElementById(String id);
 
   /**
-   * Returns the elements that are tagged with the given tag or an empty array if no such elements are found.
-   *
-   * @param tag
-   *          the tag
-   * @return the elements
-   */
-  MediaPackageElement[] getElementsByTag(String tag);
-
-  /**
    * Returns the elements that are tagged with any of the given tags or an empty array if no such elements are found. If
    * any of the tags in the <code>tags</code> collection start with a '-' character, any elements matching the tag will
    * be excluded from the returned MediaPackageElement[]. If <code>tags</code> is empty or null, all elements are
@@ -268,40 +258,6 @@ public interface MediaPackage extends Cloneable {
   Track[] getTracks(MediaPackageElementFlavor flavor);
 
   /**
-   * Returns the tracks that are part of this media package and are refering to the element identified by
-   * <code>reference</code>.
-   *
-   * @param reference
-   *          the reference
-   * @return the tracks with the specified reference
-   */
-  Track[] getTracks(MediaPackageReference reference);
-
-  /**
-   * Returns the tracks that are part of this media package and are refering to the element identified by
-   * <code>reference</code>.
-   *
-   * @param reference
-   *          the reference
-   * @param includeDerived
-   *          <code>true</code> to also include derived elements
-   * @return the tracks with the specified reference
-   */
-  Track[] getTracks(MediaPackageReference reference, boolean includeDerived);
-
-  /**
-   * Returns the tracks that are part of this media package and are refering to the element identified by
-   * <code>reference</code>.
-   *
-   * @param flavor
-   *          the element flavor
-   * @param reference
-   *          the reference
-   * @return the tracks with the specified reference
-   */
-  Track[] getTracks(MediaPackageElementFlavor flavor, MediaPackageReference reference);
-
-  /**
    * Returns <code>true</code> if the media package contains media tracks of any kind.
    *
    * @return <code>true</code> if the media package contains tracks
@@ -326,27 +282,6 @@ public interface MediaPackage extends Cloneable {
   Attachment[] getAttachments();
 
   /**
-   * Returns the attachments that are tagged with the given tag or an empty array if no such attachments are found.
-   *
-   * @param tag
-   *          the tag
-   * @return the attachments
-   */
-  Attachment[] getAttachmentsByTag(String tag);
-
-  /**
-   * Returns the attachments that are tagged with any of the given tags or an empty array if no such attachments are
-   * found. If any of the tags in the <code>tags</code> collection start with a '-' character, any elements matching the
-   * tag will be excluded from the returned Attachment[]. If <code>tags</code> is empty or null, all attachments are
-   * returned.
-   *
-   * @param tags
-   *          the tags
-   * @return the attachments
-   */
-  Attachment[] getAttachmentsByTags(Collection<String> tags);
-
-  /**
    * Returns the attachments that are part of this media package and match the specified flavor.
    *
    * @param flavor
@@ -356,52 +291,11 @@ public interface MediaPackage extends Cloneable {
   Attachment[] getAttachments(MediaPackageElementFlavor flavor);
 
   /**
-   * Returns the attachments that are part of this media package and are refering to the element identified by
-   * <code>reference</code>.
-   *
-   * @param reference
-   *          the reference
-   * @return the attachments with the specified reference
-   */
-  Attachment[] getAttachments(MediaPackageReference reference);
-
-  /**
-   * Returns the attachments that are part of this media package and are refering to the element identified by
-   * <code>reference</code>.
-   *
-   * @param reference
-   *          the reference
-   * @param includeDerived
-   *          <code>true</code> to also include derived elements
-   * @return the attachments with the specified reference
-   */
-  Attachment[] getAttachments(MediaPackageReference reference, boolean includeDerived);
-
-  /**
-   * Returns the attachments that are part of this media package and are refering to the element identified by
-   * <code>reference</code>.
-   *
-   * @param flavor
-   *          the element flavor
-   * @param reference
-   *          the reference
-   * @return the attachments with the specified reference
-   */
-  Attachment[] getAttachments(MediaPackageElementFlavor flavor, MediaPackageReference reference);
-
-  /**
    * Returns the presentations that are part of this media package.
    *
    * @return the attachments
    */
   Publication[] getPublications();
-
-  /**
-   * Returns <code>true</code> if the media package contains attachments of any kind.
-   *
-   * @return <code>true</code> if the media package contains attachments
-   */
-  boolean hasAttachments();
 
   /**
    * Returns the catalog identified by <code>catalogId</code> or <code>null</code> if that catalog doesn't exists.
@@ -418,15 +312,6 @@ public interface MediaPackage extends Cloneable {
    * @return the catalogs
    */
   Catalog[] getCatalogs();
-
-  /**
-   * Returns the catalogs that are tagged with the given tag or an empty array if no such catalogs are found.
-   *
-   * @param tag
-   *          the tag
-   * @return the catalogs
-   */
-  Catalog[] getCatalogsByTag(String tag);
 
   /**
    * Returns the catalogs that are tagged with any of the given tags or an empty array if no such elements are found. If
@@ -462,18 +347,6 @@ public interface MediaPackage extends Cloneable {
    * Returns the catalogs that are part of this media package and are refering to the element identified by
    * <code>reference</code>.
    *
-   * @param reference
-   *          the reference
-   * @param includeDerived
-   *          <code>true</code> to also include derived elements
-   * @return the catalogs with the specified reference
-   */
-  Catalog[] getCatalogs(MediaPackageReference reference, boolean includeDerived);
-
-  /**
-   * Returns the catalogs that are part of this media package and are refering to the element identified by
-   * <code>reference</code>.
-   *
    * @param flavor
    *          the element flavor
    * @param reference
@@ -483,44 +356,11 @@ public interface MediaPackage extends Cloneable {
   Catalog[] getCatalogs(MediaPackageElementFlavor flavor, MediaPackageReference reference);
 
   /**
-   * Returns <code>true</code> if the media package contains catalogs of any kind.
-   *
-   * @return <code>true</code> if the media package contains catalogs
-   */
-  boolean hasCatalogs();
-
-  /**
    * Returns media package elements that are neither, attachments, catalogs nor tracks.
    *
    * @return the other media package elements
    */
   MediaPackageElement[] getUnclassifiedElements();
-
-  /**
-   * Returns media package elements that are neither, attachments, catalogs nor tracks but have the given element
-   * flavor.
-   *
-   * @param flavor
-   *          the element flavor
-   * @return the other media package elements
-   */
-  MediaPackageElement[] getUnclassifiedElements(MediaPackageElementFlavor flavor);
-
-  /**
-   * Returns <code>true</code> if the media package contains unclassified elements.
-   *
-   * @return <code>true</code> if the media package contains unclassified elements
-   */
-  boolean hasUnclassifiedElements();
-
-  /**
-   * Returns <code>true</code> if the media package contains unclassified elements matching the specified element type.
-   *
-   * @param flavor
-   *          element flavor of the unclassified element
-   * @return <code>true</code> if the media package contains unclassified elements
-   */
-  boolean hasUnclassifiedElements(MediaPackageElementFlavor flavor);
 
   /**
    * Adds an arbitrary {@link URI} to this media package, utilizing a {@link MediaPackageBuilder} to create a suitable
@@ -637,23 +477,6 @@ public interface MediaPackage extends Cloneable {
   void addDerived(MediaPackageElement derivedElement, MediaPackageElement sourceElement);
 
   /**
-   * Adds an element to this media package that represents a derived version of <code>sourceElement</code>. Examples of
-   * a derived element could be an encoded version of a track or a converted version of a time text captions file.
-   * <p>
-   * This method will add <code>derviedElement</code> to the media package and add a reference to the original element
-   * <code>sourceElement</code>. Make sure that <code>derivedElement</code> features the right flavor, so that you are
-   * later able to look up derived work using {@link #getDerived(MediaPackageElement, MediaPackageElementFlavor)}.
-   *
-   * @param derivedElement
-   *          the derived element
-   * @param sourceElement
-   *          the source element
-   * @param properties
-   *          properties for the reference that is being created
-   */
-  void addDerived(MediaPackageElement derivedElement, MediaPackageElement sourceElement, Map<String, String> properties);
-
-  /**
    * Returns those media package elements that are derivates of <code>sourceElement</code> and feature the flavor
    * <code>derivateFlavor</code>. Using this method, you could easily look up e. g. flash-encoded versions of the
    * presenter track or converted versions of a time text captions file.
@@ -667,36 +490,12 @@ public interface MediaPackage extends Cloneable {
   MediaPackageElement[] getDerived(MediaPackageElement sourceElement, MediaPackageElementFlavor derivateFlavor);
 
   /**
-   * Adds <code>observer</code> to the list of observers of this media package.
-   *
-   * @param observer
-   *          the observer
-   */
-  void addObserver(MediaPackageObserver observer);
-
-  /**
-   * Removes <code>observer</code> from the list of observers of this media package.
-   *
-   * @param observer
-   *          the observer
-   */
-  void removeObserver(MediaPackageObserver observer);
-
-  /**
    * Verifies the media package consistency by checking the media package elements for mimetypes and checksums.
    *
    * @throws MediaPackageException
    *           if an error occurs while checking the media package
    */
   void verify() throws MediaPackageException;
-
-  /**
-   * Renames the media package to the new identifier.
-   *
-   * @param identifier
-   *          the identifier TODO @return <code>true</code> if the media package could be renamed
-   */
-  void renameTo(Id identifier);
 
   /**
    * Creates a deep copy of the media package.

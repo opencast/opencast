@@ -3,22 +3,12 @@ Database Configuration
 
 Opencast ships with embedded JDBC drivers for the H2, MySQL, MariaDB and PostgreSQL databases.
 The built-in H2 database is used by default and needs no configuration,
-but it is strongly recommended to use MariaDB for production.
+but is not suited for production.
 
 > __H2__ is not supported for updates or distributed systems. Use it for testing only!
 
 
-### Other databases
-
-Running Opencast with PostgreSQL should be possible and there is some community support for this.
-The support for this is unofficial and we cannot guarantee that every new feature is well tested on that platform.
-
-The EclipseLink JPA implementation which is used in Opencast supports other databases as well and it should be
-possible to attach other database engines.
-
-
-Setting up MariaDB
-------------------
+### Requirements
 
 Before following this guide, you should have:
 
@@ -26,7 +16,24 @@ Before following this guide, you should have:
 - Followed the [Basic Configuration instructions](basic.md)
 
 
-### Installation
+Select a Database
+-----------------
+
+The EclipseLink JPA implementation which is used in Opencast supports several different databases.
+But some databases might require additional drivers.
+Official support only exists for MariaDB, MySQL, PostgreSQL and H2.
+Other database engines are not tested and specific issues will likely not be addressed.
+
+- __MariaDB__ is the recommended database engine.
+  It is used by most adopters and is well tested.
+- __MySQL__ is supported but tested less than MariaDB.
+- __PostgreSQL__ support is experimental.
+- __H2__ is not suitable for anything but testing and development.
+  It cannot be used in distributed environments.
+
+
+MariaDB
+-------
 
 This step is not Opencast-specific and may be different depending on your scenario and system.
 This shall act as an example and is assuming CentOS 8 as Linux distribution.
@@ -77,20 +84,12 @@ You can limit the granted privileges further if you want to.
 The rights granted here are sufficient to run Opencast:
 
 ```sql
-GRANT SELECT,INSERT,UPDATE,DELETE,CREATE TEMPORARY TABLES ON opencast.*
-  TO 'opencast'@'localhost' IDENTIFIED BY 'opencast_password';
-```
-
-These privileges are often not sufficient for running the scripts used to initialize and upgrade the database.
-For this, fall back to using the root user or grant a user slightly more privileges:
-
-```sql
 GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,ALTER,DROP,INDEX,TRIGGER,CREATE TEMPORARY TABLES,REFERENCES ON opencast.*
-  TO 'admin'@'localhost' IDENTIFIED BY 'opencast_admin_password';
+  TO 'admin'@'localhost' IDENTIFIED BY 'opencast_password';
 ```
 </details>
 
-You can choose other names for the users and the database, and you **should** use a different password.
+You can choose other names for the users and the database, and you should use a different password.
 
 In a distributed system, apart from `'username'@'localhost'` (which would allow access from the local machine only),
 you should grant a external user access to the database by running the same command for a user like
@@ -104,61 +103,83 @@ Finally, leave the client and restart the database server to enable the new user
 % systemctl restart mariadb.service
 ```
 
+PostgreSQL
+----------
 
-### Set up the Database Structure
+Opencast's official PostgreSQL support is still marked as experimental.
 
-To set up the database structure you can (and should!) use the Opencast ddl scripts. You can find them in
-`…/docs/scripts/ddl/mysql5.sql` or download them from GitHub.
-
-To import the database structure using the MariaDB client, switch to the directory that contains the `mysql5.sql` file,
-run the client with a user privileged to create the database structure and switch to the database you want to use
-(e.g. `opencast`):
-
-```sh
-% mysql -u root -p opencast
-```
-
-Run the ddl script:
+Install PostgreSQL, create a database and a user.
+You may need to enable password authentication in your `pg_hba.conf` first.
+Please refer to the PostgreSQL documentation for more details.
 
 ```
-mysql> source mysql5.sql;
+sudo -u postgres psql
+postgres=# create database opencast;
+postgres=# create user opencast with encrypted password 'opencast_password';
+postgres=# grant all privileges on database opencast to opencast;
 ```
 
-Now, ensure the MariaDB [`wait_timeout`](https://mariadb.com/kb/en/library/server-system-variables/) in `mariadb.cnf`
-or `mysql.cnf` is bigger than `org.opencastproject.db.jdbc.pool.max.idle.time` in Opencast's `custom.properties`.
-Raising the `max_connections` in `mariadb.cnf` parameter might be required, too, depending on your installation's size.
-Reload the configuration into MariaDB, then connect to your database as user `opencast` and verify the values by
-executing `SHOW VARIABLES LIKE %_timeout;`. A `MySQLNonTransientConnectionException`, for instance “A PooledConnection
-that has already signaled a Connection error is still in use”, in your Opencast logs might indicate a problem with this
-configuration.
+
+Configure Opencast
+------------------
+
+The following changes must be made in `etc/custom.properties`.
+Examples are provided for MariaDB/MySQL and PostgreSQL.
+
+1. Configure Opencast to use the JDBC driver for MariaDB or PostgreSQL.
+   The MariaDB driver will also work for MySQL.
+
+        # MariaDB/MySQL
+        org.opencastproject.db.jdbc.driver=org.mariadb.jdbc.Driver
+        # PostgreSQL
+        org.opencastproject.db.jdbc.driver=org.postgresql.Driver
+
+2. Configure the host where Opencast will find the database (`127.0.0.1`) and the database name (`opencast`).
+
+        # MariaDB/MySQL
+        org.opencastproject.db.jdbc.url=jdbc:mysql://127.0.0.1/opencast?useMysqlMetadata=true
+        # PostgreSQL
+        org.opencastproject.db.jdbc.url=jdbc:postgresql://127.0.0.1/opencast
 
 
-### Configure Opencast
-
-The following changes must be made in `etc/custom.properties`:
-
-1. Change the following configuration key (uncomment if necessary):
-
-        org.opencastproject.db.ddl.generation=false
-
-    If set to true, the database structure will be generated automatically. It works, but without all the database
-    optimizations implemented in the DDL scripts used in the step 2. While convenient for development, you should never
-    set this to `true` in a production environment.
-
-2. Configure Opencast to use MariaDB/MySQL:
-
-        org.opencastproject.db.vendor=MySQL
-
-3. Configure Opencast to use the JDBC driver for MariaDB/MySQL:
-
-        org.opencastproject.db.jdbc.driver=com.mysql.jdbc.Driver
-
-4. Configure the host where Opencast will find the database (`localhost`) and the database name (`opencast`). Adjust
-the names in this example to match your configuration:
-
-        org.opencastproject.db.jdbc.url=jdbc:mysql://localhost/opencast
-
-5. Configure the username and password with which to access the database:
+3. Configure the database username and password.
 
         org.opencastproject.db.jdbc.user=opencast
         org.opencastproject.db.jdbc.pass=opencast_password
+
+
+OAI-PMH Database (optional)
+---------------------------
+
+The database tables are automatically generated by Opencast when they are needed.
+One exception to this is the OAI-PMH publication database which requires an additional trigger.
+Trying to generate the schema automatically will most likely fail.
+
+If you want to use OAI-PMH, you must create the necessary table manually.
+
+Use the following code to generate the OAI-PMH database table on MariaDB/MySQL.
+PostgreSQL is not yet supported.
+
+```sql
+CREATE TABLE oc_oaipmh (
+  mp_id VARCHAR(128) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  repo_id VARCHAR(255) NOT NULL,
+  series_id VARCHAR(128),
+  deleted tinyint(1) DEFAULT '0',
+  modification_date DATETIME DEFAULT NULL,
+  mediapackage_xml TEXT(65535) NOT NULL,
+  PRIMARY KEY (mp_id, repo_id, organization),
+  CONSTRAINT UNQ_oc_oaipmh UNIQUE (modification_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_oc_oaipmh_modification_date ON oc_oaipmh (modification_date);
+
+-- set to current date and time on insert
+CREATE TRIGGER oc_init_oaipmh_date BEFORE INSERT ON `oc_oaipmh`
+FOR EACH ROW SET NEW.modification_date = NOW();
+
+-- set to current date and time on update
+CREATE TRIGGER oc_update_oaipmh_date BEFORE UPDATE ON `oc_oaipmh`
+FOR EACH ROW SET NEW.modification_date = NOW();
+```

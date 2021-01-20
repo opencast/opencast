@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
@@ -100,17 +100,14 @@
           <extensions>true</extensions>
           <configuration>
             <libraries>
-              <library>xerces-2.11.0.jar;url:="wrap:mvn:xerces/xercesImpl/2.11.0$Export-Package=org.apache.*;version=2.11.0";type:=endorsed;export:=true;delegate:=true</library>
-              <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxp-api-1.4/2.8.0;type:=endorsed;export:=true</library>
-              <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxb-api-2.2/2.8.0;type:=endorsed;export:=true</library>
+              <library>mvn:jakarta.activation/jakarta.activation-api/1.2.1;type:=endorsed;export:=true</library>
+              <libaray>mvn:jakarta.xml.bind/jakarta.xml.bind-api/2.3.3;type:=endorsed;export:=true</libaray>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-2.2/2.8.0;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/2.8.0;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/2.8.0;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.stax-api-1.2/2.8.0;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan/2.7.2_3;type:=endorsed;export:=true</library>
-              <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan-serializer/2.7.2_1;type:=endorsed;export:=true</library>
-              <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activator/2.8.0;type:=default;export:=true</library>
-              <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.locator/2.8.0;type:=default;export:=true</library>
+              <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xerces/2.12.0_1;type:=boot;export:=true</library>
             </libraries>
             <archiveZip>false</archiveZip>
             <archiveTarGz>false</archiveTarGz>
@@ -118,6 +115,7 @@
               <feature>opencast-security-cas</feature>
               <feature>opencast-moodle</feature>
               <feature>opencast-sakai</feature>
+              <feature>opencast-canvas</feature>
             </installedFeatures>
           </configuration>
         </plugin>

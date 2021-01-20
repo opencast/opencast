@@ -36,16 +36,8 @@ public final class IncidentParser extends JaxbParser {
     super(contextPath);
   }
 
-  public JaxbIncidentDigestList parseDigestFromXml(InputStream xml) throws IOException {
-    return unmarshal(JaxbIncidentDigestList.class, xml);
-  }
-
   public JaxbIncident parseIncidentFromXml(InputStream xml) throws IOException {
     return unmarshal(JaxbIncident.class, xml);
-  }
-
-  public JaxbIncidentList parseIncidentsFromXml(InputStream xml) throws IOException {
-    return unmarshal(JaxbIncidentList.class, xml);
   }
 
   public JaxbIncidentTree parseIncidentTreeFromXml(InputStream xml) throws IOException {

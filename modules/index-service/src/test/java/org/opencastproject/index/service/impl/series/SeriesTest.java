@@ -28,13 +28,11 @@ import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.util.DateTimeSupport;
 
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jettison.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +41,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.stream.XMLStreamException;
 
 public class SeriesTest {
   private static final Logger logger = LoggerFactory.getLogger(SeriesTest.class);
@@ -102,42 +97,6 @@ public class SeriesTest {
     // Setup results
     seriesJson = IOUtils.toString(getClass().getResource("/adminui_series_metadata.json"));
     seriesXml = IOUtils.toString(getClass().getResource("/adminui_series_metadata.xml"));
-  }
-
-  @Ignore
-  @Test
-  public void testValueOf() throws ParseException, IOException, JSONException, XMLStreamException, JAXBException {
-    Series series = Series.valueOf(IOUtils.toInputStream(seriesXml), Series.createUnmarshaller());
-    assertEquals(id, series.getIdentifier());
-    assertEquals(title, series.getTitle());
-    assertEquals(description, series.getDescription());
-    assertEquals(subject, series.getSubject());
-    assertEquals(organization, series.getOrganization());
-    assertEquals(language, series.getLanguage());
-    assertEquals(license, series.getLicense());
-    assertEquals(accessPolicy, series.getAccessPolicy());
-    assertEquals(DateTimeSupport.toUTC(createdDateTime.getTime()),
-            DateTimeSupport.toUTC(series.getCreatedDateTime().getTime()));
-    assertEquals(organizer1, series.getOrganizers().get(0));
-    assertEquals(organizer2, series.getOrganizers().get(1));
-    assertEquals(organizer3, series.getOrganizers().get(2));
-    assertEquals(contributor1, series.getContributors().get(0));
-    assertEquals(contributor2, series.getContributors().get(1));
-    assertEquals(contributor3, series.getContributors().get(2));
-  }
-
-  @Ignore
-  @Test
-  public void testValueOfJson() throws ParseException, IOException, JSONException, XMLStreamException, JAXBException {
-    Series series = Series.valueOfJson(IOUtils.toInputStream(seriesJson));
-    assertEquals(id, series.getIdentifier());
-    assertEquals(title, series.getTitle());
-    assertEquals(organizer1, series.getOrganizers().get(0));
-    assertEquals(organizer2, series.getOrganizers().get(1));
-    assertEquals(organizer3, series.getOrganizers().get(2));
-    assertEquals(contributor1, series.getContributors().get(0));
-    assertEquals(contributor2, series.getContributors().get(1));
-    assertEquals(contributor3, series.getContributors().get(2));
   }
 
   @Test

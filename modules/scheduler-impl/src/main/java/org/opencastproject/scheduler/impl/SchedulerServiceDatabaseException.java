@@ -29,18 +29,6 @@ public class SchedulerServiceDatabaseException extends Exception {
 
   private static final long serialVersionUID = 7368335174562660234L;
 
-  public SchedulerServiceDatabaseException() {
-    super();
-  }
-
-  public SchedulerServiceDatabaseException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public SchedulerServiceDatabaseException(String message) {
-    super(message);
-  }
-
   public SchedulerServiceDatabaseException(Throwable cause) {
     super(cause);
   }

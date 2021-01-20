@@ -78,9 +78,9 @@ public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOpe
       } catch (NumberFormatException e) {
         throw new WorkflowOperationException("Invalid version number", e);
       }
-      job = tsamjp.moveByIdAndVersion(version, mp.getIdentifier().compact(), targetStorage);
+      job = tsamjp.moveByIdAndVersion(version, mp.getIdentifier().toString(), targetStorage);
     } else {
-      job = tsamjp.moveById(mp.getIdentifier().compact(), targetStorage);
+      job = tsamjp.moveById(mp.getIdentifier().toString(), targetStorage);
     }
     if (waitForStatus(job).isSuccess()) {
       return createResult(WorkflowOperationResult.Action.CONTINUE);

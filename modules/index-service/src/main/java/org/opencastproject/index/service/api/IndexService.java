@@ -22,7 +22,6 @@
 package org.opencastproject.index.service.api;
 
 import org.opencastproject.event.comment.EventComment;
-import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
@@ -37,6 +36,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.security.api.AccessControlList;
@@ -45,12 +45,8 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.userdirectory.ConflictException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
-import org.opencastproject.workflow.api.WorkflowException;
-import org.opencastproject.workflow.api.WorkflowInstance;
 
 import com.entwinemedia.fn.data.Opt;
-
-import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -171,32 +167,6 @@ public interface IndexService {
   String createEvent(HttpServletRequest request) throws IndexServiceException, IllegalArgumentException, UnsupportedAssetException;
 
   /**
-   * Creates a new event based on a json string and a media package.
-   *
-   * @param metadataJson
-   *          The json representing the metadata collection.
-   * @param mp
-   *          The mediapackage that will be used to create the event.
-   * @return The event's id (or a comma seperated list of event ids if it was a group of events)
-   * @throws ParseException
-   *           Thrown if unable to parse the json metadata
-   * @throws IOException
-   *           Thrown if unable to create a dublin core catalog
-   * @throws MediaPackageException
-   *           Thrown if there is a problem with the mediapackage.
-   * @throws IngestException
-   *           Thrown if unable to ingest the new event.
-   * @throws NotFoundException
-   *           Thrown if the event is not found to be created.
-   * @throws SchedulerException
-   *           Thrown if there is a problem scheduling the event.
-   * @throws UnauthorizedException
-   *           Thrown if the user is unable to create events.
-   */
-  String createEvent(JSONObject metadataJson, MediaPackage mp) throws ParseException, IOException,
-          MediaPackageException, IngestException, NotFoundException, SchedulerException, UnauthorizedException;
-
-  /**
    * Create a new event using a {@link EventHttpServletRequest}.
    *
    * @param eventHttpServletRequest
@@ -307,31 +277,6 @@ public interface IndexService {
           throws IndexServiceException, SearchIndexException, NotFoundException, UnauthorizedException;
 
   /**
-   * Update only the common default event metadata.
-   *
-   * @param id
-   *          The id of the event to update.
-   * @param metadataJSON
-   *          The metadata to update in json format.
-   * @param index
-   *          The index to update the event in.
-   * @return A metadata list of the updated fields.
-   * @throws IllegalArgumentException
-   *           Thrown if the metadata was not formatted correctly.
-   * @throws IndexServiceException
-   *           Thrown if there was an error updating the event.
-   * @throws SearchIndexException
-   *           Thrown if there was an error searching the search index.
-   * @throws NotFoundException
-   *           Thrown if the {@link Event} could not be found.
-   * @throws UnauthorizedException
-   *           Thrown if the current user is unable to update the event.
-   */
-  MetadataList updateCommonEventMetadata(String id, String metadataJSON, AbstractSearchIndex index)
-          throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
-          UnauthorizedException;
-
-  /**
    * Update the event metadata in all available catalogs.
    *
    * @param id
@@ -404,12 +349,6 @@ public interface IndexService {
 
   // TODO remove when it is no longer needed by AbstractEventEndpoint
   Source getEventSource(Event event);
-
-  // TODO remove when it is no longer needed by AbstractEventEndpoint
-  Opt<WorkflowInstance> getCurrentWorkflowInstance(String mpId) throws IndexServiceException;
-
-  // TODO remove when it is no longer needed by AbstractEventEndpoint
-  void updateWorkflowInstance(WorkflowInstance workflowInstance) throws WorkflowException, UnauthorizedException;
 
   void updateCommentCatalog(Event event, List<EventComment> comments) throws Exception;
 
@@ -498,28 +437,6 @@ public interface IndexService {
   List<SeriesCatalogUIAdapter> getSeriesCatalogUIAdapters();
 
   /**
-   * Update only the common default series metadata.
-   *
-   * @param id
-   *          The id of the series to update.
-   * @param metadataJSON
-   *          The metadata to update in json format.
-   * @param index
-   *          The index to update the series in.
-   * @return A metadata list of the updated fields.
-   * @throws IllegalArgumentException
-   *           Thrown if the metadata was not formatted correctly.
-   * @throws IndexServiceException
-   *           Thrown if there was an error updating the event.
-   * @throws NotFoundException
-   *           Thrown if the {@link Event} could not be found.
-   * @throws UnauthorizedException
-   *           Thrown if the current user is unable to update the event.
-   */
-  MetadataList updateCommonSeriesMetadata(String id, String metadataJSON, AbstractSearchIndex index)
-          throws IllegalArgumentException, IndexServiceException, NotFoundException, UnauthorizedException;
-
-  /**
    * Update the series metadata in all available catalogs.
    *
    * @param id
@@ -575,13 +492,6 @@ public interface IndexService {
    */
   void removeCatalogByFlavor(Series series, MediaPackageElementFlavor flavor)
           throws IndexServiceException, NotFoundException;
-
-  /**
-   * Checks if the given event has snapshots
-   * @param eventId the event to check
-   * @return <code>true</code> if the event has snapshots, <code>false</code> otherwise
-   */
-  boolean hasSnapshots(String eventId);
 
   Map<String,Map<String,String>> getEventWorkflowProperties(List<String> eventIds);
 

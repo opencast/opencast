@@ -155,10 +155,6 @@ public final class SchedulerUtil {
     return mkChecksumInput(Long.toString(input.getTime()));
   }
 
-  private static byte mkChecksumInput(boolean input) {
-    return (byte) (input ? 1 : 0);
-  }
-
   /**
    * Converts a scheduler event to a human readable string
    *

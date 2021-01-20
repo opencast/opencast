@@ -26,10 +26,8 @@ import static org.junit.Assert.assertEquals;
 import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
-import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -38,7 +36,6 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -133,39 +130,6 @@ public class SeriesEndpointTest {
 
     given().queryParam("sort", "managed_acl:ASC").expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .when().get(rt.host("/series.json"));
-  }
-
-  @Ignore
-  @Test
-  public void testCreateNewSeries() throws Exception {
-    String seriesMetadataString = IOUtils.toString(getClass().getResource("/postNewSeriesMetadata.json"), "UTF-8");
-
-    given().expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("new"));
-    given().formParam("metadata", "adsd").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("new"));
-
-    String result = given().formParam("metadata", seriesMetadataString).expect().statusCode(HttpStatus.SC_CREATED)
-            .when().post(rt.host("new")).asString();
-    Assert.assertEquals("23", result);
-  }
-
-  @Ignore
-  @Test
-  public void testDelete() throws Exception {
-    BulkOperationResult emptyResult = new BulkOperationResult();
-    BulkOperationResult foundResult = new BulkOperationResult();
-    foundResult.addOk("1");
-    foundResult.addOk("2");
-    foundResult.addOk("3");
-    foundResult.addNotFound("4");
-    foundResult.addServerError("5");
-    given().expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("/deleteSeries"));
-    given().body("{}").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("/deleteSeries"));
-    String result = given().body("[]").expect().statusCode(HttpStatus.SC_OK).when().post(rt.host("/deleteSeries"))
-            .asString();
-    assertEquals(emptyResult.toJson(), result);
-    result = given().body("[1,2,3,4,5]").expect().statusCode(HttpStatus.SC_OK).when().post(rt.host("/deleteSeries"))
-            .asString();
-    assertEquals(foundResult.toJson(), result);
   }
 
   @Test

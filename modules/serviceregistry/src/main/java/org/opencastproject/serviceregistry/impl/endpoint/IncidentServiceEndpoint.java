@@ -66,6 +66,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,6 +102,15 @@ import javax.ws.rs.core.Response.Status;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                 + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"})
+@Component(
+  property = {
+    "service.description=Incident Service REST Endpoint",
+    "opencast.service.type=org.opencastproject.incident",
+    "opencast.service.path=/incidents"
+  },
+  immediate = true,
+  service = { IncidentServiceEndpoint.class }
+)
 public class IncidentServiceEndpoint {
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(IncidentServiceEndpoint.class);
@@ -122,6 +133,7 @@ public class IncidentServiceEndpoint {
   protected String serviceUrl = "/incidents";
 
   /** OSGi callback for setting the incident service. */
+  @Reference(name = "incidentService")
   public void setIncidentService(IncidentService incidentService) {
     this.svc = incidentService;
   }
@@ -159,7 +171,7 @@ public class IncidentServiceEndpoint {
                                     description = "The response format [full|digest|sys]. Defaults to sys",
                                     defaultValue = "sys",
                                     type = Type.STRING)},
-             reponses = {
+             responses = {
                      @RestResponse(responseCode = SC_OK, description = "The job incidents.")})
   public Response getIncidentsOfJobAsList(
           @Context HttpServletRequest request,
@@ -207,7 +219,7 @@ public class IncidentServiceEndpoint {
                                     description = "The response format [full|digest|sys]. Defaults to sys",
                                     defaultValue = "sys",
                                     type = Type.STRING)},
-             reponses = {
+             responses = {
                      @RestResponse(responseCode = SC_OK, description = "The job incident."),
                      @RestResponse(responseCode = SC_NOT_FOUND, description = "No job incident with this identifier was found.")})
   public Response getIncidentsOfJobAsTree(
@@ -247,7 +259,7 @@ public class IncidentServiceEndpoint {
                                     description = "The media type of the response [xml|json]",
                                     defaultValue = "xml",
                                     type = Type.STRING)},
-             reponses = {
+             responses = {
                      @RestResponse(responseCode = SC_OK, description = "The job incident."),
                      @RestResponse(responseCode = SC_NOT_FOUND, description = "No job incident with this identifier was found.")})
   public Response getIncident(@PathParam("id") final long incidentId, @PathParam("type") final String type)
@@ -272,7 +284,7 @@ public class IncidentServiceEndpoint {
                      @RestParameter(name = "id", isRequired = true, description = "The incident identifiers.", type = Type.INTEGER)},
              restParameters = {
                      @RestParameter(name = "locale", isRequired = true, description = "The locale.", type = Type.STRING)},
-             reponses = {
+             responses = {
                      @RestResponse(responseCode = SC_OK, description = "The localization of the given job incidents."),
                      @RestResponse(responseCode = SC_NOT_FOUND, description = "No job incident with this incident identifier was found.")})
   public Response getLocalization(@PathParam("id") final long incidentId, @QueryParam("locale") String locale)
@@ -298,7 +310,7 @@ public class IncidentServiceEndpoint {
           @RestParameter(name = "code", isRequired = true, description = "The incident error code", type = Type.STRING),
           @RestParameter(name = "severity", isRequired = true, description = "The incident error code", type = Type.STRING),
           @RestParameter(name = "details", isRequired = false, description = "The incident details", type = Type.TEXT),
-          @RestParameter(name = "params", isRequired = false, description = "The incident parameters", type = Type.TEXT)}, reponses = {
+          @RestParameter(name = "params", isRequired = false, description = "The incident parameters", type = Type.TEXT)}, responses = {
           @RestResponse(responseCode = SC_CREATED, description = "New job incident has been created"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the one of the form params"),
           @RestResponse(responseCode = SC_CONFLICT, description = "No job incident related job exists")})

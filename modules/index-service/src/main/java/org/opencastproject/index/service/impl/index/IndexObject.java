@@ -25,8 +25,4 @@ public interface IndexObject {
 
   String INDEX_XML_NAMESPACE = "http://index.matterhorn.opencastproject.org";
 
-  /**
-   * Serializes the index object into a json string.
-   */
-  String toJSON();
 }

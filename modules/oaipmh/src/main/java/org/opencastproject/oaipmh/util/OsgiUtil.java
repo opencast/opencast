@@ -50,19 +50,6 @@ public final class OsgiUtil {
   }
 
   /**
-   * Get a mandatory, non-blank string property from a component context.
-   *
-   * @throws RuntimeException
-   *         key does not exist or its value is blank
-   */
-  public static String getComponentProperty(ComponentContext cc, String key) {
-    String p = (String) cc.getProperties().get(key);
-    if (StringUtils.isBlank(p))
-      throw new RuntimeException("Please provide component context property " + key);
-    return p;
-  }
-
-  /**
    * Get a mandatory, non-blank value from a dictionary.
    *
    * @throws ConfigurationException
@@ -102,8 +89,4 @@ public final class OsgiUtil {
     }
   }
 
-  public interface UpdateHandler {
-    void updated(Dictionary dictionary);
-    void deleted();
-  }
 }

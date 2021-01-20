@@ -32,28 +32,6 @@ public class IncidentServiceException extends Exception {
   /**
    * Creates a new incident service exception.
    *
-   * @param message
-   *          the error message
-   * @param t
-   *          the exception causing the error
-   */
-  public IncidentServiceException(String message, Throwable t) {
-    super(message, t);
-  }
-
-  /**
-   * Creates a new incident service exception.
-   *
-   * @param message
-   *          the error message
-   */
-  public IncidentServiceException(String message) {
-    super(message);
-  }
-
-  /**
-   * Creates a new incident service exception.
-   *
    * @param t
    *          the exception causing the error
    */

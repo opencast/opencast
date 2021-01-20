@@ -34,14 +34,10 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.api.SmilObject;
 
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBException;
 
 public class SmilResponseImplTest {
-
-  private static final Logger logger = LoggerFactory.getLogger(SmilResponseImplTest.class);
 
   /**
    * Test of getSmil method, of class SmilResponseImpl.

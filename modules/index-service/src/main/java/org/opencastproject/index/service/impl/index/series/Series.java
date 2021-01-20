@@ -587,7 +587,6 @@ public class Series implements IndexObject {
    *
    * @return the serialized series
    */
-  @Override
   public String toJSON() {
     try {
       if (context == null) {

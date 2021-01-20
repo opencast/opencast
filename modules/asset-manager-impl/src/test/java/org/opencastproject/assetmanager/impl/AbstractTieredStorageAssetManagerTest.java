@@ -21,7 +21,6 @@
 package org.opencastproject.assetmanager.impl;
 
 import static com.entwinemedia.fn.fns.Booleans.eq;
-import static java.lang.String.format;
 
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.impl.persistence.Database;
@@ -169,7 +168,7 @@ public class AbstractTieredStorageAssetManagerTest<A extends TieredStorageAssetM
       private Set<StoragePath> store = new HashSet<>();
 
       private void logSize() {
-        logger.debug(format("Store contains %d asset/s", store.size()));
+        logger.debug("Store contains {} asset/s", store.size());
       }
 
       @Override public void put(StoragePath path, Source source) throws AssetStoreException {
@@ -238,7 +237,7 @@ public class AbstractTieredStorageAssetManagerTest<A extends TieredStorageAssetM
       private Random r = new Random(System.nanoTime());
 
       private void logSize() {
-        logger.debug(format("Store contains %d asset/s", store.size()));
+        logger.debug("Store contains {} asset/s", store.size());
       }
 
       private void logFault() throws AssetStoreException {

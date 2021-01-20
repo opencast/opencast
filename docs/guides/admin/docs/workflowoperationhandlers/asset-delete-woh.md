@@ -9,7 +9,7 @@ asset manager.
 
 If no parameter is given, the whole episode and all of its snapshots are deleted.
 If the keep-last-snapshot parameter is used, it is advised to use the *ingest-download* workflow before *asset-delete*.
-Otherwise there will be logged a lot of errors for unreferenced snapshots.
+Otherwise there will be logged a lot of errors for unreferenced snapshots and ACLs may vanish.
 
 
 ## Parameter Table

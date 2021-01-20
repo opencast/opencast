@@ -232,16 +232,6 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
   void verify() throws MediaPackageException;
 
   /**
-   * Adds a reference to the media package <code>mediaPackage</code>.
-   * <p>
-   * Note that an element can only refer to one object. Therefore, any existing reference will be replaced.
-   *
-   * @param mediaPackage
-   *          the media package to refere to
-   */
-  void referTo(MediaPackage mediaPackage);
-
-  /**
    * Adds a reference to the media package element <code>element</code>.
    * <p>
    * Note that an element can only refere to one object. Therefore, any existing reference will be replaced. Also note

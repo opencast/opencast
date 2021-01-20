@@ -31,9 +31,6 @@ import java.util.Properties;
  */
 public interface CaptureAgentStateService {
 
-  /** Defines the name of the key in the properties file which is used to define the list of sticky agents */
-  String STICKY_AGENTS = "capture.admin.sticky.agents";
-
   /**
    * Returns an agent by its name
    *
@@ -44,14 +41,6 @@ public interface CaptureAgentStateService {
    *           if no agent with the given name has been found
    */
   Agent getAgent(String agentName) throws NotFoundException;
-
-  /**
-   * Updates an agent
-   *
-   * @param agent
-   *          the agent to update
-   */
-  void updateAgent(Agent agent);
 
   /**
    * Returns the last known agent state by its name

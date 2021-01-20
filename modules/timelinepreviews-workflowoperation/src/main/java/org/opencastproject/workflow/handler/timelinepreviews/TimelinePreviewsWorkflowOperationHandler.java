@@ -106,7 +106,7 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
-    logger.info("Start timeline previews workflow operation for mediapackage {}", mediaPackage.getIdentifier().compact());
+    logger.info("Start timeline previews workflow operation for mediapackage {}", mediaPackage.getIdentifier().toString());
 
     String sourceFlavorProperty = StringUtils.trimToNull(
             workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVOR_PROPERTY));
@@ -152,9 +152,9 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
     for (String tag : asList(sourceTagsProperty)) {
       trackSelector.addTag(tag);
     }
-    Collection<Track> sourceTracks = trackSelector.select(mediaPackage, false);
+    Collection<Track> sourceTracks = trackSelector.select(mediaPackage, true);
     if (sourceTracks.isEmpty()) {
-      logger.info("No tracks found in mediapackage {} with specified {} {}", mediaPackage.getIdentifier().compact(),
+      logger.info("No tracks found in mediapackage {} with specified {} {}", mediaPackage.getIdentifier().toString(),
               SOURCE_FLAVOR_PROPERTY,
               sourceFlavorProperty);
       createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
@@ -165,7 +165,7 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
       try {
         // generate timeline preview images
         logger.info("Create timeline previews job for track '{}' in mediapackage '{}'",
-                sourceTrack.getIdentifier(), mediaPackage.getIdentifier().compact());
+                sourceTrack.getIdentifier(), mediaPackage.getIdentifier().toString());
 
         Job timelinepreviewsJob = timelinePreviewsService.createTimelinePreviewImages(sourceTrack, imageSize);
         timelinepreviewsJobs.add(timelinepreviewsJob);
@@ -175,16 +175,16 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
 
       } catch (MediaPackageException | TimelinePreviewsException ex) {
         logger.error("Creating timeline previews job for track '{}' in media package '{}' failed with error {}",
-                sourceTrack.getIdentifier(), mediaPackage.getIdentifier().compact(), ex.getMessage());
+                sourceTrack.getIdentifier(), mediaPackage.getIdentifier().toString(), ex.getMessage());
       }
     }
 
-    logger.info("Wait for timeline previews jobs for media package {}", mediaPackage.getIdentifier().compact());
+    logger.info("Wait for timeline previews jobs for media package {}", mediaPackage.getIdentifier().toString());
     if (!waitForStatus(timelinepreviewsJobs.toArray(new Job[timelinepreviewsJobs.size()])).isSuccess()) {
       cleanupWorkspace(timelinepreviewsJobs);
       throw new WorkflowOperationException(
               String.format("Timeline previews jobs for media package '%s' have not completed successfully",
-                      mediaPackage.getIdentifier().compact()));
+                      mediaPackage.getIdentifier().toString()));
     }
 
 
@@ -211,12 +211,12 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
 
           FileInputStream timelinePreviewsInputStream = null;
           logger.info("Put timeline preview images file {} from media package {} to the media package work space",
-                  timelinePreviewsMpe.getURI(), mediaPackage.getIdentifier().compact());
+                  timelinePreviewsMpe.getURI(), mediaPackage.getIdentifier().toString());
 
           try {
             timelinePreviewsInputStream = new FileInputStream(timelinePreviewsFile);
             String fileName = FilenameUtils.getName(timelinePreviewsMpe.getURI().getPath());
-            URI timelinePreviewsWfrUri = workspace.put(mediaPackage.getIdentifier().compact(),
+            URI timelinePreviewsWfrUri = workspace.put(mediaPackage.getIdentifier().toString(),
                     timelinePreviewsMpe.getIdentifier(), fileName, timelinePreviewsInputStream);
             timelinePreviewsMpe.setURI(timelinePreviewsWfrUri);
           } catch (FileNotFoundException ex) {
@@ -254,7 +254,7 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
     }
 
 
-    logger.info("Timeline previews workflow operation for mediapackage {} completed", mediaPackage.getIdentifier().compact());
+    logger.info("Timeline previews workflow operation for mediapackage {} completed", mediaPackage.getIdentifier().toString());
     return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE);
   }
 

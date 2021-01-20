@@ -1,0 +1,2145 @@
+{
+   "MATTERHORN": "Opencast",
+   "NAV_HOME": "התחל",
+   "NAV_ABOUT": "אודות",
+   "NO": "לא",
+   "SUBMIT": "שלח",
+   "UPDATE": {
+      "MINOR": "Minor update available",
+      "MAJOR": "Major update available",
+      "UNSUPPORTED": "Version {{ version }} no longer supported",
+      "UNDETERMINED": "Indeterminable version"
+   },
+   "CANCEL": "בטל",
+   "CONFIRM": "אשר",
+   "SAVE": "שמור",
+   "CONTINUE": "Continue",
+   "CLOSE": "Close",
+   "LOGOUT": "התנתקות",
+   "RESET": "איפוס",
+   "SELECT_NO_OPTION_SELECTED": "לא נבחרה כל אופציה",
+   "SELECT_NO_OPTIONS_AVAILABLE": "אין אפשרויות זמינות",
+   "YES": "כן",
+   "COPY": "Copy to clipboard",
+   "LTI": {
+      "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
+      "SERIES_TITLE": "View Series",
+      "UPLOAD_TITLE": "Upload event",
+      "LOADING": "Loading…",
+      "NEW_UPLOAD": "Upload new event",
+      "EDIT_UPLOAD": "Edit event",
+      "CURRENT_JOBS": "Today's jobs",
+      "PRESENTER": "Presenter",
+      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
+      "CAPTION": "Captions",
+      "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
+      "UPLOAD": "Upload",
+      "UPLOADING": "Uploading",
+      "EDIT": "Save",
+      "EDIT_TITLE": "Edit event",
+      "NO_OPTION_SELECTED": "No option selected",
+      "EDITING": "Saving…",
+      "SELECT_OPTION": "Select option",
+      "JOB_TITLE": "Title",
+      "JOB_STATUS": "Status",
+      "UPLOAD_SUCCESS": "Upload succeeded!",
+      "UPLOAD_FAILURE": "Upload failed!",
+      "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
+      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
+      "EDIT_FAILURE": "Edit failed!",
+      "COPY_SUCCESS": "Copying started…",
+      "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",
+      "GENERIC_ERROR": "Error: {{message}}",
+      "DELETION_SUCCESS": "Event deletion successful",
+      "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
+      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
+      "DELETION_FAILURE": "Event deletion failed",
+      "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
+      "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
+      "CONFIRM_DELETION": "Really delete this event?",
+      "COPY_TO_SERIES": "Copy event to series",
+      "SELECT_COPY_TARGET": "Select destination series",
+      "COPY": "Copy",
+      "COPY_IN_PROGRESS": "Starting copy…",
+      "CREATOR": "by {{creator}}"
+   },
+   "LANGUAGES": {
+      "ARABIC": "ערבית",
+      "DANISH": "דנית",
+      "GERMAN": "גרמנית",
+      "GERMAN_CH": "גרמנית שוויצרית",
+      "FINNISH": "פינית",
+      "HINDI": "הינדית",
+      "ITALIAN": "איטלקית",
+      "JAPANESE": "יפנית",
+      "DUTCH": "הולנדית",
+      "NORWEGIAN": "נורווגית",
+      "FRENCH": "צרפתית",
+      "ENGLISH": "אנגלית",
+      "SPANISH": "ספרדית",
+      "ROMANSH": "רומנית",
+      "POLISH": "פולנית",
+      "PORTUGESE": "פורטוגזית",
+      "SLOVENIAN": "סלובנית",
+      "SWEDISH": "שוודית",
+      "RUSSIAN": "רוסית",
+      "TURKISH": "טורקית",
+      "UKRAINIAN": "אוקראינית",
+      "CHINESE": "סינית"
+   },
+   "PREFERENCES": {
+      "TABLE": {
+         "CAPTION": "עריכת תצוגת טבלה",
+         "SUBHEADING": "בחר את הנתונים המוגדרים כברירת מחדל שתרצה להציג בתצוגה {{ tableName }}",
+         "AVAILABLE_COLUMNS": "עמודות זמינות",
+         "SELECTED_COLUMNS": "עמודות נבחרות",
+         "FOOTER_TEXT": "הסדר והבחירה יישמרו באופן אוטומטי. הקש \"{{resetTranslation}}\" כדי לשחזר את התצוגה המהווה ברירת מחדל."
+      }
+   },
+   "CONFIRMATIONS": {
+      "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
+      "CONTINUE_ACTION": "האם את/ה בטוח/ה שאת/ה רוצה להמשיך?",
+      "METADATA": {
+         "NOTICE": {
+            "UNKNOWN": "הרכיב שלהלן יימחקו",
+            "EVENT": "האירוע הבא יימחקו",
+            "SERIES": "הסדרה הבאה תימחק",
+            "ACL": "ה-ACL הבאים יימחקו",
+            "GROUP": "הקבוצה הבאה תימחק",
+            "USER": "המשתמש הבא יימחקו",
+            "THEME": "רשימת המשתמשים בחסומים הבאה תמחק",
+            "LOCATION": "המיקום הבא יימחק"
+         },
+         "NAME": "שם"
+      },
+      "ACTIONS": {
+         "CONFIRMATION": "אישור",
+         "SHOW": {
+            "EMBEDDING_CODE": "Embedding code"
+         }
+      },
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "סדרה זו מכילה אירועים. מחיקת הסדרה לא תמחק אירועים אלו.",
+         "EVENT_WILL_BE_GONE": "אם תתקדמו, האירוע יעלם לצמיתות."
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "לא ניתן למחוק סדרה זו מכיוון שהיא עדיין מכילה אירועים."
+      }
+   },
+   "MEDIAMODULE": "מודול מדיה",
+   "SYSTEM_NOTIFICATIONS": "אזהרות והתראות מערכתיות",
+   "LANGUAGE": "בחירת שפה",
+   "HELP": {
+      "HELP": "עזרה",
+      "USERS_GUIDE": "מדריך משתמש",
+      "DOCUMENTATION": "תיעוד",
+      "REST_DOC": "תיעוד ממשק תוכנה (REST API)",
+      "HOTKEY_CHEAT_SHEET": "מקשי קיצור במקלדת",
+      "ADOPTER_REGISTRATION": "Adopter Registration"
+   },
+   "NOTIFICATIONS": {
+      "ACL_ADDED": "מדיניות הגישה נוצרה",
+      "ACL_NOT_SAVED": "מדיניות הגישה לא יכלה להשמר",
+      "ACL_UPDATED": "מדיניות הגישה עודכנה",
+      "ACL_DELETED": "מדיניות הגישה נמחקה",
+      "ACL_NOT_DELETED": "מדיניות הגישה לא יכלה להמחק",
+      "USER_ADDED": "המשתמש נוצר",
+      "USER_UPDATED": "המשתמש עודכן",
+      "USER_NOT_SAVED": "לא ניתן לשמור את המשתמש",
+      "USER_DELETED": "המשתמש נמחק",
+      "USER_NOT_DELETED": "לא ניתן למחוק את המשתמש",
+      "USER_NOT_MANAGEABLE": "המשתמש אינו ניתן לניהול",
+      "GROUP_ADDED": "הקבוצה נוצרה",
+      "GROUP_CONFLICT": "שם הקבוצה שהונפק כבר קיים",
+      "GROUP_UPDATED": "הקבוצה עודכנה",
+      "GROUP_NOT_SAVED": "לא ניתן לשמור את הקבוצה",
+      "GROUP_DELETED": "הקבוצה נמחקה",
+      "GROUP_NOT_DELETED": "לא ניתן למחוק את הקבוצה",
+      "ACCESS_DENIED": "הגישה נדחתה. אסור לך כדי להציג דף זה",
+      "SERIES_ADDED": "הסדרה נוצרה",
+      "SERIES_NOT_SAVED": "לא ניתן לשמור את הסידרה",
+      "EVENTS_CREATED": "הארוע נוצר",
+      "EVENTS_UPLOAD_STARTED": "האירוע מועלה לשרת…",
+      "EVENTS_NOT_CREATED": "לא ניתן היה ליצור את האירוע",
+      "EVENTS_UPDATED_NB": "{{ number }} אירועים עודכנו בהצלחה",
+      "EVENTS_UPDATED_ALL": "כל האירועים עודכנו בהצלחה",
+      "EVENTS_NOT_UPDATED": "לא היתה אפשרות לשמור את האירוע",
+      "EVENTS_NOT_UPDATED_ID": "לא היתה אפשרות לשמור את האירוע {{ id }}",
+      "EVENTS_NOT_UPDATED_ALL": "לא הייתה אפשרות לשמור אף אחד מהאירועים",
+      "EVENTS_PROCESSING_ACTION_RETRY": "מתחיל עיבוד מחדש...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "לא הייתה אפשרות להתחיל עיבוד מחדש.",
+      "EVENTS_PROCESSING_ACTION_NONE": "מפסיק עיבוד...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "לא ניתן היה לעצור את העיבוד.",
+      "EVENTS_PROCESSING_ACTION_STOP": "עיבוד נעצר.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "לא היתה אפשרות להפסיק את העיבוד.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "זרימות שנמחקו.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "לא ניתן למחוק את תהליך העבודה.",
+      "SERIES_UPDATED_NB": "{{ number }} סדרות עודכנו בהצלחה",
+      "SERIES_UPDATED_ALL": "כל הסדרות עודכנו בהצלחה",
+      "SERIES_NOT_UPDATED": "לא היתה אפשרות לשמור את הסידרה",
+      "SERIES_NOT_UPDATED_ID": "לא היתה אפשרות לשמור את הסידרה {{ id }}",
+      "SERIES_NOT_UPDATED_ALL": "לא ניתן לשמור אף אחד מהסדרות",
+      "EVENT_DELETED": "הארוע נמחק.",
+      "EVENT_WILL_BE_DELETED": "הארוע נמחק",
+      "EVENTS_DELETED": "הארועים נמחקו.",
+      "EVENTS_NOT_DELETED": "לא ניתן למחוק את הארוע(ים).",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "האירוע(ים) לא ניתנ(ים) למחיקה, מכיוון שאין לך את ההרשאות לבצע פעולה זו.",
+      "SERIES_DELETED": "הסדרה נמחקה",
+      "SERIES_NOT_DELETED": "לא ניתן היה למחוק את הסידרה",
+      "LOCATION_DELETED": "המיקום נמחק",
+      "LOCATION_NOT_DELETED": "לא ניתן למחוק את המיקום",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "המיקום לא ניתן למחיקה, מכיוון שאין לך את ההרשאות לבצע פעולה זו.",
+      "CONFLICT_DETECTED": "סתירה בתזמון: האירוע החדש מתנגש עם אירוע קיים. בבקשה שנו את המיקום, התאריך או השעה.",
+      "CONFLICT_BULK_DETECTED": "התנגשות בתזמון: שינוי האירועים יוצר התנגשויות. אנא שנה את המיקום, תאריכים או שעות.",
+      "CONFLICT_ALREADY_ENDED": "שגיאה בתזמון: האירוע כבר נגמר.",
+      "CONFLICT_END_BEFORE_START": "שגיאה בתזמון: תזמון הסיום חייב להיות אחרי תזמון ההתחלה.",
+      "CONFLICT_IN_THE_PAST": "לא היתה אפשרות לעדכן את לוח הזמנים: לא ניתן לתזמן אירוע בעבר.",
+      "INVALID_ACL_RULES": "חוקים חייבים להכיל תפקיד חוקי ו/או הרשאות קריאה/כתיבה.",
+      "MISSING_ACL_RULES": "לפחות תפקיד אחד עם הרשאות קריאה וכתיבה נדרש!",
+      "SAVED_ACL_RULES": "חוקי הגישה נשמרו.",
+      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "האירועים הקיימים בסדרה יצטרכו לעבור עיבוד",
+      "SERIES_ACL_LOCKED": "עריכת מדיניות גישה אסורה בזמן שפעולות רצות באירועים שהם חלק מהסדרה",
+      "SERIES_ACL_MISSING_READWRITE_ROLE": "המדיניות גישה דורשת תפקיד אחד לפחות עם הרשאות קריאה וכתיבה.",
+      "EVENT_ACL_MISSING_READWRITE_ROLE": "המדיניות גישה דורשת תפקיד אחד לפחות עם הרשאות קריאה וכתיבה.",
+      "THEME_NAME_ALREADY_TAKEN": "שם זה נמצא כבר בשימוש",
+      "THEME_NAME_EMPTY": "השם אינו יכול להשאר ריק",
+      "BUMPER_UPLOAD_ERROR": "שגיאה בזמן האלעת מדיה",
+      "BUMPER_REQUIRED": "חובה להעלות קדימון",
+      "TRAILER_UPLOAD_ERROR": "שגיאה בזמן האלעת מדיה",
+      "TITLE_UPLOAD_ERROR": "שגיאה בזמן האלעת מדיה",
+      "LICENSE_UPLOAD_ERROR": "שגיאה בזמן האלעת מדיה",
+      "WATERMARK_UPLOAD_ERROR": "שגיאה בזמן האלעת מדיה",
+      "WATERMARK_REQUIRED": "חובה להעלות סימן מים",
+      "THEME_UPLOAD_STARTED": "המדיה מועלת…",
+      "THEME_CREATED": "ערכת הנושא נוצרה",
+      "THEME_NOT_CREATED": "לא ניתן ליצור את ערכת הנושא",
+      "THEME_DELETED": "ערכת הנושא נמחקה",
+      "THEME_NOT_DELETED": "לא ניתן למחוק את ערכת הנושא",
+      "TASK_CREATED": "המשימה נוצרה",
+      "TASK_NOT_CREATED": "לא היתה אפשרות ליצור את המשימה",
+      "VIDEO_CUT_NOT_SAVED": "לא ניתן לשמור את השינויים",
+      "VIDEO_CUT_SAVED": "השינויים נשמרו",
+      "VIDEO_CUT_PROCESSING": "מעבד את הוידאו…",
+      "THUMBNAIL_CHANGE_FAILED": "החלפת תמונה ממוזערת נכשלה.",
+      "VIDEO_SOURCE_TRACKS_INVALID": "לא נבחרו רצועות וידאו",
+      "VIDEO_TOO_MANY_AUDIOS": "לא ניתן להוסיף יותר ממקור שמע אחד עבור מקור וידאו בודד",
+      "SERVER_UNRESPONSIVE": ". אופס! נראה שהשרת לא מגיב. נא נסה שוב מאוחר יותר.",
+      "SERVICE_UNAVAILABLE": ". אופס! נראה שהשרת לא מגיב. נא נסה שוב מאוחר יותר.",
+      "ACTIVE_TRANSACTION": "לא ניתן לערוך את האירוע הזה בזמן שהוא עובר עיבוד.",
+      "BULK_METADATA_UPDATE": {
+         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
+         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
+         "NO_EVENTS_UPDATED": "All updates failed.",
+         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+      },
+      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
+      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
+      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
+   },
+   "BULK_ACTIONS": {
+      "CAPTION": "פעולות",
+      "DELETE": {
+         "SERIES": {
+            "CAPTION": "מחק",
+            "BUTTON": "מחק",
+            "CANNOT_DELETE": "הסדרה המודגשת לא ניתנת למחיקה מכיוון שהיא עדיין מכילה אירועים."
+         },
+         "EVENTS": {
+            "CAPTION": "מחק",
+            "DELETE_EVENTS": "מחק אירועים",
+            "UNAUTHORIZED": "אין לך הרשאה למחוק את האירועים המודגשים. בבקשה הסר את הסימון שלהם על מנת להמשיך."
+         }
+      },
+      "DELETE_EVENTS_WARNING_LINE1": "לאחר מחיקתו, כל המטא נתונים של האירוע, קובצי האודיו והווידאו יימחקו ויהיו בלתי ניתנים לשחזור.",
+      "DELETE_EVENTS_WARNING_LINE2": "",
+      "DELETE_SERIES_WARNING_LINE1": "לאחר מחיקה, כל הסידרה של מטא נתונים יהיו בלתי ניתנים לשחזור. אירועים בסדרה לא יימחקו.",
+      "DELETE_SERIES_WARNING_LINE2": "",
+      "SCHEDULE_TASK": {
+         "CAPTION": "התחל משימה",
+         "GENERAL": {
+            "CAPTION": "כללי",
+            "SUMMARY": "({{ count }} אירועים נבחרו)",
+            "CANNOTSTART": "לא ניתן לעבד כעת אירועים המסומנים. בטל את הבחירה או נסה שוב מאוחר יותר"
+         },
+         "TASKS": {
+            "CAPTION": "משימות",
+            "SELECT": "בחר משימה"
+         },
+         "SUMMARY": {
+            "CAPTION": "סיכום",
+            "EVENTS": "אירועים",
+            "EVENTS_SUMMARY": "בחרת מספר אירועים",
+            "CONFIGURATION": "הגדרות",
+            "WORKFLOW": "משימה"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "עריכת אירועים מתוזמנים",
+         "CONFLICT_CHECK_RUNNING": "בדיקת סתירות בריצה…",
+         "GENERAL": {
+            "CAPTION": "כללי",
+            "CANNOTSTART": "לא ניתן לעבד את האירוע(ים) המסומנים, רק אירועים מתוזמנים נתמכים.",
+            "NOCHANGES": "לא זוהה שינויים לאירוע!",
+            "CONFLICT_FIRST_EVENT": "אירוע שהשתנה",
+            "CONFLICT_SECOND_EVENT": "סתירה באיורע",
+            "CANNOTEDITSCHEDULE": "עבור האירועים המסומנים, אין לך הרשאה כדי לערוך את התזמון. ניתן להמשיך, אך לא היה ניתן לערוך את התזמון באף אחד מהאירועים כלל."
+         },
+         "METADATA": {
+            "EDIT": "לערוך מטא-נתונים"
+         },
+         "SUMMARY": {
+            "CAPTION": "סיכום",
+            "SINGLE_EVENT_CAPTION": "אירוע \"{{ title }}\"",
+            "TYPE": "סוג",
+            "PREVIOUS": "ערך ישן",
+            "NEXT": "ערך חדש"
+         },
+         "EDIT": {
+            "CAPTION": "ערוך",
+            "EVENT": "אירוע",
+            "EVENTS": "אירועים",
+            "HEADER": "דף זה מאפשר לך לערוך אירועים מתוזמנים המקובצים לפי ימי השבוע. השדות מלאים מראש במקרה שלכל האירועים המתוזמנים יש אותו ערך עבור שדה מסוים. אחרת, השדה ישאר ריק. במקרה ושדה קלט נשאר ריק הערכים המתאימים יישארו ללא שינוי.",
+            "METADATA": "מטא-נתונים",
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+         }
+      },
+      "EDIT_EVENTS_METADATA": {
+         "CAPTION": "Edit the metadata of multiple events",
+         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "REQUEST_ERRORS": {
+            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
+            "NOTHING_TO_EDIT": "The events cannot be edited.",
+            "NOT_FOUND": "Not found",
+            "RUNNING_WORKFLOW": "Running workflow",
+            "TABLE": {
+               "CAPTION": "Selected events",
+               "ERRORS": "Errors"
+            }
+         },
+         "EDIT": {
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "TABLE": {
+               "CAPTION": "Metadata of selected events",
+               "FIELDS": "Metadata",
+               "VALUES": "Values"
+            }
+         },
+         "UPDATE_FAILURES": {
+            "TABLE": {
+               "CAPTION": "Update Failures"
+            },
+            "UPDATE_FAILED": "Update failed",
+            "NO_EVENTS_UPDATED": "All updates failed.",
+            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+         }
+      }
+   },
+   "DATES": {
+      "TODAY": "היום",
+      "TOMORROW": "מחר",
+      "YESTERDAY": "אתמול",
+      "THIS_WEEK": "השבוע הנוכחי",
+      "THIS_MONTH": "החודש הנוכחי",
+      "THIS_YEAR": "השנה הנוכחית"
+   },
+   "DATETIMES": {
+      "TODAY": "היום בשעה {{ time }}",
+      "TOMORROW": "מחר ב- {{ time }}",
+      "YESTERDAY": "אתמול בשעה {{ time }}"
+   },
+   "WIZARD": {
+      "NEXT_STEP": "הבא",
+      "BACK": "הקודם",
+      "CREATE": "צור",
+      "DELETE": "מחק",
+      "UPDATE": "עדכן",
+      "DURATION": {
+         "HOURS": "שעות",
+         "MINUTES": "דקות"
+      }
+   },
+   "CAPTURE_AGENT": {
+      "DEVICE": {
+         "MICROPHONE": "מיקרופון",
+         "CAMERA": "מצלמה",
+         "PRESENTATION": "מצגת"
+      }
+   },
+   "NAV": {
+      "DASHBOARD": {
+         "TITLE": "לוח בקרה"
+      },
+      "EVENTS": {
+         "TITLE": "הקלטה"
+      },
+      "SYSTEMS": {
+         "TITLE": "מערכות"
+      },
+      "CAPTUREAGENTS": {
+         "TITLE": "לכידה"
+      },
+      "USERS": {
+         "TITLE": "ארגון"
+      },
+      "INTEGRATIONS": {
+         "TITLE": "אינטגרציה"
+      },
+      "CONFIGURATION": {
+         "TITLE": "הגדרות"
+      },
+      "STATISTICS": {
+         "TITLE": "סטטיסטיקות"
+      }
+   },
+   "ADOPTER_REGISTRATION": {
+      "MODAL": {
+         "CAPTION": "Registration",
+         "SKIP": "Not now",
+         "CONTINUE": "Continue",
+         "BACK": "Back",
+         "LEGAL_INFO_STATE": {
+            "HEADER": "Terms of Service and Privacy Policy"
+         },
+         "INFORMATION_STATE": {
+            "HEADER": "Thank you for using Opencast!",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+         },
+         "FORM_STATE": {
+            "ORGANISATION": "Organisation",
+            "DEPARTMENT": "Department",
+            "COUNTRY": "Country",
+            "POSTAL_CODE": "Postal code",
+            "CITY": "City",
+            "CONTACT_INFO": "Contact information",
+            "GENDER": "Gender",
+            "GENDER_MALE": "male",
+            "GENDER_FEMALE": "female",
+            "FIRST_NAME": "First name",
+            "LAST_NAME": "Last name",
+            "STREET": "Street",
+            "NUMBER": "Number",
+            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "MAIL": "Email",
+            "CONTACT_ME": "Contact me for updates and secruity issues",
+            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
+            "POLICY_HEADLINE": "Privacy policy and terms of use",
+            "USAGE_STATISTICS": "Usage statistcs",
+            "ERROR_REPORTS": "Error reports",
+            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
+            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "READ_TERMS_OF_USE_AFTER": ""
+         },
+         "SKIP_STATE": {
+            "HEADER": "Maybe next time!",
+            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+         },
+         "THANK_YOU_STATE": {
+            "HEADER": "Thank you for your registration!",
+            "TEXT_LEADING_TO_PATH": "You can change your data at ",
+            "TEXT_LEADING_AFTER_PATH": "at any time."
+         },
+         "ERROR": {
+            "HEADER": "Error",
+            "TEXT": "An error occurred while processing your request."
+         },
+         "DELETE_SUBMIT_STATE": {
+            "TEXT": "Are you sure you want to delete your registration data?"
+         }
+      }
+   },
+   "EVENTS": {
+      "LICENSE": {
+         "ALLRIGHTS": "כל הזכויות שמורות",
+         "CCBY": "עותק על-ידי",
+         "CCBYSA": "CC BY-SA",
+         "CCBYND": "CC BY-ND",
+         "CCBYNC": "CC BY-NC",
+         "CCBYNCSA": "CC BY-NC-SA",
+         "CCBYNCND": "CC BY-NC-ND",
+         "CC0": "CC0",
+         "BSD": "BSD",
+         "CCND": "CCND",
+         "GPL": "GPL"
+      },
+      "EVENTS": {
+         "NEW": {
+            "CAPTION": "צור אירוע",
+            "METADATA": {
+               "CAPTION": "מטא-נתונים"
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "מטה-נתונים מורחב",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "מטה-נתונים מורחב"
+               }
+            },
+            "SOURCE": {
+               "CAPTION": "מקור",
+               "SELECT_SOURCE": "בחר מקור",
+               "PLACEHOLDER": {
+                  "LOCATION": "מיקום",
+                  "INPUTS": "כניסות",
+                  "HOUR": "שעה",
+                  "MINUTE": "דקה",
+                  "REPEATS": "חזרות",
+                  "START_DATE": "yyyy-mm-dd",
+                  "START_DATE_FORMAT": "yyyy-mm-dd",
+                  "END_DATE": "yyyy-mm-dd",
+                  "END_DATE_FORMAT": "yyyy-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "העלאה",
+                  "RECORDING_ELEMENTS": "רכיבי הקלטה",
+                  "RECORDING_METADATA": "הקלטת מטא נתונים",
+                  "SEGMENTABLE": {
+                     "SHORT": "שקופיות",
+                     "DETAIL": "הקובץ מכיל הקלטה של מצגת שקופיות (Keynote, Powerpoint, וכו ')."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "מציג",
+                     "DETAIL": "הקובץ מכיל הקלטה של אדם הדובר בפני קהל."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "שמע בלבד",
+                     "DETAIL": "הקובץ מכיל רק שמע."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "מספר חלקים",
+                     "DETAIL": "קבוצה של קבצים המכילים חלקים שונים של האירוע."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "תיזמון",
+                  "START_DATE": "תאריך התחלה",
+                  "START_TIME": "זמן ההתחלה",
+                  "TIMEZONE": "איזור זמן",
+                  "END_DATE": "תאריך סיום",
+                  "END_TIME": "זמן סיום",
+                  "DURATION": "משך"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "תזמן אירוע בודד"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "תזמן מספר ארועים",
+                  "REPEATS": "חזרות",
+                  "REPEAT_ON": "חזור על",
+                  "WEEKDAYS": "ימי השבוע",
+                  "WEEKDAY": "יום בשבוע"
+               },
+               "NO_SOURCE_AVAILABLE": "אין שרותים זמינים לתזמון לכידה"
+            },
+            "PROCESSING": {
+               "CAPTION": "מעבד",
+               "SELECT_WORKFLOW": "בחר מהלך עבודה",
+               "SELECT_WORKFLOW_EMPTY": "לא נמצא מהלך עבודה",
+               "WORKFLOW": "מהלך עבודה"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "האלעת נכסים",
+               "SELECT_TYPE": "בחר סוג נכס",
+               "ADD": "הוסף נכס",
+               "NO_OPTIONS": "רשימה של אפשרויות נכסים לא סופק עבור המקטע הזה של הדף!",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "הערות בכתב יד",
+                  "CAPTIONS_DFXP": "כתוביות DFXP",
+                  "CAPTIONS_WEBVTT": "כתוביות לכבדי שמיעה WebVTT",
+                  "PREVIEW_IMAGE": "תמונת תצוגה מקדימה",
+                  "SMIL": "קטלוג סימלונים",
+                  "TRACK_PARTS": "עקוב אחר חלקים"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "מדיניות גישה",
+               "POLICY": "מדיניות גישה",
+               "ACL": "מדיניות גישה"
+            },
+            "SUMMARY": {
+               "CAPTION": "תקציר",
+               "SOURCE": {
+                  "INPUT": "כניסה"
+               }
+            },
+            "WEEKDAYS": {
+               "MO": "יום שני",
+               "TU": "יום שלישי",
+               "WE": "רביעי",
+               "TH": "חמישי",
+               "FR": "שישי",
+               "SA": "שבת",
+               "SU": "ראשון"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "שני",
+               "TU": "שלישי",
+               "WE": "רביעי",
+               "TH": "חמישי",
+               "FR": "שישי",
+               "SA": "שבת",
+               "SU": "ראשון"
+            }
+         },
+         "NAVIGATION": {
+            "EVENTS": "אירועים",
+            "SERIES": "סדרות",
+            "OVERVIEW": "תקציר"
+         },
+         "UPLOAD": "העלאה",
+         "ADD_SERIES": "הוסף סדרה",
+         "ADD_EVENT": "הוסף ארוע",
+         "TABLE": {
+            "CAPTION": "אירועים",
+            "TITLE": "כותרת",
+            "PRESENTERS": "מציג(ים)",
+            "SERIES": "סדרה",
+            "DATE": "תאריך",
+            "START": "התחל",
+            "END": "סוף",
+            "STOP": "עצור",
+            "STATUS": "מצב",
+            "LOCATION": "מיקום",
+            "ACTION": "פעולות",
+            "FIRST": "ראשון",
+            "LAST": "אחרון",
+            "NEXT": "הבא",
+            "MANAGED_ACL": "מדיניות גישה",
+            "WORKFLOW_STATE": "התקדמות",
+            "PREVIOUS": "הקודם",
+            "NOCONTENT": "אין נתונים זמינים",
+            "PUBLISHED": "פורסם",
+            "WEEKDAY": "יום חול",
+            "TOOLTIP": {
+               "ASSETS": "Open asset details",
+               "START": "מסנן עבור תאריך ההתחלה הזה",
+               "SERIES": "מסנן עבור סדרה זו",
+               "STATUS": "מסנן עבור מצב אירוע",
+               "LOCATION": "מסנן עבור מיקום זה",
+               "DETAILS": "הצגת פרטי אירוע",
+               "DELETE": "מחק אירוע",
+               "EMBEDDING_CODE": "Embedding code",
+               "EDITOR": "פתח עורך וידאו",
+               "EDITOR_NEEDS_CUTTING": "פתח עורך וידאו (הערה מציינת כי חיתוך הווידאו התבקש)",
+               "COMMENTS": "הצגת הערות",
+               "PAUSED_WORKFLOW": "הצגת תהליכי עבודה מושהים",
+               "PRESENTER": "מסנן עבור מציג זה"
+            }
+         },
+         "STATUS": {
+            "SCHEDULED": "מתוזמן",
+            "RECORDING": "מקליט",
+            "UPLOADING": "מעלה",
+            "INGESTING": "לעבד",
+            "PENDING": "ממתין",
+            "PROCESSING": "פועל",
+            "PAUSED": "מושהה",
+            "PROCESSED": "הסתיים",
+            "RECORDING_FAILURE": "הקלטה נכשלה",
+            "PROCESSING_FAILURE": "עיבוד נכשל",
+            "PROCESSING_CANCELED": "עיבוד בוטל"
+         },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DELETING": "מוחק",
+            "DUPLICATING": "משכפל",
+            "PUBLISHING": "מפרסם",
+            "IMPORTING": "מייבא",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
+         },
+         "DETAILS": {
+            "HEADER": "פרטי אירוע - {{resourceId}}",
+            "TABS": {
+               "METADATA": "מטא-נתונים",
+               "EXTENDED-METADATA": "מטא-נתונים II",
+               "ASSETS": "נכסים",
+               "PUBLICATIONS": "פרסומים",
+               "SCHEDULING": "תזמון",
+               "WORKFLOWS": "תהליכים",
+               "ACCESS": "מדיניות גישה",
+               "COMMENTS": "הערות",
+               "STATISTICS": "סטטיסטיקות"
+            },
+            "PUBLICATIONS": {
+               "CAPTION": "פרסומים",
+               "NO_PUBLICATIONS_AVAILABLE": "לאירוע זה אין פרסומים",
+               "PUBLICATION_DESCRIPTION": "האירוע הזה פורסם לערוצים הציבוריים הבאים:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "אירוע זה אינו נמצא כעת בתהליך",
+               "CUSTOM": "מותאם אישית",
+               "ENGAGE": "צפייה",
+               "ENGAGE_LIVE": "צפייה חיה",
+               "EXTERNAL_API": "פרסום API חיצוני",
+               "YOUTUBE": "יוטיוב",
+               "OAIPMH": "OAI-PMH",
+               "SELECT_WORKFLOW": "בחר מהלך עבודה",
+               "SELECT_WORKFLOW_EMPTY": "לא קיימים מהלכי עבודה"
+            },
+            "MEDIA": {
+               "TRIM_MEDIA": "לקצץ מדיה",
+               "MEDIA": "מדיה",
+               "ID": "מזהה",
+               "TYPE": "סוג",
+               "MIMETYPE": "Mimetype",
+               "URL": "כתובת אינטרנט",
+               "DETAILS": "פרטים"
+            },
+            "ATTACHMENTS": {
+               "CAPTION": "קבצים מצורפים",
+               "ID": "מזהה",
+               "TYPE": "סוג",
+               "MIMETYPE": "Mimetype",
+               "TAGS": "תגיות",
+               "LINK": "קישור"
+            },
+            "SOURCE": {
+               "CAPTION": "מקור",
+               "SELECT_SOURCE": "בחר מקור",
+               "PLACEHOLDER": {
+                  "LOCATION": "מיקום",
+                  "INPUTS": "כניסות",
+                  "HOUR": "שעה",
+                  "MINUTE": "דקה",
+                  "REPEATS": "חזרות",
+                  "START_DATE": "yyyy-mm-dd",
+                  "END_DATE": "yyyy-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "העלאה",
+                  "RECORDING_ELEMENTS": "רכיבי הקלטה",
+                  "SEGMENTABLE": {
+                     "SHORT": "שקופיות",
+                     "DETAIL": "הקובץ מכיל הקלטה של מצגת שקופיות (Keynote, Powerpoint, וכו ')."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "מציג",
+                     "DETAIL": "הקובץ מכיל הקלטה של אדם הדובר בפני קהל."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "שמע בלבד",
+                     "DETAIL": "הקובץ מכיל רק שמע."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "תיזמון",
+                  "START_DATE": "תאריך התחלה",
+                  "START_TIME": "זמן ההתחלה",
+                  "TIMEZONE": "איזור זמן",
+                  "END_DATE": "תאריך סיום",
+                  "END_TIME": "זמן סיום",
+                  "DURATION": "משך"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "תזמן אירוע בודד"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "תזמן מספר ארועים",
+                  "REPEATS": "חזרות",
+                  "REPEAT_ON": "חזור על",
+                  "WEEKDAYS": "ימים בשבוע"
+               }
+            },
+            "ASSETS": {
+               "CAPTION": "נכסים",
+               "TYPE": "סוג",
+               "SIZE": "גודל",
+               "DETAILS": "פרטים",
+               "STREAMS": "שידורים",
+               "PREVIEW": "תצוגה מקדימה",
+               "ATTACHMENTS": {
+                  "TITLE": "קבצים מצורפים",
+                  "CAPTION": "קבצים מצורפים",
+                  "ID": "מזהה",
+                  "TYPE": "סוג",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "תגיות",
+                  "LINK": "קישור",
+                  "DETAILS": {
+                     "TITLE": "פרטי קובץ מצורף",
+                     "CAPTION": "פרטי קובץ מצורף",
+                     "ID": "מזהה",
+                     "TYPE": "סוג",
+                     "MIMETYPE": "Mimetype",
+                     "TAGS": "תגיות",
+                     "URL": "כתובת אינטרנט",
+                     "SIZE": "גודל",
+                     "CHECKSUM": "מחרוזת בדיקה",
+                     "REFERENCE": "יחס"
+                  }
+               },
+               "CATALOGS": {
+                  "TITLE": "קטלוגים",
+                  "CAPTION": "קטלוגים",
+                  "ID": "מזהה",
+                  "TYPE": "סוג",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "תגיות",
+                  "LINK": "קישור",
+                  "DETAILS": {
+                     "TITLE": "פרטי קטלוג",
+                     "CAPTION": "פרטי קטלוג",
+                     "ID": "מזהה",
+                     "TYPE": "סוג",
+                     "MIMETYPE": "Mimetype",
+                     "TAGS": "תגיות",
+                     "URL": "כתובת אינטרנט",
+                     "SIZE": "גודל",
+                     "CHECKSUM": "מחרוזת בדיקה",
+                     "REFERENCE": "הפניה"
+                  }
+               },
+               "MEDIA": {
+                  "TITLE": "מדיה",
+                  "CAPTION": "מדיה",
+                  "ID": "מזהה",
+                  "TYPE": "סוג",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "תגיות",
+                  "LINK": "קישור",
+                  "DETAILS": {
+                     "TITLE": "פרטי מדיה",
+                     "ID": "מזהה",
+                     "TYPE": "סוג",
+                     "MIMETYPE": "Mimetype",
+                     "URL": "כתובת אינטרנט",
+                     "RECORDING_DATE": "תאריך הקלטה",
+                     "FLAVOR": "טעם",
+                     "TAGS": "תגיות",
+                     "DURATION": "משך זמן",
+                     "STREAM_AUDIO": "ערוצי קול",
+                     "STREAM_VIDEO": "ערוצי סרט",
+                     "CHANNELS": "ערוצים",
+                     "BITRATE": "Bit rate",
+                     "BITDEPTH": "Bit depth",
+                     "SAMPLINGRATE": "קצב דגימה",
+                     "FRAMECOUNT": "מספר פריימים",
+                     "PEAKLEVELDB": "רמת שיא (dB)",
+                     "RMSLEVELDB": "רמת RMS (dB)",
+                     "RMSPEAKDB": "שיא RMS (dB)",
+                     "FRAMERATE": "קצב פריימים",
+                     "RESOLUTION": "רזולוציה",
+                     "SIZE": "גודל",
+                     "SCANTYPE": "סוג סריקה",
+                     "SCANORDER": "סדר סקירה"
+                  }
+               },
+               "PUBLICATIONS": {
+                  "TITLE": "פרסומים",
+                  "CAPTION": "פרסומים",
+                  "CHANNEL": "ערוץ",
+                  "ID": "מזהה",
+                  "TYPE": "סוג",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "תגיות",
+                  "LINK": "קישור",
+                  "DETAILS": {
+                     "TITLE": "פרטי פרסום",
+                     "CAPTION": "פרטי פרסום",
+                     "ID": "מזהה",
+                     "TYPE": "סוג",
+                     "MIMETYPE": "Mimetype",
+                     "TAGS": "תגיות",
+                     "URL": "כתובת אינטרנט",
+                     "SIZE": "גודל",
+                     "CHANNEL": "ערוץ",
+                     "REFERENCE": "יחס"
+                  }
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "מדיניות גישה",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "תבניות"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "מדיניות גישה",
+                  "DESCRIPTION": "",
+                  "LABEL": "בחר תבנית",
+                  "EMPTY": "לא נמצאה תבנית",
+                  "ROLE": "תפקיד",
+                  "WRITE": "כתיבה",
+                  "READ": "קריאה",
+                  "ADDITIONAL_ACTIONS": "פעולות נוספות",
+                  "ACTION": "פעולות",
+                  "NEW": "מדיניות חדשה",
+                  "DETAILS": "פרטים"
+               },
+               "ROLES": {
+                  "LABEL": "בחר תפקיד",
+                  "EMPTY": "לא נצאו תפקידים"
+               }
+            },
+            "COMMENTS": {
+               "CAPTION": "הערות",
+               "PLACEHOLDER": "הערות…",
+               "SELECTPLACEHOLDER": "בחר את הסיבות",
+               "RESOLVED": "נפתר",
+               "REPLY": "השב",
+               "REPLY_TO": "השיבו ל-",
+               "CANCEL_REPLY": "בטל",
+               "DELETE": "מחק",
+               "REASON": "סיבה",
+               "REASONS": {
+                  "CUTTING": "חיתוך נדרש",
+                  "REVIEW": "סקירת דרישות",
+                  "ASYNC": "רצועות שמע/וידאו לא מתואמות",
+                  "AUDIO_ISSUE": "רצועת שמע חסרה או פגומה",
+                  "CANCELED": "אירועים מבוטלים",
+                  "CONFLICTING_METADATA": "מטה-נתונים סותרים",
+                  "IMPROPER_POINT": "לא נכון או מחוץ נקודה",
+                  "MISSING_AGREEMENT": "הסכמה חסרה",
+                  "OTHER": "אחר",
+                  "PRIVACY": "שמירת פרטיות",
+                  "SEGMENTATION": "פילוח לא מדויק",
+                  "UNKNOWN_CREATOR": "יוצר לא ידוע",
+                  "VIDEO_ISSUE": "וידאו מעוות או הרוס",
+                  "WRONG_INPUT_FORMAT": "סוג הקובץ אינו נתמך",
+                  "WRONG_METADATA": "מטה-נתונים צריכים תיקון",
+                  "WRONG_SERIES_PUBLICATION": "סדרה או ערוץ פרסום שגוי",
+                  "WRONG_WORKFLOW": "תהליך עבודה שגוי",
+                  "PROCESSING_FAILURE": "עיבוד נכשל"
+               }
+            },
+            "STATISTICS": {
+               "CAPTION": "סטטיסטיקות"
+            },
+            "METADATA": {
+               "CAPTION": "פרטי אירוע",
+               "TITLE": "כותרת",
+               "ID": "UID",
+               "SERIES": "סדרות",
+               "RECORDING_DATE": "תאריך הקלטה",
+               "SUBJECT": "נושא",
+               "DESCRIPTION": "תאור",
+               "START_DATE": "תאריך התחלה",
+               "START_TIME": "זמן ההתחלה",
+               "DURATION": "משך",
+               "LOCATION": "מיקום",
+               "SOURCE": "מקור",
+               "CREATED": "נוצר",
+               "CREATED_BY": "נוצר על-ידי",
+               "PUBLISHER": "מפרסם",
+               "LICENSE": "רישיון",
+               "CONTRIBUTORS": "תורמ(ים)",
+               "RIGHTS": "זכויות",
+               "PRESENTERS": "מציג(ים)",
+               "LANGUAGE": "שפה",
+               "COPYRIGHT": "זכויות יוצרים",
+               "VISIBILITY": "נראות",
+               "PUBLIC": "מיועד לציבור",
+               "OS": "מערכת ההפעלה שמעבדת",
+               "LOCKED": {
+                  "RUNNING": "עריכת מטא-נתונים אינו מותר כאשר פעולות רצות על אירוע"
+               }
+            },
+            "SCHEDULING": {
+               "CAPTION": "תצורת תיזמון",
+               "PLACEHOLDER": {
+                  "PRESENTERS": "מציג(ים)"
+               }
+            },
+            "WORKFLOWS": {
+               "ACTIONS": "פעולות",
+               "DETAILS": "פרטים",
+               "DESCRIPTION": "תאור",
+               "MORE_INFO": "מידע נוסף",
+               "ID": "מזהה",
+               "TYPE": "סוג",
+               "TITLE": "כותרת",
+               "STATUS": "מצב",
+               "STARTED": "החל",
+               "SERIES": "סדרות",
+               "SUBMITTED": "נשלח",
+               "SUBMITTER": "מגיש",
+               "EXECUTION_TIME": "זמן ביצוע",
+               "WDID": "הגדרה של תהליך עבודה",
+               "MIMETYPE": "Mimetype",
+               "URL": "כתובת אינטרנט",
+               "CONFIGURATION": "הגדרות",
+               "NO_CONFIGURATION": "אין הגדרת פרמטרים למהלך העבודה שנבחר.",
+               "WORKFLOW": "מהלך עבודה",
+               "TOOLTIP": {
+                  "STOP": "עצירת התהליך",
+                  "ABORT": "ביטול ביצוע של תהליך עבודה (אל תנסה לבצע שוב פעולות שנכשלו)",
+                  "RETRY": "נסה שנית לבצע מופע תהליך עבודה",
+                  "DELETE": "מחיקת תהליך עבודה",
+                  "DETAILS": "פתח פרטי תהליך העבודה"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "מופעל",
+                  "RUNNING": "פועל",
+                  "PAUSED": "מושהה",
+                  "SUCCEEDED": "הצליח",
+                  "FAILED": "נכשל",
+                  "FAILING": "נכשל",
+                  "SKIPPED": "דולג",
+                  "STOPPED": "נעצר",
+                  "RETRY": "ניסיון נוסף"
+               }
+            },
+            "WORKFLOW_INSTANCES": {
+               "TITLE": "תהליכים"
+            },
+            "WORKFLOW_DETAILS": {
+               "TITLE": "פרטי מהלך-עבודה",
+               "CONFIGURATION": "הגדרות מהלך-עבודה"
+            },
+            "WORKFLOW_OPERATIONS": {
+               "TITLE": "פעולות מהלך-עבודה",
+               "DETAILS_LINK": "תהליכים",
+               "TABLE_HEADERS": {
+                  "TITLE": "כותרת",
+                  "STATUS": "מצב",
+                  "DESCRIPTION": "תאור"
+               }
+            },
+            "OPERATION_DETAILS": {
+               "TITLE": "פרטי פעולה",
+               "TABLE_HEADERS": {
+                  "TITLE": "כותרת",
+                  "STATE": "מצב",
+                  "DESCRIPTION": "תאור",
+                  "EXECUTION_HOST": "מארח מבצע",
+                  "JOB": "עבודה",
+                  "TIME_IN_QUEUE": "זמן בתור",
+                  "STARTED": "החל",
+                  "FINISHED": "הסתיים",
+                  "RETRY_STRATEGY": "אסטרטגיית נסיון נוסף",
+                  "FAILED_ATTEMPTS": "נסיונות שנכשלו",
+                  "MAX_ATTEMPTS": "מקסימום",
+                  "EXCEPTION_HANDLER_WORKFLOW": "תהליך עבודה עבור טיפול בחריגות",
+                  "FAIL_ON_ERROR": "הכשל במקרה של טעויות"
+               }
+            },
+            "QUICKACTION_WORKFLOW_DETAILS": {
+               "TITLE": "פרטי מהלך-עבודה"
+            },
+            "MEDIA_DETAILS": {
+               "TITLE": "פרטי מדיה",
+               "ID": "מזהה",
+               "TYPE": "סוג",
+               "MIMETYPE": "Mimetype",
+               "URL": "כתובת אינטרנט",
+               "RECORDING_DATE": "תאריך הקלטה",
+               "TAGS": "תגיות",
+               "DURATION": "משך",
+               "STREAM_AUDIO": "ערוצי קול",
+               "STREAM_VIDEO": "ערוצי וידאו",
+               "CHANNELS": "ערוצים",
+               "BITRATE": "קצב סיביות",
+               "FRAMERATE": "קצב תמונות",
+               "RESOLUTION": "רזולוציה"
+            },
+            "ERRORS_AND_WARNINGS": {
+               "HEADER": "שגיאות & אזהרות",
+               "TITLE": "שגיאות & אזהרות",
+               "DATE": "תאריך",
+               "HOST": "מארח",
+               "TYPE": "סוג",
+               "EMPTY": "אין שגיאות",
+               "DETAILS": {
+                  "HEADER": "פרטי שגיאה",
+                  "SEVERITY": "חומרה",
+                  "TITLE": "כותרת",
+                  "DESCRIPTION": "תאור",
+                  "JOB_ID": "מזהה משימה",
+                  "DATE": "תאריך",
+                  "HOST": "מארח מעבד",
+                  "TYPE": "סוג שירות",
+                  "TECHNICAL_DETAILS": "פרטים טכניים"
+               }
+            }
+         }
+      },
+      "SERIES": {
+         "NEW": {
+            "CAPTION": "צור סדרה",
+            "METADATA": {
+               "CAPTION": "מטא-נתונים",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "מטא-נתונים"
+               }
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "מטא-נתונים מורחב",
+               "METADATA": {
+                  "TITLE": "מטה-נתונים מורחב"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "מדיניות גישה",
+               "TEMPLATES": {
+                  "TITLE": "תבניות"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "מדיניות גישה",
+                  "DESCRIPTION": "לפחות תפקיד אחד עם הרשאות קריאה וכתיבה נדרש.",
+                  "LABEL": "בחר תבנית",
+                  "EMPTY": "לא נמצאה תבנית",
+                  "ROLE": "תפקיד",
+                  "WRITE": "כתיבה",
+                  "READ": "קריאה",
+                  "ADDITIONAL_ACTIONS": "פעולות נוספות",
+                  "ACTION": "פעולות",
+                  "NEW": "מדיניות חדשה",
+                  "DETAILS": "פרטים"
+               },
+               "ROLES": {
+                  "LABEL": "בחר תפקיד",
+                  "EMPTY": "לא נצאו תפקידים"
+               }
+            },
+            "THEME": {
+               "CAPTION": "ערכת נושא",
+               "DESCRIPTION": {
+                  "TEXT": "באפשרותך להשתמש בערכות נושא ולמתג את סרטי הווידאו שלך. ערכות נושא עשויים להגדיר סרטח פתיח וקדימון, סימני מים, שקופיות הכותרת כולל מטא-נתונים."
+               },
+               "TITLE": "ערכת נושא",
+               "LABEL": "אין ערכת נושא",
+               "EMPTY": "לא נמצאו ערכות נושא"
+            },
+            "SUMMARY": {
+               "CAPTION": "סיכום"
+            }
+         },
+         "TABLE": {
+            "CAPTION": "סדרות",
+            "TITLE": "סדרות",
+            "HAS_EVENTS": "מכיל אירועים",
+            "ORGANIZERS": "אירגונ(ים)",
+            "CONTRIBUTORS": "תורמ(ים)",
+            "CREATED": "נוצר",
+            "MANAGED_ACL": "מדיניות גישה",
+            "EVENTS": "אירועים",
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "SERIES": "סנן אירועים עבור סדרה זו",
+               "DETAILS": "פתיחת פרטי הסדרה",
+               "DELETE": "מחיקת הסדרה"
+            }
+         },
+         "DETAILS": {
+            "HEADER": "פרטי סידרה - {{resourceId}}",
+            "TABS": {
+               "METADATA": "מטא-נתונים",
+               "EXTENDED_METADATA": "מטא-נתונים II",
+               "EVENTS": "אירועים",
+               "PERMISSIONS": "מדיניות גישה",
+               "THEME": "ערכת נושא",
+               "STATISTICS": "סטטיסטיקות"
+            },
+            "ACCESS": {
+               "CAPTION": "מדיניות גישה",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "תבניות"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "מדיניות גישה",
+                  "DESCRIPTION": "",
+                  "LABEL": "בחר תבנית",
+                  "EMPTY": "לא נמצאה תבנית",
+                  "ROLE": "תפקיד",
+                  "WRITE": "כתיבה",
+                  "READ": "קריאה",
+                  "ADDITIONAL_ACTIONS": "פעולות נוספות",
+                  "ACTION": "פעולות",
+                  "NEW": "מדיניות חדשה",
+                  "DETAILS": "פרטים",
+                  "REPLACE_EVENT_ACLS": "עדכון הרשאות אירוע",
+                  "REPLACE_EVENT_ACLS_HINT": "בדיקה שכל האירועים של סדרה זו יש הרשאות אלה בתוקף",
+                  "LOAD_MORE_LIMIT": "policies shown.",
+                  "LOAD_MORE_LINK": "Load more"
+               },
+               "ROLES": {
+                  "LABEL": "בחר תפקיד",
+                  "EMPTY": "לא נמצא תפקיד"
+               }
+            },
+            "METADATA": {
+               "TITLE": "כותרת",
+               "ID": "UID",
+               "SERIES": "סדרות",
+               "PUBLISHERS": "מפרסמ(ים)",
+               "ORGANIZERS": "אירגונ(ים)",
+               "CONTRIBUTORS": "תורמ(ים)",
+               "RECORDING_DATE": "תאריך הקלטה",
+               "CREATED_BY": "נוצר על-ידי",
+               "RIGHTS": "זכויות",
+               "SUBJECT": "נושא",
+               "LANGUAGE": "שפה",
+               "LICENSE": "רישיון",
+               "DESCRIPTION": "תאור"
+            },
+            "EVENTS": {
+               "TITLE": "כותרת",
+               "PRESENTER": "מציג(ים)",
+               "CREATED": "נוצר",
+               "MODIFIED": "נערך לאחרונה",
+               "STATUS": "מצב",
+               "LOCATION": "מיקום",
+               "LINK": "קישור"
+            }
+         }
+      }
+   },
+   "RECORDINGS": {
+      "NAVIGATION": {
+         "LOCATIONS": "מיקומים"
+      },
+      "ACTIONS": {
+         "EXPORT": "יצא",
+         "REMOVE": "הסר"
+      },
+      "RECORDINGS": {
+         "TABLE": {
+            "CAPTION": "מיקומים",
+            "TITLE": "UID",
+            "NAME": "שם",
+            "LOCATION": "מיקום",
+            "UPDATED": "עדכון אחרון",
+            "NEXT_DATE": "האירוע הבא",
+            "NEXT_NAME": "כותרת האירוע הבא",
+            "STATUS": "מצב",
+            "VERSION": "גירסה",
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "NAME": "סנן אירועים עבור מיקום זה",
+               "DETAILS": "פתיחת פרטי מיקום",
+               "DELETE": "מחיקת מיקום (ביטול רישום סוכן לכידת תמונה)"
+            }
+         },
+         "DETAILS": {
+            "HEADER": "פרטי מיקום - {{resourceId}}",
+            "TAB": {
+               "GENERAL": "כללי",
+               "CONFIGURATION": "הגדרות",
+               "CAPABILITIES": "יכולות"
+            },
+            "GENERAL": {
+               "CAPTION": "כללי",
+               "NAME": "שם",
+               "URL": "כתובת",
+               "STATUS": "מצב",
+               "UPDATE": "נשמע לאחרונה"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "הגדרות",
+               "NO_CONFIGURATION": "לא סופקו הגדרות"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "יכולות",
+               "NO_CAPABILITIES": "לא סופקו יכולות"
+            }
+         }
+      }
+   },
+   "USERS": {
+      "ACTIONS": {
+         "ADD_USER": "הוסף משתמש",
+         "ADD_GROUP": "הוסף קבוצה",
+         "ADD_ACL": "הוסף מדיניות גישה"
+      },
+      "NAVIGATION": {
+         "USERS": "משתמשים",
+         "GROUPS": "קבוצות",
+         "PERMISSIONS": "מדיניות גישה"
+      },
+      "USERS": {
+         "TABLE": {
+            "CAPTION": "משתמשים",
+            "NAME": "שם",
+            "USERNAME": "שם משתמש",
+            "EMAIL": "דוא\"ל",
+            "ROLES": "תפקידים",
+            "TYPE": "סוג",
+            "PROVIDER": "ספק",
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "DELETE": "מחק משתמש",
+               "DETAILS": "פתיחת פרטי משתמש"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "צור משתמש",
+            "EDITCAPTION": "פרטי משתמש - {{username}}",
+            "TABS": {
+               "USER": "משתמש",
+               "ROLES": "תפקידים",
+               "EXTERNALROLES": "תפקידים חיצוני",
+               "EFFECTIVEROLES": "תפקידים בפועל"
+            },
+            "DESCRIPTION": {
+               "ROLES": "תפקידים וקבוצות שיכולים להיות מוקצים או כבר הוקצו למשתמש.",
+               "EXTERNALROLES": "רשימת התפקידים החיצוניים שהוקצו למשתמש על ידי ספק(י) תפקידים חיצוני(ים).",
+               "EFFECTIVEROLES": "רשימת תפקידים בפועל שהוקצו ישירות למשתמש והתפקידים שהועלו בעקיפין דרך חברות בקבוצה."
+            },
+            "FORM": {
+               "USERNAME": "שם משתמש",
+               "NAME": "שם",
+               "EMAIL": "דוא\"ל",
+               "PASSWORD": "סיסמה",
+               "REPEAT_PASSWORD": "הקלד סיסמא בשנית"
+            },
+            "ROLES": {
+               "LEFT": "תפקידים",
+               "RIGHT": "תפקידים שנבחרו",
+               "REMOVE": "הסר תפקיד",
+               "ADD": "הוסף תפקיד"
+            }
+         }
+      },
+      "GROUPS": {
+         "NEW": {
+            "CAPTION": "צור קבוצה"
+         },
+         "TABLE": {
+            "CAPTION": "קבוצות",
+            "NAME": "שם",
+            "DESCRIPTION": "תאור",
+            "ROLE": "תפקיד",
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "DETAILS": "פתיחת פרטי הקבוצה",
+               "DELETE": "מחק קבוצה"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "צור קבוצה",
+            "EDITCAPTION": "פרטי קבוצה - {{name}}",
+            "TABS": {
+               "GROUP": "קבוצה",
+               "ROLES": "תפקידים",
+               "METADATA": "מטא-נתונים",
+               "USERS": "משתמשים",
+               "SUMMARY": "סיכום"
+            },
+            "FORM": {
+               "NAME": "שם",
+               "DESCRIPTION": "תאור",
+               "SUMMARY": "סיכום",
+               "ROLES": "תפקידים",
+               "USERS": "משתמשים"
+            },
+            "USERS": {
+               "LEFT": "משתמשים",
+               "RIGHT": "משתמשים שנבחרו",
+               "REMOVE": "הסרת משתמש",
+               "ADD": "הוסף משתמש"
+            },
+            "ROLES": {
+               "LEFT": "תפקידים",
+               "RIGHT": "תפקידים שנבחרו",
+               "REMOVE": "הסר תפקיד",
+               "ADD": "הוסף תפקיד"
+            }
+         }
+      },
+      "ACLS": {
+         "TABLE": {
+            "CAPTION": "מדיניות גישה",
+            "NAME": "שם",
+            "CREATED": "נוצר",
+            "CREATOR": "יוצר",
+            "IN_USE": "בשימוש",
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "DELETE": "למחוק את מדיניות גישה",
+               "DETAILS": "פתח פרטים אודות מדיניות גישה"
+            }
+         },
+         "NEW": {
+            "CAPTION": "הוסף מדיניות גישה",
+            "TABS": {
+               "SUMMARY": "סיכום",
+               "METADATA": "מטא-נתונים",
+               "ACCESS": "גישה"
+            },
+            "METADATA": {
+               "TITLE": "מטא-נתונים",
+               "NAME": {
+                  "CAPTION": "שם",
+                  "PLACEHOLDER": "שם…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "מדיניות גישה",
+               "TEMPLATES": {
+                  "TITLE": "תבניות"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "מדיניות גישה",
+                  "LABEL": "בחר תבנית",
+                  "EMPTY": "לא נמצאה תבנית",
+                  "ROLE": "תפקיד",
+                  "WRITE": "כתיבה",
+                  "READ": "קריאה",
+                  "ADDITIONAL_ACTIONS": "פעולות נוספות",
+                  "ACTION": "פעולות",
+                  "NEW": "מדיניות חדשה",
+                  "DETAILS": "פרטים",
+                  "DESCRIPTION": "נא לבחור סט מדיניויות מוגדרות מראש או להוסיף מדיניות מותאמת אישית להלן"
+               },
+               "ROLES": {
+                  "LABEL": "בחר תפקיד",
+                  "EMPTY": "לא נצאו תפקידים"
+               }
+            }
+         },
+         "DETAILS": {
+            "HEADER": "פרטי מדיניות גישה - {{name}}",
+            "TABS": {
+               "SUMMARY": "סיכום",
+               "METADATA": "מטא-נתונים",
+               "ACCESS": "גישה"
+            },
+            "METADATA": {
+               "TITLE": "מטא-נתונים",
+               "NAME": {
+                  "CAPTION": "שם",
+                  "PLACEHOLDER": "שם…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "מדיניות גישה",
+               "TEMPLATES": {
+                  "TITLE": "תבניות"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "מדיניות גישה",
+                  "LABEL": "בחר תבנית",
+                  "EMPTY": "לא נמצאה תבנית",
+                  "ROLE": "תפקיד",
+                  "WRITE": "כתיבה",
+                  "READ": "קריאה",
+                  "ADDITIONAL_ACTIONS": "פעולות נוספות",
+                  "ACTION": "פעולות",
+                  "NEW": "מדיניות חדשה",
+                  "DETAILS": "פרטים",
+                  "DESCRIPTION": "נא לבחור סט מדיניויות מוגדרות מראש או להוסיף מדיניות מותאמת אישית להלן"
+               },
+               "ROLES": {
+                  "LABEL": "בחר תפקיד",
+                  "EMPTY": "לא נמצאו תפקידים"
+               }
+            }
+         }
+      }
+   },
+   "THEMES": {
+      "THEMES": {
+         "DETAILS": {
+            "HEADER": "פרטי ערכת-נושא - {{resourceId}}",
+            "TABS": {
+               "GENERAL": "כללי",
+               "BUMPER": "באמפר (התחלה)",
+               "TRAILER": "באמפר (סיום)",
+               "TITLE": "כותרת",
+               "LICENSE": "רישיון",
+               "WATERMARK": "סימן מים",
+               "USAGE": "שימוש"
+            },
+            "GENERAL": {
+               "CAPTION": "כללי",
+               "NAME": "שם",
+               "DESCRIPTION": "תאור",
+               "DEFAULT": "ברירת מחדל",
+               "SET_DEFAULT_INFO": "הגדר כערכת נושא ברירת מחדל עבור כל הסדרות והאירועים",
+               "NAME_ERROR": "שם זה נמצא כבר בשימוש",
+               "NAME_REQUIRED": "נדרש"
+            },
+            "BUMPER": {
+               "CAPTION": "באמפר (התחלה)",
+               "DESCRIPTION": "סירטון מוגדר מראש אשר מצורף לפני תחילת ההקלטה.",
+               "ACTIVE": "פעיל"
+            },
+            "TRAILER": {
+               "CAPTION": "באמפר (סיום)",
+               "DESCRIPTION": "סירטון מוגדר מראש אשר מצורף לסוף ההקלטה.",
+               "ACTIVE": "פעיל"
+            },
+            "TITLE": {
+               "CAPTION": "כותרת",
+               "DESCRIPTION": "שקופית מוגדרת מראש הכוללת מטה-נתונים אשר מצורף לההתחלה או הסוף של הקלטה.",
+               "ACTIVE": "פעיל"
+            },
+            "WATERMARK": {
+               "CAPTION": "סימן מים",
+               "DESCRIPTION": "תמונה שקופה למחצה אשר נמצא בשכבות על כל פריים של ההקלטה.",
+               "ACTIVE": "פעיל"
+            },
+            "USAGE": {
+               "CAPTION": "שימוש",
+               "SERIES": "שם הסדרה"
+            }
+         }
+      }
+   },
+   "CONFIGURATION": {
+      "ACTIONS": {
+         "ADD_MAIL_TEMPLATE": "הוסף תבנית",
+         "ADD_THEME": "הוסף ערכת נושא"
+      },
+      "NAVIGATION": {
+         "THEMES": "ערכות נושא"
+      },
+      "THEMES": {
+         "TABLE": {
+            "CAPTION": "ערכות נושא",
+            "NAME": "שם",
+            "DESCRIPTION": "תאור",
+            "CREATOR": "יוצר",
+            "CREATED": "נוצר",
+            "DEFAULT": "ברירת מחדל",
+            "USAGE": "שימוש",
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "DELETE": "מחק ערכת עיצוב",
+               "DETAILS": "פתח פרטי ערכת עיצוב"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "יצירת ערכת נושא",
+            "EDITCAPTION": "פרטי ערכת עיצוב - {{name}}",
+            "GENERAL": {
+               "CAPTION": "כללי",
+               "NAME": "שם",
+               "DESCRIPTION": "תאור",
+               "DEFAULT": "ברירת מחדל",
+               "SET_DEFAULT_INFO": "הגדר כערכת-נושא ברירת מחדל עבור כל הסדרות והאירועים",
+               "NAME_REQUIRED": "נדרש"
+            },
+            "BUMPER": {
+               "CAPTION": "באמפר (התחלה)",
+               "FILE_UPLOADED": "קובץ שהועלה: ",
+               "DESCRIPTION": "סירטון מוגדר מראש זה מצורף לפני תחילת ההקלטה.",
+               "ACTIVE": "פעיל",
+               "ENABLE": "לאפשר באמפר",
+               "SELECT": "בחר",
+               "UPLOAD_LABEL": "טעינת וידאו",
+               "UPLOAD_BUTTON": "העלאה"
+            },
+            "TRAILER": {
+               "CAPTION": "באמפר (סיום)",
+               "FILE_UPLOADED": "קובץ שהועלה: ",
+               "DESCRIPTION": "סירטון מוגדר מראש זה מצורף לאחר סוף ההקלטה.",
+               "ACTIVE": "פעיל",
+               "ENABLE": "לאפשר באמפר",
+               "UPLOAD_LABEL": "טעינת וידאו",
+               "UPLOAD_BUTTON": "העלאה",
+               "SELECT": "בחר"
+            },
+            "TITLE": {
+               "CAPTION": "כותרת",
+               "FILE_UPLOADED": "קובץ שהועלה: ",
+               "DESCRIPTION": "שקופית מוגדרת מראש הכוללת מטה-נתונים תיאוריים מצורף לההתחלה או הסוף של הקלטה.",
+               "ACTIVE": "פעיל",
+               "ENABLE": "לאפשר שקופית כותרת",
+               "BACKGROUND": "רקע",
+               "EXTRACT": "חלץ רקע",
+               "UPLOAD": "העלאה",
+               "UPLOAD_LABEL": "העלה תמונה",
+               "UPLOAD_BUTTON": "העלאה"
+            },
+            "WATERMARK": {
+               "CAPTION": "סימן מים",
+               "FILE_UPLOADED": "קובץ שהועלה: ",
+               "DESCRIPTION": "תמונה שקופה למחצה אשר נמצא בשכבות על כל פריים של ההקלטה.",
+               "ACTIVE": "פעיל",
+               "ENABLE": "אפשר סימני מים",
+               "TOP_LEFT": "למעלה משמאל",
+               "TOP_RIGHT": "למעלה מימין",
+               "BOTTOM_LEFT": "למטה משמאל",
+               "BOTTOM_RIGHT": "למטה מימין",
+               "UPLOAD": "העלאה",
+               "POSITION": "מיקום סימן מים ותצוגה מקדימה",
+               "FILEUPLOAD_DESCRIPTION": "קובץ צריך לכלול ערוץ אלפא (רקע שקוף). סוגי הקבצים האפשריים הם:. PNG. GIF. SVG. WEBP",
+               "UPLOAD_LABEL": "העלה תמונה",
+               "UPLOAD_BUTTON": "העלאה"
+            },
+            "SUMMARY": {
+               "CAPTION": "סיכום"
+            },
+            "USAGE": {
+               "CAPTION": "שימוש",
+               "SERIE": "שם הסדרה",
+               "EMPTY": "לא נמצאו סדרות עבור הנושא הנוכחי"
+            }
+         }
+      }
+   },
+   "SYSTEMS": {
+      "NAVIGATION": {
+         "JOBS": "עבודות",
+         "SERVERS": "שרתים",
+         "SERVICES": "שירותים"
+      },
+      "JOBS": {
+         "TABLE": {
+            "ID": "מזהה עבודה",
+            "CAPTION": "עבודות",
+            "CREATED": "נוצר",
+            "CREATOR": "יוצר",
+            "HOST_NAME": "שם מחשב מארח",
+            "NODE_NAME": "שם שרת",
+            "OPERATION": "פעולה",
+            "STARTED": "התחילה",
+            "STATUS": "מצב",
+            "SUBMITTED": "נשלח",
+            "TYPE": "סוג"
+         },
+         "STATUS": {
+            "QUEUED": "בהמתנה",
+            "PAUSED": "מושהה",
+            "RUNNING": "פועל",
+            "FINISHED": "הסתיים",
+            "FAILED": "נכשל",
+            "DELETED": "נמחק",
+            "INSTANTIATED": "מופעל",
+            "DISPATCHING": "משגר",
+            "RESTART": "הפעלה מחדש",
+            "CANCELED": "בוטל",
+            "WAITING": "ממתין"
+         }
+      },
+      "SERVERS": {
+         "TABLE": {
+            "CAPTION": "שרתים",
+            "STATUS": "מצב",
+            "HOST_NAME": "שם מחשב מארח",
+            "NODE_NAME": "שם שרת",
+            "CORES": "ליבות",
+            "COMPLETED": "משימות שהושלמו",
+            "RUNNING": "משימות רצות",
+            "QUEUED": "משימות בתור",
+            "MEAN_RUN_TIME": "זמן ריצה ממוצע",
+            "MEAN_QUEUE_TIME": "זמן ממוצע בתור",
+            "MAINTENANCE": "תחזוקה",
+            "MAINTENANCE_OFF": "הפעל מצב תחזוקה",
+            "MAINTENANCE_ON": "צא ממצב תחזוקה"
+         }
+      },
+      "SERVICES": {
+         "TABLE": {
+            "CAPTION": "שירותים",
+            "STATUS": "מצב",
+            "NAME": "שם שירות",
+            "HOST_NAME": "שם מחשב מארח",
+            "NODE_NAME": "שם שרת",
+            "COMPLETED": "משימות שהושלמו",
+            "RUNNING": "משימות רצות",
+            "QUEUED": "משימות בתור",
+            "MEAN_RUN_TIME": "זמן ריצה ממוצע",
+            "MEAN_QUEUE_TIME": "זמן תור ממוצע",
+            "SANITIZE": "נקה שירות שנכשל",
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "SANITIZE": "שירות סינון ועריכה (הגדרות השירות יחזרו למצבם הרגיל)"
+            }
+         },
+         "STATUS": {
+            "NORMAL": "רגיל",
+            "WARNING": "אזהרה",
+            "ERROR": "שגיאה"
+         }
+      }
+   },
+   "VIDEO_TOOL": {
+      "WARNING_UNSAVED": "אזהרה: חלק את מהשינויים שלך לא נשמרו. אם תצא מעורך הוידאו, שינויים אלה עלולה ללכת לאיבוד. אתה באמת רוצה להמשיך?",
+      "TIMELINE": "ציר הזמן",
+      "ZOOMLEVEL": "רמת גודל התצוגה",
+      "PREVIEW_MODE": "מצב תצוגה מקדימה",
+      "PREVIEW_MODE_TOOLTIP": "לנגן קטעים נבחרים בלבד",
+      "ZOOM": "הגדל/הקטן",
+      "BUTTONS": {
+         "CLOSE": "סגור",
+         "SAVE": "שמור",
+         "PROCESS": "שמור והמשך",
+         "ADD_COMMENT": "הוספת הערה"
+      },
+      "TABS": {
+         "EDIT": "עורך",
+         "CAPTIONS": "כותרות",
+         "ANNOTATIONS": "הערות"
+      },
+      "AREAS": {
+         "METADATA": "מטא-נתונים",
+         "THUMBNAIL": "תמונה ממוזערת",
+         "COMMENTS": "הערות",
+         "SEGMENTS": "מקטעים",
+         "TRACKS": "רצועות"
+      },
+      "ACTIONS": {
+         "SPLIT": "פצל",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "הסתר/הצג",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
+         "UNDO": "בטל",
+         "REDO": "בצע שוב",
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
+      },
+      "SEGMENTS": {
+         "REMOVE_SEGMENT": "הסר מקטע",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
+         "START": "התחל",
+         "END": "סוף"
+      },
+      "THUMBNAIL": {
+         "DESCRIPTION": "תמונת ברירת מחדל ממוזערת המשמשת לתצוגה ויזואלית של אירוע מיוצרת באופן אוטומטי. במקרה ובו תרצו תמונה ממוזערת שונה, אתם צריכים לחלץ תמונה ממוזערת מתוך הוידאו במיקום הנוכחי של הסרטון או להעלות תמונה.",
+         "ACTIONS": {
+            "EXTRACT": {
+               "FROM_VIDEO": {
+                  "LABEL": "חלץ מתוך הוידאו",
+                  "TOOLTIP": "לחלץ את התמונה הממוזערת מהוידאו במיקום הנוכחי בסרטון"
+               },
+               "FROM_LEFT_VIDEO": {
+                  "LABEL": "חלץ מתוך הוידאו השמאלי",
+                  "TOOLTIP": "לחלץ את התמונה הממוזערת מהוידאו השמאלי במיקום הנוכחי בסרטון"
+               },
+               "FROM_RIGHT_VIDEO": {
+                  "LABEL": "חלץ מתוך הוידאו הימני",
+                  "TOOLTIP": "לחלץ את התמונה הממוזערת מהוידאו הימני במיקום הנוכחי בסרטון"
+               }
+            },
+            "UPLOAD": {
+               "LABEL": "העלה תמונה",
+               "TOOLTIP": "העלאת תמונה ממוזערת"
+            },
+            "USE_DEFAULT": {
+               "LABEL": "השתמש בתמונת ברירת המחדל הממוזערת",
+               "TOOLTIP": "השתמש בתמונת ברירת המחדל הממוזערת שנוצרה באופן אוטומטי"
+            }
+         },
+         "PREVIEW": {
+            "NOT_AVAILABLE": "תצוגה מקדימה אינה זמינה",
+            "OUTDATED": "התצוגה המקדימה מיושנת מכיוון שישנם מקטעים ששונו. התצוגה המקדימה תתעדכן מייד לאחר שהשינויים שלך ישמרו."
+         },
+         "CURRENT": {
+            "DEFAULT": "אתם משתמשים כרגע בתמונת ברירת מחדל ממוזערת.",
+            "SNAPSHOT": "תמונה ממוזערת זו חולצה מהוידאו.",
+            "UPLOAD": "אתם משתמשים כרגע בתמונה ממוזערת שהועלתה."
+         }
+      },
+      "TRACKS": {
+         "DESCRIPTION": "אתם יכולים לבטל בחירה של רצועות בשביל שלא יכללו בתהליך העיבוד בהמשך. סימו לב שעליכם לפרסם (מחדש) את האירוע בשביל להכיל את השינויים בפועל.",
+         "NOTIFICATION": {
+            "NO_VIDEO_TRACK_SELECTED": "עליך לאפשר לפחות סרטון וידיאו אחד",
+            "NO_AUDIO_TRACK_SELECTED": "עליך לאפשר לפחות רצועת שמע אחת"
+         },
+         "TRACK": {
+            "HEADER": "רצועה"
+         },
+         "VIDEO": {
+            "HEADER": "סרטון הווידיאו",
+            "NOT_AVAILABLE": "אין רצועות וידאו זמינות",
+            "NO_PREVIEW_AVAILABLE": "לא נמצאה תמונה מקדימה",
+            "NO_TRACK_SELECTED": "לא נבחרה רצועת שמע",
+            "TOOLTIPS": {
+               "HIDE": "רצועת וידאו זו כרגע מאופשרת. לחץ לביטול",
+               "UNHIDE": "רצועת וידאו זו כרגע מבוטלת. לחץ לאיפשור."
+            }
+         },
+         "AUDIO": {
+            "HEADER": "רצועת שמע",
+            "NOT_AVAILABLE": "אין רצועות שמע זמינות",
+            "NO_PREVIEW_AVAILABLE": "לא נמצאה תמונה מקדימה",
+            "NO_TRACK_SELECTED": "לא נבחרה רצועת שמע",
+            "TOOLTIPS": {
+               "HIDE": "רצועת שמע זו כרגע מאופשרת. לחץ לביטול",
+               "UNHIDE": "רצועת שמע זו כרגע מבוטלת. לחץ לאיפשור"
+            }
+         }
+      },
+      "PLAYER": {
+         "PLAY": "הפעל",
+         "PAUSE": "השהה",
+         "NEXT_FRAME": "לפריים הבא",
+         "PREVIOUS_FRAME": "פריים קודם",
+         "NEXT_SEGMENT": "קטע הבא / קפיצה אל הסוף",
+         "PREVIOUS_SEGMENT": "המקטע הקודם / קפיצה להתחלה",
+         "MUTE": "השתק",
+         "VOLUME": "עוצמת שמע"
+      }
+   },
+   "LOGIN": {
+      "WELCOME": "ברוכים הבאים ל Opencast",
+      "REMEMBER": "זכור אותי במחשב זה",
+      "USERNAME": "שם משתמש…",
+      "PASSWORD": "סיסמה…",
+      "LOGIN": "התחברות למערכת",
+      "ERROR": "שם משתמש או סיסמה שגויים"
+   },
+   "TABLE_FILTERS": {
+      "FILTER_SELECTION": {
+         "PLACEHOLDER": "נא בחר מסנן…",
+         "NO_OPTIONS": "לא נמצאו מסננים"
+      },
+      "FILTER_VALUE_SELECTION": {
+         "PLACEHOLDER": "נא בחר ערך…",
+         "NO_OPTIONS": "לא נמצאו ערכים"
+      },
+      "CLEAR": "ניקוי כל המסננים",
+      "REMOVE": "הסר מסנן",
+      "ADD": "הוספת מסנן",
+      "PLACEHOLDER": "חיפוש…",
+      "PROFILES": {
+         "FILTERS_HEADER": "סטים של מסננים שמורים",
+         "EDIT": "ערוך סט מסננים",
+         "REMOVE": "הסרת מסננים שמורים",
+         "EMPTY": "אין עדין מסננים שמורים",
+         "SAVE_FILTERS": "שמור",
+         "FILTER_HEADER": "שמור סט מסננים",
+         "NAME": "שם",
+         "NAME_PLACEHOLDER": "שם…",
+         "DESCRIPTION": "תאור",
+         "DESCRIPTION_PLACEHOLDER": "תיאור…"
+      }
+   },
+   "FILTERS": {
+      "ACLS": {
+         "NAME": {
+            "LABEL": "שם"
+         }
+      },
+      "AGENTS": {
+         "NAME": {
+            "LABEL": "שם"
+         },
+         "STATUS": {
+            "LABEL": "מצב"
+         }
+      },
+      "EVENTS": {
+         "AGENT_ID": {
+            "LABEL": "מזהה שרות לכידה"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "מדיניות גישה"
+         },
+         "COMMENTS": {
+            "LABEL": "הערות",
+            "NONE": "אף אחד",
+            "OPEN": "פתח",
+            "RESOLVED": "נפתר"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "תורמים"
+         },
+         "CREATOR": {
+            "LABEL": "יוצר"
+         },
+         "PUBLISHER": {
+            "LABEL": "מפרסם"
+         },
+         "HOSTNAME": {
+            "LABEL": "שם מחשב מארח"
+         },
+         "LANGUAGE": {
+            "LABEL": "שפה"
+         },
+         "LICENSE": {
+            "LABEL": "רישיון"
+         },
+         "LOCATION": {
+            "LABEL": "מיקום"
+         },
+         "PERIOD": {
+            "LABEL": "תקופה"
+         },
+         "PRESENTERS_BIBLIOGRAPHIC": {
+            "LABEL": "בבילוגרפיית מציג"
+         },
+         "PRESENTERS_TECHNICAL": {
+            "LABEL": "מציג טכני"
+         },
+         "PROGRESS": {
+            "LABEL": "התקדמות"
+         },
+         "SERIES": {
+            "LABEL": "סדרה"
+         },
+         "SOURCE": {
+            "LABEL": "מקור"
+         },
+         "START_DATE": {
+            "LABEL": "תאריך התחלה"
+         },
+         "STATUS": {
+            "LABEL": "מצב",
+            "SCHEDULED": "מתוזמן",
+            "RECORDING": "מקליט",
+            "INGESTING": "לעבד",
+            "PROCESSING": "מעבד",
+            "ARCHIVE": "ארכיון",
+            "WAITINGFOR": "ממתין ל",
+            "UPLOAD": "העלאה",
+            "ONHOLD": "בהמתנה"
+         },
+         "SUBJECT": {
+            "LABEL": "נושא"
+         },
+         "TRACK_MIMETYPE": {
+            "LABEL": "Mimetype"
+         },
+         "TRACK_RESOLUTION": {
+            "LABEL": "רזולוציה"
+         },
+         "TRACK_TYPE": {
+            "LABEL": "סוג"
+         },
+         "WORKFLOW_DEFINITION": {
+            "LABEL": "הגדרה של תהליך עבודה"
+         },
+         "WORKFLOW_STATE": {
+            "LABEL": "מצב תהליך עבודה"
+         }
+      },
+      "JOBS": {
+         "HOSTNAME": {
+            "LABEL": "שם מחשב מארח"
+         },
+         "NODE_NAME": {
+            "LABEL": "שם שרת"
+         },
+         "STATUS": {
+            "LABEL": "מצב",
+            "PAUSED": "מושהה",
+            "QUEUED": "בהמתנה",
+            "RUNNING": "פועל",
+            "WAITING": "ממתין"
+         }
+      },
+      "SERIES": {
+         "TITLE": {
+            "LABEL": "שם"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "תורמים"
+         },
+         "ORGANIZERS": {
+            "LABEL": "מארגנים"
+         },
+         "SUBJECT": {
+            "LABEL": "נושא"
+         },
+         "LANGUAGE": {
+            "LABEL": "שפה"
+         },
+         "CREATOR": {
+            "LABEL": "יוצר"
+         },
+         "LICENSE": {
+            "LABEL": "רישיון"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "מדיניות גישה"
+         },
+         "CREATION_DATE": {
+            "LABEL": "תאריך יצירה"
+         }
+      },
+      "SERVERS": {
+         "HOSTNAME": {
+            "LABEL": "שם מחשב מארח"
+         },
+         "NODE_NAME": {
+            "LABEL": "שם שרת"
+         },
+         "STATUS": {
+            "LABEL": "מצב",
+            "MAINTENANCE": "תחזוקה",
+            "ONLINE": "מחובר",
+            "OFFLINE": "מנותק"
+         }
+      },
+      "SERVICES": {
+         "ACTIONS": {
+            "LABEL": "פעולות זמינות"
+         },
+         "HOSTNAME": {
+            "LABEL": "שם מחשב מארח"
+         },
+         "NODE_NAME": {
+            "LABEL": "שם שרת"
+         },
+         "NAME": {
+            "LABEL": "שם"
+         },
+         "STATUS": {
+            "LABEL": "מצב",
+            "ERROR": "שגיאה",
+            "NORMAL": "רגיל",
+            "WARNING": "אזהרה"
+         }
+      },
+      "THEMES": {
+         "NAME": {
+            "LABEL": "שם"
+         },
+         "DESCRIPTION": {
+            "LABEL": "תאור"
+         },
+         "CREATOR": {
+            "LABEL": "יוצר"
+         },
+         "CREATION_DATE": {
+            "LABEL": "נוצר"
+         }
+      },
+      "USERS": {
+         "PROVIDER": {
+            "LABEL": "ספק"
+         },
+         "ROLE": {
+            "LABEL": "תפקיד"
+         },
+         "USERNAME": {
+            "LABEL": "שם משתמש"
+         },
+         "NAME": {
+            "LABEL": "שם"
+         },
+         "USER_DIRECTORY": {
+            "LABEL": "מדריך למשתמש"
+         }
+      },
+      "REVIEW_STATUS": {
+         "UNSENT": "לא נשלח",
+         "UNCONFIRMED": "לא מאושר",
+         "CONFIRMED": "מאושר"
+      }
+   },
+   "TABLE_SUMMARY": "{{numberOfRows}} שורות",
+   "TABLE_NO_RESULT": "לא נמצאו תוצאות",
+   "TABLE_LOADING": "טוען…",
+   "TABLE_EDIT": "ערוך",
+   "DASHBOARD": {
+      "RUNNING": "רץ",
+      "FINISHED": "הסתיים",
+      "PAUSED": "מושהה",
+      "FAILED": "נכשל",
+      "FINISHED_WITH_COMMENTS": "משימות",
+      "SCHEDULED": "מתוזמן",
+      "RECORDING": "מקליט"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "מקשי קיצור במקלדת",
+         "HINT": "דף זה מפרט את קיצורי המקשים הזמינים כרגע. הערה כי אלו עשוים להשתנות, בהתאם לעמוד בו אתם מבקרים."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Space",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "כללי",
+         "PLAYER": "נגן",
+         "EDITOR": "עורך"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "תפריט ראשי",
+            "SELECT_NEXT_DASHBOARD_FILTER": "בחירת מסנן לוח המכוונים הבא",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "בחירת מסנן לוח המכוונים הקודם",
+            "REMOVE_FILTERS": "ניקוי כל המסננים",
+            "EVENT_VIEW": "אירועים",
+            "SERIES_VIEW": "סדרות",
+            "NEW_EVENT": "הוסף ארוע",
+            "NEW_SERIES": "הוסף סדרה",
+            "CHEAT_SHEET": "מקשי קיצור במקלדת"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "נגן/השהה",
+            "PREVIOUS_FRAME": "פריים קודם",
+            "NEXT_FRAME": "לפריים הבא",
+            "STEP_BACKWARD": "קפוץ 10ש' אחורה",
+            "STEP_FORWARD": "קפוץ 10ש' קדימה",
+            "PREVIOUS_SEGMENT": "מקטע קודם/קפוץ להתחלה",
+            "NEXT_SEGMENT": "מקטע הבא/קפוץ לסיום",
+            "VOLUME_UP": "הגבר שמע",
+            "VOLUME_DOWN": "הנמך שמע",
+            "MUTE": "השתקה/קול"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "פצל",
+            "CUT_SELECTED_SEGMENT": "גזור",
+            "PLAY_CURRENT_SEGMENT": "נגן מקטע נוכחי",
+            "CLEAR_LIST": "נקה מקטע",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "חזור על המקטע עם הקדמה",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "סוף קטע"
+         }
+      }
+   },
+   "AGENTS": {
+      "STATUS": {
+         "CAPTURING": "מצלם",
+         "ERROR": "שגיאה",
+         "IDLE": "מחכה",
+         "OFFLINE": "מנותק",
+         "SHUTTING_DOWN": "כיבוי",
+         "UNKNOWN": "לא ידוע",
+         "UPLOADING": "מעלה"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "על מנת להזין מספר ערכים יש ללחוץ על מקש Enter בין כל ערך"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "סטטיסטיקטות לא ניתנות להצגה ברגע זה. יש לנסות בשלב מאוחר יותר.",
+      "UNSUPPORTED_TYPE": "מצטערים, Opencast לא יכולה לחשב את הנתון הסטטיסטי הזה.",
+      "FROM": "מאת",
+      "TO": "עבור",
+      "TOTAL": "סה\"כ",
+      "GRANULARITY": "גרנולריות",
+      "NAVIGATION": {
+         "ORGANIZATION": "ארגון"
+      },
+      "TITLE": {
+         "RANDOM": "מידע אקראי",
+         "VIEWS_SUM": "מספר צפיות כללי",
+         "VIEWS_AVG": "מספר צפיות ממוצע",
+         "PUBLISHEDHOURS": "Published Hours of Video"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "מוצג מידע אקראי לצורך הצגת יכולות. ניתן לבטל תצוגת תרשים זה על ידי מחיקת קובץ json המכיל המספק מידע סטטיסטי מתקיית etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the published hours of video"
+      }
+   }
+}

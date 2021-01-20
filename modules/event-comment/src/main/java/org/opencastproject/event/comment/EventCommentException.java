@@ -32,38 +32,12 @@ public class EventCommentException extends Exception {
   private static final long serialVersionUID = 5021589610482150120L;
 
   /**
-   * Used to create exception without parameters.
-   */
-  public EventCommentException() {
-  }
-
-  /**
-   * Used to create exception with exception message.
-   * 
-   * @param message
-   *          exception message
-   */
-  public EventCommentException(String message) {
-    super(message);
-  }
-
-  /**
    * Used to create exception with a cause.
    * 
    * @param cause
    */
   public EventCommentException(Throwable cause) {
     super(cause);
-  }
-
-  /**
-   * Used to create exception with a message and a cause
-   * 
-   * @param message
-   * @param cause
-   */
-  public EventCommentException(String message, Throwable cause) {
-    super(message, cause);
   }
 
 }

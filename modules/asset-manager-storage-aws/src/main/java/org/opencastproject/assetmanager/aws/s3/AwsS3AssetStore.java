@@ -23,6 +23,7 @@ package org.opencastproject.assetmanager.aws.s3;
 
 import org.opencastproject.assetmanager.aws.AwsAbstractArchive;
 import org.opencastproject.assetmanager.aws.AwsUploadOperationResult;
+import org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabase;
 import org.opencastproject.assetmanager.aws.persistence.AwsAssetMapping;
 import org.opencastproject.assetmanager.impl.storage.AssetStore;
 import org.opencastproject.assetmanager.impl.storage.AssetStoreException;
@@ -30,12 +31,14 @@ import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.BucketVersioningConfiguration;
@@ -46,6 +49,9 @@ import com.amazonaws.services.s3.transfer.Upload;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +60,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Dictionary;
 
+@Component(
+  property = {
+    "service.description=Amazon S3 based asset store",
+    "store.type=aws-s3"
+  },
+  immediate = true,
+  service = { RemoteAssetStore.class, AwsS3AssetStore.class }
+)
 public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetStore {
 
   /** Log facility */
@@ -65,6 +79,8 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   public static final String AWS_S3_SECRET_ACCESS_KEY_CONFIG = "org.opencastproject.assetmanager.aws.s3.secret.key";
   public static final String AWS_S3_REGION_CONFIG = "org.opencastproject.assetmanager.aws.s3.region";
   public static final String AWS_S3_BUCKET_CONFIG = "org.opencastproject.assetmanager.aws.s3.bucket";
+  public static final String AWS_S3_ENDPOINT_CONFIG = "org.opencastproject.assetmanager.aws.s3.endpoint";
+  public static final String AWS_S3_PATH_STYLE_CONFIG = "org.opencastproject.assetmanager.aws.s3.path.style";
 
   /** The AWS client and transfer manager */
   private AmazonS3 s3 = null;
@@ -73,7 +89,25 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   /** The AWS S3 bucket name */
   private String bucketName = null;
 
+  private String endpoint = null;
+
+  private boolean pathStyle = false;
+
   private boolean bucketCreated = false;
+
+  /** OSGi Di */
+  @Override
+  @Reference(name = "workspace")
+  public void setWorkspace(Workspace workspace) {
+    super.setWorkspace(workspace);
+  }
+
+  /** OSGi Di */
+  @Override
+  @Reference(name = "database")
+  public void setDatabase(AwsAssetDatabase db) {
+    super.setDatabase(db);
+  }
 
   /**
    * Service activator, called via declarative services configuration.
@@ -81,6 +115,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    * @param cc
    *          the component context
    */
+  @Activate
   public void activate(final ComponentContext cc) throws IllegalStateException, IOException, ConfigurationException {
     // Get the configuration
     if (cc != null) {
@@ -108,6 +143,13 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       regionName = getAWSConfigKey(cc, AWS_S3_REGION_CONFIG);
       logger.info("AWS region is {}", regionName);
 
+      endpoint = getAWSConfigKey(cc, AWS_S3_ENDPOINT_CONFIG);
+      logger.info("AWS endpoint is {}", endpoint);
+
+      pathStyle = Boolean.valueOf(getAWSConfigKey(cc, AWS_S3_PATH_STYLE_CONFIG));
+      logger.info("AWS path style is {}", pathStyle);
+
+
       // Explicit credentials are optional.
       AWSCredentialsProvider provider = null;
       Option<String> accessKeyIdOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_ACCESS_KEY_ID_CONFIG);
@@ -124,7 +166,9 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
       // Create AWS client.
       s3 = AmazonS3ClientBuilder.standard()
-              .withRegion(regionName)
+              .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint
+              , regionName))
+              .withPathStyleAccessEnabled(pathStyle)
               .withCredentials(provider)
               .build();
 

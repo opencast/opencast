@@ -21,15 +21,8 @@
 
 package org.opencastproject.rest;
 
-import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
 
 /**
  * This class is used to store the results of a bulk operation on an endpoint and to easily return those results.
@@ -128,19 +121,6 @@ public class BulkOperationResult {
     bulkOperationResult.put(UNAUTHORIZED_KEY, unauthorized);
     bulkOperationResult.put(ERROR_KEY, serverError);
     return bulkOperationResult.toJSONString();
-  }
-
-  public void fromJson(InputStream jsonContent) throws IOException, ParseException {
-    StringWriter writer = new StringWriter();
-    IOUtils.copy(jsonContent, writer);
-    JSONParser parser = new JSONParser();
-    JSONObject result =  (JSONObject) parser.parse(writer.toString());
-    this.ok = (JSONArray) result.get(OK_KEY);
-    this.accepted = (JSONArray) result.get(ACCEPTED_KEY);
-    this.badRequest = (JSONArray) result.get(BAD_REQUEST_KEY);
-    this.notFound = (JSONArray) result.get(NOT_FOUND_KEY);
-    this.unauthorized = (JSONArray) result.get(UNAUTHORIZED_KEY);
-    this.serverError = (JSONArray) result.get(ERROR_KEY);
   }
 
 }

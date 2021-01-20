@@ -62,7 +62,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -207,8 +206,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
       logger.warn("Not authorized to get series with identifier '{}' found, skip operation", seriesId);
       return createResult(mediaPackage, Action.SKIP);
     } catch (SeriesException e) {
-      logger.error("Unable to get series with identifier '{}', skip operation: {}", seriesId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to get series with identifier '{}', skip operation:", seriesId, e);
       throw new WorkflowOperationException(e);
     }
 
@@ -333,7 +331,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
           MediaPackage mediaPackage) throws WorkflowOperationException {
     try (InputStream in = IOUtils.toInputStream(catalog.toXmlString(), "UTF-8")) {
       String elementId = UUID.randomUUID().toString();
-      URI catalogUrl = workspace.put(mediaPackage.getIdentifier().compact(), elementId, "dublincore.xml", in);
+      URI catalogUrl = workspace.put(mediaPackage.getIdentifier().toString(), elementId, "dublincore.xml", in);
       logger.info("Adding catalog with flavor {} to mediapackage {}", flavor, mediaPackage);
       MediaPackageElement mpe = mediaPackage.add(catalogUrl, MediaPackageElement.Type.Catalog, flavor);
       mpe.setIdentifier(elementId);

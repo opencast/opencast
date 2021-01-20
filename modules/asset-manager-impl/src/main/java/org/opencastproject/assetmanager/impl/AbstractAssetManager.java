@@ -284,7 +284,7 @@ public abstract class AbstractAssetManager implements AssetManager {
     final String mpId = pmp.getMediaPackage().getIdentifier().toString();
     final String orgId = getCurrentOrgId();
     for (final MediaPackageElement e : pmp.getElements()) {
-      logger.debug(format("Archiving %s %s %s", e.getFlavor(), e.getMimeType(), e.getURI()));
+      logger.debug("Archiving {} {} {}", e.getFlavor(), e.getMimeType(), e.getURI());
       final StoragePath storagePath = StoragePath.mk(orgId, mpId, version, e.getIdentifier());
       final Opt<StoragePath> existingAssetOpt = findAssetInVersions(e.getChecksum().toString());
       if (existingAssetOpt.isSome()) {

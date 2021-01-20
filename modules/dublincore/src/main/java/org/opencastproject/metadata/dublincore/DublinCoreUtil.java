@@ -71,15 +71,6 @@ public final class DublinCoreUtil {
   }
 
   /**
-   * Load the series DublinCore catalog contained in a media package.
-   *
-   * @return the catalog or none if the media package does not contain a series DublinCore
-   */
-  public static Opt<DublinCoreCatalog> loadSeriesDublinCore(final Workspace ws, MediaPackage mp) {
-    return loadDublinCore(ws, mp, MediaPackageSupport.Filters.isSeriesDublinCore.toFn());
-  }
-
-  /**
    * Load a DublinCore catalog of a media package identified by predicate <code>p</code>.
    *
    * @return the catalog or none if no media package element matches predicate <code>p</code>.

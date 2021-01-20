@@ -99,7 +99,7 @@ public class StatisticsRestService {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("writeDuration")
   @RestQuery(name = "writeDuration", description = "Writes a duration", returnDescription = "",
-          reponses = {
+          responses = {
                   @RestResponse(responseCode = SC_NO_CONTENT, description = "Writing worked")
           })
   public Response writeDuration(
@@ -125,7 +125,7 @@ public class StatisticsRestService {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("providers.json")
   @RestQuery(name = "getAllAsJson", description = "Returns active providers", returnDescription = "Returns the active providers JSON document",
-      reponses = {
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The active providers.")
       })
   public Response getProviders() {
@@ -149,7 +149,7 @@ public class StatisticsRestService {
           @RestParameter(name = "resolution", description = "Data aggregation level. Must be one of 'daily', 'weekly', 'monthly', 'yearly'", isRequired = true, type = STRING),
           @RestParameter(name = "zoneId", description = "The time zone id to use for calculations", isRequired = true, type = STRING),
       },
-      reponses = {
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The time series data.")
       })
   public Response getTimeSeriesData(

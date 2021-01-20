@@ -41,26 +41,4 @@ public class ServiceUnavailableException extends Exception {
     super(message);
   }
 
-  /**
-   * Creates an exception with a cause.
-   *
-   * @param cause
-   *          the original cause for failure
-   */
-  public ServiceUnavailableException(Throwable cause) {
-    super(cause);
-  }
-
-  /**
-   * Creates an exception with an error message and a cause.
-   *
-   * @param message
-   *          the error message
-   * @param cause
-   *          the original cause
-   */
-  public ServiceUnavailableException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
 }

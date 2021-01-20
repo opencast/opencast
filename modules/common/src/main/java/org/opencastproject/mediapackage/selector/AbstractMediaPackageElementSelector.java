@@ -61,9 +61,6 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
   /**
    * This base implementation will return those media package elements that match the type specified as the type
    * parameter to the class and that flavor (if specified) AND at least one of the tags (if specified) match.
-   *
-   * @see org.opencastproject.mediapackage.MediaPackageElementSelector#select(org.opencastproject.mediapackage.MediaPackage,
-   *      boolean)
    */
   @Override
   public Collection<T> select(MediaPackage mediaPackage, boolean withTagsAndFlavors) {

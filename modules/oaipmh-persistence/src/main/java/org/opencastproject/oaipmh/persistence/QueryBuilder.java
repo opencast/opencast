@@ -60,7 +60,7 @@ public class QueryBuilder {
   }
 
   public QueryBuilder mediaPackageId(MediaPackage mediaPackage) {
-    this.mediaPackageId = some(mediaPackage.getIdentifier().compact().toString());
+    this.mediaPackageId = some(mediaPackage.getIdentifier().toString().toString());
     return this;
   }
 

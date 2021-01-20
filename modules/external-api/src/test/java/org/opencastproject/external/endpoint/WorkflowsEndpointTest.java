@@ -42,6 +42,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import io.restassured.http.ContentType;
+
 public class WorkflowsEndpointTest {
 
   private static final RestServiceTestEnv env = testEnvForClasses(localhostRandomPort(), TestWorkflowsEndpoint.class);
@@ -279,6 +281,7 @@ public class WorkflowsEndpointTest {
     final String response = given().pathParam("workflowInstanceId", RUNNING_WORKFLOW_ID)
                                    .queryParam("withoperations", "true")
                                    .queryParam("withconfiguration", "true")
+                                   .contentType(ContentType.URLENC)
                                    .expect()
                                    .statusCode(SC_OK)
                                    .when()
@@ -328,7 +331,7 @@ public class WorkflowsEndpointTest {
 
   @Test
   public void testPutWorkflowWithUnauthorizedWorkflow() {
-    given().pathParam("workflowInstanceId", UNAUTHORIZED_WORKFLOW_ID)
+    given().pathParam("workflowInstanceId", UNAUTHORIZED_WORKFLOW_ID).contentType(ContentType.URLENC)
            .expect()
            .statusCode(SC_FORBIDDEN)
            .when()
@@ -337,7 +340,7 @@ public class WorkflowsEndpointTest {
 
   @Test
   public void testPutWorkflowWithMissingWorkflow() {
-    given().pathParam("workflowInstanceId", MISSING_WORKFLOW_ID)
+    given().pathParam("workflowInstanceId", MISSING_WORKFLOW_ID).contentType(ContentType.URLENC)
            .expect()
            .statusCode(SC_NOT_FOUND)
            .when()

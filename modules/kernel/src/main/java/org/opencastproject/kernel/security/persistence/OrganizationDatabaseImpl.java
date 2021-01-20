@@ -27,6 +27,9 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.util.NotFoundException;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +45,13 @@ import javax.persistence.Query;
 /**
  * Implements {@link OrganizationDatabase}. Defines permanent storage for series.
  */
+@Component(
+  property = {
+    "service.description=Organization Persistence"
+  },
+  immediate = true,
+  service = { OrganizationDatabase.class }
+)
 public class OrganizationDatabaseImpl implements OrganizationDatabase {
 
   /** Logging utilities */
@@ -56,6 +66,7 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
   protected SecurityService securityService;
 
   /** OSGi DI */
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -65,6 +76,7 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
    *
    * @param cc
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for kernel");
   }
@@ -75,6 +87,7 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

@@ -87,10 +87,18 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -123,6 +131,13 @@ import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
 /** JPA implementation of the {@link ServiceRegistry} */
+@Component(
+  property = {
+    "service.description=Service registry"
+  },
+  immediate = true,
+  service = { ManagedService.class, ServiceRegistry.class }
+)
 public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** JPA persistence unit name */
@@ -169,10 +184,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the maximum load */
   protected static final String OPT_MAXLOAD = "org.opencastproject.server.maxload";
 
-  /** Configuration key for the dispatch interval in milliseconds */
-  protected static final String OPT_DISPATCHINTERVAL = "dispatchinterval";
+  /** Configuration key for the dispatch interval, in seconds */
+  protected static final String OPT_DISPATCHINTERVAL = "dispatch.interval";
 
-  /** Configuration key for the interval to check whether the hosts in the service registry are still alive [sec] * */
+  /** Configuration key for the interval to check whether the hosts in the service registry are still alive, in seconds */
   protected static final String OPT_HEARTBEATINTERVAL = "heartbeat.interval";
 
   /** Configuration key for the collection of job statistics */
@@ -184,14 +199,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
 
-  /** Minimum delay between job dispatching attempts, in milliseconds */
-  static final long MIN_DISPATCH_INTERVAL = 1000;
+  /** Minimum delay between job dispatching attempts, in seconds */
+  static final long MIN_DISPATCH_INTERVAL = 1;
 
-  /** Default delay between job dispatching attempts, in milliseconds */
-  static final long DEFAULT_DISPATCH_INTERVAL = 5000;
+  /** Default delay between job dispatching attempts, in seconds */
+  static final long DEFAULT_DISPATCH_INTERVAL = 5;
 
-  /** Default delay before starting job dispatching, in milliseconds */
-  static final long DEFAULT_DISPATCH_START_DELAY = 60000;
+  /** Default delay before starting job dispatching, in seconds */
+  static final long DEFAULT_DISPATCH_START_DELAY = 60;
 
   /** Default jobs limit during dispatching
    * (larger value will fetch more entries from the database at the same time and increase RAM usage) */
@@ -273,10 +288,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   protected float localSystemLoad = 0.0f;
 
   /** OSGi DI */
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.common)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activate service registry");
 
@@ -378,6 +395,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     return hostName;
   }
 
+  @Deactivate
   public void deactivate() {
     logger.info("deactivate service registry");
 
@@ -421,16 +439,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String, Float)
-   */
-  @Override
-  public Job createJob(String type, String operation, Float jobLoad) throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, null, null, true, getCurrentJob(), jobLoad);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
    *      java.util.List)
    */
@@ -449,30 +457,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   public Job createJob(String type, String operation, List<String> arguments, Float jobLoad)
           throws ServiceRegistryException {
     return createJob(this.hostName, type, operation, arguments, null, true, getCurrentJob(), jobLoad);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
-   *      java.util.List, java.lang.String)
-   */
-  @Override
-  public Job createJob(String type, String operation, List<String> arguments, String payload)
-          throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, payload, true, getCurrentJob(), DEFAULT_JOB_LOAD);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
-   *      java.util.List, java.lang.String, Float)
-   */
-  @Override
-  public Job createJob(String type, String operation, List<String> arguments, String payload, Float jobLoad)
-          throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, payload, true, getCurrentJob(), jobLoad);
   }
 
   /**
@@ -500,12 +484,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     return createJob(this.hostName, type, operation, arguments, payload, dispatchable, getCurrentJob(), jobLoad);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(String, String, List, String, boolean, Job)
-   */
-  @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean dispatchable,
           Job parentJob) throws ServiceRegistryException {
     return createJob(this.hostName, type, operation, arguments, payload, dispatchable, parentJob, DEFAULT_JOB_LOAD);
@@ -839,9 +817,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     // Schedule the job dispatching.
     if (dispatchInterval > 0) {
-      logger.debug("Starting job dispatching at a custom interval of {}s", dispatchInterval / 1000);
+      logger.debug("Starting job dispatching at a custom interval of {}s", dispatchInterval);
       scheduledExecutor.scheduleWithFixedDelay(new JobDispatcher(), dispatchDelay, dispatchInterval,
-              TimeUnit.MILLISECONDS);
+              TimeUnit.SECONDS);
     }
   }
 
@@ -850,6 +828,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * configuration admin service from calling the service deactivate and activate methods
    * for a config update. It does not have to do anything as the updates are handled by updated().
    */
+  @Modified
   public void modified(Map<String, Object> config)
      throws ConfigurationException {
     logger.debug("Modified serviceregistry");
@@ -1034,37 +1013,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         tx.rollback();
       }
       throw e;
-    }
-  }
-
-  private void dumpJobs(JpaJob originalJob, JpaJob fromDb) {
-    try {
-      if (originalJob == null) {
-        logger.error("originalJob is null");
-        return;
-      }
-      if (originalJob.getStatus() == null) {
-        logger.error("originalJob.getStatus() is null");
-        return;
-      }
-      if (!originalJob.getStatus().equals(fromDb.getStatus()))
-        logger.error("JPA status mismatch: " + originalJob.getStatus() + " vs " + fromDb.getStatus());
-      if (originalJob.getProcessorServiceRegistration() == null) {
-        logger.error("originalJob.getProcessorServiceRegistration() is null");
-        return;
-      }
-      if (fromDb.getProcessorServiceRegistration() == null) {
-        logger.error("fromDb.getProcessorServiceRegistration() is null");
-        return;
-      }
-      if (!originalJob.getProcessorServiceRegistration().getId().equals(fromDb.getProcessorServiceRegistration().getId()))
-        logger.error("JPA processor service mismatch: " + originalJob.getProcessorServiceRegistration().getId() + " vs " + fromDb.getProcessorServiceRegistration().getId());
-      if (!originalJob.getDateStarted().equals(fromDb.getDateStarted()))
-        logger.error("JPA date started mismatch: " + originalJob.getDateStarted() + " vs " + fromDb.getDateStarted());
-      if (!originalJob.getChildJobsString().equals(fromDb.getChildJobsString()))
-        logger.error("JPA child job id mismatch: " + originalJob.getChildJobsString() + " vs " + fromDb.getChildJobsString());
-    } catch (Exception e) {
-      logger.error("Error logging job state information in dumpJobs()", e);
     }
   }
 
@@ -2141,27 +2089,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countOfAbnormalServices()
-   */
-  @Override
-  public long countOfAbnormalServices() throws ServiceRegistryException {
-    EntityManager em = null;
-    try {
-      em = emf.createEntityManager();
-      Query query = em.createNamedQuery("ServiceRegistration.countNotNormal");
-      Number count = (Number) query.getSingleResult();
-      return count.longValue();
-    } catch (Exception e) {
-      throw new ServiceRegistryException(e);
-    } finally {
-      if (em != null)
-        em.close();
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getServiceStatistics()
    */
   @Override
@@ -2484,6 +2411,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param client
    *          the trusted http client
    */
+  @Reference(name = "trustedHttpClient")
   void setTrustedHttpClient(TrustedHttpClient client) {
     this.client = client;
   }
@@ -2494,6 +2422,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -2504,6 +2433,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference(name = "user-directory")
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -2514,15 +2444,21 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param organizationDirectory
    *          the organization directory
    */
+  @Reference(name = "orgDirectory")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectoryService = organizationDirectory;
   }
 
   /** OSGi DI. */
+  @Reference(name = "incidentService", cardinality = ReferenceCardinality.OPTIONAL, policy =  ReferencePolicy.DYNAMIC, unbind = "unsetIncidentService")
   public void setIncidentService(IncidentService incidentService) {
     // Manually resolve the cyclic dependency between the incident service and the service registry
     ((OsgiIncidentService) incidentService).setServiceRegistry(this);
     this.incidents = new Incidents(this, incidentService);
+  }
+
+  public void unsetIncidentService(IncidentService incidentService) {
+    this.incidents = null;
   }
 
   /**
@@ -3250,7 +3186,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         } catch (Exception e) {
           logger.warn("Unable to dispatch {}", job, e);
         } finally {
-          client.close(response);
+          try {
+            client.close(response);
+          } catch (IOException e) {
+            // ignore
+          }
           setCurrentJob(null);
         }
       }

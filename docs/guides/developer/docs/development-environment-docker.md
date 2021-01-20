@@ -14,7 +14,6 @@ First, download the support assets:
 ```sh
 $ mkdir assets
 $ curl -o assets/activemq.xml https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/assets/activemq.xml
-$ curl -o assets/opencast-ddl.sql https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/assets/opencast-ddl.sql
 ```
 
 Now create a folder where the Opencast repository should be located, and expose its path as an environment variable. You
@@ -98,8 +97,8 @@ $ curl -o docker-compose.yml https://raw.githubusercontent.com/opencast/opencast
 ```
 
 This file defines a three node (admin, presentation, worker) cluster for use in testing, with all of the appropriate
-ports exported.  To access the a node run ```docker-compose exec --user opencast-builder opencast-$nodetype bash```.  For
-example, to access the presentation node run ```docker-compose exec --user opencast-builder opencast-presentation bash```.
+ports exported.  To access the a node run `docker-compose exec --user opencast-builder opencast-$nodetype bash`.  For
+example, to access the presentation node run `docker-compose exec --user opencast-builder opencast-presentation bash`.
 
 Available commands are otherwise identical.
 

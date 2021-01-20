@@ -34,8 +34,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -55,14 +53,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public final class DublinCoreJsonFormat {
   private DublinCoreJsonFormat() {
-  }
-
-  /**
-   * Read a JSON encoded catalog from a stream.
-   */
-  @Nonnull
-  public static DublinCoreCatalog read(InputStream json) throws IOException, ParseException {
-    return read((JSONObject) new JSONParser().parse(new InputStreamReader(json)));
   }
 
   /**

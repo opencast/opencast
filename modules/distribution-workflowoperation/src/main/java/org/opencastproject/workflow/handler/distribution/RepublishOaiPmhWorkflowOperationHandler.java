@@ -74,27 +74,27 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
     final String repository = getConfig(wi, OPT_REPOSITORY);
 
     logger.debug("Start updating metadata of the media package {} in OAI-PMH repository {}",
-            mp.getIdentifier().compact(), repository);
+            mp.getIdentifier().toString(), repository);
     try {
       Job updateMetadataJob = oaiPmhPublicationService.updateMetadata(mp, repository, flavors, tags, true);
       if (updateMetadataJob == null) {
         logger.info("Unable to create an OAI-PMH update metadata job for the media package {} in repository {}",
-                mp.getIdentifier().compact(), repository);
+                mp.getIdentifier().toString(), repository);
         return createResult(mp, Action.CONTINUE);
       }
 
       if (!waitForJobs(serviceRegistry, updateMetadataJob).isSuccess()) {
         throw new WorkflowOperationException(format(
                 "OAI-PMH update metadata job for the media package %s did not end successfully",
-                mp.getIdentifier().compact()));
+                mp.getIdentifier().toString()));
       }
     } catch (MediaPackageException | PublicationException | IllegalArgumentException | IllegalStateException e) {
       throw new WorkflowOperationException(format(
               "Unable to create an OAI-PMH update metadata job for the media package %s in repository %s",
-              mp.getIdentifier().compact(), repository), e);
+              mp.getIdentifier().toString(), repository), e);
     }
     logger.debug("Updating metadata of the media package {} in OAI-PMH repository {} done",
-            mp.getIdentifier().compact(), repository);
+            mp.getIdentifier().toString(), repository);
     return createResult(mp, Action.CONTINUE);
   }
 

@@ -41,10 +41,10 @@ Please make sure to install the following dependencies.
 
 Required:
 
-    java-1.8.0-openjdk-devel.x86_64 / openjdk-8-jdk
+    java-1.11.0-openjdk-devel.x86_64 / openjdk-11-jdk
     ffmpeg >= 3.2.4
     maven >= 3.1
-    python >= 2.6, < 3.0
+    python >= 2.6
     unzip
     gcc-c++
     tar
@@ -54,6 +54,7 @@ Required:
 Required (not necessarily on the same machine):
 
     ActiveMQ >= 5.10 (older versions untested)
+    Elasticsearch 7.9.x
 
 Required for text extraction (recommended):
 
@@ -71,7 +72,6 @@ Required for animate service (optional):
 
     synfig
 
-
 ### Dependency Download
 
 Pre-built versions of most dependencies that are not in the repositories can be downloaded from the respective project
@@ -80,7 +80,7 @@ website:
 * [Get FFmpeg](http://ffmpeg.org/download.html)
 * [Get Apache Maven](https://maven.apache.org/download.cgi)
 * [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
-
+* [Get Elasticsearch](https://elastic.co)
 
 Building Opencast
 -----------------

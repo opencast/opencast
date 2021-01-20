@@ -669,581 +669,1121 @@ assemblies
 
 
 admin-ui
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
   com.entwinemedia.common                functional                                       Apache License, Version 2.0
-  com.jayway.restassured                 rest-assured                                     Apache 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.mnode.ical4j                       ical4j                                           BSD 3-Clause License
-  org.codehaus.groovy                    groovy-all                                       The Apache Software License, Version 2.0
+  com.google.code.gson                   gson                                             Apache 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  commons-fileupload                     commons-fileupload                               Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  joda-time                              joda-time                                        Apache 2
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
-  org.influxdb                           org.influxdb                                     MIT License
+  org.codehaus.jettison                  jettison                                         Apache License, Version 2.0
+  org.mnode.ical4j                       ical4j                                           BSD 3-Clause
+  org.apache.servicemix.bundles          org.apache.servicemix.bundles.commons-httpclient The Apache Software License, Version 2.0
+
+
+animate-impl
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.commons                     commons-text                                     Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+animate-remote
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+animate-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 annotation-impl
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License - v 1.0
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+asset-manager-api
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.google.code.findbugs               jsr305                                           The Apache Software License, Version 2.0
+
+
+asset-manager-impl
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  com.mysema.querydsl                    querydsl-jpa                                     Apache License, Version 2.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.antlr                    Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.asm                      Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.jpa                      Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+asset-manager-storage-aws
+  GroupId                                ArtifactId                                       Licenses
+  com.fasterxml.jackson.core             jackson-annotations                              The Apache Software License, Version 2.0
+  com.fasterxml.jackson.core             jackson-core                                     The Apache Software License, Version 2.0
+  com.fasterxml.jackson.core             jackson-databind                                 The Apache Software License, Version 2.0
+  com.fasterxml.jackson.dataformat       jackson-dataformat-cbor                          The Apache Software License, Version 2.0
+  org.apache.servicemix.bundles          org.apache.servicemix.bundles.aws-java-sdk       The Apache Software License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+
+
+asset-manager-storage-fs
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+asset-manager-util
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+asset-manager-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 authorization-manager
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.felix                       org.apache.felix.fileinstall                     Apache License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
 
 
 authorization-xacml
-  GroupId                                ArtifactId                                       License
-  com.jayway.restassured                 rest-assured                                     Apache 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
   net.sf.saxon                           Saxon-HE                                         Mozilla Public License Version 2.0
-  org.apache.cxf                         cxf-bundle-jaxrs                                 The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.jboss.security                     jboss-xacml                                      lgpl
-
-
-caption-api
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+  org.osgi                               org.osgi.compendium                              Apache License, Version 2.0
 
 
 caption-impl
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.activation                     jakarta.activation-api                           EDL 1.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 caption-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
   org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 capture-admin-service-api
-  GroupId                                ArtifactId                                       License
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
 
 
 capture-admin-service-impl
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.servicemix.bundles          org.apache.servicemix.bundles.xerces             The Apache Software License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+comments-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+common-jpa-impl
+  GroupId                                ArtifactId                                       Licenses
   org.slf4j                              slf4j-api                                        MIT License
 
 
 common
-  GroupId                                ArtifactId                                       License
-  c3p0                                   c3p0                                             GNU LESSER GENERAL PUBLIC LICENSE
+  GroupId                                ArtifactId                                       Licenses
   com.entwinemedia.common                functional                                       Apache License, Version 2.0
-  com.google.code.findbugs               jsr305                                           The Apache Software License, Version 2.0
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
-  com.jayway.restassured                 rest-assured                                     Apache 2.0
-  com.sun.jersey                         jersey-bundle                                    CDDL 1.1-GPL2 w/ CPE
-  commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
-  commons-collections                    commons-collections                              The Apache Software License, Version 2.0
-  commons-fileupload                     commons-fileupload                               The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  com.mchange                            c3p0                                             GNU Lesser General Public License, Version 2.1-Eclipse Public License, Version 1.0
+  com.sun.xml.bind                       jaxb-core                                        CDDL+GPL License
+  com.sun.xml.bind                       jaxb-impl                                        Eclipse Distribution License - v 1.0
+  commons-fileupload                     commons-fileupload                               Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
   de.schlichtherle                       truezip                                          Apache License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
   joda-time                              joda-time                                        Apache 2
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.codehaus.jettison                  jettison                                         Apache License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.jpa                      Eclipse Public License - v 1.0
-  org.freemarker                         freemarker                                       BSD-style license
-  org.hamcrest                           hamcrest-core                                    New BSD License
-  org.hamcrest                           hamcrest-library                                 New BSD License
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.jpa                      Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.freemarker                         freemarker                                       Apache License, Version 2.0
+  org.mnode.ical4j                       ical4j
 
 
 composer-ffmpeg
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
-  org.apache.xmlrpc                      xmlrpc-client                                    The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.activation                     jakarta.activation-api                           EDL 1.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.felix                       org.apache.felix.fileinstall                     Apache License, Version 2.0
+  org.codehaus.plexus                    plexus-utils                                     Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 composer-service-api
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
 
 
 composer-service-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
   org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+composer-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 conductor
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+cover-image-impl
+  GroupId                                ArtifactId                                       Licenses
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.servicemix.bundles          org.apache.servicemix.bundles.xalan              The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-anim                                       The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-awt-util                                   The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-bridge                                     The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-codec                                      The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-css                                        The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-dom                                        The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-ext                                        The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-gvt                                        The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-js                                         Mozilla Public License version 1.1
+  org.apache.xmlgraphics                 batik-parser                                     The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-rasterizer                                 The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-script                                     The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-svg-dom                                    The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-svggen                                     The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-transcoder                                 The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-util                                       The Apache Software License, Version 2.0
+  org.apache.xmlgraphics                 batik-xml                                        The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-log4j12                                    MIT License
+  xml-apis                               xml-apis-ext
+
+
+cover-image-remote
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+cover-image-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+crop-ffmpeg
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+crop-remote
+  GroupId                                ArtifactId                                       Licenses
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+crop-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 db
-  GroupId                                ArtifactId                                       License
-  c3p0                                   c3p0                                             GNU LESSER GENERAL PUBLIC LICENSE
+  GroupId                                ArtifactId                                       Licenses
   com.h2database                         h2                                               The H2 License, Version 1.0
+  com.mchange                            c3p0                                             GNU Lesser General Public License, Version 2.1-Eclipse Public License, Version 1.0
+  com.mchange                            mchange-commons-java                             GNU Lesser General Public License, Version 2.1-Eclipse Public License, Version 1.0
+  com.typesafe                           config                                           -
   mysql                                  mysql-connector-java                             The GNU General Public License, Version 2
+  net.java.dev.jna                       jna                                              LGPL, version 2.1-ASL, version 2
+  org.postgresql                         postgresql                                       -
   org.slf4j                              slf4j-api                                        MIT License
-  postgresql                             postgresql                                       BSD License
 
 
 dictionary-hunspell
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 dictionary-regexp
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-distribution-service-acl
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+distribution-service-aws-s3-remote
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-distribution-service-acl-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-distribution-service-download
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+distribution-service-aws-s3
+  GroupId                                ArtifactId                                       Licenses
+  com.fasterxml.jackson.core             jackson-annotations                              The Apache Software License, Version 2.0
+  com.fasterxml.jackson.core             jackson-core                                     The Apache Software License, Version 2.0
+  com.fasterxml.jackson.core             jackson-databind                                 The Apache Software License, Version 2.0
+  com.fasterxml.jackson.dataformat       jackson-dataformat-cbor                          The Apache Software License, Version 2.0
+  com.google.code.gson                   gson                                             Apache 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  org.apache.servicemix.bundles          org.apache.servicemix.bundles.aws-java-sdk       The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 distribution-service-download-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-distribution-service-streaming
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+distribution-service-download
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 distribution-service-streaming-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+distribution-service-streaming-wowza
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+distribution-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 dublincore
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.code.findbugs               jsr305                                           The Apache Software License, Version 2.0
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  joda-time                              joda-time                                        Apache 2
+  org.apache.commons                     commons-collections4                             Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-engage-theodul-api
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+email-template-service-impl
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.felix                       org.apache.felix.fileinstall                     Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 engage-theodul-core
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  joda-time                              joda-time                                        Apache 2
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 engage-theodul-plugin-controls
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+engage-theodul-plugin-custom-matomo
+  GroupId                                ArtifactId                                       Licenses
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 engage-theodul-plugin-custom-mhConnection
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 engage-theodul-plugin-custom-notifications
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 engage-theodul-plugin-custom-usertracking
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 engage-theodul-plugin-description
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 engage-theodul-plugin-tab-description
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 engage-theodul-plugin-tab-shortcuts
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 engage-theodul-plugin-tab-slidetext
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 engage-theodul-plugin-timeline-statistics
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 engage-theodul-plugin-video-videojs
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 engage-ui
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+event-comment
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.cxf                         cxf-rt-frontend-jaxrs                            Apache License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 execute-impl
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
   org.slf4j                              slf4j-api                                        MIT License
   org.slf4j                              slf4j-log4j12                                    MIT License
+
+
+execute-remote
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
 
 
 execute-workflowoperation
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
   org.slf4j                              slf4j-log4j12                                    MIT License
 
+
 external-api
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
   com.entwinemedia.common                functional                                       Apache License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
-  org.codehaus.groovy                    groovy-all                                       The Apache Software License, Version 2.0
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  joda-time                              joda-time                                        Apache 2
+  org.apache.commons                     commons-collections4                             Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
-  org.slf4j                              slf4j-log4j12                                    MIT License
-  org.slf4j                              slf4j-simple                                     MIT License
 
 
 fileupload
-  GroupId                                ArtifactId                                       License
-  commons-fileupload                     commons-fileupload                               The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  commons-fileupload                     commons-fileupload                               Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
-
-
-index-service
-  GroupId                                ArtifactId                                       License
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-
-
-ingest-service-impl
-  GroupId                                ArtifactId                                       License
-  com.google.guava                       guava                                            The Apache Software License, Version 2.0
-  commons-collections                    commons-collections                              The Apache Software License, Version 2.0
-  commons-fileupload                     commons-fileupload                               The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  net.sourceforge.htmlunit               htmlunit                                         Apache License, Version 2.0
-  org.apache.commons                     commons-compress                                 The Apache Software License, Version 2.0
-  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.jdom                               com.springsource.org.jdom                        -
   org.slf4j                              slf4j-api                                        MIT License
 
 
-inspection-service-ffmpeg
-  GroupId                                ArtifactId                                       License
+incident-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+
+
+index-service
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  commons-fileupload                     commons-fileupload                               Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  joda-time                              joda-time                                        Apache 2
+  org.apache.felix                       org.apache.felix.fileinstall                     Apache License, Version 2.0
+  org.codehaus.jettison                  jettison                                         Apache License, Version 2.0
+  org.mnode.ical4j                       ical4j                                           -
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+ingest-download-service-impl
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
-  org.apache.tika                        tika-bundle                                      The Apache Software License, Version 2.0
-  org.apache.tika                        tika-core                                        The Apache Software License, Version 2.0
-  org.apache.tika                        tika-parsers                                     The Apache Software License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+
+
+ingest-download-service-remote
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+
+
+ingest-download-service-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+
+
+ingest-service-impl
+  GroupId                                ArtifactId                                       Licenses
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  commons-fileupload                     commons-fileupload                               Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  joda-time                              joda-time                                        Apache 2
+  org.apache.commons                     commons-compress                                 Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.cxf                         cxf-rt-frontend-jaxrs                            Apache License, Version 2.0
+  org.apache.felix                       org.apache.felix.fileinstall                     Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+inspection-service-api
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+
+
+inspection-service-ffmpeg
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 inspection-service-remote
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+inspection-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 kernel
-  GroupId                                ArtifactId                                       License
-  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
-  com.jayway.restassured                 rest-assured                                     Apache 2.0
-  commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
-  commons-collections                    commons-collections                              The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  net.sourceforge.nekohtml               com.springsource.org.cyberneko.html              The Apache Software License, Version 2.0
-  org.apache.cxf                         cxf-bundle-jaxrs                                 The Apache Software License, Version 2.0
-  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  commons-codec                          commons-codec                                    Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.cxf                         cxf-core                                         Apache License, Version 2.0
+  org.apache.cxf                         cxf-rt-frontend-jaxrs                            Apache License, Version 2.0
+  org.apache.cxf                         cxf-rt-rs-extension-providers                    Apache License, Version 2.0
+  org.apache.cxf                         cxf-rt-transports-http                           Apache License, Version 2.0
+  org.apache.felix                       org.apache.felix.fileinstall                     Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.jboss.security                     jboss-xacml                                      lgpl
+  org.codehaus.jettison                  jettison                                         Apache License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.sakaiproject.nakamura              javax.activation-mail                            -
+  org.springframework                    org.springframework.web                          -
   org.springframework.osgi               org.springframework.osgi.core                    -
-  org.springframework.security           org.springframework.security.core                -
-  org.springframework.security           org.springframework.security.web                 -
-  org.springframework.security.oauth     spring-security-oauth                            -
+  org.springframework.security           spring-security-core                             The Apache Software License, Version 2.0
+  org.springframework.security           spring-security-web                              The Apache Software License, Version 2.0
+  org.springframework.security.oauth     spring-security-oauth                            Apache 2.0
 
 
-lti
-  GroupId                                ArtifactId                                       License
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
-
-
-message-broker-api
-  GroupId                                ArtifactId                                       License
-  org.apache.geronimo.specs              geronimo-jms_1.1_spec                            The Apache Software License, Version 2.0
-
-
-message-broker-impl
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
-  org.apache.activemq                    activemq-all                                     The Apache Software License, Version 2.0
-  org.apache.geronimo.specs              geronimo-jms_1.1_spec                            The Apache Software License, Version 2.0
+live-schedule-impl
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
+logging-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+lti
+  GroupId                                ArtifactId                                       Licenses
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+
+
+mattermost-notification-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+message-broker-api
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.google.code.findbugs               jsr305                                           The Apache Software License, Version 2.0
+  com.google.code.gson                   gson                                             Apache 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+message-broker-impl
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.activemq                    activemq-client                                  Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.geronimo.specs              geronimo-jms_1.1_spec                            The Apache Software License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+metadata-api
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+
+
 metadata
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
   org.slf4j                              slf4j-api                                        MIT License
 
 
 migration
-  GroupId                                ArtifactId                                       License
-  commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
-  commons-collections                    commons-collections                              The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.google.code.gson                   gson                                             Apache 2.0
+  com.mchange                            c3p0                                             GNU Lesser General Public License, Version 2.1-Eclipse Public License, Version 1.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  joda-time                              joda-time                                        Apache 2
+  mysql                                  mysql-connector-java                             The GNU General Public License, Version 2
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 mpeg7
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-oaipmh
-  GroupId                                ArtifactId                                       License
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.slf4j                              slf4j-api                                        MIT License
-  org.slf4j                              slf4j-log4j12                                    MIT License
-  org.springframework                    org.springframework.core                         -
-
-
-publication-service-youtube-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-publication-service-youtube-v3
-  GroupId                                ArtifactId                                       License
-  com.fasterxml.jackson.core             jackson-core                                     The Apache Software License, Version 2.0-GNU Lesser General Public License, Version 2.1
-  com.google.apis                        google-api-services-plus                         The Apache Software License, Version 2.0
-  com.google.apis                        google-api-services-youtube                      The Apache Software License, Version 2.0
-  com.google.http-client                 google-http-client-jackson2                      The Apache Software License, Version 2.0
-  com.google.oauth-client                google-oauth-client-java6                        The Apache Software License, Version 2.0
-  com.google.oauth-client                google-oauth-client-jetty                        The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.felix                       org.apache.felix.http.bundle                     -
-  org.codehaus.jackson                   jackson-mapper-asl                               The Apache Software License, Version 2.0
-  org.jdom                               com.springsource.org.jdom                        -
+notification-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.sakaiproject.nakamura              javax.activation-mail                            -
   org.slf4j                              slf4j-api                                        MIT License
 
 
+oaipmh-persistence
+  GroupId                                ArtifactId                                       Licenses
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.slf4j                              slf4j-api                                        MIT License
+  org.slf4j                              slf4j-log4j12                                    MIT License
+  org.springframework                    org.springframework.core
+
+
+oaipmh-remote
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+oaipmh
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  joda-time                              joda-time                                        Apache 2
+  org.apache.commons                     commons-collections4                             Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.slf4j                              slf4j-api                                        MIT License
+  org.springframework                    org.springframework.core                         -
+  xml-apis                               xml-apis
+
+
+presets
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+publication-service-configurable-remote
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+publication-service-configurable
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+publication-service-oaipmh-remote
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+publication-service-oaipmh
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+publication-service-youtube-remote
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+publication-service-youtube-v3
+  GroupId                                ArtifactId                                       Licenses
+  com.google.apis                        google-api-services-youtube                      The Apache Software License, Version 2.0
+  com.google.http-client                 google-http-client-jackson2                      The Apache Software License, Version 2.0
+  com.google.http-client                 google-http-client                               The Apache Software License, Version 2.0
+  com.google.api-client                  google-api-client                                The Apache Software License, Version 2.0
+  com.google.oauth-client                google-oauth-client                              The Apache Software License, Version 2.0
+  com.google.oauth-client                google-oauth-client-java6                        The Apache Software License, Version 2.0
+  com.google.oauth-client                google-oauth-client-jetty                        The Apache Software License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.osgi                               org.osgi.compendium                              Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.felix                       org.apache.felix.http.bundle                     -
+  org.slf4j                              slf4j-api                                        MIT License
+  org.slf4j                              slf4j-log4j12                                    MIT License
+
 runtime-info
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+scheduler-api
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.google.code.findbugs               jsr305                                           The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+scheduler-conflict-handler
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+scheduler-conflict-notifier-comment
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+scheduler-conflict-notifier-email
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.sakaiproject.nakamura              javax.activation-mail                            -
   org.slf4j                              slf4j-api                                        MIT License
 
 
 scheduler-impl
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-logging                        commons-logging                                  The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.mnode.ical4j                       ical4j                                           BSD 3-Clause License
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.google.code.gson                   gson                                             Apache 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  joda-time                              joda-time                                        Apache 2
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.mnode.ical4j                       ical4j                                           -
   org.slf4j                              slf4j-api                                        MIT License
 
 
 scheduler-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 schema
-  GroupId                                ArtifactId                                       License
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-search
-  GroupId                                ArtifactId                                       License
-  com.sun.jna                            jna                                              null
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
-  org.elasticsearch                      elasticsearch                                    The Apache Software License, Version 2.0
-  org.slf4j                              slf4j-api                                        MIT License
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
 
 
 search-service-api
-  GroupId                                ArtifactId                                       License
-  org.slf4j                              slf4j-api                                        MIT License
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
 
 
 search-service-feeds
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.felix                       org.apache.felix.fileinstall                     Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 search-service-impl
-  GroupId                                ArtifactId                                       License
-  com.sun.syndication.feed.module        itunes                                           -
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.solr                        solr-core                                        Apache 2
-  org.apache.solr                        solr-solrj                                       Apache 2
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.jdom                               com.springsource.org.jdom                        Similar to Apache License but with the acknowledgment clause removed	https://raw.github.com/hunterhacker/jdom/master/LICENSE.txt
-  org.slf4j                              slf4j-api                                        MIT License
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
   com.rometools                          rome                                             The Apache Software License, Version 2.0
   com.rometools                          rome-modules                                     The Apache Software License, Version 2.0
   com.rometools                          rome-utils                                       The Apache Software License, Version 2.0
-
-
-search-service-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.solr                        solr-core                                        Apache 2
+  org.apache.solr                        solr-solrj                                       Apache 2
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.jdom                               jdom2                                            -
   org.slf4j                              slf4j-api                                        MIT License
 
 
+search-service-remote
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+search
+  GroupId                                ArtifactId                                       Licenses
+  com.carrotsearch                       hppc                                             The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpasyncclient                                  Apache License, Version 2.0
+  org.apache.logging.log4j               log4j-core                                       Apache License, Version 2.0
+  org.apache.lucene                      lucene-core                                      Apache 2
+  org.apache.lucene                      lucene-join                                      Apache 2
+  org.apache.lucene                      lucene-queryparser                               Apache 2
+  org.elasticsearch                      elasticsearch                                    The Apache Software License, Version 2.0
+  org.elasticsearch                      elasticsearch-core                               The Apache Software License, Version 2.0
+  org.elasticsearch                      elasticsearch-x-content                          The Apache Software License, Version 2.0
+  org.elasticsearch.client               elasticsearch-rest-client                        The Apache Software License, Version 2.0
+  org.elasticsearch.client               elasticsearch-rest-high-level-client             The Apache Software License, Version 2.0
+  org.elasticsearch.plugin               lang-mustache-client                             The Apache Software License, Version 2.0
+  org.elasticsearch.plugin               rank-eval-client                                 The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+security-aai
+  GroupId                                ArtifactId                                       Licenses
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+security-cas-client-wrapper
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.santuario                   xmlsec                                           Apache License, Version 2.0
+  org.apache.velocity                    velocity                                         The Apache Software License, Version 2.0
+  org.jasig.cas.client                   cas-client-core                                  Apache License Version 2.0
+  org.opensaml                           opensaml                                         Apache 2
+  org.owasp.esapi                        esapi                                            BSD-Creative Commons 3.0 BY-SA
+
+
 security-cas
-  GroupId                                ArtifactId                                       License
-  org.jasig.cas                          com.springsource.org.jasig.cas.client            -
-  org.opensaml                           com.springsource.org.opensaml                    -
-  org.springframework.osgi               org.springframework.osgi.core                    -
-  org.springframework.security           org.springframework.security.core                -
-  org.springframework.security           org.springframework.security.web                 -
+  GroupId                                ArtifactId                                       Licenses
   org.springframework.security           spring-security-cas                              The Apache Software License, Version 2.0
 
 
 security-shibboleth
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
   org.springframework.osgi               org.springframework.osgi.core                    -
-  org.springframework.security           org.springframework.security.core                -
-  org.springframework.security           org.springframework.security.web                 -
   org.springframework.security           spring-security-cas                              The Apache Software License, Version 2.0
+  org.springframework.security           spring-security-core                             The Apache Software License, Version 2.0
+  org.springframework.security           spring-security-web                              The Apache Software License, Version 2.0
+
+
+series-service-api
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
 
 
 series-service-impl
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  commons-logging                        commons-logging                                  The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  GroupId                                ArtifactId                                       Licenses
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 series-service-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.codehaus.jettison                  jettison                                         Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 serviceregistry
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-collections4                             Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
+silencedetection-api
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+
+
 silencedetection-impl
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+silencedetection-remote
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+smil-api
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  org.apache.servicemix.bundles          org.apache.servicemix.bundles.commons-httpclient The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 smil-impl
-  GroupId                                ArtifactId                                       License
-  javax.ws.rs                            jsr311-api                                       -
-  org.slf4j                              slf4j-log4j12                                    MIT License
-  org.opencastproject                    android-mms                                      The Apache Software License, Version 2.0 / W3C License
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 solr
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.lucene                      lucene-analyzers                                 Apache 2
   org.apache.lucene                      lucene-core                                      Apache 2
   org.apache.lucene                      lucene-highlighter                               Apache 2
@@ -1254,161 +1794,281 @@ solr
 
 
 sox-impl
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
-  org.apache.xmlrpc                      xmlrpc-client                                    The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 sox-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
   org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-static
-  GroupId                                ArtifactId                                       License
-  commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+sox-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 static-file-service-api
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
+  commons-fileupload                     commons-fileupload                               Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 static-file-service-impl
-  GroupId                                ArtifactId                                       License
-  commons-fileupload                     commons-fileupload                               The Apache Software License, Version 2.0
-  net.sourceforge.htmlunit               htmlunit                                         Apache License, Version 2.0
-  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
-  org.jdom                               com.springsource.org.jdom                        -
+  GroupId                                ArtifactId                                       Licenses
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  joda-time                              joda-time                                        Apache 2
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+static
+  GroupId                                ArtifactId                                       Licenses
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+statistics-export-service-impl
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  org.apache.commons                     commons-csv                                      Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 statistics-provider-influx
-  GroupId                                ArtifactId                                       License
-  com.googlecode.json-simple             son-simple                                       The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
-  org.influxdb                           influxdb-java                                    MIT License
-  org.osgi                               org.osgi.core                                    The Apache Software License, Version 2.0
-  org.osgi                               org.osgi.compendium                              The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  org.apache.felix                       org.apache.felix.fileinstall                     Apache License, Version 2.0
+  org.influxdb                           influxdb-java                                    The MIT License (MIT)
   org.slf4j                              slf4j-api                                        MIT License
 
 
 statistics-provider-random
-  GroupId                                ArtifactId                                       License
-  com.googlecode.json-simple             son-simple                                       The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
-  org.osgi                               org.osgi.core                                    The Apache Software License, Version 2.0
-  org.osgi                               org.osgi.compendium                              The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  com.google.code.gson                   gson                                             Apache 2.0
+  org.apache.felix                       org.apache.felix.fileinstall                     Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-statistics-provider-impl
-  GroupId                                ArtifactId                                       License
-  com.googlecode.json-simple             son-simple                                       The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.osgi                               org.osgi.core                                    The Apache Software License, Version 2.0
-  org.osgi                               org.osgi.compendium                              The Apache Software License, Version 2.0
+statistics-service-api
+  GroupId                                ArtifactId                                       Licenses
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+
+
+statistics-service-impl
+  GroupId                                ArtifactId                                       Licenses
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
   org.slf4j                              slf4j-api                                        MIT License
 
 
-statistics-provider-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.osgi                               org.osgi.core                                    The Apache Software License, Version 2.0
-  org.osgi                               org.osgi.compendium                              The Apache Software License, Version 2.0
+statistics-service-remote
+  GroupId                                ArtifactId                                       Licenses
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.codehaus.jettison                  jettison                                         Apache License, Version 2.0
+
+
+statistics-writer-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+
+
+termination-state-api
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
   org.slf4j                              slf4j-api                                        MIT License
+
+
+termination-state-aws
+  GroupId                                ArtifactId                                       Licenses
+  com.fasterxml.jackson.core             jackson-annotations                              The Apache Software License, Version 2.0
+  com.fasterxml.jackson.core             jackson-core                                     The Apache Software License, Version 2.0
+  com.fasterxml.jackson.core             jackson-databind                                 The Apache Software License, Version 2.0
+  com.fasterxml.jackson.dataformat       jackson-dataformat-cbor                          The Apache Software License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.servicemix.bundles          org.apache.servicemix.bundles.aws-java-sdk       The Apache Software License, Version 2.0
+  org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+termination-state-impl
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
 
 textanalyzer-impl
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
   org.slf4j                              slf4j-api                                        MIT License
 
 
 textanalyzer-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+textanalyzer-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 textextractor-tesseract
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 themes
-  GroupId                                ArtifactId                                       License
-  commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
-  commons-collections                    commons-collections                              The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 
-transcription-service-google-speech-impl
-  GroupId                                ArtifactId                                       License
-  com.googlecode.json-simple             json-simple                                      Apache License, Version 2.0
-  com.mchange                            c3p0                                             GNU LESSER GENERAL PUBLIC LICENSE
-  com.h2database                         h2                                               The H2 License, Version 1.0
+
+themes-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+timelinepreviews-api
+  GroupId                                ArtifactId                                       Licenses
+
+
+timelinepreviews-ffmpeg
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+timelinepreviews-remote
+  GroupId                                ArtifactId                                       Licenses
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
   org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.jpa                      Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.asm                      Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.antlr                    Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.osgi                               org.osgi.compendium                              -
-  org.osgi                               org.osgi.core                                    -
-  org.slf4j                              slf4j-log4j12                                    MIT License
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+timelinepreviews-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+transcription-service-google-speech-impl
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
 
 
 transcription-service-ibm-watson-impl
-  GroupId                                ArtifactId                                       License
-  com.googlecode.json-simple             json-simple                                      Apache License, Version 2.0
-  com.mchange                            c3p0                                             GNU LESSER GENERAL PUBLIC LICENSE
-  com.h2database                         h2                                               The H2 License, Version 1.0
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
   org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.jpa                      Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.asm                      Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.antlr                    Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.osgi                               org.osgi.compendium                              -
-  org.osgi                               org.osgi.core                                    -
-  org.slf4j                              slf4j-log4j12                                    MIT License
-
-
-transcription-service-workflowoperation
-  GroupId                                ArtifactId                                       License
-  org.osgi                               org.osgi.compendium                              -
-  org.osgi                               org.osgi.core                                    -
-  org.slf4j                              slf4j-log4j12                                    MIT License
-
-
-userdirectory
-  GroupId                                ArtifactId                                       License
-  com.google.guava                       guava                                            The Apache Software License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-  userdirectory-ldap          GroupId                                          Type License
+transcription-service-persistence
+  GroupId                                ArtifactId                                       Licenses
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+
+
+transcription-service-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+urlsigning-common
+  GroupId                                ArtifactId                                       Licenses
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  joda-time                              joda-time                                        Apache 2
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+urlsigning-service-api
+  GroupId                                ArtifactId                                       Licenses
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  joda-time                              joda-time                                        Apache 2
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+urlsigning-service-impl
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  joda-time                              joda-time                                        Apache 2
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+urlsigning-verifier-service-impl
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  joda-time                              joda-time                                        Apache 2
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+userdirectory-brightspace
+  GroupId                                ArtifactId                                       Licenses
+  be.ugent.brightspace                   valence-sdk-java                                 The Apache License, Version 2.0
+  com.fasterxml.jackson.core             jackson-annotations                              The Apache Software License, Version 2.0
+  com.fasterxml.jackson.core             jackson-core                                     The Apache Software License, Version 2.0
+  com.fasterxml.jackson.core             jackson-databind                                 The Apache Software License, Version 2.0
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+userdirectory-ldap
+  GroupId                                ArtifactId                                       Licenses
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
   org.springframework                    org.springframework.beans                        -
@@ -1417,85 +2077,210 @@ userdirectory
   org.springframework                    org.springframework.transaction                  -
   org.springframework.ldap               org.springframework.ldap                         -
   org.springframework.osgi               org.springframework.osgi.core                    -
-  org.springframework.security           org.springframework.security.core                -
-  org.springframework.security           org.springframework.security.ldap                -
-  org.springframework.security           org.springframework.security.web                 -
+  org.springframework.security           spring-security-core                             The Apache Software License, Version 2.0
+  org.springframework.security           spring-security-ldap                             The Apache Software License, Version 2.0
+  org.springframework.security           spring-security-web                              The Apache Software License, Version 2.0
+
+
+userdirectory-moodle
+  GroupId                                ArtifactId                                       Licenses
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+userdirectory-sakai
+  GroupId                                ArtifactId                                       Licenses
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+  org.springframework                    org.springframework.beans                        -
+  org.springframework                    org.springframework.core                         -
+  org.springframework                    org.springframework.jdbc                         -
+  org.springframework                    org.springframework.transaction                  -
+  org.springframework.osgi               org.springframework.osgi.core                    -
+  org.springframework.security           spring-security-core                             The Apache Software License, Version 2.0
+  org.springframework.security           spring-security-web                              The Apache Software License, Version 2.0
+
+
+userdirectory
+  GroupId                                ArtifactId                                       Licenses
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-collections4                             Apache License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+user-interface-configuration
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
 
 
 usertracking-impl
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License - v 1.0
+  GroupId                                ArtifactId                                       Licenses
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
+  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 videoeditor-ffmpeg-impl
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+videoeditor-remote
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+videoeditor-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 videosegmenter-ffmpeg
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 videosegmenter-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
+videosegmenter-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+waveform-ffmpeg
+  GroupId                                ArtifactId                                       Licenses
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+waveform-remote
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+waveform-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+workflow-condition-parser
+  GroupId                                ArtifactId                                       Licenses
+  org.antlr                              antlr4-runtime                                   The BSD License
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+
+
 workflow-service-api
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 workflow-service-impl
-  GroupId                                ArtifactId                                       License
+  GroupId                                ArtifactId                                       Licenses
   com.entwinemedia.common                functional                                       Apache License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.felix                       org.apache.felix.fileinstall                     Apache License, Version 2.0
   org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
-  org.apache.solr                        solr-core                                        Apache 2
-  org.apache.solr                        solr-solrj                                       Apache 2
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 workflow-service-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+workflow-workflowoperation
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  com.google.guava                       guava                                            The Apache Software License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
+  org.slf4j                              slf4j-api                                        MIT License
 
 
 working-file-repository-service-impl
-  GroupId                                ArtifactId                                       License
-  commons-fileupload                     commons-fileupload                               The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  org.apache.tika                        tika-bundle                                      The Apache Software License, Version 2.0
-  org.apache.tika                        tika-core                                        The Apache Software License, Version 2.0
-  org.apache.tika                        tika-parsers                                     The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  commons-fileupload                     commons-fileupload                               Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 working-file-repository-service-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
+  GroupId                                ArtifactId                                       Licenses
+  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 workspace-impl
-  GroupId                                ArtifactId                                       License
-  commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
+  GroupId                                ArtifactId                                       Licenses
+  com.entwinemedia.common                functional                                       Apache License, Version 2.0
+  commons-io                             commons-io                                       Apache License, Version 2.0
+  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
+  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
+  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
+  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
+  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License

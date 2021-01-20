@@ -23,6 +23,9 @@ package org.opencastproject.util;
 
 //CHECKSTYLE:OFF
 
+// This class provides the
+// 'osgi.service;objectClass="[...]ReadinessIndicator"' capability,
+// see pom.xml <Provide-Capability>
 public class ReadinessIndicator {
 
   /** Constant name used in service properties to indicate the artifact in question */

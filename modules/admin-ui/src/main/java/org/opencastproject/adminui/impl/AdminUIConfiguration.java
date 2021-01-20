@@ -28,6 +28,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +37,17 @@ import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Set;
 
+@Component(
+  immediate = true,
+  service = {
+    ManagedService.class,
+    AdminUIConfiguration.class
+  },
+  property = {
+    "service.description=Admin UI - Configuration",
+    "service.pid=org.opencastproject.adminui"
+  }
+)
 public class AdminUIConfiguration implements ManagedService {
 
   /** This helper class provides all information relevant for the automatic distribution of

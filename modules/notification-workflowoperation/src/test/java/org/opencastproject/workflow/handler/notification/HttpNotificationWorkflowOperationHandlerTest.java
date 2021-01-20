@@ -32,7 +32,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
-import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -44,7 +43,6 @@ import org.apache.http.message.BasicStatusLine;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.net.URI;
@@ -81,24 +79,6 @@ public class HttpNotificationWorkflowOperationHandlerTest {
 
     // set up service
     operationHandler = new HttpNotificationWorkflowOperationHandler();
-  }
-
-  @Test
-  @Ignore
-  // todo test does not pass
-  public void testSuccessfulNotification() throws Exception {
-
-    // operation configuration
-    Map<String, String> configurations = new HashMap<String, String>();
-    configurations.put(HttpNotificationWorkflowOperationHandler.OPT_URL_PATH, "http://www.host-does-not-exist.com");
-    configurations.put(HttpNotificationWorkflowOperationHandler.OPT_NOTIFICATION_SUBJECT, "test");
-    configurations.put(HttpNotificationWorkflowOperationHandler.OPT_NOTIFICATION_SUBJECT, "test message");
-    configurations.put(HttpNotificationWorkflowOperationHandler.OPT_MAX_RETRY, "2");
-    configurations.put(HttpNotificationWorkflowOperationHandler.OPT_TIMEOUT, Integer.toString(10 * 1000));
-
-    // run the operation handler
-    WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
-    Assert.assertEquals(result.getAction(), Action.CONTINUE);
   }
 
   @Test

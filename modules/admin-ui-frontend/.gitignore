@@ -1,0 +1,16 @@
+/node_modules
+/bower_components/
+/dist
+/.sass-cache
+www
+.jshintrc
+deploy.sh
+proxy.sh
+*.swo
+bin
+test/resources/*.jar
+test/resources/chromedriver
+.agignore
+adi_deploy.sh
+selenium-server-standalone.jar
+testresults

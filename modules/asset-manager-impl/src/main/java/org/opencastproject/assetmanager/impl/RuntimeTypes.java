@@ -33,8 +33,6 @@ import org.opencastproject.assetmanager.impl.query.AbstractPredicate;
 import org.opencastproject.assetmanager.impl.query.AbstractTarget;
 import org.opencastproject.assetmanager.impl.query.PropertyFieldImpl;
 
-import com.entwinemedia.fn.Fn;
-
 /**
  * This implementation of the AssetManager only takes its own implementation of query, result, record etc.
  * This could by modeled in a static, type safe manner with path dependent types but
@@ -45,15 +43,6 @@ import com.entwinemedia.fn.Fn;
 public final class RuntimeTypes {
   private RuntimeTypes() {
   }
-
-  /**
-   * {@link #convert(Version)} as a function.
-   */
-  public static final Fn<Version, VersionImpl> toVersionImpl = new Fn<Version, VersionImpl>() {
-    @Override public VersionImpl apply(Version version) {
-      return convert(version);
-    }
-  };
 
   /**
    * Try to cast a Version into a VersionImpl. Throw a {@link AssetManagerException} in case of failure.

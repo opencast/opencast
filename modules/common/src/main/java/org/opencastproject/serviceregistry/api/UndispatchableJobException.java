@@ -47,16 +47,6 @@ public class UndispatchableJobException extends Exception {
   /**
    * Creates a new undispatchable job exception
    *
-   * @param message
-   *          the error message
-   */
-  public UndispatchableJobException(String message) {
-    super(message);
-  }
-
-  /**
-   * Creates a new undispatchable job exception
-   *
    * @param t
    *          the exception causing the error
    */

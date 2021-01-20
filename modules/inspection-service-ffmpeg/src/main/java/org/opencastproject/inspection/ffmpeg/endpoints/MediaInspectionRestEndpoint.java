@@ -35,6 +35,11 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +66,16 @@ import javax.ws.rs.core.Response;
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                 + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                 + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+  property = {
+    "service.description=Media Inspection REST Endpoint",
+    "opencast.service.type=org.opencastproject.inspection",
+    "opencast.service.path=/inspection",
+    "opencast.service.jobproducer=true"
+  },
+  immediate = true,
+  service = { MediaInspectionRestEndpoint.class }
+)
 public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -78,6 +93,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -88,6 +104,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
    * @param service
    *          the inspection service
    */
+  @Reference(name = "service", cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
   public void setService(MediaInspectionService service) {
     this.service = service;
   }
@@ -107,6 +124,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
    * @param cc
    *          OSGi component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     // String serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
   }
@@ -118,7 +136,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
     restParameters = {
         @RestParameter(description = "Location of the media file.", isRequired = false, name = "uri", type = RestParameter.Type.STRING),
         @RestParameter(description = "Options passed to media inspection service", isRequired = false, name = "options", type = RestParameter.Type.STRING) },
-    reponses = {
+    responses = {
         @RestResponse(description = "XML encoded receipt is returned.", responseCode = HttpServletResponse.SC_OK),
         @RestResponse(description = "Service unavailabe or not currently present", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
         @RestResponse(description = "Problem retrieving media file or invalid media file or URL.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
@@ -142,7 +160,7 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
         @RestParameter(description = "MediaPackage Element, that should be enriched with metadata ", isRequired = true, name = "mediaPackageElement", type = RestParameter.Type.TEXT),
         @RestParameter(description = "Should the existing metadata values remain", isRequired = true, name = "override", type = RestParameter.Type.BOOLEAN),
         @RestParameter(description = "Options passed to media inspection service", isRequired = false, name = "options", type = RestParameter.Type.STRING) },
-    reponses = {
+    responses = {
         @RestResponse(description = "XML encoded receipt is returned.", responseCode = HttpServletResponse.SC_OK),
         @RestResponse(description = "Service unavailabe or not currently present", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
         @RestResponse(description = "Problem retrieving media file or invalid media file or URL.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },

@@ -44,7 +44,6 @@ import javax.jms.Session;
 public class MessageSenderImplTest {
 
   private String destinationId = "Destination.Queue";
-  private String messageText = "This is the message text";
 
   @Test
   public void testSendSerializableObjectMessage() throws JMSException {

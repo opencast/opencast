@@ -77,17 +77,6 @@ public final class PolicyUtils {
   }
 
   /**
-   * Encode a byte[] into Base 64 encoding
-   *
-   * @param value
-   *          The byte[] to encode into base 64 encoding
-   * @return The {@link String} encoded into base 64.
-   */
-  public static String base64Encode(byte[] value) {
-    return new String(Base64.encodeBase64URLSafe(value), StandardCharsets.UTF_8);
-  }
-
-  /**
    * Get a {@link Policy} from JSON data.
    *
    * @param policyJson

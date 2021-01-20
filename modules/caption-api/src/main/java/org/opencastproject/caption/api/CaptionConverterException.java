@@ -29,10 +29,6 @@ public class CaptionConverterException extends Exception {
 
   private static final long serialVersionUID = -2659460833497905596L;
 
-  public CaptionConverterException() {
-    super();
-  }
-
   public CaptionConverterException(String msg, Throwable cause) {
     super(msg, cause);
   }

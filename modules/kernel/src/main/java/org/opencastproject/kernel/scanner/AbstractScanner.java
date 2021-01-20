@@ -33,7 +33,6 @@ import org.opencastproject.util.NeedleEye;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
@@ -234,8 +233,7 @@ public abstract class AbstractScanner {
         quartz.shutdown();
       }
     } catch (org.quartz.SchedulerException e) {
-      logger.debug("Exception while shutting down quartz scheduler this will be ignored: {}",
-              ExceptionUtils.getStackTrace(e));
+      logger.debug("Exception while shutting down quartz scheduler this will be ignored:", e);
     }
   }
 

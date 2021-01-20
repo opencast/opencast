@@ -32,6 +32,9 @@ import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -42,6 +45,13 @@ import java.util.regex.Pattern;
 /**
  * The organization role provider returning the admin and anonymous role from the current organization.
  */
+@Component(
+  property = {
+    "service.description=Provides the organizations role"
+  },
+  immediate = true,
+  service = { RoleProvider.class }
+)
 public class OrganizationRoleProvider implements RoleProvider {
 
   /** The security service */
@@ -51,6 +61,7 @@ public class OrganizationRoleProvider implements RoleProvider {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }

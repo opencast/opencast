@@ -20,7 +20,6 @@
  */
 package org.opencastproject.workflow.handler.assetmanager;
 
-import static java.lang.String.format;
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -80,12 +79,12 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
       }
 
       if (deleted == 0) {
-        logger.info(format("The asset manager does not contain episode %s", mpId));
+        logger.info("The asset manager does not contain episode {}", mpId);
       } else {
-        logger.info(format("Successfully deleted %d version/s episode %s from the asset manager", deleted, mpId));
+        logger.info("Successfully deleted {} version/s episode {} from the asset manager", deleted, mpId);
       }
     } catch (Exception e) {
-      logger.warn(format("Error deleting episode %s from the asset manager: %s", mpId, e));
+      logger.warn("Error deleting episode {} from the asset manager: {}", mpId, e);
       throw new WorkflowOperationException("Unable to delete episode from the asset manager", e);
     }
     return createResult(mediaPackage, Action.CONTINUE);

@@ -18,10 +18,6 @@
               <input id="publishToEngage" name="publishToEngage" type="checkbox" checked="checked" class="configField" value="true" />
               <label for="publishToEngage">Opencast Media Module</label>
             </li>
-            <li>
-              <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" checked="checked" class="configField" value="true" />
-              <label for="publishToOaiPmh">Default OAI-PMH Repository</label>
-            </li>
             <!-- Fixme: uncomment as soon as the publish-youtube workflow operation handler supports merging
             <li>
               <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" />
@@ -43,7 +39,6 @@
       description="Applying default configuration values">
       <configurations>
         <configuration key="publishToEngage">true</configuration>
-        <configuration key="publishToOaiPmh">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
       </configurations>
     </operation>
@@ -65,19 +60,6 @@
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
         <configuration key="strategy">merge</configuration>
         <configuration key="check-availability">false</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Publish to engage player -->
-
-    <operation
-      id="republish-oaipmh"
-      if="${publishToOaiPmh}"
-      exception-handler-workflow="partial-error"
-      description="Update recording metadata in default OAI-PMH repository">
-      <configurations>
-        <configuration key="source-flavors">dublincore/*,security/*</configuration>
-        <configuration key="repository">default</configuration>
       </configurations>
     </operation>
 

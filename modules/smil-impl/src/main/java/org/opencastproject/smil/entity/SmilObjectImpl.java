@@ -21,8 +21,7 @@
 
 package org.opencastproject.smil.entity;
 
-import org.opencastproject.mediapackage.identifier.IdBuilder;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.smil.entity.api.SmilObject;
 
 import java.util.List;
@@ -36,10 +35,6 @@ import javax.xml.bind.annotation.XmlID;
 public abstract class SmilObjectImpl implements SmilObject {
 
   /**
-   * Id builder
-   */
-  private static final IdBuilder idBuilder = IdBuilderFactory.newInstance().newIdBuilder();
-  /**
    * Smil object Id
    */
   private String id;
@@ -48,7 +43,7 @@ public abstract class SmilObjectImpl implements SmilObject {
    * Constructor. Generate a new Id.
    */
   public SmilObjectImpl() {
-    id = String.format("%s-%s", getIdPrefix(), idBuilder.createNew().compact());
+    id = String.format("%s-%s", getIdPrefix(), IdImpl.fromUUID().toString());
   }
 
   /**

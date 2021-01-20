@@ -88,7 +88,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   /** The approximate load placed on the system by creating a text analysis job */
   public static final float DEFAULT_ANALYSIS_JOB_LOAD = 0.2f;
 
-  /** The key to look for in the service configuration file to override the {@link DEFAULT_ANALYSIS_JOB_LOAD} */
+  /** The key to look for in the service configuration file to override the {@link #DEFAULT_ANALYSIS_JOB_LOAD} */
   public static final String ANALYSIS_JOB_LOAD_KEY = "job.load.analysis";
 
   /** The approximate load placed on the system by creating a text analysis job */
@@ -426,6 +426,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
 
   @Override
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
-    analysisJobLoad = LoadUtil.getConfiguredLoadValue(properties, ANALYSIS_JOB_LOAD_KEY, DEFAULT_ANALYSIS_JOB_LOAD, serviceRegistry);
+    analysisJobLoad = LoadUtil.getConfiguredLoadValue(properties, ANALYSIS_JOB_LOAD_KEY, DEFAULT_ANALYSIS_JOB_LOAD,
+            serviceRegistry);
   }
 }

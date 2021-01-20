@@ -31,8 +31,6 @@ import org.opencastproject.assetmanager.impl.persistence.AssetDtos.Medium;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.util.persistencefn.PersistenceEnv;
 import org.opencastproject.util.persistencefn.PersistenceEnvs;
-import org.opencastproject.util.persistencefn.PersistenceUtil;
-import org.opencastproject.util.persistencefn.PersistenceUtil.DatabaseVendor;
 import org.opencastproject.util.persistencefn.Queries;
 
 import com.entwinemedia.fn.Fn;
@@ -51,7 +49,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.DatabaseMetaData;
 import java.util.Date;
 import java.util.List;
 
@@ -97,34 +94,6 @@ public class Database implements EntityPaths {
         }));
       }
     });
-  }
-
-  public <A> A runSql(final Sql<A> sql) {
-    return penv.tx(new Fn<EntityManager, A>() {
-      @Override public A apply(EntityManager em) {
-        for (DatabaseMetaData md : PersistenceUtil.getDatabaseMetadata(em)) {
-          final DatabaseVendor vendor = PersistenceUtil.getVendor(md);
-          switch (vendor) {
-            case H2:
-              return sql.h2(em);
-            case MYSQL:
-              return sql.mysql(em);
-            case POSTGRES:
-              return sql.postgres(em);
-            default:
-              throw new UnsupportedOperationException("Unsupported database vendor " + vendor);
-          }
-        }
-        logger.warn("Cannot determine database vendor, trying H2");
-        return sql.h2(em);
-      }
-    });
-  }
-
-  public interface Sql<A> {
-    A h2(EntityManager em);
-    A mysql(EntityManager em);
-    A postgres(EntityManager em);
   }
 
   public void logQuery(JPAQuery q) {
@@ -229,7 +198,7 @@ public class Database implements EntityPaths {
   }
 
   public void setStorageLocation(Snapshot snapshot, final String storageId) {
-    setStorageLocation(VersionImpl.mk(snapshot.getVersion()), snapshot.getMediaPackage().getIdentifier().compact(), storageId);
+    setStorageLocation(VersionImpl.mk(snapshot.getVersion()), snapshot.getMediaPackage().getIdentifier().toString(), storageId);
   }
 
   public void setStorageLocation(final VersionImpl version, final String mpId, final String storageId) {

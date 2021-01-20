@@ -21,7 +21,6 @@
 
 package org.opencastproject.util;
 
-import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -137,22 +136,6 @@ public final class XmlSafeParser {
     }
 
     return f;
-  }
-
-  /**
-   * Creates a preconfigured SAXBuilder, which is guarded against XXE and billion laugh attacks.
-   * @return the preconfigured SAXBuilder
-   */
-  public static SAXBuilder newSAXBuilder() {
-    // CHECKSTYLE:OFF
-    SAXBuilder b = new SAXBuilder();
-    // CHECKSTYLE:ON
-
-    b.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
-    b.setFeature("http://xml.org/sax/features/external-general-entities", false);
-    b.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-
-    return b;
   }
 
   /**

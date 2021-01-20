@@ -20,13 +20,7 @@
  */
 package org.opencastproject.metadata.dublincore;
 
-import static com.entwinemedia.fn.Prelude.chuck;
-
-import com.entwinemedia.fn.Fn;
-
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Byte serialization of Dublin Core catalogs.
@@ -39,21 +33,4 @@ public final class DublinCoreByteFormat {
     return DublinCores.read(new ByteArrayInputStream(bytes));
   }
 
-  /** Serialize a DublinCore catalog to a UTF-8 encoded byte array. */
-  public static byte[] writeByteArray(DublinCoreCatalog dc) {
-    try {
-      return dc.toXmlString().getBytes(StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      return chuck(e);
-    }
-  }
-
-  /**
-   * {@link #read(byte[])} as a function.
-   */
-  public static final Fn<byte[], DublinCoreCatalog> readFromArray = new Fn<byte[], DublinCoreCatalog>() {
-    @Override public DublinCoreCatalog apply(byte[] bytes) {
-      return DublinCoreByteFormat.read(bytes);
-    }
-  };
 }

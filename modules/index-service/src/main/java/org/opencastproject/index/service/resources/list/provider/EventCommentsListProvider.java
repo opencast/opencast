@@ -23,9 +23,9 @@ package org.opencastproject.index.service.resources.list.provider;
 
 import org.opencastproject.event.comment.EventCommentException;
 import org.opencastproject.event.comment.EventCommentService;
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ResourceListProvider;
+import org.opencastproject.list.api.ResourceListQuery;
 
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;

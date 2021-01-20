@@ -222,7 +222,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     URI uri = null;
     try {
       in = new FileInputStream(zip);
-      uri = workspace.putInCollection(collectionId, mediaPackage.getIdentifier().compact() + ".zip", in);
+      uri = workspace.putInCollection(collectionId, mediaPackage.getIdentifier().toString() + ".zip", in);
       logger.info("Zipped archive of recording {} is available from {}", mediaPackage, uri);
     } catch (FileNotFoundException e) {
       throw new WorkflowOperationException("zip file " + zip + " not found", e);
@@ -284,7 +284,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     }
 
     // Create the temp directory
-    File mediaPackageDir = new File(tempStorageDir, mediaPackage.getIdentifier().compact());
+    File mediaPackageDir = new File(tempStorageDir, mediaPackage.getIdentifier().toString());
     FileUtils.forceMkdir(mediaPackageDir);
 
     // Link or copy each matching element's file from the workspace to the temp directory
@@ -318,7 +318,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     FileUtils.writeStringToFile(new File(mediaPackageDir, "manifest.xml"), MediaPackageParser.getAsXml(clone), "UTF-8");
 
     // Zip the directory
-    File zip = new File(tempStorageDir, clone.getIdentifier().compact() + ".zip");
+    File zip = new File(tempStorageDir, clone.getIdentifier().toString() + ".zip");
     int compressValue = compress ? ZipUtil.DEFAULT_COMPRESSION : ZipUtil.NO_COMPRESSION;
 
     long startTime = System.currentTimeMillis();

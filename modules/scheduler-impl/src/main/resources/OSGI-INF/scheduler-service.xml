@@ -25,10 +25,6 @@
              cardinality="1..1" policy="static" bind="setAssetManager"/>
   <reference name="authorization-service" interface="org.opencastproject.security.api.AuthorizationService"
              cardinality="1..1" policy="static" bind="setAuthorizationService"/>
-  <reference name="conflict-handler" interface="org.opencastproject.scheduler.api.ConflictHandler"
-             cardinality="1..1" policy="static" bind="setConflictHandler"/>
-  <reference name="conflict-notifiers" interface="org.opencastproject.scheduler.api.ConflictNotifier"
-             cardinality="0..n" policy="dynamic" bind="addConflictNotifier" unbind="removeConflictNotifier"/>
   <reference name="event-catalog-ui-adapter" interface="org.opencastproject.metadata.dublincore.EventCatalogUIAdapter"
              cardinality="0..n" policy="dynamic" bind="addCatalogUIAdapter" unbind="removeCatalogUIAdapter"/>
   <reference name="org-directory-service" interface="org.opencastproject.security.api.OrganizationDirectoryService"

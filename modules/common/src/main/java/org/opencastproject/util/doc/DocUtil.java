@@ -135,21 +135,6 @@ public final class DocUtil {
   }
 
   /**
-   * Use this method to generate the documentation using passed in document data
-   *
-   * @param data
-   *          any populated DocData object
-   * @return the documentation (e.g. REST html) as a string
-   * @throws IllegalArgumentException
-   *           if the input data is invalid in some way
-   * @see DocData
-   */
-  public static String generate(DocData data) {
-    String template = loadTemplate(data.getDefaultTemplatePath());
-    return generate(data, template);
-  }
-
-  /**
    * Use this method to generate the documentation using passed in document data, allows the user to specify the
    * template that is used
    *

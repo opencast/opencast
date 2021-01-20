@@ -5,11 +5,11 @@
 
 Returns a list of events.
 
-The following query string parameters are supported to filter, sort and pagingate the returned list:
+The following query string parameters are supported to filter, sort and paginate the returned list:
 
 Query String Parameter |Type                         | Description
 :----------------------|:----------------------------|:-----------
-`filter`               | [`string`](types.md#basic)  | A comma-separated list of filters to limit the results with (see [Filtering](usage.md#filtering)). See the below table for the list of available filters
+`filter`               | [`string`](types.md#basic)  | A comma-separated list of filters to limit the results with (see [Filtering](usage.md#filtering)). See the below table for the list of available filters. Version 1.5.0 and newer support comma separated use of the `filter` keyword, creating a logical OR.
 `sort`                 | [`string`](types.md#basic)  | A comma-separated list of sort criteria (see [Sorting](usage.md#sorting)).  See the below table for the list of available sort criteria
 `limit`                | [`integer`](types.md#basic) | The maximum number of results to return (see [Pagination](usage.md#pagination))
 `offset`               | [`integer`](types.md#basic) | The index of the first result to return (see [Pagination](usage.md#pagination))
@@ -35,7 +35,7 @@ Filter Name       | Description
 `is_part_of`      | Events based upon which series they are a part of. Use the series identifier here (version 1.1.0 or higher)
 `source`          | Filter events whose source match this value (version 1.1.0 or higher)
 `agent_id`        | Filter events based on the capture agent id (version 1.1.0 or higher)
-`start`           | Filter events based on start date (version 1.1.0 or higer)
+`start`           | Filter events based on start date (version 1.1.0 or higher)
 `technical_start` | Filter events based on the technical start date (version 1.1.0 or higher)
 
 Note:
@@ -90,7 +90,7 @@ Field                | Type                                 | Description
 `presenter`\*        | [`array[string]`](types.md#array)    | The presenters of this event
 `created`\*          | [`datetime`](types.md#date-and-time) | The date and time this event was created
 `subjects`\*         | [`array[string]`](types.md#array)    | The subjects of this event
-`start`\*            | [`datetime`](types.md#date-and-time) | The bibliographic start date and time of this event
+`start`              | [`datetime`](types.md#date-and-time) | The technical (version < 1.4.0) or bibliographic (version >= 1.4.0) start date and time of this event
 `description`\*      | [`string`](types.md#basic)           | The description of this event
 `title`\*            | [`string`](types.md#basic)           | The title of this event
 `processing_state`   | [`string`](types.md#basic)           | The current processing state of this event
@@ -281,7 +281,7 @@ scheduling a single event:
   "agent_id": "ca24",
   "start": "2018-03-27T16:00:00Z",
   "end": "2018-03-27T19:00:00Z",
-  "inputs": ["default"],
+  "inputs": ["default"]
 }
 ```
 
@@ -366,7 +366,7 @@ Field                | Type                                 | Description
 `presenter`\*        | [`array[string]`](types.md#array)    | The presenters of this event
 `created`\*          | [`datetime`](types.md#date-and-time) | The date and time this event was created
 `subjects`\*         | [`array[string]`](types.md#array)    | The subjects of this event
-`start`              | [`datetime`](types.md#date-and-time) | The technical start date and time of this event
+`start`              | [`datetime`](types.md#date-and-time) | The technical (version < 1.4.0) or bibliographic (version >= 1.4.0) start date and time of this event
 `description`\*      | [`string`](types.md#basic)           | The description of this event
 `title`\*            | [`string`](types.md#basic)           | The title of this event
 `processing_state`   | [`string`](types.md#basic)           | The current processing state of this event

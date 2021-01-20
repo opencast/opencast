@@ -86,7 +86,6 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
@@ -99,23 +98,17 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.Precision;
-import org.opencastproject.scheduler.api.ConflictHandler;
-import org.opencastproject.scheduler.api.ConflictResolution;
-import org.opencastproject.scheduler.api.ConflictResolution.Strategy;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
-import org.opencastproject.scheduler.api.SchedulerEvent;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
-import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
 import org.opencastproject.scheduler.api.Util;
 import org.opencastproject.scheduler.endpoint.SchedulerRestService;
 import org.opencastproject.scheduler.impl.persistence.SchedulerServiceDatabaseImpl;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -231,38 +224,6 @@ public class SchedulerServiceImplTest {
   private static Map<String, String> wfProperties = new HashMap<>();
   private static Map<String, String> wfPropertiesUpdated = new HashMap<>();
 
-  private static TestConflictHandler testConflictHandler;
-
-  private static class TestConflictHandler implements ConflictHandler {
-
-    private Strategy strategy = Strategy.OLD;
-
-    public void setStrategy(Strategy strategy) {
-      this.strategy = strategy;
-    }
-
-    @Override
-    public ConflictResolution handleConflict(SchedulerEvent newEvent, SchedulerEvent oldEvent) {
-      switch (strategy) {
-        case OLD:
-          return new ConflictResolutionImpl(Strategy.OLD, oldEvent);
-        case NEW:
-          return new ConflictResolutionImpl(Strategy.NEW, newEvent);
-        case MERGED:
-          TechnicalMetadata newTechnicalMetadata = newEvent.getTechnicalMetadata();
-          TechnicalMetadata technicalMetadata = new TechnicalMetadataImpl(newTechnicalMetadata.getEventId(),
-                  newTechnicalMetadata.getAgentId(), newTechnicalMetadata.getStartDate(),
-                  newTechnicalMetadata.getEndDate(), newTechnicalMetadata.getPresenters(),
-                  newTechnicalMetadata.getWorkflowProperties(), newTechnicalMetadata.getCaptureAgentConfiguration(),
-                  newTechnicalMetadata.getRecording());
-          SchedulerEvent mergedEvent = new SchedulerEventImpl(newEvent.getEventId(), newEvent.getVersion(),
-                  newEvent.getMediaPackage(), technicalMetadata);
-          return new ConflictResolutionImpl(Strategy.MERGED, mergedEvent);
-        default:
-          throw new IllegalStateException("No strategy found for " + strategy);
-      }
-    }
-  };
 
   @BeforeClass
   public static void beforeClass() throws Exception {
@@ -319,15 +280,12 @@ public class SchedulerServiceImplTest {
     EasyMock.replay(messageSender, baseMessageMock, messageReceiver, authorizationService,
             extendedAdapter, episodeAdapter, orgDirectoryService, componentContext, bundleContext);
 
-    testConflictHandler = new TestConflictHandler();
-
     schedSvc = new SchedulerServiceImpl();
 
     schedSvc.setAuthorizationService(authorizationService);
     schedSvc.setWorkspace(workspace);
     schedSvc.setMessageSender(messageSender);
     schedSvc.setMessageReceiver(messageReceiver);
-    schedSvc.setConflictHandler(testConflictHandler);
     schedSvc.addCatalogUIAdapter(episodeAdapter);
     schedSvc.addCatalogUIAdapter(extendedAdapter);
     schedSvc.setOrgDirectoryService(orgDirectoryService);
@@ -475,20 +433,20 @@ public class SchedulerServiceImplTest {
     schedSvc.addEvent(start, end, captureDeviceID, userIds, mp, wfProperties, caProperties, Opt.<String> none());
     try {
       MediaPackage mp2 = (MediaPackage) mp.clone();
-      mp2.setIdentifier(new UUIDIdBuilderImpl().createNew());
+      mp2.setIdentifier(IdImpl.fromUUID());
       schedSvc.addEvent(start, end, captureDeviceID, userIds, mp2, wfProperties, caProperties, Opt.<String> none());
       Assert.fail();
     } catch (SchedulerConflictException e) {
       Assert.assertNotNull(e);
     }
-    MediaPackage mediaPackage = schedSvc.getMediaPackage(mp.getIdentifier().compact());
+    MediaPackage mediaPackage = schedSvc.getMediaPackage(mp.getIdentifier().toString());
     assertEquals(seriesId, mediaPackage.getSeries());
-    DublinCoreCatalog eventLoaded = schedSvc.getDublinCore(mp.getIdentifier().compact());
+    DublinCoreCatalog eventLoaded = schedSvc.getDublinCore(mp.getIdentifier().toString());
     assertEquals(event.getFirst(PROPERTY_TITLE), eventLoaded.getFirst(PROPERTY_TITLE));
     // the returned map is of type com.entwinemedia.fn.data.ImmutableMapWrapper which
     // does not delegate equals and hashcode so it is necessary to create a HashMap from it
-    TechnicalMetadata technicalMetadata = schedSvc.getTechnicalMetadata(mp.getIdentifier().compact());
-    assertEquals(mp.getIdentifier().compact(), technicalMetadata.getEventId());
+    TechnicalMetadata technicalMetadata = schedSvc.getTechnicalMetadata(mp.getIdentifier().toString());
+    assertEquals(mp.getIdentifier().toString(), technicalMetadata.getEventId());
     assertEquals(captureDeviceID, technicalMetadata.getAgentId());
     assertEquals(start, technicalMetadata.getStartDate());
     assertEquals(end, technicalMetadata.getEndDate());
@@ -496,7 +454,7 @@ public class SchedulerServiceImplTest {
     assertTrue(technicalMetadata.getRecording().isNone());
     assertTrue(technicalMetadata.getCaptureAgentConfiguration().size() >= caProperties.size());
 
-    assertEquals(wfProperties, new HashMap<>(schedSvc.getWorkflowConfig(mp.getIdentifier().compact())));
+    assertEquals(wfProperties, new HashMap<>(schedSvc.getWorkflowConfig(mp.getIdentifier().toString())));
     String lastModified = schedSvc.getScheduleLastModified(captureDeviceID);
     assertNotEquals("mod0", lastModified);
 
@@ -508,15 +466,15 @@ public class SchedulerServiceImplTest {
     mp.setSeries("series2");
 
     // Update event
-    schedSvc.updateEvent(mp.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
+    schedSvc.updateEvent(mp.getIdentifier().toString(), Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
             Opt.some(userIds), Opt.some(mp), Opt.some(wfProperties), Opt.some(caProperties));
 
-    mediaPackage = schedSvc.getMediaPackage(mp.getIdentifier().compact());
+    mediaPackage = schedSvc.getMediaPackage(mp.getIdentifier().toString());
     assertEquals("series2", mediaPackage.getSeries());
-    DublinCoreCatalog eventReloaded = schedSvc.getDublinCore(mp.getIdentifier().compact());
+    DublinCoreCatalog eventReloaded = schedSvc.getDublinCore(mp.getIdentifier().toString());
     assertEquals("Something more", eventReloaded.getFirst(PROPERTY_TITLE));
-    technicalMetadata = schedSvc.getTechnicalMetadata(mp.getIdentifier().compact());
-    assertEquals(mp.getIdentifier().compact(), technicalMetadata.getEventId());
+    technicalMetadata = schedSvc.getTechnicalMetadata(mp.getIdentifier().toString());
+    assertEquals(mp.getIdentifier().toString(), technicalMetadata.getEventId());
     assertEquals(captureDeviceID, technicalMetadata.getAgentId());
     assertEquals(start, technicalMetadata.getStartDate());
     assertEquals(end, technicalMetadata.getEndDate());
@@ -527,7 +485,7 @@ public class SchedulerServiceImplTest {
     assertNotEquals("mod0", updatedLastModified);
     assertNotEquals(lastModified, updatedLastModified);
 
-    assertTrue(schedSvc.getCaptureAgentConfiguration(mp.getIdentifier().compact()).size() >= caProperties.size());
+    assertTrue(schedSvc.getCaptureAgentConfiguration(mp.getIdentifier().toString()).size() >= caProperties.size());
   }
 
   @Test
@@ -561,7 +519,7 @@ public class SchedulerServiceImplTest {
 
     try {
       // Update end date before start date
-      schedSvc.updateEvent(mp.getIdentifier().compact(), Opt.some(end), Opt.some(start), Opt.<String> none(),
+      schedSvc.updateEvent(mp.getIdentifier().toString(), Opt.some(end), Opt.some(start), Opt.<String> none(),
               Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
               Opt.<Map<String, String>> none());
       fail("Unable to detect end date being before start date during update of event");
@@ -571,24 +529,7 @@ public class SchedulerServiceImplTest {
   }
 
   @Test
-  public void testAclPersistence() throws Exception {
-    Date start = new Date();
-    Date end = new Date(System.currentTimeMillis() + 60000);
-    String captureDeviceID = "demo";
-    MediaPackage mp = generateEvent(Opt.<String> none());
-    addAcl(Opt.<String> none(), mp, acl);
-    Map<String, String> caProperties = generateCaptureAgentMetadata("demo");
-
-    // Store event
-    schedSvc.addEvent(start, end, captureDeviceID, Collections.<String> emptySet(), mp, wfProperties, caProperties,
-            Opt.<String> none());
-
-    assertTrue(AccessControlUtil.equals(acl, schedSvc.getAccessControlList(mp.getIdentifier().compact())));
-  }
-
-  @Test
   public void nonExistantRecording() throws Exception {
-    long currentTime = System.currentTimeMillis();
     String mpId = "doesNotExist";
     try {
       schedSvc.getRecordingState(mpId);
@@ -686,7 +627,7 @@ public class SchedulerServiceImplTest {
     Assert.assertNull(response.getEntity());
 
     // Update the event and clear to cache to make sure it's reloaded
-    schedSvc.updateEvent(mediaPackage.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(),
+    schedSvc.updateEvent(mediaPackage.getIdentifier().toString(), Opt.<Date> none(), Opt.<Date> none(),
             Opt.<String> none(), Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.some(wfPropertiesUpdated),
             Opt.<Map<String, String>> none());
 
@@ -789,15 +730,15 @@ public class SchedulerServiceImplTest {
     schedSvc.addEvent(startDateTime, endTime, "Device A", Collections.<String> emptySet(), mediaPackage, wfProperties,
             caMetadata, Opt.<String> none());
 
-    MediaPackage mp = schedSvc.getMediaPackage(mediaPackage.getIdentifier().compact());
+    MediaPackage mp = schedSvc.getMediaPackage(mediaPackage.getIdentifier().toString());
     Assert.assertEquals(mediaPackage, mp);
 
     // test single update
     final String updatedTitle1 = "Recording 2";
-    final DublinCoreCatalog updatedEvent1 = generateEvent("Device A", Opt.some(mediaPackage.getIdentifier().compact()),
+    final DublinCoreCatalog updatedEvent1 = generateEvent("Device A", Opt.some(mediaPackage.getIdentifier().toString()),
             Opt.some(updatedTitle1), startDateTime, endTime);
     addDublinCore(Opt.some(catalogId), mediaPackage, updatedEvent1);
-    schedSvc.updateEvent(mediaPackage.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(),
+    schedSvc.updateEvent(mediaPackage.getIdentifier().toString(), Opt.<Date> none(), Opt.<Date> none(),
             Opt.<String> none(), Opt.<Set<String>> none(), Opt.some(mediaPackage), Opt.some(wfPropertiesUpdated),
             Opt.<Map<String, String>> none());
     Assert.fail("Schedule should not update a recording that has ended (single)");
@@ -949,7 +890,7 @@ public class SchedulerServiceImplTest {
     Version version = assetManager.takeSnapshot("test", mediaPackage).getVersion();
     Assert.assertEquals(VersionImpl.FIRST, version);
 
-    String mediaPackageId = mediaPackage.getIdentifier().compact();
+    String mediaPackageId = mediaPackage.getIdentifier().toString();
     try {
       schedSvc.getMediaPackage(mediaPackageId);
       fail();
@@ -959,13 +900,6 @@ public class SchedulerServiceImplTest {
 
     try {
       schedSvc.getDublinCore(mediaPackageId);
-      fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    try {
-      schedSvc.getAccessControlList(mediaPackageId);
       fail();
     } catch (NotFoundException e) {
       Assert.assertNotNull(e);
@@ -1214,16 +1148,16 @@ public class SchedulerServiceImplTest {
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000), "Device A",
             Collections.<String> emptySet(), mediaPackage, wfProperties, caProperties, Opt.<String> none());
 
-    Map<String, String> initalCaProps = schedSvc.getCaptureAgentConfiguration(mediaPackage.getIdentifier().compact());
-    checkEvent(mediaPackage.getIdentifier().compact(), initalCaProps, initialTitle);
+    Map<String, String> initalCaProps = schedSvc.getCaptureAgentConfiguration(mediaPackage.getIdentifier().toString());
+    checkEvent(mediaPackage.getIdentifier().toString(), initalCaProps, initialTitle);
 
     // do single update
     final String updatedTitle1 = "Recording 2";
-    final DublinCoreCatalog updatedEvent1 = generateEvent("Device A", Opt.some(mediaPackage.getIdentifier().compact()),
+    final DublinCoreCatalog updatedEvent1 = generateEvent("Device A", Opt.some(mediaPackage.getIdentifier().toString()),
             Opt.some(updatedTitle1), new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000));
     addDublinCore(Opt.some(elementId), mediaPackage, updatedEvent1);
 
-    schedSvc.updateEvent(mediaPackage.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(),
+    schedSvc.updateEvent(mediaPackage.getIdentifier().toString(), Opt.<Date> none(), Opt.<Date> none(),
             Opt.<String> none(), Opt.<Set<String>> none(), Opt.some(mediaPackage), Opt.some(wfPropertiesUpdated),
             Opt.<Map<String, String>> none());
 
@@ -1235,9 +1169,9 @@ public class SchedulerServiceImplTest {
 
     // copy to new HashMap since returned map wrapper does not delegate hashcode and equals
     assertEquals("CA properties", updatedCaProps,
-            new HashMap<>(schedSvc.getCaptureAgentConfiguration(mediaPackage.getIdentifier().compact())));
+            new HashMap<>(schedSvc.getCaptureAgentConfiguration(mediaPackage.getIdentifier().toString())));
     assertEquals("DublinCore title", updatedTitle1,
-            schedSvc.getDublinCore(mediaPackage.getIdentifier().compact()).getFirst(PROPERTY_TITLE));
+            schedSvc.getDublinCore(mediaPackage.getIdentifier().toString()).getFirst(PROPERTY_TITLE));
     checkIcalFeed(updatedCaProps, updatedTitle1);
   }
 
@@ -1302,7 +1236,7 @@ public class SchedulerServiceImplTest {
                     new Date(System.currentTimeMillis() + 600000)), Precision.Second));
     addDublinCore(Opt.some(catalogId), mediaPackage, event);
 
-    schedSvc.updateEvent(mediaPackage.getIdentifier().compact(),
+    schedSvc.updateEvent(mediaPackage.getIdentifier().toString(),
             Opt.some(new Date(System.currentTimeMillis() + 180000)),
             Opt.some(new Date(System.currentTimeMillis() + 600000)), Opt.<String> none(), Opt.<Set<String>> none(),
             Opt.some(mediaPackage), Opt.some(wfPropertiesUpdated), Opt.<Map<String, String>> none());
@@ -1313,9 +1247,9 @@ public class SchedulerServiceImplTest {
     assertEquals(1, upcoming.size());
 
     // delete event
-    schedSvc.removeEvent(mediaPackage.getIdentifier().compact());
+    schedSvc.removeEvent(mediaPackage.getIdentifier().toString());
     try {
-      schedSvc.getMediaPackage(mediaPackage.getIdentifier().compact());
+      schedSvc.getMediaPackage(mediaPackage.getIdentifier().toString());
       Assert.fail();
     } catch (NotFoundException e) {
       Assert.assertNotNull(e);
@@ -1347,7 +1281,7 @@ public class SchedulerServiceImplTest {
     schedSvc.removeScheduledRecordingsBeforeBuffer(0);
 
     try {
-      schedSvc.getMediaPackage(mp.getIdentifier().compact());
+      schedSvc.getMediaPackage(mp.getIdentifier().toString());
       Assert.fail();
     } catch (NotFoundException e) {
       Assert.assertNotNull(e);
@@ -1355,7 +1289,7 @@ public class SchedulerServiceImplTest {
 
     AQueryBuilder query = assetManager.createQuery();
     AResult result = query.select(query.snapshot()).where(query.organizationId().eq(new DefaultOrganization().getId())
-            .and(query.mediaPackageId(mp.getIdentifier().compact())).and(query.version().isLatest())).run();
+            .and(query.mediaPackageId(mp.getIdentifier().toString())).and(query.version().isLatest())).run();
     Opt<ARecord> record = result.getRecords().head();
     assertFalse(record.isSome());
   }
@@ -1624,16 +1558,6 @@ public class SchedulerServiceImplTest {
     assertEquals(orgList.size(), dublincoreCatalogs.size());
   }
 
-  public void testGetJsonMpSchedulerRestEndpoint() throws MediaPackageException, SchedulerException {
-    SchedulerRestService restService = new SchedulerRestService();
-    List<MediaPackage> mpList = new ArrayList();
-    mpList.add(generateEvent(Opt.some("mp1")));
-    mpList.add(generateEvent(Opt.some("mp2")));
-    String jsonStr = restService.getEventListAsJsonString(mpList);
-    Assert.assertTrue(jsonStr.contains("mp1"));
-    Assert.assertTrue(jsonStr.contains("mp2"));
-  }
-
   private String addDublinCore(Opt<String> id, MediaPackage mediaPackage, final DublinCoreCatalog initalEvent)
           throws URISyntaxException, IOException {
     String catalogId = UUID.randomUUID().toString();
@@ -1643,7 +1567,7 @@ public class SchedulerServiceImplTest {
       catalog = mediaPackage.getCatalog(catalogId);
     }
 
-    URI uri = workspace.put(mediaPackage.getIdentifier().compact(), catalogId, "dublincore.xml",
+    URI uri = workspace.put(mediaPackage.getIdentifier().toString(), catalogId, "dublincore.xml",
             IOUtils.toInputStream(initalEvent.toXmlString(), StandardCharsets.UTF_8.name()));
     if (catalog == null) {
       catalog = (Catalog) mediaPackage.add(uri, Type.Catalog, initalEvent.getFlavor());
@@ -1661,7 +1585,7 @@ public class SchedulerServiceImplTest {
       attachment = mediaPackage.getAttachment(attachmentId);
     }
 
-    URI uri = workspace.put(mediaPackage.getIdentifier().compact(), attachmentId, "security.xml",
+    URI uri = workspace.put(mediaPackage.getIdentifier().toString(), attachmentId, "security.xml",
             IOUtils.toInputStream(XACMLUtils.getXacml(mediaPackage, acl), StandardCharsets.UTF_8.name()));
     if (attachment == null) {
       attachment = (Attachment) mediaPackage.add(uri, Type.Attachment, MediaPackageElements.XACML_POLICY_EPISODE);
@@ -1669,16 +1593,6 @@ public class SchedulerServiceImplTest {
     }
     attachment.setChecksum(null);
     return attachmentId;
-  }
-
-  private int getCountFromString(String searchTerm, String value) {
-    int count = 0;
-    int index = 0;
-    while (value.indexOf(searchTerm, index) != -1) {
-      count++;
-      index = value.indexOf(searchTerm, index) + searchTerm.length();
-    }
-    return count;
   }
 
   private List<String> createEvents(String titlePrefix, String agent, int number, SchedulerService schedulerService)
@@ -1695,7 +1609,7 @@ public class SchedulerServiceImplTest {
       addDublinCore(Opt.<String> none(), mp, event);
       schedulerService.addEvent(startDateTime, endDateTime, agent, Collections.<String> emptySet(), mp, wfProperties,
               Collections.<String, String> emptyMap(), Opt.<String> none());
-      events.add(mp.getIdentifier().compact());
+      events.add(mp.getIdentifier().toString());
     }
     return events;
   }
@@ -1801,10 +1715,6 @@ public class SchedulerServiceImplTest {
 
   private static long hours(int a) {
     return minutes(a * 60);
-  }
-
-  private static long days(int a) {
-    return hours(a * 24);
   }
 
   AssetManager mkAssetManager() throws Exception {

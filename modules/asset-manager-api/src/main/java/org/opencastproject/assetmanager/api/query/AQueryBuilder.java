@@ -92,11 +92,6 @@ public interface AQueryBuilder {
 
   Predicate storage(String storage);
 
-  /** Get the snapshots's "availability" field. Use it to create a predicate. */
-  Field<Availability> availability();
-
-  Field<String> storage();
-
   /** Create a predicate that matches all snapshots with properties of the given namespace. */
   Predicate hasPropertiesOf(String namespace);
 
@@ -152,12 +147,6 @@ public interface AQueryBuilder {
    * The zero element of {@link Target}. Selecting nothing just selects nothing.
    */
   Target nothing();
-
-  /**
-   * The zero element of {@link Field}.
-   * Using zero in a predicate expression yields an {@link #always()} predicate.
-   */
-  Field zero();
 
   /**
    * The zero element of {@link Predicate}.

@@ -425,7 +425,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       List<Job> jobs = new ArrayList<Job>();
       Set<String> elementIds = new HashSet<String>();
       // Remove media package from the search index
-      String mpId = mp.getIdentifier().compact();
+      String mpId = mp.getIdentifier().toString();
       logger.info("Removing LIVE media package {} from the search index", mpId);
 
       jobs.add(searchService.delete(mpId));
@@ -478,7 +478,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
 
   Map<String, Track> addLiveTracks(MediaPackage mp, String caName) throws LiveScheduleException {
     HashMap<String, Track> generatedTracks = new HashMap<String, Track>();
-    String mpId = mp.getIdentifier().compact();
+    String mpId = mp.getIdentifier().toString();
     try {
       // If capture agent registered the properties:
       // capture.device.live.resolution.WIDTHxHEIGHT=COMPLETE_STREAMING_URL, use them!
@@ -725,7 +725,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
 
     try {
       // Create new distribution element
-      URI engageUri = URIUtils.resolve(new URI(engageUrlString), PLAYER_PATH + mp.getIdentifier().compact());
+      URI engageUri = URIUtils.resolve(new URI(engageUrlString), PLAYER_PATH + mp.getIdentifier().toString());
       Publication publicationElement = PublicationImpl.publication(UUID.randomUUID().toString(), CHANNEL_ID, engageUri,
               MimeTypes.parseMimeType("text/html"));
       mp.add(publicationElement);

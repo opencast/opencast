@@ -22,6 +22,7 @@
 
 package org.opencastproject.mediapackage.identifier;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -61,15 +62,6 @@ public class IdImpl implements Id {
     this.id = id;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.mediapackage.identifier.Id#compact()
-   */
-  public String compact() {
-    return toString();
-  }
-
   @Override
   public String toString() {
     return id;
@@ -97,5 +89,13 @@ public class IdImpl implements Id {
   @Override
   public int hashCode() {
     return id.hashCode();
+  }
+
+  /**
+   * Generate a new UUID-based Id.
+   * @return New Id
+   */
+  public static Id fromUUID() {
+    return new IdImpl(UUID.randomUUID().toString());
   }
 }

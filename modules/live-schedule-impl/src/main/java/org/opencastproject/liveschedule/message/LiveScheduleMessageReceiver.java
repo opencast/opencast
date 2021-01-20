@@ -28,7 +28,6 @@ import org.opencastproject.security.api.SecurityService;
 
 import com.google.common.util.concurrent.Striped;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,13 +122,13 @@ public class LiveScheduleMessageReceiver {
             }
           });
         } catch (InterruptedException e) {
-          logger.error("Problem while getting {} message events {}", queueId, ExceptionUtils.getStackTrace(e));
+          logger.error("Problem while getting {} message events", queueId, e);
         } catch (ExecutionException e) {
-          logger.error("Problem while getting {} message events {}", queueId, ExceptionUtils.getStackTrace(e));
+          logger.error("Problem while getting {} message events", queueId, e);
         } catch (CancellationException e) {
           logger.trace("Listening for {} messages has been cancelled.", queueId);
         } catch (Throwable t) {
-          logger.error("Problem while getting {} message events {}", queueId, ExceptionUtils.getStackTrace(t));
+          logger.error("Problem while getting {} message events", queueId, t);
         } finally {
           securityService.setOrganization(null);
           securityService.setUser(null);

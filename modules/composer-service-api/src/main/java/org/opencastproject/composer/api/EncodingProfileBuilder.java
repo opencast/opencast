@@ -26,12 +26,9 @@ import org.opencastproject.util.XmlSafeParser;
 import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.Writer;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 /**
@@ -85,25 +82,6 @@ public final class EncodingProfileBuilder {
   }
 
   /**
-   * Loads an encoding profile from the xml fragement.
-   *
-   * @param in
-   *          xml stream of the profile
-   * @return the profile
-   * @throws Exception
-   *           if creating the profile fails
-   */
-  public EncodingProfile parseProfile(String in) throws Exception {
-    InputStream is = null;
-    try {
-      is = IOUtils.toInputStream(in, "UTF-8");
-      return parseProfile(is);
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
-  }
-
-  /**
    * Loads an encoding profile list from the given input stream.
    *
    * @param in
@@ -119,55 +97,6 @@ public final class EncodingProfileBuilder {
     } finally {
       IOUtils.closeQuietly(in);
     }
-  }
-
-  /**
-   * Loads an encoding profile from the xml stream.
-   *
-   * @param in
-   *          xml stream of the profile list
-   * @return the profile list
-   * @throws Exception
-   *           if creating the profile list fails
-   */
-  public EncodingProfileList parseProfileList(String in) throws Exception {
-    InputStream is = null;
-    try {
-      is = IOUtils.toInputStream(in, "UTF-8");
-      return parseProfileList(is);
-    } finally {
-      IOUtils.closeQuietly(is);
-    }
-  }
-
-  /**
-   * Serializes a profile to xml.
-   *
-   * @param profile
-   *          the profile to serialize
-   * @return the xml fragment
-   * @throws Exception
-   */
-  public String toXml(EncodingProfile profile) throws Exception {
-    Marshaller marshaller = jaxbContext.createMarshaller();
-    Writer writer = new StringWriter();
-    marshaller.marshal(profile, writer);
-    return writer.toString();
-  }
-
-  /**
-   * Serializes a profile list to xml.
-   *
-   * @param profileList
-   *          the profile list to serialize
-   * @return the xml fragment
-   * @throws Exception
-   */
-  public String toXml(EncodingProfileList profileList) throws Exception {
-    Marshaller marshaller = jaxbContext.createMarshaller();
-    Writer writer = new StringWriter();
-    marshaller.marshal(profileList, writer);
-    return writer.toString();
   }
 
 }

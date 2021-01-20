@@ -7,27 +7,21 @@ Authentication
 Many campuses use some kind of single sign on, such as JASIG's Central Authentication Service, or CAS. This guide
 describes how to integrate Opencast into such a system.
 
-### Step 1
+### Enable Opencast CAS feature 
 
 First, you need to edit the file `etc/org.apache.karaf.features.cfg` and add the `opencast-security-cas` to the
 `featuresBoot` variable.
 
     featuresBoot = ..., opencast-security-cas
 
-### Step 2
+### Security Configuration
 
-In a single-tenant deployment, your `security.xml` file is under `OPENCAST_HOME/etc/security/mh_default_org.xml`. In an
-RPM/DEB based installation, it is located in `/etc/opencast/security/mh_default_org.xml`. You should make a backup copy
-of the file and substitute it by the sample file named `security_sample_cas.xml-example`. In other words:
+Edit the security configuration file at `etc/security/mh_default_org.xml`. In a multi-tenant set-up, you will have one
+configuration file for each tenant at `etc/security/<organization_id>.xml`.
 
-    $> cd etc/security
-    $> mv mh_default_org.xml mh_default_org.xml.old
-    $> cp security_sample_cas.xml-example mh_default_org.xml
-
-The sample file should be exactly the same as the default security file, except for the parts only relevant to the
-CAS. If you have done custom modifications to your security file, make sure to incorporate them to the new file, too.
-
-### Step 3
+You need to comment or uncomment some sections in this file.
+All necessary changes are marked with a `CAS Auth:` tag. You can use the find function of your editor to
+find the parts of the file you need to modify.
 
 Add the necessary configuration values to the CAS section of the new security file. The comments should be
 self-explanatory.
@@ -64,10 +58,13 @@ Authorization
 Now the system knows all the information necessary to authenticate users against CAS, but also need some authorization
 information, to tell which services the user is allowed to use and which resources is allowed to see and/or modify.
 
-You will need to configure a UserProvider to look up users as identified by CAS.
+You will need to configure a [UserProvider](security.md) to look up users as identified by CAS.
 
+* LDAP User Provider, described in [LDAP Security and Authorization](security.ldap.md)
 * [Sakai User Provider](security.user.sakai.md)
-* [LDAP User Provider](security.ldap.md) (Section `Authorization/Step 2`)
+* [Moodle User Provider](security.user.moodle.md)
+* [Brightspace D2L User Provider](security.user.brightspace.md)
+* [Canvas LMS User Provider](security.user.canvas.md)
 
 
 Original documentation from University of Saskatchewan

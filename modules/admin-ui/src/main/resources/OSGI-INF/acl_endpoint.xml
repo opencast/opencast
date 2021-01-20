@@ -9,7 +9,9 @@
     <provide interface="org.opencastproject.adminui.endpoint.AclEndpoint"/>
   </service>
   <reference name="aclServiceFactory" interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
-             cardinality="1..1" policy="static" bind="setAclServiceFactory"/>
+             bind="setAclServiceFactory"/>
   <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
-             cardinality="1..1" policy="static" bind="setSecurityService"/>
+             bind="setSecurityService"/>
+  <reference name="roleDirectoryService" interface="org.opencastproject.security.api.RoleDirectoryService"
+             bind="setRoleDirectoryService"/>
 </scr:component>

@@ -203,7 +203,7 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
                 (List<Attachment>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
         for (Attachment targetElement : targetElements) {
           String targetFileName = PathSupport.toSafeName(FilenameUtils.getName(targetElement.getURI().getPath()));
-          URI newTargetElementUri = workspace.moveTo(targetElement.getURI(), mediaPackage.getIdentifier().compact(),
+          URI newTargetElementUri = workspace.moveTo(targetElement.getURI(), mediaPackage.getIdentifier().toString(),
                   targetElement.getIdentifier(), targetFileName);
           targetElement.setURI(newTargetElementUri);
           targetElement.setChecksum(null);

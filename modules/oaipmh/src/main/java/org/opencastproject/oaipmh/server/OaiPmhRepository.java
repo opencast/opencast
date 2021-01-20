@@ -46,8 +46,6 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
 import org.opencastproject.util.data.Tuple;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -78,7 +76,6 @@ import java.util.List;
 // todo - malformed date parameter must produce a BadArgument error - if a date parameter has a finer granularity than
 //        supported by the repository this must produce a BadArgument error
 public abstract class OaiPmhRepository {
-  private static final Logger logger = LoggerFactory.getLogger(OaiPmhRepository.class);
   private static final OaiDcMetadataProvider OAI_DC_METADATA_PROVIDER = new OaiDcMetadataProvider();
   private static final String OAI_NS = OaiPmhConstants.OAI_2_0_XML_NS;
 

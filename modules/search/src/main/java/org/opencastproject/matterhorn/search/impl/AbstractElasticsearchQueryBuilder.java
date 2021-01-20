@@ -103,9 +103,6 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
     return query;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public abstract void buildQuery(T query);
 
   /**
@@ -222,12 +219,6 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
     dateRanges.add(new DateRange(fieldName, startDate, endDate));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.elasticsearch.common.xcontent.ToXContent#toXContent(org.elasticsearch.common.xcontent.XContentBuilder,
-   *      org.elasticsearch.common.xcontent.ToXContent.Params)
-   */
   @Override
   public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
     return queryBuilder.toXContent(builder, params);
@@ -236,11 +227,6 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
   @Override
   public Query toQuery(QueryShardContext context) throws IOException {
     return queryBuilder.toQuery(context);
-  }
-
-  @Override
-  public Query toFilter(QueryShardContext context) throws IOException {
-    return queryBuilder.toFilter(context);
   }
 
   @Override
@@ -333,22 +319,12 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
       return rqb;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
       return obj instanceof DateRange
               && ((DateRange) obj).field.equals(field);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
       return field.hashCode();
@@ -391,22 +367,12 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
               .collect(Collectors.toList());
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
     public boolean equals(Object obj) {
       return obj instanceof ValueGroup
               && ((ValueGroup) obj).field.equals(field);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
       return field.hashCode();

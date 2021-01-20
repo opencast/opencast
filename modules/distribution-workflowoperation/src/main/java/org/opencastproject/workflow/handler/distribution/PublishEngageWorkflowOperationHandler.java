@@ -29,8 +29,8 @@ import static org.opencastproject.util.data.functions.Strings.trimToNone;
 import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
 
 import org.opencastproject.distribution.api.DistributionException;
-import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
+import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Attachment;
@@ -97,7 +97,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /** Configuration properties id */
   private static final String ENGAGE_URL_PROPERTY = "org.opencastproject.engage.ui.url";
-  private static final String STREAMING_URL_PROPERTY = "org.opencastproject.streaming.url";
   private static final String STREAMING_PUBLISH_PROPERTY = "org.opencastproject.publish.streaming.formats";
 
   /** Workflow configuration option keys */
@@ -119,7 +118,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   static final String PLAYER_PATH = "/play/";
 
   /** The streaming distribution service */
-  private DistributionService streamingDistributionService = null;
+  private StreamingDistributionService streamingDistributionService = null;
 
   /** The download distribution service */
   private DownloadDistributionService downloadDistributionService = null;
@@ -132,9 +131,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
   private OrganizationDirectoryService organizationDirectoryService = null;
 
-  /** Whether to distribute to streaming server */
-  private boolean distributeStreaming = false;
-
   /** Which streaming formats should be published automatically */
   private List<String> publishedStreamingFormats = null;
 
@@ -144,7 +140,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @param streamingDistributionService
    *          the streaming distribution service
    */
-  protected void setStreamingDistributionService(DistributionService streamingDistributionService) {
+  protected void setStreamingDistributionService(StreamingDistributionService streamingDistributionService) {
     this.streamingDistributionService = streamingDistributionService;
   }
 
@@ -189,7 +185,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
     // Get configuration
     serverUrl = UrlSupport.url(bundleContext.getProperty(SERVER_URL_PROPERTY));
-    distributeStreaming = StringUtils.isNotBlank(bundleContext.getProperty(STREAMING_URL_PROPERTY));
     publishedStreamingFormats = Arrays.asList(Optional.ofNullable(StringUtils.split(
             bundleContext.getProperty(STREAMING_PUBLISH_PROPERTY), ",")).orElse(new String[0]));
   }
@@ -314,7 +309,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           }
         }
 
-        if (distributeStreaming) {
+        if (streamingDistributionService != null && streamingDistributionService.publishToStreaming()) {
           for (String elementId : streamingElementIds) {
             Job job = streamingDistributionService.distribute(CHANNEL_ID, mediaPackage, elementId);
             if (job != null) {
@@ -383,7 +378,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         mediaPackage.add(publicationElement);
 
         // create publication URI for streaming
-        if (distributeStreaming && !publishedStreamingFormats.isEmpty()) {
+        if (streamingDistributionService != null && streamingDistributionService.publishToStreaming() && !publishedStreamingFormats.isEmpty()) {
           for (Track track : mediaPackageForSearch.getTracks()) {
             String mimeType = track.getMimeType().toString();
             if (isStreamingFormat(track) && (publishedStreamingFormats.contains(mimeType)
@@ -441,7 +436,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @return the assembled player URI for this mediapackage
    */
   URI createEngageUri(URI engageUri, MediaPackage mp) {
-    return URIUtils.resolve(engageUri, PLAYER_PATH + mp.getIdentifier().compact());
+    return URIUtils.resolve(engageUri, PLAYER_PATH + mp.getIdentifier().toString());
   }
 
   /**
@@ -687,8 +682,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         logger.info("Merging {} '{}' into the updated mediapackage", type, element.getIdentifier());
         mergedMediaPackage.add((MediaPackageElement) element.clone());
       } else {
-        logger.info(String.format("Overwriting existing %s '%s' with '%s' in the updated mediapackage",
-                type, element.getIdentifier(), updatedMp.getElementsByFlavor(element.getFlavor())[0].getIdentifier()));
+        logger.info("Overwriting existing {} '{}' with '{}' in the updated mediapackage",
+                type, element.getIdentifier(), updatedMp.getElementsByFlavor(element.getFlavor())[0].getIdentifier());
 
       }
     }
@@ -728,7 +723,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           }
         }
 
-        if (distributeStreaming) {
+        if (streamingDistributionService.publishToStreaming()) {
           for (MediaPackageElement element : distributedMediaPackage.getElements()) {
             Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, distributedMediaPackage, element.getIdentifier());
             if (retractStreamingJob != null) {

@@ -124,14 +124,8 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
   /** A default value for limit */
   protected static final int DEFAULT_LIMIT = 100;
 
-  /** Unlimited */
-  protected static final int NO_LIMIT = Integer.MAX_VALUE;
-
   /** A default value for offset */
   protected static final int DEFAULT_OFFSET = 0;
-
-  /** The date parser format **/
-  protected static final String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss";
 
   /** The default feed encoding */
   public static final String ENCODING = "UTF-8";
@@ -444,19 +438,6 @@ public abstract class AbstractFeedGenerator implements FeedGenerator {
     String feedURL = organization.getProperties().get(PROP_ORG_FEED_URL);
     String engageUIURL = organization.getProperties().get(PROP_ORG_ENGAGE_UI_URL);
     return ensureUrl(linkTemplate, feedURL, engageUIURL, serverUrl);
-  }
-
-  /**
-   * Returns the link to the feed itself.
-   *
-   * @param organization
-   *          the organization
-   * @return the link to the feed
-   */
-  public String getLinkToSelf(Organization organization) {
-    String feedURL = organization.getProperties().get(PROP_ORG_FEED_URL);
-    String engageUIURL = organization.getProperties().get(PROP_ORG_ENGAGE_UI_URL);
-    return ensureUrl(linkSelf, feedURL, engageUIURL, serverUrl);
   }
 
   /**

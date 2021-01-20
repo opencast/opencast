@@ -35,6 +35,4 @@ public interface PersistenceEnv2<F> {
   /** Run code inside a transaction. */
   <A> Either<F, A> tx(Function<EntityManager, A> transactional);
 
-  /** Close the environment and free all associated resources. */
-  void close();
 }

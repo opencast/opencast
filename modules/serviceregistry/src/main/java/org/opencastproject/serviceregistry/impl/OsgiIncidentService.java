@@ -24,6 +24,7 @@ package org.opencastproject.serviceregistry.impl;
 import static org.opencastproject.util.IoSupport.loadPropertiesFromUrl;
 import static org.opencastproject.util.data.Monadics.mlist;
 
+import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.persistence.PersistenceEnv;
 import org.opencastproject.util.persistence.PersistenceEnvs;
@@ -35,6 +36,10 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleListener;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +50,13 @@ import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 
+@Component(
+  property = {
+    "service.description=Incident service"
+  },
+  immediate = true,
+  service = { IncidentService.class }
+)
 public class OsgiIncidentService extends AbstractIncidentService implements BundleListener {
   /** The logging instance */
   private static final Logger logger = LoggerFactory.getLogger(OsgiIncidentService.class);
@@ -81,6 +93,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference(name = "serviceRegistry")
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -91,6 +104,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
    * @param workflowService
    *          the workflow service
    */
+  @Reference(name  = "workflowService")
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
@@ -98,6 +112,7 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
   /**
    * OSGi callback on component activation.
    */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for job incidents");
     penv = PersistenceEnvs.persistenceEnvironment(emf);
@@ -111,11 +126,13 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
   /**
    * Closes entity manager factory.
    */
+  @Deactivate
   public void deactivate() {
     penv.close();
   }
 
   /** OSGi DI */
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.serviceregistry)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }

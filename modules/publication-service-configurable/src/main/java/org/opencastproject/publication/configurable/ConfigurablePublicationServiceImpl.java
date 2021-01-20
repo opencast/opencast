@@ -44,8 +44,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,8 +54,6 @@ import java.util.Set;
 import java.util.UUID;
 
 public class ConfigurablePublicationServiceImpl extends AbstractJobProducer implements ConfigurablePublicationService {
-
-  private static final Logger logger = LoggerFactory.getLogger(ConfigurablePublicationServiceImpl.class);
 
   /* Gson is thread-safe so we use a single instance */
   private Gson gson = new Gson();

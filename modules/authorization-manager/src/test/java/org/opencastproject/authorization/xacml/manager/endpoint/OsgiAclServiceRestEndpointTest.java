@@ -30,10 +30,7 @@ import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 import org.opencastproject.util.UrlSupport;
 
-import com.sun.jersey.api.core.ClassNamesResourceConfig;
-
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.junit.After;
@@ -41,8 +38,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.regex.Pattern;
 
 import javax.ws.rs.core.Response;
 
@@ -56,9 +51,6 @@ public class OsgiAclServiceRestEndpointTest {
   private static final int NOT_FOUND = Response.Status.NOT_FOUND.getStatusCode();
   private static final int CONFLICT = Response.Status.CONFLICT.getStatusCode();
   private static final int BAD_REQUEST = Response.Status.BAD_REQUEST.getStatusCode();
-  private static final int INTERNAL_SERVER_ERROR = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
-
-  private String acl;
 
   private static Long privateAclId;
   private static Long publicAclId;
@@ -75,7 +67,7 @@ public class OsgiAclServiceRestEndpointTest {
   }
 
   @After
-  public void tearDownTest() throws Exception {
+  public void tearDownTest() {
     given().pathParam("aclId", publicAclId).when().delete(host("/acl/{aclId}"));
     given().pathParam("aclId", privateAclId).when().delete(host("/acl/{aclId}"));
   }
@@ -248,10 +240,10 @@ public class OsgiAclServiceRestEndpointTest {
   // --
 
   private static final RestServiceTestEnv env = testEnvForCustomConfig(TestRestService.BASE_URL,
-          new ClassNamesResourceConfig(TestRestService.class, NotFoundExceptionMapper.class));
+          new ResourceConfig(TestRestService.class, NotFoundExceptionMapper.class));
 
   @BeforeClass
-  public static void oneTimeSetUp() throws Exception {
+  public static void oneTimeSetUp() {
     env.setUpServer();
   }
 
@@ -262,37 +254,6 @@ public class OsgiAclServiceRestEndpointTest {
 
   public static String host(String path) {
     return env.host(UrlSupport.concat("test", path));
-  }
-
-  public static class RegexMatcher extends BaseMatcher<String> {
-    private final Pattern p;
-
-    public RegexMatcher(String pattern) {
-      p = Pattern.compile(pattern);
-    }
-
-    public static RegexMatcher regex(String pattern) {
-      return new RegexMatcher(pattern);
-    }
-
-    @Override
-    public boolean matches(Object item) {
-      if (item != null) {
-        return p.matcher(item.toString()).matches();
-      } else {
-        return false;
-      }
-    }
-
-    @Override
-    public void describeTo(Description description) {
-      description.appendText("regex [" + p.pattern() + "]");
-    }
-  }
-
-  public static Long extractTransitionId(io.restassured.response.Response r) throws Exception {
-    JSONObject json = (JSONObject) new JSONParser().parse(r.asString());
-    return (Long) json.get("transitionId");
   }
 
   public static Long extractAclId(io.restassured.response.Response r) throws Exception {

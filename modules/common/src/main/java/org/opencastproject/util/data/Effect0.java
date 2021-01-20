@@ -39,20 +39,6 @@ public abstract class Effect0 extends Function0<Void> {
   /** Run the side effect. */
   protected abstract void run();
 
-  /** Return the effect as a function of arity 0. */
-  public Function0<Void> toFunction() {
-    return this;
-  }
-
-  /** Return the effect as a Runnable. */
-  public Runnable toRunnable() {
-    return new Runnable() {
-      @Override public void run() {
-        Effect0.this.run();
-      }
-    };
-  }
-
   /** Version of {@link Effect0} that allows for throwing a checked exception. */
   public abstract static class X extends Effect0 {
     @Override

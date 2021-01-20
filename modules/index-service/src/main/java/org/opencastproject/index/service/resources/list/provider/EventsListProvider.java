@@ -22,8 +22,8 @@
 package org.opencastproject.index.service.resources.list.provider;
 
 import org.opencastproject.index.service.api.EventIndex;
-import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
+import org.opencastproject.list.api.ResourceListProvider;
+import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
 import org.osgi.framework.BundleContext;

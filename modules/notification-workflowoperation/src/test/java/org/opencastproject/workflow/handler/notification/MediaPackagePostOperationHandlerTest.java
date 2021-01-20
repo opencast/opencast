@@ -97,7 +97,6 @@ public class MediaPackagePostOperationHandlerTest {
     /* Sending stuff to port 9 shound never return anything as the Discard
      * Protocol uses port 9 */
     InstanceAndHandler tuple = createWorkflow("http://127.0.0.1:9", "xml");
-    MediaPackagePostOperationHandler handler = (MediaPackagePostOperationHandler) tuple.workflowHandler;
     tuple.workflowInstance.setMediaPackage(mp);
 
     try {
@@ -123,7 +122,6 @@ public class MediaPackagePostOperationHandlerTest {
     /* Sending stuff to port 9 shound never return anything as the Discard
      * Protocol uses port 9 */
     InstanceAndHandler tuple = createWorkflow("http://127.0.0.1:9", "json");
-    MediaPackagePostOperationHandler handler = (MediaPackagePostOperationHandler) tuple.workflowHandler;
     tuple.workflowInstance.setMediaPackage(mp);
 
     try {

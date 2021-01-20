@@ -30,10 +30,12 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
@@ -45,6 +47,9 @@ import org.junit.Test;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Tests persistence: storing, merging, retrieving and removing.
@@ -61,8 +66,16 @@ public class SearchServicePersistenceTest {
    */
   @Before
   public void setUp() throws Exception {
+    EntityManagerFactory emf = newTestEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNIT);
+    EntityManager em = emf.createEntityManager();
     securityService = EasyMock.createNiceMock(SecurityService.class);
     DefaultOrganization defaultOrganization = new DefaultOrganization();
+    em.getTransaction().begin();
+    Organization org = new JpaOrganization(defaultOrganization.getId(), defaultOrganization.getName(),
+        defaultOrganization.getServers(), defaultOrganization.getAdminRole(), defaultOrganization.getAnonymousRole(),
+        defaultOrganization.getProperties());
+    em.merge(org);
+    em.getTransaction().commit();
     User user = new JaxbUser("admin", "test", defaultOrganization, new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE,
             defaultOrganization));
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
@@ -70,7 +83,7 @@ public class SearchServicePersistenceTest {
     EasyMock.replay(securityService);
 
     searchDatabase = new SearchServiceDatabaseImpl();
-    searchDatabase.setEntityManagerFactory(newTestEntityManagerFactory(SearchServiceDatabaseImpl.PERSISTENCE_UNIT));
+    searchDatabase.setEntityManagerFactory(emf);
     searchDatabase.setSecurityService(securityService);
     searchDatabase.activate(null);
 
@@ -83,8 +96,10 @@ public class SearchServicePersistenceTest {
 
   @Test
   public void testAdding() throws Exception {
-    Date modifictaionDate = new Date();
-    searchDatabase.storeMediaPackage(mediaPackage, accessControlList, modifictaionDate);
+    int mpCount = searchDatabase.countMediaPackages();
+    Date modificationDate = new Date();
+    searchDatabase.storeMediaPackage(mediaPackage, accessControlList, modificationDate);
+    Assert.assertEquals(searchDatabase.countMediaPackages(), mpCount + 1);
 
     Iterator<Tuple<MediaPackage, String>> mediaPackages = searchDatabase.getAllMediaPackages();
     while (mediaPackages.hasNext()) {
@@ -96,7 +111,7 @@ public class SearchServicePersistenceTest {
       Assert.assertEquals(accessControlList.getEntries().size(), acl.getEntries().size());
       Assert.assertEquals(accessControlList.getEntries().get(0), acl.getEntries().get(0));
       Assert.assertNull(searchDatabase.getDeletionDate(mediaPackageId));
-      Assert.assertEquals(modifictaionDate, searchDatabase.getModificationDate(mediaPackageId));
+      Assert.assertEquals(modificationDate, searchDatabase.getModificationDate(mediaPackageId));
       Assert.assertEquals(mediaPackage.getA(), searchDatabase.getMediaPackage(mediaPackageId));
       Assert.assertEquals(securityService.getOrganization().getId(), mediaPackage.getB());
       Assert.assertEquals(securityService.getOrganization().getId(), searchDatabase.getOrganizationId(mediaPackageId));

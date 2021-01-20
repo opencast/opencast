@@ -24,7 +24,6 @@ package org.opencastproject.authorization.xacml.manager.impl;
 import static org.easymock.EasyMock.anyLong;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.anyString;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -43,7 +42,6 @@ import org.opencastproject.util.data.Option;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXParseException;
 
@@ -95,44 +93,6 @@ public class AclScannerTest {
     aclScanner.setAclServiceFactory(aclServiceFactory);
     aclScanner.setOrganizationDirectoryService(orgService);
     aclScanner.setSecurityService(securityService);
-  }
-
-  @Test
-  @Ignore
-  public void testCanHandle() {
-    File wrongDirectory = EasyMock.createNiceMock(File.class);
-    EasyMock.expect(wrongDirectory.getName()).andReturn("wrong").anyTimes();
-    EasyMock.replay(wrongDirectory);
-
-    File correctDirectory = EasyMock.createNiceMock(File.class);
-    EasyMock.expect(correctDirectory.getName()).andReturn(AclScanner.ACL_DIRECTORY).anyTimes();
-    EasyMock.replay(correctDirectory);
-
-    File wrongFilenameWrongDirectory = EasyMock.createNiceMock(File.class);
-    EasyMock.expect(wrongFilenameWrongDirectory.getParentFile()).andReturn(wrongDirectory);
-    EasyMock.expect(wrongFilenameWrongDirectory.getName()).andReturn("wrong.properties");
-    EasyMock.replay(wrongFilenameWrongDirectory);
-
-    File wrongFilenameRightDirectory = EasyMock.createNiceMock(File.class);
-    EasyMock.expect(wrongFilenameRightDirectory.getParentFile()).andReturn(correctDirectory);
-    EasyMock.expect(wrongFilenameRightDirectory.getName()).andReturn("wrong.properties");
-    EasyMock.replay(wrongFilenameRightDirectory);
-
-    File rightFilenameWrongDirectory = EasyMock.createNiceMock(File.class);
-    EasyMock.expect(rightFilenameWrongDirectory.getParentFile()).andReturn(wrongDirectory);
-    EasyMock.expect(rightFilenameWrongDirectory.getName()).andReturn("right.xml");
-    EasyMock.replay(rightFilenameWrongDirectory);
-
-    File rightFilenameRightDirectory = EasyMock.createNiceMock(File.class);
-    EasyMock.expect(rightFilenameRightDirectory.getParentFile()).andReturn(correctDirectory).anyTimes();
-    EasyMock.expect(rightFilenameRightDirectory.getName()).andReturn("right.xml").anyTimes();
-    EasyMock.replay(rightFilenameRightDirectory);
-
-    AclScanner listProvidersScanner = new AclScanner();
-    assertFalse(listProvidersScanner.canHandle(wrongFilenameWrongDirectory));
-    assertFalse(listProvidersScanner.canHandle(wrongFilenameRightDirectory));
-    assertFalse(listProvidersScanner.canHandle(rightFilenameWrongDirectory));
-    assertTrue(listProvidersScanner.canHandle(rightFilenameRightDirectory));
   }
 
   @Test

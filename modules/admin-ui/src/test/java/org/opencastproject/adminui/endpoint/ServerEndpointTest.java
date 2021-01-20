@@ -66,31 +66,31 @@ public class ServerEndpointTest {
     int limit = 3;
     int offset = 2;
     given().param("limit", limit).param("offset", offset).expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).body("limit", equalTo(limit)).content("offset", equalTo(offset))
-            .body("count", equalTo(total - offset)).content("total", equalTo(total)).when().get(rt.host("/servers.json"));
+            .contentType(ContentType.JSON).body("limit", equalTo(limit)).body("offset", equalTo(offset))
+            .body("count", equalTo(total - offset)).body("total", equalTo(total)).when().get(rt.host("/servers.json"));
 
     limit = 10;
     offset = 2;
     given().param("limit", limit).param("offset", offset).expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).body("limit", equalTo(limit)).content("offset", equalTo(offset))
-            .body("count", equalTo(total - offset)).content("total", equalTo(total)).when().get(rt.host("/servers.json"));
+            .contentType(ContentType.JSON).body("limit", equalTo(limit)).body("offset", equalTo(offset))
+            .body("count", equalTo(total - offset)).body("total", equalTo(total)).when().get(rt.host("/servers.json"));
 
     offset = 4;
     given().param("limit", limit).param("offset", offset).expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).body("limit", equalTo(limit)).content("offset", equalTo(offset))
-            .body("count", equalTo(total - offset)).content("total", equalTo(total)).when().get(rt.host("/servers.json"));
+            .contentType(ContentType.JSON).body("limit", equalTo(limit)).body("offset", equalTo(offset))
+            .body("count", equalTo(total - offset)).body("total", equalTo(total)).when().get(rt.host("/servers.json"));
 
     limit = 0;
     offset = 0;
     given().param("limit", limit).param("offset", offset).expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).body("limit", equalTo(limit)).content("offset", equalTo(offset))
-            .body("count", equalTo(total - offset)).content("total", equalTo(total)).when().get(rt.host("/servers.json"));
+            .contentType(ContentType.JSON).body("limit", equalTo(limit)).body("offset", equalTo(offset))
+            .body("count", equalTo(total - offset)).body("total", equalTo(total)).when().get(rt.host("/servers.json"));
 
     limit = 4;
     offset = -1; // negatiive offset not allowed and will be changed to 0
     given().param("limit", limit).param("offset", offset).expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).body("limit", equalTo(limit)).content("offset", equalTo(offset))
-            .body("count", equalTo(4)).content("total", equalTo(total)).when().get(rt.host("/servers.json"));
+            .contentType(ContentType.JSON).body("limit", equalTo(limit)).body("offset", equalTo(offset))
+            .body("count", equalTo(4)).body("total", equalTo(total)).when().get(rt.host("/servers.json"));
 
   }
 
@@ -167,60 +167,60 @@ public class ServerEndpointTest {
   @Test
   public void testSortCores() throws ParseException {
     given().param("sort", "CORES:ASC").expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .body("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host3"))
+            .body("count", equalTo(4)).body("total", equalTo(4)).body("results[0].hostname", equalTo("host3"))
             .body("results[1].hostname", equalTo("host2")).when().get(rt.host("/servers.json"));
 
     given().param("sort", "CORES:DESC").expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .body("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host1"))
+            .body("count", equalTo(4)).body("total", equalTo(4)).body("results[0].hostname", equalTo("host1"))
             .body("results[1].hostname", equalTo("host4")).when().get(rt.host("/servers.json"));
   }
 
   @Test
   public void testSortHostName() throws ParseException {
     given().param("sort", "HOSTNAME:ASC").expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .body("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host1"))
+            .body("count", equalTo(4)).body("total", equalTo(4)).body("results[0].hostname", equalTo("host1"))
             .body("results[1].hostname", equalTo("host2")).when().get(rt.host("/servers.json"));
 
     given().param("sort", "HOSTNAME:DESC").expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).body("count", equalTo(4)).content("total", equalTo(4))
-            .body("results[0].hostname", equalTo("host4")).content("results[1].hostname", equalTo("host3")).when()
+            .contentType(ContentType.JSON).body("count", equalTo(4)).body("total", equalTo(4))
+            .body("results[0].hostname", equalTo("host4")).body("results[1].hostname", equalTo("host3")).when()
             .get(rt.host("/servers.json"));
   }
 
   @Test
   public void testSortMeanRunTime() {
     given().param("sort", "meanRunTime:ASC").expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .body("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host3"))
-            .body("results[1].hostname", equalTo("host1")).content("results[2].hostname", equalTo("host2"))
+            .body("count", equalTo(4)).body("total", equalTo(4)).body("results[0].hostname", equalTo("host3"))
+            .body("results[1].hostname", equalTo("host1")).body("results[2].hostname", equalTo("host2"))
             .when().get(rt.host("/servers.json"));
 
     given().param("sort", "meanRunTime:DESC").expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .body("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host4"))
-            .body("results[1].hostname", equalTo("host2")).content("results[2].hostname", equalTo("host1"))
+            .body("count", equalTo(4)).body("total", equalTo(4)).body("results[0].hostname", equalTo("host4"))
+            .body("results[1].hostname", equalTo("host2")).body("results[2].hostname", equalTo("host1"))
             .when().get(rt.host("/servers.json"));
   }
 
   @Test
   public void testSortMeanQueueTime() {
     given().param("sort", "meanQueueTime:asc").expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .body("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host2"))
-            .body("results[1].hostname", equalTo("host1")).content("results[2].hostname", equalTo("host3"))
+            .body("count", equalTo(4)).body("total", equalTo(4)).body("results[0].hostname", equalTo("host2"))
+            .body("results[1].hostname", equalTo("host1")).body("results[2].hostname", equalTo("host3"))
             .when().get(rt.host("/servers.json"));
 
     given().param("sort", "meanQueueTime:desc").expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .body("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host4"))
-            .body("results[1].hostname", equalTo("host3")).content("results[2].hostname", equalTo("host1"))
+            .body("count", equalTo(4)).body("total", equalTo(4)).body("results[0].hostname", equalTo("host4"))
+            .body("results[1].hostname", equalTo("host3")).body("results[2].hostname", equalTo("host1"))
             .when().get(rt.host("/servers.json"));
   }
 
   @Test
   public void testSortStatus() throws ParseException {
     given().param("sort", "ONLINE:ASC").expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .body("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host3"))
+            .body("count", equalTo(4)).body("total", equalTo(4)).body("results[0].hostname", equalTo("host3"))
             .when().get(rt.host("/servers.json"));
 
     given().param("sort", "ONLINE:DESC").expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .body("count", equalTo(4)).content("total", equalTo(4)).content("results[0].hostname", equalTo("host1"))
+            .body("count", equalTo(4)).body("total", equalTo(4)).body("results[0].hostname", equalTo("host1"))
             .when().get(rt.host("/servers.json"));
   }
 

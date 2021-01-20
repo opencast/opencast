@@ -21,34 +21,10 @@
 
 package org.opencastproject.util.data;
 
-import static org.opencastproject.util.data.Option.some;
-
 import java.lang.reflect.Array;
-import java.util.List;
 
 public final class Arrays {
   private Arrays() {
-  }
-
-  /** Return the head of array <code>as</code> or <code>none</code>. */
-  public static <A> Option<A> head(A[] as) {
-    if (as.length > 0) {
-      return some(as[0]);
-    } else {
-      return Option.none();
-    }
-  }
-
-  /**
-   * Sort array <code>as</code> according to the natural ordering. Note that <code>as</code> gets
-   * mutated!
-   *
-   * @return <code>as</code>
-   * @see java.util.Arrays#sort(Object[])
-   */
-  public static <A> A[] sort(A[] as) {
-    java.util.Arrays.sort(as);
-    return as;
   }
 
   /** Create a new array by prepending <code>a</code> to <code>as</code>: <code>[a, as0, as1, .. asn]</code> */
@@ -74,19 +50,6 @@ public final class Arrays {
     return as;
   }
 
-  public static <A> Function<A[], List<A>> toList() {
-    return new Function<A[], List<A>>() {
-      @Override
-      public List<A> apply(A[] as) {
-        if (as != null) {
-          return Collections.list(as);
-        } else {
-          return Collections.nil();
-        }
-      }
-    };
-  }
-
   /** Turn a value into a single element array. */
   public static <A> Function<A, A[]> singleton(final Class<A> type) {
     return new Function<A, A[]>() {
@@ -96,26 +59,6 @@ public final class Arrays {
         final A[] as = (A[]) Array.newInstance(type, 1);
         as[0] = a;
         return as;
-      }
-    };
-  }
-
-  /** Functional version of {@link #head(Object[])}. */
-  public static <A> Function<A[], Option<A>> head() {
-    return new Function<A[], Option<A>>() {
-      @Override
-      public Option<A> apply(A[] as) {
-        return head(as);
-      }
-    };
-  }
-
-  /** Functional version of {@link #sort}. */
-  public static <A> Function<A[], A[]> sort() {
-    return new Function<A[], A[]>() {
-      @Override
-      public A[] apply(A[] as) {
-        return sort(as);
       }
     };
   }

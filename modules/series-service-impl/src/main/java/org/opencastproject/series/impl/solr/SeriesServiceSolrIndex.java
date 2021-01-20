@@ -61,6 +61,10 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,6 +87,10 @@ import java.util.concurrent.Executors;
 /**
  * Implements {@link SeriesServiceIndex}.
  */
+@Component(
+  immediate = true,
+  service = { SeriesServiceIndex.class }
+)
 public class SeriesServiceSolrIndex implements SeriesServiceIndex {
 
   /** Configuration key for a remote solr server */
@@ -140,6 +148,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
    * @param dcService
    *          {@link DublinCoreCatalogService} object
    */
+  @Reference(name = "dc")
   public void setDublinCoreService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;
   }
@@ -150,6 +159,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -160,6 +170,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
    * @param cc
    *          the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
 
     if (cc == null) {
@@ -193,6 +204,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
    * @param cc
    *          the component context
    */
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     deactivate();
   }

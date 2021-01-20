@@ -29,8 +29,7 @@ import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.identifier.IdBuilder;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.mediapackage.track.AudioStreamImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -110,9 +109,6 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService, M
 
   /** Reference to the receipt service */
   private ServiceRegistry serviceRegistry;
-
-  /** Id builder used to create ids for encoded tracks */
-  private final IdBuilder idBuilder = IdBuilderFactory.newInstance().newIdBuilder();
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -327,7 +323,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService, M
     if (audioTrack.getAudio().get(0).getRmsLevDb() == null)
       throw new SoxException("No RMS Lev dB metadata available");
 
-    final String targetTrackId = idBuilder.createNew().toString();
+    final String targetTrackId = IdImpl.fromUUID().toString();
 
     Float rmsLevDb = audioTrack.getAudio().get(0).getRmsLevDb();
 

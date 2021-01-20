@@ -34,6 +34,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
@@ -53,28 +54,33 @@ import javax.xml.bind.annotation.XmlType;
  */
 @Entity(name = "UserAction")
 @Access(AccessType.FIELD)
-@Table(name = "oc_user_action")
+@Table(name = "oc_user_action", indexes = {
+    @Index(name = "IX_oc_user_action_created", columnList = "created"),
+    @Index(name = "IX_oc_user_action_inpoint", columnList = "inpoint"),
+    @Index(name = "IX_oc_user_action_outpoint", columnList = "outpoint"),
+    @Index(name = "IX_oc_user_action_mediapackage_id", columnList = "mediapackage"),
+    @Index(name = "IX_oc_user_action_type", columnList = "type")})
 @NamedQueries({
-        @NamedQuery(name = "findUserActions", query = "SELECT a FROM UserAction a"),
-        @NamedQuery(name = "countSessionsGroupByMediapackage", query = "SELECT a.mediapackageId, COUNT(distinct a.session), SUM(a.length) FROM UserAction a GROUP BY a.mediapackageId"),
-        @NamedQuery(name = "countSessionsGroupByMediapackageByIntervall", query = "SELECT a.mediapackageId, COUNT(distinct a.session.sessionId), SUM(a.length) FROM UserAction a WHERE :begin <= a.created AND a.created <= :end GROUP BY a.mediapackageId"),
-        @NamedQuery(name = "countSessionsOfMediapackage", query = "SELECT COUNT(distinct a.session) FROM UserAction a WHERE a.mediapackageId = :mediapackageId"),
-        @NamedQuery(name = "findLastUserFootprintOfSession", query = "SELECT a FROM UserAction a  WHERE a.session = :session AND a.type = \'FOOTPRINT\'  ORDER BY a.created DESC"),
-        @NamedQuery(name = "findLastUserActionsOfSession", query = "SELECT a FROM UserAction a  WHERE a.session = :session ORDER BY a.created DESC"),
-        @NamedQuery(name = "findUserActionsByType", query = "SELECT a FROM UserAction a WHERE a.type = :type"),
-        @NamedQuery(name = "findUserActionsByTypeAndMediapackageId", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type"),
-        @NamedQuery(name = "findUserActionsByTypeAndMediapackageIdOrderByOutpointDESC", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type ORDER BY a.outpoint DESC"),
-        @NamedQuery(name = "findUserActionsByTypeAndMediapackageIdByUserOrderByOutpointDESC", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type AND a.session.userId = :userid ORDER BY a.outpoint DESC"),
-        @NamedQuery(name = "findUserActionsByIntervall", query = "SELECT a FROM UserAction a WHERE :begin <= a.created AND a.created <= :end"),
-        @NamedQuery(name = "findUserActionsByTypeAndIntervall", query = "SELECT a FROM UserAction a WHERE :begin <= a.created AND a.created <= :end AND a.type = :type"),
-        @NamedQuery(name = "findTotal", query = "SELECT COUNT(a) FROM UserAction a"),
-        @NamedQuery(name = "findTotalByType", query = "SELECT COUNT(a) FROM UserAction a WHERE a.type = :type"),
-        @NamedQuery(name = "findTotalByTypeAndMediapackageId", query = "SELECT COUNT(a) FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type"),
-        @NamedQuery(name = "findTotalByIntervall", query = "SELECT COUNT(a) FROM UserAction a WHERE :begin <= a.created AND a.created <= :end"),
-        @NamedQuery(name = "findDistinctEpisodeIdTotalByIntervall", query = "SELECT COUNT(distinct a.mediapackageId) FROM UserAction a WHERE :begin <= a.created AND a.created <= :end"),
-        @NamedQuery(name = "findTotalByTypeAndIntervall", query = "SELECT COUNT(a) FROM UserAction a WHERE :begin <= a.created AND a.created <= :end AND a.type = :type"),
-        @NamedQuery(name = "findUserActionsByMediaPackageAndTypeAscendingByDate", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type ORDER BY a.created"),
-        @NamedQuery(name = "findUserActionsByMediaPackageAndTypeDescendingByDate", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type ORDER BY a.created DESC") })
+    @NamedQuery(name = "findUserActions", query = "SELECT a FROM UserAction a"),
+    @NamedQuery(name = "countSessionsGroupByMediapackage", query = "SELECT a.mediapackageId, COUNT(distinct a.session), SUM(a.length) FROM UserAction a GROUP BY a.mediapackageId"),
+    @NamedQuery(name = "countSessionsGroupByMediapackageByIntervall", query = "SELECT a.mediapackageId, COUNT(distinct a.session.sessionId), SUM(a.length) FROM UserAction a WHERE :begin <= a.created AND a.created <= :end GROUP BY a.mediapackageId"),
+    @NamedQuery(name = "countSessionsOfMediapackage", query = "SELECT COUNT(distinct a.session) FROM UserAction a WHERE a.mediapackageId = :mediapackageId"),
+    @NamedQuery(name = "findLastUserFootprintOfSession", query = "SELECT a FROM UserAction a  WHERE a.session = :session AND a.type = \'FOOTPRINT\'  ORDER BY a.created DESC"),
+    @NamedQuery(name = "findLastUserActionsOfSession", query = "SELECT a FROM UserAction a  WHERE a.session = :session ORDER BY a.created DESC"),
+    @NamedQuery(name = "findUserActionsByType", query = "SELECT a FROM UserAction a WHERE a.type = :type"),
+    @NamedQuery(name = "findUserActionsByTypeAndMediapackageId", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type"),
+    @NamedQuery(name = "findUserActionsByTypeAndMediapackageIdOrderByOutpointDESC", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type ORDER BY a.outpoint DESC"),
+    @NamedQuery(name = "findUserActionsByTypeAndMediapackageIdByUserOrderByOutpointDESC", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type AND a.session.userId = :userid ORDER BY a.outpoint DESC"),
+    @NamedQuery(name = "findUserActionsByIntervall", query = "SELECT a FROM UserAction a WHERE :begin <= a.created AND a.created <= :end"),
+    @NamedQuery(name = "findUserActionsByTypeAndIntervall", query = "SELECT a FROM UserAction a WHERE :begin <= a.created AND a.created <= :end AND a.type = :type"),
+    @NamedQuery(name = "findTotal", query = "SELECT COUNT(a) FROM UserAction a"),
+    @NamedQuery(name = "findTotalByType", query = "SELECT COUNT(a) FROM UserAction a WHERE a.type = :type"),
+    @NamedQuery(name = "findTotalByTypeAndMediapackageId", query = "SELECT COUNT(a) FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type"),
+    @NamedQuery(name = "findTotalByIntervall", query = "SELECT COUNT(a) FROM UserAction a WHERE :begin <= a.created AND a.created <= :end"),
+    @NamedQuery(name = "findDistinctEpisodeIdTotalByIntervall", query = "SELECT COUNT(distinct a.mediapackageId) FROM UserAction a WHERE :begin <= a.created AND a.created <= :end"),
+    @NamedQuery(name = "findTotalByTypeAndIntervall", query = "SELECT COUNT(a) FROM UserAction a WHERE :begin <= a.created AND a.created <= :end AND a.type = :type"),
+    @NamedQuery(name = "findUserActionsByMediaPackageAndTypeAscendingByDate", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type ORDER BY a.created"),
+    @NamedQuery(name = "findUserActionsByMediaPackageAndTypeDescendingByDate", query = "SELECT a FROM UserAction a WHERE a.mediapackageId = :mediapackageId AND a.type = :type ORDER BY a.created DESC") })
 @XmlType(name = "action", namespace = "http://usertracking.opencastproject.org")
 @XmlRootElement(name = "action", namespace = "http://usertracking.opencastproject.org")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -86,13 +92,12 @@ public class UserActionImpl implements UserAction {
   @XmlElement(name = "id")
   private Long id;
 
-  @Lob
   @Column(name = "mediapackage", length = 128)
   @XmlElement(name = "mediapackageId")
   private String mediapackageId;
 
   @ManyToOne(targetEntity = UserSessionImpl.class)
-  @JoinColumn(name = "session_id", nullable = false)
+  @JoinColumn(name = "session_id")
   @XmlElement(name = "sessionId")
   private UserSessionImpl session;
 

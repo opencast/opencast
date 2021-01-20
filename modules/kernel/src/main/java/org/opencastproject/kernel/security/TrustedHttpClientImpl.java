@@ -24,10 +24,7 @@ package org.opencastproject.kernel.security;
 import static org.opencastproject.kernel.rest.CurrentJobFilter.CURRENT_JOB_HEADER;
 import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint.DIGEST_AUTH;
 import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER;
-import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 
-import org.opencastproject.kernel.http.api.HttpClient;
-import org.opencastproject.kernel.http.impl.HttpClientFactory;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
@@ -37,31 +34,35 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.util.HttpResponseWrapper;
-import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.urlsigning.utils.ResourceRequestUtil;
-import org.opencastproject.util.Log;
-import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
-
-import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.AuthSchemes;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.auth.DigestScheme;
-import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +78,13 @@ import javax.management.ObjectName;
 /**
  * An http client that executes secure (though not necessarily encrypted) http requests.
  */
+@Component(
+  property = {
+    "service.description=Provides Trusted Http Clients (for use with digest authentication)"
+  },
+  immediate = true,
+  service = { TrustedHttpClient.class }
+)
 public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionMXBean {
   /** Header name used to request a new nonce from a server a request is sent to. */
   public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
@@ -144,13 +152,10 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   private int nonceTimeoutRetries = DEFAULT_NONCE_TIMEOUT_RETRIES;
 
   /** The map of open responses to their http clients, which need to be closed after we are finished with the response */
-  protected Map<HttpResponse, HttpClient> responseMap = new ConcurrentHashMap<HttpResponse, HttpClient>();
+  protected Map<HttpResponse, CloseableHttpClient> responseMap = new ConcurrentHashMap<>();
 
   /** Used to add a random amount of time up to retryMaximumVariableTime to retry a request after a nonce timeout. */
-  private Random generator = new Random();
-
-  /** Used to create HttpClients that are used to make http requests. */
-  private HttpClientFactory httpClientFactory = null;
+  private final Random generator = new Random();
 
   /** The amount of time in seconds to wait until trying the request again. */
   private int retryBaseDelay = 300;
@@ -170,6 +175,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   /** The url signing service */
   protected UrlSigningService urlSigningService = null;
 
+  @Activate
   public void activate(ComponentContext cc) {
     logger.debug("activate");
     user = cc.getBundleContext().getProperty(DIGEST_AUTH_USER_KEY);
@@ -194,18 +200,14 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
       logger.warn("Unable to register {} as an mbean: {}", this, e);
     }
 
-    Opt<Long> expiration = getOptContextProperty(cc, INTERNAL_URL_SIGNING_DURATION_KEY).toOpt().map(
-            com.entwinemedia.fn.fns.Strings.toLongF);
-    if (expiration.isSome()) {
-      signedUrlExpiresDuration = expiration.get();
-      logger.debug("The property {} has been configured to expire signed URLs in {}.",
-              INTERNAL_URL_SIGNING_DURATION_KEY, Log.getHumanReadableTimeString(signedUrlExpiresDuration));
+    final Long expiration = NumberUtils.createLong(StringUtils.trimToNull(
+        cc.getBundleContext().getProperty(INTERNAL_URL_SIGNING_DURATION_KEY)));
+    if (expiration != null) {
+      signedUrlExpiresDuration = expiration;
     } else {
       signedUrlExpiresDuration = DEFAULT_URL_SIGNING_EXPIRES_DURATION;
-      logger.debug(
-              "The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
-              INTERNAL_URL_SIGNING_DURATION_KEY, Log.getHumanReadableTimeString(signedUrlExpiresDuration));
     }
+    logger.debug("Expire signed URLs in {} seconds.", signedUrlExpiresDuration);
   }
 
   /**
@@ -214,8 +216,23 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * @param serviceRegistry
    *         the serviceRegistry to set
    */
+  @Reference(
+      name = "serviceRegistry",
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy =  ReferencePolicy.DYNAMIC,
+      unbind = "unsetServiceRegistry")
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
+  }
+
+  /**
+   * Unsets the service registry.
+   *
+   * @param serviceRegistry
+   *         the serviceRegistry to unset (unused, but needed for OSGI)
+   */
+  public void unsetServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = null;
   }
 
   /**
@@ -224,6 +241,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * @param securityService
    *         the security service
    */
+  @Reference(name = "securityService")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -234,6 +252,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * @param urlSigningService
    *        The signing service to sign urls with.
    */
+  @Reference(name = "urlSigningService")
   public void setUrlSigningService(UrlSigningService urlSigningService) {
     this.urlSigningService = urlSigningService;
   }
@@ -299,12 +318,9 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     return result;
   }
 
+  @Deactivate
   public void deactivate() {
     logger.debug("deactivate");
-  }
-
-  public void setHttpClientFactory(HttpClientFactory httpClientFactory) {
-    this.httpClientFactory = httpClientFactory;
   }
 
   public TrustedHttpClientImpl() {
@@ -315,25 +331,12 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     this.pass = pass;
   }
 
-  /** Creates a new HttpClient to use to make requests. */
-  public HttpClient makeHttpClient(int connectionTimeout, int socketTimeout) throws TrustedHttpClientException {
-    if (httpClientFactory == null) {
-      throw new TrustedHttpClientException(new NullPointerException(
-              "There is no DefaultHttpClientFactory service available so we cannot make a request"));
-    }
-    HttpClient httpClient = httpClientFactory.makeHttpClient();
-    httpClient.getParams().setIntParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, connectionTimeout);
-    httpClient.getParams().setIntParameter(CoreConnectionPNames.SO_TIMEOUT, socketTimeout);
-    return httpClient;
-  }
-
-  @Override
-  public <A> Function<Function<HttpResponse, A>, Either<Exception, A>> run(final HttpUriRequest httpUriRequest) {
-    return StandAloneTrustedHttpClientImpl.run(this, httpUriRequest);
-  }
-
-  @Override public <A> RequestRunner<A> runner(HttpUriRequest req) {
-    return StandAloneTrustedHttpClientImpl.runner(this, req);
+  /** Creates a new HttpClientBuilder to use for making requests. */
+  public HttpClientBuilder makeHttpClientBuilder(int connectionTimeout, int socketTimeout) {
+    RequestConfig config = RequestConfig.custom()
+        .setConnectionRequestTimeout(connectionTimeout)
+        .setSocketTimeout(socketTimeout).build();
+    return HttpClientBuilder.create().setDefaultRequestConfig(config);
   }
 
   /**
@@ -349,10 +352,8 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   @Override
   public HttpResponse execute(HttpUriRequest httpUriRequest, int connectionTimeout, int socketTimeout)
           throws TrustedHttpClientException {
-    final HttpClient httpClient = makeHttpClient(connectionTimeout, socketTimeout);
     // Add the request header to elicit a digest auth response
     httpUriRequest.setHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
-    httpUriRequest.setHeader(SecurityConstants.AUTHORIZATION_HEADER, "true");
 
     if (serviceRegistry != null && serviceRegistry.getCurrentJob() != null) {
       httpUriRequest.setHeader(CURRENT_JOB_HEADER, Long.toString(serviceRegistry.getCurrentJob().getId()));
@@ -369,31 +370,30 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
       }
     }
 
+    final HttpClientBuilder clientBuilder = makeHttpClientBuilder(connectionTimeout, socketTimeout);
     if ("GET".equalsIgnoreCase(httpUriRequest.getMethod()) || "HEAD".equalsIgnoreCase(httpUriRequest.getMethod())) {
       // Set the user/pass
-      final UsernamePasswordCredentials creds = new UsernamePasswordCredentials(user, pass);
-      AuthScope authScope = new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST);
-      httpClient.getCredentialsProvider().setCredentials(authScope, creds);
+      CredentialsProvider provider = new BasicCredentialsProvider();
+      provider.setCredentials(
+          new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
+          new UsernamePasswordCredentials(user, pass));
+      final CloseableHttpClient httpClient = clientBuilder.setDefaultCredentialsProvider(provider).build();
       // Run the request (the http client handles the multiple back-and-forth requests)
       try {
-        Opt<HttpUriRequest> optSignedHttpUriRequest = getSignedUrl(httpUriRequest);
-        HttpResponse response;
-        if (optSignedHttpUriRequest.isSome()) {
-          logger.debug("Adding url signing to request {} so that it is {}", httpUriRequest.getURI().toString(),
-                  optSignedHttpUriRequest.get().getURI().toString());
-          response = new HttpResponseWrapper(httpClient.execute(optSignedHttpUriRequest.get()));
-        } else {
-          logger.debug("Not adding url signing to request {}", httpUriRequest.getURI().toString());
-          response = new HttpResponseWrapper(httpClient.execute(httpUriRequest));
-        }
+        httpUriRequest = getSignedUrl(httpUriRequest);
+        HttpResponse response = new HttpResponseWrapper(httpClient.execute(httpUriRequest));
         responseMap.put(response, httpClient);
         return response;
       } catch (IOException e) {
-        // close the http connection(s)
-        httpClient.getConnectionManager().shutdown();
+        try {
+          httpClient.close();
+        } catch (IOException ioException) {
+          throw new TrustedHttpClientException(e);
+        }
         throw new TrustedHttpClientException(e);
       }
     } else {
+      final CloseableHttpClient httpClient = clientBuilder.build();
       // HttpClient doesn't handle the request dynamics for other verbs (especially when sending a streamed multipart
       // request), so we need to handle the details of the digest auth back-and-forth manually
       manuallyHandleDigestAuthentication(httpUriRequest, httpClient);
@@ -401,7 +401,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
       try {
         response = new HttpResponseWrapper(httpClient.execute(httpUriRequest));
         if (nonceTimeoutRetries > 0 && hadNonceTimeoutResponse(response)) {
-          httpClient.getConnectionManager().shutdown();
+          httpClient.close();
           response = retryAuthAndRequestAfterNonceTimeout(httpUriRequest, response);
         }
         responseMap.put(response, httpClient);
@@ -412,7 +412,11 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
           responseMap.remove(response);
         }
         // close the http connection(s)
-        httpClient.getConnectionManager().shutdown();
+        try {
+          httpClient.close();
+        } catch (IOException ioException) {
+          throw new TrustedHttpClientException(e);
+        }
         throw new TrustedHttpClientException(e);
       }
     }
@@ -427,15 +431,14 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * @throws TrustedHttpClientException
    *           Thrown if there is a problem signing the URL.
    */
-  protected Opt<HttpUriRequest> getSignedUrl(HttpUriRequest httpUriRequest) throws TrustedHttpClientException {
+  protected HttpUriRequest getSignedUrl(HttpUriRequest httpUriRequest) throws TrustedHttpClientException {
     if (("GET".equalsIgnoreCase(httpUriRequest.getMethod()) || "HEAD".equalsIgnoreCase(httpUriRequest.getMethod()))
             && ResourceRequestUtil.isNotSigned(httpUriRequest.getURI())
             && urlSigningService.accepts(httpUriRequest.getURI().toString())) {
-      logger.trace("Signing request with method: {} and URI: {}", httpUriRequest.getMethod(), httpUriRequest.getURI()
-              .toString());
+      logger.trace("Signing request with method: {} and URI: {}", httpUriRequest.getMethod(), httpUriRequest.getURI());
       try {
-        String signedUrl = urlSigningService.sign(httpUriRequest.getURI().toString(), signedUrlExpiresDuration, null,
-                null);
+        final String signedUrl = urlSigningService
+            .sign(httpUriRequest.getURI().toString(), signedUrlExpiresDuration, null, null);
         HttpRequestBase signedRequest;
         if ("GET".equalsIgnoreCase(httpUriRequest.getMethod())) {
           signedRequest = new HttpGet(signedUrl);
@@ -446,15 +449,12 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
         for (Header header : httpUriRequest.getAllHeaders()) {
           signedRequest.addHeader(header);
         }
-        return Opt.some((HttpUriRequest) signedRequest);
+        return signedRequest;
       } catch (UrlSigningException e) {
         throw new TrustedHttpClientException(e);
       }
-    } else {
-      logger.trace("Not signing request with method: {} and URI: {}", httpUriRequest.getMethod(), httpUriRequest
-              .getURI().toString());
-      return Opt.none();
     }
+    return httpUriRequest;
   }
 
   /**
@@ -476,7 +476,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     httpUriRequest.removeHeaders(AUTHORIZATION_HEADER_NAME);
 
     for (int i = 0; i < nonceTimeoutRetries; i++) {
-      HttpClient httpClient = makeHttpClient(DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT);
+      CloseableHttpClient httpClient = makeHttpClientBuilder(DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT).build();
       int variableDelay = 0;
       // Make sure that we have a variable delay greater than 0.
       if (retryMaximumVariableTime > 0) {
@@ -499,7 +499,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
         responseMap.put(response, httpClient);
         break;
       }
-      httpClient.getConnectionManager().shutdown();
+      httpClient.close();
     }
     return response;
   }
@@ -526,7 +526,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * @throws TrustedHttpClientException
    *         Thrown if the client cannot be shutdown.
    */
-  private void manuallyHandleDigestAuthentication(HttpUriRequest httpUriRequest, HttpClient httpClient)
+  private void manuallyHandleDigestAuthentication(HttpUriRequest httpUriRequest, CloseableHttpClient httpClient)
           throws TrustedHttpClientException {
     HttpRequestBase digestRequest;
     try {
@@ -552,19 +552,13 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
         httpUriRequest.setHeader(digestAuth.authenticate(creds, httpUriRequest));
       } catch (Exception e) {
         // close the http connection(s)
-        httpClient.getConnectionManager().shutdown();
+        try {
+          httpClient.close();
+        } catch (IOException ex) {
+          throw new TrustedHttpClientException(ex);
+        }
         throw new TrustedHttpClientException(e);
       }
-    }
-  }
-
-  @Override
-  public <T> T execute(HttpUriRequest httpUriRequest, ResponseHandler<T> responseHandler, int connectionTimeout,
-                       int socketTimeout) throws TrustedHttpClientException {
-    try {
-      return responseHandler.handleResponse(execute(httpUriRequest, connectionTimeout, socketTimeout));
-    } catch (IOException e) {
-      throw new TrustedHttpClientException(e);
     }
   }
 
@@ -574,27 +568,15 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * @see org.opencastproject.security.api.TrustedHttpClient#close(org.apache.http.HttpResponse)
    */
   @Override
-  public void close(HttpResponse response) {
+  public void close(HttpResponse response) throws IOException {
     if (response != null) {
-      HttpClient httpClient = responseMap.remove(response);
+      CloseableHttpClient httpClient = responseMap.remove(response);
       if (httpClient != null) {
-        httpClient.getConnectionManager().shutdown();
+        httpClient.close();
       }
     } else {
       logger.debug("Can not close a null response");
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.security.api.TrustedHttpClient#execute(org.apache.http.client.methods.HttpUriRequest,
-   * org.apache.http.client.ResponseHandler)
-   */
-  @Override
-  public <T> T execute(HttpUriRequest httpUriRequest, ResponseHandler<T> responseHandler)
-          throws TrustedHttpClientException {
-    return execute(httpUriRequest, responseHandler, DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT);
   }
 
   /**
@@ -605,32 +587,33 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * @return A String[] containing the {realm, nonce}
    */
   protected String[] getRealmAndNonce(HttpRequestBase request) throws TrustedHttpClientException {
-    HttpClient httpClient = makeHttpClient(DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT);
+    CloseableHttpClient httpClient = makeHttpClientBuilder(DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT).build();
     HttpResponse response;
     try {
-      response = new HttpResponseWrapper(httpClient.execute(request));
+      try {
+        response = new HttpResponseWrapper(httpClient.execute(request));
+        Header[] headers = response.getHeaders("WWW-Authenticate");
+        if (headers == null || headers.length == 0) {
+          logger.warn("URI {} does not support digest authentication", request.getURI());
+          return null;
+        }
+        Header authRequiredResponseHeader = headers[0];
+        String nonce = null;
+        String realm = null;
+        for (HeaderElement element : authRequiredResponseHeader.getElements()) {
+          if ("nonce".equals(element.getName())) {
+            nonce = element.getValue();
+          } else if ("Digest realm".equals(element.getName())) {
+            realm = element.getValue();
+          }
+        }
+        return new String[]{realm, nonce};
+      } finally {
+        httpClient.close();
+      }
     } catch (IOException e) {
-      httpClient.getConnectionManager().shutdown();
       throw new TrustedHttpClientException(e);
     }
-    Header[] headers = response.getHeaders("WWW-Authenticate");
-    if (headers == null || headers.length == 0) {
-      logger.warn("URI {} does not support digest authentication", request.getURI());
-      httpClient.getConnectionManager().shutdown();
-      return null;
-    }
-    Header authRequiredResponseHeader = headers[0];
-    String nonce = null;
-    String realm = null;
-    for (HeaderElement element : authRequiredResponseHeader.getElements()) {
-      if ("nonce".equals(element.getName())) {
-        nonce = element.getValue();
-      } else if ("Digest realm".equals(element.getName())) {
-        realm = element.getValue();
-      }
-    }
-    httpClient.getConnectionManager().shutdown();
-    return new String[]{realm, nonce};
   }
 
   @Override

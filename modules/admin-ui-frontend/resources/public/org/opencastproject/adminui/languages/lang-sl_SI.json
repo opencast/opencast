@@ -1,0 +1,2145 @@
+{
+   "MATTERHORN": "Opencast",
+   "NAV_HOME": "Začetek",
+   "NAV_ABOUT": "Vizitka",
+   "NO": "Ne",
+   "SUBMIT": "Pošlji",
+   "UPDATE": {
+      "MINOR": "Minor update available",
+      "MAJOR": "Major update available",
+      "UNSUPPORTED": "Version {{ version }} no longer supported",
+      "UNDETERMINED": "Indeterminable version"
+   },
+   "CANCEL": "Prekliči",
+   "CONFIRM": "Potrdi",
+   "SAVE": "Shrani",
+   "CONTINUE": "Continue",
+   "CLOSE": "Close",
+   "LOGOUT": "Odjava",
+   "RESET": "Ponastavitev",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
+   "YES": "Da",
+   "COPY": "Copy to clipboard",
+   "LTI": {
+      "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
+      "SERIES_TITLE": "View Series",
+      "UPLOAD_TITLE": "Upload event",
+      "LOADING": "Loading…",
+      "NEW_UPLOAD": "Upload new event",
+      "EDIT_UPLOAD": "Edit event",
+      "CURRENT_JOBS": "Today's jobs",
+      "PRESENTER": "Presenter",
+      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
+      "CAPTION": "Captions",
+      "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
+      "UPLOAD": "Upload",
+      "UPLOADING": "Uploading",
+      "EDIT": "Save",
+      "EDIT_TITLE": "Edit event",
+      "NO_OPTION_SELECTED": "No option selected",
+      "EDITING": "Saving…",
+      "SELECT_OPTION": "Select option",
+      "JOB_TITLE": "Title",
+      "JOB_STATUS": "Status",
+      "UPLOAD_SUCCESS": "Upload succeeded!",
+      "UPLOAD_FAILURE": "Upload failed!",
+      "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
+      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
+      "EDIT_FAILURE": "Edit failed!",
+      "COPY_SUCCESS": "Copying started…",
+      "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",
+      "GENERIC_ERROR": "Error: {{message}}",
+      "DELETION_SUCCESS": "Event deletion successful",
+      "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
+      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
+      "DELETION_FAILURE": "Event deletion failed",
+      "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
+      "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
+      "CONFIRM_DELETION": "Really delete this event?",
+      "COPY_TO_SERIES": "Copy event to series",
+      "SELECT_COPY_TARGET": "Select destination series",
+      "COPY": "Copy",
+      "COPY_IN_PROGRESS": "Starting copy…",
+      "CREATOR": "by {{creator}}"
+   },
+   "LANGUAGES": {
+      "ARABIC": "arabščina",
+      "DANISH": "danščina",
+      "GERMAN": "nemščina",
+      "GERMAN_CH": "švicarska nemščina",
+      "FINNISH": "finščina",
+      "HINDI": "hindijščina",
+      "ITALIAN": "italijanščina",
+      "JAPANESE": "japonščina",
+      "DUTCH": "nizozemščina",
+      "NORWEGIAN": "norveščina",
+      "FRENCH": "francoščina",
+      "ENGLISH": "angleščina",
+      "SPANISH": "španščina",
+      "ROMANSH": "retoromanščina",
+      "POLISH": "poljščina",
+      "PORTUGESE": "Portuguese",
+      "SLOVENIAN": "slovenščina",
+      "SWEDISH": "švedščina",
+      "RUSSIAN": "ruščina",
+      "TURKISH": "turščina",
+      "UKRAINIAN": "ukrajinščina",
+      "CHINESE": "kitajščina"
+   },
+   "PREFERENCES": {
+      "TABLE": {
+         "CAPTION": "Urejanje pogleda tabele",
+         "SUBHEADING": "Izberite privzete podatke, za katere želite, da so prikazani v pogledu {{ tableName }}.",
+         "AVAILABLE_COLUMNS": "Razpoložljivi stolpci",
+         "SELECTED_COLUMNS": "Izbrani stolpci",
+         "FOOTER_TEXT": "Vrstni red in izbor bosta samodejno shranjena. Pritisnite »{{resetTranslation}}«, da obnovite privzeti pogled."
+      }
+   },
+   "CONFIRMATIONS": {
+      "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
+      "CONTINUE_ACTION": "Ali ste prepričani, da želite nadaljevati?",
+      "METADATA": {
+         "NOTICE": {
+            "UNKNOWN": "Naslednji element bo izbrisan",
+            "EVENT": "Naslednji dogodek bo izbrisan",
+            "SERIES": "Naslednje serije bodo izbrisane",
+            "ACL": "Naslednji seznam za nadzor dostopa bo izbrisan",
+            "GROUP": "Naslednja skupina bo izbrisana",
+            "USER": "Naslednji uporabnik bo izbrisan",
+            "THEME": "Naslednja tema bo izbrisana",
+            "LOCATION": "Naslednja lokacija bo izbrisana"
+         },
+         "NAME": "Ime"
+      },
+      "ACTIONS": {
+         "CONFIRMATION": "Potrditev",
+         "SHOW": {
+            "EMBEDDING_CODE": "Embedding code"
+         }
+      },
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "Ta zbirka vsebuje posnetke. Z izbrisom zbirke, posnetki ne bodo izbrisani.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "Ta zbirka ne more biti izbrisana, ker vsebuje posnetke."
+      }
+   },
+   "MEDIAMODULE": "Predstavnostni modul",
+   "SYSTEM_NOTIFICATIONS": "Sistemska opozorila in obvestila",
+   "LANGUAGE": "Izberite jezik",
+   "HELP": {
+      "HELP": "Pomoč",
+      "USERS_GUIDE": "Uporabniški priročnik",
+      "DOCUMENTATION": "Dokumentacija",
+      "REST_DOC": "Dokumenti za API REST",
+      "HOTKEY_CHEAT_SHEET": "Bližnjice na tipkovnici",
+      "ADOPTER_REGISTRATION": "Adopter Registration"
+   },
+   "NOTIFICATIONS": {
+      "ACL_ADDED": "Pravilnik o dostopu je ustvarjen",
+      "ACL_NOT_SAVED": "Pravilnika o dostopu ni bilo mogoče shraniti",
+      "ACL_UPDATED": "Pravilnik o dostopu je posodobljen",
+      "ACL_DELETED": "Pravilnik o dostopu je izbrisan",
+      "ACL_NOT_DELETED": "Pravilnika o dostopu ni bilo mogoče izbrisati",
+      "USER_ADDED": "Uporabnik je ustvarjen",
+      "USER_UPDATED": "Uporabnik je posodobljen",
+      "USER_NOT_SAVED": "Uporabnika ni bilo mogoče shraniti",
+      "USER_DELETED": "Uporabnik je izbrisan",
+      "USER_NOT_DELETED": "Uporabnika ni bilo mogoče izbrisati",
+      "USER_NOT_MANAGEABLE": "Uporabnika ni mogoče upravljati",
+      "GROUP_ADDED": "Skupina je ustvarjena",
+      "GROUP_CONFLICT": "Generirano ime skupine že obstaja",
+      "GROUP_UPDATED": "Skupina je posodobljena",
+      "GROUP_NOT_SAVED": "Skupine ni bilo mogoče shraniti",
+      "GROUP_DELETED": "Skupina je izbrisana",
+      "GROUP_NOT_DELETED": "Skupine ni bilo mogoče izbrisati",
+      "ACCESS_DENIED": "Dostop zavrnjen. Nimate dovoljenja za ogled te strani",
+      "SERIES_ADDED": "Serija je ustvarjena",
+      "SERIES_NOT_SAVED": "Serije ni bilo mogoče shraniti",
+      "EVENTS_CREATED": "Dogodek je ustvarjen",
+      "EVENTS_UPLOAD_STARTED": "Dogodek se nalaga ...",
+      "EVENTS_NOT_CREATED": "Dogodka ni bilo mogoče ustvariti",
+      "EVENTS_UPDATED_NB": "Toliko dogodkov je uspešno posodobljenih: {{ number }}",
+      "EVENTS_UPDATED_ALL": "Vsi dogodki so uspešno posodobljeni",
+      "EVENTS_NOT_UPDATED": "Dogodka ni bilo mogoče shraniti",
+      "EVENTS_NOT_UPDATED_ID": "Dogodka {{ id }} ni bilo mogoče shraniti",
+      "EVENTS_NOT_UPDATED_ALL": "Nobenega od dogodkov ni bilo mogoče shraniti",
+      "EVENTS_PROCESSING_ACTION_RETRY": "Obdelava se nadaljuje ...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Obdelave ni bilo mogoče nadaljevati.",
+      "EVENTS_PROCESSING_ACTION_NONE": "Opustitev obdelave ...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Obdelave ni bilo mogoče opustiti.",
+      "EVENTS_PROCESSING_ACTION_STOP": "Obdelava ustavljena.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Obdelave ni bilo mogoče ustaviti.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Izbrisan potek dela.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Poteka dela ni bilo mogoče izbrisati.",
+      "SERIES_UPDATED_NB": "Toliko serij je uspešno posodobljenih: {{ number }}",
+      "SERIES_UPDATED_ALL": "Vse serije so uspešno posodobljene",
+      "SERIES_NOT_UPDATED": "Serije ni bilo mogoče shraniti",
+      "SERIES_NOT_UPDATED_ID": "Serije {{ id }}ni bilo mogoče shraniti",
+      "SERIES_NOT_UPDATED_ALL": "Nobene od serij ni bilo mogoče shraniti",
+      "EVENT_DELETED": "The event has been deleted.",
+      "EVENT_WILL_BE_DELETED": "The event is being deleted",
+      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
+      "SERIES_DELETED": "Serija je izbrisana",
+      "SERIES_NOT_DELETED": "Serije ni bilo mogoče izbrisati",
+      "LOCATION_DELETED": "Lokacija je izbrisana",
+      "LOCATION_NOT_DELETED": "Lokacije ni bilo mogoče izbrisati",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Lokacije ne morete izbrisati, ker nimate ustreznih pravic.",
+      "CONFLICT_DETECTED": "Spor v urniku: ta novi dogodek se prekriva z obstoječim. Spremenite lokacijo, datume ali ure.",
+      "CONFLICT_BULK_DETECTED": "Podvojeni podatki: spreminjanje ni mogoče. Popravite lokacije, datum ali čas.",
+      "CONFLICT_ALREADY_ENDED": "Napaka urnika: dogodek se je že končal.",
+      "CONFLICT_END_BEFORE_START": "Napaka urnika: konec urnika mora biti pozneje kot začetek.",
+      "CONFLICT_IN_THE_PAST": "Posodobitev podatkov ni mogoča: dogodka ne morete načrtovati za nazaj.",
+      "INVALID_ACL_RULES": "Pravila morajo vsebovati veljavo vlogo ter pravice do branja in/ali zapisovanja.",
+      "MISSING_ACL_RULES": "Potrebna je vsaj ena vloga z dovoljenji za branje in pisanje.",
+      "SAVED_ACL_RULES": "Pravila za dostop so shranjena.",
+      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Obstoječe dogodke v tej seriji bo treba znova obdelati",
+      "SERIES_ACL_LOCKED": "Urejanje pravilnikov o dostopu ni dovoljeno, ko se v dogodku, ki je del serije, izvajajo postopki",
+      "SERIES_ACL_MISSING_READWRITE_ROLE": "Pravilnik o dostopu zahteva vsaj eno vlogo z dovoljenji za branje in pisanje.",
+      "EVENT_ACL_MISSING_READWRITE_ROLE": "Pravilnik o dostopu zahteva vsaj eno vlogo z dovoljenji za branje in pisanje.",
+      "THEME_NAME_ALREADY_TAKEN": "To ime je že v uporabi.",
+      "THEME_NAME_EMPTY": "Ime ne sme biti prazno",
+      "BUMPER_UPLOAD_ERROR": "Napaka pri nalaganju predstavnosti",
+      "BUMPER_REQUIRED": "Naložiti morate prehod",
+      "TRAILER_UPLOAD_ERROR": "Napaka pri nalaganju predstavnosti",
+      "TITLE_UPLOAD_ERROR": "Napaka pri nalaganju predstavnosti",
+      "LICENSE_UPLOAD_ERROR": "Napaka pri nalaganju predstavnosti",
+      "WATERMARK_UPLOAD_ERROR": "Napaka pri nalaganju predstavnosti",
+      "WATERMARK_REQUIRED": "Naložiti morate logotip",
+      "THEME_UPLOAD_STARTED": "Predstavnost se nalaga ...",
+      "THEME_CREATED": "Tema je ustvarjena",
+      "THEME_NOT_CREATED": "Teme ni bilo mogoče ustvariti",
+      "THEME_DELETED": "Tema je izbrisana",
+      "THEME_NOT_DELETED": "Teme ni bilo mogoče izbrisati",
+      "TASK_CREATED": "Opravilo je ustvarjeno",
+      "TASK_NOT_CREATED": "Opravila ni bilo mogoče ustvariti",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
+      "VIDEO_CUT_PROCESSING": "Video je v obdelavi ...",
+      "THUMBNAIL_CHANGE_FAILED": "Spreminjanje sličice je spodletelo.",
+      "VIDEO_SOURCE_TRACKS_INVALID": "Niste izbrali video posnetkov za obdelavo",
+      "VIDEO_TOO_MANY_AUDIOS": "Ne morete imeti več audio datotek ob enem video posnetku",
+      "SERVER_UNRESPONSIVE": "Ojoj, videti je, da se strežnik ne odziva. Poskusite znova pozneje.",
+      "SERVICE_UNAVAILABLE": "Ojoj, videti je, da se strežnik ne odziva. Poskusite znova pozneje.",
+      "ACTIVE_TRANSACTION": "Tega dogodka ni mogoče urejati, dokler je aktiven potek dela ali transakcija.",
+      "BULK_METADATA_UPDATE": {
+         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
+         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
+         "NO_EVENTS_UPDATED": "All updates failed.",
+         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+      },
+      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
+      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
+      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
+   },
+   "BULK_ACTIONS": {
+      "CAPTION": "Dejanja",
+      "DELETE": {
+         "SERIES": {
+            "CAPTION": "Izbriši",
+            "BUTTON": "Izbriši",
+            "CANNOT_DELETE": "Označena zbirka ne more biti izbrisana, ker vsebuje posnetke."
+         },
+         "EVENTS": {
+            "CAPTION": "Izbriši",
+            "DELETE_EVENTS": "Izbriši dogodke",
+            "UNAUTHORIZED": "Nimate pravic za izbris označenih posnetkov. Spremenite izbiro za nadaljevanje."
+         }
+      },
+      "DELETE_EVENTS_WARNING_LINE1": "Izbrisanih metapodatkov dogodka ter zvočnih in video datotek ne bo mogoče povrniti.",
+      "DELETE_EVENTS_WARNING_LINE2": "",
+      "DELETE_SERIES_WARNING_LINE1": "Izbrisanih metapodatkov serije ne bo mogoče povrniti. Dogodki v seriji ne bodo izbrisani.",
+      "DELETE_SERIES_WARNING_LINE2": "",
+      "SCHEDULE_TASK": {
+         "CAPTION": "Začni opravilo",
+         "GENERAL": {
+            "CAPTION": "Splošno",
+            "SUMMARY": "(št. izbranih dogodkov: {{ count }})",
+            "CANNOTSTART": "Označenih dogodkov trenutno ni mogoče obdelati. Odznačite jih ali poskusite znova pozneje."
+         },
+         "TASKS": {
+            "CAPTION": "Opravila",
+            "SELECT": "Izberite opravilo"
+         },
+         "SUMMARY": {
+            "CAPTION": "Povzetek",
+            "EVENTS": "Dogodki",
+            "EVENTS_SUMMARY": "Izbrali ste toliko dogodkov: {{numberOfEvents}}",
+            "CONFIGURATION": "Konfiguracija",
+            "WORKFLOW": "Opravilo"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Uredi načrtovane dogodke",
+         "CONFLICT_CHECK_RUNNING": "Iskanje sporov v teku…",
+         "GENERAL": {
+            "CAPTION": "Splošno",
+            "CANNOTSTART": "Označenih posnetkov ni mogoče obdelati. Podprti so samo načrtovani.",
+            "NOCHANGES": "Ni bilo zaznanih sprememb posnetkov!",
+            "CONFLICT_FIRST_EVENT": "Spremenjen posnetek",
+            "CONFLICT_SECOND_EVENT": "Posnetek s težavami",
+            "CANNOTEDITSCHEDULE": "Za izbrane dogodke nimate pravice urejanja podatkov o načrtovanju. Lahko nadaljujete, vendar podatkov o načrtovanju ne boste mogli spreminjati."
+         },
+         "METADATA": {
+            "EDIT": "Uredi meta podatke"
+         },
+         "SUMMARY": {
+            "CAPTION": "Povzetek",
+            "SINGLE_EVENT_CAPTION": "Posnetek {{ title }}",
+            "TYPE": "Vrsta",
+            "PREVIOUS": "Stara vrednost",
+            "NEXT": "Nova vrednost"
+         },
+         "EDIT": {
+            "CAPTION": "Uredi",
+            "EVENT": "event",
+            "EVENTS": "events",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
+            "METADATA": "Metapodatki",
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+         }
+      },
+      "EDIT_EVENTS_METADATA": {
+         "CAPTION": "Edit the metadata of multiple events",
+         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "REQUEST_ERRORS": {
+            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
+            "NOTHING_TO_EDIT": "The events cannot be edited.",
+            "NOT_FOUND": "Not found",
+            "RUNNING_WORKFLOW": "Running workflow",
+            "TABLE": {
+               "CAPTION": "Selected events",
+               "ERRORS": "Errors"
+            }
+         },
+         "EDIT": {
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "TABLE": {
+               "CAPTION": "Metadata of selected events",
+               "FIELDS": "Metadata",
+               "VALUES": "Values"
+            }
+         },
+         "UPDATE_FAILURES": {
+            "TABLE": {
+               "CAPTION": "Update Failures"
+            },
+            "UPDATE_FAILED": "Update failed",
+            "NO_EVENTS_UPDATED": "All updates failed.",
+            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+         }
+      }
+   },
+   "DATES": {
+      "TODAY": "Danes",
+      "TOMORROW": "Jutri",
+      "YESTERDAY": "Včeraj",
+      "THIS_WEEK": "Ta teden",
+      "THIS_MONTH": "Ta mesec",
+      "THIS_YEAR": "To leto / letos"
+   },
+   "DATETIMES": {
+      "TODAY": "Danes ob {{ time }}",
+      "TOMORROW": "Jutri ob {{ time }}",
+      "YESTERDAY": "Včeraj ob {{ time }}"
+   },
+   "WIZARD": {
+      "NEXT_STEP": "Naprej",
+      "BACK": "Nazaj",
+      "CREATE": "Ustvari",
+      "DELETE": "Izbriši",
+      "UPDATE": "Posodobitev",
+      "DURATION": {
+         "HOURS": "Ure",
+         "MINUTES": "Minute"
+      }
+   },
+   "CAPTURE_AGENT": {
+      "DEVICE": {
+         "MICROPHONE": "Mikrofon",
+         "CAMERA": "Kamera",
+         "PRESENTATION": "Predstavitev"
+      }
+   },
+   "NAV": {
+      "DASHBOARD": {
+         "TITLE": "Nadzorna plošča"
+      },
+      "EVENTS": {
+         "TITLE": "Posnetki"
+      },
+      "SYSTEMS": {
+         "TITLE": "Sistemi"
+      },
+      "CAPTUREAGENTS": {
+         "TITLE": "Zajemi"
+      },
+      "USERS": {
+         "TITLE": "Organizacija"
+      },
+      "INTEGRATIONS": {
+         "TITLE": "Integracije"
+      },
+      "CONFIGURATION": {
+         "TITLE": "Konfiguracija"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistics"
+      }
+   },
+   "ADOPTER_REGISTRATION": {
+      "MODAL": {
+         "CAPTION": "Registration",
+         "SKIP": "Not now",
+         "CONTINUE": "Continue",
+         "BACK": "Back",
+         "LEGAL_INFO_STATE": {
+            "HEADER": "Terms of Service and Privacy Policy"
+         },
+         "INFORMATION_STATE": {
+            "HEADER": "Thank you for using Opencast!",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+         },
+         "FORM_STATE": {
+            "ORGANISATION": "Organisation",
+            "DEPARTMENT": "Department",
+            "COUNTRY": "Country",
+            "POSTAL_CODE": "Postal code",
+            "CITY": "City",
+            "CONTACT_INFO": "Contact information",
+            "GENDER": "Gender",
+            "GENDER_MALE": "male",
+            "GENDER_FEMALE": "female",
+            "FIRST_NAME": "First name",
+            "LAST_NAME": "Last name",
+            "STREET": "Street",
+            "NUMBER": "Number",
+            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "MAIL": "Email",
+            "CONTACT_ME": "Contact me for updates and secruity issues",
+            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
+            "POLICY_HEADLINE": "Privacy policy and terms of use",
+            "USAGE_STATISTICS": "Usage statistcs",
+            "ERROR_REPORTS": "Error reports",
+            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
+            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "READ_TERMS_OF_USE_AFTER": ""
+         },
+         "SKIP_STATE": {
+            "HEADER": "Maybe next time!",
+            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+         },
+         "THANK_YOU_STATE": {
+            "HEADER": "Thank you for your registration!",
+            "TEXT_LEADING_TO_PATH": "You can change your data at ",
+            "TEXT_LEADING_AFTER_PATH": "at any time."
+         },
+         "ERROR": {
+            "HEADER": "Error",
+            "TEXT": "An error occurred while processing your request."
+         },
+         "DELETE_SUBMIT_STATE": {
+            "TEXT": "Are you sure you want to delete your registration data?"
+         }
+      }
+   },
+   "EVENTS": {
+      "LICENSE": {
+         "ALLRIGHTS": "Vse pravice pridržane",
+         "CCBY": "CC BY",
+         "CCBYSA": "CC BY-SA",
+         "CCBYND": "CC BY-ND",
+         "CCBYNC": "CC BY-NC",
+         "CCBYNCSA": "CC BY-NC-SA",
+         "CCBYNCND": "CC BY-NC-ND",
+         "CC0": "CC0",
+         "BSD": "BSD",
+         "CCND": "CCND",
+         "GPL": "GPL"
+      },
+      "EVENTS": {
+         "NEW": {
+            "CAPTION": "Ustvari dogodek",
+            "METADATA": {
+               "CAPTION": "Metapodatki"
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "Razširjeni metapodatki",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Razširjeni metapodatki"
+               }
+            },
+            "SOURCE": {
+               "CAPTION": "Vir",
+               "SELECT_SOURCE": "Izberite vir",
+               "PLACEHOLDER": {
+                  "LOCATION": "Lokacija",
+                  "INPUTS": "Vhodi",
+                  "HOUR": "Ura",
+                  "MINUTE": "Minuta",
+                  "REPEATS": "Ponovitve",
+                  "START_DATE": "llll-mm-dd",
+                  "START_DATE_FORMAT": "llll-mm-dd",
+                  "END_DATE": "llll-mm-dd",
+                  "END_DATE_FORMAT": "llll-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "Naloži",
+                  "RECORDING_ELEMENTS": "Elementi posnetka",
+                  "RECORDING_METADATA": "Metapodatki posnetka",
+                  "SEGMENTABLE": {
+                     "SHORT": "Diapozitivi",
+                     "DETAIL": "Datoteka vsebuje posnetek predstavitve z diapozitivi (Keynote, Powerpoint ipd.)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Predavatelj",
+                     "DETAIL": "Datoteka vsebuje posnetek osebe, ki govori občinstvu."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Samo zvok",
+                     "DETAIL": "Datoteka vsebuje samo zvok."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "Več delov",
+                     "DETAIL": "Komplet datotek, ki vsebujejo različne dele dogodka."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Urnik",
+                  "START_DATE": "Datum začetka",
+                  "START_TIME": "Ura začetka",
+                  "TIMEZONE": "Časovni pas",
+                  "END_DATE": "Končni datum",
+                  "END_TIME": "Končni čas",
+                  "DURATION": "Trajanje"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Načrtovanje posameznega dogodka"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Načrtovanje več dogodkov",
+                  "REPEATS": "Ponovitve",
+                  "REPEAT_ON": "Ponovi ob",
+                  "WEEKDAYS": "Delovni dnevi",
+                  "WEEKDAY": "Weekday"
+               },
+               "NO_SOURCE_AVAILABLE": "Ni zastopnikov za zajem, ki jih je mogoče načrtovati"
+            },
+            "PROCESSING": {
+               "CAPTION": "Obdelava",
+               "SELECT_WORKFLOW": "Izberite potek dela",
+               "SELECT_WORKFLOW_EMPTY": "Ni najdenih potekov dela",
+               "WORKFLOW": "Potek dela"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "Nalaganje sredstev",
+               "SELECT_TYPE": "Izberite vrsto sredstva",
+               "ADD": "Dodaj sredstvo",
+               "NO_OPTIONS": "Seznam z možnostmi za datoteke ni na voljo za ta del spletne strani!",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "Beležke za razdelitev v razredu",
+                  "CAPTIONS_DFXP": "Pripisi DFXP",
+                  "CAPTIONS_WEBVTT": "Pripisi WebVTT",
+                  "PREVIEW_IMAGE": "Predogled slike",
+                  "SMIL": "Katalog smil",
+                  "TRACK_PARTS": "Deli sledi"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Pravilnik o dostopu",
+               "POLICY": "Pravilnik o dostopu",
+               "ACL": "Pravilnik o dostopu"
+            },
+            "SUMMARY": {
+               "CAPTION": "Povzetek",
+               "SOURCE": {
+                  "INPUT": "Vnos"
+               }
+            },
+            "WEEKDAYS": {
+               "MO": "pon.",
+               "TU": "tor.",
+               "WE": "sre.",
+               "TH": "čet.",
+               "FR": "pet.",
+               "SA": "sob.",
+               "SU": "ned."
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Ponedeljek",
+               "TU": "Torek",
+               "WE": "Sreda",
+               "TH": "Četrtek",
+               "FR": "Petek",
+               "SA": "Sobota",
+               "SU": "Nedelja"
+            }
+         },
+         "NAVIGATION": {
+            "EVENTS": "Dogodki",
+            "SERIES": "Serije",
+            "OVERVIEW": "Pregled"
+         },
+         "UPLOAD": "Naloži",
+         "ADD_SERIES": "Dodaj serijo",
+         "ADD_EVENT": "Dodaj dogodek",
+         "TABLE": {
+            "CAPTION": "Dogodki",
+            "TITLE": "Naslov",
+            "PRESENTERS": "Predavatelj(-i)",
+            "SERIES": "Serije",
+            "DATE": "Datum",
+            "START": "Začetek",
+            "END": "Konec",
+            "STOP": "Ustavi",
+            "STATUS": "Stanje",
+            "LOCATION": "Lokacija",
+            "ACTION": "Dejanja",
+            "FIRST": "Prvo",
+            "LAST": "Zadnje",
+            "NEXT": "Naprej",
+            "MANAGED_ACL": "Pravilnik o dostopu",
+            "WORKFLOW_STATE": "Napredek",
+            "PREVIOUS": "Nazaj",
+            "NOCONTENT": "Ni podatkov",
+            "PUBLISHED": "Objavljeno",
+            "WEEKDAY": "Delovni dan",
+            "TOOLTIP": {
+               "ASSETS": "Open asset details",
+               "START": "Filter za ta začetni datum",
+               "SERIES": "Filter za to zbirko",
+               "STATUS": "Filter za status tega posnetka",
+               "LOCATION": "Filter za to lokacijo",
+               "DETAILS": "Odpri podrobnosti posnetka",
+               "DELETE": "Izbriši posnetek",
+               "EMBEDDING_CODE": "Embedding code",
+               "EDITOR": "Odpri video urejevalnik",
+               "EDITOR_NEEDS_CUTTING": "Odpri video urejevalnik (opomba označuje, da je bilo sproženo obrezovanje videa)",
+               "COMMENTS": "Poglej komentarje",
+               "PAUSED_WORKFLOW": "Poglej začasno ustavljen potek dela",
+               "PRESENTER": "Filter for this presenter"
+            }
+         },
+         "STATUS": {
+            "SCHEDULED": "Načrtovano",
+            "RECORDING": "Posnetek",
+            "UPLOADING": "Nalaganje",
+            "INGESTING": "Uvažanje",
+            "PENDING": "Poteka",
+            "PROCESSING": "Izvajanje",
+            "PAUSED": "Začasno ustavljeno",
+            "PROCESSED": "Dokončano",
+            "RECORDING_FAILURE": "Napaka pri snemanju",
+            "PROCESSING_FAILURE": "Napaka pri obdelavi",
+            "PROCESSING_CANCELED": "Obdelava preklicana"
+         },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DELETING": "Deleting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
+         },
+         "DETAILS": {
+            "HEADER": "Podrobnosti dogodka – {{resourceId}}",
+            "TABS": {
+               "METADATA": "Metapodatki",
+               "EXTENDED-METADATA": "Metapodatki II",
+               "ASSETS": "Sredstva",
+               "PUBLICATIONS": "Objave",
+               "SCHEDULING": "Načrtovanje urnika",
+               "WORKFLOWS": "Poteki dela",
+               "ACCESS": "Pravilnik o dostopu",
+               "COMMENTS": "Komentarji",
+               "STATISTICS": "Statistics"
+            },
+            "PUBLICATIONS": {
+               "CAPTION": "Objave",
+               "NO_PUBLICATIONS_AVAILABLE": "Ta dogodek nima objav",
+               "PUBLICATION_DESCRIPTION": "Ta posnetek je bil objavljen v naslednjih kanalih:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "Ta posnetek trenutno ni v obdelavi",
+               "CUSTOM": "Po meri",
+               "ENGAGE": "Vključevanje",
+               "ENGAGE_LIVE": "Prenos v živo",
+               "EXTERNAL_API": "Objava zunanjega API-ja",
+               "YOUTUBE": "YouTube",
+               "OAIPMH": "OAI-PMH",
+               "SELECT_WORKFLOW": "Izberite potek dela",
+               "SELECT_WORKFLOW_EMPTY": "Na voljo ni nobenega poteka dela"
+            },
+            "MEDIA": {
+               "TRIM_MEDIA": "Obreži predstavnost",
+               "MEDIA": "Predstavnost",
+               "ID": "ID",
+               "TYPE": "Vrsta",
+               "MIMETYPE": "Mimetype",
+               "URL": "URL",
+               "DETAILS": "Podrobnosti"
+            },
+            "ATTACHMENTS": {
+               "CAPTION": "Priloge",
+               "ID": "ID",
+               "TYPE": "Vrsta",
+               "MIMETYPE": "Mimetype",
+               "TAGS": "Oznake",
+               "LINK": "Povezava"
+            },
+            "SOURCE": {
+               "CAPTION": "Vir",
+               "SELECT_SOURCE": "Izberite vir",
+               "PLACEHOLDER": {
+                  "LOCATION": "Lokacija",
+                  "INPUTS": "Vhodi",
+                  "HOUR": "Ura",
+                  "MINUTE": "Minuta",
+                  "REPEATS": "Ponovitve",
+                  "START_DATE": "llll-mm-dd",
+                  "END_DATE": "llll-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "Naloži",
+                  "RECORDING_ELEMENTS": "Elementi posnetka",
+                  "SEGMENTABLE": {
+                     "SHORT": "Diapozitivi",
+                     "DETAIL": "Datoteka vsebuje posnetek predstavitve z diapozitivi (Keynote, Powerpoint ipd.)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Predavatelj",
+                     "DETAIL": "Datoteka vsebuje posnetek osebe, ki govori občinstvu."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Samo zvok",
+                     "DETAIL": "Datoteka vsebuje samo zvok."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Urnik",
+                  "START_DATE": "Datum začetka",
+                  "START_TIME": "Ura začetka",
+                  "TIMEZONE": "Časovni pas",
+                  "END_DATE": "Končni datum",
+                  "END_TIME": "Končni čas",
+                  "DURATION": "Trajanje"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Načrtovanje posameznega dogodka"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Načrtovanje več dogodkov",
+                  "REPEATS": "Ponovitve",
+                  "REPEAT_ON": "Ponovi ob",
+                  "WEEKDAYS": "Delovni dnevi"
+               }
+            },
+            "ASSETS": {
+               "CAPTION": "Sredstva",
+               "TYPE": "Vrsta",
+               "SIZE": "Velikost",
+               "DETAILS": "Podrobnosti",
+               "STREAMS": "Pretoki",
+               "PREVIEW": "Predogled",
+               "ATTACHMENTS": {
+                  "TITLE": "Priloge",
+                  "CAPTION": "Priloge",
+                  "ID": "ID",
+                  "TYPE": "Vrsta",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "Oznake",
+                  "LINK": "Povezava",
+                  "DETAILS": {
+                     "TITLE": "Podrobnosti priloge",
+                     "CAPTION": "Podrobnosti priloge",
+                     "ID": "ID",
+                     "TYPE": "Vrsta",
+                     "MIMETYPE": "Mimetype",
+                     "TAGS": "Oznake",
+                     "URL": "URL",
+                     "SIZE": "Velikost",
+                     "CHECKSUM": "Kontrolna vsota",
+                     "REFERENCE": "Sklic"
+                  }
+               },
+               "CATALOGS": {
+                  "TITLE": "Katalogi",
+                  "CAPTION": "Katalogi",
+                  "ID": "ID",
+                  "TYPE": "Vrsta",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "Oznake",
+                  "LINK": "Povezava",
+                  "DETAILS": {
+                     "TITLE": "Podrobnosti kataloga",
+                     "CAPTION": "Podrobnosti kataloga",
+                     "ID": "ID",
+                     "TYPE": "Vrsta",
+                     "MIMETYPE": "Mimetype",
+                     "TAGS": "Oznake",
+                     "URL": "URL",
+                     "SIZE": "Velikost",
+                     "CHECKSUM": "Kontrolna vsota",
+                     "REFERENCE": "Sklic"
+                  }
+               },
+               "MEDIA": {
+                  "TITLE": "Predstavnost",
+                  "CAPTION": "Predstavnost",
+                  "ID": "ID",
+                  "TYPE": "Vrsta",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "Oznake",
+                  "LINK": "Povezava",
+                  "DETAILS": {
+                     "TITLE": "Podrobnosti predstavnosti",
+                     "ID": "ID",
+                     "TYPE": "Vrsta",
+                     "MIMETYPE": "Mimetype",
+                     "URL": "URL",
+                     "RECORDING_DATE": "Datum posnetka",
+                     "FLAVOR": "Okus",
+                     "TAGS": "Oznake",
+                     "DURATION": "Trajanje",
+                     "STREAM_AUDIO": "Zvočni tokovi",
+                     "STREAM_VIDEO": "Videotokovi",
+                     "CHANNELS": "Kanali",
+                     "BITRATE": "Bitna hitrost",
+                     "BITDEPTH": "Bitna globina",
+                     "SAMPLINGRATE": "Hitrost vzorčenja",
+                     "FRAMECOUNT": "Število sličic",
+                     "PEAKLEVELDB": "Najvišja raven (dB)",
+                     "RMSLEVELDB": "Raven efektivne vrednosti (dB)",
+                     "RMSPEAKDB": "Efektivna najvišja vrednost (dB)",
+                     "FRAMERATE": "Hitrost sličic",
+                     "RESOLUTION": "Ločljivost",
+                     "SIZE": "Velikost",
+                     "SCANTYPE": "Vrsta optičnega branja",
+                     "SCANORDER": "Vrstni red optičnega branja"
+                  }
+               },
+               "PUBLICATIONS": {
+                  "TITLE": "Objave",
+                  "CAPTION": "Objave",
+                  "CHANNEL": "Kanal",
+                  "ID": "ID",
+                  "TYPE": "Vrsta",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "Oznake",
+                  "LINK": "Povezava",
+                  "DETAILS": {
+                     "TITLE": "Podrobnosti objave",
+                     "CAPTION": "Podrobnosti objave",
+                     "ID": "ID",
+                     "TYPE": "Vrsta",
+                     "MIMETYPE": "Mimetype",
+                     "TAGS": "Oznake",
+                     "URL": "URL",
+                     "SIZE": "Velikost",
+                     "CHANNEL": "Kanal",
+                     "REFERENCE": "Sklic"
+                  }
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Pravilnik o dostopu",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Predloge"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Pravilnik o dostopu",
+                  "DESCRIPTION": "",
+                  "LABEL": "Izberite predlogo",
+                  "EMPTY": "Ni najdenih predlog",
+                  "ROLE": "Vloga",
+                  "WRITE": "Zapisovanje",
+                  "READ": "Branje",
+                  "ADDITIONAL_ACTIONS": "Dodatna dejanja",
+                  "ACTION": "Dejanja",
+                  "NEW": "Nov pravilnik",
+                  "DETAILS": "Podrobnosti"
+               },
+               "ROLES": {
+                  "LABEL": "Izberite vlogo",
+                  "EMPTY": "Ni najdenih vlog"
+               }
+            },
+            "COMMENTS": {
+               "CAPTION": "Komentarji",
+               "PLACEHOLDER": "Komentar ...",
+               "SELECTPLACEHOLDER": "Izberite razloge",
+               "RESOLVED": "Razrešeno",
+               "REPLY": "Odgovor",
+               "REPLY_TO": "Odgovor na",
+               "CANCEL_REPLY": "Prekliči",
+               "DELETE": "Izbriši",
+               "REASON": "Razlog",
+               "REASONS": {
+                  "CUTTING": "Potrebno je rezanje",
+                  "REVIEW": "Potreben je pregled",
+                  "ASYNC": "A/V sledi asinhrone",
+                  "AUDIO_ISSUE": "Manjkajoč ali pomanjkljiv zvočni posnetek",
+                  "CANCELED": "Preklican dogodek",
+                  "CONFLICTING_METADATA": "Neujemajoči se metapodatki",
+                  "IMPROPER_POINT": "Neprimerna vstopna ali izstopna točka",
+                  "MISSING_AGREEMENT": "Manjkajoča pogodba",
+                  "OTHER": "Drugo",
+                  "PRIVACY": "Pomislek glede zasebnosti",
+                  "SEGMENTATION": "Nenatančna segmentacija",
+                  "UNKNOWN_CREATOR": "Avtor neznan",
+                  "VIDEO_ISSUE": "Video popačen ali obrezan",
+                  "WRONG_INPUT_FORMAT": "Oblika zapisa vhodne datoteke ni podprta",
+                  "WRONG_METADATA": "Metapodatke je treba popraviti",
+                  "WRONG_SERIES_PUBLICATION": "Napačna serija ali kanal za objavo",
+                  "WRONG_WORKFLOW": "Napačen potek dela",
+                  "PROCESSING_FAILURE": "Napaka pri obdelavi"
+               }
+            },
+            "STATISTICS": {
+               "CAPTION": "Statistics"
+            },
+            "METADATA": {
+               "CAPTION": "Podrobnosti dogodka",
+               "TITLE": "Naslov",
+               "ID": "UID",
+               "SERIES": "Serije",
+               "RECORDING_DATE": "Datum posnetka",
+               "SUBJECT": "Zadeva",
+               "DESCRIPTION": "Opis",
+               "START_DATE": "Datum začetka",
+               "START_TIME": "Ura začetka",
+               "DURATION": "Trajanje",
+               "LOCATION": "Lokacija",
+               "SOURCE": "Vir",
+               "CREATED": "Ustvarjeno",
+               "CREATED_BY": "Ustvaril",
+               "PUBLISHER": "Objavil",
+               "LICENSE": "Licenca",
+               "CONTRIBUTORS": "Sodelavec (-ci)",
+               "RIGHTS": "Pravice",
+               "PRESENTERS": "Predavatelj(-i)",
+               "LANGUAGE": "Jezik",
+               "COPYRIGHT": "Avtorske pravice",
+               "VISIBILITY": "Vidljivost",
+               "PUBLIC": "Javni cilj",
+               "OS": "Operacijski sistem za obdelavo",
+               "LOCKED": {
+                  "RUNNING": "Urejanje metapodatkov ni dovoljeno, ko se v dogodku izvajajo postopki"
+               }
+            },
+            "SCHEDULING": {
+               "CAPTION": "Stanje sodelovanja",
+               "PLACEHOLDER": {
+                  "PRESENTERS": "Predavatelj(-i)"
+               }
+            },
+            "WORKFLOWS": {
+               "ACTIONS": "Dejanja",
+               "DETAILS": "Podrobnosti",
+               "DESCRIPTION": "Opis",
+               "MORE_INFO": "More Information",
+               "ID": "ID",
+               "TYPE": "Vrsta",
+               "TITLE": "Naslov",
+               "STATUS": "Stanje",
+               "STARTED": "Začeto",
+               "SERIES": "Serije",
+               "SUBMITTED": "Poslano",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Definicija poteka dela",
+               "MIMETYPE": "Mimetype",
+               "URL": "URL",
+               "CONFIGURATION": "Konfiguracija",
+               "NO_CONFIGURATION": "Ni obstoječih konfiguracijskih parametrov za izbrano definicijo poteka dela.",
+               "WORKFLOW": "Potek dela",
+               "TOOLTIP": {
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "V izdelavi",
+                  "RUNNING": "Izvajanje",
+                  "PAUSED": "Začasno ustavljeno",
+                  "SUCCEEDED": "Uspelo",
+                  "FAILED": "Ni uspelo",
+                  "FAILING": "Failing",
+                  "SKIPPED": "Izpuščen",
+                  "STOPPED": "Ustavljeno",
+                  "RETRY": "Ponovi"
+               }
+            },
+            "WORKFLOW_INSTANCES": {
+               "TITLE": "Poteki dela"
+            },
+            "WORKFLOW_DETAILS": {
+               "TITLE": "Podrobnosti poteka dela",
+               "CONFIGURATION": "Konfiguracija poteka dela"
+            },
+            "WORKFLOW_OPERATIONS": {
+               "TITLE": "Postopki poteka dela",
+               "DETAILS_LINK": "Postopki",
+               "TABLE_HEADERS": {
+                  "TITLE": "Naslov",
+                  "STATUS": "Stanje",
+                  "DESCRIPTION": "Opis"
+               }
+            },
+            "OPERATION_DETAILS": {
+               "TITLE": "Podrobnosti postopka",
+               "TABLE_HEADERS": {
+                  "TITLE": "Naslov",
+                  "STATE": "Stanje",
+                  "DESCRIPTION": "Opis",
+                  "EXECUTION_HOST": "Gostitelj izvedbe",
+                  "JOB": "Naloga",
+                  "TIME_IN_QUEUE": "Čas v čakalni vrsti",
+                  "STARTED": "Začeto",
+                  "FINISHED": "Dokončano",
+                  "RETRY_STRATEGY": "Ponovi postopek",
+                  "FAILED_ATTEMPTS": "Spodleteli poizkusi",
+                  "MAX_ATTEMPTS": "Max",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Izjeme poteka dela",
+                  "FAIL_ON_ERROR": "Napaka"
+               }
+            },
+            "QUICKACTION_WORKFLOW_DETAILS": {
+               "TITLE": "Podrobnosti poteka dela"
+            },
+            "MEDIA_DETAILS": {
+               "TITLE": "Podrobnosti predstavnosti",
+               "ID": "ID",
+               "TYPE": "Vrsta",
+               "MIMETYPE": "Mimetype",
+               "URL": "URL",
+               "RECORDING_DATE": "Datum posnetka",
+               "TAGS": "Oznake",
+               "DURATION": "Trajanje",
+               "STREAM_AUDIO": "Zvočni tokovi",
+               "STREAM_VIDEO": "Videotokovi",
+               "CHANNELS": "Kanali",
+               "BITRATE": "Bitna hitrost",
+               "FRAMERATE": "Hitrost sličic",
+               "RESOLUTION": "Ločljivost"
+            },
+            "ERRORS_AND_WARNINGS": {
+               "HEADER": "Napake in opozorila",
+               "TITLE": "Napake in opozorila",
+               "DATE": "Datum",
+               "HOST": "Gostitelj",
+               "TYPE": "Vrsta",
+               "EMPTY": "Ni napake",
+               "DETAILS": {
+                  "HEADER": "Podrobnosti napake",
+                  "SEVERITY": "Resnost",
+                  "TITLE": "Naslov",
+                  "DESCRIPTION": "Opis",
+                  "JOB_ID": "ID posla",
+                  "DATE": "Datum",
+                  "HOST": "Gostitelj za obdelavo",
+                  "TYPE": "Vrsta storitve",
+                  "TECHNICAL_DETAILS": "Tehnične podrobnosti"
+               }
+            }
+         }
+      },
+      "SERIES": {
+         "NEW": {
+            "CAPTION": "Ustvari serijo",
+            "METADATA": {
+               "CAPTION": "Metapodatki",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Metapodatki"
+               }
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "Razširjeni metapodatki",
+               "METADATA": {
+                  "TITLE": "Razširjeni metapodatki"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Pravilnik o dostopu",
+               "TEMPLATES": {
+                  "TITLE": "Predloge"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Pravilnik o dostopu",
+                  "DESCRIPTION": "Potrebna je vsaj ena vloga z dovoljenji za branje in pisanje.",
+                  "LABEL": "Izberite predlogo",
+                  "EMPTY": "Ni najdenih predlog",
+                  "ROLE": "Vloga",
+                  "WRITE": "Zapisovanje",
+                  "READ": "Branje",
+                  "ADDITIONAL_ACTIONS": "Dodatna dejanja",
+                  "ACTION": "Dejanja",
+                  "NEW": "Nov pravilnik",
+                  "DETAILS": "Podrobnosti"
+               },
+               "ROLES": {
+                  "LABEL": "Izberite vlogo",
+                  "EMPTY": "Ni najdenih vlog"
+               }
+            },
+            "THEME": {
+               "CAPTION": "Tema",
+               "DESCRIPTION": {
+                  "TEXT": "Po želji lahko uporabite različne teme s katerimi lahko opremite svoje video posnetke. Tema lahko vsebuje različne prehode, napovednike, logotipe in naslove z vključenimi metapodatki."
+               },
+               "TITLE": "Tema",
+               "LABEL": "Ni teme",
+               "EMPTY": "Ni najdene teme"
+            },
+            "SUMMARY": {
+               "CAPTION": "Povzetek"
+            }
+         },
+         "TABLE": {
+            "CAPTION": "Serije",
+            "TITLE": "Serije",
+            "HAS_EVENTS": "Vsebuje posnetke",
+            "ORGANIZERS": "Organizator(-ji)",
+            "CONTRIBUTORS": "Sodelavec(-ci)",
+            "CREATED": "Ustvarjeno",
+            "MANAGED_ACL": "Pravilnik o dostopu",
+            "EVENTS": "Dogodki",
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "SERIES": "Filtriraj posnetke za to zbirko",
+               "DETAILS": "Odpri podrobnosti zbirke",
+               "DELETE": "Izbriši zbirko"
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Podrobnosti serije – {{resourceId}}",
+            "TABS": {
+               "METADATA": "Metapodatki",
+               "EXTENDED_METADATA": "Metapodatki II",
+               "EVENTS": "Dogodki",
+               "PERMISSIONS": "Pravilnik o dostopu",
+               "THEME": "Tema",
+               "STATISTICS": "Statistics"
+            },
+            "ACCESS": {
+               "CAPTION": "Pravilnik o dostopu",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Predloge"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Pravilnik o dostopu",
+                  "DESCRIPTION": "",
+                  "LABEL": "Izberite predlogo",
+                  "EMPTY": "Ni najdenih predlog",
+                  "ROLE": "Vloga",
+                  "WRITE": "Zapisovanje",
+                  "READ": "Branje",
+                  "ADDITIONAL_ACTIONS": "Dodatna dejanja",
+                  "ACTION": "Dejanja",
+                  "NEW": "Nov pravilnik",
+                  "DETAILS": "Podrobnosti",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect",
+                  "LOAD_MORE_LIMIT": "policies shown.",
+                  "LOAD_MORE_LINK": "Load more"
+               },
+               "ROLES": {
+                  "LABEL": "Izberite vlogo",
+                  "EMPTY": "Ni najdenih vlog"
+               }
+            },
+            "METADATA": {
+               "TITLE": "Naslov",
+               "ID": "UID",
+               "SERIES": "Serije",
+               "PUBLISHERS": "Izdajatelj(-i)",
+               "ORGANIZERS": "Organizator(-ji)",
+               "CONTRIBUTORS": "Sodelavec (-ci)",
+               "RECORDING_DATE": "Datum posnetka",
+               "CREATED_BY": "Ustvaril",
+               "RIGHTS": "Pravice",
+               "SUBJECT": "Zadeva",
+               "LANGUAGE": "Jezik",
+               "LICENSE": "Licenca",
+               "DESCRIPTION": "Opis"
+            },
+            "EVENTS": {
+               "TITLE": "Naslov",
+               "PRESENTER": "Predavatelj(-i)",
+               "CREATED": "Ustvarjeno",
+               "MODIFIED": "Spremenjeno",
+               "STATUS": "Stanje",
+               "LOCATION": "Lokacija",
+               "LINK": "Povezava"
+            }
+         }
+      }
+   },
+   "RECORDINGS": {
+      "NAVIGATION": {
+         "LOCATIONS": "Lokacije"
+      },
+      "ACTIONS": {
+         "EXPORT": "Izvozi",
+         "REMOVE": "Odstrani"
+      },
+      "RECORDINGS": {
+         "TABLE": {
+            "CAPTION": "Lokacije",
+            "TITLE": "UID",
+            "NAME": "Ime",
+            "LOCATION": "Lokacija",
+            "UPDATED": "Zadnjič posodobljeno",
+            "NEXT_DATE": "Naslednji dogodek",
+            "NEXT_NAME": "Naslov naslednjega dogodka",
+            "STATUS": "Stanje",
+            "VERSION": "Različica",
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "NAME": "Filtriraj posnetke za to lokacijo",
+               "DETAILS": "Odpri podrobnosti lokacije",
+               "DELETE": "Izbriši lokacijo (odjavi capture agent)"
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Podrobnosti lokacije – {{resourceId}}",
+            "TAB": {
+               "GENERAL": "Splošno",
+               "CONFIGURATION": "Konfiguracija",
+               "CAPABILITIES": "Zmožnosti"
+            },
+            "GENERAL": {
+               "CAPTION": "Splošno",
+               "NAME": "Ime",
+               "URL": "URL",
+               "STATUS": "Stanje",
+               "UPDATE": "Zadnjič slišano od"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "Konfiguracija",
+               "NO_CONFIGURATION": "Konfiguracija ni navedena"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "Zmožnosti",
+               "NO_CAPABILITIES": "Zmožnosti niso navedene"
+            }
+         }
+      }
+   },
+   "USERS": {
+      "ACTIONS": {
+         "ADD_USER": "Dodaj uporabnika",
+         "ADD_GROUP": "Dodaj skupino",
+         "ADD_ACL": "Dodaj pravilnik o dostopu"
+      },
+      "NAVIGATION": {
+         "USERS": "Uporabniki",
+         "GROUPS": "Skupine",
+         "PERMISSIONS": "Pravilniki o dostopu"
+      },
+      "USERS": {
+         "TABLE": {
+            "CAPTION": "Uporabniki",
+            "NAME": "Ime",
+            "USERNAME": "Uporabniško ime",
+            "EMAIL": "E-pošta",
+            "ROLES": "Vloge",
+            "TYPE": "Vrsta",
+            "PROVIDER": "Ponudnik",
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "DELETE": "Brisanje uporabnika",
+               "DETAILS": "Odpri podrobnosti o uporabniku"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Ustvari uporabnika",
+            "EDITCAPTION": "Podrobnosti uporabnika - {{username}}",
+            "TABS": {
+               "USER": "Uporabnik",
+               "ROLES": "Vloge",
+               "EXTERNALROLES": "Zunanje vloge",
+               "EFFECTIVEROLES": "Veljavne vloge"
+            },
+            "DESCRIPTION": {
+               "ROLES": "Vloge in skupine, ki jih je mogoče dodeliti uporabniku ali so mu že bile dodeljene.",
+               "EXTERNALROLES": "Seznam zunanjih vlog, dodeljenih uporabniku, ki so jih podelili zunanji ponudniki vlog.",
+               "EFFECTIVEROLES": "Seznam dejanskih vlog, neposredno dodeljenih uporabniku, in vlog, posredno naloženih prek članstva v skupinah."
+            },
+            "FORM": {
+               "USERNAME": "Uporabniško ime",
+               "NAME": "Ime",
+               "EMAIL": "E-pošta",
+               "PASSWORD": "Geslo",
+               "REPEAT_PASSWORD": "Ponovite geslo"
+            },
+            "ROLES": {
+               "LEFT": "Vloge",
+               "RIGHT": "Izbrane vloge",
+               "REMOVE": "Odstrani vlogo",
+               "ADD": "Dodaj vlogo"
+            }
+         }
+      },
+      "GROUPS": {
+         "NEW": {
+            "CAPTION": "Ustvari skupino"
+         },
+         "TABLE": {
+            "CAPTION": "Skupine",
+            "NAME": "Ime",
+            "DESCRIPTION": "Opis",
+            "ROLE": "Vloga",
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "DETAILS": "Odpri podrobnosti o skupini",
+               "DELETE": "Izbriši skupino"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Ustvari skupino",
+            "EDITCAPTION": "Podrobnosti skupine - {{name}}",
+            "TABS": {
+               "GROUP": "Skupina",
+               "ROLES": "Vloge",
+               "METADATA": "Metapodatki",
+               "USERS": "Uporabniki",
+               "SUMMARY": "Povzetek"
+            },
+            "FORM": {
+               "NAME": "Ime",
+               "DESCRIPTION": "Opis",
+               "SUMMARY": "Povzetek",
+               "ROLES": "Vloge",
+               "USERS": "Uporabniki"
+            },
+            "USERS": {
+               "LEFT": "Uporabniki",
+               "RIGHT": "Izbrani uporabniki",
+               "REMOVE": "Odstrani uporabnika",
+               "ADD": "Dodaj uporabnika"
+            },
+            "ROLES": {
+               "LEFT": "Vloge",
+               "RIGHT": "Izbrane vloge",
+               "REMOVE": "Odstrani vlogo",
+               "ADD": "Dodaj vlogo"
+            }
+         }
+      },
+      "ACLS": {
+         "TABLE": {
+            "CAPTION": "Pravilniki o dostopu",
+            "NAME": "Ime",
+            "CREATED": "Ustvarjeno",
+            "CREATOR": "Avtor",
+            "IN_USE": "V uporabi",
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "DELETE": "Izbriši pravice dostopa",
+               "DETAILS": "Odpri podrobnosti o pravicah dostopa"
+            }
+         },
+         "NEW": {
+            "CAPTION": "Nov pravilnik o dostopu",
+            "TABS": {
+               "SUMMARY": "Povzetek",
+               "METADATA": "Metapodatki",
+               "ACCESS": "Dostop"
+            },
+            "METADATA": {
+               "TITLE": "Metapodatki",
+               "NAME": {
+                  "CAPTION": "Ime",
+                  "PLACEHOLDER": "Ime ..."
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Pravilnik o dostopu",
+               "TEMPLATES": {
+                  "TITLE": "Predloge"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Pravilnik o dostopu",
+                  "LABEL": "Izberite predlogo",
+                  "EMPTY": "Ni najdenih predlog",
+                  "ROLE": "Vloga",
+                  "WRITE": "Zapisovanje",
+                  "READ": "Branje",
+                  "ADDITIONAL_ACTIONS": "Dodatna dejanja",
+                  "ACTION": "Dejanja",
+                  "NEW": "Nov pravilnik",
+                  "DETAILS": "Podrobnosti",
+                  "DESCRIPTION": "Izberite vnaprej nastavljen komplet pravilnikov ali spodaj dodajte pravilnike po meri"
+               },
+               "ROLES": {
+                  "LABEL": "Izberite vlogo",
+                  "EMPTY": "Ni najdenih vlog"
+               }
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Podrobnosti pravic dostopa - {{name}}",
+            "TABS": {
+               "SUMMARY": "Povzetek",
+               "METADATA": "Metapodatki",
+               "ACCESS": "Dostop"
+            },
+            "METADATA": {
+               "TITLE": "Metapodatki",
+               "NAME": {
+                  "CAPTION": "Ime",
+                  "PLACEHOLDER": "Ime ..."
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Pravilnik o dostopu",
+               "TEMPLATES": {
+                  "TITLE": "Predloge"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Pravilnik o dostopu",
+                  "LABEL": "Izberite predlogo",
+                  "EMPTY": "Ni najdenih predlog",
+                  "ROLE": "Vloga",
+                  "WRITE": "Zapisovanje",
+                  "READ": "Branje",
+                  "ADDITIONAL_ACTIONS": "Dodatna dejanja",
+                  "ACTION": "Dejanja",
+                  "NEW": "Nov pravilnik",
+                  "DETAILS": "Podrobnosti",
+                  "DESCRIPTION": "Izberite vnaprej nastavljen komplet pravilnikov ali spodaj dodajte pravilnike po meri"
+               },
+               "ROLES": {
+                  "LABEL": "Izberite vlogo",
+                  "EMPTY": "Ni najdenih vlog"
+               }
+            }
+         }
+      }
+   },
+   "THEMES": {
+      "THEMES": {
+         "DETAILS": {
+            "HEADER": "Podrobnosti teme {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Splošno",
+               "BUMPER": "Odbijač (začetek)",
+               "TRAILER": "Odbijač (konec)",
+               "TITLE": "Naslov",
+               "LICENSE": "Licenca",
+               "WATERMARK": "Vodni žig",
+               "USAGE": "Uporaba"
+            },
+            "GENERAL": {
+               "CAPTION": "Splošno",
+               "NAME": "Ime",
+               "DESCRIPTION": "Opis",
+               "DEFAULT": "Privzeto",
+               "SET_DEFAULT_INFO": "Nastavite kot privzeto temo za vse serije in dogodke",
+               "NAME_ERROR": "Ime je že v uporabi",
+               "NAME_REQUIRED": "Obvezno"
+            },
+            "BUMPER": {
+               "CAPTION": "Odbijač (začetek)",
+               "DESCRIPTION": "Vnaprej določen video, ki se doda na začetek posnetka.",
+               "ACTIVE": "Aktivno"
+            },
+            "TRAILER": {
+               "CAPTION": "Odbijač (konec)",
+               "DESCRIPTION": "Vnaprej določen video, ki se doda na konec posnetka.",
+               "ACTIVE": "Aktivno"
+            },
+            "TITLE": {
+               "CAPTION": "Naslov",
+               "DESCRIPTION": "Vnaprej določen diapozitiv, ki vključuje opisne metapodatke in se doda na začetek ali konec posnetka.",
+               "ACTIVE": "Aktivno"
+            },
+            "WATERMARK": {
+               "CAPTION": "Vodni žig",
+               "DESCRIPTION": "Polprosojna slika, s katero se prekrije vsaka sličica posnetka.",
+               "ACTIVE": "Aktivno"
+            },
+            "USAGE": {
+               "CAPTION": "Uporaba",
+               "SERIES": "Ime serije"
+            }
+         }
+      }
+   },
+   "CONFIGURATION": {
+      "ACTIONS": {
+         "ADD_MAIL_TEMPLATE": "Dodaj predlogo",
+         "ADD_THEME": "Dodaj temo"
+      },
+      "NAVIGATION": {
+         "THEMES": "Teme"
+      },
+      "THEMES": {
+         "TABLE": {
+            "CAPTION": "Teme",
+            "NAME": "Ime",
+            "DESCRIPTION": "Opis",
+            "CREATOR": "Avtor",
+            "CREATED": "Ustvarjeno",
+            "DEFAULT": "Privzeto",
+            "USAGE": "Uporaba",
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "DELETE": "Izbriši temo",
+               "DETAILS": "Odpri podrobnosti teme"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Ustvari predlogo",
+            "EDITCAPTION": "Podrobnosti teme - {{name}}",
+            "GENERAL": {
+               "CAPTION": "Splošno",
+               "NAME": "Ime",
+               "DESCRIPTION": "Opis",
+               "DEFAULT": "Privzeto",
+               "SET_DEFAULT_INFO": "Nastavite kot privzeto temo za vse serije in dogodke",
+               "NAME_REQUIRED": "Obvezno"
+            },
+            "BUMPER": {
+               "CAPTION": "Odbijač (začetek)",
+               "FILE_UPLOADED": "Naložena datoteka: ",
+               "DESCRIPTION": "Vnaprej določen video, ki se doda na začetek posnetka.",
+               "ACTIVE": "Aktivno",
+               "ENABLE": "Omogoči odbijač",
+               "SELECT": "Izberite",
+               "UPLOAD_LABEL": "Nalaganje videa",
+               "UPLOAD_BUTTON": "Naloži"
+            },
+            "TRAILER": {
+               "CAPTION": "Odbijač (konec)",
+               "FILE_UPLOADED": "Naložena datoteka: ",
+               "DESCRIPTION": "Vnaprej določen video, ki se doda na konec posnetka.",
+               "ACTIVE": "Aktivno",
+               "ENABLE": "Omogoči odbijač",
+               "UPLOAD_LABEL": "Nalaganje videa",
+               "UPLOAD_BUTTON": "Naloži",
+               "SELECT": "Izberite"
+            },
+            "TITLE": {
+               "CAPTION": "Naslov",
+               "FILE_UPLOADED": "Naložena datoteka: ",
+               "DESCRIPTION": "Vnaprej določen diapozitiv, ki vključuje opisne metapodatke in se doda na začetek ali konec posnetka.",
+               "ACTIVE": "Aktivno",
+               "ENABLE": "Omogoči naslovni diapozitiv",
+               "BACKGROUND": "Ozadje",
+               "EXTRACT": "Dodatno ozadje",
+               "UPLOAD": "Naloži",
+               "UPLOAD_LABEL": "Nalaganje slike",
+               "UPLOAD_BUTTON": "Naloži"
+            },
+            "WATERMARK": {
+               "CAPTION": "Vodni žig",
+               "FILE_UPLOADED": "Naložena datoteka: ",
+               "DESCRIPTION": "Polprosojna slika, s katero se prekrije vsaka sličica posnetka.",
+               "ACTIVE": "Aktivno",
+               "ENABLE": "Omogoči vodni žig",
+               "TOP_LEFT": "Zgoraj levo",
+               "TOP_RIGHT": "Zgoraj desno",
+               "BOTTOM_LEFT": "Spodaj levo",
+               "BOTTOM_RIGHT": "Spodaj desno",
+               "UPLOAD": "Naloži",
+               "POSITION": "Položaj in predogled vodnega žiga",
+               "FILEUPLOAD_DESCRIPTION": "Datoteke morajo imeti kanal alfa (prosojno ozadje). Sprejemljive vrste datotek so: .PNG, .GIF, .SVG, .WEBP",
+               "UPLOAD_LABEL": "Nalaganje slike",
+               "UPLOAD_BUTTON": "Naloži"
+            },
+            "SUMMARY": {
+               "CAPTION": "Povzetek"
+            },
+            "USAGE": {
+               "CAPTION": "Uporaba",
+               "SERIE": "Ime serije",
+               "EMPTY": "Ni najdenih serij za trenutno temo"
+            }
+         }
+      }
+   },
+   "SYSTEMS": {
+      "NAVIGATION": {
+         "JOBS": "Posli",
+         "SERVERS": "Strežniki",
+         "SERVICES": "Storitve"
+      },
+      "JOBS": {
+         "TABLE": {
+            "ID": "Identifikator posla",
+            "CAPTION": "Posli",
+            "CREATED": "Ustvarjeno",
+            "CREATOR": "Avtor",
+            "HOST_NAME": "Ime gostitelja",
+            "NODE_NAME": "Node name",
+            "OPERATION": "Postopek",
+            "STARTED": "Začeto",
+            "STATUS": "Stanje",
+            "SUBMITTED": "Poslano",
+            "TYPE": "Vrsta"
+         },
+         "STATUS": {
+            "QUEUED": "V čakalni vrsti",
+            "PAUSED": "Začasno ustavljeno",
+            "RUNNING": "Izvajanje",
+            "FINISHED": "Dokončano",
+            "FAILED": "Ni uspelo",
+            "DELETED": "Izbrisano",
+            "INSTANTIATED": "V izdelavi",
+            "DISPATCHING": "V pošiljanju",
+            "RESTART": "Ponovni zagon",
+            "CANCELED": "Preklican",
+            "WAITING": "Čakanje"
+         }
+      },
+      "SERVERS": {
+         "TABLE": {
+            "CAPTION": "Strežniki",
+            "STATUS": "Stanje",
+            "HOST_NAME": "Ime gostitelja",
+            "NODE_NAME": "Node name",
+            "CORES": "Jedra",
+            "COMPLETED": "Dokončani posli",
+            "RUNNING": "Posli, ki se izvajajo",
+            "QUEUED": "Posli v čakalni vrsti",
+            "MEAN_RUN_TIME": "Povprečen čas izvajanja",
+            "MEAN_QUEUE_TIME": "Povprečen čas v čakalni vrsti",
+            "MAINTENANCE": "Vzdrževanje",
+            "MAINTENANCE_OFF": "Odpri način vzdrževanja",
+            "MAINTENANCE_ON": "Zapri način vzdrževanja"
+         }
+      },
+      "SERVICES": {
+         "TABLE": {
+            "CAPTION": "Storitve",
+            "STATUS": "Stanje",
+            "NAME": "Ime storitve",
+            "HOST_NAME": "Ime gostitelja",
+            "NODE_NAME": "Node name",
+            "COMPLETED": "Dokončani posli",
+            "RUNNING": "Posli, ki se izvajajo",
+            "QUEUED": "Posli v čakalni vrsti",
+            "MEAN_RUN_TIME": "Povprečen čas izvajanja",
+            "MEAN_QUEUE_TIME": "Povprečen čas v čakalni vrsti",
+            "SANITIZE": "Počisti neuspelo storitev",
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "SANITIZE": "Popravi servis (ponastavi v normalno stanje)"
+            }
+         },
+         "STATUS": {
+            "NORMAL": "Običajno",
+            "WARNING": "Opozorilo",
+            "ERROR": "Napaka"
+         }
+      }
+   },
+   "VIDEO_TOOL": {
+      "WARNING_UNSAVED": "Opozorilo: Nekatere spremembe niso bile shranjene. Če zapustite video urejevalnik, bodo spremembe izgubljene. Ali res želite nadaljevati?",
+      "TIMELINE": "Časovnica",
+      "ZOOMLEVEL": "Stopnja povečave",
+      "PREVIEW_MODE": "Predogled",
+      "PREVIEW_MODE_TOOLTIP": "Predvajaj samo izbrane dele",
+      "ZOOM": "Povečava/pomanjšava",
+      "BUTTONS": {
+         "CLOSE": "Zapri",
+         "SAVE": "Shrani",
+         "PROCESS": "Shrani in nadaljuj",
+         "ADD_COMMENT": "Dodaj komentar"
+      },
+      "TABS": {
+         "EDIT": "Urejevalnik",
+         "CAPTIONS": "Pripisi",
+         "ANNOTATIONS": "Pripisi"
+      },
+      "AREAS": {
+         "METADATA": "Metapodatki",
+         "THUMBNAIL": "Predogledna slika",
+         "COMMENTS": "Komentarji",
+         "SEGMENTS": "Segmenti",
+         "TRACKS": "Sledi"
+      },
+      "ACTIONS": {
+         "SPLIT": "Razdelitev",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
+         "UNDO": "Razveljavi",
+         "REDO": "Uveljavi",
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
+      },
+      "SEGMENTS": {
+         "REMOVE_SEGMENT": "Odstrani segment",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
+         "START": "Začetek",
+         "END": "Konec"
+      },
+      "THUMBNAIL": {
+         "DESCRIPTION": "Privzeta predogledna slika se ustvari avtomatično. V kolikor bi jo želeli zamenjati, jo lahko ustvarite iz video posnetka v kateremkoli času ali naložite poljubno sliko.",
+         "ACTIONS": {
+            "EXTRACT": {
+               "FROM_VIDEO": {
+                  "LABEL": "Ustvari iz videa",
+                  "TOOLTIP": "Ustvari prikazno sliko iz video posnetka na trenutni poziciji"
+               },
+               "FROM_LEFT_VIDEO": {
+                  "LABEL": "Ustvari iz videa na levi",
+                  "TOOLTIP": "Ustvari prikazno sliko iz levega video posnetka na trenutni poziciji"
+               },
+               "FROM_RIGHT_VIDEO": {
+                  "LABEL": "Ustvari iz videa na desni",
+                  "TOOLTIP": "Ustvari prikazno sliko iz desnega video posnetka na trenutni poziciji"
+               }
+            },
+            "UPLOAD": {
+               "LABEL": "Nalaganje slike",
+               "TOOLTIP": "Naloži predogledno sliko"
+            },
+            "USE_DEFAULT": {
+               "LABEL": "Uporabi privzeto prikazno sliko",
+               "TOOLTIP": "Uporabi privzeto prikazno sliko, ki se ustvari samodejno"
+            }
+         },
+         "PREVIEW": {
+            "NOT_AVAILABLE": "Predogled ni na voljo",
+            "OUTDATED": "Predogled ni prikazuje realnega stanja, ker so bili nekateri deli spremenjeni. Posodobljen bo, ko boste shranili spremembe."
+         },
+         "CURRENT": {
+            "DEFAULT": "Trenutno uporabljate privzeto prikazno sliko.",
+            "SNAPSHOT": "Trenutna prikazna slika je bila ustvarjena iz video posnetka.",
+            "UPLOAD": "Trenutno uporabljate prikazno sliko, ki ste jo naložili."
+         }
+      },
+      "TRACKS": {
+         "DESCRIPTION": "Posnetkov, ki jih ne želite obdelati, lahko odznačite. Če želite uveljaviti spremembe, morate posnetek ponovno objaviti.",
+         "NOTIFICATION": {
+            "NO_VIDEO_TRACK_SELECTED": "Izbrati morate vsaj eno video datoteko",
+            "NO_AUDIO_TRACK_SELECTED": "Izbrati morate vsaj eno audio datoteko"
+         },
+         "TRACK": {
+            "HEADER": "Datoteka"
+         },
+         "VIDEO": {
+            "HEADER": "Video datoteka",
+            "NOT_AVAILABLE": "Video datoteke niso na voljo",
+            "NO_PREVIEW_AVAILABLE": "Prikazne slike niso na voljo",
+            "NO_TRACK_SELECTED": "Video datoteke niso izbrane",
+            "TOOLTIPS": {
+               "HIDE": "Video datoteka je trenutno omogočena. Onemogočite jo",
+               "UNHIDE": "Video datoteka je trenutno onemogočena. Omogočite jo."
+            }
+         },
+         "AUDIO": {
+            "HEADER": "Audio datoteka",
+            "NOT_AVAILABLE": "Audio datoteke niso na voljo",
+            "NO_PREVIEW_AVAILABLE": "Prikazne slike niso na voljo",
+            "NO_TRACK_SELECTED": "Audio datoteke niso izbrane",
+            "TOOLTIPS": {
+               "HIDE": "Audio datoteka je trenutno omogočena. Onemogočite jo",
+               "UNHIDE": "Audio datoteka je trenutno onemogočena. Omogočite jo"
+            }
+         }
+      },
+      "PLAYER": {
+         "PLAY": "Predvajaj",
+         "PAUSE": "Premor",
+         "NEXT_FRAME": "Naslednja sličica",
+         "PREVIOUS_FRAME": "Prejšnja sličica",
+         "NEXT_SEGMENT": "Naslednji segment/skoči na konec",
+         "PREVIOUS_SEGMENT": "Prejšnji segment/skoči na začetek",
+         "MUTE": "Izklop zvoka",
+         "VOLUME": "Glasnost"
+      }
+   },
+   "LOGIN": {
+      "WELCOME": "Pozdravljeni v Opencastu",
+      "REMEMBER": "Zapomni si me v tem računalniku",
+      "USERNAME": "Uporabniško ime ...",
+      "PASSWORD": "Geslo ...",
+      "LOGIN": "Prijava",
+      "ERROR": "Napačno uporabniško ime in/ali geslo"
+   },
+   "TABLE_FILTERS": {
+      "FILTER_SELECTION": {
+         "PLACEHOLDER": "Izberite filter …",
+         "NO_OPTIONS": "Ni najdenih filtrov"
+      },
+      "FILTER_VALUE_SELECTION": {
+         "PLACEHOLDER": "Izberite vrednost ...",
+         "NO_OPTIONS": "Ni najdenih vrednosti"
+      },
+      "CLEAR": "Počisti vse filtre",
+      "REMOVE": "Odstrani filter",
+      "ADD": "Dodaj filtre",
+      "PLACEHOLDER": "Iskanje ...",
+      "PROFILES": {
+         "FILTERS_HEADER": "Shranjeni kompleti filtrov",
+         "EDIT": "Uredi filtre",
+         "REMOVE": "Odstrani filter",
+         "EMPTY": "Shranjenih filtrov še ni",
+         "SAVE_FILTERS": "Shrani",
+         "FILTER_HEADER": "Shrani komplet filtrov",
+         "NAME": "Ime",
+         "NAME_PLACEHOLDER": "Ime ...",
+         "DESCRIPTION": "Opis",
+         "DESCRIPTION_PLACEHOLDER": "Opis ..."
+      }
+   },
+   "FILTERS": {
+      "ACLS": {
+         "NAME": {
+            "LABEL": "Ime"
+         }
+      },
+      "AGENTS": {
+         "NAME": {
+            "LABEL": "Ime"
+         },
+         "STATUS": {
+            "LABEL": "Stanje"
+         }
+      },
+      "EVENTS": {
+         "AGENT_ID": {
+            "LABEL": "Zajemi ID zastopnika"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Pravilnik o dostopu"
+         },
+         "COMMENTS": {
+            "LABEL": "Komentarji",
+            "NONE": "Brez",
+            "OPEN": "Odprti",
+            "RESOLVED": "Razrešeno"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Sodelavci"
+         },
+         "CREATOR": {
+            "LABEL": "Avtor"
+         },
+         "PUBLISHER": {
+            "LABEL": "Objavil"
+         },
+         "HOSTNAME": {
+            "LABEL": "Ime gostitelja"
+         },
+         "LANGUAGE": {
+            "LABEL": "Jezik"
+         },
+         "LICENSE": {
+            "LABEL": "Licenca"
+         },
+         "LOCATION": {
+            "LABEL": "Lokacija"
+         },
+         "PERIOD": {
+            "LABEL": "Obdobje"
+         },
+         "PRESENTERS_BIBLIOGRAPHIC": {
+            "LABEL": "Bibliografija predavatelja"
+         },
+         "PRESENTERS_TECHNICAL": {
+            "LABEL": "Tehnični predavatelj"
+         },
+         "PROGRESS": {
+            "LABEL": "Napredek"
+         },
+         "SERIES": {
+            "LABEL": "Serije"
+         },
+         "SOURCE": {
+            "LABEL": "Vir"
+         },
+         "START_DATE": {
+            "LABEL": "Datum začetka"
+         },
+         "STATUS": {
+            "LABEL": "Stanje",
+            "SCHEDULED": "Načrtovano",
+            "RECORDING": "Posnetek",
+            "INGESTING": "Uvažanje",
+            "PROCESSING": "Obdelava",
+            "ARCHIVE": "Arhiv",
+            "WAITINGFOR": "Čakanje na",
+            "UPLOAD": "Naloži",
+            "ONHOLD": "Na čakanju"
+         },
+         "SUBJECT": {
+            "LABEL": "Zadeva"
+         },
+         "TRACK_MIMETYPE": {
+            "LABEL": "Mimetype"
+         },
+         "TRACK_RESOLUTION": {
+            "LABEL": "Ločljivost"
+         },
+         "TRACK_TYPE": {
+            "LABEL": "Vrsta"
+         },
+         "WORKFLOW_DEFINITION": {
+            "LABEL": "Definicija poteka dela"
+         },
+         "WORKFLOW_STATE": {
+            "LABEL": "Stanje poteka dela"
+         }
+      },
+      "JOBS": {
+         "HOSTNAME": {
+            "LABEL": "Ime gostitelja"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
+         "STATUS": {
+            "LABEL": "Stanje",
+            "PAUSED": "Začasno ustavljeno",
+            "QUEUED": "V čakalni vrsti",
+            "RUNNING": "Izvajanje",
+            "WAITING": "Čakanje"
+         }
+      },
+      "SERIES": {
+         "TITLE": {
+            "LABEL": "Ime"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Sodelavci"
+         },
+         "ORGANIZERS": {
+            "LABEL": "Organizatorji"
+         },
+         "SUBJECT": {
+            "LABEL": "Zadeva"
+         },
+         "LANGUAGE": {
+            "LABEL": "Jezik"
+         },
+         "CREATOR": {
+            "LABEL": "Avtor"
+         },
+         "LICENSE": {
+            "LABEL": "Licenca"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Pravilnik o dostopu"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Datum ustvarjanja"
+         }
+      },
+      "SERVERS": {
+         "HOSTNAME": {
+            "LABEL": "Ime gostitelja"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
+         "STATUS": {
+            "LABEL": "Stanje",
+            "MAINTENANCE": "Vzdrževanje",
+            "ONLINE": "Dosegljiv",
+            "OFFLINE": "Nedosegljiv"
+         }
+      },
+      "SERVICES": {
+         "ACTIONS": {
+            "LABEL": "Dejanja na voljo"
+         },
+         "HOSTNAME": {
+            "LABEL": "Ime gostitelja"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
+         "NAME": {
+            "LABEL": "Ime"
+         },
+         "STATUS": {
+            "LABEL": "Stanje",
+            "ERROR": "Napaka",
+            "NORMAL": "Običajno",
+            "WARNING": "Opozorilo"
+         }
+      },
+      "THEMES": {
+         "NAME": {
+            "LABEL": "Ime"
+         },
+         "DESCRIPTION": {
+            "LABEL": "Opis"
+         },
+         "CREATOR": {
+            "LABEL": "Avtor"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Ustvarjeno"
+         }
+      },
+      "USERS": {
+         "PROVIDER": {
+            "LABEL": "Ponudnik"
+         },
+         "ROLE": {
+            "LABEL": "Vloga"
+         },
+         "USERNAME": {
+            "LABEL": "Uporabniško ime"
+         },
+         "NAME": {
+            "LABEL": "Ime"
+         },
+         "USER_DIRECTORY": {
+            "LABEL": "Imenik uporabnikov"
+         }
+      },
+      "REVIEW_STATUS": {
+         "UNSENT": "Neposlano",
+         "UNCONFIRMED": "Nepotrjeno",
+         "CONFIRMED": "Potrjeno"
+      }
+   },
+   "TABLE_SUMMARY": "Št. vrstic: {{numberOfRows}}",
+   "TABLE_NO_RESULT": "Ni najdenih rezultatov",
+   "TABLE_LOADING": "Nalaganje ...",
+   "TABLE_EDIT": "Uredi",
+   "DASHBOARD": {
+      "RUNNING": "Izvajanje",
+      "FINISHED": "Dokončano",
+      "PAUSED": "Začasno ustavljeno",
+      "FAILED": "Ni uspelo",
+      "FINISHED_WITH_COMMENTS": "Opravila",
+      "SCHEDULED": "Načrtovano",
+      "RECORDING": "Posnetek"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Bližnjice na tipkovnici",
+         "HINT": "Na tej strani so prikazane bližnjice na tipkovnici, ki so trenutno na voljo. Glede na stran, na kateri se nahajajo, so bližnjice lahko različne."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Preslednica",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "Splošno",
+         "PLAYER": "Predvajalnik",
+         "EDITOR": "Urejevalnik"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Glavni meni",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Izberi naslednji prikaz filtrov",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Izberi prejšnji prikaz filtrov",
+            "REMOVE_FILTERS": "Počisti vse filtre",
+            "EVENT_VIEW": "Dogodki",
+            "SERIES_VIEW": "Serije",
+            "NEW_EVENT": "Dodaj dogodek",
+            "NEW_SERIES": "Dodaj serijo",
+            "CHEAT_SHEET": "Bližnjice na tipkovnici"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Predvajaj/premor",
+            "PREVIOUS_FRAME": "Prejšnja sličica",
+            "NEXT_FRAME": "Naslednja sličica",
+            "STEP_BACKWARD": "Skoči 10s nazaj",
+            "STEP_FORWARD": "Skoči 10s naprej",
+            "PREVIOUS_SEGMENT": "Prejšnji segment/skoči na začetek",
+            "NEXT_SEGMENT": "Naslednji segment/skoči na konec",
+            "VOLUME_UP": "Povečaj glasnost",
+            "VOLUME_DOWN": "Zmanjšaj glasnost",
+            "MUTE": "Vključi/izključi zvok"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Razdelitev",
+            "CUT_SELECTED_SEGMENT": "Izreži",
+            "PLAY_CURRENT_SEGMENT": "Predvajaj trenutni odsek",
+            "CLEAR_LIST": "Počisti segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Konec segmenta"
+         }
+      }
+   },
+   "AGENTS": {
+      "STATUS": {
+         "CAPTURING": "Snemanje",
+         "ERROR": "Napaka",
+         "IDLE": "Nedejaven",
+         "OFFLINE": "Nedosegljiv",
+         "SHUTTING_DOWN": "Ustavljanje",
+         "UNKNOWN": "Neznan",
+         "UPLOADING": "Nalaganje"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "FROM": "Od",
+      "TO": "To",
+      "TOTAL": "Total",
+      "GRANULARITY": "Granularity",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Random Data",
+         "VIEWS_SUM": "Total Number of Views",
+         "VIEWS_AVG": "Average Number of Views",
+         "PUBLISHEDHOURS": "Published Hours of Video"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the published hours of video"
+      }
+   }
+}

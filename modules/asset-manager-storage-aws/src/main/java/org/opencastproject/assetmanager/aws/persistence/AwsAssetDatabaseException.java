@@ -27,15 +27,6 @@ package org.opencastproject.assetmanager.aws.persistence;
 public class AwsAssetDatabaseException extends Exception {
 
   /**
-   * Create exception with a message.
-   *
-   * @param message
-   */
-  public AwsAssetDatabaseException(String message) {
-    super(message);
-  }
-
-  /**
    * Create exception with a cause.
    *
    * @param cause

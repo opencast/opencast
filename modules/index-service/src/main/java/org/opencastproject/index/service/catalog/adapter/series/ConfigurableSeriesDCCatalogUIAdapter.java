@@ -29,8 +29,8 @@ import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEven
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.metadata.dublincore.DublinCoreByteFormat;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesException;
@@ -39,7 +39,6 @@ import org.opencastproject.util.RequireUtil;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +57,7 @@ public class ConfigurableSeriesDCCatalogUIAdapter extends ConfigurableDCCatalogU
   private SecurityService securityService;
 
   @Override
-  public Opt<MetadataCollection> getFields(String seriesId) {
+  public Opt<DublinCoreMetadataCollection> getFields(String seriesId) {
 
     final Opt<DublinCoreCatalog> optDCCatalog = loadDublinCoreCatalog(
             RequireUtil.requireNotBlank(seriesId, "seriesId"));
@@ -69,7 +68,7 @@ public class ConfigurableSeriesDCCatalogUIAdapter extends ConfigurableDCCatalogU
   }
 
   @Override
-  public boolean storeFields(String seriesId, MetadataCollection metadata) {
+  public boolean storeFields(String seriesId, DublinCoreMetadataCollection metadata) {
     final Opt<DublinCoreCatalog> optDCCatalog = loadDublinCoreCatalog(
             RequireUtil.requireNotBlank(seriesId, "seriesId"));
     if (optDCCatalog.isSome()) {
@@ -102,8 +101,7 @@ public class ConfigurableSeriesDCCatalogUIAdapter extends ConfigurableDCCatalogU
         return Opt.some(dc);
       }
     } catch (SeriesException e) {
-      logger.error("Error while loading DublinCore catalog of series '{}': {}", seriesId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Error while loading DublinCore catalog of series '{}': {}", seriesId, e);
       return Opt.none();
     }
   }

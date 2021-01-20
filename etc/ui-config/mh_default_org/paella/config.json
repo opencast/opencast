@@ -2,7 +2,8 @@
   "player": {
     "accessControlClass": "OpencastAccessControl",
     "profileFrameStrategy": "paella.ProfileFrameStrategy",
-    "videoQualityStrategy": "paella.BestFitVideoQualityStrategy",
+    "videoQualityStrategy": "paella.LimitedBestFitVideoQualityStrategy",
+    "videoQualityStrategyParams":{ "maxAutoQualityRes":720 },
     "reloadOnFullscreen": true,
     "videoZoom": {
       "enabled": true,
@@ -37,10 +38,6 @@
         "enabled": true
       },
       {
-        "factory": "Html5VideoFactory",
-        "enabled": true
-      },
-      {
         "factory": "MpegDashVideoFactory",
         "enabled": true
       },
@@ -56,8 +53,13 @@
           "lowBufferWatchdogPeriod": 0.5,
           "highBufferWatchdogPeriod": 3
         },
-        "iOSMaxStreams": 1,
-        "androidMaxStreams": 1
+        "iOSMaxStreams": 2,
+        "androidMaxStreams": 2,
+        "initialQualityLevel": 2
+      },
+      {
+        "factory": "Html5VideoFactory",
+        "enabled": true
       },
       {
         "factory": "RTMPVideoFactory",
@@ -70,14 +72,6 @@
       {
         "factory": "YoutubeVideoFactory",
         "enabled": true
-      },
-      {
-        "factory": "Video360ThetaFactory",
-        "enabled": true
-      },
-      {
-        "factory": "Video360Factory",
-        "enabled": true
       }
     ],
     "audioMethods": [
@@ -86,13 +80,10 @@
         "enabled": true
       }
     ],
+    "defaultAudioTag": "",
     "rtmpSettings": {
       "bufferTime": 5,
       "requiresSubscription": false
-    },
-    "slidesMarks": {
-      "enabled": true,
-      "color": "gray"
     }
   },
   "defaultProfile": "presenter_presentation",
@@ -144,6 +135,10 @@
           }
         ],
         "audioTag": {
+        },
+        "videoCanvas": {
+          "*/delivery+360": "video360",
+          "*/delivery+360Theta": "video360Theta"
         }
       },
       "//**** Video profile plugins": "",
@@ -198,7 +193,8 @@
         "reloadOnFullscreen": {
           "enabled": true,
           "keepUserSelection": true
-        }
+        },
+        "ariaLabel": "Switch full screen mode"
       },
       "es.upv.paella.helpPlugin": {
         "enabled": true,
@@ -209,7 +205,10 @@
       },
       "es.upv.paella.multipleQualitiesPlugin": {
         "enabled": true,
-        "showWidthRes": true
+        "showWidthRes": true,
+        "minWindowSize": 550,
+        "minVisibleQuality": 240,
+        "ariaLabel": "Change video quality"
       },
       "es.upv.paella.playbackRatePlugin": {
         "enabled": true,
@@ -232,8 +231,9 @@
         "sortType": "time",
         "colorSearch": false
       },
-      "es.upv.paella.socialPlugin": {
-        "enabled": true
+      "es.upv.paella.sharePlugin": {
+        "enabled": true,
+        "minWindowSize": 600
       },
       "es.upv.paella.themeChooserPlugin": {
         "enabled": false
@@ -244,7 +244,8 @@
       "es.upv.paella.volumeRangePlugin": {
         "enabled": true,
         "showMasterVolume": true,
-        "showSlaveVolume": false
+        "showSlaveVolume": false,
+        "ariaLabel": "Volume"
       },
       "es.upv.paella.pipModePlugin": {
         "enabled": true
@@ -270,6 +271,15 @@
       "es.upv.paella.airPlayPlugin": {
         "enabled": true
       },
+      "es.upv.paella.timeMarksPlaybackCanvasPlugin": {
+        "enabled": true,
+        "color": "gray"
+      },
+      "es.upv.paella.BufferedPlaybackCanvasPlugin": {
+        "enabled": true,
+        "color": "rgba(0,0,0,0.4)"
+      },
+
       "es.upv.paella.liveStreamingIndicatorPlugin": {
         "enabled": true
       },

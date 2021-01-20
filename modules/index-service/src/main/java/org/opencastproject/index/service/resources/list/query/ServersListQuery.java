@@ -21,10 +21,11 @@
 
 package org.opencastproject.index.service.resources.list.query;
 
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
-import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.provider.ServersListProvider;
 import org.opencastproject.index.service.util.FiltersUtils;
+import org.opencastproject.list.api.ResourceListFilter;
+import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.util.data.Option;
 
 /**

@@ -31,7 +31,6 @@ import org.opencastproject.adminui.usersettings.UserSetting;
 import org.opencastproject.adminui.usersettings.UserSettings;
 import org.opencastproject.adminui.usersettings.UserSettingsService;
 import org.opencastproject.adminui.usersettings.persistence.UserSettingsServiceException;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Tuple;
@@ -40,8 +39,12 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
@@ -66,10 +69,19 @@ import javax.ws.rs.core.Response;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+  immediate = true,
+  service = UserSettingsEndpoint.class,
+  property = {
+    "service.description=Admin UI - Users Settings facade Endpoint",
+    "opencast.service.type=org.opencastproject.adminui.endpoint.UserSettingsEndpoint",
+    "opencast.service.path=/admin-ng/user-settings"
+  }
+)
 public class UserSettingsEndpoint {
 
   /** The logging facility */
-  private static final Log logger = Log.mk(ServerEndpoint.class);
+  private static final Logger logger = LoggerFactory.getLogger(ServerEndpoint.class);
 
   /** Base url of this endpoint */
   private String endpointBaseUrl;
@@ -79,11 +91,13 @@ public class UserSettingsEndpoint {
   /**
    * OSGi callback to set the service to retrieve user settings from.
    */
+  @Reference
   public void setUserSettingsService(UserSettingsService userSettingsService) {
     this.userSettingsService = userSettingsService;
   }
 
   /** OSGi callback. */
+  @Activate
   protected void activate(ComponentContext cc) {
     logger.info("Activate the Admin ui - Users facade endpoint");
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc);
@@ -95,7 +109,7 @@ public class UserSettingsEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "getUserSettings", description = "Returns a list of the user settings for the current user", returnDescription = "Returns a JSON representation of the list of user settings", restParameters = {
           @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user settings.") })
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The user settings.") })
   public Response getUserSettings(@QueryParam("limit") int limit, @QueryParam("offset") int offset) throws IOException {
     if (limit < 1) {
       limit = 100;
@@ -117,7 +131,7 @@ public class UserSettingsEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "createUserSetting", description = "Create a new user setting", returnDescription = "Status ok", restParameters = {
           @RestParameter(description = "The key used to represent this setting.", isRequired = true, name = "key", type = STRING),
-          @RestParameter(description = "The value representing this setting.", isRequired = true, name = "value", type = STRING) }, reponses = { @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "User setting has been created.") })
+          @RestParameter(description = "The value representing this setting.", isRequired = true, name = "value", type = STRING) }, responses = { @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "User setting has been created.") })
   public Response createUserSetting(@FormParam("key") String key, @FormParam("value") String value)
           throws NotFoundException {
     try {
@@ -133,7 +147,7 @@ public class UserSettingsEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "updateUserSetting", description = "Update a user setting", returnDescription = "The updated user setting as JSON", pathParameters = { @RestParameter(name = "settingId", description = "The setting's id", isRequired = true, type = RestParameter.Type.INTEGER) }, restParameters = {
           @RestParameter(description = "The key used to represent this setting.", isRequired = true, name = "key", type = STRING),
-          @RestParameter(description = "The value representing this setting.", isRequired = true, name = "value", type = STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "User setting has been created.") })
+          @RestParameter(description = "The value representing this setting.", isRequired = true, name = "value", type = STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "User setting has been created.") })
   public Response updateUserSetting(@PathParam("settingId") final int id, @FormParam("key") String key,
           @FormParam("value") String value) throws NotFoundException {
     try {
@@ -147,14 +161,14 @@ public class UserSettingsEndpoint {
 
   @DELETE
   @Path("/setting/{settingId}")
-  @RestQuery(name = "deleteUserSetting", description = "Delete a user setting", returnDescription = "Status ok", pathParameters = @RestParameter(name = "settingId", type = INTEGER, isRequired = true, description = "The id of the user setting."), reponses = {
+  @RestQuery(name = "deleteUserSetting", description = "Delete a user setting", returnDescription = "Status ok", pathParameters = @RestParameter(name = "settingId", type = INTEGER, isRequired = true, description = "The id of the user setting."), responses = {
           @RestResponse(responseCode = SC_OK, description = "User setting has been deleted."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "User setting not found.") })
   public Response deleteUserSetting(@PathParam("settingId") long id) throws NotFoundException {
     try {
       userSettingsService.deleteUserSetting(id);
     } catch (UserSettingsServiceException e) {
-      logger.error("Unable to remove user setting id:'%s':'%s'", id, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to remove user setting id:'%s':", id, e);
       return Response.serverError().build();
     }
     logger.debug("User setting with id %d removed.", id);

@@ -31,12 +31,6 @@ public class ExecuteException extends Exception {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Constructs a new execute exception without a message or a cause.
-   */
-  public ExecuteException() {
-  }
-
-  /**
    * Constructs a new execute exception with a message.
    * 
    * @param message

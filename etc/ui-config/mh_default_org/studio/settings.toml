@@ -1,0 +1,9 @@
+# See https://github.com/elan-ev/opencast-studio/blob/master/CONFIGURATION.md
+# for more information on possible configuration values.
+
+[opencast]
+serverUrl = "/"
+loginProvided = true
+
+[upload]
+workflowId = "studio-upload"

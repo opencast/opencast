@@ -21,7 +21,6 @@
 
 package org.opencastproject.util;
 
-import org.jdom.JDOMException;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -240,27 +239,6 @@ public class XmlSafeParserTest {
       // CHECKSTLYE:ON
     ).newTransformer();
     tf.transform(new StreamSource(xmlInput), new StreamResult(new StringWriter()));
-  }
-
-  @Test
-  public void newSAXBuilderTest() throws JDOMException, IOException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-safe.xml");
-
-    org.jdom.Document doc = XmlSafeParser.newSAXBuilder().build(xmlInput);
-  }
-
-  @Test(expected = JDOMException.class)
-  public void newSAXBuilderUnsafeTest() throws JDOMException, IOException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe.xml");
-
-    org.jdom.Document doc = XmlSafeParser.newSAXBuilder().build(xmlInput);
-  }
-
-  @Test(expected = JDOMException.class)
-  public void newSAXBuilderUnsafe2Test() throws JDOMException, IOException {
-    InputStream xmlInput = XmlSafeParserTest.class.getResourceAsStream("/dublincore-unsafe2.xml");
-
-    org.jdom.Document doc = XmlSafeParser.newSAXBuilder().build(xmlInput);
   }
 
   @Test

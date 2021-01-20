@@ -48,37 +48,10 @@ public final class JsonConv {
   private JsonConv() {
   }
 
-  public static Function<Obj, Obj> append(final Obj b) {
-    return new Function<Obj, Obj>() {
-      @Override public Obj apply(Obj a) {
-        return a.append(b);
-      }
-    };
-  }
-
-  /**
-   * Nest an object under key <code>propName</code>.
-   * <p>
-   * Example: key = acl, {id:1, name:"bla"} -&gt; {acl:{id:1, name:"bla"}}
-   */
-  public static Function<Obj, Obj> nest(final String key) {
-    return new Function<Obj, Obj>() {
-      @Override public Obj apply(Obj obj) {
-        return obj(p(key, obj));
-      }
-    };
-  }
-
   public static Obj digest(ManagedAcl acl) {
     return obj(p(KEY_ID, acl.getId()),
                p(KEY_NAME, acl.getName()));
   }
-
-  public static final Function<ManagedAcl, Obj> digestManagedAcl = new Function<ManagedAcl, Obj>() {
-    @Override public Obj apply(ManagedAcl acl) {
-      return digest(acl);
-    }
-  };
 
   public static Obj full(ManagedAcl acl) {
     return obj(p(KEY_ID, acl.getId()),
@@ -96,12 +69,6 @@ public final class JsonConv {
   public static Obj full(AccessControlList acl) {
     return obj(p(KEY_ACE, arr(mlist(acl.getEntries()).map(fullAccessControlEntry))));
   }
-
-  public static final Function<AccessControlList, Obj> fullAccessControlList = new Function<AccessControlList, Obj>() {
-    @Override public Obj apply(AccessControlList acl) {
-      return full(acl);
-    }
-  };
 
   public static Obj full(AccessControlEntry ace) {
     return obj(p(KEY_ROLE, ace.getRole()),

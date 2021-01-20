@@ -40,8 +40,6 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -58,8 +56,6 @@ import java.util.List;
  * Test class for WaveformServiceImpl.
  */
 public class WaveformServiceImplTest {
-  private static final Logger logger = LoggerFactory.getLogger(WaveformServiceImplTest.class);
-
   private static Track audioTrack = null;
   private static Track dummyTrack = null;
 

@@ -77,19 +77,24 @@ jobs:
 
     - name: install dependencies
       run: |
-        cd modules/admin-ui
+        cd modules/admin-ui-frontend
         npm ci
         ./node_modules/.bin/bower install
 
     - name: run front-end tests
       run: |
-        cd modules/admin-ui
+        cd modules/admin-ui-frontend
         npm run test-${{ matrix.browser }}
 
 
   # Build Opencast
   build:
-    name: build
+    strategy:
+      matrix:
+        java:
+          - 8
+          - 11
+    name: build (java ${{ matrix.java }})
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
@@ -105,7 +110,7 @@ jobs:
       - name: setup java
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: ${{ matrix.java }}
 
       - name: install dependencies
         run: |
@@ -125,7 +130,7 @@ jobs:
 
       - name: prepare build
         run: |
-          sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui/pom.xml
+          sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui-frontend/pom.xml
 
       - name: build opencast
         run: |

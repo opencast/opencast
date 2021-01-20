@@ -64,7 +64,14 @@ broker is mostly run on the admin server of Opencast but can be run separately. 
 For more details about the setup, have a look at the [Apache ActiveMQ configuration guide](message-broker.md).
 
 
-Step 5: Database Configuration
+Step 5: Setting up Elasticsearch
+--------------------------------
+
+Opencast requires Elasticsearch. Instructions for installing Elasticsearch can be found in the
+[installation documentation](../installation/index.md).
+
+
+Step 6: Database Configuration
 ------------------------------
 
 Opencast uses an integrated H2 database by default. While you will find it perfectly functional, it has certain
@@ -78,15 +85,13 @@ For testing, it is totally fine to keep the internal database, but you are highl
 database for productional use. For more information about database configuration, have a look at the [Database
 Configuration](database.md) section.
 
-
-Step 6: HTTPS Configuration
+Step 7: HTTPS Configuration
 ---------------------------
 
 An installation without HTTPS does not make much sense today.
 Thus, make sure to follow [a configuration guide for HTTPS](https/index.md).
 
-
-Step 7: Setting the Storage Directory (optional)
+Step 8: Setting the Storage Directory (optional)
 ------------------------------------------------
 
 Even though it is not important for all systems – on test setups you can probably omit this – you will often want to set
@@ -96,4 +101,3 @@ can set the directory by changing `org.opencastproject.storage.dir` like:
     org.opencastproject.storage.dir=/media/mhdatamount
 
 Please keep in mind that the user running Opencast must have read/write permissions to the storage directory.
-

@@ -153,7 +153,7 @@ public class GoogleSpeechStartTranscriptionOperationHandler extends AbstractWork
         continue;
       }
       try {
-        job = service.startTranscription(mediaPackage.getIdentifier().compact(), track, language);
+        job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, language);
         // Only one job per media package
         break;
       } catch (TranscriptionServiceException e) {

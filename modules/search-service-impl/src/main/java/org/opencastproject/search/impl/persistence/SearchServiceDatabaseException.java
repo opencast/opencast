@@ -32,37 +32,12 @@ public class SearchServiceDatabaseException extends Exception {
   private static final long serialVersionUID = -5638740649716499805L;
 
   /**
-   * Create exception.
-   */
-  public SearchServiceDatabaseException() {
-  }
-
-  /**
-   * Create exception with a message.
-   *
-   * @param message
-   */
-  public SearchServiceDatabaseException(String message) {
-    super(message);
-  }
-
-  /**
    * Create exception with a cause.
    *
    * @param cause
    */
   public SearchServiceDatabaseException(Throwable cause) {
     super(cause);
-  }
-
-  /**
-   * Create exception with a message and a cause.
-   *
-   * @param message
-   * @param cause
-   */
-  public SearchServiceDatabaseException(String message, Throwable cause) {
-    super(message, cause);
   }
 
 }

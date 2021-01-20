@@ -1,0 +1,2145 @@
+{
+   "MATTERHORN": "Opencast",
+   "NAV_HOME": "Start",
+   "NAV_ABOUT": "Om",
+   "NO": "Nej",
+   "SUBMIT": "Indsend",
+   "UPDATE": {
+      "MINOR": "Minor update available",
+      "MAJOR": "Major update available",
+      "UNSUPPORTED": "Version {{ version }} no longer supported",
+      "UNDETERMINED": "Indeterminable version"
+   },
+   "CANCEL": "Annullér",
+   "CONFIRM": "Bekræft",
+   "SAVE": "Gem",
+   "CONTINUE": "Continue",
+   "CLOSE": "Close",
+   "LOGOUT": "Log ud",
+   "RESET": "Nulstil",
+   "SELECT_NO_OPTION_SELECTED": "Ingen mulighed valgt",
+   "SELECT_NO_OPTIONS_AVAILABLE": "Ingen tilgængelige muligheder",
+   "YES": "Ja",
+   "COPY": "Copy to clipboard",
+   "LTI": {
+      "ERROR_LOADING_METADATA": "Error loading event metadata. Please try again later.",
+      "SERIES_TITLE": "View Series",
+      "UPLOAD_TITLE": "Upload event",
+      "LOADING": "Loading…",
+      "NEW_UPLOAD": "Upload new event",
+      "EDIT_UPLOAD": "Edit event",
+      "CURRENT_JOBS": "Today's jobs",
+      "PRESENTER": "Presenter",
+      "PRESENTER_DESCRIPTION": "Video file for the presenter track",
+      "CAPTION": "Captions",
+      "CAPTION_DESCRIPTION": "Caption file; VTT format is supported",
+      "UPLOAD": "Upload",
+      "UPLOADING": "Uploading",
+      "EDIT": "Save",
+      "EDIT_TITLE": "Edit event",
+      "NO_OPTION_SELECTED": "No option selected",
+      "EDITING": "Saving…",
+      "SELECT_OPTION": "Select option",
+      "JOB_TITLE": "Title",
+      "JOB_STATUS": "Status",
+      "UPLOAD_SUCCESS": "Upload succeeded!",
+      "UPLOAD_FAILURE": "Upload failed!",
+      "UPLOAD_FAILURE_DESCRIPTION": "Please try again later.",
+      "EDIT_SUCCESS": "Edit succeeded, beginning republishing.",
+      "EDIT_FAILURE": "Edit failed!",
+      "COPY_SUCCESS": "Copying started…",
+      "COPY_SUCCESS_DESCRIPTION": "Please wait a moment…",
+      "GENERIC_ERROR": "Error: {{message}}",
+      "DELETION_SUCCESS": "Event deletion successful",
+      "DELETION_SUCCESS_DESCRIPTION": "The event will be removed from the list in a few moments…",
+      "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
+      "DELETION_FAILURE": "Event deletion failed",
+      "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
+      "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
+      "CONFIRM_DELETION": "Really delete this event?",
+      "COPY_TO_SERIES": "Copy event to series",
+      "SELECT_COPY_TARGET": "Select destination series",
+      "COPY": "Copy",
+      "COPY_IN_PROGRESS": "Starting copy…",
+      "CREATOR": "by {{creator}}"
+   },
+   "LANGUAGES": {
+      "ARABIC": "Arabisk",
+      "DANISH": "Dansk",
+      "GERMAN": "Tysk",
+      "GERMAN_CH": "Schweizertysk",
+      "FINNISH": "Finsk",
+      "HINDI": "Hindi",
+      "ITALIAN": "Italiensk",
+      "JAPANESE": "Japansk",
+      "DUTCH": "Hollandsk",
+      "NORWEGIAN": "Norsk",
+      "FRENCH": "Fransk",
+      "ENGLISH": "Engelsk",
+      "SPANISH": "Spansk",
+      "ROMANSH": "Rætoromansk",
+      "POLISH": "Polsk",
+      "PORTUGESE": "Portugisisk",
+      "SLOVENIAN": "Slovensk",
+      "SWEDISH": "Svensk",
+      "RUSSIAN": "Russisk",
+      "TURKISH": "Tyrkisk",
+      "UKRAINIAN": "Ukrainsk",
+      "CHINESE": "Kinesisk"
+   },
+   "PREFERENCES": {
+      "TABLE": {
+         "CAPTION": "Redigere tabelvisning",
+         "SUBHEADING": "Vælg de standarddata, som skal fremgå af {{ tableName }}-visningen",
+         "AVAILABLE_COLUMNS": "Tilgængelige kolonner",
+         "SELECTED_COLUMNS": "Valgte kolonner",
+         "FOOTER_TEXT": "Rækkefølge og udvælgelse gemmes automatisk. Tryk på \"{{resetTranslation}}\" for at gendanne standardvisningen."
+      }
+   },
+   "CONFIRMATIONS": {
+      "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
+      "CONTINUE_ACTION": "Sikker på, at du vil fortsætte?",
+      "METADATA": {
+         "NOTICE": {
+            "UNKNOWN": "Det følgende element slettes",
+            "EVENT": "Den følgende begivenhed slettes",
+            "SERIES": "Den følgende serie slettes",
+            "ACL": "Den følgende ACL slettes",
+            "GROUP": "Den følgende gruppe slettes",
+            "USER": "Den følgende bruger slettes",
+            "THEME": "Det følgende tema slettes",
+            "LOCATION": "Den følgende placering slettes"
+         },
+         "NAME": "Navn"
+      },
+      "ACTIONS": {
+         "CONFIRMATION": "Bekræftelse",
+         "SHOW": {
+            "EMBEDDING_CODE": "Embedding code"
+         }
+      },
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "Denne serie indeholder begivenheder. Sletning af serien sletter ikke begivenhederne.",
+         "EVENT_WILL_BE_GONE": "If you continue, the event will be irrevocably gone."
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "Denne serie kan ikke slettes, da den stadig indeholder begivenheder."
+      }
+   },
+   "MEDIAMODULE": "Mediemodul",
+   "SYSTEM_NOTIFICATIONS": "Systemadvarsler og notifikationer",
+   "LANGUAGE": "Vælg sprog",
+   "HELP": {
+      "HELP": "Hjælp",
+      "USERS_GUIDE": "Brugerguide",
+      "DOCUMENTATION": "Dokumentation",
+      "REST_DOC": "RESTEN API-dokmenter",
+      "HOTKEY_CHEAT_SHEET": "Tastaturgenveje",
+      "ADOPTER_REGISTRATION": "Adopter Registration"
+   },
+   "NOTIFICATIONS": {
+      "ACL_ADDED": "Adgangspolitikken er blevet oprettet",
+      "ACL_NOT_SAVED": "Adgangspolitikken kunne ikke gemmes",
+      "ACL_UPDATED": "Adgangspolitikken er blevet opdateret",
+      "ACL_DELETED": "Adgangspolitikken er blevet slettet",
+      "ACL_NOT_DELETED": "Adgangspolitikken kunne ikke slettes",
+      "USER_ADDED": "Brugeren er blevet oprettet",
+      "USER_UPDATED": "Brugeren er blevet opdateret",
+      "USER_NOT_SAVED": "Brugeren kunne ikke gemmes",
+      "USER_DELETED": "Brugeren er blevet slettet",
+      "USER_NOT_DELETED": "Brugeren kunne ikke slettes",
+      "USER_NOT_MANAGEABLE": "Brugeren er ikke håndterbar",
+      "GROUP_ADDED": "Gruppen er blevet oprettet",
+      "GROUP_CONFLICT": "Det genererede gruppenavn findes allerede",
+      "GROUP_UPDATED": "Gruppen er blevet oprettet",
+      "GROUP_NOT_SAVED": "Gruppen kunne ikke gemmes",
+      "GROUP_DELETED": "Gruppen er blevet slettet",
+      "GROUP_NOT_DELETED": "Gruppen kunne ikke slettes",
+      "ACCESS_DENIED": "Adgang nægtet. Du har ikke ret til at se denne side",
+      "SERIES_ADDED": "Serien er blevet oprettet",
+      "SERIES_NOT_SAVED": "Serien kunne ikke gemmes",
+      "EVENTS_CREATED": "Begivenheden er blevet oprettet",
+      "EVENTS_UPLOAD_STARTED": "Begivenheden uploades…",
+      "EVENTS_NOT_CREATED": "Begivenheden kunne ikke oprettes",
+      "EVENTS_UPDATED_NB": "{{ number }} begivenheder blev opdateret",
+      "EVENTS_UPDATED_ALL": "Alle begivenheder blev opdateret",
+      "EVENTS_NOT_UPDATED": "Begivenheden kunne ikke gemmes",
+      "EVENTS_NOT_UPDATED_ID": "Begivenheden {{ id }} kunne ikke gemmes",
+      "EVENTS_NOT_UPDATED_ALL": "Ingen af begivenhederne kunne ikke gemmes",
+      "EVENTS_PROCESSING_ACTION_RETRY": "Behandling genoptaget.",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Behandling kunne ikke genoptages.",
+      "EVENTS_PROCESSING_ACTION_NONE": "Processen afbrudt.",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Behandling kunne ikke afbrydes.",
+      "EVENTS_PROCESSING_ACTION_STOP": "Behandling stoppet.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Behandling kunne ikke stoppes.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Slettet arbejdsgang.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Arbejdsgang kunne ikke slettes.",
+      "SERIES_UPDATED_NB": "{{ number }} serier blev opdateret",
+      "SERIES_UPDATED_ALL": "Alle serier blev opdateret",
+      "SERIES_NOT_UPDATED": "Serien kunne ikke gemmes",
+      "SERIES_NOT_UPDATED_ID": "Serien {{ id }} kunne ikke gemmes",
+      "SERIES_NOT_UPDATED_ALL": "Ingen af serierne kunne ikke gemmes",
+      "EVENT_DELETED": "The event has been deleted.",
+      "EVENT_WILL_BE_DELETED": "The event is being deleted",
+      "EVENTS_DELETED": "The events are being deleted.",
+      "EVENTS_NOT_DELETED": "The event(s) could not be deleted.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event(s) could not be deleted, because you don't have the permission to do so.",
+      "SERIES_DELETED": "Serien er blevet oprette",
+      "SERIES_NOT_DELETED": "Serien kunne ikke slettes",
+      "LOCATION_DELETED": "Placeringen er blevet slettet",
+      "LOCATION_NOT_DELETED": "Placeringen kunne ikke slettes",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Placeringen kunne ikke slettes, da du ikke har tilladelse til at gøre det.",
+      "CONFLICT_DETECTED": "Planlægningskonflikt: Denne nye begivenhed overlapper en eksisterende begivenhed. Ændre sted, datoer eller tider.",
+      "CONFLICT_BULK_DETECTED": "Planlægningskonflikt: Ændring af begivenhederne resulterer i konflikter. Ændr placering, datoer eller tider.",
+      "CONFLICT_ALREADY_ENDED": "Planlægningsfejl: Begivenheden er allerede afsluttet.",
+      "CONFLICT_END_BEFORE_START": "Planlægningsfejl: Sluttidspunkt skal ligge efter starttidspunkt.",
+      "CONFLICT_IN_THE_PAST": "Tidsplan kunne ikke opdateres: Begivenheder kan ikke planlægges i fortiden.",
+      "INVALID_ACL_RULES": "Regler skal indeholde en gyldig rolle og læse eller/og skrive rettighed(-er).",
+      "MISSING_ACL_RULES": "Mindst én rolle med Læse- og skriverettighed kræves!",
+      "SAVED_ACL_RULES": "Adgangsreglerne er blevet gemt.",
+      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "De eksisterende begivenheder i denne serie skal genbehandles",
+      "SERIES_ACL_LOCKED": "Redigering af Adgangspolitikker er ikke tilladt, når operationer afvikles for en begivenhed, der er en del af serien",
+      "SERIES_ACL_MISSING_READWRITE_ROLE": "Adgangspolitikken kræver mindst én rolle med Læse- og skriverettigheder.",
+      "EVENT_ACL_MISSING_READWRITE_ROLE": "Adgangspolitikken kræver mindst én rolle med Læse- og skriverettigheder.",
+      "THEME_NAME_ALREADY_TAKEN": "Dette navn benyttes allerede",
+      "THEME_NAME_EMPTY": "Navn er obligatorisk",
+      "BUMPER_UPLOAD_ERROR": "Fejl under upload af medie",
+      "BUMPER_REQUIRED": "Du skal uploade en bumper",
+      "TRAILER_UPLOAD_ERROR": "Fejl under upload af medie",
+      "TITLE_UPLOAD_ERROR": "Fejl under upload af medie",
+      "LICENSE_UPLOAD_ERROR": "Fejl under upload af medie",
+      "WATERMARK_UPLOAD_ERROR": "Fejl under upload af medie",
+      "WATERMARK_REQUIRED": "Du skal uploade et vandmærke",
+      "THEME_UPLOAD_STARTED": "Mediet uploades…",
+      "THEME_CREATED": "Mediet er blevet oprettet",
+      "THEME_NOT_CREATED": "Temaet kunne ikke oprettes",
+      "THEME_DELETED": "Temaet er blevet oprettet",
+      "THEME_NOT_DELETED": "Temaet kunne ikke slettes",
+      "TASK_CREATED": "Opgaven er blevet oprettet",
+      "TASK_NOT_CREATED": "Opgaven kunne ikke oprettes",
+      "VIDEO_CUT_NOT_SAVED": "The changes could not be saved",
+      "VIDEO_CUT_SAVED": "The changes have been saved",
+      "VIDEO_CUT_PROCESSING": "Videoen bearbejdes…",
+      "THUMBNAIL_CHANGE_FAILED": "Mislykkedes at skifte miniaturebillede.",
+      "VIDEO_SOURCE_TRACKS_INVALID": "Du har ikke valgt nogen videospor at behandle",
+      "VIDEO_TOO_MANY_AUDIOS": "Du kan ikke have flere end én lyd-stream på en enkelt video-stream",
+      "SERVER_UNRESPONSIVE": "Ups! Serveren lader ikke til at svare. Forsøg igen senere.",
+      "SERVICE_UNAVAILABLE": "Ups! Serveren lader ikke til at svare. Forsøg igen senere.",
+      "ACTIVE_TRANSACTION": "Begivenheden kan ikke redigeres under en aktiv arbejdsgang eller overførsel.",
+      "BULK_METADATA_UPDATE": {
+         "UNEXPECTED_ERROR": "An unexpected error occured while updating. Some events might have been updated.",
+         "ALL_EVENTS_UPDATED": "All events were successfully updated.",
+         "NO_EVENTS_UPDATED": "All updates failed.",
+         "SOME_EVENTS_NOT_UPDATED": "Some events could not be updated."
+      },
+      "ADOPTER_PROFILE_UPDATED": "Profile information successfully updated.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Oops! Couldn't update profile information. Please try again!",
+      "ADOPTER_PROFILE_DELETED": "Profile information successfully deleted.",
+      "ADOPTER_PROFILE_NOT_DELETED": "Oops! Couldn't delete profile information. Please try again!"
+   },
+   "BULK_ACTIONS": {
+      "CAPTION": "Handlinger",
+      "DELETE": {
+         "SERIES": {
+            "CAPTION": "Slet",
+            "BUTTON": "Slet",
+            "CANNOT_DELETE": "De markerede serier kan ikke slettes, da de stadig indeholder begivenheder."
+         },
+         "EVENTS": {
+            "CAPTION": "Slet",
+            "DELETE_EVENTS": "Slet begivenheder",
+            "UNAUTHORIZED": "Du har ikke tilladelse til at slette de markerede begivenheder. Afmarkér dem for at fortsætte."
+         }
+      },
+      "DELETE_EVENTS_WARNING_LINE1": "Efter sletning, slettes samtlige begivenhedsmetadata, lyd- og videofiler uigenkaldeligt.",
+      "DELETE_EVENTS_WARNING_LINE2": "",
+      "DELETE_SERIES_WARNING_LINE1": "Efter sletning, kan ingen seriemetadata genoprettes. Begivenheder i serien slettes ikke.",
+      "DELETE_SERIES_WARNING_LINE2": "",
+      "SCHEDULE_TASK": {
+         "CAPTION": "Start opgave",
+         "GENERAL": {
+            "CAPTION": "Generelt",
+            "SUMMARY": "({{ count }} begivenheder valgt)",
+            "CANNOTSTART": "Fremhævede begivenhed(-er) kan pt. ikke behandles. Fravælg den/dem eller forsøg igen senere."
+         },
+         "TASKS": {
+            "CAPTION": "Opgaver",
+            "SELECT": "Vælg opgave"
+         },
+         "SUMMARY": {
+            "CAPTION": "Oversigt",
+            "EVENTS": "Begivenheder",
+            "EVENTS_SUMMARY": "Du har valgt {{numberOfEvents}} begivenheder",
+            "CONFIGURATION": "Opsætning",
+            "WORKFLOW": "Opgave"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Redogér planlagte begivenheder",
+         "CONFLICT_CHECK_RUNNING": "Konflikttjek kører…",
+         "GENERAL": {
+            "CAPTION": "Generelt",
+            "CANNOTSTART": "Markerede begivenheder kan ikke behandles, kun planlagte begivenheder understøttes.",
+            "NOCHANGES": "Ingen ændringer i begivenhederne registreret!",
+            "CONFLICT_FIRST_EVENT": "Ændret begivenhed",
+            "CONFLICT_SECOND_EVENT": "Begivenhed i konflikt",
+            "CANNOTEDITSCHEDULE": "For de markerede begivenheder har du ikke tilladelse til at redigere planlægningsoplysninger. Du kan fortsætte, men du vil ikke kunne redigere planlægningsoplysninger for nogle begivenheder overhovedet."
+         },
+         "METADATA": {
+            "EDIT": "Redigér metadata"
+         },
+         "SUMMARY": {
+            "CAPTION": "Oversigt",
+            "SINGLE_EVENT_CAPTION": "Begivenhed “{{ title }}”",
+            "TYPE": "Type",
+            "PREVIOUS": "Gammel værdi",
+            "NEXT": "Ny værdi"
+         },
+         "EDIT": {
+            "CAPTION": "Redigér",
+            "EVENT": "begivenhed",
+            "EVENTS": "begivenheder",
+            "HEADER": "Denne side muliggør redigering af planlagte begivenheder grupperet efter ugedage. Indtastningsfelterne er forudfyldte, hvis alle planlagte begivenheder har samme værdi i et bestemt felt - ellers er felterne tomme. Efterlades inputfelter tomme, betyder det, at de respektive værdier ikke skal ændres.",
+            "METADATA": "Metadata",
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
+         }
+      },
+      "EDIT_EVENTS_METADATA": {
+         "CAPTION": "Edit the metadata of multiple events",
+         "FATAL_ERROR": "A fatal error occured: {{ fatalError }}",
+         "REQUEST_ERRORS": {
+            "CANNOT_EDIT_SOME": "Highlighted events cannot be edited.",
+            "NOTHING_TO_EDIT": "The events cannot be edited.",
+            "NOT_FOUND": "Not found",
+            "RUNNING_WORKFLOW": "Running workflow",
+            "TABLE": {
+               "CAPTION": "Selected events",
+               "ERRORS": "Errors"
+            }
+         },
+         "EDIT": {
+            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "TABLE": {
+               "CAPTION": "Metadata of selected events",
+               "FIELDS": "Metadata",
+               "VALUES": "Values"
+            }
+         },
+         "UPDATE_FAILURES": {
+            "TABLE": {
+               "CAPTION": "Update Failures"
+            },
+            "UPDATE_FAILED": "Update failed",
+            "NO_EVENTS_UPDATED": "All updates failed.",
+            "SOME_EVENTS_NOT_UPDATED": "Highlighted events could not be updated."
+         }
+      }
+   },
+   "DATES": {
+      "TODAY": "I dag",
+      "TOMORROW": "I morgen",
+      "YESTERDAY": "I går",
+      "THIS_WEEK": "Denne uge",
+      "THIS_MONTH": "Denne måned",
+      "THIS_YEAR": "Dette år"
+   },
+   "DATETIMES": {
+      "TODAY": "I dag {{ time }}",
+      "TOMORROW": "I morgen {{ time }}",
+      "YESTERDAY": "I går {{ time }}"
+   },
+   "WIZARD": {
+      "NEXT_STEP": "Næste",
+      "BACK": "Foregående",
+      "CREATE": "Oprettelse",
+      "DELETE": "Slet",
+      "UPDATE": "Opdatering",
+      "DURATION": {
+         "HOURS": "Timer",
+         "MINUTES": "Minutter"
+      }
+   },
+   "CAPTURE_AGENT": {
+      "DEVICE": {
+         "MICROPHONE": "Mikrofon",
+         "CAMERA": "Kamera",
+         "PRESENTATION": "Præsentation"
+      }
+   },
+   "NAV": {
+      "DASHBOARD": {
+         "TITLE": "Betjeningspanel"
+      },
+      "EVENTS": {
+         "TITLE": "Optagelser"
+      },
+      "SYSTEMS": {
+         "TITLE": "Systemer"
+      },
+      "CAPTUREAGENTS": {
+         "TITLE": "Optage"
+      },
+      "USERS": {
+         "TITLE": "Organisation"
+      },
+      "INTEGRATIONS": {
+         "TITLE": "Integrationer"
+      },
+      "CONFIGURATION": {
+         "TITLE": "Opsætning"
+      },
+      "STATISTICS": {
+         "TITLE": "Statistics"
+      }
+   },
+   "ADOPTER_REGISTRATION": {
+      "MODAL": {
+         "CAPTION": "Registration",
+         "SKIP": "Not now",
+         "CONTINUE": "Continue",
+         "BACK": "Back",
+         "LEGAL_INFO_STATE": {
+            "HEADER": "Terms of Service and Privacy Policy"
+         },
+         "INFORMATION_STATE": {
+            "HEADER": "Thank you for using Opencast!",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, as even some of the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding and attract more companies to provide services around Opencast."
+         },
+         "FORM_STATE": {
+            "ORGANISATION": "Organisation",
+            "DEPARTMENT": "Department",
+            "COUNTRY": "Country",
+            "POSTAL_CODE": "Postal code",
+            "CITY": "City",
+            "CONTACT_INFO": "Contact information",
+            "GENDER": "Gender",
+            "GENDER_MALE": "male",
+            "GENDER_FEMALE": "female",
+            "FIRST_NAME": "First name",
+            "LAST_NAME": "Last name",
+            "STREET": "Street",
+            "NUMBER": "Number",
+            "ADDITIONAL_ADRESS_INFO": "Add. adress information",
+            "MAIL": "Email",
+            "CONTACT_ME": "Contact me for updates and secruity issues",
+            "WHICH_DATA_TO_SHARE": "Which data do you want to share?",
+            "POLICY_HEADLINE": "Privacy policy and terms of use",
+            "USAGE_STATISTICS": "Usage statistcs",
+            "ERROR_REPORTS": "Error reports",
+            "READ_TERMS_OF_USE_BEFORE": "I have read and agree to the",
+            "READ_TERMS_OF_USE_LINK": "privacy policy and terms of use",
+            "READ_TERMS_OF_USE_AFTER": ""
+         },
+         "SKIP_STATE": {
+            "HEADER": "Maybe next time!",
+            "TEXT": "If you want to register later on, you can do that by pressing the help button in the top right corner."
+         },
+         "THANK_YOU_STATE": {
+            "HEADER": "Thank you for your registration!",
+            "TEXT_LEADING_TO_PATH": "You can change your data at ",
+            "TEXT_LEADING_AFTER_PATH": "at any time."
+         },
+         "ERROR": {
+            "HEADER": "Error",
+            "TEXT": "An error occurred while processing your request."
+         },
+         "DELETE_SUBMIT_STATE": {
+            "TEXT": "Are you sure you want to delete your registration data?"
+         }
+      }
+   },
+   "EVENTS": {
+      "LICENSE": {
+         "ALLRIGHTS": "Alle rettigheder forbeholdt",
+         "CCBY": "CC BY",
+         "CCBYSA": "CC BY-SA",
+         "CCBYND": "CC BY-ND",
+         "CCBYNC": "CC BY-NC",
+         "CCBYNCSA": "CC BY-NC-SA",
+         "CCBYNCND": "CC BY-NC-ND",
+         "CC0": "CC0",
+         "BSD": "BSD",
+         "CCND": "CCND",
+         "GPL": "GPL"
+      },
+      "EVENTS": {
+         "NEW": {
+            "CAPTION": "Opret begivenhed",
+            "METADATA": {
+               "CAPTION": "Metadata"
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "Udvidet metadata",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Udvidet metadata"
+               }
+            },
+            "SOURCE": {
+               "CAPTION": "Kilde",
+               "SELECT_SOURCE": "Vælg kilde",
+               "PLACEHOLDER": {
+                  "LOCATION": "Placering",
+                  "INPUTS": "Input",
+                  "HOUR": "Time",
+                  "MINUTE": "Minut",
+                  "REPEATS": "Gentagelser",
+                  "START_DATE": "åååå-mm-dd",
+                  "START_DATE_FORMAT": "åååå-mm-dd",
+                  "END_DATE": "åååå-mm-dd",
+                  "END_DATE_FORMAT": "åååå-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "Upload",
+                  "RECORDING_ELEMENTS": "Optagelseselementer",
+                  "RECORDING_METADATA": "Optagelsesmetadata",
+                  "SEGMENTABLE": {
+                     "SHORT": "Diaser",
+                     "DETAIL": "Filen indeholder en diaspræsentationsoptagelse (hovedindlæg, Powerpoint, mv.)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Oplægsholder",
+                     "DETAIL": "Filen indeholder en optagelse af en person, der taler til et publikum."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Kun lyd",
+                     "DETAIL": "Filen indeholder kun lyd."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "Flere dele",
+                     "DETAIL": "Et sæt af filer indeholdende forskellige dele af begivenheden."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Planlæg",
+                  "START_DATE": "Startdato",
+                  "START_TIME": "Starttidspunkt",
+                  "TIMEZONE": "Tidszone",
+                  "END_DATE": "Slutdato",
+                  "END_TIME": "Sluttidspunkt",
+                  "DURATION": "Varighed"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Planlæg enkelt begivenhed"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Planlæg flere begivenheder",
+                  "REPEATS": "Gentag",
+                  "REPEAT_ON": "Gentag på",
+                  "WEEKDAYS": "Ugedage",
+                  "WEEKDAY": "Ugedag"
+               },
+               "NO_SOURCE_AVAILABLE": "Ingen optageagent tilgængelig for planlægning"
+            },
+            "PROCESSING": {
+               "CAPTION": "Behandling",
+               "SELECT_WORKFLOW": "Vælg arbejdsgang",
+               "SELECT_WORKFLOW_EMPTY": "Ingen arbejdsgang fundet",
+               "WORKFLOW": "Arbejdsgang"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "Aktiv-upload",
+               "SELECT_TYPE": "Vælg aktivtype",
+               "ADD": "Tilføj aktiv",
+               "NO_OPTIONS": "En liste over indstillinger for aktivet blev ikke leveret til denne del af websiden!",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "Klasse uddelingsnotater",
+                  "CAPTIONS_DFXP": "Undertekster DFXP",
+                  "CAPTIONS_WEBVTT": "Undertekster WebVTT",
+                  "PREVIEW_IMAGE": "Billedeksempel",
+                  "SMIL": "SMIL-katalog",
+                  "TRACK_PARTS": "Spordele"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Adgangspolitik",
+               "POLICY": "Adgangspolitik",
+               "ACL": "Adgangspolitik"
+            },
+            "SUMMARY": {
+               "CAPTION": "Oversigt",
+               "SOURCE": {
+                  "INPUT": "Input"
+               }
+            },
+            "WEEKDAYS": {
+               "MO": "Ma",
+               "TU": "Ti",
+               "WE": "On",
+               "TH": "To",
+               "FR": "Fr",
+               "SA": "Lø",
+               "SU": "Sø"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Mandag",
+               "TU": "Tirsdag",
+               "WE": "Onsdag",
+               "TH": "Torsdag",
+               "FR": "Fredag",
+               "SA": "Lørdag",
+               "SU": "Søndag"
+            }
+         },
+         "NAVIGATION": {
+            "EVENTS": "Begivenheder",
+            "SERIES": "Serier",
+            "OVERVIEW": "Oversigt"
+         },
+         "UPLOAD": "Upload",
+         "ADD_SERIES": "Tilføj serier",
+         "ADD_EVENT": "Tilføj begivenhed",
+         "TABLE": {
+            "CAPTION": "Begivenheder",
+            "TITLE": "Titel",
+            "PRESENTERS": "Oplægsholder(-e)",
+            "SERIES": "Serier",
+            "DATE": "Dato",
+            "START": "Start",
+            "END": "Slut",
+            "STOP": "Stop",
+            "STATUS": "Status",
+            "LOCATION": "Placering",
+            "ACTION": "Handlinger",
+            "FIRST": "Første",
+            "LAST": "Sidst",
+            "NEXT": "Næste",
+            "MANAGED_ACL": "Adgangspolitik",
+            "WORKFLOW_STATE": "Fremskridt",
+            "PREVIOUS": "Foregående",
+            "NOCONTENT": "Ingen tilgængelige data",
+            "PUBLISHED": "Offentliggjort",
+            "WEEKDAY": "Ugedag",
+            "TOOLTIP": {
+               "ASSETS": "Open asset details",
+               "START": "Filtrer til denne startdato",
+               "SERIES": "Filter til denne serie",
+               "STATUS": "Filter til denne status",
+               "LOCATION": "Filter til denne placering",
+               "DETAILS": "Åbn begivenhedsoplysninger",
+               "DELETE": "Slet begivenhed",
+               "EMBEDDING_CODE": "Embedding code",
+               "EDITOR": "Åbn videoredigeringsværktøj",
+               "EDITOR_NEEDS_CUTTING": "Åbn videoredigeringsværktøjet (en kommentar indikerer, at der er blevet anmodet om videobeskæring)",
+               "COMMENTS": "Vis kommentarer",
+               "PAUSED_WORKFLOW": "Vis arbejdsgange på pause",
+               "PRESENTER": "Filtrér til denne vært"
+            }
+         },
+         "STATUS": {
+            "SCHEDULED": "Planlagt",
+            "RECORDING": "Optager",
+            "UPLOADING": "Uploader",
+            "INGESTING": "Indtager",
+            "PENDING": "Afventende",
+            "PROCESSING": "I gang",
+            "PAUSED": "På pause",
+            "PROCESSED": "Afsluttet",
+            "RECORDING_FAILURE": "Optagefejl",
+            "PROCESSING_FAILURE": "Behandlingsfejl",
+            "PROCESSING_CANCELED": "Behandling annulleret"
+         },
+         "STATE_MAPPING": {
+            "RETRACTING": "Retracting",
+            "DELETING": "Deleting",
+            "DUPLICATING": "Duplicating",
+            "PUBLISHING": "Publishing",
+            "IMPORTING": "Importing",
+            "REPUBLISHING_METADATA": "Republishing metadata",
+            "UPDATING_PREVIEWS": "Updating previews"
+         },
+         "DETAILS": {
+            "HEADER": "Begivenhedsoplydninger - {{resourceId}}",
+            "TABS": {
+               "METADATA": "Metadata",
+               "EXTENDED-METADATA": "Metadata II",
+               "ASSETS": "Aktiver",
+               "PUBLICATIONS": "Udgivelser",
+               "SCHEDULING": "Planlægning",
+               "WORKFLOWS": "Arbejdsgange",
+               "ACCESS": "Adgangspolitik",
+               "COMMENTS": "Kommentarer",
+               "STATISTICS": "Statistics"
+            },
+            "PUBLICATIONS": {
+               "CAPTION": "Udgivelser",
+               "NO_PUBLICATIONS_AVAILABLE": "Denne begivenhed er ikke blevet udgivet",
+               "PUBLICATION_DESCRIPTION": "Denne begivenhed er blevet udgivet via følgende publikationskanaler:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "Denne begivenhed er pt. ikke i gang",
+               "CUSTOM": "Tilpasset",
+               "ENGAGE": "Engage",
+               "ENGAGE_LIVE": "Engage Live",
+               "EXTERNAL_API": "Ekstern API-udgivelse",
+               "YOUTUBE": "YouTube",
+               "OAIPMH": "OAI-PMH",
+               "SELECT_WORKFLOW": "Vælg arbejdsgang",
+               "SELECT_WORKFLOW_EMPTY": "Ingen tilgængelige arbejdsgange"
+            },
+            "MEDIA": {
+               "TRIM_MEDIA": "Beskær medier",
+               "MEDIA": "Medier",
+               "ID": "ID",
+               "TYPE": "Type",
+               "MIMETYPE": "Mime-type",
+               "URL": "URL",
+               "DETAILS": "Oplysninger"
+            },
+            "ATTACHMENTS": {
+               "CAPTION": "Vedhæftninger",
+               "ID": "ID",
+               "TYPE": "Type",
+               "MIMETYPE": "Mime-type",
+               "TAGS": "Tags",
+               "LINK": "Link"
+            },
+            "SOURCE": {
+               "CAPTION": "Kilde",
+               "SELECT_SOURCE": "Vælg kilde",
+               "PLACEHOLDER": {
+                  "LOCATION": "Placering",
+                  "INPUTS": "Input",
+                  "HOUR": "Time",
+                  "MINUTE": "Minut",
+                  "REPEATS": "Gentagelser",
+                  "START_DATE": "åååå-mm-dd",
+                  "END_DATE": "åååå-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "Upload",
+                  "RECORDING_ELEMENTS": "Optagelseselementer",
+                  "SEGMENTABLE": {
+                     "SHORT": "Diaser",
+                     "DETAIL": "Filen indeholder en diaspræsentationsoptagelse (hovedindlæg, Powerpoint, mv.)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Oplægsholder",
+                     "DETAIL": "Filen indeholder en optagelse af en person, der taler til et publikum."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Kun lyd",
+                     "DETAIL": "Filen indeholder kun lyd."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Planlæg",
+                  "START_DATE": "Startdato",
+                  "START_TIME": "Starttidspunkt",
+                  "TIMEZONE": "Tidszone",
+                  "END_DATE": "Slutdato",
+                  "END_TIME": "Sluttidspunkt",
+                  "DURATION": "Varighed"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Planlæg enkelt begivenhed"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Planlæg flere begivenheder",
+                  "REPEATS": "Gentagelser",
+                  "REPEAT_ON": "Gentag",
+                  "WEEKDAYS": "Ugedage"
+               }
+            },
+            "ASSETS": {
+               "CAPTION": "Aktiver",
+               "TYPE": "Type",
+               "SIZE": "Størrelse",
+               "DETAILS": "Oplysninger",
+               "STREAMS": "Streams",
+               "PREVIEW": "Eksempelvisning",
+               "ATTACHMENTS": {
+                  "TITLE": "Vedhæftninger",
+                  "CAPTION": "Vedhæftninger",
+                  "ID": "ID",
+                  "TYPE": "Type",
+                  "MIMETYPE": "Mime-type",
+                  "TAGS": "Tags",
+                  "LINK": "Link",
+                  "DETAILS": {
+                     "TITLE": "Vedhæftningsoplysninger",
+                     "CAPTION": "Vedhæftningsoplysninger",
+                     "ID": "ID",
+                     "TYPE": "Type",
+                     "MIMETYPE": "Mime-type",
+                     "TAGS": "Tags",
+                     "URL": "URL",
+                     "SIZE": "Størrelse",
+                     "CHECKSUM": "Kontrolsum",
+                     "REFERENCE": "Reference"
+                  }
+               },
+               "CATALOGS": {
+                  "TITLE": "Kataloger",
+                  "CAPTION": "Kataloger",
+                  "ID": "ID",
+                  "TYPE": "Type",
+                  "MIMETYPE": "Mime-type",
+                  "TAGS": "Tags",
+                  "LINK": "Link",
+                  "DETAILS": {
+                     "TITLE": "Katalogoplysninger",
+                     "CAPTION": "Katalogoplysninger",
+                     "ID": "ID",
+                     "TYPE": "Type",
+                     "MIMETYPE": "Mime-type",
+                     "TAGS": "Tags",
+                     "URL": "URL",
+                     "SIZE": "Størrelse",
+                     "CHECKSUM": "Kontrolsum",
+                     "REFERENCE": "Reference"
+                  }
+               },
+               "MEDIA": {
+                  "TITLE": "Medier",
+                  "CAPTION": "Medier",
+                  "ID": "ID",
+                  "TYPE": "Type",
+                  "MIMETYPE": "Mime-type",
+                  "TAGS": "Tags",
+                  "LINK": "Link",
+                  "DETAILS": {
+                     "TITLE": "Mediedetaljer",
+                     "ID": "ID",
+                     "TYPE": "Type",
+                     "MIMETYPE": "Mime-type",
+                     "URL": "URL",
+                     "RECORDING_DATE": "Optagelsesdato",
+                     "FLAVOR": "Smag",
+                     "TAGS": "Tags",
+                     "DURATION": "Varighed",
+                     "STREAM_AUDIO": "Lyd-streams",
+                     "STREAM_VIDEO": "Video-streams",
+                     "CHANNELS": "Kanaler",
+                     "BITRATE": "Bithastighed",
+                     "BITDEPTH": "Bitdybde",
+                     "SAMPLINGRATE": "Samplingsfrekvens",
+                     "FRAMECOUNT": "Billedantal",
+                     "PEAKLEVELDB": "Peak-niveau (dB)",
+                     "RMSLEVELDB": "RMS-niveau (dB)",
+                     "RMSPEAKDB": "RMS-peak (dB)",
+                     "FRAMERATE": "Billedfrekvens",
+                     "RESOLUTION": "Opløsning",
+                     "SIZE": "Størrelse",
+                     "SCANTYPE": "Skanningstype",
+                     "SCANORDER": "Skanningsrækkefølge"
+                  }
+               },
+               "PUBLICATIONS": {
+                  "TITLE": "Udgivelser",
+                  "CAPTION": "Udgivelser",
+                  "CHANNEL": "Kanal",
+                  "ID": "ID",
+                  "TYPE": "Type",
+                  "MIMETYPE": "Mime-type",
+                  "TAGS": "Tags",
+                  "LINK": "Link",
+                  "DETAILS": {
+                     "TITLE": "Udgivelsesoplysninger",
+                     "CAPTION": "Udgivelsesoplysninger",
+                     "ID": "ID",
+                     "TYPE": "Type",
+                     "MIMETYPE": "Mime-type",
+                     "TAGS": "Tags",
+                     "URL": "URL",
+                     "SIZE": "Størrelse",
+                     "CHANNEL": "Kanal",
+                     "REFERENCE": "Reference"
+                  }
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Adgangspolitik",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Skabeloner"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Adgangspolitik",
+                  "DESCRIPTION": "",
+                  "LABEL": "Vælg en skabelon",
+                  "EMPTY": "Ingen skabelon fundet",
+                  "ROLE": "Rolle",
+                  "WRITE": "Skrive",
+                  "READ": "Læse",
+                  "ADDITIONAL_ACTIONS": "Yderligere handlinger",
+                  "ACTION": "Handlinger",
+                  "NEW": "Nye politik",
+                  "DETAILS": "Oplysninger"
+               },
+               "ROLES": {
+                  "LABEL": "Vælg en rolle",
+                  "EMPTY": "Ingen rolle fundet"
+               }
+            },
+            "COMMENTS": {
+               "CAPTION": "Kommentarer",
+               "PLACEHOLDER": "Kommenterer…",
+               "SELECTPLACEHOLDER": "Vælg årsager",
+               "RESOLVED": "Løst",
+               "REPLY": "Besvar",
+               "REPLY_TO": "Besvar til",
+               "CANCEL_REPLY": "Annullér",
+               "DELETE": "Slet",
+               "REASON": "Årsag",
+               "REASONS": {
+                  "CUTTING": "Beskæring krævet",
+                  "REVIEW": "Gennemsyn krævet",
+                  "ASYNC": "Asynkrone A/V-spor",
+                  "AUDIO_ISSUE": "Manglende eller ødelagt lydspor",
+                  "CANCELED": "Annulleret begivenhed",
+                  "CONFLICTING_METADATA": "Modstridende metadata",
+                  "IMPROPER_POINT": "Forkert indgangs- eller udgangspunkt",
+                  "MISSING_AGREEMENT": "Manglende aftale",
+                  "OTHER": "Øvrigt",
+                  "PRIVACY": "Fortrolighedsproblemer",
+                  "SEGMENTATION": "Unøjagtig segmentering",
+                  "UNKNOWN_CREATOR": "Kreatør ukendt",
+                  "VIDEO_ISSUE": "Video forvrænget eller beskåret",
+                  "WRONG_INPUT_FORMAT": "Input-filformat uunderstøttet",
+                  "WRONG_METADATA": "Metadata skal rettes",
+                  "WRONG_SERIES_PUBLICATION": "Forkert serie- eller offentliggørelseskanal",
+                  "WRONG_WORKFLOW": "Forkert arbejdsgang",
+                  "PROCESSING_FAILURE": "Behandlingsfejl"
+               }
+            },
+            "STATISTICS": {
+               "CAPTION": "Statistics"
+            },
+            "METADATA": {
+               "CAPTION": "Begivenhedsoplysninger",
+               "TITLE": "Titel",
+               "ID": "UID",
+               "SERIES": "Serier",
+               "RECORDING_DATE": "Optagelsesdato",
+               "SUBJECT": "Emne",
+               "DESCRIPTION": "Beskriveslse",
+               "START_DATE": "Startdato",
+               "START_TIME": "Starttidspunkt",
+               "DURATION": "Varighed",
+               "LOCATION": "Placering",
+               "SOURCE": "Kilde",
+               "CREATED": "Oprettet",
+               "CREATED_BY": "Oprettet af",
+               "PUBLISHER": "Udgiver",
+               "LICENSE": "Licens",
+               "CONTRIBUTORS": "Bidragyder(-e)",
+               "RIGHTS": "Rettigheder",
+               "PRESENTERS": "Oplægsholder(-e)",
+               "LANGUAGE": "Sprog",
+               "COPYRIGHT": "Ophavsrettighed",
+               "VISIBILITY": "Synlighed",
+               "PUBLIC": "Offentligt mål",
+               "OS": "Behandler operativsystem",
+               "LOCKED": {
+                  "RUNNING": "Redigering af metadata er ikke tilladt under effektuering af handlinger på en begivenhed"
+               }
+            },
+            "SCHEDULING": {
+               "CAPTION": "Planlægningsopsætning",
+               "PLACEHOLDER": {
+                  "PRESENTERS": "Oplægsholder(-e)"
+               }
+            },
+            "WORKFLOWS": {
+               "ACTIONS": "Handlinger",
+               "DETAILS": "Oplysninger",
+               "DESCRIPTION": "Beskriveslse",
+               "MORE_INFO": "Mere information",
+               "ID": "ID",
+               "TYPE": "Type",
+               "TITLE": "Titel",
+               "STATUS": "Status",
+               "STARTED": "Startet",
+               "SERIES": "Serier",
+               "SUBMITTED": "Indsendt",
+               "SUBMITTER": "Indsender",
+               "EXECUTION_TIME": "Eksekveringstid",
+               "WDID": "Arbejdsgngsdefinition",
+               "MIMETYPE": "Mime-type",
+               "URL": "URL",
+               "CONFIGURATION": "Opsætning",
+               "NO_CONFIGURATION": "Ingen eksisterende opsætningsparametre til den valgte arbejdsgangsdefinition.",
+               "WORKFLOW": "Arbejdsgang",
+               "TOOLTIP": {
+                  "STOP": "Stop arbejdsgang",
+                  "ABORT": "Afbryd eksekvering af arbejdsgang (forsøg ikke fejlede operationer igen)",
+                  "RETRY": "Førsøg eksekvering af arbejdsgang igen",
+                  "DELETE": "Slet arbejdsgang",
+                  "DETAILS": "Åbn arbejdsgangsdetaljer"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Forberedes",
+                  "RUNNING": "I gang",
+                  "PAUSED": "På pause",
+                  "SUCCEEDED": "Gennemført",
+                  "FAILED": "Mislykkedes",
+                  "FAILING": "Mislykkede",
+                  "SKIPPED": "Oversprunget",
+                  "STOPPED": "Standsede",
+                  "RETRY": "Prøv igen"
+               }
+            },
+            "WORKFLOW_INSTANCES": {
+               "TITLE": "Arbejdsgange"
+            },
+            "WORKFLOW_DETAILS": {
+               "TITLE": "Arbejdsgangsoplysninger",
+               "CONFIGURATION": "Arbejdsgangsopsætning"
+            },
+            "WORKFLOW_OPERATIONS": {
+               "TITLE": "Arbejdsgangshandlinger",
+               "DETAILS_LINK": "Handlinger",
+               "TABLE_HEADERS": {
+                  "TITLE": "Titel",
+                  "STATUS": "Status",
+                  "DESCRIPTION": "Beskriveslse"
+               }
+            },
+            "OPERATION_DETAILS": {
+               "TITLE": "Handlingsoplysninger",
+               "TABLE_HEADERS": {
+                  "TITLE": "Titel",
+                  "STATE": "Tilstand",
+                  "DESCRIPTION": "Beskriveslse",
+                  "EXECUTION_HOST": "Eksekveringsvært",
+                  "JOB": "Job",
+                  "TIME_IN_QUEUE": "Tid i kø",
+                  "STARTED": "Startet",
+                  "FINISHED": "Afsluttet",
+                  "RETRY_STRATEGY": "Forsøg igen-strategi",
+                  "FAILED_ATTEMPTS": "Mislykkede forsøg",
+                  "MAX_ATTEMPTS": "Maks.",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Arbejdsproces for undtagelseshåndtering",
+                  "FAIL_ON_ERROR": "Svigt ved fejl"
+               }
+            },
+            "QUICKACTION_WORKFLOW_DETAILS": {
+               "TITLE": "Arbejdsgangsoplysninger"
+            },
+            "MEDIA_DETAILS": {
+               "TITLE": "Medieoplysninger",
+               "ID": "ID",
+               "TYPE": "Type",
+               "MIMETYPE": "Mime-type",
+               "URL": "URL",
+               "RECORDING_DATE": "Optagelsesdato",
+               "TAGS": "Tags",
+               "DURATION": "Varighed",
+               "STREAM_AUDIO": "Lyd-streams",
+               "STREAM_VIDEO": "Video-streams",
+               "CHANNELS": "Kanaler",
+               "BITRATE": "Bithastighed",
+               "FRAMERATE": "Billedhastighed",
+               "RESOLUTION": "Opløsning"
+            },
+            "ERRORS_AND_WARNINGS": {
+               "HEADER": "Fejl og advarsler",
+               "TITLE": "Fejl og advarsler",
+               "DATE": "Dato",
+               "HOST": "Vært",
+               "TYPE": "Type",
+               "EMPTY": "Ingen fejl",
+               "DETAILS": {
+                  "HEADER": "Fejloplysninger",
+                  "SEVERITY": "Alvorlighed",
+                  "TITLE": "Titel",
+                  "DESCRIPTION": "Beskriveslse",
+                  "JOB_ID": "Job-ID",
+                  "DATE": "Dato",
+                  "HOST": "Behandler vært",
+                  "TYPE": "Tjenestetype",
+                  "TECHNICAL_DETAILS": "Tekniske oplysninger"
+               }
+            }
+         }
+      },
+      "SERIES": {
+         "NEW": {
+            "CAPTION": "Opret serie",
+            "METADATA": {
+               "CAPTION": "Metadata",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Metadata"
+               }
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "Udvidet metadata",
+               "METADATA": {
+                  "TITLE": "Udvidet metadata"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Adgangspolitik",
+               "TEMPLATES": {
+                  "TITLE": "Skabeloner"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Adgangspolitik",
+                  "DESCRIPTION": "Mindst én rolle med Læse- og skriverettighed kræves.",
+                  "LABEL": "Vælg en skabelon",
+                  "EMPTY": "Ingen skabelon fundet",
+                  "ROLE": "Rolle",
+                  "WRITE": "Skrive",
+                  "READ": "Læse",
+                  "ADDITIONAL_ACTIONS": "Yderligere handlinger",
+                  "ACTION": "Handlinger",
+                  "NEW": "Ny politik",
+                  "DETAILS": "Oplysninger"
+               },
+               "ROLES": {
+                  "LABEL": "Vælg en rolle",
+                  "EMPTY": "Ingen rolle fundet"
+               }
+            },
+            "THEME": {
+               "CAPTION": "Tema",
+               "DESCRIPTION": {
+                  "TEXT": "Du kan evt. benytte temaer til at brande dine videoer. Temaer kan definere bumper- og trailervideoer, vandmærker og titeldiaser herunder metadata."
+               },
+               "TITLE": "Tema",
+               "LABEL": "Vælg et tema",
+               "EMPTY": "Intet tema fundet"
+            },
+            "SUMMARY": {
+               "CAPTION": "Oversigt"
+            }
+         },
+         "TABLE": {
+            "CAPTION": "Serier",
+            "TITLE": "Serier",
+            "HAS_EVENTS": "Indeholder begivenheder",
+            "ORGANIZERS": "Organisator(-er)",
+            "CONTRIBUTORS": "Bidragyder(-e)",
+            "CREATED": "Oprettet",
+            "MANAGED_ACL": "Adgangspolitik",
+            "EVENTS": "Begivenheder",
+            "ACTION": "Handlinger",
+            "TOOLTIP": {
+               "SERIES": "Filtrér begivenheder til denne serie",
+               "DETAILS": "Åbn seriedetaljer",
+               "DELETE": "Slet serie"
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Serieoplysninger - {{resourceId}}",
+            "TABS": {
+               "METADATA": "Metadata",
+               "EXTENDED_METADATA": "Metadata II",
+               "EVENTS": "Begivenheder",
+               "PERMISSIONS": "Adgangspolitik",
+               "THEME": "Tema",
+               "STATISTICS": "Statistics"
+            },
+            "ACCESS": {
+               "CAPTION": "Adgangspolitik",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Skabeloner"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Adgangspolitik",
+                  "DESCRIPTION": "",
+                  "LABEL": "Vælg en skabelon",
+                  "EMPTY": "Ingen skabelon fundet",
+                  "ROLE": "Rolle",
+                  "WRITE": "Skrive",
+                  "READ": "Læse",
+                  "ADDITIONAL_ACTIONS": "Yderligere handlinger",
+                  "ACTION": "Handlinger",
+                  "NEW": "Ny politik",
+                  "DETAILS": "Oplysninger",
+                  "REPLACE_EVENT_ACLS": "Opdatér begivenhedsrettigheder",
+                  "REPLACE_EVENT_ACLS_HINT": "Sikrer, at alle begivenhederne i denne serie har disse aktive rettighedeer",
+                  "LOAD_MORE_LIMIT": "policies shown.",
+                  "LOAD_MORE_LINK": "Load more"
+               },
+               "ROLES": {
+                  "LABEL": "Vælg en rolle",
+                  "EMPTY": "Ingen rolle fundet"
+               }
+            },
+            "METADATA": {
+               "TITLE": "Titel",
+               "ID": "UID",
+               "SERIES": "Serier",
+               "PUBLISHERS": "Udgiver(-e)",
+               "ORGANIZERS": "Organisator(-er)",
+               "CONTRIBUTORS": "Bidragyder(-e)",
+               "RECORDING_DATE": "Optagelsesdato",
+               "CREATED_BY": "Oprettet af",
+               "RIGHTS": "Rettigheder",
+               "SUBJECT": "Emne",
+               "LANGUAGE": "Sprog",
+               "LICENSE": "Licens",
+               "DESCRIPTION": "Beskriveslse"
+            },
+            "EVENTS": {
+               "TITLE": "Titel",
+               "PRESENTER": "Oplægsholder(-e)",
+               "CREATED": "Oprettet",
+               "MODIFIED": "Ændret",
+               "STATUS": "Status",
+               "LOCATION": "Placering",
+               "LINK": "Link"
+            }
+         }
+      }
+   },
+   "RECORDINGS": {
+      "NAVIGATION": {
+         "LOCATIONS": "Placeringer"
+      },
+      "ACTIONS": {
+         "EXPORT": "Exportér",
+         "REMOVE": "Fjern"
+      },
+      "RECORDINGS": {
+         "TABLE": {
+            "CAPTION": "Placeringer",
+            "TITLE": "UID",
+            "NAME": "Navn",
+            "LOCATION": "Placering",
+            "UPDATED": "Senest opdateret",
+            "NEXT_DATE": "Næste begivenhed",
+            "NEXT_NAME": "Næste begivenhedstitel",
+            "STATUS": "Status",
+            "VERSION": "Version",
+            "ACTION": "Handlinger",
+            "TOOLTIP": {
+               "NAME": "Filtrér begivenheder for denne placering",
+               "DETAILS": "Åbn placeringsoplysninger",
+               "DELETE": "Slet placering (afregistrér optageagent)"
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Placeringsoplydninger - {{resourceId}}",
+            "TAB": {
+               "GENERAL": "Generelt",
+               "CONFIGURATION": "Opsætning",
+               "CAPABILITIES": "Kapaciteter"
+            },
+            "GENERAL": {
+               "CAPTION": "Generelt",
+               "NAME": "Navn",
+               "URL": "URL",
+               "STATUS": "Status",
+               "UPDATE": "Senest hørt fra"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "Opsætning",
+               "NO_CONFIGURATION": "Ingen opsætning til rådighed"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "Evner",
+               "NO_CAPABILITIES": "Ingen kapaciteter til rådighed"
+            }
+         }
+      }
+   },
+   "USERS": {
+      "ACTIONS": {
+         "ADD_USER": "Tilføj bruger",
+         "ADD_GROUP": "Tilføj gruppe",
+         "ADD_ACL": "Tilføj adgangspolitik"
+      },
+      "NAVIGATION": {
+         "USERS": "Brugere",
+         "GROUPS": "Grupper",
+         "PERMISSIONS": "Adgangspolitikker"
+      },
+      "USERS": {
+         "TABLE": {
+            "CAPTION": "Brugere",
+            "NAME": "Navn",
+            "USERNAME": "Brugernavn",
+            "EMAIL": "E-mail",
+            "ROLES": "Roller",
+            "TYPE": "Type",
+            "PROVIDER": "Udbyder",
+            "ACTION": "Handlinger",
+            "TOOLTIP": {
+               "DELETE": "Slet bruger",
+               "DETAILS": "Åbn brugeroplysninger"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Opret bruger",
+            "EDITCAPTION": "Brugerdetaljer - {{username}}",
+            "TABS": {
+               "USER": "Bruger",
+               "ROLES": "Roller",
+               "EXTERNALROLES": "Eksterne roller",
+               "EFFECTIVEROLES": "Effektive roller"
+            },
+            "DESCRIPTION": {
+               "ROLES": "Roller og grupper, som kan, eller allerede er, tildeles brugeren.",
+               "EXTERNALROLES": "Listen over eksterne, som roller brugeren er tildelt fra ekstern(-e) rolleudbyder(-e).",
+               "EFFECTIVEROLES": "Listen over effektive roller direkte tildelt brugeren samt de roller, som indirekte indlæses via et gruppemedlemskab."
+            },
+            "FORM": {
+               "USERNAME": "Brugernavn",
+               "NAME": "Navn",
+               "EMAIL": "E-mail",
+               "PASSWORD": "Adgangskode",
+               "REPEAT_PASSWORD": "Gentag adgangskode"
+            },
+            "ROLES": {
+               "LEFT": "Roller",
+               "RIGHT": "Valgte roller",
+               "REMOVE": "Fjern rolle",
+               "ADD": "Tilføj rolle"
+            }
+         }
+      },
+      "GROUPS": {
+         "NEW": {
+            "CAPTION": "Opret gruppe"
+         },
+         "TABLE": {
+            "CAPTION": "Grupper",
+            "NAME": "Navn",
+            "DESCRIPTION": "Beskriveslse",
+            "ROLE": "Rolle",
+            "ACTION": "Handlinger",
+            "TOOLTIP": {
+               "DETAILS": "Åbn gruppeoplysninger",
+               "DELETE": "Slet gruppe"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Opret gruppe",
+            "EDITCAPTION": "Gruppe detaljer - {{name}}",
+            "TABS": {
+               "GROUP": "Gruppe",
+               "ROLES": "Roller",
+               "METADATA": "Metadata",
+               "USERS": "Brugere",
+               "SUMMARY": "Oversigt"
+            },
+            "FORM": {
+               "NAME": "Navn",
+               "DESCRIPTION": "Beskriveslse",
+               "SUMMARY": "Oversigt",
+               "ROLES": "Roller",
+               "USERS": "Brugere"
+            },
+            "USERS": {
+               "LEFT": "Brugere",
+               "RIGHT": "Valgte brugere",
+               "REMOVE": "Fjern bruger",
+               "ADD": "Tilføj bruger"
+            },
+            "ROLES": {
+               "LEFT": "Roller",
+               "RIGHT": "Valgte roller",
+               "REMOVE": "Fjern rolle",
+               "ADD": "Tilføj rolle"
+            }
+         }
+      },
+      "ACLS": {
+         "TABLE": {
+            "CAPTION": "Adgangspolitikker",
+            "NAME": "Navn",
+            "CREATED": "Oprettet",
+            "CREATOR": "Opretter",
+            "IN_USE": "I brug",
+            "ACTION": "Handlinger",
+            "TOOLTIP": {
+               "DELETE": "Slet adgangspolitik",
+               "DETAILS": "Åbn adgangspolitikoplysninger"
+            }
+         },
+         "NEW": {
+            "CAPTION": "Ny adgangspolitik",
+            "TABS": {
+               "SUMMARY": "Oversigt",
+               "METADATA": "Metadata",
+               "ACCESS": "Adgang"
+            },
+            "METADATA": {
+               "TITLE": "Metadata",
+               "NAME": {
+                  "CAPTION": "Navn",
+                  "PLACEHOLDER": "Navn…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Adgangspolitik",
+               "TEMPLATES": {
+                  "TITLE": "Skabeloner"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Adgangspolitik",
+                  "LABEL": "Vælg en skabelon",
+                  "EMPTY": "Ingen skabelon fundet",
+                  "ROLE": "Rolle",
+                  "WRITE": "Skrive",
+                  "READ": "Læse",
+                  "ADDITIONAL_ACTIONS": "Yderligere handlinger",
+                  "ACTION": "Handlinger",
+                  "NEW": "Ny politik",
+                  "DETAILS": "Oplysninger",
+                  "DESCRIPTION": "Vælg et præopsat sæt af politikker eller tilføj tilpassede politikker nedenfor"
+               },
+               "ROLES": {
+                  "LABEL": "Vælg en rolle",
+                  "EMPTY": "Ingen rolle fundet"
+               }
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Adgangspolitikdetaljer - {{name}}",
+            "TABS": {
+               "SUMMARY": "Oversigt",
+               "METADATA": "Metadata",
+               "ACCESS": "Adgang"
+            },
+            "METADATA": {
+               "TITLE": "Metadata",
+               "NAME": {
+                  "CAPTION": "Navn",
+                  "PLACEHOLDER": "Navn…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Adgangspolitik",
+               "TEMPLATES": {
+                  "TITLE": "Skabeloner"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Adgangspolitik",
+                  "LABEL": "Vælg en skabelon",
+                  "EMPTY": "Ingen skabelon fundet",
+                  "ROLE": "Rolle",
+                  "WRITE": "Skrive",
+                  "READ": "Læse",
+                  "ADDITIONAL_ACTIONS": "Yderligere handlinger",
+                  "ACTION": "Handlinger",
+                  "NEW": "Ny politik",
+                  "DETAILS": "Oplysninger",
+                  "DESCRIPTION": "Vælg et præopsat sæt af politikker eller tilføj tilpassede politikker nedenfor"
+               },
+               "ROLES": {
+                  "LABEL": "Vælg en rolle",
+                  "EMPTY": "Ingen rolle fundet"
+               }
+            }
+         }
+      }
+   },
+   "THEMES": {
+      "THEMES": {
+         "DETAILS": {
+            "HEADER": "Temaoplydninger - {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Generelt",
+               "BUMPER": "Bumper (begynder)",
+               "TRAILER": "Bumper (slutter)",
+               "TITLE": "Titel",
+               "LICENSE": "Licens",
+               "WATERMARK": "Vandmærke",
+               "USAGE": "Tildeling"
+            },
+            "GENERAL": {
+               "CAPTION": "Generelt",
+               "NAME": "Navn",
+               "DESCRIPTION": "Beskriveslse",
+               "DEFAULT": "Standard",
+               "SET_DEFAULT_INFO": "Angiv som standardtema for alle serier og begivenheder",
+               "NAME_ERROR": "E-mail benyttes allerede",
+               "NAME_REQUIRED": "Krævet"
+            },
+            "BUMPER": {
+               "CAPTION": "Bumper (begynder)",
+               "DESCRIPTION": "Prædefineret video, der tilføjes begyndelsen af en optagelse.",
+               "ACTIVE": "Aktiv"
+            },
+            "TRAILER": {
+               "CAPTION": "Bumper (slutter)",
+               "DESCRIPTION": "Prædefineret video, der tilføjes begyndelsen af en optagelse.",
+               "ACTIVE": "Aktiv"
+            },
+            "TITLE": {
+               "CAPTION": "Titel",
+               "DESCRIPTION": "Prædefineret dias, inkl. beskrivende metadata, tilføjet begyndelsen eller slutningen af en optagelse.",
+               "ACTIVE": "Aktiv"
+            },
+            "WATERMARK": {
+               "CAPTION": "Vandmærke",
+               "DESCRIPTION": "Halvtransparent billede overlejret hvert billede af optagelsen.",
+               "ACTIVE": "Aktiv"
+            },
+            "USAGE": {
+               "CAPTION": "Brug",
+               "SERIES": "Serienavn"
+            }
+         }
+      }
+   },
+   "CONFIGURATION": {
+      "ACTIONS": {
+         "ADD_MAIL_TEMPLATE": "Tilføj skabelon",
+         "ADD_THEME": "Tilføj tema"
+      },
+      "NAVIGATION": {
+         "THEMES": "Temaer"
+      },
+      "THEMES": {
+         "TABLE": {
+            "CAPTION": "Temaer",
+            "NAME": "Navn",
+            "DESCRIPTION": "Beskriveslse",
+            "CREATOR": "Opretter",
+            "CREATED": "Oprettet",
+            "DEFAULT": "Standard",
+            "USAGE": "Brug",
+            "ACTION": "Handlinger",
+            "TOOLTIP": {
+               "DELETE": "Slet tema",
+               "DETAILS": "Åbn temaoplysninger"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Opret tema",
+            "EDITCAPTION": "Temadetaljer - {{name}}",
+            "GENERAL": {
+               "CAPTION": "Generelt",
+               "NAME": "Navn",
+               "DESCRIPTION": "Beskriveslse",
+               "DEFAULT": "Standard",
+               "SET_DEFAULT_INFO": "Angiv som standardtema for alle serier og begivenheder",
+               "NAME_REQUIRED": "Krævet"
+            },
+            "BUMPER": {
+               "CAPTION": "Bumper (begynder)",
+               "FILE_UPLOADED": "Fil uploadet: ",
+               "DESCRIPTION": "Prædefineret video, der tilføjes begyndelsen af en optagelse.",
+               "ACTIVE": "Aktiv",
+               "ENABLE": "Aktivér bumper",
+               "SELECT": "Vælg",
+               "UPLOAD_LABEL": "Uploader video",
+               "UPLOAD_BUTTON": "Upload"
+            },
+            "TRAILER": {
+               "CAPTION": "Bumper (slutter)",
+               "FILE_UPLOADED": "Fil uploadet: ",
+               "DESCRIPTION": "Prædefineret video, der tilføjes slutningen af en optagelse.",
+               "ACTIVE": "Aktiv",
+               "ENABLE": "Aktivér bumper",
+               "UPLOAD_LABEL": "Upload video",
+               "UPLOAD_BUTTON": "Upload",
+               "SELECT": "Vælg"
+            },
+            "TITLE": {
+               "CAPTION": "Titel",
+               "FILE_UPLOADED": "Fil uploadet: ",
+               "DESCRIPTION": "Prædefineret dias, inkl. beskrivende metadata, tilføjet begyndelsen eller slutningen af en optagelse.",
+               "ACTIVE": "Aktiv",
+               "ENABLE": "Aktivér titeldias",
+               "BACKGROUND": "Baggrund",
+               "EXTRACT": "Udtræk baggrund",
+               "UPLOAD": "Upload",
+               "UPLOAD_LABEL": "Upload billede",
+               "UPLOAD_BUTTON": "Upload"
+            },
+            "WATERMARK": {
+               "CAPTION": "Vandmærke",
+               "FILE_UPLOADED": "Fil uploadet: ",
+               "DESCRIPTION": "Halvtransparent billede overlejret hvert billede af optagelsen.",
+               "ACTIVE": "Aktiv",
+               "ENABLE": "Aktivér vandmærke",
+               "TOP_LEFT": "Venstre, øverst",
+               "TOP_RIGHT": "Øverst, højre",
+               "BOTTOM_LEFT": "Nederst, venstre",
+               "BOTTOM_RIGHT": "Nederst, højre",
+               "UPLOAD": "Upload",
+               "POSITION": "Vandmærkeplacering og uddrag",
+               "FILEUPLOAD_DESCRIPTION": "Filen skal have en alfakanal (gennemsigtig baggrund). Understøttet filtyper er: .PNG, .GIF, .SVG, .WEBP",
+               "UPLOAD_LABEL": "Upload billede",
+               "UPLOAD_BUTTON": "Upload"
+            },
+            "SUMMARY": {
+               "CAPTION": "Oversigt"
+            },
+            "USAGE": {
+               "CAPTION": "Brug",
+               "SERIE": "Serienavn",
+               "EMPTY": "Ingen serie fundet til aktuelle tema"
+            }
+         }
+      }
+   },
+   "SYSTEMS": {
+      "NAVIGATION": {
+         "JOBS": "Jobs",
+         "SERVERS": "Servere",
+         "SERVICES": "Tjenester"
+      },
+      "JOBS": {
+         "TABLE": {
+            "ID": "Jobidentifikatorer",
+            "CAPTION": "Jobs",
+            "CREATED": "Oprettet",
+            "CREATOR": "Opretter",
+            "HOST_NAME": "Værtsnavn",
+            "NODE_NAME": "Node name",
+            "OPERATION": "Handling",
+            "STARTED": "Startet",
+            "STATUS": "Status",
+            "SUBMITTED": "Indsendt",
+            "TYPE": "Type"
+         },
+         "STATUS": {
+            "QUEUED": "I kø",
+            "PAUSED": "På pause",
+            "RUNNING": "I gang",
+            "FINISHED": "Afsluttet",
+            "FAILED": "Mislykkedes",
+            "DELETED": "Slettet",
+            "INSTANTIATED": "Forberedt",
+            "DISPATCHING": "Afsendelse",
+            "RESTART": "Genstart",
+            "CANCELED": "Annulleret",
+            "WAITING": "Afventer"
+         }
+      },
+      "SERVERS": {
+         "TABLE": {
+            "CAPTION": "Servere",
+            "STATUS": "Status",
+            "HOST_NAME": "Værtsnavn",
+            "NODE_NAME": "Node name",
+            "CORES": "Kerner",
+            "COMPLETED": "Jobs fuldført",
+            "RUNNING": "Jobs kører",
+            "QUEUED": "Jobs i kø",
+            "MEAN_RUN_TIME": "Gennemsnitlig afviklingstid",
+            "MEAN_QUEUE_TIME": "Gennemsnitlig køtid",
+            "MAINTENANCE": "Vedligeholdelse",
+            "MAINTENANCE_OFF": "Skift til vedligeholdelsestilstand",
+            "MAINTENANCE_ON": "Forlad vedligeholdelsestilstand"
+         }
+      },
+      "SERVICES": {
+         "TABLE": {
+            "CAPTION": "Tjenester",
+            "STATUS": "Status",
+            "NAME": "Tjenestenavn",
+            "HOST_NAME": "Værtsnavn",
+            "NODE_NAME": "Node name",
+            "COMPLETED": "Jobs fuldført",
+            "RUNNING": "Jobs kører",
+            "QUEUED": "Jobs i kø",
+            "MEAN_RUN_TIME": "Gennemsnitlig afviklingstid",
+            "MEAN_QUEUE_TIME": "Gennemsnitlig køtid",
+            "SANITIZE": "Ryd fejlet tjeneste",
+            "ACTION": "Handlinger",
+            "TOOLTIP": {
+               "SANITIZE": "Rens tjeneste (sæt tjeneste tilbage til normaltilstanden)"
+            }
+         },
+         "STATUS": {
+            "NORMAL": "Normal",
+            "WARNING": "Advarsel",
+            "ERROR": "Fejl"
+         }
+      }
+   },
+   "VIDEO_TOOL": {
+      "WARNING_UNSAVED": "Advarsel: Visse af dine ændringer blev ikke gemt. Forlader du videoredigerngsværktøjet nu, vil disse ændringer gå tabt. Fortsæt alligevel?",
+      "TIMELINE": "Tidslinje",
+      "ZOOMLEVEL": "Zoomniveau",
+      "PREVIEW_MODE": "Eksempeltilstand",
+      "PREVIEW_MODE_TOOLTIP": "Afspil kun udvalgte segmenter",
+      "ZOOM": "Zoom",
+      "BUTTONS": {
+         "CLOSE": "Luk",
+         "SAVE": "Gem",
+         "PROCESS": "Gem og fortsæt",
+         "ADD_COMMENT": "Tilføj kommentar"
+      },
+      "TABS": {
+         "EDIT": "Redigering",
+         "CAPTIONS": "Undertekster",
+         "ANNOTATIONS": "Anmærkninger"
+      },
+      "AREAS": {
+         "METADATA": "Metadata",
+         "THUMBNAIL": "Eksempel",
+         "COMMENTS": "Kommentarer",
+         "SEGMENTS": "Segmenter",
+         "TRACKS": "Spor"
+      },
+      "ACTIONS": {
+         "SPLIT": "Opdel",
+         "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
+         "CUT": "Hide/Show",
+         "CUT_TOOLTIP": "Hide or show the selected part of the video.",
+         "REPLAY_SEGMENT": "Play Start of Segment",
+         "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
+         "REPLAY_END_OF_SEGMENT": "Play End of Segment",
+         "REPLAY_END_OF_SEGMENT_TOOLTIP": "Play a few seconds at the end of the current segment.",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Play Transition",
+         "REPLAY_SEGMENT_WITH_PREROLL_TOOLTIP": "Play a few seconds containing the end of the previous and the beginning of the next segment.",
+         "UNDO": "Fortryd",
+         "REDO": "Gentag",
+         "CLEAR_SEGMENTS": "Clear All Segments",
+         "CLEAR_SEGMENTS_TOOLTIP": "Clear all segments, leaving one big segment."
+      },
+      "SEGMENTS": {
+         "REMOVE_SEGMENT": "Fjern segment",
+         "SHOW_SEGMENT": "Show this Segment",
+         "HIDE_SEGMENT": "Hide this Segment",
+         "START": "Start",
+         "END": "Slut"
+      },
+      "THUMBNAIL": {
+         "DESCRIPTION": "En standardminiature, benyttet som en visuel repræsentation af begivenheden, genereres automatisk. Vil du hellere benytte en anden miniature, kan du udtrække en fra videoen på den aktuelle afspilningsposition eller uploade et billede.",
+         "ACTIONS": {
+            "EXTRACT": {
+               "FROM_VIDEO": {
+                  "LABEL": "Udtræk fra video",
+                  "TOOLTIP": "Udtræk miniature fra videoen på den aktuelle afspilningsposition"
+               },
+               "FROM_LEFT_VIDEO": {
+                  "LABEL": "Udtræk fra venstre video",
+                  "TOOLTIP": "Udtræk miniature fra den venstre video på den aktuelle afspilningsposition"
+               },
+               "FROM_RIGHT_VIDEO": {
+                  "LABEL": "Udtræk fra højre video",
+                  "TOOLTIP": "Udtræk miniature fra den højre video på den aktuelle afspilningsposition"
+               }
+            },
+            "UPLOAD": {
+               "LABEL": "Upload billede",
+               "TOOLTIP": "Uploade et miniaturebillede"
+            },
+            "USE_DEFAULT": {
+               "LABEL": "Benyt standardminiature",
+               "TOOLTIP": "Brug automatisk genereret standardminiature"
+            }
+         },
+         "PREVIEW": {
+            "NOT_AVAILABLE": "Intet eksempel tilgængeligt",
+            "OUTDATED": "Eksemplet er forældet, da segmenter er ændret. Det opdateres, så snart du gemmer dine ændringer."
+         },
+         "CURRENT": {
+            "DEFAULT": "Du benytter aktuelt standardminiaturen.",
+            "SNAPSHOT": "Den aktuelle miniature er blevet udtrukket fra videoen.",
+            "UPLOAD": "Du benytter aktuelt en uploadet miniature."
+         }
+      },
+      "TRACKS": {
+         "DESCRIPTION": "Du kan fravælge spor for at udelukke dem fra yderligere behandling. Bemærk, at du er nødt til at (gen-)udgive begivenheden for at effektuere ændringerne.",
+         "NOTIFICATION": {
+            "NO_VIDEO_TRACK_SELECTED": "Du skal aktivere minimum ét videospor",
+            "NO_AUDIO_TRACK_SELECTED": "Du skal aktivere minimum ét lydspor"
+         },
+         "TRACK": {
+            "HEADER": "Spor"
+         },
+         "VIDEO": {
+            "HEADER": "Videospor",
+            "NOT_AVAILABLE": "Intet videospor tilgængeligt",
+            "NO_PREVIEW_AVAILABLE": "Intet billedeksempel fundet",
+            "NO_TRACK_SELECTED": "Intet videospor valgt",
+            "TOOLTIPS": {
+               "HIDE": "Dette videospor er i øjeblikket aktivt. Klik for at deaktivere",
+               "UNHIDE": "Dette videospor er i øjeblikket inaktivt. Klik for at eaktivere."
+            }
+         },
+         "AUDIO": {
+            "HEADER": "Lydspor",
+            "NOT_AVAILABLE": "Ingen lydspor tilgængelig",
+            "NO_PREVIEW_AVAILABLE": "Intet billedeksempel fundet",
+            "NO_TRACK_SELECTED": "Intet lydspor valgt",
+            "TOOLTIPS": {
+               "HIDE": "Dette lydspor er i øjeblikket aktivt. Klik for at deaktivere",
+               "UNHIDE": "Dette videospor er i øjeblikket inaktivt. Klik for at aktivere"
+            }
+         }
+      },
+      "PLAYER": {
+         "PLAY": "Afspil",
+         "PAUSE": "På pause",
+         "NEXT_FRAME": "Næste billede",
+         "PREVIOUS_FRAME": "Foregående billede",
+         "NEXT_SEGMENT": "Næste segment/Hop til slutning",
+         "PREVIOUS_SEGMENT": "Foregående segment/Hop til start",
+         "MUTE": "Gør tavs",
+         "VOLUME": "Lydstyrke"
+      }
+   },
+   "LOGIN": {
+      "WELCOME": "Velkommen til Opencast",
+      "REMEMBER": "Husk mig på denne computer",
+      "USERNAME": "Brugernavn…",
+      "PASSWORD": "Adgangskode…",
+      "LOGIN": "Log ind",
+      "ERROR": "Forkert brugernavn og/eller adgangskode"
+   },
+   "TABLE_FILTERS": {
+      "FILTER_SELECTION": {
+         "PLACEHOLDER": "Vælg et filter…",
+         "NO_OPTIONS": "Ingen filtre fundet"
+      },
+      "FILTER_VALUE_SELECTION": {
+         "PLACEHOLDER": "Vælg en værdi…",
+         "NO_OPTIONS": "Ingen værdier fundet"
+      },
+      "CLEAR": "Ryd alle filtre",
+      "REMOVE": "Fjern filter",
+      "ADD": "Tilføj filtre",
+      "PLACEHOLDER": "Søg…",
+      "PROFILES": {
+         "FILTERS_HEADER": "Gemte filtersæt",
+         "EDIT": "Redigér filtersæt",
+         "REMOVE": "Fjern gemt filter",
+         "EMPTY": "Endnu ingen gemte filtre",
+         "SAVE_FILTERS": "Gem",
+         "FILTER_HEADER": "Gem filtersæt",
+         "NAME": "Navn",
+         "NAME_PLACEHOLDER": "Navn…",
+         "DESCRIPTION": "Beskriveslse",
+         "DESCRIPTION_PLACEHOLDER": "Beskriveslse…"
+      }
+   },
+   "FILTERS": {
+      "ACLS": {
+         "NAME": {
+            "LABEL": "Navn"
+         }
+      },
+      "AGENTS": {
+         "NAME": {
+            "LABEL": "Navn"
+         },
+         "STATUS": {
+            "LABEL": "Status"
+         }
+      },
+      "EVENTS": {
+         "AGENT_ID": {
+            "LABEL": "Optagelsesagent-ID"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Adgangspolitik"
+         },
+         "COMMENTS": {
+            "LABEL": "Kommentarer",
+            "NONE": "Ingen",
+            "OPEN": "Åbne",
+            "RESOLVED": "Løst"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Bidragydere"
+         },
+         "CREATOR": {
+            "LABEL": "Kreatør"
+         },
+         "PUBLISHER": {
+            "LABEL": "Udgiver"
+         },
+         "HOSTNAME": {
+            "LABEL": "Værtsnavn"
+         },
+         "LANGUAGE": {
+            "LABEL": "Sprog"
+         },
+         "LICENSE": {
+            "LABEL": "Licens"
+         },
+         "LOCATION": {
+            "LABEL": "Placering"
+         },
+         "PERIOD": {
+            "LABEL": "Periode"
+         },
+         "PRESENTERS_BIBLIOGRAPHIC": {
+            "LABEL": "Oplægsholderbibliografi"
+         },
+         "PRESENTERS_TECHNICAL": {
+            "LABEL": "Oplægsholder, teknisk"
+         },
+         "PROGRESS": {
+            "LABEL": "Fremskridt"
+         },
+         "SERIES": {
+            "LABEL": "Serie"
+         },
+         "SOURCE": {
+            "LABEL": "Kilde"
+         },
+         "START_DATE": {
+            "LABEL": "Startdato"
+         },
+         "STATUS": {
+            "LABEL": "Status",
+            "SCHEDULED": "Planlagt",
+            "RECORDING": "Optager",
+            "INGESTING": "Indtager",
+            "PROCESSING": "Behandler",
+            "ARCHIVE": "Arkiv",
+            "WAITINGFOR": "Afventer",
+            "UPLOAD": "Upload",
+            "ONHOLD": "Afventende"
+         },
+         "SUBJECT": {
+            "LABEL": "Emne"
+         },
+         "TRACK_MIMETYPE": {
+            "LABEL": "Mime-type"
+         },
+         "TRACK_RESOLUTION": {
+            "LABEL": "Opløsning"
+         },
+         "TRACK_TYPE": {
+            "LABEL": "Type"
+         },
+         "WORKFLOW_DEFINITION": {
+            "LABEL": "Arbejdsgngsdefinition"
+         },
+         "WORKFLOW_STATE": {
+            "LABEL": "Arbejdsgangstilstand"
+         }
+      },
+      "JOBS": {
+         "HOSTNAME": {
+            "LABEL": "Værtsnavn"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
+         "STATUS": {
+            "LABEL": "Status",
+            "PAUSED": "På pause",
+            "QUEUED": "I kø",
+            "RUNNING": "Kører",
+            "WAITING": "Afventer"
+         }
+      },
+      "SERIES": {
+         "TITLE": {
+            "LABEL": "Navn"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Bidragydere"
+         },
+         "ORGANIZERS": {
+            "LABEL": "Arrangører"
+         },
+         "SUBJECT": {
+            "LABEL": "Emne"
+         },
+         "LANGUAGE": {
+            "LABEL": "Sprog"
+         },
+         "CREATOR": {
+            "LABEL": "Kreatør"
+         },
+         "LICENSE": {
+            "LABEL": "Licens"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Adgangspolitik"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Oprettelsesdato"
+         }
+      },
+      "SERVERS": {
+         "HOSTNAME": {
+            "LABEL": "Værtsnavn"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
+         "STATUS": {
+            "LABEL": "Status",
+            "MAINTENANCE": "Vedligeholdelse",
+            "ONLINE": "Online",
+            "OFFLINE": "Offline"
+         }
+      },
+      "SERVICES": {
+         "ACTIONS": {
+            "LABEL": "Tilgængelige handlinger"
+         },
+         "HOSTNAME": {
+            "LABEL": "Værtsnavn"
+         },
+         "NODE_NAME": {
+            "LABEL": "Node name"
+         },
+         "NAME": {
+            "LABEL": "Navn"
+         },
+         "STATUS": {
+            "LABEL": "Status",
+            "ERROR": "Fejl",
+            "NORMAL": "Normal",
+            "WARNING": "Advarsel"
+         }
+      },
+      "THEMES": {
+         "NAME": {
+            "LABEL": "Navn"
+         },
+         "DESCRIPTION": {
+            "LABEL": "Beskriveslse"
+         },
+         "CREATOR": {
+            "LABEL": "Kreatør"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Oprettet"
+         }
+      },
+      "USERS": {
+         "PROVIDER": {
+            "LABEL": "Udbyder"
+         },
+         "ROLE": {
+            "LABEL": "Rolle"
+         },
+         "USERNAME": {
+            "LABEL": "Brugernavn"
+         },
+         "NAME": {
+            "LABEL": "Navn"
+         },
+         "USER_DIRECTORY": {
+            "LABEL": "Brugermappe"
+         }
+      },
+      "REVIEW_STATUS": {
+         "UNSENT": "Usendt",
+         "UNCONFIRMED": "Ubekræftet",
+         "CONFIRMED": "Bekræftet"
+      }
+   },
+   "TABLE_SUMMARY": "{{numberOfRows}} rækker",
+   "TABLE_NO_RESULT": "Intet resultat fundet",
+   "TABLE_LOADING": "Indlæser…",
+   "TABLE_EDIT": "Redigér",
+   "DASHBOARD": {
+      "RUNNING": "Kører",
+      "FINISHED": "Færdig",
+      "PAUSED": "På pause",
+      "FAILED": "Mislykkedes",
+      "FINISHED_WITH_COMMENTS": "At-gøre",
+      "SCHEDULED": "Planlagt",
+      "RECORDING": "Optagelse"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Tastaturgenveje",
+         "HINT": "Denne side viser de aktuelt tilgængelige tastaturgenveje. Bemærk, at disse kan ændre sig, afhængigt af hvilken side du besøger."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Mellemrum",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Side↑",
+         "PAGEDOWN": "Side↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "Generelt",
+         "PLAYER": "Afspiller",
+         "EDITOR": "Redigering"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Hovedmenu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Vælg næste betjeningspanelsfilter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Vælg foregående betjeningspanelsfilter",
+            "REMOVE_FILTERS": "Ryd alle filtre",
+            "EVENT_VIEW": "Begivenheder",
+            "SERIES_VIEW": "Serier",
+            "NEW_EVENT": "Tilføj begivenhed",
+            "NEW_SERIES": "Tilføj serier",
+            "CHEAT_SHEET": "Tastaturgenveje"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Afspil/pause",
+            "PREVIOUS_FRAME": "Foregående billede",
+            "NEXT_FRAME": "Næste billede",
+            "STEP_BACKWARD": "Spring 10s tilbage",
+            "STEP_FORWARD": "Spring 10s frem",
+            "PREVIOUS_SEGMENT": "Foregående segment/Spring til start",
+            "NEXT_SEGMENT": "Næste segment/Spring til slutning",
+            "VOLUME_UP": "Lydstyrke op",
+            "VOLUME_DOWN": "Lydstyrke ned",
+            "MUTE": "Slå lyd fra/til"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Opdel",
+            "CUT_SELECTED_SEGMENT": "Klip",
+            "PLAY_CURRENT_SEGMENT": "Afspil aktuelle segment",
+            "CLEAR_LIST": "Ryd segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Genafspil segment med pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Slut på segment"
+         }
+      }
+   },
+   "AGENTS": {
+      "STATUS": {
+         "CAPTURING": "Optager",
+         "ERROR": "Fejl",
+         "IDLE": "Ikke aktiv",
+         "OFFLINE": "Offline",
+         "SHUTTING_DOWN": "Lukker ned",
+         "UNKNOWN": "Ukendt",
+         "UPLOADING": "Uploader"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "For at indsætte flere værdier, så tryk Retur efter hver værdi"
+      }
+   },
+   "STATISTICS": {
+      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Please try again later.",
+      "UNSUPPORTED_TYPE": "Sorry, Opencast cannot render this type of statistical data.",
+      "FROM": "Fra",
+      "TO": "To",
+      "TOTAL": "Total",
+      "GRANULARITY": "Granularity",
+      "NAVIGATION": {
+         "ORGANIZATION": "Organisation"
+      },
+      "TITLE": {
+         "RANDOM": "Random Data",
+         "VIEWS_SUM": "Total Number of Views",
+         "VIEWS_AVG": "Average Number of Views",
+         "PUBLISHEDHOURS": "Published Hours of Video"
+      },
+      "DESCRIPTION": {
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "VIEWS_SUM": "This displays the total number of views per time unit.",
+         "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
+         "PUBLISHEDHOURS": "This displays the published hours of video"
+      }
+   }
+}

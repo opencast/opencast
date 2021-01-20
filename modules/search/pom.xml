@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>opencast-search</artifactId>
   <name>Opencast :: search</name>
@@ -7,14 +8,14 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <lucene.version>6.6.1</lucene.version>
-    <elasticsearch.version>5.6.15</elasticsearch.version>
+    <lucene.version>8.6.2</lucene.version>
+    <elasticsearch.version>7.9.2</elasticsearch.version>
   </properties>
   <dependencies>
     <dependency>
@@ -38,33 +39,28 @@
     </dependency>
     <!-- elasticsearch -->
     <dependency>
+      <groupId>org.elasticsearch.client</groupId>
+      <artifactId>elasticsearch-rest-high-level-client</artifactId>
+      <version>${elasticsearch.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.elasticsearch.client</groupId>
+      <artifactId>elasticsearch-rest-client</artifactId>
+      <version>${elasticsearch.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
       <version>${elasticsearch.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.elasticsearch.client</groupId>
-      <artifactId>transport</artifactId>
+      <groupId>org.elasticsearch</groupId>
+      <artifactId>elasticsearch-core</artifactId>
       <version>${elasticsearch.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.elasticsearch.plugin</groupId>
-      <artifactId>transport-netty3-client</artifactId>
-      <version>${elasticsearch.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.elasticsearch.plugin</groupId>
-      <artifactId>transport-netty4-client</artifactId>
-      <version>${elasticsearch.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.elasticsearch.plugin</groupId>
-      <artifactId>reindex-client</artifactId>
-      <version>${elasticsearch.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.elasticsearch.plugin</groupId>
-      <artifactId>percolator-client</artifactId>
+      <groupId>org.elasticsearch</groupId>
+      <artifactId>elasticsearch-x-content</artifactId>
       <version>${elasticsearch.version}</version>
     </dependency>
     <dependency>
@@ -74,32 +70,22 @@
     </dependency>
     <dependency>
       <groupId>org.elasticsearch.plugin</groupId>
-      <artifactId>parent-join-client</artifactId>
+      <artifactId>rank-eval-client</artifactId>
       <version>${elasticsearch.version}</version>
     </dependency>
-    <!-- Elasticsearch dependencies -->
     <dependency>
-      <groupId>net.java.dev.jna</groupId>
-      <artifactId>jna</artifactId>
-      <version>4.1.0</version>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpasyncclient</artifactId>
+      <version>4.1.4</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-analyzers-common</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+      <version>${httpcomponents-httpcore.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-backward-codecs</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-codecs</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore-osgi</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
@@ -108,45 +94,8 @@
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-expressions</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-grouping</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-highlighter</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-join</artifactId>
       <version>${lucene.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-memory</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-misc</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-queries</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
@@ -154,123 +103,9 @@
       <version>${lucene.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-sandbox</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-spatial</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-spatial-extras</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-spatial3d</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.lucene</groupId>
-      <artifactId>lucene-suggest</artifactId>
-      <version>${lucene.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.spatial4j</groupId>
-      <artifactId>spatial4j</artifactId>
-      <version>0.4</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.vividsolutions</groupId>
-      <artifactId>jts</artifactId>
-      <version>1.13</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.ow2.asm</groupId>
-      <artifactId>asm</artifactId>
-      <version>4.1</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.ow2.asm</groupId>
-      <artifactId>asm-commons</artifactId>
-      <version>4.1</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.ow2.asm</groupId>
-      <artifactId>asm-tree</artifactId>
-      <version>4.1</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>com.carrotsearch</groupId>
       <artifactId>hppc</artifactId>
-      <version>0.7.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-smile</artifactId>
-      <version>2.8.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-yaml</artifactId>
-      <version>2.8.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.ning</groupId>
-      <artifactId>compress-lzf</artifactId>
-      <version>1.0.2</version>
-    </dependency>
-    <dependency>
-      <groupId>com.tdunning</groupId>
-      <artifactId>t-digest</artifactId>
-      <version>3.2</version>
-    </dependency>
-    <dependency>
-      <groupId>org.hdrhistogram</groupId>
-      <artifactId>HdrHistogram</artifactId>
-      <version>2.1.9</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-cli</groupId>
-      <artifactId>commons-cli</artifactId>
-      <version>1.3.1</version>
-    </dependency>
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-all</artifactId>
-      <version>4.1.33.Final</version>
-    </dependency>
-    <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <version>1.15</version>
-    </dependency>
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.joda</groupId>
-      <artifactId>joda-convert</artifactId>
-      <version>1.2</version>
-    </dependency>
-    <dependency>
-      <groupId>com.twitter</groupId>
-      <artifactId>jsr166e</artifactId>
-      <version>1.1.0</version>
+      <version>0.8.1</version>
     </dependency>
 
     <!-- thirdparty -->
@@ -285,11 +120,6 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.jcraft</groupId>
-      <artifactId>jzlib</artifactId>
-      <version>1.1.3</version>
     </dependency>
 
     <!-- logging -->
@@ -314,6 +144,26 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <ignoredUnusedDeclaredDependency>org.elasticsearch:elasticsearch-core</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.elasticsearch.plugin:lang-mustache-client</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.elasticsearch.plugin:rank-eval-client</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpasyncclient</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-join</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-queryparser</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>com.carrotsearch:hppc</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.logging.log4j:log4j-core</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore-osgi</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -322,109 +172,49 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
-              !com.barchart.udt*,
-              !org.jctools*,
-              !org.zeromq*,
-              !com.conversantmedia*,
-              !com.fasterxml.jackson.dataformat.xml*,
-              !com.lmax.disruptor*,
-              !org.apache.kafka*,
-              !com.fasterxml.aalto*,
-              !com.github.mustachejava*,
-              !com.google.common.geometry,
-              !com.google.protobuf*,
-              !com.jcraft.jzlib,
-              !gnu.io*,
-              !groovy.lang,
-              !io.netty.internal.tcnative,
-              !org.eclipse.jetty.alpn,
-              !org.antlr.*,
-              !org.apache.log4j.*,
-              !org.conscrypt*,
-              !org.tartarus.snowball*,
-              !org.apache.http.impl.nio.client,
-              !org.apache.tomcat.*,
-              !org.bouncycastle.*,
-              !org.codehaus.groovy.*,
-              !org.eclipse.jetty.npn.*,
-              !org.elasticsearch.join,
-              !org.elasticsearch.percolator,
-              !org.elasticsearch.script*,
-              !org.hyperic.sigar,
-              !org.jboss.logging,
-              !org.jboss.marshalling,
-              !org.locationtech*,
-              !lzma.sdk*,
-              !net.jpountz.*,
-              !joptsimple*,
-              !sun.security.*,
+              !com.conversantmedia.util.*,
+              !com.fasterxml.jackson.dataformat.smile,
+              !com.fasterxml.jackson.dataformat.xml.*,
+              !com.fasterxml.jackson.dataformat.yaml.*,
+              !com.lmax.disruptor.*,
+              !com.sun.jna.*,
+              !com.tdunning.*,
+              !joptsimple.*,
+              !org.HdrHistogram.*,
+              !org.apache.kafka.clients.producer.*,
+              !org.apache.lucene.*,
+              !javax.activation.*,
+              !javax.annotation,
+              !org.elasticsearch.geometry.*,
+              !org.elasticsearch.secure_sm.*,
+              !org.jctools.queues.*,
+              !org.locationtech.jts.geom.*,
+              !org.locationtech.spatial4j.*,
+              !org.zeromq.*,
+              !com.github.mustachejava.*,
               *
             </Import-Package>
-            <Private-Package>
-              org.jboss.netty.*
-            </Private-Package>
             <Export-Package>
               org.apache.logging.log4j*,
               org.opencastproject.matterhorn.search.impl;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
-              HdrHistogram,
-              log4j-core,
-              asm,
-              asm-commons,
-              asm-tree,
-              commons-cli,
-              compress-lzf,
+              elasticsearch-rest-high-level-client,
+              elasticsearch-rest-client,
               elasticsearch,
-              transport,
-              hppc,
-              jackson-dataformat-smile,
-              jackson-dataformat-yaml,
-              jna,
-              joda-time,
-              joda-convert,
-              jsr166e,
-              jts,
-              jzlib,
+              elasticsearch-core,
+              elasticsearch-x-content,
               lang-mustache-client,
-              lucene-analyzers-common,
-              lucene-backward-codecs,
-              lucene-codecs,
               lucene-core,
-              lucene-expressions,
-              lucene-grouping,
-              lucene-highlighter,
               lucene-join,
-              lucene-memory,
-              lucene-misc,
-              lucene-queries,
               lucene-queryparser,
-              lucene-sandbox,
-              lucene-spatial,
-              lucene-spatial-extras,
-              lucene-spatial3d,
-              lucene-suggest,
-              netty-all,
-              parent-join-client,
-              percolator-client,
-              reindex-client,
-              snakeyaml,
-              spatial4j,
-              transport,
-              transport-netty3-client,
-              transport-netty4-client,
-              t-digest
+              rank-eval-client,
+              httpasyncclient,
+              hppc,
+              log4j-core
             </Embed-Dependency>
             <_exportcontents>
-              com.spatial4j.*;version=0.4,
-              com.carrotsearch.*,
-              org.jboss.netty.*,
-              org.apache.commons.cli,
-              org.joda.*,
-              com.vividsolutions.*,
-              org.apache.lucene.*,
               org.elasticsearch.*,
-              org.tartarus.snowball
             </_exportcontents>
           </instructions>
         </configuration>

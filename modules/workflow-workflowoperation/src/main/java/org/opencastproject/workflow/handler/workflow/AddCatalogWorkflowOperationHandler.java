@@ -35,8 +35,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -62,10 +60,6 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
   private enum CatalogTypeCollisionBehavior {
     SKIP, KEEP, FAIL
   }
-
-  /** The logging facility */
-  private static final Logger logger = LoggerFactory
-    .getLogger(AddCatalogWorkflowOperationHandler.class);
 
   /** config key for the catalog name */
   private static final String CFG_KEY_CATALOG_NAME   = "catalog-name";

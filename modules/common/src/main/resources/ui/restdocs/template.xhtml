@@ -108,7 +108,7 @@
     </tr>
     </#if>
     <tr class="method">
-      <th scope="row">Optional (<#if (endpoint.method == "GET")>query<#else>form</#if>) params:</th>
+      <th scope="row">Optional (<#if (endpoint.method == "GET" || endpoint.method == "DELETE")>query<#else>form</#if>) params:</th>
       <td>
         <#list endpoint.optionalParams as param>
         <tt>${param.name}<#if param.defaultValue??>&#40;Default value=${param.escapedDefaultValue}&#41;</#if></tt>:
@@ -212,7 +212,8 @@
                          name="${item.name}"
                          class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>"
                          type="checkbox"
-                         value="true" <#if item.defaultValue??>checked="${item.defaultValue}" defaultChecked="${item.defaultValue}"</#if> />
+                         value="true"
+                         <#if item.defaultValue?? && item.defaultValue == "true">checked</#if> />
                 </td>
                 <td class="form_field_description">${item.description!}</td>
                 <#elseif item.type == "file">

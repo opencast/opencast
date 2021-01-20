@@ -52,8 +52,6 @@ import java.io.InputStream;
 public class AbstractFileSystemAssetStoreTest {
   private static final String XML_EXTENSTION = ".xml";
 
-  private static final String TEST_ROOT_DIR_NAME = "test-archive";
-
   private static final String ORG_ID = "sampleOrgId";
 
   private static final String MP_ID = "sampleMediaPackageId";

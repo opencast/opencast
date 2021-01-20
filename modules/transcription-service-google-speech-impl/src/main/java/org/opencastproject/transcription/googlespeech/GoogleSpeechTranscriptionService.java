@@ -135,13 +135,6 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
   // Cluster name
   private String clusterName = "";
 
-  // The events we are interested in receiving notifications
-  public interface JobEvent {
-
-    String COMPLETED_WITH_RESULTS = "recognitions.completed_with_results";
-    String FAILED = "recognitions.failed";
-  }
-
   /**
    * Service dependencies
    */
@@ -428,8 +421,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       // Update state in database
       database.updateJobControl(jobId, TranscriptionJobControl.Status.Error.name());
       TranscriptionJobControl jobControl = database.findByJob(jobId);
-      logger.warn(String.format("Error received for media package %s, job id %s",
-              jobControl.getMediaPackageId(), jobId));
+      logger.warn("Error received for media package {}, job id {}",
+              jobControl.getMediaPackageId(), jobId);
       // Send notification email
       sendEmail(TRANSCRIPTION_ERROR,
               String.format("There was a transcription error for for media package %s, job id %s.",
@@ -515,9 +508,9 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
            * "lastUpdateTime": "2017-07-20T16:37:17.158630Z" } }
            */
           String jobId = (String) jsonObject.get("name");
-          logger.info(String.format(
-                  "Transcription for mp %s has been submitted. Job id: %s", mpId,
-                  jobId));
+          logger.info(
+                  "Transcription for mp {} has been submitted. Job id: {}", mpId,
+                  jobId);
 
           database.storeJobControl(mpId, track.getIdentifier(), jobId, TranscriptionJobControl.Status.InProgress.name(),
                   track.getDuration() == null ? 0 : track.getDuration().longValue(), null, PROVIDER);
@@ -663,8 +656,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
           break;
       }
     } catch (Exception e) {
-      String msg = String.format("Exception when calling the transcription service for job id: %s", jobId);
-      logger.warn(String.format(msg, jobId), e);
+      logger.warn("Exception when calling the transcription service for job id: {}", jobId, e);
       throw new TranscriptionServiceException(String.format(
               "Exception when calling the transcription service for job id: %s", jobId), e);
     } finally {
@@ -866,7 +858,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       smtpService.send(toEmailAddress, String.format("%s (%s)", subject, clusterName), body);
       logger.info("Sent e-mail notification to {}", toEmailAddress);
     } catch (Exception e) {
-      logger.error(String.format("Could not send email: %s\n%s", subject, body), e);
+      logger.error("Could not send email: {}\n{}", subject, body, e);
     }
   }
 

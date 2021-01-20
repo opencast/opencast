@@ -21,8 +21,8 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaUser;
@@ -114,7 +114,7 @@ public class UsersListProviderTest {
 
   @Test
   public void testListSimple() throws ListProviderException {
-    Map<String, String> list = usersListProvider.getList(UsersListProvider.NAME, null);
+    Map<String, String> list = usersListProvider.getList(UsersListProvider.NAME_ONLY, null);
     Assert.assertTrue(list.containsKey(user1.getName()));
     Assert.assertTrue(list.containsKey(user2.getName()));
     Assert.assertTrue(list.containsKey(user3.getName()));
@@ -127,12 +127,12 @@ public class UsersListProviderTest {
     Assert.assertTrue(list.containsKey(user4.getUsername()));
     Assert.assertEquals(4, list.size());
 
-    list = usersListProvider.getList(UsersListProvider.EMAIL, null);
+    list = usersListProvider.getList(UsersListProvider.EMAIL_ONLY, null);
     Assert.assertTrue(list.containsKey(user1.getEmail()));
     Assert.assertTrue(list.containsKey(user4.getEmail()));
     Assert.assertEquals(2, list.size());
 
-    list = usersListProvider.getList(UsersListProvider.USERDIRECTORY, null);
+    list = usersListProvider.getList(UsersListProvider.USERDIRECTORY_ONLY, null);
     Assert.assertTrue(list.containsKey(user1.getProvider()));
     Assert.assertEquals(1, list.size());
   }

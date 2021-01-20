@@ -30,8 +30,6 @@ import org.opencastproject.silencedetection.impl.SilenceDetectionProperties;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.google.common.io.LineReader;
-
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -84,7 +82,7 @@ public class FFmpegSilenceDetector {
         if (binaryFile.exists()) {
           binary = binaryFile.getAbsolutePath();
         } else {
-          logger.warn("FFMPEG binary file {} does not exist", StringUtils.trim(binaryPath));
+          logger.warn("FFmpeg binary file {} does not exist", StringUtils.trim(binaryPath));
         }
       }
     } catch (Exception ex) {
@@ -145,46 +143,40 @@ public class FFmpegSilenceDetector {
     if (track.getDuration() == null) {
       throw new MediaPackageException("Track " + trackId + " does not have a duration");
     }
-    logger.info("Track {} loaded, duration is {} s", filePath, track.getDuration() / 1000);
-
+    logger.debug("Track {} loaded, duration is {} s", filePath, track.getDuration() / 1000);
     logger.info("Starting silence detection of {}", filePath);
-    String mediaPath = filePath.replaceAll(" ", "\\ ");
     DecimalFormat decimalFmt = new DecimalFormat("0.000", new DecimalFormatSymbols(Locale.US));
     String minSilenceLengthInSeconds = decimalFmt.format((double) minSilenceLength / 1000.0);
     String filter = "silencedetect=noise=" + thresholdDB + ":duration=" + minSilenceLengthInSeconds;
-    String[] command = new String[] {binary, "-nostats", "-i", mediaPath, "-filter:a", filter, "-f", "null", "-"};
-    String commandline = StringUtils.join(command, " ");
+    String[] command = new String[] {
+        binary, "-nostats", "-nostdin", "-i", filePath, "-vn", "-filter:a", filter, "-f", "null", "-"};
 
-    logger.info("Running {}", commandline);
+    logger.info("Running {}", (Object) command);
 
     ProcessBuilder pbuilder = new ProcessBuilder(command);
     List<String> segmentsStrings = new LinkedList<String>();
     Process process = pbuilder.start();
-    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-    try {
-      LineReader lr = new LineReader(reader);
-      String line = lr.readLine();
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+      String line = reader.readLine();
       while (null != line) {
         /* We want only lines from the silence detection filter */
         logger.debug("FFmpeg output: {}", line);
         if (line.startsWith("[silencedetect ")) {
           segmentsStrings.add(line);
         }
-        line = lr.readLine();
+        line = reader.readLine();
       }
     } catch (IOException e) {
-      logger.error("Error executing ffmpeg: {}", e.getMessage());
-    } finally {
-      reader.close();
+      logger.error("Error executing ffmpeg", e);
     }
 
-    /**
+    /*
      * Example output:
      * [silencedetect @ 0x2968e40] silence_start: 466.486
      * [silencedetect @ 0x2968e40] silence_end: 469.322 | silence_duration: 2.83592
      */
 
-    LinkedList<MediaSegment> segmentsTmp = new LinkedList<MediaSegment>();
+    LinkedList<MediaSegment> segmentsTmp = new LinkedList<>();
     if (segmentsStrings.size() == 0) {
       /* No silence found -> Add one segment for the whole track */
       logger.info("No silence found. Adding one large segment.");

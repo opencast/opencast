@@ -101,7 +101,6 @@ public class SchedulerServiceDatabaseImplTest {
     final String recordingState = "recordingState";
     final Long lastHeard = new Date().getTime();
     final String presenters = "Werner";
-    final String lastModifiedOrigin = "lastModifiedOrigin";
     final Date lastModifiedDate = new Date();
     final String checksum = "checksum";
     final Map<String, String> wfProperties = Collections.singletonMap("wffoo", "wfbar");
@@ -153,7 +152,6 @@ public class SchedulerServiceDatabaseImplTest {
     final String recordingState = "recordingState";
     final Long lastHeard = new Date().getTime();
     final String presenters = "Werner";
-    final String lastModifiedOrigin = "lastModifiedOrigin";
     final Date lastModifiedDate = new Date();
     final String checksum = "checksum";
     final Map<String, String> wfProperties = Collections.singletonMap("wffoo", "wfbar");
@@ -678,7 +676,6 @@ public class SchedulerServiceDatabaseImplTest {
     final String mpId = "mpId";
     final String agentId = "agent1";
     final String orgId = new DefaultOrganization().getId();
-    final Date intervalStart = new Date(nowMillis);
     final Date intervalEnd = new Date(nowMillis + 5 * oneHourMillis);
     final Date[] eventStartDates = {
         new Date(nowMillis - 4 * oneHourMillis),
@@ -726,7 +723,6 @@ public class SchedulerServiceDatabaseImplTest {
     final String recordingState = "recordingState";
     final Long lastHeard = new Date().getTime();
     final String presenters = "Werner";
-    final String lastModifiedOrigin = "lastModifiedOrigin";
     final Date lastModifiedDate = new Date();
     final String checksum = "checksum";
     final Map<String, String> wfProperties = Collections.singletonMap("wffoo", "wfbar");

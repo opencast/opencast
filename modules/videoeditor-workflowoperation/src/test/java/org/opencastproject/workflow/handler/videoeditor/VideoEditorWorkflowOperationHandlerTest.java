@@ -51,7 +51,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
@@ -244,41 +243,6 @@ public class VideoEditorWorkflowOperationHandlerTest {
       MediaPackageElement[] derivedElements = result.getMediaPackage().getDerived(skippedTrack, derivedTrackFlavor);
       Assert.assertTrue("Media package should contain track with flavor " + derivedTrackFlavor.toString(),
               derivedElements != null && derivedElements.length > 0);
-    }
-  }
-
-  @Test
-  @Ignore
-  public void testEditorOperationSkipWithModifiedSkippedFlavorsAndTargetFlavorProperty()
-          throws WorkflowOperationException {
-    Map<String, String> configuration = getDefaultConfiguration(true);
-    configuration.put("skipped-flavors", "*/preview");
-    configuration.put("target-flavor-subtype", "edited");
-    WorkflowInstanceImpl workflowInstance = getWorkflowInstance(mp, configuration);
-    WorkflowOperationResult result = videoEditorWorkflowOperationHandler.skip(workflowInstance, null);
-    Assert.assertNotNull(
-            "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
-
-    // mediapackage should contain new derived track with flavor given by "target-flavor-subtype" configuration
-    WorkflowOperationInstance worflowOperationInstance = workflowInstance.getCurrentOperation();
-    String targetFlavorSubtypeProperty = worflowOperationInstance.getConfiguration("target-flavor-subtype");
-    String skippedFlavorsProperty = worflowOperationInstance.getConfiguration("skipped-flavors");
-
-    TrackSelector trackSelector = new TrackSelector();
-    trackSelector.addFlavor(skippedFlavorsProperty);
-    Collection<Track> skippedTracks = trackSelector.select(result.getMediaPackage(), false);
-    Assert.assertTrue("Mediapackage does not contain any tracks matching flavor " + skippedFlavorsProperty,
-            skippedTracks != null && !skippedTracks.isEmpty());
-
-    for (Track skippedTrack : skippedTracks) {
-      MediaPackageElementFlavor derivedTrackFlavor = MediaPackageElementFlavor.flavor(skippedTrack.getFlavor()
-              .getType(), targetFlavorSubtypeProperty);
-      MediaPackageElement[] derivedElements = result.getMediaPackage().getDerived(skippedTrack, derivedTrackFlavor);
-      Assert.assertTrue("Media package should contain track with flavor " + derivedTrackFlavor.toString(),
-              derivedElements != null && derivedElements.length > 0);
-      Assert.assertTrue("Mediapackage schould contain a derived track with flavor subtype "
-              + targetFlavorSubtypeProperty,
-              derivedElements[0].getFlavor().getSubtype().equals(targetFlavorSubtypeProperty));
     }
   }
 

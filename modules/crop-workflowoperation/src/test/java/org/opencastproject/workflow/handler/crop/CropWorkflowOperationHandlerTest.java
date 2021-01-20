@@ -52,7 +52,6 @@ public class CropWorkflowOperationHandlerTest {
   private CropWorkflowOperationHandler operationHandler;
 
   private MediaPackage mp;
-  private MediaPackage mpEncode;
   private Job job;
   private Track[] tracks;
 

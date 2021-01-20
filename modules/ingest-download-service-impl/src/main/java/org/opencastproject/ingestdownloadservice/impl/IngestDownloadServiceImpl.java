@@ -263,7 +263,7 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
       final URI originalUri = element.getURI();
       try (InputStream in = new FileInputStream(file)) {
         final String filename = FilenameUtils.getName(element.getURI().getPath());
-        final URI uri = workspace.put(mediaPackage.getIdentifier().compact(), element.getIdentifier(), filename, in);
+        final URI uri = workspace.put(mediaPackage.getIdentifier().toString(), element.getIdentifier(), filename, in);
         element.setURI(uri);
       } finally {
         try {

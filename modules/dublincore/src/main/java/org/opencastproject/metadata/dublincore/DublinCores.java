@@ -21,7 +21,6 @@
 
 package org.opencastproject.metadata.dublincore;
 
-import static java.util.UUID.randomUUID;
 import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
 import static org.opencastproject.mediapackage.XMLCatalogImpl.XSI_NS_PREFIX;
 import static org.opencastproject.metadata.dublincore.DublinCore.ELEMENTS_1_1_NS_PREFIX;
@@ -36,8 +35,6 @@ import org.opencastproject.metadata.dublincore.OpencastDctermsDublinCore.Episode
 import org.opencastproject.metadata.dublincore.OpencastDctermsDublinCore.Series;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
-
-import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
 
@@ -118,56 +115,6 @@ public final class DublinCores {
   }
 
   /**
-   * Create a new Opencast DublinCore metadata catalog for episodes.
-   * <ul>
-   * <li>Set flavor to {@link org.opencastproject.mediapackage.MediaPackageElements#EPISODE}.
-   * <li>Register all necessary namespaces and set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
-   * <li>Set the {@link DublinCore#PROPERTY_IDENTIFIER dcterms:identifier} to {@code id}
-   * <li>The catalog does not have an {@linkplain DublinCoreCatalog#getIdentifier() identifier}
-   * </ul>
-   */
-  @Nonnull
-  public static Episode mkOpencastEpisode(String id) {
-    final Episode dc = mkOpencastEpisode();
-    dc.setDcIdentifier(id);
-    return dc;
-  }
-
-  /**
-   * Create a new Opencast DublinCore metadata catalog for episodes.
-   * <ul>
-   * <li>Set flavor to {@link org.opencastproject.mediapackage.MediaPackageElements#EPISODE}.
-   * <li>Register all necessary namespaces and set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
-   * <li>Set the {@link DublinCore#PROPERTY_IDENTIFIER dcterms:identifier} to {@code id} if some, or create a random
-   *   UUID otherwise
-   * <li>The catalog does not have an {@linkplain DublinCoreCatalog#getIdentifier() identifier}
-   * </ul>
-   */
-  @Nonnull
-  public static Episode mkOpencastEpisode(Opt<String> id) {
-    final Episode dc = mkOpencastEpisode();
-    dc.setDcIdentifier(id.getOr(randomUUID().toString()));
-    return dc;
-  }
-
-  /**
-   * Create a new Opencast DublinCore metadata catalog for episodes.
-   * <ul>
-   * <li>Set flavor to {@link org.opencastproject.mediapackage.MediaPackageElements#EPISODE}.
-   * <li>Register all necessary namespaces and set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
-   * <li>Set the {@link DublinCore#PROPERTY_IDENTIFIER dcterms:identifier} to {@code id}
-   * <li>Link to series {@code seriesId} setting the {@link DublinCore#PROPERTY_IS_PART_OF} property.
-   * <li>The catalog does not have an {@linkplain DublinCoreCatalog#getIdentifier() identifier}
-   * </ul>
-   */
-  @Nonnull
-  public static Episode mkOpencastEpisode(String id, String seriesId) {
-    final Episode dc = mkOpencastEpisode(id);
-    dc.setIsPartOf(seriesId);
-    return dc;
-  }
-
-  /**
    * Create an Opencast episode DublinCore accessor for a {@link DublinCoreCatalog}.
    * Read and write operations access and modify the wrapped catalog.
    */
@@ -188,31 +135,6 @@ public final class DublinCores {
   @Nonnull
   public static Series mkOpencastSeries() {
     return new Series(mkOpencast(MediaPackageElements.SERIES));
-  }
-
-  /**
-   * Create a new Opencast DublinCore metadata catalog for series.
-   * <ul>
-   * <li>Set flavor to {@link org.opencastproject.mediapackage.MediaPackageElements#SERIES}.
-   * <li>Register all necessary namespaces and set the root tag to {@link #OC_DC_CATALOG_ROOT_ELEMENT}.
-   * <li>Set the {@link DublinCore#PROPERTY_IDENTIFIER dcterms:identifier} to {@code id}
-   * <li>The catalog does not have an {@linkplain DublinCoreCatalog#getIdentifier() identifier}
-   * </ul>
-   */
-  @Nonnull
-  public static Series mkOpencastSeries(String id) {
-    final Series dc = mkOpencastSeries();
-    dc.setDcIdentifier(id);
-    return dc;
-  }
-
-  /**
-   * Create an Opencast series DublinCore accessor for a {@link DublinCoreCatalog}.
-   * Read and write operations access and modify the wrapped catalog.
-   */
-  @Nonnull
-  public static Series mkOpencastSeries(DublinCoreCatalog dc) {
-    return new Series(dc);
   }
 
   /**
@@ -242,9 +164,7 @@ public final class DublinCores {
    * <p>
    * The reader is not capable of determining the catalog's flavor.
    * <p>
-   * <strong>Implementation note:</strong> In order to detect the format the whole stream is read into memory first. If you
-   * know upfront whether JSON or XML is used you may want to choose {@link DublinCoreJsonFormat#read(java.io.InputStream)}
-   * or {@link DublinCoreXmlFormat#read(java.io.InputStream)} for performance reasons.
+   * <strong>Implementation note:</strong> In order to detect the format the whole stream is read into memory first.
    */
   @Nonnull
   public static DublinCoreCatalog read(InputStream in) {

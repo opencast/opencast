@@ -145,28 +145,9 @@ public final class ResourceRequestUtil {
       String encryptedPolicy = PolicyUtils.getPolicySignature(policy, encryptionKey);
       return signature.equals(encryptedPolicy);
     } catch (Exception e) {
-      logger.warn("Unable to encrypt policy because {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to encrypt policy because", e);
       return false;
     }
-  }
-
-  /**
-   * Create a {@link ResourceRequest} from the necessary data encoded policy, encryptionKeyId and signature.
-   *
-   * @param encodedPolicy
-   *          The policy Base64 encoded.
-   * @param encryptionKeyId
-   *          The id of the encryption key used.
-   * @param signature
-   *          The policy encrypted using the key attached to the encryptionKeyId
-   * @return A new {@link ResourceRequest} filled with the parameter data.
-   */
-  public static ResourceRequest createResourceRequest(String encodedPolicy, String encryptionKeyId, String signature) {
-    ResourceRequest resourceRequest = new ResourceRequest();
-    resourceRequest.setEncodedPolicy(encodedPolicy);
-    resourceRequest.setEncryptionKeyId(encryptionKeyId);
-    resourceRequest.setSignature(signature);
-    return resourceRequest;
   }
 
   /**

@@ -91,7 +91,7 @@ public class IndexEndpoint {
   @POST
   @Path("clearIndex")
   @RestQuery(name = "clearIndex", description = "Clear the Admin UI index",
-    returnDescription = "OK if index is cleared", reponses = {
+    returnDescription = "OK if index is cleared", responses = {
     @RestResponse(description = "Index is cleared", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "Unable to clear index", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) })
   public Response clearIndex() {
@@ -118,7 +118,7 @@ public class IndexEndpoint {
         + "The available services are: Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager and Comments. "
         + "The service order (see above) is very important! Make sure, you do not run index rebuild for more than one "
         + "service at a time!",
-        type = RestParameter.Type.STRING) }, reponses = {
+        type = RestParameter.Type.STRING) }, responses = {
       @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
   public Response recreateIndexFromService(@PathParam("service") final String service) {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
@@ -143,7 +143,7 @@ public class IndexEndpoint {
   @POST
   @Path("recreateIndex")
   @RestQuery(name = "recreateIndex", description = "Clear and repopulates the Admin UI Index directly from the Services",
-    returnDescription = "OK if repopulation has started", reponses = {
+    returnDescription = "OK if repopulation has started", responses = {
     @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
   public Response recreateIndex() {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),

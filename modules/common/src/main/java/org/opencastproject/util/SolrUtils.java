@@ -22,7 +22,6 @@
 package org.opencastproject.util;
 
 import static org.opencastproject.util.data.functions.Strings.format;
-import static org.opencastproject.util.data.functions.Strings.trimToNone;
 
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -60,13 +59,6 @@ public final class SolrUtils {
             .replaceAll("\\|\\|", "\\\\|\\\\|");
   }
 
-  /** {@link #clean(String)} as a function. Return none if string is empty after cleaning. */
-  public static final Function<String, Option<String>> clean = new Function<String, Option<String>>() {
-    @Override public Option<String> apply(String s) {
-      return trimToNone(clean(s));
-    }
-  };
-
   /**
    * Returns a serialized version of the date or <code>null</code> if <code>null</code> was passed in for the date.
    *
@@ -79,13 +71,6 @@ public final class SolrUtils {
       return null;
     return newSolrDateFormat().format(date);
   }
-
-  /** {@link #serializeDate(java.util.Date)} as a function. */
-  public static final Function<Date, String> serializeDate = new Function<Date, String>() {
-    @Override public String apply(Date date) {
-      return serializeDate(date);
-    }
-  };
 
   /**
    * Returns the date or <code>null</code> if <code>null</code> was passed in for the date.

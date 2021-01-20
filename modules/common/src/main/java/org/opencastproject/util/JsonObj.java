@@ -30,12 +30,9 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
-import org.apache.commons.io.IOUtils;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,17 +57,6 @@ public final class JsonObj {
     return new JsonObj(parse(json));
   }
 
-  public static JsonObj mk(InputStream in) throws IOException {
-    return new JsonObj(parse(IOUtils.toString(in)));
-  }
-
-  public static final Function<InputStream, JsonObj> fromInputStream = new Function.X<InputStream, JsonObj>() {
-    @Override
-    public JsonObj xapply(InputStream in) throws Exception {
-      return mk(in);
-    }
-  };
-
   /** {@link #jsonObj(java.util.Map)} as a function. */
   public static final Function<Map, JsonObj> jsonObj = new Function<Map, JsonObj>() {
     @Override
@@ -92,10 +78,6 @@ public final class JsonObj {
   }
 
   public JsonVal val(String key) {
-    return new JsonVal(get(Object.class, key));
-  }
-
-  public JsonVal valOpt(String key) {
     return new JsonVal(get(Object.class, key));
   }
 

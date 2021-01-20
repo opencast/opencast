@@ -26,6 +26,7 @@ import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.AdaptivePlaylist;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
@@ -43,6 +44,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -54,6 +56,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * The workflow definition for handling multiple concurrent outputs in one ffmpeg operation. This allows encoding and
@@ -93,6 +97,8 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
+
+  private Predicate<EncodingProfile> isManifestEP = p ->  p.getOutputType() == EncodingProfile.MediaType.Manifest;
 
   /**
    * {@inheritDoc}
@@ -135,6 +141,10 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
 
     public List<String> getProfiles() {
       return this.encodingProfiles;
+    }
+
+    public List<EncodingProfile> getEncodingProfiles() {
+      return this.encodingProfileList;
     }
 
     void addSourceFlavor(String flavor) {
@@ -295,6 +305,10 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
     return StringUtils.split(sourceOption, SEPARATOR);
   }
 
+  private List<Track> getManifest(Collection<Track> tracks) {
+    return tracks.stream().filter(AdaptivePlaylist.isHLSTrackPred).collect(Collectors.toList());
+  }
+
   /*
    * Encode multiple tracks in a mediaPackage concurrently with different encoding profiles for each track. The encoding
    * profiles are specified by names in a list and are the names used to tag each corresponding output. Each source
@@ -367,13 +381,18 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
       Job job = entry.getKey();
       Track sourceTrack = entry.getValue().getTrack(); // source
       ElementProfileTagFlavor info = entry.getValue().getInfo(); // tags and flavors
+      List<EncodingProfile> eplist = entry.getValue().getProfileList();
       // add this receipt's queue time to the total
       totalTimeInQueue += job.getQueueTime();
       // it is allowed for compose jobs to return an empty payload. See the EncodeEngine interface
       if (job.getPayload().length() > 0) {
         @SuppressWarnings("unchecked")
         List<Track> composedTracks = (List<Track>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
-        if (composedTracks.size() != info.getProfiles().size()) {
+        // HLS Manifest profile has precedence and overrides individual encoding profiles
+        boolean isHLS = eplist.stream().anyMatch(isManifestEP);
+        if (isHLS) { // check that manifests and segments counts are correct
+          decipherHLSPlaylistResults(sourceTrack, entry.getValue(), mediaPackage, composedTracks);
+        } else if (composedTracks.size() != info.getProfiles().size()) {
           logger.info("Encoded {} tracks, with {} profiles", composedTracks.size(), info.getProfiles().size());
           throw new WorkflowOperationException("Number of output tracks does not match number of encoding profiles");
         }
@@ -389,23 +408,20 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
               composedTrack.addTag(tag);
             }
           }
+          // Tag each output with encoding profile name if configured
           if (entry.getValue().getTagWithProfile()) {
-            // Tag each output with encoding profile name if configured
-            String rawfileName = composedTrack.getURI().getRawPath();
-            List<EncodingProfile> eps = entry.getValue().getProfileList();
-            for (EncodingProfile ep : eps) {
-              String suffix = ep.getSuffix();
-              // !! workspace.putInCollection renames the file - need to do the same with suffix
-              suffix = PathSupport.toSafeName(suffix);
-              if (suffix.length() > 0 && rawfileName.endsWith(suffix)) {
-                composedTrack.addTag(ep.getIdentifier());
-                logger.debug("Tagging composed track {} with '{}'", composedTrack.getURI(), ep.getIdentifier());
-                break;
-              }
-            }
+            tagByProfile(composedTrack, eplist);
+          }
+          String fileName;
+          if (!isHLS || composedTrack.isMaster()) {
+            // name after source track if user facing
+            fileName = getFileNameFromElements(sourceTrack, composedTrack);
+          } else { // HLS-VOD
+            // Should all the files be renamed to the same as source
+            // which defeats the purpose of the suffix in encoding profiles
+            fileName = FilenameUtils.getName(composedTrack.getURI().getPath());
           }
           // store new tracks to mediaPackage
-          String fileName = getFileNameFromElements(sourceTrack, composedTrack);
           composedTrack.setURI(workspace.moveTo(composedTrack.getURI(), mediaPackage.getIdentifier().toString(),
                   composedTrack.getIdentifier(), fileName));
           mediaPackage.addDerived(composedTrack, sourceTrack);
@@ -417,6 +433,41 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
     WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, totalTimeInQueue);
     logger.debug("MultiEncode operation completed");
     return result;
+  }
+
+  /**
+   * Find the matching encoding profile for this track and tag by name
+   *
+   * @param track
+   * @param profiles
+   *          - profiles used to encode a track to multiple formats
+   * @return
+   */
+  private void tagByProfile(Track track, List<EncodingProfile> profiles) {
+    String rawfileName = track.getURI().getRawPath();
+    for (EncodingProfile ep : profiles) {
+      String suffix = ep.getSuffix();
+      // !! workspace.putInCollection renames the file - need to do the same with suffix
+      suffix = PathSupport.toSafeName(suffix);
+      if (suffix.length() > 0 && rawfileName.endsWith(suffix)) {
+        track.addTag(ep.getIdentifier());
+        return;
+      }
+    }
+  }
+
+  private void decipherHLSPlaylistResults(Track track, JobInformation jobInfo, MediaPackage mediaPackage,
+          List<Track> composedTracks)
+          throws WorkflowOperationException, IllegalArgumentException, NotFoundException, IOException {
+    int nprofiles = jobInfo.getInfo().getProfiles().size();
+    List<Track> manifests = getManifest(composedTracks);
+
+    if (manifests.size() != nprofiles) {
+      throw new WorkflowOperationException("Number of output playlists does not match number of encoding profiles");
+    }
+    if (composedTracks.size() != manifests.size() * 2 - 1) {
+      throw new WorkflowOperationException("Number of output media does not match number of encoding profiles");
+    }
   }
 
   private MediaPackageElementFlavor newFlavor(Track track, String flavor) throws WorkflowOperationException {

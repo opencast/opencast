@@ -21,11 +21,7 @@
 
 package org.opencastproject.util.data;
 
-import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
-
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -37,12 +33,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
-import java.util.Properties;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * This class provides functions to ease and secure the handling of collections by supporting a type safe -- at least to
@@ -62,33 +54,6 @@ public final class Collections {
     } catch (Exception e) {
       throw new IllegalArgumentException("Type " + as.getClass() + " needs a parameterless constructor");
     }
-  }
-
-  /**
-   * Get a value from a map, creating and adding a new one, if the value is missing, i.e. it is null.
-   *
-   * @param c
-   *          creates the missing value
-   */
-  public static <K, V> V getOrCreate(Map<K, V> map, K key, Creator<V> c) {
-    V v = map.get(key);
-    if (v == null) {
-      v = c.create();
-      map.put(key, v);
-    }
-    return v;
-  }
-
-  /**
-   * Get a value from a map, creating and adding a new one, if the value is missing, i.e. it is null.
-   */
-  public static <K, V> V getOrCreate(Map<K, V> map, K key, Function0<V> f) {
-    V v = map.get(key);
-    if (v == null) {
-      v = f.apply();
-      map.put(key, v);
-    }
-    return v;
   }
 
   /**
@@ -242,16 +207,6 @@ public final class Collections {
     }
   }
 
-  /** Return the last element of the list. */
-  public static <A> Option<A> last(List<A> as) {
-    return as.size() > 0 ? some(as.get(as.size() - 1)) : Option.<A> none();
-  }
-
-  /** Return the last element of the array. */
-  public static <A> Option<A> last(A[] as) {
-    return as.length > 0 ? some(as[as.length - 1]) : Option.<A> none();
-  }
-
   /** Make a string from a collection separating each element by <code>sep</code>. */
   public static String mkString(Collection<?> as, String sep) {
     final StringBuilder b = new StringBuilder();
@@ -294,16 +249,6 @@ public final class Collections {
     return x;
   }
 
-  /** Concatenates two lists. */
-  public static <A> List<A> concat(List<? extends A> as, List<? extends A> bs) {
-    List<A> x = new ArrayList<>();
-    for (A a : as)
-      x.add(a);
-    for (A b : bs)
-      x.add(b);
-    return x;
-  }
-
   /**
    * Merge two maps where <code>b</code> takes precedence.
    *
@@ -316,26 +261,6 @@ public final class Collections {
     return java.util.Collections.unmodifiableMap(x);
   }
 
-  /**
-   * Merge two sets into one. <code>b</code> takes precedence over <code>a</code>.
-   *
-   * @return a new immutable set
-   */
-  public static <A> Set<A> merge(Set<? extends A> a, Set<? extends A> b) {
-    final Set<A> x = new HashSet<>();
-    x.addAll(a);
-    x.addAll(b);
-    return java.util.Collections.unmodifiableSet(x);
-  }
-
-  public static <A, M extends Iterable<? extends A>> List<A> diff(M as, M bs) {
-    final List<A> diff = toList(as.iterator());
-    for (A b : bs) {
-      diff.remove(b);
-    }
-    return diff;
-  }
-
   /** Drain all elements of <code>as</code> into a list. */
   public static <A> List<A> toList(Iterator<? extends A> as) {
     final List<A> t = new ArrayList<>();
@@ -345,33 +270,9 @@ public final class Collections {
     return t;
   }
 
-  /** Create a list of tuples (K, V) from a map. */
-  public static <K, V> List<Tuple<K, V>> toList(Map<K, V> map) {
-    List<Tuple<K, V>> list = new ArrayList<>();
-    for (Entry<K, V> entry : map.entrySet()) {
-      list.add(Tuple.tuple(entry.getKey(), entry.getValue()));
-    }
-    return list;
-  }
-
-  @SafeVarargs
-  public static <K, V> Map<K, V> toList(Tuple<? extends K, ? extends V>... ts) {
-    final Map<K, V> map = new HashMap<>(ts.length);
-    for (Tuple<? extends K, ? extends V> t : ts) {
-      map.put(t.getA(), t.getB());
-    }
-    return map;
-  }
-
   /** Drain all elements of <code>as</code> into a list. */
   public static <A> List<A> toList(Collection<A> as) {
     return new ArrayList<>(as);
-  }
-
-  /** Return nil if <code>a</code> is null or a list containing <code>a</code> otherwise. */
-  @SuppressWarnings("unchecked")
-  public static <A> List<A> toList(A a) {
-    return a != null ? list(a) : Collections.<A> nil();
   }
 
   /**
@@ -455,16 +356,6 @@ public final class Collections {
     return map;
   }
 
-  /** Create a sorted map from a list of tuples (K, V) based on the natural ordering of K. */
-  @SafeVarargs
-  public static <K, V> SortedMap<K, V> smap(Tuple<? extends K, ? extends V>... ts) {
-    final SortedMap<K, V> map = new TreeMap<>();
-    for (Tuple<? extends K, ? extends V> t : ts) {
-      map.put(t.getA(), t.getB());
-    }
-    return map;
-  }
-
   /** Create a dictionary from a list of tuples (K, V). */
   @SafeVarargs
   public static <K, V> Dictionary<K, V> dict(Tuple<? extends K, ? extends V>... ts) {
@@ -473,125 +364,6 @@ public final class Collections {
       dict.put(t.getA(), t.getB());
     }
     return dict;
-  }
-
-  /** Create properties from a list of tuples (K, V). */
-  @SafeVarargs
-  public static Properties properties(Tuple<String, String>... ts) {
-    Properties a = new Properties();
-    for (Tuple<String, String> t : ts) {
-      a.setProperty(t.getA(), t.getB());
-    }
-    return a;
-  }
-
-  /** Convert a properties object into a typed immutable map. */
-  public static Map<String, String> toMap(final Properties p) {
-    final Map<String, String> m = new HashMap<>();
-    for (Map.Entry e : p.entrySet()) {
-      m.put(e.getKey().toString(), e.getValue().toString());
-    }
-    return java.util.Collections.unmodifiableMap(m);
-  }
-
-  /**
-   * Partition a list after some predicate <code>group</code> into <code>map</code>.
-   *
-   * Use e.g. <code>ArrayListMultimap.create()</code> to create a multimap.
-   *
-   * @see #groupBy(Iterable, Function)
-   */
-  public static <K, V> Multimap<K, V> groupBy(Multimap<K, V> map,
-                                              Iterable<? extends V> values,
-                                              Function<? super V, ? extends K> group) {
-    for (V value : values) {
-      final K key = group.apply(value);
-      map.put(key, value);
-    }
-    return map;
-  }
-
-  /**
-   * Partition a list after some predicate <code>group</code> into <code>map</code>.
-   *
-   * @return an {@link ImmutableMultimap}
-   * @see #groupBy(com.google.common.collect.Multimap, Iterable, Function)
-   */
-  public static <K, V> ImmutableMultimap<K, V> groupBy(Iterable<? extends V> values,
-                                                       Function<? super V, ? extends K> group) {
-    final ImmutableMultimap.Builder<K, V> map = ImmutableMultimap.builder();
-    for (V value : values) {
-      final K key = group.apply(value);
-      map.put(key, value);
-    }
-    return map.build();
-  }
-
-  /**
-   * Partition a list after some predicate <code>group</code> into <code>map</code>.
-   */
-  public static <K, V, X> Multimap<K, V> makeMap(Multimap<K, V> map,
-                                                 Iterable<? extends X> values,
-                                                 Function<? super X, Tuple<K, V>> group) {
-    for (X value : values) {
-      final Tuple<K, V> entry = group.apply(value);
-      map.put(entry.getA(), entry.getB());
-    }
-    return map;
-  }
-
-  /** Partition a list in chunks of size <code>size</code>. The last chunk may be smaller. */
-  public static <A> List<List<A>> grouped(List<A> as, int size) {
-    final List<List<A>> grouped = new ArrayList<>((as.size() / size) + 1);
-    List<A> group = new ArrayList<>(size);
-    grouped.add(group);
-    int count = size;
-    for (A a : as) {
-      if (count == 0) {
-        group = new ArrayList<>(size);
-        grouped.add(group);
-        count = size;
-      }
-      group.add(a);
-      count--;
-    }
-    return grouped;
-  }
-
-  /** Create a list of unique elements determined by a given criteria. */
-  public static <A, B> Collection<A> unique(List<A> as, Function<A, B> criteria) {
-    final Map<B, A> unique = new HashMap<>();
-    for (A a : as) {
-      unique.put(criteria.apply(a), a);
-    }
-    return unique.values();
-  }
-
-  /**
-   * Partition a list after some predicate <code>keyGen</code>. The partition function has to make sure that keys are
-   * unique per list element because each key holds only one value. Later values overwrite newer ones.
-   *
-   * The resulting map is an immutable {@link java.util.HashMap}.
-   *
-   * @see #asMap(java.util.Map, java.util.List, Function)
-   */
-  public static <K, V> Map<K, V> asMap(List<V> values, Function<V, K> keyGen) {
-    return java.util.Collections.unmodifiableMap(asMap(new HashMap<K, V>(), values, keyGen));
-  }
-
-  /**
-   * Partition a list after some predicate <code>keyGen</code> into <code>map</code>. The partition function has to make
-   * sure that keys are unique per list element because each key holds only one value. Later values overwrite newer
-   * ones.
-   *
-   * @see #asMap(java.util.List, Function)
-   */
-  public static <K, V> Map<K, V> asMap(Map<K, V> map, List<V> values, Function<V, K> keyGen) {
-    for (V value : values) {
-      final K key = keyGen.apply(value);
-      map.put(key, value);
-    }
-    return map;
   }
 
   /** Create an array from a collection. */
@@ -605,28 +377,6 @@ public final class Collections {
     final double[] target = new double[as.size()];
     int i = 0;
     for (Double a : as) {
-      target[i] = a;
-      i++;
-    }
-    return target;
-  }
-
-  /** Convert a collection of {@link Float}s into an array of primitive type. */
-  public static float[] toFloatArray(Collection<Float> as) {
-    final float[] target = new float[as.size()];
-    int i = 0;
-    for (Float a : as) {
-      target[i] = a;
-      i++;
-    }
-    return target;
-  }
-
-  /** Convert a collection of {@link Integer}s into an array of primitive type. */
-  public static int[] toIntArray(Collection<Integer> as) {
-    final int[] target = new int[as.size()];
-    int i = 0;
-    for (Integer a : as) {
       target[i] = a;
       i++;
     }
@@ -722,84 +472,6 @@ public final class Collections {
     };
   }
 
-  public static <A> Function<Option<A>, List<A>> optionToList() {
-    return new Function<Option<A>, List<A>>() {
-      @Override
-      public List<A> apply(Option<A> as) {
-        return as.list();
-      }
-    };
-  }
-
-  public static <A, B> Function<A[], List<B>> flatMapArrayToList(final Function<A, List<B>> f) {
-    return new Function<A[], List<B>>() {
-      @Override
-      public List<B> apply(A[] as) {
-        return Monadics.mlist(as).bind(f).value();
-      }
-    };
-  }
-
-  /** Turn an option into an iterator. */
-  public static <A> Function<Option<A>, Iterator<A>> optionToIterator() {
-    return new Function<Option<A>, Iterator<A>>() {
-      @Override
-      public Iterator<A> apply(Option<A> as) {
-        return as.iterator();
-      }
-    };
-  }
-
-  public static <A> Function<List<A>, Option<A>> head() {
-    return new Function<List<A>, Option<A>>() {
-      @Override
-      public Option<A> apply(List<A> as) {
-        return Collections.head(as);
-      }
-    };
-  }
-
-  /** Sort a list. */
-  public static <A extends Comparable> Function<List<A>, List<A>> sort() {
-    return new Function<List<A>, List<A>>() {
-      @Override
-      public List<A> apply(List<A> as) {
-        List<A> asCopy = new ArrayList<>(as);
-        java.util.Collections.sort(asCopy);
-        return asCopy;
-      }
-    };
-  }
-
-  /** Create a function that checks if its argument is contained in <code>as</code>. */
-  public static <A> Function<A, Boolean> containedIn(final List<A> as) {
-    return new Function<A, Boolean>() {
-      @Override
-      public Boolean apply(A a) {
-        return as.contains(a);
-      }
-    };
-  }
-
-  /** Curried version of {@link List#contains(Object)}. */
-  public static <A> Function<List<A>, Function<A, Boolean>> containedIn() {
-    return new Function<List<A>, Function<A, Boolean>>() {
-      @Override
-      public Function<A, Boolean> apply(final List<A> as) {
-        return containedIn(as);
-      }
-    };
-  }
-
-  public static <A> Function<Option<A>, A> getOrElse(final A a) {
-    return new Function<Option<A>, A>() {
-      @Override
-      public A apply(Option<A> ao) {
-        return ao.getOrElse(a);
-      }
-    };
-  }
-
   /** Concat (aka flatten) a collection of collections by concatenating them all. [[a]] -&gt; [a] */
   public static <A, M extends Collection<? extends Collection<A>>> List<A> concat(M as) {
     final List<A> target = new ArrayList<>(as.size());
@@ -807,16 +479,6 @@ public final class Collections {
       target.addAll(a);
     }
     return target;
-  }
-
-  /** Return a function to get data from a map. <code>map -&gt; key -&gt; value</code> */
-  public static <A, B> Function<A, Option<B>> getMap(final Map<A, B> map) {
-    return new Function<A, Option<B>>() {
-      @Override
-      public Option<B> apply(A a) {
-        return option(map.get(a));
-      }
-    };
   }
 
 }

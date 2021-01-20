@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>9-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -39,9 +39,6 @@
               org.opencastproject.silencedetection.endpoint.*;version=${project.version},
               org.opencastproject.silencedetection.ffmpeg.*;version=${project.version},
             </Export-Package>
-            <Service-Component>
-              OSGI-INF/silence-detection-service.xml,
-            </Service-Component>
           </instructions>
         </configuration>
       </plugin>
@@ -51,10 +48,6 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -85,8 +78,8 @@
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.ws.rs</groupId>
-      <artifactId>jsr311-api</artifactId>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

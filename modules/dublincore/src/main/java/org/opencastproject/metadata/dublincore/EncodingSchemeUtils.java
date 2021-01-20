@@ -22,11 +22,6 @@
 
 package org.opencastproject.metadata.dublincore;
 
-import static org.opencastproject.util.data.Option.option;
-
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
-
 import com.entwinemedia.fn.data.Opt;
 
 import org.joda.time.Duration;
@@ -192,13 +187,6 @@ public final class EncodingSchemeUtils {
     return null;
   }
 
-  public static Long decodeMandatoryDuration(DublinCoreValue value) {
-    Long l = decodeDuration(value);
-    if (l == null)
-      throw new IllegalArgumentException("Cannot decode duration: " + value);
-    return l;
-  }
-
   public static Long decodeMandatoryDuration(String value) {
     Long l = decodeDuration(value);
     if (l == null)
@@ -230,13 +218,6 @@ public final class EncodingSchemeUtils {
     return null;
   }
 
-  /** {@link #decodeDate(org.opencastproject.metadata.dublincore.DublinCoreValue)} as a function. */
-  public static final Function<DublinCoreValue, Option<Date>> dcValueToDate = new Function<DublinCoreValue, Option<Date>>() {
-    @Override public Option<Date> apply(DublinCoreValue dublinCoreValue) {
-      return option(decodeDate(dublinCoreValue));
-    }
-  };
-
   /**
    * Tries to decode the given value as a W3C-DTF encoded date. If decoding fails, null is returned.
    *
@@ -258,13 +239,6 @@ public final class EncodingSchemeUtils {
 
     return null;
   }
-
-  /** {@link #decodeDate(String)} as a function. */
-  public static final Function<String, Option<Date>> stringToDate = new Function<String, Option<Date>>() {
-    @Override public Option<Date> apply(String s) {
-      return option(decodeDate(s));
-    }
-  };
 
   /**
    * Like {@link #decodeDate(String)}, but throws an {@link IllegalArgumentException} if the value cannot be decoded.

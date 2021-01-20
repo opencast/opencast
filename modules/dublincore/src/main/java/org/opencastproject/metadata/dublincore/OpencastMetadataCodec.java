@@ -35,11 +35,6 @@ public final class OpencastMetadataCodec {
   private OpencastMetadataCodec() {
   }
 
-  /** Encode a date with day precision. */
-  @Nonnull public static DublinCoreValue encodeDate(Date date) {
-    return EncodingSchemeUtils.encodeDate(date, Precision.Day);
-  }
-
   /** Encode a date with a given precision. */
   @Nonnull public static DublinCoreValue encodeDate(Date date, Precision p) {
     return EncodingSchemeUtils.encodeDate(date, p);
@@ -77,11 +72,6 @@ public final class OpencastMetadataCodec {
   /** Encode a period with a given precision. */
   @Nonnull public static DublinCoreValue encodePeriod(Date from, Date to, Precision precision) {
     return EncodingSchemeUtils.encodePeriod(new DCMIPeriod(from, to), precision);
-  }
-
-  /** Decode a period. */
-  @Nonnull public static DCMIPeriod decodePeriod(String period) {
-    return EncodingSchemeUtils.decodeMandatoryPeriod(period);
   }
 
   /** Decode a temporal value. */

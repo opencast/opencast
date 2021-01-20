@@ -233,6 +233,25 @@ public interface WorkflowService {
           UnauthorizedException, WorkflowStateException;
 
   /**
+   * Permanently removes a workflow instance. Option to remove a workflow instance regardless of its status.
+   *
+   * @param workflowInstanceId
+   *          the workflow instance identifier
+   * @param force
+   *          remove the workflow instance no matter the status
+   * @throws WorkflowDatabaseException
+   *           if there is a problem writing to the database
+   * @throws NotFoundException
+   *           if no workflow instance with the given identifier could be found
+   * @throws UnauthorizedException
+   *           if the current user does not have write permissions on the workflow instance
+   * @throws WorkflowStateException
+   *           if the workflow instance is in a disallowed state
+   */
+  void remove(long workflowInstanceId, boolean force) throws WorkflowDatabaseException, WorkflowParsingException,
+          NotFoundException, UnauthorizedException, WorkflowStateException;
+
+  /**
    * Temporarily suspends a started workflow instance.
    *
    * @param workflowInstanceId

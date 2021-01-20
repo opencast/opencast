@@ -23,7 +23,6 @@ package org.opencastproject.scheduler.api;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
@@ -272,20 +271,6 @@ public interface SchedulerService {
    *           if exception occurred
    */
   TechnicalMetadata getTechnicalMetadata(String mediaPackageId)
-          throws NotFoundException, UnauthorizedException, SchedulerException;
-
-  /**
-   * Retrieves access control list associated with specified event ID.
-   *
-   * @param mediaPackageId
-   *          ID of event for which access control list will be retrieved
-   * @return {@link AccessControlList} for specified event
-   * @throws NotFoundException
-   *           if event with specified ID cannot be found
-   * @throws SchedulerException
-   *           if exception occurred
-   */
-  AccessControlList getAccessControlList(String mediaPackageId)
           throws NotFoundException, UnauthorizedException, SchedulerException;
 
   /**

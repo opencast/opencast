@@ -189,4 +189,4 @@ set all servers to use the same URL (e.g. URL of the admin node).
 
 To ensure that jobs are not dispatched by non-admin nodes, on these you should also set:
 
-    dispatchinterval=0
+    dispatch.interval=0

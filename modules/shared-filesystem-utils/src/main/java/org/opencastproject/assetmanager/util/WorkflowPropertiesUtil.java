@@ -119,7 +119,7 @@ public final class WorkflowPropertiesUtil {
     // Store all properties
     for (final Map.Entry<String, String> entry : properties.entrySet()) {
       final PropertyId propertyId = PropertyId
-              .mk(mediaPackage.getIdentifier().compact(), WORKFLOW_PROPERTIES_NAMESPACE, entry.getKey());
+              .mk(mediaPackage.getIdentifier().toString(), WORKFLOW_PROPERTIES_NAMESPACE, entry.getKey());
       final Property property = Property.mk(propertyId, Value.mk(entry.getValue()));
       assetManager.setProperty(property);
     }

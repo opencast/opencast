@@ -24,15 +24,9 @@ package org.opencastproject.oaipmh.util;
 
 import org.opencastproject.util.data.Function;
 
-import org.osgi.service.component.ComponentContext;
-
-import java.util.Collections;
-import java.util.Map;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Functions supporting persistence.
@@ -40,21 +34,6 @@ import javax.persistence.spi.PersistenceProvider;
 public final class PersistenceUtil {
 
   private PersistenceUtil() {
-  }
-
-  /**
-   * Create a new entity manager factory with the persistence unit name <code>emName</code>. A
-   * {@link PersistenceProvider} named <code>persistence</code> has to be registered as an OSGi service. If you want to
-   * configure the factory please also register a map containing all properties under the name
-   * <code>persistenceProps</code>. See {@link PersistenceProvider#createEntityManagerFactory(String, Map)} for more
-   * information about config maps.
-   */
-  public static EntityManagerFactory newEntityManagerFactory(ComponentContext cc, String emName) {
-    PersistenceProvider persistenceProvider = (PersistenceProvider) cc.locateService("persistence");
-    final Map persistenceProps;
-    Map pp = (Map) cc.locateService("persistenceProps");
-    persistenceProps = pp != null ? pp : Collections.emptyMap();
-    return persistenceProvider.createEntityManagerFactory(emName, persistenceProps);
   }
 
   /**

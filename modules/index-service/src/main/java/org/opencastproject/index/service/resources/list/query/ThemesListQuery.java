@@ -21,10 +21,11 @@
 
 package org.opencastproject.index.service.resources.list.query;
 
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
-import org.opencastproject.index.service.resources.list.api.ResourceListFilter.SourceType;
 import org.opencastproject.index.service.resources.list.provider.UsersListProvider;
 import org.opencastproject.index.service.util.FiltersUtils;
+import org.opencastproject.list.api.ResourceListFilter;
+import org.opencastproject.list.api.ResourceListFilter.SourceType;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.util.data.Option;
 
 /**
@@ -75,7 +76,7 @@ public class ThemesListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createCreatorFilter(Option<String> creator) {
     return FiltersUtils.generateFilter(creator, FILTER_CREATOR_NAME, FILTER_CREATOR_LABEL, SourceType.SELECT,
-            Option.some(UsersListProvider.NAME));
+            Option.some(UsersListProvider.NAME_ONLY));
   }
 
 }

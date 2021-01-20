@@ -23,28 +23,19 @@ package org.opencastproject.util.persistencefn;
 
 import static com.entwinemedia.fn.Prelude.chuck;
 import static org.opencastproject.util.persistencefn.PersistenceUtil.mkEntityManager;
-import static org.opencastproject.util.persistencefn.PersistenceUtil.mkEntityManagerFactory;
 import static org.opencastproject.util.persistencefn.PersistenceUtil.mkTestEntityManagerFactory;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
-import org.osgi.service.component.ComponentContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Map;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.persistence.spi.PersistenceProvider;
 
 /**
  * Persistence environment factory.
  */
 public final class PersistenceEnvs {
-  private static final Logger logger = LoggerFactory.getLogger(PersistenceEnvs.class);
 
   private PersistenceEnvs() {
   }
@@ -112,29 +103,6 @@ public final class PersistenceEnvs {
   }
 
   /**
-   * Shortcut for <code>persistenceEnvironment(newEntityManagerFactory(cc, emName))</code>.
-   *
-   * @see org.opencastproject.util.persistence.PersistenceUtil#newEntityManagerFactory(org.osgi.service.component.ComponentContext, String)
-   */
-  public static PersistenceEnv mk(ComponentContext cc, String emName) {
-    return mk(mkEntityManagerFactory(cc, emName));
-  }
-
-  /**
-   * Shortcut for <code>newPersistenceEnvironment(newEntityManagerFactory(cc, emName, persistenceProps))</code>.
-   *
-   * @see org.opencastproject.util.persistence.PersistenceUtil#newEntityManagerFactory(org.osgi.service.component.ComponentContext, String, java.util.Map)
-   */
-  public static PersistenceEnv mk(ComponentContext cc, String emName, Map persistenceProps) {
-    return mk(mkEntityManagerFactory(cc, emName, persistenceProps));
-  }
-
-  /** Create a new persistence environment. This method is the preferred way of creating a persistence environment. */
-  public static PersistenceEnv mk(PersistenceProvider persistenceProvider, String emName, Map persistenceProps) {
-    return mk(persistenceProvider.createEntityManagerFactory(emName, persistenceProps));
-  }
-
-  /**
    * Create a new persistence environment based on an entity manager factory backed by an in-memory H2 database for
    * testing purposes.
    *
@@ -143,19 +111,6 @@ public final class PersistenceEnvs {
    */
   public static PersistenceEnv mkTestEnv(String emName) {
     return mk(mkTestEntityManagerFactory(emName));
-  }
-
-  /**
-   * Create a new persistence environment based on an entity manager factory backed by an in-memory H2 database for
-   * testing purposes.
-   *
-   * @param emName
-   *         name of the persistence unit (see META-INF/persistence.xml)
-   * @param withSqlLogging
-   *         turn on EclipseLink SQL logging
-   */
-  public static PersistenceEnv mkTestEnv(String emName, boolean withSqlLogging) {
-    return mk(mkTestEntityManagerFactory(emName, withSqlLogging));
   }
 
   /**

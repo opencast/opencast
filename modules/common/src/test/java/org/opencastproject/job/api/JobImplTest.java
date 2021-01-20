@@ -42,8 +42,6 @@ public class JobImplTest {
   private final Date completed = new Date(1455009315000L); // Tue Feb 09 2016 09:15:15
   private final URI uri;
 
-  private final List<Long> blockedJobs = Arrays.asList(5L, 6L);
-
   private JobImpl job;
 
   public JobImplTest() throws Exception {

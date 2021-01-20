@@ -28,11 +28,22 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
+@Component(
+  property = {
+    "service.description=File system based asset store",
+    "store.type=local-filesystem"
+  },
+  immediate = true,
+  service = { AssetStore.class }
+)
 public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(OsgiFileSystemAssetStore.class);
@@ -67,6 +78,7 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
   /**
    * OSGi DI.
    */
+  @Reference(name = "workspace")
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
   }
@@ -77,6 +89,7 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
    * @param cc
    *          the component context
    */
+  @Activate
   public void activate(final ComponentContext cc) throws IllegalStateException, IOException {
     storeType = (String) cc.getProperties().get(AssetStore.STORE_TYPE_PROPERTY);
     logger.info("{} is: {}", AssetStore.STORE_TYPE_PROPERTY, storeType);

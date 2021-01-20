@@ -24,6 +24,10 @@ package org.opencastproject.assetmanager.aws.persistence;
 import org.opencastproject.assetmanager.impl.storage.StoragePath;
 
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +36,13 @@ import java.util.List;
 
 import javax.persistence.EntityManagerFactory;
 
+@Component(
+  property = {
+    "service.description=Aws S3 File Archive Persistence"
+  },
+  immediate = false,
+  service = { AwsAssetDatabase.class }
+)
 public class AwsAssetDatabaseImpl implements AwsAssetDatabase {
 
   /** Logging utilities */
@@ -43,16 +54,19 @@ public class AwsAssetDatabaseImpl implements AwsAssetDatabase {
   protected EntityManagerFactory emf;
 
   /** OSGi callback. */
+  @Activate
   public void activate(ComponentContext cc) {
     logger.info("Activating AWS S3 archive");
   }
 
   /** OSGi callback. Closes entity manager factory. */
+  @Deactivate
   public void deactivate(ComponentContext cc) {
     emf.close();
   }
 
   /** OSGi DI */
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.assetmanager.aws.persistence)")
   public void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }

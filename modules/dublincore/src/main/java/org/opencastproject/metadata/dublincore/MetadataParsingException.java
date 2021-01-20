@@ -29,15 +29,6 @@ public class MetadataParsingException extends Exception {
   private static final long serialVersionUID = 4133872609543242983L;
 
   /**
-   * Constructor without cause.
-   *
-   * @param message
-   */
-  public MetadataParsingException(String message) {
-    super(message);
-  }
-
-  /**
    * Full fledged constructor.
    *
    * @param message

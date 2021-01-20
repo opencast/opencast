@@ -21,20 +21,11 @@
 package org.opencastproject.scheduler.api;
 
 import static org.opencastproject.util.EqualsUtil.eq;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
 
-import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.EqualsUtil;
-import org.opencastproject.util.Jsons;
-import org.opencastproject.util.Jsons.Obj;
-import org.opencastproject.util.Jsons.Prop;
 import org.opencastproject.util.data.Option;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -76,22 +67,6 @@ public final class Period {
     this.end = end;
     this.purpose = purpose;
     this.comment = comment;
-  }
-
-  public static Period period(long id, Date start, Date end, String purpose, String comment) {
-    return new Period(some(id), start, end, option(purpose), option(comment));
-  }
-
-  public static Period period(long id, Date start, Date end) {
-    return new Period(some(id), start, end, Option.<String> none(), Option.<String> none());
-  }
-
-  public static Period period(Date start, Date end) {
-    return new Period(none(Long.class), start, end, Option.<String> none(), Option.<String> none());
-  }
-
-  public static Period period(Date start, Date end, String purpose, String comment) {
-    return new Period(none(Long.class), start, end, option(purpose), option(comment));
   }
 
   /**
@@ -152,20 +127,6 @@ public final class Period {
   @Override
   public int hashCode() {
     return EqualsUtil.hash(id, start, end, purpose, comment);
-  }
-
-  public Obj toJson() {
-    List<Prop> props = new ArrayList<>();
-    for (Long identifier : id)
-      props.add(Jsons.p("id", identifier));
-    props.add(Jsons.p("start", DateTimeSupport.toUTC(start.getTime())));
-    props.add(Jsons.p("end", DateTimeSupport.toUTC(end.getTime())));
-    for (String p : purpose)
-      props.add(Jsons.p("purpose", p));
-    for (String c : comment)
-      props.add(Jsons.p("comment", c));
-
-    return Jsons.obj(props.toArray(new Prop[props.size()]));
   }
 
 }

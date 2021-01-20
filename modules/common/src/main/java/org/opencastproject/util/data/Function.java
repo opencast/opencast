@@ -22,8 +22,6 @@
 
 package org.opencastproject.util.data;
 
-import static org.opencastproject.util.data.Either.left;
-import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.util.data.functions.Functions;
@@ -89,11 +87,6 @@ public abstract class Function<A, B> {
     return Functions.toEffect(this);
   }
 
-  /** Convert this function into a google guava function. */
-  public com.google.common.base.Function<A, B> toGuava() {
-    return Functions.toGuava(this);
-  }
-
   public Fn<A, B> toFn() {
     return new Fn<A, B>() {
       @Override
@@ -120,37 +113,6 @@ public abstract class Function<A, B> {
      */
     protected abstract B xapply(A a) throws Exception;
 
-    public final Function<A, Either<Exception, B>> either() {
-      return new Function<A, Either<Exception, B>>() {
-        @Override
-        public Either<Exception, B> apply(A a) {
-          try {
-            return right(xapply(a));
-          } catch (Exception e) {
-            return left(e);
-          }
-        }
-      };
-    }
   }
 
-  /** Version of {@link Function} that allows for throwing a checked exception. */
-  public abstract static class Xe<A, B, Err> extends Function<A, Either<Err, B>> {
-    private final Function<Exception, Err> toErr;
-
-    protected Xe(Function<Exception, Err> toErr) {
-      this.toErr = toErr;
-    }
-
-    @Override
-    public final Either<Err, B> apply(A a) {
-      try {
-        return right(xapply(a));
-      } catch (Exception e) {
-        return left(toErr.apply(e));
-      }
-    }
-
-    protected abstract B xapply(A a) throws Exception;
-  }
 }

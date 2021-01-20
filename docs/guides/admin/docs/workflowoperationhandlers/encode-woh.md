@@ -8,12 +8,13 @@ Description
 
 The encode workflow operation can be used to encode media files to different formats using [FFmpeg](https://ffmpeg.org).
 
-Its functionality is similar to the [compose workflow operation](compose-woh.md) but can utilize the parallel encoding
-capabilities of FFmpeg. This has the advantage that the source file needs to be read only once for several encodings,
-reducing the encoding time quite a lot. Additionally, this will let FFmpeg make better use of multiple CPU cores.
+It can utilize the parallel encoding capabilities of FFmpeg. This has the advantage that the source file needs to be
+read only once for several encodings, reducing the encoding time quite a lot. Additionally, this will let FFmpeg make
+better use of multiple CPU cores.
 
 
-## Parameter Table
+Parameter Table
+---------------
 
 |configuration keys|example           |description                           |
 |------------------|------------------|--------------------------------------|
@@ -36,18 +37,19 @@ run of the operation, the media package will contain four new tracks: the first 
 Operation Example
 -----------------
 
-    <operation
-      id="encode"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="encoding media files">
-        <configurations>
-        <configuration key="source-flavor">*/trimmed</configuration>
-        <configuration key="target-flavor">*/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">parallel.http</configuration>
-      </configurations>
-    </operation>
+```xml
+<operation
+  id="encode"
+  exception-handler-workflow="partial-error"
+  description="encoding media files">
+    <configurations>
+    <configuration key="source-flavor">*/trimmed</configuration>
+    <configuration key="target-flavor">*/delivery</configuration>
+    <configuration key="target-tags">engage-download,engage-streaming</configuration>
+    <configuration key="encoding-profile">parallel.http</configuration>
+  </configurations>
+</operation>
+```
 
 
 Encoding Profile Example
@@ -86,11 +88,12 @@ profile.parallel.http.ffmpeg.command = -i #{in.video.path} \
 ### Resolution Based Encoding
 
 The `encode` operation supports encoding based on the input video's resolution. For example, you can encode a certain
-output resolution only for high resolution inputs. For this you can define variables like `if-height-geq-720` which
-retain their value only if the video resolution meets the defined criteria.
+output resolution only for high resolution inputs. For this you can define conditionally set variables like `if-height-geq-720`
+as part of the `ffmpeg.command` property which retain their value only if the video resolution meets the defined criteria.
+This variable can then be used in the `ffmpeg.command` property.
 
 This modification to the encoding profile from above will encode the 720p output only if the input height is at least
-720 pixels:
+720 pixels, note the Reference `#{if-height-geq-720}` to the variable at the end of the `ffmpeg.command` property:
 
 ```properties
 …
@@ -103,3 +106,11 @@ profile.parallel.http.ffmpeg.command = -i #{in.video.path} \
   -c:a aac -ar 44100 -ab 96k #{out.dir}/#{out.name}#{out.suffix.high-quality} \
   #{if-height-geq-720}
 ```
+
+There are currently two resolution based conditionally set variables supported:
+
+| Variable                                 | Example                           | Description                                                                                                                    |
+|------------------------------------------|-----------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+|`if-height-geq-<height>`                  |`if-height-geq-720`                |The value is set if the height of the video is greater or equal to `<height>` pixels.                                           |
+|`if-width-or-height-geq-<width>-<height>` |`if-width-or-height-geq-1280-720`  |The value is set if the width of the video is greater or equal to `<width>` or if the height is greater or equal to `<height>`. |
+|`if-height-lt-<height>`                   |`if-height-lt-480`                 |The value is set if the height of the video is less than `<height>` pixels.                                                     |

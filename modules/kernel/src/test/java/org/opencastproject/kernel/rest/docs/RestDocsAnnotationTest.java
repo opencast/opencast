@@ -57,13 +57,13 @@ public class RestDocsAnnotationTest {
         Assert.assertEquals("The ID of the capture to start", annotation.restParameters()[0].description());
         Assert.assertTrue(annotation.restParameters()[0].isRequired());
 
-        Assert.assertTrue(annotation.reponses().length == 2);
+        Assert.assertTrue(annotation.responses().length == 2);
 
-        Assert.assertEquals(200, annotation.reponses()[0].responseCode());
-        Assert.assertEquals("When the capture started correctly", annotation.reponses()[0].description());
+        Assert.assertEquals(200, annotation.responses()[0].responseCode());
+        Assert.assertEquals("When the capture started correctly", annotation.responses()[0].description());
 
-        Assert.assertEquals(400, annotation.reponses()[1].responseCode());
-        Assert.assertEquals("When there are no media devices", annotation.reponses()[1].description());
+        Assert.assertEquals(400, annotation.responses()[1].responseCode());
+        Assert.assertEquals("When there are no media devices", annotation.responses()[1].description());
       }
     } catch (SecurityException e) {
       Assert.fail();
@@ -84,7 +84,7 @@ public class RestDocsAnnotationTest {
             returnDescription = "A list of capture agent things",
             pathParameters = { @RestParameter(name = "location", description = "The room of the capture agent", isRequired = false, type = Type.STRING, defaultValue = "") },
             restParameters = { @RestParameter(name = "id", description = "The ID of the capture to start", isRequired = true, type = Type.STRING, defaultValue = "") },
-            reponses = { @RestResponse(responseCode = 200, description = "When the capture started correctly"),
+            responses = { @RestResponse(responseCode = 200, description = "When the capture started correctly"),
                          @RestResponse(responseCode = 400, description = "When there are no media devices") }
             )
     public int methodA()

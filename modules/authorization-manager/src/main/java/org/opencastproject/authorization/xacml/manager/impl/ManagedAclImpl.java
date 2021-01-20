@@ -71,9 +71,4 @@ public final class ManagedAclImpl implements ManagedAcl {
     return organizationId;
   }
 
-  public static ManagedAclImpl fromManagedAcl(ManagedAcl acl) {
-    if (acl instanceof ManagedAclImpl)
-      return (ManagedAclImpl) acl;
-    return new ManagedAclImpl(acl.getId(), acl.getName(), acl.getOrganizationId(), acl.getAcl());
-  }
 }

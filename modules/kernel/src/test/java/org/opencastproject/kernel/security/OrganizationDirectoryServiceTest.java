@@ -140,7 +140,7 @@ public class OrganizationDirectoryServiceTest {
     // Add properties
     properties.put(OrganizationDirectoryServiceImpl.ORG_ID_KEY, "mh_default");
     properties.put(OrganizationDirectoryServiceImpl.ORG_NAME_KEY, "Opencast Test");
-    properties.put(OrganizationDirectoryServiceImpl.ORG_SERVER_KEY, "localhost");
+    properties.put(OrganizationDirectoryServiceImpl.ORG_SERVER_PREFIX + "localhost", "localhost");
     properties.put(OrganizationDirectoryServiceImpl.ORG_PORT_KEY, "8080");
     properties.put(OrganizationDirectoryServiceImpl.ORG_ADMIN_ROLE_KEY, "ROLE_TEST_ADMIN");
     properties.put(OrganizationDirectoryServiceImpl.ORG_ANONYMOUS_ROLE_KEY, "ROLE_TEST_ANONYMOUS");
@@ -153,10 +153,11 @@ public class OrganizationDirectoryServiceTest {
       fail("Configuration exception occured");
     }
 
-    // Update properties
+    properties = new Hashtable<String, String>();
     properties.put(OrganizationDirectoryServiceImpl.ORG_ID_KEY, "mh_default");
     properties.put(OrganizationDirectoryServiceImpl.ORG_NAME_KEY, "Opencast Test 2");
-    properties.put(OrganizationDirectoryServiceImpl.ORG_SERVER_KEY, "localhost2,another");
+    properties.put(OrganizationDirectoryServiceImpl.ORG_SERVER_PREFIX + "localhost2", "localhost2");
+    properties.put(OrganizationDirectoryServiceImpl.ORG_SERVER_PREFIX + "another", "another");
     properties.put(OrganizationDirectoryServiceImpl.ORG_PORT_KEY, "8081");
     properties.put(OrganizationDirectoryServiceImpl.ORG_ADMIN_ROLE_KEY, "ROLE_TEST2_ADMIN");
     properties.put(OrganizationDirectoryServiceImpl.ORG_ANONYMOUS_ROLE_KEY, "ROLE_TEST2_ANONYMOUS");

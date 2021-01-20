@@ -49,6 +49,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,6 +78,14 @@ import javax.persistence.RollbackException;
 /**
  * IMPL for the capture-admin service (MH-1336, MH-1394, MH-1457, MH-1475 and MH-1476).
  */
+@Component(
+  property = {
+    "service.description=Capture-Admin Service",
+    "service.pid=org.opencastproject.capture.agent"
+  },
+  immediate = true,
+  service = { CaptureAgentStateService.class , ManagedServiceFactory.class }
+)
 public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, ManagedServiceFactory {
 
   private static final Logger logger = LoggerFactory.getLogger(CaptureAgentStateServiceImpl.class);
@@ -103,6 +115,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   protected Object nullToken = new Object();
 
   /** OSGi DI */
+  @Reference(name = "entityManagerFactory", target = "(osgi.unit.name=org.opencastproject.capture.admin.impl.CaptureAgentStateServiceImpl)")
   void setEntityManagerFactory(EntityManagerFactory emf) {
     this.emf = emf;
   }
@@ -111,6 +124,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -119,6 +133,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     logger.info("CaptureAgentStateServiceImpl starting.");
   }
 
+  @Activate
   public void activate(ComponentContext cc) {
 
     // Set up the agent cache
@@ -139,6 +154,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     logger.info("Capture agent status timeout is {} minutes", timeoutInMinutes);
   }
 
+  @Deactivate
   public void deactivate() {
     agentCache.invalidateAll();
   }
@@ -153,16 +169,6 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     String org = securityService.getOrganization().getId();
     Agent agent = getAgent(name, org);
     return updateCachedLastHeardFrom(agent, org);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.capture.admin.api.CaptureAgentStateService#updateAgent(Agent)
-   */
-  @Override
-  public void updateAgent(Agent agent) {
-    updateAgentInDatabase((AgentImpl) agent);
   }
 
   /**

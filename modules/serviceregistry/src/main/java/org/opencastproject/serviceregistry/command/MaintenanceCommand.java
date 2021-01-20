@@ -21,53 +21,31 @@
 
 package org.opencastproject.serviceregistry.command;
 
-import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.util.NotFoundException;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * An interactive shell command for putting Maintainable services in and out of maintenance mode
  *
  */
+@Component(
+  property = {
+    "service.description=Maintenance Command (m:set id true|false, m:list)",
+    "osgi.command.scope=maintain",
+    "osgi.command.function=set",
+    "osgi.command.function=list"
+  },
+  immediate = true,
+  service = { MaintenanceCommand.class }
+)
 public class MaintenanceCommand {
   protected ServiceRegistry serviceRegistry;
 
+  @Reference(name = "remoteServiceManager")
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     this.serviceRegistry = remoteServiceManager;
-  }
-
-  public String set(String baseUrl, boolean maintenanceMode) {
-    try {
-      serviceRegistry.setMaintenanceStatus(baseUrl, maintenanceMode);
-      if (maintenanceMode) {
-        return baseUrl + " is now in maintenance mode\n";
-      } else {
-        return baseUrl + " has returned to service\n";
-      }
-    } catch (ServiceRegistryException e) {
-      return "Error setting maintenance mode: " + e.getMessage() + "\n";
-    } catch (NotFoundException e) {
-      return "Error setting maintenance mode, host " + baseUrl + " not found";
-    }
-  }
-
-  public String list() {
-    try {
-      StringBuilder sb = new StringBuilder();
-      for (ServiceRegistration reg : serviceRegistry.getServiceRegistrations()) {
-        sb.append(reg.getServiceType());
-        sb.append("@");
-        sb.append(reg.getHost());
-        if (reg.isInMaintenanceMode()) {
-          sb.append(" (maintenance mode)");
-        }
-        sb.append("\n");
-      }
-      return sb.toString();
-    } catch (ServiceRegistryException e) {
-      return "Error: " + e.getMessage() + "\n";
-    }
   }
 
 }

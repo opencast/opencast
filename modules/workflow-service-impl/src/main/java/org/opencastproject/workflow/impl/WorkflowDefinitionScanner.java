@@ -35,6 +35,9 @@ import org.opencastproject.workflow.api.WorkflowStateMapping;
 
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +57,13 @@ import java.util.stream.Stream;
  * Loads, unloads, and reloads {@link WorkflowDefinition}s from "*workflow.xml" files in any of fileinstall's watch
  * directories.
  */
+@Component(
+  property = {
+    "service.description=Workflow Definition Scanner"
+  },
+  immediate = true,
+  service = { ArtifactInstaller.class, WorkflowDefinitionScanner.class }
+)
 public class WorkflowDefinitionScanner implements ArtifactInstaller {
   private static final Logger logger = LoggerFactory.getLogger(WorkflowDefinitionScanner.class);
 
@@ -80,6 +90,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
 
   private OrganizationDirectoryService organizationDirectoryService;
 
+  @Reference(name = "index")
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     this.organizationDirectoryService = organizationDirectoryService;
   }
@@ -92,6 +103,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
    * @param ctx
    *          the bundle context
    */
+  @Activate
   void activate(BundleContext ctx) {
     this.bundleCtx = ctx;
   }
@@ -122,6 +134,7 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller {
       if (fileWithIdentifier.getValue().equals(workflowIdentifier) && !fileWithIdentifier.getKey().equals(artifact)) {
         logger.warn("Workflow with identifier '{}' already registered in file '{}', ignoring", workflowIdentifier,
                 fileWithIdentifier.getKey());
+        artifactsWithError.add(artifact);
         return;
       }
     }

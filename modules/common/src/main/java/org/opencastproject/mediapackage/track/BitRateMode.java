@@ -22,8 +22,6 @@
 
 package org.opencastproject.mediapackage.track;
 
-import org.opencastproject.util.EnumSupport;
-
 /**
  * Contains the several bitrate modes.
  */
@@ -31,7 +29,4 @@ public enum BitRateMode {
 
   VariableBitRate, ConstantBitRate;
 
-  public static BitRateMode fromString(String value) {
-    return EnumSupport.fromString(BitRateMode.class, value);
-  }
 }

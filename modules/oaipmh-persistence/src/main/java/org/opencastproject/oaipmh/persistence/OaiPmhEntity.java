@@ -72,7 +72,7 @@ public class OaiPmhEntity {
   private String repositoryId;
 
   /** Series id */
-  @Column(name = "series_id")
+  @Column(name = "series_id",length = 128)
   private String series;
 
   /** Flag indicating deletion. */
@@ -91,15 +91,15 @@ public class OaiPmhEntity {
 
   /** Serialized media package */
   @Lob
-  @Column(name = "mediapackage_xml", length = 65535)
+  @Column(name = "mediapackage_xml", length = 65535, nullable = false)
   private String mediaPackageXML;
 
   /** List of serialized media package element entities */
   @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumns({
-    @JoinColumn(name = "mp_id", referencedColumnName = "mp_id", nullable = false, table = "oc_oaipmh_elements"),
-    @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false, table = "oc_oaipmh_elements"),
-    @JoinColumn(name = "repo_id", referencedColumnName = "repo_id", nullable = false, table = "oc_oaipmh_elements")
+    @JoinColumn(name = "mp_id", referencedColumnName = "mp_id", nullable = false, table = "oc_oaipmh_elements", insertable = false, updatable = false),
+    @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false, table = "oc_oaipmh_elements", insertable = false, updatable = false),
+    @JoinColumn(name = "repo_id", referencedColumnName = "repo_id", nullable = false, table = "oc_oaipmh_elements", insertable = false, updatable = false)
   })
   private List<OaiPmhElementEntity> mediaPackageElements = new ArrayList<>();
 

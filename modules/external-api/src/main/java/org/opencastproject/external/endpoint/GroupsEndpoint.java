@@ -34,7 +34,6 @@ import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.external.common.ApiMediaType;
@@ -81,7 +80,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
+            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0 })
 @RestService(name = "externalapigroups", title = "External API Groups Service", notes = {}, abstractText = "Provides resources and operations related to the groups")
 public class GroupsEndpoint {
 
@@ -113,7 +113,7 @@ public class GroupsEndpoint {
           @RestParameter(name = "filter", isRequired = false, description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = RestParameter.Type.INTEGER) }, reponses = {
+          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = RestParameter.Type.INTEGER) }, responses = {
                   @RestResponse(description = "A (potentially empty) list of groups.", responseCode = HttpServletResponse.SC_OK) })
   public Response getGroups(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
@@ -129,7 +129,7 @@ public class GroupsEndpoint {
       results = indexService.getGroups(filter, optLimit, optOffset, Opt.nul(StringUtils.trimToNull(sort)),
               externalIndex);
     } catch (SearchIndexException e) {
-      logger.error("The External Search Index was not able to get the groups list: {}", getStackTrace(e));
+      logger.error("The External Search Index was not able to get the groups list:", e);
       return ApiResponses.serverError("Could not retrieve groups, reason: '%s'", getMessage(e));
     }
 
@@ -144,7 +144,7 @@ public class GroupsEndpoint {
   @GET
   @Path("{groupId}")
   @RestQuery(name = "getgroup", description = "Returns a single group.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, responses = {
                   @RestResponse(description = "The group is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified group does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id)
@@ -158,7 +158,7 @@ public class GroupsEndpoint {
   @DELETE
   @Path("{groupId}")
   @RestQuery(name = "deletegroup", description = "Deletes a group.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, responses = {
                   @RestResponse(description = "The group has been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
                   @RestResponse(description = "The specified group does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id)
@@ -183,7 +183,7 @@ public class GroupsEndpoint {
                   @RestParameter(name = "name", isRequired = false, description = "Group Name", type = STRING),
                   @RestParameter(name = "description", description = "Group Description", isRequired = false, type = STRING),
                   @RestParameter(name = "roles", description = "Comma-separated list of roles", isRequired = false, type = STRING),
-                  @RestParameter(name = "members", description = "Comma-separated list of members", isRequired = false, type = STRING) }, reponses = {
+                  @RestParameter(name = "members", description = "Comma-separated list of members", isRequired = false, type = STRING) }, responses = {
                           @RestResponse(description = "The group has been updated.", responseCode = HttpServletResponse.SC_CREATED),
                           @RestResponse(description = "The specified group does not exist.", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
   public Response updateGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
@@ -206,7 +206,7 @@ public class GroupsEndpoint {
           @RestParameter(name = "name", isRequired = true, description = "Group Name", type = STRING),
           @RestParameter(name = "description", description = "Group Description", isRequired = false, type = STRING),
           @RestParameter(name = "roles", description = "Comma-separated list of roles", isRequired = false, type = STRING),
-          @RestParameter(name = "members", description = "Comma-separated list of members", isRequired = false, type = STRING) }, reponses = {
+          @RestParameter(name = "members", description = "Comma-separated list of members", isRequired = false, type = STRING) }, responses = {
                   @RestResponse(description = "A new group is created.", responseCode = SC_CREATED),
                   @RestResponse(description = "The request is invalid or inconsistent.", responseCode = SC_BAD_REQUEST) })
   public Response createGroup(@HeaderParam("Accept") String acceptHeader, @FormParam("name") String name,
@@ -229,7 +229,7 @@ public class GroupsEndpoint {
   @Path("{groupId}/members")
   @RestQuery(name = "addgroupmember", description = "Adds a member to a group.", returnDescription = "", pathParameters = {
           @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "member", description = "Member Name", isRequired = true, type = STRING) }, reponses = {
+                  @RestParameter(name = "member", description = "Member Name", isRequired = true, type = STRING) }, responses = {
                           @RestResponse(description = "The member was already member of the group.", responseCode = SC_OK),
                           @RestResponse(description = "The member has been added.", responseCode = SC_NO_CONTENT),
                           @RestResponse(description = "The specified group does not exist.", responseCode = SC_NOT_FOUND) })
@@ -259,11 +259,10 @@ public class GroupsEndpoint {
         return ApiResponses.notFound("Cannot find group with id '%s'.", id);
       }
     } catch (SearchIndexException e) {
-      logger.warn("The external search index was not able to retrieve the group with id '%s', reason: ",
-              getStackTrace(e));
+      logger.warn("The external search index was not able to retrieve the group with id '{}', reason: ", id, e);
       return ApiResponses.serverError("Could not retrieve group with id '%s', reason: '%s'", id, getMessage(e));
     } catch (NotFoundException e) {
-      logger.warn("The external search index was not able to update the group with id {}, ", getStackTrace(e));
+      logger.warn("The external search index was not able to update the group with id {}, ", id, e);
       return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'", id, getMessage(e));
     }
   }
@@ -272,7 +271,7 @@ public class GroupsEndpoint {
   @Path("{groupId}/members/{memberId}")
   @RestQuery(name = "removegroupmember", description = "Removes a member from a group", returnDescription = "", pathParameters = {
           @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING),
-          @RestParameter(name = "memberId", description = "The member id", isRequired = true, type = STRING) }, reponses = {
+          @RestParameter(name = "memberId", description = "The member id", isRequired = true, type = STRING) }, responses = {
                   @RestResponse(description = "The member has been removed.", responseCode = HttpServletResponse.SC_NO_CONTENT),
                   @RestResponse(description = "The specified group or member does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response removeGroupMember(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
@@ -302,10 +301,10 @@ public class GroupsEndpoint {
         return ApiResponses.notFound("Cannot find group with id '%s'.", id);
       }
     } catch (SearchIndexException e) {
-      logger.warn("The external search index was not able to retrieve the group with id {}, ", getStackTrace(e));
+      logger.warn("The external search index was not able to retrieve the group with id {}, ", id, e);
       return ApiResponses.serverError("Could not retrieve groups, reason: '%s'", getMessage(e));
     } catch (NotFoundException e) {
-      logger.warn("The external search index was not able to update the group with id {}, ", getStackTrace(e));
+      logger.warn("The external search index was not able to update the group with id {}, ", id, e);
       return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'", id, getMessage(e));
     }
   }

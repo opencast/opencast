@@ -109,7 +109,7 @@ public class SchedulerUpdateHandler extends UpdateHandler {
           throw new IllegalArgumentException("Unhandled type of SchedulerItem");
       }
     } catch (Exception e) {
-      logger.warn(String.format("Exception occurred for mp %s, event type %s", mpId, schedulerItem.getType()), e);
+      logger.warn("Exception occurred for mp {}, event type {}", mpId, schedulerItem.getType(), e);
     } finally {
       logger.debug("Scheduler message handler END for mp {} event type {} in thread {}", mpId, schedulerItem.getType(),
               Thread.currentThread().getId());

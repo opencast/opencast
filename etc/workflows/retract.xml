@@ -31,10 +31,6 @@
               <label for="retractPreview">Preview and Editing Media</label>
             </li>
             <li>
-              <input id="retractFromOaiPmh" type="checkbox" checked="checked" class="configField" value="true" />
-              <label for="retractFromOaiPmh">Default OAI-PMH Repository</label>
-            </li>
-            <li>
               <input id="retractFromYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
               <label for="retractFromYouTube">YouTube</label>
             </li>
@@ -55,7 +51,6 @@
         <configuration key="retractFromAws">true</configuration>
         <configuration key="retractFromApi">true</configuration>
         <configuration key="retractPreview">true</configuration>
-        <configuration key="retractFromOaiPmh">true</configuration>
         <configuration key="retractFromYouTube">false</configuration>
       </configurations>
     </operation>

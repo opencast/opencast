@@ -47,7 +47,6 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
-import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.json.JValue;
@@ -55,6 +54,9 @@ import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +89,15 @@ import javax.ws.rs.core.Response.Status;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+  immediate = true,
+  service = TasksEndpoint.class,
+  property = {
+    "service.description=Admin UI - Tasks facade Endpoint",
+    "opencast.service.type=org.opencastproject.adminui.endpoint.TasksEndpoint",
+    "opencast.service.path=/admin-ng/tasks"
+  }
+)
 public class TasksEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(TasksEndpoint.class);
@@ -95,30 +106,26 @@ public class TasksEndpoint {
 
   private AssetManager assetManager;
 
-  private Workspace workspace;
-
   /** OSGi callback for the workflow service. */
+  @Reference
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
   /** OSGi callback to set the asset manager. */
+  @Reference
   public void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }
 
-  /** OSGi callback to set the workspace. */
-  public void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
-  }
-
+  @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Activate tasks endpoint");
   }
 
   @GET
   @Path("processing.json")
-  @RestQuery(name = "getProcessing", description = "Returns all the data related to the processing tab in the new tasks modal as JSON", returnDescription = "All the data related to the tasks processing tab as JSON", restParameters = { @RestParameter(name = "tags", isRequired = false, description = "A comma separated list of tags to filter the workflow definitions", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the tasks processing tab as JSON") })
+  @RestQuery(name = "getProcessing", description = "Returns all the data related to the processing tab in the new tasks modal as JSON", returnDescription = "All the data related to the tasks processing tab as JSON", restParameters = { @RestParameter(name = "tags", isRequired = false, description = "A comma separated list of tags to filter the workflow definitions", type = RestParameter.Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the tasks processing tab as JSON") })
   public Response getProcessing(@QueryParam("tags") String tagsString) {
     List<String> tags = RestUtil.splitCommaSeparatedParam(Option.option(tagsString)).value();
 
@@ -143,7 +150,7 @@ public class TasksEndpoint {
 
   @POST
   @Path("/new")
-  @RestQuery(name = "createNewTask", description = "Creates a new task by the given metadata as JSON", returnDescription = "The task identifiers", restParameters = { @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON", type = RestParameter.Type.TEXT) }, reponses = {
+  @RestQuery(name = "createNewTask", description = "Creates a new task by the given metadata as JSON", returnDescription = "The task identifiers", restParameters = { @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON", type = RestParameter.Type.TEXT) }, responses = {
           @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Task sucessfully added"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "If the workflow definition is not found"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "If the metadata is not set or couldn't be parsed") })

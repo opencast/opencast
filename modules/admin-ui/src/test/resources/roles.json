@@ -1,0 +1,6 @@
+[
+  { "name": "ROLE_ADMIN", "description": "", "organization": "mh_default_org", "type": "INTERNAL" },
+  { "name": "ROLE_ANONYMOUS", "description": "", "organization": "mh_default_org", "type": "SYSTEM" },
+  { "name": "ROLE_ADMIN_UI", "description": "", "organization": "mh_default_org", "type": "INTERNAL" },
+  { "name": "ROLE_API", "description": "", "organization": "mh_default_org", "type": "INTERNAL" }
+]

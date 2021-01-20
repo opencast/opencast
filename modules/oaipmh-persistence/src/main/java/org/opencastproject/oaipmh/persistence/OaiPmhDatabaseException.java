@@ -31,12 +31,6 @@ public class OaiPmhDatabaseException extends Exception {
   private static final long serialVersionUID = -2495399082450974552L;
 
   /**
-   * Create exception.
-   */
-  public OaiPmhDatabaseException() {
-  }
-
-  /**
    * Create exception with a message.
    * 
    * @param message

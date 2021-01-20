@@ -41,6 +41,9 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,13 +73,20 @@ import javax.ws.rs.core.Response;
                 "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
                         + "other words, there is a bug! You should file an error report with your server logs from the time when the "
                         + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+@Component(
+  property = {
+    "service.description=Group Role REST EndPoint",
+    "opencast.service.type=org.opencastproject.userdirectory.endpoint.GroupRoleEndpoint",
+    "opencast.service.jobproducer=false",
+    "opencast.service.path=/groups"
+  },
+  immediate = false,
+  service = { GroupRoleEndpoint.class }
+)
 public class GroupRoleEndpoint {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(GroupRoleEndpoint.class);
-
-  /** The JPA persistence unit name */
-  public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
 
   /** the jpaGroupRoleProvider Impl service */
   private JpaGroupRoleProvider jpaGroupRoleProvider;
@@ -85,6 +95,7 @@ public class GroupRoleEndpoint {
    * @param jpaGroupRoleProvider
    *          the jpaGroupRoleProvider to set
    */
+  @Reference(name = "JpaGroupRoleProvider")
   public void setJpaGroupRoleProvider(JpaGroupRoleProvider jpaGroupRoleProvider) {
     this.jpaGroupRoleProvider = jpaGroupRoleProvider;
   }
@@ -92,6 +103,7 @@ public class GroupRoleEndpoint {
   /**
    * Callback for activation of this component.
    */
+  @Activate
   public void activate() {
     logger.info("Activating  {}", getClass().getName());
   }
@@ -102,7 +114,7 @@ public class GroupRoleEndpoint {
   @RestQuery(name = "allgroup", description = "Returns a list of groups", returnDescription = "Returns a JSON or XML representation of the list of groups available the current user's organization", pathParameters = {
           @RestParameter(description = "The output format (json or xml) of the response body.", isRequired = true, name = "format", type = RestParameter.Type.STRING) }, restParameters = {
           @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The groups.") })
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The groups.") })
   public Response getGroupsAsJsonOrXml(@PathParam("format") String format, @QueryParam("limit") int limit,
           @QueryParam("offset") int offset)
           throws IOException {
@@ -119,7 +131,7 @@ public class GroupRoleEndpoint {
   @DELETE
   @Path("{id}")
   @RestQuery(name = "removegroup", description = "Remove a group", returnDescription = "Return no content", pathParameters = {
-          @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = Type.STRING) }, reponses = {
+          @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = Type.STRING) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "Group deleted"),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to remove a group with the admin role."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found."),
@@ -143,7 +155,7 @@ public class GroupRoleEndpoint {
           @RestParameter(name = "name", description = "The group name", isRequired = true, type = Type.STRING),
           @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
           @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
-          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = false, type = Type.TEXT) }, reponses = {
+          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = false, type = Type.TEXT) }, responses = {
                   @RestResponse(responseCode = SC_CREATED, description = "Group created"),
                   @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long"),
                   @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a group with the admin role."),
@@ -169,7 +181,7 @@ public class GroupRoleEndpoint {
           @RestParameter(name = "name", description = "The group name", isRequired = true, type = Type.STRING),
           @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
           @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
-          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = true, type = Type.TEXT) }, reponses = {
+          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = true, type = Type.TEXT) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "Group updated"),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to update a group with the admin role."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found"),

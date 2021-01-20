@@ -23,7 +23,6 @@ package org.opencastproject.job.api;
 
 import static com.entwinemedia.fn.data.Opt.none;
 import static com.entwinemedia.fn.data.Opt.some;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 
 import org.opencastproject.job.api.Incident.Severity;
@@ -341,7 +340,7 @@ public abstract class AbstractJobProducer implements JobProducer {
         jobAfterProcessing.setStatus(Status.FAILED);
         jobAfterProcessing = getServiceRegistry().updateJob(jobAfterProcessing);
         getServiceRegistry().incident().unhandledException(jobAfterProcessing, Severity.FAILURE, t);
-        logger.error("Error handling operation '{}': {}", jobAfterProcessing.getOperation(), getStackTrace(t));
+        logger.error("Error handling operation '{}':", jobAfterProcessing.getOperation(), t);
         if (t instanceof ServiceRegistryException)
           throw (ServiceRegistryException) t;
       }

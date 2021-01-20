@@ -78,6 +78,10 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,6 +103,14 @@ import java.util.concurrent.Executors;
 /**
  * Provides data access to the workflow service through file storage in the workspace, indexed via solr.
  */
+@Component(
+  property = {
+    "service.description=Workflow Service Index",
+    "synchronousIndexing=false"
+  },
+  immediate = true,
+  service = { WorkflowServiceIndex.class }
+)
 public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /** The logger */
@@ -218,6 +230,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * @param cc
    *          the component context
    */
+  @Activate
   public void activate(ComponentContext cc) {
     String solrServerUrlConfig = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_SOLR_URL));
     if (solrServerUrlConfig != null) {
@@ -365,6 +378,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
   /**
    * Shuts down the solr index.
    */
+  @Deactivate
   public void deactivate() {
     SolrServerFactory.shutdown(solrServer);
   }
@@ -503,7 +517,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     if (instance.getState().isTerminated()) {
       AQueryBuilder query = assetManager.createQuery();
       AResult result = query.select(query.snapshot())
-              .where(query.mediaPackageId(mp.getIdentifier().compact()).and(query.version().isLatest())).run();
+              .where(query.mediaPackageId(mp.getIdentifier().toString()).and(query.version().isLatest())).run();
       if (result.getRecords().head().isSome()) {
         aclMp = result.getRecords().head().get().getSnapshot().get().getMediaPackage();
       }
@@ -1093,6 +1107,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * @param registry
    *          the service registry
    */
+  @Reference(name = "serviceregistry")
   protected void setServiceRegistry(ServiceRegistry registry) {
     this.serviceRegistry = registry;
   }
@@ -1103,6 +1118,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * @param orgDirectory
    *          the organization directory service
    */
+  @Reference(name = "orgDirectory")
   protected void setOrgDirectory(OrganizationDirectoryService orgDirectory) {
     this.orgDirectory = orgDirectory;
   }
@@ -1113,6 +1129,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * @param authorizationService
    *          the authorizationService to set
    */
+  @Reference(name = "authorization")
   protected void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
   }
@@ -1123,6 +1140,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * @param securityService
    *          the securityService to set
    */
+  @Reference(name = "security")
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -1133,6 +1151,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * @param assetManager
    *          the asset manager
    */
+  @Reference(name = "assetManager")
   protected void setAssetManager(AssetManager assetManager) {
     this.assetManager = assetManager;
   }

@@ -27,7 +27,6 @@ import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.series.SeriesItem;
 import org.opencastproject.security.api.SecurityService;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,11 +110,11 @@ public class ConductingSeriesUpdatedEventHandler {
             workflowPermissionsUpdatedEventHandler.handleEvent(seriesItem);
           }
         } catch (InterruptedException | ExecutionException e) {
-          logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(e));
+          logger.error("Problem while getting series update message events", e);
         } catch (CancellationException e) {
           logger.trace("Listening for series update messages has been cancelled.");
         } catch (Throwable t) {
-          logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(t));
+          logger.error("Problem while getting series update message events", t);
         } finally {
           securityService.setOrganization(null);
           securityService.setUser(null);

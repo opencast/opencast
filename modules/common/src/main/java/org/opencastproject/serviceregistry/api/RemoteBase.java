@@ -38,6 +38,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.joda.time.DateTimeConstants;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +89,7 @@ public class RemoteBase {
    *
    * @param client
    */
+  @Reference
   public void setTrustedHttpClient(TrustedHttpClient client) {
     this.client = client;
   }
@@ -97,6 +99,7 @@ public class RemoteBase {
    *
    * @param remoteServiceManager
    */
+  @Reference
   public void setRemoteServiceManager(ServiceRegistry remoteServiceManager) {
     this.remoteServiceManager = remoteServiceManager;
   }
@@ -274,7 +277,11 @@ public class RemoteBase {
    */
   protected void closeConnection(HttpResponse response) {
     if (response != null)
-      client.close(response);
+      try {
+        client.close(response);
+      } catch (IOException e) {
+        // ignore
+      }
   }
 
   /**

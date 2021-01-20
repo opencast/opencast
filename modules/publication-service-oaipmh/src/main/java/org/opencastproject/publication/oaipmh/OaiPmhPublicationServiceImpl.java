@@ -244,7 +244,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   protected Publication publish(Job job, MediaPackage mediaPackage, String repository, Set<String> downloadElementIds,
           Set<String> streamingElementIds, boolean checkAvailability)
           throws PublicationException, MediaPackageException {
-    String mpId = mediaPackage.getIdentifier().compact();
+    String mpId = mediaPackage.getIdentifier().toString();
     SearchResult searchResult = oaiPmhDatabase.search(QueryBuilder.queryRepo(repository).mediaPackageId(mpId)
             .isDeleted(false).build());
     // retract oai-pmh if published
@@ -351,7 +351,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
           Set<MediaPackageElementFlavor> retractDownloadFlavors, Set<MediaPackageElementFlavor> retractStreamingFlavors,
           Set<? extends MediaPackageElement> publications, boolean checkAvailable) throws MediaPackageException,
       PublicationException {
-    final String mpId = mediaPackage.getIdentifier().compact();
+    final String mpId = mediaPackage.getIdentifier().toString();
     final String channel = getPublicationChannelName(repository);
 
     try {
@@ -542,7 +542,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
 
   protected Publication retract(Job job, MediaPackage mediaPackage, String repository)
           throws PublicationException, NotFoundException {
-    String mpId = mediaPackage.getIdentifier().compact();
+    String mpId = mediaPackage.getIdentifier().toString();
 
     // track elements for retraction
     MediaPackage oaiPmhMp = null;
@@ -565,8 +565,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
       throw new PublicationException(format("Unable to retract media package %s from OAI-PMH repository %s",
               mpId, repository), e);
     } catch (NotFoundException e) {
-      logger.debug(format("Skip retracting media package %s from OIA-PMH repository %s as it isn't published.",
-              mpId, repository), e);
+      logger.debug("Skip retracting media package {} from OIA-PMH repository {} as it isn't published.",
+              mpId, repository, e);
     }
 
     if (oaiPmhMp != null && oaiPmhMp.getElements().length > 0) {
@@ -642,11 +642,11 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         throw new PublicationException("Error filtering media package", e);
       }
     } else if (result.size() == 0) {
-      logger.info(format("Skipping update of media package %s since it is not currently published to %s",
-              mediaPackage, repository));
+      logger.info("Skipping update of media package {} since it is not currently published to {}",
+              mediaPackage, repository);
       return null;
     } else {
-      final String msg = format("More than one media package with id %s found", mediaPackage.getIdentifier().compact());
+      final String msg = format("More than one media package with id %s found", mediaPackage.getIdentifier().toString());
       logger.warn(msg);
       throw new PublicationException(msg);
     }
@@ -661,7 +661,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     if (elementIdsToDistribute.isEmpty()) {
       logger.debug("The media package {} does not contain any elements to update. "
                       + "Skip OAI-PMH metadata update operation for repository {}",
-              mediaPackage.getIdentifier().compact(), repository);
+              mediaPackage.getIdentifier().toString(), repository);
       return null;
     }
     logger.debug("distribute elements {}", StringUtils.join(elementIdsToDistribute, ", "));
@@ -674,7 +674,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
       if (!waitForJobs(job, serviceRegistry, distJob).isSuccess()) {
         throw new PublicationException(format(
                 "Unable to distribute updated elements from media package %s to the download distribution service",
-                mediaPackage.getIdentifier().compact()));
+                mediaPackage.getIdentifier().toString()));
       }
       if (distJob.getPayload() != null) {
         for (MediaPackageElement mpe : MediaPackageElementParser.getArrayFromXml(distJob.getPayload())) {
@@ -684,7 +684,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     } catch (DistributionException | MediaPackageException e) {
       throw new PublicationException(format(
               "Unable to distribute updated elements from media package %s to the download distribution service",
-              mediaPackage.getIdentifier().compact()), e);
+              mediaPackage.getIdentifier().toString()), e);
     }
 
     // update elements (URLs)
@@ -704,12 +704,12 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     }
     // Publish the media package to OAI-PMH
     try {
-      logger.debug(format("Updating metadata of media package %s in %s",
-              publishedMp.getIdentifier().compact(), repository));
+      logger.debug("Updating metadata of media package {} in {}",
+              publishedMp.getIdentifier().toString(), repository);
       oaiPmhDatabase.store(publishedMp, repository);
     } catch (OaiPmhDatabaseException e) {
       throw new PublicationException(format("Media package %s could not be updated",
-              publishedMp.getIdentifier().compact()));
+              publishedMp.getIdentifier().toString()));
     }
     // retract orphaned elements from download distribution
     // orphaned elements are all those elements to which the updated media package no longer refers (in terms of element uri)
@@ -739,11 +739,11 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
           if (retractJob != null) {
             if (!waitForJobs(job, serviceRegistry, retractJob).isSuccess())
               logger.warn("The download distribution retract job for the orphaned elements from media package {} does not end successfully",
-                      oaiPmhSearchResultItem.getMediaPackage().getIdentifier().compact());
+                      oaiPmhSearchResultItem.getMediaPackage().getIdentifier().toString());
           }
         } catch (DistributionException e) {
           logger.warn("Unable to retract orphaned elements from download distribution service for the media package {} channel {}",
-                  oaiPmhSearchResultItem.getMediaPackage().getIdentifier().compact(), getPublicationChannelName(repository), e);
+                  oaiPmhSearchResultItem.getMediaPackage().getIdentifier().toString(), getPublicationChannelName(repository), e);
         }
       }
     }
@@ -954,8 +954,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         for (final MediaPackageElement outdated : mergedMp.getElementsByFlavor(flavor)) {
           mergedMp.remove(outdated);
         }
-        logger.debug(format("Update %s %s of type %s", updatedElement.getElementType().toString().toLowerCase(),
-                updatedElement.getIdentifier(), updatedElement.getElementType()));
+        logger.debug("Update {} {} of type {}", updatedElement.getElementType().toString().toLowerCase(),
+                updatedElement.getIdentifier(), updatedElement.getElementType());
         mergedMp.add(updatedElement);
       }
     }

@@ -32,37 +32,12 @@ public class ThemesServiceDatabaseException extends Exception {
   private static final long serialVersionUID = -1712784704794307599L;
 
   /**
-   * Create exception.
-   */
-  public ThemesServiceDatabaseException() {
-  }
-
-  /**
-   * Create exception with a message.
-   *
-   * @param message
-   */
-  public ThemesServiceDatabaseException(String message) {
-    super(message);
-  }
-
-  /**
    * Create exception with a cause.
    *
    * @param cause
    */
   public ThemesServiceDatabaseException(Throwable cause) {
     super(cause);
-  }
-
-  /**
-   * Create exception with a message and a cause.
-   *
-   * @param message
-   * @param cause
-   */
-  public ThemesServiceDatabaseException(String message, Throwable cause) {
-    super(message, cause);
   }
 
 }

@@ -28,7 +28,10 @@ import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Role;
+import org.opencastproject.security.api.RoleDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.data.Option;
 
@@ -64,6 +67,16 @@ public class TestAclEndpoint extends AclEndpoint {
     managedAcls.add(new ManagedAclImpl(1L, "public", org.getId(), publicAcl));
     managedAcls.add(new ManagedAclImpl(2L, "private", org.getId(), privateAcl));
 
+    List<Role> roles = new ArrayList<>();
+    roles.add(new JaxbRole("ROLE_ADMIN", org, "", Role.Type.INTERNAL));
+    roles.add(new JaxbRole("ROLE_ANONYMOUS", org, "", Role.Type.SYSTEM));
+    roles.add(new JaxbRole("ROLE_ADMIN_UI", org, "", Role.Type.INTERNAL));
+    roles.add(new JaxbRole("ROLE_API", org, "", Role.Type.INTERNAL));
+
+    List<Role> rolesSubset = new ArrayList<>();
+    rolesSubset.add(roles.get(1));
+    rolesSubset.add(roles.get(3));
+
     AclService aclService = EasyMock.createNiceMock(AclService.class);
     EasyMock.expect(aclService.getAcls()).andReturn(managedAcls).anyTimes();
     EasyMock.expect(aclService.getAcl(EasyMock.anyLong())).andReturn(Option.some(managedAcls.get(0))).anyTimes();
@@ -78,7 +91,15 @@ public class TestAclEndpoint extends AclEndpoint {
     EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
     EasyMock.replay(securityService);
 
+    RoleDirectoryService roleDirectoryService = EasyMock.createNiceMock(RoleDirectoryService.class);
+    EasyMock.expect(roleDirectoryService.findRoles(EasyMock.eq("%"), EasyMock.anyObject(), EasyMock.eq(1),
+      EasyMock.eq(2))).andReturn(rolesSubset).anyTimes();
+    EasyMock.expect(roleDirectoryService.findRoles(EasyMock.anyString(), EasyMock.anyObject(), EasyMock.anyInt(),
+      EasyMock.anyInt())).andReturn(roles).anyTimes();
+    EasyMock.replay(roleDirectoryService);
+
     this.setAclServiceFactory(aclServiceFactory);
     this.setSecurityService(securityService);
+    this.setRoleDirectoryService(roleDirectoryService);
   }
 }

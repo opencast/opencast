@@ -21,7 +21,6 @@
 
 package org.opencastproject.job.api;
 
-import static org.opencastproject.util.data.Collections.nullToNil;
 import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.serviceregistry.api.IncidentServiceException;
@@ -51,7 +50,4 @@ public final class JaxbIncidentList {
     this.incidents = mlist(incidents).map(JaxbIncident.mkFn).value();
   }
 
-  public List<Incident> toIncidents() {
-    return mlist(nullToNil(incidents)).map(JaxbIncident.toIncidentFn).value();
-  }
 }

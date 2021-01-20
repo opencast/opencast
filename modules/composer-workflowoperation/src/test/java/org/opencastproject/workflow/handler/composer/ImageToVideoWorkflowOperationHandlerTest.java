@@ -151,7 +151,7 @@ public class ImageToVideoWorkflowOperationHandlerTest {
 
     try {
       // run the operation handler
-      WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
+      getWorkflowOperationResult(mp, configurations);
       Assert.fail();
     } catch (WorkflowOperationException e) {
       Assert.assertNotNull("Duration is required!", e);

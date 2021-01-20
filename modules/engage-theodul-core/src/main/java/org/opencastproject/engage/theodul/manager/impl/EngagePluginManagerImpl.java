@@ -40,6 +40,7 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +56,7 @@ import java.util.Set;
  * A service that tracks the de-/registration of Theodul Player Plugins and
  * de-/installs static resource and REST endpoint servlets under a shared URL.
  */
+@Component
 public class EngagePluginManagerImpl implements EngagePluginManager, ServiceListener {
 
   private static final Logger log = LoggerFactory.getLogger(EngagePluginManagerImpl.class);

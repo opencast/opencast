@@ -92,7 +92,7 @@ public class GoogleSpeechTranscriptionRestService extends AbstractJobProducerEnd
   @Path("results")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "results", description = "Get JSON result of a submitted transcription job", returnDescription = "Returns a JSON representation of the transcription result", restParameters = {
-    @RestParameter(name = "jobId", description = "job id of the submitted transcription (can be found in Google Speech database table)", isRequired = true, type = Type.STRING)}, reponses = {
+    @RestParameter(name = "jobId", description = "job id of the submitted transcription (can be found in Google Speech database table)", isRequired = true, type = Type.STRING)}, responses = {
     @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "If no errors"),
     @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "An error occurred")})
   // GET v1/operations/7022084740052439959
@@ -113,7 +113,7 @@ public class GoogleSpeechTranscriptionRestService extends AbstractJobProducerEnd
   @Path("status")
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(name = "status", description = "Get mediapackage transcription status", returnDescription = "Returns transcription status", restParameters = {
-    @RestParameter(name = "mediaPackageID", description = "the mediapackage identifier", isRequired = true, type = Type.STRING)}, reponses = {
+    @RestParameter(name = "mediaPackageID", description = "the mediapackage identifier", isRequired = true, type = Type.STRING)}, responses = {
     @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "If no errors"),
     @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "An error occurred")})
   public Response getTranscriptionStatus(@QueryParam("mediaPackageID") String mpId,

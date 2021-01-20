@@ -32,37 +32,12 @@ public class AclServiceException extends Exception {
   private static final long serialVersionUID = 4248927464242312658L;
 
   /**
-   * Create exception.
-   */
-  public AclServiceException() {
-  }
-
-  /**
-   * Create exception with a message.
-   *
-   * @param message
-   */
-  public AclServiceException(String message) {
-    super(message);
-  }
-
-  /**
    * Create exception with a cause.
    *
    * @param cause
    */
   public AclServiceException(Throwable cause) {
     super(cause);
-  }
-
-  /**
-   * Create exception with a message and a cause.
-   *
-   * @param message
-   * @param cause
-   */
-  public AclServiceException(String message, Throwable cause) {
-    super(message, cause);
   }
 
 }

@@ -59,6 +59,15 @@ public interface SearchServiceDatabase {
   String getOrganizationId(String mediaPackageId) throws NotFoundException, SearchServiceDatabaseException;
 
   /**
+   * Returns the number of mediapackages in persistent storage, including deleted entries.
+   *
+   * @return the number of mediapackages in storage
+   * @throws SearchServiceDatabaseException
+   *           if an error occurs
+   */
+  int countMediaPackages() throws SearchServiceDatabaseException;
+
+  /**
    * Gets a single media package by its identifier.
    *
    * @param mediaPackageId

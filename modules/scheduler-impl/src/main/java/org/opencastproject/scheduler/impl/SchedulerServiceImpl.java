@@ -22,7 +22,6 @@ package org.opencastproject.scheduler.impl;
 
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.some;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.calculateChecksum;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.episodeToMp;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.eventOrganizationFilter;
@@ -72,8 +71,6 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.Precision;
-import org.opencastproject.scheduler.api.ConflictHandler;
-import org.opencastproject.scheduler.api.ConflictNotifier;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.RecordingImpl;
 import org.opencastproject.scheduler.api.RecordingState;
@@ -222,12 +219,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The authorization service */
   private AuthorizationService authorizationService;
 
-  /** The conflict handler */
-  private ConflictHandler conflictHandler;
-
-  /** The list of registered conflict notifiers */
-  private List<ConflictNotifier> conflictNotifiers = new ArrayList<>();
-
   /** The organization directory service */
   private OrganizationDirectoryService orgDirectoryService;
 
@@ -309,25 +300,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
-  }
-
-  /**
-   * OSGi callback to set the conflict handler.
-   *
-   * @param conflictHandler
-   */
-  public void setConflictHandler(ConflictHandler conflictHandler) {
-    this.conflictHandler = conflictHandler;
-  }
-
-  /** OSGi callback to add {@link ConflictNotifier} instance. */
-  public void addConflictNotifier(ConflictNotifier conflictNotifier) {
-    conflictNotifiers.add(conflictNotifier);
-  }
-
-  /** OSGi callback to remove {@link ConflictNotifier} instance. */
-  public void removeConflictNotifier(ConflictNotifier conflictNotifier) {
-    conflictNotifiers.remove(conflictNotifier);
   }
 
   /**
@@ -426,7 +398,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     if (endDateTime.before(startDateTime))
       throw new IllegalArgumentException("The end date is before the start date");
 
-    final String mediaPackageId = mediaPackage.getIdentifier().compact();
+    final String mediaPackageId = mediaPackage.getIdentifier().toString();
 
     try {
       AQueryBuilder query = assetManager.createQuery();
@@ -473,7 +445,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     } catch (SchedulerException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Failed to create event with id '{}': {}", mediaPackageId, getStackTrace(e));
+      logger.error("Failed to create event with id '{}':", mediaPackageId, e);
       throw new SchedulerException(e);
     }
   }
@@ -519,7 +491,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         while (ids.size() <= periods.size()) {
           Id id = new IdImpl(UUID.randomUUID().toString());
           ids.add(id);
-          Predicate np = qb.mediaPackageId(id.compact());
+          Predicate np = qb.mediaPackageId(id.toString());
           //Haha, p = np jokes with the AM query language. Ha. Haha. Ha.  (Sob...)
           if (null == p) {
             p = np;
@@ -583,7 +555,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         }
         mediaPackage.setTitle(newTitle);
 
-        String mediaPackageId = mediaPackage.getIdentifier().compact();
+        String mediaPackageId = mediaPackage.getIdentifier().toString();
         //Converting from iCal4j DateTime objects to plain Date objects to prevent AMQ issues below
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         cal.setTime(event.getStart());
@@ -708,7 +680,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                 startDateTime.getOr(start), endDateTime.getOr(end))).filter(new Fn<MediaPackage, Boolean>() {
                     @Override
                     public Boolean apply(MediaPackage mp) {
-                    return !mpId.equals(mp.getIdentifier().compact());
+                    return !mpId.equals(mp.getIdentifier().toString());
                   }
                   }).toList();
         if (conflictingEvents.size() > 0) {
@@ -831,7 +803,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       return Opt.none();
 
     Opt<Asset> asset = assetManager.getAsset(snapshot.getVersion(),
-            snapshot.getMediaPackage().getIdentifier().compact(), dcCatalog.get().getIdentifier());
+            snapshot.getMediaPackage().getIdentifier().toString(), dcCatalog.get().getIdentifier());
     if (asset.isNone())
       return Opt.none();
 
@@ -904,7 +876,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     } catch (RuntimeNotFoundException e) {
       throw e.getWrappedException();
     } catch (Exception e) {
-      logger.error("Failed to get mediapackage of event '{}': {}", mediaPackageId, getStackTrace(e));
+      logger.error("Failed to get mediapackage of event '{}':", mediaPackageId, e);
       throw new SchedulerException(e);
     }
   }
@@ -931,7 +903,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Failed to get dublin core catalog of event '{}': {}", mediaPackageId, getStackTrace(e));
+      logger.error("Failed to get dublin core catalog of event '{}':", mediaPackageId, e);
       throw new SchedulerException(e);
     }
   }
@@ -950,30 +922,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Failed to get technical metadata of event '{}': {}", mediaPackageId, getStackTrace(e));
-      throw new SchedulerException(e);
-    }
-  }
-
-  @Override
-  public AccessControlList getAccessControlList(String mediaPackageId) throws NotFoundException, SchedulerException {
-    notEmpty(mediaPackageId, "mediaPackageId");
-
-    try {
-      AQueryBuilder query = assetManager.createQuery();
-      AResult result = query.select(query.snapshot())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withOwner(query))
-                  .and(query.version().isLatest()))
-              .run();
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isNone())
-        throw new NotFoundException();
-
-      return authorizationService.getActiveAcl(record.get().getSnapshot().get().getMediaPackage()).getA();
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      logger.error("Failed to get access control list of event '{}': {}", mediaPackageId, getStackTrace(e));
+      logger.error("Failed to get technical metadata of event '{}':", mediaPackageId, e);
       throw new SchedulerException(e);
     }
   }
@@ -990,7 +939,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Failed to get workflow configuration of event '{}': {}", mediaPackageId, getStackTrace(e));
+      logger.error("Failed to get workflow configuration of event '{}':", mediaPackageId, e);
       throw new SchedulerException(e);
     }
   }
@@ -1008,7 +957,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Failed to get capture agent contiguration of event '{}': {}", mediaPackageId, getStackTrace(e));
+      logger.error("Failed to get capture agent contiguration of event '{}':", mediaPackageId, e);
       throw new SchedulerException(e);
     }
   }
@@ -1267,7 +1216,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       } catch (NotFoundException e) {
         logger.debug("Skipping event with id {} because it is not found", eventId);
       } catch (Exception e) {
-        logger.warn("Unable to delete event with id '{}': {}", eventId, getStackTrace(e));
+        logger.warn("Unable to delete event with id '{}':", eventId, e);
       }
     }
 
@@ -1464,7 +1413,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       persistence.touchLastEntry(captureAgentId);
       populateLastModifiedCache();
     } catch (SchedulerServiceDatabaseException e) {
-      logger.error("Failed to update last modified entry of agent '{}': {}", captureAgentId, getStackTrace(e));
+      logger.error("Failed to update last modified entry of agent '{}':", captureAgentId, e);
     }
   }
 

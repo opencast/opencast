@@ -32,16 +32,4 @@ public class MoodleWebServiceException extends Exception {
     super(message);
   }
 
-  public MoodleWebServiceException(String message, Throwable cause) {
-    super(message, cause);
-  }
-
-  public MoodleWebServiceException(Throwable cause) {
-    super(cause);
-  }
-
-  public MoodleWebServiceException(String message, Throwable cause, boolean enableSuppression,
-          boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
 }

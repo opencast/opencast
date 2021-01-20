@@ -147,15 +147,6 @@ public class JaxbJob {
             rootJobId, dispatchable, uri, jobLoad);
   }
 
-  public static Fn<JaxbJob, Job> fnToJob() {
-    return new Fn<JaxbJob, Job>() {
-      @Override
-      public Job apply(JaxbJob jaxbJob) {
-        return jaxbJob.toJob();
-      }
-    };
-  }
-
   public static Fn<Job, JaxbJob> fnFromJob() {
     return new Fn<Job, JaxbJob>() {
       @Override

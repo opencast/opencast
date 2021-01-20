@@ -103,16 +103,6 @@ public final class RestUtil {
     return b;
   }
 
-  /** Create a file response. */
-  public static Response.ResponseBuilder fileResponse(File f, Option<String> contentType, Option<String> fileName) {
-    final Response.ResponseBuilder b = Response.ok(f).header("Content-Length", f.length());
-    for (String t : contentType)
-      b.header("Content-Type", t);
-    for (String fn : fileName)
-      b.header("Content-Disposition", "attachment; filename=" + fn);
-    return b;
-  }
-
   /**
    * create a partial file response
    *

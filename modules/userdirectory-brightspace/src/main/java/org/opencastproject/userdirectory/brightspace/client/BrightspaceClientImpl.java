@@ -55,7 +55,6 @@ public class BrightspaceClientImpl implements BrightspaceClient {
 
   private static final Logger logger = LoggerFactory.getLogger(BrightspaceClientImpl.class);
 
-  private static final String COURSE_ID = "Course Offering";
   private static final String GET_USER_BY_USERNAME = "/d2l/api/lp/1.0/users/?orgDefinedId=";
   private static final String GET_ALL_USERS = "/d2l/api/lp/1.0/users/";
   private static final String GET_COURSES_BY_BRIGHTSPACE_USER_ID = "/d2l/api/lp/1.0/enrollments/users/{brightspace-userid}/orgUnits/";

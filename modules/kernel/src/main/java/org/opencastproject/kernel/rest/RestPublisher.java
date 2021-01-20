@@ -33,7 +33,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.endpoint.Server;
@@ -553,7 +552,7 @@ public class RestPublisher implements RestConstants {
         try {
           response.sendRedirect("/docs.html?path=" + request.getServletPath());
         } catch (IOException e) {
-          logger.error("Unable to redirect to rest docs: {}", ExceptionUtils.getStackTrace(e));
+          logger.error("Unable to redirect to rest docs:", e);
         }
       } else {
         super.handleRequest(request, response);

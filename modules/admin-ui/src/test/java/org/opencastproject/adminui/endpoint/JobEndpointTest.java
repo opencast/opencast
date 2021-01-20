@@ -39,8 +39,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +48,6 @@ import io.restassured.http.ContentType;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class JobEndpointTest {
-  private static final Logger logger = LoggerFactory.getLogger(JobEndpointTest.class);
   private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestJobEndpoint.class);
 
   private JSONParser parser;

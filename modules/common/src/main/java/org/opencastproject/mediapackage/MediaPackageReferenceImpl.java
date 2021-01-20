@@ -35,12 +35,6 @@ public class MediaPackageReferenceImpl implements MediaPackageReference {
   /** Convenience reference that matches any media package */
   public static final MediaPackageReference ANY_MEDIAPACKAGE = new MediaPackageReferenceImpl(TYPE_MEDIAPACKAGE, ANY);
 
-  /** Convenience reference that matches the current media package */
-  public static final MediaPackageReference SELF_MEDIAPACKAGE = new MediaPackageReferenceImpl(TYPE_MEDIAPACKAGE, SELF);
-
-  /** Convenience reference that matches any series */
-  public static final MediaPackageReference ANY_SERIES = new MediaPackageReferenceImpl(TYPE_SERIES, "*");
-
   /** The reference identifier */
   protected String identifier = null;
 

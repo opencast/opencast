@@ -213,22 +213,6 @@ public final class AQueryBuilderImpl implements AQueryBuilder, EntityPaths {
     };
   }
 
-  @Override public Field<Availability> availability() {
-    return new AbstractSnapshotField<Availability, String>(Q_SNAPSHOT.availability) {
-      @Override protected String extract(Availability availability) {
-        return availability.name();
-      }
-    };
-  }
-
-  @Override public Field<String> storage() {
-    return new AbstractSnapshotField<String, String>(Q_SNAPSHOT.storageId) {
-      @Override protected String extract(String storageId) {
-        return storageId;
-      }
-    };
-  }
-
   /* -- */
 
   // TODO DRY with #hasProperties
@@ -312,11 +296,6 @@ public final class AQueryBuilderImpl implements AQueryBuilder, EntityPaths {
       }
 
     };
-  }
-
-  @Override public Field zero() {
-    // TODO implement zero element of fields
-    throw new UnsupportedOperationException();
   }
 
   @Override public Predicate always() {

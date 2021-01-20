@@ -216,10 +216,10 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
         workspace.delete(elementToRemove.getURI());
       } catch (NotFoundException ex) {
         logger.debug("Workspace doesn't contain element with Id '{}' from media package '{}': {}",
-                elementToRemove.getIdentifier(), mediaPackage.getIdentifier().compact(), ex.getMessage());
+                elementToRemove.getIdentifier(), mediaPackage.getIdentifier().toString(), ex.getMessage());
       } catch (IOException ex) {
         logger.warn("Unable to remove element with Id '{}' from the media package '{}': {}",
-                elementToRemove.getIdentifier(), mediaPackage.getIdentifier().compact(), ex.getMessage());
+                elementToRemove.getIdentifier(), mediaPackage.getIdentifier().toString(), ex.getMessage());
       }
     }
     return createResult(mediaPackage, Action.CONTINUE);
@@ -267,9 +267,9 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
     String elementUri = elementToRemove.getURI().toString();
     String deleteUri;
     if (StringUtils.containsIgnoreCase(elementUri, UrlSupport.concat(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
-              elementToRemove.getMediaPackage().getIdentifier().compact(), elementToRemove.getIdentifier()))) {
+              elementToRemove.getMediaPackage().getIdentifier().toString(), elementToRemove.getIdentifier()))) {
       deleteUri = UrlSupport.concat(repositoryBaseUrl, WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX,
-              elementToRemove.getMediaPackage().getIdentifier().compact(), elementToRemove.getIdentifier());
+              elementToRemove.getMediaPackage().getIdentifier().toString(), elementToRemove.getIdentifier());
     } else if (StringUtils.containsIgnoreCase(elementUri, WorkingFileRepository.COLLECTION_PATH_PREFIX)) {
       deleteUri = UrlSupport.concat(repositoryBaseUrl, WorkingFileRepository.COLLECTION_PATH_PREFIX,
           StringUtils.substringAfter(elementToRemove.getURI().getPath(), WorkingFileRepository.COLLECTION_PATH_PREFIX));
@@ -284,14 +284,18 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
       response = client.execute(delete);
       int statusCode = response.getStatusLine().getStatusCode();
       if (statusCode == HttpStatus.SC_NO_CONTENT || statusCode == HttpStatus.SC_OK) {
-        logger.info("Sucessfully deleted external URI {}", delete.getURI());
+        logger.info("Successfully deleted external URI {}", delete.getURI());
       } else if (statusCode == HttpStatus.SC_NOT_FOUND) {
         logger.info("External URI {} has already been deleted", delete.getURI());
       } else {
         logger.info("Unable to delete external URI {}, status code '{}' returned", delete.getURI(), statusCode);
       }
     } finally {
-      client.close(response);
+      try {
+        client.close(response);
+      } catch (IOException e) {
+        // ignore
+      }
     }
   }
 }

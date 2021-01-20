@@ -1,0 +1,85 @@
+<section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="embedding-code">
+  <header>
+    <a class="fa fa-times close-modal" ng-click="close()"></a>
+    <h2 translate="CONFIRMATIONS.ACTIONS.SHOW.EMBEDDING_CODE"><!-- Confirm --></h2>
+  </header>
+
+  <script>
+    var engageUrl = "<SERVER_URL>";
+
+    $(document).ready(function() {
+      var reply = $.ajax({
+        url: "/api/info/organization/properties/engageuiurl",
+        timeout: 3000,
+        success: function(result) {
+          engageUrl = result['org.opencastproject.engage.ui.url'];
+          if (typeof engageUrl === "undefined") {
+            engageUrl = "<SERVER_URL>";
+          }
+        }
+      });
+    });
+
+    var embs = $(".embedSizeButton");
+    for (var i = 0; i < embs.length; i = i + 1) {
+      var e = embs[i];
+      e.onclick = function(event) {
+        var value = event.target ? event.target.textContent : event.toElement.textContent;
+        if (value) {
+          var embedSizeButtons = $(".embedSizeButton");
+          for (var j = 0; j < embedSizeButtons.length; j++) {
+            if (embedSizeButtons[j].id == value) {
+              embedSizeButtons[j].classList.add("embedSizeButtonSelected");
+            } else {
+              embedSizeButtons[j].classList.remove("embedSizeButtonSelected");
+            }
+          }
+          var id = $("#id_video").html();
+          var url = engageUrl + "/play/" + id;
+          var size = value.trim().split("x");
+          $("#social_embed-textarea")[0].value = '<iframe allowfullscreen src="' + url + '" style="border:0px #FFFFFF none;" name="Player" scrolling="no" frameborder="0" marginheight="0px" marginwidth="0px" width="' + size[0] + '" height="' + size[1] + '"></iframe>';
+        }
+      };
+    }
+
+    function copyToClipboard() {
+        var copyText = $("#social_embed-textarea")[0];
+        copyText.select();
+        document.execCommand("copy");
+        $("#copy_confirm").html( $(".embedSizeButtonSelected").attr('id') );
+        $("#copy_confirm_pre").css('visibility', 'visible');
+        $("#copy_confirm").css('visibility', 'visible');
+    }
+  </script>
+
+  <div class="embedded-code-boxes">
+    <div id=' 620x349 ' class="embedSizeButton size_620x349">
+      <span class="span-embedded-code"> 620x349 </span>
+    </div>
+    <div id=' 540x304 ' class="embedSizeButton size_540x304">
+      <span class="span-embedded-code"> 540x304 </span>
+    </div>
+    <div id=' 460x259 ' class="embedSizeButton size_460x259">
+      <span class="span-embedded-code"> 460x259 </span>
+    </div>
+    <div id=' 380x214 ' class="embedSizeButton size_380x214">
+      <span class="span-embedded-code"> 380x214 </span>
+    </div>
+    <div id=' 300x169 ' class="embedSizeButton size_300x169">
+      <span class="span-embedded-code"> 300x169 </span>
+    </div>
+  </div>
+  <span id="id_video" class="embedded-code-no-visible">{{id}}</span>
+  <div id='' class="embedded-code-video"><textarea id='social_embed-textarea' class="social_embed-textarea embedded-code-textarea" rows='4' cols='1'></textarea></div>
+
+  <div class='copyConfirm'>
+    <span id="copy_confirm_pre" translate="CONFIRMATIONS.EMBEDDING_CODE" class="embedded-code-no-visible"></span>
+    <span id="copy_confirm" class="embedded-code-no-visible"></span>
+  </div>
+
+  <div class="embedded-code-copy-to-clipboard">
+    <div class="btn-container" style="margin-bottom: 20px;">
+      <a translate="COPY" class="cancel-btn" onclick="copyToClipboard()"><i><!--- Copy --></i></a>
+    </div>
+  </div>
+</section>

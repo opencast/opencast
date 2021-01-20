@@ -22,7 +22,6 @@
 
 package org.opencastproject.inspection.ffmpeg.api;
 
-import org.opencastproject.mediapackage.track.Colorimetry;
 import org.opencastproject.mediapackage.track.FrameRateMode;
 import org.opencastproject.mediapackage.track.ScanOrder;
 import org.opencastproject.mediapackage.track.ScanType;
@@ -60,8 +59,6 @@ public class VideoStreamMetadata extends StreamMetadata {
 
   protected ScanType scanType;
   protected ScanOrder scanOrder;
-
-  protected Colorimetry colorimetry;
 
   public String getFormatSettingsBVOP() {
     return formatSettingsBVOP;
@@ -242,13 +239,5 @@ public class VideoStreamMetadata extends StreamMetadata {
 
   public void setScanOrder(ScanOrder scanOrder) {
     this.scanOrder = scanOrder;
-  }
-
-  public Colorimetry getColorimetry() {
-    return colorimetry;
-  }
-
-  public void setColorimetry(Colorimetry colorimetry) {
-    this.colorimetry = colorimetry;
   }
 }

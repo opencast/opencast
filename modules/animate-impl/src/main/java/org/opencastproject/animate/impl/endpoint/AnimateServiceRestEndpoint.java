@@ -39,6 +39,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +68,16 @@ import javax.ws.rs.core.Response;
   abstractText = "Create animated video clips using Synfig.",
   notes = {
     "Use <a href=https://www.synfig.org/>Synfig Studio</a> to create animation files"})
+@Component(
+    immediate = true,
+    service = AnimateServiceRestEndpoint.class,
+    property = {
+        "service.description=Animate Service REST Endpoint",
+        "opencast.service.type=org.opencastproject.animate",
+        "opencast.service.path=/animate",
+        "opencast.service.jobproducer=true"
+    }
+)
 public class AnimateServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */
@@ -86,6 +98,7 @@ public class AnimateServiceRestEndpoint extends AbstractJobProducerEndpoint {
    * @param serviceRegistry
    *          the service registry
    */
+  @Reference
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
   }
@@ -96,6 +109,7 @@ public class AnimateServiceRestEndpoint extends AbstractJobProducerEndpoint {
    * @param animateService
    *          the animate service
    */
+  @Reference
   public void setAnimateService(AnimateService animateService) {
     this.animateService = animateService;
   }
@@ -111,7 +125,7 @@ public class AnimateServiceRestEndpoint extends AbstractJobProducerEndpoint {
               description = "Synfig command line arguments as JSON array"),
       @RestParameter(name = "metadata", isRequired = true, type = STRING,
               description = "Metadata for replacement as JSON object") },
-    reponses = {
+    responses = {
       @RestResponse(description = "Animation created successfully", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "Invalid data", responseCode = HttpServletResponse.SC_BAD_REQUEST),
       @RestResponse(description = "Internal error", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },

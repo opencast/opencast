@@ -65,6 +65,9 @@ import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,6 +103,15 @@ import javax.ws.rs.core.Response;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
+@Component(
+  immediate = true,
+  service = UsersEndpoint.class,
+  property = {
+    "service.description=Admin UI - Users facade Endpoint",
+    "opencast.service.type=org.opencastproject.adminui.endpoint.UsersEndpoint",
+    "opencast.service.path=/admin-ng/users"
+  }
+)
 public class UsersEndpoint {
 
   /** The logging facility */
@@ -127,6 +139,7 @@ public class UsersEndpoint {
    * @param userDirectoryService
    *          the userDirectoryService to set
    */
+  @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
   }
@@ -135,6 +148,7 @@ public class UsersEndpoint {
    * @param securityService
    *          the securityService to set
    */
+  @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
@@ -143,11 +157,13 @@ public class UsersEndpoint {
    * @param jpaUserAndRoleProvider
    *          the user provider to set
    */
+  @Reference
   public void setJpaUserAndRoleProvider(JpaUserAndRoleProvider jpaUserAndRoleProvider) {
     this.jpaUserAndRoleProvider = jpaUserAndRoleProvider;
   }
 
   /** OSGi callback. */
+  @Activate
   protected void activate(ComponentContext cc) {
     logger.info("Activate the Admin ui - Users facade endpoint");
     final Tuple<String, String> endpointUrl = getEndpointUrl(cc);
@@ -161,7 +177,7 @@ public class UsersEndpoint {
           @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the following: STATUS, NAME OR LAST_UPDATED.  Add '_DESC' to reverse the sort order (e.g. STATUS_DESC).", type = STRING),
           @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
   public Response getUsers(@QueryParam("filter") String filter, @QueryParam("sort") String sort,
           @QueryParam("limit") int limit, @QueryParam("offset") int offset) throws IOException {
     if (limit < 1)
@@ -275,7 +291,7 @@ public class UsersEndpoint {
           @RestParameter(description = "The password.", isRequired = true, name = "password", type = STRING),
           @RestParameter(description = "The name.", isRequired = false, name = "name", type = STRING),
           @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
-          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, reponses = {
+          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, responses = {
           @RestResponse(responseCode = SC_CREATED, description = "User has been created."),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a user with a admin role."),
           @RestResponse(responseCode = SC_CONFLICT, description = "An user with this username already exist.")})
@@ -320,7 +336,7 @@ public class UsersEndpoint {
 
   @GET
   @Path("{username}.json")
-  @RestQuery(name = "getUser", description = "Get an user", returnDescription = "Status ok", pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
+  @RestQuery(name = "getUser", description = "Get an user", returnDescription = "Status ok", pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), responses = {
           @RestResponse(responseCode = SC_OK, description = "User has been found."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
   public Response getUser(@PathParam("username") String username) {
@@ -339,7 +355,7 @@ public class UsersEndpoint {
           @RestParameter(description = "The password.", isRequired = false, name = "password", type = STRING),
           @RestParameter(description = "The name.", isRequired = false, name = "name", type = STRING),
           @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
-          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
+          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), responses = {
           @RestResponse(responseCode = SC_OK, description = "User has been updated."),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to update a user with admin role."),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid data provided.")})
@@ -382,7 +398,7 @@ public class UsersEndpoint {
 
   @DELETE
   @Path("{username}.json")
-  @RestQuery(name = "deleteUser", description = "Deleter a new  user", returnDescription = "Status ok", pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), reponses = {
+  @RestQuery(name = "deleteUser", description = "Deleter a new  user", returnDescription = "Status ok", pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), responses = {
           @RestResponse(responseCode = SC_OK, description = "User has been deleted."),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to delete a user with admin role."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })

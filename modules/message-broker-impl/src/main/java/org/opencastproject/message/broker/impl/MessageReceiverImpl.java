@@ -24,6 +24,10 @@ package org.opencastproject.message.broker.impl;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,13 +45,28 @@ import javax.jms.Session;
 /**
  * A class to receive messages from a ActiveMQ Message Broker.
  */
+@Component(
+  property = {
+    "service.description=Message Broker Receiver",
+    "service.pid=org.opencastproject.message.broker.impl.MessageReceiverImpl"
+  },
+  immediate = true,
+  service = { MessageReceiver.class }
+)
 public class MessageReceiverImpl extends MessageBaseFacility implements MessageReceiver {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(MessageReceiverImpl.class);
 
-  /** The OSGi service PID */
-  private static final String SERVICE_PID = "org.opencastproject.message.broker.impl.MessageReceiverImpl";
+  @Activate
+  public void activate(BundleContext bc) throws Exception {
+    super.activate(bc);
+  }
+
+  @Deactivate
+  public void deactivate() {
+    super.deactivate();
+  }
 
   /**
    * Wait for a connection and then create a consumer from it
@@ -121,7 +140,7 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
     while (true) {
       // Wait for a message
       Message message = waitForMessage(destinationId, type);
-      if (message != null && message instanceof ObjectMessage) {
+      if (message instanceof ObjectMessage) {
         ObjectMessage objectMessage = (ObjectMessage) message;
         return objectMessage.getObject();
       }
@@ -132,13 +151,12 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
 
   @Override
   public FutureTask<Serializable> receiveSerializable(final String destinationId, final DestinationType type) {
-    FutureTask<Serializable> futureTask = new FutureTask<Serializable>(new Callable<Serializable>() {
+    return new FutureTask<Serializable>(new Callable<Serializable>() {
       @Override
       public Serializable call() throws JMSException {
         return getSerializable(destinationId, type);
       }
     });
-    return futureTask;
   }
 
 }

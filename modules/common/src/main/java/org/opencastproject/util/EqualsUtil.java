@@ -118,17 +118,8 @@ public final class EqualsUtil {
     return true;
   }
 
-  /** Check if both objects are either null or not null. */
-  public static boolean bothNullOrNot(Object a, Object b) {
-    return !(a == null ^ b == null);
-  }
-
   public static boolean bothNotNull(Object a, Object b) {
     return a != null && b != null;
-  }
-
-  public static boolean bothNull(Object a, Object b) {
-    return a == null && b == null;
   }
 
   /**

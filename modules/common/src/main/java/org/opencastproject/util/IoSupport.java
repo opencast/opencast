@@ -32,7 +32,6 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.data.Effect2;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
@@ -58,10 +57,8 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -71,7 +68,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.Properties;
 
 import de.schlichtherle.io.FileWriter;
@@ -120,24 +116,6 @@ public final class IoSupport {
   }
 
   /**
-   * Closes a <code>StreamHelper</code> quietly so that no exceptions are thrown.
-   *
-   * @param s
-   *          maybe null
-   */
-  public static boolean closeQuietly(final StreamHelper s) {
-    if (s == null) {
-      return false;
-    }
-    try {
-      s.stopReading();
-    } catch (InterruptedException e) {
-      logger.warn("Interrupted while waiting for stream helper to stop reading");
-    }
-    return true;
-  }
-
-  /**
    * Closes the processes input, output and error streams.
    *
    * @param process
@@ -152,37 +130,6 @@ public final class IoSupport {
       return true;
     }
     return false;
-  }
-
-  /**
-   * Extracts the content from the given input stream. This method is intended to faciliate handling of processes that
-   * have error, input and output streams.
-   *
-   * @param is
-   *          the input stream
-   * @return the stream content
-   */
-  public static String getOutput(InputStream is) {
-    InputStreamReader bis = new InputStreamReader(is);
-    StringBuffer outputMsg = new StringBuffer();
-    char[] chars = new char[1024];
-    try {
-      int len = 0;
-      try {
-        while ((len = bis.read(chars)) > 0) {
-          outputMsg.append(chars, 0, len);
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    } finally {
-      if (bis != null)
-        try {
-          bis.close();
-        } catch (IOException e) {
-        }
-    }
-    return outputMsg.toString();
   }
 
   /**
@@ -295,21 +242,15 @@ public final class IoSupport {
     } finally {
       IOUtils.closeQuietly(in);
 
-      if (response != null && trustedClient != null) {
-        trustedClient.close(response);
-        response = null;
+      if (response != null) {
+        try {
+          trustedClient.close(response);
+        } catch (IOException e) {
+        }
       }
     }
 
     return sb.toString();
-  }
-
-  public static Properties loadPropertiesFromFile(final String path) {
-    try {
-      return loadPropertiesFromStream(new FileInputStream(path));
-    } catch (FileNotFoundException e) {
-      return chuck(e);
-    }
   }
 
   public static Properties loadPropertiesFromUrl(final URL url) {
@@ -330,30 +271,6 @@ public final class IoSupport {
         return p;
       }
     });
-  }
-
-  /** Load a properties file from the classpath using the class loader of {@link IoSupport}. */
-  public static Properties loadPropertiesFromClassPath(String resource) {
-    return loadPropertiesFromClassPath(resource, IoSupport.class);
-  }
-
-  /** Load a properties file from the classpath using the class loader of the given class. */
-  public static Properties loadPropertiesFromClassPath(final String resource, final Class<?> clazz) {
-    for (InputStream in : openClassPathResource(resource, clazz)) {
-      return withResource(in, new Function<InputStream, Properties>() {
-        @Override
-        public Properties apply(InputStream is) {
-          final Properties p = new Properties();
-          try {
-            p.load(is);
-          } catch (Exception e) {
-            throw new Error("Cannot load resource " + resource + "@" + clazz);
-          }
-          return p;
-        }
-      });
-    }
-    return chuck(new FileNotFoundException(resource + " does not exist"));
   }
 
   /** Load a text file from the class path using the class loader of the given class. */
@@ -485,24 +402,6 @@ public final class IoSupport {
   }
 
   /**
-   * Handle a stream inside <code>e</code> and ensure that <code>s</code> gets closed properly.
-   *
-   * @return true, if the file exists, false otherwise
-   */
-  public static boolean withFile(File file, Effect2<OutputStream, File> e) {
-    OutputStream s = null;
-    try {
-      s = new FileOutputStream(file);
-      e.apply(s, file);
-      return true;
-    } catch (FileNotFoundException ignore) {
-      return false;
-    } finally {
-      IoSupport.closeQuietly(s);
-    }
-  }
-
-  /**
    * Handle a stream inside <code>f</code> and ensure that <code>s</code> gets closed properly.
    *
    * @param s
@@ -566,29 +465,6 @@ public final class IoSupport {
     }
   }
 
-  /** Handle multiple streams inside <code>f</code> and ensure that they get closed properly. */
-  public static <A> A withStreams(InputStream[] in, OutputStream[] out, Function2<InputStream[], OutputStream[], A> f) {
-    try {
-      return f.apply(in, out);
-    } finally {
-      for (Closeable a : in) {
-        IoSupport.closeQuietly(a);
-      }
-      for (Closeable a : out) {
-        IoSupport.closeQuietly(a);
-      }
-    }
-  }
-
-  /** Like {@link IOUtils#toString(java.net.URL, String)} but without checked exception. */
-  public static String readToString(URL url, String encoding) {
-    try {
-      return IOUtils.toString(url, encoding);
-    } catch (IOException e) {
-      return chuck(e);
-    }
-  }
-
   /** Function that reads an input stream into a string using utf-8 encoding. Stream does not get closed. */
   public static final Function<InputStream, String> readToString = new Function.X<InputStream, String>() {
     @Override
@@ -596,18 +472,6 @@ public final class IoSupport {
       return IOUtils.toString(in, "utf-8");
     }
   };
-
-  /** Wrap function <code>f</code> to close the input stream after usage. */
-  public static <A> Function<InputStream, A> closeAfterwards(final Function<InputStream, ? extends A> f) {
-    return new Function<InputStream, A>() {
-      @Override
-      public A apply(InputStream in) {
-        final A a = f.apply(in);
-        IOUtils.closeQuietly(in);
-        return a;
-      }
-    };
-  }
 
   /** Create a function that creates a {@link java.io.FileInputStream}. */
   public static Function0<InputStream> fileInputStream(final File a) {
@@ -622,14 +486,6 @@ public final class IoSupport {
   /** Create a file from the list of path elements. */
   public static File file(String... pathElems) {
     return new File(path(pathElems));
-  }
-
-  /** Returns the given {@link File} back when it's ready for reading */
-  public static File waitForFile(File file) {
-    while (!Files.isReadable(file.toPath())) {
-      Prelude.sleep(100L);
-    }
-    return file;
   }
 
   /**
