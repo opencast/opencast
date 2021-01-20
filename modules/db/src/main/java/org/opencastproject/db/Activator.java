@@ -171,7 +171,8 @@ public class Activator implements BundleActivator {
   private void runUpdate(Statement statement, String sql) throws RuntimeException, SQLException {
     int affected = statement.executeUpdate(sql);
     if (affected != 1) {
-      throw new RuntimeException("Unable to update on a testing table, check that your database user has the right permissions!");
+      throw new RuntimeException(
+              "Unable to update on a testing table, check that your database user has the right permissions!");
     }
   }
 

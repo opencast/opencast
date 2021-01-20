@@ -262,7 +262,8 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   /**
    * {@inheritDoc}
    *
-   * @see org.springframework.security.oauth.provider.OAuthAuthenticationHandler#createAuthentication(javax.servlet.http.HttpServletRequest,
+   * @see org.springframework.security.oauth.provider.OAuthAuthenticationHandler#createAuthentication(
+   *      javax.servlet.http.HttpServletRequest,
    *      org.springframework.security.oauth.provider.ConsumerAuthentication,
    *      org.springframework.security.oauth.provider.token.OAuthAccessProviderToken)
    */
