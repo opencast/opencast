@@ -34,6 +34,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Functions;
@@ -210,7 +211,10 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
       try { // try to load job from filesystem
         synchronized (this) {
           File jobFile = getJobFile(id);
-          FileUploadJob job = (FileUploadJob) jobUnmarshaller.unmarshal(jobFile);
+          FileUploadJob job = null;
+          try (FileInputStream jobFileStream = new FileInputStream(jobFile)) {
+            job = (FileUploadJob) jobUnmarshaller.unmarshal(XmlSafeParser.parse(jobFileStream));
+          }
           job.setLastModified(jobFile.lastModified()); // get last modified time from job file
           return job;
         } // if loading from fs also fails

@@ -21,6 +21,8 @@
 
 package org.opencastproject.serviceregistry.api;
 
+import org.opencastproject.util.XmlSafeParser;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -32,7 +34,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Marshals and unmarshals {@link SystemLoad}s.
@@ -80,7 +81,7 @@ public final class SystemLoadParser {
     Unmarshaller unmarshaller;
     try {
       unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), SystemLoad.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), SystemLoad.class).getValue();
     } catch (Exception e) {
       throw new IOException(e);
     }

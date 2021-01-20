@@ -32,6 +32,7 @@ import static org.opencastproject.util.EqualsUtil.hash;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
+import org.opencastproject.util.XmlSafeParser;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fns;
@@ -64,7 +65,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -457,7 +457,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    *           If the xml parser environment is not correctly configured
    */
   protected Document newDocument() throws ParserConfigurationException {
-    DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    DocumentBuilderFactory docBuilderFactory = XmlSafeParser.newDocumentBuilderFactory();
     docBuilderFactory.setNamespaceAware(true);
     DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
     return docBuilder.newDocument();
@@ -476,8 +476,8 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    */
   protected void saveToXml(Node document, String docType, OutputStream out) throws TransformerException, IOException {
     StreamResult streamResult = new StreamResult(out);
-    TransformerFactory tf = TransformerFactory.newInstance();
-    Transformer serializer = tf.newTransformer();
+    Transformer serializer = XmlSafeParser.newTransformerFactory()
+            .newTransformer();
     serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
     if (docType != null)
       serializer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, docType);
@@ -836,7 +836,8 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
       Document doc = this.toXml();
       DOMSource domSource = new DOMSource(doc);
       StreamResult result = new StreamResult(out);
-      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      Transformer transformer = XmlSafeParser.newTransformerFactory()
+              .newTransformer();
       transformer.transform(domSource, result);
     } catch (ParserConfigurationException e) {
       throw new IOException("unable to parse document");

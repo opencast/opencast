@@ -38,6 +38,7 @@ import com.entwinemedia.fn.Stream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -90,10 +91,16 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
   @Override
   public InputStream serialize(DublinCoreCatalog catalog) throws IOException {
     try {
-      Transformer tf = TransformerFactory.newInstance().newTransformer();
-      DOMSource xmlSource = new DOMSource(catalog.toXml());
       ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+      Document xmlCatalog = catalog.toXml();
+      // CHECKSTYLE:OFF
+      DOMSource xmlSource = new DOMSource(xmlCatalog);
+      Transformer tf = TransformerFactory.newInstance().newTransformer();
+      // Document was already parsed, so this is safe
       tf.transform(xmlSource, new StreamResult(out));
+      // CHECKSTYLE:ON
+
       return new ByteArrayInputStream(out.toByteArray());
     } catch (Exception e) {
       throw new IOException(e);

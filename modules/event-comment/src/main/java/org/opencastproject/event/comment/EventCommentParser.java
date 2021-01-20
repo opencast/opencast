@@ -28,6 +28,7 @@ import org.opencastproject.mediapackage.UnsupportedElementException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.IOUtils;
@@ -47,7 +48,6 @@ import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
@@ -82,7 +82,7 @@ public final class EventCommentParser {
   public static List<EventComment> getCommentsFromXml(String xml, UserDirectoryService userDirectoryService)
           throws EventCommentException {
     try {
-      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+      Document doc = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder()
               .parse(IOUtils.toInputStream(xml, "UTF-8"));
 
       List<EventComment> comments = new ArrayList<EventComment>();
@@ -112,7 +112,7 @@ public final class EventCommentParser {
   public static EventComment getCommentFromXml(String xml, UserDirectoryService userDirectoryService)
           throws EventCommentException {
     try {
-      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+      Document doc = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder()
               .parse(IOUtils.toInputStream(xml, "UTF-8"));
       return commentFromManifest(doc.getDocumentElement(), userDirectoryService);
     } catch (Exception e) {
@@ -134,7 +134,7 @@ public final class EventCommentParser {
   public static EventCommentReply getCommentReplyFromXml(String xml, UserDirectoryService userDirectoryService)
           throws EventCommentException {
     try {
-      Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+      Document doc = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder()
               .parse(IOUtils.toInputStream(xml, "UTF-8"));
       return replyFromManifest(doc.getDocumentElement(), userDirectoryService);
     } catch (Exception e) {
@@ -424,7 +424,8 @@ public final class EventCommentParser {
   private static String serializeNode(Document xmlDocument) throws EventCommentException {
     // Serialize the document
     try {
-      Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      Transformer transformer = XmlSafeParser.newTransformerFactory()
+              .newTransformer();
       // transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
       StringWriter writer = new StringWriter();
       transformer.transform(new DOMSource(xmlDocument), new StreamResult(writer));
@@ -436,7 +437,7 @@ public final class EventCommentParser {
 
   /** Create a new DOM document. */
   private static Document newDocument() {
-    final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
+    final DocumentBuilderFactory docBuilderFactory = XmlSafeParser.newDocumentBuilderFactory();
     docBuilderFactory.setNamespaceAware(true);
     try {
       return docBuilderFactory.newDocumentBuilder().newDocument();

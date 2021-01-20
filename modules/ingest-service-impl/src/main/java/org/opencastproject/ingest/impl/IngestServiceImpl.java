@@ -71,6 +71,7 @@ import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.ProgressInputStream;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -103,7 +104,6 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -602,7 +602,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     ByteArrayOutputStream baos = null;
     ByteArrayInputStream bais = null;
     try {
-      Document domMP = new SAXBuilder().build(manifest);
+      Document domMP = XmlSafeParser.newSAXBuilder().build(manifest);
       String mpNSUri = "http://mediapackage.opencastproject.org";
 
       Namespace oldNS = domMP.getRootElement().getNamespace();

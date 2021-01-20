@@ -21,6 +21,8 @@
 
 package org.opencastproject.composer.api;
 
+import org.opencastproject.util.XmlSafeParser;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
@@ -31,7 +33,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Provides a mechanism to transform {@link EncodingProfile}s to and from xml.
@@ -77,7 +78,7 @@ public final class EncodingProfileBuilder {
   public EncodingProfile parseProfile(InputStream in) throws Exception {
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
     try {
-      return unmarshaller.unmarshal(new StreamSource(in), EncodingProfileImpl.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), EncodingProfileImpl.class).getValue();
     } finally {
       IOUtils.closeQuietly(in);
     }
@@ -114,7 +115,7 @@ public final class EncodingProfileBuilder {
   public EncodingProfileList parseProfileList(InputStream in) throws Exception {
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
     try {
-      return unmarshaller.unmarshal(new StreamSource(in), EncodingProfileList.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), EncodingProfileList.class).getValue();
     } finally {
       IOUtils.closeQuietly(in);
     }

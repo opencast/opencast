@@ -27,12 +27,15 @@ import org.opencastproject.smil.entity.SmilImpl;
 import org.opencastproject.smil.entity.SmilObjectImpl;
 import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.api.SmilObject;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
+import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 
@@ -211,7 +214,11 @@ public class SmilResponseImpl implements SmilResponse {
     StringWriter writer = new StringWriter();
     JAXBContext ctx = JAXBContext.newInstance(SmilResponseImpl.class);
     Unmarshaller unmarshaller = ctx.createUnmarshaller();
-    return (SmilResponse) unmarshaller.unmarshal(smilResponseXml);
+    try {
+      return (SmilResponse) unmarshaller.unmarshal(XmlSafeParser.parse(smilResponseXml));
+    } catch (IOException | SAXException e) {
+      throw new JAXBException(e);
+    }
 
   }
 

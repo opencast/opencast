@@ -23,10 +23,12 @@ package org.opencastproject.mediapackage;
 
 import static org.apache.commons.io.IOUtils.toInputStream;
 
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.data.Function;
 
-import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Iterator;
@@ -95,9 +97,11 @@ public final class MediaPackageElementParser {
     Unmarshaller m = null;
     try {
       m = MediaPackageImpl.context.createUnmarshaller();
-      return (MediaPackageElement) m.unmarshal(new InputSource(toInputStream(xml)));
+      return (MediaPackageElement) m.unmarshal(XmlSafeParser.parse(toInputStream(xml)));
     } catch (JAXBException e) {
       throw new MediaPackageException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    } catch (IOException | SAXException e) {
+      throw new MediaPackageException(e);
     }
   }
 

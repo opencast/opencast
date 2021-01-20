@@ -24,6 +24,7 @@ package org.opencastproject.metadata.mpeg7;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.api.CatalogService;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
@@ -32,7 +33,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -62,7 +62,7 @@ public class Mpeg7CatalogService implements CatalogService<Mpeg7Catalog> {
   @Override
   public InputStream serialize(Mpeg7Catalog catalog) throws IOException {
     try {
-      Transformer tf = TransformerFactory.newInstance().newTransformer();
+      Transformer tf = XmlSafeParser.newTransformerFactory().newTransformer();
       DOMSource xmlSource = new DOMSource(catalog.toXml());
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       tf.transform(xmlSource, new StreamResult(out));

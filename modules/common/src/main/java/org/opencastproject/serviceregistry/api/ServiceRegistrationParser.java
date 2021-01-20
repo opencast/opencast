@@ -21,6 +21,8 @@
 
 package org.opencastproject.serviceregistry.api;
 
+import org.opencastproject.util.XmlSafeParser;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -32,7 +34,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Marshals and unmarshals {@link ServiceRegistration}s.
@@ -78,7 +79,7 @@ public final class ServiceRegistrationParser {
     Unmarshaller unmarshaller;
     try {
       unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), JaxbServiceRegistration.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), JaxbServiceRegistration.class).getValue();
     } catch (Exception e) {
       throw new IOException(e);
     } finally {
@@ -120,7 +121,7 @@ public final class ServiceRegistrationParser {
     Unmarshaller unmarshaller;
     try {
       unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), JaxbServiceStatisticsList.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), JaxbServiceStatisticsList.class).getValue();
     } catch (Exception e) {
       throw new IOException(e);
     } finally {
@@ -132,7 +133,7 @@ public final class ServiceRegistrationParser {
     Unmarshaller unmarshaller;
     try {
       unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), JaxbServiceRegistrationList.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), JaxbServiceRegistrationList.class).getValue();
     } catch (Exception e) {
       throw new IOException(e);
     } finally {

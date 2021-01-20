@@ -31,12 +31,14 @@ import org.opencastproject.mediapackage.identifier.IdBuilder;
 import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -1522,9 +1524,11 @@ public final class MediaPackageImpl implements MediaPackage {
   public static MediaPackageImpl valueOf(InputStream xml) throws MediaPackageException {
     try {
       Unmarshaller unmarshaller = context.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(xml), MediaPackageImpl.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(xml), MediaPackageImpl.class).getValue();
     } catch (JAXBException e) {
       throw new MediaPackageException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    } catch (IOException | SAXException e) {
+      throw new MediaPackageException(e);
     } finally {
       IoSupport.closeQuietly(xml);
     }
@@ -1544,14 +1548,22 @@ public final class MediaPackageImpl implements MediaPackage {
       Unmarshaller unmarshaller = context.createUnmarshaller();
 
       // Serialize the media package
-      DOMSource domSource = new DOMSource(xml);
       out = new ByteArrayOutputStream();
       StreamResult result = new StreamResult(out);
+
+      // CHECKSTYLE:OFF
+      // This is safe because the Node was already parsed
       Transformer transformer = TransformerFactory.newInstance().newTransformer();
+      // CHECKSTYLE:ON
+      DOMSource domSource = new DOMSource(xml);
       transformer.transform(domSource, result);
+
       in = new ByteArrayInputStream(out.toByteArray());
 
+      // CHECKSTYLE:OFF
+      // in was already parsed, therefore this is save
       return unmarshaller.unmarshal(new StreamSource(in), MediaPackageImpl.class).getValue();
+      // CHECKSTYLE:ON
     } catch (Exception e) {
       throw new MediaPackageException("Error deserializing media package node", e);
     } finally {

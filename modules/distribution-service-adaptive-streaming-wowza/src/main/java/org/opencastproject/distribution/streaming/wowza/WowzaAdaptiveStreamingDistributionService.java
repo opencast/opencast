@@ -43,6 +43,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.data.Option;
 
 import com.google.gson.Gson;
@@ -83,11 +84,9 @@ import java.util.TreeSet;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -617,8 +616,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   private Document getSmilDocument(File smilFile) throws DistributionException {
     if (!smilFile.isFile()) {
       try {
-        DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+        DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
         Document doc = docBuilder.newDocument();
         Element smil = doc.createElement("smil");
         doc.appendChild(smil);
@@ -640,8 +638,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
     }
 
     try {
-      DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
+      DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
       Document doc = docBuilder.parse(smilFile);
 
       if (!"smil".equalsIgnoreCase(doc.getDocumentElement().getNodeName())) {
@@ -664,8 +661,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
 
   private void saveSmilFile(File smilFile, Document doc) throws DistributionException {
     try {
-      TransformerFactory transformerFactory = TransformerFactory.newInstance();
-      Transformer transformer = transformerFactory.newTransformer();
+      Transformer transformer = XmlSafeParser.newTransformerFactory().newTransformer();
       DOMSource source = new DOMSource(doc);
       StreamResult stream = new StreamResult(smilFile);
       transformer.transform(source, stream);

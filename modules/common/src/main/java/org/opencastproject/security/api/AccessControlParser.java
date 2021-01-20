@@ -25,6 +25,7 @@ import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 
@@ -44,7 +45,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Marshals and unmarshals {@link AccessControlList}s to/from XML.
@@ -210,7 +210,7 @@ public final class AccessControlParser {
     Unmarshaller unmarshaller;
     try {
       unmarshaller = jaxbContext.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(in), AccessControlList.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(in), AccessControlList.class).getValue();
     } catch (Exception e) {
       if (e instanceof IOException) {
         throw (IOException) e;

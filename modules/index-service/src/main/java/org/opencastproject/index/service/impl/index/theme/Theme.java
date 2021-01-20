@@ -24,6 +24,7 @@ package org.opencastproject.index.service.impl.index.theme;
 import org.opencastproject.index.service.impl.index.IndexObject;
 import org.opencastproject.util.DateTimeSupport.UtcTimestampAdapter;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.XmlSafeParser;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -31,6 +32,7 @@ import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
+import org.xml.sax.SAXException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -54,7 +56,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.stream.StreamSource;
 
 /**
  * Object wrapper for a theme.
@@ -340,9 +341,11 @@ public class Theme implements IndexObject {
         createJAXBContext();
       }
       Unmarshaller unmarshaller = context.createUnmarshaller();
-      return unmarshaller.unmarshal(new StreamSource(xml), Theme.class).getValue();
+      return unmarshaller.unmarshal(XmlSafeParser.parse(xml), Theme.class).getValue();
     } catch (JAXBException e) {
       throw new IOException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    } catch (SAXException e) {
+      throw new IOException(e);
     } finally {
       IoSupport.closeQuietly(xml);
     }
@@ -378,9 +381,12 @@ public class Theme implements IndexObject {
     xmlToJsonNamespaces.put(IndexObject.INDEX_XML_NAMESPACE, "");
     config.setXmlToJsonNamespaces(xmlToJsonNamespaces);
     MappedNamespaceConvention con = new MappedNamespaceConvention(config);
-    XMLStreamReader xmlStreamReader = new MappedXMLStreamReader(obj, con);
     Unmarshaller unmarshaller = context.createUnmarshaller();
+    // CHECKSTYLE:OFF
+    // the xml is parsed from json and should be safe
+    XMLStreamReader xmlStreamReader = new MappedXMLStreamReader(obj, con);
     Theme event = (Theme) unmarshaller.unmarshal(xmlStreamReader);
+    // CHECKSTYLE:ON
     return event;
   }
 

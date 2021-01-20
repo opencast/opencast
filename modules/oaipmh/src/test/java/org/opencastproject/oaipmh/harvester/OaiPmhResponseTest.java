@@ -24,6 +24,8 @@ package org.opencastproject.oaipmh.harvester;
 
 import static org.junit.Assert.assertEquals;
 
+import org.opencastproject.util.XmlSafeParser;
+
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,7 +39,7 @@ public class OaiPmhResponseTest {
   }
 
   public Document loadDoc(String name) throws Exception {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    DocumentBuilderFactory factory = XmlSafeParser.newDocumentBuilderFactory();
     factory.setNamespaceAware(true);
     return factory.newDocumentBuilder().parse(this.getClass().getResourceAsStream(name));
   }

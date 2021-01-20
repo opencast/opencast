@@ -31,6 +31,7 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -53,9 +54,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -199,7 +198,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
       String[] languageArray = service.getLanguageList((Catalog) element, inputType);
 
       // build response
-      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+      DocumentBuilder docBuilder = XmlSafeParser.newDocumentBuilderFactory().newDocumentBuilder();
       Document doc = docBuilder.newDocument();
       Element root = doc.createElement("languages");
       root.setAttribute("type", inputType);
@@ -213,8 +212,7 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
       DOMSource domSource = new DOMSource(root);
       StringWriter writer = new StringWriter();
       StreamResult result = new StreamResult(writer);
-      Transformer transformer;
-      transformer = TransformerFactory.newInstance().newTransformer();
+      Transformer transformer = XmlSafeParser.newTransformerFactory().newTransformer();
       transformer.transform(domSource, result);
 
       return Response.status(Response.Status.OK).entity(writer.toString()).build();
