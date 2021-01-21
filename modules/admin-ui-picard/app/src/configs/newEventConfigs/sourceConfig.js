@@ -37,6 +37,30 @@ export const uploadAssetOptions = [
         "multiple": false,
         "displayOrder": 14,
         "accept": ".avi,.flv,.m4v,.mkv,.mov,.mp4,.mpeg,.mpg,.ogv,.webm,.wmv,.flac,.m4a,.mp3,.ogg,.wav,.wma"
+    }, {
+        'id': 'attachment_attachment_notes',
+        'title': 'class handout notes',
+        'flavorType': 'attachment',
+        'flavorSubType': 'notes',
+        'type': 'attachment'
+    }, {
+        'id':'catalog_captions_dfxp',
+        'title': 'captions DFXP',
+        'flavorType': 'captions',
+        'flavorSubType': 'timedtext',
+        'type': 'catalog'
+    },{
+        'id': 'attachment_text_webvtt',
+        'title': 'Captions WebVTT',
+        'flavorType': 'text',
+        'flavorSubType': 'webvtt',
+        'type': 'attachment'
+    },{
+        'id':'attachment_presenter_search_preview',
+        'title': 'video list thumbnail',
+        'flavorType': 'presenter',
+        'flavorSubType': 'search+preview',
+        'type': 'attachment'
     }
 ];
 

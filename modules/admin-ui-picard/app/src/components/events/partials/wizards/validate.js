@@ -6,9 +6,12 @@ today.setHours(0, 0, 0, 0);
 export const NewEventSchema = [Yup.object().shape({
     title: Yup.string().required('Required')
 }), Yup.object().shape({
+
+}),
+    Yup.object().shape({
     sourceMode: Yup.string(),
     scheduleStartDate: Yup.date().when('sourceMode', {
-        is: 'SCHEDULE_SINGLE' || 'SCHEDULE_MULTIPLE',
+        is: value => value === 'SCHEDULE_SINGLE' || value === 'SCHEDULE_MULTIPLE',
         then: Yup.date().required('Required')
     }),
     scheduleEndDate: Yup.date().when('sourceMode', {
@@ -47,4 +50,6 @@ export const NewEventSchema = [Yup.object().shape({
         is: value => value === 'SCHEDULE_SINGLE' || value === 'SCHEDULE_MULTIPLE',
         then: Yup.string().required('Required')
     })
+}), Yup.object().shape({
+    processingWorkflow: Yup.string().required('Required')
 })]

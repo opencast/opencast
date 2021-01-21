@@ -14,10 +14,12 @@ import {makeStyles, Step, StepLabel, Stepper,} from '@material-ui/core';
 import {FaCircle, FaDotCircle} from "react-icons/all";
 import {useTranslation} from "react-i18next";
 import {sourceMetadata, uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConfig";
-import {initialFormValuesNewEvents} from "../../../../configs/newEventConfigs/newEventWizardStates";
+import {initialFormValuesNewEvents} from "../../../../configs/newEventConfigs/newEventWizardConfig";
 import {MuiPickersUtilsProvider} from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import {getCurrentLanguageInformation} from "../../../../utils/utils";
+import NewEventAssetUpload from "./NewEventAssetUpload";
+import NewEventMetadataExtended from "./NewEventMetadataExtended";
 
 // Base style for Stepper component
 const useStepperStyle = makeStyles((theme) => ({
@@ -56,14 +58,39 @@ const NewEventWizard = ({onSubmit, metadataFields}) => {
 
     const [page, setPage] = useState(0);
     const [snapshot, setSnapshot] = useState(initialValues);
+
     // Caption of steps used by Stepper
-    // Todo: Get Steps depending on Wizard states (see newEventWizardStates)
     const steps = [
-        t('EVENTS.EVENTS.NEW.METADATA.CAPTION'),
-        t('EVENTS.EVENTS.NEW.SOURCE.CAPTION'),
-        t('EVENTS.EVENTS.NEW.PROCESSING.CAPTION'),
-        t('EVENTS.EVENTS.NEW.ACCESS.CAPTION'),
-        t('EVENTS.EVENTS.NEW.SUMMARY.CAPTION')
+        {
+            translation: 'EVENTS.EVENTS.NEW.METADATA.CAPTION',
+            name: 'metadata'
+        },
+        {
+            translation: 'EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA',
+            name: 'metadata-extended',
+            hidden: true
+        },
+        {
+            translation: 'EVENTS.EVENTS.NEW.SOURCE.CAPTION',
+            name: 'source'
+        },
+        {
+            translation: 'EVENTS.EVENTS.NEW.UPLOAD_ASSET.CAPTION',
+            name: 'upload-asset',
+            hidden: false
+        },
+        {
+            translation: 'EVENTS.EVENTS.NEW.PROCESSING.CAPTION',
+            name: 'processing'
+        },
+        {
+            translation: 'EVENTS.EVENTS.NEW.ACCESS.CAPTION',
+            name: 'access'
+        },
+        {
+            translation: 'EVENTS.EVENTS.NEW.SUMMARY.CAPTION',
+            name: 'summary'
+        }
     ];
 
     // Validation schema of current page
@@ -71,12 +98,21 @@ const NewEventWizard = ({onSubmit, metadataFields}) => {
 
     const nextPage = values => {
         setSnapshot(values);
-        setPage(page + 1);
+        if (steps[page + 1].hidden) {
+            setPage(page + 2);
+        } else {
+            setPage(page + 1);
+        }
     }
 
-    const previousPage = values => {
+    const previousPage = (values, twoPagesBack) => {
         setSnapshot(values);
-        setPage(page - 1);
+        // if previous page is hidden or not always shown, than go back two pages
+        if (steps[page - 1].hidden || twoPagesBack) {
+            setPage(page - 2);
+        } else {
+            setPage(page - 1);
+        }
     }
 
     //todo: implement
@@ -90,14 +126,14 @@ const NewEventWizard = ({onSubmit, metadataFields}) => {
             {/* Stepper that shows each step of wizard as header */}
             <Stepper activeStep={page} alternativeLabel connector={false} className={cn("step-by-step", classes.root)}>
                 {steps.map(label => (
-                    <Step key={label}>
-                        <StepLabel
-                            StepIconComponent={CustomStepIcon}
-                        >{label}</StepLabel>
-                    </Step>
+                    !label.hidden ? (
+                        <Step key={label.translation}>
+                            <StepLabel StepIconComponent={CustomStepIcon}>{t(label.translation)}</StepLabel>
+                        </Step>
+                    ) : null
                 ))}
             </Stepper>
-            {/*// Initialize overall form*/}
+            {/* Initialize overall form */}
             <MuiPickersUtilsProvider  utils={DateFnsUtils} locale={currentLanguage.dateLocale}>
                 <Formik initialValues={snapshot}
                         validationSchema={currentValidationSchema}
@@ -109,28 +145,40 @@ const NewEventWizard = ({onSubmit, metadataFields}) => {
                                                              formik={formik}
                                                              onSubmit={() => console.log(formik.values)}/>}
                             {page === 1 && (
+                                <NewEventMetadataExtended previousPage={previousPage}
+                                                          nextPage={nextPage}
+                                                          formik={formik}
+                                                          onSubmit={() => console.log("Step Metadata Extended onSubmit")}/>
+                            )}
+                            {page === 2 && (
                                 <NewEventSource previousPage={previousPage}
                                                 nextPage={nextPage}
                                                 formik={formik}
-                                                onSubmit={() => console.log("Step 3 onSubmit")}/>
+                                                onSubmit={() => console.log(formik.values)}/>
                             )}
-                            {page === 2 && (
+                            {page === 3  && (
+                                <NewEventAssetUpload previousPage={previousPage}
+                                                     nextPage={nextPage}
+                                                     formik={formik}
+                                                     onSubmit={() => console.log("Step Asset onSubmit")} />
+                            )}
+                            {page === 4 && (
                                 <NewEventProcessing previousPage={previousPage}
                                                     nextPage={nextPage}
                                                     formik={formik}
-                                                    onSubmit={() => console.log("Step 4 onSubmit")}/>
+                                                    onSubmit={() => console.log("Step Processing onSubmit")}/>
                             )}
-                            {page === 3 && (
+                            {page === 5 && (
                                 <NewEventAccess previousPage={previousPage}
                                                 nextPage={nextPage}
                                                 formik={formik}
-                                                onSubmit={() => console.log("Step 5 onSubmit")}/>
+                                                onSubmit={() => console.log("Step Access onSubmit")}/>
                             )}
-                            {page === 4 && (
+                            {page === 6 && (
                                 <NewEventSummary previousPage={previousPage}
                                                  nextPage={handleSubmit}
                                                  formik={formik}
-                                                 onSubmit={() => console.log("Step 6 onSubmit")}/>
+                                                 onSubmit={() => console.log("Step Summary onSubmit")}/>
                             )}
                         </div>
                     )}

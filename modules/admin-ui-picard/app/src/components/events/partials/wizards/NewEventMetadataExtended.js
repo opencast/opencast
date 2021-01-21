@@ -1,9 +1,11 @@
 import React from "react";
-import {useTranslation} from "react-i18next";
-import cn from "classnames";
 
-const NewEventMetadataExtended = ({ onSubmit, previousPage, nextPage, formik }) => {
-
+const NewEventMetadataExtended = ({ onSubmit, previousPage, nextPage, formik, hidden }) => {
+        return (
+            <div>
+                Metadata Extended
+            </div>
+        );
 }
 
 export default NewEventMetadataExtended;

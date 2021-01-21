@@ -1,5 +1,5 @@
 import {createNotification, removeNotification} from "../actions/notificationActions";
-import {getLastAddedNotification, getNotificationById} from "../selectors/notificationSelector";
+import {getLastAddedNotification} from "../selectors/notificationSelector";
 
 //todo: Put in config file and get values from there
 const ADMIN_NOTIFICATION_DURATION_ERROR = 5;

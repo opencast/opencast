@@ -11,6 +11,7 @@
     "@testing-library/user-event": "^7.2.1",
     "classnames": "^2.2.6",
     "date-fns": "^2.16.1",
+    "dompurify": "^2.2.6",
     "font-awesome": "^4.7.0",
     "formik": "^2.2.5",
     "http-proxy-middleware": "^1.0.5",

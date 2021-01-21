@@ -19,6 +19,7 @@ import acls from "./reducers/aclReducers";
 import themes from "./reducers/themeReducers";
 import health from "./reducers/healthReducers";
 import {notifications} from "./reducers/notificationReducers";
+import workflows from "./reducers/workflowReducers";
 
 /**
  * This File contains the configuration for the store used by the reducers all over the app
@@ -40,7 +41,8 @@ const reducers = {
     acls,
     themes,
     health,
-    notifications
+    notifications,
+    workflows
 };
 
 // Configuration for persisting store

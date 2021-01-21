@@ -11,10 +11,9 @@ import RenderField from "./RenderField";
 import {
     hours,
     minutes,
-    newEventWizardStates,
     NOTIFICATION_CONTEXT,
     weekdays
-} from "../../../../configs/newEventConfigs/newEventWizardStates";
+} from "../../../../configs/newEventConfigs/newEventWizardConfig";
 import {getRecordings} from "../../../../selectors/recordingSelectors";
 import {fetchRecordings} from "../../../../thunks/recordingThunks";
 import {connect} from "react-redux";
@@ -179,7 +178,7 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInput
                         }}
                         tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
                 <button className="cancel"
-                        onClick={() => previousPage()}
+                        onClick={() => previousPage(formik.values, false)}
                         tabIndex="101">{t('WIZARD.BACK')}</button>
             </footer>
 
@@ -202,6 +201,7 @@ const Upload = ({ setFieldValue }) => {
                     <ul>
                         {/*File upload button for each upload asset*/}
                         {uploadAssetOptions.map((asset, key) => (
+                            asset.type === 'track' ? (
                             <li key={key}>
                                 <div className="file-upload">
                                     <input id={asset.id}
@@ -215,6 +215,7 @@ const Upload = ({ setFieldValue }) => {
                                 <span className="ui-helper-hidden">({asset.type} "{asset.flavorType}/{asset.flavorSubType}")</span>
                                 <p>{t(asset.translate + ".DETAIL")}</p>
                             </li>
+                            ) : null
                         ))
                         }
                     </ul>
@@ -324,7 +325,6 @@ const Schedule = ({ formik, inputDevices }) => {
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME')} <i className="required">*</i></td>
                         <td>
                             {/* one options for each entry in hours*/}
-                            {/* todo: check for conflicts*/}
                             <Field tabIndex="5"
                                    as="select"
                                    name="scheduleStartTimeHour"
@@ -335,7 +335,6 @@ const Schedule = ({ formik, inputDevices }) => {
                                 ))}
                             </Field>
                             {/* one options for each entry in minutes*/}
-                            {/* todo: check for conflicts*/}
                             <Field tabIndex="6"
                                    as="select"
                                    name="scheduleStartTimeMinutes"
@@ -351,7 +350,6 @@ const Schedule = ({ formik, inputDevices }) => {
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION')} <i className="required">*</i></td>
                         <td>
                             {/* one options for each entry in hours*/}
-                            {/* todo: check for conflicts*/}
                             <Field tabIndex="7"
                                    as="select"
                                    name="scheduleDurationHour"
@@ -362,7 +360,6 @@ const Schedule = ({ formik, inputDevices }) => {
                                 ))}
                             </Field>
                             {/* one options for each entry in minutes*/}
-                            {/* todo: check for conflicts*/}
                             <Field tabIndex="8"
                                    as="select"
                                    name="scheduleDurationMinutes"
@@ -378,7 +375,6 @@ const Schedule = ({ formik, inputDevices }) => {
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME')} <i className="required">*</i></td>
                         <td>
                             {/* one options for each entry in hours*/}
-                            {/* todo: check for conflicts*/}
                             <Field tabIndex="9"
                                    as="select"
                                    name="scheduleEndTimeHour"
@@ -389,7 +385,6 @@ const Schedule = ({ formik, inputDevices }) => {
                                 ))}
                             </Field>
                             {/* one options for each entry in minutes*/}
-                            {/* todo: check for conflicts*/}
                             <Field tabIndex="10"
                                    as="select"
                                    name="scheduleEndTimeMinutes"
@@ -404,7 +399,6 @@ const Schedule = ({ formik, inputDevices }) => {
                     <tr>
                         <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')} <i className="required">*</i></td>
                         {/* one options for each capture agents that has input options */}
-                        {/* todo: check for conflicts */}
                         <td>
                             <select placeholder={t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}
                                     tabIndex="11"
