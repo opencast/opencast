@@ -19,7 +19,7 @@ Parameter Table
 |Configuration Keys    |Example              |Description                                                    |
 |----------------------|---------------------|---------------------------------------------------------------|
 |source-media-flavors  |`presenter/prepared` |The flavors containing the video tracks.                       |
-|source-json-flavor    |`json/times`         |The flavor of the JSON. Must contain exactly one file.         |
+|source-json-flavor    |`cut-marks/json`     |The flavor of the JSON. Must contain exactly one file.         |
 |target-smil-flavor    |`smil/cutmarks`      |The flavor of the resulting SMIL.                              |
 |target-tags           |`archive`            |(Optional) Tags to add to the resulting SMIL. Default is `null`|
 
@@ -51,7 +51,7 @@ Operation Example
     exception-handler-workflow="partial-error">
   <configurations>
     <configuration key="source-media-flavors">presenter/prepared,presentation/prepared</configuration>
-    <configuration key="source-json-flavor">json/times</configuration>
+    <configuration key="source-json-flavor">cut-marks/json</configuration>
     <configuration key="target-smil-flavor">smil/cutting</configuration>
   </configurations>
 </operation>

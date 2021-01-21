@@ -117,8 +117,9 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *        org.opencastproject.workflow.api.WorkflowInstance,
+   *        JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -149,14 +150,14 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
       logger.warn("No catalogs in the source flavor. Skipping...");
       return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
     } else if (catalogs.length > 1) {
-      throw new WorkflowOperationException("More than one catalog in the source flavor! Make sure there is only catalog.");
+      throw new WorkflowOperationException("More than one catalog with source flavor! Make sure there is only one.");
     }
 
     // Parse JSON
     List<Times> cutMarks;
     Catalog jsonWithTimes = catalogs[0];
-    try (BufferedReader bufferedReader = new BufferedReader(new FileReader(getMediaPackageElementPath(jsonWithTimes)))) {
-      cutMarks = gson.fromJson(bufferedReader, timesListType);
+    try (BufferedReader reader = new BufferedReader(new FileReader(getMediaPackageElementPath(jsonWithTimes)))) {
+      cutMarks = gson.fromJson(reader, timesListType);
     } catch (Exception e) {
       throw new WorkflowOperationException("Could not read JSON", e);
     }
@@ -180,11 +181,11 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
     ArrayList<Track> tracksFromFlavors = new ArrayList<>();
     for (MediaPackageElementFlavor flavor : flavors) {
       logger.debug("Trying to get Tracks from Flavor {}", flavor);
-      List<Track> tracks = getTracksFromFlavor(flavor, mediaPackage);
-      logger.debug("Found {} tracks in flavor {}", tracks.size(), flavor);
-      if (tracks.size() > 0) {
-        tracksFromFlavors.addAll(tracks);
-      }
+      TrackSelector trackSelector = new TrackSelector();
+      trackSelector.addFlavor(flavor);
+      Collection<Track> tracks = trackSelector.select(mediaPackage, false);
+      logger.debug("Found {} tracks with flavor {}", tracks.size(), flavor);
+      tracksFromFlavors.addAll(tracks);
     }
 
     // Are there actually any tracks?
@@ -260,25 +261,6 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
     final WorkflowOperationResult result = createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE);
     logger.debug("Cut marks to smil operation completed");
     return result;
-  }
-
-  private List<Track> getTracksFromFlavor(MediaPackageElementFlavor flavor, MediaPackage mediaPackage) {
-    // Get tracks from flavor
-    TrackSelector trackSelector = new TrackSelector();
-    trackSelector.addFlavor(flavor);
-    Collection<Track> tracks = trackSelector.select(mediaPackage, false);
-
-    // Get only videos
-    ArrayList<Track> videos = new ArrayList<>();
-    for (Track video : tracks) {
-      if (video.hasVideo()) {
-        videos.add((video));
-      } else {
-        logger.debug("Skipping track {} since it does not seem to have a vide track.", video);
-      }
-    }
-
-    return videos;
   }
 
   /**

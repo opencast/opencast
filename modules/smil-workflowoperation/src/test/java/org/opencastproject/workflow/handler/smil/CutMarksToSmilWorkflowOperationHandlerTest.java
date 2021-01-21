@@ -54,7 +54,7 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
   private static final String SOURCE_MEDIA_FLAVORS = "source-media-flavors";
   private static final String SOURCE_MEDIA_FLAVORS_KEY = "source/presenter";
   private static final String SOURCE_JSON_FLAVOR = "source-json-flavor";
-  private static final String SOURCE_JSON_FLAVOR_KEY = "json/times";
+  private static final String SOURCE_JSON_FLAVOR_KEY = "cut-marks/json";
   private static final String TARGET_SMIL_FLAVOR = "target-smil-flavor";
   private static final String TARGET_SMIL_FLAVOR_KEY = "a/b";
 
@@ -123,15 +123,15 @@ public class CutMarksToSmilWorkflowOperationHandlerTest {
     EasyMock.replay(workspace, workflow);
     handler.setWorkspace(workspace);
 
-    EasyMock.expect(instance.getConfiguration(SOURCE_MEDIA_FLAVORS)).andReturn(String.join(",", trackFlavors)).anyTimes();
+    EasyMock.expect(instance.getConfiguration(SOURCE_MEDIA_FLAVORS))
+        .andReturn(String.join(",", trackFlavors))
+        .anyTimes();
     EasyMock.expect(instance.getConfiguration(SOURCE_JSON_FLAVOR)).andReturn(SOURCE_JSON_FLAVOR_KEY).anyTimes();
     EasyMock.replay(instance);
   }
 
   /**
    * Initializes the smil service used for creating the final smil
-   * A more complete example on how to mock the smil service can be found under:
-   * modules/videoeditor-workflowoperation/src/test/java/org/opencastproject/workflow/handler/videoeditor/SmilServiceMock.java
    * @throws Exception
    */
   private void smilServiceSetup() throws Exception {
