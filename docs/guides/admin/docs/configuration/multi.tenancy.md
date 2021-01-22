@@ -49,8 +49,8 @@ installation, on each of the nodes.  As an example, this is what the admin node 
     id=tenant1
     name=Tenant 1
     port=8080
-    prop.org.opencastproject.host.admin.opencast.org=tenant1-admin.opencast.org
-    prop.org.opencastproject.host.presentation.opencast.org=tenant1-presentation.opencast.org
+    prop.org.opencastproject.host.admin.opencast.org=tenant1-admin.example.org
+    prop.org.opencastproject.host.presentation.opencast.org=tenant1-presentation.example.org
     admin_role=ROLE_ADMIN
     anonymous_role=ROLE_ANONYMOUS
 
@@ -68,7 +68,8 @@ copy of the already existing `org.opencastproject.organization-mh_default_org.cf
 Note, the default organization file `org.opencastproject.organization-mh_default_org.org` *must* refer to the actual
 server names:
 
-    server=admin.opencast.org
+    prop.org.opencastproject.host.admin.opencast.org=admin.opencast.org
+    prop.org.opencastproject.host.presentation.opencast.org=presentation.opencast.org
 
 This file sets the default organization that is selected.  This is currently required because some Opencast components
 do not support multitenancy.
@@ -76,17 +77,7 @@ do not support multitenancy.
 Note that if you are running Apache httpd with mod\_proxy in front of the Opencast installation, the port number will be
 -1 in both files.
 
-### Step 2: Tenant-specific capture agent users
-
-If you use tenant-specific capture agent users, you should use the `prop.org.opencastproject.host.<server url>` options
-to map the internal host addresses to the tenant specific ones in the endpoint services/available.
-Example:
-
-    prop.org.opencastproject.host.admin-presentation.opencast.com=tenant1.admin-presentation.opencast.com
-    prop.org.opencastproject.host.ingest.opencast.com=tenant1.ingest.opencast.com
-    prop.org.opencastproject.host.worker.opencast.com=tenant1.worker.opencast.com
-
-### Step 3: Security Configuration
+### Step 2: Security Configuration
 
 Create a file called tenant1.xml in /etc/security. This file specifies access rules for individual URLs that specify
 which roles are needed in order to access a given URL. In addition, it allows to define the directory services that are
@@ -95,7 +86,7 @@ anything that can go into a Spring Security configuration.
 
 The easiest way of creating that file is probably to create a copy of the already existing `mh_default_org.xml`.
 
-### Step 4: Other Configuration
+### Step 3: Other Configuration
 
 Two additional files should be copied: `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg`
 should be copied to `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common-tenant1.cfg`, and
