@@ -11,7 +11,7 @@
     "bootstrap": "^4.5.3",
     "http-mock-server": "^0.5.2",
     "i18next": "^17.0.16",
-    "i18next-browser-languagedetector": "^3.0.3",
+    "i18next-browser-languagedetector": "^6.0.1",
     "query-string": "^6.8.3",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
