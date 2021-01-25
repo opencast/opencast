@@ -256,9 +256,11 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
   private void storeJob(FileUploadJob job) throws FileUploadException {
     try {
-      logger.debug("Attempting to store job {}", job.getId());
-      File jobFile = ensureExists(getJobFile(job.getId()));
-      jobMarshaller.marshal(job, jobFile);
+      synchronized (this) {
+          logger.debug("Attempting to store job {}", job.getId());
+          File jobFile = ensureExists(getJobFile(job.getId()));
+          jobMarshaller.marshal(job, jobFile);
+      }
     } catch (Exception e) {
       throw fileUploadException(Severity.error, "Failed to write job file.", e);
     }
