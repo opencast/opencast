@@ -166,6 +166,7 @@ nav:
    - Clone: 'workflowoperationhandlers/clone-woh.md'
    - Cover Image: 'workflowoperationhandlers/coverimage-woh.md'
    - Crop Video: 'workflowoperationhandlers/cropvideo-woh.md'
+   - Cut Marks To Smil: 'workflowoperationhandlers/cut-marks-to-smil-woh.md'
    - Defaults: 'workflowoperationhandlers/defaults-woh.md'
    - Demux: 'workflowoperationhandlers/demux-woh.md'
    - Duplicate Event: 'workflowoperationhandlers/duplicate-event-woh.md'
