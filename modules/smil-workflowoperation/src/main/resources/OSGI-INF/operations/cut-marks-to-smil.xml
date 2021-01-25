@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.workflow.handler.smil.CutMarksToSmilWorkflowOperationHandler"
+               immediate="true">
+  <implementation class="org.opencastproject.workflow.handler.smil.CutMarksToSmilWorkflowOperationHandler"/>
+  <property name="service.description" value="Cut Marks To Smil Operation Handler"/>
+  <property name="workflow.operation" value="cut-marks-to-smil"/>
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
+  </service>
+  <reference name="Workspace" interface="org.opencastproject.workspace.api.Workspace"
+             bind="setWorkspace"/>
+  <reference name="ServiceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             bind="setServiceRegistry"/>
+  <reference name="smil-service" cardinality="1..1" interface="org.opencastproject.smil.api.SmilService"
+             policy="static" bind="setSmilService"/>
+</scr:component>
