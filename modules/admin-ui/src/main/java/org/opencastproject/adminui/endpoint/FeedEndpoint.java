@@ -21,7 +21,11 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.apache.http.HttpStatus.SC_OK;
+
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.util.doc.rest.RestQuery;
+import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.io.IOUtils;
@@ -61,6 +65,15 @@ public class FeedEndpoint extends RemoteBase {
   @GET
   @Path("/feeds")
   @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(
+      name = "feeds",
+      description = "List available series based feeds retrieved from the search service",
+      returnDescription = "Return list of feeds",
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "List of available feeds returned.")
+      })
   public String listFeedServices() {
 
     HttpGet get = new HttpGet("/feeds");
