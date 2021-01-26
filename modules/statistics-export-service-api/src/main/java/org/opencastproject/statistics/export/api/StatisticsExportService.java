@@ -62,7 +62,7 @@ public interface StatisticsExportService {
    */
   String getCSV(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution dataResolution,
                 AbstractSearchIndex index, ZoneId zoneId) throws SearchIndexException, UnauthorizedException,
-      NotFoundException;
+          NotFoundException;
 
   /**
    * Get a CSV representation for the query result based on the given parameters.
