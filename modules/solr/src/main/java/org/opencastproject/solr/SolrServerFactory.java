@@ -129,7 +129,7 @@ public final class SolrServerFactory {
    *          Default directory for specific index
    */
   public static String getEmbeddedDir(ComponentContext cc, String indexKey, String defaultDir)
-    throws IllegalStateException {
+          throws IllegalStateException {
     /* Check if we have a specific key for this SOLR index */
     String solrDir = cc.getBundleContext().getProperty(indexKey);
     if (StringUtils.isNotEmpty(solrDir)) {

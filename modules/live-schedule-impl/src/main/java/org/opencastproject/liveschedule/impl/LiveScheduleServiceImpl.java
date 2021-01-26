@@ -382,7 +382,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     Publication[] publications = mediaPackage.getPublications();
     for (Publication publication : publications) {
       if (publication.getChannel().equals(CHANNEL_ID)) {
-          createOrUpdatePublicationTracks(publication, generatedTracks);
+        createOrUpdatePublicationTracks(publication, generatedTracks);
       }
     }
   }

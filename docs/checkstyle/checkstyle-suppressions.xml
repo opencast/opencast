@@ -136,7 +136,6 @@
     <suppress checks="Indentation" files="modules/common/.+\.java"/>
     <suppress checks="Indentation" files="modules/common-jpa-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-ffmpeg/.+\.java"/>
-    <suppress checks="Indentation" files="modules/composer-service-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/crop-api/.+\.java"/>
@@ -148,7 +147,6 @@
     <suppress checks="Indentation" files="modules/distribution-service-aws-s3/.+\.java"/>
     <suppress checks="Indentation" files="modules/distribution-service-aws-s3-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/distribution-service-download/.+\.java"/>
-    <suppress checks="Indentation" files="modules/distribution-service-download-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/distribution-service-streaming-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/distribution-service-streaming-wowza/.+\.java"/>
     <suppress checks="Indentation" files="modules/distribution-workflowoperation/.+\.java"/>
@@ -166,29 +164,22 @@
     <suppress checks="Indentation" files="modules/engage-theodul-plugin-timeline-statistics/.+\.java"/>
     <suppress checks="Indentation" files="modules/engage-theodul-plugin-video-videojs/.+\.java"/>
     <suppress checks="Indentation" files="modules/engage-ui/.+\.java"/>
-    <suppress checks="Indentation" files="modules/execute-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/execute-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/external-api/.+\.java"/>
-    <suppress checks="Indentation" files="modules/external-api-index/.+\.java"/>
     <suppress checks="Indentation" files="modules/fileupload/.+\.java"/>
     <suppress checks="Indentation" files="modules/hello-world-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/index-service/.+\.java"/>
     <suppress checks="Indentation" files="modules/ingest-service-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/inspection-service-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/inspection-service-ffmpeg/.+\.java"/>
     <suppress checks="Indentation" files="modules/inspection-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/kernel/.+\.java"/>
-    <suppress checks="Indentation" files="modules/live-schedule-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/logging-workflowoperation/.+\.java"/>
-    <suppress checks="Indentation" files="modules/lti-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/message-broker-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/metadata/.+\.java"/>
     <suppress checks="Indentation" files="modules/metrics-exporter/.+\.java"/>
     <suppress checks="Indentation" files="modules/notification-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/oaipmh/.+\.java"/>
     <suppress checks="Indentation" files="modules/oaipmh-persistence/.+\.java"/>
-    <suppress checks="Indentation" files="modules/publication-service-api/.+\.java"/>
-    <suppress checks="Indentation" files="modules/publication-service-configurable/.+\.java"/>
     <suppress checks="Indentation" files="modules/publication-service-oaipmh/.+\.java"/>
     <suppress checks="Indentation" files="modules/publication-service-youtube-v3/.+\.java"/>
     <suppress checks="Indentation" files="modules/runtime-info/.+\.java"/>
@@ -202,9 +193,7 @@
     <suppress checks="Indentation" files="modules/silencedetection-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/smil-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/smil-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/solr/.+\.java"/>
     <suppress checks="Indentation" files="modules/static-file-service-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/statistics-export-service-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/statistics-export-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/statistics-service-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/textanalyzer-impl/.+\.java"/>
@@ -215,20 +204,15 @@
     <suppress checks="Indentation" files="modules/transcription-service-google-speech-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-persistence/.+\.java"/>
     <suppress checks="Indentation" files="modules/transcription-service-workflowoperation/.+\.java"/>
-    <suppress checks="Indentation" files="modules/urlsigning-common/.+\.java"/>
     <suppress checks="Indentation" files="modules/urlsigning-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory-canvas/.+\.java"/>
-    <suppress checks="Indentation" files="modules/userdirectory-ldap/.+\.java"/>
     <suppress checks="Indentation" files="modules/userdirectory-sakai/.+\.java"/>
     <suppress checks="Indentation" files="modules/videoeditor-ffmpeg-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/videogrid-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/videosegmenter-ffmpeg/.+\.java"/>
-    <suppress checks="Indentation" files="modules/waveform-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/waveform-ffmpeg/.+\.java"/>
-    <suppress checks="Indentation" files="modules/waveform-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/waveform-workflowoperation/.+\.java"/>
-    <suppress checks="Indentation" files="modules/workflow-service-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-workflowoperation/.+\.java"/>

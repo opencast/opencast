@@ -77,6 +77,6 @@ public final class Options {
       result = gson.toJson(NO_OPTION);
     }
     return result;
-   }
+  }
 
 }
