@@ -202,8 +202,9 @@ public class TranscriptionJobControlDto implements Serializable {
   public static List<TranscriptionJobControlDto> findByMediaPackageTrackAndStatus(EntityManager em,
           final String mediaPackageId, String trackId, final String... status) throws TranscriptionDatabaseException {
     Collection<String> statusCol = new HashSet<String>();
-    for (String st : status)
+    for (String st : status) {
       statusCol.add(st);
+    }
     Query query = null;
     try {
       query = em.createNamedQuery("TranscriptionJobControl.findByMediaPackageTrackAndStatus");

@@ -541,8 +541,9 @@ public class FileUploadServiceImpl implements FileUploadService, ManagedService 
 
       List<Track> tracks = new ArrayList<Track>(Arrays.asList(mp.getTracks(flavor)));
       tracks.removeAll(excludeTracks);
-      if (tracks.size() != 1)
+      if (tracks.size() != 1) {
         throw new FileUploadException("Ingested track not found");
+      }
 
       return tracks.get(0).getURI().toURL();
     } catch (Exception e) {

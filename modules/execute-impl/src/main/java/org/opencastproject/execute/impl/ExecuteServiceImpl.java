@@ -468,7 +468,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
             return MediaPackageElementParser.getAsXml(MediaPackageElementBuilderFactory.newInstance()
                     .newElementBuilder().elementFromURI(newURI, expectedType, null));
           } else {
-             throw new ExecuteException("Expected output file does not exist: " + outFile.getAbsolutePath());
+            throw new ExecuteException("Expected output file does not exist: " + outFile.getAbsolutePath());
           }
         }
         return "";

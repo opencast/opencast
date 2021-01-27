@@ -70,9 +70,8 @@ public class LtiServiceRemoteImpl extends RemoteBase implements LtiService {
     try {
       response = safeGetResponse(new HttpGet("/jobs?seriesId=" + seriesId));
       return gson.fromJson(
-              new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8),
-              new TypeToken<List<LtiJob>>() {
-              }.getType());
+          new InputStreamReader(response.getEntity().getContent(), StandardCharsets.UTF_8),
+          new TypeToken<List<LtiJob>>() { }.getType());
     } catch (IOException e) {
       throw new RuntimeException("failed retrieving jobs", e);
     } finally {

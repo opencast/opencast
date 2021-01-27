@@ -78,8 +78,9 @@ public final class SmilUtil {
   public static Document loadSmilDocument(InputStream in, MediaPackageElement mpe) {
     try {
       Either<Exception, org.w3c.dom.Document> eitherDocument = XmlUtil.parseNs(new InputSource(in));
-      if (eitherDocument.isRight())
+      if (eitherDocument.isRight()) {
         return eitherDocument.right().value();
+      }
 
       throw eitherDocument.left().value();
     } catch (Exception e) {

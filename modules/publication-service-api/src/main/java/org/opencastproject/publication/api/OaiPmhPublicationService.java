@@ -72,7 +72,7 @@ public interface OaiPmhPublicationService {
    */
   Job publish(MediaPackage mediaPackage, String repository, Set<String> downloadElementIds,
       Set<String> streamingElementIds, boolean checkAvailability) throws PublicationException,
-      MediaPackageException;
+          MediaPackageException;
 
   /**
    * Updates the given media package in the Oai-Pmh storage incrementally, i.e. without retracting the whole media
