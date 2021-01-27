@@ -44,17 +44,17 @@ Opencast workflows are defined in XML.  The structure of a Opencast workflow loo
 
 ## Create a Workflow
 
-This sections will walk you through creating a custom workflow, which will encode ingested tracks to defined output
+This section will walk you through creating a custom workflow, which will encode ingested tracks to defined output
 format.
 
-### Encoding Profiles
+### Step 1: Encoding Profiles
 
 First create or select the encoding profiles you want to use. For more details on this, have a look at the [Encoding
 Profile Configuration Guide](encoding.md). For this guide we assume that we have an encoding profile `mov-low.http`
 which creates a distribution format definition for mp4 video and a `feed-cover.http` encoding profile to create
 thumbnail images for the videos.
 
-### Describe the Workflow
+### Step 2: Describe the Workflow
 
 Start by naming the workflow and giving it a meaningful description:
 
@@ -111,7 +111,7 @@ Start by naming the workflow and giving it a meaningful description:
   line breaks are ignored so that the XML remains compact and readable even with long paragraphs.
 
 
-### Inspect the Media
+### Step 3: Inspect the Media
 
 The first operation will be to inspect the media for technical metadata, such as format and length:
 
@@ -138,7 +138,7 @@ The first operation will be to inspect the media for technical metadata, such as
 The *fail-on-error* attribute is a boolean determining whether the workflow will throw an error to the
 exception-handler-workflow or simply proceed with the remaining operations.
 
-### Encoding
+### Step 4: Encoding
 
 The next operations will encode the media to the Mp4 format:
 
@@ -190,7 +190,7 @@ The next operations will encode the media to the Mp4 format:
 * The `encoding-profile` attribute refers to an encoding profile defined in `etc/encoding`.
 
 
-### Encode to Thumbnail
+### Step 5: Encode to Thumbnail
 
 The next operations will create thumbnails from the media:
 
@@ -235,7 +235,7 @@ The next operations will create thumbnails from the media:
 
 * The time attribute determines the approximate frame of the source media is used. The time unit is in seconds.
 
-### Distribute the Media
+### Step 6: Distribute the Media
 
 The next operation copies the encoded media to the Opencast distribution channel:
 
@@ -262,6 +262,7 @@ The next operation copies the encoded media to the Opencast distribution channel
 
 * The publish-engage operation uses all media tagged as *rss* or *atom* as input.
 
+<!-- _Are the next sections still part of Creating a Custom Workflow? -->
 ## Accept User Input
 
 Workflow definitions may optionally include variables to be replaced by user input. For instance, this may be used to

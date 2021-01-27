@@ -11,7 +11,6 @@ Security Configuration
 Edit the security configuration file at `etc/security/mh_default_org.xml`. In a multi-tenant set-up, you will have one
 configuration file for each tenant at `etc/security/<organization_id>.xml`.
 
-
 You will find several commented out LDAP sections in this file.
 Uncomment them and fill in the necessary configuration values.
 
@@ -93,7 +92,6 @@ Finally, enable the authentication provider by uncommenting:
 ```xml
 <sec:authentication-provider ref="ldapAuthProvider" />
 ```
-
 
 LDAP Service Configuration
 --------------------------

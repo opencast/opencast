@@ -8,7 +8,7 @@ versions of Opencast, please refer to [older release notes](https://docs.opencas
 2. Replace Opencast with the new version
 3. Back-up Opencast files and database (optional)
 4. [Upgrade the database](#database-migration)
-5. [Install and configure a standalone Elasticsearch node](#install-and-confifure-a-standalone-elasticsearch-node)
+5. [Install and configure a standalone Elasticsearch node](#install-and-configure-a-standalone-elasticsearch-node)
 6. [Review the configuration changes and adjust your configuration accordingly](#configuration-changes)
 7. Remove search index data folder
 8. Start Opencast
@@ -53,15 +53,15 @@ Please make sure to compare your configuration against the current configuration
 Install and configure a standalone Elasticsearch node
 -----------------------------------------------------
 
-In the past, Opencast came with its own integrated Elasticsearch node. However, recent versions of Elasticsearch no longer
-support to be embedded in applications. Since the Elasticsearch client was updated to version 7, Opencast now requires an
-external Elasticsearch node of the same version to be present. This means, that all Opencast adopters now have to run
-Elasticsearch.
+Although Opencast has come with its own integrated Elasticsearch node in the past, recent versions of Elasticsearch no
+longer support being embedded in applications. Since the Elasticsearch client was updated to version 7, Opencast requires
+an external Elasticsearch node of the same version to be present. This means all Opencast adopters now have to run
+Elasticsearch as a service.
 
 Please check [the installation guides](installation/index.md) for information about how to setup Elasticsearch.
 
 If you already used an external Elasticsearch node in the past, please update your node to version 7. Since the index
-schema has changed, you will need to drop you indices and [rebuild them](#rebuild-the-elasticsearch-indexes).
+schema has changed, you will need to drop your indices and [rebuild them](#rebuild-the-elasticsearch-indexes).
 
 
 Rebuild the Elasticsearch Indexes
