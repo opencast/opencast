@@ -37,9 +37,9 @@ Adding A Tenant
 ---------------
 
 To add a tenant to the installation, two things need to be put in place: a tenant configuration and a set of security
-rules. For this example we have a three node install of `admin.opencast.org`, `worker.opencast.org`, and
-`presentation.opencast.org`.  Assume that the new tenant is called `tenant1` and should be mapped to
-`tenant1-*.opencast.org`.
+rules. For this example we have a three node install of `admin.example.org`, `worker.example.org`, and
+`presentation.example.org`.  Assume that the new tenant is called `tenant1` and should be mapped to
+`tenant1-*.example.org`.
 
 ### Step 1: Tenant Configuration
 
@@ -49,14 +49,14 @@ installation, on each of the nodes.  As an example, this is what the admin node 
     id=tenant1
     name=Tenant 1
     port=8080
-    prop.org.opencastproject.host.admin.opencast.org=tenant1-admin.example.org
-    prop.org.opencastproject.host.presentation.opencast.org=tenant1-presentation.example.org
+    prop.org.opencastproject.host.admin.example.org=tenant1-admin.example.org
+    prop.org.opencastproject.host.presentation.example.org=tenant1-presentation.example.org
     admin_role=ROLE_ADMIN
     anonymous_role=ROLE_ANONYMOUS
 
     # Admin and Presentation Server Urls
-    prop.org.opencastproject.admin.ui.url=https://tenant1-admin.opencast.org
-    prop.org.opencastproject.engage.ui.url=https://tenant1-presentation.opencast.org
+    prop.org.opencastproject.admin.ui.url=https://tenant1-admin.example.org
+    prop.org.opencastproject.engage.ui.url=https://tenant1-presentation.example.org
 
     # Default properties for the user interface
     prop.logo_mediamodule=/engage/ui/img/logo/opencast-icon.svg
@@ -68,8 +68,8 @@ copy of the already existing `org.opencastproject.organization-mh_default_org.cf
 Note, the default organization file `org.opencastproject.organization-mh_default_org.org` *must* refer to the actual
 server names:
 
-    prop.org.opencastproject.host.admin.opencast.org=admin.opencast.org
-    prop.org.opencastproject.host.presentation.opencast.org=presentation.opencast.org
+    prop.org.opencastproject.host.admin.example.org=admin.example.org
+    prop.org.opencastproject.host.presentation.example.org=presentation.example.org
 
 This file sets the default organization that is selected.  This is currently required because some Opencast components
 do not support multitenancy.
