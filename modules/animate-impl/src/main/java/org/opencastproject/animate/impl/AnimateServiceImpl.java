@@ -126,8 +126,9 @@ public class AnimateServiceImpl extends AbstractJobProducer implements AnimateSe
 
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-    if (properties == null)
+    if (properties == null) {
       return;
+    }
     logger.debug("Start updating animate service");
 
     synfigBinary = StringUtils.defaultIfBlank((String) properties.get(SYNFIG_BINARY_CONFIG), SYNFIG_BINARY_DEFAULT);

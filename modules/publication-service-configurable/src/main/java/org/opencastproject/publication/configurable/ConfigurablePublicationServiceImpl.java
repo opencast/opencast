@@ -200,7 +200,7 @@ public class ConfigurablePublicationServiceImpl extends AbstractJobProducer impl
         }
         List<? extends MediaPackageElement> distributedElements = MediaPackageElementParser.getArrayFromXml(job.getPayload());
         for (MediaPackageElement mpe : distributedElements) {
-           PublicationImpl.addElementToPublication(publication, mpe);
+          PublicationImpl.addElementToPublication(publication, mpe);
         }
       } finally {
         // Remove our changes

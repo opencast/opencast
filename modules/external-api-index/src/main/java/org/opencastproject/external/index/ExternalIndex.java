@@ -46,8 +46,12 @@ public class ExternalIndex extends AbstractSearchIndex {
   private static final int INDEX_VERSION = 101;
 
   /** The document types */
-  private static final String[] DOCUMENT_TYPES = new String[] { Event.DOCUMENT_TYPE, Group.DOCUMENT_TYPE,
-          Series.DOCUMENT_TYPE, "version" };
+  private static final String[] DOCUMENT_TYPES = new String[] {
+      Event.DOCUMENT_TYPE,
+      Group.DOCUMENT_TYPE,
+      Series.DOCUMENT_TYPE,
+      "version"
+  };
 
   /**
    * OSGi callback to activate this component instance.
