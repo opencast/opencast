@@ -1,8 +1,0 @@
-modules/common-jpa-impl/pom.xml
-modules/common/pom.xml
-modules/cover-image-impl/pom.xml
-modules/external-api/pom.xml
-modules/index-service/pom.xml
-modules/oaipmh-persistence/pom.xml
-modules/scheduler-impl/pom.xml
-modules/security-shibboleth/pom.xml

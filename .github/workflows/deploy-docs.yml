@@ -1,0 +1,97 @@
+name: Deploy documentation
+
+on:
+  push:
+    branches:
+      - 'r/*'
+      - 'develop'
+
+jobs:
+  deploy-documentation:
+    if: github.repository_owner == 'opencast'
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: set up python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: install graphviz
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt update -y
+        sudo apt install -yq graphviz
+
+    - name: install dependencies
+      run: |
+        pip install -q mkdocs mkdocs-windmill requests
+        pip install -q markdown_inline_graphviz_extension
+        pip install -q markdown_inline_graphviz_extension-png
+
+    - name: build admin docs
+      working-directory: docs/guides/admin/
+      run: |
+        python -m mkdocs build
+
+    - name: build developer docs
+      working-directory: docs/guides/developer/
+      run: |
+        python -m mkdocs build
+
+    - name: build landing page
+      if: github.ref == 'refs/heads/develop'
+      working-directory: docs/guides/.infrastructure/
+      run: |
+        ./generate-versions
+
+    - name: prepare git
+      run: |
+        git config --global user.name "Opencast Docs Bot"
+        git config --global user.email "cloud@opencast.org"
+
+    - name: prepare github ssh key
+      env:
+        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY_DOCS }}
+      run: |
+        install -dm 700 ~/.ssh/
+        echo "${DEPLOY_KEY}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+    - name: clone repository
+      run: |
+        git clone "git@github.com:opencast/docs.opencast.org.git" docs.opencast.org
+        cd docs.opencast.org
+        git checkout gh-pages
+
+    - name: remove old deployment
+      working-directory: docs.opencast.org/
+      run: |
+        set -x
+        echo "${GITHUB_REF#refs/heads/}"
+        if [ -d "${GITHUB_REF#refs/heads/}" ]; then
+        git rm -r "${GITHUB_REF#refs/heads/}"
+        fi
+
+    - name: store build
+      run: |
+        mkdir -p docs.opencast.org/"${GITHUB_REF#refs/heads/}"
+        mv -v docs/guides/admin/site docs.opencast.org/"${GITHUB_REF#refs/heads/}/admin"
+        mv -v docs/guides/developer/site docs.opencast.org/"${GITHUB_REF#refs/heads/}/developer"
+        mv -v docs/guides/.infrastructure/*.html docs.opencast.org/ || :
+        mv -v docs/guides/.infrastructure/*.js docs.opencast.org/ || :
+        git log -n1 > docs.opencast.org/"${GITHUB_REF#refs/heads/}/commit"
+
+    - name: commit new version
+      working-directory: docs.opencast.org/
+      run: |
+        git add .
+        git commit -m "Build of ${GITHUB_REF#refs/heads/} from $(date)"
+
+    - name: push updates
+      working-directory: docs.opencast.org/
+      run: |
+        git push origin gh-pages

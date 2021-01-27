@@ -98,7 +98,7 @@ public interface StatisticsExportService {
    *           If the resource identified by resourceId could not be found.
    */
   String getCSV(StatisticsProvider provider, String resourceId, Instant from, Instant to, DataResolution dataResolution,
-          AbstractSearchIndex index, ZoneId zoneId, boolean fullMetadata, DetailLevel detailLevel, int limit, int offset,
-          Map<String, String> filters)
+          AbstractSearchIndex index, ZoneId zoneId, boolean fullMetadata, DetailLevel detailLevel, int limit,
+          int offset, Map<String, String> filters)
           throws SearchIndexException, UnauthorizedException, NotFoundException;
 }

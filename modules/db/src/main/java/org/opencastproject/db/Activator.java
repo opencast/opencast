@@ -32,7 +32,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Hashtable;
 
 import javax.sql.DataSource;
@@ -136,6 +138,42 @@ public class Activator implements BundleActivator {
     logger.info("Database connection pool established at {}", jdbcUrl);
     logger.info("Database connection pool parameters: max.size={}, min.size={}, max.idle.time={}",
       pooledDataSource.getMaxPoolSize(), pooledDataSource.getMinPoolSize(), pooledDataSource.getMaxIdleTime());
+    Statement statement = pooledDataSource.getConnection().createStatement();
+
+    long random = Math.round(Math.random() * 1000000);
+    String tableName = "oc_temp_" + random;
+    try {
+      statement.executeUpdate("CREATE TABLE " + tableName + " ( id BIGINT NOT NULL, test BIGINT, PRIMARY KEY (id) );");
+      runUpdate(statement, "INSERT INTO " + tableName + " VALUES (" + random + ", 0);");
+      runUpdate(statement, "UPDATE " + tableName + " SET test = " + random + ";");
+      ResultSet rs = statement.executeQuery("SELECT * FROM " + tableName + ";");
+      while (rs.next()) {
+        long id = rs.getLong("id");
+        long test = rs.getLong("test");
+        if (id != random || test != random) {
+          throw new RuntimeException("Unable to verify updating a table functions correctly");
+        }
+      }
+      runUpdate(statement, "DELETE FROM " + tableName + " WHERE id = " + random + ";");
+      logger.info("Database credentials passed basic tests!");
+    } catch (Exception e) {
+      throw new RuntimeException("Unable to verify SQL credentials have required permissions!", e);
+    } finally {
+      try {
+        statement.executeQuery("DROP TABLE " + tableName + ";");
+      } catch (Exception e) {
+        logger.warn("Unable to delete temp table {}, please remove this yourself!", tableName);
+      }
+    }
+
+  }
+
+  private void runUpdate(Statement statement, String sql) throws RuntimeException, SQLException {
+    int affected = statement.executeUpdate(sql);
+    if (affected != 1) {
+      throw new RuntimeException(
+              "Unable to update on a testing table, check that your database user has the right permissions!");
+    }
   }
 
   @Override

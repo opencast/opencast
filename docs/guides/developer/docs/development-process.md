@@ -33,14 +33,22 @@ this repository are explained later in this guide.
   on GitHub to [create pull requests](https://help.github.com/articles/creating-a-pull-request/) from your repository
   which will show up on the project's list of open pull requests.
 
-### Bugfix vs Feature
 
-Opencast distinguishes between bug fix and feature pull requests.
+### Accepting Criteria for Patches in Different Versions
 
-* Features are *only* allowed to be merged into `develop`, which will let them automatically become part of the next
-  major/minor release, given that the release branch for the next release has not been cut yet.
+Updates between minor versions should be as smooth as possible and should usually not need manual intervention.
+That is why patches may only be accepted into releases branches (`r/?.x`) if they meet the following criteria:
 
-* Bug fixes can be merged both into `develop` and into release branches.
+* Patches must not modify existing database tables
+* Patches must not modify the indexes or otherwise cause re-indexing
+* Patches must not require a different ActiveMQ configuration
+* Patches must not modify existing translation keys
+* Patches must work with the same configuration within a major version
+
+Patches which do not meet these criteria should target the branch `develop` to become part of the next major version.
+
+To determine the acceptance of patches, all pull requests will be discussed in the technical meeting.
+This protects against inclusion of controversial changes with no broader consent among committers.
 
 
 ### Reviews
@@ -62,7 +70,7 @@ of what work has been done. To this end, there are a few expectations for all pu
 * The GitHub issue  title should match the pull request title
 * The pull request description should contain a summary of the work done, along with reasoning for any major change
     * The GitHub issue should contain the same information
-* For feature pull requests, accompanying documentation should be included
+* Pull request should include appropriate documentation
 * The pull request should have a clean commit history
 * In the case of major user interface changes, it is good practice to include screenshots of the change
 * Any actions that would be required for a version upgrade (e.g: from 3.x to 4.x) must be documented in
@@ -89,15 +97,15 @@ Swift overview:
   this branch only. Release branches are branched off from `develop`. It is basically the preparation for the next big
   release at all times.
 * The release branches are named `r/<a>.x` (e.g. `r/6.x`). They are the latest state of development for a specific
-  release. Only bug fixes and no features may be added to these branches. All releases are created from these branches.
-  The branches live on as long as there may be additional maintenance releases for a given version.
+  major version.  All minor releases are created from these branches.  The branches live on as long as there may be
+  additional maintenance releases for a given version.
 * Git tags in the form of `a.b` are created to indicate official releases.
 
 
 To get a closer look at the branching model, let us consider a simple example with a single release:
 
 
-{% dot branching-simple.svg
+```graphviz dot branching-simple.png
 
 /**
     develop ---*----*----*------*------- ... -----------*-->
@@ -145,7 +153,7 @@ digraph G {
   r2 -> d4;
   r5 -> d7;
 }
-%}
+```
 
 As described above, `develop` is the branch used for preparing the next version. At some point marked in the release
 schedule, the release branch is cut from `develop`. This action also marks the feature freeze for that version since
@@ -173,7 +181,7 @@ to create a new maintenance release. The version `6.1` above is an example of th
 
 With Opencast supporting two major releases, you may find not one, but up to three active release branches.
 
-{% dot branching-two-versions.svg
+```graphviz dot branching-two-versions.png
 
 /**
     develop ---*-----*-----*------*-----*- ... -----------*------*------*---->
@@ -236,7 +244,7 @@ digraph G {
   r23 -> d9;
   r25 -> d11;
 }
-%}
+```
 
 Mostly, this is just the same as the simpler model from before. The branches exist separately from each other and only
 interact through merges from older to newer versions so that bug fixes from a release branch will automatically become
@@ -250,8 +258,8 @@ exists, `r/8.x` and from there into `develop`. That way patches bubble through a
 Release Process
 ---------------
 
-As indicated above, the release cycle of a new Opencast version starts when a release branch is cut. The new features
-merged into `develop` afterwards will be part of the next version, but not the one just cut.
+As indicated above, the release cycle of a new Opencast version starts when a release branch is cut. Patches merged into
+`develop` after the cut will be part of the next version, but not the one just cut.
 
 This is why the position of release manager for the next Opencast version should be assigned at this point. The current
 release manager should therefore ask for volunteers in the mailing lists. For more details about the rights and
@@ -274,9 +282,9 @@ Usually, a release schedule will look like this:
 
 |Date                     |Phase
 |-------------------------|------------------------------------------
-|April 1st                |Feature Freeze
-|May 6th - May 12th       |Translation week
-|May 13th - May 26th      |Public QA phase
+|May 15th                 |Feature Freeze
+|May 24th                 |Translation week
+|May 31st                 |Public QA phase
 |June 15th                |Release of Opencast 7.0
 
 
@@ -295,7 +303,7 @@ the next release branch is cut.
 
 Git tags are used to mark Opencast releases. Here is how a release looks like in the history:
 
-{% dot branching-tags.svg
+```graphviz dot branching-tags.png
 
 /**
     r/7.x  ------------(A)---->
@@ -322,7 +330,7 @@ digraph G {
   // branch names
   begin[shape=plaintext, label="r/7.x", fixedsize=false];
 }
-%}
+```
 
 To create a version based on a given state of the release branch (commit `A`), the release manager will branch off from
 this commit, make the necessary version changes to all `pom.xml` files and create a commit which is then finally tagged.
@@ -335,8 +343,8 @@ For more details about how to create a release, have a look at the [Release Mana
 After a final release, additional issues may show up. These issues may be fixed on the ongoing release branch and at
 some point released as maintenance release.
 
-There is usually no release schedule for maintenance releases. It is up to the release manager to decide when it is
-worthwhile to create a maintenance release with the fixes for bugs affecting a given release.
+Maintenance releases will be cut monthly for the latest stable release. For legacy releases, it is up to the release
+manager to decide when it is worthwhile to make the cut.
 
 Quality Assurance
 -----------------

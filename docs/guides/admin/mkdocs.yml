@@ -58,6 +58,8 @@ nav:
       - Using Apache httpd: configuration/https/apache-httpd.md
       - Internal HTTPS: 'configuration/https/opencast.only.md'
       - Migrating old content to HTTPS: 'configuration/https/migration.md'
+      - Self-Signed Certificates: 'configuration/https/self-signed-certificates.md'
+   - Firewall: 'configuration/firewall.md'
    - Asset Manager: 'configuration/asset-manager.md'
    - Message Broker: 'configuration/message-broker.md'
    - Metadata: 'configuration/metadata.md'
@@ -78,6 +80,7 @@ nav:
       - Sakai User Provider: 'configuration/security.user.sakai.md'
       - Brightspace User Provider: 'configuration/security.user.brightspace.md'
       - Canvas User Provider: 'configuration/security.user.canvas.md'
+   - Serving Static Files: 'configuration/serving-static-files.md'
    - Stream Security: 'configuration/stream-security.md'
    - Workflow: 'configuration/workflow.md'
    - External API: 'configuration/external-api.md'
@@ -103,6 +106,7 @@ nav:
    - Live Schedule: 'modules/liveschedule.md'
    - LTI Module: 'modules/ltimodule.md'
    - Media Module: 'modules/mediamodule.configuration.md'
+   - Metrics (OpenMetrics, Prometheus): modules/metrics.md
    - Player:
       - Configuration: 'modules/player.configuration.md'
       - URL Parameters: 'modules/player.url.parameter.md'
@@ -123,7 +127,7 @@ nav:
    - Search Index:
       - Overview: 'modules/searchindex/index.md'
       - Solr: 'modules/searchindex/solr.md'
-      - Elasticsearch: 'modules/searchindex/elasticsearch.md'
+      - Elasticsearch: 'configuration/elasticsearch.md'
    - Stream Security: 'modules/stream-security.md'
    - Studio: 'modules/studio.md'
    - Termination State:
@@ -162,6 +166,7 @@ nav:
    - Clone: 'workflowoperationhandlers/clone-woh.md'
    - Cover Image: 'workflowoperationhandlers/coverimage-woh.md'
    - Crop Video: 'workflowoperationhandlers/cropvideo-woh.md'
+   - Cut Marks To Smil: 'workflowoperationhandlers/cut-marks-to-smil-woh.md'
    - Defaults: 'workflowoperationhandlers/defaults-woh.md'
    - Demux: 'workflowoperationhandlers/demux-woh.md'
    - Duplicate Event: 'workflowoperationhandlers/duplicate-event-woh.md'

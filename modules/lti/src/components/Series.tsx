@@ -60,6 +60,8 @@ const SeriesEpisode: React.StatelessComponent<EpisodeProps> = ({ episode, delete
     </div>;
 }
 
+const EPISONDES_PER_PAGE:number = 15;
+
 class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
     constructor(props: SeriesProps) {
         super(props);
@@ -75,15 +77,15 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
             ...this.state,
             currentPage: pageNumber
         });
-        this.loadCurrentPage();
+        this.loadCurrentPage(pageNumber);
     }
 
-    loadCurrentPage() {
+    loadCurrentPage(pageNumber: number = 1) {
         const qs = parsedQueryString();
-        const episodesPerPage = 15;
+
         searchEpisode(
-            episodesPerPage,
-            this.state.currentPage - 1,
+            EPISONDES_PER_PAGE,
+            (pageNumber - 1) * EPISONDES_PER_PAGE,
             undefined,
             typeof qs.series === "string" ? qs.series : undefined,
             typeof qs.series_name === "string" ? qs.series_name : undefined
@@ -190,7 +192,7 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
                 <footer className="mt-3">
                     <Pagination
                         activePage={this.state.currentPage}
-                        itemsCountPerPage={sr.limit}
+                        itemsCountPerPage={EPISONDES_PER_PAGE}
                         totalItemsCount={sr.total}
                         pageRangeDisplayed={5}
                         itemClass="page-item"

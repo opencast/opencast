@@ -14,6 +14,8 @@ versions of Opencast, please refer to [older release notes](https://docs.opencas
 8. Start Opencast
 9. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
 10. [Check passwords](#check-passwords)
+11. Static file delivery
+
 
 Configuration Changes
 ---------------------
@@ -24,14 +26,20 @@ Please make sure to compare your configuration against the current configuration
 - The default for the configuration option `lti.create_jpa_user_reference` changed from `false` (Opencast 8.3) to `true`.
 - Make sure to have `?useMysqlMetadata=true` appended to `org.opencastproject.db.jdbc.url` if you use MariaDB as
   database.
+- Opencast Studio now uses TOML instead of JSON as configuration format. Additionally, the ACL template is
+  now specified as a string in the TOML file and not as a separate file (usually `acl.xml`) anymore. Finally,
+  the variables passed into the Mustache ACL template have changed. For more information, see
+  [this document](https://github.com/elan-ev/opencast-studio/blob/2020-09-14/CONFIGURATION.md).
 
 Install and configure a standalone Elasticsearch node
 -----------------------------------------------------
 
 Although Opencast has come with its own integrated Elasticsearch node in the past, recent versions of Elasticsearch no
-longer support being embedded in applications.
-Since the Elasticsearch client was updated to version 7, Opencast requires an external Elasticsearch node of the same
-version to be present. This means all Opencast adopters now have to run Elasticsearch as a service.
+longer support being embedded in applications. Since the Elasticsearch client was updated to version 7, Opencast requires
+an external Elasticsearch node of the same version to be present. This means all Opencast adopters now have to run
+Elasticsearch as a service.
+
+Please check [the installation guides](installation/index.md) for information about how to setup Elasticsearch.
 
 If you already used an external Elasticsearch node in the past, please update your node to version 7. Since the index
 schema has changed, you will need to drop your indices and [rebuild them](#rebuild-the-elasticsearch-indexes).
@@ -83,3 +91,16 @@ but to benefit from this mechanism, users have to reset their password.
 
 You can use the endpoint `/user-utils/users/md5.json` to find out which users are still using MD5-hashed passwords and
 suggest to them that they update their passwords.
+
+
+Static File Delivery
+--------------------
+
+Opencast 9.2 came with a [completely new system for securing static file content](configuration/serving-static-files.md)
+which is now active by default in Opencast 10. If you are deferring the file access authorization to another system
+using Opencast's [security token mechanism](configuration/stream-security.md), you need to deactivate this protection
+in:
+
+```
+etc/org.opencastproject.fsresources.StaticResourceServlet.cfg
+```

@@ -41,6 +41,9 @@
     <!-- Allow anonymous access to the player redirect -->
     <sec:intercept-url pattern="/play/*" access="ROLE_ANONYMOUS" />
 
+    <!-- Define roles for metrics endpoint -->
+    <sec:intercept-url pattern="/metrics" access="ROLE_ADMIN, ROLE_METRICS" />
+
     <!-- Protect admin UI facade -->
     <sec:intercept-url pattern="/workflow/definitions.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/acl/acls.json" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />

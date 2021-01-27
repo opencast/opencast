@@ -64,6 +64,7 @@
     <module>modules/asset-manager-workflowoperation</module>
     <module>modules/asset-manager-storage-aws</module>
     <module>modules/asset-manager-storage-fs</module>
+    <module>modules/asset-manager-static-file-authorization</module>
     <module>modules/shared-filesystem-utils</module>
     <module>modules/authorization-manager</module>
     <module>modules/authorization-xacml</module>
@@ -113,14 +114,12 @@
     <module>modules/engage-theodul-plugin-controls</module>
     <module>modules/engage-theodul-plugin-custom-mhConnection</module>
     <module>modules/engage-theodul-plugin-custom-notifications</module>
-    <module>modules/engage-theodul-plugin-custom-usertracking</module>
     <module>modules/engage-theodul-plugin-custom-matomo</module>
     <module>modules/engage-theodul-plugin-description</module>
     <module>modules/engage-theodul-plugin-tab-description</module>
     <module>modules/engage-theodul-plugin-tab-shortcuts</module>
     <module>modules/engage-theodul-plugin-tab-slidetext</module>
     <module>modules/engage-theodul-plugin-tab-downloads</module>
-    <module>modules/engage-theodul-plugin-timeline-statistics</module>
     <module>modules/engage-theodul-plugin-video-videojs</module>
     <module>modules/engage-ui</module>
     <module>modules/execute-api</module>
@@ -161,6 +160,7 @@
     <module>modules/message-broker-impl</module>
     <module>modules/metadata</module>
     <module>modules/metadata-api</module>
+    <module>modules/metrics-exporter</module>
     <module>modules/mpeg7</module>
     <module>modules/notification-workflowoperation</module>
     <module>modules/oaipmh</module>
@@ -204,6 +204,7 @@
     <module>modules/silencedetection-remote</module>
     <module>modules/smil-api</module>
     <module>modules/smil-impl</module>
+    <module>modules/smil-workflowoperation</module>
     <module>modules/solr</module>
     <module>modules/sox-api</module>
     <module>modules/sox-impl</module>
@@ -389,6 +390,7 @@
           <skip>${checkstyle.skip}</skip>
           <configLocation>${opencast.basedir}/docs/checkstyle/opencast-checkstyle.xml</configLocation>
           <headerLocation>${opencast.basedir}/docs/checkstyle/opencast-header.txt</headerLocation>
+          <suppressionsLocation>${opencast.basedir}/docs/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <consoleOutput>true</consoleOutput>
           <logViolationsToConsole>true</logViolationsToConsole>
@@ -1174,6 +1176,16 @@
         <artifactId>xmlunit</artifactId>
         <version>1.6</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>xml-apis</groupId>
+        <artifactId>xml-apis</artifactId>
+        <version>2.0.2</version>
+      </dependency>
+      <dependency>
+        <groupId>dom4j</groupId>
+        <artifactId>dom4j</artifactId>
+        <version>1.6.1</version>
       </dependency>
       <!-- logging -->
       <dependency>

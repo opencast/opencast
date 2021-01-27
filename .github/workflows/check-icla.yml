@@ -1,0 +1,38 @@
+name: Check ICLA
+on:
+  pull_request:
+    types:
+      - opened
+
+jobs:
+  main:
+    if: github.event.pull_request.user.login != 'dependabot-preview[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v1
+
+      - name: Install Python module
+        run: pip install apereocla
+
+      - name: Check Apereo ICLA for GitHub user
+        run: apereocla -g "${{ github.event.pull_request.user.login }}"
+
+      - name: Comment if no CLA has been filed
+        if: ${{ failure() }}
+        uses: thollander/actions-comment-pull-request@master
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          message: >
+            Hi @${{ github.event.pull_request.user.login }}
+
+            Thank you for contributing to Opencast.
+
+            We noticed that you have not yet filed an [Individual Contributor License Agreement](https://www.apereo.org/licensing/agreements/icla).
+            Doing that (once) helps us to ensure that Opencast stays free for all.
+            If you make your contribution on behalf of an institution, you might also want to file a
+            [Corporate Contributor License Agreement](https://www.apereo.org/licensing/agreements/ccla)
+            (giving you as individual contributor a bit more security as well). It can take a while for
+            this bot to find out about new filings, so if you just filed one or both of the above do not
+            worry about this message!
+
+            Please let us know if you have any questions regarding the CLA.

@@ -5,9 +5,8 @@ on:
   - cron: "0 5 * * 1"
 
 jobs:
-
-  # Check documentation with markdownlint and build it using mkdocs
   update-translations:
+    if: github.repository_owner == 'opencast'
     runs-on: ubuntu-20.04
     env:
       CROWDIN_API_KEY: ${{ secrets.CROWDIN_API_KEY }}

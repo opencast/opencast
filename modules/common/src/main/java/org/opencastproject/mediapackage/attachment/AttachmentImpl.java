@@ -82,7 +82,7 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
    * @param mimeType
    *          the attachments mime type
    */
-  protected AttachmentImpl(String identifier, MediaPackageElementFlavor flavor, URI uri, long size, Checksum checksum,
+  protected AttachmentImpl(String identifier, MediaPackageElementFlavor flavor, URI uri, Long size, Checksum checksum,
           MimeType mimeType) {
     super(identifier, Type.Attachment, flavor, uri, size, checksum, mimeType);
     if (uri != null)
@@ -98,7 +98,7 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
    *          the attachments location
    */
   protected AttachmentImpl(URI uri) {
-    this(null, null, uri, 0, null, null);
+    this(null, null, uri, null, null, null);
   }
 
   /**

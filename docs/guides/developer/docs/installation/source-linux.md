@@ -118,15 +118,15 @@ $ sudo apt-get install -y nodejs
 You can use `docker-compose` to easily run both ActiveMQ and Elasticsearch:
 
 ```sh
-$ cd docs/guides/developer                                                                                                                         (git)-[develop] [0]
+$ cd docs/scripts/devel-dependency-containers
 $ docker-compose up -d
 ```
 
 To shut the services down ahain, run:
 
 ```sh
-$ cd docs/guides/developer                                                                                                                         (git)-[develop] [0]
-$ docker-compose dowm
+$ cd docs/scripts/devel-dependency-containers
+$ docker-compose down
 ```
 
 

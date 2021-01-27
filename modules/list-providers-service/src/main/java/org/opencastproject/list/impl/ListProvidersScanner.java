@@ -90,7 +90,8 @@ public class ListProvidersScanner implements ArtifactInstaller {
     private boolean translatable;
     private String defaultKey;
 
-    SingleResourceListProviderImpl(String listName, Map<String, String> list, String organizationId, boolean translatable) {
+    SingleResourceListProviderImpl(String listName, Map<String, String> list, String organizationId,
+            boolean translatable) {
       this.listName = listName;
       this.list = list;
       this.orgId = organizationId;
