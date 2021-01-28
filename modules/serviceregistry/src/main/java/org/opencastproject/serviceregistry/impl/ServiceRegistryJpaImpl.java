@@ -117,6 +117,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.management.ObjectInstance;
 import javax.persistence.EntityManager;
@@ -271,7 +272,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** A static list of statuses that influence how load balancing is calculated */
   protected static final List<Status> JOB_STATUSES_INFLUENCING_LOAD_BALANCING;
 
-  protected static HashMap<Long, Float> jobCache = new HashMap<Long, Float>();
+  private static final Status[] activeJobStatus =
+      Arrays.stream(Status.values()).filter(Status::isActive).collect(Collectors.toList()).toArray(new Status[0]);
+
+  protected static HashMap<Long, Float> jobCache = new HashMap<>();
 
   static {
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING = new ArrayList<Status>();
@@ -1832,20 +1836,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @Override
   public List<Job> getActiveJobs() throws ServiceRegistryException {
-    List<Status> statuses = new ArrayList<Status>();
-    for (Status status : Status.values()) {
-      if (status.isActive())
-        statuses.add(status);
-    }
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      List<JpaJob> jpaJobs = getJobsByStatus(em, statuses.toArray(new Status[statuses.size()]));
-      List<Job> jobs = new ArrayList<Job>(jpaJobs.size());
-      for (JpaJob jpaJob : jpaJobs) {
-        jobs.add(jpaJob.toJob());
-      }
-      return jobs;
+      List<JpaJob> jpaJobs = getJobsByStatus(em, activeJobStatus);
+      return jpaJobs.stream().map(JpaJob::toJob).collect(Collectors.toList());
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     } finally {

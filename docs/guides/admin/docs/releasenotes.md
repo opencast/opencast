@@ -122,10 +122,20 @@ could not upload videos, before.
 Additional Notes about 9.2
 --------------------------
 
+Opencast 9.2 comes with a few new features, non of which require any migrations or change the default bohavior of
+Opencast 9.x.
+
+A [metrics endpoint has been added](modules/metrics.md). It supports the [OpenMetrics format](https://openmetrics.io)
+and can be used by tools like [Prometheus](https://prometheus.io). The endpoint is available at `/metrics`.
+
 A [completely new system for securing static file content](configuration/serving-static-files.md) has been integrated.
 While is is not active by default for compatibility to older 9.x releases, it can be easily enabled and used to ensure
 access to static files has the same security checks you are already used to from the player and from other user
 interfaces.
+
+A new [workflow operation `cut-marks-to-smil`](workflowoperationhandlers/cut-marks-to-smil-woh.md) has been added to
+allow a simpler specification of cutting information for the video editor. This was also the last piece missing from the
+[BigBlueButton recordings integration](https://github.com/elan-ev/opencast-bigbluebutton-integration) in Opencast.
 
 
 Release Schedule

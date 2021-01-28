@@ -7,10 +7,6 @@ This guide is based on an RPM software repository available for Red Hat-based Li
 University](https://uni-osnabrueck.de). This repository provides preconfigured Opencast installations and all necessary
 3rd-party-tools.
 
-<div class=warn>
-<b>Opencast 9</b> is currently available from the testing repository only.
-</div>
-
 
 Availability
 ------------
@@ -42,11 +38,6 @@ yum install -y https://pkg.opencast.org/rpms/release/el/7/oc-09/noarch/opencast-
 It might take some time after the release of a new Opencast version before the RPMs are moved to the stable repository.
 Until then, you can use `/etc/yum.repos.d/opencast-testing.repo` instead to get the latest version.
 Note that the testing repository is an additional repository and still requires the stable repository to be active.
-
-<div class=warn>
-For <b>Opencast 9</b> temporarily enable the testing repository in <code>/etc/yum.repo.d/opencast-testing.repo</code>
-while it is not yet in the stable repository.
-</div>
 
 You can check if the repositories were successfully enabled using:
 

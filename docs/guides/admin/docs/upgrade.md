@@ -7,13 +7,31 @@ versions of Opencast, please refer to [older release notes](https://docs.opencas
 1. Stop your current Opencast instance
 2. Replace Opencast with the new version
 3. Back-up Opencast files and database (optional)
-4. Upgrade the database
+4. [Upgrade the database](#database-migration)
 5. [Install and configure a standlone Elasticsearch node](#install-and-confifure-a-standalone-elasticsearch-node)
 6. [Review the configuration changes and adjust your configuration accordingly](#configuration-changes)
 7. Remove search index data folder
 8. Start Opencast
 9. [Rebuild the Elasticsearch indexes](#rebuild-the-elasticsearch-indexes)
 10. [Check passwords](#check-passwords)
+
+
+Database Migration
+------------------
+
+There are two parts to the Opencast 9 database migration:
+
+- Two database tables become unnecessary with Opencast 9 and can be dropped.
+  Opencast provides database upgrade script which include all necessary SQL commands.
+  You will find them in
+  [`docs/upgrade/8_to_9/`](https://github.com/opencast/opencast/blob/develop/docs/upgrade/8_to_9/mysql5.sql).
+  This script is suitable for both, MariaDB and MySQL.
+
+- Opencast no longer needs scripts to manually create the database structure.
+  This will now happen automatically and Opencast 9 will create a new table on its first run.
+  This means that Opencast's database user now needs additional priviledges.
+  Please consult the [database configuration guide](configuration/database.md) for more details.
+
 
 Configuration Changes
 ---------------------
@@ -29,6 +47,7 @@ Please make sure to compare your configuration against the current configuration
   the variables passed into the Mustache ACL template have changed. For more information, see
   [this document](https://github.com/elan-ev/opencast-studio/blob/2020-09-14/CONFIGURATION.md).
 
+
 Install and configure a standalone Elasticsearch node
 -----------------------------------------------------
 
@@ -41,6 +60,7 @@ Please check [the installation guides](installation/index.md) for information ab
 
 If you already used an external Elasticsearch node in the past, please update your node to version 7. Since the index
 schema has changed, you will need to drop you indices and [rebuild them](#rebuild-the-elasticsearch-indexes).
+
 
 Rebuild the Elasticsearch Indexes
 ----------------------------------
