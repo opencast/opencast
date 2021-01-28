@@ -11,6 +11,10 @@ app.use(
     express.static(path.join(__dirname, "test/app/GET/admin-ng"))
 );
 app.use(
+    "/acl-manager",
+    express.static(path.join(__dirname, "test/app/GET/acl-manager"))
+);
+app.use(
     "/blacklist",
     express.static(path.join(__dirname, "test/app/GET/blacklist"))
 );

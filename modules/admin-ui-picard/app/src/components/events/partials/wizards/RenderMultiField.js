@@ -7,7 +7,7 @@ const childRef = React.createRef();
 /**
  * This component renders an editable field for multiple values depending on the type of the corresponding metadata
  */
-const RenderMultiField = ({ metadataField }) => {
+const RenderMultiField = ({ fieldInformation, onlyCollectionValues=false }) => {
     // Indicator if currently edit mode is activated
     const [editMode, setEditMode] = useState(false);
     // Temporary storage for value user currently types in
@@ -15,7 +15,7 @@ const RenderMultiField = ({ metadataField }) => {
 
     // Formik hook for getting data of specific form field
     // DON'T delete meta, hook works with indices not variable names
-    const [field, meta, helpers] = useField(metadataField.id);
+    const [field, meta, helpers] = useField(fieldInformation.id);
 
     useEffect(() => {
         const handleClickOutside = e => {
@@ -44,14 +44,27 @@ const RenderMultiField = ({ metadataField }) => {
         setInputValue(itemValue);
     }
 
-    // Handle key down even and add inputValue to formik field value
     const handleKeyDown = (event) => {
         // Check if pressed key is Enter
         if (event.keyCode === 13 && inputValue !== "") {
             event.preventDefault();
-            // add current inputValue to formik field value
-            field.value[field.value.length] = inputValue;
-            helpers.setValue(field.value);
+
+            // Flag if only values of collection are allowed or any value
+            if (onlyCollectionValues) {
+                // add input to formik field value if not already added and input in collection of possible values
+                if (!field.value.find(e => e === inputValue)
+                    && fieldInformation.collection.find(e=> e.value === inputValue)) {
+                    field.value[field.value.length] = inputValue;
+                    helpers.setValue(field.value);
+                }
+            } else {
+                // add input to formik field value if not already added
+                if (!field.value.find(e => e === inputValue)) {
+                    field.value[field.value.length] = inputValue;
+                    helpers.setValue(field.value);
+                }
+            }
+
             // reset inputValue
             setInputValue("");
         }
@@ -67,8 +80,8 @@ const RenderMultiField = ({ metadataField }) => {
         // Render editable field for multiple values depending on type of metadata field
         // (types: see metadata.json retrieved from backend)
       <>
-          {(metadataField.type === "mixed_text" && metadataField.collection.length !== 0) ? (
-              <EditableMultiSelect metadataFieldCollection={metadataField.collection}
+          {(fieldInformation.type === "mixed_text" && !!fieldInformation.collection) ? (
+              <EditableMultiSelect collection={fieldInformation.collection}
                                    fieldValue={field.value}
                                    editMode={editMode}
                                    setEditMode={setEditMode}
@@ -76,7 +89,7 @@ const RenderMultiField = ({ metadataField }) => {
                                    removeItem={removeItem}
                                    handleChange={handleChange}
                                    handleKeyDown={handleKeyDown}/>
-          ) : (metadataField.type === "mixed_text" && (
+          ) : (fieldInformation.type === "mixed_text" && (
               <EditableMultiValue fieldValue={field.value}
                                   editMode={editMode}
                                   setEditMode={setEditMode}
@@ -90,7 +103,7 @@ const RenderMultiField = ({ metadataField }) => {
 }
 
 // Renders multi select
-const EditableMultiSelect = ({ fieldValue, metadataFieldCollection, editMode, setEditMode, inputValue, removeItem, handleChange,
+const EditableMultiSelect = ({ fieldValue, collection, editMode, setEditMode, inputValue, removeItem, handleChange,
                                  handleKeyDown }) => {
     const { t } = useTranslation();
 
@@ -109,7 +122,7 @@ const EditableMultiSelect = ({ fieldValue, metadataFieldCollection, editMode, se
                         />
                         {/* Display possible options for values as some kind of dropdown */}
                         <datalist id="data-list">
-                            {metadataFieldCollection.map((item, key) => (
+                            {collection.map((item, key) => (
                                 <option key={key}>{item.value}</option>
                             ))}
                         </datalist>
