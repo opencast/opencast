@@ -23,6 +23,7 @@ export const fetchAcls = () => async (dispatch, getState) => {
 
 
 // todo: unite following in one fetch method (maybe also move to own file containing all fetches regarding resources endpoint)
+// get acl templates
 export const fetchAclTemplates = async () => {
     let data = await axios.get('/admin-ng/resources/ACL.json');
 
@@ -36,6 +37,7 @@ export const fetchAclTemplates = async () => {
     });
 };
 
+// fetch additional actions that a policy allows user to perform on an event
 export const fetchAclActions = async () => {
     let data = await axios.get('/admin-ng/resources/ACL.ACTIONS.json');
 
@@ -50,6 +52,7 @@ export const fetchAclActions = async () => {
 
 };
 
+// fetch all possible roles a policy can have
 export const fetchRoles = async () => {
     let params = {
         filters: 'role_target:ACL',
@@ -69,6 +72,7 @@ export const fetchRoles = async () => {
     });
 };
 
+// fetch all policies of an certain acl template
 export const fetchAclTemplateById = async (id) => {
 
     let template = [];
@@ -76,9 +80,12 @@ export const fetchAclTemplateById = async (id) => {
     let response = await axios.get(`/acl-manager/acl/${id}`);
 
     let acl = response.data.acl;
+
+    // transform response data in form that is used in new event wizard for policies (for each role one entry)
     for (let i = 0; acl.ace.length > i; i++) {
         if (template.find(rule => rule.role === acl.ace[i].role)) {
             for (let j = 0; template.length > j; j++) {
+                // Only update entry for policy if already added with other action
                 if(template[j].role === acl.ace[i].role) {
                     if (acl.ace[i].action === "read") {
                         template[j] = {
@@ -105,6 +112,7 @@ export const fetchAclTemplateById = async (id) => {
                 }
             }
         } else {
+            // add policy if role not seen before
             if (acl.ace[i].action === "read") {
                 template = template.concat({
                     role: acl.ace[i].role,

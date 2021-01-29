@@ -8,17 +8,11 @@ import {createMuiTheme, ThemeProvider} from "@material-ui/core";
 import {Field} from "formik";
 import {sourceMetadata, uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConfig";
 import RenderField from "./RenderField";
-import {
-    hours,
-    minutes,
-    NOTIFICATION_CONTEXT,
-    weekdays
-} from "../../../../configs/newEventConfigs/newEventWizardConfig";
+import {hours, minutes, NOTIFICATION_CONTEXT, weekdays} from "../../../../configs/newEventConfigs/newEventWizardConfig";
 import {getRecordings} from "../../../../selectors/recordingSelectors";
 import {fetchRecordings} from "../../../../thunks/recordingThunks";
 import {connect} from "react-redux";
 import {addNotification} from "../../../../thunks/notificationThunks";
-import {getNotifications} from "../../../../selectors/notificationSelector";
 import {removeNotificationEventsForm} from "../../../../actions/notificationActions";
 import {checkForConflicts} from "../../../../thunks/eventThunks";
 
@@ -110,7 +104,7 @@ const NewEventSource = ({ onSubmit, previousPage, nextPage, formik, loadingInput
                 <div className="modal-body">
                     <div className="full-col">
                         {/*Show notifications with context events-form*/}
-                        <Notifications context={NOTIFICATION_CONTEXT}/>
+                        <Notifications context="not_corner"/>
                         <div className="obj list-obj">
                             <header className="no-expand">{t('EVENTS.EVENTS.NEW.SOURCE.SELECT_SOURCE')}</header>
                             {/* Radio buttons for choosing source mode */}
@@ -431,7 +425,6 @@ const Schedule = ({ formik, inputDevices }) => {
 // Getting state data out of redux store
 const mapStateToProps = state => ({
     inputDevices: getRecordings(state),
-    notifications: getNotifications(state)
 });
 
 // Mapping actions to dispatch

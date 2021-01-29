@@ -3,12 +3,17 @@ import {useTranslation} from "react-i18next";
 import cn from "classnames";
 import {uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConfig";
 
+/**
+ * This component renders the asset upload page of the new event wizard
+ * (only if its not set hidden (see newEventWizardConfig) or user chose UPLOAD as source mode)
+ */
 const NewEventAssetUpload = ({ onSubmit, previousPage, nextPage , formik }) => {
     const { t } = useTranslation();
 
     // Get upload assets that are not of type track
     const uploadAssets = uploadAssetOptions.filter(asset => asset.type !== 'track');
 
+    // if user not chose upload in step before, the skip this step
     if (formik.values.sourceMode !== 'UPLOAD') {
         nextPage(formik.values);
         return null;

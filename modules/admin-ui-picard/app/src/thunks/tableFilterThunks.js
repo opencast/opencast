@@ -15,7 +15,6 @@ export const fetchFilters = resource => async dispatch => {
         switch (resource) {
             case 'events': {
                 const data = await axios.get('admin-ng/resources/events/filters.json');
-                console.log(data);
                 const eventsData =  await data.data;
 
                 response = transformResponse(eventsData);
@@ -102,7 +101,6 @@ export const fetchFilters = resource => async dispatch => {
 export const fetchStats = () => async dispatch => {
     try {
         let data =  await axios.get('admin-ng/resources/STATS.json');
-        console.log(data);
         let response = await data.data;
 
         const stats = Object.keys(response).map(key => {
@@ -146,7 +144,7 @@ function transformResponse(data) {
             filters[key].options = filterArr;
         }
     } catch (e) {  console.log(e.message);}
-    console.log(filters);
+
     return {filters: filters};
 }
 

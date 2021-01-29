@@ -7,7 +7,9 @@ import {fetchWorkflowDef} from "../../../../thunks/workflowThunks";
 import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 import RenderWorkflowConfig from "./RenderWorkflowConfig";
 
-
+/**
+ * This component renders the processing page for new events in the new event wizard.
+ */
 const NewEventProcessing = ({ onSubmit, previousPage, nextPage, formik, loadingWorkflowDef, workflowDef }) => {
     const { t } = useTranslation();
 
@@ -31,22 +33,28 @@ const NewEventProcessing = ({ onSubmit, previousPage, nextPage, formik, loadingW
             <div className="modal-content">
                 <div className="modal-body">
                     <div className="full-col">
+                        {/* Workflow definition Selection*/}
                         <div className="obj quick-actions">
                             <header className="no-expand">
                                 {t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}
                             </header>
                             <div className="obj-container padded">
-                                {/*TODO: Add no-results-text*/}
-                                <Field tabIndex="99"
-                                       as="select"
-                                       name="processingWorkflow"
-                                       placeholder={t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}
-                                       style={{width: '100%'}}>
-                                    <option value="" />
-                                    {workflowDef.map((workflow, key)=> (
-                                        <option key={key} value={workflow.id}>{workflow.title}</option>
-                                    ))}
-                                </Field>
+                                {workflowDef.length > 0 ? (
+                                    <Field tabIndex="99"
+                                           as="select"
+                                           name="processingWorkflow"
+                                           placeholder={t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW')}
+                                           style={{width: '100%'}}>
+                                        <option value="" />
+                                        {workflowDef.map((workflow, key)=> (
+                                            <option key={key} value={workflow.id}>{workflow.title}</option>
+                                        ))}
+                                    </Field>
+                                ) : (
+                                    <span>{t('EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY')}</span>
+                                )}
+
+                                {/* Configuration panel of selected workflow */}
                                 <div className="collapsible-box">
                                     <div id="new-event-workflow-configuration"
                                          className="checkbox-container obj-container">
@@ -66,14 +74,11 @@ const NewEventProcessing = ({ onSubmit, previousPage, nextPage, formik, loadingW
                 <button type="submit"
                         className={cn("submit",
                             {
-                                active: (formik.touched.processingWorkflow && formik.isValid),
-                                inactive: !(formik.touched.processingWorkflow && formik.isValid)
+                                active: (formik.values.processingWorkflow && formik.isValid),
+                                inactive: !(formik.values.processingWorkflow && formik.isValid)
                             })}
-                        disabled={!(formik.touched.processingWorkflow && formik.isValid)}
+                        disabled={!(formik.values.processingWorkflow && formik.isValid)}
                         onClick={() => {
-                            console.log("IN BUTTON OF PROCESSING");
-                            console.log(formik.values);
-                            console.log(formik);
                             nextPage(formik.values);
                             onSubmit();
                         }}

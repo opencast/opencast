@@ -23,12 +23,8 @@ const RenderWorkflowConfig = (props) => {
 
     let ref = React.useRef();
 
-   console.log("THIS IS THE REF");
-   console.log(ref.current?.childNodes);
    if (ref.current?.childNodes !== undefined) {
        let array = [...ref.current?.childNodes];
-       console.log("CHILD NODES AS ARRAY");
-       console.log(array);
    }
     return (
         <>

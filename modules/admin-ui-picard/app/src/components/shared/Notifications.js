@@ -16,10 +16,11 @@ const Notifications = ({ setNotificationHidden, notifications, globalPosition, c
     }
 
     return (
-        // if context is events-form then render notification without consider global notification position
-        context === 'events-form' ? (
+        // if context is not_corner then render notification without consider global notification position
+        context === 'not_corner' ? (
             <ul>{notifications.map((notification, key) => (
-                (!notification.hidden && notification.context === 'events-form') ? (
+                (!notification.hidden && (notification.context === 'events-form' ||
+                    notification.context === 'events-access')) ? (
                     <li key={key}>
                         <div className={cn(notification.type, 'alert sticky')}>
                             <a onClick={() => closeNotification(notification.id)}

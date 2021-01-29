@@ -86,8 +86,6 @@ export const loadSeriesIntoTable = () => (dispatch, getState) => {
             selected: false
         }
     });
-    console.log('Load Series Results: ');
-    console.log(resource);
     const c = seriesTableConfig.columns;
     const columns = c.map(column => {
         const col = series.columns.find(co => co.name === column.name);
@@ -355,8 +353,6 @@ export const goToPage = pageNumber => (dispatch, getState) => {
     const offset = getPageOffset(state);
     const pages = getTablePages(state);
 
-    console.log(offset);
-    console.log(pages[offset].number);
 
     dispatch(setPageActive(pages[offset].number));
 

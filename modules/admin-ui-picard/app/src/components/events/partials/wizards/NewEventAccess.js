@@ -5,8 +5,16 @@ import Notifications from "../../../shared/Notifications";
 import {fetchAclActions, fetchAclTemplateById, fetchAclTemplates, fetchRoles} from "../../../../thunks/aclThunks";
 import {FieldArray, Field} from "formik";
 import RenderMultiField from "./RenderMultiField";
+import {connect} from "react-redux";
+import {addNotification} from "../../../../thunks/notificationThunks";
+import {NOTIFICATION_CONTEXT_ACCESS} from "../../../../configs/newEventConfigs/newEventWizardConfig";
+import {removeNotificationEventsAccess} from "../../../../actions/notificationActions";
 
-const NewEventAccess = ({ onSubmit, previousPage, nextPage, formik }) => {
+/**
+ * This component renders the access page for new events in the new event wizard.
+ */
+const NewEventAccess = ({ onSubmit, previousPage, nextPage, formik, addNotification,
+                            removeNotificationEventsAccess }) => {
     const { t } = useTranslation();
 
     // States containing response from server concerning acl templates, actions and roles
@@ -16,6 +24,7 @@ const NewEventAccess = ({ onSubmit, previousPage, nextPage, formik }) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        // fetch data about roles, acl templates and actions from backend
         async function fetchData() {
             setLoading(true);
             const responseTemplates = await fetchAclTemplates();
@@ -31,18 +40,56 @@ const NewEventAccess = ({ onSubmit, previousPage, nextPage, formik }) => {
     }, []);
 
     const handleTemplateChange = async (e) => {
+        // fetch information about chosen template from backend
         const template =  await fetchAclTemplateById(e.target.value);
 
         formik.setFieldValue('policies', template);
+        checkPolicies();
     }
+
+    // check if all policies provided by the user have valid read/write rights
+    const checkPolicies = () => {
+
+        // Remove old notifications of context event-access
+        // Helps to prevent multiple notifications for same problem
+        removeNotificationEventsAccess();
+
+        const policies = formik.values.policies;
+        let check = true;
+        let bothRights = false;
+
+        for (let i = 0; policies.length > i; i++) {
+            // check if there is at least one policy with read and write rights
+            if (policies[i].read && policies[i].write) {
+                bothRights = true;
+            }
+
+            // check if each policy has read or write right (at least one checkbox should be checked)
+            if (!policies[i].read && !policies[i].write) {
+                check = false;
+            }
+        }
+
+        if (!check) {
+            addNotification('warning','INVALID_ACL_RULES', -1, null, NOTIFICATION_CONTEXT_ACCESS);
+        }
+
+        if (!bothRights) {
+            addNotification('warning','MISSING_ACL_RULES', -1, null, NOTIFICATION_CONTEXT_ACCESS);
+            check = false;
+        }
+
+        return check;
+    }
+
 
     return (
         <>
             <div className="modal-content">
                 <div className="modal-body">
                     <div className="full-col">
-                        {/*TODO: implement notifications events-access (similar to event-form)*/}
-                        <Notifications />
+                        {/* Notifications */}
+                        <Notifications context="not_corner"/>
                         {!loading && (
                             <ul>
                                 <li>
@@ -54,6 +101,8 @@ const NewEventAccess = ({ onSubmit, previousPage, nextPage, formik }) => {
                                             <p>
                                                 {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.DESCRIPTION')}
                                             </p>
+
+                                            {/* Template selection*/}
                                             <div className="obj tbl-list">
                                                 <table className="main-tbl">
                                                     <thead>
@@ -94,6 +143,7 @@ const NewEventAccess = ({ onSubmit, previousPage, nextPage, formik }) => {
                                             </div>
                                         </div>
 
+                                        {/* Area for editing policies */}
                                         <div className="obj-container">
                                             <div className="obj tbl-list">
                                                 <header>
@@ -189,7 +239,7 @@ const NewEventAccess = ({ onSubmit, previousPage, nextPage, formik }) => {
                                                                                     write: false,
                                                                                     actions: []
                                                                                 });
-                                                                                console.log(formik.values)
+                                                                                checkPolicies();
                                                                             }}>
                                                                                 + {t('EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.NEW')}
                                                                             </a>
@@ -220,8 +270,10 @@ const NewEventAccess = ({ onSubmit, previousPage, nextPage, formik }) => {
                             })}
                         disabled={!(formik.dirty && formik.isValid)}
                         onClick={() => {
-                            nextPage(formik.values);
-                            onSubmit();
+                            if(checkPolicies()) {
+                                nextPage(formik.values);
+                                onSubmit();
+                            }
                         }}
                         tabIndex="100">{t('WIZARD.NEXT_STEP')}</button>
                 <button className="cancel"
@@ -234,4 +286,10 @@ const NewEventAccess = ({ onSubmit, previousPage, nextPage, formik }) => {
     )
 }
 
-export default NewEventAccess;
+
+const mapDispatchToProps = dispatch => ({
+    addNotification: (type, key, duration, parameter, context) => dispatch(addNotification(type, key, duration, parameter, context)),
+    removeNotificationEventsAccess: () => dispatch(removeNotificationEventsAccess())
+});
+
+export default connect(null, mapDispatchToProps)(NewEventAccess);

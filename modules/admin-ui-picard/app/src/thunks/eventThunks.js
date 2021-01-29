@@ -88,15 +88,18 @@ export const checkForConflicts =  async (startDate, endDate, duration, device) =
         duration: duration,
         end: endDate
     }
+    let status = 0;
 
-    let response = await axios.post('/admin-ng/event/new/conflicts', metadata,
+    axios.post('/admin-ng/event/new/conflicts', metadata,
         {
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
-        });
-
-    let status = response.status;
+        }).then(response => {
+            status = response.status;
+    }).catch(reason => {
+            status = reason.status;
+    });
 
     return status !== 409;
 

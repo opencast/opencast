@@ -1,8 +1,13 @@
 import * as Yup from 'yup';
 
+/**
+ * This File contains all schemas used for validation with yup in the context of events and series
+ */
+
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 
+// Validation Schema used in new event wizard (each step has its own yup validation object)
 export const NewEventSchema = [Yup.object().shape({
     title: Yup.string().required('Required')
 }), Yup.object().shape({

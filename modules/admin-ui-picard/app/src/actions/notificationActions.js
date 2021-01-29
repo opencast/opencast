@@ -6,6 +6,7 @@
 export const CREATE_NOTIFICATION = 'CREATE_NOTIFICATION';
 export const REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION';
 export const REMOVE_NOTIFICATION_EVENTS_FORM = 'REMOVE_NOTIFICATION_EVENTS_FORM';
+export const REMOVE_NOTIFICATION_EVENTS_ACCESS = 'REMOVE_NOTIFICATION_EVENTS_ACCESS';
 
 // Constants regarding updates of notification
 export const SET_HIDDEN = 'SET_HIDDEN';
@@ -26,7 +27,11 @@ export const removeNotification = id => ({
 
 export const removeNotificationEventsForm = () => ({
     type: REMOVE_NOTIFICATION_EVENTS_FORM
-})
+});
+
+export const removeNotificationEventsAccess = () => ({
+    type: REMOVE_NOTIFICATION_EVENTS_ACCESS
+});
 
 // Actions affecting updates of notifications
 

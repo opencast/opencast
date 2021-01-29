@@ -59,7 +59,6 @@ const Events = ({loadingEvents, loadingEventsIntoTable, events, showActions, loa
         // Load event filters
         loadingFilters("events");
 
-        console.log("Use effect fired");
 
         // Function for handling clicks outside of an open dropdown menu
         const handleClickOutside = e => {

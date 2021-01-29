@@ -1,6 +1,6 @@
 import {
     CREATE_NOTIFICATION,
-    REMOVE_NOTIFICATION,
+    REMOVE_NOTIFICATION, REMOVE_NOTIFICATION_EVENTS_ACCESS,
     REMOVE_NOTIFICATION_EVENTS_FORM,
     SET_HIDDEN
 } from "../actions/notificationActions";
@@ -68,6 +68,12 @@ export const notifications = (state=initialState, action) => {
             return {
                 ...state,
                 notifications: state.notifications.filter(notification => notification.context !== 'events-form')
+            }
+        }
+        case REMOVE_NOTIFICATION_EVENTS_ACCESS: {
+            return {
+                ...state,
+                notifications: state.notifications.filter(notification => notification.context !== 'events-access')
             }
         }
         case SET_HIDDEN: {

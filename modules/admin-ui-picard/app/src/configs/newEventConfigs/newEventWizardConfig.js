@@ -62,3 +62,6 @@ export const weekdays = [
 
 // Context for notifications shown in events-form
 export const NOTIFICATION_CONTEXT = 'events-form';
+
+// Context for notifications shown in access page
+export const NOTIFICATION_CONTEXT_ACCESS = 'events-access';
