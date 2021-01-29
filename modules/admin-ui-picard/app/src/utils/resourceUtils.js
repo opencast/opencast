@@ -18,17 +18,17 @@ export const getURLParams = state => {
     }
 
     if (filters.length) {
-        return new URLSearchParams({
+        return {
             filters: filters.join(','),
             sort: getTableSorting(state) + ':' + getTableDirection(state),
             limit: getPageLimit(state),
             offset: getPageOffset(state)
-        });
+        };
     } else {
-        return new URLSearchParams({
+        return {
             sort: getTableSorting(state) + ':' + getTableDirection(state),
             limit: getPageLimit(state),
             offset: getPageOffset(state)
-        });
+        };
     }
 }

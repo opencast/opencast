@@ -6,6 +6,7 @@ import {
     loadEventsSuccess
 } from "../actions/eventActions";
 import {getURLParams} from "../utils/resourceUtils";
+import axios from "axios";
 
 // fetch events from server
 export const fetchEvents = () => async (dispatch, getState) => {
@@ -16,9 +17,9 @@ export const fetchEvents = () => async (dispatch, getState) => {
         let params = getURLParams(state);
 
         //admin-ng/event/events.json?filter={filter}&sort={sort}&limit=0&offset=0
-        let data = await fetch('admin-ng/event/events.json?' + params);
+        let data = await axios.get('admin-ng/event/events.json', { params: params });
 
-        const response =  await data.json();
+        const response =  await data.data;
 
         for (let i = 0; response.results.length > i; i++) {
             // insert date property
@@ -55,8 +56,8 @@ export const fetchEventMetadata = () => async (dispatch, getState)=> {
     try {
         dispatch(loadEventMetadataInProgress());
 
-        let data = await fetch('admin-ng/event/new/metadata');
-        const response = await data.json();
+        let data = await axios.get('admin-ng/event/new/metadata');
+        const response = await data.data;
 
         const metadata = response[0];
 
@@ -88,13 +89,12 @@ export const checkForConflicts =  async (startDate, endDate, duration, device) =
         end: endDate
     }
 
-    let response = await fetch('/admin-ng/event/new/conflicts', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: metadata
-    });
+    let response = await axios.post('/admin-ng/event/new/conflicts', metadata,
+        {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
 
     let status = response.status;
 

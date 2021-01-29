@@ -6,6 +6,7 @@ import {
     setError
 } from "../actions/healthActions";
 import {getErrorStatus} from "../selectors/healthSelectors";
+import axios from "axios";
 
 /**
  * This file contains methods/thunks used to query the REST-API of Opencast to get information about the health status of OC.
@@ -35,7 +36,7 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
         dispatch(setError(false));
 
         // Get current state of Broker
-        fetch('/broker/status').then(
+        axios.get('/broker/status').then(
             function (response){
                 let healthStatus;
                 if (response.status === 204) {
@@ -70,11 +71,10 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
         });
 
         // Get current state of services
-        fetch('/services/health.json').then(
+        axios.get('/services/health.json').then(
           function(response) {
-              response.json().then(function (data) {
                   let healthStatus;
-                  if (undefined === data || undefined === data.health) {
+                  if (undefined === response.data || undefined === response.data.health) {
                       healthStatus = {
                           name: STATES_NAMES,
                           status: MALFORMED_DATA,
@@ -89,7 +89,7 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
                       return;
                   }
                   let abnormal = 0;
-                  abnormal = data.health['warning'] + data.health['error'];
+                  abnormal = response.data.health['warning'] + response.data.health['error'];
                   if (abnormal === 0) {
                       healthStatus = {
                           name: BACKEND_NAMES,
@@ -110,21 +110,21 @@ export const fetchHealthStatus = () => async (dispatch, getState) => {
                       }
                       dispatch(addNumError(abnormal));
                   }
-              }).catch(function (err) {
-                  let healthStatus = {
-                      name: STATES_NAMES,
-                      status: err.statusText,
-                      error: true
-                  }
-                  dispatch(loadHealthStatus(healthStatus));
 
-                  if (getErrorStatus(getState()) === false) {
-                      dispatch(setError(true));
-                  }
-                  dispatch(addNumError(1));
-              })
           }
-        );
+        ).catch(function (err) {
+            let healthStatus = {
+                name: STATES_NAMES,
+                status: err.statusText,
+                error: true
+            }
+            dispatch(loadHealthStatus(healthStatus));
+
+            if (getErrorStatus(getState()) === false) {
+                dispatch(setError(true));
+            }
+            dispatch(addNumError(1));
+        });
 
 
     } catch (e) {

@@ -1,4 +1,5 @@
 import {loadFiltersSuccess, loadFiltersFailure, loadFiltersInProgress, loadStats} from '../actions/tableFilterActions';
+import axios from "axios";
 /**
 * This file contains methods/thunks used to query the REST-API of Opencast to get the filters of a certain resource type.
 * This information is used to filter the entries of the table in the main view.
@@ -13,72 +14,72 @@ export const fetchFilters = resource => async dispatch => {
 
         switch (resource) {
             case 'events': {
-                const data = await fetch('admin-ng/resources/events/filters.json');
+                const data = await axios.get('admin-ng/resources/events/filters.json');
                 console.log(data);
-                const eventsData =  await data.json();
+                const eventsData =  await data.data;
 
                 response = transformResponse(eventsData);
                 break;
             }
             case 'series': {
-                const data = await fetch('admin-ng/resources/series/filters.json');
-                const seriesData =  await data.json();
+                const data = await axios.get('admin-ng/resources/series/filters.json');
+                const seriesData =  await data.data;
 
                 response = transformResponse(seriesData);
                 break;
             }
             case 'recordings': {
-                const data = await fetch('admin-ng/resources/recordings/filters.json');
-                const recordingsData = await data.json();
+                const data = await axios.get('admin-ng/resources/recordings/filters.json');
+                const recordingsData = await data.data;
 
                 response = transformResponse(recordingsData);
                 break;
             }
             case 'jobs': {
-                const data = await fetch('admin-ng/resources/jobs/filters.json');
-                const jobsData = await data.json();
+                const data = await axios.get('admin-ng/resources/jobs/filters.json');
+                const jobsData = await data.data;
 
                 response = transformResponse(jobsData);
                 break;
             }
             case 'servers': {
-                const data = await fetch('admin-ng/resources/servers/filters.json');
-                const serversData = await data.json();
+                const data = await axios.get('admin-ng/resources/servers/filters.json');
+                const serversData = await data.data;
 
                 response = transformResponse(serversData);
                 break;
             }
             case 'services': {
-                const data = await fetch('admin-ng/resources/services/filters.json');
-                const servicesData = await data.json();
+                const data = await axios.get('admin-ng/resources/services/filters.json');
+                const servicesData = await data.data;
 
                 response = transformResponse(servicesData);
                 break;
             }
             case 'users': {
-                const data = await fetch('admin-ng/resources/users/filters.json');
-                const usersData = await data.json();
+                const data = await axios.get('admin-ng/resources/users/filters.json');
+                const usersData = await data.data;
 
                 response = transformResponse(usersData);
                 break;
             }
             case 'groups': {
-                const data = await fetch('admin-ng/resources/groups/filters.json');
-                const groupsData = await data.json();
+                const data = await axios.get('admin-ng/resources/groups/filters.json');
+                const groupsData = await data.data;
 
                 response = transformResponse(groupsData);
                 break;
             }
             case 'acls': {
-                const data = await fetch('admin-ng/resources/acls/filters.json');
-                const aclsData = await data.json();
+                const data = await axios.get('admin-ng/resources/acls/filters.json');
+                const aclsData = await data.data;
 
                 response = transformResponse(aclsData);
                 break;
             }
             case 'themes': {
-                const data = await fetch('admin-ng/resources/themes/filters.json');
-                const themesData = await data.json();
+                const data = await axios.get('admin-ng/resources/themes/filters.json');
+                const themesData = await data.data;
 
                 response = transformResponse(themesData);
                 break;
@@ -100,9 +101,9 @@ export const fetchFilters = resource => async dispatch => {
 
 export const fetchStats = () => async dispatch => {
     try {
-        let data =  await fetch('admin-ng/resources/STATS.json');
+        let data =  await axios.get('admin-ng/resources/STATS.json');
         console.log(data);
-        let response = await data.json();
+        let response = await data.data;
 
         const stats = Object.keys(response).map(key => {
             let stat = JSON.parse(response[key]);

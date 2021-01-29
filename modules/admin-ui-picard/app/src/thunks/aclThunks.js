@@ -11,9 +11,9 @@ export const fetchAcls = () => async (dispatch, getState) => {
         let params = getURLParams(state);
 
         // /acls.json?limit=0&offset=0&filter={filter}&sort={sort}
-        let data = await fetch('admin-ng/acl/acls.json?' + params);
+        let data = await axios.get('admin-ng/acl/acls.json', {params: params});
 
-        const acls = await data.json();
+        const acls = await data.data;
         dispatch(loadAclsSuccess(acls));
 
     } catch (e) {
@@ -24,9 +24,9 @@ export const fetchAcls = () => async (dispatch, getState) => {
 
 // todo: unite following in one fetch method (maybe also move to own file containing all fetches regarding resources endpoint)
 export const fetchAclTemplates = async () => {
-    let data = await fetch('/admin-ng/resources/ACL.json');
+    let data = await axios.get('/admin-ng/resources/ACL.json');
 
-    const response = await data.json();
+    const response = await data.data;
 
     return Object.keys(response).map(key => {
         return {
@@ -37,9 +37,9 @@ export const fetchAclTemplates = async () => {
 };
 
 export const fetchAclActions = async () => {
-    let data = await fetch('/admin-ng/resources/ACL.ACTIONS.json');
+    let data = await axios.get('/admin-ng/resources/ACL.ACTIONS.json');
 
-    const response = await data.json();
+    const response = await data.data;
 
     return Object.keys(response).map(key => {
         return {
@@ -51,15 +51,15 @@ export const fetchAclActions = async () => {
 };
 
 export const fetchRoles = async () => {
-    let params = new URLSearchParams({
+    let params = {
         filters: 'role_target:ACL',
         limit: '100',
         offset: '0'
-    })
+    };
 
-    let data = await fetch ('/admin-ng/resources/ROLES.json?' + params);
+    let data = await axios.get('/admin-ng/resources/ROLES.json', {params: params});
 
-    const response = await data.json();
+    const response = await data.data;
 
     return Object.keys(response).map(key => {
         return {
