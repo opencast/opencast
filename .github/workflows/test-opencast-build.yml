@@ -6,28 +6,6 @@ on:
 
 jobs:
 
-  # Check documentation with markdownlint and build it using mkdocs
-  documentation:
-    runs-on: ubuntu-20.04
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: set up python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-
-    - name: install dependencies
-      run: |
-        pip install -q mkdocs markdown_inline_graphviz_extension mkdocs-windmill
-        cd docs/guides
-        npm ci
-
-    - name: check documentation
-      run: bash ./.style-and-markdown-build.sh
-
-
   # Test database upgrade path.
   # For this, we initialize a 2.2 database and upgrade all the way to the latest version
   database:
