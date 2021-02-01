@@ -21,9 +21,6 @@
     <suppress checks="LineLength" files="modules/composer-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/composer-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/composer-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/cover-image-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/crop-ffmpeg/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/crop-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/distribution-service-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/distribution-service-aws-s3/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/distribution-service-download/.+\.(java|properties)"/>
@@ -138,8 +135,6 @@
     <suppress checks="Indentation" files="modules/composer-ffmpeg/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-workflowoperation/.+\.java"/>
-    <suppress checks="Indentation" files="modules/crop-api/.+\.java"/>
-    <suppress checks="Indentation" files="modules/crop-ffmpeg/.+\.java"/>
     <suppress checks="Indentation" files="modules/db/.+\.java"/>
     <suppress checks="Indentation" files="modules/dictionary-hunspell/.+\.java"/>
     <suppress checks="Indentation" files="modules/dictionary-regexp/.+\.java"/>
@@ -221,7 +216,6 @@
     <suppress checks="Indentation" files="modules/workspace-impl/.+\.java"/>
 
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/admin-ui/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/adopter-statistics-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/annotation-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/asset-manager-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/asset-manager-storage-aws/.+\.java"/>
@@ -237,10 +231,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/composer-service-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/composer-service-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/composer-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/conductor/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/cover-image-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/cover-image-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/crop-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/db/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/distribution-service-aws-s3/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/distribution-service-download/.+\.java"/>

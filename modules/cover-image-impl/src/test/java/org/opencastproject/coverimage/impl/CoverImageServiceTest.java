@@ -89,7 +89,8 @@ public class CoverImageServiceTest {
     NamespaceContext usingNamespaces = new SimpleNamespaceContext().withBinding("xsl",
             "http://www.w3.org/1999/XSL/Transform").withBinding("svg", "http://www.w3.org/2000/svg");
     assertThat(the(xslDoc),
-            hasXPath("/xsl:stylesheet/xsl:template/svg:svg/svg:defs/svg:linearGradient[@id='lgGray']", usingNamespaces));
+            hasXPath("/xsl:stylesheet/xsl:template/svg:svg/svg:defs/svg:linearGradient[@id='lgGray']",
+              usingNamespaces));
   }
 
   /**

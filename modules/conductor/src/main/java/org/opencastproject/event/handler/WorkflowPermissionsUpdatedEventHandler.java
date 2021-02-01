@@ -157,8 +157,9 @@ public class WorkflowPermissionsUpdatedEventHandler {
 
       while (result.size() > 0) {
         for (WorkflowInstance instance : result.getItems()) {
-          if (!instance.isActive())
+          if (!instance.isActive()) {
             continue;
+          }
 
           Organization org = organizationDirectoryService.getOrganization(instance.getOrganizationId());
           securityService.setOrganization(org);
