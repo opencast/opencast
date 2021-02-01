@@ -76,8 +76,9 @@ public class TesseractTextExtractorTest {
     try {
       p = new ProcessBuilder(command).start();
       int status = p.waitFor();
-      if (status != 0)
+      if (status != 0) {
         throw new IllegalStateException();
+      }
     } catch (Throwable t) {
       logger.warn("Skipping text analysis tests due to missing tesseract installation");
       logger.warn(t.getMessage(), t);
@@ -112,8 +113,9 @@ public class TesseractTextExtractorTest {
    */
   @Test
   public void testAnalyze() throws Exception {
-    if (!tesseractInstalled)
+    if (!tesseractInstalled) {
       return;
+    }
 
     List<String> output = analyzer.extract(testFile);
     assertFalse(output.isEmpty());
