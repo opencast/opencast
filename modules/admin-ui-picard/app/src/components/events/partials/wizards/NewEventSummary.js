@@ -2,9 +2,55 @@ import React from "react";
 import cn from "classnames";
 import {useTranslation} from "react-i18next";
 import Notifications from "../../../shared/Notifications";
+import {getEventMetadata} from "../../../../selectors/eventSelectors";
+import {connect} from "react-redux";
+import {uploadAssetOptions} from "../../../../configs/newEventConfigs/sourceConfig";
+import {getWorkflowDef} from "../../../../selectors/workflowSelectors";
 
-const NewEventSummary = ({ onSubmit, previousPage, formik }) => {
+/**
+ * This component renders the summary page for new events in the new event wizard.
+ */
+const NewEventSummary = ({ onSubmit, previousPage, formik, metaDataExtendedHidden, assetUploadHidden,
+                             metadataEvents, workflowDef }) => {
     const { t } = useTranslation();
+
+    // metadata that user has provided
+    let metadata = [];
+    for (let i = 0; metadataEvents.fields.length > i; i++) {
+        let fieldValue = formik.values[metadataEvents.fields[i].id];
+        if (!!fieldValue && fieldValue.length > 0) {
+            metadata = metadata.concat({
+                name: metadataEvents.fields[i].id,
+                label: metadataEvents.fields[i].label,
+                value: fieldValue
+            });
+        }
+    }
+
+    // upload asset that user has provided
+    let uploadAssets = [];
+    for (let i = 0; uploadAssetOptions.length > i; i++) {
+        let fieldValue = formik.values[uploadAssetOptions[i].id];
+        if (!!fieldValue) {
+            uploadAssets = uploadAssets.concat({
+                name: uploadAssetOptions[i].id,
+                translate: uploadAssetOptions[i].translate,
+                type: uploadAssetOptions[i].type,
+                flavorType: uploadAssetOptions[i].flavorType,
+                flavorSubType: uploadAssetOptions[i].flavorSubType,
+                value: fieldValue
+            });
+        }
+    }
+
+    // Get upload assets that are of type track
+    const uploadAssetsTrack = uploadAssets.filter(asset => asset.type === 'track');
+
+    // Get upload assets that are not of type track
+    const uploadAssetsNonTrack = uploadAssets.filter(asset => asset.type !== 'track');
+
+    // Get additional information about chosen workflow definition
+    const workflowDefinition = workflowDef.find(workflow => workflow.id === formik.values.processingWorkflow);
 
     return(
         <>
@@ -19,99 +65,127 @@ const NewEventSummary = ({ onSubmit, previousPage, formik }) => {
                             <header className="no-expand">{t('EVENTS.EVENTS.NEW.METADATA.CAPTION')}</header>
                             <div className="obj-container">
                                 <table className="main-tbl">
-                                    {/*todo: get a constant containing all metadata entries and make tr for each*/}
-                                    <tr>
-                                        <td>Title</td>
-                                        <td>Testing</td>
-                                    </tr>
+                                    {/*Insert row for each metadata entry user has provided*/}
+                                    {metadata.map((entry, key) => (
+                                        <tr key={key}>
+                                            <td>{t(entry.label)}</td>
+                                            <td>{Array.isArray(entry.value) ?
+                                                entry.value.join(', ')
+                                                : entry.value}</td>
+                                        </tr>
+                                    ))}
                                 </table>
                             </div>
                         </div>
 
                         {/*Summary metadata extended*/}
-                        {/*todo: get a constant containing all metadata extended entries and make tr for each or show not at all*/}
-                        <div className="obj tbl-list">
-                            <header className="no-expand">{t('EVENTS.EVENTS.NEW.METADATA_EXTENDED.CAPTION')}</header>
-                            <div className="obj-container">
-                                <table className="main-tbl">
-                                    <tr>
-                                        <td>Neues Feld</td>
-                                        <td>Inhalt</td>
-                                    </tr>
-                                </table>
+                        {/*todo: metadata extended not implemented yet, so there are no values provided by user yet*/}
+                        {!metaDataExtendedHidden ? (
+                            <div className="obj tbl-list">
+                                <header className="no-expand">{t('EVENTS.EVENTS.NEW.METADATA_EXTENDED.CAPTION')}</header>
+                                <div className="obj-container">
+                                    <table className="main-tbl">
+                                        <tr>
+                                            <td>Placeholder Label</td>
+                                            <td>Placeholder Value</td>
+                                        </tr>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
+                        ): null}
 
                         {/*Summary upload assets*/}
-                        {/*todo: get a constant containing all asset uploads and make tr for each or show not at all*/}
-                        <div className="obj tbl-list">
-                            <header className="no-expand">{t('EVENTS.EVENTS.NEW.UPLOAD_ASSET.CAPTION')}</header>
-                            <div className="obj-container">
-                                <table className="main-tbl">
-                                    <tr>
-                                        <td>Title <span className="ui-helper-hidden"> (asset.type "asset.flavorType/asset.flavorSubType"</span></td>
-                                        <td>FileName</td>
-                                    </tr>
-                                </table>
+                        {/*Show only if asset upload page is not hidden, the sourceMode is UPLOAD and the there
+                        are actually upload assets provided by the user*/}
+                        {!assetUploadHidden && formik.values.sourceMode === 'UPLOAD' && uploadAssetsNonTrack.length > 0 ? (
+                            <div className="obj tbl-list">
+                                <header className="no-expand">{t('EVENTS.EVENTS.NEW.UPLOAD_ASSET.CAPTION')}</header>
+                                <div className="obj-container">
+                                    <table className="main-tbl">
+                                        {/*Insert row for each upload asset user has provided*/}
+                                        {uploadAssetsNonTrack.map((asset, key) => (
+                                            <tr key={key}>
+                                                <td>
+                                                    {asset.name}
+                                                    <span className="ui-helper-hidden">
+                                                        ({asset.type} "{asset.flavorType}//{asset.flavorSubType}")
+                                                    </span>
+                                                </td>
+                                                <td>{asset.value.name}</td>
+                                            </tr>
+                                        ))}
+                                    </table>
+                                </div>
                             </div>
-                        </div>
+                        ) : null}
 
-                        {/*Summary source mode UPLOAD*/}
-                        {/*todo: get a constant containing all source entries and make tr for each*/}
+
+                        {/* Summary source */}
                         <div className="obj tbl-list">
                             <header className="no-expand">{t('EVENTS.EVENTS.NEW.SOURCE.CAPTION')}</header>
                             <div className="obj-container">
-                                <table className="main-tbl">
-                                    <tr>
-                                        <td>title
-                                            <span className="ui-helper-hidden">(asset.type "asset.flavorType/asset.subFlavorType")</span>
-                                        </td>
-                                        <td>filename</td>
-                                    </tr>
-                                </table>
+                                {/*Summary source mode UPLOAD*/}
+                                {formik.values.sourceMode === 'UPLOAD' && (
+                                    <table className="main-tbl">
+                                        {/*Insert row for each upload asset of type track user has provided*/}
+                                        {uploadAssetsTrack.map((asset, key) => (
+                                            <tr key={key}>
+                                                <td>{t(asset.translate + ".SHORT")}
+                                                    <span className="ui-helper-hidden">
+                                                        ({asset.type} "{asset.flavorType}//{asset.flavorSubType}")
+                                                    </span>
+                                                </td>
+                                                <td>{asset.value.name}</td>
+                                            </tr>
+                                        ))}
+                                        <tr>
+                                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE')}</td>
+                                            <td>{t('dateFormats.date.short', { date: new Date(formik.values.startDate) })}</td>
+                                        </tr>
+                                    </table>
+                                )}
                                 {/*Summary source mode SCHEDULE-SINGLE/SCHEDULE-MULTIPLE*/}
-                                <table className="main-tbl">
-                                    <tr>
-                                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE')}</td>
-                                        <td>start-UPLOAD</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE')}</td>
-                                        <td>start-SCHEDULE</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME')}</td>
-                                        <td>start-Time-SCHEDULE</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE')}</td>
-                                        <td>end-SCHEDULE</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME')}</td>
-                                        <td>end-Time-SCHEDULE</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.REPEAT_ON')}</td>
-                                        <td>Repeat on</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAYS')}</td>
-                                        <td>weekday</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION')}</td>
-                                        <td>duration</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}</td>
-                                        <td>location</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{t('EVENTS.EVENTS.NEW.SUMMARY.SOURCE.INPUT')}</td>
-                                        <td>input</td>
-                                    </tr>
-                                </table>
+                                {(formik.values.sourceMode === 'SCHEDULE_SINGLE' || formik.values.sourceMode === 'SCHEDULE_MULTIPLE') && (
+                                    <table className="main-tbl">
+                                        <tr>
+                                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE')}</td>
+                                            <td>{t('dateFormats.date.short', { date: formik.values.scheduleStartDate })}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME')}</td>
+                                            <td>{formik.values.scheduleStartTimeHour}:{formik.values.scheduleStartTimeMinutes}</td>
+                                        </tr>
+                                        {formik.values.sourceMode === 'SCHEDULE_MULTIPLE' && (
+                                            <tr>
+                                                <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE')}</td>
+                                                <td>{t('dateFormats.date.short', { date: formik.values.scheduleEndDate })}</td>
+                                            </tr>
+                                        )}
+                                        <tr>
+                                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME')}</td>
+                                            <td>{formik.values.scheduleEndTimeHour}:{formik.values.scheduleEndTimeMinutes}</td>
+                                        </tr>
+                                        {formik.values.sourceMode === 'SCHEDULE_MULTIPLE' && (
+                                            <tr>
+                                                <td>{t('EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAYS')}</td>
+                                                <td>{formik.values.repeatOn.join(', ')}</td>
+                                            </tr>
+                                        )}
+                                        <tr>
+                                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION')}</td>
+                                            <td>{formik.values.scheduleDurationHour}:{formik.values.scheduleDurationMinutes}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>{t('EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION')}</td>
+                                            <td>{formik.values.location}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>{t('EVENTS.EVENTS.NEW.SUMMARY.SOURCE.INPUT')}</td>
+                                            <td>{formik.values.deviceInputs.join(', ')}</td>
+                                        </tr>
+                                    </table>
+                                )}
+
                             </div>
                         </div>
 
@@ -123,7 +197,7 @@ const NewEventSummary = ({ onSubmit, previousPage, formik }) => {
                             <table className="main-tbl">
                                 <tr>
                                     <td>{t('EVENTS.EVENTS.NEW.PROCESSING.WORKFLOW')}</td>
-                                    <td>Workflow title</td>
+                                    <td>{workflowDefinition.title}</td>
                                 </tr>
                                 {/*todo: repeat entry for each configuration key/value pair*/}
                                 <tr>
@@ -156,17 +230,20 @@ const NewEventSummary = ({ onSubmit, previousPage, formik }) => {
                                         </th>
                                     </tr>
                                 </thead>
-                                <tr>
-                                    <td>Policy role</td>
-                                    {/*todo: is checked whenever has read/write rights or not (ng-model)*/}
-                                    <td className="fit"><input type="checkbox" disabled /></td>
-                                    <td className="fit"><input type="checkbox" disabled /></td>
-                                    {/*todo: show only if has additional actions*/}
-                                    <td className="fit">
-                                        {/*todo: repeat for each additional actions*/}
-                                        <div>custom Action</div>
-                                    </td>
-                                </tr>
+                                {/*Insert row for each policy user has provided*/}
+                                {formik.values.policies.map((policy, key) => (
+                                    <tr key={key}>
+                                        <td>{policy.role}</td>
+                                        <td className="fit"><input type="checkbox" disabled checked={policy.read} /></td>
+                                        <td className="fit"><input type="checkbox" disabled checked={policy.write} /></td>
+                                        <td className="fit">
+                                            {/*repeat for each additional action*/}
+                                            {policy.actions.map((action, key) => (
+                                                <div key={key}>{action}</div>
+                                            ))}
+                                        </td>
+                                    </tr>
+                                ))}
                             </table>
                         </div>
                     </div>
@@ -195,4 +272,9 @@ const NewEventSummary = ({ onSubmit, previousPage, formik }) => {
     )
 }
 
-export default NewEventSummary;
+const mapStateToProps = state => ({
+    metadataEvents: getEventMetadata(state),
+    workflowDef: getWorkflowDef(state)
+})
+
+export default connect(mapStateToProps)(NewEventSummary);

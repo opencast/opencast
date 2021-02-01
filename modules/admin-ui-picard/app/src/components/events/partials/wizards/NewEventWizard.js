@@ -178,6 +178,8 @@ const NewEventWizard = ({onSubmit, metadataFields}) => {
                                 <NewEventSummary previousPage={previousPage}
                                                  nextPage={handleSubmit}
                                                  formik={formik}
+                                                 metaDataExtendedHidden={steps[1].hidden}
+                                                 assetUploadHidden={steps[3].hidden}
                                                  onSubmit={() => console.log("Step Summary onSubmit")}/>
                             )}
                         </div>
