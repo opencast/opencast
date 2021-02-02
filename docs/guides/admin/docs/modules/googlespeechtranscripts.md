@@ -247,6 +247,23 @@ A sample one can be found in etc/workflows/google-speech-attach-transcripts.xml
     </operation>
 
 ```
+Transcription delay before cancellation
+-------------------
+If an event is deleted before the end of Google transcription process, or the Google Speech to Text API has some issues, or
+something unexpected happens, the transcription process for the event will not be immediately cancelled.
+Instead, transcription will be attempted several times based on the video duration and configuration properties: `completion.check.buffer` and `max.processing.time`.
+
+`Video duration` + `completion.check.buffer` + `max.processing.time` set the duration before a 
+Google transcription job is cancelled.
+
+`completion.check.buffer` 5 minutes by default
+
+`completion.check.buffer` 5 hours by default.
+
+All these values can be changed in Google Transcription properties file: _etc/org.opencastproject.transcription.googlespeech.GoogleSpeechTranscriptionService.cfg_
+
+For example, if you have a 30 min video, using the default values, it will take 5 hours and 35 min before the transcription
+is cancelled (when something goes wrong).
 
 Workflow Operations
 -------------------

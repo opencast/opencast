@@ -606,7 +606,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     } catch (Exception e) {
       if (hasTranscriptionRequestExpired(jobId)) {
         // Cancel the job and inform admin
-        cancelTranscription(jobId, "Transcription job canceled due to errors");
+        cancelTranscription(jobId, "Google Transcription job canceled due to errors");
+        logger.info("Google Transcription job {} has been canceled. Email notification sent", jobId);
       }
       String msg = String.format("Exception when calling the recognitions endpoint for media package %s, job id %s",
               mpId, jobId);
@@ -880,9 +881,10 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
         deleteStorageFile(mpId, token);
       } catch (Exception ex) {
         logger.warn(String.format("could not delete file %s.%s from Google cloud storage", mpId, defaultEncoding), ex);
+      } finally {
+        // Send notification email
+        sendEmail("Transcription ERROR", String.format("%s(media package %s, job id %s).", message, mpId, jobId));
       }
-      // Send notification email
-      sendEmail("Transcription ERROR", String.format("%s(media package %s, job id %s).", message, mpId, jobId));
     } catch (Exception e) {
       logger.error(String.format("ERROR while deleting transcription job: %s", jobId), e);
     }
@@ -897,8 +899,25 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       }
     } catch (Exception e) {
       logger.error(String.format("ERROR while calculating transcription request expiration for job: %s", jobId), e);
+      // to avoid perpetual non-expired state, transcription is set as expired
+      return true;
     }
     return false;
+  }
+
+  private long getRemainingTranscriptionExpireTimeInMin(String jobId) {
+    try {
+      long expiredTime = (database.findByJob(jobId).getDateCreated().getTime() + database.findByJob(jobId).getTrackDuration()
+              + (completionCheckBuffer + maxProcessingSeconds) * 1000) - (System.currentTimeMillis());
+      // Transcription has expired
+      if (expiredTime < 0) {
+        expiredTime = 0;
+      }
+      return TimeUnit.MILLISECONDS.toMinutes(expiredTime);
+    } catch (Exception e) {
+      logger.error("Unable to calculate remaining transcription expired time for transcription job {}", jobId);
+    }
+    return 0;
   }
 
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
@@ -1042,7 +1061,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
             }
           }
 
-          // Jobs that get here have state TranscriptionCompleted
+          // Jobs that get here have state TranscriptionCompleted or had an IOException]
           try {
 
             // Apply workflow to attach transcripts
@@ -1079,10 +1098,12 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     if (r.getSize() == 0) {
       if (!hasTranscriptionRequestExpired(jobId)) {
         // Media package not archived but still within completion time? Skip until next time.
-        logger.warn("Media package {} has not been archived yet. Skipped.", mpId);
+        logger.warn("Media package {} has not been archived yet or has been deleted. Will keep trying for {} "
+                + "more minutes before cancelling transcription job {}.", mpId, getRemainingTranscriptionExpireTimeInMin(jobId), jobId);
       } else {
         // Close transcription job and email admin
-        cancelTranscription(jobId, "Transcription job canceled, archived media package not found");
+        cancelTranscription(jobId, " Google Transcription job canceled, archived media package not found");
+        logger.info("Google Transcription job {} has been canceled. Email notification sent", jobId);
       }
       return null;
     }
