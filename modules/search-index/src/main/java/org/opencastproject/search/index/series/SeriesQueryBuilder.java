@@ -54,9 +54,6 @@ public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<Series
     super(query);
   }
 
-  /**
-   * @see org.opencastproject.matterhorn.search.impl.AbstractElasticsearchQueryBuilder#buildQuery(org.opencastproject.matterhorn.search.SearchQuery)
-   */
   @Override
   public void buildQuery(SeriesSearchQuery query) {
     // Organization

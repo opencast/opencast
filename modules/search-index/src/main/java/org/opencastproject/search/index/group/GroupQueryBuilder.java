@@ -54,9 +54,6 @@ public class GroupQueryBuilder extends AbstractElasticsearchQueryBuilder<GroupSe
     super(query);
   }
 
-  /**
-   * @see org.opencastproject.matterhorn.search.impl.AbstractElasticsearchQueryBuilder#buildQuery(org.opencastproject.matterhorn.search.SearchQuery)
-   */
   @Override
   public void buildQuery(GroupSearchQuery query) {
     // Organization

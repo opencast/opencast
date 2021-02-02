@@ -49,9 +49,6 @@ public class ThemeQueryBuilder extends AbstractElasticsearchQueryBuilder<ThemeSe
     super(query);
   }
 
-  /**
-   * @see org.opencastproject.matterhorn.search.impl.AbstractElasticsearchQueryBuilder#buildQuery(org.opencastproject.matterhorn.search.SearchQuery)
-   */
   @Override
   public void buildQuery(ThemeSearchQuery query) {
     // Organization

@@ -53,9 +53,6 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     super(query);
   }
 
-  /**
-   * @see org.opencastproject.matterhorn.search.impl.AbstractElasticsearchQueryBuilder#buildQuery(org.opencastproject.matterhorn.search.SearchQuery)
-   */
   @Override
   public void buildQuery(EventSearchQuery query) {
     // Organization
