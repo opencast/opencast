@@ -96,7 +96,7 @@ public class IndexRebuildService {
     recreateService(index, IndexRecreateObject.Service.Scheduler);
     recreateService(index, IndexRecreateObject.Service.Workflow);
     recreateService(index, IndexRecreateObject.Service.AssetManager);
-
+    recreateService(index, IndexRecreateObject.Service.Comments);
   }
 
   /**
